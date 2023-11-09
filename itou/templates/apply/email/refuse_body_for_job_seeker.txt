@@ -1,10 +1,10 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
 
-Votre candidature chez {{ job_application.to_siae.display_name }} n'a malheureusement pas pu aboutir.
+Votre candidature chez {{ job_application.to_company.display_name }} n'a malheureusement pas pu aboutir.
 
 {% if job_application.is_refused_due_to_deactivation %}
-Pour l'instant cette SIAE n'est plus habilitée à recevoir de candidatures. 
+Pour l'instant cette SIAE n'est plus habilitée à recevoir de candidatures.
 {% endif %}
 
 Nous vous souhaitons bon courage dans votre recherche et sommes persuadés que votre démarche aboutira ailleurs.

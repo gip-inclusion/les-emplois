@@ -154,12 +154,12 @@ class Command(BaseCommand):
             .filter(
                 status=Status.ARCHIVED,
                 job_application__approval__end_at__gte=prolongation_cutoff,  # Take approvals that can still be used
-                asp_id=F("job_application__to_siae__convention__asp_id"),  # Exclude orphans
+                asp_id=F("job_application__to_company__convention__asp_id"),  # Exclude orphans
                 last_employee_record_snapshot__lt=F("last_approval_change"),
             )
             .order_by(
                 "job_application__approval__number",
-                "job_application__to_siae__siret",
+                "job_application__to_company__siret",
             )
         )
 

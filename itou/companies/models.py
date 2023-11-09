@@ -86,10 +86,13 @@ class CompanyQuerySet(OrganizationQuerySet):
             COALESCE((
                 SELECT COUNT(U0."id") AS "count"
                 FROM "job_applications_jobapplication" U0
-                WHERE (U0."created_at" >= 2021-06-10 08:45:51.998244 + 00:00 AND U0."to_siae_id" = "siaes_siae"."id")
-                GROUP BY U0."to_siae_id"), 0) AS "count_recent_received_job_apps"
+                WHERE (
+                    U0."created_at" >= 2021-06-10 08:45:51.998244 + 00:00
+                    AND U0."to_company_id" = "siaes_siae"."id"
+                )
+                GROUP BY U0."to_company_id"), 0) AS "count_recent_received_job_apps"
         FROM
-            "siaes_siae"
+            "companies_company"
 
         See https://github.com/martsberger/django-sql-utils
         """
@@ -99,11 +102,11 @@ class CompanyQuerySet(OrganizationQuerySet):
         sub_query = Subquery(
             (
                 job_application_model.objects.filter(
-                    to_siae=OuterRef("id"),
+                    to_company=OuterRef("id"),
                     created_at__gte=timezone.now()
                     - timezone.timedelta(weeks=job_application_model.WEEKS_BEFORE_CONSIDERED_OLD),
                 )
-                .values("to_siae")  # group job apps by to_siae
+                .values("to_company")  # group job apps by to_company
                 .annotate(count=Count("pk"))
                 .values("count")
             ),

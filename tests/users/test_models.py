@@ -398,7 +398,7 @@ class ModelTest(TestCase):
     def test_last_hire_was_made_by_siae(self):
         job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
         user = job_application.job_seeker
-        company_1 = job_application.to_siae
+        company_1 = job_application.to_company
         assert user.last_hire_was_made_by_siae(company_1)
         company_2 = CompanyFactory()
         assert not user.last_hire_was_made_by_siae(company_2)

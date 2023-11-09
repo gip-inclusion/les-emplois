@@ -13,7 +13,7 @@
         {% else %}
             La candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
         {% endif %}
-        <b>a bien été envoyée chez {{ job_application.to_siae.display_name }}</b>.
+        <b>a bien été envoyée chez {{ job_application.to_company.display_name }}</b>.
     </p>
 {% endblock %}
 

@@ -23,8 +23,8 @@ class EmployeeRecordEligibilityTest(TestCase):
         # Hiring SIAE is the expected SIAE
         company_good = CompanyFactory()
         company_bad = CompanyFactory()
-        eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=company_good)
-        non_eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=company_bad)
+        eligible_job_application = JobApplicationFactory(with_approval=True, to_company=company_good)
+        non_eligible_job_application = JobApplicationFactory(with_approval=True, to_company=company_bad)
 
         assert eligible_job_application in JobApplication.objects.eligible_as_employee_record(company_good)
         assert non_eligible_job_application not in JobApplication.objects.eligible_as_employee_record(company_good)
@@ -32,8 +32,8 @@ class EmployeeRecordEligibilityTest(TestCase):
     def test_existing_employee_record(self):
         # A job application must not have any employee record linked if newly created
         company = CompanyFactory()
-        non_eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=company)
-        eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=company)
+        non_eligible_job_application = JobApplicationFactory(with_approval=True, to_company=company)
+        eligible_job_application = JobApplicationFactory(with_approval=True, to_company=company)
         EmployeeRecordWithProfileFactory(job_application=non_eligible_job_application, status=er_enums.Status.READY)
 
         assert non_eligible_job_application not in JobApplication.objects.eligible_as_employee_record(company)
@@ -45,8 +45,8 @@ class EmployeeRecordEligibilityTest(TestCase):
         company_bad = CompanyFactory(kind=companies_enums.CompanyKind.EATT)
         # job application created with a fake approval
         # to avoid filtering criteria with empty approval
-        non_eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=company_bad)
-        eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=company_good)
+        non_eligible_job_application = JobApplicationFactory(with_approval=True, to_company=company_bad)
+        eligible_job_application = JobApplicationFactory(with_approval=True, to_company=company_good)
 
         assert non_eligible_job_application not in JobApplication.objects.eligible_as_employee_record(company_bad)
         assert eligible_job_application not in JobApplication.objects.eligible_as_employee_record(company_bad)
@@ -55,10 +55,10 @@ class EmployeeRecordEligibilityTest(TestCase):
         # Employee record creation can be blocked via admin for a given job application
         company = CompanyFactory()
         non_eligible_job_application = JobApplicationFactory(
-            with_approval=True, to_siae=company, create_employee_record=False
+            with_approval=True, to_company=company, create_employee_record=False
         )
         eligible_job_application = JobApplicationFactory(
-            with_approval=True, to_siae=company, create_employee_record=True
+            with_approval=True, to_company=company, create_employee_record=True
         )
 
         assert non_eligible_job_application not in JobApplication.objects.eligible_as_employee_record(company)
@@ -70,9 +70,11 @@ class EmployeeRecordEligibilityTest(TestCase):
         good_ts = EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE + timedelta(days=1)
         company = CompanyFactory()
         non_eligible_job_application = JobApplicationFactory(
-            with_approval=True, to_siae=company, hiring_start_at=bad_ts
+            with_approval=True, to_company=company, hiring_start_at=bad_ts
         )
-        eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=company, hiring_start_at=good_ts)
+        eligible_job_application = JobApplicationFactory(
+            with_approval=True, to_company=company, hiring_start_at=good_ts
+        )
 
         assert non_eligible_job_application not in JobApplication.objects.eligible_as_employee_record(company)
         assert eligible_job_application in JobApplication.objects.eligible_as_employee_record(company)
@@ -81,8 +83,8 @@ class EmployeeRecordEligibilityTest(TestCase):
         # Job application must be linked to an existing approval to be eligible
         company = CompanyFactory()
 
-        non_eligible_job_application = JobApplicationWithoutApprovalFactory(to_siae=company)
-        eligible_job_application = JobApplicationFactory(with_approval=True, to_siae=company)
+        non_eligible_job_application = JobApplicationWithoutApprovalFactory(to_company=company)
+        eligible_job_application = JobApplicationFactory(with_approval=True, to_company=company)
 
         assert non_eligible_job_application not in JobApplication.objects.eligible_as_employee_record(company)
         assert eligible_job_application in JobApplication.objects.eligible_as_employee_record(company)
@@ -97,9 +99,9 @@ def test_existing_new_employee_records():
     # This about displaying "unfinished" and uncomplete employee records.
     company = CompanyFactory()
     expected_employee_record = EmployeeRecordWithProfileFactory(
-        job_application__to_siae=company, status=er_enums.Status.NEW
+        job_application__to_company=company, status=er_enums.Status.NEW
     )
-    EmployeeRecordWithProfileFactory(job_application__to_siae=company, status=er_enums.Status.READY)
+    EmployeeRecordWithProfileFactory(job_application__to_company=company, status=er_enums.Status.READY)
 
     assert list(JobApplication.objects.eligible_as_employee_record(company)) == [
         expected_employee_record.job_application
@@ -109,13 +111,13 @@ def test_existing_new_employee_records():
 def test_existing_new_employee_records_are_not_eligible_with_a_different_asp_id():
     employee_record = EmployeeRecordWithProfileFactory(status=er_enums.Status.NEW, asp_id=0)
 
-    assert list(JobApplication.objects.eligible_as_employee_record(employee_record.job_application.to_siae)) == []
+    assert list(JobApplication.objects.eligible_as_employee_record(employee_record.job_application.to_company)) == []
 
 
 @pytest.mark.parametrize("field", ["asp_measure", "siret", "approval_number"])
 def test_existing_new_employee_records_are_eligible_with_a_different_value_for_field(field):
     employee_record = EmployeeRecordWithProfileFactory(status=er_enums.Status.NEW, **{field: ""})
 
-    assert list(JobApplication.objects.eligible_as_employee_record(employee_record.job_application.to_siae)) == [
+    assert list(JobApplication.objects.eligible_as_employee_record(employee_record.job_application.to_company)) == [
         employee_record.job_application
     ]

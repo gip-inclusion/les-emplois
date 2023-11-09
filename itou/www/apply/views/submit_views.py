@@ -163,7 +163,7 @@ class ApplicationBaseView(ApplyStepBaseView):
 
     def get_previous_applications_queryset(self):
         # Useful in CheckPreviousApplications and ApplicationJobsView
-        return self.job_seeker.job_applications.filter(to_siae=self.siae)
+        return self.job_seeker.job_applications.filter(to_company=self.siae)
 
 
 class ApplyStepForSenderBaseView(ApplyStepBaseView):
@@ -1029,7 +1029,7 @@ class ApplicationResumeView(ApplicationBaseView):
     def post(self, request, *args, **kwargs):
         # Prevent multiple rapid clicks on the submit button to create multiple job applications.
         job_application = (
-            self.job_seeker.job_applications.filter(to_siae=self.siae).created_in_past(seconds=10).first()
+            self.job_seeker.job_applications.filter(to_company=self.siae).created_in_past(seconds=10).first()
         )
         if job_application:
             return HttpResponseRedirect(
@@ -1041,7 +1041,7 @@ class ApplicationResumeView(ApplicationBaseView):
             # Fill the job application with the required information
             job_application = JobApplication(
                 job_seeker=self.job_seeker,
-                to_siae=self.siae,
+                to_company=self.siae,
                 sender=request.user,
                 sender_kind=request.user.kind,
                 message=self.form.cleaned_data["message"],
@@ -1142,7 +1142,7 @@ class ApplicationEndView(ApplyStepBaseView):
         super().setup(request, *args, **kwargs)
 
         self.job_application = get_object_or_404(
-            JobApplication.objects.select_related("job_seeker", "to_siae"),
+            JobApplication.objects.select_related("job_seeker", "to_company"),
             pk=kwargs.get("application_pk"),
         )
         self.form = CreateOrUpdateJobSeekerStep2Form(

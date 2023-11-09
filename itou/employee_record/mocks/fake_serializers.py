@@ -16,7 +16,7 @@ class TestEmployeeRecordSerializer(EmployeeRecordSerializer):
 
         result = super().to_representation(instance)
         # Map test fields / values
-        result["siret"] = get_staging_siret_from_kind(instance.job_application.to_siae.kind, instance.siret)
+        result["siret"] = get_staging_siret_from_kind(instance.job_application.to_company.kind, instance.siret)
 
         return result
 
@@ -38,7 +38,7 @@ class TestEmployeeRecordUpdateNotificationSerializer(EmployeeRecordUpdateNotific
 
         # Map test fields / values
         result["siret"] = get_staging_siret_from_kind(
-            instance.employee_record.job_application.to_siae.kind, instance.siret
+            instance.employee_record.job_application.to_company.kind, instance.siret
         )
 
         return result

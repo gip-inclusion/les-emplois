@@ -160,7 +160,7 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
             .values_list("pk", flat=True)
         )
         try:
-            return queryset.filter(job_application__to_siae__id__in=siaes).order_by("-created_at", "-updated_at")
+            return queryset.filter(job_application__to_company__id__in=siaes).order_by("-created_at", "-updated_at")
         finally:
             # Tracking is currently done via user-agent header
             logger.info(

@@ -47,7 +47,7 @@ class ApplicantsView(generics.ListAPIView):
         siae_id = self.request.user.companymembership_set.get().siae_id
 
         return (
-            User.objects.filter(job_applications__to_siae_id=siae_id, kind=UserKind.JOB_SEEKER)
+            User.objects.filter(job_applications__to_company_id=siae_id, kind=UserKind.JOB_SEEKER)
             .select_related("jobseeker_profile__birth_place", "jobseeker_profile__birth_country")
             .prefetch_related("job_applications")
             .order_by("-pk")

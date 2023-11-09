@@ -40,7 +40,7 @@ def get_org_members_count(org):
 
 def _get_ja_sent_by_prescribers_without_org():
     return JobApplication.objects.filter(
-        to_siae_id__in=get_active_siae_pks(),
+        to_company_id__in=get_active_siae_pks(),
         sender_kind=SenderKind.PRESCRIBER,
         sender_prescriber_organization=None,
     ).exclude(origin=Origin.PE_APPROVAL)

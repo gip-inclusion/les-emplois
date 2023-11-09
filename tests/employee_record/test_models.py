@@ -136,10 +136,10 @@ class EmployeeRecordModelTest(TestCase):
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application)
 
-        old_siae, old_approval = job_application.to_siae, job_application.approval
+        old_siae, old_approval = job_application.to_company, job_application.approval
         new_company, new_approval = CompanyFactory(), ApprovalFactory()
 
-        employee_record.job_application.to_siae = new_company
+        employee_record.job_application.to_company = new_company
         employee_record.job_application.approval = new_approval
         employee_record.job_application.save()
 
@@ -293,8 +293,8 @@ def test_clone_for_orphan_employee_record(status):
     # Check fields that are copied or possibly overwritten
     assert clone.job_application == employee_record.job_application
     assert clone.approval_number == employee_record.approval_number
-    assert clone.asp_id == employee_record.job_application.to_siae.convention.asp_id
-    assert clone.siret == employee_record.job_application.to_siae.siret
+    assert clone.asp_id == employee_record.job_application.to_company.convention.asp_id
+    assert clone.siret == employee_record.job_application.to_company.siret
 
     # Check fields that should be empty
     assert clone.asp_processing_code is None
@@ -325,7 +325,7 @@ def test_clone_without_primary_key():
 
 
 def test_clone_without_convention():
-    employee_record = EmployeeRecordFactory(orphan=True, job_application__to_siae__convention=None)
+    employee_record = EmployeeRecordFactory(orphan=True, job_application__to_company__convention=None)
     with pytest.raises(CloningError, match=r"SIAE \d{14} has no convention"):
         employee_record.clone()
 
@@ -478,7 +478,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
     )
     def test_state_disabled(self, _mock):
         assert self.employee_record.job_application not in JobApplication.objects.eligible_as_employee_record(
-            self.employee_record.job_application.to_siae
+            self.employee_record.job_application.to_company
         )
 
         # Employee record in READY state can't be disabled
@@ -519,7 +519,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
 
         assert self.employee_record.job_application not in JobApplication.objects.eligible_as_employee_record(
-            self.employee_record.job_application.to_siae
+            self.employee_record.job_application.to_company
         )
 
         self.employee_record.update_as_rejected("12", "JSON Invalide", None)
@@ -568,7 +568,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
     )
     def test_reactivate_when_the_siae_has_changed(self, _mock):
         new_company = CompanyFactory(use_employee_record=True)
-        old_company = self.employee_record.job_application.to_siae
+        old_company = self.employee_record.job_application.to_company
 
         assert self.employee_record.siret == old_company.siret
         assert self.employee_record.asp_id == old_company.asp_id
@@ -578,7 +578,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.employee_record.update_as_disabled()
 
         # Change SIAE
-        self.employee_record.job_application.to_siae = new_company
+        self.employee_record.job_application.to_company = new_company
         self.employee_record.job_application.save()
         self.employee_record.refresh_from_db()
         # Reactivate the employee record
@@ -694,15 +694,19 @@ class TestEmployeeRecordQueryset:
     def test_for_siae(self):
         employee_record_1, employee_record_2 = EmployeeRecordFactory.create_batch(2)
 
-        assert EmployeeRecord.objects.for_company(employee_record_1.job_application.to_siae).get() == employee_record_1
-        assert EmployeeRecord.objects.for_company(employee_record_2.job_application.to_siae).get() == employee_record_2
+        assert (
+            EmployeeRecord.objects.for_company(employee_record_1.job_application.to_company).get() == employee_record_1
+        )
+        assert (
+            EmployeeRecord.objects.for_company(employee_record_2.job_application.to_company).get() == employee_record_2
+        )
 
     def test_for_siae_with_different_asp_id(self):
         employee_record = EmployeeRecordFactory(
             asp_id=0,
         )
 
-        assert list(EmployeeRecord.objects.for_company(employee_record.job_application.to_siae)) == []
+        assert list(EmployeeRecord.objects.for_company(employee_record.job_application.to_company)) == []
 
 
 @pytest.mark.parametrize("factory", [BareEmployeeRecordFactory, BareEmployeeRecordUpdateNotificationFactory])

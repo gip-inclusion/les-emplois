@@ -119,7 +119,7 @@ def get_hiring_siae(job_seeker):
     hirings = [ja for ja in job_seeker.job_applications.all() if ja.state == JobApplicationWorkflow.STATE_ACCEPTED]
     if hirings:
         latest_hiring = max(hirings, key=attrgetter("created_at"))
-        return latest_hiring.to_siae
+        return latest_hiring.to_company
     return None
 
 

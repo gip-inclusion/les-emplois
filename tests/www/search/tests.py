@@ -166,13 +166,13 @@ class SearchSiaeTest(TestCase):
 
         # Many job descriptions and job applications.
         company = CompanyFactory(with_jobs=True, department="44", coords=guerande.coords, post_code="44350")
-        JobApplicationFactory(to_siae=company)
+        JobApplicationFactory(to_company=company)
         created_companies.append(company)
 
         # Many job descriptions and more job applications than the first one.
         company = CompanyFactory(with_jobs=True, department="44", coords=guerande.coords, post_code="44350")
-        JobApplicationFactory(to_siae=company)
-        JobApplicationFactory(to_siae=company)
+        JobApplicationFactory(to_company=company)
+        JobApplicationFactory(to_company=company)
         created_companies.append(company)
 
         # No job description, no job application.
@@ -216,11 +216,11 @@ class SearchSiaeTest(TestCase):
         city = create_city_saint_andre()
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117", with_membership=True)
         job = JobDescriptionFactory(siae=company)
-        JobApplicationFactory.create_batch(20, to_siae=company, selected_jobs=[job], state="new")
+        JobApplicationFactory.create_batch(20, to_company=company, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
         self.assertNotContains(response, """20+<span class="ms-1">candidatures</span>""", html=True)
 
-        JobApplicationFactory(to_siae=company, selected_jobs=[job], state="new")
+        JobApplicationFactory(to_company=company, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
         self.assertContains(
             response,
@@ -447,11 +447,11 @@ class JobDescriptionSearchViewTest(TestCase):
         city = create_city_saint_andre()
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117")
         job = JobDescriptionFactory(siae=company)
-        JobApplicationFactory.create_batch(20, to_siae=company, selected_jobs=[job], state="new")
+        JobApplicationFactory.create_batch(20, to_company=company, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
         self.assertNotContains(response, """20+<span class="ms-1">candidatures</span>""", html=True)
 
-        JobApplicationFactory(to_siae=company, selected_jobs=[job], state="new")
+        JobApplicationFactory(to_company=company, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
         self.assertContains(
             response,

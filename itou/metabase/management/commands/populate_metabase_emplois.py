@@ -208,7 +208,7 @@ class Command(BaseCommand):
         of prescriber users *without* any organization.
         """
         active_user_created_job_applications_filter = Q(
-            ~Q(jobapplication__origin=Origin.PE_APPROVAL) & Q(jobapplication__to_siae_id__in=get_active_siae_pks())
+            ~Q(jobapplication__origin=Origin.PE_APPROVAL) & Q(jobapplication__to_company_id__in=get_active_siae_pks())
         )
         job_applications_count = Count(
             "jobapplication",
@@ -284,7 +284,7 @@ class Command(BaseCommand):
                 ),
                 Prefetch(
                     "job_applications",
-                    queryset=JobApplication.objects.select_related("to_siae"),
+                    queryset=JobApplication.objects.select_related("to_company"),
                 ),
                 "created_by",
             )
@@ -309,7 +309,9 @@ class Command(BaseCommand):
 
     def populate_job_applications(self):
         queryset = (
-            JobApplication.objects.select_related("to_siae", "sender", "sender_siae", "sender_prescriber_organization")
+            JobApplication.objects.select_related(
+                "to_company", "sender", "sender_siae", "sender_prescriber_organization"
+            )
             .prefetch_related("logs")
             .only(
                 "pk",
@@ -327,16 +329,16 @@ class Command(BaseCommand):
                 "state",
                 "refusal_reason",
                 "job_seeker_id",
-                "to_siae__kind",
-                "to_siae__brand",
-                "to_siae__name",
-                "to_siae__department",
+                "to_company__kind",
+                "to_company__brand",
+                "to_company__name",
+                "to_company__department",
                 "approval_id",
                 "approval_delivery_mode",
                 "contract_type",
             )
             .exclude(origin=Origin.PE_APPROVAL)
-            .filter(to_siae_id__in=get_active_siae_pks())
+            .filter(to_company_id__in=get_active_siae_pks())
             .all()
         )
 
@@ -348,7 +350,7 @@ class Command(BaseCommand):
         """
         queryset = (
             JobApplication.objects.exclude(origin=Origin.PE_APPROVAL)
-            .filter(to_siae_id__in=get_active_siae_pks())
+            .filter(to_company_id__in=get_active_siae_pks())
             .exclude(selected_jobs=None)
             .values("pk", "selected_jobs__id")
         )
@@ -364,7 +366,7 @@ class Command(BaseCommand):
         the SAFIR code.
         """
         queryset1 = Approval.objects.prefetch_related(
-            "user", "user__job_applications", "user__job_applications__to_siae"
+            "user", "user__job_applications", "user__job_applications__to_company"
         ).all()
         queryset2 = PoleEmploiApproval.objects.filter(
             start_at__gte=approvals.POLE_EMPLOI_APPROVAL_MINIMUM_START_DATE

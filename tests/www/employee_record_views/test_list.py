@@ -30,7 +30,7 @@ class ListEmployeeRecordsTest(TestCase):
         )
         self.user = self.company.members.get(first_name="Elliot")
         self.user_without_perms = self.company_without_perms.members.get(first_name="Hannibal")
-        self.job_application = JobApplicationWithApprovalNotCancellableFactory(to_siae=self.company)
+        self.job_application = JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:list")
 
@@ -76,7 +76,7 @@ class ListEmployeeRecordsTest(TestCase):
 
     def test_job_seeker_filter(self):
         approval_number_formatted = format_filters.format_approval_number(self.job_application.approval.number)
-        other_job_application = JobApplicationWithApprovalNotCancellableFactory(to_siae=self.company)
+        other_job_application = JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
         other_approval_number_formatted = format_filters.format_approval_number(other_job_application.approval.number)
         self.client.force_login(self.user)
 
@@ -108,7 +108,7 @@ class ListEmployeeRecordsTest(TestCase):
     def test_employee_records_with_a_suspension_need_to_be_updated(self):
         self.client.force_login(self.user)
         approvals_factories.SuspensionFactory(
-            approval=self.job_application.approval, siae=self.job_application.to_siae
+            approval=self.job_application.approval, siae=self.job_application.to_company
         )
 
         response = self.client.get(self.url + "?status=NEW")
@@ -124,7 +124,7 @@ class ListEmployeeRecordsTest(TestCase):
         self.client.force_login(self.user)
         approvals_factories.ProlongationFactory(
             approval=self.job_application.approval,
-            declared_by_siae=self.job_application.to_siae,
+            declared_by_siae=self.job_application.to_company,
         )
 
         response = self.client.get(self.url + "?status=NEW")
@@ -182,7 +182,7 @@ class ListEmployeeRecordsTest(TestCase):
     def test_rejected_without_custom_message(self):
         self.client.force_login(self.user)
 
-        record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_siae=self.company)
+        record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_company=self.company)
         record.update_as_ready()
         record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
         record.update_as_rejected("0012", "JSON Invalide", None)
@@ -194,7 +194,7 @@ class ListEmployeeRecordsTest(TestCase):
     def test_rejected_custom_messages(self):
         self.client.force_login(self.user)
 
-        record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_siae=self.company)
+        record = employee_record_factories.EmployeeRecordWithProfileFactory(job_application__to_company=self.company)
 
         tests_specs = [
             (
@@ -247,12 +247,12 @@ class ListEmployeeRecordsTest(TestCase):
         self.client.force_login(self.user)
 
         job_applicationA = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.company,
+            to_company=self.company,
             job_seeker__last_name="Aaaaa",
             hiring_start_at=timezone.now() - relativedelta(days=15),
         )
         job_applicationZ = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.company,
+            to_company=self.company,
             job_seeker__last_name="Zzzzz",
             hiring_start_at=timezone.now() - relativedelta(days=10),
         )
@@ -283,12 +283,12 @@ class ListEmployeeRecordsTest(TestCase):
         self.client.force_login(self.user)
 
         recordA = employee_record_factories.EmployeeRecordWithProfileFactory(
-            job_application__to_siae=self.company,
+            job_application__to_company=self.company,
             job_application__job_seeker__last_name="Aaaaa",
             job_application__hiring_start_at=timezone.now() - relativedelta(days=15),
         )
         recordZ = employee_record_factories.EmployeeRecordWithProfileFactory(
-            job_application__to_siae=self.company,
+            job_application__to_company=self.company,
             job_application__job_seeker__last_name="Zzzzz",
             job_application__hiring_start_at=timezone.now() - relativedelta(days=10),
         )
@@ -330,12 +330,12 @@ class ListEmployeeRecordsTest(TestCase):
         self.client.force_login(self.user)
 
         recordA = employee_record_factories.EmployeeRecordWithProfileFactory(
-            job_application__to_siae=self.company,
+            job_application__to_company=self.company,
             job_application__job_seeker__last_name="Aaaaa",
             job_application__hiring_start_at=timezone.now() - relativedelta(days=15),
         )
         recordZ = employee_record_factories.EmployeeRecordWithProfileFactory(
-            job_application__to_siae=self.company,
+            job_application__to_company=self.company,
             job_application__job_seeker__last_name="Zzzzz",
             job_application__hiring_start_at=timezone.now() - relativedelta(days=10),
         )
@@ -374,7 +374,7 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url + "?status=NEW")
         self.assertContains(response, "1 résultat")
 
-        JobApplicationWithApprovalNotCancellableFactory(to_siae=self.company)
+        JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
         response = self.client.get(self.url + "?status=NEW")
         self.assertContains(response, "2 résultats")
 

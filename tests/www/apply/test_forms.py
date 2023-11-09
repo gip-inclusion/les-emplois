@@ -93,8 +93,8 @@ class RefusalFormTest(TestCase):
 class TestAcceptForm:
     def test_accept_form_without_geiq(self):
         # Job application accept form for a "standard" SIAE
-        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.EI)
-        form = apply_forms.AcceptForm(siae=job_application.to_siae)
+        job_application = JobApplicationFactory(to_company__kind=CompanyKind.EI)
+        form = apply_forms.AcceptForm(siae=job_application.to_company)
 
         assert sorted(form.fields.keys()) == [
             "answer",
@@ -124,15 +124,15 @@ class TestAcceptForm:
             "qualification_type",
         ]
         # Job application accept form for a GEIQ: more fields
-        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ)
-        form = apply_forms.AcceptForm(siae=job_application.to_siae)
+        job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
+        form = apply_forms.AcceptForm(siae=job_application.to_company)
 
         assert sorted(form.fields.keys()) == EXPECTED_FIELDS
 
         # Dynamic contract type details field
-        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ)
+        job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
         form = apply_forms.AcceptForm(
-            siae=job_application.to_siae,
+            siae=job_application.to_company,
             data={"contract_type": ContractType.OTHER},
         )
         assert sorted(form.fields.keys()) == EXPECTED_FIELDS
@@ -140,10 +140,10 @@ class TestAcceptForm:
     def test_accept_form_geiq_required_fields_validation(self, faker):
         [city] = create_test_cities(["54"], num_per_department=1)
         create_test_romes_and_appellations(["N4105"], appellations_per_rome=2)
-        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ)
-        job_description = JobDescriptionFactory(siae=job_application.to_siae, location=None)
+        job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
+        job_description = JobDescriptionFactory(siae=job_application.to_company, location=None)
         post_data = {"hiring_start_at": f"{datetime.now():%Y-%m-%d}"}
-        form = apply_forms.AcceptForm(siae=job_application.to_siae, data=post_data)
+        form = apply_forms.AcceptForm(siae=job_application.to_company, data=post_data)
         sorted_errors = dict(sorted(form.errors.items()))
         assert sorted_errors == {
             "contract_type": ["Ce champ est obligatoire."],
@@ -156,7 +156,7 @@ class TestAcceptForm:
         }
 
         post_data |= {"prehiring_guidance_days": faker.pyint()}
-        form = apply_forms.AcceptForm(siae=job_application.to_siae, data=post_data)
+        form = apply_forms.AcceptForm(siae=job_application.to_company, data=post_data)
         sorted_errors = dict(sorted(form.errors.items()))
         assert sorted_errors == {
             "contract_type": ["Ce champ est obligatoire."],
@@ -171,7 +171,7 @@ class TestAcceptForm:
         post_data |= {"hired_job": job_description.pk, "location": city.pk}
 
         post_data |= {"contract_type": ContractType.APPRENTICESHIP}
-        form = apply_forms.AcceptForm(siae=job_application.to_siae, data=post_data)
+        form = apply_forms.AcceptForm(siae=job_application.to_company, data=post_data)
         sorted_errors = dict(sorted(form.errors.items()))
         assert sorted_errors == {
             "nb_hours_per_week": ["Ce champ est obligatoire."],
@@ -187,13 +187,13 @@ class TestAcceptForm:
             "planned_training_hours": faker.pyint(),
             "contract_type": ContractType.PROFESSIONAL_TRAINING,
         }
-        form = apply_forms.AcceptForm(siae=job_application.to_siae, data=post_data)
+        form = apply_forms.AcceptForm(siae=job_application.to_company, data=post_data)
         assert form.is_valid()
 
     def test_accept_form_geiq_contract_type_field_validation(self, faker):
         create_test_romes_and_appellations(["N4105"], appellations_per_rome=2)
-        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ)
-        job_description = JobDescriptionFactory(siae=job_application.to_siae)
+        job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
+        job_description = JobDescriptionFactory(siae=job_application.to_company)
         post_data = {
             "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
             "prehiring_guidance_days": faker.pyint(),
@@ -203,7 +203,7 @@ class TestAcceptForm:
 
         # ContractType.OTHER ask for more details
         form = apply_forms.AcceptForm(
-            siae=job_application.to_siae, data=post_data | {"contract_type": ContractType.OTHER}
+            siae=job_application.to_company, data=post_data | {"contract_type": ContractType.OTHER}
         )
 
         sorted_errors = dict(sorted(form.errors.items()))
@@ -215,7 +215,7 @@ class TestAcceptForm:
         }
 
         form = apply_forms.AcceptForm(
-            siae=job_application.to_siae,
+            siae=job_application.to_company,
             data=post_data
             | {
                 "contract_type": ContractType.OTHER,
@@ -230,7 +230,7 @@ class TestAcceptForm:
 
         # ContractType.APPRENTICESHIP doesn't ask for more details
         form = apply_forms.AcceptForm(
-            siae=job_application.to_siae,
+            siae=job_application.to_company,
             data=post_data
             | {
                 "contract_type": ContractType.APPRENTICESHIP,
@@ -244,7 +244,7 @@ class TestAcceptForm:
 
         # ContractType.PROFESSIONAL_TRAINING doesn't ask for more details
         form = apply_forms.AcceptForm(
-            siae=job_application.to_siae,
+            siae=job_application.to_company,
             data=post_data
             | {
                 "contract_type": ContractType.PROFESSIONAL_TRAINING,
@@ -264,12 +264,12 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         create_test_cities(["54", "57"], num_per_department=2)
 
-        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, state="processing")
-        job_description = JobDescriptionFactory(siae=job_application.to_siae)
+        job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, state="processing")
+        job_description = JobDescriptionFactory(siae=job_application.to_company)
         city = City.objects.order_by("?").first()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
-        self.client.force_login(job_application.to_siae.members.first())
+        self.client.force_login(job_application.to_company.members.first())
 
         response = self.client.get(url_accept)
         assert response.status_code == 200
@@ -309,11 +309,11 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
 
     def test_geiq_inverted_vae_fields(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
-        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, state="processing")
-        job_description = JobDescriptionFactory(siae=job_application.to_siae)
+        job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, state="processing")
+        job_description = JobDescriptionFactory(siae=job_application.to_company)
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
-        self.client.force_login(job_application.to_siae.members.first())
+        self.client.force_login(job_application.to_company.members.first())
 
         response = self.client.get(url_accept)
         assert response.status_code == 200
@@ -347,10 +347,10 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
 
         # with a SIAE
-        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.EI, state="processing")
+        job_application = JobApplicationFactory(to_company__kind=CompanyKind.EI, state="processing")
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
-        self.client.force_login(job_application.to_siae.members.first())
+        self.client.force_login(job_application.to_company.members.first())
 
         response = self.client.get(url_accept)
         assert response.status_code == 200
@@ -378,12 +378,12 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         assert job_application.state == JobApplicationWorkflow.STATE_PROCESSING
 
         # with a GEIQ
-        job_application = JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, state="processing")
-        job_description = JobDescriptionFactory(siae=job_application.to_siae)
+        job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, state="processing")
+        job_description = JobDescriptionFactory(siae=job_application.to_company)
         post_data |= {"hired_job": job_description.pk}
 
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        self.client.force_login(job_application.to_siae.members.first())
+        self.client.force_login(job_application.to_company.members.first())
         response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
 
         assert response.status_code == 200
@@ -403,10 +403,10 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
 
     def test_specific_iae_mentions_in_accept_form(self):
         def _response(kind):
-            job_application = JobApplicationFactory(to_siae__kind=kind, state="processing")
+            job_application = JobApplicationFactory(to_company__kind=kind, state="processing")
             url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
-            self.client.force_login(job_application.to_siae.members.first())
+            self.client.force_login(job_application.to_company.members.first())
             response = self.client.get(url_accept)
 
             assert response.status_code == 200

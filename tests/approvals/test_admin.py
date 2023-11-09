@@ -75,6 +75,6 @@ def test_create_suspensionç_with_no_approval_does_raise_500(admin_client):
 
 def test_assigned_company(admin_client):
     approval = ApprovalFactory(with_jobapplication=True)
-    siae = approval.jobapplication_set.get().to_siae
+    siae = approval.jobapplication_set.get().to_company
     response = admin_client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
     assertContains(response, get_admin_view_link(siae, content=siae.display_name), count=2)

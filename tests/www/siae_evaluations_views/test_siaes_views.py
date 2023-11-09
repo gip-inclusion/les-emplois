@@ -45,7 +45,7 @@ def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_
 
     job_application = JobApplicationFactory(
         with_approval=True,
-        to_siae=siae,
+        to_company=siae,
         sender_siae=siae,
         eligibility_diagnosis=eligibility_diagnosis,
         hiring_start_at=timezone.now() - relativedelta(months=2),
@@ -891,7 +891,7 @@ class SiaeSubmitProofsViewTest(TestCase):
         super().setUp()
         membership = CompanyMembershipFactory()
         self.user = membership.user
-        self.siae = membership.siae
+        self.company = membership.siae
 
     @staticmethod
     def url(evaluated_siae):
@@ -901,7 +901,7 @@ class SiaeSubmitProofsViewTest(TestCase):
         )
 
     def test_is_submittable(self):
-        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.company, self.user)
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application
         )
@@ -927,7 +927,7 @@ class SiaeSubmitProofsViewTest(TestCase):
         assert evaluated_administrative_criteria.submitted_at is not None
 
     def test_is_not_submittable(self):
-        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.company, self.user)
         EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application, proof=None)
         self.client.force_login(self.user)
 
@@ -940,7 +940,7 @@ class SiaeSubmitProofsViewTest(TestCase):
 
     def test_is_submittable_with_accepted(self):
         fake_now = timezone.now()
-        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.company, self.user)
 
         evaluated_administrative_criteria0 = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application
@@ -970,14 +970,14 @@ class SiaeSubmitProofsViewTest(TestCase):
 
     def test_is_submittable_with_a_forgotten_submitted_doc(self):
         fake_now = timezone.now()
-        not_yet_submitted_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        not_yet_submitted_job_application = create_evaluated_siae_with_consistent_datas(self.company, self.user)
         EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=not_yet_submitted_job_application,
             proof=FileFactory(),
             submitted_at=None,
         )
         submitted_job_application = EvaluatedJobApplicationFactory(
-            job_application=JobApplicationFactory(to_siae=self.siae),
+            job_application=JobApplicationFactory(to_company=self.company),
             evaluated_siae=not_yet_submitted_job_application.evaluated_siae,
         )
         EvaluatedAdministrativeCriteriaFactory(
@@ -992,7 +992,7 @@ class SiaeSubmitProofsViewTest(TestCase):
         assert response.url == "/dashboard/"
 
     def test_is_not_submittable_with_submission_freezed(self):
-        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.company, self.user)
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application
         )
@@ -1026,7 +1026,7 @@ class SiaeSubmitProofsViewTest(TestCase):
     def test_submitted_email(self):
         institution_membership = InstitutionMembershipFactory()
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(
-            self.siae, self.user, institution=institution_membership.institution
+            self.company, self.user, institution=institution_membership.institution
         )
         EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application)
         self.client.force_login(self.user)
@@ -1052,7 +1052,7 @@ class SiaeSubmitProofsViewTest(TestCase):
         # fixme vincentporte : convert data preparation into factory
         institution_membership = InstitutionMembershipFactory()
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(
-            self.siae, self.user, institution=institution_membership.institution
+            self.company, self.user, institution=institution_membership.institution
         )
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application

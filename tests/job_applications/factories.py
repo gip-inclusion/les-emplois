@@ -44,19 +44,19 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
         )
         # GEIQ diagnosis created by a GEIQ
         with_geiq_eligibility_diagnosis = factory.Trait(
-            to_siae=factory.SubFactory(CompanyFactory, with_membership=True, kind=CompanyKind.GEIQ),
-            sender=factory.LazyAttribute(lambda obj: obj.to_siae.members.first()),
+            to_company=factory.SubFactory(CompanyFactory, with_membership=True, kind=CompanyKind.GEIQ),
+            sender=factory.LazyAttribute(lambda obj: obj.to_company.members.first()),
             geiq_eligibility_diagnosis=factory.SubFactory(
                 GEIQEligibilityDiagnosisFactory,
                 job_seeker=factory.SelfAttribute("..job_seeker"),
                 author=factory.SelfAttribute("..sender"),
                 author_kind=AuthorKind.GEIQ,
-                author_geiq=factory.SelfAttribute("..to_siae"),
+                author_geiq=factory.SelfAttribute("..to_company"),
             ),
             eligibility_diagnosis=None,
         )
         with_geiq_eligibility_diagnosis_from_prescriber = factory.Trait(
-            to_siae=factory.SubFactory(CompanyFactory, with_membership=True, kind=CompanyKind.GEIQ),
+            to_company=factory.SubFactory(CompanyFactory, with_membership=True, kind=CompanyKind.GEIQ),
             sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
             geiq_eligibility_diagnosis=factory.SubFactory(
                 GEIQEligibilityDiagnosisFactory,
@@ -78,7 +78,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
         )
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
-    to_siae = factory.SubFactory(CompanyFactory, with_membership=True)
+    to_company = factory.SubFactory(CompanyFactory, with_membership=True)
     message = factory.Faker("sentence", nb_words=40)
     answer = factory.Faker("sentence", nb_words=40)
     hiring_start_at = factory.LazyFunction(lambda: datetime.now(timezone.utc).date())
@@ -112,7 +112,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
             for siae_job_description in extracted:
                 if isinstance(siae_job_description, Appellation):
                     siae_job_description, _ = JobDescription.objects.get_or_create(
-                        siae=self.to_siae, appellation=siae_job_description
+                        siae=self.to_company, appellation=siae_job_description
                     )
                 self.selected_jobs.add(siae_job_description)
 
@@ -144,8 +144,8 @@ class JobApplicationSentBySiaeFactory(JobApplicationFactory):
     sender_kind = SenderKind.EMPLOYER
     # Currently an Siae can only postulate for itself,
     # this is the default behavior here.
-    sender_siae = factory.SelfAttribute("to_siae")
-    sender = factory.LazyAttribute(lambda obj: obj.to_siae.members.first())
+    sender_siae = factory.SelfAttribute("to_company")
+    sender = factory.LazyAttribute(lambda obj: obj.to_company.members.first())
 
 
 class JobApplicationSentByPrescriberFactory(JobApplicationFactory):

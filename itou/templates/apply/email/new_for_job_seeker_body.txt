@@ -5,15 +5,15 @@
 
 {% if job_application.is_sent_by_proxy %}
 
-{{ job_application.sender.get_full_name }} a envoyé votre candidature chez {{ job_application.to_siae.display_name }}.
+{{ job_application.sender.get_full_name }} a envoyé votre candidature chez {{ job_application.to_company.display_name }}.
 Vous et {{ job_application.sender.get_full_name }} serez tous les deux informés de l'avancement de cette candidature.
 
 {% else %}
-Candidature chez {{ job_application.to_siae.display_name }} envoyée avec succès !
+Candidature chez {{ job_application.to_company.display_name }} envoyée avec succès !
 
 {% endif %}
 
-*Nom de la structure* : {{ job_application.to_siae.display_name }}
+*Nom de la structure* : {{ job_application.to_company.display_name }}
 
 {% if job_application.message %}
 

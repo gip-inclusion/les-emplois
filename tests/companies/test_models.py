@@ -250,11 +250,11 @@ class SiaeQuerySetTest(TestCase):
         company = CompanyFactory()
         model = JobApplicationFactory._meta.model
         old_date = timezone.now() - timedelta(weeks=model.WEEKS_BEFORE_CONSIDERED_OLD, days=1)
-        JobApplicationFactory(to_siae=company, created_at=old_date)
+        JobApplicationFactory(to_company=company, created_at=old_date)
 
         expected = 3
         for _ in range(expected):
-            JobApplicationFactory(to_siae=company)
+            JobApplicationFactory(to_company=company)
 
         result = Company.objects.with_count_recent_received_job_apps().get(pk=company.pk)
 
@@ -263,8 +263,8 @@ class SiaeQuerySetTest(TestCase):
     def test_with_computed_job_app_score(self):
         company = CompanyFactory(with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"))
         company.job_description_through.first()
-        JobApplicationFactory(to_siae=company)
-        JobApplicationFactory(to_siae=company)
+        JobApplicationFactory(to_company=company)
+        JobApplicationFactory(to_company=company)
 
         expected_score = company.job_applications_received.count() / company.job_description_through.count()
         result = Company.objects.with_computed_job_app_score().get(pk=company.pk)
@@ -281,8 +281,8 @@ class SiaeQuerySetTest(TestCase):
 
     def test_with_computed_job_app_score_no_job_description(self):
         company = CompanyFactory()
-        JobApplicationFactory(to_siae=company)
-        JobApplicationFactory(to_siae=company)
+        JobApplicationFactory(to_company=company)
+        JobApplicationFactory(to_company=company)
 
         expected_score = None
         result = Company.objects.with_computed_job_app_score().get(pk=company.pk)
@@ -338,13 +338,13 @@ class JobDescriptionQuerySetTest(TestCase):
         # Test popular threshold: popular job description
         popular_job_description = siae_job_descriptions[0]
         for _ in range(JobDescription.POPULAR_THRESHOLD + 1):
-            JobApplicationFactory(to_siae=company, selected_jobs=[popular_job_description], job_seeker=job_seeker)
+            JobApplicationFactory(to_company=company, selected_jobs=[popular_job_description], job_seeker=job_seeker)
 
         assert JobDescription.objects.with_annotation_is_popular().get(pk=popular_job_description.pk).is_popular
 
         # Test popular threshold: unpopular job description
         unpopular_job_description = siae_job_descriptions[1]
-        JobApplicationFactory(to_siae=company, selected_jobs=[unpopular_job_description])
+        JobApplicationFactory(to_company=company, selected_jobs=[unpopular_job_description])
 
         assert not JobDescription.objects.with_annotation_is_popular().get(pk=unpopular_job_description.pk).is_popular
 
@@ -355,7 +355,7 @@ class JobDescriptionQuerySetTest(TestCase):
 
         JobApplicationFactory.create_batch(
             threshold_exceeded,
-            to_siae=company,
+            to_company=company,
             job_seeker=job_seeker,
             selected_jobs=[popular_job_description],
             state=JobApplicationWorkflow.STATE_ACCEPTED,
@@ -366,7 +366,7 @@ class JobDescriptionQuerySetTest(TestCase):
     def test_with_job_applications_count(self):
         company = CompanyFactory(with_jobs=True)
         job_description = company.job_description_through.first()
-        JobApplicationFactory(to_siae=company, selected_jobs=[job_description])
+        JobApplicationFactory(to_company=company, selected_jobs=[job_description])
         siae_job_description = JobDescription.objects.with_job_applications_count().get(pk=job_description.pk)
         assert hasattr(siae_job_description, "job_applications_count")
         assert siae_job_description.job_applications_count == 1

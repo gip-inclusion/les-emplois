@@ -209,25 +209,25 @@ TABLE.add_columns(
             "name": "id_structure",
             "type": "integer",
             "comment": "ID de la structure destinaire de la candidature",
-            "fn": lambda o: o.to_siae_id,
+            "fn": lambda o: o.to_company_id,
         },
         {
             "name": "type_structure",
             "type": "varchar",
             "comment": "Type de la structure destinaire de la candidature",
-            "fn": lambda o: o.to_siae.kind,
+            "fn": lambda o: o.to_company.kind,
         },
         {
             "name": "nom_structure",
             "type": "varchar",
             "comment": "Nom de la structure destinaire de la candidature",
-            "fn": lambda o: o.to_siae.display_name,
+            "fn": lambda o: o.to_company.display_name,
         },
         {
             "name": "nom_complet_structure",
             "type": "varchar",
             "comment": "Nom complet de la structure destinaire de la candidature",
-            "fn": lambda o: f"{o.to_siae.kind} - ID {o.to_siae_id} - {o.to_siae.display_name}",
+            "fn": lambda o: f"{o.to_company.kind} - ID {o.to_company_id} - {o.to_company.display_name}",
         },
     ]
 )
@@ -236,7 +236,7 @@ TABLE.add_columns(
     get_department_and_region_columns(
         name_suffix="_structure",
         comment_suffix=" de la structure destinaire de la candidature",
-        custom_fn=lambda o: o.to_siae,
+        custom_fn=lambda o: o.to_company,
     )
 )
 

@@ -45,14 +45,14 @@ from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase
 
 
-def create_batch_of_job_applications(siae):
+def create_batch_of_job_applications(company):
     JobApplicationFactory.create_batch(
         evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
         with_approval=True,
-        to_siae=siae,
-        sender_siae=siae,
+        to_company=company,
+        sender_siae=company,
         eligibility_diagnosis__author_kind=AuthorKind.EMPLOYER,
-        eligibility_diagnosis__author_siae=siae,
+        eligibility_diagnosis__author_siae=company,
         hiring_start_at=timezone.now() - relativedelta(months=2),
     )
 
@@ -67,40 +67,41 @@ class EvaluationCampaignMiscMethodsTest(TestCase):
         def create_job_apps(count):
             return JobApplicationFactory.create_batch(
                 count,
-                to_siae=company,
+                to_company=company,
                 job_seeker=job_seeker,
                 eligibility_diagnosis=eligibility_diagnosis,
                 sender=sender,
             )
 
         # zero job application
-        qs = select_min_max_job_applications(JobApplication.objects.filter(to_siae=company))
+        qs = select_min_max_job_applications(JobApplication.objects.filter(to_company=company))
         assert isinstance(qs, JobApplicationQuerySet)
         assert 0 == qs.count()
 
         # one job applications made by SIAE
         [job_application] = create_job_apps(1)
         assert (
-            job_application == select_min_max_job_applications(JobApplication.objects.filter(to_siae=company)).first()
+            job_application
+            == select_min_max_job_applications(JobApplication.objects.filter(to_company=company)).first()
         )
-        assert 1 == select_min_max_job_applications(JobApplication.objects.filter(to_siae=company)).count()
+        assert 1 == select_min_max_job_applications(JobApplication.objects.filter(to_company=company)).count()
 
         # under 10 job applications, 20% is below the minimum value of 2 -> select 2
         create_job_apps(5)
         assert (
             evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN
-            == select_min_max_job_applications(JobApplication.objects.filter(to_siae=company)).count()
+            == select_min_max_job_applications(JobApplication.objects.filter(to_company=company)).count()
         )
 
         # from 20 job applications to 100 we have the correct percentage
         create_job_apps(55)
-        assert 12 == select_min_max_job_applications(JobApplication.objects.filter(to_siae=company)).count()
+        assert 12 == select_min_max_job_applications(JobApplication.objects.filter(to_company=company)).count()
 
         # Over 100, stop at the max number -> 20
         create_job_apps(50)
         assert (
             evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MAX
-            == select_min_max_job_applications(JobApplication.objects.filter(to_siae=company)).count()
+            == select_min_max_job_applications(JobApplication.objects.filter(to_company=company)).count()
         )
 
 
@@ -159,7 +160,7 @@ def campaign_eligible_job_app_objects():
     job_app = JobApplicationFactory(
         job_seeker=job_seeker,
         approval=approval,
-        to_siae=company,
+        to_company=company,
         sender_siae=company,
         eligibility_diagnosis=diag,
         hiring_start_at=timezone.now() - relativedelta(months=2),
@@ -319,7 +320,7 @@ class EvaluationCampaignManagerTest(TestCase):
         company_1 = CompanyFactory(department="14")
         JobApplicationFactory(
             with_approval=True,
-            to_siae=company_1,
+            to_company=company_1,
             sender_siae=company_1,
             eligibility_diagnosis__author_kind=AuthorKind.EMPLOYER,
             eligibility_diagnosis__author_siae=company_1,
@@ -333,8 +334,8 @@ class EvaluationCampaignManagerTest(TestCase):
         eligible_siaes_res = evaluation_campaign.eligible_siaes()
         assert 1 == eligible_siaes_res.count()
         assert {
-            "to_siae": company_2.id,
-            "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
+            "to_company": company_2.id,
+            "to_company_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
         } in eligible_siaes_res
 
         # adding 2 more job applications to company_2
@@ -343,8 +344,8 @@ class EvaluationCampaignManagerTest(TestCase):
         eligible_siaes_res = evaluation_campaign.eligible_siaes()
         assert 1 == eligible_siaes_res.count()
         assert {
-            "to_siae": company_2.id,
-            "to_siae_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN * 2,
+            "to_company": company_2.id,
+            "to_company_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN * 2,
         } in eligible_siaes_res
 
     def test_number_of_siaes_to_select(self):
@@ -387,7 +388,7 @@ class EvaluationCampaignManagerTest(TestCase):
         JobApplicationFactory.create_batch(
             evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
             with_approval=True,
-            to_siae=company,
+            to_company=company,
             sender_siae=company,
             eligibility_diagnosis=eligibility_diagnosis,
             hiring_start_at=timezone.now() - relativedelta(months=2),
@@ -401,7 +402,7 @@ class EvaluationCampaignManagerTest(TestCase):
             1  # SAVEPOINT from transaction.atomic()
             + 1  # UPDATE SET percent_set_at
             + 1  # COUNT eligible job applications
-            + 1  # SELECT to_siae_id and job application count for SIAE with at least 2 auto-prescriptions.
+            + 1  # SELECT to_company_id and job application count for SIAE with at least 2 auto-prescriptions.
             + 1  # SELECT SIAE details
             + 1  # INSERT EvaluatedSiae
             + 1  # COUNT eligible job applications

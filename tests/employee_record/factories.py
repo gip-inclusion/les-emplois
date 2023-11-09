@@ -27,14 +27,14 @@ class EmployeeRecordFactory(BareEmployeeRecordFactory):
     """
 
     job_application = factory.SubFactory(
-        JobApplicationWithApprovalNotCancellableFactory, to_siae__use_employee_record=True
+        JobApplicationWithApprovalNotCancellableFactory, to_company__use_employee_record=True
     )
-    asp_id = factory.SelfAttribute(".job_application.to_siae.convention.asp_id")
+    asp_id = factory.SelfAttribute(".job_application.to_company.convention.asp_id")
     asp_measure = factory.LazyAttribute(
-        lambda obj: asp_models.SiaeMeasure.from_siae_kind(obj.job_application.to_siae.kind)
+        lambda obj: asp_models.SiaeMeasure.from_siae_kind(obj.job_application.to_company.kind)
     )
     approval_number = factory.SelfAttribute(".job_application.approval.number")
-    siret = factory.SelfAttribute(".job_application.to_siae.siret")
+    siret = factory.SelfAttribute(".job_application.to_company.siret")
 
     @classmethod
     def _create(cls, model_class, *args, **kwargs):
@@ -63,7 +63,7 @@ class EmployeeRecordFactory(BareEmployeeRecordFactory):
             status=Status.READY,
             job_application=factory.SubFactory(
                 JobApplicationWithCompleteJobSeekerProfileFactory,
-                to_siae__use_employee_record=True,
+                to_company__use_employee_record=True,
             ),
         )
 

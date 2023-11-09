@@ -31,7 +31,7 @@ class EmployeeRecordAPIPermissionsTest(APITestCase):
             job_application=job_application, status=Status.READY
         )
 
-        self.user = self.employee_record_ready.job_application.to_siae.members.first()
+        self.user = self.employee_record_ready.job_application.to_company.members.first()
         self.unauthorized_user = EmployerFactory()
 
     def test_permissions_ok_with_token(self):
@@ -95,7 +95,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         self.employee_record = EmployeeRecord.from_job_application(job_application)
         self.employee_record.update_as_ready()
 
-        self.siae = job_application.to_siae
+        self.siae = job_application.to_company
         self.employer = self.siae.members.first()
         self.user = job_application.job_seeker
 
@@ -136,7 +136,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         self.assertContains(response, self.siae.siret)
 
         # status = SENT
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=self.siae)
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_company=self.siae)
         employee_record_sent = EmployeeRecord.from_job_application(job_application=job_application)
         employee_record_sent.update_as_ready()
 
@@ -160,7 +160,7 @@ class EmployeeRecordAPIFetchListTest(APITestCase):
         self.assertContains(response, self.siae.siret)
 
         # status = REJECTED
-        job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=self.siae)
+        job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_company=self.siae)
         employee_record_rejected = EmployeeRecord.from_job_application(job_application=job_application)
         employee_record_rejected.update_as_ready()
         employee_record_rejected.update_as_sent(self.faker.asp_batch_filename(), 1, None)
@@ -234,7 +234,7 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         employee_record = EmployeeRecord.from_job_application(job_application)
         employee_record.update_as_ready()
 
-        member = employee_record.job_application.to_siae.members.first()
+        member = employee_record.job_application.to_company.members.first()
         self.client.force_login(member)
 
         response = self.client.get(ENDPOINT_URL + "?status=READY", format="json")
@@ -260,13 +260,13 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         employee_record.update_as_ready()
 
         job_application_2 = JobApplicationWithCompleteJobSeekerProfileFactory(
-            to_siae=employee_record.job_application.to_siae
+            to_company=employee_record.job_application.to_company
         )
         employee_record = EmployeeRecord.from_job_application(job_application_2)
         employee_record.update_as_ready()
         employee_record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
 
-        member = employee_record.job_application.to_siae.members.first()
+        member = employee_record.job_application.to_company.members.first()
         self.client.force_login(member)
         response = self.client.get(ENDPOINT_URL + "?status=READY", format="json")
 
@@ -305,7 +305,7 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         today_param = f"{today:%Y-%m-%d}"
         yesterday_param = f"{today - relativedelta(days=1):%Y-%m-%d}"
 
-        member = employee_record.job_application.to_siae.members.first()
+        member = employee_record.job_application.to_company.members.first()
         self.client.force_login(member)
         response = self.client.get(ENDPOINT_URL + f"?created={today_param}", format="json")
 
@@ -316,7 +316,7 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         assert len(results.get("results")) == 1
         result = results.get("results")[0]
 
-        assert result.get("siret") == job_application.to_siae.siret
+        assert result.get("siret") == job_application.to_company.siret
 
         response = self.client.get(ENDPOINT_URL + f"?created={yesterday_param}", format="json")
         results = response.json()
@@ -341,13 +341,13 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         employee_record_1.status = Status.PROCESSED  # Default status if no `status` params present
         employee_record_1.save()
 
-        job_application_2 = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=job_application_1.to_siae)
+        job_application_2 = JobApplicationWithCompleteJobSeekerProfileFactory(to_company=job_application_1.to_company)
         employee_record_2 = EmployeeRecord.from_job_application(job_application_2)
         employee_record_2.created_at = ancient_ts
         employee_record_2.status = Status.PROCESSED  # Default status if no `status` params present
         employee_record_2.save()
 
-        member = employee_record_1.job_application.to_siae.members.first()
+        member = employee_record_1.job_application.to_company.members.first()
 
         self.client.force_login(member)
         response = self.client.get(ENDPOINT_URL + f"?since={today}", format="json")
@@ -365,7 +365,7 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         results = response.json().get("results")
 
         assert results
-        assert results[0].get("siret") == job_application_1.to_siae.siret
+        assert results[0].get("siret") == job_application_1.to_company.siret
 
         response = self.client.get(ENDPOINT_URL + f"?since={ancient}", format="json")
 
@@ -390,12 +390,12 @@ class EmployeeRecordAPIParametersTest(APITestCase):
         employee_record_1.created_at = sooner_ts
         employee_record_1.save()  # in state NEW
 
-        job_application_2 = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=job_application_1.to_siae)
+        job_application_2 = JobApplicationWithCompleteJobSeekerProfileFactory(to_company=job_application_1.to_company)
         employee_record_2 = EmployeeRecord.from_job_application(job_application_2)
         employee_record_2.created_at = ancient_ts
         employee_record_2.update_as_ready()
 
-        member = employee_record_1.job_application.to_siae.members.first()
+        member = employee_record_1.job_application.to_company.members.first()
 
         self.client.force_login(member)
         response = self.client.get(ENDPOINT_URL + "?status=NEW", format="json")

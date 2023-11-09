@@ -1,6 +1,6 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% block subject %}
-{% if job_application.to_siae.is_subject_to_eligibility_rules %}
+{% if job_application.to_company.is_subject_to_eligibility_rules %}
 PASS IAE pour {{ job_application.job_seeker.get_full_name }} et avis sur les emplois de l'inclusion
 {% else %}
 Confirmation de l'embauche

@@ -72,7 +72,7 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
             JobApplication.objects.filter(
                 job_seeker=approval.user,
                 state=JobApplicationWorkflow.STATE_ACCEPTED,
-                to_siae=self.siae,
+                to_company=self.siae,
                 approval=approval,
             )
             .select_related(
@@ -139,7 +139,7 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
         context["all_job_applications"] = (
             JobApplication.objects.filter(
                 job_seeker=approval.user,
-                to_siae=self.siae,
+                to_company=self.siae,
             )
             .select_related("sender")
             .prefetch_related("selected_jobs")
@@ -610,7 +610,7 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
         approval = Approval.objects.filter(number=number).first()
         if approval:
             job_application = approval.user.last_accepted_job_application
-            if job_application and job_application.to_siae == siae:
+            if job_application and job_application.to_company == siae:
                 # Suspensions and prolongations links are available in the job application details page.
                 application_details_url = reverse(
                     "apply:details_for_siae",
@@ -714,7 +714,7 @@ def pe_approval_create(request, pe_approval_id):
     # Then we create the necessary JobApplication for redirection
     job_application = JobApplication(
         job_seeker=job_seeker,
-        to_siae=siae,
+        to_company=siae,
         state=JobApplicationWorkflow.STATE_ACCEPTED,
         approval=approval_from_pe,
         origin=Origin.PE_APPROVAL,  # This origin is specific to this process.

@@ -28,7 +28,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
                 with_approval=True,
                 approval__origin=approvals_enums.Origin.PE_APPROVAL,
                 approval__eligibility_diagnosis=None,
-                to_siae=self.company,
+                to_company=self.company,
                 approval__number=self.pe_approval.number,
             )
             self.approval = self.job_application.approval
@@ -131,7 +131,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
             job_seeker=job_seeker,
         )
 
-        another_company = job_application.to_siae
+        another_company = job_application.to_company
         assert another_company != self.company
 
         # This is the current user (NOT a member of `another_siae`).
@@ -168,7 +168,7 @@ class PoleEmploiApprovalSearchUserTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.job_application = JobApplicationFactory(with_approval=True)
-        cls.siae_user = cls.job_application.to_siae.members.first()
+        cls.siae_user = cls.job_application.to_company.members.first()
 
     def test_nominal(self):
         """
@@ -197,8 +197,8 @@ class PoleEmploiApprovalCreateTest(TestCase):
     def setUp(self):
         super().setUp()
         self.job_application = JobApplicationFactory(with_approval=True)
-        self.company = self.job_application.to_siae
-        self.employer = self.job_application.to_siae.members.first()
+        self.company = self.job_application.to_company
+        self.employer = self.job_application.to_company.members.first()
         self.approval = self.job_application.approval
         self.job_seeker = self.job_application.job_seeker
         self.pe_approval = PoleEmploiApprovalFactory()

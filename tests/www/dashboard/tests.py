@@ -139,14 +139,14 @@ class DashboardViewTest(TestCase):
         assert response.context["num_rejected_employee_records"] == 0
 
         # create rejected job applications
-        job_application = JobApplicationFactory(with_approval=True, to_siae=company)
+        job_application = JobApplicationFactory(with_approval=True, to_company=company)
         EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
         # You can't create 2 employee records with the same job application
         # Factories were allowing it until a recent fix was applied
-        job_application = JobApplicationFactory(with_approval=True, to_siae=company)
+        job_application = JobApplicationFactory(with_approval=True, to_company=company)
         EmployeeRecordFactory(job_application=job_application, status=Status.REJECTED)
 
-        other_job_application = JobApplicationFactory(with_approval=True, to_siae=other_company)
+        other_job_application = JobApplicationFactory(with_approval=True, to_company=other_company)
         EmployeeRecordFactory(job_application=other_job_application, status=Status.REJECTED)
 
         session = self.client.session
@@ -950,7 +950,7 @@ class EditJobSeekerInfo(TestCase):
     @override_settings(TALLY_URL="https://tally.so")
     def test_edit_by_siae_with_nir(self):
         job_application = JobApplicationSentByPrescriberFactory()
-        user = job_application.to_siae.members.first()
+        user = job_application.to_company.members.first()
 
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
         job_application.job_seeker.created_by = user
@@ -1014,7 +1014,7 @@ class EditJobSeekerInfo(TestCase):
         job_application = JobApplicationSentByPrescriberFactory(
             job_seeker__nir="", job_seeker__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER
         )
-        user = job_application.to_siae.members.first()
+        user = job_application.to_company.members.first()
 
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
         job_application.job_seeker.created_by = user
@@ -1059,7 +1059,7 @@ class EditJobSeekerInfo(TestCase):
 
     def test_edit_by_siae_without_nir_information(self):
         job_application = JobApplicationSentByPrescriberFactory(job_seeker__nir="", job_seeker__lack_of_nir_reason="")
-        user = job_application.to_siae.members.first()
+        user = job_application.to_company.members.first()
 
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
         job_application.job_seeker.created_by = user
@@ -1208,7 +1208,7 @@ class EditJobSeekerInfo(TestCase):
         new_email = "bidou@yopmail.com"
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
-        job_application = JobApplicationSentByPrescriberFactory(to_siae=company, job_seeker__created_by=user)
+        job_application = JobApplicationSentByPrescriberFactory(to_company=company, job_seeker__created_by=user)
 
         self.client.force_login(user)
 
@@ -1249,7 +1249,7 @@ class EditJobSeekerInfo(TestCase):
     def test_edit_email_when_confirmed(self):
         new_email = "bidou@yopmail.com"
         job_application = JobApplicationSentByPrescriberFactory()
-        user = job_application.to_siae.members.first()
+        user = job_application.to_company.members.first()
 
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
         job_application.job_seeker.created_by = user

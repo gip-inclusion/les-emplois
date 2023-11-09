@@ -38,19 +38,19 @@ class TestApprovalDetailView:
             sender_prescriber_organization=PrescriberOrganizationFactory(authorized=True),
         )
         assert job_application.is_sent_by_authorized_prescriber
-        EligibilityDiagnosisFactory(job_seeker=approval.user, author_siae=job_application.to_siae)
+        EligibilityDiagnosisFactory(job_seeker=approval.user, author_siae=job_application.to_company)
 
         # Another job applcation on the same SIAE, by a non authorized prescriber
         same_siae_job_application = JobApplicationSentByPrescriberOrganizationFactory(
             job_seeker=job_application.job_seeker,
-            to_siae=job_application.to_siae,
+            to_company=job_application.to_company,
             state=JobApplicationWorkflow.STATE_NEW,
         )
         assert not same_siae_job_application.is_sent_by_authorized_prescriber
         # A third job application on another SIAE
         other_siae_job_application = JobApplicationFactory(job_seeker=job_application.job_seeker)
 
-        employer = job_application.to_siae.members.first()
+        employer = job_application.to_company.members.first()
         client.force_login(employer)
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
@@ -127,7 +127,7 @@ class TestApprovalDetailView:
         )
 
         # Employer version
-        user = job_application.to_siae.members.first()
+        user = job_application.to_company.members.first()
         client.force_login(user)
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
@@ -284,7 +284,7 @@ class TestApprovalDetailView:
     def test_suspend_button(self, client):
         approval = ApprovalFactory(with_jobapplication=True)
         job_application = approval.jobapplication_set.get()
-        siae = job_application.to_siae
+        siae = job_application.to_company
         employer = siae.members.first()
         client.force_login(employer)
 
@@ -313,7 +313,7 @@ class TestApprovalDetailView:
             end_at=timezone.localdate() + relativedelta(months=2),
         )
         job_application = approval.jobapplication_set.get()
-        siae = job_application.to_siae
+        siae = job_application.to_company
         employer = siae.members.first()
         client.force_login(employer)
 
@@ -334,7 +334,7 @@ class TestApprovalDetailView:
     def test_edit_user_info_button(self, client):
         approval = ApprovalFactory(with_jobapplication=True)
         job_application = approval.jobapplication_set.get()
-        employer = job_application.to_siae.members.first()
+        employer = job_application.to_company.members.first()
         client.force_login(employer)
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
 
@@ -379,7 +379,7 @@ class TestApprovalDetailView:
         )
         job_application = JobApplicationFactory(
             hiring_start_at=datetime.date(2021, 3, 1),
-            to_siae=membership.siae,
+            to_company=membership.siae,
             job_seeker=JobSeekerFactory(last_name="John", first_name="Doe"),
             with_approval=True,
             # Don't set an ASP_ITOU_PREFIX (see approval.save for details)

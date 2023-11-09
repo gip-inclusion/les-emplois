@@ -59,7 +59,7 @@ class ApprovalForm(forms.Form):
         return Exists(
             JobApplication.objects.filter(
                 approval=OuterRef("pk"),
-                to_siae_id=self.siae_pk,
+                to_company_id=self.siae_pk,
                 state=JobApplicationWorkflow.STATE_ACCEPTED,
             )
         )

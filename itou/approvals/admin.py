@@ -43,7 +43,7 @@ class JobApplicationInline(ItouStackedInline):
         "job_seeker",
         "approval_manually_delivered_by",
     )
-    list_select_related = ("to_siae",)
+    list_select_related = ("to_company",)
 
     # Mandatory for "custom" inline fields
     readonly_fields = ("employee_record_status", "to_company_link")
@@ -58,9 +58,9 @@ class JobApplicationInline(ItouStackedInline):
     def to_company_link(self, obj):
         return format_html(
             "{} — SIRET : {} ({})",
-            get_admin_view_link(obj.to_siae, content=obj.to_siae.display_name),
-            obj.to_siae.siret,
-            obj.to_siae.kind,
+            get_admin_view_link(obj.to_company, content=obj.to_company.display_name),
+            obj.to_company.siret,
+            obj.to_company.kind,
         )
 
     # Custom read-only fields as workaround :
@@ -85,16 +85,16 @@ class JobApplicationInline(ItouStackedInline):
         already_exists = None
         if obj.approval:
             already_exists = (
-                EmployeeRecord.objects.for_company(obj.to_siae).filter(approval_number=obj.approval.number).exists()
+                EmployeeRecord.objects.for_company(obj.to_company).filter(approval_number=obj.approval.number).exists()
             )
 
-        if JobApplication.objects.eligible_as_employee_record(siae=obj.to_siae).filter(pk=obj.pk).exists():
+        if JobApplication.objects.eligible_as_employee_record(siae=obj.to_company).filter(pk=obj.pk).exists():
             return "En attente de création" + (" (doublon)" if already_exists else "")
 
         if already_exists:  # Put this check after the eligibility to show that one is proposed but is also a duplicate
             return "Une fiche salarié existe déjà pour ce candidat"
 
-        if not obj.to_siae.can_use_employee_record:
+        if not obj.to_company.can_use_employee_record:
             return "La SIAE n'utilise pas les fiches salarié"
 
         if not obj.create_employee_record:

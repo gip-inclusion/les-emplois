@@ -65,7 +65,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         raise PermissionDenied
 
     filters_form = EmployeeRecordFilterForm(
-        JobApplication.objects.accepted().filter(to_siae=siae).get_unique_fk_objects("job_seeker"),
+        JobApplication.objects.accepted().filter(to_company=siae).get_unique_fk_objects("job_seeker"),
         data=request.GET,
     )
     filters_form.full_clean()
@@ -314,7 +314,7 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
 
     employee_record = (
         job_application.employee_record.full_fetch()
-        .select_related("job_application__to_siae__convention")
+        .select_related("job_application__to_company__convention")
         .latest("created_at")
     )
     form = NewEmployeeRecordStep4(employee_record, data=request.POST or None)

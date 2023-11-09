@@ -3,12 +3,12 @@
 --
 CREATE TEMP VIEW tmp AS (
     SELECT
-    to_siae.id as "Id établissement",
-    to_siae.siret as "SIRET établissement",
+    to_company.id as "Id établissement",
+    to_company.siret as "SIRET établissement",
     convention.siret_signature as "SIRET à la signature",
-    to_siae.kind as "Type établissement",
-    to_siae.name as "Nom établissement",
-    to_siae.department as "Département établissement",
+    to_company.kind as "Type établissement",
+    to_company.name as "Nom établissement",
+    to_company.department as "Département établissement",
     a.number as "Numero pass",
     a.start_at as "Date début PASS",
     a.end_at as "Date fin PASS",
@@ -19,8 +19,8 @@ CREATE TEMP VIEW tmp AS (
     diagnostic_criterions.all_criterions as "Machin"
     FROM job_applications_jobapplication as ja
     INNER join approvals_approval a ON a.id = ja.approval_id
-    INNER JOIN siaes_siae as to_siae on to_siae.id = ja.to_siae_id
-    INNER JOIN siaes_siaeconvention as convention on convention.id = to_siae.convention_id
+    INNER JOIN siaes_siae as to_company on to_company.id = ja.to_company_id
+    INNER JOIN siaes_siaeconvention as convention on convention.id = to_company.convention_id
     INNER JOIN users_user u ON u.id = ja.job_seeker_id
     INNER JOIN (
         select
@@ -33,7 +33,7 @@ CREATE TEMP VIEW tmp AS (
         LEFT JOIN eligibility_administrativecriteria criteria
             on criteria.id = sel_criteria.administrative_criteria_id
         group by diag.id
-    ) diagnostic_criterions ON diagnostic_criterions.job_seeker_id = ja.job_seeker_id and diagnostic_criterions.author_siae_id = ja.to_siae_id
+    ) diagnostic_criterions ON diagnostic_criterions.job_seeker_id = ja.job_seeker_id and diagnostic_criterions.author_siae_id = ja.to_company_id
     where
         ja.state = 'accepted'
         and ja.approval_id is not null

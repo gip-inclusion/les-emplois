@@ -21,7 +21,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
         cls.author = cls.prescriber.members.first()
         cls.job_seeker = cls.diagnosis.job_seeker
         cls.company = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ)
-        cls.job_application = JobApplicationFactory(to_siae=cls.company, job_seeker=cls.job_seeker)
+        cls.job_application = JobApplicationFactory(to_company=cls.company, job_seeker=cls.job_seeker)
         cls.url = reverse("apply:details_for_siae", kwargs={"job_application_id": cls.job_application.pk})
 
     def test_with_geiq_eligibility_details(self):
@@ -32,7 +32,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
         self.assertTemplateUsed("apply/includes/geiq_diagnosis_details.html")
 
     def test_without_geiq_eligibility_details(self):
-        job_application = JobApplicationFactory(to_siae=self.company)
+        job_application = JobApplicationFactory(to_company=self.company)
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
 
         self.client.force_login(self.company.members.first())
@@ -68,7 +68,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
 
     def test_allowance_details_for_geiq(self):
         diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True)
-        job_application = JobApplicationFactory(to_siae=diagnosis.author_geiq, job_seeker=diagnosis.job_seeker)
+        job_application = JobApplicationFactory(to_company=diagnosis.author_geiq, job_seeker=diagnosis.job_seeker)
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
 
         # Annex 2, level 2 criteria: no allowance for GEIQ
@@ -106,7 +106,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
         )
 
     def test_details_as_authorized_prescriber_with_expired_diagnosis(self):
-        job_application = JobApplicationFactory(to_siae=self.company, job_seeker=self.expired_diagnosis.job_seeker)
+        job_application = JobApplicationFactory(to_company=self.company, job_seeker=self.expired_diagnosis.job_seeker)
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
 
         self.client.force_login(self.company.members.first())

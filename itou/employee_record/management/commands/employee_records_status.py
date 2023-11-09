@@ -34,8 +34,8 @@ class Command(BaseCommand):
                 employee_record = EmployeeRecord.objects.get(siret__in=siret, approval_number=approval_number)
             except EmployeeRecord.DoesNotExist:
                 try:
-                    job_application = JobApplication.objects.select_related("to_siae").get(
-                        to_siae__siret__in=siret, approval__number=approval_number
+                    job_application = JobApplication.objects.select_related("to_company").get(
+                        to_company__siret__in=siret, approval__number=approval_number
                     )
                 except JobApplication.DoesNotExist:
                     siret_used = "+".join(siret)
@@ -46,7 +46,7 @@ class Command(BaseCommand):
                 except JobApplication.MultipleObjectsReturned:
                     info, siret_used = "Plusieurs candidatures", "+".join(siret)
                 else:
-                    siret_used = job_application.to_siae.siret
+                    siret_used = job_application.to_company.siret
                     if job_application.state != JobApplicationWorkflow.STATE_ACCEPTED:
                         info = "La candidature n'est pas en état 'acceptée'"
                     elif job_application.origin == Origin.AI_STOCK:
@@ -59,7 +59,7 @@ class Command(BaseCommand):
                     ):
                         info = "Date de début du contrat avant l'interopérabilité"
                     elif (
-                        JobApplication.objects.eligible_as_employee_record(job_application.to_siae)
+                        JobApplication.objects.eligible_as_employee_record(job_application.to_company)
                         .filter(pk=job_application.pk)
                         .exists()
                     ):

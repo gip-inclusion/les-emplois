@@ -209,13 +209,13 @@ class ApprovalQuerySet(CommonApprovalQuerySet):
                 .with_accepted_at()
                 .filter(job_seeker=OuterRef("user"))
                 .order_by("-accepted_at", "-hiring_start_at")
-                .values("to_siae")[:1],
+                .values("to_company")[:1],
             )
         )
 
     def is_assigned_to(self, company_id):
         return (
-            self.filter(user__job_applications__to_siae=company_id)
+            self.filter(user__job_applications__to_company=company_id)
             .with_assigned_company()
             .filter(assigned_company=company_id)
         )
@@ -513,8 +513,8 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             user_nir=self.user.nir,
             user_birthdate=self.user.birthdate,
             user_id_national_pe=self.user.jobseeker_profile.pe_obfuscated_nir,
-            siae_siret=job_application.to_siae.siret,
-            siae_kind=job_application.to_siae.kind,
+            siae_siret=job_application.to_company.siret,
+            siae_kind=job_application.to_company.kind,
             sender_kind=job_application.sender_kind,
             prescriber_kind=prescriber_kind,
         ).save()
@@ -767,10 +767,10 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             )
             return
 
-        siae = job_application.to_siae
-        type_siae = companies_enums.siae_kind_to_pe_type_siae(siae.kind)
+        company = job_application.to_company
+        type_siae = companies_enums.siae_kind_to_pe_type_siae(company.kind)
         if not type_siae:
-            self.pe_log_err("could not find PE type for siae={} siae_kind={}", siae, siae.kind)
+            self.pe_log_err("could not find PE type for siae={} siae_kind={}", company, company.kind)
             self.pe_save_error(
                 None,
                 api_enums.PEApiPreliminaryCheckFailureReason.INVALID_SIAE_KIND,
@@ -815,8 +815,8 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
         self.pe_maj_pass(
             id_national_pe=self.user.jobseeker_profile.pe_obfuscated_nir,
-            siae_siret=siae.siret,
-            siae_kind=siae.kind,
+            siae_siret=company.siret,
+            siae_kind=company.kind,
             sender_kind=job_application.sender_kind,
             prescriber_kind=prescriber_kind,
             at=at,

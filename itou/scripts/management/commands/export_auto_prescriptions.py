@@ -23,13 +23,13 @@ class Command(XlsxExportMixin, BaseCommand):
             .select_related(
                 "approval",
                 "job_seeker",
-                "to_siae__convention",
+                "to_company__convention",
             )
             .filter(
                 state=JobApplicationWorkflow.STATE_ACCEPTED,
-                to_siae__kind__in=[CompanyKind.ACI, CompanyKind.EI, CompanyKind.ETTI, CompanyKind.AI],
+                to_company__kind__in=[CompanyKind.ACI, CompanyKind.EI, CompanyKind.ETTI, CompanyKind.AI],
                 eligibility_diagnosis__author_kind=KIND_EMPLOYER,
-                eligibility_diagnosis__author_siae=F("to_siae"),
+                eligibility_diagnosis__author_siae=F("to_company"),
                 approval__start_at__range=[start_at_min, start_at_max],
             )
         )
@@ -58,14 +58,14 @@ class Command(XlsxExportMixin, BaseCommand):
 
         data = [
             [
-                ja.to_siae.pk,
-                ja.to_siae.siret,
-                ja.to_siae.convention.siret_signature,
-                ja.to_siae.kind,
-                ja.to_siae.name,
-                ja.to_siae.department,
-                DEPARTMENTS.get(ja.to_siae.department, "Département inconnu"),
-                ja.to_siae.region,
+                ja.to_company.pk,
+                ja.to_company.siret,
+                ja.to_company.convention.siret_signature,
+                ja.to_company.kind,
+                ja.to_company.name,
+                ja.to_company.department,
+                DEPARTMENTS.get(ja.to_company.department, "Département inconnu"),
+                ja.to_company.region,
                 ja.approval.number,
                 ja.approval.start_at,
                 ja.approval.end_at,

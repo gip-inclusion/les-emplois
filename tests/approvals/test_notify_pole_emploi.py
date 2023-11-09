@@ -80,7 +80,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         approval = ApprovalFactory(
             with_jobapplication=True,
-            with_jobapplication__to_siae__kind=CompanyKind.ACI,
+            with_jobapplication__to_company__kind=CompanyKind.ACI,
         )
         approval.notify_pole_emploi(at=now)
         approval.refresh_from_db()
@@ -90,7 +90,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             "dateFinPassIAE": approval.end_at.isoformat(),
             "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
             "numPassIAE": approval.number,
-            "numSIRETsiae": approval.jobapplication_set.first().to_siae.siret,
+            "numSIRETsiae": approval.jobapplication_set.first().to_company.siret,
             "origineCandidature": "PRES",
             "statutReponsePassIAE": "A",
             "typeSIAE": 836,
@@ -111,7 +111,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         approval = ApprovalFactory(
             with_jobapplication=True,
-            with_jobapplication__to_siae__kind=CompanyKind.ACI,
+            with_jobapplication__to_company__kind=CompanyKind.ACI,
         )
         approval.user.jobseeker_profile.pe_obfuscated_nir = "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
         approval.user.jobseeker_profile.save()
@@ -123,7 +123,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             "dateFinPassIAE": approval.end_at.isoformat(),
             "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
             "numPassIAE": approval.number,
-            "numSIRETsiae": approval.jobapplication_set.first().to_siae.siret,
+            "numSIRETsiae": approval.jobapplication_set.first().to_company.siret,
             "origineCandidature": "PRES",
             "statutReponsePassIAE": "A",
             "typeSIAE": 836,
@@ -142,7 +142,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         approval = ApprovalFactory(
             with_jobapplication=True,
-            with_jobapplication__to_siae__kind=CompanyKind.ACI,
+            with_jobapplication__to_company__kind=CompanyKind.ACI,
             with_jobapplication__sent_by_authorized_prescriber_organisation=True,
             with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.CAF,
         )
@@ -154,7 +154,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             "dateFinPassIAE": approval.end_at.isoformat(),
             "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
             "numPassIAE": approval.number,
-            "numSIRETsiae": approval.jobapplication_set.first().to_siae.siret,
+            "numSIRETsiae": approval.jobapplication_set.first().to_company.siret,
             "origineCandidature": "PRES",
             "statutReponsePassIAE": "A",
             "typeSIAE": 836,
@@ -174,7 +174,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         approval = ApprovalFactory(
             with_jobapplication=True,
-            with_jobapplication__to_siae__kind=CompanyKind.ACI,
+            with_jobapplication__to_company__kind=CompanyKind.ACI,
             with_jobapplication__sent_by_authorized_prescriber_organisation=True,
             with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.SPIP,
         )
@@ -186,7 +186,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             "dateFinPassIAE": approval.end_at.isoformat(),
             "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
             "numPassIAE": approval.number,
-            "numSIRETsiae": approval.jobapplication_set.first().to_siae.siret,
+            "numSIRETsiae": approval.jobapplication_set.first().to_company.siret,
             "origineCandidature": "PRES",
             "statutReponsePassIAE": "A",
             "typeSIAE": 836,
@@ -275,7 +275,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         job_seeker = JobSeekerFactory()
         company = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
-        JobApplicationFactory(to_siae=company, approval=approval, state=JobApplicationWorkflow.STATE_ACCEPTED)
+        JobApplicationFactory(to_company=company, approval=approval, state=JobApplicationWorkflow.STATE_ACCEPTED)
         approval.notify_pole_emploi(at=now)
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_error"
@@ -293,7 +293,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         job_seeker = JobSeekerFactory()
         company = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
-        JobApplicationFactory(to_siae=company, approval=approval, state=JobApplicationWorkflow.STATE_POSTPONED)
+        JobApplicationFactory(to_company=company, approval=approval, state=JobApplicationWorkflow.STATE_POSTPONED)
         approval.notify_pole_emploi(at=now)
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_pending"

@@ -35,7 +35,7 @@ class EmployeeRecordAdminForm(forms.ModelForm):
         if "financial_annex" in self.fields:
             self.fields["financial_annex"].required = False
             self.fields["financial_annex"].queryset = siaes_models.SiaeFinancialAnnex.objects.filter(
-                convention=self.instance.job_application.to_siae.convention
+                convention=self.instance.job_application.to_company.convention
             ).order_by("-number")
 
 

@@ -59,22 +59,22 @@ class GeiqJobApplicationListView(generics.ListAPIView):
                 .annotate(siren=Substr("siret", pos=1, length=9))
                 .filter(siren__in=[geiq.siret[:9] for geiq in geiqs])
             )
-            extra_filters.update({"to_siae__in": geiqs | antennas})
+            extra_filters.update({"to_company__in": geiqs | antennas})
         siren = self.request.query_params.get("siren")
         if siren is not None:
             try:
                 validate_siren(siren)
             except ValidationError:
                 raise InvalidSirenError("Invalid SIREN.")
-            extra_filters.update({"to_siae__siret__startswith": siren[:9]})
+            extra_filters.update({"to_company__siret__startswith": siren[:9]})
         return (
             JobApplication.objects.filter(
                 state=JobApplicationWorkflow.STATE_ACCEPTED,
-                to_siae__kind=CompanyKind.GEIQ,
+                to_company__kind=CompanyKind.GEIQ,
                 **extra_filters,
             )
             .select_related(
-                "to_siae",
+                "to_company",
                 "sender_prescriber_organization",
                 "job_seeker__jobseeker_profile",
                 "geiq_eligibility_diagnosis",
@@ -93,7 +93,7 @@ class GeiqJobApplicationListView(generics.ListAPIView):
                 ),
             )
             .order_by(
-                "to_siae__siret",
+                "to_company__siret",
                 "job_seeker__last_name",
                 "job_seeker__first_name",
                 "pk",
