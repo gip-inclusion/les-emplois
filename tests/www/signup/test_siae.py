@@ -79,7 +79,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         # Check IC will redirect to the correct url
         token = company.get_token()
         previous_url = reverse("signup:employer", args=(company.pk, token))
-        next_url = reverse("signup:siae_join", args=(company.pk, token))
+        next_url = reverse("signup:company_join", args=(company.pk, token))
         params = {
             "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
@@ -140,7 +140,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         # Check IC will redirect to the correct url
         token = company.get_token()
         previous_url = reverse("signup:employer", args=(company.pk, token))
-        next_url = reverse("signup:siae_join", args=(company.pk, token))
+        next_url = reverse("signup:company_join", args=(company.pk, token))
         params = {
             "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
@@ -182,7 +182,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         # Check IC will redirect to the correct url
         token = company.get_token()
         previous_url = reverse("signup:employer", args=(company.pk, token))
-        next_url = reverse("signup:siae_join", args=(company.pk, token))
+        next_url = reverse("signup:company_join", args=(company.pk, token))
         params = {
             "user_kind": KIND_EMPLOYER,
             "previous_url": previous_url,
@@ -210,7 +210,9 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
     def test_user_invalid_siae_id(self):
         company = CompanyFactory(kind=CompanyKind.ETTI)
-        response = self.client.get(reverse("signup:employer", kwargs={"siae_id": "0", "token": company.get_token()}))
+        response = self.client.get(
+            reverse("signup:employer", kwargs={"company_id": "0", "token": company.get_token()})
+        )
         self.assertRedirects(response, reverse("signup:company_select"))
         assertMessages(
             response,
@@ -227,7 +229,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         self.client.force_login(user)
         company = CompanyFactory(kind=CompanyKind.ETTI)
         response = self.client.get(
-            reverse("signup:siae_join", kwargs={"siae_id": "0", "token": company.get_token()}), follow=True
+            reverse("signup:company_join", kwargs={"company_id": "0", "token": company.get_token()}), follow=True
         )
         self.assertRedirects(response, reverse("signup:company_select"))
         assertMessages(
@@ -372,12 +374,17 @@ class SiaeSignupViewsExceptionsTest(TestCase):
 
         # Skip IC process and jump to joining the SIAE.
         token = company.get_token()
-        url = reverse("signup:siae_join", args=(company.pk, token))
+        url = reverse("signup:company_join", args=(company.pk, token))
 
         response = self.client.get(url)
         assertMessages(
             response,
-            [(messages.ERROR, "Vous ne pouvez pas rejoindre une SIAE avec ce compte car vous n'êtes pas employeur.")],
+            [
+                (
+                    messages.ERROR,
+                    "Vous ne pouvez pas rejoindre une structure avec ce compte car vous n'êtes pas employeur.",
+                )
+            ],
         )
         self.assertRedirects(response, reverse("search:siaes_home"))
 
