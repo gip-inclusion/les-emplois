@@ -28,14 +28,14 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
     def setUpTestData(cls):
         institution_membership = InstitutionMembershipFactory(institution__name="DDETS 87")
         cls.institution_user = institution_membership.user
-        company_membership = CompanyMembershipFactory(siae__name="Les petits jardins")
+        company_membership = CompanyMembershipFactory(company__name="Les petits jardins")
         cls.employer = company_membership.user
         cls.evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             evaluation_campaign__institution=institution_membership.institution,
             evaluation_campaign__name="Contrôle 2022",
-            siae=company_membership.siae,
+            siae=company_membership.company,
             notified_at=timezone.now(),
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat. Séparé de son chat pendant une journée.",
@@ -442,7 +442,7 @@ class TestViewProof:
     def test_access_no_proof(self, client):
         job_app = EvaluatedJobApplicationFactory()
         crit = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app, proof=None)
-        membership = CompanyMembershipFactory(siae_id=job_app.evaluated_siae.siae_id)
+        membership = CompanyMembershipFactory(company_id=job_app.evaluated_siae.siae_id)
         client.force_login(membership.user)
         url = reverse("siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": crit.pk})
         response = client.get(url)
@@ -452,7 +452,7 @@ class TestViewProof:
         job_app = EvaluatedJobApplicationFactory()
         key = default_storage.save("evaluations/test.pdf", pdf_file)
         crit = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app, proof=FileFactory(key=key))
-        membership = CompanyMembershipFactory(siae_id=job_app.evaluated_siae.siae_id)
+        membership = CompanyMembershipFactory(company_id=job_app.evaluated_siae.siae_id)
         url = reverse("siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": crit.pk})
         client.force_login(membership.user)
         # Boto3 signed requests depend on the current date, with a second resolution.
@@ -468,7 +468,7 @@ class TestViewProof:
         job_app = EvaluatedJobApplicationFactory()
         crit = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app)
         other_evaluated_siae = EvaluatedSiaeFactory()
-        membership = CompanyMembershipFactory(siae=other_evaluated_siae.siae)
+        membership = CompanyMembershipFactory(company=other_evaluated_siae.siae)
         url = reverse("siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": crit.pk})
         client.force_login(membership.user)
         response = client.get(url)

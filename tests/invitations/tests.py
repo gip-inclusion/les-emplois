@@ -168,7 +168,7 @@ class TestSiaeInvitation(TestCase):
 
     def test_add_inactive_member_back_to_company(self):
         invitation = SentEmployerInvitationFactory(email="hey@you.com")
-        CompanyMembershipFactory(siae=invitation.siae, user__email=invitation.email, is_active=False)
+        CompanyMembershipFactory(company=invitation.siae, user__email=invitation.email, is_active=False)
         employers = invitation.siae.members.count()
         siae_active_members = invitation.siae.active_members.count()
         invitation.add_invited_user_to_company()

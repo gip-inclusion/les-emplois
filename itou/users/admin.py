@@ -47,9 +47,9 @@ class EmailAddressInline(ItouTabularInline):
 class CompanyMembershipInline(ItouTabularInline):
     model = CompanyMembership
     extra = 0
-    raw_id_fields = ("siae",)
+    raw_id_fields = ("company",)
     readonly_fields = (
-        "siae_id_link",
+        "company_id_link",
         "joined_at",
         "is_admin",
         "is_active",
@@ -68,8 +68,8 @@ class CompanyMembershipInline(ItouTabularInline):
     def has_add_permission(self, request, obj=None):
         return True
 
-    def siae_id_link(self, obj):
-        return get_admin_view_link(obj.siae)
+    def company_id_link(self, obj):
+        return get_admin_view_link(obj.company)
 
 
 class PrescriberMembershipInline(ItouTabularInline):

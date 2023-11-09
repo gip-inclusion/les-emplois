@@ -74,7 +74,7 @@ class SiaeJobApplicationListViewTest(TestCase):
         super().setUp()
         membership = CompanyMembershipFactory()
         self.user = membership.user
-        self.siae = membership.siae
+        self.siae = membership.company
 
     @staticmethod
     def url(evaluated_siae):
@@ -551,7 +551,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
         super().setUp()
         membership = CompanyMembershipFactory()
         self.user = membership.user
-        self.siae = membership.siae
+        self.siae = membership.company
 
     def test_access_without_activ_campaign(self):
         self.client.force_login(self.user)
@@ -725,7 +725,7 @@ class SiaeUploadDocsViewTest(TestCase):
         super().setUp()
         membership = CompanyMembershipFactory()
         self.user = membership.user
-        self.siae = membership.siae
+        self.siae = membership.company
 
     def test_access_on_unknown_evaluated_job_application(self):
         self.client.force_login(self.user)
@@ -740,7 +740,7 @@ class SiaeUploadDocsViewTest(TestCase):
     def test_access_without_ownership(self):
         membership = CompanyMembershipFactory()
         user = membership.user
-        siae = membership.siae
+        siae = membership.company
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(siae, user)
         criterion = (
             evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
@@ -891,7 +891,7 @@ class SiaeSubmitProofsViewTest(TestCase):
         super().setUp()
         membership = CompanyMembershipFactory()
         self.user = membership.user
-        self.company = membership.siae
+        self.company = membership.company
 
     @staticmethod
     def url(evaluated_siae):
@@ -1074,7 +1074,7 @@ class SiaeCalendarViewTest(TestCase):
         super().setUp()
         membership = CompanyMembershipFactory()
         self.user = membership.user
-        self.siae = membership.siae
+        self.siae = membership.company
 
     def test_active_campaign_calendar(self):
         calendar_html = """

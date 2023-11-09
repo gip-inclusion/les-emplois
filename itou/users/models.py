@@ -632,7 +632,10 @@ class User(AbstractUser, AddressMixin):
         # `company_set.active_or_in_grace_period()` and `companymembership_set.active()` in a single query.
         user_company_set_pks = self.company_set.active_or_in_grace_period().values_list("pk", flat=True)
         memberships = (
-            self.companymembership_set.active().select_related("siae").filter(siae__pk__in=user_company_set_pks).all()
+            self.companymembership_set.active()
+            .select_related("company")
+            .filter(company__pk__in=user_company_set_pks)
+            .all()
         )
         return memberships
 

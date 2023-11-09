@@ -301,7 +301,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                "unique_together": {("user_id", "siae_id")},
+                "unique_together": {("user", "siae")},
                 "db_table": "siaes_siaemembership",
             },
         ),

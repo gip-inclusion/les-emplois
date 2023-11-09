@@ -27,8 +27,8 @@ class TestEvaluationCampaignAdmin:
             siae__convention__siret_signature="00000000000032",
             siae__phone="",
         )
-        CompanyMembershipFactory(siae=campaign1_siae.siae, user__email="campaign1+1@beta.gouv.fr")
-        CompanyMembershipFactory(siae=campaign1_siae.siae, user__email="campaign1+2@beta.gouv.fr")
+        CompanyMembershipFactory(company=campaign1_siae.siae, user__email="campaign1+1@beta.gouv.fr")
+        CompanyMembershipFactory(company=campaign1_siae.siae, user__email="campaign1+2@beta.gouv.fr")
         campaign2 = EvaluationCampaignFactory(name="Contrôle 01/01/2021", institution__name="DDETS 01")
         campaign2_siae = EvaluatedSiaeFactory(
             evaluation_campaign=campaign2,
@@ -38,7 +38,7 @@ class TestEvaluationCampaignAdmin:
             siae__phone="0612345678",
             reviewed_at=timezone.now(),
         )
-        CompanyMembershipFactory(siae=campaign2_siae.siae, user__email="campaign2@beta.gouv.fr")
+        CompanyMembershipFactory(company=campaign2_siae.siae, user__email="campaign2@beta.gouv.fr")
         campaign3 = EvaluationCampaignFactory(
             name="Contrôle 01/01/2019", institution__name="DDETS 01", ended_at=timezone.now()
         )
@@ -52,7 +52,7 @@ class TestEvaluationCampaignAdmin:
             notification_text="Justificatifs mangés par le chat",
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.MISSING_PROOF,
         )
-        CompanyMembershipFactory(siae=campaign3_siae.siae, user__email="campaign3@beta.gouv.fr")
+        CompanyMembershipFactory(company=campaign3_siae.siae, user__email="campaign3@beta.gouv.fr")
         campaign4 = EvaluationCampaignFactory(name="Contrôle 01/01/2018", institution__name="DDETS 01")
         campaign4_siae = EvaluatedSiaeFactory(
             evaluation_campaign=campaign4,
@@ -75,7 +75,7 @@ class TestEvaluationCampaignAdmin:
             submitted_at=timezone.now() - relativedelta(days=1),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
-        CompanyMembershipFactory(siae=campaign4_siae.siae, user__email="campaign4@beta.gouv.fr")
+        CompanyMembershipFactory(company=campaign4_siae.siae, user__email="campaign4@beta.gouv.fr")
         # Not selected.
         EvaluatedSiaeFactory(evaluation_campaign__name="Contrôle 02/02/2020")
         admin_user = ItouStaffFactory(is_superuser=True)

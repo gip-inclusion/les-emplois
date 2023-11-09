@@ -95,7 +95,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
         )
         use_employee_record = factory.Trait(kind=factory.fuzzy.FuzzyChoice(models.Company.ASP_EMPLOYEE_RECORD_KINDS))
         with_membership = factory.Trait(
-            membership=factory.RelatedFactory("tests.companies.factories.CompanyMembershipFactory", "siae"),
+            membership=factory.RelatedFactory("tests.companies.factories.CompanyMembershipFactory", "company"),
         )
         with_jobs = factory.Trait(romes=factory.PostGeneration(_create_job_from_rome_code))
         for_snapshot = factory.Trait(
@@ -107,7 +107,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
                 "with_membership",
                 yes_declaration=factory.RelatedFactory(
                     "tests.companies.factories.CompanyMembershipFactory",
-                    "siae",
+                    "company",
                     user__for_snapshot=True,
                 ),
             ),
@@ -142,7 +142,7 @@ class CompanyMembershipFactory(factory.django.DjangoModelFactory):
         model = models.CompanyMembership
 
     user = factory.SubFactory(EmployerFactory)
-    siae = factory.SubFactory(CompanyFactory)
+    company = factory.SubFactory(CompanyFactory)
     is_admin = True
 
 
@@ -152,8 +152,8 @@ class CompanyWith2MembershipsFactory(CompanyFactory):
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
 
-    membership1 = factory.RelatedFactory(CompanyMembershipFactory, "siae")
-    membership2 = factory.RelatedFactory(CompanyMembershipFactory, "siae", is_admin=False)
+    membership1 = factory.RelatedFactory(CompanyMembershipFactory, "company")
+    membership2 = factory.RelatedFactory(CompanyMembershipFactory, "company", is_admin=False)
 
 
 class CompanyWith4MembershipsFactory(CompanyFactory):
@@ -163,13 +163,13 @@ class CompanyWith4MembershipsFactory(CompanyFactory):
     """
 
     # active admin user
-    membership1 = factory.RelatedFactory(CompanyMembershipFactory, "siae")
+    membership1 = factory.RelatedFactory(CompanyMembershipFactory, "company")
     # active normal user
-    membership2 = factory.RelatedFactory(CompanyMembershipFactory, "siae", is_admin=False)
+    membership2 = factory.RelatedFactory(CompanyMembershipFactory, "company", is_admin=False)
     # inactive admin user
-    membership3 = factory.RelatedFactory(CompanyMembershipFactory, "siae", user__is_active=False)
+    membership3 = factory.RelatedFactory(CompanyMembershipFactory, "company", user__is_active=False)
     # inactive normal user
-    membership4 = factory.RelatedFactory(CompanyMembershipFactory, "siae", is_admin=False, user__is_active=False)
+    membership4 = factory.RelatedFactory(CompanyMembershipFactory, "company", is_admin=False, user__is_active=False)
 
 
 CompanyWithMembershipAndJobsFactory = functools.partial(CompanyFactory, with_membership=True, with_jobs=True)

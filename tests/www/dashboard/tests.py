@@ -287,8 +287,8 @@ class DashboardViewTest(TestCase):
                     self.assertNotContains(response, "Créer/rejoindre une autre structure")
 
     def test_dashboard_siae_stats(self):
-        membershipfactory = CompanyMembershipFactory()
-        self.client.force_login(membershipfactory.user)
+        membership = CompanyMembershipFactory()
+        self.client.force_login(membership.user)
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Voir les données de candidatures de mes structures")
         self.assertContains(response, reverse("stats:stats_siae_hiring"))
@@ -395,14 +395,14 @@ class DashboardViewTest(TestCase):
             evaluation_campaign__name="Final decision reached",
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
-            siae=membership.siae,
+            siae=membership.company,
             notified_at=timezone.now(),
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat. Séparé de son chat pendant une journée.",
         )
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name="In progress",
-            siae=membership.siae,
+            siae=membership.company,
             evaluation_campaign__evaluations_asked_at=timezone.now(),
         )
         # Add jb applications and criterias to check for 1+N
@@ -416,12 +416,12 @@ class DashboardViewTest(TestCase):
             evaluation_campaign__name="Not notified",
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
-            siae=membership.siae,
+            siae=membership.company,
         )
         evaluated_siae_campaign_closed = EvaluatedSiaeFactory(
             evaluation_campaign__name="Just closed",
             complete=True,
-            siae=membership.siae,
+            siae=membership.company,
             evaluation_campaign__ended_at=timezone.now() - relativedelta(days=4),
             notified_at=timezone.now(),
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.MISSING_PROOF,
@@ -431,7 +431,7 @@ class DashboardViewTest(TestCase):
         EvaluatedSiaeFactory(
             evaluation_campaign__name="Long closed",
             complete=True,
-            siae=membership.siae,
+            siae=membership.company,
             evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
             notified_at=timezone.now(),
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
@@ -1529,7 +1529,7 @@ class EditUserPreferencesTest(TestCase):
     def test_employer_opt_in_siae_no_job_description(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
-        recipient = user.companymembership_set.get(siae=company)
+        recipient = user.companymembership_set.get(company=company)
         form_name = "new_job_app_notification_form"
 
         self.client.force_login(user)
@@ -1558,7 +1558,7 @@ class EditUserPreferencesTest(TestCase):
         company = CompanyWithMembershipAndJobsFactory()
         user = company.members.first()
         job_descriptions_pks = list(company.job_description_through.values_list("pk", flat=True))
-        recipient = user.companymembership_set.get(siae=company)
+        recipient = user.companymembership_set.get(company=company)
         form_name = "new_job_app_notification_form"
         self.client.force_login(user)
 
@@ -1586,7 +1586,7 @@ class EditUserPreferencesTest(TestCase):
     def test_employer_opt_out_siae_no_job_descriptions(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
-        recipient = user.companymembership_set.get(siae=company)
+        recipient = user.companymembership_set.get(company=company)
         form_name = "new_job_app_notification_form"
         self.client.force_login(user)
 
@@ -1614,7 +1614,7 @@ class EditUserPreferencesTest(TestCase):
         company = CompanyWithMembershipAndJobsFactory()
         user = company.members.first()
         job_descriptions_pks = list(company.job_description_through.values_list("pk", flat=True))
-        recipient = user.companymembership_set.get(siae=company)
+        recipient = user.companymembership_set.get(company=company)
         form_name = "new_job_app_notification_form"
         self.client.force_login(user)
 
@@ -1889,7 +1889,7 @@ def test_maze_survey(client, snapshot):
 
 @pytest.mark.parametrize("kind", CompanyKind)
 def test_alert_message_for_ai_stock_prolongation(client, snapshot, kind):
-    employer = CompanyMembershipFactory(siae__kind=kind).user
+    employer = CompanyMembershipFactory(company__kind=kind).user
     client.force_login(employer)
 
     response = client.get(reverse("dashboard:index"))

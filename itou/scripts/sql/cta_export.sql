@@ -73,7 +73,7 @@ with company_data as (
         inner join companies_companymembership as company_membership
             on (company_membership.user_id=u.id)
         inner join companies_company as company
-            on (company.id=company_membership.siae_id)
+            on (company.id=company_membership.company_id)
     where u.kind='employer' and company_membership.is_active
 ),
 

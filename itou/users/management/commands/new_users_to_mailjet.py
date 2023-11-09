@@ -124,7 +124,7 @@ class Command(BaseCommand):
                 CompanyMembership.objects.filter(
                     user_id=OuterRef("pk"),
                     is_active=True,
-                    siae__kind__in=SIAE_WITH_CONVENTION_KINDS,
+                    company__kind__in=SIAE_WITH_CONVENTION_KINDS,
                 )
             )
         )

@@ -170,7 +170,7 @@ class CompanyQuerySet(OrganizationQuerySet):
         # Prefer a sub query to a join for performance reasons.
         # See `self.with_count_recent_received_job_apps`.
         return self.annotate(
-            has_active_members=Exists(CompanyMembership.objects.filter(siae=OuterRef("pk"), is_active=True))
+            has_active_members=Exists(CompanyMembership.objects.filter(company=OuterRef("pk"), is_active=True))
         )
 
 
@@ -235,7 +235,7 @@ class Company(AddressMixin, OrganizationAbstract):
         settings.AUTH_USER_MODEL,
         verbose_name="membres",
         through="CompanyMembership",
-        through_fields=("siae", "user"),
+        through_fields=("company", "user"),
         blank=True,
     )
 
@@ -488,7 +488,7 @@ class Company(AddressMixin, OrganizationAbstract):
 class CompanyMembership(MembershipAbstract):
     """Intermediary model between `User` and `Company`."""
 
-    siae = models.ForeignKey(Company, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         related_name="updated_companymembership_set",
@@ -499,7 +499,9 @@ class CompanyMembership(MembershipAbstract):
     notifications = models.JSONField(verbose_name="notifications", default=dict, blank=True)
 
     class Meta:
-        unique_together = ("user_id", "siae_id")
+        constraints = [
+            models.UniqueConstraint(fields=["user", "company"], name="user_company_unique"),
+        ]
 
 
 class JobDescriptionQuerySet(models.QuerySet):
