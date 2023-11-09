@@ -16,6 +16,13 @@ class DatumCode(models.TextChoices):
     EMPLOYEE_RECORD_WITH_ERROR_AT_FIRST_EXCHANGE = "ER-102", "FS avec une erreur au premier retour"
     EMPLOYEE_RECORD_WITH_ERROR_3436_AT_FIRST_EXCHANGE = "ER-102-3436", "FS avec une erreur 3436 au premier retour"
     EMPLOYEE_RECORD_WITH_AT_LEAST_ONE_ERROR = "ER-103", "FS ayant eu au moins un retour en erreur"
+    # Approval - Base
+    APPROVAL_COUNT = "AP-001", "PASS IAE total"
+    APPROVAL_CANCELLED = "AP-002", "PASS IAE annulés"
+    # Approval - PE notification cycle
+    APPROVAL_PE_NOTIFY_SUCCESS = "AP-101", "PASS IAE synchronisés avec succès avec pole emploi"
+    APPROVAL_PE_NOTIFY_PENDING = "AP-102", "PASS IAE en attente de synchronisation avec pole emploi"
+    APPROVAL_PE_NOTIFY_ERROR = "AP-103", "PASS IAE en erreur de synchronisation avec pole emploi"
 
 
 class Datum(models.Model):
