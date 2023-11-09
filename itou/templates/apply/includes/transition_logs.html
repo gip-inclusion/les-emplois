@@ -3,7 +3,7 @@
         <li>
             Passé en "<b>{{ log.pretty_to_state }}</b>"
             <ul>
-                {% if log.to_state != job_application.state.workflow.STATE_OBSOLETE %}
+                {% if log.to_state != job_application.state.workflow.STATE_OBSOLETE and not request.user.is_job_seeker %}
                     <li>Par {{ log.user.get_full_name }}</li>
                 {% endif %}
                 <li>Le {{ log.timestamp|date:"d F Y à H:i" }}</li>
