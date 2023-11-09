@@ -32,15 +32,30 @@
                             <p>
                                 Afin de le prolonger ou de le suspendre, nous vous invitons à <a href="{% url 'apply:start' siae_pk=request.current_organization.pk %}">réaliser une auto-prescription</a>.
                             </p>
-                            <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
+                            <a class="btn btn-link btn-ico ps-lg-0 " href="{{ back_url }}" aria-label="Retourner à l'étape précédente">
+                                <i class="ri-arrow-go-back-line ri-lg"></i>
+                                <span>Retour</span>
+                            </a>
                         {% else %}
-                            <p>
-                                L'agrément <strong>{{ approval.number }}</strong> a été délivré pour <strong>{{ approval.first_name|title }} {{ approval.last_name|upper }}</strong>.
-                            </p>
-                            <p>Nous allons l'importer dans votre compte pour vous permettre de le suspendre ou de le prolonger.</p>
-                            <p>Mais avant, nous avons besoin de connaître l'adresse e-mail de votre salarié(e).</p>
-                            <a class="btn btn-outline-primary" href="{{ back_url }}">Annuler</a>
-                            <a class="btn btn-primary" href="{% url 'approvals:pe_approval_search_user' approval.pk %}">Continuer</a>
+                            <div class="c-form">
+                                <p>
+                                    L'agrément <strong>{{ approval.number }}</strong> a été délivré pour <strong>{{ approval.first_name|title }} {{ approval.last_name|upper }}</strong>.
+                                </p>
+                                <p>Nous allons l'importer dans votre compte pour vous permettre de le suspendre ou de le prolonger.</p>
+                                <p>Mais avant, nous avons besoin de connaître l'adresse e-mail de votre salarié(e).</p>
+                                <hr>
+                                <div class="form-row align-items-center justify-content-end gx-3">
+                                    <div class="form-group col-6 col-lg-auto">
+                                        <a href="{{ back_url }}" class="btn btn-block btn-ico btn-outline-primary">
+                                            <i class="ri-close-fill ri-lg"></i>
+                                            <span>Annuler</span>
+                                        </a>
+                                    </div>
+                                    <div class="form-group col-6 col-lg-auto">
+                                        <a class="btn btn-primary btn-block" href="{% url 'approvals:pe_approval_search_user' approval.pk %}">Continuer</a>
+                                    </div>
+                                </div>
+                            </div>
                         {% endif %}
 
                     {% else %}

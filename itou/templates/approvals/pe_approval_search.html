@@ -28,13 +28,19 @@
 
                     {% endif %}
 
-                    <form method="get" role="form" class="js-prevent-multiple-submit">
+                    <div class="c-form">
+                        <form method="get" role="form" class="js-prevent-multiple-submit">
 
-                        {% bootstrap_form form alert_error_type="all" %}
+                            {% bootstrap_form form alert_error_type="all" %}
 
-                        <div class="form-group">{% bootstrap_button "Rechercher" button_type="submit" button_class="btn btn-primary" %}</div>
-
-                    </form>
+                            <hr>
+                            <div class="form-row align-items-center justify-content-end gx-3">
+                                <div class="form-group col-12 col-lg-auto">
+                                    {% bootstrap_button "Rechercher" button_type="submit" button_class="btn btn-primary w-100 w-lg-auto" %}
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
