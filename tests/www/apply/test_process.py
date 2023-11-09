@@ -342,7 +342,8 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
 
         # transition logs setup
-        job_application.process(user=job_application.to_siae.active_members.first())
+        job_application.process(user=job_application.to_company.active_members.first())
+        jatl = job_application.logs.first()
 
         self.client.force_login(job_application.job_seeker)
 
@@ -350,8 +351,11 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         html_fragment = self._get_transition_logs_content(response, job_application)
 
-        self.assertIsNone(html_fragment)
-        # upcoming tests when job seeker can see transition logs
+        self.assertIsNotNone(html_fragment)
+        self.assertEqual(html_fragment.b.string, jatl.pretty_to_state)
+        # transition logs user is hidden for job seeker
+        self.assertFalse(html_fragment.find("li", string=f"Par {jatl.user.get_full_name()}"))
+        self.assertTrue(html_fragment.find("li", string=f'Le {date_format(localtime(jatl.timestamp), "d F Y à H:i")}'))
 
     def test_details_for_job_seeker_when_refused(self, *args, **kwargs):
         job_application = JobApplicationFactory(

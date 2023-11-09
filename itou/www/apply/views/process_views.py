@@ -59,6 +59,8 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
         JobApplication, id=job_application_id, job_seeker=request.user, hidden_for_siae=False
     )
 
+    transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
+
     expired_eligibility_diagnosis = EligibilityDiagnosis.objects.last_expired(
         job_seeker=job_application.job_seeker, for_siae=job_application.to_company
     )
@@ -76,6 +78,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "job_application": job_application,
+        "transition_logs": transition_logs,
         "back_url": back_url,
         "matomo_custom_title": "Candidature",
     }
