@@ -200,7 +200,7 @@ class SiaeModelTest(TestCase):
         assert company.name in email.subject
         assert company.kind in email.body
         assert company.siret in email.body
-        assert reverse("signup:siae_select") in email.body
+        assert reverse("signup:company_select") in email.body
 
     def test_deactivation_queryset_methods(self):
         company = CompanyFactory()

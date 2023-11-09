@@ -381,7 +381,7 @@ class Company(AddressMixin, OrganizationAbstract):
         if self.has_members or not self.auth_email:
             raise ValidationError("Company cannot be signed up for, this should never happen.")
         to = [self.auth_email]
-        context = {"siae": self, "signup_url": reverse("signup:siae_select")}
+        context = {"siae": self, "signup_url": reverse("signup:company_select")}
         subject = "siaes/email/activate_your_account_subject.txt"
         body = "siaes/email/activate_your_account_body.txt"
         return get_email_message(to, context, subject, body)

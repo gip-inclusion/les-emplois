@@ -38,7 +38,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, "Employeur solidaire")
 
         response = self.client.post(url, data={"kind": UserKind.EMPLOYER})
-        self.assertRedirects(response, reverse("signup:siae_select"))
+        self.assertRedirects(response, reverse("signup:company_select"))
 
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
@@ -49,7 +49,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         company = CompanyFactory(kind=CompanyKind.ETTI)
         assert 0 == company.members.count()
 
-        url = reverse("signup:siae_select")
+        url = reverse("signup:company_select")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -114,7 +114,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
         # Magic link is no longer valid because siae.members.count() has changed.
         response = self.client.get(magic_link, follow=True)
-        self.assertRedirects(response, reverse("signup:siae_select"))
+        self.assertRedirects(response, reverse("signup:company_select"))
         expected_message = (
             "Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription."
         )
@@ -211,7 +211,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
     def test_user_invalid_siae_id(self):
         company = CompanyFactory(kind=CompanyKind.ETTI)
         response = self.client.get(reverse("signup:employer", kwargs={"siae_id": "0", "token": company.get_token()}))
-        self.assertRedirects(response, reverse("signup:siae_select"))
+        self.assertRedirects(response, reverse("signup:company_select"))
         assertMessages(
             response,
             [
@@ -229,7 +229,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         response = self.client.get(
             reverse("signup:siae_join", kwargs={"siae_id": "0", "token": company.get_token()}), follow=True
         )
-        self.assertRedirects(response, reverse("signup:siae_select"))
+        self.assertRedirects(response, reverse("signup:company_select"))
         assertMessages(
             response,
             [
@@ -322,7 +322,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         assert len(mail.outbox) == 0
 
     def test_facilitator_base_signup_process(self):
-        url = reverse("signup:siae_select")
+        url = reverse("signup:company_select")
         response = self.client.get(url, {"siren": "111111111"})  # not existing SIREN
         self.assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
         self.assertContains(response, get_tally_form_url("wA799W"))
@@ -341,7 +341,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         for siae in siaes:
             CompanyMembershipFactory.create_batch(2, siae=siae)
 
-        url = reverse("signup:siae_select")
+        url = reverse("signup:company_select")
         # ensure we only perform 4 requests, whatever the number of SIAEs sharing the
         # same SIREN. Before, this request was issuing 3*N slow requests, N being the
         # number of SIAEs.

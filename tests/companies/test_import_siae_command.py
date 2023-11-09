@@ -221,7 +221,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
     def test_activate_your_account_email_for_a_siae_without_members_but_with_auth_email(self):
         instance = lazy_import_siae_command()
         instance.create_new_siaes()
-        assert reverse("signup:siae_select") in mail.outbox[0].body
+        assert reverse("signup:company_select") in mail.outbox[0].body
         assert collections.Counter(mail.subject for mail in mail.outbox) == collections.Counter(
             f"Activez le compte de votre {kind} {name} sur les emplois de l'inclusion"
             for (kind, name) in Company.objects.values_list("kind", "name")
