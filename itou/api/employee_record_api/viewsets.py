@@ -150,17 +150,19 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
         # - and only when rendering a template
 
         # Query optimization:
-        # if `siaes` is not wrapped into a list,
+        # if `companies` is not wrapped into a list,
         # the resulting queryset will be reused as a subquery in the main query (below),
         # leading to ghastly performance issues.
         # Using a list gives a 20-50x speed gain on the query.
-        siaes = list(
+        companies = list(
             self.request.user.company_set.filter(companymembership__is_active=True, companymembership__is_admin=True)
             .active_or_in_grace_period()
             .values_list("pk", flat=True)
         )
         try:
-            return queryset.filter(job_application__to_company__id__in=siaes).order_by("-created_at", "-updated_at")
+            return queryset.filter(job_application__to_company__id__in=companies).order_by(
+                "-created_at", "-updated_at"
+            )
         finally:
             # Tracking is currently done via user-agent header
             logger.info(

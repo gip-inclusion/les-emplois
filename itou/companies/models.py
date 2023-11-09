@@ -38,12 +38,12 @@ class CompanyQuerySet(OrganizationQuerySet):
             # GEIQ, EA, EATT, ... have no convention logic and thus are always active.
             # `~` means NOT, similarly to dataframes.
             ~Q(kind__in=SIAE_WITH_CONVENTION_KINDS)
-            # Staff created siaes are always active until eventually
-            # converted to ASP source siaes by import_siae script.
-            # Such siaes are created by our staff when ASP data is lacking
+            # Staff created companiess are always active until eventually
+            # converted to ASP source companies by import_siae script.
+            # Such companies are created by our staff when ASP data is lacking
             # the most recent data about them.
             | Q(source=Company.SOURCE_STAFF_CREATED)
-            # ASP source siaes and user created siaes are active if and only
+            # ASP source companies and user created companies are active if and only
             # if they have an active convention.
             | has_active_convention
             # Exclude POLE EMPLOI specifically since it is there to be linked with
@@ -183,7 +183,7 @@ class Company(AddressMixin, OrganizationAbstract):
     """
     Structures d'insertion par l'activité économique.
 
-    To retrieve jobs of an siae:
+    To retrieve jobs of an company:
         self.jobs.all()             <QuerySet [<Appellation>, ...]>
         self.job_description_through.all()     <QuerySet [<JobDescription>, ...]>
     """
