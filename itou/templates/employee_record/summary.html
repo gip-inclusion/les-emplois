@@ -33,6 +33,20 @@
                     </div>
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2 mb-3">
+                    {% if employee_record.status != "READY" and employee_record.status != "SENT" %}
+                        <div class="c-box mb-4">
+                            {% if employee_record.status == "NEW" %}
+                                <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=NEW" class="btn btn-block btn-primary my-2">Compléter la fiche salarié</a>
+                            {% elif employee_record.status == "REJECTED" %}
+                                <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=REJECTED" class="btn btn-block btn-primary my-2">Modifier la fiche salarié</a>
+                            {% elif employee_record.status == "DISABLED" %}
+                                <a href="{% url "employee_record_views:reactivate" employee_record.pk %}" class="btn btn-block btn-outline-primary my-2">Réactiver la fiche salarié</a>
+                            {% endif %}
+                            {% if employee_record.status == "REJECTED" or employee_record.status == "PROCESSED" %}
+                                <a href="{% url "employee_record_views:disable" employee_record.pk %}" class="btn btn-block btn-outline-primary my-2">Désactiver la fiche salarié</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                     <div class="c-box">
                         {% with job_application=employee_record.job_application %}
                             <p>
