@@ -22,15 +22,16 @@
                         <hr>
                         <div>
                             {% if can_update_job_description %}
-                                <div class="row mb-4">
-                                    <div class="col">
-                                        <a href="{% url "companies_views:update_job_description" job_description_id=job.pk %}" class="btn btn-sm btn-outline-primary" aria-label="Modifier la fiche de poste">
-                                            Modifier
+                                <div class="form-row align-items-center gx-3 mb-4">
+                                    <div class="form-group col-12 col-lg order-2 order-lg-1">
+                                        <a href="{% url "companies_views:job_description_list" %}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retour vers la liste des postes">
+                                            <i class="ri-arrow-go-back-line ri-lg"></i>
+                                            <span>Retour</span>
                                         </a>
                                     </div>
-                                    <div class="col-auto">
-                                        <a href="{% url "companies_views:job_description_list" %}" class="btn btn-sm btn-primary" aria-label="Retour vers la liste des postes">
-                                            Fermer
+                                    <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                                        <a href="{% url "companies_views:update_job_description" job_description_id=job.pk %}" class="btn btn-primary btn-block" aria-label="Modifier la fiche de poste">
+                                            Modifier
                                         </a>
                                     </div>
                                 </div>
@@ -55,7 +56,7 @@
 
                                 {% if others_active_jobs and not siae.block_job_applications %}
                                     <hr>
-                                    <h2 class="h2">
+                                    <h2>
                                         Consulter le{{ others_active_jobs|pluralizefr }} recrutement{{ others_active_jobs|pluralizefr }} en cours dans cette structure
                                     </h2>
                                     <ul class="list-group list-group-flush mb-4">
