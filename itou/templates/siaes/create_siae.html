@@ -5,18 +5,17 @@
 
 {% block content_title %}
     <h1>Créer/rejoindre une nouvelle structure</h1>
-    <div class="alert alert-info">
-        <p>Vous souhaitez rejoindre une structure :</p>
-        <ul>
-            <li>
-                ayant déjà un ou plusieurs membres, <b>demandez à l’un de ces membres de vous inviter depuis son tableau de bord</b>
-            </li>
-            <li>
-                connue des services des emplois de l'inclusion mais n’ayant pas encore de membre : <a href="{% url 'signup:company_select' %}">utilisez ce formulaire</a>
-            </li>
-        </ul>
-        <p class="mb-0">Dans les autres cas, complétez le formulaire ci-dessous.</p>
-    </div>
+    <p>Vous souhaitez rejoindre une structure :</p>
+    <ul>
+        <li>
+            ayant déjà un ou plusieurs membres, <b>demandez à l’un de ces membres de vous inviter depuis son tableau de bord</b>
+        </li>
+        <li>
+            connue des services des emplois de l'inclusion mais n’ayant pas encore de membre : <a href="{% url 'signup:company_select' %}">utilisez ce formulaire</a>
+        </li>
+    </ul>
+    <p class="mb-0">Dans les autres cas, complétez le formulaire ci-dessous.</p>
+
 {% endblock %}
 
 {% block content %}
@@ -44,12 +43,28 @@
                                 {% bootstrap_field field %}
                             {% endfor %}
 
-                            <p>
-                                En cliquant sur le bouton "Enregistrer", vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
-                            </p>
-                            <div class="form-group">
-                                <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
-                                {% bootstrap_button "Enregistrer" button_type="submit" button_class="btn btn-primary" %}
+                            <hr>
+                            <div class="alert alert-warning">
+                                <div class="row">
+                                    <div class="col-auto pe-0">
+                                        <i class="ri-information-line ri-xl"></i>
+                                    </div>
+                                    <div class="col">
+                                        En cliquant sur le bouton <b>« Enregistrer »</b>, vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row align-items-center gx-3">
+                                <div class="form-group col-12 col-lg order-2 order-lg-1">
+                                    <a href="{% url 'dashboard:index' %}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retourner au tableau de bord">
+                                        <i class="ri-arrow-go-back-line ri-lg"></i>
+                                        <span>Retour</span>
+                                    </a>
+                                </div>
+                                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                                    <button class="btn btn-primary btn-block" aria-label="Enregister la fiche structure">Enregistrer</button>
+                                </div>
                             </div>
                         </form>
                     </div>
