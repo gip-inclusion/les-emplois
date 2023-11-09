@@ -27,18 +27,18 @@
                     </div>
 
                     <div class="c-form">
-                        <div class="text-center">
-                            <h1 class="h1-hero">
+                        <div class="text-center mb-3 mb-lg-5">
+                            <div class="mb-2">
                                 <img src="{% static 'img/edit_siae_header.svg' %}" alt="En-tête édition SIAE" class="edit-siae-header-image">
-                            </h1>
-                            <h2 class="h1">
+                            </div>
+                            <h1>
                                 Informations générales
                                 <br class="d-none d-lg-inline">
                                 de ma structure
-                            </h2>
+                            </h1>
                         </div>
 
-                        <div class="card c-card c-card--emploi my-3 my-lg-5">
+                        <div class="card c-card c-card--emploi mb-3 mb-lg-5">
                             <div class="card-body">
                                 <p>
                                     <i class="ri-home-7-line ri-xl me-2"></i>{{ siae.kind }} - {{ siae.get_kind_display }}
@@ -66,14 +66,16 @@
                             {% bootstrap_field form.email %}
                             {% bootstrap_field form.website %}
 
-                            <hr class="my-3 my-lg-5">
-
-                            <div class="row mt-3 mt-lg-5 justify-content-end">
-                                <div class="col-6 col-lg-auto">
-                                    <a class="btn btn-link" aria-label="Retourner au tableau de bord" href="{% url 'dashboard:index' %}">Retour</a>
+                            <hr>
+                            <div class="form-row align-items-center gx-3">
+                                <div class="form-group col-12 col-lg order-2 order-lg-1">
+                                    <a href="{% url 'dashboard:index' %}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retourner au tableau de bord">
+                                        <i class="ri-arrow-go-back-line ri-lg"></i>
+                                        <span>Retour</span>
+                                    </a>
                                 </div>
-                                <div class="col-6 col-lg-auto">
-                                    <button aria-label="Vers l'étape suivante du formulaire" class="btn float-end btn-primary">Suivant</button>
+                                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                                    <button class="btn btn-primary btn-block" aria-label="Vers l'étape suivante du formulaire">Suivant</button>
                                 </div>
                             </div>
                         </form>
