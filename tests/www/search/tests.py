@@ -245,7 +245,7 @@ class SearchSiaeTest(TestCase):
         self.assertNotContains(response, hiring_str)
         self.assertContains(response, no_hiring_str)
 
-        CompanyMembershipFactory(siae=company)
+        CompanyMembershipFactory(company=company)
         response = self.client.get(self.url, {"city": city.slug})
         self.assertContains(response, hiring_str)
         self.assertNotContains(response, no_hiring_str)

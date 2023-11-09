@@ -57,18 +57,18 @@ class ItouCurrentOrganizationMiddleware:
                 siaes = {
                     siae.pk: siae
                     for siae in user.company_set.filter(
-                        pk__in=[membership.siae_id for membership in active_memberships]
+                        pk__in=[membership.company_id for membership in active_memberships]
                     ).active_or_in_grace_period()
                 }
                 really_active_memberships = []
                 for membership in active_memberships:
-                    if membership.siae_id in siaes:
+                    if membership.company_id in siaes:
                         # The siae is active (or in grace period)
-                        membership.siae = siaes[membership.siae_id]
+                        membership.company = siaes[membership.company_id]
                         really_active_memberships.append(membership)
                 # If there is no current siae, we want to default to the first active one
                 # (and preferably not one in grace period)
-                really_active_memberships.sort(key=lambda m: (m.siae.has_convention_in_grace_period, m.created_at))
+                really_active_memberships.sort(key=lambda m: (m.company.has_convention_in_grace_period, m.created_at))
 
                 (
                     request.organizations,
@@ -76,7 +76,7 @@ class ItouCurrentOrganizationMiddleware:
                     request.is_current_organization_admin,
                 ) = extract_membership_infos_and_update_session(
                     really_active_memberships,
-                    "siae",
+                    "company",
                     request.session,
                 )
 

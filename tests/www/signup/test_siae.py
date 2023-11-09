@@ -331,7 +331,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, reverse("signup:facilitator_search"))
 
     def test_siae_select_does_not_die_under_requests(self):
-        siaes = (
+        companies = (
             CompanyWithMembershipAndJobsFactory(siret="40219166200001"),
             CompanyWithMembershipAndJobsFactory(siret="40219166200002"),
             CompanyWithMembershipAndJobsFactory(siret="40219166200003"),
@@ -340,8 +340,8 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
             CompanyWithMembershipAndJobsFactory(siret="40219166200005", kind=CompanyKind.AI),
         )
         # Add more than one member to all SIAE to test prefetch and distinct
-        for siae in siaes:
-            CompanyMembershipFactory.create_batch(2, siae=siae)
+        for company in companies:
+            CompanyMembershipFactory.create_batch(2, company=company)
 
         url = reverse("signup:company_select")
         # ensure we only perform 4 requests, whatever the number of SIAEs sharing the

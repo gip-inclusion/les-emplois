@@ -937,7 +937,7 @@ def test_populate_memberships():
             (
                 company_membership.user_id,
                 True,
-                company_membership.siae_id,
+                company_membership.company_id,
                 None,
                 None,
                 datetime.date(2023, 2, 1),

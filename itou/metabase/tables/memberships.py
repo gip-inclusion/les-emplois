@@ -18,7 +18,7 @@ TABLE.add_columns(
             "name": "id_structure",
             "type": "integer",
             "comment": "ID structure",
-            "fn": lambda o: o.siae_id if isinstance(o, CompanyMembership) else None,
+            "fn": lambda o: o.company_id if isinstance(o, CompanyMembership) else None,
         },
         {
             "name": "id_organisation",

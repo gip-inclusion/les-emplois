@@ -257,7 +257,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
 
     def test_already_a_member(self):
         # The invited user is already a member
-        CompanyMembershipFactory(siae=self.sender_company, is_admin=False)
+        CompanyMembershipFactory(company=self.sender_company, is_admin=False)
         guest = self.sender_company.members.exclude(email=self.sender.email).first()
         self.client.force_login(self.sender)
         self.post_data.update(

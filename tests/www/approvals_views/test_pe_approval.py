@@ -41,8 +41,8 @@ class PoleEmploiApprovalSearchTest(TestCase):
         """
         The search for PE approval screen should not crash ;)
         """
-        company = CompanyMembershipFactory()
-        self.client.force_login(company.user)
+        membership = CompanyMembershipFactory()
+        self.client.force_login(membership.user)
 
         response = self.client.get(self.url)
         self.assertContains(response, "Rechercher")
@@ -63,8 +63,8 @@ class PoleEmploiApprovalSearchTest(TestCase):
         """
         Don't accept approval suffixes (example: 1234567890123P01).
         """
-        company = CompanyMembershipFactory()
-        self.client.force_login(company.user)
+        membership = CompanyMembershipFactory()
+        self.client.force_login(membership.user)
 
         response = self.client.get(self.url, {"number": "1234567890123P01"})
         assert not response.context["form"].is_valid()
@@ -74,8 +74,8 @@ class PoleEmploiApprovalSearchTest(TestCase):
         The search for PE approval screen should display that there is no results
         if a PE approval number was searched for but nothing was found
         """
-        company = CompanyMembershipFactory()
-        self.client.force_login(company.user)
+        membership = CompanyMembershipFactory()
+        self.client.force_login(membership.user)
 
         response = self.client.get(self.url, {"number": 123123123123})
         self.assertNotContains(response, "Continuer")

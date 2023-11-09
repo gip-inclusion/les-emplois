@@ -54,7 +54,7 @@ class NotificationsBaseClassTest(TestCase):
         assert self.companymembership_set.filter(user__email__in=recipients_emails).count() == len(recipients_emails)
 
     def test_inactive_user_not_in_recipients(self):
-        CompanyMembershipFactory(siae=self.company, user__is_active=False, is_admin=False)
+        CompanyMembershipFactory(company=self.company, user__is_active=False, is_admin=False)
         assert self.companymembership_set.count() == 2
 
         recipients = self.notification.get_recipients()
@@ -62,7 +62,7 @@ class NotificationsBaseClassTest(TestCase):
 
     def test_get_recipients_default_send_to_unset_recipients(self):
         # Unset recipients are present in get_recipients if SEND_TO_UNSET_RECIPIENTS = True
-        CompanyMembershipFactory(siae=self.company, user__is_active=False, is_admin=False)
+        CompanyMembershipFactory(company=self.company, user__is_active=False, is_admin=False)
         recipients = self.notification.get_recipients()
 
         assert self.companymembership_set.count() == 2

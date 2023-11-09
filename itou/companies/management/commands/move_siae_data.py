@@ -126,8 +126,8 @@ class Command(BaseCommand):
             self.stdout.write(f"| Job descriptions: {job_descriptions.count()}\n")
 
             # Move users not already present in siae destination
-            members = siaes_models.CompanyMembership.objects.filter(siae_id=from_id).exclude(
-                user__in=users_models.User.objects.filter(companymembership__siae_id=to_id)
+            members = siaes_models.CompanyMembership.objects.filter(company_id=from_id).exclude(
+                user__in=users_models.User.objects.filter(companymembership__company_id=to_id)
             )
             self.stdout.write(f"| Members: {members.count()}\n")
 
@@ -143,7 +143,7 @@ class Command(BaseCommand):
             # Don't move invitations for existing members
             # The goal is to keep information about the original information
             invitations = invitations_models.EmployerInvitation.objects.filter(siae_id=from_id).exclude(
-                email__in=users_models.User.objects.filter(companymembership__siae_id=to_id).values_list(
+                email__in=users_models.User.objects.filter(companymembership__company_id=to_id).values_list(
                     "email", flat=True
                 )
             )
@@ -237,7 +237,7 @@ class Command(BaseCommand):
             if move_all_data:
                 # do not move duplicated job_descriptions
                 job_descriptions.exclude(appellation_id__in=to_company_appellation_id).update(company_id=to_id)
-                members.update(siae_id=to_id)
+                members.update(company_id=to_id)
                 diagnoses.update(author_siae_id=to_id)
                 prolongations.update(declared_by_siae_id=to_id)
                 suspensions.update(siae_id=to_id)

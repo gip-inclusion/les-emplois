@@ -223,7 +223,7 @@ def render_stats_siae(request, page_title):
         context=context,
         params={
             mb.C1_SIAE_FILTER_KEY: [
-                str(membership.siae_id) for membership in request.user.active_or_in_grace_period_siae_memberships()
+                str(membership.company_id) for membership in request.user.active_or_in_grace_period_siae_memberships()
             ]
         },
     )

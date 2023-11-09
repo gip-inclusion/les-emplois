@@ -374,12 +374,12 @@ class TestApprovalDetailView:
             user__email="oph@dewinter.com",
             user__first_name="Milady",
             user__last_name="de Winter",
-            siae__id=999999,
-            siae__name="ACI de la Rochelle",
+            company__id=999999,
+            company__name="ACI de la Rochelle",
         )
         job_application = JobApplicationFactory(
             hiring_start_at=datetime.date(2021, 3, 1),
-            to_company=membership.siae,
+            to_company=membership.company,
             job_seeker=JobSeekerFactory(last_name="John", first_name="Doe"),
             with_approval=True,
             # Don't set an ASP_ITOU_PREFIX (see approval.save for details)

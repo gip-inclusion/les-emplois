@@ -274,7 +274,7 @@ class CompanyJoinView(LoginRequiredMixin, CompanyBaseView):
 
         CompanyMembership.objects.create(
             user=request.user,
-            siae=self.company,
+            company=self.company,
             # Only the first member becomes an admin.
             is_admin=self.company.active_members.count() == 0,
         )
@@ -768,7 +768,7 @@ class FacilitatorBaseMixin:
 
     def _get_session_siae(self):
         org_data = self.request.session[ITOU_SESSION_FACILITATOR_SIGNUP_KEY]
-        self.siae_to_create = Company(
+        self.company_to_create = Company(
             kind=CompanyKind.OPCS,
             source=Company.SOURCE_USER_CREATED,
             siret=org_data["siret"],
@@ -822,19 +822,19 @@ class FacilitatorUserView(FacilitatorBaseMixin, TemplateView):
         )
         return super().get_context_data(**kwargs) | {
             "inclusion_connect_url": inclusion_connect_url,
-            "company": self.siae_to_create,
+            "company": self.company_to_create,
         }
 
 
 class FacilitatorJoinView(FacilitatorBaseMixin, View):
     def get(self, request, *args, **kwargs):
-        self.siae_to_create.auth_email = request.user.email
-        self.siae_to_create.created_by = request.user
-        self.siae_to_create.save()
+        self.company_to_create.auth_email = request.user.email
+        self.company_to_create.created_by = request.user
+        self.company_to_create.save()
 
         CompanyMembership.objects.create(
             user=request.user,
-            siae=self.siae_to_create,
+            company=self.company_to_create,
             is_admin=True,  # by construction, this user is the first of the SIAE.
         )
 
