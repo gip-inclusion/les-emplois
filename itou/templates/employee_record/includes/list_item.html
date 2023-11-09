@@ -149,7 +149,7 @@
                     {% if item.employee_record_new %}
                         <a href="{% url "employee_record_views:disable" item.employee_record_new.id %}" class="btn btn-sm btn-outline-primary mt-2">Désactiver la fiche salarié</a>
                     {% endif %}
-                    <a href="{% url "employee_record_views:create" item.id %}?from_status=NEW" class="btn btn-sm btn-outline-primary mt-2">Créer la fiche salarié</a>
+                    <a href="{% url "employee_record_views:create" item.id %}?from_status=NEW" class="btn btn-sm btn-outline-primary mt-2">Compléter la fiche salarié</a>
                 </div>
             {% endif %}
         {% else %}

@@ -140,7 +140,7 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url + "?status=NEW")
 
         self.assertContains(response, "Désactiver la fiche salarié")
-        self.assertContains(response, "Créer la fiche salarié")
+        self.assertContains(response, "Compléter la fiche salarié")
 
     @override_settings(TALLY_URL="https://tally.so")
     def test_employee_records_with_nir_associated_to_other(self):
@@ -174,7 +174,7 @@ class ListEmployeeRecordsTest(TestCase):
         self.assertContains(response, "demander la régularisation du numéro de sécurité sociale")
         self.assertContains(response, f'href="https://tally.so/r/wzxQlg?employeerecord={ new_er.pk }"')
         self.assertNotContains(response, "Désactiver la fiche salarié")
-        self.assertNotContains(response, "Créer la fiche salarié")
+        self.assertNotContains(response, "Compléter la fiche salarié")
 
     def test_rejected_without_custom_message(self):
         self.client.force_login(self.user)
