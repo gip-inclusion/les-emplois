@@ -214,13 +214,13 @@ class EvaluationCampaign(models.Model):
         # accepted job_applications with self-approval made by hiring siae.
         return (
             JobApplication.objects.exclude(approval=None)
-            .select_related("approval", "to_siae", "eligibility_diagnosis", "eligibility_diagnosis__author_siae")
+            .select_related("approval", "to_company", "eligibility_diagnosis", "eligibility_diagnosis__author_siae")
             .filter(
-                to_siae__department=self.institution.department,
-                to_siae__kind__in=evaluation_enums.EvaluationSiaesKind.Evaluable,
+                to_company__department=self.institution.department,
+                to_company__kind__in=evaluation_enums.EvaluationSiaesKind.Evaluable,
                 state=JobApplicationWorkflow.STATE_ACCEPTED,
                 eligibility_diagnosis__author_kind=KIND_EMPLOYER,
-                eligibility_diagnosis__author_siae=F("to_siae"),
+                eligibility_diagnosis__author_siae=F("to_company"),
                 hiring_start_at__gte=self.evaluated_period_start_at,
                 hiring_start_at__lte=self.evaluated_period_end_at,
                 approval__number__startswith=settings.ASP_ITOU_PREFIX,
@@ -230,9 +230,9 @@ class EvaluationCampaign(models.Model):
     def eligible_siaes(self):
         return (
             self.eligible_job_applications()
-            .values("to_siae")
-            .annotate(to_siae_count=Count("to_siae"))
-            .filter(to_siae_count__gte=evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN)
+            .values("to_company")
+            .annotate(to_company_count=Count("to_company"))
+            .filter(to_company_count__gte=evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN)
         )
 
     def number_of_siaes_to_select(self):
@@ -243,7 +243,9 @@ class EvaluationCampaign(models.Model):
 
     def eligible_siaes_under_ratio(self):
         return (
-            self.eligible_siaes().values_list("to_siae", flat=True).order_by("?")[: self.number_of_siaes_to_select()]
+            self.eligible_siaes()
+            .values_list("to_company", flat=True)
+            .order_by("?")[: self.number_of_siaes_to_select()]
         )
 
     def populate(self, set_at):
@@ -267,7 +269,7 @@ class EvaluationCampaign(models.Model):
                     EvaluatedJobApplication(evaluated_siae=evaluated_siae, job_application=job_application)
                     for evaluated_siae in evaluated_siaes
                     for job_application in select_min_max_job_applications(
-                        self.eligible_job_applications().filter(to_siae=evaluated_siae.siae)
+                        self.eligible_job_applications().filter(to_company=evaluated_siae.siae)
                     )
                 ]
             )

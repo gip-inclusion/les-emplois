@@ -425,7 +425,7 @@ class RefusalForm(forms.Form):
 
     def __init__(self, job_application, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if job_application.to_siae.kind == CompanyKind.GEIQ:
+        if job_application.to_company.kind == CompanyKind.GEIQ:
             self.fields["refusal_reason"].choices = job_applications_enums.RefusalReason.displayed_choices(
                 extra_exclude_enums=[
                     job_applications_enums.RefusalReason.PREVENT_OBJECTIVES,
@@ -1086,13 +1086,13 @@ class PrescriberFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsFor
         to_siaes = data.get("to_siaes")
 
         if to_siaes:
-            qs = Q(to_siae__id__in=to_siaes)
+            qs = Q(to_company__id__in=to_siaes)
             qs_list.append(qs)
 
         return qs_list
 
     def get_to_siaes_choices(self):
-        to_siaes = self.job_applications_qs.get_unique_fk_objects("to_siae")
+        to_siaes = self.job_applications_qs.get_unique_fk_objects("to_company")
         to_siaes = [siae for siae in to_siaes if siae.display_name]
         to_siaes = [(siae.id, siae.display_name.title()) for siae in to_siaes]
         return sorted(to_siaes, key=lambda siae: siae[1])

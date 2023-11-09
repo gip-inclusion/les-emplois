@@ -2,7 +2,7 @@
 <ul>
     {% if request.user.is_prescriber %}
         <li>
-            Employeur : <b>{{ job_application.to_siae.display_name }}</b>
+            Employeur : <b>{{ job_application.to_company.display_name }}</b>
         </li>
     {% endif %}
     <li>

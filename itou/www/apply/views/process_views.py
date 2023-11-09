@@ -35,7 +35,7 @@ def check_waiting_period(job_application):
     # This code should still stay relevant for the 3.5 years to come to account for the PE approvals
     # that have been delivered in December 2021 (and that may have 2 years waiting periods)
     if job_application.job_seeker.approval_can_be_renewed_by(
-        siae=job_application.to_siae,
+        siae=job_application.to_company,
         sender_prescriber_organization=job_application.sender_prescriber_organization,
     ):
         raise PermissionDenied(apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
@@ -45,7 +45,9 @@ def _get_geiq_eligibility_diagnosis_for_siae(job_application):
     # Get current GEIQ diagnosis or *last expired one*
     return (
         job_application.geiq_eligibility_diagnosis
-        or GEIQEligibilityDiagnosis.objects.diagnoses_for(job_application.job_seeker, job_application.to_siae).first()
+        or GEIQEligibilityDiagnosis.objects.diagnoses_for(
+            job_application.job_seeker, job_application.to_company
+        ).first()
     )
 
 
@@ -66,7 +68,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
             "sender",
             "sender_siae",
             "sender_prescriber_organization",
-            "to_siae",
+            "to_company",
             "approval",
         )
         .prefetch_related("selected_jobs__appellation")
@@ -76,13 +78,13 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
 
     expired_eligibility_diagnosis = EligibilityDiagnosis.objects.last_expired(
-        job_seeker=job_application.job_seeker, for_siae=job_application.to_siae
+        job_seeker=job_application.job_seeker, for_siae=job_application.to_company
     )
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_siae"))
     geiq_eligibility_diagnosis = None
 
-    if job_application.to_siae.kind == CompanyKind.GEIQ:
+    if job_application.to_company.kind == CompanyKind.GEIQ:
         geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_siae(job_application)
 
     context = {
@@ -119,7 +121,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "sender",
         "sender_siae",
         "sender_prescriber_organization",
-        "to_siae",
+        "to_company",
         "approval",
     ).prefetch_related("selected_jobs__appellation")
     job_application = get_object_or_404(queryset, id=job_application_id)
@@ -138,7 +140,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
 
     # Latest GEIQ diagnosis for this job seeker created by a *prescriber*
     geiq_eligibility_diagnosis = (
-        job_application.to_siae.kind == CompanyKind.GEIQ
+        job_application.to_company.kind == CompanyKind.GEIQ
         and GEIQEligibilityDiagnosis.objects.valid()
         .filter(author_prescriber_organization__isnull=False)
         .for_job_seeker(job_application.job_seeker)
@@ -248,7 +250,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 
     return common_views._accept(
         request,
-        job_application.to_siae,
+        job_application.to_company,
         job_application.job_seeker,
         error_url=next_url,
         back_url=next_url,
@@ -271,7 +273,7 @@ class AcceptHTMXFragmentView(TemplateView):
             # TODO(xfernandez): remove this version in a week
             queryset = JobApplication.objects.siae_member_required(request.user)
             job_application = get_object_or_404(queryset, id=job_application_id)
-            siae = job_application.to_siae
+            siae = job_application.to_company
         self.form_accept = AcceptForm(instance=job_application, siae=siae, data=request.POST or None)
 
     def get_context_data(self, **kwargs):
@@ -309,7 +311,7 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
     """
     Trigger the `cancel` transition.
     """
-    queryset = JobApplication.objects.siae_member_required(request.user).select_related("to_siae")
+    queryset = JobApplication.objects.siae_member_required(request.user).select_related("to_company")
     job_application = get_object_or_404(queryset, id=job_application_id)
     check_waiting_period(job_application)
     next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
@@ -362,7 +364,7 @@ def archive(request, job_application_id):
     if request.method == "POST":
         try:
             username = job_application.job_seeker.get_full_name()
-            siae_name = job_application.to_siae.display_name
+            siae_name = job_application.to_company.display_name
 
             job_application.hidden_for_siae = True
             job_application.save()
@@ -421,7 +423,7 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
     )
     return common_views._eligibility(
         request,
-        job_application.to_siae,
+        job_application.to_company,
         job_application.job_seeker,
         cancel_url=reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id}),
         next_url=reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id}),
@@ -441,7 +443,7 @@ def geiq_eligibility(request, job_application_id, template_name="apply/process_g
     next_url = request.GET.get("next_url")
     return common_views._geiq_eligibility(
         request,
-        job_application.to_siae,
+        job_application.to_company,
         job_application.job_seeker,
         back_url=back_url,
         next_url=next_url,
@@ -463,7 +465,7 @@ def geiq_eligibility_criteria(
 
     queryset = JobApplication.objects.siae_member_required(request.user)
     job_application = get_object_or_404(queryset, pk=job_application_id)
-    return common_views._geiq_eligibility_criteria(request, job_application.to_siae, job_application.job_seeker)
+    return common_views._geiq_eligibility_criteria(request, job_application.to_company, job_application.job_seeker)
 
 
 @require_POST
@@ -492,7 +494,7 @@ def delete_prior_action(request, job_application_id, prior_action_id):
                 "transition_logs": job_application.logs.select_related("user").all().order_by("timestamp"),
                 "geiq_eligibility_diagnosis": (
                     _get_geiq_eligibility_diagnosis_for_siae(job_application)
-                    if job_application.to_siae.kind == CompanyKind.GEIQ
+                    if job_application.to_company.kind == CompanyKind.GEIQ
                     else None
                 ),
             },
@@ -559,7 +561,7 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
                     state_update = True
             form.save()
             geiq_eligibility_diagnosis = None
-            if state_update and job_application.to_siae.kind == CompanyKind.GEIQ:
+            if state_update and job_application.to_company.kind == CompanyKind.GEIQ:
                 geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_siae(job_application)
             return render(
                 request,

@@ -715,7 +715,7 @@ class User(AbstractUser, AddressMixin):
     def last_hire_was_made_by_siae(self, siae):
         if not self.is_job_seeker:
             return False
-        return self.last_accepted_job_application and self.last_accepted_job_application.to_siae == siae
+        return self.last_accepted_job_application and self.last_accepted_job_application.to_company == siae
 
     @classmethod
     def create_job_seeker_by_proxy(cls, proxy_user, **fields):

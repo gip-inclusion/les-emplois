@@ -3,7 +3,7 @@
 {% load str_filters %}
 {% block body %}
 
-La candidature suivante a été envoyée avec succès à l'entreprise {{ job_application.to_siae.display_name }} ({{ job_application.to_siae.kind }}) localisée à {{ job_application.to_siae.city }} !
+La candidature suivante a été envoyée avec succès à l'entreprise {{ job_application.to_company.display_name }} ({{ job_application.to_company.kind }}) localisée à {{ job_application.to_company.city }} !
 
 *Candidat* :
 

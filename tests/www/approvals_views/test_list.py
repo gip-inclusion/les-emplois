@@ -20,7 +20,7 @@ class TestApprovalsListView:
 
         approval_for_other_company = ApprovalFactory(with_jobapplication=True)
 
-        employer = job_application.to_siae.members.first()
+        employer = job_application.to_company.members.first()
         client.force_login(employer)
         url = reverse("approvals:list")
         response = client.get(url)
@@ -36,10 +36,10 @@ class TestApprovalsListView:
 
         another_approval = ApprovalFactory(
             with_jobapplication=True,
-            with_jobapplication__to_siae=job_application.to_siae,
+            with_jobapplication__to_company=job_application.to_company,
         )
 
-        employer = job_application.to_siae.members.first()
+        employer = job_application.to_company.members.first()
         client.force_login(employer)
         url = reverse("approvals:list")
         response = client.get(url)
@@ -57,7 +57,7 @@ class TestApprovalsListView:
         job_application.pk = None
         job_application.save()
 
-        employer = job_application.to_siae.members.first()
+        employer = job_application.to_company.members.first()
         client.force_login(employer)
         url = reverse("approvals:list")
         response = client.get(url)
@@ -73,13 +73,13 @@ class TestApprovalsListView:
         job_application = approval.jobapplication_set.get()
         approval_same_company = ApprovalFactory(
             with_jobapplication=True,
-            with_jobapplication__to_siae=job_application.to_siae,
+            with_jobapplication__to_company=job_application.to_company,
             user__first_name="Seb",
             user__last_name="Tambre",
         )
         approval_other_company = ApprovalFactory(with_jobapplication=True)
 
-        employer = job_application.to_siae.members.first()
+        employer = job_application.to_company.members.first()
         client.force_login(employer)
 
         url = reverse("approvals:list")
@@ -128,22 +128,22 @@ class TestApprovalsListView:
             start_at=now - relativedelta(years=3),
             end_at=now - relativedelta(years=1),
             with_jobapplication=True,
-            with_jobapplication__to_siae=company,
+            with_jobapplication__to_company=company,
         )
         future_approval = ApprovalFactory(
             start_at=now + relativedelta(days=1),
             with_jobapplication=True,
-            with_jobapplication__to_siae=company,
+            with_jobapplication__to_company=company,
         )
         valid_approval = ApprovalFactory(
             start_at=now - relativedelta(years=1),
             with_jobapplication=True,
-            with_jobapplication__to_siae=company,
+            with_jobapplication__to_company=company,
         )
         suspended_approval = ApprovalFactory(
             start_at=now - relativedelta(years=1),
             with_jobapplication=True,
-            with_jobapplication__to_siae=company,
+            with_jobapplication__to_company=company,
         )
         SuspensionFactory(
             approval=suspended_approval,
@@ -247,26 +247,26 @@ class TestApprovalsListView:
             start_at=in_less_than_1_month - relativedelta(years=2),
             end_at=in_less_than_1_month,
             with_jobapplication=True,
-            with_jobapplication__to_siae=company,
+            with_jobapplication__to_company=company,
         )
         in_less_than_3_months = now + relativedelta(days=80)
         approval_3 = ApprovalFactory(
             start_at=in_less_than_3_months - relativedelta(years=2),
             end_at=in_less_than_3_months,
             with_jobapplication=True,
-            with_jobapplication__to_siae=company,
+            with_jobapplication__to_company=company,
         )
         in_less_than_7_mmonths = now + relativedelta(days=200)
         approval_7 = ApprovalFactory(
             start_at=in_less_than_7_mmonths - relativedelta(years=2),
             end_at=in_less_than_7_mmonths,
             with_jobapplication=True,
-            with_jobapplication__to_siae=company,
+            with_jobapplication__to_company=company,
         )
         ApprovalFactory(
             start_at=now - relativedelta(years=1),
             with_jobapplication=True,
-            with_jobapplication__to_siae=company,
+            with_jobapplication__to_company=company,
         )
 
         employer = company.members.first()

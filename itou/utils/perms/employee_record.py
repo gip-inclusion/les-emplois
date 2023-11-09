@@ -28,7 +28,7 @@ def siae_is_allowed(job_application, siae):
     """
     SIAEs are only allowed to see "their" employee records
     """
-    return job_application.to_siae == siae
+    return job_application.to_company == siae
 
 
 def can_create_employee_record(request, job_application_id) -> JobApplication:
@@ -48,12 +48,12 @@ def can_create_employee_record(request, job_application_id) -> JobApplication:
     job_application = get_object_or_404(
         JobApplication.objects.select_related(
             "approval",
-            "to_siae",
+            "to_company",
             "job_seeker",
             "job_seeker__jobseeker_profile",
         ),
         pk=job_application_id,
-        to_siae=siae,
+        to_company=siae,
     )
 
     if job_application.job_seeker.lack_of_nir_reason == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER:

@@ -5,14 +5,14 @@
         <b>{{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}</b>
         chez
         <b>
-            <a href="{{ job_application.to_siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
-                {{ job_application.to_siae.display_name }}
+            <a href="{{ job_application.to_company.get_card_url }}?back_url={{ request.get_full_path|urlencode }}">
+                {{ job_application.to_company.display_name }}
             </a>
         </b>
-        {% if job_application.to_siae.grace_period_has_expired %}
+        {% if job_application.to_company.grace_period_has_expired %}
             <span class="badge badge-sm rounded-pill bg-danger">
                 Structure déconventionnée depuis le
-                {{ job_application.to_siae.grace_period_end_date|date:"d F Y" }}
+                {{ job_application.to_company.grace_period_end_date|date:"d F Y" }}
             </span>
         {% endif %}
     </p>

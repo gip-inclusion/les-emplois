@@ -48,7 +48,7 @@
 
     {# Job application accepted: cancel --------------------------------------------------------------------- #}
     {% if job_application.state.is_accepted and job_application.can_be_cancelled %}
-        {% if job_application.to_siae.is_subject_to_eligibility_rules %}
+        {% if job_application.to_company.is_subject_to_eligibility_rules %}
             <p>
                 <strong>Rétractation</strong>
             </p>

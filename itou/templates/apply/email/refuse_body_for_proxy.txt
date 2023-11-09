@@ -1,7 +1,7 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
 
-La candidature de {{ job_application.job_seeker.get_full_name }} envoyée par {{ job_application.sender.get_full_name }} chez {{ job_application.to_siae.display_name }} n'a malheureusement pas pu aboutir.
+La candidature de {{ job_application.job_seeker.get_full_name }} envoyée par {{ job_application.sender.get_full_name }} chez {{ job_application.to_company.display_name }} n'a malheureusement pas pu aboutir.
 
 {% if job_application.is_refused_due_to_deactivation %}
 Pour l'instant cette SIAE n'est plus habilitée à recevoir de candidatures.

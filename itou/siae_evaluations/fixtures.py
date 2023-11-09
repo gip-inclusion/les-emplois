@@ -124,7 +124,7 @@ def load_data():
                     sender=employer,
                     sender_kind=users_enums.KIND_EMPLOYER,
                     state=JobApplicationWorkflow.STATE_ACCEPTED,
-                    to_siae=controlled_siae,
+                    to_company=controlled_siae,
                 ).id
             ]
 

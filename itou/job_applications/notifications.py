@@ -9,7 +9,7 @@ class NewSpontaneousJobAppEmployersNotification(BaseNotification):
 
     def __init__(self, job_application):
         self.job_application = job_application
-        active_memberships = job_application.to_siae.companymembership_set.active()
+        active_memberships = job_application.to_company.companymembership_set.active()
         super().__init__(recipients_qs=active_memberships)
 
     @property
@@ -71,7 +71,7 @@ class NewQualifiedJobAppEmployersNotification(BaseNotification):
     def __init__(self, job_application):
         self.job_application = job_application
         self.subscribed_pks = self.job_application.selected_jobs.values_list("pk", flat=True)
-        active_memberships = job_application.to_siae.companymembership_set.active()
+        active_memberships = job_application.to_company.companymembership_set.active()
         super().__init__(recipients_qs=active_memberships)
 
     @property

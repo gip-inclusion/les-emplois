@@ -24,7 +24,7 @@ class Command(BaseCommand):
             JobApplication.objects.filter(
                 state=JobApplicationWorkflow.STATE_ACCEPTED,
                 eligibility_diagnosis=None,
-                to_siae__kind__in=SIAE_WITH_CONVENTION_KINDS,
+                to_company__kind__in=SIAE_WITH_CONVENTION_KINDS,
                 approval__isnull=False,
             )
             .exclude(origin=job_applications_enums.Origin.AI_STOCK)

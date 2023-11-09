@@ -32,7 +32,7 @@ class ApprovalSuspendViewTest(TestCase):
         approval = job_application.approval
         assert 0 == approval.suspension_set.count()
 
-        siae_user = job_application.to_siae.members.first()
+        siae_user = job_application.to_company.members.first()
         self.client.force_login(siae_user)
 
         back_url = reverse("search:siaes_home")
@@ -102,14 +102,14 @@ class ApprovalSuspendViewTest(TestCase):
             "preview": "1",
         }
 
-        form = SuspensionForm(approval=job_application.approval, siae=job_application.to_siae, data=post_data)
+        form = SuspensionForm(approval=job_application.approval, siae=job_application.to_company, data=post_data)
 
         assert not form.is_valid()
         assert form.errors["end_at"][0] is not None
 
         # Check 'set_default_end_date' and expect a default end date to be set
         post_data["set_default_end_date"] = True
-        form = SuspensionForm(approval=job_application.approval, siae=job_application.to_siae, data=post_data)
+        form = SuspensionForm(approval=job_application.approval, siae=job_application.to_company, data=post_data)
 
         assert form.is_valid()
         assert form.cleaned_data["end_at"] == Suspension.get_max_end_at(today)
@@ -132,7 +132,7 @@ class ApprovalSuspendViewTest(TestCase):
             "reason_explanation": "",
             "preview": "1",
         }
-        form = SuspensionForm(approval=job_application.approval, siae=job_application.to_siae, data=post_data)
+        form = SuspensionForm(approval=job_application.approval, siae=job_application.to_company, data=post_data)
         assert not form.is_valid()
 
     def test_update_suspension(self):
@@ -149,7 +149,7 @@ class ApprovalSuspendViewTest(TestCase):
         )
 
         approval = job_application.approval
-        siae_user = job_application.to_siae.members.first()
+        siae_user = job_application.to_company.members.first()
         start_at = today
         end_at = today + relativedelta(days=10)
 
@@ -197,7 +197,7 @@ class ApprovalSuspendViewTest(TestCase):
         )
 
         approval = job_application.approval
-        siae_user = job_application.to_siae.members.first()
+        siae_user = job_application.to_company.members.first()
         start_at = today
         end_at = today + relativedelta(days=10)
 

@@ -17,7 +17,7 @@
                 </span>
             {% endif %}
 
-            {% if job_application.to_siae.is_subject_to_eligibility_rules %}
+            {% if job_application.to_company.is_subject_to_eligibility_rules %}
                 {% with approval=job_application.job_seeker.latest_common_approval %}
                     {% if approval %}
                         <span class="badge badge-xs rounded-pill {% if approval.state == 'EXPIRED' %} bg-emploi-light text-primary{% else %} bg-success-lighter text-success{% endif %}">

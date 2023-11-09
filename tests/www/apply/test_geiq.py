@@ -29,7 +29,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
         cls.author = cls.prescriber_org.members.first()
         cls.job_seeker = cls.valid_diagnosis.job_seeker
         cls.job_application = JobApplicationFactory(
-            to_siae=cls.geiq,
+            to_company=cls.geiq,
             job_seeker=cls.job_seeker,
         )
         cls.url = reverse(
@@ -46,7 +46,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
 
     def test_without_geiq_eligibility_details(self):
         # No GEIQ diagnosis for this job seeker / job application
-        job_application = JobApplicationFactory(to_siae=self.geiq)
+        job_application = JobApplicationFactory(to_company=self.geiq)
         self.client.force_login(self.geiq.members.first())
         response = self.client.get(
             reverse(
@@ -61,7 +61,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
     def test_details_as_geiq_with_valid_eligibility_diagnosis(self):
         diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True)
         job_application = JobApplicationFactory(
-            to_siae=diagnosis.author_geiq,
+            to_company=diagnosis.author_geiq,
             geiq_eligibility_diagnosis=diagnosis,
             eligibility_diagnosis=None,
         )
@@ -89,7 +89,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
     def test_details_as_geiq_with_expired_eligibility_diagnosis(self):
         diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True, expired=True)
         job_application = JobApplicationFactory(
-            to_siae=diagnosis.author_geiq,
+            to_company=diagnosis.author_geiq,
             geiq_eligibility_diagnosis=diagnosis,
             eligibility_diagnosis=None,
         )
@@ -125,7 +125,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
         )
 
     def test_details_as_authorized_prescriber_with_expired_diagnosis(self):
-        job_application = JobApplicationFactory(to_siae=self.geiq, job_seeker=self.expired_diagnosis.job_seeker)
+        job_application = JobApplicationFactory(to_company=self.geiq, job_seeker=self.expired_diagnosis.job_seeker)
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
 
         self.client.force_login(self.geiq.members.first())
@@ -154,7 +154,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
         # Slightly more complex than for prescribers :
         # allowance amount is variable in function of chosen administrative criteria
         diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True)
-        job_application = JobApplicationFactory(to_siae=diagnosis.author_geiq, job_seeker=diagnosis.job_seeker)
+        job_application = JobApplicationFactory(to_company=diagnosis.author_geiq, job_seeker=diagnosis.job_seeker)
         url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
 
         # Annex 2, level 2 criteria: no allowance for GEIQ
@@ -222,7 +222,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
     def test_job_seeker_not_resident_in_qpv_or_zrr(self):
         # ZRR / QPV criteria info fragment is loaded before HTMX "zone"
         diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True, job_seeker=self.job_seeker)
-        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_siae=diagnosis.author_geiq)
+        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_company=diagnosis.author_geiq)
         url = reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
         self.client.force_login(diagnosis.author_geiq.members.first())
         response = self.client.get(url)
@@ -244,7 +244,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
     def test_job_seeker_qpv_details_display(self):
         # Check QPV fragment is displayed:
         diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True, job_seeker=self.job_seeker_in_qpv)
-        job_application = JobApplicationFactory(job_seeker=self.job_seeker_in_qpv, to_siae=diagnosis.author_geiq)
+        job_application = JobApplicationFactory(job_seeker=self.job_seeker_in_qpv, to_company=diagnosis.author_geiq)
         url = reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
 
         self.client.force_login(diagnosis.author_geiq.members.first())
@@ -271,7 +271,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
         # Check ZRR fragment is displayed
 
         diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True, job_seeker=self.job_seeker_in_zrr)
-        job_application = JobApplicationFactory(job_seeker=self.job_seeker_in_zrr, to_siae=diagnosis.author_geiq)
+        job_application = JobApplicationFactory(job_seeker=self.job_seeker_in_zrr, to_company=diagnosis.author_geiq)
         url = reverse("apply:geiq_eligibility_criteria", kwargs={"job_application_id": job_application.pk})
 
         self.client.force_login(diagnosis.author_geiq.members.first())
@@ -295,7 +295,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
         self.assertContains(response, "Résident en ZRR")
 
     def test_jobseeker_cannot_create_geiq_diagnosis(self):
-        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_siae=self.geiq)
+        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.geiq)
         self.client.force_login(self.job_seeker)
         # Needed to setup session
         response = self.client.get(

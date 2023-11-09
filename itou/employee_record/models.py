@@ -103,7 +103,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
             "financial_annex",
             "job_application",
             "job_application__approval",
-            "job_application__to_siae",
+            "job_application__to_company",
             "job_application__job_seeker",
             "job_application__job_seeker__jobseeker_profile__birth_country",
             "job_application__job_seeker__jobseeker_profile__birth_place",
@@ -115,8 +115,8 @@ class EmployeeRecordQuerySet(models.QuerySet):
     # Search queries
     def for_company(self, siae):
         return self.filter(
-            job_application__to_siae=siae,
-            asp_id=F("job_application__to_siae__convention__asp_id"),
+            job_application__to_company=siae,
+            asp_id=F("job_application__to_company__convention__asp_id"),
         )
 
     def find_by_batch(self, filename, line_number):
@@ -152,7 +152,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
         Employee records with an `asp_id` different from their hiring SIAE.
         Could occur when using `siae.move_siae_data` management command.
         """
-        return self.exclude(job_application__to_siae__convention__asp_id=F("asp_id"))
+        return self.exclude(job_application__to_company__convention__asp_id=F("asp_id"))
 
 
 class EmployeeRecord(ASPExchangeInformation):
@@ -244,7 +244,7 @@ class EmployeeRecord(ASPExchangeInformation):
         """
         Check if job application is valid for FS
         """
-        if not self.job_application.to_siae.convention:
+        if not self.job_application.to_company.convention:
             raise ValidationError(self.ERROR_NO_CONVENTION_AVAILABLE)
 
         if not self.job_application.state.is_accepted:
@@ -274,9 +274,9 @@ class EmployeeRecord(ASPExchangeInformation):
 
     def _fill_denormalized_fields(self):
         # If the SIAE is an antenna, the SIRET will be rejected by the ASP so we have to use the mother's one
-        self.siret = self.siret_from_asp_source(self.job_application.to_siae)
-        self.asp_id = self.job_application.to_siae.convention.asp_id
-        self.asp_measure = SiaeMeasure.from_siae_kind(self.job_application.to_siae.kind)
+        self.siret = self.siret_from_asp_source(self.job_application.to_company)
+        self.asp_id = self.job_application.to_company.convention.asp_id
+        self.asp_measure = SiaeMeasure.from_siae_kind(self.job_application.to_company.kind)
         self.approval_number = self.job_application.approval.number
 
     # Business methods
@@ -413,8 +413,8 @@ class EmployeeRecord(ASPExchangeInformation):
         if not self.pk:
             raise CloningError("This employee record has not been saved yet (no PK).")
 
-        if not self.job_application.to_siae.convention:
-            raise CloningError(f"SIAE {self.job_application.to_siae.siret} has no convention")
+        if not self.job_application.to_company.convention:
+            raise CloningError(f"SIAE {self.job_application.to_company.siret} has no convention")
 
         # Cleanup clone fields
         er_copy = EmployeeRecord(
@@ -478,8 +478,8 @@ class EmployeeRecord(ASPExchangeInformation):
         """
         ASP convention ID (from siae.convention.asp_convention_id)
         """
-        if self.job_application and self.job_application.to_siae:
-            return self.job_application.to_siae.convention.asp_convention_id
+        if self.job_application and self.job_application.to_company:
+            return self.job_application.to_company.convention.asp_convention_id
 
         return None
 
@@ -493,7 +493,7 @@ class EmployeeRecord(ASPExchangeInformation):
         MUST return None otherwise
         """
         if self.job_seeker_profile and self.job_seeker_profile.is_employed:
-            return EmployerType.from_itou_siae_kind(self.job_application.to_siae.kind)
+            return EmployerType.from_itou_siae_kind(self.job_application.to_company.kind)
         return None
 
     @property
@@ -526,12 +526,12 @@ class EmployeeRecord(ASPExchangeInformation):
         """
         Mapping between ASP and itou models for SIAE kind ("Mesure")
         """
-        return SiaeMeasure.from_siae_kind(self.job_application.to_siae.kind)
+        return SiaeMeasure.from_siae_kind(self.job_application.to_company.kind)
 
     @property
     def is_orphan(self):
         """Orphan employee records have different stored and actual `asp_id` fields."""
-        return self.job_application.to_siae.convention.asp_id != self.asp_id
+        return self.job_application.to_company.convention.asp_id != self.asp_id
 
     @staticmethod
     def siret_from_asp_source(siae):

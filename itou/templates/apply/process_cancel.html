@@ -9,7 +9,7 @@
             </div>
             <div class="col">
                 <p class="mb-0">
-                    {% if job_application.to_siae.is_subject_to_eligibility_rules %}
+                    {% if job_application.to_company.is_subject_to_eligibility_rules %}
                         En validant, <b>vous renoncez aux aides au poste</b> liées à cette candidature pour tous les jours travaillés de ce salarié. Si ce salarié a travaillé dans votre structure, il est préférable de suspendre son PASS IAE ci-dessus.
                     {% else %}
                         En annulant cette embauche, vous confirmez que le salarié n’avait pas encore commencé à travailler dans votre structure.

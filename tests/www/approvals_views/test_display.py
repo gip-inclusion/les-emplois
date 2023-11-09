@@ -17,7 +17,7 @@ class TestDisplayApproval(TestCase):
     def test_display_job_app_approval(self, *args, **kwargs):
         job_application = JobApplicationFactory(with_approval=True)
 
-        employer = job_application.to_siae.members.first()
+        employer = job_application.to_company.members.first()
         self.client.force_login(employer)
 
         response = self.client.get(
@@ -25,7 +25,7 @@ class TestDisplayApproval(TestCase):
         )
 
         assert response.context["approval"] == job_application.approval
-        assert response.context["siae"] == job_application.to_siae
+        assert response.context["siae"] == job_application.to_company
         self.assertContains(response, "le 26 avril 2023")
         self.assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
@@ -37,12 +37,12 @@ class TestDisplayApproval(TestCase):
         JobApplicationFactory(
             job_seeker=job_application.job_seeker,
             approval=job_application.approval,
-            to_siae=job_application.to_siae,
+            to_company=job_application.to_company,
             state=job_application.state,
             created_at=job_application.created_at - relativedelta(days=1),
         )
 
-        employer = job_application.to_siae.members.first()
+        employer = job_application.to_company.members.first()
         self.client.force_login(employer)
 
         response = self.client.get(
@@ -50,7 +50,7 @@ class TestDisplayApproval(TestCase):
         )
 
         assert response.context["approval"] == job_application.approval
-        assert response.context["siae"] == job_application.to_siae
+        assert response.context["siae"] == job_application.to_company
         self.assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
 
@@ -61,7 +61,7 @@ class TestDisplayApproval(TestCase):
             with_approval=True, eligibility_diagnosis=None, approval__number="625741810181"
         )
 
-        employer = job_application.to_siae.members.first()
+        employer = job_application.to_company.members.first()
         self.client.force_login(employer)
 
         response = self.client.get(
@@ -69,7 +69,7 @@ class TestDisplayApproval(TestCase):
         )
 
         assert response.context["approval"] == job_application.approval
-        assert response.context["siae"] == job_application.to_siae
+        assert response.context["siae"] == job_application.to_company
         self.assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
 
@@ -83,7 +83,7 @@ class TestDisplayApproval(TestCase):
             origin=Origin.AI_STOCK,
         )
 
-        employer = job_application.to_siae.members.first()
+        employer = job_application.to_company.members.first()
         self.client.force_login(employer)
 
         response = self.client.get(
@@ -91,7 +91,7 @@ class TestDisplayApproval(TestCase):
         )
 
         assert response.context["approval"] == job_application.approval
-        assert response.context["siae"] == job_application.to_siae
+        assert response.context["siae"] == job_application.to_company
         self.assertContains(response, "Imprimer ce PASS IAE")
 
     def test_display_approval_missing_diagnosis_ai_approval(self, *args, **kwargs):
@@ -103,7 +103,7 @@ class TestDisplayApproval(TestCase):
             approval__origin=Origin.AI_STOCK,
         )
 
-        employer = job_application.to_siae.members.first()
+        employer = job_application.to_company.members.first()
         self.client.force_login(employer)
 
         response = self.client.get(
@@ -111,6 +111,6 @@ class TestDisplayApproval(TestCase):
         )
 
         assert response.context["approval"] == job_application.approval
-        assert response.context["siae"] == job_application.to_siae
+        assert response.context["siae"] == job_application.to_company
         self.assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")

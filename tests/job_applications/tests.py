@@ -71,22 +71,22 @@ class JobApplicationModelTest(TestCase):
     def test_eligibility_diagnosis_by_siae_required(self):
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            to_siae__kind=CompanyKind.GEIQ,
+            to_company__kind=CompanyKind.GEIQ,
             eligibility_diagnosis=None,
         )
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
-            job_application.job_seeker, for_siae=job_application.to_siae
+            job_application.job_seeker, for_siae=job_application.to_company
         )
         assert not has_considered_valid_diagnoses
         assert not job_application.eligibility_diagnosis_by_siae_required
 
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            to_siae__kind=CompanyKind.EI,
+            to_company__kind=CompanyKind.EI,
             eligibility_diagnosis=None,
         )
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
-            job_application.job_seeker, for_siae=job_application.to_siae
+            job_application.job_seeker, for_siae=job_application.to_company
         )
         assert not has_considered_valid_diagnoses
         assert job_application.eligibility_diagnosis_by_siae_required
@@ -96,7 +96,7 @@ class JobApplicationModelTest(TestCase):
             sent_by_authorized_prescriber_organisation=True,
             state=JobApplicationWorkflow.STATE_PROCESSING,
         )
-        user = job_application.to_siae.members.first()
+        user = job_application.to_company.members.first()
         job_application.accept(user=user)
         assert job_application.accepted_by == user
 
@@ -141,7 +141,7 @@ class JobApplicationModelTest(TestCase):
 
     def test_get_sender_kind_display(self):
         non_siae_items = [
-            (JobApplicationSentBySiaeFactory(to_siae__kind=kind), "Employeur")
+            (JobApplicationSentBySiaeFactory(to_company__kind=kind), "Employeur")
             for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS]
         ]
         items = [
@@ -160,39 +160,39 @@ class JobApplicationModelTest(TestCase):
         with self.assertRaisesRegex(
             ValidationError, "Le nombre d'heures par semaine ne peut être saisi que pour un GEIQ"
         ):
-            JobApplicationFactory(to_siae__kind=CompanyKind.EI, nb_hours_per_week=20)
+            JobApplicationFactory(to_company__kind=CompanyKind.EI, nb_hours_per_week=20)
 
         with self.assertRaisesRegex(
             ValidationError, "Les précisions sur le type de contrat ne peuvent être saisies que pour un GEIQ"
         ):
-            JobApplicationFactory(to_siae__kind=CompanyKind.EI, contract_type_details="foo")
+            JobApplicationFactory(to_company__kind=CompanyKind.EI, contract_type_details="foo")
 
         with self.assertRaisesRegex(ValidationError, "Le type de contrat ne peut être saisi que pour un GEIQ"):
-            JobApplicationFactory(to_siae__kind=CompanyKind.EI, contract_type=ContractType.OTHER)
+            JobApplicationFactory(to_company__kind=CompanyKind.EI, contract_type=ContractType.OTHER)
 
         # Constraints
         with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
             JobApplicationFactory(
-                to_siae__kind=CompanyKind.GEIQ,
+                to_company__kind=CompanyKind.GEIQ,
                 contract_type=ContractType.PROFESSIONAL_TRAINING,
                 contract_type_details="foo",
             )
 
         with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
-            JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, nb_hours_per_week=1)
+            JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, nb_hours_per_week=1)
 
         with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
-            JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, contract_type=ContractType.OTHER)
+            JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, contract_type=ContractType.OTHER)
 
         with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
-            JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, contract_type_details="foo")
+            JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, contract_type_details="foo")
 
         with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
-            JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, contract_type_details="foo", nb_hours_per_week=1)
+            JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, contract_type_details="foo", nb_hours_per_week=1)
 
         with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
             JobApplicationFactory(
-                to_siae__kind=CompanyKind.GEIQ, contract_type=ContractType.OTHER, nb_hours_per_week=1
+                to_company__kind=CompanyKind.GEIQ, contract_type=ContractType.OTHER, nb_hours_per_week=1
             )
 
         # Mind the parens in RE...
@@ -208,13 +208,13 @@ class JobApplicationModelTest(TestCase):
             ValidationError,
             f"Assurez-vous que cette valeur est supérieure ou égale à {GEIQ_MIN_HOURS_PER_WEEK}.",
         ):
-            JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, nb_hours_per_week=0)
+            JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, nb_hours_per_week=0)
 
         with self.assertRaisesRegex(
             ValidationError,
             f"Assurez-vous que cette valeur est inférieure ou égale à {GEIQ_MAX_HOURS_PER_WEEK}.",
         ):
-            JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, nb_hours_per_week=49)
+            JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, nb_hours_per_week=49)
 
         # Should pass: normal cases
         JobApplicationFactory()
@@ -222,11 +222,11 @@ class JobApplicationModelTest(TestCase):
         for contract_type in [ContractType.APPRENTICESHIP, ContractType.PROFESSIONAL_TRAINING]:
             with self.subTest(contract_type):
                 JobApplicationFactory(
-                    to_siae__kind=CompanyKind.GEIQ, contract_type=contract_type, nb_hours_per_week=35
+                    to_company__kind=CompanyKind.GEIQ, contract_type=contract_type, nb_hours_per_week=35
                 )
 
         JobApplicationFactory(
-            to_siae__kind=CompanyKind.GEIQ,
+            to_company__kind=CompanyKind.GEIQ,
             contract_type=ContractType.OTHER,
             nb_hours_per_week=30,
             contract_type_details="foo",
@@ -240,13 +240,13 @@ class JobApplicationModelTest(TestCase):
             JobApplicationFactory(job_seeker=PrescriberFactory())
 
     def test_inverted_vae_contract(self):
-        JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, inverted_vae_contract=True)
-        JobApplicationFactory(to_siae__kind=CompanyKind.GEIQ, inverted_vae_contract=False)
-        JobApplicationFactory(to_siae__kind=CompanyKind.EI, inverted_vae_contract=None)
+        JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, inverted_vae_contract=True)
+        JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, inverted_vae_contract=False)
+        JobApplicationFactory(to_company__kind=CompanyKind.EI, inverted_vae_contract=None)
         with self.assertRaisesRegex(
             ValidationError, "Un contrat associé à une VAE inversée n'est possible que pour les GEIQ"
         ):
-            JobApplicationFactory(to_siae__kind=CompanyKind.AI, inverted_vae_contract=True)
+            JobApplicationFactory(to_company__kind=CompanyKind.AI, inverted_vae_contract=True)
 
 
 def test_can_be_cancelled():
@@ -262,14 +262,14 @@ def test_geiq_qualification_fields_contraint():
         Exception, match="Incohérence dans les champs concernant la qualification pour le contrat GEIQ"
     ):
         JobApplicationFactory(
-            to_siae__kind=CompanyKind.GEIQ,
+            to_company__kind=CompanyKind.GEIQ,
             qualification_type=QualificationType.STATE_DIPLOMA,
             qualification_level=QualificationLevel.NOT_RELEVANT,
         )
 
     for qualification_type in [QualificationType.CQP, QualificationType.CCN]:
         JobApplicationFactory(
-            to_siae__kind=CompanyKind.GEIQ,
+            to_company__kind=CompanyKind.GEIQ,
             qualification_type=qualification_type,
             qualification_level=QualificationLevel.NOT_RELEVANT,
         )
@@ -287,16 +287,18 @@ def test_can_have_prior_action():
     non_geiq = CompanyFactory.build(kind=CompanyKind.AI)
 
     assert (
-        JobApplicationFactory.build(to_siae=geiq, state=JobApplicationWorkflow.STATE_NEW).can_have_prior_action
+        JobApplicationFactory.build(to_company=geiq, state=JobApplicationWorkflow.STATE_NEW).can_have_prior_action
         is False
     )
     assert (
-        JobApplicationFactory.build(to_siae=geiq, state=JobApplicationWorkflow.STATE_POSTPONED).can_have_prior_action
+        JobApplicationFactory.build(
+            to_company=geiq, state=JobApplicationWorkflow.STATE_POSTPONED
+        ).can_have_prior_action
         is True
     )
     assert (
         JobApplicationFactory.build(
-            to_siae=non_geiq, state=JobApplicationWorkflow.STATE_POSTPONED
+            to_company=non_geiq, state=JobApplicationWorkflow.STATE_POSTPONED
         ).can_have_prior_action
         is False
     )
@@ -307,22 +309,24 @@ def test_can_change_prior_actions():
     non_geiq = CompanyFactory(kind=CompanyKind.ACI)
 
     assert (
-        JobApplicationFactory.build(to_siae=geiq, state=JobApplicationWorkflow.STATE_NEW).can_change_prior_actions
+        JobApplicationFactory.build(to_company=geiq, state=JobApplicationWorkflow.STATE_NEW).can_change_prior_actions
         is False
     )
     assert (
         JobApplicationFactory.build(
-            to_siae=geiq, state=JobApplicationWorkflow.STATE_POSTPONED
+            to_company=geiq, state=JobApplicationWorkflow.STATE_POSTPONED
         ).can_change_prior_actions
         is True
     )
     assert (
-        JobApplicationFactory.build(to_siae=geiq, state=JobApplicationWorkflow.STATE_ACCEPTED).can_change_prior_actions
+        JobApplicationFactory.build(
+            to_company=geiq, state=JobApplicationWorkflow.STATE_ACCEPTED
+        ).can_change_prior_actions
         is False
     )
     assert (
         JobApplicationFactory.build(
-            to_siae=non_geiq, state=JobApplicationWorkflow.STATE_POSTPONED
+            to_company=non_geiq, state=JobApplicationWorkflow.STATE_POSTPONED
         ).can_change_prior_actions
         is False
     )
@@ -449,7 +453,7 @@ class JobApplicationQuerySetTest(TestCase):
         assert hasattr(qs, "sender")
         assert hasattr(qs, "sender_siae")
         assert hasattr(qs, "sender_prescriber_organization")
-        assert hasattr(qs, "to_siae")
+        assert hasattr(qs, "to_company")
         assert hasattr(qs, "selected_jobs")
         assert hasattr(qs, "has_suspended_approval")
         assert hasattr(qs, "jobseeker_eligibility_diagnosis")
@@ -461,120 +465,120 @@ class JobApplicationQuerySetTest(TestCase):
         # Results must be a list of job applications:
         # Accepted
         job_app = JobApplicationFactory(state=JobApplicationWorkflow.STATE_NEW)
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
 
         # With an approval
         job_app = JobApplicationWithoutApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
 
         # Approval `create_employee_record` is False.
         job_app = JobApplicationWithApprovalNotCancellableFactory(create_employee_record=False)
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
 
         # Must be accepted and only after CANCELLATION_DAYS_AFTER_HIRING_STARTED
         job_app = JobApplicationFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
 
         # Approval start date is also checked (must be older then CANCELLATION_DAY_AFTER_HIRING STARTED).
         job_app = JobApplicationWithApprovalNotCancellableFactory()
-        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
 
         # After employee record creation
         job_app = JobApplicationWithApprovalNotCancellableFactory()
         employee_record = EmployeeRecordFactory(
             job_application=job_app,
-            asp_id=job_app.to_siae.convention.asp_id,
+            asp_id=job_app.to_company.convention.asp_id,
             approval_number=job_app.approval.number,
             status=Status.NEW,
         )
-        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
         employee_record.status = Status.PROCESSED
         employee_record.save()
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
 
         # After employee record is disabled
         employee_record.update_as_disabled()
         assert employee_record.status == Status.DISABLED
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
 
         # Create a second job application to the same SIAE and for the same approval
         second_job_app = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
-            to_siae=job_app.to_siae,
+            to_company=job_app.to_company,
             approval=job_app.approval,
         )
-        assert second_job_app not in JobApplication.objects.eligible_as_employee_record(second_job_app.to_siae)
+        assert second_job_app not in JobApplication.objects.eligible_as_employee_record(second_job_app.to_company)
 
         # No employee record, but with a suspension
         job_app = JobApplicationFactory(
             with_approval=True,
             hiring_start_at=None,
         )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
         SuspensionFactory(
-            siae=job_app.to_siae,
+            siae=job_app.to_company,
             approval=job_app.approval,
         )
-        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
         # No employee record, but with a suspension, and `create_employee_record` is False
         job_app = JobApplicationFactory(
             with_approval=True,
             hiring_start_at=None,
             create_employee_record=False,
         )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
         SuspensionFactory(
-            siae=job_app.to_siae,
+            siae=job_app.to_company,
             approval=job_app.approval,
         )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
         # No employee record, but with a prolongation
         job_app = JobApplicationFactory(
             with_approval=True,
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             hiring_start_at=None,
         )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
         ProlongationFactory(
-            declared_by_siae=job_app.to_siae,
+            declared_by_siae=job_app.to_company,
             approval=job_app.approval,
         )
-        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
         # No employee record, but with a prolongation, and `create_employee_record` is False
         job_app = JobApplicationFactory(
             with_approval=True,
             hiring_start_at=None,
             create_employee_record=False,
         )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
         ProlongationFactory(
-            declared_by_siae=job_app.to_siae,
+            declared_by_siae=job_app.to_company,
             approval=job_app.approval,
         )
-        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
         # No employee record, but with a prolongation and a suspension
         job_app = JobApplicationFactory(
             with_approval=True,
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             hiring_start_at=None,
         )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
         SuspensionFactory(
-            siae=job_app.to_siae,
+            siae=job_app.to_company,
             approval=job_app.approval,
         )
         ProlongationFactory(
-            declared_by_siae=job_app.to_siae,
+            declared_by_siae=job_app.to_company,
             approval=job_app.approval,
         )
-        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
         # ...and with an employee record already existing for that employee
         EmployeeRecordFactory(
             status=Status.READY,
-            job_application__to_siae=job_app.to_siae,
+            job_application__to_company=job_app.to_company,
             approval_number=job_app.approval.number,
         )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
 
     def test_eligible_job_applications_with_a_suspended_or_extended_approval_older_than_cutoff(self):
         job_app = JobApplicationFactory(
@@ -582,18 +586,18 @@ class JobApplicationQuerySetTest(TestCase):
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             hiring_start_at=None,
         )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
         SuspensionFactory(
-            siae=job_app.to_siae,
+            siae=job_app.to_company,
             approval=job_app.approval,
             created_at=timezone.make_aware(datetime.datetime(2001, 1, 1)),
         )
         ProlongationFactory(
-            declared_by_siae=job_app.to_siae,
+            declared_by_siae=job_app.to_company,
             approval=job_app.approval,
             created_at=timezone.make_aware(datetime.datetime(2001, 1, 1)),
         )
-        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_siae)
+        assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
 
     def test_with_accepted_at_for_created_from_pe_approval(self):
         JobApplicationFactory(
@@ -643,7 +647,7 @@ class JobApplicationQuerySetTest(TestCase):
         # User account is deleted.
         job_application.sender = None
         job_application.save(update_fields=["sender"])
-        employer = job_application.to_siae.members.first()
+        employer = job_application.to_company.members.first()
         job_application.accept(user=employer)
         recipients = []
         for email in mail.outbox:
@@ -688,7 +692,7 @@ class JobApplicationNotificationsTest(TestCase):
         )
         email = NewQualifiedJobAppEmployersNotification(job_application=job_application).email
         # To.
-        assert job_application.to_siae.members.first().email in email.to
+        assert job_application.to_company.members.first().email in email.to
         assert len(email.to) == 1
 
         # Body.
@@ -703,9 +707,9 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.sender.get_full_name() in email.body
         assert job_application.sender.email in email.body
         assert format_filters.format_phone(job_application.sender.phone) in email.body
-        assert job_application.to_siae.display_name in email.body
-        assert job_application.to_siae.city in email.body
-        assert str(job_application.to_siae.pk) in email.body
+        assert job_application.to_company.display_name in email.body
+        assert job_application.to_company.city in email.body
+        assert str(job_application.to_company.pk) in email.body
         assert job_application.resume_link in email.body
 
     def test_new_for_prescriber(self):
@@ -733,9 +737,9 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.sender.get_full_name() in email.body
         assert job_application.sender.email in email.body
         assert format_filters.format_phone(job_application.sender.phone) in email.body
-        assert job_application.to_siae.display_name in email.body
-        assert job_application.to_siae.kind in email.body
-        assert job_application.to_siae.city in email.body
+        assert job_application.to_company.display_name in email.body
+        assert job_application.to_company.kind in email.body
+        assert job_application.to_company.city in email.body
 
         # Assert the Job Seeker does not have access to confidential information.
         email = job_application.email_new_for_job_seeker()
@@ -754,7 +758,7 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.sender_kind == SenderKind.JOB_SEEKER
 
         # Subject
-        assert job_application.to_siae.display_name in email.subject
+        assert job_application.to_company.display_name in email.subject
 
         # Body.
         assert job_application.job_seeker.first_name.title() in email.body
@@ -765,7 +769,7 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.message in email.body
         for job in job_application.selected_jobs.all():
             assert job.display_name in email.body
-        assert job_application.to_siae.display_name in email.body
+        assert job_application.to_company.display_name in email.body
         assert reverse("login:job_seeker") in email.body
         assert reverse("account_reset_password") in email.body
         assert job_application.resume_link in email.body
@@ -781,14 +785,14 @@ class JobApplicationNotificationsTest(TestCase):
         # Subject.
         assert "Candidature acceptée" in email.subject
         # Body.
-        assert job_application.to_siae.display_name in email.body
+        assert job_application.to_company.display_name in email.body
         assert job_application.answer in email.body
 
     def test_accept_for_proxy(self):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         email = job_application.email_accept_for_proxy
         # To.
-        assert job_application.to_siae.email not in email.to
+        assert job_application.to_company.email not in email.to
         assert email.to == [job_application.sender.email]
         assert len(email.to) == 1
         assert len(email.bcc) == 0
@@ -797,7 +801,7 @@ class JobApplicationNotificationsTest(TestCase):
         # Body.
         assert job_application.job_seeker.get_full_name() in email.body
         assert job_application.sender.get_full_name() in email.body
-        assert job_application.to_siae.display_name in email.body
+        assert job_application.to_company.display_name in email.body
         assert job_application.answer in email.body
         assert "Date de début du contrat" in email.body
         assert job_application.hiring_start_at.strftime("%d/%m/%Y") in email.body
@@ -816,7 +820,7 @@ class JobApplicationNotificationsTest(TestCase):
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             hiring_start_at=datetime.date.today(),
         )
-        accepted_by = job_application.to_siae.members.first()
+        accepted_by = job_application.to_company.members.first()
         email = job_application.email_manual_approval_delivery_required_notification(accepted_by)
         # To.
         assert settings.ITOU_EMAIL_CONTACT in email.to
@@ -826,11 +830,11 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.job_seeker.last_name.upper() in email.body
         assert job_application.job_seeker.email in email.body
         assert job_application.job_seeker.birthdate.strftime("%d/%m/%Y") in email.body
-        assert job_application.to_siae.siret in email.body
-        assert job_application.to_siae.kind in email.body
-        assert job_application.to_siae.get_kind_display() in email.body
-        assert job_application.to_siae.get_department_display() in email.body
-        assert job_application.to_siae.display_name in email.body
+        assert job_application.to_company.siret in email.body
+        assert job_application.to_company.kind in email.body
+        assert job_application.to_company.get_kind_display() in email.body
+        assert job_application.to_company.get_department_display() in email.body
+        assert job_application.to_company.display_name in email.body
         assert job_application.hiring_start_at.strftime("%d/%m/%Y") in email.body
         assert job_application.hiring_end_at.strftime("%d/%m/%Y") in email.body
         assert accepted_by.get_full_name() in email.body
@@ -844,7 +848,7 @@ class JobApplicationNotificationsTest(TestCase):
             hiring_start_at=datetime.date.today(),
             hiring_end_at=None,
         )
-        accepted_by = job_application.to_siae.members.first()
+        accepted_by = job_application.to_company.members.first()
         email = job_application.email_manual_approval_delivery_required_notification(accepted_by)
         assert "Date de fin du contrat : Non renseigné" in email.body
 
@@ -862,7 +866,7 @@ class JobApplicationNotificationsTest(TestCase):
         # Body.
         assert job_application.sender.get_full_name() in email.body
         assert job_application.job_seeker.get_full_name() in email.body
-        assert job_application.to_siae.display_name in email.body
+        assert job_application.to_company.display_name in email.body
         assert job_application.answer in email.body
         assert job_application.answer_to_prescriber in email.body
 
@@ -877,7 +881,7 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.job_seeker.email in email.to
         assert len(email.to) == 1
         # Body.
-        assert job_application.to_siae.display_name in email.body
+        assert job_application.to_company.display_name in email.body
         assert job_application.answer in email.body
         assert job_application.answer_to_prescriber not in email.body
 
@@ -905,7 +909,7 @@ class JobApplicationNotificationsTest(TestCase):
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             approval=approval,
         )
-        accepted_by = job_application.to_siae.members.first()
+        accepted_by = job_application.to_company.members.first()
         email = job_application.email_deliver_approval(accepted_by)
         # To.
         assert accepted_by.email in email.to
@@ -920,14 +924,14 @@ class JobApplicationNotificationsTest(TestCase):
         assert approval.user.birthdate.strftime("%d/%m/%Y") in email.body
         assert job_application.hiring_start_at.strftime("%d/%m/%Y") in email.body
         assert job_application.hiring_end_at.strftime("%d/%m/%Y") in email.body
-        assert job_application.to_siae.display_name in email.body
-        assert job_application.to_siae.get_kind_display() in email.body
-        assert job_application.to_siae.address_line_1 in email.body
-        assert job_application.to_siae.address_line_2 in email.body
-        assert job_application.to_siae.post_code in email.body
-        assert job_application.to_siae.city in email.body
+        assert job_application.to_company.display_name in email.body
+        assert job_application.to_company.get_kind_display() in email.body
+        assert job_application.to_company.address_line_1 in email.body
+        assert job_application.to_company.address_line_2 in email.body
+        assert job_application.to_company.post_code in email.body
+        assert job_application.to_company.city in email.body
         assert global_constants.ITOU_HELP_CENTER_URL in email.body
-        assert job_application.to_siae.accept_survey_url in email.body
+        assert job_application.to_company.accept_survey_url in email.body
 
     def test_email_deliver_approval_without_hiring_end_at(self):
         job_seeker = JobSeekerFactory()
@@ -939,14 +943,14 @@ class JobApplicationNotificationsTest(TestCase):
             approval=approval,
             hiring_end_at=None,
         )
-        accepted_by = job_application.to_siae.members.first()
+        accepted_by = job_application.to_company.members.first()
         email = job_application.email_deliver_approval(accepted_by)
         assert "Se terminant le : Non renseigné" in email.body
 
     def test_email_deliver_approval_when_subject_to_eligibility_rules(self):
-        job_application = JobApplicationFactory(with_approval=True, to_siae__subject_to_eligibility=True)
+        job_application = JobApplicationFactory(with_approval=True, to_company__subject_to_eligibility=True)
 
-        email = job_application.email_deliver_approval(job_application.to_siae.members.first())
+        email = job_application.email_deliver_approval(job_application.to_company.members.first())
 
         assert (
             f"PASS IAE pour {job_application.job_seeker.get_full_name()} et avis sur les emplois de l'inclusion"
@@ -955,9 +959,9 @@ class JobApplicationNotificationsTest(TestCase):
         assert "PASS IAE" in email.body
 
     def test_email_deliver_approval_when_not_subject_to_eligibility_rules(self):
-        job_application = JobApplicationFactory(with_approval=True, to_siae__not_subject_to_eligibility=True)
+        job_application = JobApplicationFactory(with_approval=True, to_company__not_subject_to_eligibility=True)
 
-        email = job_application.email_deliver_approval(job_application.to_siae.members.first())
+        email = job_application.email_deliver_approval(job_application.to_company.members.first())
 
         assert "Confirmation de l'embauche" == email.subject
         assert "PASS IAE" not in email.body
@@ -976,7 +980,7 @@ class JobApplicationNotificationsTest(TestCase):
             approval=approval,
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
         )
-        job_application.accept(user=job_application.to_siae.members.first())
+        job_application.accept(user=job_application.to_company.members.first())
         mail.outbox = []  # Delete previous emails.
         job_application.manually_deliver_approval(delivered_by=staff_member)
         assert job_application.approval_number_sent_by_email
@@ -997,7 +1001,7 @@ class JobApplicationNotificationsTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
         )
-        job_application.accept(user=job_application.to_siae.members.first())
+        job_application.accept(user=job_application.to_company.members.first())
         mail.outbox = []  # Delete previous emails.
         job_application.manually_refuse_approval(refused_by=staff_member)
         assert job_application.approval_manually_refused_by == staff_member
@@ -1012,7 +1016,7 @@ class JobApplicationNotificationsTest(TestCase):
             sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_ACCEPTED
         )
 
-        cancellation_user = job_application.to_siae.active_members.first()
+        cancellation_user = job_application.to_company.active_members.first()
         email = job_application.email_cancel(cancelled_by=cancellation_user)
         # To.
         assert cancellation_user.email in email.to
@@ -1037,7 +1041,7 @@ class JobApplicationNotificationsTest(TestCase):
         # User account is deleted.
         job_application.sender = None
         job_application.save(update_fields=["sender"])
-        cancellation_user = job_application.to_siae.active_members.first()
+        cancellation_user = job_application.to_company.active_members.first()
         job_application.cancel(user=cancellation_user)
         [email] = mail.outbox
         assert email.to == [cancellation_user.email]
@@ -1049,7 +1053,7 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         job_descriptions = company.job_description_through.all()
 
         selected_job = job_descriptions[0]
-        job_application = JobApplicationFactory(to_siae=company, selected_jobs=[selected_job])
+        job_application = JobApplicationFactory(to_company=company, selected_jobs=[selected_job])
 
         membership = company.companymembership_set.first()
         assert not membership.notifications
@@ -1064,7 +1068,7 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         # A job application is sent concerning another job_description.
         # He should then be subscribed to two different notifications.
         selected_job = job_descriptions[1]
-        job_application = JobApplicationFactory(to_siae=company, selected_jobs=[selected_job])
+        job_application = JobApplicationFactory(to_company=company, selected_jobs=[selected_job])
 
         NewQualifiedJobAppEmployersNotification.subscribe(recipient=membership, subscribed_pks=[selected_job.pk])
         assert NewQualifiedJobAppEmployersNotification.is_subscribed(
@@ -1095,7 +1099,7 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         )
 
         # Two selected jobs. Each user subscribed to one of them. We should have two recipients.
-        job_application = JobApplicationFactory(to_siae=company, selected_jobs=job_descriptions)
+        job_application = JobApplicationFactory(to_company=company, selected_jobs=job_descriptions)
         notification = NewQualifiedJobAppEmployersNotification(job_application=job_application)
 
         assert len(notification.recipients_emails) == 2
@@ -1109,7 +1113,7 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
         company.members.add(user)
 
         selected_job = company.job_description_through.first()
-        job_application = JobApplicationFactory(to_siae=company, selected_jobs=[selected_job])
+        job_application = JobApplicationFactory(to_company=company, selected_jobs=[selected_job])
 
         notification = NewQualifiedJobAppEmployersNotification(job_application=job_application)
 
@@ -1119,7 +1123,7 @@ class NewQualifiedJobAppEmployersNotificationTest(TestCase):
     def test_unsubscribe(self):
         company = CompanyWithMembershipAndJobsFactory()
         selected_job = company.job_description_through.first()
-        job_application = JobApplicationFactory(to_siae=company, selected_jobs=[selected_job])
+        job_application = JobApplicationFactory(to_company=company, selected_jobs=[selected_job])
         assert company.members.count() == 1
 
         recipient = company.companymembership_set.first()
@@ -1178,7 +1182,7 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_seeker.job_applications.pending().count() == 4
 
         job_application = job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_PROCESSING).first()
-        job_application.accept(user=job_application.to_siae.members.first())
+        job_application.accept(user=job_application.to_company.members.first())
 
         assert job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_ACCEPTED).count() == 1
         assert job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_OBSOLETE).count() == 3
@@ -1214,7 +1218,7 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_seeker.job_applications.count() == 6
 
         job_application = job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_OBSOLETE).first()
-        job_application.accept(user=job_application.to_siae.members.first())
+        job_application.accept(user=job_application.to_company.members.first())
 
         assert job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_ACCEPTED).count() == 2
         assert job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_OBSOLETE).count() == 4
@@ -1237,7 +1241,7 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
         )
-        job_application.accept(user=job_application.to_siae.members.first())
+        job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval.number == pe_approval.number
         assert job_application.approval_number_sent_by_email
@@ -1256,7 +1260,7 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
         )
-        job_application.accept(user=job_application.to_siae.members.first())
+        job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval.number == pe_approval.number
         assert job_application.approval_number_sent_by_email
@@ -1279,7 +1283,7 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
         )
-        job_application.accept(user=job_application.to_siae.members.first())
+        job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_MANUAL
         # Check sent email.
@@ -1298,7 +1302,7 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
         )
-        job_application.accept(user=job_application.to_siae.members.first())
+        job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC
         assert len(mail.outbox) == 2
@@ -1314,7 +1318,7 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
         )
-        job_application.accept(user=job_application.to_siae.members.first())
+        job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC
         assert len(mail.outbox) == 2
@@ -1330,7 +1334,7 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
         )
-        job_application.accept(user=job_application.to_siae.members.first())
+        job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC
         assert len(mail.outbox) == 2
@@ -1346,7 +1350,7 @@ class JobApplicationWorkflowTest(TestCase):
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.pole_emploi_id != ""
-        job_application.accept(user=job_application.to_siae.members.first())
+        job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
@@ -1369,8 +1373,8 @@ class JobApplicationWorkflowTest(TestCase):
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.pole_emploi_id != ""
-        job_application.accept(user=job_application.to_siae.members.first())
-        assert job_application.to_siae.is_subject_to_eligibility_rules
+        job_application.accept(user=job_application.to_company.members.first())
+        assert job_application.to_company.is_subject_to_eligibility_rules
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
@@ -1402,7 +1406,7 @@ class JobApplicationWorkflowTest(TestCase):
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.pole_emploi_id != ""
-        job_application.accept(user=job_application.to_siae.members.first())
+        job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
@@ -1433,7 +1437,7 @@ class JobApplicationWorkflowTest(TestCase):
             eligibility_diagnosis=None,
         )
         with pytest.raises(xwf_models.AbortTransition):
-            job_application.accept(user=job_application.to_siae.members.first())
+            job_application.accept(user=job_application.to_company.members.first())
 
     def test_accept_job_application_sent_by_job_seeker_in_waiting_period_valid_diagnosis(self):
         """
@@ -1455,7 +1459,7 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=user, state=JobApplicationWorkflow.STATE_PROCESSING
         )
-        job_application.accept(user=job_application.to_siae.members.first())
+        job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
@@ -1475,8 +1479,8 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationWithoutApprovalFactory(state=JobApplicationWorkflow.STATE_PROCESSING)
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.pole_emploi_id != ""
-        job_application.accept(user=job_application.to_siae.members.first())
-        assert job_application.to_siae.is_subject_to_eligibility_rules
+        job_application.accept(user=job_application.to_company.members.first())
+        assert job_application.to_company.is_subject_to_eligibility_rules
         assert job_application.approval is None
         assert not job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == ""
@@ -1494,10 +1498,10 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            to_siae__kind=CompanyKind.GEIQ,
+            to_company__kind=CompanyKind.GEIQ,
         )
-        job_application.accept(user=job_application.to_siae.members.first())
-        assert not job_application.to_siae.is_subject_to_eligibility_rules
+        job_application.accept(user=job_application.to_company.members.first())
+        assert not job_application.to_company.is_subject_to_eligibility_rules
         assert job_application.approval is None
         assert not job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == ""
@@ -1515,23 +1519,23 @@ class JobApplicationWorkflowTest(TestCase):
         """
         job_application = JobApplicationSentBySiaeFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            to_siae__kind=CompanyKind.EI,
+            to_company__kind=CompanyKind.EI,
             eligibility_diagnosis=None,
         )
 
-        to_siae = job_application.to_siae
-        to_employer_member = to_siae.members.first()
+        to_company = job_application.to_company
+        to_employer_member = to_company.members.first()
         job_seeker = job_application.job_seeker
 
         eligibility_diagnosis = EligibilityDiagnosisMadeBySiaeFactory(
-            job_seeker=job_seeker, author=to_employer_member, author_siae=to_siae
+            job_seeker=job_seeker, author=to_employer_member, author_siae=to_company
         )
 
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_seeker.pole_emploi_id != ""
 
         job_application.accept(user=to_employer_member)
-        assert job_application.to_siae.is_subject_to_eligibility_rules
+        assert job_application.to_company.is_subject_to_eligibility_rules
         assert job_application.eligibility_diagnosis == eligibility_diagnosis
 
     def test_refuse(self):
@@ -1556,7 +1560,7 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.job_seeker.approvals.count() == 1
         assert JobApplication.objects.filter(approval=job_application.approval).count() == 1
 
-        cancellation_user = job_application.to_siae.active_members.first()
+        cancellation_user = job_application.to_company.active_members.first()
         job_application.cancel(user=cancellation_user)
 
         assert job_application.state == JobApplicationWorkflow.STATE_CANCELLED
@@ -1573,7 +1577,7 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.job_seeker.approvals.count() == 1
         assert JobApplication.objects.filter(approval=approval).count() == 2
 
-        cancellation_user = job_application.to_siae.active_members.first()
+        cancellation_user = job_application.to_company.active_members.first()
         job_application.cancel(user=cancellation_user)
 
         assert job_application.state == JobApplicationWorkflow.STATE_CANCELLED
@@ -1586,7 +1590,7 @@ class JobApplicationWorkflowTest(TestCase):
 
         # Linked employee record with blocking status
         job_application = JobApplicationFactory(with_approval=True, hiring_start_at=(today - relativedelta(days=365)))
-        cancellation_user = job_application.to_siae.active_members.first()
+        cancellation_user = job_application.to_company.active_members.first()
         EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED)
 
         # xworkflows.base.AbortTransition
@@ -1597,7 +1601,7 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationFactory(
             with_approval=True, hiring_start_at=today, state=JobApplicationWorkflow.STATE_NEW
         )
-        cancellation_user = job_application.to_siae.active_members.first()
+        cancellation_user = job_application.to_company.active_members.first()
         with pytest.raises(xwf_models.AbortTransition):
             job_application.cancel(user=cancellation_user)
 
@@ -1612,7 +1616,7 @@ class JobApplicationXlsxExportTest(TestCase):
             selected_jobs=Appellation.objects.all(),
             eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
         )
-        job_application.accept(user=job_application.to_siae.members.first())
+        job_application.accept(user=job_application.to_company.members.first())
 
         # The accept transition above will create a valid PASS IAE for the job seeker.
         assert job_seeker.approvals.last().is_valid
@@ -1629,8 +1633,8 @@ class JobApplicationXlsxExportTest(TestCase):
                 job_seeker.birthdate.strftime("%d/%m/%Y"),
                 job_seeker.city,
                 job_seeker.post_code,
-                job_application.to_siae.display_name,
-                str(job_application.to_siae.kind),
+                job_application.to_company.display_name,
+                str(job_application.to_company.kind),
                 " ".join(a.display_name for a in job_application.selected_jobs.all()),
                 "Candidature spontanée",
                 "",
@@ -1671,8 +1675,8 @@ class JobApplicationXlsxExportTest(TestCase):
                 job_seeker.birthdate.strftime("%d/%m/%Y"),
                 job_seeker.city,
                 job_seeker.post_code,
-                job_application.to_siae.display_name,
-                str(job_application.to_siae.kind),
+                job_application.to_company.display_name,
+                str(job_application.to_company.kind),
                 " ".join(a.display_name for a in job_application.selected_jobs.all()),
                 "Candidature spontanée",
                 "",
@@ -1710,7 +1714,7 @@ class JobApplicationAdminFormTest(TestCase):
             "sender_kind",
             "sender_siae",
             "sender_prescriber_organization",
-            "to_siae",
+            "to_company",
             "state",
             "selected_jobs",
             "hired_job",
@@ -1746,10 +1750,10 @@ class JobApplicationAdminFormTest(TestCase):
         form = JobApplicationAdminForm()
         assert list(form.fields.keys()) == form_fields_list
 
-        # mandatory fields : job_seeker, to_siae
+        # mandatory fields : job_seeker, to_company
         form_errors = {
             "job_seeker": [{"message": "Ce champ est obligatoire.", "code": "required"}],
-            "to_siae": [{"message": "Ce champ est obligatoire.", "code": "required"}],
+            "to_company": [{"message": "Ce champ est obligatoire.", "code": "required"}],
             "state": [{"message": "Ce champ est obligatoire.", "code": "required"}],
             "origin": [{"message": "Ce champ est obligatoire.", "code": "required"}],
             "created_at": [{"message": "Ce champ est obligatoire.", "code": "required"}],

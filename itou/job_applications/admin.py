@@ -69,7 +69,7 @@ class JobApplicationAdmin(ItouModelAdmin):
         "sender",
         "sender_siae",
         "sender_prescriber_organization",
-        "to_siae",
+        "to_company",
         "approval",
         "transferred_by",
         "transferred_from",
@@ -81,7 +81,7 @@ class JobApplicationAdmin(ItouModelAdmin):
         "approval_number_sent_by_email",
         "approval_delivery_mode",
         "sender_prescriber_organization__is_authorized",
-        "to_siae__department",
+        "to_company__department",
         "origin",
     )
     readonly_fields = (
@@ -105,7 +105,7 @@ class JobApplicationAdmin(ItouModelAdmin):
                 "fields": [
                     "state",
                     "job_seeker",
-                    "to_siae",
+                    "to_company",
                     "sender_kind",
                     "sender",
                     "sender_siae",
@@ -181,7 +181,7 @@ class JobApplicationAdmin(ItouModelAdmin):
         siren_length = 9
         siret_length = 14
         if search_term.isdecimal() and len(search_term) in [siren_length, siret_length]:
-            search_fields.append("to_siae__siret__startswith")
+            search_fields.append("to_company__siret__startswith")
 
         # Without search_fields, the search bar is hidden.
         # Provide a dummy value that’s quick to search, in order not to slow
@@ -211,7 +211,7 @@ class JobApplicationAdmin(ItouModelAdmin):
         created, ignored = [], []
 
         for job_application in queryset:
-            if job_application.employee_record.for_company(job_application.to_siae).exists():
+            if job_application.employee_record.for_company(job_application.to_company).exists():
                 ignored.append(job_application)
                 continue
 

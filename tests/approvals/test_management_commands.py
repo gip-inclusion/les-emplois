@@ -25,9 +25,9 @@ class ExportPEApiRejectionsTestCase(TestCase):
             user__last_name="Pers,e",
             user__first_name='Jul"ie',
             with_jobapplication=True,
-            with_jobapplication__to_siae__department=42,
-            with_jobapplication__to_siae__kind="EI",
-            with_jobapplication__to_siae__name="Ma petite entreprise",
+            with_jobapplication__to_company__department=42,
+            with_jobapplication__to_company__kind="EI",
+            with_jobapplication__to_company__name="Ma petite entreprise",
         )
         stdout = io.StringIO()
         management.call_command("export_pe_api_rejections", stdout=stdout, stderr=io.StringIO())

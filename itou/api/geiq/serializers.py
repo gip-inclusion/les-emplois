@@ -78,7 +78,7 @@ class PriorActionSerializer(serializers.ModelSerializer):
 class GeiqJobApplicationSerializer(serializers.ModelSerializer):
     id_embauche = serializers.UUIDField(source="pk")
     id_utilisateur = serializers.UUIDField(source="job_seeker.public_id")
-    siret_employeur = serializers.CharField(source="to_siae.siret")
+    siret_employeur = serializers.CharField(source="to_company.siret")
     nir = serializers.CharField(source="job_seeker.nir")
     nom = serializers.CharField(source="job_seeker.last_name")
     prenom = serializers.CharField(source="job_seeker.first_name")

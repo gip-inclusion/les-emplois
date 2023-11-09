@@ -70,7 +70,7 @@ class ProcessListTest(TestCase):
         states = list(JobApplicationWorkflow.states)
         remaining_states, last_state = states[:-1], states[-1]
         common_kwargs = {
-            "to_siae": hit_pit,
+            "to_company": hit_pit,
             "sender_prescriber_organization": pole_emploi,
             "eligibility_diagnosis": None,
         }
@@ -546,7 +546,7 @@ class ProcessListSiaeTest(ProcessListTest):
             state=JobApplicationWorkflow.STATE_ACCEPTED,
             hiring_start_at=yesterday,
             approval__start_at=yesterday,
-            to_siae=self.hit_pit,
+            to_company=self.hit_pit,
         )
         response = self.client.get(f"{self.siae_base_url}?{params}")
         applications = response.context["job_applications_page"].object_list
@@ -666,8 +666,8 @@ class ProcessListSiaeTest(ProcessListTest):
 
         create_test_romes_and_appellations(["M1805", "N1101"], appellations_per_rome=2)
         (appellation1, appellation2) = Appellation.objects.all().order_by("?")[:2]
-        JobApplicationSentByJobSeekerFactory(to_siae=self.hit_pit, selected_jobs=[appellation1])
-        JobApplicationSentByJobSeekerFactory(to_siae=self.hit_pit, selected_jobs=[appellation2])
+        JobApplicationSentByJobSeekerFactory(to_company=self.hit_pit, selected_jobs=[appellation1])
+        JobApplicationSentByJobSeekerFactory(to_company=self.hit_pit, selected_jobs=[appellation2])
 
         params = urlencode({"selected_jobs": [appellation1.pk]}, True)
         url = f"{self.siae_base_url}?{params}"
@@ -691,7 +691,7 @@ class TestListForSiae:
         job_seeker = JobSeekerFactory(first_name="Jacques", last_name="Henry")
         JobApplicationFactory(
             id="11111111-1111-1111-1111-111111111111",
-            to_siae=hit_pit,
+            to_company=hit_pit,
             job_seeker=job_seeker,
             sender=sender,
             message="Third application",
@@ -699,7 +699,7 @@ class TestListForSiae:
         )
         JobApplicationFactory(
             id="22222222-2222-2222-2222-222222222222",
-            to_siae=hit_pit,
+            to_company=hit_pit,
             job_seeker=job_seeker,
             sender=sender,
             message="Second application",
@@ -707,7 +707,7 @@ class TestListForSiae:
         )
         JobApplicationFactory(
             id="33333333-3333-3333-3333-333333333333",
-            to_siae=hit_pit,
+            to_company=hit_pit,
             job_seeker=job_seeker,
             sender=sender,
             message="First application",
@@ -839,14 +839,14 @@ class ProcessListPrescriberTest(ProcessListTest):
         Thibault wants to see applications sent to Hit Pit.
         """
         self.client.force_login(self.thibault_pe)
-        to_siaes_ids = [self.hit_pit.pk]
-        params = urlencode({"to_siaes": to_siaes_ids}, True)
+        to_companys_ids = [self.hit_pit.pk]
+        params = urlencode({"to_companys": to_companys_ids}, True)
         url = f"{self.prescriber_base_url}?{params}"
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
         assert len(applications) == 9
-        assert applications[0].to_siae.pk in to_siaes_ids
+        assert applications[0].to_company.pk in to_companys_ids
 
 
 def test_list_for_unauthorized_prescriber_view(client):
@@ -870,7 +870,7 @@ def test_list_for_unauthorized_prescriber_view(client):
         + 1  # get list of job seekers (distinct job_seeker_id)
         + 1  # get list of administrative criteria
         + 2  # get list of job application + prefetch of job descriptions
-        + 1  # get list of siaes (distinct to_siae_id)
+        + 1  # get list of siaes (distinct to_company_id)
         + 3  # count, list & prefetch of job application
         + 1  # get job seekers approvals
         + 1  # check user authorized membership (can_edit_personal_information)

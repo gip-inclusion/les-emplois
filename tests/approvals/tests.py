@@ -907,7 +907,7 @@ class CustomApprovalAdminViewsTest(TestCase):
             approval=None,
             approval_number_sent_by_email=False,
         )
-        job_application.accept(user=job_application.to_siae.members.first())
+        job_application.accept(user=job_application.to_company.members.first())
 
         # Delete emails sent by previous transition.
         mail.outbox = []
@@ -1009,7 +1009,7 @@ class CustomApprovalAdminViewsTest(TestCase):
         # When the job application will lead to a duplicate employee record but is still proposed
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_ACCEPTED,
-            to_siae=employee_record.job_application.to_siae,
+            to_company=employee_record.job_application.to_company,
             approval=employee_record.job_application.approval,
         )
         msg = JobApplicationInline.employee_record_status(job_application)
@@ -1034,9 +1034,9 @@ class CustomApprovalAdminViewsTest(TestCase):
         # When employee records are allowed (or not) for the SIAE
         for kind in CompanyKind:
             with self.subTest("SIAE doesn't use employee records", kind=kind):
-                job_application = JobApplicationFactory(with_approval=True, to_siae__kind=kind)
+                job_application = JobApplicationFactory(with_approval=True, to_company__kind=kind)
                 msg = JobApplicationInline.employee_record_status(job_application)
-                if not job_application.to_siae.can_use_employee_record:
+                if not job_application.to_company.can_use_employee_record:
                     assert msg == "La SIAE n'utilise pas les fiches salarié"
                 else:
                     assert msg == "En attente de création"
@@ -1044,7 +1044,7 @@ class CustomApprovalAdminViewsTest(TestCase):
         # When an employee record already exists for the candidate
         employee_record = EmployeeRecordFactory(status=Status.READY)
         job_application = JobApplicationFactory(
-            to_siae=employee_record.job_application.to_siae,
+            to_company=employee_record.job_application.to_company,
             approval=employee_record.job_application.approval,
         )
         msg = JobApplicationInline.employee_record_status(job_application)

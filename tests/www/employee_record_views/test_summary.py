@@ -12,7 +12,7 @@ class SummaryEmployeeRecordsTest(TestCase):
         # User must be super user for UI first part (tmp)
         self.company = CompanyWithMembershipAndJobsFactory(name="Wanna Corp.", membership__user__first_name="Billy")
         self.user = self.company.members.get(first_name="Billy")
-        self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_siae=self.company)
+        self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_company=self.company)
         self.employee_record = EmployeeRecordWithProfileFactory(job_application=self.job_application)
         self.url = reverse("employee_record_views:summary", args=(self.employee_record.id,))
 

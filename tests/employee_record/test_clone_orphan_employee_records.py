@@ -15,7 +15,7 @@ def command_fixture():
 
 def test_management_command_default_run(command):
     employee_record = factories.EmployeeRecordFactory(orphan=True)
-    siae = employee_record.job_application.to_siae
+    siae = employee_record.job_application.to_company
 
     command.handle(for_siae=siae.pk)
 
@@ -34,10 +34,10 @@ def test_management_command_default_run(command):
 
 def test_management_command_wet_run(command):
     employee_record = factories.EmployeeRecordFactory(orphan=True)
-    siae = employee_record.job_application.to_siae
+    siae = employee_record.job_application.to_company
     # Create non-orphan employee records with the old and new ASP ID to check filtering
-    factories.EmployeeRecordFactory(job_application__to_siae__convention__asp_id=employee_record.asp_id)
-    factories.EmployeeRecordFactory(job_application__to_siae__convention__asp_id=siae.convention.asp_id)
+    factories.EmployeeRecordFactory(job_application__to_company__convention__asp_id=employee_record.asp_id)
+    factories.EmployeeRecordFactory(job_application__to_company__convention__asp_id=siae.convention.asp_id)
 
     command.handle(for_siae=siae.pk, wet_run=True)
 
@@ -57,14 +57,14 @@ def test_management_command_wet_run(command):
 def test_management_command_when_the_new_asp_id_is_used_by_multiple_convention(command):
     employee_record = factories.EmployeeRecordFactory(
         orphan=True,
-        job_application__to_siae__kind=companies_enums.CompanyKind.EI,
+        job_application__to_company__kind=companies_enums.CompanyKind.EI,
     )
-    siae = employee_record.job_application.to_siae
+    siae = employee_record.job_application.to_company
 
     # Create a non-orphan employee record that use the same convention
     factories.EmployeeRecordFactory(
-        job_application__to_siae__kind=companies_enums.CompanyKind.ACI,
-        job_application__to_siae__convention__asp_id=siae.convention.asp_id,
+        job_application__to_company__kind=companies_enums.CompanyKind.ACI,
+        job_application__to_company__convention__asp_id=siae.convention.asp_id,
     )
     # SiaeConventionFactory() use the `django_get_or_create` option to match the ("asp_id", "kind")` unique
     # constraint, and in this test case we need to be sure that more than one convention share the same asp_id.
@@ -88,10 +88,10 @@ def test_management_command_when_the_new_asp_id_is_used_by_multiple_convention(c
 def test_management_command_do_not_try_to_create_multiple_records_for_the_same_approval(command):
     first_employee_record = factories.EmployeeRecordFactory(
         orphan=True,
-        job_application__to_siae__kind=companies_enums.CompanyKind.EI,
+        job_application__to_company__kind=companies_enums.CompanyKind.EI,
     )
     second_employee_record = first_employee_record.clone()  # Use clone to create the most perfect duplicate
-    siae = second_employee_record.job_application.to_siae
+    siae = second_employee_record.job_application.to_company
 
     command.handle(for_siae=siae.pk)
 

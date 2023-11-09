@@ -85,9 +85,9 @@ class Command(BaseCommand):
             self.stderr.write(f"Unable to find the siae ID {from_id}\n")
             return
 
-        to_siae_qs = siaes_models.Company.objects.filter(pk=to_id)
+        to_company_qs = siaes_models.Company.objects.filter(pk=to_id)
         try:
-            to_siae = to_siae_qs.get()
+            to_company = to_company_qs.get()
         except siaes_models.Company.DoesNotExist:
             self.stderr.write(f"Unable to find the siae ID {to_id}\n")
             return
@@ -108,10 +108,10 @@ class Command(BaseCommand):
         job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=from_id)
         self.stdout.write(f"| Job applications sent: {job_applications_sent.count()}")
 
-        job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=from_id)
+        job_applications_received = job_applications_models.JobApplication.objects.filter(to_company_id=from_id)
         self.stdout.write(f"| Job applications received: {job_applications_received.count()}")
 
-        employee_records_created_count = EmployeeRecord.objects.filter(job_application__to_siae_id=from_id).count()
+        employee_records_created_count = EmployeeRecord.objects.filter(job_application__to_company_id=from_id).count()
         self.stdout.write(f"| Employee records created: {employee_records_created_count}")
 
         if move_all_data:
@@ -149,26 +149,32 @@ class Command(BaseCommand):
             )
             self.stdout.write(f"| Invitations: {invitations.count()}\n")
 
-        self.stdout.write(f"INTO siae.id={to_siae.pk} - {to_siae.kind} {to_siae.siret} - {to_siae.display_name}\n")
+        self.stdout.write(
+            f"INTO siae.id={to_company.pk} - {to_company.kind} {to_company.siret} - {to_company.display_name}\n"
+        )
 
         dest_siae_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=to_id)
         self.stdout.write(f"| Job applications sent: {dest_siae_job_applications_sent.count()}\n")
 
-        dest_siae_job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=to_id)
+        dest_siae_job_applications_received = job_applications_models.JobApplication.objects.filter(
+            to_company_id=to_id
+        )
         self.stdout.write(f"| Job applications received: {dest_siae_job_applications_received.count()}\n")
 
-        dest_employee_records_created_count = EmployeeRecord.objects.filter(job_application__to_siae_id=to_id).count()
+        dest_employee_records_created_count = EmployeeRecord.objects.filter(
+            job_application__to_company_id=to_id
+        ).count()
         self.stdout.write(f"| Employee records created: {dest_employee_records_created_count}")
 
         if move_all_data and not preserve_to_siae_data:
-            self.stdout.write(f"| Brand '{to_siae.brand}' will be updated with '{from_siae.display_name}'\n")
+            self.stdout.write(f"| Brand '{to_company.brand}' will be updated with '{from_siae.display_name}'\n")
             self.stdout.write(
-                f"| Description \n{to_siae.description}\nwill be updated with\n{from_siae.description}\n"
+                f"| Description \n{to_company.description}\nwill be updated with\n{from_siae.description}\n"
             )
-            self.stdout.write(f"| Phone '{to_siae.phone}' will be updated with '{from_siae.phone}'\n")
-            self.stdout.write(f"| Coords '{to_siae.coords}' will be updated with '{from_siae.coords}'\n")
+            self.stdout.write(f"| Phone '{to_company.phone}' will be updated with '{from_siae.phone}'\n")
+            self.stdout.write(f"| Coords '{to_company.coords}' will be updated with '{from_siae.coords}'\n")
             self.stdout.write(
-                f"| Geoscore '{to_siae.geocoding_score}' will be updated with '{from_siae.geocoding_score}'\n"
+                f"| Geoscore '{to_company.geocoding_score}' will be updated with '{from_siae.geocoding_score}'\n"
             )
 
         if not wet_run:
@@ -190,15 +196,15 @@ class Command(BaseCommand):
             # unlinked to be transfered. Job_description can be different enough to be irrelevant.
             if move_all_data:
                 # find Appellation linked to job_description siae B
-                to_siae_appellation_id = siaes_models.JobDescription.objects.filter(siae_id=to_id).values_list(
+                to_company_appellation_id = siaes_models.JobDescription.objects.filter(siae_id=to_id).values_list(
                     "appellation_id", flat=True
                 )
 
                 # find job_applications in siae A, linked with job_description which Appellation is found in siae B
                 job_applications_to_clear = job_applications_models.JobApplication.objects.filter(
-                    to_siae_id=from_id,
+                    to_company_id=from_id,
                     selected_jobs__in=siaes_models.JobDescription.objects.filter(
-                        siae_id=from_id, appellation_id__in=to_siae_appellation_id
+                        siae_id=from_id, appellation_id__in=to_company_appellation_id
                     ),
                 )
 
@@ -207,13 +213,13 @@ class Command(BaseCommand):
                     job_application.selected_jobs.clear()
 
             job_applications_sent.update(sender_siae_id=to_id)
-            job_applications_received.update(to_siae_id=to_id)
+            job_applications_received.update(to_company_id=to_id)
             # Also move employee records
             employee_records_to_clone = (
-                # Not reusing the previous queryset, so we can use the updated to_siae and only take the orphans
+                # Not reusing the previous queryset, so we can use the updated to_company and only take the orphans
                 # (the ones with a different `asp_id`), in case of a SIRET change the employer can (should)
                 # reactivate/deactivate the employee record to resend it to the ASP with the new SIRET.
-                EmployeeRecord.objects.filter(job_application__to_siae_id=to_id)
+                EmployeeRecord.objects.filter(job_application__to_company_id=to_id)
                 .orphans()
                 # Deduplicate to avoid errors because of the UNIQUE CONSTRAINT (asp_id, approval_number)
                 .distinct("approval_number")
@@ -230,14 +236,14 @@ class Command(BaseCommand):
 
             if move_all_data:
                 # do not move duplicated job_descriptions
-                job_descriptions.exclude(appellation_id__in=to_siae_appellation_id).update(siae_id=to_id)
+                job_descriptions.exclude(appellation_id__in=to_company_appellation_id).update(siae_id=to_id)
                 members.update(siae_id=to_id)
                 diagnoses.update(author_siae_id=to_id)
                 prolongations.update(declared_by_siae_id=to_id)
                 suspensions.update(siae_id=to_id)
                 invitations.update(siae_id=to_id)
                 if preserve_to_siae_data:
-                    to_siae_qs.update(
+                    to_company_qs.update(
                         brand=from_siae.display_name,
                         description=from_siae.description,
                         phone=from_siae.phone,
@@ -260,19 +266,21 @@ class Command(BaseCommand):
         orig_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=from_id)
         self.stdout.write(f"| Job applications sent: {orig_job_applications_sent.count()}\n")
 
-        orig_job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=from_id)
+        orig_job_applications_received = job_applications_models.JobApplication.objects.filter(to_company_id=from_id)
         self.stdout.write(f"| Job applications received: {orig_job_applications_received.count()}\n")
 
-        orig_employee_records = EmployeeRecord.objects.filter(job_application__to_siae_id=from_id)
+        orig_employee_records = EmployeeRecord.objects.filter(job_application__to_company_id=from_id)
         self.stdout.write(f"| Employee records created: {orig_employee_records.count()}")
 
-        self.stdout.write(f"INTO siae.id={to_siae.pk}\n")
+        self.stdout.write(f"INTO siae.id={to_company.pk}\n")
 
         dest_siae_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=to_id)
         self.stdout.write(f"| Job applications sent: {dest_siae_job_applications_sent.count()}\n")
 
-        dest_siae_job_applications_received = job_applications_models.JobApplication.objects.filter(to_siae_id=to_id)
+        dest_siae_job_applications_received = job_applications_models.JobApplication.objects.filter(
+            to_company_id=to_id
+        )
         self.stdout.write(f"| Job applications received: {dest_siae_job_applications_received.count()}\n")
 
-        dest_employee_records = EmployeeRecord.objects.filter(job_application__to_siae_id=to_id)
+        dest_employee_records = EmployeeRecord.objects.filter(job_application__to_company_id=to_id)
         self.stdout.write(f"| Employee records created: {dest_employee_records.count()}")

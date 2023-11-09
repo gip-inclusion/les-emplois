@@ -1,14 +1,14 @@
 {% extends "layout/base_email_text_body.txt" %}
 {% block body %}
 
-Nous sommes ravis de vous annoncer que la candidature de {{ job_application.job_seeker.get_full_name }}, adressée par {{ job_application.sender.get_full_name }}, a été acceptée par {{ job_application.to_siae.display_name }}.
+Nous sommes ravis de vous annoncer que la candidature de {{ job_application.job_seeker.get_full_name }}, adressée par {{ job_application.sender.get_full_name }}, a été acceptée par {{ job_application.to_company.display_name }}.
 
 - Date de début du contrat : {{ job_application.hiring_start_at|date:"d/m/Y" }}
 - Date de fin du contrat : {{ job_application.hiring_end_at|date:"d/m/Y"|default:"Non renseigné" }}
 
 Ces dates sont uniquement pour information.
 
-{% if job_application.to_siae.is_subject_to_eligibility_rules %}Seules les dates déclarées dans l'Extranet 2.0 de l'ASP font foi.{% endif %}
+{% if job_application.to_company.is_subject_to_eligibility_rules %}Seules les dates déclarées dans l'Extranet 2.0 de l'ASP font foi.{% endif %}
 
 {% if job_application.answer %}
 *Message de l'entreprise* :

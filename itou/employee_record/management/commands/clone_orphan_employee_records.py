@@ -28,7 +28,7 @@ class Command(BaseCommand):
 
         self.stderr.write(f"Clone orphans employee records of {siae=} {siae.siret=} {siae.convention.asp_id=}")
 
-        orphans = EmployeeRecord.objects.filter(job_application__to_siae=siae).orphans()
+        orphans = EmployeeRecord.objects.filter(job_application__to_company=siae).orphans()
         to_clone = (
             orphans.exclude(approval_number__in=EmployeeRecord.objects.for_company(siae).values("approval_number"))
             .distinct("approval_number")

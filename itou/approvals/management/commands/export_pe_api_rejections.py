@@ -33,7 +33,7 @@ class Command(XlsxExportMixin, BaseCommand):
         data = []
         for approval in rejected_approvals:
             # Use the same logic that Approval.notify_pole_emploi() to get the SIAE using the PASS.
-            siae = approval.jobapplication_set.accepted().order_by("-created_at").first().to_siae
+            company = approval.jobapplication_set.accepted().order_by("-created_at").first().to_company
             data.append(
                 [
                     approval.number,
@@ -44,9 +44,9 @@ class Command(XlsxExportMixin, BaseCommand):
                     approval.user.last_name,
                     approval.user.first_name,
                     approval.user.birthdate.isoformat(),
-                    siae.kind,
-                    siae.name,
-                    siae.department,
+                    company.kind,
+                    company.name,
+                    company.department,
                 ]
             )
 

@@ -424,7 +424,7 @@ class ApplyAsJobSeekerTest(TestCase):
             )
         assert response.status_code == 302
 
-        job_application = JobApplication.objects.get(sender=user, to_siae=company)
+        job_application = JobApplication.objects.get(sender=user, to_company=company)
         assert job_application.job_seeker == user
         assert job_application.sender_kind == SenderKind.JOB_SEEKER
         assert job_application.sender_siae is None
@@ -842,7 +842,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             )
         assert response.status_code == 302
 
-        job_application = JobApplication.objects.get(sender=user, to_siae=company)
+        job_application = JobApplication.objects.get(sender=user, to_company=company)
         assert job_application.job_seeker == new_job_seeker
         assert job_application.sender_kind == SenderKind.PRESCRIBER
         assert job_application.sender_siae is None
@@ -1097,7 +1097,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             )
         assert response.status_code == 302
 
-        job_application = JobApplication.objects.get(sender=user, to_siae=company)
+        job_application = JobApplication.objects.get(sender=user, to_company=company)
         assert job_application.job_seeker == new_job_seeker
         assert job_application.sender_kind == SenderKind.PRESCRIBER
         assert job_application.sender_siae is None
@@ -1387,7 +1387,7 @@ class ApplyAsPrescriberTest(TestCase):
             )
         assert response.status_code == 302
 
-        job_application = JobApplication.objects.get(sender=user, to_siae=company)
+        job_application = JobApplication.objects.get(sender=user, to_company=company)
         assert job_application.job_seeker == new_job_seeker
         assert job_application.sender_kind == SenderKind.PRESCRIBER
         assert job_application.sender_siae is None
@@ -1824,7 +1824,7 @@ class ApplyAsSiaeTest(TestCase):
             )
         assert response.status_code == 302
 
-        job_application = JobApplication.objects.get(sender=user, to_siae=company)
+        job_application = JobApplication.objects.get(sender=user, to_company=company)
         assert job_application.job_seeker == new_job_seeker
         assert job_application.sender_kind == SenderKind.EMPLOYER
         assert job_application.sender_siae == company
@@ -2102,7 +2102,7 @@ class DirectHireFullProcessTest(TestCase):
         post_data = post_data | {"confirmed": "True"}
         response = self.client.post(next_url, headers={"hx-request": "true"}, data=post_data)
 
-        job_application = JobApplication.objects.get(sender=user, to_siae=company)
+        job_application = JobApplication.objects.get(sender=user, to_company=company)
         next_url = reverse("approvals:detail", kwargs={"pk": job_application.approval.pk})
         self.assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
 
@@ -2234,7 +2234,7 @@ class DirectHireFullProcessTest(TestCase):
         post_data = post_data | {"confirmed": "True"}
         response = self.client.post(confirmation_url, headers={"hx-request": "true"}, data=post_data)
 
-        job_application = JobApplication.objects.get(sender=user, to_siae=company)
+        job_application = JobApplication.objects.get(sender=user, to_company=company)
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         self.assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
 
@@ -2446,7 +2446,8 @@ def test_application_end_update_job_seeker(client):
     assert not job_seeker.can_edit_personal_information(job_application.sender)
     assert job_seeker.address_line_2 == ""
     url = reverse(
-        "apply:application_end", kwargs={"siae_pk": job_application.to_siae.pk, "application_pk": job_application.pk}
+        "apply:application_end",
+        kwargs={"siae_pk": job_application.to_company.pk, "application_pk": job_application.pk},
     )
     client.force_login(job_application.sender)
     response = client.post(
@@ -3390,7 +3391,7 @@ class CheckPreviousApplicationsViewTestCase(TestCase):
         self._login_and_setup_session(self.job_seeker)
 
         # Create a very recent application
-        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_siae=self.company)
+        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company)
         response = self.client.get(self.check_prev_applications_url)
         self.assertContains(
             response, "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
@@ -3424,7 +3425,7 @@ class CheckPreviousApplicationsViewTestCase(TestCase):
         self._login_and_setup_session(authorized_prescriber)
 
         # Create a very recent application
-        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_siae=self.company)
+        job_application = JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company)
         response = self.client.get(self.check_prev_applications_url)
         self.assertContains(
             response, "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
@@ -3453,7 +3454,7 @@ class CheckPreviousApplicationsViewTestCase(TestCase):
         self.assertNotContains(response, self.check_prev_applications_url)
 
     def test_with_previous_as_employer(self):
-        JobApplicationFactory(job_seeker=self.job_seeker, to_siae=self.company)
+        JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company)
         self._login_and_setup_session(self.company.members.first())
 
         response = self.client.get(self.check_prev_applications_url)
@@ -3674,7 +3675,7 @@ class CheckPreviousApplicationsForHireViewTestCase(TestCase):
 
     def test_with_previous_as_employer(self):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
-        JobApplicationFactory(job_seeker=self.job_seeker, to_siae=self.company, eligibility_diagnosis=None)
+        JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company, eligibility_diagnosis=None)
         self.client.force_login(self.company.members.first())
 
         response = self.client.get(self._reverse("apply:check_prev_applications_for_hire"))
@@ -3694,7 +3695,7 @@ class CheckPreviousApplicationsForHireViewTestCase(TestCase):
 
     def test_with_previous_as_geiq_staff(self):
         self.company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
-        JobApplicationFactory(job_seeker=self.job_seeker, to_siae=self.company, eligibility_diagnosis=None)
+        JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company, eligibility_diagnosis=None)
         self.client.force_login(self.company.members.first())
 
         response = self.client.get(self._reverse("apply:check_prev_applications_for_hire"))
@@ -3859,7 +3860,7 @@ class HireConfirmationTestCase(TestCase):
             self._reverse("apply:hire_confirmation"), headers={"hx-request": "true"}, data=post_data
         )
 
-        job_application = JobApplication.objects.get(sender=self.company.members.first(), to_siae=self.company)
+        job_application = JobApplication.objects.get(sender=self.company.members.first(), to_company=self.company)
         next_url = reverse("approvals:detail", kwargs={"pk": job_application.approval.pk})
         self.assertRedirects(response, next_url, status_code=200)
 
@@ -3915,7 +3916,7 @@ class HireConfirmationTestCase(TestCase):
             self._reverse("apply:hire_confirmation"), headers={"hx-request": "true"}, data=post_data
         )
 
-        job_application = JobApplication.objects.get(sender=self.company.members.first(), to_siae=self.company)
+        job_application = JobApplication.objects.get(sender=self.company.members.first(), to_company=self.company)
         next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
         self.assertRedirects(response, next_url, status_code=200)
 

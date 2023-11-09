@@ -158,7 +158,7 @@ class TestPrescriberWithOrgInvitationEmails(SimpleTestCase):
 
 
 class TestSiaeInvitation(TestCase):
-    def test_add_member_to_siae(self):
+    def test_add_member_to_company(self):
         invitation = SentEmployerInvitationFactory(email="hey@you.com")
         EmployerFactory(email=invitation.email)
         employers = invitation.siae.members.count()
@@ -166,7 +166,7 @@ class TestSiaeInvitation(TestCase):
         employers_after = invitation.siae.members.count()
         assert employers + 1 == employers_after
 
-    def test_add_inactive_member_back_to_siae(self):
+    def test_add_inactive_member_back_to_company(self):
         invitation = SentEmployerInvitationFactory(email="hey@you.com")
         CompanyMembershipFactory(siae=invitation.siae, user__email=invitation.email, is_active=False)
         employers = invitation.siae.members.count()

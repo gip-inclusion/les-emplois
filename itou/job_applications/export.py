@@ -93,7 +93,7 @@ def _resolve_title(title, nir):
 
 def _serialize_job_application(job_application):
     job_seeker = job_application.job_seeker
-    siae = job_application.to_siae
+    company = job_application.to_company
 
     numero_pass_iae = ""
     approval_start_date = None
@@ -113,8 +113,8 @@ def _serialize_job_application(job_application):
         _format_date(job_seeker.birthdate),
         job_seeker.city,
         job_seeker.post_code,
-        siae.display_name,
-        siae.kind,
+        company.display_name,
+        company.kind,
         _get_selected_jobs(job_application),
         _get_readable_sender_kind(job_application),
         _get_prescriber_orgname(job_application),

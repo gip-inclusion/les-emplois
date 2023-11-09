@@ -76,7 +76,7 @@ class ApplicantsAPITest(APITestCase):
 
     def test_applicant_data(self):
         company = CompanyFactory(with_membership=True)
-        job_seeker1 = JobApplicationFactory(to_siae=company).job_seeker
+        job_seeker1 = JobApplicationFactory(to_company=company).job_seeker
         # Will not refactor ASP factories:
         # - too long,
         # - not the point
@@ -91,7 +91,7 @@ class ApplicantsAPITest(APITestCase):
         job_seeker1.jobseeker_profile.birth_place = CommuneFactory()
         job_seeker1.jobseeker_profile.birth_country = CountryFactory()
         job_seeker1.jobseeker_profile.save()
-        job_seeker2 = JobApplicationFactory(to_siae=company).job_seeker
+        job_seeker2 = JobApplicationFactory(to_company=company).job_seeker
         job_seeker2.address_line_1 = "2nd address test"
         job_seeker2.address_line_2 = "2nd address 2"
         job_seeker2.post_code = "59000"

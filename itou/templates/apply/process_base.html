@@ -21,7 +21,7 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    {% if job_application.to_siae.is_subject_to_eligibility_rules %}
+                    {% if job_application.to_company.is_subject_to_eligibility_rules %}
                         {% if request.user.is_employer %}
                             {% if not job_application.state.is_accepted and not job_application.state.is_cancelled %}
                                 {# Employers need to know the expiration date of an approval #}

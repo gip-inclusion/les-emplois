@@ -50,10 +50,10 @@ Le candidat lui même.
 
 {% endif %}
 
-Candidature envoyée à l'entreprise {{ job_application.to_siae.display_name }}, {{ job_application.to_siae.city }}. Identifiant sur les emplois de l'inclusion : {{ job_application.to_siae.pk }}.
+Candidature envoyée à l'entreprise {{ job_application.to_company.display_name }}, {{ job_application.to_company.city }}. Identifiant sur les emplois de l'inclusion : {{ job_application.to_company.pk }}.
 
 --------------------
-{% if job_application.to_siae.is_subject_to_eligibility_rules %}
+{% if job_application.to_company.is_subject_to_eligibility_rules %}
 Toute demande de PASS IAE doit être effectuée au plus tard le jour de l'embauche. Les demandes rétroactives ne sont pas autorisées.
 {% endif %}
 Vous pouvez désactiver les notifications depuis votre espace utilisateur (rubrique "Mon espace" > "Mes notifications" ).

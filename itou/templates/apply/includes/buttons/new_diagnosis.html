@@ -1,5 +1,5 @@
 <div class="my-2">
-    {% with suspension=job_application.to_siae.get_active_suspension_text_with_dates %}
+    {% with suspension=job_application.to_company.get_active_suspension_text_with_dates %}
         {% if suspension %}
             <button class="btn btn-primary btn-block btn-ico disabled"
                     data-bs-toggle="tooltip"

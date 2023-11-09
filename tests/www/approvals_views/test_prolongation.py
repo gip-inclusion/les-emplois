@@ -45,10 +45,10 @@ class ApprovalProlongationTest(TestCase):
             hiring_start_at=today - relativedelta(days=1),
             approval__start_at=today - relativedelta(months=12),
             approval__end_at=today + relativedelta(months=2),
-            to_siae__kind=siae_kind,
+            to_company__kind=siae_kind,
         )
-        self.siae = self.job_application.to_siae
-        self.siae_user = self.job_application.to_siae.members.first()
+        self.siae = self.job_application.to_company
+        self.siae_user = self.job_application.to_company.members.first()
         self.approval = self.job_application.approval
         assert 0 == self.approval.prolongation_set.count()
 
@@ -112,7 +112,7 @@ class ApprovalProlongationTest(TestCase):
         prolongation_request = self.approval.prolongationrequest_set.get()
         assert prolongation_request.created_by == self.siae_user
         assert prolongation_request.declared_by == self.siae_user
-        assert prolongation_request.declared_by_siae == self.job_application.to_siae
+        assert prolongation_request.declared_by_siae == self.job_application.to_company
         assert prolongation_request.validated_by == self.prescriber
         assert prolongation_request.reason == post_data["reason"]
         assert not prolongation_request.report_file
@@ -302,7 +302,7 @@ class ApprovalProlongationTest(TestCase):
         prolongation = self.approval.prolongation_set.first()
         assert prolongation.created_by == self.siae_user
         assert prolongation.declared_by == self.siae_user
-        assert prolongation.declared_by_siae == self.job_application.to_siae
+        assert prolongation.declared_by_siae == self.job_application.to_company
         assert prolongation.validated_by is None
         assert prolongation.reason == post_data["reason"]
 

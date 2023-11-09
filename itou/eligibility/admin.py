@@ -57,7 +57,7 @@ class JobApplicationInline(ItouTabularInline):
         "approval",
     )
     readonly_fields = fields
-    list_select_related = ("to_siae",)
+    list_select_related = ("to_company",)
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -69,9 +69,9 @@ class JobApplicationInline(ItouTabularInline):
     def to_company_link(self, obj):
         return format_html(
             "{} — SIRET : {} ({})",
-            get_admin_view_link(obj.to_siae, content=obj.to_siae.display_name),
-            obj.to_siae.siret,
-            obj.to_siae.kind,
+            get_admin_view_link(obj.to_company, content=obj.to_company.display_name),
+            obj.to_company.siret,
+            obj.to_company.kind,
         )
 
 

@@ -39,7 +39,7 @@ class MoveSiaeDataTest(TestCase):
 
     def test_orphan_employee_records_are_cloned(self):
         old_company, new_company = companies_factories.CompanyFactory.create_batch(2)
-        EmployeeRecordFactory(job_application__to_siae=old_company)
+        EmployeeRecordFactory(job_application__to_company=old_company)
 
         management.call_command(
             "move_siae_data",
@@ -58,7 +58,7 @@ class MoveSiaeDataTest(TestCase):
     def test_employee_records_are_accessible_when_the_convention_is_the_same(self):
         old_company = companies_factories.CompanyFactory()
         new_company = companies_factories.CompanyFactory(convention=old_company.convention)
-        EmployeeRecordFactory(job_application__to_siae=old_company)
+        EmployeeRecordFactory(job_application__to_company=old_company)
 
         management.call_command(
             "move_siae_data",
@@ -77,7 +77,7 @@ class MoveSiaeDataTest(TestCase):
 
 def test_update_siaes_job_app_score():
     company_1 = companies_factories.CompanyFactory()
-    company_2 = JobApplicationFactory(to_siae__with_jobs=True).to_siae
+    company_2 = JobApplicationFactory(to_company__with_jobs=True).to_company
 
     assert company_1.job_app_score is None
     assert company_2.job_app_score is None

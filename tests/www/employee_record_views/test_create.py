@@ -54,7 +54,7 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         self.user_siae_bad_kind = self.company_bad_kind.members.get(first_name="Barracus")
 
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.company,
+            to_company=self.company,
             job_seeker_with_address=True,
         )
 
@@ -267,7 +267,7 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
 
     def test_job_seeker_without_address(self):
         # Job seeker has no address filled (which should not happen without admin operation)
-        self.job_application = JobApplicationWithApprovalNotCancellableFactory(to_siae=self.company)
+        self.job_application = JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
 
         response = self.client.get(self.url)
         url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
@@ -292,7 +292,7 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
     def test_job_seeker_address_not_geolocated(self):
         # Job seeker has an address filled but can't be geolocated
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.company,
+            to_company=self.company,
             job_seeker=JobSeekerWithAddressFactory(),
         )
         self.job_seeker = self.job_application.job_seeker
@@ -422,7 +422,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
     def setUp(self):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.company,
+            to_company=self.company,
             job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True),
         )
         self.job_seeker = self.job_application.job_seeker
@@ -558,7 +558,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         # but incorrect context :
         # create another employee record with similar features
         dup_job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.company,
+            to_company=self.company,
             job_seeker=self.job_seeker,
             approval=self.job_application.approval,
         )
@@ -591,7 +591,7 @@ class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
     def setUp(self):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.company,
+            to_company=self.company,
             job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True),
         )
         self.job_seeker = self.job_application.job_seeker
@@ -621,7 +621,7 @@ class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
     def setUp(self):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.company,
+            to_company=self.company,
             job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True),
         )
         self.job_seeker = self.job_application.job_seeker
@@ -669,7 +669,7 @@ class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
     def setUp(self):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
-            to_siae=self.company,
+            to_company=self.company,
             job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True),
         )
         self.job_seeker = self.job_application.job_seeker

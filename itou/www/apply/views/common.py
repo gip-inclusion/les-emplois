@@ -87,7 +87,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
                 job_application = form_accept.save(commit=False)
                 if creating:
                     job_application.job_seeker = job_seeker
-                    job_application.to_siae = siae
+                    job_application.to_company = siae
                     job_application.sender = request.user
                     job_application.sender_kind = UserKind.EMPLOYER
                     job_application.sender_siae = siae
@@ -126,7 +126,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
             messages.error(request, "Action déjà effectuée.")
             return HttpResponseClientRedirect(error_url)
 
-        if job_application.to_siae.is_subject_to_eligibility_rules:
+        if job_application.to_company.is_subject_to_eligibility_rules:
             # Automatic approval delivery mode.
             if job_application.approval:
                 external_link = get_external_link_markup(
@@ -167,17 +167,17 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
                         f"{external_link}."
                     ),
                 )
-        elif job_application.to_siae.kind == CompanyKind.GEIQ:
+        elif job_application.to_company.kind == CompanyKind.GEIQ:
             # If job seeker has as valid GEIQ diagnosis issued by a GEIQ or a prescriber
             # link this diagnosis to the current job application
             if geiq_eligibility_diagnosis := GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
-                job_application.job_seeker, job_application.to_siae
+                job_application.job_seeker, job_application.to_company
             ).first():
                 job_application.geiq_eligibility_diagnosis = geiq_eligibility_diagnosis
                 job_application.save(update_fields=["geiq_eligibility_diagnosis"])
 
         external_link = get_external_link_markup(
-            url=job_application.to_siae.accept_survey_url,
+            url=job_application.to_company.accept_survey_url,
             text="Je donne mon avis",
         )
         messages.warning(

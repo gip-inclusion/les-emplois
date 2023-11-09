@@ -118,7 +118,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
 
 class JobApplicationQuerySet(models.QuerySet):
     def siae_member_required(self, user):
-        return self.filter(to_siae__members=user, to_siae__members__is_active=True)
+        return self.filter(to_company__members=user, to_company__members__is_active=True)
 
     def pending(self):
         return self.filter(state__in=JobApplicationWorkflow.PENDING_STATES)
@@ -145,7 +145,7 @@ class JobApplicationQuerySet(models.QuerySet):
             "sender",
             "sender_siae",
             "sender_prescriber_organization",
-            "to_siae",
+            "to_company",
         ]:
             raise RuntimeError("Unauthorized fk_field")
 
@@ -249,7 +249,7 @@ class JobApplicationQuerySet(models.QuerySet):
             "sender",
             "sender_siae",
             "sender_prescriber_organization",
-            "to_siae__convention",
+            "to_company__convention",
         ).prefetch_related(
             "selected_jobs__appellation",
             "selected_jobs__location",
@@ -300,9 +300,9 @@ class JobApplicationQuerySet(models.QuerySet):
         Not a public API: use `eligible_as_employee_record`.
         """
         return self.filter(
-            to_siae=siae,
+            to_company=siae,
             employee_record__status=employeerecord_enums.Status.NEW,
-            employee_record__asp_id=F("to_siae__convention__asp_id"),
+            employee_record__asp_id=F("to_company__convention__asp_id"),
         )
 
     def _eligible_job_applications_without_employee_record(self, siae):
@@ -319,7 +319,7 @@ class JobApplicationQuerySet(models.QuerySet):
             # Must be linked to an approval
             approval__isnull=False,
             # Only for that SIAE
-            to_siae=siae,
+            to_company=siae,
             # Admin control: can prevent creation of employee record
             create_employee_record=True,
             # There must be **NO** employee record linked in this part
@@ -334,14 +334,14 @@ class JobApplicationQuerySet(models.QuerySet):
             .annotate(
                 has_recent_suspension=Exists(
                     Suspension.objects.filter(
-                        siae=OuterRef("to_siae"),
+                        siae=OuterRef("to_company"),
                         approval=OuterRef("approval"),
                         created_at__gte=EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
                     )
                 ),
                 has_recent_prolongation=Exists(
                     Prolongation.objects.filter(
-                        declared_by_siae=OuterRef("to_siae"),
+                        declared_by_siae=OuterRef("to_company"),
                         approval=OuterRef("approval"),
                         created_at__gte=EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
                     )
@@ -356,7 +356,7 @@ class JobApplicationQuerySet(models.QuerySet):
                 # - Prolongation will always block the employer, it's a much rarer case for Suspension.
                 Q(has_recent_suspension=True, create_employee_record=True) | Q(has_recent_prolongation=True),
                 # Only for that SIAE
-                to_siae=siae,
+                to_company=siae,
                 # There must be **NO** employee record linked in this part
                 employee_record__isnull=True,
             )
@@ -514,7 +514,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         on_delete=models.SET_NULL,
     )
 
-    to_siae = models.ForeignKey(
+    to_company = models.ForeignKey(
         "companies.Company",
         verbose_name="SIAE destinataire",
         on_delete=models.CASCADE,
@@ -708,9 +708,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 "Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte candidat"
             )
 
-        # `to_siae` is not guaranteed to exist if a `full_clean` is performed in some occasions (f.i. in an admin form)
-        # checking existence of `to_siae_id` keeps us safe here
-        if self.to_siae_id and self.to_siae.kind != CompanyKind.GEIQ:
+        # `to_company` is not guaranteed to exist if a `full_clean` is performed in some occasions
+        # (f.i. in an admin form) checking existence of `to_company_id` keeps us safe here
+        if self.to_company_id and self.to_company.kind != CompanyKind.GEIQ:
             if self.contract_type:
                 raise ValidationError("Le type de contrat ne peut être saisi que pour un GEIQ")
             if self.contract_type_details:
@@ -750,8 +750,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         Returns True if an eligibility diagnosis must be made by an SIAE
         when processing an application, False otherwise.
         """
-        return self.to_siae.is_subject_to_eligibility_rules and not self.job_seeker.has_valid_diagnosis(
-            for_siae=self.to_siae
+        return self.to_company.is_subject_to_eligibility_rules and not self.job_seeker.has_valid_diagnosis(
+            for_siae=self.to_company
         )
 
     @property
@@ -792,7 +792,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def can_have_prior_action(self):
-        return self.to_siae.can_have_prior_action and not self.state.is_new
+        return self.to_company.can_have_prior_action and not self.state.is_new
 
     @property
     def can_change_prior_actions(self):
@@ -824,7 +824,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             not self.sender_prescriber_organization or not self.sender_prescriber_organization.is_authorized
         ):
             return "Orienteur"
-        elif self.sender_kind == SenderKind.EMPLOYER and self.to_siae.kind not in SIAE_WITH_CONVENTION_KINDS:
+        elif self.sender_kind == SenderKind.EMPLOYER and self.to_company.kind not in SIAE_WITH_CONVENTION_KINDS:
             # Not an SIAE per se
             return "Employeur"
         else:
@@ -836,10 +836,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     def can_be_transferred(self, user, target_siae):
         # User must be member of both origin and target SIAE to make a transfer
-        if not (self.to_siae.has_member(user) and target_siae.has_member(user)):
+        if not (self.to_company.has_member(user) and target_siae.has_member(user)):
             return False
         # Can't transfer to same structure
-        if target_siae == self.to_siae:
+        if target_siae == self.to_company:
             return False
         # User must be SIAE user / employee
         if not user.is_employer:
@@ -849,13 +849,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def transfer_to(self, transferred_by, target_siae):
         if not (self.is_in_transferable_state and self.can_be_transferred(transferred_by, target_siae)):
             raise ValidationError(
-                f"Cette candidature n'est pas transferable ({transferred_by=}, {target_siae=}, {self.to_siae=})"
+                f"Cette candidature n'est pas transferable ({transferred_by=}, {target_siae=}, {self.to_company=})"
             )
 
-        self.transferred_from = self.to_siae
+        self.transferred_from = self.to_company
         self.transferred_by = transferred_by
         self.transferred_at = timezone.now()
-        self.to_siae = target_siae
+        self.to_company = target_siae
         self.state = JobApplicationWorkflow.STATE_NEW
         # Consider job application as new : don't keep answers
         self.answer = self.answer_to_prescriber = ""
@@ -871,7 +871,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         self.save(
             update_fields=[
                 "eligibility_diagnosis",
-                "to_siae",
+                "to_company",
                 "state",
                 "transferred_at",
                 "transferred_by",
@@ -902,13 +902,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         """
         Returns the eligibility diagnosis linked to this job application or None.
         """
-        if not self.to_siae.is_subject_to_eligibility_rules:
+        if not self.to_company.is_subject_to_eligibility_rules:
             return None
         if self.eligibility_diagnosis:
             return self.eligibility_diagnosis
         # As long as the job application has not been accepted, diagnosis-related
         # business rules may still prioritize one diagnosis over another.
-        return EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, for_siae=self.to_siae)
+        return EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, for_siae=self.to_company)
 
     def get_resume_link(self):
         if self.resume_link:
@@ -937,16 +937,16 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             emails.append(self.email_accept_for_proxy)
 
         # Link to the job seeker's eligibility diagnosis.
-        if self.to_siae.is_subject_to_eligibility_rules:
+        if self.to_company.is_subject_to_eligibility_rules:
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-                self.job_seeker, for_siae=self.to_siae
+                self.job_seeker, for_siae=self.to_company
             )
 
         # Approval issuance logic.
-        if not self.hiring_without_approval and self.to_siae.is_subject_to_eligibility_rules:
+        if not self.hiring_without_approval and self.to_company.is_subject_to_eligibility_rules:
             if self.job_seeker.has_common_approval_in_waiting_period:
                 if self.job_seeker.approval_can_be_renewed_by(
-                    siae=self.to_siae, sender_prescriber_organization=self.sender_prescriber_organization
+                    siae=self.to_company, sender_prescriber_organization=self.sender_prescriber_organization
                 ):
                     # Security check: it's supposed to be blocked upstream.
                     raise xwf_models.AbortTransition("Job seeker has an approval in waiting period.")
@@ -1095,7 +1095,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if not self.approval:
             raise RuntimeError("No approval found for this job application.")
         to = [accepted_by.email]
-        context = {"job_application": self, "siae_survey_link": self.to_siae.accept_survey_url}
+        context = {"job_application": self, "siae_survey_link": self.to_company.accept_survey_url}
         subject = "approvals/email/deliver_subject.txt"
         body = "approvals/email/deliver_body.txt"
         return get_email_message(to, context, subject, body)

@@ -38,7 +38,7 @@ def manually_add_approval(
         raise PermissionDenied
 
     queryset = JobApplication.objects.select_related(
-        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae"
+        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_company"
     )
     job_application = get_object_or_404(
         queryset,
@@ -108,7 +108,7 @@ def manually_refuse_approval(
         raise PermissionDenied
 
     queryset = JobApplication.objects.select_related(
-        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_siae"
+        "job_seeker", "sender", "sender_siae", "sender_prescriber_organization", "to_company"
     )
     job_application = get_object_or_404(
         queryset,

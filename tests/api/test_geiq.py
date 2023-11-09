@@ -40,8 +40,8 @@ def test_candidatures_geiq_token_authentication():
     antenna = CompanyFactory(siret="11832575900037", kind=CompanyKind.GEIQ, source=Company.SOURCE_USER_CREATED)
     token.siaes.add(geiq)
 
-    JobApplicationFactory(state="accepted", to_siae=geiq)
-    JobApplicationFactory(state="accepted", to_siae=antenna)
+    JobApplicationFactory(state="accepted", to_company=geiq)
+    JobApplicationFactory(state="accepted", to_company=antenna)
 
     api_client = APIClient(headers={"Authorization": "Token invalid"})
     response = api_client.get(reverse("v1:geiq_jobapplication_list"))
@@ -84,7 +84,7 @@ def test_candidatures_geiq_is_empty(snapshot, job_application_status):
         with_geiq_eligibility_diagnosis=True,
         state=job_application_status,
     )
-    _api_token_for([ja.to_siae])
+    _api_token_for([ja.to_company])
     response = client.get(reverse("v1:geiq_jobapplication_list"))
     assert response.status_code == 200
     assert response.json() == snapshot(name="empty")
@@ -108,8 +108,8 @@ def test_candidatures_geiq_nominal(snapshot):
         job_seeker=job_seeker,
         sender_kind="prescriber",
         sender_prescriber_organization__kind="HUDA",
-        to_siae__siret="11832575900001",
-        to_siae__kind=CompanyKind.GEIQ,
+        to_company__siret="11832575900001",
+        to_company__kind=CompanyKind.GEIQ,
         prehiring_guidance_days=42,
         contract_type="PROFESSIONAL_TRAINING",
         nb_hours_per_week=47,
@@ -126,8 +126,8 @@ def test_candidatures_geiq_nominal(snapshot):
         state="accepted",
         job_seeker=job_seeker,
         sender_kind=UserKind.EMPLOYER,
-        to_siae__siret="11832575966666",  # same SIREN, different SIRET
-        to_siae__kind=CompanyKind.GEIQ,
+        to_company__siret="11832575966666",  # same SIREN, different SIRET
+        to_company__kind=CompanyKind.GEIQ,
         prehiring_guidance_days=28,
         contract_type="APPRENTICESHIP",
         nb_hours_per_week=35,
@@ -137,7 +137,7 @@ def test_candidatures_geiq_nominal(snapshot):
         inverted_vae_contract=False,
     )
 
-    _api_token_for([job_application.to_siae])
+    _api_token_for([job_application.to_company])
 
     # professional experience
     PriorActionFactory(job_application=job_application, action="PROFESSIONAL_SITUATION_EXPERIENCE_PMSMP")
@@ -168,7 +168,7 @@ def test_candidatures_geiq_nominal(snapshot):
     assert response.json() == {"detail": "Invalid SIREN."}
 
     with assertNumQueries(num_queries):
-        response = client.get(f"{reverse('v1:geiq_jobapplication_list')}?siren={job_application.to_siae.siren}")
+        response = client.get(f"{reverse('v1:geiq_jobapplication_list')}?siren={job_application.to_company.siren}")
     assert response.status_code == 200
     assert response.json()["count"] == 2  # returns the antenna as well
 

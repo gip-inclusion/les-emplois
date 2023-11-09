@@ -13,10 +13,10 @@ Informations pour l'obtention d'un PASS IAE suite à l'embauche de votre candida
 
 *Employeur solidaire* :
 
-- Siret : {{ job_application.to_siae.siret }}
-- Nom : {{ job_application.to_siae.display_name }}
-- Type : {{ job_application.to_siae.kind }} ({{ job_application.to_siae.get_kind_display }})
-- Département : {{ job_application.to_siae.get_department_display }}
+- Siret : {{ job_application.to_company.siret }}
+- Nom : {{ job_application.to_company.display_name }}
+- Type : {{ job_application.to_company.kind }} ({{ job_application.to_company.get_kind_display }})
+- Département : {{ job_application.to_company.get_department_display }}
 - Date de début du contrat : {{ job_application.hiring_start_at|date:"d/m/Y" }}
 - Date de fin du contrat : {{ job_application.hiring_end_at|date:"d/m/Y"|default:"Non renseigné" }}{% if accepted_by %}
 - Accepté par : {{ accepted_by.get_full_name }} - {{ accepted_by.email }}{% endif %}
