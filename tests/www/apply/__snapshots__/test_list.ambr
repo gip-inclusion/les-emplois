@@ -72,6 +72,7 @@
                   <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
               
           
+          
   
       </span>
       
@@ -102,9 +103,7 @@
   
                                       <div class="card-footer text-end bg-light">
                                           
-                                          <a aria-label="Plus d'informations sur Jacques HENRY" class="btn btn-sm btn-outline-primary bg-white" href="/apply/11111111-1111-1111-1111-111111111111/jobseeker/details?back_url=/apply/job_seeker/list">
-                                              Plus d'informations
-                                          </a>
+                                          <a aria-label="Voir ma candidature" class="btn btn-sm btn-outline-primary bg-white" href="/apply/11111111-1111-1111-1111-111111111111/jobseeker/details?back_url=/apply/job_seeker/list">Voir ma candidature</a>
                                       </div>
                                   </div>
                               
@@ -124,6 +123,7 @@
               
                   <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
               
+          
           
   
       </span>
@@ -160,9 +160,7 @@
                                                   En attente de réponse depuis 3 semaines.
                                               </span>
                                           
-                                          <a aria-label="Plus d'informations sur Jacques HENRY" class="btn btn-sm btn-outline-primary bg-white" href="/apply/22222222-2222-2222-2222-222222222222/jobseeker/details?back_url=/apply/job_seeker/list">
-                                              Plus d'informations
-                                          </a>
+                                          <a aria-label="Voir ma candidature" class="btn btn-sm btn-outline-primary bg-white" href="/apply/22222222-2222-2222-2222-222222222222/jobseeker/details?back_url=/apply/job_seeker/list">Voir ma candidature</a>
                                       </div>
                                   </div>
                               
@@ -182,6 +180,7 @@
               
                   <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
               
+          
           
   
       </span>
@@ -218,9 +217,7 @@
                                                   En attente de réponse depuis 8 semaines.
                                               </span>
                                           
-                                          <a aria-label="Plus d'informations sur Jacques HENRY" class="btn btn-sm btn-outline-primary bg-white" href="/apply/33333333-3333-3333-3333-333333333333/jobseeker/details?back_url=/apply/job_seeker/list">
-                                              Plus d'informations
-                                          </a>
+                                          <a aria-label="Voir ma candidature" class="btn btn-sm btn-outline-primary bg-white" href="/apply/33333333-3333-3333-3333-333333333333/jobseeker/details?back_url=/apply/job_seeker/list">Voir ma candidature</a>
                                       </div>
                                   </div>
                               
@@ -269,6 +266,9 @@
   
           
               <strong>Vous</strong>
+          
+          
+              chez <a href="/company/42/card"><strong>Hit pit</strong></a>
           
   
       </span>
@@ -329,6 +329,9 @@
   
           
               <strong>Vous</strong>
+          
+          
+              chez <a href="/company/42/card"><strong>Hit pit</strong></a>
           
   
       </span>
@@ -394,6 +397,9 @@
   
           
               <strong>Vous</strong>
+          
+          
+              chez <a href="/company/42/card"><strong>Hit pit</strong></a>
           
   
       </span>
@@ -499,6 +505,7 @@
                   <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
               
           
+          
   
       </span>
       
@@ -597,6 +604,7 @@
                   <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
               
           
+          
   
       </span>
       
@@ -669,6 +677,7 @@
               
                   <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
               
+          
           
   
       </span>

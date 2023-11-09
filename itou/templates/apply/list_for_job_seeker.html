@@ -81,9 +81,7 @@
                                         {% endif %}
                                         <a class="btn btn-sm btn-outline-primary bg-white"
                                            href="{% url 'apply:details_for_jobseeker' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                           aria-label="Plus d'informations sur {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}">
-                                            Plus d'informations
-                                        </a>
+                                           aria-label="Voir ma candidature">Voir ma candidature</a>
                                     </div>
                                 </div>
                             {% endfor %}
