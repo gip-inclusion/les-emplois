@@ -33,7 +33,7 @@ def _get_user_form_data(user):
     if user.jobseeker_profile.birth_country:
         form_data["birth_country"] = user.jobseeker_profile.birth_country_id
     if user.jobseeker_profile.birth_place:
-        form_data["insee_commune_code"] = user.jobseeker_profile.birth_place.code
+        form_data["birth_place"] = user.jobseeker_profile.birth_place_id
     return form_data
 
 
@@ -202,7 +202,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
 
         # France as birth country without commune
         data["birth_country"] = CountryFranceFactory().pk
-        data.pop("insee_commune_code")
+        data.pop("birth_place")
         response = self.client.post(self.url, data=data)
 
         assert 200 == response.status_code
@@ -212,7 +212,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         self.client.get(self.url)
 
         data = _get_user_form_data(self.job_seeker)
-        data["insee_commune_code"] = CommuneFactory().code
+        data["birth_place"] = CommuneFactory().pk
         response = self.client.post(self.url, data=data)
 
         # Redirects must go to step 2
@@ -227,7 +227,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
 
         # Set a country different from France
         data = _get_user_form_data(self.job_seeker)
-        data.pop("insee_commune_code")
+        data.pop("birth_place")
         data["birth_country"] = CountryOutsideEuropeFactory().pk
 
         target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
