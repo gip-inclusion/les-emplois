@@ -3,9 +3,9 @@
   '''
   <form class="js-prevent-multiple-submit" method="post">
   
-                          <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
   
-                          <div class="form-group form-group-required"><label class="form-label" for="id_address_line_1">Adresse</label><input class="form-control" disabled="" id="id_address_line_1" maxlength="255" name="address_line_1" placeholder="Adresse" required="" type="text"/></div><div class="form-group"><label class="form-label" for="id_address_line_2">Complément d'adresse</label><input class="form-control" disabled="" id="id_address_line_2" maxlength="255" name="address_line_2" placeholder="Complément d'adresse" type="text"/><div class="form-text">Appartement, suite, bloc, bâtiment, boite postale, etc.</div>
+                              <div class="form-group form-group-required"><label class="form-label" for="id_address_line_1">Adresse</label><input class="form-control" disabled="" id="id_address_line_1" maxlength="255" name="address_line_1" placeholder="Adresse" required="" type="text"/></div><div class="form-group"><label class="form-label" for="id_address_line_2">Complément d'adresse</label><input class="form-control" disabled="" id="id_address_line_2" maxlength="255" name="address_line_2" placeholder="Complément d'adresse" type="text"/><div class="form-text">Appartement, suite, bloc, bâtiment, boite postale, etc.</div>
   </div><div class="form-group form-group-required"><label class="form-label" for="id_post_code">Code postal</label><input class="form-control" disabled="" id="id_post_code" maxlength="5" name="post_code" placeholder="Code postal" required="" type="text"/></div><div class="form-group form-group-required"><label class="form-label" for="id_city">Ville</label><input class="form-control" disabled="" id="id_city" maxlength="255" name="city" placeholder="Ville" required="" type="text"/></div><div class="form-group form-group-required"><label class="form-label" for="id_department">Département</label><select class="form-select" disabled="" id="id_department" name="department" required="">
     <option value="">---------</option>
   
@@ -227,11 +227,18 @@
   </div><div class="form-group"><label class="form-label" for="id_description">Description</label><textarea class="form-control" cols="40" disabled="" id="id_description" name="description" placeholder="Description" rows="10"></textarea><div class="form-text">Texte de présentation de votre structure.</div>
   </div>
   
-                          <div class="form-group">
-                              <a class="btn btn-outline-primary" href="/dashboard/">Annuler</a>
-                              <button class="btn btn-primary" type="submit">Enregistrer</button>
-                          </div>
-  
-                      </form>
+                              <hr/>
+                              <div class="form-row align-items-center gx-3">
+                                  <div class="form-group col-12 col-lg order-2 order-lg-1">
+                                      <a aria-label="Retourner au tableau de bord" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/dashboard/">
+                                          <i class="ri-arrow-go-back-line ri-lg"></i>
+                                          <span>Retour</span>
+                                      </a>
+                                  </div>
+                                  <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                                      <button aria-label="Enregistrer la modification" class="btn btn-primary btn-block">Enregistrer</button>
+                                  </div>
+                              </div>
+                          </form>
   '''
 # ---

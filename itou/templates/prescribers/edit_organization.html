@@ -23,18 +23,27 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    <form method="post" class="js-prevent-multiple-submit">
+                    <div class="c-form">
+                        <form method="post" class="js-prevent-multiple-submit">
 
-                        {% csrf_token %}
+                            {% csrf_token %}
 
-                        {% bootstrap_form form alert_error_type="all" %}
+                            {% bootstrap_form form alert_error_type="all" %}
 
-                        <div class="form-group">
-                            <a class="btn btn-outline-primary" href="{% url 'dashboard:index' %}">Annuler</a>
-                            {% bootstrap_button "Enregistrer" button_type="submit" button_class="btn btn-primary" %}
-                        </div>
-
-                    </form>
+                            <hr>
+                            <div class="form-row align-items-center gx-3">
+                                <div class="form-group col-12 col-lg order-2 order-lg-1">
+                                    <a href="{% url 'dashboard:index' %}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retourner au tableau de bord">
+                                        <i class="ri-arrow-go-back-line ri-lg"></i>
+                                        <span>Retour</span>
+                                    </a>
+                                </div>
+                                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                                    <button class="btn btn-primary btn-block" aria-label="Enregistrer la modification">Enregistrer</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
