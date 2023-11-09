@@ -16,4 +16,4 @@ class CompanyApiTokenAdmin(ItouModelAdmin):
     list_display = ["key", "label", "created_at"]
     ordering = ["-created_at"]
     read_only_fields = ["key", "created_at"]
-    autocomplete_fields = ["siaes"]
+    autocomplete_fields = ["companies"]
