@@ -88,7 +88,7 @@ class CompanyQuerySet(OrganizationQuerySet):
                 FROM "job_applications_jobapplication" U0
                 WHERE (
                     U0."created_at" >= 2021-06-10 08:45:51.998244 + 00:00
-                    AND U0."to_company_id" = "siaes_siae"."id"
+                    AND U0."to_company_id" = "companies_company"."id"
                 )
                 GROUP BY U0."to_company_id"), 0) AS "count_recent_received_job_apps"
         FROM

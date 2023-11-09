@@ -19,8 +19,8 @@ CREATE TEMP VIEW tmp AS (
     diagnostic_criterions.all_criterions as "Machin"
     FROM job_applications_jobapplication as ja
     INNER join approvals_approval a ON a.id = ja.approval_id
-    INNER JOIN siaes_siae as to_company on to_company.id = ja.to_company_id
-    INNER JOIN siaes_siaeconvention as convention on convention.id = to_company.convention_id
+    INNER JOIN companies_company as to_company on to_company.id = ja.to_company_id
+    INNER JOIN companies_siaeconvention as convention on convention.id = to_company.convention_id
     INNER JOIN users_user u ON u.id = ja.job_seeker_id
     INNER JOIN (
         select

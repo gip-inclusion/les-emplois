@@ -2,7 +2,7 @@
 -- France entière pour les Comités Technique d'Animation.
 -- https://trello.com/c/XwYFC7Yc
 --
--- Objectif métier : Amélioration des SIAE TOUR. Export mensuel.
+-- Objectif métier : Amélioration des company TOUR. Export mensuel.
 --
 -- Champs demandés :
 -- * Type de profil utilisateur : employeur, prescripteur habilité, orienteur
@@ -47,34 +47,34 @@ returns varchar as $$
 $$ language plpgsql;
 
 
-with siae_data as (
+with company_data as (
     select
         'Employeur' as "Utilisateur - type",
-        -- siae
-        siae.kind as "Structure - type",
-        siae.name as "Structure - nom",
-        siae.address_line_1 as "Structure - adresse ligne 1",
-        siae.address_line_2 as "Structure - adresse ligne 2",
-        siae.post_code as "Structure - code postal",
-        siae.city as "Structure - ville",
-        siae.department as "Structure - département",
-        get_region_name(siae.department) as "Structure - région",
+        -- company
+        company.kind as "Structure - type",
+        company.name as "Structure - nom",
+        company.address_line_1 as "Structure - adresse ligne 1",
+        company.address_line_2 as "Structure - adresse ligne 2",
+        company.post_code as "Structure - code postal",
+        company.city as "Structure - ville",
+        company.department as "Structure - département",
+        get_region_name(company.department) as "Structure - région",
 
         -- user
         u.first_name as "Utilisateur - prénom",
         u.last_name as "Utilisateur - nom",
         u.email as "Utilisateur - e-mail",
         case
-            when siae_membership.is_admin is true then 'Oui' else 'Non'
+            when company_membership.is_admin is true then 'Oui' else 'Non'
         end as "Administrateur ?",
         to_char(u.date_joined, 'dd-mm-yyyy') as "Utilisateur - date d'inscription"
     from
         users_user as u
-        inner join siaes_siaemembership as siae_membership
-            on (siae_membership.user_id=u.id)
-        inner join siaes_siae as siae
-            on (siae.id=siae_membership.siae_id)
-    where u.kind='employer' and siae_membership.is_active
+        inner join companies_companymembership as company_membership
+            on (company_membership.user_id=u.id)
+        inner join companies_company as company
+            on (company.id=company_membership.siae_id)
+    where u.kind='employer' and company_membership.is_active
 ),
 
 org_data as (
@@ -109,7 +109,7 @@ org_data as (
     where u.kind='prescriber' and prescriber_membership.is_active
 )
 
-select * from siae_data as siae
+select * from company_data as company
     union all
         select * from org_data as org
  ;
