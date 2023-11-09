@@ -8,27 +8,7 @@
             </div>
             {# Statuses #}
             <div class="col-12 col-md-auto">
-                {% if form.status.value == "SENT" %}
-                    <span class="badge rounded-pill badge-sm bg-warning">
-                        Transmise à l'ASP le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
-                    </span>
-                {% elif form.status.value == "REJECTED" %}
-                    <span class="badge rounded-pill badge-sm bg-danger">
-                        Retour en erreur le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
-                    </span>
-                {% elif form.status.value == "PROCESSED" %}
-                    <span class="badge rounded-pill badge-sm bg-success">
-                        Intégrée ASP le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
-                    </span>
-                {% elif form.status.value == "READY" %}
-                    <span class="badge rounded-pill badge-sm bg-secondary">
-                        Complétée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
-                    </span>
-                {% elif form.status.value == "DISABLED" %}
-                    <span class="badge rounded-pill badge-sm bg-emploi-lightest text-primary">
-                        Désactivée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
-                    </span>
-                {% endif %}
+                {% include 'employee_record/includes/_status.html' with employee_record=employee_record only %}
             </div>
         </div>
 

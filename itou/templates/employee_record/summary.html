@@ -9,6 +9,9 @@
 
 {% block content_title %}
     <h1>Détail fiche salarié ASP: {{ employee_record.job_seeker.get_full_name }}</h1>
+    <p>
+        {% include 'employee_record/includes/_status.html' with employee_record=employee_record only %}
+    </p>
 {% endblock %}
 
 {% block content %}
@@ -31,8 +34,6 @@
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2 mb-3">
                     <div class="c-box">
-                        <p>{{ employee_record.get_status_display }} le {{ employee_record.updated_at }}</p>
-                        <hr class="my-3">
                         {% with job_application=employee_record.job_application %}
                             <p>
                                 <b>PASS IAE :</b>
