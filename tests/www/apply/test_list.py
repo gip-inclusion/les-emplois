@@ -199,8 +199,8 @@ class ProcessListSiaeTest(ProcessListTest):
         city = create_city_saint_andre()
         create_test_romes_and_appellations(["N4105"], appellations_per_rome=2)
         appellations = Appellation.objects.all()[:2]
-        job1 = JobDescriptionFactory(siae=self.hit_pit, appellation=appellations[0], location=city)
-        job2 = JobDescriptionFactory(siae=self.hit_pit, appellation=appellations[1], location=city)
+        job1 = JobDescriptionFactory(company=self.hit_pit, appellation=appellations[0], location=city)
+        job2 = JobDescriptionFactory(company=self.hit_pit, appellation=appellations[1], location=city)
         for job_application in JobApplication.objects.all():
             job_application.selected_jobs.set([job1, job2])
 

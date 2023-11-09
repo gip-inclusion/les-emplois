@@ -141,7 +141,7 @@ class TestAcceptForm:
         [city] = create_test_cities(["54"], num_per_department=1)
         create_test_romes_and_appellations(["N4105"], appellations_per_rome=2)
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
-        job_description = JobDescriptionFactory(siae=job_application.to_company, location=None)
+        job_description = JobDescriptionFactory(company=job_application.to_company, location=None)
         post_data = {"hiring_start_at": f"{datetime.now():%Y-%m-%d}"}
         form = apply_forms.AcceptForm(siae=job_application.to_company, data=post_data)
         sorted_errors = dict(sorted(form.errors.items()))
@@ -193,7 +193,7 @@ class TestAcceptForm:
     def test_accept_form_geiq_contract_type_field_validation(self, faker):
         create_test_romes_and_appellations(["N4105"], appellations_per_rome=2)
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
-        job_description = JobDescriptionFactory(siae=job_application.to_company)
+        job_description = JobDescriptionFactory(company=job_application.to_company)
         post_data = {
             "hiring_start_at": f"{datetime.now():%Y-%m-%d}",
             "prehiring_guidance_days": faker.pyint(),
@@ -265,7 +265,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         create_test_cities(["54", "57"], num_per_department=2)
 
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, state="processing")
-        job_description = JobDescriptionFactory(siae=job_application.to_company)
+        job_description = JobDescriptionFactory(company=job_application.to_company)
         city = City.objects.order_by("?").first()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -310,7 +310,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
     def test_geiq_inverted_vae_fields(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, state="processing")
-        job_description = JobDescriptionFactory(siae=job_application.to_company)
+        job_description = JobDescriptionFactory(company=job_application.to_company)
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         self.client.force_login(job_application.to_company.members.first())
@@ -379,7 +379,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
 
         # with a GEIQ
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, state="processing")
-        job_description = JobDescriptionFactory(siae=job_application.to_company)
+        job_description = JobDescriptionFactory(company=job_application.to_company)
         post_data |= {"hired_job": job_description.pk}
 
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})

@@ -416,7 +416,7 @@ def test_populate_job_applications():
         # this would also be a source of flakyness if not enforced.
         kind="GEIQ",
     )
-    job = JobDescriptionFactory(is_active=True, siae=company)
+    job = JobDescriptionFactory(is_active=True, company=company)
     ja = JobApplicationFactory(with_geiq_eligibility_diagnosis=True, contract_type=ContractType.APPRENTICESHIP)
     ja.selected_jobs.add(job)
 
@@ -1020,7 +1020,7 @@ def test_populate_fiches_de_poste():
         # this would also be a source of flakyness if not enforced.
         kind="GEIQ",
     )
-    job = JobDescriptionFactory(is_active=False, siae=company)
+    job = JobDescriptionFactory(is_active=False, company=company)
 
     # trigger the first .from_db() call and populate _old_is_active.
     # please note that .refresh_from_db() would call .from_db() but _old_is_active

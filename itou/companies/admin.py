@@ -39,7 +39,7 @@ class JobsInline(ItouTabularInline):
         "created_at",
         "contract_type",
     )
-    raw_id_fields = ("appellation", "siae", "location")
+    raw_id_fields = ("appellation", "company", "location")
     readonly_fields = (
         "appellation",
         "custom_name",
@@ -263,19 +263,19 @@ class CompanyAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
 class JobDescriptionAdmin(ItouModelAdmin):
     list_display = (
         "display_name",
-        "siae",
+        "company",
         "contract_type",
         "created_at",
         "updated_at",
         "is_active",
         "open_positions",
     )
-    raw_id_fields = ("appellation", "siae", "location")
+    raw_id_fields = ("appellation", "company", "location")
     list_filter = ("source_kind",)
     search_fields = (
         "pk",
-        "siae__siret",
-        "siae__name",
+        "company__siret",
+        "company__name",
         "custom_name",
         "appellation__name",
     )

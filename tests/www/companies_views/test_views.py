@@ -57,7 +57,7 @@ class CardViewTest(TestCase):
     def test_card_no_active_jobs(self):
         company = CompanyFactory(name="les petits jardins", with_membership=True)
         job_description = JobDescriptionFactory(
-            siae=company,
+            company=company,
             custom_name="Plaquiste",
             location=self.vannes,
             contract_type=ContractType.PERMANENT,
@@ -177,7 +177,7 @@ class CardViewTest(TestCase):
     def test_card_no_other_jobs(self):
         company = CompanyFactory(name="les petits jardins", with_membership=True)
         job_description = JobDescriptionFactory(
-            siae=company,
+            company=company,
             custom_name="Plaquiste",
             location=self.vannes,
             contract_type=ContractType.PERMANENT,
@@ -279,14 +279,14 @@ class CardViewTest(TestCase):
         # Job appellation must be different, the factory picks one at random.
         app1, app2 = Appellation.objects.filter(code__in=["12001", "12007"]).order_by("code")
         active_job_description = JobDescriptionFactory(
-            siae=company,
+            company=company,
             custom_name="Plaquiste",
             location=self.vannes,
             contract_type=ContractType.PERMANENT,
             appellation=app1,
         )
         other_job_description = JobDescriptionFactory(
-            siae=company,
+            company=company,
             custom_name="Peintre",
             location=self.vannes,
             contract_type=ContractType.PERMANENT,
@@ -431,7 +431,7 @@ class CardViewTest(TestCase):
     def test_block_job_applications(self):
         company = CompanyFactory(block_job_applications=True)
         job_description = JobDescriptionFactory(
-            siae=company,
+            company=company,
             custom_name="Plaquiste",
             location=self.vannes,
             contract_type=ContractType.PERMANENT,

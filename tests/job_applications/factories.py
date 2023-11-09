@@ -112,7 +112,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
             for siae_job_description in extracted:
                 if isinstance(siae_job_description, Appellation):
                     siae_job_description, _ = JobDescription.objects.get_or_create(
-                        siae=self.to_company, appellation=siae_job_description
+                        company=self.to_company, appellation=siae_job_description
                     )
                 self.selected_jobs.add(siae_job_description)
 

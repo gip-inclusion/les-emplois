@@ -215,7 +215,7 @@ class SearchSiaeTest(TestCase):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117", with_membership=True)
-        job = JobDescriptionFactory(siae=company)
+        job = JobDescriptionFactory(company=company)
         JobApplicationFactory.create_batch(20, to_company=company, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
         self.assertNotContains(response, """20+<span class="ms-1">candidatures</span>""", html=True)
@@ -289,7 +289,7 @@ class JobDescriptionSearchViewTest(TestCase):
         )
 
         company = CompanyFactory(department="75", coords=paris_city.coords, post_code="75001")
-        job = JobDescriptionFactory(siae=company)
+        job = JobDescriptionFactory(company=company)
 
         # Filter on city
         with self.assertNumQueries(
@@ -422,9 +422,9 @@ class JobDescriptionSearchViewTest(TestCase):
         company = CompanyFactory(department="44", coords=guerande.coords, post_code="44350")
         appellations = Appellation.objects.all()
         # get a different appellation for every job description, since they share the same SIAE
-        job1 = JobDescriptionFactory(siae=company, appellation=appellations[0])
-        job2 = JobDescriptionFactory(siae=company, appellation=appellations[1])
-        job3 = JobDescriptionFactory(siae=company, appellation=appellations[2])
+        job1 = JobDescriptionFactory(company=company, appellation=appellations[0])
+        job2 = JobDescriptionFactory(company=company, appellation=appellations[1])
+        job3 = JobDescriptionFactory(company=company, appellation=appellations[2])
 
         response = self.client.get(self.url, {"city": guerande.slug})
         jobs_results = response.context["results_page"]
@@ -446,7 +446,7 @@ class JobDescriptionSearchViewTest(TestCase):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         city = create_city_saint_andre()
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117")
-        job = JobDescriptionFactory(siae=company)
+        job = JobDescriptionFactory(company=company)
         JobApplicationFactory.create_batch(20, to_company=company, selected_jobs=[job], state="new")
         response = self.client.get(self.url, {"city": city.slug})
         self.assertNotContains(response, """20+<span class="ms-1">candidatures</span>""", html=True)
@@ -471,8 +471,8 @@ class JobDescriptionSearchViewTest(TestCase):
             department="", coords=st_andre.coords, post_code="44117", kind=CompanyKind.AI
         )
         company = CompanyFactory(department="44", coords=st_andre.coords, post_code="44117", kind=CompanyKind.AI)
-        JobDescriptionFactory(siae=company_without_dpt, location=None)
-        JobDescriptionFactory(siae=company)
+        JobDescriptionFactory(company=company_without_dpt, location=None)
+        JobDescriptionFactory(company=company)
         response = self.client.get(self.url, {"city": st_andre.slug})
         assert response.status_code == 200
 
@@ -483,17 +483,17 @@ class JobDescriptionSearchViewTest(TestCase):
         appellations = Appellation.objects.filter(code__in=["10357", "10386", "10479"])
 
         job1 = JobDescriptionFactory(
-            siae=company, appellation=appellations[0], contract_type=ContractType.APPRENTICESHIP
+            company=company, appellation=appellations[0], contract_type=ContractType.APPRENTICESHIP
         )
         job2 = JobDescriptionFactory(
-            siae=company, appellation=appellations[1], contract_type=ContractType.BUSINESS_CREATION
+            company=company, appellation=appellations[1], contract_type=ContractType.BUSINESS_CREATION
         )
 
         inactive_company = CompanyFactory(
             department="45", coords=city.coords, post_code="44117", kind=CompanyKind.EI, convention=None
         )
         job3 = JobDescriptionFactory(
-            siae=inactive_company,
+            company=inactive_company,
             appellation=appellations[2],
             contract_type=ContractType.APPRENTICESHIP,
         )
@@ -570,13 +570,13 @@ class JobDescriptionSearchViewTest(TestCase):
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117")
         romes = Rome.objects.all().order_by("code")
         job1 = JobDescriptionFactory(
-            siae=company,
+            company=company,
             appellation=romes[0].appellations.first(),
             contract_type=ContractType.APPRENTICESHIP,
             custom_name="Eviteur de Flakyness",
         )
         job2 = JobDescriptionFactory(
-            siae=company,
+            company=company,
             appellation=romes[1].appellations.first(),
             contract_type=ContractType.BUSINESS_CREATION,
             custom_name="Forceur de Nom de Métier",
@@ -586,7 +586,7 @@ class JobDescriptionSearchViewTest(TestCase):
             department="45", coords=city.coords, post_code="44117", kind=CompanyKind.EI, convention=None
         )
         job3 = JobDescriptionFactory(
-            siae=inactive_company, contract_type=ContractType.APPRENTICESHIP, custom_name="Métier Inutilisé"
+            company=inactive_company, contract_type=ContractType.APPRENTICESHIP, custom_name="Métier Inutilisé"
         )
 
         # no filter: returns everything.
@@ -660,11 +660,11 @@ class JobDescriptionSearchViewTest(TestCase):
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117")
         appellations = Appellation.objects.all()
         job1 = JobDescriptionFactory(
-            siae=company, appellation=appellations[0], contract_type=ContractType.APPRENTICESHIP
+            company=company, appellation=appellations[0], contract_type=ContractType.APPRENTICESHIP
         )
         pe_company = Company.unfiltered_objects.get(siret=POLE_EMPLOI_SIRET)
         job_pec = JobDescriptionFactory(
-            siae=pe_company,
+            company=pe_company,
             location=city,
             source_kind=JobSource.PE_API,
             source_id="fuuuuuuuu",

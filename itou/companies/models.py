@@ -123,8 +123,8 @@ class CompanyQuerySet(OrganizationQuerySet):
         # See `self.with_count_recent_received_job_apps`.
         sub_query = Subquery(
             (
-                JobDescription.objects.filter(is_active=True, siae=OuterRef("id"))
-                .values("siae")
+                JobDescription.objects.filter(is_active=True, company=OuterRef("id"))
+                .values("company")
                 .annotate(count=Count("pk"))
                 .values("count")
             ),
@@ -144,7 +144,7 @@ class CompanyQuerySet(OrganizationQuerySet):
         count_recent_received_job_apps = Cast("count_recent_received_job_apps", output_field=models.FloatField())
 
         # Check if a job description exists before computing the score.
-        has_active_job_desc = Exists(JobDescription.objects.filter(siae=OuterRef("pk"), is_active=True))
+        has_active_job_desc = Exists(JobDescription.objects.filter(company=OuterRef("pk"), is_active=True))
 
         # Transform integer into a float to avoid any weird side effect.
         # See self.with_count_active_job_descriptions
@@ -540,7 +540,7 @@ class JobDescriptionQuerySet(models.QuerySet):
     def active(self):
         subquery = Subquery(
             Company.unfiltered_objects.filter(
-                pk=OuterRef("siae"),
+                pk=OuterRef("company"),
             ).active()
         )
         return self.annotate(is_siae_active=Exists(subquery)).filter(is_active=True, is_siae_active=True)
@@ -550,8 +550,8 @@ class JobDescriptionQuerySet(models.QuerySet):
             Q(location__isnull=False, location__coords__dwithin=(point, D(km=distance_km)))
             | Q(
                 location__isnull=True,
-                siae__coords__isnull=False,
-                siae__coords__dwithin=(point, D(km=distance_km)),
+                company__coords__isnull=False,
+                company__coords__dwithin=(point, D(km=distance_km)),
             )
         )
 
@@ -569,7 +569,7 @@ class JobDescription(models.Model):
     MAX_WORKED_HOURS_PER_WEEK = 48
 
     appellation = models.ForeignKey("jobs.Appellation", on_delete=models.CASCADE)
-    siae = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="job_description_through")
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="job_description_through")
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, db_index=True)
     is_active = models.BooleanField(verbose_name="recrutement ouvert", default=True)
@@ -685,7 +685,7 @@ class JobDescription(models.Model):
     def display_location(self):
         if self.location:
             return f"{self.location.name} ({self.location.department})"
-        return f"{self.siae.city} ({self.siae.department})"
+        return f"{self.company.city} ({self.company.department})"
 
     @property
     def display_contract_type(self):
@@ -697,7 +697,7 @@ class JobDescription(models.Model):
 
     @property
     def is_from_pole_emploi(self):
-        return self.siae.siret == POLE_EMPLOI_SIRET
+        return self.company.siret == POLE_EMPLOI_SIRET
 
     @property
     def is_pec_offer(self):
