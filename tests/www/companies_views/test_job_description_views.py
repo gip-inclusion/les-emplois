@@ -100,7 +100,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
             + 2  # fetch user memberships (and if siae is active/in grace period)
             + 1  # count job descriptions
             + 1  # fetch job descriptions
-            + 3  # prefetch appelation, rome & siae
+            + 2  # prefetch appelation, rome
             + 3  # update session
         ):
             response = self.client.get(self.url)
@@ -255,7 +255,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
 
         self.url = self.edit_url
 
-    def test_edit_job_description_siae(self):
+    def test_edit_job_description_company(self):
         response = self._login(self.user)
 
         assert response.status_code == 200
@@ -592,7 +592,6 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             + 1  # fetch siaes_siaejobdescription
             + 1  # fetch siaes infos
             + 1  # fetch jobappelation
-            + 1  # fetch other job infos
             + 3  # update session
         ):
             response = self.client.get(self.url)
@@ -617,7 +616,6 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             + 1  # fetch siaes_siaejobdescription
             + 1  # fetch siaes infos
             + 1  # fetch jobappelation
-            + 1  # fetch other job infos
             + 3  # update session
         ):
             response = self.client.get(self.url)

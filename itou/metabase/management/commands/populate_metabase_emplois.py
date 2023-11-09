@@ -192,10 +192,10 @@ class Command(BaseCommand):
     def populate_job_descriptions(self):
         queryset = (
             JobDescription.objects.select_related(
-                "siae",
+                "company",
                 "appellation__rome",
             )
-            .filter(siae_id__in=get_active_siae_pks())
+            .filter(company_id__in=get_active_siae_pks())
             .with_job_applications_count()
             .all()
         )

@@ -206,7 +206,7 @@ class JobDescriptionFactory(factory.django.DjangoModelFactory):
         model = models.JobDescription
 
     appellation = factory.LazyAttribute(lambda obj: Appellation.objects.order_by("?").first())
-    siae = factory.SubFactory(CompanyFactory)
+    company = factory.SubFactory(CompanyFactory)
     description = factory.Faker("sentence", locale="fr_FR")
     contract_type = factory.fuzzy.FuzzyChoice(ContractType.values)
     location = factory.LazyAttribute(lambda obj: City.objects.order_by("?").first())

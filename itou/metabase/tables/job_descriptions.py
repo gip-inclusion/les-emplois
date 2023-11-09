@@ -29,14 +29,14 @@ TABLE.add_columns(
             "comment": "Recrutement ouvert à ce jour",
             "fn": lambda o: o.is_active,
         },
-        {"name": "id_employeur", "type": "integer", "comment": "ID employeur", "fn": lambda o: o.siae.id},
-        {"name": "type_employeur", "type": "varchar", "comment": "Type employeur", "fn": lambda o: o.siae.kind},
-        {"name": "siret_employeur", "type": "varchar", "comment": "SIRET employeur", "fn": lambda o: o.siae.siret},
+        {"name": "id_employeur", "type": "integer", "comment": "ID employeur", "fn": lambda o: o.company.id},
+        {"name": "type_employeur", "type": "varchar", "comment": "Type employeur", "fn": lambda o: o.company.kind},
+        {"name": "siret_employeur", "type": "varchar", "comment": "SIRET employeur", "fn": lambda o: o.company.siret},
         {
             "name": "nom_employeur",
             "type": "varchar",
             "comment": "Nom employeur",
-            "fn": lambda o: o.siae.display_name,
+            "fn": lambda o: o.company.display_name,
         },
         {
             "name": "mises_a_jour_champs",
@@ -51,7 +51,7 @@ TABLE.add_columns(
     get_department_and_region_columns(
         name_suffix="_employeur",
         comment_suffix=" employeur",
-        custom_fn=lambda o: o.siae,
+        custom_fn=lambda o: o.company,
     )
 )
 

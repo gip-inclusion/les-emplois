@@ -140,7 +140,7 @@ class Command(BaseCommand):
                 if item.kind in [DiffItemKind.ADDITION, DiffItemKind.EDITION]:
                     job = pe_offer_to_job_description(item.raw)
                     if job:
-                        job.siae = pe_siae
+                        job.company = pe_siae
                         if item.kind == DiffItemKind.ADDITION:
                             added_offers.append(job)
                         else:

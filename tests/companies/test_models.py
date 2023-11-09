@@ -373,7 +373,7 @@ class JobDescriptionQuerySetTest(TestCase):
 
     def test_is_active(self):
         company = CompanyFactory(kind=CompanyKind.EI, convention=None)
-        job = JobDescriptionFactory(siae=company, is_active=False)
+        job = JobDescriptionFactory(company=company, is_active=False)
         assert JobDescription.objects.active().count() == 0
         job.is_active = True
         job.save(update_fields=["is_active"])

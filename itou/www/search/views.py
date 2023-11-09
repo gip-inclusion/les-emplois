@@ -54,12 +54,12 @@ class EmployerSearchBaseView(FormView):
         job_descriptions = (
             JobDescription.objects.active()
             .within(city.coords, distance)
-            .select_related("siae", "location", "appellation")
-            .exclude(siae__block_job_applications=True)
+            .select_related("company", "location", "appellation")
+            .exclude(company__block_job_applications=True)
             .annotate(
                 distance=Case(
                     When(location__isnull=False, then=Distance("location__coords", city.coords) / 1000),
-                    When(location__isnull=True, then=Distance("siae__coords", city.coords) / 1000),
+                    When(location__isnull=True, then=Distance("company__coords", city.coords) / 1000),
                 )
             )
         )
@@ -68,7 +68,7 @@ class EmployerSearchBaseView(FormView):
 
         if kinds:
             siaes = siaes.filter(kind__in=kinds)
-            job_descriptions = job_descriptions.filter(siae__kind__in=kinds)
+            job_descriptions = job_descriptions.filter(company__kind__in=kinds)
 
         if contract_types:
             clauses = Q(contract_type__in=[c for c in contract_types if c != ContractNature.PEC_OFFER.value])
@@ -86,7 +86,7 @@ class EmployerSearchBaseView(FormView):
             siaes = siaes.filter(department__in=departments)
             job_descriptions = job_descriptions.filter(
                 Q(location__isnull=False, location__department__in=departments)
-                | Q(location__isnull=True, siae__department__in=departments)
+                | Q(location__isnull=True, company__department__in=departments)
             )
 
         if districts:
@@ -162,8 +162,8 @@ class EmployerSearchView(EmployerSearchBaseView):
                 Prefetch(
                     lookup="job_description_through",
                     queryset=JobDescription.objects.with_annotation_is_popular()
-                    .filter(siae__in=siaes, is_active=True)
-                    .select_related("appellation", "location", "siae"),
+                    .filter(company__in=siaes, is_active=True)
+                    .select_related("appellation", "location", "company"),
                     to_attr="active_job_descriptions",
                 )
             )
@@ -207,8 +207,8 @@ class JobDescriptionSearchView(EmployerSearchBaseView):
                 # de création des fiches de poste ou en enrichissant la table "Cities" de tous les arrondissements
                 # de Paris, Lyon et Marseille.
                 # En attendant on ne pourra pas trier par arrondissement pour ces offres.
-            elif job_description.siae.department:
-                department = job_description.siae.department
+            elif job_description.company.department:
+                department = job_description.company.department
             if department:
                 departments.add(department)
 

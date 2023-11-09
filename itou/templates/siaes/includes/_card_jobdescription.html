@@ -12,18 +12,18 @@
                     {% endif %}
                 {% else %}
                     <a class="matomo-event btn btn-sm btn-ico btn-link text-start p-0 mh-auto"
-                       href="{{ job_description.siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}"
+                       href="{{ job_description.company.get_card_url }}?back_url={{ request.get_full_path|urlencode }}"
                        data-matomo-category="candidature"
                        data-matomo-action="clic"
                        data-matomo-option="clic-structure-fichedeposte"
                        target="_blank"
                        aria-label="Ouvrir la page de la structure dans un nouvel onglet">
-                        <span>{{ job_description.siae.kind }} - {{ job_description.siae.display_name }}</span>
+                        <span>{{ job_description.company.kind }} - {{ job_description.company.display_name }}</span>
                         <i class="ri-external-link-line ri-xl"></i>
                     </a>
                 {% endif %}
             </div>
-            {% if job_description.siae.kind in ea_eatt_kinds %}
+            {% if job_description.company.kind in ea_eatt_kinds %}
                 <div>
                     <span class="badge rounded-pill badge-sm bg-accent-01-lightest text-accent-01">Priorité aux bénéficiaires de la RQTH</span>
                 </div>
@@ -62,7 +62,7 @@
                 {% if job_description.location %}
                     {{ job_description.location }}
                 {% else %}
-                    {{ job_description.siae.city | title }} ({{ job_description.siae.department }})
+                    {{ job_description.company.city | title }} ({{ job_description.company.department }})
                 {% endif %}
             </span>
             <span class="me-3 flex-md-grow-1">
