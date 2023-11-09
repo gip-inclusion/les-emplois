@@ -16,10 +16,6 @@ from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Wi
 from .enums import EmployeeRecordOrder
 
 
-# Endpoint for INSEE communes autocomplete
-COMMUNE_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:communes")
-
-
 class SelectEmployeeRecordStatusForm(forms.Form):
     # The user is only able to select a subset of the possible
     # employee record statuses.
@@ -72,8 +68,6 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
     - birth place and birth country of the employee
     """
 
-    COMMUNE_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:communes")
-
     READ_ONLY_FIELDS = []
     REQUIRED_FIELDS = [
         "title",
@@ -83,23 +77,20 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         "birth_country",
     ]
 
-    insee_commune = forms.CharField(
+    birth_place = forms.ModelChoiceField(
+        queryset=Commune.objects,
         label="Commune de naissance",
-        required=False,
         help_text="La commune de naissance ne doit être saisie que lorsque le salarié est né en France",
-        widget=forms.TextInput(
+        widget=RemoteAutocompleteSelect2Widget(
             attrs={
-                "class": "js-commune-autocomplete-input form-control",
-                "data-autocomplete-source-url": COMMUNE_AUTOCOMPLETE_SOURCE_URL,
-                "data-period-date": "birthdate",
-                "data-autosubmit-on-enter-pressed": 0,
-                "placeholder": "Nom de la commune",
-                "autocomplete": "off",
-            }
+                "data-ajax--url": format_lazy("{}?select2=", reverse_lazy("autocomplete:communes")),
+                "data-ajax--cache": "true",
+                "data-ajax--type": "GET",
+                "data-minimum-input-length": 2,
+                "data-placeholder": "Nom de la commune",
+            },
         ),
-    )
-    insee_commune_code = forms.CharField(
-        required=False, widget=forms.HiddenInput(attrs={"class": "js-commune-autocomplete-hidden"})
+        required=False,
     )
 
     # This is a JobSeekerProfile field
@@ -112,8 +103,6 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
             "first_name",
             "last_name",
             "birthdate",
-            "insee_commune",
-            "insee_commune_code",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -133,10 +122,7 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         jobseeker_profile = self.instance.jobseeker_profile
 
         if jobseeker_profile.birth_place:
-            self.initial[
-                "insee_commune"
-            ] = f"{jobseeker_profile.birth_place.name} ({jobseeker_profile.birth_place.department_code})"
-            self.initial["insee_commune_code"] = jobseeker_profile.birth_place.code
+            self.initial["birth_place"] = jobseeker_profile.birth_place_id
 
         if jobseeker_profile.birth_country:
             self.initial["birth_country"] = jobseeker_profile.birth_country_id
@@ -144,19 +130,21 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
     def clean(self):
         super().clean()
 
-        commune_code = self.cleaned_data.get("insee_commune_code")
+        birth_place = self.cleaned_data.get("birth_place")
         birth_date = self.cleaned_data.get("birthdate")
 
         # Country coherence is done at model level (users.User)
         # Here we must add coherence between birthdate and communes
         # existing at this period (not a simple check of existence)
 
-        if commune_code and birth_date:
+        if birth_place and birth_date:
             try:
-                self.cleaned_data["birth_place"] = Commune.objects.by_insee_code_and_period(commune_code, birth_date)
+                self.cleaned_data["birth_place"] = Commune.objects.by_insee_code_and_period(
+                    birth_place.code, birth_date
+                )
             except Commune.DoesNotExist as ex:
                 raise forms.ValidationError(
-                    f"Le code INSEE {commune_code} n'est pas référencé par l'ASP en date du {birth_date:%d/%m/%Y}"
+                    f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {birth_date:%d/%m/%Y}"
                 ) from ex
 
     def _post_clean(self):
