@@ -28,18 +28,18 @@
                     </div>
 
                     <div class="c-form">
-                        <div class="text-center">
-                            <h1 class="h1-hero">
+                        <div class="text-center mb-3 mb-lg-5">
+                            <div class="mb-2">
                                 <img src="{% static 'img/edit_siae_header.svg' %}" alt="En-tête édition SIAE" class="edit-siae-header-image">
-                            </h1>
-                            <h2 class="h1">
+                            </div>
+                            <h1>
                                 Aperçu de la fiche
                                 <br class="d-none d-lg-inline">
                                 de ma structure
-                            </h2>
+                            </h1>
                         </div>
 
-                        <div class="card c-card c-card--emploi my-3 my-lg-5">
+                        <div class="card c-card c-card--emploi mb-3 mb-lg-5">
                             <div class="card-body">
                                 <p>
                                     <i class="ri-home-7-line ri-xl me-2"></i>{{ siae.kind }} - {{ siae.get_kind_display }}
@@ -69,30 +69,31 @@
 
                             {% if siae.email or siae.phone or siae.website %}
                                 <hr>
+                                <ul class="list-unstyled">
+                                    {% if siae.email %}
+                                        <li>
+                                            <i class="ri-mail-line ri-xl me-2"></i>
+                                            <a aria-label="Contact par mail" href="mailto:{{ siae.email }}" class="font-weight-bold">{{ siae.email }}</a>
+                                        </li>
+                                    {% endif %}
 
-                                {% if siae.email %}
-                                    <p>
-                                        <i class="ri-mail-line ri-xl me-2"></i>
-                                        <a aria-label="Contact par mail" href="mailto:{{ siae.email }}" class="font-weight-bold">{{ siae.email }}</a>
-                                    </p>
-                                {% endif %}
+                                    {% if siae.phone %}
+                                        <li>
+                                            <i class="ri-phone-line ri-xl me-2"></i>
+                                            <a aria-label="Contact téléphonique" href="tel:{{ siae.phone|cut:' ' }}" class="font-weight-bold">{{ siae.phone|format_phone }}</a>
+                                        </li>
+                                    {% endif %}
 
-                                {% if siae.phone %}
-                                    <p>
-                                        <i class="ri-phone-line ri-xl me-2"></i>
-                                        <a aria-label="Contact téléphonique" href="tel:{{ siae.phone|cut:' ' }}" class="font-weight-bold">{{ siae.phone|format_phone }}</a>
-                                    </p>
-                                {% endif %}
-
-                                {% if siae.website %}
-                                    <p>
-                                        <i class="ri-global-line ri-xl me-2"></i>
-                                        <a aria-label="Site web (ouverture dans un nouvel onglet)" href="{{ siae.website }}" rel="noopener" target="_blank" class="font-weight-bold">{{ siae.website }}</a>
-                                    </p>
-                                {% endif %}
+                                    {% if siae.website %}
+                                        <li>
+                                            <i class="ri-global-line ri-xl me-2"></i>
+                                            <a aria-label="Site web (ouverture dans un nouvel onglet)" href="{{ siae.website }}" rel="noopener" target="_blank" class="font-weight-bold">{{ siae.website }}</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
                             {% endif %}
 
-                            <hr class="mb-3 mb-lg-5">
+                            <hr>
 
                             <div class="alert alert-warning">
                                 <div class="row">
@@ -107,14 +108,15 @@
                                 </div>
                             </div>
 
-                            <div class="row mt-3 mt-lg-5 justify-content-end">
-                                <div class="col-6 col-lg-auto">
-                                    <a class="btn btn-link" aria-label="Retourner à l'édition de la description" href="{{ prev_url }}">Retour</a>
+                            <div class="form-row align-items-center gx-3">
+                                <div class="form-group col-12 col-lg order-2 order-lg-1">
+                                    <a href="{{ prev_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retourner à l'édition de la description">
+                                        <i class="ri-arrow-go-back-line ri-lg"></i>
+                                        <span>Retour</span>
+                                    </a>
                                 </div>
-                                <div class="col-6 col-lg-auto">
-                                    <button aria-label="Publier le formulaire" class="btn btn-primary float-end matomo-event" data-matomo-category="employeurs" data-matomo-action="submit" data-matomo-option="publier-infos-structure">
-                                        Publier
-                                    </button>
+                                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                                    <button class="btn btn-primary btn-block" aria-label="Publier le formulaire" data-matomo-category="employeurs" data-matomo-action="submit" data-matomo-option="publier-infos-structure">Publier</button>
                                 </div>
                             </div>
                         </form>
