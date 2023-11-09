@@ -280,7 +280,6 @@ class JobAppellationAndLocationMixin(forms.Form):
 class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
     def __init__(self, current_siae: Company, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.instance.siae = current_siae
 
         self.fields["appellation"].required = True
 
@@ -354,7 +353,6 @@ class EditJobDescriptionDetailsForm(forms.ModelForm):
 
     def __init__(self, current_siae: Company, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.instance.siae = current_siae
 
         placeholder = "Soyez le plus concret possible"
         self.fields["description"].widget.attrs.update({"placeholder": placeholder})
