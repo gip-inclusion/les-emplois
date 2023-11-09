@@ -26,11 +26,16 @@
                     </div>
 
                     <div class="c-form">
-                        <div class="text-center mb-3">
-                            <img src="{% static 'img/edit_job_description_header.svg' %}" alt="">
+                        <div class="text-center mb-3 mb-lg-5">
+                            <div class="mb-2">
+                                <img src="{% static 'img/edit_job_description_header.svg' %}" alt="">
+                            </div>
+                            <h1>
+                                Informations générales
+                                <br class="d-none d-lg-inline">
+                                de ma fiche de poste
+                            </h1>
                         </div>
-                        <h1 class="text-center mb-5">Informations générales de ma fiche de poste</h1>
-                        <hr>
 
                         <form method="post" action="?step={{ step }}" class="js-prevent-multiple-submit">
                             {% bootstrap_form_errors form alert_error_type="all" %}
@@ -48,10 +53,17 @@
                             <div id="_other_contract_type_group">{% bootstrap_field form.other_contract_type %}</div>
                             {% bootstrap_field form.hours_per_week %}
                             {% bootstrap_field form.open_positions %}
-
-                            <div class="form-group pt-3 text-end">
-                                <a class="btn btn-outline-primary" href="{% url "companies_views:job_description_list" %}" aria-label="Retour à la liste des métiers">Retour</a>
-                                <button type="submit" class="btn btn-primary" aria-label="Passer à l'étape suivante">Suivant</button>
+                            <hr>
+                            <div class="form-row align-items-center gx-3">
+                                <div class="form-group col-12 col-lg order-2 order-lg-1">
+                                    <a href="{% url "companies_views:job_description_list" %}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retourner à la liste des métiers">
+                                        <i class="ri-arrow-go-back-line ri-lg"></i>
+                                        <span>Retour</span>
+                                    </a>
+                                </div>
+                                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                                    <button class="btn btn-primary btn-block" aria-label="Passer à l'étape suivante">Suivant</button>
+                                </div>
                             </div>
                         </form>
                     </div>
