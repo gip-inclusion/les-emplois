@@ -10,7 +10,7 @@ class CompanyApiToken(models.Model):
     key = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     label = models.CharField(verbose_name="mémo permettant d'identifier l'usage du jeton", max_length=60, unique=True)
     created_at = models.DateTimeField(default=timezone.now)
-    siaes = models.ManyToManyField(Company, related_name="api_tokens")
+    companies = models.ManyToManyField(Company, related_name="api_tokens")
 
     class Meta:
         verbose_name = "jeton d'API SIAE"

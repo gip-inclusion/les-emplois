@@ -24,7 +24,7 @@ class GeiqApiAuthentication(authentication.TokenAuthentication):
 
     def authenticate_credentials(self, key):
         try:
-            api_token = self.model.objects.prefetch_related("siaes").get(key=key)
+            api_token = self.model.objects.prefetch_related("companies").get(key=key)
             return (GeiqApiAnonymousUser(), api_token)
         except (ValidationError, self.model.DoesNotExist):
             raise exceptions.AuthenticationFailed("Invalid token.")
@@ -53,7 +53,7 @@ class GeiqJobApplicationListView(generics.ListAPIView):
         extra_filters = {}
         api_token = self.request.auth
         if api_token:
-            geiqs = api_token.siaes.all()
+            geiqs = api_token.companies.all()
             antennas = (
                 Company.objects.filter(source=Company.SOURCE_USER_CREATED, kind=CompanyKind.GEIQ)
                 .annotate(siren=Substr("siret", pos=1, length=9))

@@ -23,11 +23,11 @@ def _api_client():
     return client
 
 
-def _api_token_for(siaes):
+def _api_token_for(companies):
     token = CompanyApiToken(label="test")
     token.save()
-    for siae in siaes:
-        token.siaes.add(siae)
+    for company in companies:
+        token.companies.add(company)
     return token
 
 
@@ -38,7 +38,7 @@ def test_candidatures_geiq_token_authentication():
 
     geiq = CompanyFactory(siret="11832575900001", kind=CompanyKind.GEIQ)
     antenna = CompanyFactory(siret="11832575900037", kind=CompanyKind.GEIQ, source=Company.SOURCE_USER_CREATED)
-    token.siaes.add(geiq)
+    token.companies.add(geiq)
 
     JobApplicationFactory(state="accepted", to_company=geiq)
     JobApplicationFactory(state="accepted", to_company=antenna)
