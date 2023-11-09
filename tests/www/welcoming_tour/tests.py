@@ -78,7 +78,7 @@ class WelcomingTourTest(InclusionConnectBaseTestCase):
         company = CompanyFactory(with_membership=True)
         token = company.get_token()
         previous_url = reverse("signup:employer", args=(company.pk, token))
-        next_url = reverse("signup:siae_join", args=(company.pk, token))
+        next_url = reverse("signup:company_join", args=(company.pk, token))
         response = mock_oauth_dance(
             self.client,
             KIND_EMPLOYER,

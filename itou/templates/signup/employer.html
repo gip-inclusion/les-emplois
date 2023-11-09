@@ -11,20 +11,20 @@
     </h1>
     <div class="alert alert-emploi">
         <p class="lead mb-0">
-            Vous allez rejoindre <b>{{ siae.display_name }}</b>
+            Vous allez rejoindre <b>{{ company.display_name }}</b>
         </p>
         <p class="mb-0">
-            {{ siae.siret|format_siret }} - {{ siae.kind }} {{ siae.get_kind_display }}
+            {{ company.siret|format_siret }} - {{ company.kind }} {{ company.get_kind_display }}
             <br>
-            {% if siae.address_line_1 %}
-                {{ siae.address_line_1 }}
+            {% if company.address_line_1 %}
+                {{ company.address_line_1 }}
                 <br>
             {% endif %}
-            {% if siae.address_line_2 %}
-                {{ siae.address_line_2 }}
+            {% if company.address_line_2 %}
+                {{ company.address_line_2 }}
                 <br>
             {% endif %}
-            {{ siae.post_code }} {{ siae.city }}
+            {{ company.post_code }} {{ company.city }}
         </p>
     </div>
 {% endblock %}

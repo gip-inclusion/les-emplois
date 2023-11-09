@@ -86,6 +86,6 @@ urlpatterns = [
     ),
     # SIAE.
     path("siae/select", views.company_select, name="company_select"),
-    path("siae/<int:siae_id>/<str:token>", views.SiaeUserView.as_view(), name="employer"),
-    path("siae/join/<int:siae_id>/<str:token>", views.SiaeJoinView.as_view(), name="siae_join"),
+    path("siae/<int:company_id>/<str:token>", views.CompanyUserView.as_view(), name="employer"),
+    path("siae/join/<int:company_id>/<str:token>", views.CompanyJoinView.as_view(), name="company_join"),
 ]

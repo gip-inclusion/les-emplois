@@ -211,22 +211,24 @@ def company_select(request, template_name="signup/company_select.html"):
     return render(request, template_name, context)
 
 
-class SiaeBaseView(View):
+class CompanyBaseView(View):
     def __init__(self):
         super().__init__()
-        self.siae = None
+        self.company = None
         self.token = None
 
     def setup(self, request, *args, **kwargs):
         self.token = kwargs["token"]
         super().setup(request, *args, **kwargs)
 
-    def dispatch(self, request, *args, siae_id, **kwargs):
+    def dispatch(self, request, *args, company_id, **kwargs):
         try:
-            self.siae = Company.objects.active().get(pk=siae_id)
+            self.company = Company.objects.active().get(pk=company_id)
         except Company.DoesNotExist:
-            self.siae = None
-        if self.siae is None or not company_signup_token_generator.check_token(company=self.siae, token=self.token):
+            self.company = None
+        if self.company is None or not company_signup_token_generator.check_token(
+            company=self.company, token=self.token
+        ):
             messages.warning(
                 request,
                 "Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription.",
@@ -235,7 +237,7 @@ class SiaeBaseView(View):
         return super().dispatch(request, *args, **kwargs)
 
 
-class SiaeUserView(SiaeBaseView, TemplateView):
+class CompanyUserView(CompanyBaseView, TemplateView):
     """
     Display Inclusion Connect button.
     This page is also shown if an error is detected during
@@ -248,7 +250,7 @@ class SiaeUserView(SiaeBaseView, TemplateView):
         ic_params = {
             "user_kind": KIND_EMPLOYER,
             "previous_url": self.request.get_full_path(),
-            "next_url": reverse("signup:siae_join", args=(self.siae.pk, self.token)),
+            "next_url": reverse("signup:company_join", args=(self.company.pk, self.token)),
         }
         inclusion_connect_url = (
             f"{reverse('inclusion_connect:authorize')}?{urlencode(ic_params)}"
@@ -257,24 +259,24 @@ class SiaeUserView(SiaeBaseView, TemplateView):
         )
         return super().get_context_data(**kwargs) | {
             "inclusion_connect_url": inclusion_connect_url,
-            "siae": self.siae,
+            "company": self.company,
         }
 
 
-class SiaeJoinView(LoginRequiredMixin, SiaeBaseView):
+class CompanyJoinView(LoginRequiredMixin, CompanyBaseView):
     def get(self, request, *args, **kwargs):
         if not request.user.is_employer:
-            logger.error("A non staff user tried to join a SIAE")
+            logger.error("A non staff user tried to join a company")
             messages.error(
-                request, "Vous ne pouvez pas rejoindre une SIAE avec ce compte car vous n'êtes pas employeur."
+                request, "Vous ne pouvez pas rejoindre une structure avec ce compte car vous n'êtes pas employeur."
             )
             return HttpResponseRedirect(reverse("search:siaes_home"))
 
         CompanyMembership.objects.create(
             user=request.user,
-            siae=self.siae,
+            siae=self.company,
             # Only the first member becomes an admin.
-            is_admin=self.siae.active_members.count() == 0,
+            is_admin=self.company.active_members.count() == 0,
         )
 
         url = get_adapter(request).get_login_redirect_url(request)
@@ -820,7 +822,7 @@ class FacilitatorUserView(FacilitatorBaseMixin, TemplateView):
         )
         return super().get_context_data(**kwargs) | {
             "inclusion_connect_url": inclusion_connect_url,
-            "siae": self.siae_to_create,
+            "company": self.siae_to_create,
         }
 
 
