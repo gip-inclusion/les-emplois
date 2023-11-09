@@ -14,16 +14,25 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    <form method="post" action="{% url 'approvals:pe_approval_create' pe_approval.id %}" class="js-prevent-multiple-submit">
+                    <div class="c-form">
+                        <form method="post" action="{% url 'approvals:pe_approval_create' pe_approval.id %}" class="js-prevent-multiple-submit">
 
-                        {% csrf_token %}
+                            {% csrf_token %}
 
-                        {% bootstrap_form form alert_error_type="all" %}
+                            {% bootstrap_form form alert_error_type="all" %}
 
-                        <div>{% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" %}</div>
+                            <div class="mb-3">
+                                {% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" %}
+                            </div>
 
-                        <div class="form-group">{% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-primary" %}</div>
-                    </form>
+                            <hr>
+                            <div class="form-row align-items-center justify-content-end gx-3">
+                                <div class="form-group col-12 col-lg-auto">
+                                    {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-primary w-100 w-lg-auto" %}
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
