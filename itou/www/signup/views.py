@@ -77,7 +77,7 @@ class ChooseUserKindSignupView(FormView):
         urls = {
             UserKind.JOB_SEEKER: reverse("signup:job_seeker_situation"),
             UserKind.PRESCRIBER: reverse("signup:prescriber_check_already_exists"),
-            UserKind.EMPLOYER: reverse("signup:siae_select"),
+            UserKind.EMPLOYER: reverse("signup:company_select"),
         }
         return HttpResponseRedirect(urls[form.cleaned_data["kind"]])
 
@@ -155,31 +155,31 @@ def job_seeker_nir(request, template_name="signup/job_seeker_nir.html"):
 # ------------------------------------------------------------------------------------------
 
 
-def siae_select(request, template_name="signup/siae_select.html"):
+def company_select(request, template_name="signup/company_select.html"):
     """
     Entry point of the signup process for SIAEs which consists of 2 steps.
 
     The user is asked to select an SIAE based on a selection that match a given SIREN number.
     """
 
-    siaes_without_members = None
-    siaes_with_members = None
+    companies_without_members = None
+    companies_with_members = None
 
     next_url = get_safe_url(request, "next")
 
     siren_form = forms.SiaeSearchBySirenForm(data=request.GET or None)
-    siae_select_form = None
+    company_select_form = None
 
     # The SIREN, when available, is always passed in the querystring.
     if request.method in ["GET", "POST"] and siren_form.is_valid():
         # Make sure to look only for active structures.
-        siaes_for_siren = (
+        companies_for_siren = (
             Company.objects.active().filter(siret__startswith=siren_form.cleaned_data["siren"]).distinct("pk")
         )
         # A user cannot join structures that already have members.
         # Show these structures in the template to make that clear.
-        siaes_with_members = (
-            siaes_for_siren.exclude(members=None)
+        companies_with_members = (
+            companies_for_siren.exclude(members=None)
             # the template directly displays the first membership's user "as the admin".
             # that's why we only select SIAEs that have at least an active admin user.
             # it should always be the case, but lets enforce it anyway.
@@ -187,14 +187,14 @@ def siae_select(request, template_name="signup/siae_select.html"):
             # avoid the template issuing requests for every member and user.
             .prefetch_related("memberships__user")
         )
-        siaes_without_members = siaes_for_siren.filter(members=None)
-        siae_select_form = forms.SiaeSelectForm(data=request.POST or None, siaes=siaes_without_members)
+        companies_without_members = companies_for_siren.filter(members=None)
+        company_select_form = forms.SiaeSelectForm(data=request.POST or None, siaes=companies_without_members)
 
-    if request.method == "POST" and siae_select_form and siae_select_form.is_valid():
-        siae_selected = siae_select_form.cleaned_data["siaes"]
-        siae_selected.new_signup_activation_email_to_official_contact(request).send()
+    if request.method == "POST" and company_select_form and company_select_form.is_valid():
+        company_selected = company_select_form.cleaned_data["siaes"]
+        company_selected.new_signup_activation_email_to_official_contact(request).send()
         message = (
-            f"Nous venons d'envoyer un e-mail à l'adresse {siae_selected.obfuscated_auth_email} "
+            f"Nous venons d'envoyer un e-mail à l'adresse {company_selected.obfuscated_auth_email} "
             f"pour continuer votre inscription. Veuillez consulter votre boite "
             f"de réception."
         )
@@ -203,9 +203,9 @@ def siae_select(request, template_name="signup/siae_select.html"):
 
     context = {
         "next_url": next_url,
-        "siaes_without_members": siaes_without_members,
-        "siaes_with_members": siaes_with_members,
-        "siae_select_form": siae_select_form,
+        "companies_without_members": companies_without_members,
+        "companies_with_members": companies_with_members,
+        "company_select_form": company_select_form,
         "siren_form": siren_form,
     }
     return render(request, template_name, context)
@@ -231,7 +231,7 @@ class SiaeBaseView(View):
                 request,
                 "Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription.",
             )
-            return HttpResponseRedirect(reverse("signup:siae_select"))
+            return HttpResponseRedirect(reverse("signup:company_select"))
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -793,7 +793,7 @@ def facilitator_search(request, template_name="signup/facilitator_search.html"):
 
     context = {
         "form": form,
-        "prev_url": reverse("signup:siae_select"),
+        "prev_url": reverse("signup:company_select"),
     }
     return render(request, template_name, context)
 

@@ -28,7 +28,7 @@
                     </form>
 
 
-                    {% if siren_form.cleaned_data and not siaes_without_members and not siaes_with_members %}
+                    {% if siren_form.cleaned_data and not companies_without_members and not companies_with_members %}
                         <div class="alert alert-warning mt-5" role="status">
                             <p class="mb-0">
                                 <i class="ri-information-line ri-xl text-warning me-2"></i>
@@ -69,10 +69,12 @@
                     {% endif %}
 
 
-                    {% if siaes_without_members and siae_select_form %}
+                    {% if companies_without_members and company_select_form %}
                         <div class="mt-5">
 
-                            <h3 class="h2">Entreprise{{ siaes_without_members|pluralizefr }} disponible{{ siaes_without_members|pluralizefr }}</h3>
+                            <h3 class="h2">
+                                Entreprise{{ companies_without_members|pluralizefr }} disponible{{ companies_without_members|pluralizefr }}
+                            </h3>
 
                             <p class="text-muted">Les données sont fournies par la DGEFP et les extranets IAE 2.0 et EA 2 de l’ASP.</p>
 
@@ -89,10 +91,10 @@
                             The best solution I've yet found to display more info to the user than just a
                             label is to manually render the inputs.
                                 {% endcomment %}
-                                {% for siae in siaes_without_members %}
+                                {% for siae in companies_without_members %}
                                     <p>
-                                        <label for="id_{{ siae_select_form.siaes.html_name }}_{{ forloop.counter0 }}" class="align-top">
-                                            <input type="radio" name="{{ siae_select_form.siaes.html_name }}" value="{{ siae.pk }}" id="id_{{ siae_select_form.siaes.html_name }}_{{ forloop.counter0 }}" required>
+                                        <label for="id_{{ company_select_form.siaes.html_name }}_{{ forloop.counter0 }}" class="align-top">
+                                            <input type="radio" name="{{ company_select_form.siaes.html_name }}" value="{{ siae.pk }}" id="id_{{ company_select_form.siaes.html_name }}_{{ forloop.counter0 }}" required>
                                             <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
                                             <br>
                                             {{ siae.display_name }}
@@ -121,22 +123,24 @@
                     {% endif %}
 
 
-                    {% if siaes_with_members %}
+                    {% if companies_with_members %}
                         <div class="mt-5">
 
-                            <h3 class="h2">Entreprise{{ siaes_with_members|pluralizefr }} déjà inscrite{{ siaes_with_members|pluralizefr }}</h3>
+                            <h3 class="h2">
+                                Entreprise{{ companies_with_members|pluralizefr }} déjà inscrite{{ companies_with_members|pluralizefr }}
+                            </h3>
 
                             <p class="text-muted">
                                 Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre
-                                {% if siaes_with_members|length == 1 %}
+                                {% if companies_with_members|length == 1 %}
                                     cette
                                 {% else %}
                                     ces
                                 {% endif %}
-                                structure{{ siaes_with_members|pluralizefr }}.
+                                structure{{ companies_with_members|pluralizefr }}.
                             </p>
 
-                            {% for siae in siaes_with_members %}
+                            {% for siae in companies_with_members %}
                                 <div>
                                     <p>
                                         <b>{{ siae.siren }} {{ siae.siret_nic }}</b> - {{ siae.kind }}
@@ -163,7 +167,7 @@
                     {% endif %}
 
 
-                    {% if siaes_without_members or siaes_with_members %}
+                    {% if companies_without_members or companies_with_members %}
                         <div class="mt-5 text-end">
                             <p>
                                 En cas de problème, <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">contactez-nous</a>.
