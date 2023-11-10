@@ -187,8 +187,8 @@ class TestApprovalDetailView:
             # get_context_data
             + 1  # for every *active* suspension, check if there is an accepted job application after it
             + 1  # approval.suspension_set.end_at >= today >= approval.suspension_set.start_at (.can_be_suspended)
-            + 1  # job_application.with_accepted_at annotation coming from (.last_hire_was_made_by_siae)
-            + 1  # siae infos (.last_hire_was_made_by_siae)
+            + 1  # job_application.with_accepted_at annotation coming from (.last_hire_was_made_by_company)
+            + 1  # siae infos (.last_hire_was_made_by_company)
             + 1  # user approvals (.is_last_for_user)
             + 1  # siae infos (job_application.get_eligibility_diagnosis())
             + 1  # approval.suspensions_for_status_card lists approval suspensions

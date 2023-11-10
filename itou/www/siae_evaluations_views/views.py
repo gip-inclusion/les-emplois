@@ -25,8 +25,8 @@ from itou.siae_evaluations.models import (
     Sanctions,
 )
 from itou.utils.emails import send_email_messages
+from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
-from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.eligibility_views.forms import AdministrativeCriteriaOfJobApplicationForm
 from itou.www.siae_evaluations_views.forms import (
@@ -371,7 +371,7 @@ class InstitutionEvaluatedSiaeNotifyStep3View(InstitutionEvaluatedSiaeNotifyMixi
 def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
     allowed_viewers = {
         "institution": (get_current_institution_or_404, "evaluation_campaign__institution"),
-        "siae": (get_current_siae_or_404, "siae"),
+        "siae": (get_current_company_or_404, "siae"),
     }
     viewer_or_404, filter_lookup = allowed_viewers[viewer_type]
     viewer = viewer_or_404(request)
@@ -535,7 +535,7 @@ def siae_job_applications_list(
     evaluated_siae_pk,
     template_name="siae_evaluations/siae_job_applications_list.html",
 ):
-    siae = get_current_siae_or_404(request)
+    siae = get_current_company_or_404(request)
     evaluated_siae = get_object_or_404(
         EvaluatedSiae.objects.filter(pk=evaluated_siae_pk, siae=siae, evaluation_campaign__ended_at=None)
         .exclude(evaluation_campaign__evaluations_asked_at=None)
@@ -569,7 +569,7 @@ def siae_job_applications_list(
 def siae_select_criteria(
     request, evaluated_job_application_pk, template_name="siae_evaluations/siae_select_criteria.html"
 ):
-    siae = get_current_siae_or_404(request)
+    siae = get_current_company_or_404(request)
     evaluated_job_application = get_object_or_404(
         EvaluatedJobApplication,
         pk=evaluated_job_application_pk,
@@ -647,7 +647,7 @@ def siae_upload_doc(
     evaluated_administrative_criteria = get_object_or_404(
         EvaluatedAdministrativeCriteria.objects.select_related("evaluated_job_application"),
         pk=evaluated_administrative_criteria_pk,
-        evaluated_job_application__evaluated_siae__siae=get_current_siae_or_404(request),
+        evaluated_job_application__evaluated_siae__siae=get_current_company_or_404(request),
         evaluated_job_application__evaluated_siae__evaluation_campaign__ended_at__isnull=True,
     )
 
@@ -693,7 +693,7 @@ def siae_submit_proofs(request, evaluated_siae_pk):
     evaluated_siae = get_object_or_404(
         EvaluatedSiae,
         pk=evaluated_siae_pk,
-        siae=get_current_siae_or_404(request),
+        siae=get_current_company_or_404(request),
         evaluation_campaign__evaluations_asked_at__isnull=False,
         evaluation_campaign__ended_at=None,
     )

@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from itou.employee_record.enums import Status
 from itou.job_applications.models import JobApplication
 from itou.users.enums import LackOfNIRReason
-from itou.utils.perms.siae import get_current_siae_or_404
+from itou.utils.perms.company import get_current_company_or_404
 
 
 def tunnel_step_is_allowed(job_application):
@@ -38,7 +38,7 @@ def can_create_employee_record(request, job_application_id) -> JobApplication:
     JobApplication object reusable in view (skip one extra DB query)
     """
     # SIAEs only
-    siae = get_current_siae_or_404(request)
+    siae = get_current_company_or_404(request)
 
     # SIAE is eligible to employee record ?
     if not siae.can_use_employee_record:

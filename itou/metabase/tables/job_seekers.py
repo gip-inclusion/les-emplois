@@ -11,7 +11,7 @@ from itou.metabase.tables.utils import (
     get_ai_stock_job_seeker_pks,
     get_choice,
     get_department_and_region_columns,
-    get_hiring_siae,
+    get_hiring_company,
     get_post_code_column,
     get_qpv_job_seeker_pks,
     hash_content,
@@ -341,7 +341,7 @@ def get_table():
                 "name": "type_structure_dernière_embauche",
                 "type": "varchar",
                 "comment": "Type de la structure destinataire de la dernière embauche du candidat",
-                "fn": lambda o: get_hiring_siae(o).kind if get_hiring_siae(o) else None,
+                "fn": lambda o: get_hiring_company(o).kind if get_hiring_company(o) else None,
             },
             {
                 "name": "total_critères_niveau_1",

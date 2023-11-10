@@ -19,9 +19,9 @@ from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
 from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
-from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.templatetags.str_filters import pluralizefr
 from itou.www.invitations_views.forms import (
     EmployerInvitationFormSet,
@@ -198,8 +198,8 @@ def join_prescriber_organization(request, invitation_id):
 
 @login_required
 def invite_employer(request, template_name="invitations_views/create.html"):
-    siae = get_current_siae_or_404(request)
-    form_kwargs = {"sender": request.user, "siae": siae}
+    company = get_current_company_or_404(request)
+    form_kwargs = {"sender": request.user, "siae": company}
     formset = EmployerInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     if request.POST:
         if formset.is_valid():
@@ -216,7 +216,7 @@ def invite_employer(request, template_name="invitations_views/create.html"):
 
     form_post_url = reverse("invitations_views:invite_employer")
     back_url = reverse("companies_views:members")
-    context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset, "organization": siae}
+    context = {"back_url": back_url, "form_post_url": form_post_url, "formset": formset, "organization": company}
 
     return render(request, template_name, context)
 
@@ -224,7 +224,7 @@ def invite_employer(request, template_name="invitations_views/create.html"):
 @login_required
 def join_siae(request, invitation_id):
     invitation = get_object_or_404(EmployerInvitation, pk=invitation_id)
-    if not invitation.guest_can_join_siae(request):
+    if not invitation.guest_can_join_company(request):
         raise PermissionDenied()
 
     if not invitation.siae.is_active:

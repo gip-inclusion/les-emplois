@@ -32,9 +32,9 @@ from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
-from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
 from itou.www.dashboard.forms import (
     EditJobSeekerInfoForm,
@@ -61,7 +61,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     current_org = None
 
     if request.user.is_employer:
-        current_org = get_current_siae_or_404(request)
+        current_org = get_current_company_or_404(request)
         can_show_financial_annexes = current_org.convention_can_be_accessed_by(request.user)
         can_show_employee_records = current_org.can_use_employee_record
         active_campaigns = (

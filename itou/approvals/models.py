@@ -620,7 +620,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
     def can_be_suspended_by_siae(self, siae):
         # Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
-        return self.can_be_suspended and self.user.last_hire_was_made_by_siae(siae)
+        return self.can_be_suspended and self.user.last_hire_was_made_by_company(siae)
 
     @cached_property
     def last_in_progress_suspension(self):
@@ -1128,7 +1128,7 @@ class Suspension(models.Model):
         cached_result = getattr(self, "_can_be_handled_by_siae_cache", None)
         if cached_result:
             return cached_result
-        self._can_be_handled_by_siae_cache = self.is_in_progress and self.approval.user.last_hire_was_made_by_siae(
+        self._can_be_handled_by_siae_cache = self.is_in_progress and self.approval.user.last_hire_was_made_by_company(
             siae
         )
         return self._can_be_handled_by_siae_cache

@@ -64,7 +64,7 @@ from itou.metabase.tables import (
     siaes,
     users,
 )
-from itou.metabase.tables.utils import get_active_siae_pks
+from itou.metabase.tables.utils import get_active_companies_pks
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siae_evaluations.models import (
     EvaluatedAdministrativeCriteria,
@@ -88,7 +88,7 @@ class Command(BaseCommand):
         super().__init__(*args, **kwargs)
         self.MODE_TO_OPERATION = {
             "analytics": self.populate_analytics,
-            "siaes": self.populate_siaes,
+            "siaes": self.populate_companies,
             "job_descriptions": self.populate_job_descriptions,
             "organizations": self.populate_organizations,
             "job_seekers": self.populate_job_seekers,
@@ -121,7 +121,7 @@ class Command(BaseCommand):
         populate_table(analytics.AnalyticsTable, batch_size=10_000, querysets=[Datum.objects.all()])
         populate_table(analytics.DashboardVisitTable, batch_size=10_000, querysets=[StatsDashboardVisit.objects.all()])
 
-    def populate_siaes(self):
+    def populate_companies(self):
         ONE_MONTH_AGO = timezone.now() - timezone.timedelta(days=30)
         queryset = (
             Company.objects.active()
@@ -195,7 +195,7 @@ class Command(BaseCommand):
                 "company",
                 "appellation__rome",
             )
-            .filter(company_id__in=get_active_siae_pks())
+            .filter(company_id__in=get_active_companies_pks())
             .with_job_applications_count()
             .all()
         )
@@ -208,7 +208,8 @@ class Command(BaseCommand):
         of prescriber users *without* any organization.
         """
         active_user_created_job_applications_filter = Q(
-            ~Q(jobapplication__origin=Origin.PE_APPROVAL) & Q(jobapplication__to_company_id__in=get_active_siae_pks())
+            ~Q(jobapplication__origin=Origin.PE_APPROVAL)
+            & Q(jobapplication__to_company_id__in=get_active_companies_pks())
         )
         job_applications_count = Count(
             "jobapplication",
@@ -338,7 +339,7 @@ class Command(BaseCommand):
                 "contract_type",
             )
             .exclude(origin=Origin.PE_APPROVAL)
-            .filter(to_company_id__in=get_active_siae_pks())
+            .filter(to_company_id__in=get_active_companies_pks())
             .all()
         )
 
@@ -350,7 +351,7 @@ class Command(BaseCommand):
         """
         queryset = (
             JobApplication.objects.exclude(origin=Origin.PE_APPROVAL)
-            .filter(to_company_id__in=get_active_siae_pks())
+            .filter(to_company_id__in=get_active_companies_pks())
             .exclude(selected_jobs=None)
             .values("pk", "selected_jobs__id")
         )

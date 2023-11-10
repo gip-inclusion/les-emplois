@@ -252,7 +252,7 @@ class EmployerInvitation(InvitationAbstract):
             membership.is_active = True
             membership.save()
 
-    def guest_can_join_siae(self, request):
+    def guest_can_join_company(self, request):
         user = get_object_or_404(User, email=self.email)
         return user == request.user and user.is_employer
 

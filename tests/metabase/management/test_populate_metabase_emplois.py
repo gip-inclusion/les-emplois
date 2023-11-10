@@ -183,7 +183,7 @@ def test_populate_job_seekers():
         to_company__kind="ETTI",
     )
     # Older accepted job_application with no eligibility diagnosis
-    # Allow to check get_hiring_siae()
+    # Allow to check get_hiring_company()
     JobApplicationFactory(
         job_seeker=user_3,
         with_approval=True,
@@ -420,7 +420,7 @@ def test_populate_job_applications():
     ja = JobApplicationFactory(with_geiq_eligibility_diagnosis=True, contract_type=ContractType.APPRENTICESHIP)
     ja.selected_jobs.add(job)
 
-    num_queries = 1  # Select siaes for get_active_siae_pks()
+    num_queries = 1  # Select siaes for get_active_companies_pks()
     num_queries += 1  # Count job applications
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
     num_queries += 1  # COMMIT Create table
@@ -1091,7 +1091,7 @@ def test_populate_fiches_de_poste():
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_siaes():
+def test_populate_companies():
     company = CompanyFactory(
         for_snapshot=True,
         siret="17643069438162",

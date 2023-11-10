@@ -29,15 +29,15 @@ from itou.common_apps.address.departments import (
     format_region_for_matomo,
 )
 from itou.utils.apis import metabase as mb
+from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
-from itou.utils.perms.siae import get_current_siae_or_404
 
 from . import utils
 
 
 def get_stats_siae_current_org(request):
-    current_org = get_current_siae_or_404(request)
+    current_org = get_current_company_or_404(request)
     if not utils.can_view_stats_siae(request):
         raise PermissionDenied
     return current_org
@@ -223,7 +223,8 @@ def render_stats_siae(request, page_title):
         context=context,
         params={
             mb.C1_SIAE_FILTER_KEY: [
-                str(membership.company_id) for membership in request.user.active_or_in_grace_period_siae_memberships()
+                str(membership.company_id)
+                for membership in request.user.active_or_in_grace_period_company_memberships()
             ]
         },
     )

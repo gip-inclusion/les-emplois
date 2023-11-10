@@ -13,7 +13,7 @@ class ApplicantsAPIPermission(IsAuthenticated):
         if not super().has_permission(request, view):
             return False
 
-        memberships = request.user.active_or_in_grace_period_siae_memberships()
+        memberships = request.user.active_or_in_grace_period_company_memberships()
 
         try:
             return memberships.get().is_admin
