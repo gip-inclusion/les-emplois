@@ -9,9 +9,7 @@
 
 {% block content_title %}
     <h1>Détail fiche salarié ASP: {{ employee_record.job_seeker.get_full_name }}</h1>
-    <p>
-        {% include 'employee_record/includes/_status.html' with employee_record=employee_record only %}
-    </p>
+    <p>{% include 'employee_record/includes/_status.html' with employee_record=employee_record only %}</p>
 {% endblock %}
 
 {% block content %}
@@ -21,19 +19,21 @@
                 <div class="col-12 col-lg-8 order-2 order-lg-1">
                     <div class="c-box">
                         {% include "employee_record/includes/employee_record_summary.html" %}
-                        <hr class="mb-3">
-                        <div class="row mt-3">
-                            <div class="col-12 col-md-auto">
-                                <a href="{% url "employee_record_views:list" %}?status={{ employee_record.status }}" class="btn btn-block btn-link ps-lg-0">
-                                    <i class="ri-arrow-go-back-line ri-lg"></i>
-                                    <span>Retour à la liste</span>
-                                </a>
+                        {% if employee_record.status != "ARCHIVED" %}
+                            <hr class="mb-3">
+                            <div class="row mt-3">
+                                <div class="col-12 col-md-auto">
+                                    <a href="{% url "employee_record_views:list" %}?status={{ employee_record.status }}" class="btn btn-block btn-link ps-lg-0">
+                                        <i class="ri-arrow-go-back-line ri-lg"></i>
+                                        <span>Retour à la liste</span>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2 mb-3">
-                    {% if employee_record.status != "READY" and employee_record.status != "SENT" %}
+                    {% if employee_record.status != "READY" and employee_record.status != "SENT" and employee_record.status != "ARCHIVED" %}
                         <div class="c-box mb-4">
                             {% if employee_record.status == "NEW" %}
                                 <a href="{% url "employee_record_views:create" employee_record.job_application.pk %}?from_status=NEW" class="btn btn-block btn-primary my-2">Compléter la fiche salarié</a>
