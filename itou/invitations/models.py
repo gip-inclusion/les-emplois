@@ -223,7 +223,7 @@ class EmployerInvitation(InvitationAbstract):
         settings.AUTH_USER_MODEL,
         verbose_name="parrain ou marraine",
         on_delete=models.CASCADE,
-        related_name="siae_invitations",
+        related_name="company_invitations",
     )
     company = models.ForeignKey("companies.Company", on_delete=models.CASCADE, related_name="invitations")
 
