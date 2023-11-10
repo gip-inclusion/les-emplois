@@ -427,7 +427,7 @@ class ApplyAsJobSeekerTest(TestCase):
         job_application = JobApplication.objects.get(sender=user, to_company=company)
         assert job_application.job_seeker == user
         assert job_application.sender_kind == SenderKind.JOB_SEEKER
-        assert job_application.sender_siae is None
+        assert job_application.sender_company is None
         assert job_application.sender_prescriber_organization is None
         assert job_application.state == job_application.state.workflow.STATE_NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -845,7 +845,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         job_application = JobApplication.objects.get(sender=user, to_company=company)
         assert job_application.job_seeker == new_job_seeker
         assert job_application.sender_kind == SenderKind.PRESCRIBER
-        assert job_application.sender_siae is None
+        assert job_application.sender_company is None
         assert job_application.sender_prescriber_organization == prescriber_organization
         assert job_application.state == job_application.state.workflow.STATE_NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -1100,7 +1100,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         job_application = JobApplication.objects.get(sender=user, to_company=company)
         assert job_application.job_seeker == new_job_seeker
         assert job_application.sender_kind == SenderKind.PRESCRIBER
-        assert job_application.sender_siae is None
+        assert job_application.sender_company is None
         assert job_application.sender_prescriber_organization == prescriber_organization
         assert job_application.state == job_application.state.workflow.STATE_NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -1390,7 +1390,7 @@ class ApplyAsPrescriberTest(TestCase):
         job_application = JobApplication.objects.get(sender=user, to_company=company)
         assert job_application.job_seeker == new_job_seeker
         assert job_application.sender_kind == SenderKind.PRESCRIBER
-        assert job_application.sender_siae is None
+        assert job_application.sender_company is None
         assert job_application.sender_prescriber_organization is None
         assert job_application.state == job_application.state.workflow.STATE_NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -1827,7 +1827,7 @@ class ApplyAsSiaeTest(TestCase):
         job_application = JobApplication.objects.get(sender=user, to_company=company)
         assert job_application.job_seeker == new_job_seeker
         assert job_application.sender_kind == SenderKind.EMPLOYER
-        assert job_application.sender_siae == company
+        assert job_application.sender_company == company
         assert job_application.sender_prescriber_organization is None
         assert job_application.state == job_application.state.workflow.STATE_NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -2108,7 +2108,7 @@ class DirectHireFullProcessTest(TestCase):
 
         assert job_application.job_seeker == new_job_seeker
         assert job_application.sender_kind == SenderKind.EMPLOYER
-        assert job_application.sender_siae == company
+        assert job_application.sender_company == company
         assert job_application.sender_prescriber_organization is None
         assert job_application.state == job_application.state.workflow.STATE_ACCEPTED
         assert job_application.message == ""
@@ -2240,7 +2240,7 @@ class DirectHireFullProcessTest(TestCase):
 
         assert job_application.job_seeker == job_seeker
         assert job_application.sender_kind == SenderKind.EMPLOYER
-        assert job_application.sender_siae == company
+        assert job_application.sender_company == company
         assert job_application.sender_prescriber_organization is None
         assert job_application.state == job_application.state.workflow.STATE_ACCEPTED
         assert job_application.message == ""
@@ -3866,7 +3866,7 @@ class HireConfirmationTestCase(TestCase):
 
         assert job_application.job_seeker == self.job_seeker
         assert job_application.sender_kind == SenderKind.EMPLOYER
-        assert job_application.sender_siae == self.company
+        assert job_application.sender_company == self.company
         assert job_application.sender_prescriber_organization is None
         assert job_application.state == job_application.state.workflow.STATE_ACCEPTED
         assert job_application.message == ""
@@ -3922,7 +3922,7 @@ class HireConfirmationTestCase(TestCase):
 
         assert job_application.job_seeker == self.job_seeker
         assert job_application.sender_kind == SenderKind.EMPLOYER
-        assert job_application.sender_siae == self.company
+        assert job_application.sender_company == self.company
         assert job_application.sender_prescriber_organization is None
         assert job_application.state == job_application.state.workflow.STATE_ACCEPTED
         assert job_application.message == ""

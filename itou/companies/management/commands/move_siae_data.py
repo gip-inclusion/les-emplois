@@ -105,7 +105,7 @@ class Command(BaseCommand):
             )
         )
 
-        job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=from_id)
+        job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_company_id=from_id)
         self.stdout.write(f"| Job applications sent: {job_applications_sent.count()}")
 
         job_applications_received = job_applications_models.JobApplication.objects.filter(to_company_id=from_id)
@@ -153,7 +153,9 @@ class Command(BaseCommand):
             f"INTO siae.id={to_company.pk} - {to_company.kind} {to_company.siret} - {to_company.display_name}\n"
         )
 
-        dest_siae_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=to_id)
+        dest_siae_job_applications_sent = job_applications_models.JobApplication.objects.filter(
+            sender_company_id=to_id
+        )
         self.stdout.write(f"| Job applications sent: {dest_siae_job_applications_sent.count()}\n")
 
         dest_siae_job_applications_received = job_applications_models.JobApplication.objects.filter(
@@ -212,7 +214,7 @@ class Command(BaseCommand):
                 for job_application in job_applications_to_clear:
                     job_application.selected_jobs.clear()
 
-            job_applications_sent.update(sender_siae_id=to_id)
+            job_applications_sent.update(sender_company_id=to_id)
             job_applications_received.update(to_company_id=to_id)
             # Also move employee records
             employee_records_to_clone = (
@@ -263,7 +265,7 @@ class Command(BaseCommand):
                 "DATA" if move_all_data else "JOB APPLICATIONS AND EMPLOYEE RECORDS", from_siae.pk
             )
         )
-        orig_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=from_id)
+        orig_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_company_id=from_id)
         self.stdout.write(f"| Job applications sent: {orig_job_applications_sent.count()}\n")
 
         orig_job_applications_received = job_applications_models.JobApplication.objects.filter(to_company_id=from_id)
@@ -274,7 +276,9 @@ class Command(BaseCommand):
 
         self.stdout.write(f"INTO siae.id={to_company.pk}\n")
 
-        dest_siae_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_siae_id=to_id)
+        dest_siae_job_applications_sent = job_applications_models.JobApplication.objects.filter(
+            sender_company_id=to_id
+        )
         self.stdout.write(f"| Job applications sent: {dest_siae_job_applications_sent.count()}\n")
 
         dest_siae_job_applications_received = job_applications_models.JobApplication.objects.filter(

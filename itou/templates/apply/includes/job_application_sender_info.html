@@ -26,10 +26,10 @@
         </li>
     {% endif %}
 
-    {% if job_application.sender_siae %}
+    {% if job_application.sender_company %}
         <li>
             Employeur solidaire :
-            <b>{{ job_application.sender_siae.display_name }}</b>
+            <b>{{ job_application.sender_company.display_name }}</b>
         </li>
     {% endif %}
 

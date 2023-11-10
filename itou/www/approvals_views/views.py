@@ -708,7 +708,7 @@ def pe_approval_create(request, pe_approval_id):
         origin=Origin.PE_APPROVAL,  # This origin is specific to this process.
         sender=request.user,
         sender_kind=SenderKind.EMPLOYER,
-        sender_siae=siae,
+        sender_company=siae,
     )
 
     # Then we create an Approval based on the PoleEmploiApproval data

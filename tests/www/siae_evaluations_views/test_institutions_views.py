@@ -51,7 +51,7 @@ def create_evaluated_siae_consistent_datas(evaluation_campaign, extra_evaluated_
     job_application = JobApplicationFactory(
         with_approval=True,
         to_company=siae,
-        sender_siae=siae,
+        sender_company=siae,
         eligibility_diagnosis=eligibility_diagnosis,
         hiring_start_at=timezone.now() - relativedelta(months=2),
     )
