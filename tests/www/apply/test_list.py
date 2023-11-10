@@ -838,15 +838,21 @@ class ProcessListPrescriberTest(ProcessListTest):
         """
         Thibault wants to see applications sent to Hit Pit.
         """
+        JobApplicationFactory(sender=self.thibault_pe)  # To another company
+
         self.client.force_login(self.thibault_pe)
-        to_companys_ids = [self.hit_pit.pk]
-        params = urlencode({"to_companys": to_companys_ids}, True)
+        to_companies_ids = [self.hit_pit.pk]
+        params = urlencode({"to_companies": to_companies_ids}, True)
         url = f"{self.prescriber_base_url}?{params}"
         response = self.client.get(url)
 
         applications = response.context["job_applications_page"].object_list
         assert len(applications) == 9
-        assert applications[0].to_company.pk in to_companys_ids
+        assert applications[0].to_company.pk in to_companies_ids
+
+        response = self.client.get(self.prescriber_base_url)
+        applications = response.context["job_applications_page"].object_list
+        assert len(applications) == 10
 
 
 def test_list_for_unauthorized_prescriber_view(client):
