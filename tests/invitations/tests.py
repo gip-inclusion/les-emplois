@@ -161,19 +161,19 @@ class TestSiaeInvitation(TestCase):
     def test_add_member_to_company(self):
         invitation = SentEmployerInvitationFactory(email="hey@you.com")
         EmployerFactory(email=invitation.email)
-        employers = invitation.siae.members.count()
+        employers = invitation.company.members.count()
         invitation.add_invited_user_to_company()
-        employers_after = invitation.siae.members.count()
+        employers_after = invitation.company.members.count()
         assert employers + 1 == employers_after
 
     def test_add_inactive_member_back_to_company(self):
         invitation = SentEmployerInvitationFactory(email="hey@you.com")
-        CompanyMembershipFactory(company=invitation.siae, user__email=invitation.email, is_active=False)
-        employers = invitation.siae.members.count()
-        siae_active_members = invitation.siae.active_members.count()
+        CompanyMembershipFactory(company=invitation.company, user__email=invitation.email, is_active=False)
+        employers = invitation.company.members.count()
+        siae_active_members = invitation.company.active_members.count()
         invitation.add_invited_user_to_company()
-        employers_after = invitation.siae.members.count()
-        siae_active_members_after = invitation.siae.active_members.count()
+        employers_after = invitation.company.members.count()
+        siae_active_members_after = invitation.company.active_members.count()
         assert employers == employers_after
         assert siae_active_members + 1 == siae_active_members_after
 
@@ -191,7 +191,7 @@ class TestSiaeInvitationEmails(SimpleTestCase):
         assert invitation.first_name.title() in email.body
         assert invitation.last_name.upper() in email.body
         assert invitation.email in email.body
-        assert invitation.siae.display_name in email.body
+        assert invitation.company.display_name in email.body
 
         # To
         assert invitation.sender.email in email.to
@@ -201,13 +201,13 @@ class TestSiaeInvitationEmails(SimpleTestCase):
         email = invitation.email_invitation
 
         # Subject
-        assert invitation.siae.display_name in email.subject
+        assert invitation.company.display_name in email.subject
 
         # Body
         assert invitation.first_name.title() in email.body
         assert invitation.last_name.upper() in email.body
         assert invitation.acceptance_link in email.body
-        assert invitation.siae.display_name in email.body
+        assert invitation.company.display_name in email.body
 
         # To
         assert invitation.email in email.to

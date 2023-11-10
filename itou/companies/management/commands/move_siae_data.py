@@ -142,7 +142,7 @@ class Command(BaseCommand):
 
             # Don't move invitations for existing members
             # The goal is to keep information about the original information
-            invitations = invitations_models.EmployerInvitation.objects.filter(siae_id=from_id).exclude(
+            invitations = invitations_models.EmployerInvitation.objects.filter(company_id=from_id).exclude(
                 email__in=users_models.User.objects.filter(companymembership__company_id=to_id).values_list(
                     "email", flat=True
                 )
@@ -241,7 +241,7 @@ class Command(BaseCommand):
                 diagnoses.update(author_siae_id=to_id)
                 prolongations.update(declared_by_siae_id=to_id)
                 suspensions.update(siae_id=to_id)
-                invitations.update(siae_id=to_id)
+                invitations.update(company_id=to_id)
                 if preserve_to_siae_data:
                     to_company_qs.update(
                         brand=from_siae.display_name,

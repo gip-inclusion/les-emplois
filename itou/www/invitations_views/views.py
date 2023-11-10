@@ -89,7 +89,7 @@ def new_user(request, invitation_type, invitation_id):
         messages.error(request, "Cette invitation n'est plus valide.")
         return render(request, "invitations_views/invitation_errors.html", context={"invitation": invitation})
 
-    if invitation_type == KIND_EMPLOYER and not invitation.siae.is_active:
+    if invitation_type == KIND_EMPLOYER and not invitation.company.is_active:
         messages.error(request, "La structure que vous souhaitez rejoindre n'est plus active.")
         return render(request, "invitations_views/invitation_errors.html", context={"invitation": invitation})
 
@@ -199,7 +199,7 @@ def join_prescriber_organization(request, invitation_id):
 @login_required
 def invite_employer(request, template_name="invitations_views/create.html"):
     company = get_current_company_or_404(request)
-    form_kwargs = {"sender": request.user, "siae": company}
+    form_kwargs = {"sender": request.user, "company": company}
     formset = EmployerInvitationFormSet(data=request.POST or None, form_kwargs=form_kwargs)
     if request.POST:
         if formset.is_valid():
@@ -227,16 +227,16 @@ def join_siae(request, invitation_id):
     if not invitation.guest_can_join_company(request):
         raise PermissionDenied()
 
-    if not invitation.siae.is_active:
+    if not invitation.company.is_active:
         messages.error(request, "Cette structure n'est plus active.")
     elif invitation.can_be_accepted:
         invitation.add_invited_user_to_company()
         invitation.accept()
-        messages.success(request, f"Vous êtes désormais membre de la structure {invitation.siae.display_name}.")
+        messages.success(request, f"Vous êtes désormais membre de la structure {invitation.company.display_name}.")
     else:
         messages.error(request, "Cette invitation n'est plus valide.")
 
-    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = invitation.siae.pk
+    request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = invitation.company.pk
     url = get_adapter(request).get_login_redirect_url(request)
     return HttpResponseRedirect(url)
 

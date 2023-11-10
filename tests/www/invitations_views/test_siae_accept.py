@@ -40,7 +40,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
         # Make sure there's a welcome message.
         self.assertContains(
-            response, escape(f"Vous êtes désormais membre de la structure {invitation.siae.display_name}.")
+            response, escape(f"Vous êtes désormais membre de la structure {invitation.company.display_name}.")
         )
 
         # Assert the user sees his new siae dashboard
@@ -271,7 +271,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
     def test_inactive_siae(self):
         company = CompanyFactory(convention__is_active=False)
-        invitation = SentEmployerInvitationFactory(siae=company)
+        invitation = SentEmployerInvitationFactory(company=company)
         user = EmployerFactory(email=invitation.email)
         self.client.force_login(user)
         join_url = reverse("invitations_views:join_siae", kwargs={"invitation_id": invitation.id})
@@ -301,7 +301,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         user = CompanyFactory(convention__is_active=False, with_membership=True).members.first()
         invitation = SentEmployerInvitationFactory(
             sender=sender,
-            siae=company,
+            company=company,
             first_name=user.first_name,
             last_name=user.last_name,
             email=user.email,
@@ -322,7 +322,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         sender = company.members.first()
         invitation = SentEmployerInvitationFactory(
             sender=sender,
-            siae=company,
+            company=company,
             email=OIDC_USERINFO["email"],
         )
         response = self.client.get(invitation.acceptance_link, follow=True)

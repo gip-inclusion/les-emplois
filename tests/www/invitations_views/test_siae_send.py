@@ -37,7 +37,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         response = self.client.get(INVITATION_URL)
 
         # Assert form is present
-        form = EmployerInvitationForm(sender=self.sender, siae=self.company)
+        form = EmployerInvitationForm(sender=self.sender, company=self.company)
         self.assertContains(response, form["first_name"].label)
         self.assertContains(response, form["last_name"].label)
         self.assertContains(response, form["email"].label)
@@ -79,7 +79,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         assert invitation.last_name == guest.last_name
         assert invitation.email == guest.email
         assert invitation.sender == self.sender
-        assert invitation.siae == self.company
+        assert invitation.company == self.company
         assert invitation.USER_KIND == UserKind.EMPLOYER
 
     def test_send_invitation_to_not_employer(self):
@@ -108,7 +108,7 @@ class TestSendSingleSiaeInvitation(TestCase):
         self.client.force_login(sender_2)
         self.client.post(INVITATION_URL, data=self.post_data)
         assert EmployerInvitation.objects.count() == 2
-        invitation = EmployerInvitation.objects.get(siae=company)
+        invitation = EmployerInvitation.objects.get(company=company)
         assert invitation.first_name == self.guest_data["first_name"]
         assert invitation.last_name == self.guest_data["last_name"]
         assert invitation.email == self.guest_data["email"]
