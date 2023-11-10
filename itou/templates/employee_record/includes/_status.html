@@ -18,4 +18,8 @@
     <span class="badge rounded-pill badge-sm bg-emploi-lightest text-primary">
         Désactivée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
     </span>
+{% elif employee_record.status == "ARCHIVED" %}
+    <span class="badge rounded-pill badge-sm bg-emploi-lightest text-primary">
+        Archivée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
+    </span>
 {% endif %}

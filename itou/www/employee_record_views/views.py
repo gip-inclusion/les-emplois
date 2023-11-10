@@ -1,22 +1,26 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Count, Exists, OuterRef
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.http import require_safe
+from formtools.wizard.views import NamedUrlSessionWizardView
 
-from itou.approvals.models import Prolongation, Suspension
+from itou.approvals.models import Approval, Prolongation, Suspension
 from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
-from itou.users.enums import LackOfNIRReason
+from itou.users.enums import LackOfNIRReason, UserKind
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
 from itou.www.employee_record_views.forms import (
+    AddEmployeeRecordChooseApprovalForm,
+    AddEmployeeRecordChooseEmployeeForm,
     EmployeeRecordFilterForm,
     NewEmployeeRecordStep1Form,
     NewEmployeeRecordStep2Form,
@@ -25,6 +29,7 @@ from itou.www.employee_record_views.forms import (
     SelectEmployeeRecordStatusForm,
 )
 
+from ...users.models import User
 from .enums import EmployeeRecordOrder
 
 
@@ -53,7 +58,66 @@ STEPS = [
 ]
 
 
-# Views
+class AddView(LoginRequiredMixin, NamedUrlSessionWizardView):
+    template_name = "employee_record/add.html"
+    form_list = [
+        ("choose-employee", AddEmployeeRecordChooseEmployeeForm),
+        ("choose-approval", AddEmployeeRecordChooseApprovalForm),
+    ]
+
+    def dispatch(self, request, *args, **kwargs):
+        self.company = get_current_company_or_404(request)
+        if not self.company.can_use_employee_record:
+            raise PermissionDenied
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form_kwargs(self, step=None):
+        hiring_of_the_company = JobApplication.objects.accepted().filter(to_company=self.company)
+        if step == "choose-employee":
+            return {"employees": hiring_of_the_company.get_unique_fk_objects("job_seeker")}
+        elif step == "choose-approval":
+            employee = User.objects.get(
+                pk=self.get_cleaned_data_for_step("choose-employee")["employee"], kind=UserKind.JOB_SEEKER
+            )
+            return {
+                "employee": employee,
+                # FIXME(rsebille): Remove the approvals `pk_in` filter once employee records creation
+                #  does not require a job applications.
+                "approvals": employee.approvals.filter(
+                    pk__in=[a.pk for a in hiring_of_the_company.get_unique_fk_objects("approval")]
+                ).order_by("-end_at"),
+            }
+        return {}
+
+    def done(self, form_list, *args, **kwargs):
+        approval = Approval.objects.get(
+            pk=self.get_all_cleaned_data()["approval"], user=self.get_all_cleaned_data()["employee"]
+        )
+        try:
+            employee_record = EmployeeRecord.objects.for_company(self.company).get(approval_number=approval.number)
+        except EmployeeRecord.DoesNotExist:  # Send to the creation tunnel with the last accepted job application
+            job_application = (
+                JobApplication.objects.filter(to_company=self.company, approval=approval)
+                .accepted()
+                .with_accepted_at()
+                .latest("accepted_at")
+            )
+            return HttpResponseRedirect(
+                reverse("employee_record_views:create", kwargs={"job_application_id": job_application.pk})
+            )
+        else:
+            if employee_record.status == Status.NEW:  # Should be filled, send to the creation tunnel
+                return HttpResponseRedirect(
+                    reverse(
+                        "employee_record_views:create",
+                        kwargs={"job_application_id": employee_record.job_application.pk},
+                    )
+                )
+            else:  # An employee record exists, show the summary
+                return HttpResponseRedirect(
+                    reverse("employee_record_views:summary", kwargs={"employee_record_id": employee_record.pk})
+                )
 
 
 @login_required

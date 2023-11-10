@@ -1,0 +1,70 @@
+{% extends "layout/base.html" %}
+{% load django_bootstrap5 %}
+{% load format_filters %}
+{% load str_filters %}
+{% load theme_inclusion %}
+{% load matomo %}
+
+{% block title %}Créer une fiche salarié {{ block.super }}{% endblock %}
+{% block content_title %}
+    <h1>Créer une fiche salarié - {{ request.current_organization.display_name }}</h1>
+{% endblock %}
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-md-9">
+                    <div class="c-stepper mb-3 mb-lg-5">
+                        <div class="progress progress--emploi">
+                            <div class="progress-bar progress-bar-{{ wizard|stepper_progress }}" role="progressbar" aria-valuenow="{{ wizard|stepper_progress }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        <p>
+                            <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }}
+                        </p>
+                    </div>
+                    <div class="c-form mb-3 mb-lg-5">
+                        <form method="post">
+                            {% csrf_token %}
+                            {{ wizard.management_form }}
+
+                            {% bootstrap_form form alert_error_type="non_fields" %}
+
+                            {% if not wizard.steps.next %}
+                                <p>
+                                    Après avoir sélectionné le PASS IAE concerné et cliqué sur <i>"Confirmer"</i>, 2 cas de figure sont possibles :
+                                </p>
+                                <ul>
+                                    <li>
+                                        <p class="m-0">
+                                            <b>Une fiche salarié existe déjà pour ce salarié et ce PASS IAE :</b> dans ce cas vous serez automatiquement redirigé sur la page de détail de cette fiche salarié.
+                                        </p>
+                                        <p>
+                                            Si la fiche salarié est déjà intégrée et que vous avez besoin de la renvoyer dans l’Extranet IAE 2.0 de l’ASP, vous devez la <b>désactiver</b> puis la <b>réactiver</b>.
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <b>Aucune fiche salarié n’existe pour ce salarié et ce PASS IAE :</b> dans ce cas vous serez redirigé vers le formulaire de création et d’envoi de la fiche salarié.
+                                    </li>
+                                </ul>
+                            {% endif %}
+
+                            <hr>
+                            <p class="fs-xs">* champ obligatoire</p>
+                            <div class="form-group text-end">
+                                {% if wizard.steps.prev %}
+                                    {% bootstrap_button "Retour" button_type="submit" button_class="btn btn-outline-primary" name="wizard_goto_step" value=wizard.steps.prev %}
+                                {% else %}
+                                    <a class="btn btn-link btn-outline-primary" href="{% url "employee_record_views:list" %}?status=NEW">Annuler</a>
+                                {% endif %}
+                                <button class="btn btn-primary" {% if not wizard.steps.next %}{% matomo_event "fiches-salarié" "submit" "création" %}{% endif %}>
+                                    {{ wizard.steps.next|yesno:"Suivant,Confirmer" }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

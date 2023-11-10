@@ -80,6 +80,14 @@
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
+            <div class="row my-3 my-md-5">
+                <div class="col-12">
+                    <div class="c-box p-3 p-md-4 d-flex align-items-center">
+                        <div class="p-0 flex-grow-1 h5 m-0">Vous ne trouvez pas la fiche salarié d’un de vos salariés ?</div>
+                        <a class="btn btn-primary" href="{% url "employee_record_views:add" %}">Créer une fiche salarié</a>
+                    </div>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-12 col-md-3">
                     <aside class="c-aside-filters">

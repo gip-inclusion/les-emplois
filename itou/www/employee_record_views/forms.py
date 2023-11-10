@@ -4,7 +4,7 @@ from django.core.validators import MinLengthValidator, RegexValidator
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.text import format_lazy
-from django_select2.forms import Select2MultipleWidget
+from django_select2.forms import Select2MultipleWidget, Select2Widget
 
 from itou.asp.models import Commune, Country, RSAAllocation
 from itou.companies.models import SiaeFinancialAnnex
@@ -14,6 +14,40 @@ from itou.utils.validators import validate_pole_emploi_id
 from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Widget
 
 from .enums import EmployeeRecordOrder
+
+
+class AddEmployeeRecordChooseEmployeeForm(forms.Form):
+    employee = forms.ChoiceField(
+        required=True,
+        label="Nom du salarié",
+        widget=Select2Widget,
+        help_text="Le salarié concerné par le transfert de données vers l'Extranet IAE 2.0 de l'ASP",
+    )
+
+    def __init__(self, employees, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["employee"].choices = [(None, "Sélectionnez le salarié")] + sorted(
+            [(user.id, user.get_full_name().title()) for user in employees if user.get_full_name()],
+            key=lambda u: u[1],
+        )
+
+
+class AddEmployeeRecordChooseApprovalForm(forms.Form):
+    approval = forms.ChoiceField(
+        label="PASS IAE",
+        required=True,
+        help_text="Le PASS IAE concerné par le transfert de données vers l'Extranet IAE 2.0 de l'ASP",
+    )
+
+    def __init__(self, *args, employee, approvals, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["approval"].choices = [
+            (approval.pk, f"{approval.number} — Du {approval.start_at:%d/%m/%Y} au {approval.end_at:%d/%m/%Y}")
+            for approval in approvals
+        ]
+        self.fields["approval"].label = f"PASS IAE de {employee.get_full_name()}"
 
 
 class SelectEmployeeRecordStatusForm(forms.Form):
