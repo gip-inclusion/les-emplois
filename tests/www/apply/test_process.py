@@ -310,7 +310,7 @@ class ProcessViewsTest(TestCase):
 
         for user in [
             JobSeekerFactory(),
-            EmployerFactory(with_siae=True),
+            EmployerFactory(with_company=True),
             PrescriberFactory(),
             LaborInspectorFactory(membership=True),
         ]:

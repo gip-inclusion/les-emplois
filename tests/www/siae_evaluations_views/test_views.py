@@ -434,7 +434,7 @@ class TestViewProof:
         assertRedirects(response, f"{reverse('account_login')}?next={url}")
 
     def test_access_nonexistent_id(self, client):
-        client.force_login(EmployerFactory(with_siae=True))
+        client.force_login(EmployerFactory(with_company=True))
         url = reverse("siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": 0})
         response = client.get(url)
         assert response.status_code == 404

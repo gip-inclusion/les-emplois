@@ -266,7 +266,7 @@ def test_prescriber_account_activation_view_with_next(client):
 
 
 def test_employer_account_activation_view(client):
-    user = EmployerFactory(with_siae=True, identity_provider=IdentityProvider.DJANGO)
+    user = EmployerFactory(with_company=True, identity_provider=IdentityProvider.DJANGO)
     client.force_login(user)
 
     url = reverse("dashboard:activate_ic_account")
