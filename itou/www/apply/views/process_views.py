@@ -56,7 +56,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
     Detail of an application for a JOBSEEKER
     """
     job_application = get_object_or_404(
-        JobApplication, id=job_application_id, job_seeker=request.user, hidden_for_siae=False
+        JobApplication, id=job_application_id, job_seeker=request.user, hidden_for_company=False
     )
 
     transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
@@ -376,7 +376,7 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
 @login_required
 def archive(request, job_application_id):
     """
-    Archive the job_application for an SIAE (ie. sets the hidden_for_siae flag to True)
+    Archive the job_application for an SIAE (ie. sets the hidden_for_company flag to True)
     then redirects to the list of job_applications
     """
     queryset = JobApplication.objects.siae_member_required(request.user)
@@ -401,7 +401,7 @@ def archive(request, job_application_id):
             username = job_application.job_seeker.get_full_name()
             siae_name = job_application.to_company.display_name
 
-            job_application.hidden_for_siae = True
+            job_application.hidden_for_company = True
             job_application.save()
 
             success_message = f"La candidature de {username} chez {siae_name} a bien été supprimée."

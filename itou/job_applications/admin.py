@@ -117,7 +117,7 @@ class JobApplicationAdmin(ItouModelAdmin):
                     "answer_to_prescriber",
                     "hiring_start_at",
                     "hiring_end_at",
-                    "hidden_for_siae",
+                    "hidden_for_company",
                     "create_employee_record",
                 ]
             },
