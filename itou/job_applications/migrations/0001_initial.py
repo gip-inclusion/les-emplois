@@ -100,7 +100,7 @@ class Migration(migrations.Migration):
                         null=True,
                         on_delete=django.db.models.deletion.CASCADE,
                         to="companies.siae",
-                        verbose_name="SIAE émettrice",
+                        verbose_name="entreprise émettrice",
                     ),
                 ),
                 (
@@ -109,7 +109,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="job_applications_received",
                         to="companies.siae",
-                        verbose_name="SIAE destinataire",
+                        verbose_name="entreprise destinataire",
                     ),
                 ),
                 (
@@ -270,7 +270,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="job_application_transferred",
                         to="companies.siae",
-                        verbose_name="SIAE d'origine",
+                        verbose_name="entreprise d'origine",
                     ),
                 ),
             ],
