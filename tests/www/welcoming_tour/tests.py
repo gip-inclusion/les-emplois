@@ -105,7 +105,7 @@ class WelcomingTourExceptions(TestCase):
         job_seeker = JobSeekerFactory.build()
 
         # First signup step: job seeker NIR.
-        next_to = reverse("apply:start", kwargs={"siae_pk": company.pk})
+        next_to = reverse("apply:start", kwargs={"company_pk": company.pk})
         url = f"{reverse('signup:job_seeker_nir')}?next={next_to}"
         self.client.post(url, {"nir": job_seeker.nir, "confirm": 1})
 

@@ -22,7 +22,7 @@
                 </li>
                 {% if request.current_organization.kind == CompanyKind.GEIQ %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'apply:check_nir_for_hire' siae_pk=request.current_organization.pk %}" class="btn-link btn-ico">
+                        <a href="{% url 'apply:check_nir_for_hire' company_pk=request.current_organization.pk %}" class="btn-link btn-ico">
                             <i class="ri-user-follow-line ri-lg font-weight-normal"></i>
                             <span>Déclarer une embauche</span>
                         </a>
@@ -39,7 +39,7 @@
                         </span>
                     {% else %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'apply:start' siae_pk=request.current_organization.pk %}" class="btn-link btn-ico">
+                            <a href="{% url 'apply:start' company_pk=request.current_organization.pk %}" class="btn-link btn-ico">
                                 <i class="ri-draft-line ri-lg font-weight-normal"></i>
                                 <span>Enregistrer une candidature</span>
                             </a>

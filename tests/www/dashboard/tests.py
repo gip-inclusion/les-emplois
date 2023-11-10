@@ -236,9 +236,9 @@ class DashboardViewTest(TestCase):
 
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertContains(response, APPLICATION_SAVE_LABEL)
-                self.assertContains(response, reverse("apply:start", kwargs={"siae_pk": company.pk}))
+                self.assertContains(response, reverse("apply:start", kwargs={"company_pk": company.pk}))
                 self.assertContains(response, HIRE_LINK_LABEL)
-                self.assertContains(response, reverse("apply:check_nir_for_hire", kwargs={"siae_pk": company.pk}))
+                self.assertContains(response, reverse("apply:check_nir_for_hire", kwargs={"company_pk": company.pk}))
 
         for kind in set(CompanyKind) - set(display_kinds):
             with self.subTest(f"should not display when siae_kind={kind}"):
@@ -247,9 +247,11 @@ class DashboardViewTest(TestCase):
                 self.client.force_login(user)
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertNotContains(response, APPLICATION_SAVE_LABEL)
-                self.assertNotContains(response, reverse("apply:start", kwargs={"siae_pk": company.pk}))
+                self.assertNotContains(response, reverse("apply:start", kwargs={"company_pk": company.pk}))
                 self.assertNotContains(response, HIRE_LINK_LABEL)
-                self.assertNotContains(response, reverse("apply:check_nir_for_hire", kwargs={"siae_pk": company.pk}))
+                self.assertNotContains(
+                    response, reverse("apply:check_nir_for_hire", kwargs={"company_pk": company.pk})
+                )
 
     def test_dashboard_agreements_with_suspension_sanction(self):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
@@ -265,7 +267,7 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
         # Check that "Déclarer une embauche" is here, but not its matching link
         self.assertContains(response, "Déclarer une embauche")
-        self.assertNotContains(response, reverse("apply:start", kwargs={"siae_pk": company.pk}))
+        self.assertNotContains(response, reverse("apply:start", kwargs={"company_pk": company.pk}))
         # Check that the button tooltip is there
         self.assertContains(
             response,
