@@ -2165,7 +2165,7 @@ def test_reload_qualification_fields(qualification_type, client, snapshot):
     company = CompanyFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    url = reverse("apply:reload_qualification_fields", kwargs={"siae_pk": company.pk})
+    url = reverse("apply:reload_qualification_fields", kwargs={"company_pk": company.pk})
     response = client.post(
         url,
         data={
@@ -2188,7 +2188,7 @@ def test_reload_qualification_fields_404(client):
     company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    url = reverse("apply:reload_qualification_fields", kwargs={"siae_pk": 0})
+    url = reverse("apply:reload_qualification_fields", kwargs={"company_pk": 0})
     response = client.post(
         url,
         data={
@@ -2214,7 +2214,7 @@ def test_reload_contract_type_and_options(contract_type, client, snapshot):
     company = CompanyFactory(pk=10, kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    url = reverse("apply:reload_contract_type_and_options", kwargs={"siae_pk": company.pk})
+    url = reverse("apply:reload_contract_type_and_options", kwargs={"company_pk": company.pk})
     response = client.post(
         url,
         data={
@@ -2237,7 +2237,7 @@ def test_reload_contract_type_and_options_404(client):
     company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
     employer = company.members.first()
     client.force_login(employer)
-    url = reverse("apply:reload_contract_type_and_options", kwargs={"siae_pk": 0})
+    url = reverse("apply:reload_contract_type_and_options", kwargs={"company_pk": 0})
     response = client.post(
         url,
         data={
@@ -2280,7 +2280,9 @@ def test_htmx_reload_contract_type_and_options(client, snapshot):
     form_soup = parse_response_to_soup(response, selector="#acceptForm")
 
     # Update form soup with htmx call
-    reload_url = reverse("apply:reload_contract_type_and_options", kwargs={"siae_pk": job_application.to_company.pk})
+    reload_url = reverse(
+        "apply:reload_contract_type_and_options", kwargs={"company_pk": job_application.to_company.pk}
+    )
     data["contract_type"] = ContractType.PERMANENT
     htmx_response = client.post(
         reload_url,

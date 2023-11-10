@@ -298,11 +298,11 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 class AcceptHTMXFragmentView(TemplateView):
     NO_ERROR_FIELDS = []
 
-    def setup(self, request, job_application_id=None, siae_pk=None, *args, **kwargs):
+    def setup(self, request, job_application_id=None, company_pk=None, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        if siae_pk is not None:
-            siae = get_object_or_404(Company.objects.member_required(request.user), pk=siae_pk)
+        if company_pk is not None:
+            siae = get_object_or_404(Company.objects.member_required(request.user), pk=company_pk)
             job_application = None
         elif job_application_id:
             # TODO(xfernandez): remove this version in a week

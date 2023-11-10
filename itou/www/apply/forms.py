@@ -557,7 +557,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             self.fields["qualification_type"].widget.attrs.update(
                 {
                     "hx-trigger": "change",
-                    "hx-post": reverse("apply:reload_qualification_fields", kwargs={"siae_pk": siae.pk}),
+                    "hx-post": reverse("apply:reload_qualification_fields", kwargs={"company_pk": siae.pk}),
                     "hx-swap": "outerHTML",
                     "hx-select": "#geiq_qualification_fields_block",
                     "hx-target": "#geiq_qualification_fields_block",
@@ -585,7 +585,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             self.fields["contract_type"].widget.attrs.update(
                 {
                     "hx-trigger": "change",
-                    "hx-post": reverse("apply:reload_contract_type_and_options", kwargs={"siae_pk": siae.pk}),
+                    "hx-post": reverse("apply:reload_contract_type_and_options", kwargs={"company_pk": siae.pk}),
                     "hx-swap": "outerHTML",
                     "hx-select": "#geiq_contract_type_and_options_block",
                     "hx-target": "#geiq_contract_type_and_options_block",
@@ -631,7 +631,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         self.fields["hired_job"].choices = choices
         self.fields["hired_job"].widget.attrs.update(
             {
-                "hx-post": reverse("apply:reload_job_description_fields", kwargs={"siae_pk": siae.pk}),
+                "hx-post": reverse("apply:reload_job_description_fields", kwargs={"company_pk": siae.pk}),
                 "hx-swap": "outerHTML",
                 "hx-select": "#job_description_fields_block",
                 "hx-target": "#job_description_fields_block",

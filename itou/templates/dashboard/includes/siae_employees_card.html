@@ -21,7 +21,7 @@
                             <span class="disabled">Déclarer une embauche</span>
                         </span>
                     {% else %}
-                        <a href="{% url 'apply:check_nir_for_hire' siae_pk=request.current_organization.pk %}" class="btn-link btn-ico">
+                        <a href="{% url 'apply:check_nir_for_hire' company_pk=request.current_organization.pk %}" class="btn-link btn-ico">
                             <i class="ri-user-follow-line ri-lg font-weight-normal"></i>
                             <span>Déclarer une embauche</span>
                         </a>

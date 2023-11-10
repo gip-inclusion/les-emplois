@@ -59,7 +59,7 @@
             {% else %}
                 <div class="d-flex justify-content-between align-items-center">
                     <span>Cette structure vous intéresse ?</span>
-                    <a class="btn btn-sm btn-primary" href="{% url 'apply:start' siae_pk=siae.pk %}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                    <a class="btn btn-sm btn-primary" href="{% url 'apply:start' company_pk=siae.pk %}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                         Postuler
                     </a>
                 </div>

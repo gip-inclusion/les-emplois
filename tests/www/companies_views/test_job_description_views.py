@@ -578,7 +578,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         )
         self.assertContains(response, "Retour vers la liste des postes")
         self.assertContains(response, reverse("companies_views:job_description_list"))
-        self.assertNotContains(response, reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
+        self.assertNotContains(response, reverse("apply:start", kwargs={"company_pk": self.siae.pk}))
 
     def test_prescriber_card_actions(self):
         # Checks if non-SIAE can apply to opened job descriptions
@@ -597,7 +597,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             response = self.client.get(self.url)
 
         self.assertContains(response, "Postuler auprès de l'employeur solidaire")
-        self.assertContains(response, reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
+        self.assertContains(response, reverse("apply:start", kwargs={"company_pk": self.siae.pk}))
         self.assertNotContains(
             response,
             reverse(
@@ -621,7 +621,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             response = self.client.get(self.url)
 
         self.assertContains(response, "Postuler auprès de l'employeur solidaire")
-        self.assertContains(response, reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
+        self.assertContains(response, reverse("apply:start", kwargs={"company_pk": self.siae.pk}))
         self.assertNotContains(
             response,
             reverse(
@@ -634,7 +634,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         response = self.client.get(self.url)
 
         self.assertContains(response, "Postuler auprès de l'employeur solidaire")
-        self.assertContains(response, reverse("apply:start", kwargs={"siae_pk": self.siae.pk}))
+        self.assertContains(response, reverse("apply:start", kwargs={"company_pk": self.siae.pk}))
         self.assertNotContains(
             response,
             reverse(
