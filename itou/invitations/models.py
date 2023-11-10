@@ -225,7 +225,7 @@ class EmployerInvitation(InvitationAbstract):
         on_delete=models.CASCADE,
         related_name="siae_invitations",
     )
-    siae = models.ForeignKey("companies.Company", on_delete=models.CASCADE, related_name="invitations")
+    company = models.ForeignKey("companies.Company", on_delete=models.CASCADE, related_name="invitations")
 
     class Meta:
         verbose_name = "invitation employeur"
@@ -243,12 +243,12 @@ class EmployerInvitation(InvitationAbstract):
 
     def add_invited_user_to_company(self):
         user = User.objects.get(email=self.email)
-        self.siae.members.add(user)
+        self.company.members.add(user)
         user.save()
         # We must be able to invite a former member of this SIAE
         # however `members.add()` does not update membership status if it already exists
-        if user not in self.siae.active_members:
-            membership = user.companymembership_set.get(is_active=False, company=self.siae)
+        if user not in self.company.active_members:
+            membership = user.companymembership_set.get(is_active=False, company=self.company)
             membership.is_active = True
             membership.save()
 
@@ -264,7 +264,7 @@ class EmployerInvitation(InvitationAbstract):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
-            "establishment_name": self.siae.display_name,
+            "establishment_name": self.company.display_name,
         }
         subject = "invitations_views/email/accepted_notif_sender_subject.txt"
         body = "invitations_views/email/accepted_notif_establishment_sender_body.txt"
@@ -280,7 +280,7 @@ class EmployerInvitation(InvitationAbstract):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "sender": self.sender,
-            "establishment": self.siae,
+            "establishment": self.company,
         }
         subject = "invitations_views/email/invitation_establishment_subject.txt"
         body = "invitations_views/email/invitation_establishment_body.txt"

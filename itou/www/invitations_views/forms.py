@@ -110,9 +110,9 @@ class EmployerInvitationForm(forms.ModelForm):
         fields = ["first_name", "last_name", "email"]
         model = EmployerInvitation
 
-    def __init__(self, sender, siae, *args, **kwargs):
+    def __init__(self, sender, company, *args, **kwargs):
         self.sender = sender
-        self.siae = siae
+        self.company = company
         super().__init__(*args, **kwargs)
 
     def _invited_user_exists_error(self, email):
@@ -125,7 +125,7 @@ class EmployerInvitationForm(forms.ModelForm):
                 error = forms.ValidationError("Cet utilisateur n'est pas un employeur.")
                 self.add_error("email", error)
             else:
-                user_is_member = self.siae.active_members.filter(email=user.email).exists()
+                user_is_member = self.company.active_members.filter(email=user.email).exists()
                 if user_is_member:
                     error = forms.ValidationError("Cette personne fait déjà partie de votre structure.")
                     self.add_error("email", error)
@@ -138,7 +138,7 @@ class EmployerInvitationForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         invitation = super().save(commit=False)
         invitation.sender = self.sender
-        invitation.siae = self.siae
+        invitation.company = self.company
         invitation.save()
         return invitation
 

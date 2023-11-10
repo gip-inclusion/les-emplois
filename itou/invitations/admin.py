@@ -42,10 +42,10 @@ class BaseInvitationAdmin(ItouModelAdmin):
 
 @admin.register(EmployerInvitation)
 class EmployerInvitationAdmin(BaseInvitationAdmin):
-    list_display = BaseInvitationAdmin.list_display + ("siae",)
-    raw_id_fields = BaseInvitationAdmin.raw_id_fields + ("siae",)
-    search_fields = BaseInvitationAdmin.search_fields + ("siae__siret",)
-    list_select_related = BaseInvitationAdmin.list_select_related + ("siae",)
+    list_display = BaseInvitationAdmin.list_display + ("company",)
+    raw_id_fields = BaseInvitationAdmin.raw_id_fields + ("company",)
+    search_fields = BaseInvitationAdmin.search_fields + ("company__siret",)
+    list_select_related = BaseInvitationAdmin.list_select_related + ("company",)
 
 
 @admin.register(PrescriberWithOrgInvitation)

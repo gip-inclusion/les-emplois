@@ -6,7 +6,7 @@
 {% block content_title %}
     <h1>Bienvenue {{ invitation.first_name|title }} {{ invitation.last_name|upper }} !</h1>
     <p>
-        Vous allez rejoindre le tableau de bord de <span class="font-weight-bold">{{ invitation.organization.name }}{{ invitation.siae.display_name }}</span>
+        Vous allez rejoindre le tableau de bord de <span class="font-weight-bold">{{ invitation.organization.name }}{{ invitation.company.display_name }}</span>
     </p>
 {% endblock %}
 

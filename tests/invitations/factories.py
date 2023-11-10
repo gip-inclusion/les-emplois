@@ -17,7 +17,7 @@ class EmployerInvitationFactory(factory.django.DjangoModelFactory):
     first_name = factory.Sequence("first_name{}".format)
     last_name = factory.Sequence("last_name{}".format)
     sender = factory.SubFactory(EmployerFactory)
-    siae = factory.SubFactory(CompanyFactory, with_membership=True)
+    company = factory.SubFactory(CompanyFactory, with_membership=True)
 
 
 class SentEmployerInvitationFactory(EmployerInvitationFactory):
