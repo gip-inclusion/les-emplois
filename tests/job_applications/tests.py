@@ -1774,7 +1774,7 @@ class JobApplicationAdminFormTest(TestCase):
             "approval_manually_delivered_by",
             "approval_manually_refused_by",
             "approval_manually_refused_at",
-            "hidden_for_siae",
+            "hidden_for_company",
             "transferred_at",
             "transferred_by",
             "transferred_from",

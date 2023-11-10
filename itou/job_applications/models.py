@@ -130,7 +130,7 @@ class JobApplicationQuerySet(models.QuerySet):
         """
         Filters out the archived job_applications
         """
-        return self.exclude(hidden_for_siae=True)
+        return self.exclude(hidden_for_company=True)
 
     def created_on_given_year_and_month(self, year, month):
         return self.filter(created_at__year=year, created_at__month=month)
@@ -590,7 +590,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name="date de refus manuel du PASS IAE", blank=True, null=True
     )
 
-    hidden_for_siae = models.BooleanField(default=False, verbose_name="masqué coté employeur")
+    hidden_for_company = models.BooleanField(default=False, verbose_name="masqué coté employeur")
 
     transferred_at = models.DateTimeField(verbose_name="date de transfert", null=True, blank=True)
     transferred_by = models.ForeignKey(

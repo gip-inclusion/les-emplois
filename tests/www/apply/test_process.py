@@ -186,7 +186,9 @@ class ProcessViewsTest(TestCase):
         """A hidden job_application is not displayed."""
 
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, job_seeker__kind=UserKind.JOB_SEEKER, hidden_for_siae=True
+            sent_by_authorized_prescriber_organisation=True,
+            job_seeker__kind=UserKind.JOB_SEEKER,
+            hidden_for_company=True,
         )
         employer = job_application.to_company.members.first()
         self.client.force_login(employer)
@@ -1330,7 +1332,7 @@ class ProcessViewsTest(TestCase):
         assert job_application.state.is_accepted
 
     def test_archive(self, *args, **kwargs):
-        """Ensure that when an SIAE archives a job_application, the hidden_for_siae flag is updated."""
+        """Ensure that when an SIAE archives a job_application, the hidden_for_company flag is updated."""
 
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_CANCELLED
@@ -1355,7 +1357,7 @@ class ProcessViewsTest(TestCase):
         self.assertRedirects(response, next_url)
 
         job_application.refresh_from_db()
-        assert job_application.hidden_for_siae
+        assert job_application.hidden_for_company
 
 
 class ProcessTemplatesTest(TestCase):
