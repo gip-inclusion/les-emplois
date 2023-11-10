@@ -500,9 +500,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         default=SenderKind.PRESCRIBER,
     )
 
-    # When the sender is an SIAE member, keep a track of his current SIAE.
+    # When the sender is an employer, keep a track of his current company.
     sender_siae = models.ForeignKey(
-        "companies.Company", verbose_name="SIAE émettrice", null=True, blank=True, on_delete=models.CASCADE
+        "companies.Company", verbose_name="entreprise émettrice", null=True, blank=True, on_delete=models.CASCADE
     )
 
     # When the sender is a prescriber, keep a track of his current organization (if any).
@@ -516,7 +516,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     to_company = models.ForeignKey(
         "companies.Company",
-        verbose_name="SIAE destinataire",
+        verbose_name="entreprise destinataire",
         on_delete=models.CASCADE,
         related_name="job_applications_received",
     )
@@ -598,7 +598,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
     transferred_from = models.ForeignKey(
         "companies.Company",
-        verbose_name="SIAE d'origine",
+        verbose_name="entreprise d'origine",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
