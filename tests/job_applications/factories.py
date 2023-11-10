@@ -144,7 +144,7 @@ class JobApplicationSentBySiaeFactory(JobApplicationFactory):
     sender_kind = SenderKind.EMPLOYER
     # Currently an Siae can only postulate for itself,
     # this is the default behavior here.
-    sender_siae = factory.SelfAttribute("to_company")
+    sender_company = factory.SelfAttribute("to_company")
     sender = factory.LazyAttribute(lambda obj: obj.to_company.members.first())
 
 

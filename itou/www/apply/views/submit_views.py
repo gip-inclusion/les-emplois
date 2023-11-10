@@ -1049,7 +1049,7 @@ class ApplicationResumeView(ApplicationBaseView):
             if request.user.is_prescriber:
                 job_application.sender_prescriber_organization = request.current_organization
             if request.user.is_employer:
-                job_application.sender_siae = request.current_organization
+                job_application.sender_company = request.current_organization
 
             if resume := self.form.cleaned_data.get("resume"):
                 key = f"resume/{uuid.uuid4()}.pdf"

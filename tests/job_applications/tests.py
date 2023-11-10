@@ -451,7 +451,7 @@ class JobApplicationQuerySetTest(TestCase):
         assert hasattr(qs, "approval")
         assert hasattr(qs, "job_seeker")
         assert hasattr(qs, "sender")
-        assert hasattr(qs, "sender_siae")
+        assert hasattr(qs, "sender_company")
         assert hasattr(qs, "sender_prescriber_organization")
         assert hasattr(qs, "to_company")
         assert hasattr(qs, "selected_jobs")
@@ -1753,7 +1753,7 @@ class JobApplicationAdminFormTest(TestCase):
             "resume_link",
             "sender",
             "sender_kind",
-            "sender_siae",
+            "sender_company",
             "sender_prescriber_organization",
             "to_company",
             "state",
@@ -1809,7 +1809,7 @@ class JobApplicationAdminFormTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory()
         sender = job_application.sender
         sender_kind = job_application.sender_kind
-        sender_siae = job_application.sender_siae
+        sender_company = job_application.sender_company
 
         job_application.sender = None
         form = JobApplicationAdminForm(model_to_dict(job_application))
@@ -1823,11 +1823,11 @@ class JobApplicationAdminFormTest(TestCase):
         assert ["Emetteur du mauvais type."] == form.errors["__all__"]
         job_application.sender_kind = sender_kind
 
-        job_application.sender_siae = JobApplicationSentBySiaeFactory().sender_siae
+        job_application.sender_company = JobApplicationSentBySiaeFactory().sender_company
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
         assert ["SIAE émettrice inattendue."] == form.errors["__all__"]
-        job_application.sender_siae = sender_siae
+        job_application.sender_company = sender_company
 
         job_application.sender_prescriber_organization = (
             JobApplicationSentByPrescriberOrganizationFactory().sender_prescriber_organization
@@ -1842,14 +1842,14 @@ class JobApplicationAdminFormTest(TestCase):
 
     def test_applications_sent_by_siae(self):
         job_application = JobApplicationSentBySiaeFactory()
-        sender_siae = job_application.sender_siae
+        sender_company = job_application.sender_company
         sender = job_application.sender
 
-        job_application.sender_siae = None
+        job_application.sender_company = None
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
         assert ["SIAE émettrice manquante."] == form.errors["__all__"]
-        job_application.sender_siae = sender_siae
+        job_application.sender_company = sender_company
 
         job_application.sender = JobSeekerFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
@@ -1895,11 +1895,11 @@ class JobApplicationAdminFormTest(TestCase):
         assert ["Organisation du prescripteur émettrice manquante."] == form.errors["__all__"]
         job_application.sender_prescriber_organization = sender_prescriber_organization
 
-        job_application.sender_siae = JobApplicationSentBySiaeFactory().sender_siae
+        job_application.sender_company = JobApplicationSentBySiaeFactory().sender_company
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
         assert ["SIAE émettrice inattendue."] == form.errors["__all__"]
-        job_application.sender_siae = None
+        job_application.sender_company = None
 
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert form.is_valid()

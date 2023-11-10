@@ -90,7 +90,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
                     job_application.to_company = siae
                     job_application.sender = request.user
                     job_application.sender_kind = UserKind.EMPLOYER
-                    job_application.sender_siae = siae
+                    job_application.sender_company = siae
                     job_application.process(user=request.user)
                 job_application.accept(user=request.user)
 

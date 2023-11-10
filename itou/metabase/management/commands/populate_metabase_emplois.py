@@ -311,7 +311,7 @@ class Command(BaseCommand):
     def populate_job_applications(self):
         queryset = (
             JobApplication.objects.select_related(
-                "to_company", "sender", "sender_siae", "sender_prescriber_organization"
+                "to_company", "sender", "sender_company", "sender_prescriber_organization"
             )
             .prefetch_related("logs")
             .only(
@@ -320,7 +320,7 @@ class Command(BaseCommand):
                 "hiring_start_at",
                 "origin",
                 "sender_kind",
-                "sender_siae__kind",
+                "sender_company__kind",
                 "sender_prescriber_organization__kind",
                 "sender_prescriber_organization__name",
                 "sender_prescriber_organization__code_safir_pole_emploi",

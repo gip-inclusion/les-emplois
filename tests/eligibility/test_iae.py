@@ -395,7 +395,7 @@ class AdministrativeCriteriaModelTest(TestCase):
         job_application1 = JobApplicationFactory(
             with_approval=True,
             to_company=company,
-            sender_siae=company,
+            sender_company=company,
             eligibility_diagnosis=eligibility_diagnosis,
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )
@@ -403,7 +403,7 @@ class AdministrativeCriteriaModelTest(TestCase):
         job_application2 = JobApplicationFactory(
             with_approval=True,
             to_company=company,
-            sender_siae=company,
+            sender_company=company,
             hiring_start_at=timezone.now() - relativedelta(months=2),
         )
 

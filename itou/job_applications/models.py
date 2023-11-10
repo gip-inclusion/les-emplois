@@ -143,7 +143,7 @@ class JobApplicationQuerySet(models.QuerySet):
         if fk_field not in [
             "job_seeker",
             "sender",
-            "sender_siae",
+            "sender_company",
             "sender_prescriber_organization",
             "to_company",
         ]:
@@ -247,7 +247,7 @@ class JobApplicationQuerySet(models.QuerySet):
             "approval",
             "job_seeker",
             "sender",
-            "sender_siae",
+            "sender_company",
             "sender_prescriber_organization",
             "to_company__convention",
         ).prefetch_related(
@@ -501,7 +501,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
 
     # When the sender is an employer, keep a track of his current company.
-    sender_siae = models.ForeignKey(
+    sender_company = models.ForeignKey(
         "companies.Company", verbose_name="entreprise émettrice", null=True, blank=True, on_delete=models.CASCADE
     )
 

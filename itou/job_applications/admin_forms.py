@@ -13,7 +13,7 @@ class JobApplicationAdminForm(forms.ModelForm):
     def clean(self):
         sender = self.cleaned_data["sender"]
         sender_kind = self.cleaned_data["sender_kind"]
-        sender_siae = self.cleaned_data["sender_siae"]
+        sender_company = self.cleaned_data["sender_company"]
         sender_prescriber_organization = self.cleaned_data["sender_prescriber_organization"]
 
         if sender_kind == SenderKind.JOB_SEEKER:
@@ -23,7 +23,7 @@ class JobApplicationAdminForm(forms.ModelForm):
                 raise ValidationError("Emetteur du mauvais type.")
 
         if sender_kind == SenderKind.EMPLOYER:
-            if sender_siae is None:
+            if sender_company is None:
                 raise ValidationError("SIAE émettrice manquante.")
             if sender is None:
                 raise ValidationError("Emetteur SIAE manquant.")
@@ -32,7 +32,7 @@ class JobApplicationAdminForm(forms.ModelForm):
                 if not sender.is_employer:
                     raise ValidationError("Emetteur du mauvais type.")
 
-        elif sender_siae is not None:
+        elif sender_company is not None:
             raise ValidationError("SIAE émettrice inattendue.")
 
         if sender_kind == SenderKind.PRESCRIBER:

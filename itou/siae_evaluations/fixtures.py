@@ -120,7 +120,7 @@ def load_data():
                     hiring_start_at=datetime_within_period_range.date(),
                     created_at=datetime_within_period_range,
                     job_seeker=job_seeker,
-                    sender_siae=controlled_siae,
+                    sender_company=controlled_siae,
                     sender=employer,
                     sender_kind=users_enums.KIND_EMPLOYER,
                     state=JobApplicationWorkflow.STATE_ACCEPTED,

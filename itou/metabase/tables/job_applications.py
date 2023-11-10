@@ -35,7 +35,7 @@ def get_job_application_detailed_origin(ja):
     detailed_origin = get_job_application_origin(ja)
     # Add the relevant detailed origin depending on the origin.
     if ja.sender_kind == SenderKind.EMPLOYER:
-        detailed_origin += f" {ja.sender_siae.kind}"
+        detailed_origin += f" {ja.sender_company.kind}"
     if ja.sender_kind == SenderKind.PRESCRIBER:
         if ja.sender_prescriber_organization:
             detailed_origin += f" {ja.sender_prescriber_organization.kind}"

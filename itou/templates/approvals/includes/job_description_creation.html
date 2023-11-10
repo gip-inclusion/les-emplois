@@ -8,7 +8,7 @@
         {% elif job_application.sender_kind == SenderKind.JOB_SEEKER %}
             <i class="ri-user-line mr-2" aria-hidden="true"></i><strong>Le candidat lui-même</strong>
         {% elif job_application.sender_kind == SenderKind.EMPLOYER %}
-            <strong class="mr-2">{{ job_application.sender_siae.display_name }}</strong>
+            <strong class="mr-2">{{ job_application.sender_company.display_name }}</strong>
             {% if request.user.is_employer %}
                 {% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
                     <i class="ri-community-line me-2" aria-hidden="true"></i>Employeur (Import agrément Pôle emploi)
