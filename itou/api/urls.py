@@ -2,6 +2,7 @@ from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView
 from rest_framework import routers
 
+from itou.api.c4_api.views import C4CompanyView
 from itou.api.data_inclusion_api.views import DataInclusionStructureView
 from itou.api.geiq.views import GeiqJobApplicationListView
 
@@ -55,4 +56,5 @@ urlpatterns += router.urls
 urlpatterns += [
     path("structures/", DataInclusionStructureView.as_view(), name="structures-list"),
     path("candidats/", ApplicantsView.as_view(), name="applicants-list"),
+    path("marche/", C4CompanyView.as_view(), name="marche-company-list"),
 ]

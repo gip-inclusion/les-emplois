@@ -617,3 +617,5 @@ CSP_REPORT_URI = os.getenv("CSP_REPORT_URI", None)
 AIRFLOW_BASE_URL = os.getenv("AIRFLOW_BASE_URL")
 
 FORCE_IC_LOGIN = True
+
+C4_TOKEN = os.getenv("C4_TOKEN", None)
