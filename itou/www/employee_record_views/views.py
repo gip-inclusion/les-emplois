@@ -14,8 +14,8 @@ from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.users.enums import LackOfNIRReason
 from itou.utils.pagination import pager
+from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
-from itou.utils.perms.siae import get_current_siae_or_404
 from itou.www.employee_record_views.forms import (
     EmployeeRecordFilterForm,
     NewEmployeeRecordStep1Form,
@@ -59,7 +59,7 @@ STEPS = [
 @login_required
 @require_safe
 def list_employee_records(request, template_name="employee_record/list.html"):
-    siae = get_current_siae_or_404(request)
+    siae = get_current_company_or_404(request)
 
     if not siae.can_use_employee_record:
         raise PermissionDenied
@@ -375,7 +375,7 @@ def create_step_5(request, job_application_id, template_name="employee_record/cr
 
 @login_required
 def summary(request, employee_record_id, template_name="employee_record/summary.html"):
-    siae = get_current_siae_or_404(request)
+    siae = get_current_company_or_404(request)
 
     if not siae.can_use_employee_record:
         raise PermissionDenied
@@ -396,7 +396,7 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
 
 @login_required
 def disable(request, employee_record_id, template_name="employee_record/disable.html"):
-    siae = get_current_siae_or_404(request)
+    siae = get_current_company_or_404(request)
 
     if not siae.can_use_employee_record:
         raise PermissionDenied
@@ -427,7 +427,7 @@ def disable(request, employee_record_id, template_name="employee_record/disable.
 
 @login_required
 def reactivate(request, employee_record_id, template_name="employee_record/reactivate.html"):
-    siae = get_current_siae_or_404(request)
+    siae = get_current_company_or_404(request)
 
     if not siae.can_use_employee_record:
         raise PermissionDenied

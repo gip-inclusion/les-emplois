@@ -30,8 +30,8 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.pagination import ItouPaginator, pager
+from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
-from itou.utils.perms.siae import get_current_siae_or_404
 from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import UserExistsForm
@@ -60,7 +60,7 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         if request.user.is_authenticated:
-            self.siae = get_current_siae_or_404(request)
+            self.siae = get_current_company_or_404(request)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -99,7 +99,7 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
         context["can_view_personal_information"] = True  # SIAE members have access to personal info
         context["can_edit_personal_information"] = self.request.user.can_edit_personal_information(approval.user)
         context["approval_can_be_suspended_by_siae"] = approval.can_be_suspended_by_siae(self.siae)
-        context["hire_by_other_siae"] = not approval.user.last_hire_was_made_by_siae(self.siae)
+        context["hire_by_other_siae"] = not approval.user.last_hire_was_made_by_company(self.siae)
         context["approval_can_be_prolonged"] = approval.can_be_prolonged
         context["job_application"] = job_application
         context["matomo_custom_title"] = "Profil salarié"
@@ -227,7 +227,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
     Declare a prolongation for the given approval.
     """
 
-    siae = get_current_siae_or_404(request)
+    siae = get_current_company_or_404(request)
     approval = get_object_or_404(Approval, pk=approval_id)
 
     if not approval.can_be_prolonged:
@@ -316,7 +316,7 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
         super().setup(request, *args, **kwargs)
 
         if request.user.is_authenticated:
-            self.siae = get_current_siae_or_404(request)
+            self.siae = get_current_company_or_404(request)
             self.approval = get_object_or_404(Approval, pk=approval_id)
 
         if not self.approval.can_be_prolonged:
@@ -490,7 +490,7 @@ class ProlongationRequestDenyView(ProlongationRequestViewMixin, NamedUrlSessionW
 
 @login_required
 def suspend(request, approval_id, template_name="approvals/suspend.html"):
-    siae = get_current_siae_or_404(request)
+    siae = get_current_company_or_404(request)
     approval = get_object_or_404(Approval, pk=approval_id)
 
     if not approval.can_be_suspended_by_siae(siae):
@@ -529,7 +529,7 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
     Edit the given suspension.
     """
 
-    siae = get_current_siae_or_404(request)
+    siae = get_current_company_or_404(request)
     suspension = get_object_or_404(Suspension, pk=suspension_id)
 
     if not suspension.can_be_handled_by_siae(siae):
@@ -565,7 +565,7 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
     Delete the given suspension.
     """
 
-    siae = get_current_siae_or_404(request)
+    siae = get_current_company_or_404(request)
     suspension = get_object_or_404(Suspension, pk=suspension_id)
 
     if not suspension.can_be_handled_by_siae(siae):
@@ -600,7 +600,7 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
     approval = None
     form = PoleEmploiApprovalSearchForm(request.GET or None)
     number = None
-    siae = get_current_siae_or_404(request)
+    siae = get_current_company_or_404(request)
     back_url = reverse("approvals:pe_approval_search")
 
     if form.is_valid():
@@ -663,7 +663,7 @@ def pe_approval_create(request, pe_approval_id):
 
     Create a Approval and a JobApplication out of a (previously created) User and a PoleEmploiApproval.
     """
-    siae = get_current_siae_or_404(request)
+    siae = get_current_company_or_404(request)
     pe_approval = get_object_or_404(PoleEmploiApproval, pk=pe_approval_id)
 
     form = UserExistsForm(data=request.POST or None)

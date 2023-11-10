@@ -106,7 +106,7 @@ def get_first_membership_join_date(memberships):
     return None
 
 
-def get_hiring_siae(job_seeker):
+def get_hiring_company(job_seeker):
     """
     Ideally the job_seeker would have a unique hiring so that we can
     properly link the approval back to the siae. However we already
@@ -279,11 +279,11 @@ def get_ai_stock_job_seeker_pks():
 
 
 @functools.cache
-def get_active_siae_pks():
+def get_active_companies_pks():
     """
-    Load once and for all the list of all active siae pks in memory and reuse them multiple times in various
+    Load once and for all the list of all active company pks in memory and reuse them multiple times in various
     queries to avoid additional joins of the SiaeConvention model and the non trivial use of the
-    `Siae.objects.active()` queryset on a related model of a queryset on another model. This is a list of less
+    `Company.objects.active()` queryset on a related model of a queryset on another model. This is a list of less
     than 10k integers thus should not use much memory. The end result being both simpler code
     and better performance.
     """

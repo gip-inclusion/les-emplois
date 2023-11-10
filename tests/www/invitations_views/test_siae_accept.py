@@ -11,7 +11,7 @@ from django.utils.html import escape
 
 from itou.users.enums import KIND_EMPLOYER, UserKind
 from itou.users.models import User
-from itou.utils.perms.siae import get_current_siae_or_404
+from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.urls import add_url_params
 from tests.companies.factories import CompanyFactory
 from tests.invitations.factories import ExpiredEmployerInvitationFactory, SentEmployerInvitationFactory
@@ -44,7 +44,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         )
 
         # Assert the user sees his new siae dashboard
-        current_company = get_current_siae_or_404(response.wsgi_request)
+        current_company = get_current_company_or_404(response.wsgi_request)
         # A user can be member of one or more siae
         assert current_company in user.company_set.all()
 
@@ -312,7 +312,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         # /invitations/<uui>/join_siae then /welcoming_tour/index
         assert len(response.redirect_chain) == 2
 
-        current_company = get_current_siae_or_404(response.wsgi_request)
+        current_company = get_current_company_or_404(response.wsgi_request)
         assert company.pk == current_company.pk
         self.assert_accepted_invitation(response, invitation, user)
 

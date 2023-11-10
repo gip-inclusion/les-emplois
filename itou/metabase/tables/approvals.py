@@ -9,7 +9,7 @@ from itou.metabase.tables.utils import (
     MetabaseTable,
     get_column_from_field,
     get_department_and_region_columns,
-    get_hiring_siae,
+    get_hiring_company,
     hash_content,
 )
 from itou.prescribers.models import PrescriberOrganization
@@ -32,7 +32,7 @@ def get_code_safir_to_pe_org():
     }
 
 
-def get_siae_from_approval(approval):
+def get_company_from_approval(approval):
     if isinstance(approval, PoleEmploiApproval):
         return None
     assert isinstance(approval, Approval)
@@ -41,12 +41,12 @@ def get_siae_from_approval(approval):
         # but actually is a prescriber or an employer.
         # We ignore this error here and instead report it in the final `report_data_inconsistencies` method.
         return None
-    return get_hiring_siae(approval.user)
+    return get_hiring_company(approval.user)
 
 
-def get_siae_or_pe_org_from_approval(approval):
+def get_company_or_pe_org_from_approval(approval):
     if isinstance(approval, Approval):
-        return get_siae_from_approval(approval)
+        return get_company_from_approval(approval)
     assert isinstance(approval, PoleEmploiApproval)
     code_safir = approval.pe_structure_code
     pe_org = get_code_safir_to_pe_org().get(code_safir)
@@ -99,25 +99,25 @@ TABLE.add_columns(
             "name": "id_structure",
             "type": "integer",
             "comment": "ID structure qui a embauché si PASS IAE",
-            "fn": lambda o: getattr(get_siae_from_approval(o), "id", None),
+            "fn": lambda o: getattr(get_company_from_approval(o), "id", None),
         },
         {
             "name": "type_structure",
             "type": "varchar",
             "comment": "Type de la structure qui a embauché si PASS IAE",
-            "fn": lambda o: getattr(get_siae_from_approval(o), "kind", None),
+            "fn": lambda o: getattr(get_company_from_approval(o), "kind", None),
         },
         {
             "name": "siret_structure",
             "type": "varchar",
             "comment": "SIRET de la structure qui a embauché si PASS IAE",
-            "fn": lambda o: getattr(get_siae_from_approval(o), "siret", None),
+            "fn": lambda o: getattr(get_company_from_approval(o), "siret", None),
         },
         {
             "name": "nom_structure",
             "type": "varchar",
             "comment": "Nom de la structure qui a embauché si PASS IAE",
-            "fn": lambda o: getattr(get_siae_from_approval(o), "display_name", None),
+            "fn": lambda o: getattr(get_company_from_approval(o), "display_name", None),
         },
     ]
 )
@@ -128,7 +128,7 @@ TABLE.add_columns(
         comment_suffix=(
             " de la structure qui a embauché si PASS IAE ou du PE qui a délivré l agrément si Agrément PE"
         ),
-        custom_fn=get_siae_or_pe_org_from_approval,
+        custom_fn=get_company_or_pe_org_from_approval,
     )
 )
 

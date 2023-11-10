@@ -11,8 +11,8 @@ from itou.eligibility.models import SelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.pagination import pager
+from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
-from itou.utils.perms.siae import get_current_siae_or_404
 from itou.www.apply.forms import (
     FilterJobApplicationsForm,
     PrescriberFilterJobApplicationsForm,
@@ -169,10 +169,10 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     """
     List of applications for an SIAE.
     """
-    siae = get_current_siae_or_404(request)
-    job_applications = siae.job_applications_received
+    company = get_current_company_or_404(request)
+    job_applications = company.job_applications_received
 
-    filters_form = SiaeFilterJobApplicationsForm(job_applications, siae, request.GET or None)
+    filters_form = SiaeFilterJobApplicationsForm(job_applications, company, request.GET or None)
 
     # Add related data giving the criteria for adding the necessary annotations
     job_applications = job_applications.not_archived().with_list_related_data(
@@ -191,11 +191,11 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     # SIAE members have access to personal info
     _add_user_can_view_personal_information(job_applications_page, lambda ja: True)
 
-    if siae.kind in SIAE_WITH_CONVENTION_KINDS:
+    if company.kind in SIAE_WITH_CONVENTION_KINDS:
         _add_administrative_criteria(job_applications_page)
 
     context = {
-        "siae": siae,
+        "siae": company,
         "job_applications_page": job_applications_page,
         "filters_form": filters_form,
         "filters_counter": filters_counter,
@@ -210,15 +210,15 @@ def list_for_siae_exports(request, template_name="apply/list_of_available_export
     with the possibiliy to download those applications as a CSV file.
     """
 
-    siae = get_current_siae_or_404(request)
-    job_applications = siae.job_applications_received.not_archived()
+    company = get_current_company_or_404(request)
+    job_applications = company.job_applications_received.not_archived()
     total_job_applications = job_applications.count()
     job_applications_by_month = job_applications.with_monthly_counts()
 
     context = {
         "job_applications_by_month": job_applications_by_month,
         "total_job_applications": total_job_applications,
-        "siae": siae,
+        "siae": company,
         "export_for": "siae",
     }
     return render(request, template_name, context)
@@ -230,9 +230,9 @@ def list_for_siae_exports_download(request, month_identifier=None):
     List of applications for a SIAE for a given month identifier (YYYY-mm),
     exported as a CSV file with immediate download
     """
-    siae = get_current_siae_or_404(request)
-    job_applications = siae.job_applications_received.not_archived().with_list_related_data()
-    filename = f"candidatures-{slugify(siae.display_name)}"
+    company = get_current_company_or_404(request)
+    job_applications = company.job_applications_received.not_archived().with_list_related_data()
+    filename = f"candidatures-{slugify(company.display_name)}"
     if month_identifier:
         year, month = month_identifier.split("-")
         filename = f"{filename}-{month_identifier}"

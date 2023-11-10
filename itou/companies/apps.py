@@ -10,10 +10,10 @@ class CompaniesAppConfig(AppConfig):
 
     def ready(self):
         super().ready()
-        models.signals.post_migrate.connect(create_pole_emploi_siae, sender=self)
+        models.signals.post_migrate.connect(create_pole_emploi_company, sender=self)
 
 
-def create_pole_emploi_siae(*args, **kwargs):
+def create_pole_emploi_company(*args, **kwargs):
     from itou.companies.models import Company
 
     Company._base_manager.get_or_create(

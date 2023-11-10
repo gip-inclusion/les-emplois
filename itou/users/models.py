@@ -623,7 +623,7 @@ class User(AbstractUser, AddressMixin):
         time_since_date_joined = timezone.now() - self.date_joined
         return time_since_date_joined.days < 7
 
-    def active_or_in_grace_period_siae_memberships(self):
+    def active_or_in_grace_period_company_memberships(self):
         """
         Return the siae memberships accessible to the employer, which means either active
         or in grace period, with a minimum of database queries.
@@ -716,10 +716,10 @@ class User(AbstractUser, AddressMixin):
         # Assuming its the case can lead to issues downstream
         return self.job_applications.accepted().with_accepted_at().order_by("-accepted_at", "-hiring_start_at").first()
 
-    def last_hire_was_made_by_siae(self, siae):
+    def last_hire_was_made_by_company(self, company):
         if not self.is_job_seeker:
             return False
-        return self.last_accepted_job_application and self.last_accepted_job_application.to_company == siae
+        return self.last_accepted_job_application and self.last_accepted_job_application.to_company == company
 
     @classmethod
     def create_job_seeker_by_proxy(cls, proxy_user, **fields):

@@ -15,7 +15,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.pagination import pager
-from itou.utils.perms.siae import get_current_siae_or_404
+from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.companies_views import forms as siaes_forms
 
@@ -77,9 +77,9 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
 
 @login_required
 def job_description_list(request, template_name="siaes/job_description_list.html"):
-    siae = get_current_siae_or_404(request)
+    company = get_current_company_or_404(request)
     job_descriptions = (
-        JobDescription.objects.filter(company__pk=siae.pk)
+        JobDescription.objects.filter(company__pk=company.pk)
         .select_related("location", "company")
         .prefetch_related("appellation", "appellation__rome")
         .order_by_most_recent()
@@ -90,7 +90,7 @@ def job_description_list(request, template_name="siaes/job_description_list.html
     if request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY):
         del request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY]
 
-    form = siaes_forms.BlockJobApplicationsForm(instance=siae, data=request.POST or None)
+    form = siaes_forms.BlockJobApplicationsForm(instance=company, data=request.POST or None)
 
     if request.method == "POST":
         # note (fv): waiting for a proper htmx implementation, this will do meanwhile
@@ -98,7 +98,7 @@ def job_description_list(request, template_name="siaes/job_description_list.html
         match (request.POST.get("action")):
             case "delete":
                 # delete method via htmx would be nice
-                job_description = JobDescription.objects.filter(company_id=siae.pk, pk=job_description_id).first()
+                job_description = JobDescription.objects.filter(company_id=company.pk, pk=job_description_id).first()
                 if job_description is not None:
                     job_description.delete()
                     messages.success(request, "La fiche de poste a été supprimée.", extra_tags="toast")
@@ -106,7 +106,9 @@ def job_description_list(request, template_name="siaes/job_description_list.html
                     messages.warning(request, "La fiche de poste que vous souhaitez supprimer n'existe plus.")
             case "toggle_active":
                 is_active = bool(request.POST.get("job_description_is_active", False))
-                if job_description := JobDescription.objects.filter(company_id=siae.pk, pk=job_description_id).first():
+                if job_description := JobDescription.objects.filter(
+                    company_id=company.pk, pk=job_description_id
+                ).first():
                     job_description.is_active = is_active
                     job_description.save(update_fields=["is_active"])
                     if is_active:
@@ -124,8 +126,8 @@ def job_description_list(request, template_name="siaes/job_description_list.html
                 else:
                     messages.error(request, "La fiche de poste que vous souhaitiez modifier n'existe plus.")
             case "block_job_applications":
-                siae = form.save()
-                if siae.block_job_applications:
+                company = form.save()
+                if company.block_job_applications:
                     messages.warning(
                         request,
                         (
@@ -151,7 +153,7 @@ def job_description_list(request, template_name="siaes/job_description_list.html
     }
 
     context = {
-        "siae": siae,
+        "siae": company,
         "form": form,
         "job_pager": job_pager,
         "page": page,
@@ -175,12 +177,12 @@ def _get_job_description(session_data):
 
 @login_required
 def edit_job_description(request, template_name="siaes/edit_job_description.html"):
-    siae = get_current_siae_or_404(request)
+    company = get_current_company_or_404(request)
     session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY) or {}
     job_description = _get_job_description(session_data)
 
     form = siaes_forms.EditJobDescriptionForm(
-        siae, instance=job_description, data=request.POST or None, initial=session_data
+        company, instance=job_description, data=request.POST or None, initial=session_data
     )
 
     if request.method == "POST" and form.is_valid():
@@ -211,7 +213,7 @@ def edit_job_description(request, template_name="siaes/edit_job_description.html
 
 @login_required
 def edit_job_description_details(request, template_name="siaes/edit_job_description_details.html"):
-    siae = get_current_siae_or_404(request)
+    company = get_current_company_or_404(request)
     session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
 
     if not session_data:
@@ -228,7 +230,7 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
         ).rome.code
 
     form = siaes_forms.EditJobDescriptionDetailsForm(
-        siae, instance=job_description, data=request.POST or None, initial=session_data
+        company, instance=job_description, data=request.POST or None, initial=session_data
     )
 
     if request.method == "POST" and form.is_valid():
@@ -257,7 +259,7 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
     context = {
         "form": form,
         "rome": rome,
-        "is_opcs": siae.is_opcs,
+        "is_opcs": company.is_opcs,
         "breadcrumbs": breadcrumbs,
     }
 
@@ -266,7 +268,7 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
 
 @login_required
 def edit_job_description_preview(request, template_name="siaes/edit_job_description_preview.html"):
-    siae = get_current_siae_or_404(request)
+    company = get_current_company_or_404(request)
     session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
 
     if not session_data:
@@ -290,7 +292,7 @@ def edit_job_description_preview(request, template_name="siaes/edit_job_descript
     else:
         appellation = Appellation.objects.get(pk=session_data.get("appellation"))
     job_description.appellation = appellation
-    job_description.company = siae
+    job_description.company = company
 
     if request.method == "POST":
         try:
@@ -320,7 +322,7 @@ def edit_job_description_preview(request, template_name="siaes/edit_job_descript
         breadcrumbs["Créer une fiche de poste"] = reverse("companies_views:edit_job_description")
 
     context = {
-        "siae": siae,
+        "siae": company,
         "job": job_description,
         "breadcrumbs": breadcrumbs,
     }
@@ -343,7 +345,7 @@ def show_financial_annexes(request, template_name="siaes/show_financial_annexes.
     Show a summary of the financial annexes of the convention to the siae admin user. Financial annexes are grouped
     by suffix and only the most relevant one (active if any, or most recent if not) is shown for each suffix.
     """
-    current_siae = get_current_siae_or_404(request)
+    current_siae = get_current_company_or_404(request)
     if not current_siae.convention_can_be_accessed_by(request.user):
         raise PermissionDenied
 
@@ -386,7 +388,7 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
     """
     Let siae admin user select a new convention via a financial annex number.
     """
-    current_siae = get_current_siae_or_404(request)
+    current_siae = get_current_company_or_404(request)
     if not current_siae.convention_can_be_changed_by(request.user):
         raise PermissionDenied
 
@@ -449,7 +451,7 @@ def card(request, siae_id, template_name="siaes/card.html"):
 
 @login_required
 def create_siae(request, template_name="siaes/create_siae.html"):
-    current_siae = get_current_siae_or_404(request)
+    current_siae = get_current_company_or_404(request)
     if not request.user.can_create_siae_antenna(parent_siae=current_siae):
         raise PermissionDenied
 
@@ -477,23 +479,23 @@ def edit_siae_step_contact_infos(request, template_name="siaes/edit_siae.html"):
     if ITOU_SESSION_EDIT_SIAE_KEY not in request.session:
         request.session[ITOU_SESSION_EDIT_SIAE_KEY] = {}
 
-    siae = get_current_siae_or_404(request)
+    company = get_current_company_or_404(request)
     if not request.is_current_organization_admin:
         raise PermissionDenied
 
     # Force the "brand" initial data to match either brand, or a capitalized version of the base name.
     # This ensures the filed will be filled with a correct value as default.
-    siae.brand = siae.display_name
+    company.brand = company.display_name
 
     form = siaes_forms.EditSiaeForm(
-        instance=siae, data=request.POST or None, initial=request.session[ITOU_SESSION_EDIT_SIAE_KEY]
+        instance=company, data=request.POST or None, initial=request.session[ITOU_SESSION_EDIT_SIAE_KEY]
     )
     if request.method == "POST" and form.is_valid():
         request.session[ITOU_SESSION_EDIT_SIAE_KEY].update(form.cleaned_data)
         request.session.modified = True
         return HttpResponseRedirect(reverse("companies_views:edit_siae_step_description"))
 
-    context = {"form": form, "siae": siae}
+    context = {"form": form, "siae": company}
     return render(request, template_name, context)
 
 
@@ -502,12 +504,12 @@ def edit_siae_step_description(request, template_name="siaes/edit_siae_descripti
     if ITOU_SESSION_EDIT_SIAE_KEY not in request.session:
         return HttpResponseRedirect(reverse("companies_views:edit_siae_step_contact_infos"))
 
-    siae = get_current_siae_or_404(request)
+    company = get_current_company_or_404(request)
     if not request.is_current_organization_admin:
         raise PermissionDenied
 
     form = siaes_forms.EditSiaeDescriptionForm(
-        instance=siae, data=request.POST or None, initial=request.session[ITOU_SESSION_EDIT_SIAE_KEY]
+        instance=company, data=request.POST or None, initial=request.session[ITOU_SESSION_EDIT_SIAE_KEY]
     )
 
     if request.method == "POST" and form.is_valid():
@@ -515,7 +517,7 @@ def edit_siae_step_description(request, template_name="siaes/edit_siae_descripti
         request.session.modified = True
         return HttpResponseRedirect(reverse("companies_views:edit_siae_step_preview"))
 
-    context = {"form": form, "siae": siae, "prev_url": reverse("companies_views:edit_siae_step_contact_infos")}
+    context = {"form": form, "siae": company, "prev_url": reverse("companies_views:edit_siae_step_contact_infos")}
     return render(request, template_name, context)
 
 
@@ -524,7 +526,7 @@ def edit_siae_step_preview(request, template_name="siaes/edit_siae_preview.html"
     if ITOU_SESSION_EDIT_SIAE_KEY not in request.session:
         return HttpResponseRedirect(reverse("companies_views:edit_siae_step_contact_infos"))
 
-    siae = get_current_siae_or_404(request)
+    company = get_current_company_or_404(request)
     if not request.is_current_organization_admin:
         raise PermissionDenied
 
@@ -536,14 +538,14 @@ def edit_siae_step_preview(request, template_name="siaes/edit_siae_preview.html"
     #   on the underlying models)
     # - enables us to perform a single save() in the whole block instead of at least 2 (custom
     #   form) or 3 (existing forms)
-    siae.__dict__.update(**form_data)
+    company.__dict__.update(**form_data)
 
     if request.method == "POST":
-        siae.department = department_from_postcode(siae.post_code)
+        company.department = department_from_postcode(company.post_code)
 
         try:
-            siae.set_coords(siae.geocoding_address, post_code=siae.post_code)
-            siae.save()
+            company.set_coords(company.geocoding_address, post_code=company.post_code)
+            company.save()
             # Clear the session now, so that we start fresh if we edit again.
             del request.session[ITOU_SESSION_EDIT_SIAE_KEY]
             request.session.modified = True
@@ -558,7 +560,11 @@ def edit_siae_step_preview(request, template_name="siaes/edit_siae_preview.html"
                 ),
             )
 
-    context = {"siae": siae, "form_data": form_data, "prev_url": reverse("companies_views:edit_siae_step_description")}
+    context = {
+        "siae": company,
+        "form_data": form_data,
+        "prev_url": reverse("companies_views:edit_siae_step_description"),
+    }
     return render(request, template_name, context)
 
 
@@ -567,15 +573,15 @@ def edit_siae_step_preview(request, template_name="siaes/edit_siae_preview.html"
 
 @login_required
 def members(request, template_name="siaes/members.html"):
-    siae = get_current_siae_or_404(request)
-    if not siae.is_active:
+    company = get_current_company_or_404(request)
+    if not company.is_active:
         raise PermissionDenied
 
-    active_siae_members = siae.companymembership_set.active().select_related("user").all().order_by("joined_at")
-    pending_invitations = siae.invitations.pending()
+    active_siae_members = company.companymembership_set.active().select_related("user").all().order_by("joined_at")
+    pending_invitations = company.invitations.pending()
 
     context = {
-        "siae": siae,
+        "siae": company,
         "members": active_siae_members,
         "pending_invitations": pending_invitations,
     }
@@ -584,14 +590,14 @@ def members(request, template_name="siaes/members.html"):
 
 @login_required
 def deactivate_member(request, user_id, template_name="siaes/deactivate_member.html"):
-    siae = get_current_siae_or_404(request)
+    company = get_current_company_or_404(request)
     target_member = User.objects.get(pk=user_id)
 
     if deactivate_org_member(request=request, target_member=target_member):
         return HttpResponseRedirect(reverse("companies_views:members"))
 
     context = {
-        "structure": siae,
+        "structure": company,
         "target_member": target_member,
     }
 
@@ -600,7 +606,7 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
 
 @login_required
 def update_admin_role(request, action, user_id, template_name="siaes/update_admins.html"):
-    siae = get_current_siae_or_404(request)
+    company = get_current_company_or_404(request)
     target_member = User.objects.get(pk=user_id)
 
     if update_org_admin_role(request=request, target_member=target_member, action=action):
@@ -608,7 +614,7 @@ def update_admin_role(request, action, user_id, template_name="siaes/update_admi
 
     context = {
         "action": action,
-        "structure": siae,
+        "structure": company,
         "target_member": target_member,
     }
 
