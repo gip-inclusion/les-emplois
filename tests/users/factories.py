@@ -87,7 +87,7 @@ class EmployerFactory(UserFactory):
     identity_provider = IdentityProvider.INCLUSION_CONNECT
 
     @factory.post_generation
-    def with_siae(self, created, extracted, **kwargs):
+    def with_company(self, created, extracted, **kwargs):
         from tests.companies.factories import CompanyMembershipFactory
 
         if created and extracted is True:

@@ -930,7 +930,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         The user is still created and can try again.
         """
         org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.OTHER)
-        EmployerFactory(email=OIDC_USERINFO["email"], with_siae=True)
+        EmployerFactory(email=OIDC_USERINFO["email"], with_company=True)
 
         response = self.client.get(reverse("signup:prescriber_check_already_exists"))
         assert response.status_code == 200

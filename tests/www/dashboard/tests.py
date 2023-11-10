@@ -1807,7 +1807,7 @@ def test_prescriber_using_django_has_to_activate_ic_account(client):
 @respx.mock
 @override_inclusion_connect_settings
 def test_employer_using_django_has_to_activate_ic_account(client):
-    user = EmployerFactory(with_siae=True, identity_provider=IdentityProvider.DJANGO, email=OIDC_USERINFO["email"])
+    user = EmployerFactory(with_company=True, identity_provider=IdentityProvider.DJANGO, email=OIDC_USERINFO["email"])
     client.force_login(user)
     url = reverse("dashboard:index")
     response = client.get(url, follow=True)
@@ -1833,7 +1833,7 @@ def test_employer_using_django_has_to_activate_ic_account(client):
     "factory,expected",
     [
         pytest.param(JobSeekerFactory, assertNotContains, id="JobSeeker"),
-        pytest.param(partial(EmployerFactory, with_siae=True), assertNotContains, id="Employer"),
+        pytest.param(partial(EmployerFactory, with_company=True), assertNotContains, id="Employer"),
         pytest.param(partial(LaborInspectorFactory, membership=True), assertNotContains, id="LaborInspector"),
         pytest.param(PrescriberFactory, assertNotContains, id="PrescriberWithoutOrganization"),
         pytest.param(
@@ -1880,7 +1880,7 @@ def test_maze_survey(client, snapshot):
         response = client.get(reverse("dashboard:index"))
         assertNotContains(response, maze_link)
 
-    employer = EmployerFactory(with_siae=True)
+    employer = EmployerFactory(with_company=True)
     client.force_login(employer)
     client.session.clear()
     response = client.get(reverse("dashboard:index"))

@@ -205,7 +205,7 @@ def test_app_model_change_url(admin_client):
 
 
 def test_free_ic_email(admin_client):
-    employer = EmployerFactory(with_siae=True, username="ic_uuid_username", email="ic_user@email.com")
+    employer = EmployerFactory(with_company=True, username="ic_uuid_username", email="ic_user@email.com")
     prescriber = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
 
     # only:one user at a time

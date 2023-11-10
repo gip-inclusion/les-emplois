@@ -225,7 +225,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         )
 
     def test_join_invalid_siae_id(self):
-        user = EmployerFactory(with_siae=True)
+        user = EmployerFactory(with_company=True)
         self.client.force_login(user)
         company = CompanyFactory(kind=CompanyKind.ETTI)
         response = self.client.get(

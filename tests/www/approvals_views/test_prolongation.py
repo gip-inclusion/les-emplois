@@ -35,9 +35,9 @@ class ApprovalProlongationTest(TestCase):
         self.prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
         self.prescriber = self.prescriber_organization.members.first()
 
-        self._setup_with_siae_kind(CompanyKind.EI)
+        self._setup_with_company_kind(CompanyKind.EI)
 
-    def _setup_with_siae_kind(self, siae_kind: CompanyKind):
+    def _setup_with_company_kind(self, siae_kind: CompanyKind):
         today = timezone.localdate()
         self.job_application = JobApplicationFactory(
             with_approval=True,
@@ -318,7 +318,7 @@ class ApprovalProlongationTest(TestCase):
         # Check that report file object is saved and linked to prolongation
         # Bad reason types are checked by UI (JS) and ultimately by DB constraints
 
-        self._setup_with_siae_kind(CompanyKind.AI)
+        self._setup_with_company_kind(CompanyKind.AI)
         self.client.force_login(self.employer)
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         response = self.client.get(url)

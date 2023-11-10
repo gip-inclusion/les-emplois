@@ -125,8 +125,8 @@ class UserHijackPermTestCase(TestCase):
         (JobSeekerFactory, IdentityProvider.FRANCE_CONNECT, False),
         (PrescriberFactory, IdentityProvider.DJANGO, True),
         (PrescriberFactory, IdentityProvider.INCLUSION_CONNECT, False),
-        (partial(EmployerFactory, with_siae=True), IdentityProvider.DJANGO, True),
-        (partial(EmployerFactory, with_siae=True), IdentityProvider.INCLUSION_CONNECT, False),
+        (partial(EmployerFactory, with_company=True), IdentityProvider.DJANGO, True),
+        (partial(EmployerFactory, with_company=True), IdentityProvider.INCLUSION_CONNECT, False),
         (LaborInspectorFactory, IdentityProvider.DJANGO, False),
     ],
 )
