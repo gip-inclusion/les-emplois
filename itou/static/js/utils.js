@@ -5,8 +5,9 @@ htmx.onLoad((target) => {
 
   /**
    * Force select2 initialization after htmx swaps
+   * select2-hidden-accessible detection skips already initialized widgets like in the case of document.ready
    */
-  $('.django-select2', target).djangoSelect2()
+  $('.django-select2:not(.select2-hidden-accessible)', target).djangoSelect2()
 
   /**
    * JS to swap elements based on CSS selectors
