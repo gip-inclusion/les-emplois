@@ -20,7 +20,7 @@ def edit_contract_start_date(request, job_application_id, template_name="apply/e
 
     This view is kept apart from process or submit views
     """
-    queryset = JobApplication.objects.siae_member_required(request.user)
+    queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
 
     if not job_application.state.is_accepted:
