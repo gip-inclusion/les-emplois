@@ -16,7 +16,7 @@ class EmployeeRecordEligibilityTest(TestCase):
     Tests for `eligible_as_employee_record` queryset method.
     This method has been refactored to stick closely to clearly defined business and technical rules.
     Hence a new suite of tests.
-    TODO: to be completed soon with upcoming changes to be made in the `move_siae_data` process.
+    TODO: to be completed soon with upcoming changes to be made in the `move_company_data` process.
     """
 
     def test_target_company(self):

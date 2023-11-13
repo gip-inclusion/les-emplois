@@ -150,7 +150,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
     def orphans(self):
         """
         Employee records with an `asp_id` different from their hiring SIAE.
-        Could occur when using `siae.move_siae_data` management command.
+        Could occur when using `siae.move_company_data` management command.
         """
         return self.exclude(job_application__to_company__convention__asp_id=F("asp_id"))
 
