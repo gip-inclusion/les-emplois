@@ -17,5 +17,7 @@ urlpatterns = [
         views.join_prescriber_organization,
         name="join_prescriber_organization",
     ),
-    path("<uuid:invitation_id>/join_siae", views.join_siae, name="join_siae"),
+    path("<uuid:invitation_id>/join-company", views.join_company, name="join_company"),
+    # FIXME Keep for backward compatibility, remove in january
+    path("<uuid:invitation_id>/join_siae", views.join_company, name="join_siae"),
 ]

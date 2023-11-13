@@ -340,7 +340,7 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         )
         self.client.force_login(user)
         response = self.client.get(invitation.acceptance_link, follow=True)
-        # /invitations/<uui>/join_siae then /welcoming_tour/index
+        # /invitations/<uui>/join_company then /welcoming_tour/index
         assert len(response.redirect_chain) == 2
         self.assert_invitation_is_accepted(response, user, invitation, new_user=False)
 

@@ -239,13 +239,13 @@ class EmployerInvitation(InvitationAbstract):
 
     @property
     def acceptance_url_for_existing_user(self):
-        return reverse("invitations_views:join_siae", kwargs={"invitation_id": self.pk})
+        return reverse("invitations_views:join_company", kwargs={"invitation_id": self.pk})
 
     def add_invited_user_to_company(self):
         user = User.objects.get(email=self.email)
         self.company.members.add(user)
         user.save()
-        # We must be able to invite a former member of this SIAE
+        # We must be able to invite a former member of this company
         # however `members.add()` does not update membership status if it already exists
         if user not in self.company.active_members:
             membership = user.companymembership_set.get(is_active=False, company=self.company)
