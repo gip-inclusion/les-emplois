@@ -1,13 +1,11 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
 
-{% block title %}Annuler la suspension de PASS IAE {{ block.super }}{% endblock %}
+{% block title %}Supprimer la suspension du PASS IAE {{ block.super }}{% endblock %}
 
 {% block content_title %}
     <h1>
-        Annuler la suspension de PASS IAE
-        <br>
-        <span class="text-muted">{{ suspension.approval.user.get_full_name }}</span>
+        Supprimer la suspension du PASS IAE de <span class="text-muted">{{ suspension.approval.user.get_full_name }}</span>
     </h1>
 {% endblock %}
 
@@ -16,33 +14,59 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    <div class="card my-3 text-center">
-                        <div class="card-body">
-                            <h5 class="h4 card-title">Vous êtes sur le point d'annuler la suspension</h5>
-                            <p class="card-text">{{ suspension.get_reason_display }}</p>
-                            <p class="card-text">
-                                À partir du
-                                <span class="badge rounded-pill bg-dark">{{ suspension.start_at|date:"d/m/Y" }}</span>
-                                jusqu'au
-                                <span class="badge rounded-pill bg-dark">{{ suspension.end_at|date:"d/m/Y" }}</span>
-                            </p>
-                        </div>
+                    <div class="c-stepper mb-3 mb-lg-5">
+                        {% include 'approvals/includes/progress_bar.html' with ratio=80 only %}
+                        <p>
+                            <strong>Étape 2/2</strong> : Confirmation
+                        </p>
                     </div>
-
-                    <form method="post" class="js-prevent-multiple-submit">
-
-                        {% csrf_token %}
-
-                        <input type="hidden" name="confirm" value="true">
-
-                        <div class="form-group">
-                            <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
-                            {% bootstrap_button "Confirmer l'annulation de la suspension" button_type="submit" button_class="btn btn-danger" %}
-                        </div>
-
-                    </form>
                 </div>
             </div>
         </div>
     </section>
+
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="card c-card">
+                        <div class="card-body">
+                            <p class="card-text">
+                                <strong>Action choisie</strong> : Confirmer la <strong class="text-danger">suppression définitive</strong> de cette suspension.
+                            </p>
+                            <div class="alert alert-danger fade show" role="status">
+                                <div class="row">
+                                    <div class="col-auto pe-0">
+                                        <i class="ri-information-line ri-xl text-danger"></i>
+                                    </div>
+                                    <div class="col">
+                                        <p class="mb-0">
+                                            Attention : la suppression définitive de cette suspension aura pour conséquence de :
+                                            <ul>
+                                                <li>
+                                                    <strong>Réduire la durée restante de ce PASS IAE de {{ lost_days }} jour{{ lost_days|pluralizefr }}.</strong>
+                                                </li>
+                                            </ul>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="text-end">
+                                <form method="post" class="js-prevent-multiple-submit">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="confirm" value="true">
+                                    <div class="form-group">
+                                        <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
+                                        {% bootstrap_button "Confirmer la suppression" button_type="submit" button_class="btn btn-primary" %}
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
 {% endblock %}
