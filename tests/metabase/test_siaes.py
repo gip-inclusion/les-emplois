@@ -1,6 +1,6 @@
 import pytest
 
-from itou.metabase.tables.siaes import TABLE
+from itou.metabase.tables.companies import TABLE
 from tests.cities.factories import create_city_vannes
 from tests.companies.factories import CompanyFactory
 
