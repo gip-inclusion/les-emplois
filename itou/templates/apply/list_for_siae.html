@@ -104,7 +104,7 @@
                                             </span>
                                         {% endif %}
                                         <a class="btn btn-sm btn-outline-primary bg-white"
-                                           href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
+                                           href="{% url 'apply:details_for_company' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
                                            aria-label="Gérer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}"
                                            data-matomo-category="candidature"
                                            data-matomo-action="clic"

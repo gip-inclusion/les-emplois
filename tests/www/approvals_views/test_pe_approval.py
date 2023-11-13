@@ -92,7 +92,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         response = self.client.get(self.url, {"number": self.approval.number})
         assert response.status_code == 302
 
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": self.job_application.id})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.id})
         assert response.url == next_url
 
     def test_has_no_last_accepted_job_application(self):
@@ -222,7 +222,7 @@ class PoleEmploiApprovalCreateTest(TestCase):
         assert response.status_code == 302
         assert new_user.last_accepted_job_application is not None
         next_url = reverse(
-            "apply:details_for_siae", kwargs={"job_application_id": new_user.last_accepted_job_application.id}
+            "apply:details_for_company", kwargs={"job_application_id": new_user.last_accepted_job_application.id}
         )
         assert response.url == next_url
         assert Approval.objects.count() == initial_approval_count + 1

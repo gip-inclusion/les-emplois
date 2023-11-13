@@ -236,7 +236,7 @@ urlpatterns = [
         process_views.details_for_prescriber,
         name="details_for_prescriber",
     ),
-    path("<uuid:job_application_id>/siae/details", process_views.details_for_siae, name="details_for_siae"),
+    path("<uuid:job_application_id>/siae/details", process_views.details_for_company, name="details_for_company"),
     path("<uuid:job_application_id>/siae/process", process_views.process, name="process"),
     path("<uuid:job_application_id>/siae/eligibility", process_views.eligibility, name="eligibility"),
     path("<uuid:job_application_id>/siae/geiq_eligibility", process_views.geiq_eligibility, name="geiq_eligibility"),

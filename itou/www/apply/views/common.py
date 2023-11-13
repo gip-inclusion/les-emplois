@@ -168,7 +168,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
         if creating and siae.is_subject_to_eligibility_rules and job_application.approval:
             final_url = reverse("approvals:detail", kwargs={"pk": job_application.approval.pk})
         else:
-            final_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+            final_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
 
         return HttpResponseClientRedirect(final_url)
 

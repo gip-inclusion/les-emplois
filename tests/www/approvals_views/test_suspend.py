@@ -74,7 +74,7 @@ class ApprovalSuspendViewTest(TestCase):
         assert suspension.created_by == employer
 
         # Ensure suspension reason is not displayed in details page
-        detail_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        detail_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(detail_url)
         self.assertNotContains(response, suspension.get_reason_display())
 

@@ -4,7 +4,7 @@
         {% include "eligibility/includes/form.html" %}
 
     Or with a `cancel_url` param:
-        {% url 'apply:details_for_siae' job_application_id=job_application.id as cancel_url %}
+        {% url 'apply:details_for_company' job_application_id=job_application.id as cancel_url %}
         {% include "eligibility/includes/form.html" with cancel_url=cancel_url %}
 
 {% endcomment %}

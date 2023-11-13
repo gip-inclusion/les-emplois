@@ -961,7 +961,7 @@ class EditJobSeekerInfo(TestCase):
 
         self.client.force_login(user)
 
-        back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+        back_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
         url = f"{url}?back_url={back_url}&from_application={job_application.pk}"
 
@@ -1025,7 +1025,7 @@ class EditJobSeekerInfo(TestCase):
 
         self.client.force_login(user)
 
-        back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+        back_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
         url = f"{url}?back_url={back_url}"
 
@@ -1070,7 +1070,7 @@ class EditJobSeekerInfo(TestCase):
 
         self.client.force_login(user)
 
-        back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+        back_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
         url = f"{url}?back_url={back_url}"
 
@@ -1214,7 +1214,7 @@ class EditJobSeekerInfo(TestCase):
 
         self.client.force_login(user)
 
-        back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+        back_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
         url = f"{url}?back_url={back_url}"
 
@@ -1264,7 +1264,7 @@ class EditJobSeekerInfo(TestCase):
         # Now the SIAE wants to edit the jobseeker email. The field is not available, and it cannot be bypassed
         self.client.force_login(user)
 
-        back_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+        back_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
         url = f"{url}?back_url={back_url}"
 
