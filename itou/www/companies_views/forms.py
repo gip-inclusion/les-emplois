@@ -276,9 +276,9 @@ class JobAppellationAndLocationMixin(forms.Form):
         }
 
 
-# SIAE job descriptions forms (2 steps and session based)
+# Job descriptions forms (2 steps and session based)
 class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
-    def __init__(self, current_siae: Company, *args, **kwargs):
+    def __init__(self, current_company: Company, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.fields["appellation"].required = True
@@ -296,13 +296,13 @@ class EditJobDescriptionForm(JobAppellationAndLocationMixin, forms.ModelForm):
         self.fields["contract_type"].required = True
         self.fields["open_positions"].required = True
 
-        if current_siae.is_opcs:
+        if current_company.is_opcs:
             self.fields["market_context_description"].required = True
         else:
             del self.fields["market_context_description"]
 
         self.fields["contract_type"].choices = BLANK_CHOICE_DASH + ContractType.choices_for_company(
-            company=current_siae
+            company=current_company
         )
 
     class Meta:
@@ -351,12 +351,11 @@ class EditJobDescriptionDetailsForm(forms.ModelForm):
             "bénéficier en priorité aux publics résidant en Quartier Prioritaire de la Ville.",
         }
 
-    def __init__(self, current_siae: Company, *args, **kwargs):
+    def __init__(self, current_company: Company, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         placeholder = "Soyez le plus concret possible"
         self.fields["description"].widget.attrs.update({"placeholder": placeholder})
         self.fields["profile_description"].widget.attrs.update({"placeholder": placeholder})
 
-        if not current_siae.is_opcs:
+        if not current_company.is_opcs:
             del self.fields["is_qpv_mandatory"]
