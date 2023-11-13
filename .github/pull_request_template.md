@@ -1,7 +1,5 @@
 **Carte Notion : **
 
-<!-- Pensez à mettre le label "no-changelog" si nécessaire. -->
-
 ### Pourquoi ?
 
 Indiquer le problème que nous sommes en train de résoudre et les objectifs métiers ou techniques qui sont visés par ces changements.
@@ -12,3 +10,7 @@ Attirer l'attention sur les décisions d'architecture ou de conception important
 
 ### Captures d'écran <!-- optionnel -->
 
+### Actions facultatives
+
+- [ ] Ajouter l'étiquette « no-changelog » ?
+- [ ] Mettre à jour le CHANGELOG_breaking_changes.md ?
