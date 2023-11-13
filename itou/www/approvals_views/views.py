@@ -593,7 +593,11 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
 
     if request.method == "POST" and request.POST.get("confirm") == "true":
         suspension.delete()
-        messages.success(request, "Annulation de suspension effectuée.")
+        messages.success(
+            request,
+            f"La suspension de {suspension.approval.user.get_full_name()} a bien été supprimée.",
+            extra_tags="toast",
+        )
         return HttpResponseRedirect(back_url)
 
     context = {
