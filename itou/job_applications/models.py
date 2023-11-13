@@ -117,7 +117,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
 
 
 class JobApplicationQuerySet(models.QuerySet):
-    def siae_member_required(self, user):
+    def is_active_company_member(self, user):
         return self.filter(to_company__members=user, to_company__members__is_active=True)
 
     def pending(self):

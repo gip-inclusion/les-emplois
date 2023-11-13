@@ -94,7 +94,7 @@ def details_for_siae(request, job_application_id, template_name="apply/process_d
     - to give an answer.
     """
     queryset = (
-        JobApplication.objects.siae_member_required(request.user)
+        JobApplication.objects.is_active_company_member(request.user)
         .not_archived()
         .select_related(
             "job_seeker",
@@ -199,7 +199,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
 @login_required
 @require_POST
 def process(request, job_application_id):
-    queryset = JobApplication.objects.siae_member_required(request.user)
+    queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
 
     try:
@@ -214,7 +214,7 @@ def process(request, job_application_id):
 
 @login_required
 def refuse(request, job_application_id, template_name="apply/process_refuse.html"):
-    queryset = JobApplication.objects.siae_member_required(request.user)
+    queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
 
     form = RefusalForm(job_application=job_application, data=request.POST or None)
@@ -243,7 +243,7 @@ def refuse(request, job_application_id, template_name="apply/process_refuse.html
 
 @login_required
 def postpone(request, job_application_id, template_name="apply/process_postpone.html"):
-    queryset = JobApplication.objects.siae_member_required(request.user)
+    queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
     check_waiting_period(job_application)
 
@@ -275,7 +275,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     """
     Trigger the `accept` transition.
     """
-    queryset = JobApplication.objects.siae_member_required(request.user)
+    queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
     check_waiting_period(job_application)
     next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
@@ -306,7 +306,7 @@ class AcceptHTMXFragmentView(TemplateView):
             job_application = None
         elif job_application_id:
             # TODO(xfernandez): remove this version in a week
-            queryset = JobApplication.objects.siae_member_required(request.user)
+            queryset = JobApplication.objects.is_active_company_member(request.user)
             job_application = get_object_or_404(queryset, id=job_application_id)
             siae = job_application.to_company
         self.form_accept = AcceptForm(instance=job_application, siae=siae, data=request.POST or None)
@@ -346,7 +346,7 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
     """
     Trigger the `cancel` transition.
     """
-    queryset = JobApplication.objects.siae_member_required(request.user).select_related("to_company")
+    queryset = JobApplication.objects.is_active_company_member(request.user).select_related("to_company")
     job_application = get_object_or_404(queryset, id=job_application_id)
     check_waiting_period(job_application)
     next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
@@ -379,7 +379,7 @@ def archive(request, job_application_id):
     Archive the job_application for an SIAE (ie. sets the hidden_for_company flag to True)
     then redirects to the list of job_applications
     """
-    queryset = JobApplication.objects.siae_member_required(request.user)
+    queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
 
     cancelled_states = [
@@ -414,7 +414,7 @@ def archive(request, job_application_id):
 
 @login_required
 def transfer(request, job_application_id):
-    queryset = JobApplication.objects.siae_member_required(request.user)
+    queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, pk=job_application_id)
     target_siae = get_object_or_404(Company.objects, pk=request.POST.get("target_siae_id"))
     back_url = request.POST.get("back_url", reverse("apply:list_for_siae"))
@@ -446,7 +446,7 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
     Check eligibility (as an SIAE).
     """
 
-    queryset = JobApplication.objects.siae_member_required(request.user)
+    queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(
         queryset,
         id=job_application_id,
@@ -465,7 +465,7 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
 
 @login_required
 def geiq_eligibility(request, job_application_id, template_name="apply/process_geiq_eligibility.html"):
-    queryset = JobApplication.objects.siae_member_required(request.user)
+    queryset = JobApplication.objects.is_active_company_member(request.user)
     # Check GEIQ eligibility during job application process
     job_application = get_object_or_404(queryset, pk=job_application_id)
     back_url = request.GET.get("back_url") or reverse(
@@ -494,14 +494,14 @@ def geiq_eligibility_criteria(
 ):
     """Dynamic GEIQ eligibility criteria form (HTMX)"""
 
-    queryset = JobApplication.objects.siae_member_required(request.user)
+    queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, pk=job_application_id)
     return common_views._geiq_eligibility_criteria(request, job_application.to_company, job_application.job_seeker)
 
 
 @require_POST
 def delete_prior_action(request, job_application_id, prior_action_id):
-    queryset = JobApplication.objects.siae_member_required(request.user)
+    queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(
         queryset,
         id=job_application_id,
@@ -541,7 +541,7 @@ def delete_prior_action(request, job_application_id, prior_action_id):
 
 @login_required
 def add_or_modify_prior_action(request, job_application_id, prior_action_id=None):
-    queryset = JobApplication.objects.siae_member_required(request.user)
+    queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(
         queryset,
         id=job_application_id,
