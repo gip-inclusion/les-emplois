@@ -3,6 +3,6 @@
 
 Candidature transférée
 
-L’employeur de la structure {{ origin_siae.display_name }} a transféré votre candidature à la structure {{ target_company.display_name }}.
+L’employeur de la structure {{ origin_company.display_name }} a transféré votre candidature à la structure {{ target_company.display_name }}.
 
 {% endblock body %}

@@ -887,7 +887,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         # Always send an email to job seeker and origin SIAE
         emails = [
-            self.get_email_transfer_origin_siae(transferred_by, self.transferred_from, target_company),
+            self.get_email_transfer_origin_company(transferred_by, self.transferred_from, target_company),
             self.get_email_transfer_job_seeker(transferred_by, self.transferred_from, target_company),
         ]
 
@@ -1124,36 +1124,36 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         body = "approvals/email/refuse_manually_body.txt"
         return get_email_message(to, context, subject, body)
 
-    def _get_transfer_email(self, to, subject, body, transferred_by, origin_siae, target_company):
+    def _get_transfer_email(self, to, subject, body, transferred_by, origin_company, target_company):
         context = {
             "job_application": self,
             "transferred_by": transferred_by,
-            "origin_siae": origin_siae,
+            "origin_company": origin_company,
             "target_company": target_company,
         }
         return get_email_message(to, context, subject, body)
 
-    def get_email_transfer_origin_siae(self, transferred_by, origin_siae, target_company):
-        # Send email to every active member of the origin SIAE
-        to = list(origin_siae.active_members.values_list("email", flat=True))
-        subject = "apply/email/transfer_origin_siae_subject.txt"
-        body = "apply/email/transfer_origin_siae_body.txt"
+    def get_email_transfer_origin_company(self, transferred_by, origin_company, target_company):
+        # Send email to every active member of the origin company
+        to = list(origin_company.active_members.values_list("email", flat=True))
+        subject = "apply/email/transfer_origin_company_subject.txt"
+        body = "apply/email/transfer_origin_company_body.txt"
 
-        return self._get_transfer_email(to, subject, body, transferred_by, origin_siae, target_company)
+        return self._get_transfer_email(to, subject, body, transferred_by, origin_company, target_company)
 
-    def get_email_transfer_job_seeker(self, transferred_by, origin_siae, target_company):
+    def get_email_transfer_job_seeker(self, transferred_by, origin_company, target_company):
         to = [self.job_seeker.email]
         subject = "apply/email/transfer_job_seeker_subject.txt"
         body = "apply/email/transfer_job_seeker_body.txt"
 
-        return self._get_transfer_email(to, subject, body, transferred_by, origin_siae, target_company)
+        return self._get_transfer_email(to, subject, body, transferred_by, origin_company, target_company)
 
-    def get_email_transfer_prescriber(self, transferred_by, origin_siae, target_company):
+    def get_email_transfer_prescriber(self, transferred_by, origin_company, target_company):
         to = [self.sender.email]
         subject = "apply/email/transfer_prescriber_subject.txt"
         body = "apply/email/transfer_prescriber_body.txt"
 
-        return self._get_transfer_email(to, subject, body, transferred_by, origin_siae, target_company)
+        return self._get_transfer_email(to, subject, body, transferred_by, origin_company, target_company)
 
     def manually_deliver_approval(self, delivered_by):
         self.approval_number_sent_by_email = True
