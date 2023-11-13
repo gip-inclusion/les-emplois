@@ -10,8 +10,8 @@ from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFac
 from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
+    JobApplicationSentByCompanyFactory,
     JobApplicationSentByPrescriberFactory,
-    JobApplicationSentBySiaeFactory,
 )
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
@@ -106,7 +106,7 @@ class JobApplicationTransferModelTest(TestCase):
         assert job_application.eligibility_diagnosis is not None
 
         # Eligibilty diagnosis not sent by authorized prescriber must be deleted
-        job_application = JobApplicationSentBySiaeFactory(
+        job_application = JobApplicationSentByCompanyFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             to_company=origin_company,
             eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
@@ -151,7 +151,7 @@ class JobApplicationTransferModelTest(TestCase):
         target_user = target_company.members.first()
         target_company.members.add(origin_user)
 
-        job_application = JobApplicationSentBySiaeFactory(
+        job_application = JobApplicationSentByCompanyFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             to_company=origin_company,
             eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
@@ -193,7 +193,7 @@ class JobApplicationTransferModelTest(TestCase):
         # `source` contains possible entry points of transition
         for from_state in JobApplicationWorkflow.transitions["transfer"].source:
             with self.subTest(from_state):
-                job_application = JobApplicationSentBySiaeFactory(state=from_state)
+                job_application = JobApplicationSentByCompanyFactory(state=from_state)
                 job_application.state = JobApplicationWorkflow.STATE_NEW
                 job_application.save()  # Triggers transition check
 
@@ -208,7 +208,7 @@ class JobApplicationTransferModelTest(TestCase):
         origin_user = origin_company.members.first()
         target_company.members.add(origin_user)
 
-        job_application = JobApplicationSentBySiaeFactory(
+        job_application = JobApplicationSentByCompanyFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             to_company=origin_company,
             eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
@@ -268,7 +268,7 @@ class JobApplicationTransferModelTest(TestCase):
         origin_user_2 = origin_company.members.all()[1]
         target_company.members.add(origin_user_1)
 
-        job_application = JobApplicationSentBySiaeFactory(
+        job_application = JobApplicationSentByCompanyFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             to_company=origin_company,
             eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
