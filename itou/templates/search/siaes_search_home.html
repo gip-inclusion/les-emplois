@@ -8,7 +8,7 @@
 
 {% block content %}
 
-    {% include "search/includes/generic_search_home.html" with form=siae_search_form title="Rechercher un emploi inclusif" url_search="search:siaes_results" template_form_name="search/includes/siaes_search_form.html" %}
+    {% include "search/includes/generic_search_home.html" with form=siae_search_form title="Rechercher un emploi inclusif" url_search="search:employers_results" template_form_name="search/includes/siaes_search_form.html" %}
 
     {% if not user.is_authenticated %}
         <section class="bg-white text-center pt-5 pb-6">

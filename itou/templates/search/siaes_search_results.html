@@ -26,11 +26,11 @@
                         {% endif %}
                         <ul class="s-tabs-01__nav nav nav-tabs mt-3 mt-md-5">
                             <li class="nav-item" role="presentation">
-                                <a class="matomo-event nav-link {% if request.resolver_match.view_name == "search:siaes_results" %}active{% endif %}"
+                                <a class="matomo-event nav-link {% if request.resolver_match.view_name == "search:employers_results" %}active{% endif %}"
                                    data-matomo-category="candidature"
                                    data-matomo-action="clic"
                                    data-matomo-option="clic-onglet-employeur"
-                                   href="{% url "search:siaes_results" %}?{{ filters_query_string }}">
+                                   href="{% url "search:employers_results" %}?{{ filters_query_string }}">
                                     <i class="ri-hotel-line ri-xl font-weight-normal me-1"></i>
                                     <span>
                                         Employeur{{ siaes_count|pluralizefr }} <span class="badge badge-sm rounded-pill bg-info-lighter text-info">{{ siaes_count }}</span>
@@ -66,7 +66,7 @@
                                     <div class="col-12 col-md-8">
                                         <div class="mb-3 mb-md-4">
                                             <h3 class="h4 mb-0">
-                                                {% if request.resolver_match.view_name == "search:siaes_results" %}
+                                                {% if request.resolver_match.view_name == "search:employers_results" %}
                                                     {{ siaes_count }} résultat{{ siaes_count|pluralizefr }}
                                                 {% else %}
                                                     {{ job_descriptions_count }} résultat{{ job_descriptions_count|pluralizefr }}
@@ -74,7 +74,7 @@
                                             </h3>
                                         </div>
                                         {% for item in results_page %}
-                                            {% if request.resolver_match.view_name == "search:siaes_results" %}
+                                            {% if request.resolver_match.view_name == "search:employers_results" %}
                                                 {% include "companies/includes/_card_siae.html" with siae=item %}
                                             {% else %}
                                                 {% include "companies/includes/_card_jobdescription.html" with job_description=item %}

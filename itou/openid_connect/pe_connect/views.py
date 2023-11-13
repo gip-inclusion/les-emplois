@@ -121,7 +121,7 @@ def pe_connect_callback(request):
         if "email" in e.args:
             return HttpResponseRedirect(reverse("pe_connect:no_email"))
         messages.error(request, "Une erreur technique est survenue, impossible de vous connecter avec Pôle Emploi.")
-        return HttpResponseRedirect("search:siaes_home")
+        return HttpResponseRedirect("search:employers_home")
 
     try:
         # At this step, we can update the user's fields in DB and create a session if required
@@ -180,7 +180,7 @@ def pe_connect_logout(request):
 
     params = {
         "id_token_hint": id_token,
-        "redirect_uri": get_absolute_url(reverse("search:siaes_home")),
+        "redirect_uri": get_absolute_url(reverse("search:employers_home")),
     }
     url = constants.PE_CONNECT_ENDPOINT_LOGOUT
     complete_url = f"{url}?{urlencode(params)}"

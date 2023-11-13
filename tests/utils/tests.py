@@ -662,7 +662,7 @@ class UtilsTemplateTagsTestCase(TestCase):
 
     def test_redirection_url(self):
         base_url = reverse("dashboard:index")
-        redirect_field_value = reverse("search:siaes_home")
+        redirect_field_value = reverse("search:employers_home")
 
         # Redirection value.
         context = {"redirect_field_value": redirect_field_value}
@@ -689,7 +689,7 @@ class UtilsTemplateTagsTestCase(TestCase):
 
     def test_redirection_input_field(self):
         name = "next"
-        value = reverse("search:siaes_home")
+        value = reverse("search:employers_home")
 
         # Redirection value.
         context = {"redirect_field_value": value}

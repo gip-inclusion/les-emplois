@@ -199,7 +199,7 @@ def company_select(request, template_name="signup/company_select.html"):
             f"de réception."
         )
         messages.success(request, message)
-        return HttpResponseRedirect(next_url or reverse("search:siaes_home"))
+        return HttpResponseRedirect(next_url or reverse("search:employers_home"))
 
     context = {
         "next_url": next_url,
@@ -270,7 +270,7 @@ class CompanyJoinView(LoginRequiredMixin, CompanyBaseView):
             messages.error(
                 request, "Vous ne pouvez pas rejoindre une structure avec ce compte car vous n'êtes pas employeur."
             )
-            return HttpResponseRedirect(reverse("search:siaes_home"))
+            return HttpResponseRedirect(reverse("search:employers_home"))
 
         CompanyMembership.objects.create(
             user=request.user,
@@ -702,7 +702,7 @@ def prescriber_join_org(request):
         messages.error(
             request, "Vous ne pouvez pas rejoindre une organisation avec ce compte car vous n'êtes pas prescripteur."
         )
-        return HttpResponseRedirect(reverse("search:siaes_home"))
+        return HttpResponseRedirect(reverse("search:employers_home"))
 
     # Get useful information from session.
     session_data = request.session[global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY]

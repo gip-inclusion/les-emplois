@@ -22,7 +22,7 @@ pytestmark = pytest.mark.ignore_template_errors
 class SearchSiaeTest(TestCase):
     def setUp(self):
         super().setUp()
-        self.url = reverse("search:siaes_results")
+        self.url = reverse("search:employers_results")
 
     def test_not_existing(self):
         response = self.client.get(self.url, {"city": "foo-44"})

@@ -62,7 +62,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         # Pass `siren` in request.GET
         response = self.client.post(f"{url}?siren={company.siret[:9]}", data=post_data)
         assert response.status_code == 302
-        self.assertRedirects(response, reverse("search:siaes_home"))
+        self.assertRedirects(response, reverse("search:employers_home"))
 
         assert len(mail.outbox) == 1
         email = mail.outbox[0]
@@ -386,7 +386,7 @@ class SiaeSignupViewsExceptionsTest(TestCase):
                 )
             ],
         )
-        self.assertRedirects(response, reverse("search:siaes_home"))
+        self.assertRedirects(response, reverse("search:employers_home"))
 
         # Check `User` state.
         assert not company.has_admin(user)
