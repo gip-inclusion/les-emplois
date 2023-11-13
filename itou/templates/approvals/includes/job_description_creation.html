@@ -31,7 +31,7 @@
             {% endif %}
         {% endif %}
         {% if request.user.is_prescriber %}
-            chez <a href="{% url 'companies_views:card' siae_id=job_application.to_siae.id %}"><strong>{{ job_application.to_siae.display_name }}</strong></a>
+            chez <a href="{% url 'companies_views:card' siae_id=job_application.to_company.id %}"><strong>{{ job_application.to_company.display_name }}</strong></a>
         {% endif %}
 
     </span>
