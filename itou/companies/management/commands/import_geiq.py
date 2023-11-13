@@ -79,25 +79,25 @@ def get_geiq_df():
 
 
 def build_geiq(row):
-    siae = Company()
-    siae.siret = row.siret
-    siae.kind = CompanyKind.GEIQ
-    siae.source = Company.SOURCE_GEIQ
-    siae.name = row["name"]  # row.name returns row index.
-    assert not siae.name.isnumeric()
-    siae.email = ""  # Do not make the authentification email public!
-    siae.auth_email = row.auth_email
-    siae.address_line_1 = row.address_line_1
-    siae.address_line_2 = ""
+    company = Company()
+    company.siret = row.siret
+    company.kind = CompanyKind.GEIQ
+    company.source = Company.SOURCE_GEIQ
+    company.name = row["name"]  # row.name returns row index.
+    assert not company.name.isnumeric()
+    company.email = ""  # Do not make the authentification email public!
+    company.auth_email = row.auth_email
+    company.address_line_1 = row.address_line_1
+    company.address_line_2 = ""
     if row.address_line_2:
-        siae.address_line_2 = row.address_line_2
-    siae.post_code = row.post_code
-    siae.city = row.city
-    siae.department = row.department
+        company.address_line_2 = row.address_line_2
+    company.post_code = row.post_code
+    company.city = row.city
+    company.department = row.department
 
-    siae = geocode_siae(siae)
+    company = geocode_siae(company)
 
-    return siae
+    return company
 
 
 class Command(BaseCommand):

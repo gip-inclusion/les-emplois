@@ -353,7 +353,7 @@ def edit_user_notifications(request, template_name="dashboard/edit_user_notifica
     company = get_object_or_404(Company, pk=current_company_pk)
     membership = request.user.companymembership_set.get(company=company)
     new_job_app_notification_form = EditNewJobAppEmployersNotificationForm(
-        recipient=membership, siae=company, data=request.POST or None
+        recipient=membership, company=company, data=request.POST or None
     )
 
     dashboard_url = reverse_lazy("dashboard:index")

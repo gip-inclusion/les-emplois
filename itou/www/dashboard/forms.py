@@ -166,20 +166,20 @@ class EditUserEmailForm(forms.Form):
 class EditNewJobAppEmployersNotificationForm(forms.Form):
     spontaneous = forms.BooleanField(label="Candidatures spontanées", required=False, widget=SwitchCheckboxWidget())
 
-    def __init__(self, *args, **kwargs):
-        self.recipient = kwargs.pop("recipient")
-        self.siae = kwargs.pop("siae")
+    def __init__(self, recipient, company, *args, **kwargs):
+        self.recipient = recipient
+        self.company = company
         super().__init__(*args, **kwargs)
         self.fields["spontaneous"].initial = NewSpontaneousJobAppEmployersNotification.is_subscribed(self.recipient)
 
-        if self.siae.job_description_through.exists():
-            default_pks = self.siae.job_description_through.values_list("pk", flat=True)
+        if self.company.job_description_through.exists():
+            default_pks = self.company.job_description_through.values_list("pk", flat=True)
             self.subscribed_pks = NewQualifiedJobAppEmployersNotification.recipient_subscribed_pks(
                 recipient=self.recipient, default_pks=default_pks
             )
             choices = [
                 (job_description.pk, job_description.display_name)
-                for job_description in self.siae.job_description_through.all()
+                for job_description in self.company.job_description_through.all()
             ]
             self.fields["qualified"] = forms.MultipleChoiceField(
                 label="Fiches de poste",
@@ -195,7 +195,7 @@ class EditNewJobAppEmployersNotificationForm(forms.Form):
         else:
             NewSpontaneousJobAppEmployersNotification.unsubscribe(recipient=self.recipient)
 
-        if self.siae.job_description_through.exists():
+        if self.company.job_description_through.exists():
             to_subscribe_pks = self.cleaned_data.get("qualified")
             NewQualifiedJobAppEmployersNotification.replace_subscriptions(
                 recipient=self.recipient, subscribed_pks=to_subscribe_pks

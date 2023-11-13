@@ -33,14 +33,14 @@ class ProlongationReason(models.TextChoices):
     HEALTH_CONTEXT = "HEALTH_CONTEXT", "Contexte sanitaire"
 
     @classmethod
-    def for_company(cls, siae):
+    def for_company(cls, company):
         enums = [
             cls.SENIOR_CDI,
             cls.COMPLETE_TRAINING,
             cls.RQTH,
             cls.SENIOR,
         ]
-        if siae.kind in [companies_enums.CompanyKind.AI, companies_enums.CompanyKind.ACI]:
+        if company.kind in [companies_enums.CompanyKind.AI, companies_enums.CompanyKind.ACI]:
             enums.append(cls.PARTICULAR_DIFFICULTIES)
 
         empty = [(None, cls.__empty__)] if hasattr(cls, "__empty__") else []

@@ -54,19 +54,19 @@ class ItouCurrentOrganizationMiddleware:
         if user.is_authenticated:
             if user.is_employer:
                 active_memberships = list(user.companymembership_set.filter(is_active=True).order_by("created_at"))
-                siaes = {
-                    siae.pk: siae
-                    for siae in user.company_set.filter(
+                companies = {
+                    company.pk: company
+                    for company in user.company_set.filter(
                         pk__in=[membership.company_id for membership in active_memberships]
                     ).active_or_in_grace_period()
                 }
                 really_active_memberships = []
                 for membership in active_memberships:
-                    if membership.company_id in siaes:
-                        # The siae is active (or in grace period)
-                        membership.company = siaes[membership.company_id]
+                    if membership.company_id in companies:
+                        # The company is active (or in grace period)
+                        membership.company = companies[membership.company_id]
                         really_active_memberships.append(membership)
-                # If there is no current siae, we want to default to the first active one
+                # If there is no current company, we want to default to the first active one
                 # (and preferably not one in grace period)
                 really_active_memberships.sort(key=lambda m: (m.company.has_convention_in_grace_period, m.created_at))
 
@@ -142,8 +142,8 @@ class ItouCurrentOrganizationMiddleware:
         skip_middleware_conditions = [
             request.path in login_routes,
             request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
-            request.path.startswith("/signup/siae/join"),  # employer about to join an siae
-            request.path.startswith("/signup/facilitator/join"),  # facilitator about to join an siae
+            request.path.startswith("/signup/siae/join"),  # employer about to join an company
+            request.path.startswith("/signup/facilitator/join"),  # facilitator about to join an company
             request.path == reverse("account_logout"),
             request.path.startswith("/hijack/release"),  # Allow to release hijack
         ]

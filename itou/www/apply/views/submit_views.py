@@ -80,13 +80,13 @@ def _check_job_seeker_approval(request, job_seeker, siae):
 class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
     def __init__(self):
         super().__init__()
-        self.siae = None
+        self.company = None
         self.apply_session = None
         self.hire_process = None
 
     def setup(self, request, *args, **kwargs):
-        self.siae = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
-        self.apply_session = SessionNamespace(request.session, f"job_application-{self.siae.pk}")
+        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
+        self.apply_session = SessionNamespace(request.session, f"job_application-{self.company.pk}")
         self.hire_process = kwargs.pop("hire_process", False)
         super().setup(request, *args, **kwargs)
 
@@ -100,10 +100,10 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
                 UserKind.EMPLOYER,
             ]:
                 raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
-            elif request.user.is_employer and not self.siae.has_member(request.user):
+            elif request.user.is_employer and not self.company.has_member(request.user):
                 raise PermissionDenied("Vous ne pouvez postuler pour un candidat que dans votre structure.")
 
-        if not self.siae.has_active_members:
+        if not self.company.has_active_members:
             raise PermissionDenied(
                 "Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne."
             )
@@ -114,7 +114,7 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
-            "siae": self.siae,
+            "siae": self.company,
             "back_url": self.get_back_url(),
             "hire_process": self.hire_process,
         }
@@ -134,24 +134,24 @@ class ApplicationBaseView(ApplyStepBaseView):
             # Do nothing, LoginRequiredMixin will raise in dispatch()
             return
         self.job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=kwargs["job_seeker_pk"])
-        _check_job_seeker_approval(request, self.job_seeker, self.siae)
-        if self.siae.kind == CompanyKind.GEIQ:
+        _check_job_seeker_approval(request, self.job_seeker, self.company)
+        if self.company.kind == CompanyKind.GEIQ:
             self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
-                self.job_seeker, self.siae
+                self.job_seeker, self.company
             ).first()
         else:
             # General IAE eligibility case
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-                self.job_seeker, for_siae=self.siae
+                self.job_seeker, for_siae=self.company
             )
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "job_seeker": self.job_seeker,
             "eligibility_diagnosis": self.eligibility_diagnosis,
-            "is_subject_to_eligibility_rules": self.siae.is_subject_to_eligibility_rules,
+            "is_subject_to_eligibility_rules": self.company.is_subject_to_eligibility_rules,
             "geiq_eligibility_diagnosis": self.geiq_eligibility_diagnosis,
-            "is_subject_to_geiq_eligibility_rules": self.siae.kind == CompanyKind.GEIQ,
+            "is_subject_to_geiq_eligibility_rules": self.company.kind == CompanyKind.GEIQ,
             "can_edit_personal_information": self.request.user.can_edit_personal_information(self.job_seeker),
             "can_view_personal_information": self.request.user.can_view_personal_information(self.job_seeker),
             # Do not show the warning for job seekers
@@ -163,7 +163,7 @@ class ApplicationBaseView(ApplyStepBaseView):
 
     def get_previous_applications_queryset(self):
         # Useful in CheckPreviousApplications and ApplicationJobsView
-        return self.job_seeker.job_applications.filter(to_company=self.siae)
+        return self.job_seeker.job_applications.filter(to_company=self.company)
 
 
 class ApplyStepForSenderBaseView(ApplyStepBaseView):
@@ -177,13 +177,13 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
 
     def dispatch(self, request, *args, **kwargs):
         if self.sender.is_authenticated and self.sender.kind not in [UserKind.PRESCRIBER, UserKind.EMPLOYER]:
-            return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.siae.pk}))
+            return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.company.pk}))
         return super().dispatch(request, *args, **kwargs)
 
     def redirect_to_check_infos(self, job_seeker_pk):
         view_name = "apply:check_job_seeker_info_for_hire" if self.hire_process else "apply:step_check_job_seeker_info"
         return HttpResponseRedirect(
-            reverse(view_name, kwargs={"company_pk": self.siae.pk, "job_seeker_pk": job_seeker_pk})
+            reverse(view_name, kwargs={"company_pk": self.company.pk, "job_seeker_pk": job_seeker_pk})
         )
 
 
@@ -191,14 +191,14 @@ class StartView(ApplyStepBaseView):
     def get(self, request, *args, **kwargs):
         # SIAE members can only submit a job application to their SIAE
         if request.user.is_employer:
-            if suspension_explanation := self.siae.get_active_suspension_text_with_dates():
+            if suspension_explanation := self.company.get_active_suspension_text_with_dates():
                 raise PermissionDenied(
                     "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
                     "a posteriori. " + suspension_explanation
                 )
 
         # Refuse all applications except those made by an SIAE member
-        if self.siae.block_job_applications and not self.siae.has_member(request.user):
+        if self.company.block_job_applications and not self.company.has_member(request.user):
             raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
 
         # Create a sub-session for this job application process
@@ -214,11 +214,11 @@ class StartView(ApplyStepBaseView):
             and request.current_organization.has_pending_authorization()
         ):
             return HttpResponseRedirect(
-                reverse("apply:pending_authorization_for_sender", kwargs={"company_pk": self.siae.pk})
+                reverse("apply:pending_authorization_for_sender", kwargs={"company_pk": self.company.pk})
             )
 
         tunnel = "job_seeker" if request.user.is_job_seeker else "sender"
-        return HttpResponseRedirect(reverse(f"apply:check_nir_for_{tunnel}", kwargs={"company_pk": self.siae.pk}))
+        return HttpResponseRedirect(reverse(f"apply:check_nir_for_{tunnel}", kwargs={"company_pk": self.company.pk}))
 
 
 class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
@@ -240,7 +240,7 @@ class CheckNIRForJobSeekerView(ApplyStepBaseView):
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated and not self.job_seeker.is_job_seeker:
-            return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.siae.pk}))
+            return HttpResponseRedirect(reverse("apply:start", kwargs={"company_pk": self.company.pk}))
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -249,7 +249,7 @@ class CheckNIRForJobSeekerView(ApplyStepBaseView):
             return HttpResponseRedirect(
                 reverse(
                     "apply:step_check_job_seeker_info",
-                    kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                    kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
                 )
             )
 
@@ -260,7 +260,7 @@ class CheckNIRForJobSeekerView(ApplyStepBaseView):
             return HttpResponseRedirect(
                 reverse(
                     "apply:step_check_job_seeker_info",
-                    kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                    kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
                 )
             )
 
@@ -271,7 +271,7 @@ class CheckNIRForJobSeekerView(ApplyStepBaseView):
             return HttpResponseRedirect(
                 reverse(
                     "apply:step_check_job_seeker_info",
-                    kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                    kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
                 )
             )
 
@@ -297,7 +297,7 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
     def redirect_to_check_email(self, session_uuid):
         view_name = "apply:search_by_email_for_hire" if self.hire_process else "apply:search_by_email_for_sender"
         return HttpResponseRedirect(
-            reverse(view_name, kwargs={"company_pk": self.siae.pk, "session_uuid": session_uuid})
+            reverse(view_name, kwargs={"company_pk": self.company.pk, "session_uuid": session_uuid})
         )
 
     def post(self, request, *args, **kwargs):
@@ -372,7 +372,7 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSend
 
                 return HttpResponseRedirect(
                     reverse(
-                        view_name, kwargs={"company_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name}
+                        view_name, kwargs={"company_pk": self.company.pk, "session_uuid": self.job_seeker_session.name}
                     )
                 )
 
@@ -414,13 +414,13 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSend
 
     def get_back_url(self):
         view_name = "apply:check_nir_for_hire" if self.hire_process else "apply:check_nir_for_sender"
-        return reverse(view_name, kwargs={"company_pk": self.siae.pk})
+        return reverse(view_name, kwargs={"company_pk": self.company.pk})
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
             "nir": self.job_seeker_session.get("user", {}).get("nir"),
-            "siae": self.siae,
+            "siae": self.company,
         }
 
 
@@ -439,14 +439,14 @@ class CreateJobSeekerForSenderBaseView(SessionNamespaceRequiredMixin, ApplyStepF
         view_name = self.previous_hire_url if self.hire_process else self.previous_apply_url
         return reverse(
             view_name,
-            kwargs={"company_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
+            kwargs={"company_pk": self.company.pk, "session_uuid": self.job_seeker_session.name},
         )
 
     def get_next_url(self):
         view_name = self.next_hire_url if self.hire_process else self.next_apply_url
         return reverse(
             view_name,
-            kwargs={"company_pk": self.siae.pk, "session_uuid": self.job_seeker_session.name},
+            kwargs={"company_pk": self.company.pk, "session_uuid": self.job_seeker_session.name},
         )
 
 
@@ -621,7 +621,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
 
     def get_next_url(self):
         if self.hire_process:
-            if self.siae.kind == CompanyKind.GEIQ:
+            if self.company.kind == CompanyKind.GEIQ:
                 view_name = "apply:geiq_eligibility_for_hire"
             else:
                 view_name = "apply:eligibility_for_hire"
@@ -630,7 +630,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
 
         return reverse(
             view_name,
-            kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.profile.user.pk},
+            kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.profile.user.pk},
         )
 
     def post(self, request, *args, **kwargs):
@@ -690,7 +690,7 @@ class CheckJobSeekerInformations(ApplicationBaseView):
             return HttpResponseRedirect(
                 reverse(
                     "apply:step_check_prev_applications",
-                    kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                    kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
                 )
             )
 
@@ -702,7 +702,7 @@ class CheckJobSeekerInformations(ApplicationBaseView):
             return HttpResponseRedirect(
                 reverse(
                     "apply:step_check_prev_applications",
-                    kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                    kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
                 )
             )
 
@@ -755,12 +755,12 @@ class CheckPreviousApplications(ApplicationBaseView):
         if self.hire_process:
             view_name = (
                 "apply:geiq_eligibility_for_hire"
-                if self.siae.kind == CompanyKind.GEIQ
+                if self.company.kind == CompanyKind.GEIQ
                 else "apply:eligibility_for_hire"
             )
         else:
             view_name = "apply:application_jobs"
-        return reverse(view_name, kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk})
+        return reverse(view_name, kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk})
 
     def get(self, request, *args, **kwargs):
         if not self.previous_applications.exists():
@@ -805,7 +805,7 @@ class ApplicationJobsView(ApplicationBaseView):
             self.apply_session.init({})
 
         self.form = ApplicationJobsForm(
-            self.siae,
+            self.company,
             initial={"selected_jobs": self.apply_session.get("selected_jobs", [])},
             data=request.POST or None,
         )
@@ -815,10 +815,12 @@ class ApplicationJobsView(ApplicationBaseView):
             self.apply_session.set("selected_jobs", self.form.cleaned_data.get("selected_jobs", []))
             # dispatching to IAE or GEIQ eligibility
             path_name = (
-                "application_geiq_eligibility" if self.siae.kind == CompanyKind.GEIQ else "application_eligibility"
+                "application_geiq_eligibility" if self.company.kind == CompanyKind.GEIQ else "application_eligibility"
             )
             return HttpResponseRedirect(
-                reverse("apply:" + path_name, kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk})
+                reverse(
+                    "apply:" + path_name, kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk}
+                )
             )
 
         return self.render_to_response(self.get_context_data(**kwargs))
@@ -836,12 +838,12 @@ class ApplicationJobsView(ApplicationBaseView):
         if self.get_previous_applications_queryset().exists():
             return reverse(
                 "apply:step_check_prev_applications",
-                kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
             )
 
         return reverse(
             "apply:step_check_job_seeker_info",
-            kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+            kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
         )
 
 
@@ -863,14 +865,14 @@ class ApplicationEligibilityView(ApplicationBaseView):
 
         self.form = AdministrativeCriteriaForm(
             request.user,
-            siae=self.siae,
+            siae=self.company,
             initial=initial_data,
             data=request.POST or None,
         )
 
     def get_next_url(self):
         return reverse(
-            "apply:application_resume", kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+            "apply:application_resume", kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk}
         )
 
     def dispatch(self, request, *args, **kwargs):
@@ -878,7 +880,7 @@ class ApplicationEligibilityView(ApplicationBaseView):
             # Otherwise LoginRequiredMixin will raise in dispatch()
             bypass_eligibility_conditions = [
                 # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
-                not self.siae.is_subject_to_eligibility_rules,
+                not self.company.is_subject_to_eligibility_rules,
                 # Only "authorized prescribers" can perform an eligibility diagnosis.
                 not (
                     request.user.is_prescriber
@@ -922,7 +924,7 @@ class ApplicationEligibilityView(ApplicationBaseView):
             "progress": 50,
             "job_seeker": self.job_seeker,
             "back_url": reverse(
-                "apply:application_jobs", kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+                "apply:application_jobs", kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk}
             ),
             "full_content_width": True,
         }
@@ -943,7 +945,7 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
             return
 
         self.form = GEIQAdministrativeCriteriaForm(
-            siae=self.siae,
+            company=self.company,
             administrative_criteria=(
                 self.geiq_eligibility_diagnosis.administrative_criteria.all()
                 if self.geiq_eligibility_diagnosis
@@ -951,14 +953,14 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
             ),
             form_url=reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
             ),
             data=request.POST or None,
         )
 
     def get_next_url(self):
         return reverse(
-            "apply:application_resume", kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+            "apply:application_resume", kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk}
         )
 
     def dispatch(self, request, *args, **kwargs):
@@ -972,7 +974,7 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
         geo_criteria_detected = self.job_seeker.address_in_qpv or self.job_seeker.zrr_city_name
         return super().get_context_data(**kwargs) | {
             "back_url": reverse(
-                "apply:application_jobs", kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk}
+                "apply:application_jobs", kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk}
             ),
             "form": self.form,
             "full_content_width": True,
@@ -1024,7 +1026,7 @@ class ApplicationResumeView(ApplicationBaseView):
             self.apply_session.init({})
 
         self.form = SubmitJobApplicationForm(
-            siae=self.siae,
+            company=self.company,
             user=request.user,
             initial={"selected_jobs": self.apply_session.get("selected_jobs", [])},
             data=request.POST or None,
@@ -1034,19 +1036,20 @@ class ApplicationResumeView(ApplicationBaseView):
     def post(self, request, *args, **kwargs):
         # Prevent multiple rapid clicks on the submit button to create multiple job applications.
         job_application = (
-            self.job_seeker.job_applications.filter(to_company=self.siae).created_in_past(seconds=10).first()
+            self.job_seeker.job_applications.filter(to_company=self.company).created_in_past(seconds=10).first()
         )
         if job_application:
             return HttpResponseRedirect(
                 reverse(
-                    "apply:application_end", kwargs={"company_pk": self.siae.pk, "application_pk": job_application.pk}
+                    "apply:application_end",
+                    kwargs={"company_pk": self.company.pk, "application_pk": job_application.pk},
                 )
             )
         if self.form.is_valid():
             # Fill the job application with the required information
             job_application = JobApplication(
                 job_seeker=self.job_seeker,
-                to_company=self.siae,
+                to_company=self.company,
                 sender=request.user,
                 sender_kind=request.user.kind,
                 message=self.form.cleaned_data["message"],
@@ -1092,19 +1095,19 @@ class ApplicationResumeView(ApplicationBaseView):
                 return HttpResponseRedirect(
                     reverse(
                         "apply:application_end",
-                        kwargs={"company_pk": self.siae.pk, "application_pk": job_application.pk},
+                        kwargs={"company_pk": self.company.pk, "application_pk": job_application.pk},
                     )
                 )
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_back_url(self):
         view_name = "apply:application_jobs"
-        if self.siae.kind == CompanyKind.GEIQ and self.request.user.is_prescriber_with_authorized_org:
+        if self.company.kind == CompanyKind.GEIQ and self.request.user.is_prescriber_with_authorized_org:
             view_name = "apply:application_geiq_eligibility"
-        elif self.siae.kind != CompanyKind.GEIQ:
+        elif self.company.kind != CompanyKind.GEIQ:
             bypass_eligibility_conditions = [
                 # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
-                not self.siae.is_subject_to_eligibility_rules,
+                not self.company.is_subject_to_eligibility_rules,
                 # Only "authorized prescribers" can perform an eligibility diagnosis.
                 not (
                     self.request.user.is_prescriber
@@ -1119,7 +1122,7 @@ class ApplicationResumeView(ApplicationBaseView):
 
         return reverse(
             view_name,
-            kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+            kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
         )
 
     def get_context_data(self, **kwargs):
@@ -1198,7 +1201,7 @@ class UpdateJobSeekerBaseView(SessionNamespaceRequiredMixin, ApplyStepBaseView):
             "job_seeker": self.job_seeker,
             "step_3_url": reverse(
                 "apply:update_job_seeker_step_3_for_hire" if self.hire_process else "apply:update_job_seeker_step_3",
-                kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
             ),
         }
 
@@ -1210,14 +1213,14 @@ class UpdateJobSeekerBaseView(SessionNamespaceRequiredMixin, ApplyStepBaseView):
         view_name = self.previous_hire_url if self.hire_process else self.previous_apply_url
         return reverse(
             view_name,
-            kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+            kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
         )
 
     def get_next_url(self):
         view_name = self.next_hire_url if self.hire_process else self.next_apply_url
         return reverse(
             view_name,
-            kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+            kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
         )
 
 
@@ -1439,7 +1442,7 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
             messages.error(request, " ".join(e.messages))
             url = reverse(
                 "apply:update_job_seeker_step_1",
-                kwargs={"company_pk": self.siae.pk, "job_seeker_pk": self.job_seeker.pk},
+                kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
             )
         else:
             self.profile.save()
@@ -1456,23 +1459,23 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
 
 @login_required
 def eligibility_for_hire(request, company_pk, job_seeker_pk, template_name="apply/submit/eligibility_for_hire.html"):
-    siae = get_object_or_404(Company.objects.member_required(request.user), pk=company_pk)
+    company = get_object_or_404(Company.objects.member_required(request.user), pk=company_pk)
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
-    next_url = reverse("apply:hire_confirmation", kwargs={"company_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
+    next_url = reverse("apply:hire_confirmation", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
     bypass_eligibility_conditions = [
         # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
-        not siae.is_subject_to_eligibility_rules,
+        not company.is_subject_to_eligibility_rules,
         # No need for eligibility diagnosis if the job seeker already has a PASS IAE
         job_seeker.has_valid_common_approval,
     ]
-    if any(bypass_eligibility_conditions) or job_seeker.has_valid_diagnosis(for_siae=siae):
+    if any(bypass_eligibility_conditions) or job_seeker.has_valid_diagnosis(for_siae=company):
         return HttpResponseRedirect(next_url)
     return common_views._eligibility(
         request,
-        siae,
+        company,
         job_seeker,
         cancel_url=reverse(
-            "apply:check_job_seeker_info_for_hire", kwargs={"company_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+            "apply:check_job_seeker_info_for_hire", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}
         ),
         next_url=next_url,
         template_name=template_name,
@@ -1484,23 +1487,24 @@ def eligibility_for_hire(request, company_pk, job_seeker_pk, template_name="appl
 def geiq_eligibility_for_hire(
     request, company_pk, job_seeker_pk, template_name="apply/submit/geiq_eligibility_for_hire.html"
 ):
-    siae = get_object_or_404(
+    company = get_object_or_404(
         Company.objects.member_required(request.user).filter(kind=CompanyKind.GEIQ), pk=company_pk
     )
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
-    next_url = reverse("apply:hire_confirmation", kwargs={"company_pk": siae.pk, "job_seeker_pk": job_seeker.pk})
-    if GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, siae).exists():
+    next_url = reverse("apply:hire_confirmation", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+    if GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, company).exists():
         return HttpResponseRedirect(next_url)
     return common_views._geiq_eligibility(
         request,
-        siae,
+        company,
         job_seeker,
         back_url=reverse(
-            "apply:check_job_seeker_info_for_hire", kwargs={"company_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+            "apply:check_job_seeker_info_for_hire", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}
         ),
         next_url=next_url,
         geiq_eligibility_criteria_url=reverse(
-            "apply:geiq_eligibility_criteria_for_hire", kwargs={"company_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+            "apply:geiq_eligibility_criteria_for_hire",
+            kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk},
         ),
         template_name=template_name,
         extra_context={"hire_process": True},
@@ -1509,44 +1513,44 @@ def geiq_eligibility_for_hire(
 
 @login_required
 def geiq_eligibility_criteria_for_hire(request, company_pk, job_seeker_pk):
-    siae = get_object_or_404(
+    company = get_object_or_404(
         Company.objects.member_required(request.user).filter(kind=CompanyKind.GEIQ), pk=company_pk
     )
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
     return common_views._geiq_eligibility_criteria(
         request,
-        siae,
+        company,
         job_seeker,
     )
 
 
 @login_required
 def hire_confirmation(request, company_pk, job_seeker_pk, template_name="apply/submit/hire_confirmation.html"):
-    siae = get_object_or_404(Company.objects.member_required(request.user), pk=company_pk)
+    company = get_object_or_404(Company.objects.member_required(request.user), pk=company_pk)
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
-    if siae.kind == CompanyKind.GEIQ:
-        geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, siae).first()
+    if company.kind == CompanyKind.GEIQ:
+        geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, company).first()
         eligibility_diagnosis = None
     else:
         # General IAE eligibility case
-        eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker, for_siae=siae)
+        eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker, for_siae=company)
         geiq_eligibility_diagnosis = None
     return common_views._accept(
         request,
-        siae,
+        company,
         job_seeker,
         error_url=reverse(
             "apply:hire_confirmation", kwargs={"company_pk": company_pk, "job_seeker_pk": job_seeker_pk}
         ),
         back_url=reverse(
-            "apply:check_job_seeker_info_for_hire", kwargs={"company_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+            "apply:check_job_seeker_info_for_hire", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}
         ),
         template_name=template_name,
         extra_context={
             "can_edit_personal_information": request.user.can_edit_personal_information(job_seeker),
-            "is_subject_to_eligibility_rules": siae.is_subject_to_eligibility_rules,
+            "is_subject_to_eligibility_rules": company.is_subject_to_eligibility_rules,
             "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
             "eligibility_diagnosis": eligibility_diagnosis,
-            "is_subject_to_geiq_eligibility_rules": siae.kind == CompanyKind.GEIQ,
+            "is_subject_to_geiq_eligibility_rules": company.kind == CompanyKind.GEIQ,
         },
     )

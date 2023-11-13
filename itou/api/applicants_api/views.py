@@ -43,11 +43,11 @@ class ApplicantsView(generics.ListAPIView):
     serializer_class = ApplicantSerializer
 
     def get_queryset(self):
-        # unique siae asserted by permission class
-        siae_id = self.request.user.companymembership_set.get().company_id
+        # unique company asserted by permission class
+        company_id = self.request.user.companymembership_set.get().company_id
 
         return (
-            User.objects.filter(job_applications__to_company_id=siae_id, kind=UserKind.JOB_SEEKER)
+            User.objects.filter(job_applications__to_company_id=company_id, kind=UserKind.JOB_SEEKER)
             .select_related("jobseeker_profile__birth_place", "jobseeker_profile__birth_country")
             .prefetch_related("job_applications")
             .order_by("-pk")

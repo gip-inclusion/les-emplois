@@ -131,32 +131,32 @@ def get_ea_eatt_df():
 
 
 def build_ea_eatt(row):
-    siae = Company()
-    siae.siret = row.siret
-    siae.kind = row.kind
-    assert siae.kind in [CompanyKind.EA, CompanyKind.EATT]
-    siae.source = Company.SOURCE_EA_EATT
+    company = Company()
+    company.siret = row.siret
+    company.kind = row.kind
+    assert company.kind in [CompanyKind.EA, CompanyKind.EATT]
+    company.source = Company.SOURCE_EA_EATT
 
-    siae.name = row["name"]  # row.name returns row index.
-    assert not siae.name.isnumeric()
+    company.name = row["name"]  # row.name returns row index.
+    assert not company.name.isnumeric()
 
-    siae.email = ""  # Do not make the authentification email public!
-    siae.auth_email = row.auth_email
+    company.email = ""  # Do not make the authentification email public!
+    company.auth_email = row.auth_email
 
-    siae.phone = row.phone.replace(" ", "").replace(".", "") if row.phone else ""
-    phone_is_valid = siae.phone and len(siae.phone) == 10
+    company.phone = row.phone.replace(" ", "").replace(".", "") if row.phone else ""
+    phone_is_valid = company.phone and len(company.phone) == 10
     if not phone_is_valid:
-        siae.phone = ""  # siae.phone cannot be null in db
+        company.phone = ""  # company.phone cannot be null in db
 
-    siae.address_line_1 = row.address_line_1
-    siae.address_line_2 = ""
-    siae.post_code = row.post_code
-    siae.city = row.city
-    siae.department = row.department
+    company.address_line_1 = row.address_line_1
+    company.address_line_2 = ""
+    company.post_code = row.post_code
+    company.city = row.city
+    company.department = row.department
 
-    siae = geocode_siae(siae)
+    company = geocode_siae(company)
 
-    return siae
+    return company
 
 
 class Command(BaseCommand):
