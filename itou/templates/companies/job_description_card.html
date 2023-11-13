@@ -18,7 +18,7 @@
             <div class="row">
                 <div class="col-12 col-lg-8">
                     <div class="c-box">
-                        {% include "siaes/includes/_job_description_details.html" %}
+                        {% include "companies/includes/_job_description_details.html" %}
                         <hr>
                         <div>
                             {% if can_update_job_description %}
@@ -61,7 +61,7 @@
                                     </h2>
                                     <ul class="list-group list-group-flush mb-4">
                                         {% for other_job in others_active_jobs %}
-                                            {% include "siaes/includes/_list_siae_actives_jobs_row.html" with job=other_job %}
+                                            {% include "companies/includes/_list_siae_actives_jobs_row.html" with job=other_job %}
                                         {% endfor %}
                                     </ul>
                                 {% endif %}

@@ -127,7 +127,7 @@
                             {% if active_jobs_descriptions %}
                                 <ul class="list-group list-group-flush list-group-link">
                                     {% for job in active_jobs_descriptions %}
-                                        {% include "siaes/includes/_siae_jobdescription.html" %}
+                                        {% include "companies/includes/_siae_jobdescription.html" %}
                                     {% endfor %}
                                 </ul>
                             {% else %}
@@ -138,7 +138,7 @@
                             <div id="autres-metiers" class="tab-pane fade" aria-labelledby="autres-metiers-tab" role="tabpanel">
                                 <ul class="list-group list-group-flush list-group-link">
                                     {% for job in other_jobs_descriptions %}
-                                        {% include "siaes/includes/_siae_jobdescription.html" %}
+                                        {% include "companies/includes/_siae_jobdescription.html" %}
                                     {% endfor %}
                                 </ul>
                             </div>

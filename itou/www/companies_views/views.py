@@ -30,7 +30,7 @@ ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
 ### Job description views
 
 
-def job_description_card(request, job_description_id, template_name="siaes/job_description_card.html"):
+def job_description_card(request, job_description_id, template_name="companies/job_description_card.html"):
     job_description = get_object_or_404(JobDescription.objects.select_related("location"), pk=job_description_id)
     back_url = get_safe_url(request, "back_url")
     company = job_description.company
@@ -76,7 +76,7 @@ def job_description_card(request, job_description_id, template_name="siaes/job_d
 
 
 @login_required
-def job_description_list(request, template_name="siaes/job_description_list.html"):
+def job_description_list(request, template_name="companies/job_description_list.html"):
     company = get_current_company_or_404(request)
     job_descriptions = (
         JobDescription.objects.filter(company__pk=company.pk)
@@ -176,7 +176,7 @@ def _get_job_description(session_data):
 
 
 @login_required
-def edit_job_description(request, template_name="siaes/edit_job_description.html"):
+def edit_job_description(request, template_name="companies/edit_job_description.html"):
     company = get_current_company_or_404(request)
     session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY) or {}
     job_description = _get_job_description(session_data)
@@ -212,7 +212,7 @@ def edit_job_description(request, template_name="siaes/edit_job_description.html
 
 
 @login_required
-def edit_job_description_details(request, template_name="siaes/edit_job_description_details.html"):
+def edit_job_description_details(request, template_name="companies/edit_job_description_details.html"):
     company = get_current_company_or_404(request)
     session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
 
@@ -267,7 +267,7 @@ def edit_job_description_details(request, template_name="siaes/edit_job_descript
 
 
 @login_required
-def edit_job_description_preview(request, template_name="siaes/edit_job_description_preview.html"):
+def edit_job_description_preview(request, template_name="companies/edit_job_description_preview.html"):
     company = get_current_company_or_404(request)
     session_data = request.session.get(ITOU_SESSION_JOB_DESCRIPTION_KEY)
 
@@ -340,7 +340,7 @@ def update_job_description(request, job_description_id):
 
 
 @login_required
-def show_financial_annexes(request, template_name="siaes/show_financial_annexes.html"):
+def show_financial_annexes(request, template_name="companies/show_financial_annexes.html"):
     """
     Show a summary of the financial annexes of the convention to the siae admin user. Financial annexes are grouped
     by suffix and only the most relevant one (active if any, or most recent if not) is shown for each suffix.
@@ -384,7 +384,7 @@ def show_financial_annexes(request, template_name="siaes/show_financial_annexes.
 
 
 @login_required
-def select_financial_annex(request, template_name="siaes/select_financial_annex.html"):
+def select_financial_annex(request, template_name="companies/select_financial_annex.html"):
     """
     Let siae admin user select a new convention via a financial annex number.
     """
@@ -427,7 +427,7 @@ def select_financial_annex(request, template_name="siaes/select_financial_annex.
 ### Company CRUD views
 
 
-def card(request, siae_id, template_name="siaes/card.html"):
+def card(request, siae_id, template_name="companies/card.html"):
     company = get_object_or_404(Company.objects.with_has_active_members(), pk=siae_id)
     jobs_descriptions = JobDescription.objects.filter(company=company).select_related("appellation", "location")
     back_url = get_safe_url(request, "back_url")
@@ -452,7 +452,7 @@ def card(request, siae_id, template_name="siaes/card.html"):
 
 
 @login_required
-def create_company(request, template_name="siaes/create_siae.html"):
+def create_company(request, template_name="companies/create_siae.html"):
     current_compny = get_current_company_or_404(request)
     if not request.user.can_create_siae_antenna(parent_siae=current_compny):
         raise PermissionDenied
@@ -477,7 +477,7 @@ def create_company(request, template_name="siaes/create_siae.html"):
 
 
 @login_required
-def edit_company_step_contact_infos(request, template_name="siaes/edit_siae.html"):
+def edit_company_step_contact_infos(request, template_name="companies/edit_siae.html"):
     if ITOU_SESSION_EDIT_COMPANY_KEY not in request.session:
         request.session[ITOU_SESSION_EDIT_COMPANY_KEY] = {}
 
@@ -502,7 +502,7 @@ def edit_company_step_contact_infos(request, template_name="siaes/edit_siae.html
 
 
 @login_required
-def edit_company_step_description(request, template_name="siaes/edit_siae_description.html"):
+def edit_company_step_description(request, template_name="companies/edit_siae_description.html"):
     if ITOU_SESSION_EDIT_COMPANY_KEY not in request.session:
         return HttpResponseRedirect(reverse("companies_views:edit_company_step_contact_infos"))
 
@@ -524,7 +524,7 @@ def edit_company_step_description(request, template_name="siaes/edit_siae_descri
 
 
 @login_required
-def edit_company_step_preview(request, template_name="siaes/edit_siae_preview.html"):
+def edit_company_step_preview(request, template_name="companies/edit_siae_preview.html"):
     if ITOU_SESSION_EDIT_COMPANY_KEY not in request.session:
         return HttpResponseRedirect(reverse("companies_views:edit_company_step_contact_infos"))
 
@@ -574,7 +574,7 @@ def edit_company_step_preview(request, template_name="siaes/edit_siae_preview.ht
 
 
 @login_required
-def members(request, template_name="siaes/members.html"):
+def members(request, template_name="companies/members.html"):
     company = get_current_company_or_404(request)
     if not company.is_active:
         raise PermissionDenied
@@ -591,7 +591,7 @@ def members(request, template_name="siaes/members.html"):
 
 
 @login_required
-def deactivate_member(request, user_id, template_name="siaes/deactivate_member.html"):
+def deactivate_member(request, user_id, template_name="companies/deactivate_member.html"):
     company = get_current_company_or_404(request)
     target_member = User.objects.get(pk=user_id)
 
@@ -607,7 +607,7 @@ def deactivate_member(request, user_id, template_name="siaes/deactivate_member.h
 
 
 @login_required
-def update_admin_role(request, action, user_id, template_name="siaes/update_admins.html"):
+def update_admin_role(request, action, user_id, template_name="companies/update_admins.html"):
     company = get_current_company_or_404(request)
     target_member = User.objects.get(pk=user_id)
 
