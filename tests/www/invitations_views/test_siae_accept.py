@@ -56,7 +56,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
-        next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
+        next_url = reverse("invitations_views:join_company", args=(invitation.pk,))
         params = {
             "user_kind": KIND_EMPLOYER,
             "user_email": invitation.email,
@@ -96,7 +96,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
-        next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
+        next_url = reverse("invitations_views:join_company", args=(invitation.pk,))
         params = {
             "user_kind": KIND_EMPLOYER,
             "user_email": invitation.email,
@@ -138,7 +138,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
-        next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
+        next_url = reverse("invitations_views:join_company", args=(invitation.pk,))
         params = {
             "user_kind": KIND_EMPLOYER,
             "user_email": invitation.email,
@@ -175,7 +175,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         response = self.client.get(invitation.acceptance_link, follow=True)
         assert reverse("login:employer") in response.wsgi_request.get_full_path()
         assert not invitation.accepted
-        next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
+        next_url = reverse("invitations_views:join_company", args=(invitation.pk,))
         previous_url = f"{reverse('login:employer')}?{urlencode({'next': next_url})}"
         params = {
             "user_kind": UserKind.EMPLOYER,
@@ -216,7 +216,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
-        next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
+        next_url = reverse("invitations_views:join_company", args=(invitation.pk,))
         params = {
             "user_kind": KIND_EMPLOYER,
             "user_email": invitation.email,
@@ -265,7 +265,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
         user = EmployerFactory(email=invitation.email)
         self.client.force_login(user)
-        join_url = reverse("invitations_views:join_siae", kwargs={"invitation_id": invitation.id})
+        join_url = reverse("invitations_views:join_company", kwargs={"invitation_id": invitation.id})
         response = self.client.get(join_url, follow=True)
         self.assertContains(response, escape("Cette invitation n'est plus valide."))
 
@@ -274,7 +274,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         invitation = SentEmployerInvitationFactory(company=company)
         user = EmployerFactory(email=invitation.email)
         self.client.force_login(user)
-        join_url = reverse("invitations_views:join_siae", kwargs={"invitation_id": invitation.id})
+        join_url = reverse("invitations_views:join_company", kwargs={"invitation_id": invitation.id})
         response = self.client.get(join_url, follow=True)
         self.assertContains(response, escape("Cette structure n'est plus active."))
 
@@ -309,7 +309,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         self.client.force_login(user)
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertRedirects(response, reverse("welcoming_tour:index"))
-        # /invitations/<uui>/join_siae then /welcoming_tour/index
+        # /invitations/<uui>/join-company then /welcoming_tour/index
         assert len(response.redirect_chain) == 2
 
         current_company = get_current_company_or_404(response.wsgi_request)
@@ -331,7 +331,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
 
         # If the user still manages to signup with IC
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
-        next_url = reverse("invitations_views:join_siae", args=(invitation.pk,))
+        next_url = reverse("invitations_views:join_company", args=(invitation.pk,))
         response = mock_oauth_dance(
             self.client,
             KIND_EMPLOYER,

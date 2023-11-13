@@ -222,7 +222,7 @@ def invite_employer(request, template_name="invitations_views/create.html"):
 
 
 @login_required
-def join_siae(request, invitation_id):
+def join_company(request, invitation_id):
     invitation = get_object_or_404(EmployerInvitation, pk=invitation_id)
     if not invitation.guest_can_join_company(request):
         raise PermissionDenied()
