@@ -14,9 +14,9 @@ from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.www.apply.forms import (
+    CompanyFilterJobApplicationsForm,
     FilterJobApplicationsForm,
     PrescriberFilterJobApplicationsForm,
-    SiaeFilterJobApplicationsForm,
 )
 from itou.www.stats.utils import can_view_stats_pe
 
@@ -172,7 +172,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     company = get_current_company_or_404(request)
     job_applications = company.job_applications_received
 
-    filters_form = SiaeFilterJobApplicationsForm(job_applications, company, request.GET or None)
+    filters_form = CompanyFilterJobApplicationsForm(job_applications, company, request.GET or None)
 
     # Add related data giving the criteria for adding the necessary annotations
     job_applications = job_applications.not_archived().with_list_related_data(

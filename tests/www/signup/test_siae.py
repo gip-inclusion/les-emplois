@@ -316,9 +316,9 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         # Check `User` state.
         assert user.kind == UserKind.EMPLOYER
         assert user.is_active
-        siae = Company.objects.get(siret=FAKE_SIRET)
-        assert siae.has_admin(user)
-        assert 1 == siae.members.count()
+        company = Company.objects.get(siret=FAKE_SIRET)
+        assert company.has_admin(user)
+        assert 1 == company.members.count()
 
         # No sent email.
         assert len(mail.outbox) == 0

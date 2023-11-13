@@ -903,20 +903,20 @@ class MockedCompanySignupTokenGenerator(CompanySignupTokenGenerator):
 
 class CompanySignupTokenGeneratorTest(TestCase):
     def test_make_token(self):
-        siae = Company.objects.create()
+        company = Company.objects.create()
         p0 = CompanySignupTokenGenerator()
-        tk1 = p0.make_token(siae)
-        assert p0.check_token(siae, tk1) is True
+        tk1 = p0.make_token(company)
+        assert p0.check_token(company, tk1) is True
 
     def test_10265(self):
         """
         The token generated for a siae created in the same request
         will work correctly.
         """
-        siae = Company.objects.create(email="itou@example.com")
+        company = Company.objects.create(email="itou@example.com")
         siae_reload = Company.objects.get(email="itou@example.com")
         p0 = MockedCompanySignupTokenGenerator(datetime.datetime.now())
-        tk1 = p0.make_token(siae)
+        tk1 = p0.make_token(company)
         tk2 = p0.make_token(siae_reload)
         assert tk1 == tk2
 
@@ -924,42 +924,42 @@ class CompanySignupTokenGeneratorTest(TestCase):
         """The token is valid after n seconds, but no greater."""
         # Uses a mocked version of CompanySignupTokenGenerator so we can change
         # the value of 'now'.
-        siae = Company.objects.create()
+        company = Company.objects.create()
         p0 = CompanySignupTokenGenerator()
-        tk1 = p0.make_token(siae)
+        tk1 = p0.make_token(company)
         p1 = MockedCompanySignupTokenGenerator(
             datetime.datetime.now() + datetime.timedelta(seconds=(COMPANY_SIGNUP_MAGIC_LINK_TIMEOUT - 1))
         )
-        assert p1.check_token(siae, tk1) is True
+        assert p1.check_token(company, tk1) is True
         p2 = MockedCompanySignupTokenGenerator(
             datetime.datetime.now() + datetime.timedelta(seconds=(COMPANY_SIGNUP_MAGIC_LINK_TIMEOUT + 1))
         )
-        assert p2.check_token(siae, tk1) is False
+        assert p2.check_token(company, tk1) is False
 
     def test_check_token_with_nonexistent_token_and_user(self):
-        siae = Company.objects.create()
+        company = Company.objects.create()
         p0 = CompanySignupTokenGenerator()
-        tk1 = p0.make_token(siae)
+        tk1 = p0.make_token(company)
         assert p0.check_token(None, tk1) is False
-        assert p0.check_token(siae, None) is False
-        assert p0.check_token(siae, tk1) is True
+        assert p0.check_token(company, None) is False
+        assert p0.check_token(company, tk1) is True
 
     def test_any_new_signup_invalidates_past_token(self):
         """
         Tokens are based on siae.members.count() so that
         any new signup invalidates past tokens.
         """
-        siae = Company.objects.create()
+        company = Company.objects.create()
         p0 = CompanySignupTokenGenerator()
-        tk1 = p0.make_token(siae)
-        assert p0.check_token(siae, tk1) is True
+        tk1 = p0.make_token(company)
+        assert p0.check_token(company, tk1) is True
         user = User(kind=UserKind.EMPLOYER)
         user.save()
         membership = CompanyMembership()
         membership.user = user
-        membership.company = siae
+        membership.company = company
         membership.save()
-        assert p0.check_token(siae, tk1) is False
+        assert p0.check_token(company, tk1) is False
 
 
 class CnilCompositionPasswordValidatorTest(SimpleTestCase):

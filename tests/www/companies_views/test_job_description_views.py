@@ -69,7 +69,7 @@ class JobDescriptionAbstractTest(TestCase):
             )
         )
 
-        self.siae = company
+        self.company = company
         self.user = user
 
         self.list_url = reverse("companies_views:job_description_list")
@@ -105,7 +105,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         ):
             response = self.client.get(self.url)
 
-        assert self.siae.job_description_through.count() == 4
+        assert self.company.job_description_through.count() == 4
         self.assertContains(
             response,
             '<h3 class="h4 mb-0">4 métiers exercés</h3>',
@@ -114,7 +114,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         )
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
 
-        for job in self.siae.job_description_through.all():
+        for job in self.company.job_description_through.all():
             with self.subTest(job.pk):
                 self.assertContains(response, f"/job_description/{job.pk}/card")
                 self.assertContains(response, f"toggle_job_description_form_{job.pk}")
@@ -135,13 +135,13 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         response = self.client.post(self.url, data=post_data)
 
         self.assertRedirects(response, self.url)
-        assert not self.siae.block_job_applications
+        assert not self.company.block_job_applications
 
         response = self.client.post(self.url, data={})
-        self.siae.refresh_from_db()
+        self.company.refresh_from_db()
 
         self.assertRedirects(response, self.url)
-        assert self.siae.block_job_applications
+        assert self.company.block_job_applications
 
     @freeze_time("2021-06-21 10:10:10.10")
     def test_toggle_job_description_activity(self):
@@ -149,7 +149,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
 
         assert response.status_code == 200
 
-        job_description = self.siae.job_description_through.first()
+        job_description = self.company.job_description_through.first()
         post_data = {"job_description_id": job_description.pk, "action": "toggle_active"}
         response = self.client.post(self.url, data=post_data)
         job_description.refresh_from_db()
@@ -218,7 +218,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
 
         assert response.status_code == 200
 
-        job_description = self.siae.job_description_through.first()
+        job_description = self.company.job_description_through.first()
         post_data = {
             "job_description_id": job_description.pk,
             "action": "delete",
@@ -313,7 +313,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
 
         self.assertRedirects(response, self.list_url)
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
-        assert self.siae.job_description_through.count() == 5
+        assert self.company.job_description_through.count() == 5
 
     def test_edit_job_description_opcs(self):
         opcs = CompanyFactory(
@@ -460,7 +460,7 @@ class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
     def setUp(self):
         super().setUp()
 
-        self.job_description = self.siae.job_description_through.filter(location__isnull=False).first()
+        self.job_description = self.company.job_description_through.filter(location__isnull=False).first()
         self.update_url = reverse(
             "companies_views:update_job_description",
             kwargs={
@@ -556,7 +556,7 @@ class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
 class JobDescriptionCardTest(JobDescriptionAbstractTest):
     def setUp(self):
         super().setUp()
-        self.job_description = self.siae.job_description_through.first()
+        self.job_description = self.company.job_description_through.first()
         self.url = reverse(
             "companies_views:job_description_card",
             kwargs={
@@ -578,7 +578,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         )
         self.assertContains(response, "Retour vers la liste des postes")
         self.assertContains(response, reverse("companies_views:job_description_list"))
-        self.assertNotContains(response, reverse("apply:start", kwargs={"company_pk": self.siae.pk}))
+        self.assertNotContains(response, reverse("apply:start", kwargs={"company_pk": self.company.pk}))
 
     def test_prescriber_card_actions(self):
         # Checks if non-SIAE can apply to opened job descriptions
@@ -597,7 +597,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             response = self.client.get(self.url)
 
         self.assertContains(response, "Postuler auprès de l'employeur solidaire")
-        self.assertContains(response, reverse("apply:start", kwargs={"company_pk": self.siae.pk}))
+        self.assertContains(response, reverse("apply:start", kwargs={"company_pk": self.company.pk}))
         self.assertNotContains(
             response,
             reverse(
@@ -621,7 +621,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             response = self.client.get(self.url)
 
         self.assertContains(response, "Postuler auprès de l'employeur solidaire")
-        self.assertContains(response, reverse("apply:start", kwargs={"company_pk": self.siae.pk}))
+        self.assertContains(response, reverse("apply:start", kwargs={"company_pk": self.company.pk}))
         self.assertNotContains(
             response,
             reverse(
@@ -634,7 +634,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         response = self.client.get(self.url)
 
         self.assertContains(response, "Postuler auprès de l'employeur solidaire")
-        self.assertContains(response, reverse("apply:start", kwargs={"company_pk": self.siae.pk}))
+        self.assertContains(response, reverse("apply:start", kwargs={"company_pk": self.company.pk}))
         self.assertNotContains(
             response,
             reverse(

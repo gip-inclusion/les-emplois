@@ -625,7 +625,7 @@ class User(AbstractUser, AddressMixin):
 
     def active_or_in_grace_period_company_memberships(self):
         """
-        Return the siae memberships accessible to the employer, which means either active
+        Return the company memberships accessible to the employer, which means either active
         or in grace period, with a minimum of database queries.
         """
         # Unfortunately we need two queries here, no solution was found to combine both

@@ -109,7 +109,7 @@ def get_first_membership_join_date(memberships):
 def get_hiring_company(job_seeker):
     """
     Ideally the job_seeker would have a unique hiring so that we can
-    properly link the approval back to the siae. However we already
+    properly link the approval back to the company. However we already
     have many job_seekers with two or more hirings. In this case
     we consider the latest hiring, which is an ugly workaround
     around the fact that we do not have a proper approval=>siae

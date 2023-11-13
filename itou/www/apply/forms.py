@@ -338,11 +338,11 @@ class ApplicationJobsForm(forms.ModelForm):
             "selected_jobs": forms.CheckboxSelectMultiple,
         }
 
-    def __init__(self, siae, *args, **kwargs):
+    def __init__(self, company, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.fields["selected_jobs"].queryset = (
-            siae.job_description_through.active().with_annotation_is_popular().prefetch_related("appellation")
+            company.job_description_through.active().with_annotation_is_popular().prefetch_related("appellation")
         )
         if not self.initial.get("selected_jobs"):
             self.initial["spontaneous_application"] = True
@@ -360,7 +360,7 @@ class ApplicationJobsForm(forms.ModelForm):
 
 class SubmitJobApplicationForm(forms.Form):
     """
-    Submit a job application to an SIAE.
+    Submit a job application to an company.
     """
 
     resume = ItouFileField(
@@ -370,12 +370,12 @@ class SubmitJobApplicationForm(forms.Form):
         max_upload_size=5 * global_constants.MB,
     )
 
-    def __init__(self, siae, user, *args, **kwargs):
-        self.siae = siae
+    def __init__(self, company, user, *args, **kwargs):
+        self.company = company
         super().__init__(*args, **kwargs)
         self.fields.update(forms.fields_for_model(JobApplication, fields=["selected_jobs", "message"]))
         selected_jobs = self.fields["selected_jobs"]
-        selected_jobs.queryset = siae.job_description_through.filter(is_active=True)
+        selected_jobs.queryset = company.job_description_through.filter(is_active=True)
         selected_jobs.widgets = forms.CheckboxSelectMultiple()
         selected_jobs.label = "Métiers recherchés"
 
@@ -440,7 +440,7 @@ class RefusalForm(forms.Form):
 
 class AnswerForm(forms.Form):
     """
-    Allow an SIAE to add an answer message when postponing.
+    Allow an company to add an answer message when postponing.
     """
 
     answer = forms.CharField(
@@ -453,8 +453,8 @@ class AnswerForm(forms.Form):
 
 class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
     """
-    Allow an SIAE to accept a job application.
-    If SIAE is a GEIQ, add specific fields (contract type, number of hours per week)
+    Allow an company to accept a job application.
+    If company is a GEIQ, add specific fields (contract type, number of hours per week)
     """
 
     SIAE_OPTIONAL_FIELDS = (
@@ -516,10 +516,10 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             ),
         }
 
-    def __init__(self, *args, siae, **kwargs):
+    def __init__(self, *args, company, **kwargs):
         super().__init__(*args, **kwargs)
-        self.siae = siae
-        self.is_geiq = siae.kind == CompanyKind.GEIQ
+        self.company = company
+        self.is_geiq = company.kind == CompanyKind.GEIQ
 
         self.fields["hiring_start_at"].required = True
         for field in ["hiring_start_at", "hiring_end_at"]:
@@ -557,7 +557,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             self.fields["qualification_type"].widget.attrs.update(
                 {
                     "hx-trigger": "change",
-                    "hx-post": reverse("apply:reload_qualification_fields", kwargs={"company_pk": siae.pk}),
+                    "hx-post": reverse("apply:reload_qualification_fields", kwargs={"company_pk": company.pk}),
                     "hx-swap": "outerHTML",
                     "hx-select": "#geiq_qualification_fields_block",
                     "hx-target": "#geiq_qualification_fields_block",
@@ -585,13 +585,13 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             self.fields["contract_type"].widget.attrs.update(
                 {
                     "hx-trigger": "change",
-                    "hx-post": reverse("apply:reload_contract_type_and_options", kwargs={"company_pk": siae.pk}),
+                    "hx-post": reverse("apply:reload_contract_type_and_options", kwargs={"company_pk": company.pk}),
                     "hx-swap": "outerHTML",
                     "hx-select": "#geiq_contract_type_and_options_block",
                     "hx-target": "#geiq_contract_type_and_options_block",
                 },
             )
-        elif siae.kind in SIAE_WITH_CONVENTION_KINDS:
+        elif company.kind in SIAE_WITH_CONVENTION_KINDS:
             # Add specific details to help texts for IAE
             self.fields["hiring_start_at"].help_text += (
                 " La date est modifiable jusqu'à la veille de la date saisie. En cas de premier PASS IAE pour "
@@ -617,7 +617,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             )
 
         choices = [("", "Sélectionnez un poste")]
-        if jobs := siae.job_description_through.all().order_by("custom_name", "is_active"):
+        if jobs := company.job_description_through.all().order_by("custom_name", "is_active"):
             if active_jobs := sorted_jobs_for_display(job for job in jobs if job.is_active):
                 choices.append(("Postes ouverts au recrutement", active_jobs))
             if inactive_jobs := sorted_jobs_for_display(job for job in jobs if not job.is_active):
@@ -631,7 +631,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         self.fields["hired_job"].choices = choices
         self.fields["hired_job"].widget.attrs.update(
             {
-                "hx-post": reverse("apply:reload_job_description_fields", kwargs={"company_pk": siae.pk}),
+                "hx-post": reverse("apply:reload_job_description_fields", kwargs={"company_pk": company.pk}),
                 "hx-swap": "outerHTML",
                 "hx-select": "#job_description_fields_block",
                 "hx-target": "#job_description_fields_block",
@@ -693,7 +693,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         if self.cleaned_data.get("hired_job") == self.OTHER_HIRED_JOB:
             # Check that the new job application is not a duplicate from the list
             if existing_job_description := JobDescription.objects.filter(
-                company=self.siae, location=location, appellation=appellation
+                company=self.company, location=location, appellation=appellation
             ).first():
                 # Found one matching: reuse it and don't create a new one
                 self.instance.hired_job = existing_job_description
@@ -703,7 +703,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
                 # - marked as autogenerated
                 # - associated to current job application
                 new_job_description = JobDescription(
-                    company=self.siae,
+                    company=self.company,
                     appellation=appellation,
                     location=location,
                     is_active=False,
@@ -767,7 +767,7 @@ class PriorActionForm(forms.ModelForm):
 
 class EditHiringDateForm(forms.ModelForm):
     """
-    Allows a SIAE to change contract date (if current one is in the future)
+    Allows a company to change contract date (if current one is in the future)
     """
 
     class Meta:
@@ -954,9 +954,9 @@ class FilterJobApplicationsForm(forms.Form):
         return filters_counter
 
 
-class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
+class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     """
-    Job applications filters common to SIAE and Prescribers.
+    Job applications filters common to companies and Prescribers.
     """
 
     senders = forms.MultipleChoiceField(required=False, label="Nom de la personne", widget=Select2MultipleWidget)
@@ -1027,9 +1027,9 @@ class SiaePrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         return qs_list
 
 
-class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
+class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsForm):
     """
-    Job applications filters for SIAE only.
+    Job applications filters for companies only.
     """
 
     sender_organizations = forms.MultipleChoiceField(
@@ -1038,15 +1038,15 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
         widget=Select2MultipleWidget,
     )
 
-    def __init__(self, job_applications_qs, siae, *args, **kwargs):
+    def __init__(self, job_applications_qs, company, *args, **kwargs):
         super().__init__(job_applications_qs, *args, **kwargs)
         self.fields["sender_organizations"].choices += self.get_sender_organization_choices()
 
-        if siae.kind not in SIAE_WITH_CONVENTION_KINDS:
+        if company.kind not in SIAE_WITH_CONVENTION_KINDS:
             del self.fields["eligibility_validated"]
 
-        if not siae.can_have_prior_action:
-            # Drop "pré-embauche" state from filter for non-GEIQ SIAE
+        if not company.can_have_prior_action:
+            # Drop "pré-embauche" state from filter for non-GEIQ companies
             self.fields["states"].choices = [
                 (k, v) for k, v in self.fields["states"].choices if k != JobApplicationWorkflow.STATE_PRIOR_TO_HIRE
             ]
@@ -1069,7 +1069,7 @@ class SiaeFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
         return sorted(sender_orgs, key=lambda org: org[0])
 
 
-class PrescriberFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsForm):
+class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsForm):
     """
     Job applications filters for Prescribers only.
     """
@@ -1093,9 +1093,9 @@ class PrescriberFilterJobApplicationsForm(SiaePrescriberFilterJobApplicationsFor
 
     def get_to_companies_choices(self):
         to_companies = self.job_applications_qs.get_unique_fk_objects("to_company")
-        to_companies = [siae for siae in to_companies if siae.display_name]
-        to_companies = [(siae.id, siae.display_name.title()) for siae in to_companies]
-        return sorted(to_companies, key=lambda siae: siae[1])
+        to_companies = [company for company in to_companies if company.display_name]
+        to_companies = [(company.id, company.display_name.title()) for company in to_companies]
+        return sorted(to_companies, key=lambda company: company[1])
 
 
 class CheckJobSeekerGEIQEligibilityForm(forms.Form):

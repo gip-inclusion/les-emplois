@@ -28,8 +28,8 @@ class GEIQAdministrativeCriteriaForm(forms.Form):
     # Foldable optional radio fields
     pole_emploi_related = forms.CharField(max_length=100, required=False)
 
-    def __init__(self, siae, administrative_criteria, form_url, accept_no_criteria=True, **kwargs):
-        if not siae or siae.kind != CompanyKind.GEIQ:
+    def __init__(self, company, administrative_criteria, form_url, accept_no_criteria=True, **kwargs):
+        if not company or company.kind != CompanyKind.GEIQ:
             raise ValueError("This form is only for GEIQ")
 
         if administrative_criteria is None:
@@ -40,7 +40,7 @@ class GEIQAdministrativeCriteriaForm(forms.Form):
 
         super().__init__(**kwargs)
 
-        self.siae = siae
+        self.company = company
         self.accept_no_criteria = accept_no_criteria
         self.criteria = list(GEIQAdministrativeCriteria.objects.all().order_by("ui_rank"))
         selected_pks = [ac.pk for ac in administrative_criteria]
@@ -151,8 +151,8 @@ class GEIQAdministrativeCriteriaForGEIQForm(GEIQAdministrativeCriteriaForm):
     # Specific for .. GEIQ structure (not prescriber)
     proof_of_eligibility = forms.BooleanField(required=False)
 
-    def __init__(self, siae, administrative_criteria, form_url, **kwargs):
-        super().__init__(siae, administrative_criteria, form_url, accept_no_criteria=False, **kwargs)
+    def __init__(self, company, administrative_criteria, form_url, **kwargs):
+        super().__init__(company, administrative_criteria, form_url, accept_no_criteria=False, **kwargs)
 
         proof_of_eligibility = self.fields["proof_of_eligibility"]
         proof_of_eligibility.widget.attrs.update({"hx-trigger": "change", "hx-post": form_url})
