@@ -46,6 +46,7 @@ from itou.metabase.db import build_final_tables, populate_table
 from itou.metabase.tables import (
     analytics,
     approvals,
+    companies,
     criteria,
     evaluated_criteria,
     evaluated_job_applications,
@@ -62,7 +63,6 @@ from itou.metabase.tables import (
     prolongations,
     rome_codes,
     selected_jobs,
-    siaes,
     users,
 )
 from itou.metabase.tables.utils import get_active_companies_pks
@@ -188,7 +188,7 @@ class Command(BaseCommand):
             .all()
         )
 
-        populate_table(siaes.TABLE, batch_size=100, querysets=[queryset])
+        populate_table(companies.TABLE, batch_size=100, querysets=[queryset])
 
     def populate_job_descriptions(self):
         queryset = (
