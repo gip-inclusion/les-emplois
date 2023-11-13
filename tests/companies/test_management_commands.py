@@ -95,7 +95,7 @@ def test_update_siaes_job_app_score():
 
 
 @freeze_time("2023-05-01")
-def test_update_siae_coords(settings, capsys, respx_mock):
+def test_update_companies_coords(settings, capsys, respx_mock):
     company_1 = companies_factories.CompanyFactory(
         coords="POINT (2.387311 48.917735)", geocoding_score=0.65
     )  # score too low
@@ -116,7 +116,7 @@ def test_update_siae_coords(settings, capsys, respx_mock):
         ),
     )
 
-    management.call_command("update_siae_coords", wet_run=True)
+    management.call_command("update_companies_coords", wet_run=True)
     stdout, stderr = capsys.readouterr()
     assert stderr == ""
     assert stdout.splitlines() == [
@@ -128,7 +128,7 @@ def test_update_siae_coords(settings, capsys, respx_mock):
         f"searched_address='{company_2.address_line_1} {company_2.post_code}' object_pk={company_2.pk}",
         "API result score=0.83 label='9 avenue Delorme 92220 Boulogne' "
         f"searched_address='{company_3.address_line_1} {company_3.post_code}' object_pk={company_3.pk}",
-        "> count=1 SIAEs geolocated with a high score.",
+        "> count=1 companies geolocated with a high score.",
     ]
 
     company_3.refresh_from_db()
