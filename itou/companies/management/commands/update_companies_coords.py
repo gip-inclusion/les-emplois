@@ -1,5 +1,5 @@
 """
-Out of 7405 SIAEs, 2452 have a score below 0.8 or are not geolocated at all.
+Out of 7405 companies, 2452 have a score below 0.8 or are not geolocated at all.
 
 After resolution:
 - 1343 more (total 6296, or 85%) have a score above 0.8
@@ -8,9 +8,9 @@ After resolution:
 - 64 are geolocated with a score below 0.4 . Do they have members ?
 - 48 are NOT geolocated
 
-Surprisingly the resolution seems to be still quite good at 0.6 for the SIAEs.
+Surprisingly the resolution seems to be still quite good at 0.6 for the companies.
 
-We also notice that for the lowest scores, usually the SIAES include several
+We also notice that for the lowest scores, usually the companies include several
 post codes in the address line 1, resulting in bad results. The intention was
 probably to provide a postal address, but that does not really help.
 
@@ -38,12 +38,12 @@ class Command(BaseCommand):
         )
 
     def handle(self, wet_run, **options):
-        siaes = Company.objects.all()
+        companies = Company.objects.all()
 
-        siaes_to_save = list(geolocate_qs(siaes, is_verbose=True))
+        companies_to_save = list(geolocate_qs(companies, is_verbose=True))
         if wet_run:
             Company.objects.bulk_update(
-                siaes_to_save,
+                companies_to_save,
                 ["coords", "geocoding_score", "ban_api_resolved_address", "geocoding_updated_at"],
             )
-            self.stdout.write(f"> count={len(siaes_to_save)} SIAEs geolocated with a high score.")
+            self.stdout.write(f"> count={len(companies_to_save)} companies geolocated with a high score.")
