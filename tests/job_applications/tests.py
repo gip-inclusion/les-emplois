@@ -685,7 +685,7 @@ class JobApplicationNotificationsTest(TestCase):
         # Set up data for the whole TestCase.
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
 
-    def test_new_for_siae(self):
+    def test_new_for_company(self):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             selected_jobs=Appellation.objects.all(),
