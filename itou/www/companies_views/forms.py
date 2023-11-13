@@ -15,7 +15,7 @@ from itou.utils.urls import get_external_link_markup
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
 
-class CreateSiaeForm(forms.ModelForm):
+class CreateCompanyForm(forms.ModelForm):
     class Meta:
         model = Company
         fields = [
@@ -41,12 +41,12 @@ class CreateSiaeForm(forms.ModelForm):
             "description": "Texte de présentation de votre structure.",
         }
 
-    def __init__(self, current_siae, current_user, *args, **kwargs):
-        self.current_siae = current_siae
+    def __init__(self, current_company, current_user, *args, **kwargs):
+        self.current_company = current_company
         self.current_user = current_user
         super().__init__(*args, **kwargs)
 
-        self.fields["kind"].choices = [(current_siae.kind, dict(CompanyKind.choices)[current_siae.kind])]
+        self.fields["kind"].choices = [(current_company.kind, dict(CompanyKind.choices)[current_company.kind])]
 
         self.fields["department"].choices = [("", "---")] + list(DEPARTMENTS.items())
 
@@ -55,7 +55,7 @@ class CreateSiaeForm(forms.ModelForm):
             self.fields[required_field].required = True
 
     def clean_kind(self):
-        return self.current_siae.kind
+        return self.current_company.kind
 
     def clean(self):
         siret = self.cleaned_data.get("siret")
@@ -79,8 +79,8 @@ class CreateSiaeForm(forms.ModelForm):
             error_message = mark_safe(f"{error_message} {external_link} {error_message_siret}")
             raise forms.ValidationError(error_message)
 
-        if not siret.startswith(self.current_siae.siren):
-            raise forms.ValidationError(f"Le SIRET doit commencer par le SIREN {self.current_siae.siren}")
+        if not siret.startswith(self.current_company.siren):
+            raise forms.ValidationError(f"Le SIRET doit commencer par le SIREN {self.current_company.siren}")
 
         return self.cleaned_data
 
@@ -89,7 +89,7 @@ class CreateSiaeForm(forms.ModelForm):
         company.set_coords(company.geocoding_address, post_code=company.post_code)
         company.created_by = self.current_user
         company.source = Company.SOURCE_USER_CREATED
-        company.convention = self.current_siae.convention
+        company.convention = self.current_company.convention
         company.save()
 
         CompanyMembership.objects.create(company=company, is_admin=True, user=self.current_user)

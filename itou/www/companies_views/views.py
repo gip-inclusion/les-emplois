@@ -455,8 +455,8 @@ def create_siae(request, template_name="siaes/create_siae.html"):
     if not request.user.can_create_siae_antenna(parent_siae=current_siae):
         raise PermissionDenied
 
-    form = siaes_forms.CreateSiaeForm(
-        current_siae=current_siae,
+    form = siaes_forms.CreateCompanyForm(
+        current_company=current_siae,
         current_user=request.user,
         data=request.POST or None,
         initial={"siret": current_siae.siret, "kind": current_siae.kind, "department": current_siae.department},
