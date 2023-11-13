@@ -72,9 +72,10 @@
                               
                                   <!-- djlint:off --><!-- djlint:on -->
                                   
+                                      <br/>
                                       <small>
-                                          <a class="ms-3" href="/approvals/suspension/1/edit?back_url=/approvals/detail/1">Modifier</a>
-                                          <a class="ms-3" href="/approvals/suspension/1/delete?back_url=/approvals/detail/1">Annuler</a>
+                                          <a href="/approvals/suspension/1/action/edit/?back_url=/approvals/detail/1">Modifier la suspension</a>
+                                          <a class="ms-1" href="/approvals/suspension/1/action/?back_url=/approvals/detail/1">Supprimer la suspension</a>
                                       </small>
                                   
                               
