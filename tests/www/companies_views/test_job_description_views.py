@@ -97,7 +97,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
             BASE_NUM_QUERIES
             + 1  # fetch django session
             + 1  # fetch user
-            + 2  # fetch user memberships (and if siae is active/in grace period)
+            + 2  # fetch user memberships (and if company is active/in grace period)
             + 1  # count job descriptions
             + 1  # fetch job descriptions
             + 2  # prefetch appelation, rome
@@ -198,20 +198,20 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         self.assertRedirects(response, self.url)
         assertMessages(response, [(messages.ERROR, "La fiche de poste que vous souhaitiez modifier n'existe plus.")])
 
-        # Trying to update job description from an other SIAE does nothing
-        other_siae_job_description = JobDescriptionFactory(is_active=False)
+        # Trying to update job description from an other company does nothing
+        other_company_job_description = JobDescriptionFactory(is_active=False)
         response = self.client.post(
             self.url,
             data={
-                "job_description_id": other_siae_job_description.pk,
+                "job_description_id": other_company_job_description.pk,
                 "job_description_is_active": "on",
                 "action": "toggle_active",
             },
         )
         self.assertRedirects(response, self.url)
         assertMessages(response, [(messages.ERROR, "La fiche de poste que vous souhaitiez modifier n'existe plus.")])
-        other_siae_job_description.refresh_from_db()
-        assert not other_siae_job_description.is_active
+        other_company_job_description.refresh_from_db()
+        assert not other_company_job_description.is_active
 
     def test_delete_job_descriptions(self):
         response = self._login(self.user)
@@ -235,18 +235,18 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         self.assertRedirects(response, self.url)
         assertMessages(response, [(messages.WARNING, "La fiche de poste que vous souhaitez supprimer n'existe plus.")])
 
-        # Trying to delete job description from an other SIAE does nothing
-        other_siae_job_description = JobDescriptionFactory()
+        # Trying to delete job description from an other company does nothing
+        other_company_job_description = JobDescriptionFactory()
         response = self.client.post(
             self.url,
             data={
-                "job_description_id": other_siae_job_description.pk,
+                "job_description_id": other_company_job_description.pk,
                 "action": "delete",
             },
         )
         self.assertRedirects(response, self.url)
         assertMessages(response, [(messages.WARNING, "La fiche de poste que vous souhaitez supprimer n'existe plus.")])
-        assert JobDescription.objects.filter(pk=other_siae_job_description.pk).exists()
+        assert JobDescription.objects.filter(pk=other_company_job_description.pk).exists()
 
 
 class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
@@ -266,7 +266,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
 
         post_data = {
-            "appellation": "11076",  # Must be a non existing one for the SIAE
+            "appellation": "11076",  # Must be a non existing one for the company
             "custom_name": "custom_name",
             "location": self.paris_city.pk,
             "hours_per_week": 35,
@@ -336,7 +336,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
 
         post_data = {
-            "appellation": "11076",  # Must be a non existing one for the SIAE
+            "appellation": "11076",  # Must be a non existing one for the company
             "market_context_description": "Whatever market description",
             "custom_name": "custom_name",
             "location": self.paris_city.pk,
@@ -405,7 +405,7 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         assert ITOU_SESSION_JOB_DESCRIPTION_KEY not in self.client.session
 
         post_data = {
-            "appellation": "11076",  # Must be a non existing one for the SIAE
+            "appellation": "11076",  # Must be a non existing one for the company
             "custom_name": "custom_name",
             "location": self.paris_city.pk,
             "hours_per_week": 35,
@@ -565,7 +565,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         )
 
     def test_employer_card_actions(self):
-        # Checks if SIAE can update their job descriptions
+        # Checks if company can update their job descriptions
         response = self._login(self.user)
 
         self.assertContains(response, "Modifier la fiche de poste")
@@ -581,7 +581,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         self.assertNotContains(response, reverse("apply:start", kwargs={"company_pk": self.company.pk}))
 
     def test_prescriber_card_actions(self):
-        # Checks if non-SIAE can apply to opened job descriptions
+        # Checks if non-employers can apply to opened job descriptions
         self.client.force_login(PrescriberOrganizationWithMembershipFactory().members.first())
 
         with self.assertNumQueries(
@@ -589,8 +589,8 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             + 1  # fetch django session
             + 1  # fetch user
             + 1  # fetch user memberships
-            + 1  # fetch siaes_siaejobdescription
-            + 1  # fetch siaes infos
+            + 1  # fetch companies_jobdescription
+            + 1  # fetch companies infos
             + 1  # fetch jobappelation
             + 3  # update session
         ):
@@ -613,8 +613,8 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             BASE_NUM_QUERIES
             + 1  # fetch django session
             + 1  # fetch user
-            + 1  # fetch siaes_siaejobdescription
-            + 1  # fetch siaes infos
+            + 1  # fetch companies_jobdescription
+            + 1  # fetch companies infos
             + 1  # fetch jobappelation
             + 3  # update session
         ):

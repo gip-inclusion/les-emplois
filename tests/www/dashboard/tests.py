@@ -80,7 +80,7 @@ class DashboardViewTest(TestCase):
         response = self.client.get(url)
         assert response.status_code == 200
 
-    def test_user_with_inactive_siae_can_still_login_during_grace_period(self):
+    def test_user_with_inactive_company_can_still_login_during_grace_period(self):
         company = CompanyPendingGracePeriodFactory()
         user = EmployerFactory()
         company.members.add(user)
@@ -90,7 +90,7 @@ class DashboardViewTest(TestCase):
         response = self.client.get(url)
         assert response.status_code == 200
 
-    def test_user_with_inactive_siae_cannot_login_after_grace_period(self):
+    def test_user_with_inactive_company_cannot_login_after_grace_period(self):
         company = CompanyAfterGracePeriodFactory()
         user = EmployerFactory()
         company.members.add(user)
@@ -151,21 +151,21 @@ class DashboardViewTest(TestCase):
 
         session = self.client.session
 
-        # select the first SIAE's in the session
+        # select the first company's in the session
         session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = company.pk
         session.save()
         response = self.client.get(url)
         self.assertContains(response, "bg-danger")
         assert response.context["num_rejected_employee_records"] == 2
 
-        # select the second SIAE's in the session
+        # select the second company's in the session
         session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = other_company.pk
         session.save()
         response = self.client.get(url)
         self.assertContains(response, "bg-danger")
         assert response.context["num_rejected_employee_records"] == 1
 
-        # select the third SIAE's in the session
+        # select the third company's in the session
         session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = last_company.pk
         session.save()
         response = self.client.get(url)
@@ -198,7 +198,7 @@ class DashboardViewTest(TestCase):
             CompanyKind.ACI,
             CompanyKind.ETTI,
         ]:
-            with self.subTest(f"should display when siae_kind={kind}"):
+            with self.subTest(f"should display when company_kind={kind}"):
                 company = CompanyFactory(kind=kind, with_membership=True)
                 user = company.members.first()
                 self.client.force_login(user)
@@ -207,7 +207,7 @@ class DashboardViewTest(TestCase):
                 self.assertContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
 
         for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS]:
-            with self.subTest(f"should not display when siae_kind={kind}"):
+            with self.subTest(f"should not display when company_kind={kind}"):
                 company = CompanyFactory(kind=kind, with_membership=True)
                 user = company.members.first()
                 self.client.force_login(user)
@@ -229,7 +229,7 @@ class DashboardViewTest(TestCase):
             CompanyKind.GEIQ,
         ]
         for kind in display_kinds:
-            with self.subTest(f"should display when siae_kind={kind}"):
+            with self.subTest(f"should display when company_kind={kind}"):
                 company = CompanyFactory(kind=kind, with_membership=True)
                 user = company.members.first()
                 self.client.force_login(user)
@@ -241,7 +241,7 @@ class DashboardViewTest(TestCase):
                 self.assertContains(response, reverse("apply:check_nir_for_hire", kwargs={"company_pk": company.pk}))
 
         for kind in set(CompanyKind) - set(display_kinds):
-            with self.subTest(f"should not display when siae_kind={kind}"):
+            with self.subTest(f"should not display when company_kind={kind}"):
                 company = CompanyFactory(kind=kind, with_membership=True)
                 user = company.members.first()
                 self.client.force_login(user)
@@ -444,7 +444,7 @@ class DashboardViewTest(TestCase):
         num_queries = BASE_NUM_QUERIES
         num_queries += 1  #  get django session
         num_queries += 1  #  get user (middleware)
-        num_queries += 2  #  get siae memberships (middleware)
+        num_queries += 2  #  get company memberships (middleware)
         num_queries += 1  #  OrganizationAbstract.has_admin()
         num_queries += 1  #  select job applications states
         num_queries += 1  #  count employee records
@@ -554,7 +554,7 @@ class DashboardViewTest(TestCase):
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, "DORA")
 
-    def test_dora_card_is_shown_for_siae(self):
+    def test_dora_card_is_shown_for_employer(self):
         company = CompanyFactory(with_membership=True)
         self.client.force_login(company.members.first())
 
@@ -582,7 +582,7 @@ class DashboardViewTest(TestCase):
         self.assertNotContains(response, "Consultez l’offre de service de vos partenaires")
         self.assertNotContains(response, "Donnez de la visibilité à votre offre d’insertion")
 
-    def test_dora_banner_is_shown_for_siae(self):
+    def test_dora_banner_is_shown_for_employer(self):
         for department in ["91", "26", "74", "30"]:
             with self.subTest(department=department):
                 company = CompanyFactory(
@@ -950,7 +950,7 @@ class EditJobSeekerInfo(TestCase):
         self.NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
 
     @override_settings(TALLY_URL="https://tally.so")
-    def test_edit_by_siae_with_nir(self):
+    def test_edit_by_company_with_nir(self):
         job_application = JobApplicationSentByPrescriberFactory()
         user = job_application.to_company.members.first()
 
@@ -1012,7 +1012,7 @@ class EditJobSeekerInfo(TestCase):
         # last_checked_at should have been updated
         assert job_seeker.last_checked_at > previous_last_checked_at
 
-    def test_edit_by_siae_with_lack_of_nir_reason(self):
+    def test_edit_by_company_with_lack_of_nir_reason(self):
         job_application = JobApplicationSentByPrescriberFactory(
             job_seeker__nir="", job_seeker__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER
         )
@@ -1059,7 +1059,7 @@ class EditJobSeekerInfo(TestCase):
         # last_checked_at should have been updated
         assert job_seeker.last_checked_at > previous_last_checked_at
 
-    def test_edit_by_siae_without_nir_information(self):
+    def test_edit_by_company_without_nir_information(self):
         job_application = JobApplicationSentByPrescriberFactory(job_seeker__nir="", job_seeker__lack_of_nir_reason="")
         user = job_application.to_company.members.first()
 
@@ -1433,8 +1433,8 @@ class EditUserEmailFormTest(TestCase):
         assert form.is_valid()
 
 
-class SwitchSiaeTest(TestCase):
-    def test_switch_siae(self):
+class SwitchCompanyTest(TestCase):
+    def test_switch_company(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         self.client.force_login(user)
@@ -1478,7 +1478,7 @@ class SwitchSiaeTest(TestCase):
         assert response.status_code == 200
         assert response.context["request"].current_organization == related_company
 
-    def test_can_still_switch_to_inactive_siae_during_grace_period(self):
+    def test_can_still_switch_to_inactive_company_during_grace_period(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         self.client.force_login(user)
@@ -1501,7 +1501,7 @@ class SwitchSiaeTest(TestCase):
         assert response.status_code == 200
         assert response.context["request"].current_organization == related_company
 
-    def test_cannot_switch_to_inactive_siae_after_grace_period(self):
+    def test_cannot_switch_to_inactive_company_after_grace_period(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         self.client.force_login(user)
@@ -1514,13 +1514,13 @@ class SwitchSiaeTest(TestCase):
         assert response.status_code == 200
         assert response.context["request"].current_organization == company
 
-        # Switching to that siae is not even possible in practice because
+        # Switching to that company is not even possible in practice because
         # it does not even show up in the menu.
         url = reverse("dashboard:switch_organization")
         response = self.client.post(url, data={"organization_id": related_company.pk})
         assert response.status_code == 404
 
-        # User is still working on the main active siae.
+        # User is still working on the main active company.
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
@@ -1528,7 +1528,7 @@ class SwitchSiaeTest(TestCase):
 
 
 class EditUserPreferencesTest(TestCase):
-    def test_employer_opt_in_siae_no_job_description(self):
+    def test_employer_opt_in_company_no_job_description(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         recipient = user.companymembership_set.get(company=company)
@@ -1556,7 +1556,7 @@ class EditUserPreferencesTest(TestCase):
         assert recipient.notifications
         assert NewSpontaneousJobAppEmployersNotification.is_subscribed(recipient=recipient)
 
-    def test_employer_opt_in_siae_with_job_descriptions(self):
+    def test_employer_opt_in_company_with_job_descriptions(self):
         company = CompanyWithMembershipAndJobsFactory()
         user = company.members.first()
         job_descriptions_pks = list(company.job_description_through.values_list("pk", flat=True))
@@ -1585,7 +1585,7 @@ class EditUserPreferencesTest(TestCase):
         for pk in job_descriptions_pks:
             assert NewQualifiedJobAppEmployersNotification.is_subscribed(recipient=recipient, subscribed_pk=pk)
 
-    def test_employer_opt_out_siae_no_job_descriptions(self):
+    def test_employer_opt_out_company_no_job_descriptions(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         recipient = user.companymembership_set.get(company=company)
@@ -1612,7 +1612,7 @@ class EditUserPreferencesTest(TestCase):
         assert recipient.notifications
         assert not NewSpontaneousJobAppEmployersNotification.is_subscribed(recipient=recipient)
 
-    def test_employer_opt_out_siae_with_job_descriptions(self):
+    def test_employer_opt_out_company_with_job_descriptions(self):
         company = CompanyWithMembershipAndJobsFactory()
         user = company.members.first()
         job_descriptions_pks = list(company.job_description_through.values_list("pk", flat=True))
@@ -1737,7 +1737,7 @@ class SwitchInstitutionTest(TestCase):
 TOKEN_MENU_STR = "Accès aux APIs"
 
 
-def test_api_token_view_for_siae_admin(client):
+def test_api_token_view_for_company_admin(client):
     employer = CompanyMembershipFactory().user
     client.force_login(employer)
 
@@ -1764,7 +1764,7 @@ def test_api_token_view_for_siae_admin(client):
     assert Token.objects.filter(user=employer).count() == 1
 
 
-def test_api_token_view_for_non_siae_admin(client):
+def test_api_token_view_for_non_company_admin(client):
     employer = CompanyMembershipFactory(is_admin=False).user
     client.force_login(employer)
 

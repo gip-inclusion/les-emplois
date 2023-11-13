@@ -31,7 +31,7 @@ from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 pytestmark = pytest.mark.ignore_template_errors
 
 
-class SiaeSignupTest(InclusionConnectBaseTestCase):
+class CompanySignupTest(InclusionConnectBaseTestCase):
     def test_choose_user_kind(self):
         url = reverse("signup:choose_user_kind")
         response = self.client.get(url)
@@ -42,9 +42,9 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
-    def test_join_an_siae_without_members(self):
+    def test_join_an_company_without_members(self):
         """
-        A user joins an SIAE without members.
+        A user joins an company without members.
         """
         company = CompanyFactory(kind=CompanyKind.ETTI)
         assert 0 == company.members.count()
@@ -53,11 +53,11 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         response = self.client.get(url)
         assert response.status_code == 200
 
-        # Find an SIAE by SIREN.
+        # Find an company by SIREN.
         response = self.client.get(url, {"siren": company.siret[:9]})
         assert response.status_code == 200
 
-        # Choose an SIAE between results.
+        # Choose an company between results.
         post_data = {"siaes": company.pk}
         # Pass `siren` in request.GET
         response = self.client.post(f"{url}?siren={company.siret[:9]}", data=post_data)
@@ -112,7 +112,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         # No new sent email.
         assert len(mail.outbox) == 1
 
-        # Magic link is no longer valid because siae.members.count() has changed.
+        # Magic link is no longer valid because company.members.count() has changed.
         response = self.client.get(magic_link, follow=True)
         self.assertRedirects(response, reverse("signup:company_select"))
         expected_message = (
@@ -122,9 +122,9 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
-    def test_join_an_siae_without_members_as_an_existing_employer(self):
+    def test_join_an_company_without_members_as_an_existing_employer(self):
         """
-        A user joins an SIAE without members.
+        A user joins an company without members.
         """
         company = CompanyFactory(kind=CompanyKind.ETTI)
         assert 0 == company.members.count()
@@ -166,9 +166,9 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
 
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
-    def test_join_an_siae_without_members_as_an_existing_employer_returns_on_other_browser(self):
+    def test_join_an_company_without_members_as_an_existing_employer_returns_on_other_browser(self):
         """
-        A user joins an SIAE without members.
+        A user joins an company without members.
         """
         company = CompanyFactory(kind=CompanyKind.ETTI)
 
@@ -208,7 +208,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         assert 1 == company.members.count()
         assert 2 == user.company_set.count()
 
-    def test_user_invalid_siae_id(self):
+    def test_user_invalid_company_id(self):
         company = CompanyFactory(kind=CompanyKind.ETTI)
         response = self.client.get(
             reverse("signup:employer", kwargs={"company_id": "0", "token": company.get_token()})
@@ -224,7 +224,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
             ],
         )
 
-    def test_join_invalid_siae_id(self):
+    def test_join_invalid_company_id(self):
         user = EmployerFactory(with_company=True)
         self.client.force_login(user)
         company = CompanyFactory(kind=CompanyKind.ETTI)
@@ -330,7 +330,7 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, get_tally_form_url("wA799W"))
         self.assertContains(response, reverse("signup:facilitator_search"))
 
-    def test_siae_select_does_not_die_under_requests(self):
+    def test_company_select_does_not_die_under_requests(self):
         companies = (
             CompanyWithMembershipAndJobsFactory(siret="40219166200001"),
             CompanyWithMembershipAndJobsFactory(siret="40219166200002"),
@@ -339,18 +339,18 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
             CompanyWithMembershipAndJobsFactory(siret="40219166200005"),
             CompanyWithMembershipAndJobsFactory(siret="40219166200005", kind=CompanyKind.AI),
         )
-        # Add more than one member to all SIAE to test prefetch and distinct
+        # Add more than one member to all company to test prefetch and distinct
         for company in companies:
             CompanyMembershipFactory.create_batch(2, company=company)
 
         url = reverse("signup:company_select")
-        # ensure we only perform 4 requests, whatever the number of SIAEs sharing the
+        # ensure we only perform 4 requests, whatever the number of companies sharing the
         # same SIREN. Before, this request was issuing 3*N slow requests, N being the
-        # number of SIAEs.
+        # number of companies.
         with self.assertNumQueries(
             BASE_NUM_QUERIES
-            + 1  # SELECT siaes with active admins
-            + 1  # SELECT the conventions for those siaes
+            + 1  # SELECT companies with active admins
+            + 1  # SELECT the conventions for those companies
             + 1  # prefetch memberships
             + 1  # prefetch users associated with those memberships
         ):
@@ -364,15 +364,15 @@ class SiaeSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, "00005", count=2)
 
 
-class SiaeSignupViewsExceptionsTest(TestCase):
-    def test_non_staff_cant_join_a_siae(self):
+class CompanySignupViewsExceptionsTest(TestCase):
+    def test_non_staff_cant_join_a_company(self):
         company = CompanyFactory(kind=CompanyKind.ETTI)
         assert 0 == company.members.count()
 
         user = PrescriberFactory(email=OIDC_USERINFO["email"])
         self.client.login(email=user.email, password=DEFAULT_PASSWORD)
 
-        # Skip IC process and jump to joining the SIAE.
+        # Skip IC process and jump to joining the company.
         token = company.get_token()
         url = reverse("signup:company_join", args=(company.pk, token))
 

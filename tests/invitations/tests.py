@@ -157,7 +157,7 @@ class TestPrescriberWithOrgInvitationEmails(SimpleTestCase):
         assert invitation.email in email.to
 
 
-class TestSiaeInvitation(TestCase):
+class TestCompanyInvitation(TestCase):
     def test_add_member_to_company(self):
         invitation = SentEmployerInvitationFactory(email="hey@you.com")
         EmployerFactory(email=invitation.email)
@@ -170,15 +170,15 @@ class TestSiaeInvitation(TestCase):
         invitation = SentEmployerInvitationFactory(email="hey@you.com")
         CompanyMembershipFactory(company=invitation.company, user__email=invitation.email, is_active=False)
         employers = invitation.company.members.count()
-        siae_active_members = invitation.company.active_members.count()
+        company_active_members = invitation.company.active_members.count()
         invitation.add_invited_user_to_company()
         employers_after = invitation.company.members.count()
-        siae_active_members_after = invitation.company.active_members.count()
+        company_active_members_after = invitation.company.active_members.count()
         assert employers == employers_after
-        assert siae_active_members + 1 == siae_active_members_after
+        assert company_active_members + 1 == company_active_members_after
 
 
-class TestSiaeInvitationEmails(SimpleTestCase):
+class TestCompanyInvitationEmails(SimpleTestCase):
     def test_accepted_notif_sender(self):
         invitation = SentEmployerInvitationFactory.build()
         email = invitation.email_accepted_notif_sender

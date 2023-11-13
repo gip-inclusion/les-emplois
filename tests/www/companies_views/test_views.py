@@ -693,8 +693,8 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         assert response.status_code == 403
 
 
-class CreateSiaeViewTest(TestCase):
-    def test_create_non_preexisting_siae_outside_of_siren_fails(self):
+class CreateCompanyViewTest(TestCase):
+    def test_create_non_preexisting_company_outside_of_siren_fails(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
 
@@ -712,7 +712,7 @@ class CreateSiaeViewTest(TestCase):
         post_data = {
             "siret": new_siret,
             "kind": company.kind,
-            "name": "FAMOUS SIAE SUB STRUCTURE",
+            "name": "FAMOUS COMPANY SUB STRUCTURE",
             "source": Company.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
@@ -720,7 +720,7 @@ class CreateSiaeViewTest(TestCase):
             "department": "67",
             "email": "",
             "phone": "0610203050",
-            "website": "https://famous-siae.com",
+            "website": "https://famous-company.com",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
@@ -732,7 +732,7 @@ class CreateSiaeViewTest(TestCase):
 
         assert not Company.objects.filter(siret=post_data["siret"]).exists()
 
-    def test_create_preexisting_siae_outside_of_siren_fails(self):
+    def test_create_preexisting_company_outside_of_siren_fails(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
 
@@ -750,7 +750,7 @@ class CreateSiaeViewTest(TestCase):
         post_data = {
             "siret": new_siret,
             "kind": preexisting_company.kind,
-            "name": "FAMOUS SIAE SUB STRUCTURE",
+            "name": "FAMOUS COMPANY SUB STRUCTURE",
             "source": Company.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
@@ -758,7 +758,7 @@ class CreateSiaeViewTest(TestCase):
             "department": "67",
             "email": "",
             "phone": "0610203050",
-            "website": "https://famous-siae.com",
+            "website": "https://famous-company.com",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
@@ -770,7 +770,7 @@ class CreateSiaeViewTest(TestCase):
 
         assert Company.objects.filter(siret=post_data["siret"]).count() == 1
 
-    def test_cannot_create_siae_with_same_siret_and_same_kind(self):
+    def test_cannot_create_company_with_same_siret_and_same_kind(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
 
@@ -783,7 +783,7 @@ class CreateSiaeViewTest(TestCase):
         post_data = {
             "siret": company.siret,
             "kind": company.kind,
-            "name": "FAMOUS SIAE SUB STRUCTURE",
+            "name": "FAMOUS COMPANY SUB STRUCTURE",
             "source": Company.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
@@ -791,7 +791,7 @@ class CreateSiaeViewTest(TestCase):
             "department": "67",
             "email": "",
             "phone": "0610203050",
-            "website": "https://famous-siae.com",
+            "website": "https://famous-company.com",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
@@ -805,7 +805,7 @@ class CreateSiaeViewTest(TestCase):
         assert Company.objects.filter(siret=post_data["siret"]).count() == 1
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_cannot_create_siae_with_same_siret_and_different_kind(self, _mock_call_ban_geocoding_api):
+    def test_cannot_create_company_with_same_siret_and_different_kind(self, _mock_call_ban_geocoding_api):
         company = CompanyFactory(with_membership=True)
         company.kind = CompanyKind.ETTI
         company.save()
@@ -820,7 +820,7 @@ class CreateSiaeViewTest(TestCase):
         post_data = {
             "siret": company.siret,
             "kind": CompanyKind.ACI,
-            "name": "FAMOUS SIAE SUB STRUCTURE",
+            "name": "FAMOUS COMPANY SUB STRUCTURE",
             "source": Company.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
@@ -828,7 +828,7 @@ class CreateSiaeViewTest(TestCase):
             "department": "67",
             "email": "",
             "phone": "0610203050",
-            "website": "https://famous-siae.com",
+            "website": "https://famous-company.com",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
@@ -837,7 +837,7 @@ class CreateSiaeViewTest(TestCase):
         assert Company.objects.filter(siret=post_data["siret"]).count() == 1
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_cannot_create_siae_with_same_siren_and_different_kind(self, _mock_call_ban_geocoding_api):
+    def test_cannot_create_company_with_same_siren_and_different_kind(self, _mock_call_ban_geocoding_api):
         company = CompanyFactory(with_membership=True)
         company.kind = CompanyKind.ETTI
         company.save()
@@ -855,7 +855,7 @@ class CreateSiaeViewTest(TestCase):
         post_data = {
             "siret": new_siret,
             "kind": CompanyKind.ACI,
-            "name": "FAMOUS SIAE SUB STRUCTURE",
+            "name": "FAMOUS COMPANY SUB STRUCTURE",
             "source": Company.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
@@ -863,7 +863,7 @@ class CreateSiaeViewTest(TestCase):
             "department": "67",
             "email": "",
             "phone": "0610203050",
-            "website": "https://famous-siae.com",
+            "website": "https://famous-company.com",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
@@ -873,7 +873,7 @@ class CreateSiaeViewTest(TestCase):
         assert Company.objects.filter(siret=new_siret).count() == 0
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_create_siae_with_same_siren_and_same_kind(self, mock_call_ban_geocoding_api):
+    def test_create_company_with_same_siren_and_same_kind(self, mock_call_ban_geocoding_api):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
 
@@ -889,7 +889,7 @@ class CreateSiaeViewTest(TestCase):
         post_data = {
             "siret": new_siret,
             "kind": company.kind,
-            "name": "FAMOUS SIAE SUB STRUCTURE",
+            "name": "FAMOUS COMPANY SUB STRUCTURE",
             "source": Company.SOURCE_USER_CREATED,
             "address_line_1": "2 Rue de Soufflenheim",
             "city": "Betschdorf",
@@ -897,7 +897,7 @@ class CreateSiaeViewTest(TestCase):
             "department": "67",
             "email": "",
             "phone": "0610203050",
-            "website": "https://famous-siae.com",
+            "website": "https://famous-company.com",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
         response = self.client.post(url, data=post_data)
@@ -933,7 +933,7 @@ class CreateSiaeViewTest(TestCase):
         assert new_company.geocoding_score == 0.587663373207207
 
 
-class EditSiaeViewTest(TestCase):
+class EditCompanyViewTest(TestCase):
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
     def test_edit(self, _unused_mock):
         company = CompanyFactory(with_membership=True)
@@ -946,10 +946,10 @@ class EditSiaeViewTest(TestCase):
         self.assertContains(response, "Informations générales")
 
         post_data = {
-            "brand": "NEW FAMOUS SIAE BRAND NAME",
+            "brand": "NEW FAMOUS COMPANY BRAND NAME",
             "phone": "0610203050",
             "email": "",
-            "website": "https://famous-siae.com",
+            "website": "https://famous-company.com",
             "address_line_1": "1 Rue Jeanne d'Arc",
             "address_line_2": "",
             "post_code": "62000",
@@ -987,7 +987,7 @@ class EditSiaeViewTest(TestCase):
         assert self.client.session["edit_siae_session_key"] == {
             "address_line_1": "1 Rue Jeanne d'Arc",
             "address_line_2": "",
-            "brand": "NEW FAMOUS SIAE BRAND NAME",
+            "brand": "NEW FAMOUS COMPANY BRAND NAME",
             "city": "Arras",
             "department": "62",
             "description": "Le meilleur des SIAEs !",
@@ -995,7 +995,7 @@ class EditSiaeViewTest(TestCase):
             "phone": "0610203050",
             "post_code": "62000",
             "provided_support": "On est très très forts pour tout",
-            "website": "https://famous-siae.com",
+            "website": "https://famous-company.com",
         }
 
         # Go forward again
@@ -1007,14 +1007,14 @@ class EditSiaeViewTest(TestCase):
         response = self.client.post(response.redirect_chain[-1][0])
         self.assertRedirects(response, reverse("dashboard:index"))
 
-        # refresh Siae, but using the siret to be sure we didn't mess with the PK
+        # refresh company, but using the siret to be sure we didn't mess with the PK
         company = Company.objects.get(siret=company.siret)
 
-        assert company.brand == "NEW FAMOUS SIAE BRAND NAME"
+        assert company.brand == "NEW FAMOUS COMPANY BRAND NAME"
         assert company.description == "Le meilleur des SIAEs !"
         assert company.email == "toto@titi.fr"
         assert company.phone == "0610203050"
-        assert company.website == "https://famous-siae.com"
+        assert company.website == "https://famous-company.com"
 
         assert company.address_line_1 == "1 Rue Jeanne d'Arc"
         assert company.address_line_2 == ""
@@ -1034,7 +1034,7 @@ class EditSiaeViewTest(TestCase):
 
         self.client.force_login(user)
 
-        # Only admin members should be allowed to edit SIAE's details
+        # Only admin members should be allowed to edit company's details
         membership = user.companymembership_set.first()
         membership.is_admin = False
         membership.save()
@@ -1043,7 +1043,7 @@ class EditSiaeViewTest(TestCase):
         assert response.status_code == 403
 
 
-class EditSiaeViewWithWrongAddressTest(TestCase):
+class EditCompanyViewWithWrongAddressTest(TestCase):
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
     def test_edit(self, _unused_mock):
         company = CompanyFactory(with_membership=True)
@@ -1056,10 +1056,10 @@ class EditSiaeViewWithWrongAddressTest(TestCase):
         self.assertContains(response, "Informations générales")
 
         post_data = {
-            "brand": "NEW FAMOUS SIAE BRAND NAME",
+            "brand": "NEW FAMOUS COMPANY BRAND NAME",
             "phone": "0610203050",
             "email": "toto@titi.fr",
-            "website": "https://famous-siae.com",
+            "website": "https://famous-company.com",
             "address_line_1": "1 Rue Jeanne d'Arc",
             "address_line_2": "",
             "post_code": "62000",
@@ -1157,10 +1157,9 @@ class UserMembershipDeactivationTest(TestCase):
         response = self.client.post(url)
         assert response.status_code == 403
 
-    def test_user_with_no_siae_left(self):
+    def test_user_with_no_company_left(self):
         """
-        Former SIAE members with no SIAE membership left must not
-        be able to log in.
+        Former employer with no membership left must not be able to log in.
         They are still "active" technically speaking, so if they
         are activated/invited again, they will be able to log in.
         """
@@ -1212,14 +1211,14 @@ class UserMembershipDeactivationTest(TestCase):
         # Wherever guest lands should give a 200 OK
         assert response.status_code == 200
 
-        # Check response context, only one SIAE should remain
+        # Check response context, only one company should remain
         assert len(response.context["request"].organizations) == 1
 
 
-class SIAEAdminMembersManagementTest(TestCase):
+class CompanyAdminMembersManagementTest(TestCase):
     def test_add_admin(self):
         """
-        Check the ability for an admin to add another admin to the siae
+        Check the ability for an admin to add another admin to the company
         """
         company = CompanyWith2MembershipsFactory()
         admin = company.members.filter(companymembership__is_admin=True).first()

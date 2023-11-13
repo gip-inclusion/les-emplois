@@ -8,7 +8,7 @@ from tests.utils.test import TestCase
 pytestmark = pytest.mark.ignore_template_errors
 
 
-class SearchSiaeTest(TestCase):
+class SearchCompanyTest(TestCase):
     def test_home_anonymous(self):
         url = reverse("home:hp")
         response = self.client.get(url)
