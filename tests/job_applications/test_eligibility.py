@@ -19,7 +19,7 @@ class EmployeeRecordEligibilityTest(TestCase):
     TODO: to be completed soon with upcoming changes to be made in the `move_siae_data` process.
     """
 
-    def test_target_siae(self):
+    def test_target_company(self):
         # Hiring SIAE is the expected SIAE
         company_good = CompanyFactory()
         company_bad = CompanyFactory()

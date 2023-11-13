@@ -1657,11 +1657,11 @@ class ProcessTransferJobApplicationTest(TestCase):
 
         self.assertContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
         self.assertContains(response, f"transfer_confirmation_modal_{other_company.pk}")
-        self.assertContains(response, "target_siae_id")
+        self.assertContains(response, "target_company_id")
         self.assertContains(response, transfer_url)
 
         # Confirm from modal window
-        post_data = {"target_siae_id": other_company.pk}
+        post_data = {"target_company_id": other_company.pk}
         response = self.client.post(transfer_url, data=post_data, follow=True)
         messages = list(response.context.get("messages"))
 
@@ -1681,7 +1681,7 @@ class ProcessTransferJobApplicationTest(TestCase):
         )
         # Forge query
         self.client.force_login(user)
-        post_data = {"target_siae_id": other_company.pk}
+        post_data = {"target_company_id": other_company.pk}
         transfer_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
         response = self.client.post(transfer_url, data=post_data)
         assert response.status_code == 404

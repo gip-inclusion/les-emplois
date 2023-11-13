@@ -37,11 +37,11 @@ def can_create_employee_record(request, job_application_id) -> JobApplication:
     If a valid job_application_id is given, return a full-fledged
     JobApplication object reusable in view (skip one extra DB query)
     """
-    # SIAEs only
-    siae = get_current_company_or_404(request)
+    # company only
+    company = get_current_company_or_404(request)
 
-    # SIAE is eligible to employee record ?
-    if not siae.can_use_employee_record:
+    # company is eligible to employee record ?
+    if not company.can_use_employee_record:
         raise PermissionDenied("Cette structure ne peut pas utiliser la gestion des fiches salarié'.")
 
     # We want to reuse a job application in view, but first check that all is ok
@@ -53,7 +53,7 @@ def can_create_employee_record(request, job_application_id) -> JobApplication:
             "job_seeker__jobseeker_profile",
         ),
         pk=job_application_id,
-        to_company=siae,
+        to_company=company,
     )
 
     if job_application.job_seeker.lack_of_nir_reason == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER:
