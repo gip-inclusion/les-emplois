@@ -177,7 +177,7 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
 # ------------------------------------------------------------------------------------------
 
 
-class SiaeSearchBySirenForm(forms.Form):
+class CompanySearchBySirenForm(forms.Form):
     siren = forms.CharField(
         label="Numéro SIREN de votre structure",
         min_length=9,
@@ -187,7 +187,7 @@ class SiaeSearchBySirenForm(forms.Form):
     )
 
 
-class SiaeSelectForm(forms.Form):
+class CompanySiaeSelectForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.siaes = kwargs.pop("siaes")
         super().__init__(*args, **kwargs)

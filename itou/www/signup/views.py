@@ -167,7 +167,7 @@ def company_select(request, template_name="signup/company_select.html"):
 
     next_url = get_safe_url(request, "next")
 
-    siren_form = forms.SiaeSearchBySirenForm(data=request.GET or None)
+    siren_form = forms.CompanySearchBySirenForm(data=request.GET or None)
     company_select_form = None
 
     # The SIREN, when available, is always passed in the querystring.
@@ -188,7 +188,7 @@ def company_select(request, template_name="signup/company_select.html"):
             .prefetch_related("memberships__user")
         )
         companies_without_members = companies_for_siren.filter(members=None)
-        company_select_form = forms.SiaeSelectForm(data=request.POST or None, siaes=companies_without_members)
+        company_select_form = forms.CompanySiaeSelectForm(data=request.POST or None, siaes=companies_without_members)
 
     if request.method == "POST" and company_select_form and company_select_form.is_valid():
         company_selected = company_select_form.cleaned_data["siaes"]
