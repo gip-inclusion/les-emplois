@@ -55,7 +55,7 @@
             </p>
         {% else %}
             {% if siae.active_job_descriptions %}
-                {% include "siaes/includes/_list_siae_actives_jobs.html" with jobs_descriptions=siae.active_job_descriptions %}
+                {% include "companies/includes/_list_siae_actives_jobs.html" with jobs_descriptions=siae.active_job_descriptions %}
             {% else %}
                 <div class="d-flex justify-content-between align-items-center">
                     <span>Cette structure vous intéresse ?</span>

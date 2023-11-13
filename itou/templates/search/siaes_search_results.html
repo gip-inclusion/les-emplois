@@ -75,9 +75,9 @@
                                         </div>
                                         {% for item in results_page %}
                                             {% if request.resolver_match.view_name == "search:siaes_results" %}
-                                                {% include "siaes/includes/_card_siae.html" with siae=item %}
+                                                {% include "companies/includes/_card_siae.html" with siae=item %}
                                             {% else %}
-                                                {% include "siaes/includes/_card_jobdescription.html" with job_description=item %}
+                                                {% include "companies/includes/_card_jobdescription.html" with job_description=item %}
                                             {% endif %}
                                         {% empty %}
                                             <div class="c-card card mb-3 mb-md-4">

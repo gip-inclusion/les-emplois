@@ -1,6 +1,6 @@
 {% load str_filters %}
 
-{% include "siaes/includes/_siae_info.html" %}
+{% include "companies/includes/_siae_info.html" %}
 
 {% if job.is_active %}
     <p class="badge rounded-pill bg-success mb-4">
@@ -73,5 +73,5 @@
 {% endif %}
 
 {% if siae.email or siae.phone or siae.website %}
-    {% include "siaes/includes/_siae_details.html" %}
+    {% include "companies/includes/_siae_details.html" %}
 {% endif %}

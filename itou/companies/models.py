@@ -373,8 +373,8 @@ class Company(AddressMixin, OrganizationAbstract):
         to = [self.auth_email]
         signup_magic_link = get_absolute_url(self.signup_magic_link)
         context = {"siae": self, "signup_magic_link": signup_magic_link}
-        subject = "siaes/email/new_signup_activation_email_to_official_contact_subject.txt"
-        body = "siaes/email/new_signup_activation_email_to_official_contact_body.txt"
+        subject = "companies/email/new_signup_activation_email_to_official_contact_subject.txt"
+        body = "companies/email/new_signup_activation_email_to_official_contact_body.txt"
         return get_email_message(to, context, subject, body)
 
     def activate_your_account_email(self):
@@ -382,8 +382,8 @@ class Company(AddressMixin, OrganizationAbstract):
             raise ValidationError("Company cannot be signed up for, this should never happen.")
         to = [self.auth_email]
         context = {"siae": self, "signup_url": reverse("signup:company_select")}
-        subject = "siaes/email/activate_your_account_subject.txt"
-        body = "siaes/email/activate_your_account_body.txt"
+        subject = "companies/email/activate_your_account_subject.txt"
+        body = "companies/email/activate_your_account_body.txt"
         return get_email_message(to, context, subject, body)
 
     @property

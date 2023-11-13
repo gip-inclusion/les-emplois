@@ -21,13 +21,13 @@ def get_request():
     return request
 
 
-# Job applications list (SIAE)
+# Job applications list (company)
 
 
 def test_job_application_multiple_jobs():
     create_test_romes_and_appellations(["M1805"], appellations_per_rome=3)
 
-    tmpl = load_template("apply/includes/list_card_body_siae.html")
+    tmpl = load_template("apply/includes/list_card_body_company.html")
 
     job_application = JobApplicationSentBySiaeFactory(
         selected_jobs=Appellation.objects.all(),

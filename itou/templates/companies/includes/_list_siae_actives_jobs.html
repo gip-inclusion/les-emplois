@@ -7,13 +7,13 @@
 
 <ul class="list-group list-group-flush">
     {% for job in jobs_descriptions|slice:":5" %}
-        {% include "siaes/includes/_list_siae_actives_jobs_row.html" with job=job %}
+        {% include "companies/includes/_list_siae_actives_jobs_row.html" with job=job %}
     {% endfor %}
 </ul>
 {% if jobs_descriptions|length > 5 %}
     <ul class="list-group list-group-flush collapse" id="collapse_{{ forloop.counter0 }}">
         {% for job in jobs_descriptions|slice:"5:" %}
-            {% include "siaes/includes/_list_siae_actives_jobs_row.html" with job=job is_appended=forloop.first %}
+            {% include "companies/includes/_list_siae_actives_jobs_row.html" with job=job is_appended=forloop.first %}
         {% endfor %}
     </ul>
     <div class="mt-3 text-center">
