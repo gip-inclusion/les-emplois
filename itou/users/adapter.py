@@ -40,7 +40,7 @@ class UserAdapter(DefaultAccountAdapter):
         authenticated user.
         Tests are in itou.inclusion_connect.tests.
         """
-        redirect_url = reverse("search:siaes_home")
+        redirect_url = reverse("search:employers_home")
         # Inclusion Connect
         ic_session = request.session.get(INCLUSION_CONNECT_SESSION_KEY)
         if ic_session:

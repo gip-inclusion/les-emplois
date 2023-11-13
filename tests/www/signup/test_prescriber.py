@@ -988,7 +988,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         # The user should be redirected to home page with a warning, the session isn't flushed
         assert self.client.session.get(INCLUSION_CONNECT_SESSION_KEY)
         assert auth.get_user(self.client).is_authenticated
-        self.assertRedirects(response, reverse("search:siaes_home"))
+        self.assertRedirects(response, reverse("search:employers_home"))
         assertMessages(
             response,
             [

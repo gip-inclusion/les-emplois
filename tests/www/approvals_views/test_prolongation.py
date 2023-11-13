@@ -59,7 +59,7 @@ class ApprovalProlongationTest(TestCase):
 
         self.client.force_login(self.employer)
 
-        back_url = reverse("search:siaes_home")
+        back_url = reverse("search:employers_home")
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         url = f"{url}?{params}"
@@ -265,7 +265,7 @@ class ApprovalProlongationTest(TestCase):
 
         self.client.force_login(self.employer)
 
-        back_url = reverse("search:siaes_home")
+        back_url = reverse("search:employers_home")
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
         url = f"{url}?{params}"

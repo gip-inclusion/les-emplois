@@ -13,7 +13,7 @@ class SearchSiaeTest(TestCase):
         url = reverse("home:hp")
         response = self.client.get(url)
         response = self.client.get(url, follow=True)
-        self.assertRedirects(response, reverse("search:siaes_home"))
+        self.assertRedirects(response, reverse("search:employers_home"))
         self.assertContains(response, "Rechercher un emploi inclusif")
 
     def test_home_logged_in(self):

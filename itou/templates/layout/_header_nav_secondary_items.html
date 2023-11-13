@@ -5,7 +5,7 @@
         </li>
     {% endif %}
     <li>
-        <a class="{% if '/search/employers' in request.path %}is-active{% endif %}" href="{% url 'search:siaes_home' %}">Rechercher un emploi inclusif</a>
+        <a class="{% if '/search/employers' in request.path %}is-active{% endif %}" href="{% url 'search:employers_home' %}">Rechercher un emploi inclusif</a>
     </li>
     <li>
         <a class="{% if '/search/prescribers' in request.path %}is-active{% endif %}" href="{% url 'search:prescribers_home' %}">Rechercher des prescripteurs habilités</a>

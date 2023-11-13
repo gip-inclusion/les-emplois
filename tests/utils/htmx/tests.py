@@ -12,13 +12,13 @@ from tests.utils.test import parse_response_to_soup
 # Unittest style
 class HtmxRequestFactoryTest(HtmxTestCase):
     def test_get(self):
-        response = self.htmx_client.get(reverse("search:siaes_home"))
+        response = self.htmx_client.get(reverse("search:employers_home"))
         assert response.status_code == 200
         assert isinstance(response.wsgi_request.htmx, HtmxDetails)
         assert response.wsgi_request.htmx.boosted is False
 
     def test_post(self):
-        response = self.htmx_client.post(reverse("search:siaes_home"))
+        response = self.htmx_client.post(reverse("search:employers_home"))
         assert response.status_code == 200
         assert isinstance(response.wsgi_request.htmx, HtmxDetails)
         assert response.wsgi_request.htmx.boosted is False
@@ -26,7 +26,7 @@ class HtmxRequestFactoryTest(HtmxTestCase):
 
 # Pytest style
 def test_htmx_client(htmx_client):
-    response = htmx_client.get(reverse("search:siaes_home"))
+    response = htmx_client.get(reverse("search:employers_home"))
     assert response.status_code == 200
     assert isinstance(response.wsgi_request.htmx, HtmxDetails)
     assert response.wsgi_request.htmx.boosted is False
