@@ -3,7 +3,7 @@ from django.contrib import admin, messages
 from django.utils import timezone
 
 import itou.employee_record.models as models
-from itou.companies import models as siaes_models
+from itou.companies import models as companies_models
 
 from ..utils.admin import ItouModelAdmin, ItouTabularInline, get_admin_view_link
 from ..utils.templatetags.str_filters import pluralizefr
@@ -34,7 +34,7 @@ class EmployeeRecordAdminForm(forms.ModelForm):
 
         if "financial_annex" in self.fields:
             self.fields["financial_annex"].required = False
-            self.fields["financial_annex"].queryset = siaes_models.SiaeFinancialAnnex.objects.filter(
+            self.fields["financial_annex"].queryset = companies_models.SiaeFinancialAnnex.objects.filter(
                 convention=self.instance.job_application.to_company.convention
             ).order_by("-number")
 

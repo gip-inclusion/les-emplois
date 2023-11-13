@@ -1,7 +1,7 @@
 import django.db.transaction as transaction
 from django.core.management.base import BaseCommand
 
-from itou.companies import models as siaes_models
+from itou.companies import models as companies_models
 from itou.employee_record.models import EmployeeRecord
 
 
@@ -18,7 +18,7 @@ class Command(BaseCommand):
 
     @transaction.atomic()
     def handle(self, for_siae, *, wet_run=False, **options):
-        siae = siaes_models.Company.objects.filter(pk=for_siae).select_related("convention").first()
+        siae = companies_models.Company.objects.filter(pk=for_siae).select_related("convention").first()
         if not siae:
             self.stderr.write(f"No SIAE found for pk={for_siae!r}.")
             return

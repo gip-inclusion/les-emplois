@@ -19,7 +19,7 @@ def get_permissions_dict():
     import itou.approvals.models as approvals_models
     import itou.asp.models as asp_models
     import itou.cities.models as cities_models
-    import itou.companies.models as siaes_models
+    import itou.companies.models as companies_models
     import itou.eligibility.models as eligibility_models
     import itou.employee_record.models as employee_record_models
     import itou.institutions.models as institution_models
@@ -59,11 +59,11 @@ def get_permissions_dict():
             jobs_models.Rome: PERMS_READ,
             prescribers_models.PrescriberMembership: PERMS_ALL,
             prescribers_models.PrescriberOrganization: PERMS_ADD,
-            siaes_models.Company: PERMS_ADD,
-            siaes_models.SiaeConvention: PERMS_EDIT,
-            siaes_models.SiaeFinancialAnnex: PERMS_READ,
-            siaes_models.JobDescription: PERMS_ALL,
-            siaes_models.CompanyMembership: PERMS_ALL,
+            companies_models.Company: PERMS_ADD,
+            companies_models.SiaeConvention: PERMS_EDIT,
+            companies_models.SiaeFinancialAnnex: PERMS_READ,
+            companies_models.JobDescription: PERMS_ALL,
+            companies_models.CompanyMembership: PERMS_ALL,
             siae_evaluations_models.Calendar: PERMS_READ,
             siae_evaluations_models.EvaluationCampaign: PERMS_READ,
             siae_evaluations_models.EvaluatedSiae: PERMS_READ,
@@ -101,11 +101,11 @@ def get_permissions_dict():
                 jobs_models.Rome,
                 prescribers_models.PrescriberMembership,
                 prescribers_models.PrescriberOrganization,
-                siaes_models.Company,
-                siaes_models.SiaeConvention,
-                siaes_models.SiaeFinancialAnnex,
-                siaes_models.JobDescription,
-                siaes_models.CompanyMembership,
+                companies_models.Company,
+                companies_models.SiaeConvention,
+                companies_models.SiaeFinancialAnnex,
+                companies_models.JobDescription,
+                companies_models.CompanyMembership,
                 users_models.User,
                 users_models.JobSeekerProfile,
             )

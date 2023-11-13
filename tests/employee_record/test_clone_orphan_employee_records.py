@@ -3,7 +3,7 @@ import io
 import pytest
 from django.core.management import call_command
 
-from itou.companies import enums as companies_enums, models as siaes_models
+from itou.companies import enums as companies_enums, models as companies_models
 from itou.employee_record.management.commands import clone_orphan_employee_records
 from tests.employee_record import factories
 
@@ -68,7 +68,7 @@ def test_management_command_when_the_new_asp_id_is_used_by_multiple_convention(c
     )
     # SiaeConventionFactory() use the `django_get_or_create` option to match the ("asp_id", "kind")` unique
     # constraint, and in this test case we need to be sure that more than one convention share the same asp_id.
-    assert siaes_models.SiaeConvention.objects.filter(asp_id=siae.convention.asp_id).count() == 2
+    assert companies_models.SiaeConvention.objects.filter(asp_id=siae.convention.asp_id).count() == 2
 
     command.handle(for_siae=siae.pk)
 
