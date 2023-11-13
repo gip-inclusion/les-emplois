@@ -4,7 +4,7 @@
 Bonjour,
 
 Nous faisons suite à votre demande de PASS IAE pour {{ job_application.job_seeker.get_full_name }} :
-{{ itou_protocol }}://{{ itou_fqdn }}{% url 'apply:details_for_siae' job_application.pk %}
+{{ itou_protocol }}://{{ itou_fqdn }}{% url 'apply:details_for_company' job_application.pk %}
 
 Nous sommes dans l'impossibilité de vous délivrer ce PASS IAE pour le motif suivant :
 

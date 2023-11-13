@@ -75,7 +75,7 @@ class EditContractTest(TestCase):
         }
 
         response = self.client.post(self.url, data=post_data)
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": self.job_application_1.id})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application_1.id})
         self.assertRedirects(response, next_url)
 
         self.job_application_1.refresh_from_db()
@@ -107,7 +107,7 @@ class EditContractTest(TestCase):
         }
 
         response = self.client.post(self.url, data=post_data)
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": self.job_application_1.id})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application_1.id})
         self.assertRedirects(response, next_url)
 
         self.job_application_1.refresh_from_db()
@@ -121,7 +121,7 @@ class EditContractTest(TestCase):
         }
 
         response = self.client.post(self.url, data=post_data)
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": self.job_application_1.id})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application_1.id})
         self.assertRedirects(response, next_url)
 
         self.job_application_1.refresh_from_db()
@@ -192,7 +192,7 @@ class EditContractTest(TestCase):
         }
 
         response = self.client.post(self.url, data=post_data)
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": self.job_application_1.id})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application_1.id})
         self.assertRedirects(response, next_url)
 
         self.job_application_1.refresh_from_db()

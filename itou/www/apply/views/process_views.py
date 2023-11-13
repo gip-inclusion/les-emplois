@@ -87,7 +87,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
 
 
 @login_required
-def details_for_siae(request, job_application_id, template_name="apply/process_details_siae.html"):
+def details_for_company(request, job_application_id, template_name="apply/process_details_company.html"):
     """
     Detail of an application for an SIAE with the ability:
     - to update start date of a contract (provided given date is in the future),
@@ -208,7 +208,7 @@ def process(request, job_application_id):
     except xwf_models.InvalidTransitionError:
         messages.error(request, "Action déjà effectuée.")
 
-    next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+    next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
     return HttpResponseRedirect(next_url)
 
 
@@ -230,7 +230,7 @@ def refuse(request, job_application_id, template_name="apply/process_refuse.html
         except xwf_models.InvalidTransitionError:
             messages.error(request, "Action déjà effectuée.")
 
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
         return HttpResponseRedirect(next_url)
     context = {
         "form": form,
@@ -258,7 +258,7 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
         except xwf_models.InvalidTransitionError:
             messages.error(request, "Action déjà effectuée.")
 
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
         return HttpResponseRedirect(next_url)
 
     context = {
@@ -278,7 +278,7 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
     check_waiting_period(job_application)
-    next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+    next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
     if not job_application.hiring_without_approval and job_application.eligibility_diagnosis_by_siae_required:
         messages.error(request, "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée.")
         return HttpResponseRedirect(next_url)
@@ -349,7 +349,7 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
     queryset = JobApplication.objects.is_active_company_member(request.user).select_related("to_company")
     job_application = get_object_or_404(queryset, id=job_application_id)
     check_waiting_period(job_application)
-    next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+    next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
 
     if not job_application.can_be_cancelled:
         messages.error(request, "Vous ne pouvez pas annuler cette embauche.")
@@ -456,8 +456,8 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
         request,
         job_application.to_company,
         job_application.job_seeker,
-        cancel_url=reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id}),
-        next_url=reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id}),
+        cancel_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id}),
+        next_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id}),
         template_name=template_name,
         extra_context={"job_application": job_application},
     )
@@ -469,7 +469,7 @@ def geiq_eligibility(request, job_application_id, template_name="apply/process_g
     # Check GEIQ eligibility during job application process
     job_application = get_object_or_404(queryset, pk=job_application_id)
     back_url = request.GET.get("back_url") or reverse(
-        "apply:details_for_siae", kwargs={"job_application_id": job_application.pk}
+        "apply:details_for_company", kwargs={"job_application_id": job_application.pk}
     )
     next_url = request.GET.get("next_url")
     return common_views._geiq_eligibility(

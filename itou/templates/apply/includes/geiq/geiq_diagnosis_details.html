@@ -67,7 +67,7 @@
                             <p>Les critères que vous avez sélectionnés ne vous permettent pas de bénéficier d’une aide financière de l’État.</p>
                         </div>
                         <div class="col-auto ps-0">
-                            <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?next_url={% url 'apply:details_for_siae' job_application_id=job_application.pk %}" class="btn btn-primary">Mettre à jour</a>
+                            <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?next_url={% url 'apply:details_for_company' job_application_id=job_application.pk %}" class="btn btn-primary">Mettre à jour</a>
                         </div>
                     </div>
                 </div>

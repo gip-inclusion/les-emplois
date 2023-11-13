@@ -2247,7 +2247,7 @@ class DirectHireFullProcessTest(TestCase):
         response = self.client.post(confirmation_url, headers={"hx-request": "true"}, data=post_data)
 
         job_application = JobApplication.objects.get(sender=user, to_company=company)
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         self.assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
 
         assert job_application.job_seeker == job_seeker
@@ -3940,7 +3940,7 @@ class HireConfirmationTestCase(TestCase):
         )
 
         job_application = JobApplication.objects.get(sender=self.company.members.first(), to_company=self.company)
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         self.assertRedirects(response, next_url, status_code=200)
 
         assert job_application.job_seeker == self.job_seeker

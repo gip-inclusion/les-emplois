@@ -45,7 +45,7 @@
             <hr>
             <div class="form-row align-items-center justify-content-end">
                 <div class="form-group mb-0 col-6 col-lg-auto">
-                    <a class="btn btn-outline-primary btn-block" href="{% url 'apply:details_for_siae' job_application_id=job_application.id %}">Annuler</a>
+                    <a class="btn btn-outline-primary btn-block" href="{% url 'apply:details_for_company' job_application_id=job_application.id %}">Annuler</a>
                 </div>
                 <div class="form-group mb-0 col-6 col-lg-auto">
                     {% bootstrap_button "Confirmer le refus" button_type="submit" button_class="btn btn-block btn-danger" %}

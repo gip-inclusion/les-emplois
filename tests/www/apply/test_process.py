@@ -115,7 +115,7 @@ class ProcessViewsTest(TestCase):
 
         post_data = post_data | {"confirmed": "True"}
         response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         # django-htmx triggers a client side redirect when it receives a response with the HX-Redirect header.
         # It renders an HttpResponseRedirect subclass which, unfortunately, responds with a 200 status code.
         # I guess it's normal as it's an AJAX response.
@@ -125,7 +125,7 @@ class ProcessViewsTest(TestCase):
 
         return response, next_url
 
-    def test_details_for_siae(self, *args, **kwargs):
+    def test_details_for_company(self, *args, **kwargs):
         """Display the details of a job application."""
 
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, resume_link="")
@@ -133,7 +133,7 @@ class ProcessViewsTest(TestCase):
         employer = company.members.first()
         self.client.force_login(employer)
 
-        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
         self.assertContains(response, format_nir(job_application.job_seeker.nir))
@@ -147,7 +147,7 @@ class ProcessViewsTest(TestCase):
         job_application.job_seeker.pole_emploi_id = ""
         job_application.job_seeker.save()
 
-        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertContains(response, "Modifier les informations")
         self.assertContains(response, "Adresse : <span>Non renseignée</span>", html=True)
@@ -159,7 +159,7 @@ class ProcessViewsTest(TestCase):
         job_application.job_seeker.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
         job_application.job_seeker.save()
 
-        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label)
 
@@ -169,7 +169,7 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker__resume_link=resume_link, resume_link="", to_company=company
         )
-        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertNotContains(response, "CV : <span>Non renseigné</span>", html=True)
         self.assertContains(response, resume_link)
@@ -177,12 +177,12 @@ class ProcessViewsTest(TestCase):
         # 2/ Job application was sent with an attached resume
         new_resume_link = "https://server.com/sylvester-stallone.pdf"
         job_application = JobApplicationSentByJobSeekerFactory(to_company=company, resume_link=new_resume_link)
-        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertContains(response, new_resume_link)
         self.assertNotContains(response, resume_link)
 
-    def test_details_for_siae_hidden(self, *args, **kwargs):
+    def test_details_for_company_hidden(self, *args, **kwargs):
         """A hidden job_application is not displayed."""
 
         job_application = JobApplicationFactory(
@@ -193,11 +193,11 @@ class ProcessViewsTest(TestCase):
         employer = job_application.to_company.members.first()
         self.client.force_login(employer)
 
-        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         assert 404 == response.status_code
 
-    def test_details_for_siae_as_prescriber(self, *args, **kwargs):
+    def test_details_for_company_as_prescriber(self, *args, **kwargs):
         """As a prescriber, I cannot access the job_applications details for SIAEs."""
 
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
@@ -205,7 +205,7 @@ class ProcessViewsTest(TestCase):
 
         self.client.force_login(prescriber)
 
-        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         assert response.status_code == 404
 
@@ -403,7 +403,7 @@ class ProcessViewsTest(TestCase):
 
         url = reverse("apply:process", kwargs={"job_application_id": job_application.pk})
         response = self.client.post(url)
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         self.assertRedirects(response, next_url)
 
         job_application = JobApplication.objects.get(pk=job_application.pk)
@@ -435,7 +435,7 @@ class ProcessViewsTest(TestCase):
                     "answer": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                 }
                 response = self.client.post(url, data=post_data)
-                next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+                next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
                 self.assertRedirects(response, next_url)
 
                 job_application = JobApplication.objects.get(pk=job_application.pk)
@@ -461,7 +461,7 @@ class ProcessViewsTest(TestCase):
 
                 post_data = {"answer": ""}
                 response = self.client.post(url, data=post_data)
-                next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+                next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
                 self.assertRedirects(response, next_url)
 
                 job_application = JobApplication.objects.get(pk=job_application.pk)
@@ -627,7 +627,7 @@ class ProcessViewsTest(TestCase):
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url_accept, follow=True)
         self.assertRedirects(
-            response, reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+            response, reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         )
         assert "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée." == str(
             list(response.context["messages"])[-1]
@@ -1164,7 +1164,7 @@ class ProcessViewsTest(TestCase):
             f"{criterion3.key}": "true",
         }
         response = self.client.post(url, data=post_data)
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         self.assertRedirects(response, next_url)
 
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
@@ -1269,7 +1269,7 @@ class ProcessViewsTest(TestCase):
             "confirm": "true",
         }
         response = self.client.post(url, data=post_data)
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         self.assertRedirects(response, next_url)
 
         job_application.refresh_from_db()
@@ -1305,7 +1305,7 @@ class ProcessViewsTest(TestCase):
         self.client.force_login(employer)
         url = reverse("apply:cancel", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         self.assertRedirects(response, next_url)
 
         job_application.refresh_from_db()
@@ -1373,7 +1373,7 @@ class ProcessTemplatesTest(TestCase):
         cls.employer = cls.job_application.to_company.members.first()
 
         kwargs = {"job_application_id": cls.job_application.pk}
-        cls.url_details = reverse("apply:details_for_siae", kwargs=kwargs)
+        cls.url_details = reverse("apply:details_for_company", kwargs=kwargs)
         cls.url_process = reverse("apply:process", kwargs=kwargs)
         cls.url_eligibility = reverse("apply:eligibility", kwargs=kwargs)
         cls.url_refuse = reverse("apply:refuse", kwargs=kwargs)
@@ -1582,7 +1582,7 @@ class ProcessTransferJobApplicationTest(TestCase):
 
         self.client.force_login(user)
         response = self.client.get(
-            reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         )
 
         self.assertNotContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
@@ -1603,12 +1603,12 @@ class ProcessTransferJobApplicationTest(TestCase):
 
         self.client.force_login(user)
         response = self.client.get(
-            reverse("apply:details_for_siae", kwargs={"job_application_id": job_application_1.pk})
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application_1.pk})
         )
         self.assertNotContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
 
         response = self.client.get(
-            reverse("apply:details_for_siae", kwargs={"job_application_id": job_application_2.pk})
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application_2.pk})
         )
 
         self.assertNotContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
@@ -1629,7 +1629,7 @@ class ProcessTransferJobApplicationTest(TestCase):
 
         self.client.force_login(user)
         response = self.client.get(
-            reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         )
         self.assertContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
 
@@ -1652,7 +1652,7 @@ class ProcessTransferJobApplicationTest(TestCase):
 
         self.client.force_login(user)
         response = self.client.get(
-            reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         )
 
         self.assertContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
@@ -1739,14 +1739,14 @@ def test_accept_button(client):
             <span>Accepter cette candidature</span>
         </a>"""
     client.force_login(job_application.to_company.members.first())
-    response = client.get(reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk}))
+    response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
     # GEIQ without GEIQ diagnosis: we get the modals
     assertNotContains(response, DIRECT_ACCEPT_BUTTON)
 
     job_application.to_company.kind = CompanyKind.AI
     job_application.to_company.save(update_fields=("kind",))
 
-    response = client.get(reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk}))
+    response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
     assertContains(response, DIRECT_ACCEPT_BUTTON)
 
 
@@ -1912,7 +1912,7 @@ def test_delete_prior_action(client, with_geiq_diagnosis):
         kwargs={"job_application_id": job_application.pk, "prior_action_id": prior_action2.pk},
     )
     client.force_login(user)
-    details_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+    details_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
     response = client.get(details_url)
     simulated_page = parse_response_to_soup(response, selector="#main")
 
@@ -1954,7 +1954,7 @@ def test_htmx_add_prior_action_and_cancel(client):
         to_company__kind=CompanyKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING
     )
     client.force_login(job_application.to_company.members.first())
-    details_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+    details_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
     response = client.get(details_url)
     simulated_page = parse_response_to_soup(response, selector="#main")
 
@@ -1985,7 +1985,7 @@ def test_htmx_modify_prior_action_and_cancel(client):
     )
     prior_action = PriorActionFactory(job_application=job_application)
     client.force_login(job_application.to_company.members.first())
-    details_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+    details_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
     response = client.get(details_url)
     simulated_page = parse_response_to_soup(response, selector="#main")
 
@@ -2009,7 +2009,7 @@ def test_htmx_modify_prior_action_and_cancel(client):
 
 
 @pytest.mark.parametrize("with_geiq_diagnosis", [True, False])
-def test_details_for_siae_with_prior_action(client, with_geiq_diagnosis):
+def test_details_for_company_with_prior_action(client, with_geiq_diagnosis):
     job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
     user = job_application.to_company.members.first()
     client.force_login(user)
@@ -2021,7 +2021,7 @@ def test_details_for_siae_with_prior_action(client, with_geiq_diagnosis):
             author_kind=AuthorKind.GEIQ,
         )
 
-    details_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+    details_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
     response = client.get(details_url)
     # The job application is still new
     assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
@@ -2152,7 +2152,7 @@ def test_details_for_geiq_with_inverted_vae_contract(client, inverted_vae_contra
     user = job_application.to_company.members.first()
     client.force_login(user)
 
-    response = client.get(reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk}))
+    response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
 
     inverted_vae_text = "associé à une VAE inversée"
 
@@ -2389,7 +2389,7 @@ def test_select_other_job_description_for_job_application(client):
     response = client.post(url, data=data, follow=False)
     # Caution: should redirect after that point, but done via HTMX we get a 200 status code
     assert response.status_code == 200
-    assert response.url == reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+    assert response.url == reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
 
     # Perform some checks on job description now attached to job application
     job_application.refresh_from_db()

@@ -27,7 +27,7 @@ def edit_contract_start_date(request, job_application_id, template_name="apply/e
         PermissionDenied()
 
     form = EditHiringDateForm(instance=job_application, data=request.POST or None)
-    url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+    url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
 
     if request.method == "POST" and form.is_valid():
         form.save()

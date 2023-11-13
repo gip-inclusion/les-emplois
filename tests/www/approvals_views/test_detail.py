@@ -60,12 +60,15 @@ class TestApprovalDetailView:
         assertContains(response, "Éligibilité à l'IAE")
         assertContains(response, "Candidatures de ce salarié")
         assertContains(response, "Voir sa candidature", count=2)
-        assertContains(response, reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk}))
         assertContains(
-            response, reverse("apply:details_for_siae", kwargs={"job_application_id": same_siae_job_application.pk})
+            response, reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        )
+        assertContains(
+            response, reverse("apply:details_for_company", kwargs={"job_application_id": same_siae_job_application.pk})
         )
         assertNotContains(
-            response, reverse("apply:details_for_siae", kwargs={"job_application_id": other_siae_job_application.pk})
+            response,
+            reverse("apply:details_for_company", kwargs={"job_application_id": other_siae_job_application.pk}),
         )
         assertContains(response, '<i class="ri-group-line me-2" aria-hidden="true"></i>Prescripteur habilité', count=1)
         assertContains(response, '<i class="ri-group-line me-2" aria-hidden="true"></i>Orienteur', count=1)
@@ -142,7 +145,7 @@ class TestApprovalDetailView:
             "PASS IAE valide jusqu’au 25/04/2025, si le contrat démarre aujourd’hui.",
         )
 
-        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
         assertContains(
             response,

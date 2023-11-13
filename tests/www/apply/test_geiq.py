@@ -33,7 +33,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
             job_seeker=cls.job_seeker,
         )
         cls.url = reverse(
-            "apply:details_for_siae",
+            "apply:details_for_company",
             kwargs={"job_application_id": cls.job_application.pk},
         )
 
@@ -50,7 +50,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
         self.client.force_login(self.geiq.members.first())
         response = self.client.get(
             reverse(
-                "apply:details_for_siae",
+                "apply:details_for_company",
                 kwargs={"job_application_id": job_application.pk},
             )
         )
@@ -69,7 +69,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
         self.client.force_login(diagnosis.author_geiq.members.first())
         response = self.client.get(
             reverse(
-                "apply:details_for_siae",
+                "apply:details_for_company",
                 kwargs={"job_application_id": job_application.pk},
             )
         )
@@ -97,7 +97,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
         self.client.force_login(diagnosis.author_geiq.members.first())
         response = self.client.get(
             reverse(
-                "apply:details_for_siae",
+                "apply:details_for_company",
                 kwargs={"job_application_id": job_application.pk},
             )
         )
@@ -126,7 +126,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
 
     def test_details_as_authorized_prescriber_with_expired_diagnosis(self):
         job_application = JobApplicationFactory(to_company=self.geiq, job_seeker=self.expired_diagnosis.job_seeker)
-        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
 
         self.client.force_login(self.geiq.members.first())
         response = self.client.get(url)
@@ -155,7 +155,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
         # allowance amount is variable in function of chosen administrative criteria
         diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True)
         job_application = JobApplicationFactory(to_company=diagnosis.author_geiq, job_seeker=diagnosis.job_seeker)
-        url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.pk})
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
 
         # Annex 2, level 2 criteria: no allowance for GEIQ
         diagnosis.administrative_criteria.set([GEIQAdministrativeCriteria.objects.get(pk=17)])

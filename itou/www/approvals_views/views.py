@@ -613,7 +613,7 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
             if job_application and job_application.to_company == siae:
                 # Suspensions and prolongations links are available in the job application details page.
                 application_details_url = reverse(
-                    "apply:details_for_siae",
+                    "apply:details_for_company",
                     kwargs={"job_application_id": job_application.pk},
                 )
                 return HttpResponseRedirect(application_details_url)
@@ -685,7 +685,7 @@ def pe_approval_create(request, pe_approval_id):
     if possible_matching_approval:
         messages.info(request, "Cet agrément a déjà été importé.")
         job_application = JobApplication.objects.filter(approval=possible_matching_approval).first()
-        next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
         return HttpResponseRedirect(next_url)
 
     # It is not possible to attach an approval to a job seeker that already has a valid approval.
@@ -730,5 +730,5 @@ def pe_approval_create(request, pe_approval_id):
         request,
         "L'agrément a bien été importé, vous pouvez désormais le prolonger ou le suspendre.",
     )
-    next_url = reverse("apply:details_for_siae", kwargs={"job_application_id": job_application.id})
+    next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
     return HttpResponseRedirect(next_url)
