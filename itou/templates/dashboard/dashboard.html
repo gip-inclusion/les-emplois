@@ -24,7 +24,7 @@
                 Cela peut affecter sa position dans les résultats de recherche.
                 <br>
                 {% if request.is_current_organization_admin %}
-                    <a href="{% url 'companies_views:edit_siae_step_contact_infos' %}">Indiquez une autre adresse</a>
+                    <a href="{% url 'companies_views:edit_company_step_contact_infos' %}">Indiquez une autre adresse</a>
                 {% else %}
                     {% with request.current_organization.active_admin_members.first as admin %}
                         Veuillez contacter un de vos administrateurs (par exemple {{ admin.get_full_name }}) pour qu'il ou elle indique une autre adresse

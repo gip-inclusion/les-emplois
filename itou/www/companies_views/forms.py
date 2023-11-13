@@ -97,7 +97,7 @@ class CreateCompanyForm(forms.ModelForm):
         return company
 
 
-class EditSiaeForm(forms.ModelForm):
+class EditCompanyForm(forms.ModelForm):
     class Meta:
         model = Company
         fields = [
@@ -177,15 +177,15 @@ class BlockJobApplicationsForm(forms.ModelForm):
         }
 
     def save(self, commit=True):
-        siae = super().save(commit=commit)
+        company = super().save(commit=commit)
         block_job_applications = self.cleaned_data["block_job_applications"]
 
         if commit:
             if block_job_applications:
-                siae.job_applications_blocked_at = timezone.now()
-            siae.block_job_applications = block_job_applications
-            siae.save()
-        return siae
+                company.job_applications_blocked_at = timezone.now()
+            company.block_job_applications = block_job_applications
+            company.save()
+        return company
 
 
 class FinancialAnnexSelectForm(forms.Form):

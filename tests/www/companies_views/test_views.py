@@ -700,7 +700,7 @@ class CreateSiaeViewTest(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("companies_views:create_siae")
+        url = reverse("companies_views:create_company")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -738,7 +738,7 @@ class CreateSiaeViewTest(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("companies_views:create_siae")
+        url = reverse("companies_views:create_company")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -776,7 +776,7 @@ class CreateSiaeViewTest(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("companies_views:create_siae")
+        url = reverse("companies_views:create_company")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -813,7 +813,7 @@ class CreateSiaeViewTest(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("companies_views:create_siae")
+        url = reverse("companies_views:create_company")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -848,7 +848,7 @@ class CreateSiaeViewTest(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("companies_views:create_siae")
+        url = reverse("companies_views:create_company")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -879,7 +879,7 @@ class CreateSiaeViewTest(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("companies_views:create_siae")
+        url = reverse("companies_views:create_company")
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -941,7 +941,7 @@ class EditSiaeViewTest(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("companies_views:edit_siae_step_contact_infos")
+        url = reverse("companies_views:edit_company_step_contact_infos")
         response = self.client.get(url)
         self.assertContains(response, "Informations générales")
 
@@ -963,7 +963,7 @@ class EditSiaeViewTest(TestCase):
         # Go to next step: description
         post_data["email"] = "toto@titi.fr"
         response = self.client.post(url, data=post_data)
-        self.assertRedirects(response, reverse("companies_views:edit_siae_step_description"))
+        self.assertRedirects(response, reverse("companies_views:edit_company_step_description"))
 
         response = self.client.post(url, data=post_data, follow=True)
         self.assertContains(response, "Présentation de l'activité")
@@ -975,13 +975,13 @@ class EditSiaeViewTest(TestCase):
             "provided_support": "On est très très forts pour tout",
         }
         response = self.client.post(url, data=post_data)
-        self.assertRedirects(response, reverse("companies_views:edit_siae_step_preview"))
+        self.assertRedirects(response, reverse("companies_views:edit_company_step_preview"))
 
         response = self.client.post(url, data=post_data, follow=True)
         self.assertContains(response, "Aperçu de la fiche")
 
         # Go back, should not be an issue
-        step_2_url = reverse("companies_views:edit_siae_step_description")
+        step_2_url = reverse("companies_views:edit_company_step_description")
         response = self.client.get(step_2_url)
         self.assertContains(response, "Présentation de l'activité")
         assert self.client.session["edit_siae_session_key"] == {
@@ -1038,7 +1038,7 @@ class EditSiaeViewTest(TestCase):
         membership = user.companymembership_set.first()
         membership.is_admin = False
         membership.save()
-        url = reverse("companies_views:edit_siae_step_contact_infos")
+        url = reverse("companies_views:edit_company_step_contact_infos")
         response = self.client.get(url)
         assert response.status_code == 403
 
@@ -1051,7 +1051,7 @@ class EditSiaeViewWithWrongAddressTest(TestCase):
 
         self.client.force_login(user)
 
-        url = reverse("companies_views:edit_siae_step_contact_infos")
+        url = reverse("companies_views:edit_company_step_contact_infos")
         response = self.client.get(url)
         self.assertContains(response, "Informations générales")
 
@@ -1067,7 +1067,7 @@ class EditSiaeViewWithWrongAddressTest(TestCase):
         }
         response = self.client.post(url, data=post_data, follow=True)
 
-        self.assertRedirects(response, reverse("companies_views:edit_siae_step_description"))
+        self.assertRedirects(response, reverse("companies_views:edit_company_step_description"))
 
         # Go to next step: summary
         url = response.redirect_chain[-1][0]
@@ -1076,7 +1076,7 @@ class EditSiaeViewWithWrongAddressTest(TestCase):
             "provided_support": "On est très très forts pour tout",
         }
         response = self.client.post(url, data=post_data, follow=True)
-        self.assertRedirects(response, reverse("companies_views:edit_siae_step_preview"))
+        self.assertRedirects(response, reverse("companies_views:edit_company_step_preview"))
 
         # Save the object for real
         response = self.client.post(response.redirect_chain[-1][0])
