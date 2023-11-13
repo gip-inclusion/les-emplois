@@ -42,7 +42,7 @@
                             <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Retour</button>
                             <form method="post" action="{% url 'apply:transfer' job_application_id=job_application.id %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="target_siae_id" value="{{ siae.pk }}" />
+                                <input type="hidden" name="target_company_id" value="{{ siae.pk }}" />
                                 <input type="hidden" name="back_url" value="{{ back_url }}" />
                                 <button class="btn btn-sm btn-primary">Confirmer</button>
                             </form>
