@@ -47,10 +47,10 @@ from tests.eligibility.factories import EligibilityDiagnosisFactory, Eligibility
 from tests.employee_record.factories import BareEmployeeRecordFactory, EmployeeRecordFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
+    JobApplicationSentByCompanyFactory,
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
     JobApplicationSentByPrescriberOrganizationFactory,
-    JobApplicationSentBySiaeFactory,
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithoutApprovalFactory,
 )
@@ -109,7 +109,7 @@ class JobApplicationModelTest(TestCase):
         job_application = JobApplicationSentByPrescriberOrganizationFactory()
         assert not job_application.is_sent_by_authorized_prescriber
 
-        job_application = JobApplicationSentBySiaeFactory()
+        job_application = JobApplicationSentByCompanyFactory()
         assert not job_application.is_sent_by_authorized_prescriber
 
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
@@ -141,13 +141,13 @@ class JobApplicationModelTest(TestCase):
 
     def test_get_sender_kind_display(self):
         non_siae_items = [
-            (JobApplicationSentBySiaeFactory(to_company__kind=kind), "Employeur")
+            (JobApplicationSentByCompanyFactory(to_company__kind=kind), "Employeur")
             for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS]
         ]
         items = [
             [JobApplicationFactory(sent_by_authorized_prescriber_organisation=True), "Prescripteur"],
             [JobApplicationSentByPrescriberOrganizationFactory(), "Orienteur"],
-            [JobApplicationSentBySiaeFactory(), "Employeur (SIAE)"],
+            [JobApplicationSentByCompanyFactory(), "Employeur (SIAE)"],
             [JobApplicationSentByJobSeekerFactory(), "Demandeur d'emploi"],
         ] + non_siae_items
 
@@ -609,7 +609,7 @@ class JobApplicationQuerySetTest(TestCase):
         assert job_application.accepted_at == job_application.created_at
 
     def test_with_accepted_at_for_accept_transition(self):
-        job_application = JobApplicationSentBySiaeFactory()
+        job_application = JobApplicationSentByCompanyFactory()
         job_application.process()
         job_application.accept(user=job_application.sender)
 
@@ -620,7 +620,7 @@ class JobApplicationQuerySetTest(TestCase):
         assert JobApplication.objects.with_accepted_at().first().accepted_at == expected_created_at
 
     def test_with_accepted_at_with_multiple_transitions(self):
-        job_application = JobApplicationSentBySiaeFactory()
+        job_application = JobApplicationSentByCompanyFactory()
         job_application.process()
         job_application.accept(user=job_application.sender)
         assert job_application.approval.number == "XXXXX0000001"
@@ -656,7 +656,7 @@ class JobApplicationQuerySetTest(TestCase):
         assert recipients == [job_application.job_seeker.email, employer.email]
 
     def test_with_accepted_at_default_value(self):
-        job_application = JobApplicationSentBySiaeFactory()
+        job_application = JobApplicationSentByCompanyFactory()
 
         assert JobApplication.objects.with_accepted_at().first().accepted_at is None
 
@@ -667,7 +667,7 @@ class JobApplicationQuerySetTest(TestCase):
         assert JobApplication.objects.with_accepted_at().first().accepted_at is None
 
     def test_with_accepted_at_for_accepted_with_no_transition(self):
-        JobApplicationSentBySiaeFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        JobApplicationSentByCompanyFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
         job_application = JobApplication.objects.with_accepted_at().first()
         assert job_application.accepted_at == job_application.created_at
 
@@ -1558,7 +1558,7 @@ class JobApplicationWorkflowTest(TestCase):
         Given a job application for an SIAE subject to eligibility rules,
         when accepting it, then the eligibility diagnosis is linked to it.
         """
-        job_application = JobApplicationSentBySiaeFactory(
+        job_application = JobApplicationSentByCompanyFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             to_company__kind=CompanyKind.EI,
             eligibility_diagnosis=None,
@@ -1823,7 +1823,7 @@ class JobApplicationAdminFormTest(TestCase):
         assert ["Emetteur du mauvais type."] == form.errors["__all__"]
         job_application.sender_kind = sender_kind
 
-        job_application.sender_company = JobApplicationSentBySiaeFactory().sender_company
+        job_application.sender_company = JobApplicationSentByCompanyFactory().sender_company
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
         assert ["SIAE émettrice inattendue."] == form.errors["__all__"]
@@ -1841,7 +1841,7 @@ class JobApplicationAdminFormTest(TestCase):
         assert form.is_valid()
 
     def test_applications_sent_by_siae(self):
-        job_application = JobApplicationSentBySiaeFactory()
+        job_application = JobApplicationSentByCompanyFactory()
         sender_company = job_application.sender_company
         sender = job_application.sender
 
@@ -1895,7 +1895,7 @@ class JobApplicationAdminFormTest(TestCase):
         assert ["Organisation du prescripteur émettrice manquante."] == form.errors["__all__"]
         job_application.sender_prescriber_organization = sender_prescriber_organization
 
-        job_application.sender_company = JobApplicationSentBySiaeFactory().sender_company
+        job_application.sender_company = JobApplicationSentByCompanyFactory().sender_company
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
         assert ["SIAE émettrice inattendue."] == form.errors["__all__"]

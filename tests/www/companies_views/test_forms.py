@@ -52,7 +52,7 @@ class EditJobDescriptionFormTest(TestCase):
         form = EditJobDescriptionForm(current_company=company, data=post_data)
         assert form.is_valid()
 
-    def test_siae_errors(self):
+    def test_company_errors(self):
         company = CompanyFactory()
         post_data = {}
 
@@ -92,7 +92,7 @@ class EditJobDescriptionFormTest(TestCase):
         form = EditJobDescriptionForm(current_company=company, data=post_data)
         assert form.is_valid()
 
-    def test_siae_fields(self):
+    def test_company_fields(self):
         company = CompanyFactory()
         post_data = {
             "appellation": "10357",
@@ -223,7 +223,7 @@ class EditJobDescriptionFormTest(TestCase):
 
 
 class EditJobDescriptionDetailsFormTest(TestCase):
-    def test_siae_fields(self):
+    def test_company_fields(self):
         company = CompanyFactory()
 
         post_data = {

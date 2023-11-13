@@ -14,9 +14,9 @@ from tests.cities.factories import create_test_cities
 from tests.companies.factories import JobDescriptionFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
+    JobApplicationSentByCompanyFactory,
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
-    JobApplicationSentBySiaeFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
@@ -85,7 +85,7 @@ class RefusalFormTest(TestCase):
         form = apply_forms.RefusalForm(job_application=job_application)
         assert "answer_to_prescriber" not in form.fields.keys()
 
-        job_application = JobApplicationSentBySiaeFactory()
+        job_application = JobApplicationSentByCompanyFactory()
         form = apply_forms.RefusalForm(job_application=job_application)
         assert "answer_to_prescriber" not in form.fields.keys()
 

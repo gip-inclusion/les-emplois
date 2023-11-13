@@ -109,12 +109,12 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
 
         if extracted:
             # A list of jobs were passed in, use them.
-            for siae_job_description in extracted:
-                if isinstance(siae_job_description, Appellation):
-                    siae_job_description, _ = JobDescription.objects.get_or_create(
-                        company=self.to_company, appellation=siae_job_description
+            for job_description in extracted:
+                if isinstance(job_description, Appellation):
+                    job_description, _ = JobDescription.objects.get_or_create(
+                        company=self.to_company, appellation=job_description
                     )
-                self.selected_jobs.add(siae_job_description)
+                self.selected_jobs.add(job_description)
 
 
 class PriorActionFactory(factory.django.DjangoModelFactory):
@@ -138,11 +138,11 @@ class JobApplicationSentByJobSeekerFactory(JobApplicationFactory):
     sender_kind = SenderKind.JOB_SEEKER
 
 
-class JobApplicationSentBySiaeFactory(JobApplicationFactory):
-    """Generates a JobApplication() object sent by an Siae."""
+class JobApplicationSentByCompanyFactory(JobApplicationFactory):
+    """Generates a JobApplication() object sent by an company."""
 
     sender_kind = SenderKind.EMPLOYER
-    # Currently an Siae can only postulate for itself,
+    # Currently an company can only postulate for itself,
     # this is the default behavior here.
     sender_company = factory.SelfAttribute("to_company")
     sender = factory.LazyAttribute(lambda obj: obj.to_company.members.first())

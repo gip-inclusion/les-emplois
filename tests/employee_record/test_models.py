@@ -26,10 +26,10 @@ from tests.employee_record.factories import (
 )
 from tests.job_applications.factories import (
     JobApplicationFactory,
+    JobApplicationSentByCompanyFactory,
     JobApplicationSentByJobSeekerFactory,
     JobApplicationSentByPrescriberFactory,
     JobApplicationSentByPrescriberOrganizationFactory,
-    JobApplicationSentBySiaeFactory,
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
     JobApplicationWithoutApprovalFactory,
@@ -217,7 +217,7 @@ class EmployeeRecordModelTest(TestCase):
     "factory,expected",
     [
         (JobApplicationSentByJobSeekerFactory, "07"),
-        (JobApplicationSentBySiaeFactory, "07"),
+        (JobApplicationSentByCompanyFactory, "07"),
         (JobApplicationSentByPrescriberFactory, "08"),
         (JobApplicationSentByPrescriberOrganizationFactory, "08"),
     ],
