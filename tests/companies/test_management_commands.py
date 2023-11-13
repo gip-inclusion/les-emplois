@@ -75,7 +75,7 @@ class MoveSiaeDataTest(TestCase):
         assert EmployeeRecord.objects.count() == 1
 
 
-def test_update_siaes_job_app_score():
+def test_update_companies_job_app_score():
     company_1 = companies_factories.CompanyFactory()
     company_2 = JobApplicationFactory(to_company__with_jobs=True).to_company
 
@@ -83,9 +83,9 @@ def test_update_siaes_job_app_score():
     assert company_2.job_app_score is None
 
     stdout = io.StringIO()
-    management.call_command("update_siaes_job_app_score", stdout=stdout)
+    management.call_command("update_companies_job_app_score", stdout=stdout)
     # company_1 did not change (from None to None)
-    assert "Updated 1 Siaes" in stdout.getvalue()
+    assert "Updated 1 companies" in stdout.getvalue()
 
     company_1.refresh_from_db()
     company_2.refresh_from_db()
