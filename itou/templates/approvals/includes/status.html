@@ -55,7 +55,7 @@ Arguments:
         <ul class="list-unstyled">
             <li class="h4 mt-4 mb-2">
                 Nombre de jours restants sur le PASS IAE : {{ common_approval.remainder.days }} jour{{ common_approval.remainder.days|pluralizefr }}
-                <i class="ri-information-line ri-xl"
+                <i class="ri-information-line ri-xl text-info"
                    data-bs-toggle="tooltip"
                    title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
             </li>
@@ -69,7 +69,7 @@ Arguments:
             {% if not hiring_pending %}
                 <li class="pb-2">
                     Date de fin prévisionnelle : {{ common_approval.end_at|date:"d/m/Y" }}
-                    <i class="ri-information-line ri-xl" data-bs-toggle="tooltip" title="Cette date de fin est susceptible d'évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i>
+                    <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" title="Cette date de fin est susceptible d'évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i>
                 </li>
             {% endif %}
         </ul>
@@ -95,14 +95,13 @@ Arguments:
             {% endif %}
         {% endif %}
     {% endif %}
-    {% if common_approval.pending_prolongation_request %}<p>Une demande de prolongation est en cours</p>{% endif %}
 </div>
 
 {% if common_approval.is_valid and common_approval.is_pass_iae %}
     {# Suspensions history. #}
     {% with common_approval.suspensions_for_status_card as suspensions %}
         {% if suspensions.last_in_progress or suspensions.older %}
-            <div id="suspensions-list" class="ps-2 border-start approval-left-border">
+            <div id="suspensions-list" class="ps-3 border-start approval-left-border">
                 {% if suspensions.last_in_progress %}
                     <p class="mb-1">Suspension en cours :</p>
                     <ul class="list-unstyled">
@@ -137,7 +136,7 @@ Arguments:
     {# Prolongations history. #}
     {% with prolongations=common_approval.prolongations_for_status_card prolongation_requests=common_approval.prolongation_requests_for_status_card %}
         {% if prolongations or prolongation_requests %}
-            <div id="prolongations-list" class="ps-2 border-start approval-left-border">
+            <div id="prolongations-list" class="ps-3 border-start approval-left-border">
                 {% if prolongations.in_progress %}
                     <p class="mb-1">Prolongation en cours :</p>
                     {% include "approvals/includes/prolongations_list.html" with prolongations=prolongations.in_progress %}
@@ -149,7 +148,7 @@ Arguments:
                     {% include "approvals/includes/prolongations_list.html" with prolongations=prolongations.not_in_progress %}
                 {% endif %}
                 {% if prolongation_requests %}
-                    <p class="mb-1">Demande{{ prolongation_requests|pluralizefr }} de prolongation</p>
+                    <p class="mb-1">Demande{{ prolongation_requests|pluralizefr }} de prolongation en cours :</p>
                     <ul class="list-unstyled">
                         {% for prolongation_request in prolongation_requests %}
                             <li>
@@ -157,7 +156,7 @@ Arguments:
                                 <small class="ms-3">{{ prolongation_request.get_reason_display }}</small>
                                 <small class="d-block mb-2">
                                     {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}
-                                        En cours
+                                        Demandée le {{ prolongation_request.created_at|date:"d/m/Y" }} par <i>{{ prolongation_request.declared_by.get_full_name }}</i> à <i>{{ prolongation_request.validated_by.get_full_name }}</i> ({{ prolongation_request.prescriber_organization.display_name }} - {{ prolongation_request.prescriber_organization.department }})
                                     {% elif prolongation_request.status == ProlongationRequestStatus.DENIED %}
                                         Refusée par <i>{{ prolongation_request.processed_by.get_full_name }}</i> ({{ prolongation_request.prescriber_organization.display_name }})
                                     {% endif %}

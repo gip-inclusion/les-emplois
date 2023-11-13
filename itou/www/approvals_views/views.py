@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
+from django.db.models import Prefetch
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -90,7 +91,15 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
 
 class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
     model = Approval
-    queryset = Approval.objects.select_related("user").prefetch_related("suspension_set")
+    queryset = Approval.objects.select_related("user").prefetch_related(
+        "suspension_set",
+        Prefetch(
+            "prolongationrequest_set",
+            queryset=ProlongationRequest.objects.select_related(
+                "declared_by", "validated_by", "processed_by", "prescriber_organization"
+            ),
+        ),
+    )
     template_name = "approvals/detail.html"
 
     def get_context_data(self, **kwargs):

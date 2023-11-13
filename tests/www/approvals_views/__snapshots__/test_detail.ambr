@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestApprovalDetailView.test_approval_status_includes[Approval prolongations list]
   '''
-  <div class="ps-2 border-start approval-left-border" id="prolongations-list">
+  <div class="ps-3 border-start approval-left-border" id="prolongations-list">
                   
                       <p class="mb-1">Prolongation en cours :</p>
                       <ul class="list-unstyled">
@@ -43,12 +43,27 @@
   
                   
                   
+                      <p class="mb-1">Demande de prolongation en cours :</p>
+                      <ul class="list-unstyled">
+                          
+                              <li>
+                                  du 26/04/2023 au 26/05/2023
+                                  <small class="ms-3">Fin d'une formation</small>
+                                  <small class="d-block mb-2">
+                                      
+                                          Demandée le 26/04/2023 par <i>Milady DE WINTER</i> à <i>First LAST</i> (Organization - 72)
+                                      
+                                  </small>
+                              </li>
+                          
+                      </ul>
+                  
               </div>
   '''
 # ---
 # name: TestApprovalDetailView.test_approval_status_includes[Approval suspensions list]
   '''
-  <div class="ps-2 border-start approval-left-border" id="suspensions-list">
+  <div class="ps-3 border-start approval-left-border" id="suspensions-list">
                   
                       <p class="mb-1">Suspension en cours :</p>
                       <ul class="list-unstyled">
