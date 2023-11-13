@@ -379,4 +379,4 @@ class ListEmployeeRecordsTest(TestCase):
         self.assertContains(response, "2 résultats")
 
         response = self.client.get(self.url + "?status=READY")
-        self.assertContains(response, "Aucun résultat")
+        self.assertContains(response, "0 résultat")

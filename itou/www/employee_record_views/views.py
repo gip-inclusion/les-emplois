@@ -159,7 +159,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         "filters_form": filters_form,
         "employee_records_list": employee_records_list,
         "badges": status_badges,
-        "navigation_pages": pager(data, request.GET.get("page", 1), items_per_page=10) if data else None,
+        "navigation_pages": pager(data, request.GET.get("page"), items_per_page=10),
         "feature_availability_date": EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
         "need_manual_regularization": need_manual_regularization,
         "ordered_by_label": order_by.label,

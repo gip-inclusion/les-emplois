@@ -120,8 +120,8 @@
                     <div class="c-box p-3 p-md-4">
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1">
-                                {% with cnt=navigation_pages.paginator.count %}
-                                    <span class="h4 m-0">{{ cnt|default:"Aucun" }} résultat{{ cnt|pluralizefr }}</span>
+                                {% with navigation_pages.paginator.count as counter %}
+                                    <h3 class="h4 m-0">{{ counter }} résultat{{ counter|pluralizefr }}</h3>
                                 {% endwith %}
                             </div>
                             <div>
@@ -155,12 +155,7 @@
                             {% endif %}
                         </div>
 
-                        {% if not navigation_pages %}
-                            <p class="my-3 my-md-4">
-                                <i class="ri-forbid-line ri-lg me-1" aria-hidden="true"></i>
-                                <span>Aucune fiche salarié avec le statut selectionné ...</span>
-                            </p>
-                        {% endif %}
+                        {% if not navigation_pages %}<p class="my-3 my-md-4">Aucune fiche salarié avec le statut selectionné.</p>{% endif %}
                     </div>
 
                     {% include "includes/pagination.html" with page=navigation_pages %}
