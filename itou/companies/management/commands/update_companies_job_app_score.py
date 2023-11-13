@@ -7,7 +7,7 @@ from itou.companies import models
 
 
 class Command(BaseCommand):
-    help = """Update the SIAE job_app_score"""
+    help = """Update the company job_app_score"""
 
     def handle(self, **options):
         start = time.perf_counter()
@@ -19,4 +19,4 @@ class Command(BaseCommand):
                 | Q(job_app_score__isnull=True) & Q(computed_job_app_score__isnull=True)
             ).update(job_app_score=F("computed_job_app_score"))
         )
-        self.stdout.write(f"Updated {nb_updated} Siaes in {time.perf_counter() - start:.3f} seconds")
+        self.stdout.write(f"Updated {nb_updated} companies in {time.perf_counter() - start:.3f} seconds")
