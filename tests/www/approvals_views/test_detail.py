@@ -11,7 +11,12 @@ from pytest_django.asserts import assertContains, assertNotContains, assertNumQu
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.templatetags.format_filters import format_approval_number
-from tests.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
+from tests.approvals.factories import (
+    ApprovalFactory,
+    ProlongationFactory,
+    ProlongationRequestFactory,
+    SuspensionFactory,
+)
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
@@ -70,8 +75,6 @@ class TestApprovalDetailView:
             response,
             reverse("apply:details_for_company", kwargs={"job_application_id": other_siae_job_application.pk}),
         )
-        assertContains(response, '<i class="ri-group-line me-2" aria-hidden="true"></i>Prescripteur habilité', count=1)
-        assertContains(response, '<i class="ri-group-line me-2" aria-hidden="true"></i>Orienteur', count=1)
 
     def test_detail_view_no_job_application(self, client):
         company = CompanyFactory(with_membership=True)
@@ -115,7 +118,6 @@ class TestApprovalDetailView:
             + 1  # select latest approval for user (can_be_prolonged)
             + 1  # approval.remainder fetches approval suspensions to compute remaining days.
             + 1  # release savepoint before the template rendering
-            + 1  # template: approval.pending_prolongation_request fetch the current pending prolongation request
             + 1  # template: approval.suspensions_for_status_card lists approval suspensions
             + 1  # template: approval prolongations list.
             + 1  # template: approval.prolongation_requests_for_status_card lists not accepted prolongation requests
@@ -125,6 +127,7 @@ class TestApprovalDetailView:
             + 1  # Create savepoint (atomic request to update the Django session)
             + 1  # Update the Django session
             + 1  # Release savepoint
+            + 1  # Prefetch prolongationrequest_set and the associated FKs
         )
 
         # Employer version
@@ -199,7 +202,6 @@ class TestApprovalDetailView:
             + 1  # siae membership (get_context_siae)
             # template: approvals/includes/status.html
             + 1  # template: approval.remainder fetches approval suspensions to compute remaining days
-            + 1  # template: approval.pending_prolongation_request fetch the current pending prolongation request
             + 1  # template: approval.prolongations_for_status_card
             + 1  # template: approval.prolongation_requests_for_status_card lists not accepted prolongation requests
             # template: eligibility_diagnosis.html
@@ -211,6 +213,7 @@ class TestApprovalDetailView:
             + 2  # all_job_applications with prefetch selected_jobs
             # template: approvals/includes/job_description_list.html
             + 1  # prescriberorganization: job_application.sender_prescriber_organization
+            + 1  # Prefetch prolongationrequest_set and the associated FKs
         )
 
         with assertNumQueries(expected_num_queries):
@@ -221,9 +224,11 @@ class TestApprovalDetailView:
 
         approval.suspension_set.all().delete()
 
+        prescriber = PrescriberFactory(first_name="Milady", last_name="de Winter", email="milady@dewinter.com")
+
         ## Display prolongations
         default_kwargs = {
-            "declared_by": PrescriberFactory(first_name="Milady", last_name="de Winter", email="milady@dewinter.com"),
+            "declared_by": prescriber,
             "validated_by": None,
             "approval": approval,
         }
@@ -233,6 +238,17 @@ class TestApprovalDetailView:
             start_at=timezone.localdate() - relativedelta(days=7),
             end_at=timezone.localdate() + relativedelta(days=3),
             **default_kwargs,
+        )
+
+        ProlongationRequestFactory(
+            declared_by=prescriber,
+            validated_by=PrescriberFactory(
+                first_name="First",
+                last_name="Last",
+                email="first@last.com",
+            ),
+            approval=approval,
+            prescriber_organization=PrescriberOrganizationFactory(name="Organization", department="72"),
         )
 
         # Older
@@ -270,7 +286,10 @@ class TestApprovalDetailView:
         user = job_application.sender
         client.force_login(user)
 
-        url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+        url = reverse(
+            "apply:details_for_prescriber",
+            kwargs={"job_application_id": job_application.pk},
+        )
         response = client.get(url)
         assertNotContains(
             response,
@@ -321,7 +340,10 @@ class TestApprovalDetailView:
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
         assert approval.can_be_prolonged
         response = client.get(url)
-        assertContains(response, reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id}))
+        assertContains(
+            response,
+            reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id}),
+        )
 
         approval.end_at = timezone.localdate() - relativedelta(months=4)
         approval.save()
@@ -329,7 +351,10 @@ class TestApprovalDetailView:
         del approval.can_be_prolonged
         assert not approval.can_be_prolonged
         response = client.get(url)
-        assertNotContains(response, reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id}))
+        assertNotContains(
+            response,
+            reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id}),
+        )
 
     @override_settings(TALLY_URL="https://tally.so")
     def test_edit_user_info_button(self, client):
@@ -340,7 +365,8 @@ class TestApprovalDetailView:
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
 
         user_info_edit_url = reverse(
-            "dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id}
+            "dashboard:edit_job_seeker_info",
+            kwargs={"job_seeker_pk": job_application.job_seeker_id},
         )
         user_info_edit_url = f"{user_info_edit_url}?back_url={url}&from_application={job_application.pk}"
         user_info_not_allowed = "Vous ne pouvez pas modifier ses informations"
