@@ -19,7 +19,7 @@ from tests.utils.test import BASE_NUM_QUERIES, TestCase
 pytestmark = pytest.mark.ignore_template_errors
 
 
-class SearchSiaeTest(TestCase):
+class SearchCompanyTest(TestCase):
     def setUp(self):
         super().setUp()
         self.url = reverse("search:employers_results")
@@ -51,9 +51,9 @@ class SearchSiaeTest(TestCase):
         with self.assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # select the city
-            + 1  # fetch initial SIAES (to extract the filters afterwards)
+            + 1  # fetch initial companies (to extract the filters afterwards)
             + 2  # two counts for the tab headers
-            + 1  # actual select of the SIAEs, with related objects and annotated distance
+            + 1  # actual select of the companies, with related objects and annotated distance
             + 1  # prefetch active job descriptions
         ):
             response = self.client.get(self.url, {"city": city_slug})
@@ -96,20 +96,26 @@ class SearchSiaeTest(TestCase):
         self.assertContains(response, "Aucun résultat")
 
     def test_distance(self):
-        # 3 SIAEs in two departments to test distance and department filtering
+        # 3 companies in two departments to test distance and department filtering
         vannes = create_city_vannes()
-        SIAE_VANNES = "SIAE Vannes"
-        CompanyFactory(name=SIAE_VANNES, department="56", coords=vannes.coords, post_code="56760", kind=CompanyKind.AI)
+        COMPANY_VANNES = "Entreprise Vannes"
+        CompanyFactory(
+            name=COMPANY_VANNES, department="56", coords=vannes.coords, post_code="56760", kind=CompanyKind.AI
+        )
 
         guerande = create_city_guerande()
-        SIAE_GUERANDE = "SIAE Guérande"
+        COMPANY_GUERANDE = "Entreprise Guérande"
         CompanyFactory(
-            name=SIAE_GUERANDE, department="44", coords=guerande.coords, post_code="44350", kind=CompanyKind.AI
+            name=COMPANY_GUERANDE, department="44", coords=guerande.coords, post_code="44350", kind=CompanyKind.AI
         )
         saint_andre = create_city_saint_andre()
-        SIAE_SAINT_ANDRE = "SIAE Saint André des Eaux"
+        COMPANY_SAINT_ANDRE = "Entreprise Saint André des Eaux"
         CompanyFactory(
-            name=SIAE_SAINT_ANDRE, department="44", coords=saint_andre.coords, post_code="44117", kind=CompanyKind.AI
+            name=COMPANY_SAINT_ANDRE,
+            department="44",
+            coords=saint_andre.coords,
+            post_code="44117",
+            kind=CompanyKind.AI,
         )
 
         # 100 km
@@ -119,9 +125,9 @@ class SearchSiaeTest(TestCase):
             """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>""",
             html=True,
         )
-        self.assertContains(response, SIAE_VANNES.capitalize())
-        self.assertContains(response, SIAE_GUERANDE.capitalize())
-        self.assertContains(response, SIAE_SAINT_ANDRE.capitalize())
+        self.assertContains(response, COMPANY_VANNES.capitalize())
+        self.assertContains(response, COMPANY_GUERANDE.capitalize())
+        self.assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
 
         # 15 km
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 15})
@@ -130,8 +136,8 @@ class SearchSiaeTest(TestCase):
             """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
             html=True,
         )
-        self.assertContains(response, SIAE_GUERANDE.capitalize())
-        self.assertContains(response, SIAE_SAINT_ANDRE.capitalize())
+        self.assertContains(response, COMPANY_GUERANDE.capitalize())
+        self.assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
 
         # 100 km and 44
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 100, "departments": ["44"]})
@@ -140,8 +146,8 @@ class SearchSiaeTest(TestCase):
             """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
             html=True,
         )
-        self.assertContains(response, SIAE_GUERANDE.capitalize())
-        self.assertContains(response, SIAE_SAINT_ANDRE.capitalize())
+        self.assertContains(response, COMPANY_GUERANDE.capitalize())
+        self.assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
 
         # 100 km and 56
         response = self.client.get(self.url, {"city": vannes.slug, "distance": 100, "departments": ["56"]})
@@ -150,11 +156,11 @@ class SearchSiaeTest(TestCase):
             """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
             html=True,
         )
-        self.assertContains(response, SIAE_VANNES.capitalize())
+        self.assertContains(response, COMPANY_VANNES.capitalize())
 
     def test_order_by(self):
         """
-        Check SIAE results sorting.
+        Check company results sorting.
         Don't test sorting by active members to avoid creating too much data.
         """
         guerande = create_city_guerande()
@@ -188,10 +194,10 @@ class SearchSiaeTest(TestCase):
         with self.assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # find city
-            + 1  # find siaes
-            + 1  # count siaes
+            + 1  # find companies
+            + 1  # count companies
             + 1  # count job descriptions
-            + 1  # get siaes infos
+            + 1  # get companies infos
             + 1  # get job descriptions infos
         ):
             response = self.client.get(self.url, {"city": guerande.slug})
@@ -296,7 +302,7 @@ class JobDescriptionSearchViewTest(TestCase):
             BASE_NUM_QUERIES
             + 1  # select the city
             + 1  # fetch initial job descriptions to add to the form fields
-            + 2  # count the number of results for siaes & job descriptions
+            + 2  # count the number of results for companies & job descriptions
             + 1  # select the job descriptions for the page
         ):
             response = self.client.get(self.url, {"city": city_slug})
@@ -341,11 +347,11 @@ class JobDescriptionSearchViewTest(TestCase):
 
     def test_distance(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
-        # 3 SIAEs in two departments to test distance and department filtering
+        # 3 companies in two departments to test distance and department filtering
         vannes = create_city_vannes()
-        SIAE_VANNES = "SIAE Vannes"
+        COMPANY_VANNES = "Entreprise Vannes"
         CompanyFactory(
-            name=SIAE_VANNES,
+            name=COMPANY_VANNES,
             department="56",
             coords=vannes.coords,
             post_code="56760",
@@ -354,9 +360,9 @@ class JobDescriptionSearchViewTest(TestCase):
         )
 
         guerande = create_city_guerande()
-        SIAE_GUERANDE = "SIAE Guérande"
+        COMPANY_GUERANDE = "Entreprise Guérande"
         CompanyFactory(
-            name=SIAE_GUERANDE,
+            name=COMPANY_GUERANDE,
             department="44",
             coords=guerande.coords,
             post_code="44350",
@@ -364,9 +370,9 @@ class JobDescriptionSearchViewTest(TestCase):
             with_jobs=True,
         )
         saint_andre = create_city_saint_andre()
-        SIAE_SAINT_ANDRE = "SIAE Saint André des Eaux"
+        COMPANY_SAINT_ANDRE = "Entreprise Saint André des Eaux"
         CompanyFactory(
-            name=SIAE_SAINT_ANDRE,
+            name=COMPANY_SAINT_ANDRE,
             department="44",
             coords=saint_andre.coords,
             post_code="44117",
@@ -381,9 +387,9 @@ class JobDescriptionSearchViewTest(TestCase):
             """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>""",
             html=True,
         )
-        self.assertContains(response, SIAE_VANNES.capitalize())
-        self.assertContains(response, SIAE_GUERANDE.capitalize())
-        self.assertContains(response, SIAE_SAINT_ANDRE.capitalize())
+        self.assertContains(response, COMPANY_VANNES.capitalize())
+        self.assertContains(response, COMPANY_GUERANDE.capitalize())
+        self.assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
 
         # 15 km
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 15})
@@ -392,8 +398,8 @@ class JobDescriptionSearchViewTest(TestCase):
             """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
             html=True,
         )
-        self.assertContains(response, SIAE_GUERANDE.capitalize())
-        self.assertContains(response, SIAE_SAINT_ANDRE.capitalize())
+        self.assertContains(response, COMPANY_GUERANDE.capitalize())
+        self.assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
 
         # 100 km and 44
         response = self.client.get(self.url, {"city": guerande.slug, "distance": 100, "departments": ["44"]})
@@ -402,8 +408,8 @@ class JobDescriptionSearchViewTest(TestCase):
             """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
             html=True,
         )
-        self.assertContains(response, SIAE_GUERANDE.capitalize())
-        self.assertContains(response, SIAE_SAINT_ANDRE.capitalize())
+        self.assertContains(response, COMPANY_GUERANDE.capitalize())
+        self.assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
         self.assertContains(response, "56 - Morbihan")  # the other department is still visible in the filters
 
         # 100 km and 56
@@ -413,7 +419,7 @@ class JobDescriptionSearchViewTest(TestCase):
             """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
             html=True,
         )
-        self.assertContains(response, SIAE_VANNES.capitalize())
+        self.assertContains(response, COMPANY_VANNES.capitalize())
 
     def test_order_by(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
@@ -421,7 +427,7 @@ class JobDescriptionSearchViewTest(TestCase):
 
         company = CompanyFactory(department="44", coords=guerande.coords, post_code="44350")
         appellations = Appellation.objects.all()
-        # get a different appellation for every job description, since they share the same SIAE
+        # get a different appellation for every job description, since they share the same
         job1 = JobDescriptionFactory(company=company, appellation=appellations[0])
         job2 = JobDescriptionFactory(company=company, appellation=appellations[1])
         job3 = JobDescriptionFactory(company=company, appellation=appellations[2])

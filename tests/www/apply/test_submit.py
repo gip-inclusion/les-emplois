@@ -53,7 +53,7 @@ pytestmark = pytest.mark.ignore_template_errors
 
 
 class ApplyTest(TestCase):
-    def test_siae_with_no_members(self):
+    def test_company_with_no_members(self):
         company = CompanyFactory()
         user = JobSeekerFactory()
         self.client.force_login(user)
@@ -1462,16 +1462,16 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         job_seeker = JobSeekerFactory(nir="")
         # Create an approval to bypass the eligibility diagnosis step.
         PoleEmploiApprovalFactory(birthdate=job_seeker.birthdate, pole_emploi_id=job_seeker.pole_emploi_id)
-        siae, user = self.create_test_data()
+        company, user = self.create_test_data()
         self.client.force_login(user)
 
         # Follow all redirections…
-        response = self.client.get(reverse("apply:start", kwargs={"company_pk": siae.pk}), follow=True)
+        response = self.client.get(reverse("apply:start", kwargs={"company_pk": company.pk}), follow=True)
 
         # …until a job seeker has to be determined.
         assert response.status_code == 200
         last_url = response.redirect_chain[-1][0]
-        assert last_url == reverse("apply:check_nir_for_sender", kwargs={"company_pk": siae.pk})
+        assert last_url == reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk})
 
         # Enter a non-existing NIR.
         # ----------------------------------------------------------------------
@@ -1480,7 +1480,8 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         response = self.client.post(last_url, data=post_data)
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
         next_url = reverse(
-            "apply:search_by_email_for_sender", kwargs={"company_pk": siae.pk, "session_uuid": job_seeker_session_name}
+            "apply:search_by_email_for_sender",
+            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
         assert self.client.session[job_seeker_session_name] == {"user": {"nir": nir}}
@@ -1508,7 +1509,7 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         self.assertRedirects(
             response,
             reverse(
-                "apply:step_check_job_seeker_info", kwargs={"company_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+                "apply:step_check_job_seeker_info", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}
             ),
             target_status_code=302,
         )
@@ -1574,7 +1575,7 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
-class ApplyAsSiaeTest(TestCase):
+class ApplyAsCompanyTest(TestCase):
     def setUp(self):
         super().setUp()
         [self.city] = create_test_cities(["67"], num_per_department=1)
@@ -1585,8 +1586,8 @@ class ApplyAsSiaeTest(TestCase):
             "selected_jobs": [],
         }
 
-    def test_perms_for_siae(self):
-        """An SIAE can postulate only for itself."""
+    def test_perms_for_company(self):
+        """An company can postulate only for itself."""
         company_1 = CompanyFactory(with_membership=True)
         company_2 = CompanyFactory(with_membership=True)
 
@@ -1613,8 +1614,8 @@ class ApplyAsSiaeTest(TestCase):
             status_code=403,
         )
 
-    def test_apply_as_siae(self):
-        """Apply as SIAE."""
+    def test_apply_as_company(self):
+        """Apply as company."""
 
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
@@ -1868,8 +1869,8 @@ class DirectHireFullProcessTest(TestCase):
         super().setUp()
         [self.city] = create_test_cities(["67"], num_per_department=1)
 
-    def test_perms_for_siae(self):
-        """An SIAE can hire only for itself."""
+    def test_perms_for_company(self):
+        """An company can hire only for itself."""
         company_1 = CompanyFactory(with_membership=True)
         company_2 = CompanyFactory(with_membership=True)
 
@@ -1900,8 +1901,8 @@ class DirectHireFullProcessTest(TestCase):
             status_code=403,
         )
 
-    def test_hire_as_siae(self):
-        """Apply as SIAE (and create new job seeker)"""
+    def test_hire_as_company(self):
+        """Apply as company (and create new job seeker)"""
 
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
@@ -2337,7 +2338,7 @@ class ApplicationViewTest(TestCase):
         self.assertContains(response, 'name="selected_jobs"')
         self.assertContains(response, 'name="resume"')
 
-    def test_application_eligibility_is_bypassed_for_siae_not_subject_to_eligibility_rules(self):
+    def test_application_eligibility_is_bypassed_for_company_not_subject_to_eligibility_rules(self):
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True)
         job_seeker = JobSeekerFactory()
 
@@ -2518,7 +2519,7 @@ class LastCheckedAtViewTest(TestCase):
         warning_check(response, "Merci de vérifier la validité des informations")
         link_check(response, f'<a class="btn btn-link" href="{update_url}">Vérifier le profil</a>', html=True)
 
-    def test_siae_employee(self):
+    def test_company_employee(self):
         self._check_last_checked_at(self.company.members.first(), sees_warning=True, sees_verify_link=True)
 
     def test_job_seeker(self):
@@ -2858,14 +2859,14 @@ class UpdateJobSeekerTestCase(UpdateJobSeekerBaseTestCase):
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         self._check_only_administrative_allowed(authorized_prescriber)
 
-    def test_as_siae_with_proxied_job_seeker(self):
+    def test_as_company_with_proxied_job_seeker(self):
         # Make sure the job seeker does not manage its own account
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_everything_allowed(self.company.members.first())
 
-    def test_as_siae_with_non_proxied_job_seeker(self):
+    def test_as_company_with_non_proxied_job_seeker(self):
         # Make sure the job seeker does manage its own account
         self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
         self.job_seeker.save(update_fields=["last_login"])
@@ -2895,7 +2896,7 @@ class UpdateJobSeekerTestCase(UpdateJobSeekerBaseTestCase):
         # Check that we could update its NIR infos
         assert self.job_seeker.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
 
-    def test_as_siae_that_last_step_doesnt_crash_with_direct_access(self):
+    def test_as_company_that_last_step_doesnt_crash_with_direct_access(self):
         # Make sure the job seeker does not manage its own account
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
@@ -2963,14 +2964,14 @@ class UpdateJobSeekerForHireTestCase(UpdateJobSeekerBaseTestCase):
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         self._check_nothing_permitted(authorized_prescriber)
 
-    def test_as_siae_with_proxied_job_seeker(self):
+    def test_as_company_with_proxied_job_seeker(self):
         # Make sure the job seeker does not manage its own account
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_everything_allowed(self.company.members.first())
 
-    def test_as_siae_with_non_proxied_job_seeker(self):
+    def test_as_company_with_non_proxied_job_seeker(self):
         # Make sure the job seeker does manage its own account
         self.job_seeker.last_login = timezone.now() - relativedelta(months=1)
         self.job_seeker.save(update_fields=["last_login"])
@@ -3000,7 +3001,7 @@ class UpdateJobSeekerForHireTestCase(UpdateJobSeekerBaseTestCase):
         # Check that we could update its NIR infos
         assert self.job_seeker.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
 
-    def test_as_siae_that_last_step_doesnt_crash_with_direct_access(self):
+    def test_as_company_that_last_step_doesnt_crash_with_direct_access(self):
         # Make sure the job seeker does not manage its own account
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
@@ -3605,7 +3606,7 @@ class FindJobSeekerForHireViewTestCase(TestCase):
 
 
 class CheckJobSeekerInformationsForHireTestCase(TestCase):
-    def test_siae(self):
+    def test_company(self):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         job_seeker = JobSeekerFactory(
             first_name="Son prénom",
@@ -3849,7 +3850,7 @@ class HireConfirmationTestCase(TestCase):
     def _reverse(self, view_name):
         return reverse(view_name, kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk})
 
-    def test_as_siae(self):
+    def test_as_company(self):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         EligibilityDiagnosisFactory(job_seeker=self.job_seeker)
         self.client.force_login(self.company.members.first())

@@ -45,7 +45,7 @@ class TestEditOrganization:
             "department": "67",
             "email": "",
             "phone": "0610203050",
-            "website": "https://famous-siae.com",
+            "website": "https://famous-company.com",
         }
         with mock.patch(
             "itou.utils.apis.geocoding.call_ban_geocoding_api",
@@ -114,7 +114,7 @@ class TestEditOrganization:
             "department": "67",
             "email": "",
             "phone": "0610203050",
-            "website": "https://famous-siae.com",
+            "website": "https://famous-company.com",
         }
         with mock.patch(
             "itou.utils.apis.geocoding.call_ban_geocoding_api",
@@ -156,7 +156,7 @@ class TestEditOrganization:
             "department": "67",
             "email": "",
             "phone": "0610203050",
-            "website": "https://famous-siae.com",
+            "website": "https://famous-company.com",
         }
         with mock.patch(
             "itou.utils.apis.geocoding.call_ban_geocoding_api",

@@ -15,11 +15,11 @@ from tests.utils.test import TestCase
 INVITATION_URL = reverse("invitations_views:invite_employer")
 
 
-class TestSendSingleSiaeInvitation(TestCase):
+class TestSendSingleCompanyInvitation(TestCase):
     def setUp(self):
         super().setUp()
         self.company = CompanyFactory(with_membership=True)
-        # The sender is a member of the SIAE
+        # The sender is a member of the company
         self.sender = self.company.members.first()
         self.guest_data = {"first_name": "Léonie", "last_name": "Bathiat", "email": "leonie@example.com"}
         self.post_data = {
@@ -97,12 +97,12 @@ class TestSendSingleSiaeInvitation(TestCase):
                     assert error_dict["email"][0] == "Cet utilisateur n'est pas un employeur."
 
     def test_two_employers_invite_the_same_guest(self):
-        # SIAE 1 invites guest.
+        # company 1 invites guest.
         self.client.force_login(self.sender)
         self.client.post(INVITATION_URL, data=self.post_data, follow=True)
         assert EmployerInvitation.objects.count() == 1
 
-        # SIAE 2 invites guest as well.
+        # company 2 invites guest as well.
         company = CompanyFactory(with_membership=True)
         sender_2 = company.members.first()
         self.client.force_login(sender_2)
@@ -114,10 +114,10 @@ class TestSendSingleSiaeInvitation(TestCase):
         assert invitation.email == self.guest_data["email"]
 
 
-class TestSendMultipleSiaeInvitation(TestCase):
+class TestSendMultipleCompanyInvitation(TestCase):
     def setUp(self):
         self.company = CompanyFactory(with_membership=True)
-        # The sender is a member of the SIAE
+        # The sender is a member of the company
         self.sender = self.company.members.first()
         # Define instances not created in DB
         self.invited_user = EmployerFactory.build()
@@ -180,10 +180,10 @@ class TestSendInvitationToSpecialGuest(TestCase):
             "form-MAX_NUM_FORMS": "",
         }
 
-    def test_invite_existing_user_with_existing_inactive_siae(self):
+    def test_invite_existing_user_with_existing_inactive_company(self):
         """
-        An inactive SIAIE user (i.e. attached to a single inactive siae)
-        can only be ressucitated by being invited to a new SIAE.
+        An inactive SIAIE user (i.e. attached to a single inactive company)
+        can only be ressucitated by being invited to a new company.
         We test here that this is indeed possible.
         """
         guest = CompanyFactory(convention__is_active=False, with_membership=True).members.first()

@@ -139,7 +139,7 @@ class ProcessViewsTest(TestCase):
         self.assertContains(response, format_nir(job_application.job_seeker.nir))
         self.assertContains(response, job_application.job_seeker.pole_emploi_id)
         self.assertContains(response, job_application.job_seeker.phone.replace(" ", ""))
-        self.assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)  # the SIAE is not a GEIQ
+        self.assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)  # the company is not a GEIQ
 
         job_application.job_seeker.created_by = employer
         job_application.job_seeker.phone = ""
@@ -198,7 +198,7 @@ class ProcessViewsTest(TestCase):
         assert 404 == response.status_code
 
     def test_details_for_company_as_prescriber(self, *args, **kwargs):
-        """As a prescriber, I cannot access the job_applications details for SIAEs."""
+        """As a prescriber, I cannot access the job_applications details for companies."""
 
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         prescriber = job_application.sender_prescriber_organization.members.first()
@@ -243,8 +243,8 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertContains(response, LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER.label, html=True)
 
-    def test_details_for_prescriber_as_siae(self, *args, **kwargs):
-        """As a SIAE user, I cannot access the job_applications details for prescribers."""
+    def test_details_for_prescriber_as_company(self, *args, **kwargs):
+        """As a company user, I cannot access the job_applications details for prescribers."""
 
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         employer = job_application.to_company.members.first()
@@ -659,7 +659,7 @@ class ProcessViewsTest(TestCase):
             reason=Suspension.Reason.BROKEN_CONTRACT.value,
         )
 
-        # Now, another Siae wants to hire the job seeker
+        # Now, another company wants to hire the job seeker
         other_company = CompanyFactory(with_membership=True)
         job_application = JobApplicationFactory(
             approval=approval_job_seeker,
@@ -669,7 +669,7 @@ class ProcessViewsTest(TestCase):
         )
         other_employer = job_application.to_company.members.first()
 
-        # login with other siae
+        # login with other company
         self.client.force_login(other_employer)
         hiring_start_at = today + relativedelta(days=20)
         hiring_end_at = Approval.get_default_end_date(hiring_start_at)
@@ -766,7 +766,7 @@ class ProcessViewsTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
         )
 
-        # SIAE 1 logs in and accepts the first job application.
+        # company 1 logs in and accepts the first job application.
         # The delivered approval should start at the same time as the contract.
         user = job_application.to_company.members.first()
         self.client.force_login(user)
@@ -786,7 +786,7 @@ class ProcessViewsTest(TestCase):
         assert job_application.approval.end_at == approval_default_ending
         self.client.logout()
 
-        # SIAE 2 accepts the second job application
+        # company 2 accepts the second job application
         # but its contract starts earlier than the approval delivered the first time.
         # Approval's starting date should be brought forward.
         user = job_app_starting_earlier.to_company.members.first()
@@ -812,7 +812,7 @@ class ProcessViewsTest(TestCase):
         assert job_app_starting_earlier.approval.end_at == approval_default_ending
         self.client.logout()
 
-        # SIAE 3 accepts the third job application.
+        # company 3 accepts the third job application.
         # Its contract starts later than the corresponding approval.
         # Approval's starting date should not be updated.
         user = job_app_starting_later.to_company.members.first()
@@ -1184,8 +1184,8 @@ class ProcessViewsTest(TestCase):
         assert criterion2 in administrative_criteria
         assert criterion3 in administrative_criteria
 
-    def test_eligibility_for_siae_not_subject_to_eligibility_rules(self, *args, **kwargs):
-        """Test eligibility for an Siae not subject to eligibility rules."""
+    def test_eligibility_for_company_not_subject_to_eligibility_rules(self, *args, **kwargs):
+        """Test eligibility for an company not subject to eligibility rules."""
 
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
@@ -1332,7 +1332,7 @@ class ProcessViewsTest(TestCase):
         assert job_application.state.is_accepted
 
     def test_archive(self, *args, **kwargs):
-        """Ensure that when an SIAE archives a job_application, the hidden_for_company flag is updated."""
+        """Ensure that when an company archives a job_application, the hidden_for_company flag is updated."""
 
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_CANCELLED
@@ -1567,11 +1567,11 @@ class ProcessTemplatesTest(TestCase):
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class ProcessTransferJobApplicationTest(TestCase):
-    TRANSFER_TO_OTHER_SIAE_SENTENCE = "Transférer cette candidature vers"
+    TRANSFER_TO_OTHER_COMPANY_SENTENCE = "Transférer cette candidature vers"
 
     def test_job_application_transfer_disabled_for_lone_users(self):
-        # A user member of only one SIAE
-        # must not be able to transfer a job application to another SIAE
+        # A user member of only one company
+        # must not be able to transfer a job application to another company
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         job_application = JobApplicationFactory(
@@ -1585,11 +1585,11 @@ class ProcessTransferJobApplicationTest(TestCase):
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         )
 
-        self.assertNotContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
+        self.assertNotContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
 
     def test_job_application_transfer_disabled_for_bad_state(self):
-        # A user member of only one SIAE must not be able to transfert
-        # to another SIAE
+        # A user member of only one company must not be able to transfert
+        # to another company
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         job_application_1 = JobApplicationFactory(
@@ -1605,16 +1605,16 @@ class ProcessTransferJobApplicationTest(TestCase):
         response = self.client.get(
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application_1.pk})
         )
-        self.assertNotContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
+        self.assertNotContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
 
         response = self.client.get(
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application_2.pk})
         )
 
-        self.assertNotContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
+        self.assertNotContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
 
     def test_job_application_transfer_enabled(self):
-        # A user member of several SIAE can transfer a job application
+        # A user member of several company can transfer a job application
         company = CompanyFactory(with_membership=True)
         other_company = CompanyFactory(with_membership=True)
         user = company.members.first()
@@ -1631,7 +1631,7 @@ class ProcessTransferJobApplicationTest(TestCase):
         response = self.client.get(
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         )
-        self.assertContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
+        self.assertContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
 
     def test_job_application_transfer_redirection(self):
         # After transfering a job application,
@@ -1655,7 +1655,7 @@ class ProcessTransferJobApplicationTest(TestCase):
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         )
 
-        self.assertContains(response, self.TRANSFER_TO_OTHER_SIAE_SENTENCE)
+        self.assertContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
         self.assertContains(response, f"transfer_confirmation_modal_{other_company.pk}")
         self.assertContains(response, "target_company_id")
         self.assertContains(response, transfer_url)
@@ -1804,7 +1804,7 @@ def test_add_prior_action_processing(client):
     assert response.status_code == 403
     assert not job_application.prior_actions.filter(action=job_applications_enums.Prequalification.POE).exists()
 
-    # State is processing but SIAE is not a GEIQ
+    # State is processing but company is not a GEIQ
     job_application = JobApplicationFactory(
         to_company__kind=CompanyKind.AI, state=JobApplicationWorkflow.STATE_PROCESSING
     )
