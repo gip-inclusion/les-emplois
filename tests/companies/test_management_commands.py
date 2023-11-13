@@ -16,13 +16,13 @@ class MoveSiaeDataTest(TestCase):
     def test_uses_wet_run(self):
         company_1 = companies_factories.CompanyWithMembershipAndJobsFactory()
         company_2 = companies_factories.CompanyFactory()
-        management.call_command("move_siae_data", from_id=company_1.pk, to_id=company_2.pk)
+        management.call_command("move_company_data", from_id=company_1.pk, to_id=company_2.pk)
         assert company_1.jobs.count() == 4
         assert company_1.members.count() == 1
         assert company_2.jobs.count() == 0
         assert company_2.members.count() == 0
 
-        management.call_command("move_siae_data", from_id=company_1.pk, to_id=company_2.pk, wet_run=True)
+        management.call_command("move_company_data", from_id=company_1.pk, to_id=company_2.pk, wet_run=True)
         assert company_1.jobs.count() == 0
         assert company_1.members.count() == 0
         assert company_2.jobs.count() == 4
@@ -31,7 +31,7 @@ class MoveSiaeDataTest(TestCase):
     def test_does_not_stop_if_kind_is_different(self):
         company_1 = companies_factories.CompanyWithMembershipAndJobsFactory(kind=CompanyKind.ACI)
         company_2 = companies_factories.CompanyFactory(kind=CompanyKind.EATT)
-        management.call_command("move_siae_data", from_id=company_1.pk, to_id=company_2.pk, wet_run=True)
+        management.call_command("move_company_data", from_id=company_1.pk, to_id=company_2.pk, wet_run=True)
         assert company_1.jobs.count() == 0
         assert company_1.members.count() == 0
         assert company_2.jobs.count() == 4
@@ -42,7 +42,7 @@ class MoveSiaeDataTest(TestCase):
         EmployeeRecordFactory(job_application__to_company=old_company)
 
         management.call_command(
-            "move_siae_data",
+            "move_company_data",
             from_id=old_company.pk,
             to_id=new_company.pk,
             stdout=io.StringIO(),
@@ -61,7 +61,7 @@ class MoveSiaeDataTest(TestCase):
         EmployeeRecordFactory(job_application__to_company=old_company)
 
         management.call_command(
-            "move_siae_data",
+            "move_company_data",
             from_id=old_company.pk,
             to_id=new_company.pk,
             stdout=io.StringIO(),
