@@ -33,6 +33,7 @@ from itou.analytics.models import Datum, StatsDashboardVisit
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, ProlongationRequest
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS
+from itou.companies.enums import ContractType
 from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
@@ -470,11 +471,17 @@ class Command(BaseCommand):
         # TODO(vperron,dejafait): This works as long as we don't have several table creations in the same call.
         # If we someday want to create several tables, we will probably need to disable autocommit in our helper
         # functions and make it manually at the end.
-        table_name = "c1_ref_origine_candidature"
-        self.stdout.write(f"Preparing content for {table_name} table...")
-        rows = [OrderedDict(code=str(item), label=item.label) for item in Origin]
-        df = get_df_from_rows(rows)
-        store_df(df=df, table_name=table_name)
+        enum_data = [
+            {"table_name": "c1_ref_origine_candidature", "enum": Origin},
+            {"table_name": "c1_ref_type_contrat", "enum": ContractType},
+        ]
+        for item in enum_data:
+            table_name = item["table_name"]
+            enum = item["enum"]
+            self.stdout.write(f"Preparing content for {table_name} table...")
+            rows = [OrderedDict(code=str(item), label=item.label) for item in enum]
+            df = get_df_from_rows(rows)
+            store_df(df=df, table_name=table_name)
 
     @timeit
     def report_data_inconsistencies(self):

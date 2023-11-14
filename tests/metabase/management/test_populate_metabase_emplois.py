@@ -970,6 +970,7 @@ def test_populate_enums():
     num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
     num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
     num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries *= 2  # We inject thus many enums so far.
     with assertNumQueries(num_queries):
         management.call_command("populate_metabase_emplois", mode="enums")
 
@@ -982,6 +983,11 @@ def test_populate_enums():
             ("default", "Créée normalement via les emplois"),
             ("pe_approval", "Créée lors d'un import d'Agrément Pole Emploi"),
         ]
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM c1_ref_type_contrat ORDER BY code")
+        rows = cursor.fetchall()
+        assert rows[0] == ("APPRENTICESHIP", "Contrat d'apprentissage")
 
 
 def test_data_inconsistencies(capsys):
@@ -1011,7 +1017,7 @@ def test_data_inconsistencies(capsys):
 @freeze_time("2023-02-02")
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
-def test_populate_fiches_de_poste():
+def test_populate_job_descriptions():
     create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
     company = CompanyFactory(
         for_snapshot=True,
@@ -1066,6 +1072,7 @@ def test_populate_fiches_de_poste():
                 "M1805",
                 "Études et développement informatique",
                 1,
+                job.contract_type,
                 company.pk,
                 "GEIQ",
                 "12989128580059",
