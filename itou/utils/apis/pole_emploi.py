@@ -177,7 +177,7 @@ class PoleEmploiApiClient:
         """
         params = {
             "dateDebutPassIAE": approval.start_at.strftime(DATE_FORMAT) if approval.start_at else "",
-            "dateFinPassIAE": approval.end_at.strftime(DATE_FORMAT) if approval.start_at else "",
+            "dateFinPassIAE": approval.get_pe_end_at(),
             "idNational": encrypted_identifier,
             "numPassIAE": approval.number,
             # we force this field to be "A" for "Approved". The origin of this field is lost with

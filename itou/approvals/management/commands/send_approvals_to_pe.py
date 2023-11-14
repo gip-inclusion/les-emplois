@@ -23,6 +23,7 @@ class Command(BaseCommand):
 
     def handle(self, *, wet_run, delay, **options):
         today = timezone.localdate()
+
         queryset = (
             approvals_models.Approval.objects.filter(
                 # we will ignore any approval that starts after today anyway.
@@ -47,14 +48,46 @@ class Command(BaseCommand):
             ).order_by("-start_at")
         )
 
-        self.stdout.write(
-            f"approvals needing to be sent count={queryset.count()}, batch count={MAX_APPROVALS_PER_RUN}"
-        )
+        nb_approvals = queryset.count()
+        self.stdout.write(f"approvals needing to be sent count={nb_approvals}, batch count={MAX_APPROVALS_PER_RUN}")
+        nb_approvals_to_send = min(nb_approvals, MAX_APPROVALS_PER_RUN)
 
-        for approval in queryset[:MAX_APPROVALS_PER_RUN]:
+        for approval in queryset[:nb_approvals_to_send]:
             self.stdout.write(
                 f"approvals={approval} start_at={approval.start_at} pe_state={approval.pe_notification_status}"
             )
             if wet_run:
                 approval.notify_pole_emploi()
+                sleep(delay)
+
+        batch_left = MAX_APPROVALS_PER_RUN - nb_approvals_to_send
+        cancelled_queryset = (
+            approvals_models.CancelledApproval.objects.filter(
+                # we will ignore any approval that starts after today anyway.
+                start_at__lte=today,
+                pe_notification_status__in=[
+                    api_enums.PEApiNotificationStatus.PENDING,
+                    api_enums.PEApiNotificationStatus.SHOULD_RETRY,
+                ],
+            )
+            # those with a no-nir, no-birthdate or no-name user are also removed from the queryset
+            # in order not to block the cron. They will be picked up as soon as they are set.
+            .exclude(
+                Q(user_nir="")
+                | Q(user_birthdate=None)
+                # there are no such cases in the database at the time of writing, but it *might* happen.
+                | Q(user_first_name="")
+                | Q(user_last_name="")
+            ).order_by("-start_at")
+        )
+        self.stdout.write(
+            f"cancelled approvals needing to be sent count={cancelled_queryset.count()}, batch count={batch_left}"
+        )
+        for cancelled_approval in cancelled_queryset[:batch_left]:
+            self.stdout.write(
+                f"cancelled_approval={cancelled_approval} start_at={cancelled_approval.start_at} "
+                f"pe_state={cancelled_approval.pe_notification_status}"
+            )
+            if wet_run:
+                cancelled_approval.notify_pole_emploi()
                 sleep(delay)
