@@ -1399,7 +1399,7 @@ class ProcessTemplatesTest(TestCase):
         self.assertNotContains(response, self.url_process)
         self.assertContains(response, self.url_eligibility)
         self.assertContains(response, self.url_refuse)
-        self.assertNotContains(response, self.url_postpone)
+        self.assertContains(response, self.url_postpone)
         self.assertNotContains(response, self.url_accept)
 
     def test_details_template_for_state_prior_to_hire(self):
@@ -1412,7 +1412,7 @@ class ProcessTemplatesTest(TestCase):
         self.assertNotContains(response, self.url_process)
         self.assertContains(response, self.url_eligibility)
         self.assertContains(response, self.url_refuse)
-        self.assertNotContains(response, self.url_postpone)
+        self.assertContains(response, self.url_postpone)
         self.assertNotContains(response, self.url_accept)
 
     def test_details_template_for_state_processing_but_suspended_siae(self):
@@ -1436,7 +1436,7 @@ class ProcessTemplatesTest(TestCase):
             ),
         )
         self.assertContains(response, self.url_refuse)
-        self.assertNotContains(response, self.url_postpone)
+        self.assertContains(response, self.url_postpone)
         self.assertNotContains(response, self.url_accept)
 
     def test_details_template_for_state_postponed(self):
