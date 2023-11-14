@@ -24,7 +24,7 @@ from itou.files.models import File
 from itou.job_applications import enums as job_application_enums
 from itou.prescribers import enums as prescribers_enums
 from itou.utils.apis import enums as api_enums, pole_emploi_api_client
-from itou.utils.apis.pole_emploi import PoleEmploiAPIBadResponse, PoleEmploiAPIException
+from itou.utils.apis.pole_emploi import DATE_FORMAT, PoleEmploiAPIBadResponse, PoleEmploiAPIException
 from itou.utils.models import DateRange
 from itou.utils.validators import alphanumeric, validate_siret
 
@@ -251,6 +251,9 @@ class PENotificationMixin(models.Model):
     class Meta:
         abstract = True
 
+    def get_pe_end_at(self):
+        return self.end_at.strftime(DATE_FORMAT)
+
     def _pe_notification_update(self, status, at=None, endpoint=None, exit_code=None):
         """A helper method to update the fields of the mixin:
         - whatever the destination class (Approval, PoleEmploiApproval)
@@ -368,6 +371,73 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
 
     def __str__(self):
         return self.number
+
+    def get_pe_end_at(self):
+        # For cancelled approval, we send start_at == end_at
+        return self.start_at.strftime(DATE_FORMAT)
+
+    def notify_pole_emploi(self):
+        at = timezone.now()
+        if self.start_at > at.date():
+            self.pe_log_err("start_at={} starts after today={}", self.start_at, at.date())
+            self.pe_save_pending(
+                api_enums.PEApiPreliminaryCheckFailureReason.STARTS_IN_FUTURE,
+                at,
+            )
+            return
+
+        type_siae = companies_enums.siae_kind_to_pe_type_siae(self.siae_kind)
+        if not type_siae:
+            self.pe_log_err("could not find PE type for siae_siret={} siae_kind={}", self.siae_siret, self.siae_kind)
+            self.pe_save_error(
+                None,
+                api_enums.PEApiPreliminaryCheckFailureReason.INVALID_SIAE_KIND,
+                at,
+            )
+            return
+
+        if not all(
+            [
+                self.user_first_name,
+                self.user_last_name,
+                self.user_nir,
+                self.user_birthdate,
+            ]
+        ):
+            self.pe_log_err(
+                "had an invalid user_first_name={} user_last_name={} nir={}",
+                self.user_first_name,
+                self.user_last_name,
+                self.user_nir,
+            )
+            # we save those as pending since the cron will ignore those cases anyway and thus has
+            # no chance to block itself.
+            self.pe_save_pending(
+                api_enums.PEApiPreliminaryCheckFailureReason.MISSING_USER_DATA,
+                at,
+            )
+            return
+
+        if not self.user_id_national_pe:
+            id_national = self.pe_rech_individu(
+                self.user_first_name,
+                self.user_last_name,
+                self.user_nir,
+                self.user_birthdate,
+                at,
+            )
+            if not id_national:
+                return
+            self.user_id_national_pe = id_national
+            self.save(update_fields=["user_id_national_pe"])
+        self.pe_maj_pass(
+            id_national_pe=self.user_id_national_pe,
+            siae_siret=self.siae_siret,
+            siae_kind=self.siae_kind,
+            sender_kind=self.sender_kind,
+            prescriber_kind=self.prescriber_kind,
+            at=at,
+        )
 
 
 class Approval(PENotificationMixin, CommonApprovalMixin):

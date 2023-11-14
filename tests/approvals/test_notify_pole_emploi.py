@@ -10,8 +10,9 @@ from django.test import override_settings
 from django.utils import timezone
 from freezegun import freeze_time
 
-from itou.approvals.models import Approval
+from itou.approvals.models import Approval, CancelledApproval
 from itou.companies.enums import CompanyKind, siae_kind_to_pe_type_siae
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.mocks.pole_emploi import (
@@ -20,7 +21,7 @@ from itou.utils.mocks.pole_emploi import (
     API_RECHERCHE_MANY_RESULTS,
     API_RECHERCHE_RESULT_KNOWN,
 )
-from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
+from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, PoleEmploiApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
@@ -336,10 +337,235 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         )
 
 
+@override_settings(
+    API_ESD={
+        "BASE_URL": "https://pe.fake",
+        "AUTH_BASE_URL": "https://auth.fr",
+        "KEY": "foobar",
+        "SECRET": "pe-secret",
+    }
+)
+class CancelledApprovalNotifyPoleEmploiIntegrationTest(TestCase):
+    def setUp(self):
+        super().setUp()
+        respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
+            200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
+        )
+
+    def test_invalid_job_seeker_for_pole_emploi(self):
+        """
+        Error case: our job seeker is not valid (from PoleEmploi’s point of view: here, the NIR is missing)
+         - We do not even call the APIs
+         - no entry should be added to the notification log database
+        """
+        cancelled_approval = CancelledApprovalFactory(user_nir="")
+        with freeze_time() as frozen_now:
+            cancelled_approval.notify_pole_emploi()
+        cancelled_approval.refresh_from_db()
+        assert cancelled_approval.pe_notification_status == "notification_pending"
+        assert cancelled_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
+        assert cancelled_approval.pe_notification_endpoint is None
+        assert cancelled_approval.pe_notification_exit_code == "MISSING_USER_DATA"
+
+    @respx.mock
+    def test_notification_accepted_nominal(self):
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+            200, json=API_RECHERCHE_RESULT_KNOWN
+        )
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        cancelled_approval = CancelledApprovalFactory(siae_kind=CompanyKind.EI)
+        with freeze_time() as frozen_now:
+            cancelled_approval.notify_pole_emploi()
+        cancelled_approval.refresh_from_db()
+        payload = json.loads(respx.calls.last.request.content)
+        assert payload == {
+            "dateDebutPassIAE": cancelled_approval.start_at.isoformat(),
+            "dateFinPassIAE": cancelled_approval.start_at.isoformat(),
+            "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
+            "numPassIAE": cancelled_approval.number,
+            "numSIRETsiae": cancelled_approval.siae_siret,
+            "origineCandidature": "EMPL",
+            "statutReponsePassIAE": "A",
+            "typeSIAE": 838,
+        }
+        assert cancelled_approval.pe_notification_status == "notification_success"
+        assert cancelled_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
+        assert cancelled_approval.pe_notification_endpoint is None
+        assert cancelled_approval.pe_notification_exit_code is None
+
+    @respx.mock
+    def test_notification_accepted_with_id_national(self):
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        cancelled_approval = CancelledApprovalFactory(
+            siae_kind=CompanyKind.ACI, user_id_national_pe="ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
+        )
+        with freeze_time() as frozen_now:
+            cancelled_approval.notify_pole_emploi()
+        cancelled_approval.refresh_from_db()
+        payload = json.loads(respx.calls.last.request.content)
+        assert payload == {
+            "dateDebutPassIAE": cancelled_approval.start_at.isoformat(),
+            "dateFinPassIAE": cancelled_approval.start_at.isoformat(),
+            "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
+            "numPassIAE": cancelled_approval.number,
+            "numSIRETsiae": cancelled_approval.siae_siret,
+            "origineCandidature": "EMPL",
+            "statutReponsePassIAE": "A",
+            "typeSIAE": 836,
+        }
+        assert cancelled_approval.pe_notification_status == "notification_success"
+        assert cancelled_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
+        assert cancelled_approval.pe_notification_endpoint is None
+        assert cancelled_approval.pe_notification_exit_code is None
+
+    @respx.mock
+    def test_notification_accepted_with_prescriber_organization(self):
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+            200, json=API_RECHERCHE_RESULT_KNOWN
+        )
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        cancelled_approval = CancelledApprovalFactory(
+            siae_kind=CompanyKind.ACI,
+            sender_kind=SenderKind.PRESCRIBER,
+            prescriber_kind=PrescriberOrganizationKind.CAF,
+        )
+        with freeze_time() as frozen_now:
+            cancelled_approval.notify_pole_emploi()
+        cancelled_approval.refresh_from_db()
+        payload = json.loads(respx.calls.last.request.content)
+        assert payload == {
+            "dateDebutPassIAE": cancelled_approval.start_at.isoformat(),
+            "dateFinPassIAE": cancelled_approval.start_at.isoformat(),
+            "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
+            "numPassIAE": cancelled_approval.number,
+            "numSIRETsiae": cancelled_approval.siae_siret,
+            "origineCandidature": "PRES",
+            "statutReponsePassIAE": "A",
+            "typeSIAE": 836,
+            "typologiePrescripteur": "CAF",
+        }
+        assert cancelled_approval.pe_notification_status == "notification_success"
+        assert cancelled_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
+        assert cancelled_approval.pe_notification_endpoint is None
+        assert cancelled_approval.pe_notification_exit_code is None
+
+    @respx.mock
+    def test_notification_accepted_with_sensitive_prescriber_organization(self):
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+            200, json=API_RECHERCHE_RESULT_KNOWN
+        )
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        cancelled_approval = CancelledApprovalFactory(
+            siae_kind=CompanyKind.ACI,
+            sender_kind=SenderKind.PRESCRIBER,
+            prescriber_kind=PrescriberOrganizationKind.SPIP,
+        )
+        with freeze_time() as frozen_now:
+            cancelled_approval.notify_pole_emploi()
+        cancelled_approval.refresh_from_db()
+        payload = json.loads(respx.calls.last.request.content)
+        assert payload == {
+            "dateDebutPassIAE": cancelled_approval.start_at.isoformat(),
+            "dateFinPassIAE": cancelled_approval.start_at.isoformat(),
+            "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
+            "numPassIAE": cancelled_approval.number,
+            "numSIRETsiae": cancelled_approval.siae_siret,
+            "origineCandidature": "PRES",
+            "statutReponsePassIAE": "A",
+            "typeSIAE": 836,
+            "typologiePrescripteur": "Autre",
+        }
+        assert cancelled_approval.pe_notification_status == "notification_success"
+        assert cancelled_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
+        assert cancelled_approval.pe_notification_endpoint is None
+        assert cancelled_approval.pe_notification_exit_code is None
+
+    @respx.mock
+    @freeze_time()
+    def test_notification_stays_pending_if_approval_starts_after_today(self):
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+            200, json=API_RECHERCHE_RESULT_KNOWN
+        )
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
+        tomorrow = (timezone.now() + datetime.timedelta(days=1)).date()
+        cancelled_approval = CancelledApprovalFactory(start_at=tomorrow)
+        with self.assertLogs("itou.approvals.models") as logs:
+            cancelled_approval.notify_pole_emploi()
+        assert (
+            f"notify_pole_emploi cancelledapproval={cancelled_approval} "
+            f"start_at={cancelled_approval.start_at} "
+            f"starts after today={timezone.now().date()}" in logs.output[0]
+        )
+        cancelled_approval.refresh_from_db()
+        assert cancelled_approval.pe_notification_status == "notification_pending"
+        assert cancelled_approval.pe_notification_time == timezone.now()
+        assert cancelled_approval.pe_notification_endpoint is None
+        assert cancelled_approval.pe_notification_exit_code == "STARTS_IN_FUTURE"
+
+    @respx.mock
+    def test_notification_goes_to_retry_if_there_is_a_timeout(self):
+        respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").mock(
+            side_effect=httpx.ConnectTimeout
+        )
+        cancelled_approval = CancelledApprovalFactory()
+        with freeze_time() as frozen_now:
+            cancelled_approval.notify_pole_emploi()
+        cancelled_approval.refresh_from_db()
+        assert cancelled_approval.pe_notification_status == "notification_should_retry"
+        assert cancelled_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
+        assert cancelled_approval.pe_notification_endpoint is None
+        assert cancelled_approval.pe_notification_exit_code is None
+
+    @respx.mock
+    def test_notification_goes_to_error_if_something_goes_wrong_with_rech_individu(self):
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+            200, json=API_RECHERCHE_MANY_RESULTS
+        )
+        cancelled_approval = CancelledApprovalFactory()
+        with freeze_time() as frozen_now:
+            cancelled_approval.notify_pole_emploi()
+        cancelled_approval.refresh_from_db()
+        assert cancelled_approval.pe_notification_status == "notification_error"
+        assert cancelled_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
+        assert cancelled_approval.pe_notification_endpoint == "rech_individu"
+        assert cancelled_approval.pe_notification_exit_code == "S002"
+
+    @respx.mock
+    def test_notification_goes_to_error_if_something_goes_wrong_with_maj_pass(self):
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+            200, json=API_RECHERCHE_RESULT_KNOWN
+        )
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
+        cancelled_approval = CancelledApprovalFactory()
+        with freeze_time() as frozen_now:
+            cancelled_approval.notify_pole_emploi()
+        cancelled_approval.refresh_from_db()
+        assert cancelled_approval.pe_notification_status == "notification_error"
+        assert cancelled_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
+        assert cancelled_approval.pe_notification_endpoint == "maj_pass"
+        assert cancelled_approval.pe_notification_exit_code == "S022"
+
+    @respx.mock
+    def test_notification_goes_to_error_if_missing_siae_kind(self):
+        respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
+            200, json=API_RECHERCHE_RESULT_KNOWN
+        )
+        respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
+        cancelled_approval = CancelledApprovalFactory(siae_kind="FOO")  # unknown kind
+        with freeze_time() as frozen_now:
+            cancelled_approval.notify_pole_emploi()
+        cancelled_approval.refresh_from_db()
+        assert cancelled_approval.pe_notification_status == "notification_error"
+        assert cancelled_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
+        assert cancelled_approval.pe_notification_endpoint is None
+        assert cancelled_approval.pe_notification_exit_code == "INVALID_SIAE_KIND"
+
+
 class ApprovalsSendToPeManagementTestCase(TestCase):
+    @patch.object(CancelledApproval, "notify_pole_emploi")
     @patch.object(Approval, "notify_pole_emploi")
     @patch("itou.approvals.management.commands.send_approvals_to_pe.sleep")
-    def test_invalid_job_seeker_for_pole_emploi(self, sleep_mock, notify_mock):
+    def test_invalid_job_seeker_for_pole_emploi(self, sleep_mock, notify_mock, cancelled_notify_mock):
         stdout = io.StringIO()
         # create ignored Approvals, will not even be counted in the batch. the cron will wait for
         # the database to have the necessary job application, nir, or start date to fetch them.
@@ -347,6 +573,10 @@ class ApprovalsSendToPeManagementTestCase(TestCase):
         ApprovalFactory(user__nir="")
         ApprovalFactory(user__birthdate=None)
         ApprovalFactory(start_at=datetime.datetime.today().date() + datetime.timedelta(days=1))
+
+        # Create CancelledApproval
+        delete_approval = ApprovalFactory(with_origin_values=True)
+        delete_approval.delete()
 
         # other approvals
         retry_approval = ApprovalFactory(
@@ -367,11 +597,15 @@ class ApprovalsSendToPeManagementTestCase(TestCase):
             "pe_state=notification_pending",
             f"approvals={retry_approval} start_at={retry_approval.start_at.isoformat()} "
             "pe_state=notification_should_retry",
+            "cancelled approvals needing to be sent count=1, batch count=8",
+            f"cancelled_approval={delete_approval} start_at={delete_approval.start_at.isoformat()} "
+            "pe_state=notification_pending",
             "",
         ]
         sleep_mock.assert_called_with(3)
-        assert sleep_mock.call_count == 2
+        assert sleep_mock.call_count == 3
         assert notify_mock.call_count == 2
+        assert cancelled_notify_mock.call_count == 1
 
 
 @override_settings(
