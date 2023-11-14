@@ -29,6 +29,12 @@ TABLE.add_columns(
             "comment": "Recrutement ouvert à ce jour",
             "fn": lambda o: o.is_active,
         },
+        {
+            "name": "type_contrat",
+            "type": "varchar",
+            "comment": "Type de contrat proposé",
+            "fn": lambda o: o.contract_type,
+        },
         {"name": "id_employeur", "type": "integer", "comment": "ID employeur", "fn": lambda o: o.company.id},
         {"name": "type_employeur", "type": "varchar", "comment": "Type employeur", "fn": lambda o: o.company.kind},
         {"name": "siret_employeur", "type": "varchar", "comment": "SIRET employeur", "fn": lambda o: o.company.siret},
