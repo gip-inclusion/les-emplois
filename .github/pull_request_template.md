@@ -10,7 +10,7 @@ Attirer l'attention sur les décisions d'architecture ou de conception important
 
 ### Captures d'écran <!-- optionnel -->
 
-### Actions facultatives
+### À vérifier
 
 - [ ] Ajouter l'étiquette « no-changelog » ?
 - [ ] Mettre à jour le CHANGELOG_breaking_changes.md ?
