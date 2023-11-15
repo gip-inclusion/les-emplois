@@ -15,6 +15,7 @@ from itou.approvals.enums import (
 )
 from itou.approvals.models import (
     Approval,
+    CancelledApproval,
     PoleEmploiApproval,
     Prolongation,
     ProlongationRequest,
@@ -76,6 +77,28 @@ class ApprovalFactory(factory.django.DjangoModelFactory):
 
             state = kwargs.pop("state", JobApplicationWorkflow.STATE_ACCEPTED)
             self.jobapplication_set.add(JobApplicationFactory(state=state, job_seeker=self.user, **kwargs))
+
+
+class CancelledApprovalFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = CancelledApproval
+
+    number = factory.fuzzy.FuzzyText(length=7, chars=string.digits, prefix=Approval.ASP_ITOU_PREFIX)
+    start_at = factory.LazyFunction(datetime.date.today)
+    end_at = factory.LazyAttribute(lambda obj: Approval.get_default_end_date(obj.start_at))
+
+    user_first_name = factory.Faker("first_name")
+    user_last_name = factory.Faker("last_name")
+    user_birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
+
+    siae_kind = factory.fuzzy.FuzzyChoice(SIAE_WITH_CONVENTION_KINDS)
+    siae_siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
+    sender_kind = SenderKind.EMPLOYER
+    prescriber_kind = ""
+
+    @factory.lazy_attribute
+    def user_nir(self):
+        return JobSeekerFactory.build(birthdate=self.user_birthdate).nir
 
 
 class SuspensionFactory(factory.django.DjangoModelFactory):
