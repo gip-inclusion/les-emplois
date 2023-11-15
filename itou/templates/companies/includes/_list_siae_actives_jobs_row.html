@@ -21,7 +21,7 @@
                 {% if job.location %}
                     {{ job.location }}
                 {% else %}
-                    {{ job.siae.city|title }} ({{ job.siae.department }})
+                    {{ job.company.city|title }} ({{ job.company.department }})
                 {% endif %}
             </span>
         </div>
