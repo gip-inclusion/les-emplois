@@ -45,13 +45,24 @@ def test_collect_analytics_with_data():
         2, pe_notification_status=api_enums.PEApiNotificationStatus.SHOULD_RETRY
     )
     approvals_factories.ApprovalFactory.create_batch(2, pe_notification_status=api_enums.PEApiNotificationStatus.ERROR)
-    approval = approvals_factories.ApprovalFactory(with_jobapplication=True)
-    approval.delete()
+
+    approvals_factories.CancelledApprovalFactory.create_batch(
+        1, pe_notification_status=api_enums.PEApiNotificationStatus.SUCCESS
+    )
+    approvals_factories.CancelledApprovalFactory.create_batch(
+        2, pe_notification_status=api_enums.PEApiNotificationStatus.PENDING
+    )
+    approvals_factories.CancelledApprovalFactory.create_batch(
+        3, pe_notification_status=api_enums.PEApiNotificationStatus.SHOULD_RETRY
+    )
+    approvals_factories.CancelledApprovalFactory.create_batch(
+        4, pe_notification_status=api_enums.PEApiNotificationStatus.ERROR
+    )
 
     assert approvals.collect_analytics_data(timezone.now()) == {
         models.DatumCode.APPROVAL_COUNT: 9,
-        models.DatumCode.APPROVAL_CANCELLED: 1,
-        models.DatumCode.APPROVAL_PE_NOTIFY_SUCCESS: 3,
-        models.DatumCode.APPROVAL_PE_NOTIFY_PENDING: 4,
-        models.DatumCode.APPROVAL_PE_NOTIFY_ERROR: 2,
+        models.DatumCode.APPROVAL_CANCELLED: 10,
+        models.DatumCode.APPROVAL_PE_NOTIFY_SUCCESS: 4,
+        models.DatumCode.APPROVAL_PE_NOTIFY_PENDING: 9,
+        models.DatumCode.APPROVAL_PE_NOTIFY_ERROR: 6,
     }
