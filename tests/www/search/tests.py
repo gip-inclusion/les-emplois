@@ -237,7 +237,6 @@ class SearchCompanyTest(TestCase):
             html=True,
         )
 
-    @pytest.mark.ignore_template_errors
     def test_has_no_active_members(self):
         hiring_str = "recrutements en cours"
         no_hiring_str = (
