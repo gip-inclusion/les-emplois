@@ -37,9 +37,6 @@ POST_DATA = {
 INVITATION_URL = reverse("invitations_views:invite_prescriber_with_org")
 
 
-pytestmark = pytest.mark.ignore_template_errors
-
-
 class TestSendPrescriberWithOrgInvitation(TestCase):
     def setUp(self):
         super().setUp()
@@ -229,6 +226,7 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         assert current_org in user.prescriberorganization_set.all()
 
     @respx.mock
+    @pytest.mark.ignore_template_errors
     def test_accept_prescriber_org_invitation(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         response = self.client.get(invitation.acceptance_link)
@@ -292,6 +290,7 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         self.assert_invitation_is_accepted(response, user, invitation)
 
     @respx.mock
+    @pytest.mark.ignore_template_errors
     def test_accept_prescriber_org_invitation_returns_on_other_browser(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         response = self.client.get(invitation.acceptance_link)

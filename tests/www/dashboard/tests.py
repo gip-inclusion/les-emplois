@@ -61,9 +61,6 @@ from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, JobSeekerFa
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 
 
-pytestmark = pytest.mark.ignore_template_errors
-
-
 class DashboardViewTest(TestCase):
     NO_PRESCRIBER_ORG_MSG = "Votre compte utilisateur n’est rattaché à aucune organisation."
     NO_PRESCRIBER_ORG_FOR_PE_MSG = (
@@ -80,6 +77,7 @@ class DashboardViewTest(TestCase):
         response = self.client.get(url)
         assert response.status_code == 200
 
+    @pytest.mark.ignore_template_errors
     def test_user_with_inactive_company_can_still_login_during_grace_period(self):
         company = CompanyPendingGracePeriodFactory()
         user = EmployerFactory()
@@ -1434,6 +1432,7 @@ class EditUserEmailFormTest(TestCase):
 
 
 class SwitchCompanyTest(TestCase):
+    @pytest.mark.ignore_template_errors
     def test_switch_company(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
@@ -1478,6 +1477,7 @@ class SwitchCompanyTest(TestCase):
         assert response.status_code == 200
         assert response.context["request"].current_organization == related_company
 
+    @pytest.mark.ignore_template_errors
     def test_can_still_switch_to_inactive_company_during_grace_period(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
@@ -1527,6 +1527,7 @@ class SwitchCompanyTest(TestCase):
         assert response.context["request"].current_organization == company
 
 
+@pytest.mark.ignore_template_errors
 class EditUserPreferencesTest(TestCase):
     def test_employer_opt_in_company_no_job_description(self):
         company = CompanyFactory(with_membership=True)
@@ -1764,6 +1765,7 @@ def test_api_token_view_for_company_admin(client):
     assert Token.objects.filter(user=employer).count() == 1
 
 
+@pytest.mark.ignore_template_errors
 def test_api_token_view_for_non_company_admin(client):
     employer = CompanyMembershipFactory(is_admin=False).user
     client.force_login(employer)

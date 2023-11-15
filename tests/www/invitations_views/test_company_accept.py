@@ -22,9 +22,6 @@ from tests.users.factories import EmployerFactory
 from tests.utils.test import assertMessages
 
 
-pytestmark = pytest.mark.ignore_template_errors
-
-
 class TestAcceptInvitation(InclusionConnectBaseTestCase):
     def assert_accepted_invitation(self, response, invitation, user):
         user.refresh_from_db()
@@ -49,6 +46,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         assert current_company in user.company_set.all()
 
     @respx.mock
+    @pytest.mark.ignore_template_errors
     def test_accept_invitation_signup(self):
         invitation = SentEmployerInvitationFactory(email=OIDC_USERINFO["email"])
         response = self.client.get(invitation.acceptance_link, follow=True)
@@ -89,6 +87,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         self.assert_accepted_invitation(response, invitation, user)
 
     @respx.mock
+    @pytest.mark.ignore_template_errors
     def test_accept_invitation_signup_returns_on_other_browser(self):
         invitation = SentEmployerInvitationFactory(email=OIDC_USERINFO["email"])
         response = self.client.get(invitation.acceptance_link, follow=True)
@@ -131,6 +130,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         self.assert_accepted_invitation(response, invitation, user)
 
     @respx.mock
+    @pytest.mark.ignore_template_errors
     def test_accept_invitation_signup_bad_email_case(self):
         invitation = SentEmployerInvitationFactory(email=OIDC_USERINFO["email"].upper())
         response = self.client.get(invitation.acceptance_link, follow=True)
@@ -209,6 +209,7 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         self.assertRedirects(response, reverse("account_logout"))
 
     @respx.mock
+    @pytest.mark.ignore_template_errors
     def test_accept_invitation_signup_wrong_email(self):
         invitation = SentEmployerInvitationFactory()
         response = self.client.get(invitation.acceptance_link, follow=True)
