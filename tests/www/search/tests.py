@@ -16,14 +16,12 @@ from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase
 
 
-pytestmark = pytest.mark.ignore_template_errors
-
-
 class SearchCompanyTest(TestCase):
     def setUp(self):
         super().setUp()
         self.url = reverse("search:employers_results")
 
+    @pytest.mark.ignore_template_errors
     def test_not_existing(self):
         response = self.client.get(self.url, {"city": "foo-44"})
         self.assertContains(response, "Aucun résultat avec les filtres actuels.")
@@ -239,6 +237,7 @@ class SearchCompanyTest(TestCase):
             html=True,
         )
 
+    @pytest.mark.ignore_template_errors
     def test_has_no_active_members(self):
         hiring_str = "recrutements en cours"
         no_hiring_str = (
@@ -263,6 +262,7 @@ class SearchPrescriberTest(TestCase):
         response = self.client.get(url)
         self.assertContains(response, "Rechercher des prescripteurs habilités")
 
+    @pytest.mark.ignore_template_errors
     def test_results(self):
         url = reverse("search:prescribers_results")
 
@@ -283,6 +283,7 @@ class JobDescriptionSearchViewTest(TestCase):
         super().setUp()
         self.url = reverse("search:job_descriptions_results")
 
+    @pytest.mark.ignore_template_errors
     def test_not_existing(self):
         response = self.client.get(self.url, {"city": "foo-44"})
         self.assertContains(response, "Aucun résultat avec les filtres actuels.")
@@ -570,6 +571,7 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertNotContains(response, capfirst(job2.display_name), html=True)
         self.assertNotContains(response, capfirst(job3.display_name), html=True)
 
+    @pytest.mark.ignore_template_errors
     def test_domains(self):
         create_test_romes_and_appellations(("N1101", "M1805"))
         city = create_city_saint_andre()

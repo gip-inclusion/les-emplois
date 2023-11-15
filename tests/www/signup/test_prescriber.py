@@ -32,9 +32,6 @@ from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.test import assertMessages
 
 
-pytestmark = pytest.mark.ignore_template_errors
-
-
 @override_settings(
     API_INSEE_BASE_URL="https://insee.fake",
     API_INSEE_SIRENE_BASE_URL="https://entreprise.fake",
@@ -61,6 +58,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         self.assertRedirects(response, reverse("signup:prescriber_check_already_exists"))
 
     @respx.mock
+    @pytest.mark.ignore_template_errors
     def test_create_user_prescriber_member_of_pole_emploi(self):
         """
         Test the creation of a user of type prescriber and his joining to a Pole emploi agency.
@@ -150,6 +148,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    @pytest.mark.ignore_template_errors
     def test_create_user_prescriber_with_authorized_org_returns_on_other_browser(self, mock_call_ban_geocoding_api):
         siret = "26570134200148"
 
@@ -223,6 +222,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    @pytest.mark.ignore_template_errors
     def test_create_user_prescriber_with_authorized_org_of_known_kind(self, mock_call_ban_geocoding_api):
         """
         Test the creation of a user of type prescriber with an authorized organization of *known* kind.
@@ -298,6 +298,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    @pytest.mark.ignore_template_errors
     def test_create_user_prescriber_with_authorized_org_of_unknown_kind(self, mock_call_ban_geocoding_api):
         """
         Test the creation of a user of type prescriber with an authorized organization of *unknown* kind.
@@ -390,6 +391,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    @pytest.mark.ignore_template_errors
     def test_create_user_prescriber_with_unauthorized_org(self, mock_call_ban_geocoding_api):
         """
         Test the creation of a user of type prescriber with an unauthorized organization.
@@ -494,6 +496,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret2})
         self.assertRedirects(response, url)
 
+    @pytest.mark.ignore_template_errors
     def test_create_user_prescriber_with_existing_siren_same_department(self):
         """
         Test the creation of a user of type prescriber with existing SIREN in a same department
@@ -552,6 +555,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         self.assertRedirects(response, url)
 
     @respx.mock
+    @pytest.mark.ignore_template_errors
     def test_create_user_prescriber_without_org(self):
         """
         Test the creation of a user of type prescriber without organization.
@@ -600,6 +604,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    @pytest.mark.ignore_template_errors
     def test_create_user_prescriber_with_same_siret_and_different_kind(self, mock_call_ban_geocoding_api):
         """
         A user can create a new prescriber organization with an existing SIRET number,
@@ -669,6 +674,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    @pytest.mark.ignore_template_errors
     def test_create_user_prescriber_with_same_siret_and_same_kind(self, mock_call_ban_geocoding_api):
         """
         A user can't create a new prescriber organization with an existing SIRET number if:
@@ -700,6 +706,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, "utilise déjà ce type d'organisation avec le même SIRET")
         mock_call_ban_geocoding_api.assert_called_once()
 
+    @pytest.mark.ignore_template_errors
     def test_form_to_request_for_an_invitation(self):
         siret = "26570134200148"
         prescriber_org = PrescriberOrganizationWithMembershipFactory(siret=siret)
@@ -734,6 +741,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         assert invitation_url in mail_body
 
     @respx.mock
+    @pytest.mark.ignore_template_errors
     def test_prescriber_already_exists__simple_signup(self):
         """
         He does not want to join an organization, only create an account.
@@ -770,6 +778,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         assert user.has_sso_provider
 
     @respx.mock
+    @pytest.mark.ignore_template_errors
     def test_prescriber_already_exists__create_organization(self):
         """
         User is already a prescriber.
@@ -852,6 +861,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
     """
 
     @respx.mock
+    @pytest.mark.ignore_template_errors
     def test_organization_creation_error(self):
         """
         The organization creation didn't work.
@@ -924,6 +934,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         assert not user.prescriberorganization_set.exists()
 
     @respx.mock
+    @pytest.mark.ignore_template_errors
     def test_non_prescriber_cant_join_organisation(self):
         """
         The organization creation didn't work.
@@ -1000,6 +1011,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         )
 
     @respx.mock
+    @pytest.mark.ignore_template_errors
     def test_employer_already_exists(self):
         """
         User is already a member of an SIAE.
@@ -1078,6 +1090,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         assert not user.prescriberorganization_set.exists()
 
     @respx.mock
+    @pytest.mark.ignore_template_errors
     def test_prescriber_signup__pe_organization_wrong_email(self):
         """
         A user creates a prescriber account on Itou with Inclusion Connect.

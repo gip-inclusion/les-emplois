@@ -14,9 +14,6 @@ from tests.prescribers.factories import PrescriberOrganizationWithMembershipFact
 from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
 
 
-pytestmark = pytest.mark.ignore_template_errors
-
-
 class JobApplicationGEIQEligibilityDetailsTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -219,6 +216,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
         )
         apply_session.save()
 
+    @pytest.mark.ignore_template_errors
     def test_job_seeker_not_resident_in_qpv_or_zrr(self):
         # ZRR / QPV criteria info fragment is loaded before HTMX "zone"
         diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True, job_seeker=self.job_seeker)
@@ -241,6 +239,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
 
         self.assertTemplateNotUsed(response, "apply/includes/known_criteria.html")
 
+    @pytest.mark.ignore_template_errors
     def test_job_seeker_qpv_details_display(self):
         # Check QPV fragment is displayed:
         diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True, job_seeker=self.job_seeker_in_qpv)
@@ -267,6 +266,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
         self.assertTemplateUsed(response, "apply/includes/known_criteria.html")
         self.assertContains(response, "Résident QPV")
 
+    @pytest.mark.ignore_template_errors
     def test_job_seeker_zrr_details_display(self):
         # Check ZRR fragment is displayed
 

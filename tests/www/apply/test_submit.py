@@ -49,9 +49,6 @@ from tests.users.factories import (
 from tests.utils.test import TestCase, assertMessages
 
 
-pytestmark = pytest.mark.ignore_template_errors
-
-
 class ApplyTest(TestCase):
     def test_company_with_no_members(self):
         company = CompanyFactory()
@@ -2132,6 +2129,7 @@ class DirectHireFullProcessTest(TestCase):
         response = self.client.get(next_url)
         assert response.status_code == 200
 
+    @pytest.mark.ignore_template_errors
     def test_hire_as_geiq(self):
         """Apply as GEIQ with pre-existing job seeker without previous application"""
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"), kind=CompanyKind.GEIQ)
@@ -3246,6 +3244,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         )
         self.assertTemplateNotUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
+    @pytest.mark.ignore_template_errors
     def test_sanity_check_geiq_diagnosis_for_non_geiq(self):
         job_seeker = JobSeekerFactory()
         # See comment im previous test:
@@ -3800,6 +3799,7 @@ class GEIQEligibilityForHireTestCase(TestCase):
         response = self.client.get(self._reverse("apply:eligibility_for_hire"))
         self.assertRedirects(response, self._reverse("apply:hire_confirmation"))
 
+    @pytest.mark.ignore_template_errors
     def test_job_seeker_without_valid_diagnosis(self):
         self.company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
         assert not GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, self.company).exists()

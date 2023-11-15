@@ -23,9 +23,6 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.utils.test import TestCase, parse_response_to_soup
 
 
-pytestmark = pytest.mark.ignore_template_errors
-
-
 @pytest.mark.usefixtures("unittest_compatibility")
 class CardViewTest(TestCase):
     OTHER_TAB_ID = "autres-metiers"
@@ -638,6 +635,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         response = self.client.get(url)
         assert response.status_code == 403
 
+    @pytest.mark.ignore_template_errors
     def test_asp_source_siae_non_admin_cannot_see_nor_select_af(self):
         company = CompanyFactory(membership__is_admin=False, with_membership=True)
         user = company.members.first()
