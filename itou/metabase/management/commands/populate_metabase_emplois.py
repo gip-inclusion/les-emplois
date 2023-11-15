@@ -472,13 +472,11 @@ class Command(BaseCommand):
         # TODO(vperron,dejafait): This works as long as we don't have several table creations in the same call.
         # If we someday want to create several tables, we will probably need to disable autocommit in our helper
         # functions and make it manually at the end.
-        enum_data = [
-            {"table_name": "c1_ref_origine_candidature", "enum": Origin},
-            {"table_name": "c1_ref_type_contrat", "enum": ContractType},
-        ]
-        for item in enum_data:
-            table_name = item["table_name"]
-            enum = item["enum"]
+        enum_to_table = {
+            Origin: "c1_ref_origine_candidature",
+            ContractType: "c1_ref_type_contrat",
+        }
+        for enum, table_name in enum_to_table.items():
             self.stdout.write(f"Preparing content for {table_name} table...")
             rows = [OrderedDict(code=str(item), label=item.label) for item in enum]
             df = get_df_from_rows(rows)
