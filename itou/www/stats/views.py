@@ -28,6 +28,7 @@ from itou.common_apps.address.departments import (
     format_region_and_department_for_matomo,
     format_region_for_matomo,
 )
+from itou.utils import constants as global_constants
 from itou.utils.apis import metabase as mb
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
@@ -102,6 +103,7 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
         "stats_base_url": settings.METABASE_SITE_URL,
         "tally_popup_form_id": tally_popup_form_id,
         "tally_embed_form_id": tally_embed_form_id,
+        "PILOTAGE_HELP_CENTER_URL": global_constants.PILOTAGE_HELP_CENTER_URL,
     }
 
     # Key value pairs in context override preexisting pairs in base_context.
