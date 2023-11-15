@@ -61,7 +61,7 @@ def rename_table_atomically(from_table_name, to_table_name):
     to_table_name to z_old_<to_table_name>.
     This allows us to take our time filling the new table without locking the current one.
     Note that when the old table z_old_<to_table_name> is deleted, all its obsolete airflow staging views
-    are deleted as well, they will be rebuilt by the next run of the airflow DAG `final_tables`.
+    are deleted as well, they will be rebuilt by the next run of the airflow DAG `dbt_daily`.
     """
 
     with MetabaseDatabaseCursor() as (cur, conn):
@@ -105,11 +105,21 @@ def create_table(table_name: str, columns: list[str, str], reset=False):
         conn.commit()
 
 
-def build_final_tables():
+def build_dbt_daily():
     # FIXME(vperron): this has to be moved to DBT seeds.
     create_unversioned_tables_if_needed()
     response = httpx.post(
-        urllib.parse.urljoin(settings.AIRFLOW_BASE_URL, "api/v1/dags/final_tables/dagRuns"),
+        urllib.parse.urljoin(settings.AIRFLOW_BASE_URL, "api/v1/dags/dbt_daily/dagRuns"),
+        json={"conf": {}},
+    )
+    response.raise_for_status()
+
+
+def build_dbt_weekly():
+    # FIXME(vperron): this has to be moved to DBT seeds.
+    create_unversioned_tables_if_needed()
+    response = httpx.post(
+        urllib.parse.urljoin(settings.AIRFLOW_BASE_URL, "api/v1/dags/dbt_weekly/dagRuns"),
         json={"conf": {}},
     )
     response.raise_for_status()

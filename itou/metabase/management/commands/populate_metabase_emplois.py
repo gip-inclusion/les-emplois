@@ -42,7 +42,7 @@ from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Rome
 from itou.metabase.dataframes import get_df_from_rows, store_df
-from itou.metabase.db import build_final_tables, populate_table
+from itou.metabase.db import build_dbt_daily, populate_table
 from itou.metabase.tables import (
     analytics,
     approvals,
@@ -111,7 +111,7 @@ class Command(BaseCommand):
             "insee_codes_vs_post_codes": self.populate_insee_codes_vs_post_codes,
             "departments": self.populate_departments,
             "enums": self.populate_enums,
-            "final_tables": self.build_final_tables,
+            "dbt_daily": self.build_dbt_daily,
             "data_inconsistencies": self.report_data_inconsistencies,
         }
 
@@ -502,8 +502,8 @@ class Command(BaseCommand):
             )
 
     @timeit
-    def build_final_tables(self):
-        build_final_tables()
+    def build_dbt_daily(self):
+        build_dbt_daily()
 
     @timeit
     @monitor(monitor_slug="populate-metabase-emplois")

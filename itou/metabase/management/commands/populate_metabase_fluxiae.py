@@ -66,7 +66,7 @@ from django.core.management.base import BaseCommand
 # Another way to do it would be to rationalize our import (to Itou) & export (to Metabase) logic.
 from itou.companies.management.commands._import_siae.utils import get_fluxiae_df, get_fluxiae_referential_filenames
 from itou.metabase.dataframes import store_df
-from itou.metabase.db import build_final_tables
+from itou.metabase.db import build_dbt_weekly
 from itou.utils.python import timeit
 from itou.utils.slack import send_slack_message
 
@@ -105,7 +105,7 @@ class Command(BaseCommand):
         self.populate_fluxiae_view(vue_name="fluxIAE_Salarie", skip_first_row=False)
         self.populate_fluxiae_view(vue_name="fluxIAE_Structure")
 
-        build_final_tables()
+        build_dbt_weekly()
 
         send_slack_message(
             ":white_check_mark: Fin de la mise à jour hebdomadaire de Metabase avec les"
