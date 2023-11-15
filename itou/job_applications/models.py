@@ -140,7 +140,9 @@ class JobApplicationQuerySet(models.QuerySet):
         Get unique foreign key objects in a single query.
         TODO: move this method in a custom manager since it's not chainable.
         """
+        # FIXME: Replace that static list by a dynamic one
         if fk_field not in [
+            "approval",
             "job_seeker",
             "sender",
             "sender_company",
@@ -149,7 +151,8 @@ class JobApplicationQuerySet(models.QuerySet):
         ]:
             raise RuntimeError("Unauthorized fk_field")
 
-        job_applications = self.order_by(fk_field).distinct(fk_field).select_related(fk_field)
+        # Use the `_id` field because ordering by a ForeignKey will follow the Meta.ordering but the distinct will not.
+        job_applications = self.order_by(f"{fk_field}_id").distinct(f"{fk_field}_id").select_related(fk_field)
         return [
             getattr(job_application, fk_field)
             for job_application in job_applications

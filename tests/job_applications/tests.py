@@ -13,7 +13,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
-from itou.approvals.models import CancelledApproval
+from itou.approvals.models import Approval, CancelledApproval
 from itou.companies.enums import CompanyKind, ContractType
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
@@ -349,17 +349,21 @@ class JobApplicationQuerySetTest(TestCase):
         assert JobApplication.objects.created_in_past(hours=35).count() == 3
 
     def test_get_unique_fk_objects(self):
-        # Create 3 job applications for 2 candidates to check
-        # that `get_unique_fk_objects` returns 2 candidates.
-        JobApplicationSentByJobSeekerFactory()
-        job_seeker = JobSeekerFactory()
-        JobApplicationSentByJobSeekerFactory.create_batch(2, job_seeker=job_seeker)
+        # Create 3 job applications and 3 approvals for 2 candidates
+        JobApplicationWithApprovalNotCancellableFactory()
+        approval = ApprovalFactory(expired=True)
+        JobApplicationWithApprovalNotCancellableFactory(job_seeker=approval.user)
+        JobApplicationSentByJobSeekerFactory(job_seeker=approval.user)
 
         unique_job_seekers = JobApplication.objects.get_unique_fk_objects("job_seeker")
-
         assert JobApplication.objects.count() == 3
         assert len(unique_job_seekers) == 2
-        assert type(unique_job_seekers[0]) == User
+        assert isinstance(unique_job_seekers[0], User)
+
+        unique_approvals = JobApplication.objects.get_unique_fk_objects("approval")
+        assert Approval.objects.count() == 3
+        assert len(unique_approvals) == 2
+        assert isinstance(unique_approvals[0], Approval)
 
     def test_with_has_suspended_approval(self):
         job_app = JobApplicationSentByJobSeekerFactory()
