@@ -82,9 +82,6 @@ from tests.users.factories import (
 from tests.utils.test import TestCase, assertMessagesFromRequest, parse_response_to_soup
 
 
-pytestmark = pytest.mark.ignore_template_errors
-
-
 def get_response_for_middlewaremixin(request):
     """
     `SessionMiddleware` inherits from `MiddlewareMixin` which requires
@@ -680,7 +677,7 @@ class UtilsTemplateTagsTestCase(TestCase):
         template = Template(
             """
             {% load redirection_fields %}
-            {% url "dashboard:index" %}{% redirection_url value=redirect_field_value %}
+            {% url "dashboard:index" %}{% redirection_url value=redirect_field_value|default:"" %}
         """
         )
         out = template.render(Context()).strip()
@@ -707,7 +704,7 @@ class UtilsTemplateTagsTestCase(TestCase):
         template = Template(
             """
             {% load redirection_fields %}
-            {% redirection_input_field value=redirect_field_value %}
+            {% redirection_input_field value=redirect_field_value|default:"" %}
         """
         )
         out = template.render(Context()).strip()
