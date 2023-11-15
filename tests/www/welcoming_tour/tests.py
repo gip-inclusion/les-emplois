@@ -1,4 +1,3 @@
-import pytest
 import respx
 from allauth.account.adapter import get_adapter
 from allauth.account.models import EmailConfirmationHMAC
@@ -13,9 +12,6 @@ from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTest
 from tests.openid_connect.inclusion_connect.tests import mock_oauth_dance
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from tests.utils.test import TestCase
-
-
-pytestmark = pytest.mark.ignore_template_errors
 
 
 def get_confirm_email_url(request, email):

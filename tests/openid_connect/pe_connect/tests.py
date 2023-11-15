@@ -25,8 +25,6 @@ from tests.users.factories import JobSeekerFactory, UserFactory
 from tests.utils.test import reload_module
 
 
-pytestmark = pytest.mark.ignore_template_errors
-
 PEAMU_USERINFO = {
     "given_name": "Angela Claire Louise",
     "family_name": "DUBOIS",
