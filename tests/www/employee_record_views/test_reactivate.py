@@ -9,9 +9,6 @@ from tests.job_applications.factories import JobApplicationWithCompleteJobSeeker
 from tests.utils.test import TestCase
 
 
-pytestmark = pytest.mark.ignore_template_errors
-
-
 @pytest.mark.usefixtures("unittest_compatibility")
 class ReactivateEmployeeRecordsTest(TestCase):
     def setUp(self):
