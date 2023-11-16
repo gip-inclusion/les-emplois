@@ -679,6 +679,7 @@ def siae_upload_doc(
     back_url = get_safe_url(request, "back_url", fallback_url=url)
 
     context = {
+        "job_seeker": evaluated_administrative_criteria.evaluated_job_application.job_application.job_seeker,
         "evaluated_administrative_criteria": evaluated_administrative_criteria,
         "form": form,
         "back_url": back_url,

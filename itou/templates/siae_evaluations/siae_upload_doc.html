@@ -3,10 +3,7 @@
 {% load i18n %}
 {% load static %}
 
-{% block title %}
-    Auto-prescriptions à justifier pour
-    {{ full_name|title }}
-{% endblock %}
+{% block title %}Auto-prescriptions à justifier pour {{ job_seeker.get_full_name }}{% endblock %}
 
 {% block content_title_wrapper %}{% endblock %}
 
