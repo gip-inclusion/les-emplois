@@ -42,7 +42,6 @@ class Command(BaseCommand):
                 Q(user__nir="")
                 | Q(user__birthdate=None)
                 # there are no such cases in the database at the time of writing, but it *might* happen.
-                | Q(user__nir="")
                 | Q(user__first_name="")
                 | Q(user__last_name="")
             ).order_by("-start_at")
