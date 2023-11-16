@@ -37,7 +37,7 @@
                             </h1>
                         </div>
 
-                        <form method="post" action="?step={{ step }}" class="js-prevent-multiple-submit">
+                        <form method="post" class="js-prevent-multiple-submit">
                             {% bootstrap_form_errors form alert_error_type="all" %}
 
                             {% csrf_token %}
