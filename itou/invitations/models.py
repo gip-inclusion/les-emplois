@@ -142,6 +142,11 @@ class InvitationAbstract(models.Model):
         """
         raise NotImplementedError
 
+    @property
+    def target(self):
+        """The AbstractOrganization child targeted by the invitation"""
+        raise NotImplementedError
+
 
 class PrescriberWithOrgInvitation(InvitationAbstract):
     USER_KIND = UserKind.PRESCRIBER
@@ -216,6 +221,10 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
         body = "invitations_views/email/invitation_establishment_body.txt"
         return get_email_message(to, context, subject, body)
 
+    @property
+    def target(self):
+        return self.organization
+
 
 class EmployerInvitation(InvitationAbstract):
     USER_KIND = UserKind.EMPLOYER
@@ -285,6 +294,10 @@ class EmployerInvitation(InvitationAbstract):
         subject = "invitations_views/email/invitation_establishment_subject.txt"
         body = "invitations_views/email/invitation_establishment_body.txt"
         return get_email_message(to, context, subject, body)
+
+    @property
+    def target(self):
+        return self.company
 
 
 class LaborInspectorInvitation(InvitationAbstract):
@@ -360,3 +373,7 @@ class LaborInspectorInvitation(InvitationAbstract):
         subject = "invitations_views/email/invitation_establishment_subject.txt"
         body = "invitations_views/email/invitation_establishment_body.txt"
         return get_email_message(to, context, subject, body)
+
+    @property
+    def target(self):
+        return self.institution
