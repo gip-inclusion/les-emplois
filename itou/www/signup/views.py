@@ -26,7 +26,7 @@ from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.adapter import UserAdapter
-from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, UserKind
+from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, MATOMO_ACCOUNT_TYPE, UserKind
 from itou.utils import constants as global_constants
 from itou.utils.nav_history import get_prev_url_from_history, push_url_in_history
 from itou.utils.tokens import company_signup_token_generator
@@ -260,6 +260,7 @@ class CompanyUserView(CompanyBaseView, TemplateView):
         return super().get_context_data(**kwargs) | {
             "inclusion_connect_url": inclusion_connect_url,
             "company": self.company,
+            "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.EMPLOYER],
         }
 
 
@@ -617,6 +618,7 @@ def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_e
     context = {
         "inclusion_connect_url": inclusion_connect_url,
         "pole_emploi_org": pole_emploi_org,
+        "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.PRESCRIBER],
         "prev_url": get_prev_url_from_history(request, global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY),
     }
     return render(request, template_name, context)
@@ -680,6 +682,7 @@ def prescriber_user(request, template_name="signup/prescriber_user.html"):
 
     context = {
         "inclusion_connect_url": inclusion_connect_url,
+        "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.PRESCRIBER],
         "join_as_orienteur_without_org": join_as_orienteur_without_org,
         "join_authorized_org": join_authorized_org,
         "kind_label": kind_label,
@@ -823,6 +826,7 @@ class FacilitatorUserView(FacilitatorBaseMixin, TemplateView):
         return super().get_context_data(**kwargs) | {
             "inclusion_connect_url": inclusion_connect_url,
             "company": self.company_to_create,
+            "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.EMPLOYER],
         }
 
 

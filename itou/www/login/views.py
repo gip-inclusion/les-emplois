@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.urls import reverse
 
-from itou.users.enums import UserKind
+from itou.users.enums import MATOMO_ACCOUNT_TYPE, UserKind
 from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.login.forms import ItouLoginForm
 
@@ -60,8 +60,7 @@ class PrescriberLoginView(ItouLoginView):
         context = super().get_context_data(**kwargs)
 
         extra_context = {
-            "account_type_display_name": "prescripteur",
-            "matomo_account_type": UserKind.PRESCRIBER,
+            "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.PRESCRIBER],
             "login_url": reverse("login:prescriber"),
             "signup_url": reverse("signup:prescriber_check_already_exists"),
             "signup_allowed": True,
@@ -78,8 +77,7 @@ class EmployerLoginView(ItouLoginView):
         context = super().get_context_data(**kwargs)
 
         extra_context = {
-            "account_type_display_name": "employeur solidaire",
-            "matomo_account_type": UserKind.EMPLOYER,
+            "matomo_account_type": MATOMO_ACCOUNT_TYPE[UserKind.EMPLOYER],
             "login_url": reverse("login:employer"),
             "signup_url": reverse("signup:company_select"),
             "signup_allowed": True,
@@ -95,7 +93,6 @@ class LaborInspectorLoginView(ItouLoginView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         extra_context = {
-            "account_type_display_name": "institution partenaire",
             "login_url": reverse("login:labor_inspector"),
             "signup_allowed": False,
         }

@@ -20,6 +20,12 @@ class UserKind(models.TextChoices):
     ITOU_STAFF = KIND_ITOU_STAFF, "administrateur"
 
 
+MATOMO_ACCOUNT_TYPE = {
+    UserKind.PRESCRIBER: "prescripteur",
+    UserKind.EMPLOYER: "employeur solidaire",
+}
+
+
 class Title(models.TextChoices):
     M = "M", "Monsieur"
     MME = "MME", "Madame"
