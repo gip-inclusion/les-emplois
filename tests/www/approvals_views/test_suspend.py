@@ -1,3 +1,5 @@
+from unittest import mock
+
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
@@ -10,6 +12,7 @@ from itou.www.approvals_views.forms import SuspensionForm
 from tests.approvals.factories import SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
 
 
@@ -220,3 +223,163 @@ class ApprovalSuspendViewTest(TestCase):
         self.assertRedirects(response, back_url)
 
         assert 0 == approval.suspension_set.count()
+
+
+class ApprovalSuspendActionChoiceViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        today = timezone.localdate()
+        cls.job_application = JobApplicationFactory(
+            with_approval=True,
+            # Ensure that the job_application cannot be canceled.
+            hiring_start_at=today - relativedelta(days=1),
+        )
+        cls.approval = cls.job_application.approval
+        cls.employer = cls.job_application.to_company.members.first()
+        cls.suspension = SuspensionFactory(
+            approval=cls.approval, start_at=today, end_at=today + relativedelta(days=10), created_by=cls.employer
+        )
+        cls.url = reverse("approvals:suspension_action_choice", kwargs={"suspension_id": cls.suspension.pk})
+
+    def test_not_current_siae(self):
+        self.client.force_login(JobSeekerFactory())
+        response = self.client.get(self.url)
+        assert response.status_code == 404
+
+    def test_not_current_suspension(self):
+        self.client.force_login(self.employer)
+        response = self.client.get(
+            reverse("approvals:suspension_action_choice", kwargs={"suspension_id": self.suspension.pk + 1})
+        )
+        assert response.status_code == 404
+
+    def test_suspension_cannot_be_handled(self):
+        self.client.force_login(self.employer)
+        with mock.patch("itou.approvals.models.Suspension.can_be_handled_by_siae", return_value=False):
+            response = self.client.get(self.url)
+        assert response.status_code == 403
+
+    def test_context(self):
+        self.client.force_login(self.employer)
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response.context["suspension"] == self.suspension
+        assert response.context["back_url"] == reverse("approvals:detail", kwargs={"pk": self.suspension.approval_id})
+
+    def test_post_delete(self):
+        self.client.force_login(self.employer)
+        response = self.client.post(self.url, data={"action": "delete"})
+        assert response.url == reverse("approvals:suspension_delete", kwargs={"suspension_id": self.suspension.pk})
+
+    def test_post_enddate(self):
+        self.client.force_login(self.employer)
+
+        response = self.client.post(self.url, data={"action": "update_enddate"})
+        assert response.url == reverse(
+            "approvals:suspension_update_enddate", kwargs={"suspension_id": self.suspension.pk}
+        )
+
+    def test_post_enddate_with_invalid_action_parameter(self):
+        self.client.force_login(self.employer)
+
+        response = self.client.post(self.url, data={"action": "unknown_action"})
+        assert response.status_code == 400
+
+
+class ApprovalSuspendUpdateEndDateViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        today = timezone.localdate()
+        cls.job_application = JobApplicationFactory(
+            with_approval=True,
+            # Ensure that the job_application cannot be canceled.
+            hiring_start_at=today - relativedelta(days=20),
+        )
+        cls.approval = cls.job_application.approval
+        cls.employer = cls.job_application.to_company.members.first()
+        cls.suspension = SuspensionFactory(
+            approval=cls.approval,
+            start_at=today - relativedelta(days=10),
+            end_at=today + relativedelta(days=10),
+            created_by=cls.employer,
+        )
+        cls.url = reverse("approvals:suspension_update_enddate", kwargs={"suspension_id": cls.suspension.pk})
+
+    def test_not_current_siae(self):
+        self.client.force_login(JobSeekerFactory())
+
+        response = self.client.get(self.url)
+        assert response.status_code == 404
+
+    def test_not_current_suspension(self):
+        self.client.force_login(self.employer)
+
+        response = self.client.get(
+            reverse("approvals:suspension_action_choice", kwargs={"suspension_id": self.suspension.pk + 1})
+        )
+        assert response.status_code == 404
+
+    def test_suspension_cannot_be_handled(self):
+        self.client.force_login(self.employer)
+        with mock.patch("itou.approvals.models.Suspension.can_be_handled_by_siae", return_value=False):
+            response = self.client.get(self.url)
+        assert response.status_code == 403
+
+    def test_context(self):
+        self.client.force_login(self.employer)
+
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert response.context["suspension"] == self.suspension
+        assert response.context["back_url"] == reverse(
+            "approvals:suspension_action_choice", kwargs={"suspension_id": self.suspension.id}
+        )
+        assert "form" in response.context
+
+        form = response.context["form"]
+        assert form.initial["first_day_back_to_work"] == timezone.localdate()
+        assert form.siae == self.job_application.to_company
+        assert form.approval == self.approval
+        assert form.instance == self.suspension
+        assert form.fields["first_day_back_to_work"].widget.attrs == {
+            "min": self.suspension.start_at + relativedelta(days=1),
+            "max": self.suspension.end_at,
+        }
+
+    def test_context_on_first_day_of_suspension(self):
+        self.suspension.start_at = timezone.localdate()
+        self.suspension.save()
+        self.client.force_login(self.employer)
+
+        response = self.client.get(self.url)
+        assert response.status_code == 200
+        assert "form" in response.context
+
+        form = response.context["form"]
+        assert form.initial["first_day_back_to_work"] == timezone.localdate() + relativedelta(days=1)
+
+    def test_post(self):
+        self.client.force_login(self.employer)
+
+        response = self.client.post(self.url, data={"first_day_back_to_work": timezone.localdate()})
+        assert response.url == reverse("approvals:detail", kwargs={"pk": self.suspension.approval_id})
+        self.suspension.refresh_from_db()
+        assert self.suspension.end_at == timezone.localdate() - relativedelta(days=1)
+        assert self.suspension.updated_by == self.employer
+
+    def test_post_with_invalid_endate(self):
+        self.client.force_login(self.employer)
+
+        response = self.client.post(
+            self.url, data={"first_day_back_to_work": self.suspension.start_at - relativedelta(days=1)}
+        )
+        assert response.status_code == 200
+        assert "form" in response.context
+
+        form = response.context["form"]
+        assert form.is_valid() is False
+        assert "first_day_back_to_work" in form.errors
+        assert (
+            form.errors["first_day_back_to_work"][0]
+            == "Vous ne pouvez pas saisir une date de réintégration antérieure au début de la suspension."
+        )

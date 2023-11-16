@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
 from django.db.models import Prefetch
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
@@ -537,6 +537,37 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
         "back_url": back_url,
         "form": form,
         "preview": preview,
+    }
+    return render(request, template_name, context)
+
+
+@login_required()
+def suspension_action_choice(request, suspension_id, template_name="approvals/suspension_action_choice.html"):
+    siae = get_current_company_or_404(request)
+    suspension = get_object_or_404(Suspension, pk=suspension_id)
+
+    if not suspension.can_be_handled_by_siae(siae):
+        raise PermissionDenied()
+
+    if request.method == "POST":
+        if request.POST.get("action") == "delete":
+            return HttpResponseRedirect(
+                reverse("approvals:suspension_delete", kwargs={"suspension_id": suspension.id})
+            )
+
+        if request.POST.get("action") == "update_enddate":
+            return HttpResponseRedirect(
+                reverse("approvals:suspension_update_enddate", kwargs={"suspension_id": suspension.id})
+            )
+
+        return HttpResponseBadRequest('invalid "action" parameter')
+
+    back_url = get_safe_url(
+        request, "back_url", fallback_url=reverse("approvals:detail", kwargs={"pk": suspension.approval_id})
+    )
+    context = {
+        "suspension": suspension,
+        "back_url": back_url,
     }
     return render(request, template_name, context)
 
