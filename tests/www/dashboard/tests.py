@@ -77,9 +77,8 @@ class DashboardViewTest(TestCase):
         response = self.client.get(url)
         assert response.status_code == 200
 
-    @pytest.mark.ignore_template_errors
     def test_user_with_inactive_company_can_still_login_during_grace_period(self):
-        company = CompanyPendingGracePeriodFactory()
+        company = CompanyPendingGracePeriodFactory(with_membership=True)
         user = EmployerFactory()
         company.members.add(user)
         self.client.force_login(user)
@@ -89,7 +88,7 @@ class DashboardViewTest(TestCase):
         assert response.status_code == 200
 
     def test_user_with_inactive_company_cannot_login_after_grace_period(self):
-        company = CompanyAfterGracePeriodFactory()
+        company = CompanyAfterGracePeriodFactory(with_membership=True)
         user = EmployerFactory()
         company.members.add(user)
         self.client.force_login(user)
@@ -1432,13 +1431,12 @@ class EditUserEmailFormTest(TestCase):
 
 
 class SwitchCompanyTest(TestCase):
-    @pytest.mark.ignore_template_errors
     def test_switch_company(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         self.client.force_login(user)
 
-        related_company = CompanyFactory()
+        related_company = CompanyFactory(with_membership=True)
         related_company.members.add(user)
 
         url = reverse("dashboard:index")
@@ -1477,13 +1475,12 @@ class SwitchCompanyTest(TestCase):
         assert response.status_code == 200
         assert response.context["request"].current_organization == related_company
 
-    @pytest.mark.ignore_template_errors
     def test_can_still_switch_to_inactive_company_during_grace_period(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         self.client.force_login(user)
 
-        related_company = CompanyPendingGracePeriodFactory()
+        related_company = CompanyPendingGracePeriodFactory(with_membership=True)
         related_company.members.add(user)
 
         url = reverse("dashboard:index")
@@ -1765,9 +1762,9 @@ def test_api_token_view_for_company_admin(client):
     assert Token.objects.filter(user=employer).count() == 1
 
 
-@pytest.mark.ignore_template_errors
 def test_api_token_view_for_non_company_admin(client):
-    employer = CompanyMembershipFactory(is_admin=False).user
+    company = CompanyFactory(with_membership=True)
+    employer = CompanyMembershipFactory(is_admin=False, company=company).user
     client.force_login(employer)
 
     assert not Token.objects.exists()
