@@ -183,7 +183,7 @@ class Company(AddressMixin, OrganizationAbstract):
     """
     Structures d'insertion par l'activité économique.
 
-    To retrieve jobs of an company:
+    To retrieve jobs of a company:
         self.jobs.all()             <QuerySet [<Appellation>, ...]>
         self.job_description_through.all()     <QuerySet [<JobDescription>, ...]>
     """

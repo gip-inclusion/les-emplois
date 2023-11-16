@@ -134,7 +134,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
 
 class CompanyMembershipFactory(factory.django.DjangoModelFactory):
     """
-    Generate an CompanyMembership() object (with its related Company() and User() objects) for unit tests.
+    Generate a CompanyMembership() object (with its related Company() and User() objects) for unit tests.
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
 
@@ -148,7 +148,7 @@ class CompanyMembershipFactory(factory.django.DjangoModelFactory):
 
 class CompanyWith2MembershipsFactory(CompanyFactory):
     """
-    Generates an Company() object with 2 members for unit tests.
+    Generates a Company() object with 2 members for unit tests.
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
 
@@ -158,7 +158,7 @@ class CompanyWith2MembershipsFactory(CompanyFactory):
 
 class CompanyWith4MembershipsFactory(CompanyFactory):
     """
-    Generates an Company() object with 4 members for unit tests.
+    Generates a Company() object with 4 members for unit tests.
     https://factoryboy.readthedocs.io/en/latest/recipes.html#many-to-many-relation-with-a-through
     """
 

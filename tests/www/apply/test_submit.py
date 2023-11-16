@@ -1587,7 +1587,7 @@ class ApplyAsCompanyTest(TestCase):
         }
 
     def test_perms_for_company(self):
-        """An company can postulate only for itself."""
+        """A company can postulate only for itself."""
         company_1 = CompanyFactory(with_membership=True)
         company_2 = CompanyFactory(with_membership=True)
 
@@ -1870,7 +1870,7 @@ class DirectHireFullProcessTest(TestCase):
         [self.city] = create_test_cities(["67"], num_per_department=1)
 
     def test_perms_for_company(self):
-        """An company can hire only for itself."""
+        """A company can hire only for itself."""
         company_1 = CompanyFactory(with_membership=True)
         company_2 = CompanyFactory(with_membership=True)
 
