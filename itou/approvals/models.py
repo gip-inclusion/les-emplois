@@ -777,19 +777,18 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     def get_default_end_date(start_at):
         return start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS) - relativedelta(days=1)
 
-    def notify_pole_emploi(self, at=None):
+    def notify_pole_emploi(self):
         # We do not send approvals that start in the future to PE, because their IS can't handle them.
         # In this case, do not mark them as "should retry" but leave them pending. The pending ones
         # will be caught by the second pass cron. The "should retry" then assumes:
         # - the approval was ready to be sent (user OK, dates OK)
         # - we had an actual issue.
-        if not at:
-            at = timezone.now()
-        if self.start_at > at.date():
-            self.pe_log_err("start_at={} starts after today={}", self.start_at, at.date())
+        now = timezone.now()
+        if self.start_at > now.date():
+            self.pe_log_err("start_at={} starts after today={}", self.start_at, now.date())
             self.pe_save_pending(
                 api_enums.PEApiPreliminaryCheckFailureReason.STARTS_IN_FUTURE,
-                at,
+                now,
             )
             return
 
@@ -803,7 +802,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 self.pe_log_err("had no accepted job application")
                 self.pe_save_pending(
                     api_enums.PEApiPreliminaryCheckFailureReason.NO_JOB_APPLICATION,
-                    at,
+                    now,
                 )
                 return
 
@@ -819,7 +818,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             self.pe_save_error(
                 None,
                 api_enums.PEApiPreliminaryCheckFailureReason.INVALID_SIAE_KIND,
-                at,
+                now,
             )
             return
 
@@ -836,7 +835,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             # no chance to block itself.
             self.pe_save_pending(
                 api_enums.PEApiPreliminaryCheckFailureReason.MISSING_USER_DATA,
-                at,
+                now,
             )
             return
 
@@ -846,7 +845,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 self.user.last_name,
                 self.user.nir,
                 self.user.birthdate,
-                at,
+                now,
             )
             if not id_national:
                 return
@@ -860,7 +859,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             siae_kind=siae_kind,
             sender_kind=sender_kind,
             prescriber_kind=prescriber_organization_kind,
-            at=at,
+            at=now,
         )
 
 
@@ -1774,15 +1773,14 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
     def number_with_spaces(self):
         return f"{self.number[:5]} {self.number[5:7]} {self.number[7:]}"
 
-    def notify_pole_emploi(self, at=None):
-        if not at:
-            at = timezone.now()
+    def notify_pole_emploi(self):
+        now = timezone.now()
         id_national = self.pe_rech_individu(
             first_name=self.first_name,
             last_name=self.last_name,
             birthdate=self.birthdate,
             nir=self.nir,
-            at=at,
+            at=now,
         )
         if id_national:
             self.pe_maj_pass(
@@ -1791,7 +1789,7 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
                 siae_kind=self.siae_kind,
                 sender_kind=job_application_enums.SenderKind.PRESCRIBER,
                 prescriber_kind=prescribers_enums.PrescriberOrganizationKind.PE,
-                at=at,
+                at=now,
             )
 
 

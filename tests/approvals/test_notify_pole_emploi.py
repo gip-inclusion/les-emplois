@@ -48,32 +48,31 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
          - We do not even call the APIs
          - no entry should be added to the notification log database
         """
-        now = timezone.now()
         approval = ApprovalFactory(user__nir="", with_jobapplication=True)
-        approval.notify_pole_emploi(at=now)
+        with freeze_time() as frozen_now:
+            approval.notify_pole_emploi()
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_pending"
-        assert approval.pe_notification_time == now
+        assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
         assert approval.pe_notification_endpoint is None
         assert approval.pe_notification_exit_code == "MISSING_USER_DATA"
 
     def test_invalid_job_application(self):
-        now = timezone.now()
         approval = ApprovalFactory(
             with_jobapplication=True,
             with_jobapplication__state=JobApplicationWorkflow.STATE_CANCELLED,
         )
-        approval.notify_pole_emploi(at=now)
+        with freeze_time() as frozen_now:
+            approval.notify_pole_emploi()
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_pending"
-        assert approval.pe_notification_time == now
+        assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
         assert approval.pe_notification_endpoint is None
         assert approval.pe_notification_exit_code == "NO_JOB_APPLICATION"
 
     @respx.mock
     @freeze_time("2021-06-21")
     def test_notification_accepted_nominal(self):
-        now = timezone.now()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
             200, json=API_RECHERCHE_RESULT_KNOWN
         )
@@ -82,7 +81,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             with_jobapplication=True,
             with_jobapplication__to_company__kind=CompanyKind.ACI,
         )
-        approval.notify_pole_emploi(at=now)
+        approval.notify_pole_emploi()
         approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
         assert payload == {
@@ -96,7 +95,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             "typeSIAE": 836,
         }
         assert approval.pe_notification_status == "notification_success"
-        assert approval.pe_notification_time == now
+        assert approval.pe_notification_time == timezone.now()
         assert approval.pe_notification_endpoint is None
         assert approval.pe_notification_exit_code is None
         approval.user.jobseeker_profile.refresh_from_db()
@@ -107,7 +106,6 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
 
     @respx.mock
     def test_notification_accepted_with_id_national(self):
-        now = timezone.now()
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         approval = ApprovalFactory(
             with_jobapplication=True,
@@ -115,7 +113,8 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         )
         approval.user.jobseeker_profile.pe_obfuscated_nir = "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
         approval.user.jobseeker_profile.save()
-        approval.notify_pole_emploi(at=now)
+        with freeze_time() as frozen_now:
+            approval.notify_pole_emploi()
         approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
         assert payload == {
@@ -129,13 +128,12 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             "typeSIAE": 836,
         }
         assert approval.pe_notification_status == "notification_success"
-        assert approval.pe_notification_time == now
+        assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
         assert approval.pe_notification_endpoint is None
         assert approval.pe_notification_exit_code is None
 
     @respx.mock
     def test_notification_accepted_with_prescriber_organization(self):
-        now = timezone.now()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
             200, json=API_RECHERCHE_RESULT_KNOWN
         )
@@ -146,7 +144,8 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             with_jobapplication__sent_by_authorized_prescriber_organisation=True,
             with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.CAF,
         )
-        approval.notify_pole_emploi(at=now)
+        with freeze_time() as frozen_now:
+            approval.notify_pole_emploi()
         approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
         assert payload == {
@@ -161,13 +160,12 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             "typologiePrescripteur": "CAF",
         }
         assert approval.pe_notification_status == "notification_success"
-        assert approval.pe_notification_time == now
+        assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
         assert approval.pe_notification_endpoint is None
         assert approval.pe_notification_exit_code is None
 
     @respx.mock
     def test_notification_accepted_with_sensitive_prescriber_organization(self):
-        now = timezone.now()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
             200, json=API_RECHERCHE_RESULT_KNOWN
         )
@@ -178,7 +176,8 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             with_jobapplication__sent_by_authorized_prescriber_organisation=True,
             with_jobapplication__sender_prescriber_organization__kind=PrescriberOrganizationKind.SPIP,
         )
-        approval.notify_pole_emploi(at=now)
+        with freeze_time() as frozen_now:
+            approval.notify_pole_emploi()
         approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
         assert payload == {
@@ -193,7 +192,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             "typologiePrescripteur": "Autre",
         }
         assert approval.pe_notification_status == "notification_success"
-        assert approval.pe_notification_time == now
+        assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
         assert approval.pe_notification_endpoint is None
         assert approval.pe_notification_exit_code is None
 
@@ -206,8 +205,8 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         tomorrow = (now + datetime.timedelta(days=1)).date()
         approval = ApprovalFactory(start_at=tomorrow)
-        with self.assertLogs("itou.approvals.models") as logs:
-            approval.notify_pole_emploi(at=now)
+        with freeze_time() as frozen_now, self.assertLogs("itou.approvals.models") as logs:
+            approval.notify_pole_emploi()
         assert (
             f"notify_pole_emploi approval={approval} "
             f"start_at={approval.start_at} "
@@ -215,59 +214,58 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         )
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_pending"
-        assert approval.pe_notification_time == now
+        assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
         assert approval.pe_notification_endpoint is None
         assert approval.pe_notification_exit_code == "STARTS_IN_FUTURE"
 
     @respx.mock
     def test_notification_goes_to_retry_if_there_is_a_timeout(self):
-        now = timezone.now()
         respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").mock(
             side_effect=httpx.ConnectTimeout
         )
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker, with_jobapplication=True)
-        approval.notify_pole_emploi(at=now)
+        with freeze_time() as frozen_now:
+            approval.notify_pole_emploi()
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_should_retry"
-        assert approval.pe_notification_time == now
+        assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
         assert approval.pe_notification_endpoint is None
         assert approval.pe_notification_exit_code is None
 
     @respx.mock
     def test_notification_goes_to_error_if_something_goes_wrong_with_rech_individu(self):
-        now = timezone.now()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
             200, json=API_RECHERCHE_MANY_RESULTS
         )
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker, with_jobapplication=True)
-        approval.notify_pole_emploi(at=now)
+        with freeze_time() as frozen_now:
+            approval.notify_pole_emploi()
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_error"
-        assert approval.pe_notification_time == now
+        assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
         assert approval.pe_notification_endpoint == "rech_individu"
         assert approval.pe_notification_exit_code == "S002"
 
     @respx.mock
     def test_notification_goes_to_error_if_something_goes_wrong_with_maj_pass(self):
-        now = timezone.now()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
             200, json=API_RECHERCHE_RESULT_KNOWN
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker, with_jobapplication=True)
-        approval.notify_pole_emploi(at=now)
+        with freeze_time() as frozen_now:
+            approval.notify_pole_emploi()
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_error"
-        assert approval.pe_notification_time == now
+        assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
         assert approval.pe_notification_endpoint == "maj_pass"
         assert approval.pe_notification_exit_code == "S022"
 
     @respx.mock
     def test_notification_goes_to_error_if_missing_siae_kind(self):
-        now = timezone.now()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
             200, json=API_RECHERCHE_RESULT_KNOWN
         )
@@ -276,16 +274,16 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         company = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
         JobApplicationFactory(to_company=company, approval=approval, state=JobApplicationWorkflow.STATE_ACCEPTED)
-        approval.notify_pole_emploi(at=now)
+        with freeze_time() as frozen_now:
+            approval.notify_pole_emploi()
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_error"
-        assert approval.pe_notification_time == now
+        assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
         assert approval.pe_notification_endpoint is None
         assert approval.pe_notification_exit_code == "INVALID_SIAE_KIND"
 
     @respx.mock
     def test_notification_goes_to_pending_if_job_application_is_not_accepted(self):
-        now = timezone.now()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
             200, json=API_RECHERCHE_RESULT_KNOWN
         )
@@ -294,10 +292,11 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         company = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
         JobApplicationFactory(to_company=company, approval=approval, state=JobApplicationWorkflow.STATE_POSTPONED)
-        approval.notify_pole_emploi(at=now)
+        with freeze_time() as frozen_now:
+            approval.notify_pole_emploi()
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_pending"
-        assert approval.pe_notification_time == now
+        assert approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
         assert approval.pe_notification_endpoint is None
         assert approval.pe_notification_exit_code == "NO_JOB_APPLICATION"
 
@@ -313,7 +312,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         siae = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker, with_origin_values=True, origin_siae_kind=CompanyKind.ETTI)
         JobApplicationFactory(to_company=siae, approval=approval, state=JobApplicationWorkflow.STATE_ACCEPTED)
-        approval.notify_pole_emploi(at=now)
+        approval.notify_pole_emploi()
         approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
         assert payload == {
@@ -386,7 +385,6 @@ class ApprovalsSendToPeManagementTestCase(TestCase):
 class PoleEmploiApprovalNotifyPoleEmploiIntegrationTest(TestCase):
     @respx.mock
     def test_notification_accepted_nominal(self):
-        now = timezone.now()
         respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
             200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
         )
@@ -397,7 +395,8 @@ class PoleEmploiApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         pe_approval = PoleEmploiApprovalFactory(
             nir="FOOBAR2000", siae_kind=CompanyKind.ACI.value
         )  # avoid the OPCS, not mapped yet
-        pe_approval.notify_pole_emploi(at=now)
+        with freeze_time() as frozen_now:
+            pe_approval.notify_pole_emploi()
         pe_approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)
         assert payload == {
@@ -412,6 +411,6 @@ class PoleEmploiApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             "typologiePrescripteur": "PE",
         }
         assert pe_approval.pe_notification_status == "notification_success"
-        assert pe_approval.pe_notification_time == now
+        assert pe_approval.pe_notification_time == frozen_now().replace(tzinfo=datetime.UTC)
         assert pe_approval.pe_notification_endpoint is None
         assert pe_approval.pe_notification_exit_code is None
