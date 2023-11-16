@@ -59,6 +59,7 @@ urlpatterns = [
         views.suspension_action_choice,
         name="suspension_action_choice",
     ),
+    path("suspension/<int:suspension_id>/action/delete/", views.suspension_delete, name="suspension_delete"),
     # PE Approvals
     path("pe-approval/search", views.pe_approval_search, name="pe_approval_search"),
     path(

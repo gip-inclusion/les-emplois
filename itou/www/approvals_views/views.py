@@ -620,7 +620,11 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
     if not suspension.can_be_handled_by_siae(siae):
         raise PermissionDenied()
 
-    back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
+    back_url = get_safe_url(
+        request,
+        "back_url",
+        fallback_url=reverse("approvals:suspension_action_choice", kwargs={"suspension_id": suspension_id}),
+    )
 
     if request.method == "POST" and request.POST.get("confirm") == "true":
         suspension.delete()
@@ -629,11 +633,12 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
             f"La suspension de {suspension.approval.user.get_full_name()} a bien été supprimée.",
             extra_tags="toast",
         )
-        return HttpResponseRedirect(back_url)
+        return HttpResponseRedirect(reverse("approvals:detail", kwargs={"pk": suspension.approval_id}))
 
     context = {
         "suspension": suspension,
         "back_url": back_url,
+        "lost_days": (timezone.localdate() - suspension.start_at).days + 1,
     }
     return render(request, template_name, context)
 

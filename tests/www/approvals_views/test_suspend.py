@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import urlencode
+from pytest_django.asserts import assertContains
 
 from itou.approvals.models import Suspension
 from itou.employee_record.enums import Status
@@ -208,19 +209,39 @@ class ApprovalSuspendViewTest(TestCase):
 
         self.client.force_login(employer)
 
-        back_url = reverse("search:employers_home")
+        back_url = reverse("approvals:suspension_action_choice", kwargs={"suspension_id": suspension.pk})
+        redirect_url = reverse("approvals:detail", kwargs={"pk": suspension.approval_id})
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:suspension_delete", kwargs={"suspension_id": suspension.pk})
         url = f"{url}?{params}"
 
         response = self.client.get(url)
-        assert response.status_code == 200
+        assertContains(
+            response,
+            (
+                f'<a class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="{back_url}"> '
+                '<i class="ri-arrow-go-back-line ri-lg"></i><span>Retour</span></a>'
+            ),
+            html=True,
+            status_code=200,
+        )
+
+        assertContains(
+            response,
+            (
+                '<strong>Action choisie</strong> : Confirmer la <strong class="text-danger">'
+                "suppression définitive</strong> de cette suspension."
+            ),
+            html=True,
+        )
+        lost_days = (timezone.localdate() - start_at).days + 1  # including start and end dates
+        assertContains(response, f"Réduire la durée restante de ce PASS IAE de {lost_days} jour")
 
         post_data = {"confirm": "true"}
 
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
-        self.assertRedirects(response, back_url)
+        assert response.url == redirect_url
 
         assert 0 == approval.suspension_set.count()
 
