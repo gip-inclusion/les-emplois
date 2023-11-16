@@ -156,6 +156,8 @@ class CardViewTest(TestCase):
              <div class="d-flex justify-content-end mt-3">
               <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
                  href="/apply/{company.pk}/start"
+                 data-matomo-event=true data-matomo-category=candidature data-matomo-action=clic
+                 data-matomo-option=start_application
                  aria-label="Postuler aupr&egrave;s de l'employeur solidaire Les petits jardins">
                <i class="ri-draft-line">
                </i>
@@ -256,6 +258,8 @@ class CardViewTest(TestCase):
              <div class="d-flex justify-content-end mt-3">
               <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
                  href="/apply/{company.pk}/start"
+                 data-matomo-event=true data-matomo-category=candidature data-matomo-action=clic
+                 data-matomo-option=start_application
                  aria-label="Postuler aupr&egrave;s de l'employeur solidaire Les petits jardins">
                <i class="ri-draft-line">
                </i>
@@ -410,6 +414,8 @@ class CardViewTest(TestCase):
              <div class="d-flex justify-content-end mt-3">
               <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
                  href="/apply/{company.pk}/start"
+                 data-matomo-event=true data-matomo-category=candidature data-matomo-action=clic
+                 data-matomo-option=start_application
                  aria-label="Postuler aupr&egrave;s de l'employeur solidaire Les petits jardins">
                <i class="ri-draft-line">
                </i>

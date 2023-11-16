@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
+{% load matomo %}
 
 {% block title %}Prolonger ou suspendre un agrément émis par Pôle emploi {{ block.super }}{% endblock %}
 
@@ -30,7 +31,7 @@
                                 {% endif %}
                             </div>
                             <p>
-                                Afin de le prolonger ou de le suspendre, nous vous invitons à <a href="{% url 'apply:start' company_pk=request.current_organization.pk %}">réaliser une auto-prescription</a>.
+                                Afin de le prolonger ou de le suspendre, nous vous invitons à <a href="{% url 'apply:start' company_pk=request.current_organization.pk %} {% matomo_event "candidature" "clic" "start_application" %}">réaliser une auto-prescription</a>.
                             </p>
                             <a class="btn btn-link btn-ico ps-lg-0 " href="{{ back_url }}" aria-label="Retourner à l'étape précédente">
                                 <i class="ri-arrow-go-back-line ri-lg"></i>
