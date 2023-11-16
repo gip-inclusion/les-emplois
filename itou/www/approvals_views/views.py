@@ -566,7 +566,7 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
         suspension = form.save(commit=False)
         suspension.updated_by = request.user
         suspension.save()
-        messages.success(request, "Modification de suspension effectuée.")
+        messages.success(request, "Modification de suspension effectuée.", extra_tags="toast")
         return HttpResponseRedirect(back_url)
 
     context = {
