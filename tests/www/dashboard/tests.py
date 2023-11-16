@@ -1540,6 +1540,7 @@ class EditUserPreferencesTest(TestCase):
         url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
         assert response.status_code == 200
+        assertContains(response, "Candidatures spontanées")
 
         # Recipients are subscribed to spontaneous notifications by default,
         # the form should reflect that.
