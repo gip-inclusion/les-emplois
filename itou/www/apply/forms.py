@@ -360,7 +360,7 @@ class ApplicationJobsForm(forms.ModelForm):
 
 class SubmitJobApplicationForm(forms.Form):
     """
-    Submit a job application to an company.
+    Submit a job application to a company.
     """
 
     resume = ItouFileField(
@@ -440,7 +440,7 @@ class RefusalForm(forms.Form):
 
 class AnswerForm(forms.Form):
     """
-    Allow an company to add an answer message when postponing.
+    Allow a company to add an answer message when postponing.
     """
 
     answer = forms.CharField(
@@ -453,7 +453,7 @@ class AnswerForm(forms.Form):
 
 class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
     """
-    Allow an company to accept a job application.
+    Allow a company to accept a job application.
     If company is a GEIQ, add specific fields (contract type, number of hours per week)
     """
 

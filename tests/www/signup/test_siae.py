@@ -44,7 +44,7 @@ class CompanySignupTest(InclusionConnectBaseTestCase):
     @respx.mock
     def test_join_an_company_without_members(self):
         """
-        A user joins an company without members.
+        A user joins a company without members.
         """
         company = CompanyFactory(kind=CompanyKind.ETTI)
         assert 0 == company.members.count()
@@ -53,11 +53,11 @@ class CompanySignupTest(InclusionConnectBaseTestCase):
         response = self.client.get(url)
         assert response.status_code == 200
 
-        # Find an company by SIREN.
+        # Find a company by SIREN.
         response = self.client.get(url, {"siren": company.siret[:9]})
         assert response.status_code == 200
 
-        # Choose an company between results.
+        # Choose a company between results.
         post_data = {"siaes": company.pk}
         # Pass `siren` in request.GET
         response = self.client.post(f"{url}?siren={company.siret[:9]}", data=post_data)
@@ -124,7 +124,7 @@ class CompanySignupTest(InclusionConnectBaseTestCase):
     @respx.mock
     def test_join_an_company_without_members_as_an_existing_employer(self):
         """
-        A user joins an company without members.
+        A user joins a company without members.
         """
         company = CompanyFactory(kind=CompanyKind.ETTI)
         assert 0 == company.members.count()
@@ -168,7 +168,7 @@ class CompanySignupTest(InclusionConnectBaseTestCase):
     @respx.mock
     def test_join_an_company_without_members_as_an_existing_employer_returns_on_other_browser(self):
         """
-        A user joins an company without members.
+        A user joins a company without members.
         """
         company = CompanyFactory(kind=CompanyKind.ETTI)
 

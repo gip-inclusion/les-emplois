@@ -1185,7 +1185,7 @@ class ProcessViewsTest(TestCase):
         assert criterion3 in administrative_criteria
 
     def test_eligibility_for_company_not_subject_to_eligibility_rules(self, *args, **kwargs):
-        """Test eligibility for an company not subject to eligibility rules."""
+        """Test eligibility for a company not subject to eligibility rules."""
 
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
@@ -1332,7 +1332,7 @@ class ProcessViewsTest(TestCase):
         assert job_application.state.is_accepted
 
     def test_archive(self, *args, **kwargs):
-        """Ensure that when an company archives a job_application, the hidden_for_company flag is updated."""
+        """Ensure that when a company archives a job_application, the hidden_for_company flag is updated."""
 
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_CANCELLED

@@ -142,8 +142,8 @@ class ItouCurrentOrganizationMiddleware:
         skip_middleware_conditions = [
             request.path in login_routes,
             request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
-            request.path.startswith("/signup/siae/join"),  # employer about to join an company
-            request.path.startswith("/signup/facilitator/join"),  # facilitator about to join an company
+            request.path.startswith("/signup/siae/join"),  # employer about to join a company
+            request.path.startswith("/signup/facilitator/join"),  # facilitator about to join a company
             request.path == reverse("account_logout"),
             request.path.startswith("/hijack/release"),  # Allow to release hijack
         ]
