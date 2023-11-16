@@ -1,3 +1,5 @@
+{% load matomo %}
+
 <div class="col mb-3 mb-md-5">
     <div class="c-box p-0 h-100">
         <div class="p-3 p-lg-4">
@@ -39,7 +41,7 @@
                         </span>
                     {% else %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'apply:start' company_pk=request.current_organization.pk %}" class="btn-link btn-ico">
+                            <a href="{% url 'apply:start' company_pk=request.current_organization.pk %}" class="btn-link btn-ico" {% matomo_event "candidature" "clic" "start_application" %}>
                                 <i class="ri-draft-line ri-lg font-weight-normal"></i>
                                 <span>Enregistrer une candidature</span>
                             </a>

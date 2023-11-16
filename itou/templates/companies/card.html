@@ -2,6 +2,7 @@
 {% load format_filters %}
 {% load str_filters %}
 {% load static %}
+{% load matomo %}
 
 {% block title %}{{ siae.display_name }} {{ block.super }}{% endblock %}
 
@@ -51,7 +52,10 @@
                         {% if not siae.has_active_members %}
                             <p class="mb-0">Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne.</p>
                         {% elif not siae.block_job_applications %}
-                            <a class="btn btn-primary btn-block btn-ico justify-content-center" href="{% url 'apply:start' company_pk=siae.pk %}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                            <a class="btn btn-primary btn-block btn-ico justify-content-center"
+                               href="{% url 'apply:start' company_pk=siae.pk %}"
+                               {% matomo_event "candidature" "clic" "start_application" %}
+                               aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                                 <i class="ri-draft-line"></i>
                                 <span>Postuler</span>
                             </a>
@@ -145,7 +149,10 @@
                         {% endif %}
                         {% if not siae.block_job_applications and siae.has_active_members %}
                             <div class="d-flex justify-content-end mt-3">
-                                <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" href="{% url 'apply:start' company_pk=siae.pk %}" aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                                <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
+                                   href="{% url 'apply:start' company_pk=siae.pk %}"
+                                   {% matomo_event "candidature" "clic" "start_application" %}
+                                   aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                                     <i class="ri-draft-line"></i>
                                     <span>Postuler</span>
                                 </a>
