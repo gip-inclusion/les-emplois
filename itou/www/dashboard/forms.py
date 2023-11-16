@@ -12,7 +12,7 @@ from itou.users.enums import IdentityProvider
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis.exceptions import AddressLookupError
-from itou.utils.widgets import DuetDatePickerWidget, MultipleSwitchCheckboxWidget, SwitchCheckboxWidget
+from itou.utils.widgets import DuetDatePickerWidget
 
 
 class SSOReadonlyMixin:
@@ -164,7 +164,7 @@ class EditUserEmailForm(forms.Form):
 
 
 class EditNewJobAppEmployersNotificationForm(forms.Form):
-    spontaneous = forms.BooleanField(label="Candidatures spontanées", required=False, widget=SwitchCheckboxWidget())
+    spontaneous = forms.BooleanField(label="Candidatures spontanées", required=False)
 
     def __init__(self, recipient, company, *args, **kwargs):
         self.recipient = recipient
@@ -184,7 +184,7 @@ class EditNewJobAppEmployersNotificationForm(forms.Form):
             self.fields["qualified"] = forms.MultipleChoiceField(
                 label="Fiches de poste",
                 required=False,
-                widget=MultipleSwitchCheckboxWidget(),
+                widget=forms.CheckboxSelectMultiple(),
                 choices=choices,
                 initial=self.subscribed_pks,
             )
