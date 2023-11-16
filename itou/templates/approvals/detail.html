@@ -11,9 +11,7 @@
                 <div class="col-12 col-lg-8">
                     <div class="c-box mb-3 mb-lg-5">
                         {# Approval status. #}
-                        <div>
-                            {% include "approvals/includes/status.html" with common_approval=approval hiring_pending=job_application.is_pending %}
-                        </div>
+                        <div>{% include "approvals/includes/status.html" with common_approval=approval hiring_pending=hiring_pending %}</div>
 
                         {# Approval actions. #}
                         {% if approval and request.user.is_employer %}
@@ -60,7 +58,9 @@
                         <h3>Informations personnelles</h3>
                         {% include "apply/includes/job_seeker_info.html" with job_seeker=approval.user job_application=job_application with_matomo_event=True can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request only %}
                         {# Eligibility ------------------------------------------------------------------------- #}
-                        {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_seeker=job_application.job_seeker is_sent_by_authorized_prescriber=job_application.is_sent_by_authorized_prescriber siae=job_application.to_company %}
+                        {% if eligibility_diagnosis %}
+                            {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_seeker=job_application.job_seeker is_sent_by_authorized_prescriber=job_application.is_sent_by_authorized_prescriber siae=job_application.to_company %}
+                        {% endif %}
                     </div>
 
                     {# Job applications ------------------------------------------------------------------------ #}

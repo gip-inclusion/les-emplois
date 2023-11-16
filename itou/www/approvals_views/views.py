@@ -102,9 +102,9 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
         context["hire_by_other_siae"] = not approval.user.last_hire_was_made_by_company(self.siae)
         context["approval_can_be_prolonged"] = approval.can_be_prolonged
         context["job_application"] = job_application
+        context["hiring_pending"] = job_application and job_application.is_pending
         context["matomo_custom_title"] = "Profil salarié"
-        if job_application:
-            context["eligibility_diagnosis"] = job_application.get_eligibility_diagnosis()
+        context["eligibility_diagnosis"] = job_application and job_application.get_eligibility_diagnosis()
 
         if approval.is_in_progress:
             for suspension in approval.suspensions_by_start_date_asc:
