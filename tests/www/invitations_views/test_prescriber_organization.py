@@ -1,7 +1,6 @@
 from datetime import timedelta
 from urllib.parse import urlencode
 
-import pytest
 import respx
 from allauth.account.models import EmailAddress
 from django.conf import settings
@@ -226,7 +225,6 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         assert current_org in user.prescriberorganization_set.all()
 
     @respx.mock
-    @pytest.mark.ignore_template_errors
     def test_accept_prescriber_org_invitation(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         response = self.client.get(invitation.acceptance_link)
@@ -290,7 +288,6 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         self.assert_invitation_is_accepted(response, user, invitation)
 
     @respx.mock
-    @pytest.mark.ignore_template_errors
     def test_accept_prescriber_org_invitation_returns_on_other_browser(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         response = self.client.get(invitation.acceptance_link)
