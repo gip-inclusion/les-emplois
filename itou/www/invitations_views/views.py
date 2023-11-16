@@ -16,7 +16,7 @@ from itou.invitations.models import (
     PrescriberWithOrgInvitation,
 )
 from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
-from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER
+from itou.users.enums import KIND_EMPLOYER, KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, MATOMO_ACCOUNT_TYPE
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.company import get_current_company_or_404
@@ -59,6 +59,7 @@ def handle_invited_user_registration_with_inclusion_connect(request, invitation,
     context = {
         "inclusion_connect_url": inclusion_connect_url,
         "invitation": invitation,
+        "matomo_account_type": MATOMO_ACCOUNT_TYPE[invitation_type],
     }
     return render(request, "invitations_views/new_ic_user.html", context=context)
 

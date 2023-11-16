@@ -29,7 +29,7 @@ from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
-from itou.users.enums import IdentityProvider, UserKind
+from itou.users.enums import MATOMO_ACCOUNT_TYPE, IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.company import get_current_company_or_404
@@ -412,6 +412,6 @@ class AccountMigrationView(LoginRequiredMixin, TemplateView):
         inclusion_connect_url = add_url_params(reverse("inclusion_connect:activate_account"), params)
         extra_context = {
             "inclusion_connect_url": inclusion_connect_url,
-            "matomo_account_type": self.request.user.kind,
+            "matomo_account_type": MATOMO_ACCOUNT_TYPE[self.request.user.kind],
         }
         return context | extra_context

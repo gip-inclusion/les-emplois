@@ -1,7 +1,6 @@
 from unittest import mock
 
 import httpx
-import pytest
 import respx
 from django.conf import settings
 from django.contrib import messages
@@ -39,7 +38,6 @@ class CompanySignupTest(InclusionConnectBaseTestCase):
 
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
-    @pytest.mark.ignore_template_errors
     def test_join_an_company_without_members(self):
         """
         A user joins a company without members.
@@ -120,7 +118,6 @@ class CompanySignupTest(InclusionConnectBaseTestCase):
 
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
-    @pytest.mark.ignore_template_errors
     def test_join_an_company_without_members_as_an_existing_employer(self):
         """
         A user joins a company without members.
@@ -165,7 +162,6 @@ class CompanySignupTest(InclusionConnectBaseTestCase):
 
     @freeze_time("2022-09-15 15:53:54")
     @respx.mock
-    @pytest.mark.ignore_template_errors
     def test_join_an_company_without_members_as_an_existing_employer_returns_on_other_browser(self):
         """
         A user joins a company without members.
@@ -250,7 +246,6 @@ class CompanySignupTest(InclusionConnectBaseTestCase):
         API_INSEE_CONSUMER_KEY="foo",
         API_INSEE_CONSUMER_SECRET="bar",
     )
-    @pytest.mark.ignore_template_errors
     def test_create_facilitator(self, mock_call_ban_geocoding_api):
         respx.post(f"{settings.API_INSEE_BASE_URL}/token").mock(
             return_value=httpx.Response(200, json=INSEE_API_RESULT_MOCK)
