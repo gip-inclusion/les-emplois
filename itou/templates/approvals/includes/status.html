@@ -113,7 +113,7 @@ Arguments:
                                     <br>
                                     <small>
                                         <a href="{% url 'approvals:suspension_update' suspension_id=suspensions.last_in_progress.pk %}?back_url={{ request.get_full_path|urlencode }}">Modifier la suspension</a>
-                                        <a class="ms-1" href="{% url 'approvals:suspension_delete' suspension_id=suspensions.last_in_progress.pk %}?back_url={{ request.get_full_path|urlencode }}">Annuler la suspension</a>
+                                        <a class="ms-1" href="{% url 'approvals:suspension_action_choice' suspension_id=suspensions.last_in_progress.pk %}?back_url={{ request.get_full_path|urlencode }}">Supprimer la suspension</a>
                                     </small>
                                 {% endif %}
                             {% endif %}

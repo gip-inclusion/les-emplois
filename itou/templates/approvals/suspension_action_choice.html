@@ -1,0 +1,66 @@
+{% extends "layout/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}Supprimer la suspension du PASS IAE {{ block.super }}{% endblock %}
+
+{% block content_title %}
+    <h1>
+        Supprimer la suspension du PASS IAE de
+        <br>
+        <span class="text-muted">{{ suspension.approval.user.get_full_name }}</span>
+    </h1>
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="c-stepper mb-3 mb-lg-5">
+                        {% include 'approvals/includes/progress_bar.html' with ratio=40 only %}
+                        <p>
+                            <strong>Étape 1/2</strong> : Choix de l'action
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="card c-card">
+                        <div class="card-body">
+                            <p class="card-text">
+                                <strong>Quelle action souhaitez-vous faire ?</strong>
+                            </p>
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="action" id="endDateRadios" value="update_enddate" checked>
+                                    <label class="form-check-label" for="endDateRadios">
+                                        Lever la suspension pour <strong class="text-success">réintégrer ce candidat</strong>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="action" id="deleteRadios" value="delete">
+                                    <label class="form-check-label" for="deleteRadios">
+                                        Confirmer la <strong class="text-danger">suppression définitive</strong> de cette suspension
+                                    </label>
+                                </div>
+                                <hr>
+                                <div class="text-end">
+                                    <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
+                                    {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary" %}
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
