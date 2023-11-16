@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load format_filters %}
 {% load str_filters %}
+{% load matomo %}
 
 {% block title %}{{ job.display_name }} - {{ siae.display_name }} {{ block.super }}{% endblock %}
 
@@ -43,10 +44,8 @@
                                     {% if job.is_active and not siae.block_job_applications %}
                                         <div class="col-auto text-end">
                                             <a href="{% url "apply:start" company_pk=siae.pk %}?job_description_id={{ job.pk }}"
-                                               class="matomo-event btn btn-sm btn-primary"
-                                               data-matomo-category="candidature"
-                                               data-matomo-action="clic"
-                                               data-matomo-option="clic-metiers"
+                                               class="btn btn-sm btn-primary"
+                                               {% matomo_event "candidature" "clic" "start_application" %}
                                                aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
                                                 Postuler
                                             </a>
