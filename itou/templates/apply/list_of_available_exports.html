@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load i18n %}
+{% load matomo %}
 
 {% block title %}Export des candidatures {{ block.super }}{% endblock %}
 
@@ -64,22 +65,12 @@
                                             <td>{{ total_job_applications }}</td>
                                             <td>
                                                 {% if export_for == "siae" %}
-                                                    <a class="matomo-event btn-link"
-                                                       data-matomo-category="candidatures"
-                                                       data-matomo-action="exports"
-                                                       data-matomo-option="export-siae"
-                                                       aria-label="Télécharger cet export SIAE"
-                                                       href="{% url 'apply:list_for_siae_exports_download' %}">
+                                                    <a class="btn-link" {% matomo_event "candidature" "exports" "export-siae" %} aria-label="Télécharger cet export SIAE" href="{% url 'apply:list_for_siae_exports_download' %}">
                                                         <i class="ri-download-line me-1" aria-hidden="true"></i>
                                                         Télécharger
                                                     </a>
                                                 {% else %}
-                                                    <a class="matomo-event btn-link"
-                                                       data-matomo-category="candidatures"
-                                                       data-matomo-action="exports"
-                                                       data-matomo-option="export-prescripteur"
-                                                       aria-label="Télécharger cet export prescripteur"
-                                                       href="{% url 'apply:list_for_prescriber_exports_download' %}">
+                                                    <a class="btn-link" {% matomo_event "candidature" "exports" "export-prescripteur" %} aria-label="Télécharger cet export prescripteur" href="{% url 'apply:list_for_prescriber_exports_download' %}">
                                                         <i class="ri-download-line me-1" aria-hidden="true"></i>
                                                         Télécharger
                                                     </a>
@@ -92,20 +83,16 @@
                                                 <td>{{ month.c }}</td>
                                                 <td>
                                                     {% if export_for == "siae" %}
-                                                        <a class="matomo-event btn-link"
-                                                           data-matomo-category="candidatures"
-                                                           data-matomo-action="exports"
-                                                           data-matomo-option="export-siae"
+                                                        <a class="btn-link"
+                                                           {% matomo_event "candidature" "exports" "export-siae" %}
                                                            aria-label="Télécharger cet export SIAE"
                                                            href="{% url 'apply:list_for_siae_exports_download' month_identifier=month.month|date:"Y-m" %}">
                                                             <i class="ri-download-line me-1" aria-hidden="true"></i>
                                                             Télécharger
                                                         </a>
                                                     {% else %}
-                                                        <a class="matomo-event btn-link"
-                                                           data-matomo-category="candidatures"
-                                                           data-matomo-action="exports"
-                                                           data-matomo-option="export-prescripteur"
+                                                        <a class="btn-link"
+                                                           {% matomo_event "candidature" "exports" "export-prescripteur" %}
                                                            aria-label="Télécharger cet export prescripteur"
                                                            href="{% url 'apply:list_for_prescriber_exports_download' month_identifier=month.month|date:"Y-m" %}">
                                                             <i class="ri-download-line me-1" aria-hidden="true"></i>
