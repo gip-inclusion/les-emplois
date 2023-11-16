@@ -1524,7 +1524,6 @@ class SwitchCompanyTest(TestCase):
         assert response.context["request"].current_organization == company
 
 
-@pytest.mark.ignore_template_errors
 class EditUserPreferencesTest(TestCase):
     def test_employer_opt_in_company_no_job_description(self):
         company = CompanyFactory(with_membership=True)

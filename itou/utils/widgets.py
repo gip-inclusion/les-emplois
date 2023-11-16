@@ -67,37 +67,6 @@ class DuetDatePickerWidget(forms.DateInput):
         return get_min_birthdate()
 
 
-class SwitchCheckboxWidget(forms.CheckboxInput):
-    """
-    Display a switch button instead of a checkbox.
-    See https://getbootstrap.com/docs/4.4/components/forms/#switches
-
-    Usage :
-    - Add it to a form
-    - Add the "form-check form-switch" classes to the div containing the input.
-
-    Example:
-    ```
-    # Form
-    my_field = forms.BooleanField(widget=SwitchCheckboxWidget())
-
-    # Template
-    {% bootstrap_form form field_class="form-check form-switch" %}
-    ```
-    """
-
-    template_name = "utils/widgets/switch_checkbox_option.html"
-
-
-class MultipleSwitchCheckboxWidget(forms.CheckboxSelectMultiple):
-    """
-    Display switch buttons instead of checkboxes.
-    See https://getbootstrap.com/docs/4.4/components/forms/#switches
-    """
-
-    option_template_name = "utils/widgets/switch_checkbox_option.html"
-
-
 class OSMWidget(gis_widgets.OSMWidget):
     # https://docs.djangoproject.com/en/4.1/ref/contrib/gis/forms-api/#widget-classes
     # We copied the html to include the nonce attribute
