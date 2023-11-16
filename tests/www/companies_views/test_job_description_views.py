@@ -246,7 +246,6 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         assert JobDescription.objects.filter(pk=other_company_job_description.pk).exists()
 
 
-@pytest.mark.ignore_template_errors
 class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
     def setUp(self):
         super().setUp()
@@ -454,7 +453,6 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         self.assertRedirects(response, self.edit_url)
 
 
-@pytest.mark.ignore_template_errors
 class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
     def setUp(self):
         super().setUp()
