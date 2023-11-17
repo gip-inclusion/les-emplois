@@ -83,7 +83,7 @@
                                     </small>
                                 </p>
                             {% endif %}
-                            <a class="btn btn btn-outline-secondary mt-3" href="{{ prev_url }}">Retour</a>
+                            <a class="btn btn btn-outline-secondary mt-3" href="">Retour</a>{# Reload the current page with an empty form #}
                             <a href="{% url 'signup:prescriber_choose_org' siret=form.cleaned_data.siret %}" class="btn btn-primary mt-3">Inscrire mon organisation</a>
                         </div>
                     {% endif %}

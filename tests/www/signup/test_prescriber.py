@@ -1,7 +1,6 @@
 from unittest import mock
 
 import httpx
-import pytest
 import respx
 from django.conf import settings
 from django.contrib import auth, messages
@@ -491,7 +490,6 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret2})
         self.assertRedirects(response, url)
 
-    @pytest.mark.ignore_template_errors
     def test_create_user_prescriber_with_existing_siren_same_department(self):
         """
         Test the creation of a user of type prescriber with existing SIREN in a same department
@@ -598,7 +596,6 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    @pytest.mark.ignore_template_errors
     def test_create_user_prescriber_with_same_siret_and_different_kind(self, mock_call_ban_geocoding_api):
         """
         A user can create a new prescriber organization with an existing SIRET number,
@@ -668,7 +665,6 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    @pytest.mark.ignore_template_errors
     def test_create_user_prescriber_with_same_siret_and_same_kind(self, mock_call_ban_geocoding_api):
         """
         A user can't create a new prescriber organization with an existing SIRET number if:
@@ -700,7 +696,6 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, "utilise déjà ce type d'organisation avec le même SIRET")
         mock_call_ban_geocoding_api.assert_called_once()
 
-    @pytest.mark.ignore_template_errors
     def test_form_to_request_for_an_invitation(self):
         siret = "26570134200148"
         prescriber_org = PrescriberOrganizationWithMembershipFactory(siret=siret)
