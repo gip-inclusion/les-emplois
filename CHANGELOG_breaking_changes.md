@@ -1,5 +1,4 @@
 # Journal des changements techniques majeurs
 
-<!-- This is just a placeholder to be discussed. Replace me by real-world information. -->
-## YYYY-MM-DD
-- Courte description du changement. Si besoin, ajoutez plus d'informations : actions à faire pour mettre à jour, etc …
+## 2023-11-16
+- Renommage SIAE en Company dans tout le code non spécifique à l'IAE. De nombreux modèles et champs ont été renommés (avec migrations et renommage en base de données) et des urls ont changé. Voir les PR commençant par « Renommage Siae ».
