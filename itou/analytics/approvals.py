@@ -20,6 +20,7 @@ def collect_analytics_data(before):
             ),
         ),
         pe_notify_error=Count("pk", filter=Q(pe_notification_status=api_enums.PEApiNotificationStatus.ERROR)),
+        pe_notify_ready=Count("pk", filter=Q(pe_notification_status=api_enums.PEApiNotificationStatus.READY)),
     )
     cancelled_counts = approvals_models.CancelledApproval.objects.filter(created_at__lt=before).aggregate(
         total=Count("pk"),
@@ -34,6 +35,7 @@ def collect_analytics_data(before):
             ),
         ),
         pe_notify_error=Count("pk", filter=Q(pe_notification_status=api_enums.PEApiNotificationStatus.ERROR)),
+        pe_notify_ready=Count("pk", filter=Q(pe_notification_status=api_enums.PEApiNotificationStatus.READY)),
     )
     return {
         models.DatumCode.APPROVAL_COUNT: counts["total"],
@@ -45,4 +47,5 @@ def collect_analytics_data(before):
             counts["pe_notify_pending"] + cancelled_counts["pe_notify_pending"]
         ),
         models.DatumCode.APPROVAL_PE_NOTIFY_ERROR: counts["pe_notify_error"] + cancelled_counts["pe_notify_error"],
+        models.DatumCode.APPROVAL_PE_NOTIFY_READY: counts["pe_notify_ready"] + cancelled_counts["pe_notify_ready"],
     }

@@ -23,6 +23,7 @@ class DatumCode(models.TextChoices):
     APPROVAL_PE_NOTIFY_SUCCESS = "AP-101", "PASS IAE synchronisés avec succès avec pole emploi"
     APPROVAL_PE_NOTIFY_PENDING = "AP-102", "PASS IAE en attente de synchronisation avec pole emploi"
     APPROVAL_PE_NOTIFY_ERROR = "AP-103", "PASS IAE en erreur de synchronisation avec pole emploi"
+    APPROVAL_PE_NOTIFY_READY = "AP-104", "PASS IAE prêts à être synchronisés avec pole emploi"
 
 
 class Datum(models.Model):
