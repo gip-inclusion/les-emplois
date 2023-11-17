@@ -66,6 +66,7 @@ from itou.metabase.tables import (
     users,
 )
 from itou.metabase.tables.utils import get_active_companies_pks
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.siae_evaluations.models import (
     EvaluatedAdministrativeCriteria,
@@ -475,6 +476,7 @@ class Command(BaseCommand):
         enum_to_table = {
             Origin: "c1_ref_origine_candidature",
             ContractType: "c1_ref_type_contrat",
+            PrescriberOrganizationKind: "c1_ref_type_prescripteur",
         }
         for enum, table_name in enum_to_table.items():
             self.stdout.write(f"Preparing content for {table_name} table...")
