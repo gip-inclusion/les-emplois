@@ -29,6 +29,7 @@ class Migration(migrations.Migration):
                             ("AP-101", "PASS IAE synchronisés avec succès avec pole emploi"),
                             ("AP-102", "PASS IAE en attente de synchronisation avec pole emploi"),
                             ("AP-103", "PASS IAE en erreur de synchronisation avec pole emploi"),
+                            ("AP-104", "PASS IAE prêts à être synchronisés avec pole emploi"),
                         ],
                     ),
                 ),
