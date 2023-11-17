@@ -85,6 +85,7 @@ class PEApiNotificationStatus(models.TextChoices):
     The default value is PENDING, meaning we never tried to notify PE yet.
 
     Then it could be:
+    - READY if the approval can be sent (all the required fields are present and the approval has already started)
     - SUCCESS if the whole notification was indeed an acknowledged success
     - SHOULD_RETRY if we encountered recoverable errors along the way
     - ERROR in the case of unrecoverable errors, in which case:
@@ -104,6 +105,7 @@ class PEApiNotificationStatus(models.TextChoices):
     """
 
     PENDING = "notification_pending"
+    READY = "notification_ready"
     SUCCESS = "notification_success"
     ERROR = "notification_error"
     # HTTP errors: timeouts, DNS issues, bad auth, too many requests.

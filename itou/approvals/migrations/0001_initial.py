@@ -94,6 +94,7 @@ class Migration(migrations.Migration):
                     models.CharField(
                         choices=[
                             ("notification_pending", "Pending"),
+                            ("notification_ready", "Ready"),
                             ("notification_success", "Success"),
                             ("notification_error", "Error"),
                             ("notification_should_retry", "Should Retry"),
@@ -225,6 +226,7 @@ class Migration(migrations.Migration):
                     models.CharField(
                         choices=[
                             ("notification_pending", "Pending"),
+                            ("notification_ready", "Ready"),
                             ("notification_success", "Success"),
                             ("notification_error", "Error"),
                             ("notification_should_retry", "Should Retry"),
