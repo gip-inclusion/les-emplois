@@ -17,6 +17,7 @@ asgiref==3.7.2 \
     # via
     #   -r requirements/test.txt
     #   django
+    #   django-htmx
 asttokens==2.2.1 \
     --hash=sha256:4622110b2a6f30b77e1473affaa97e711bc2f07d3f10848420ff1898edbe94f3 \
     --hash=sha256:6b0ac9e93fb0335014d382b8fa9b3afa7df546984258005da0b9e7095b3deb1c
@@ -400,9 +401,9 @@ django-hijack==3.4.2 \
     --hash=sha256:b2628a4fbb3bf92aaba88e661bdfbb7c59a95350efedae8852a41e07e7245326 \
     --hash=sha256:bf8f8aa5c2678dc0a5dc43be1d48406459a47014f12682c2986658fa243ddae8
     # via -r requirements/test.txt
-django-htmx==1.17.1 \
-    --hash=sha256:48b6dff40df09f78535ee9db92c7123db3f5243e5f4e95ab061df91a7864f897 \
-    --hash=sha256:c5264ba7b8656934fdda8ea2b19d8a0eaef7d50468683229f3a1aa3bd660bd72
+django-htmx==1.17.2 \
+    --hash=sha256:4089f2ed38727e9846c2f4cd1daddf6b010c7be8d834cfbcffc8c5ecf445c04e \
+    --hash=sha256:f4971432d2ca45dbb31d9b58add1c50ae54354afe4bf59cafd591b1711b502c0
     # via -r requirements/test.txt
 django-import-export==3.3.3 \
     --hash=sha256:2c1b16e1cf2ea5f62a165d8867e7c6dcff25673ab7201fd18aaf67c9ee90367e \
