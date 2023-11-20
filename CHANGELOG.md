@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## [75] - 2023-11-19
+
+### Ajouté
+- Notification des PASS IAE supprimés à Pôle emploi
+- Fiches salarié : Parcours de création autonome
+- Fiches Salarié : Prévenir les SIAE du délai d’intégration dans l’Extranet IAE de l’ASP
+- API des entreprises à destinations du marché de l'inclusion
+
+### Modifié
+- Fiche de poste : correction de l'affichage de la ville d'une fiche de poste en l'absence de l'information
+- Candidatures : Permettre de mettre en liste d'attente des candidatures à l'étude nécessitant un diagnostic d'éligibilité
+- Libellés : Changement pour les contrats "Convergence" et "Premières Heures"
+- Candidatures : Refonte de la carte candidature pour les candidats
+- Harmonisation de la zone de boutons dans les formulaires
+- Changer certaines bannières infos/alertes par des toasts
+
 ## [74] - 2023-11-06
 
 ### Ajouté
