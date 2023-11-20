@@ -264,11 +264,13 @@ class ApprovalSuspendActionChoiceViewTest(TestCase):
 
     def test_not_current_siae(self):
         self.client.force_login(JobSeekerFactory())
+
         response = self.client.get(self.url)
         assert response.status_code == 404
 
     def test_not_current_suspension(self):
         self.client.force_login(self.employer)
+
         response = self.client.get(
             reverse("approvals:suspension_action_choice", kwargs={"suspension_id": self.suspension.pk + 1})
         )
@@ -282,6 +284,7 @@ class ApprovalSuspendActionChoiceViewTest(TestCase):
 
     def test_context(self):
         self.client.force_login(self.employer)
+
         response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.context["suspension"] == self.suspension
@@ -289,6 +292,7 @@ class ApprovalSuspendActionChoiceViewTest(TestCase):
 
     def test_post_delete(self):
         self.client.force_login(self.employer)
+
         response = self.client.post(self.url, data={"action": "delete"})
         assert response.url == reverse("approvals:suspension_delete", kwargs={"suspension_id": self.suspension.pk})
 
@@ -391,6 +395,7 @@ class ApprovalSuspendUpdateEndDateViewTest(TestCase):
     def test_post_with_invalid_endate(self):
         self.client.force_login(self.employer)
 
+        # MIN
         response = self.client.post(
             self.url, data={"first_day_back_to_work": self.suspension.start_at - relativedelta(days=1)}
         )
@@ -403,4 +408,19 @@ class ApprovalSuspendUpdateEndDateViewTest(TestCase):
         assert (
             form.errors["first_day_back_to_work"][0]
             == "Vous ne pouvez pas saisir une date de réintégration antérieure au début de la suspension."
+        )
+
+        # MAX
+        response = self.client.post(
+            self.url, data={"first_day_back_to_work": self.suspension.end_at + relativedelta(days=1)}
+        )
+        assert response.status_code == 200
+        assert "form" in response.context
+
+        form = response.context["form"]
+        assert form.is_valid() is False
+        assert "first_day_back_to_work" in form.errors
+        assert (
+            form.errors["first_day_back_to_work"][0]
+            == "Vous ne pouvez pas saisir une date de réintégration postérieure à la fin de la suspension."
         )

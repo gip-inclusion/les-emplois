@@ -522,6 +522,46 @@ class SuspensionForm(forms.ModelForm):
             self.cleaned_data["end_at"] = Suspension.get_max_end_at(start_at)
 
 
+class SuspensionEndDateForm(forms.Form):
+    """
+    first_day_back_to_work is the day after the last day of the suspension (end_at).
+    """
+
+    first_day_back_to_work = forms.DateField(
+        widget=DuetDatePickerWidget(),
+        label="A quelle date le salarié va-t-il réintégrer votre entreprise ?",
+        help_text=(
+            "La date de fin de suspension sera mise à jour, le PASS sera de nouveau actif "
+            "à la date de réintégration du candidat."
+        ),
+    )
+
+    def __init__(self, *args, approval, instance, siae, **kwargs):
+        self.approval = approval
+        self.siae = siae
+        self.instance = instance
+        super().__init__(*args, **kwargs)
+
+        self.minimal_first_day_back_to_work = self.instance.start_at + relativedelta(days=1)
+        self.initial["first_day_back_to_work"] = max(self.minimal_first_day_back_to_work, timezone.localdate())
+        self.fields["first_day_back_to_work"].widget = DuetDatePickerWidget(
+            {"min": self.minimal_first_day_back_to_work, "max": self.instance.end_at}
+        )
+
+    def clean_first_day_back_to_work(self):
+        first_day_back_to_work = self.cleaned_data.get("first_day_back_to_work")
+
+        if first_day_back_to_work <= self.instance.start_at:
+            raise ValidationError(
+                "Vous ne pouvez pas saisir une date de réintégration antérieure au début de la suspension."
+            )
+        if first_day_back_to_work >= self.instance.end_at:
+            raise ValidationError(
+                "Vous ne pouvez pas saisir une date de réintégration postérieure à la fin de la suspension."
+            )
+        return first_day_back_to_work
+
+
 class PoleEmploiApprovalSearchForm(forms.Form):
     number = forms.CharField(
         label="Numéro",
