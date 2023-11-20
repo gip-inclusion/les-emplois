@@ -13,7 +13,9 @@ anyio==3.7.1 \
 asgiref==3.7.2 \
     --hash=sha256:89b2ef2247e3b562a16eef663bc0e2e703ec6468e2fa8a5cd61cd449786d4f6e \
     --hash=sha256:9e0ce3aa93a819ba5b45120216b23878cf6e8525eb3848653452b4192b92afed
-    # via django
+    # via
+    #   django
+    #   django-htmx
 attrs==23.1.0 \
     --hash=sha256:1f28b4522cdc2fb4256ac1a020c78acf9cba2c6b461ccd2c126f3aa8e8335d04 \
     --hash=sha256:6279836d581513a26f1bf235f9acd333bc9115683f14f7e8fae46c98fc50e015
@@ -302,9 +304,9 @@ django-hijack==3.4.2 \
     --hash=sha256:b2628a4fbb3bf92aaba88e661bdfbb7c59a95350efedae8852a41e07e7245326 \
     --hash=sha256:bf8f8aa5c2678dc0a5dc43be1d48406459a47014f12682c2986658fa243ddae8
     # via -r requirements/base.in
-django-htmx==1.17.1 \
-    --hash=sha256:48b6dff40df09f78535ee9db92c7123db3f5243e5f4e95ab061df91a7864f897 \
-    --hash=sha256:c5264ba7b8656934fdda8ea2b19d8a0eaef7d50468683229f3a1aa3bd660bd72
+django-htmx==1.17.2 \
+    --hash=sha256:4089f2ed38727e9846c2f4cd1daddf6b010c7be8d834cfbcffc8c5ecf445c04e \
+    --hash=sha256:f4971432d2ca45dbb31d9b58add1c50ae54354afe4bf59cafd591b1711b502c0
     # via -r requirements/base.in
 django-import-export==3.3.3 \
     --hash=sha256:2c1b16e1cf2ea5f62a165d8867e7c6dcff25673ab7201fd18aaf67c9ee90367e \
