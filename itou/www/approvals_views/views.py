@@ -45,6 +45,7 @@ from itou.www.approvals_views.forms import (
     ProlongationRequestDenyInformationReasonExplanationForm,
     ProlongationRequestDenyInformationReasonForm,
     ProlongationRequestFilterForm,
+    SuspensionEndDateForm,
     SuspensionForm,
     get_prolongation_form,
 )
@@ -599,6 +600,42 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
         suspension.save()
         messages.success(request, "Modification de suspension effectuée.", extra_tags="toast")
         return HttpResponseRedirect(back_url)
+
+    context = {
+        "suspension": suspension,
+        "back_url": back_url,
+        "form": form,
+    }
+    return render(request, template_name, context)
+
+
+@login_required()
+def suspension_update_enddate(request, suspension_id, template_name="approvals/suspension_update_enddate.html"):
+    siae = get_current_company_or_404(request)
+    suspension = get_object_or_404(Suspension, pk=suspension_id)
+
+    if not suspension.can_be_handled_by_siae(siae):
+        raise PermissionDenied()
+
+    form = SuspensionEndDateForm(
+        approval=suspension.approval,
+        siae=siae,
+        instance=suspension,
+        data=request.POST or None,
+    )
+
+    back_url = get_safe_url(
+        request,
+        "back_url",
+        fallback_url=reverse("approvals:suspension_action_choice", kwargs={"suspension_id": suspension_id}),
+    )
+
+    if request.method == "POST" and form.is_valid():
+        suspension.end_at = form.cleaned_data["first_day_back_to_work"] - timedelta(days=1)
+        suspension.updated_by = request.user
+        suspension.save()
+        messages.success(request, "Modification de suspension effectuée.", extra_tags="toast")
+        return HttpResponseRedirect(reverse("approvals:detail", kwargs={"pk": suspension.approval_id}))
 
     context = {
         "suspension": suspension,
