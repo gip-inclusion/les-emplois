@@ -31,6 +31,7 @@ urlpatterns = [
     path("pe/state/raw", views.stats_pe_state_raw, name="stats_pe_state_raw"),
     path("pe/tension", views.stats_pe_tension, name="stats_pe_tension"),
     # Institution stats - DDETS IAE - department level.
+    # Legacy `ddets` term is used in URLs for retroactivity in Matomo stats but in fact it means `ddets_iae`.
     path(
         "ddets/auto_prescription",
         views.stats_ddets_iae_auto_prescription,
@@ -49,6 +50,7 @@ urlpatterns = [
     path("ddets/iae", views.stats_ddets_iae_iae, name="stats_ddets_iae_iae"),
     path("ddets/siae_evaluation", views.stats_ddets_iae_siae_evaluation, name="stats_ddets_iae_siae_evaluation"),
     path("ddets/hiring", views.stats_ddets_iae_hiring, name="stats_ddets_iae_hiring"),
+    path("ddets/state", views.stats_ddets_iae_state, name="stats_ddets_iae_state"),
     # Institution stats - DDETS LOG - department level.
     path("ddets_log/state", views.stats_ddets_log_state, name="stats_ddets_log_state"),
     # Institution stats - DREETS IAE - region level.
@@ -87,6 +89,8 @@ urlpatterns = [
     path("dgefp/af", views.stats_dgefp_af, name="stats_dgefp_af"),
     # Institution stats - DIHAL - nation level.
     path("dihal/state", views.stats_dihal_state, name="stats_dihal_state"),
+    # Institution stats - DRIHL - region level - IDF only.
+    path("drihl/state", views.stats_drihl_state, name="stats_drihl_state"),
     # Institution stats - IAE Network - nation level.
     path("iae_network/hiring", views.stats_iae_network_hiring, name="stats_iae_network_hiring"),
 ]

@@ -80,6 +80,10 @@ def get_params_for_region(region):
     return params
 
 
+def get_params_for_idf_region():
+    return get_params_for_region("Île-de-France")
+
+
 def get_params_for_whole_country():
     return {
         mb.DEPARTMENT_FILTER_KEY: list(DEPARTMENTS.values()),
@@ -450,6 +454,14 @@ def stats_ddets_iae_hiring(request):
 
 
 @login_required
+def stats_ddets_iae_state(request):
+    return render_stats_ddets_iae(
+        request=request,
+        page_title="Suivi des prescriptions des AHI de mon département",
+    )
+
+
+@login_required
 def stats_ddets_log_state(request):
     current_org = get_current_institution_or_404(request)
     if not utils.can_view_stats_ddets_log(request):
@@ -462,6 +474,7 @@ def stats_ddets_log_state(request):
         "department": department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
+    # Here we show stats for the whole region and not just the department, this is quite unusual for DDETS.
     params = get_params_for_region(region)
     return render_stats(
         request=request,
@@ -585,6 +598,17 @@ def stats_dihal_state(request):
         "page_title": "Suivi des prescriptions des AHI",
     }
     return render_stats(request=request, context=context, params=get_params_for_whole_country())
+
+
+@login_required
+def stats_drihl_state(request):
+    get_current_institution_or_404(request)
+    if not utils.can_view_stats_drihl(request):
+        raise PermissionDenied
+    context = {
+        "page_title": "Suivi des prescriptions des AHI",
+    }
+    return render_stats(request=request, context=context, params=get_params_for_idf_region())
 
 
 @login_required

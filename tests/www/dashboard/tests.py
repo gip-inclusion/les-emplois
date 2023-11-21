@@ -315,6 +315,13 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, "Suivre les prescriptions des AHI")
         self.assertContains(response, reverse("stats:stats_dihal_state"))
 
+    def test_dashboard_drihl_institution_stats(self):
+        membershipfactory = InstitutionMembershipFactory(institution__kind=InstitutionKind.DRIHL)
+        self.client.force_login(membershipfactory.user)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, "Suivre les prescriptions des AHI")
+        self.assertContains(response, reverse("stats:stats_drihl_state"))
+
     def test_dashboard_iae_network_institution_stats(self):
         membershipfactory = InstitutionMembershipFactory(institution__kind=InstitutionKind.IAE_NETWORK)
         self.client.force_login(membershipfactory.user)
