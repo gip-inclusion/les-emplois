@@ -15,6 +15,7 @@ from itou.companies.enums import CompanyKind, siae_kind_to_pe_type_siae
 from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.utils.apis import enums as api_enums
 from itou.utils.mocks.pole_emploi import (
     API_MAJPASS_RESULT_ERROR,
     API_MAJPASS_RESULT_OK,
@@ -569,14 +570,19 @@ class ApprovalsSendToPeManagementTestCase(TestCase):
         stdout = io.StringIO()
         # create ignored Approvals, will not even be counted in the batch. the cron will wait for
         # the database to have the necessary job application, nir, or start date to fetch them.
-        ApprovalFactory(with_jobapplication=False)
-        ApprovalFactory(user__nir="")
-        ApprovalFactory(user__birthdate=None)
-        ApprovalFactory(start_at=datetime.datetime.today().date() + datetime.timedelta(days=1))
+        no_jobapp = ApprovalFactory(with_jobapplication=False)
+        missing_user_data1 = ApprovalFactory(user__nir="")
+        missing_user_data2 = ApprovalFactory(user__birthdate=None)
+        future = ApprovalFactory(start_at=datetime.datetime.today().date() + datetime.timedelta(days=1))
 
         # Create CancelledApproval
-        delete_approval = ApprovalFactory(with_origin_values=True)
-        delete_approval.delete()
+        cancelled_approval_future = CancelledApprovalFactory(
+            start_at=datetime.datetime.today().date() + datetime.timedelta(days=1)
+        )
+        cancelled_approvals = [
+            CancelledApprovalFactory(start_at=datetime.datetime.today().date() - datetime.timedelta(days=i))
+            for i in range(10)
+        ]
 
         # other approvals
         retry_approval = ApprovalFactory(
@@ -594,18 +600,30 @@ class ApprovalsSendToPeManagementTestCase(TestCase):
         assert stdout.getvalue().split("\n") == [
             "approvals needing to be sent count=2, batch count=10",
             f"approvals={pending_approval} start_at={pending_approval.start_at.isoformat()} "
-            "pe_state=notification_pending",
+            "pe_state=notification_ready",
             f"approvals={retry_approval} start_at={retry_approval.start_at.isoformat()} "
             "pe_state=notification_should_retry",
-            "cancelled approvals needing to be sent count=1, batch count=8",
-            f"cancelled_approval={delete_approval} start_at={delete_approval.start_at.isoformat()} "
-            "pe_state=notification_pending",
+            "cancelled approvals needing to be sent count=10, batch count=8",
+        ] + [
+            f"cancelled_approval={cancelled_approval} start_at={cancelled_approval.start_at.isoformat()} "
+            "pe_state=notification_ready"
+            for cancelled_approval in cancelled_approvals[:8]
+        ] + [
             "",
         ]
         sleep_mock.assert_called_with(3)
-        assert sleep_mock.call_count == 3
+        assert sleep_mock.call_count == 10
         assert notify_mock.call_count == 2
-        assert cancelled_notify_mock.call_count == 1
+        assert cancelled_notify_mock.call_count == 8
+        for approval in [no_jobapp, missing_user_data1, missing_user_data2, future, cancelled_approval_future]:
+            approval.refresh_from_db()
+            assert approval.pe_notification_status == api_enums.PEApiNotificationStatus.PENDING
+        # Since the notify_pole_emploi have been mocked, the READY/SHOULD_RETRY approvals kept their statuses
+        retry_approval.refresh_from_db()
+        assert retry_approval.pe_notification_status == api_enums.PEApiNotificationStatus.SHOULD_RETRY
+        for approval in [pending_approval, *cancelled_approvals]:
+            approval.refresh_from_db()
+            assert approval.pe_notification_status == api_enums.PEApiNotificationStatus.READY
 
 
 @override_settings(
