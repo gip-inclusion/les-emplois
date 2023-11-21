@@ -24,29 +24,30 @@ class Command(BaseCommand):
     def handle(self, *, wet_run, delay, **options):
         today = timezone.localdate()
 
-        queryset = (
-            approvals_models.Approval.objects.filter(
-                # we will ignore any approval that starts after today anyway.
-                start_at__lte=today,
-                # those with no accepted job application would also fail and stay pending.
-                # also removes the approvals without any job application yet.
-                jobapplication__state=JobApplicationWorkflow.STATE_ACCEPTED,
-                # those with no user will crash, but we don't have the case yet in the DB.
-                pe_notification_status__in=[
-                    api_enums.PEApiNotificationStatus.PENDING,
-                    api_enums.PEApiNotificationStatus.SHOULD_RETRY,
-                ],
-            )
-            # those with a no-nir, no-birthdate or no-name user are also removed from the queryset
-            # in order not to block the cron. They will be picked up as soon as they are set.
-            .exclude(
-                Q(user__nir="")
-                | Q(user__birthdate=None)
-                # there are no such cases in the database at the time of writing, but it *might* happen.
-                | Q(user__first_name="")
-                | Q(user__last_name="")
-            ).order_by("-start_at")
+        # Check if pending approvals are now READY to be sent
+        approvals_models.Approval.objects.filter(
+            pe_notification_status=api_enums.PEApiNotificationStatus.PENDING,
+            start_at__lte=today,
+            # those with no accepted job application would also fail and stay pending.
+            # also removes the approvals without any job application yet.
+            jobapplication__state=JobApplicationWorkflow.STATE_ACCEPTED,
+        ).exclude(Q(user__nir="") | Q(user__birthdate=None) | Q(user__first_name="") | Q(user__last_name="")).update(
+            pe_notification_status=api_enums.PEApiNotificationStatus.READY
         )
+        approvals_models.CancelledApproval.objects.filter(
+            pe_notification_status=api_enums.PEApiNotificationStatus.PENDING,
+            start_at__lte=today,
+        ).exclude(Q(user_nir="") | Q(user_birthdate=None) | Q(user_first_name="") | Q(user_last_name="")).update(
+            pe_notification_status=api_enums.PEApiNotificationStatus.READY
+        )
+
+        # Send READY Approvals
+        queryset = approvals_models.Approval.objects.filter(
+            pe_notification_status__in=[
+                api_enums.PEApiNotificationStatus.READY,
+                api_enums.PEApiNotificationStatus.SHOULD_RETRY,
+            ],
+        ).order_by("-start_at")
 
         nb_approvals = queryset.count()
         self.stdout.write(f"approvals needing to be sent count={nb_approvals}, batch count={MAX_APPROVALS_PER_RUN}")
@@ -60,26 +61,14 @@ class Command(BaseCommand):
                 approval.notify_pole_emploi()
                 sleep(delay)
 
+        # Send READY CancelledApprovals
         batch_left = MAX_APPROVALS_PER_RUN - nb_approvals_to_send
-        cancelled_queryset = (
-            approvals_models.CancelledApproval.objects.filter(
-                # we will ignore any approval that starts after today anyway.
-                start_at__lte=today,
-                pe_notification_status__in=[
-                    api_enums.PEApiNotificationStatus.PENDING,
-                    api_enums.PEApiNotificationStatus.SHOULD_RETRY,
-                ],
-            )
-            # those with a no-nir, no-birthdate or no-name user are also removed from the queryset
-            # in order not to block the cron. They will be picked up as soon as they are set.
-            .exclude(
-                Q(user_nir="")
-                | Q(user_birthdate=None)
-                # there are no such cases in the database at the time of writing, but it *might* happen.
-                | Q(user_first_name="")
-                | Q(user_last_name="")
-            ).order_by("-start_at")
-        )
+        cancelled_queryset = approvals_models.CancelledApproval.objects.filter(
+            pe_notification_status__in=[
+                api_enums.PEApiNotificationStatus.READY,
+                api_enums.PEApiNotificationStatus.SHOULD_RETRY,
+            ],
+        ).order_by("-start_at")
         self.stdout.write(
             f"cancelled approvals needing to be sent count={cancelled_queryset.count()}, batch count={batch_left}"
         )
