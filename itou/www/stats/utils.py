@@ -29,6 +29,7 @@ def can_view_stats_dashboard_widget(request):
         or can_view_stats_dreets_iae(request)
         or can_view_stats_dgefp(request)
         or can_view_stats_dihal(request)
+        or can_view_stats_drihl(request)
         or can_view_stats_iae_network(request)
     )
 
@@ -148,6 +149,14 @@ def can_view_stats_dihal(request):
         request.user.is_labor_inspector
         and isinstance(request.current_organization, Institution)
         and request.current_organization.kind == InstitutionKind.DIHAL
+    )
+
+
+def can_view_stats_drihl(request):
+    return (
+        request.user.is_labor_inspector
+        and isinstance(request.current_organization, Institution)
+        and request.current_organization.kind == InstitutionKind.DRIHL
     )
 
 
