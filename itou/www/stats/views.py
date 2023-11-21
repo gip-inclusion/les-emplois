@@ -44,13 +44,6 @@ def get_stats_siae_current_org(request):
     return current_org
 
 
-def get_stats_ddets_iae_department(request):
-    current_org = get_current_institution_or_404(request)
-    if not utils.can_view_stats_ddets_iae(request):
-        raise PermissionDenied
-    return current_org.department
-
-
 def get_stats_dreets_iae_region(request):
     current_org = get_current_institution_or_404(request)
     if not utils.can_view_stats_dreets_iae(request):
@@ -398,20 +391,38 @@ def stats_pe_tension(request):
     )
 
 
-def render_stats_ddets_iae(request, page_title, extra_context=None):
-    if extra_context is None:
-        # Do not use mutable default arguments,
-        # see https://florimond.dev/en/posts/2018/08/python-mutable-defaults-are-the-source-of-all-evil/
-        extra_context = {}
-    department = get_stats_ddets_iae_department(request)
-    params = get_params_for_departement(department)
+def render_stats_ddets(request, page_title, extra_context, extend_stats_to_whole_region):
+    current_org = get_current_institution_or_404(request)
+    department = current_org.department
+    department_label = DEPARTMENTS[department]
+    region = current_org.region
     context = {
-        "page_title": f"{page_title} ({DEPARTMENTS[department]})",
+        "page_title": f"{page_title} ({region})"
+        if extend_stats_to_whole_region
+        else f"{page_title} ({department_label})",
+        # Tracking is always based on department even if we show stats for the whole region.
         "department": department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
     context.update(extra_context)
+    params = get_params_for_region(region) if extend_stats_to_whole_region else get_params_for_departement(department)
     return render_stats(request=request, context=context, params=params)
+
+
+def render_stats_ddets_iae(request, page_title, extra_context=None, extend_stats_to_whole_region=False):
+    if extra_context is None:
+        # Do not use mutable default arguments,
+        # see https://florimond.dev/en/posts/2018/08/python-mutable-defaults-are-the-source-of-all-evil/
+        extra_context = {}
+    get_current_institution_or_404(request)
+    if not utils.can_view_stats_ddets_iae(request):
+        raise PermissionDenied
+    return render_stats_ddets(
+        request=request,
+        page_title=page_title,
+        extra_context=extra_context,
+        extend_stats_to_whole_region=extend_stats_to_whole_region,
+    )
 
 
 @login_required
@@ -457,29 +468,29 @@ def stats_ddets_iae_hiring(request):
 def stats_ddets_iae_state(request):
     return render_stats_ddets_iae(
         request=request,
-        page_title="Suivi des prescriptions des AHI de mon département",
+        page_title="Suivi des prescriptions des AHI de ma région",
+        extend_stats_to_whole_region=True,
+    )
+
+
+def render_stats_ddets_log(request, page_title, extend_stats_to_whole_region):
+    get_current_institution_or_404(request)
+    if not utils.can_view_stats_ddets_log(request):
+        raise PermissionDenied
+    return render_stats_ddets(
+        request=request,
+        page_title=page_title,
+        extra_context=None,
+        extend_stats_to_whole_region=extend_stats_to_whole_region,
     )
 
 
 @login_required
 def stats_ddets_log_state(request):
-    current_org = get_current_institution_or_404(request)
-    if not utils.can_view_stats_ddets_log(request):
-        raise PermissionDenied
-    department = current_org.department
-    region = current_org.region
-    context = {
-        "page_title": f"Suivi des prescriptions des AHI de ma région ({region})",
-        # Tracking is based on ddets_log department even if we show stats for the whole region.
-        "department": department,
-        "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
-    }
-    # Here we show stats for the whole region and not just the department, this is quite unusual for DDETS.
-    params = get_params_for_region(region)
-    return render_stats(
+    return render_stats_ddets_log(
         request=request,
-        context=context,
-        params=params,
+        page_title="Suivi des prescriptions des AHI de ma région",
+        extend_stats_to_whole_region=True,
     )
 
 
