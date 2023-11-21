@@ -261,7 +261,7 @@ def download(asset_key, download_infos):
             print(f"{prefix} - {filepath} found - no hash verification - keeping file")
 
     if not filepath.exists():
-        filepath.parent.mkdir(exist_ok=True)
+        filepath.parent.mkdir(parents=True, exist_ok=True)
         print(f"{prefix} - Downloading {filepath}")
 
         stream_kwargs = {
