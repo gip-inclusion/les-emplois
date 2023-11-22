@@ -484,6 +484,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     create_employee_record = models.BooleanField(default=True, verbose_name="création d'une fiche salarié")
 
     # The job seeker's resume used for this job application.
+    # TODO: Remove the patchy code block of the `test_bucket` fixture when this field become a ForeignKey()
     resume_link = models.URLField(max_length=500, verbose_name="lien vers un CV", blank=True)
 
     # Who send the job application. It can be the same user as `job_seeker`

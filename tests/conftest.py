@@ -81,6 +81,21 @@ def preload_spatial_reference(django_db_setup, django_db_blocker):
 
 @pytest.fixture(autouse=True, scope="session")
 def test_bucket():
+    # TODO: Remove this code block once we stop using a models.URLField() to store a S3 link (ie. `resume_link`)
+    from django.core.validators import URLValidator
+
+    patchy.patch(
+        URLValidator.__call__,
+        '''\
+        @@ -16,3 +16,5 @@ def __call__(self, value):
+             try:
+        +        if value.startswith("''' + settings.AWS_S3_ENDPOINT_URL + '''"):
+        +           return
+                 super().__call__(value)
+             except ValidationError as e:
+        ''',  # fmt: skip
+    )
+
     call_command("configure_bucket", autoexpire=True)
     yield
 

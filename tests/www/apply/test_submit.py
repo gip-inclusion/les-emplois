@@ -433,7 +433,7 @@ class ApplyAsJobSeekerTest(TestCase):
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert list(job_application.selected_jobs.all()) == [company.job_description_through.first()]
         assert job_application.resume_link == (
-            f"http://localhost:9000/tests/{storages['public'].location}"
+            f"{settings.AWS_S3_ENDPOINT_URL}tests/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
 
@@ -1110,7 +1110,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             company.job_description_through.last(),
         ]
         assert job_application.resume_link == (
-            f"http://localhost:9000/tests/{storages['public'].location}"
+            f"{settings.AWS_S3_ENDPOINT_URL}tests/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
 
@@ -1401,7 +1401,7 @@ class ApplyAsPrescriberTest(TestCase):
             company.job_description_through.last(),
         ]
         assert job_application.resume_link == (
-            f"http://localhost:9000/tests/{storages['public'].location}"
+            f"{settings.AWS_S3_ENDPOINT_URL}tests/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
 
@@ -1844,7 +1844,7 @@ class ApplyAsCompanyTest(TestCase):
             company.job_description_through.last(),
         ]
         assert job_application.resume_link == (
-            f"http://localhost:9000/tests/{storages['public'].location}"
+            f"{settings.AWS_S3_ENDPOINT_URL}tests/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
         )
 
