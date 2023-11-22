@@ -1,3 +1,9 @@
+{% if members_stats.admin_count == 1 and members_stats.total_count > 1 %}
+    <p class="mt-4 mb-5">
+        Nous vous recommandons de nommer plusieurs administrateurs
+        afin de garantir l’accès et la sécurité de cet espace professionnel à tous vos membres.
+    </p>
+{% endif %}
 
 <div class="table-responsive-lg mt-3 mt-md-4">
     <table class="table">
