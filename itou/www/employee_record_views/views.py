@@ -74,6 +74,10 @@ class AddView(LoginRequiredMixin, NamedUrlSessionWizardView):
     }
 
     def dispatch(self, request, *args, **kwargs):
+        # Do LoginRequiredMixin.dispatch() here so we get the 404 and the redirect before the PermissionDenied
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
+
         self.company = get_current_company_or_404(request)
         if not self.company.can_use_employee_record:
             raise PermissionDenied
