@@ -58,12 +58,20 @@ STEPS = [
 ]
 
 
+def _show_add_choose_approval_form(wizard):
+    cleaned_data = wizard.get_cleaned_data_for_step("choose-employee") or {}
+    return bool(cleaned_data.get("employee"))
+
+
 class AddView(LoginRequiredMixin, NamedUrlSessionWizardView):
     template_name = "employee_record/add.html"
     form_list = [
         ("choose-employee", AddEmployeeRecordChooseEmployeeForm),
         ("choose-approval", AddEmployeeRecordChooseApprovalForm),
     ]
+    condition_dict = {
+        "choose-approval": _show_add_choose_approval_form,
+    }
 
     def dispatch(self, request, *args, **kwargs):
         self.company = get_current_company_or_404(request)
