@@ -21,6 +21,9 @@ imports
 exports
 !exports/*.md
 
+# Backup files
+backups
+
 # Debian
 .bash_history
 .python_history
