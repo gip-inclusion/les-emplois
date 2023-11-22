@@ -99,21 +99,6 @@
             <a href="#header">Retour au début de la page</a>
         </div>
 
-        {% if request.path == "/dashboard/" and user.is_employer %}
-            <div id="alertMazeSurvey" class="maze-survey bg-white shadow fixed-sm-bottom m-3 py-3 alert alert-dismissible alert-dismissible-once d-none">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" data-bs-target="#alertMazeSurvey" aria-label="Fermer">
-                </button>
-                <p>
-                    <strong>Les emplois de l’inclusion évoluent !</strong>
-                </p>
-                <p>Nous faisons évoluer l'interface des Emplois de l'inclusion et avons besoins de vos retours.</p>
-                <a href="https://t.maze.co/197820845" rel="noopener" target="_blank" class="btn btn-block btn-primary btn-ico">
-                    <i class="ri-star-smile-line font-weight-medium" aria-hidden="true"></i>
-                    <span>Accéder au test</span>
-                </a>
-            </div>
-        {% endif %}
-
         <script src="{% static "vendor/jquery/jquery.min.js" %}"></script>
         <script src="{% static "vendor/bootstrap/popper.min.js" %}"></script>
         <script src="{% static "vendor/bootstrap/bootstrap.min.js" %}"></script>

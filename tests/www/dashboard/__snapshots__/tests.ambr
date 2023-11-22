@@ -17,19 +17,3 @@
           </div>
   '''
 # ---
-# name: test_maze_survey
-  '''
-  <div class="maze-survey bg-white shadow fixed-sm-bottom m-3 py-3 alert alert-dismissible alert-dismissible-once d-none" id="alertMazeSurvey">
-                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" data-bs-target="#alertMazeSurvey" type="button">
-                  </button>
-                  <p>
-                      <strong>Les emplois de l’inclusion évoluent !</strong>
-                  </p>
-                  <p>Nous faisons évoluer l'interface des Emplois de l'inclusion et avons besoins de vos retours.</p>
-                  <a class="btn btn-block btn-primary btn-ico" href="https://t.maze.co/197820845" rel="noopener" target="_blank">
-                      <i aria-hidden="true" class="ri-star-smile-line font-weight-medium"></i>
-                      <span>Accéder au test</span>
-                  </a>
-              </div>
-  '''
-# ---

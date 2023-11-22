@@ -1868,26 +1868,6 @@ def test_prolongation_requests_badge(client):
     assert soup.text == "3"
 
 
-def test_maze_survey(client, snapshot):
-    maze_link = "https://t.maze.co/197820845"
-
-    for user in [
-        JobSeekerFactory(),
-        PrescriberFactory(),
-        LaborInspectorFactory(membership=True),
-    ]:
-        client.force_login(user)
-        client.session.clear()
-        response = client.get(reverse("dashboard:index"))
-        assertNotContains(response, maze_link)
-
-    employer = EmployerFactory(with_company=True)
-    client.force_login(employer)
-    client.session.clear()
-    response = client.get(reverse("dashboard:index"))
-    assert str(parse_response_to_soup(response, ".maze-survey")) == snapshot
-
-
 @pytest.mark.parametrize("kind", CompanyKind)
 def test_alert_message_for_ai_stock_prolongation(client, snapshot, kind):
     employer = CompanyMembershipFactory(company__kind=kind).user

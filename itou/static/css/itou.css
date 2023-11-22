@@ -397,13 +397,4 @@ _:-ms-fullscreen,
     border-top-right-radius: 0.5rem;
 }
 
-.maze-survey {
-    padding-right: 1rem;
-    z-index: 100000 !important;
-}
 
-@media (min-width: 768px) {
-    .maze-survey {
-        width: 441px !important;
-    }
-}
