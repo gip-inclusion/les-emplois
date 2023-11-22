@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
@@ -56,11 +57,16 @@ def member_list(request, template_name="prescribers/members.html"):
     members = (
         organization.prescribermembership_set.active().select_related("user").all().order_by("-is_admin", "joined_at")
     )
+    members_stats = members.aggregate(
+        total_count=Count("pk"),
+        admin_count=Count("pk", filter=Q(is_admin=True)),
+    )
     pending_invitations = organization.invitations.pending()
 
     context = {
         "organization": organization,
         "members": members,
+        "members_stats": members_stats,
         "pending_invitations": pending_invitations,
     }
     return render(request, template_name, context)

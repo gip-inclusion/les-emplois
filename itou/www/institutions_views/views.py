@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
@@ -18,6 +19,10 @@ def member_list(request, template_name="institutions/members.html"):
     members = (
         institution.institutionmembership_set.active().select_related("user").all().order_by("-is_admin", "joined_at")
     )
+    members_stats = members.aggregate(
+        total_count=Count("pk"),
+        admin_count=Count("pk", filter=Q(is_admin=True)),
+    )
 
     pending_invitations = None
     # Institution members can only be labor inspectors for the moment,
@@ -28,6 +33,7 @@ def member_list(request, template_name="institutions/members.html"):
     context = {
         "institution": institution,
         "members": members,
+        "members_stats": members_stats,
         "pending_invitations": pending_invitations,
     }
     return render(request, template_name, context)

@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -580,11 +581,16 @@ def members(request, template_name="companies/members.html"):
         raise PermissionDenied
 
     active_company_members = company.companymembership_set.active().select_related("user").all().order_by("joined_at")
+    active_company_members_stats = active_company_members.aggregate(
+        total_count=Count("pk"),
+        admin_count=Count("pk", filter=Q(is_admin=True)),
+    )
     pending_invitations = company.invitations.pending()
 
     context = {
         "siae": company,
         "members": active_company_members,
+        "members_stats": active_company_members_stats,
         "pending_invitations": pending_invitations,
     }
     return render(request, template_name, context)
