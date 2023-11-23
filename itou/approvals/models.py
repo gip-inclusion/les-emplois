@@ -564,6 +564,24 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 """,
                 declare=[("current_employee_record_id", "INT")],
             ),
+            pgtrigger.Trigger(
+                name="plan_pe_notification_on_date_updates",
+                when=pgtrigger.Before,
+                operation=pgtrigger.UpdateOf("start_at", "end_at"),
+                condition=pgtrigger.Q(old__end_at__df=pgtrigger.F("new__end_at"))
+                | pgtrigger.Q(old__start_at__df=pgtrigger.F("new__start_at")),
+                func=f"""
+                    -- If there is an "UPDATE" action on 'approvals_approval' table (Approval model object)
+                    -- and dates are modified then reset pe_notification_status field to PENDING status
+                    IF (TG_OP = 'UPDATE') THEN
+                        IF NEW.pe_notification_status IS DISTINCT FROM OLD.pe_notification_status THEN
+                            RAISE EXCEPTION 'Modification de pe_notification_status en même temps que les dates';
+                        END IF;
+                        NEW.pe_notification_status := '{api_enums.PEApiNotificationStatus.PENDING}';
+                    END IF;
+                    RETURN NEW;
+                """,
+            ),
         ]
 
     def __str__(self):
