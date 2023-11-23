@@ -53,6 +53,25 @@
                                             ({{ form.instance.validated_by.email }})
                                         </p>
                                     {% endif %}
+                                    {% if ai_renew_approval_display_message %}
+                                        <div class="mt-3 alert alert-info" role="status">
+                                            <div class="row">
+                                                <div class="col-auto pe-0">
+                                                    <i class="ri-information-line ri-xl text-info"></i>
+                                                </div>
+                                                <div class="col">
+                                                    <p class="mb-2">
+                                                        <strong>Information sur la régularisation des PASS IAE pour les AI :</strong>
+                                                    </p>
+                                                    <p class="mb-0">
+                                                        À titre exceptionnel, au regard du nombre important de PASS IAE arrivant à expiration d'ici la fin de l’année, il a été convenu de reporter la date de fin des PASS IAE concernés par des prolongations refusées par les prescripteurs habilités (dans une limite de 30 jours maximum), afin d’éviter la perte éventuelle des aides au poste. Dans ce cas, la date de fin du PASS sera actualisée à la date du refus par le prescripteur habilité.
+                                                        <br>
+                                                        En cas d’acceptation, la durée de prolongation demandée s’applique.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
 

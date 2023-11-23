@@ -14,7 +14,7 @@ from itou.approvals.enums import ProlongationReason
 from itou.approvals.models import Prolongation
 from itou.companies.enums import CompanyKind
 from itou.utils.widgets import DuetDatePickerWidget
-from tests.approvals.factories import ProlongationFactory
+from tests.approvals.factories import ApprovalFactory, ProlongationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
@@ -446,3 +446,56 @@ class ApprovalProlongationTest(TestCase):
 
         error_msg = parse_response_to_soup(response, selector="input#id_email + .invalid-feedback")
         assert str(error_msg) == self.snapshot(name="unknown authorized prescriber")
+
+    @freeze_time()
+    def test_ai_renew_approval_display_message(self):
+        approval = ApprovalFactory(with_jobapplication=True, end_at=timezone.localdate() + relativedelta(days=30))
+        company = approval.jobapplication_set.first().to_company
+        employer = company.active_members.first()
+
+        self.client.force_login(employer)
+        url = reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.pk})
+
+        html_message = (
+            '<p class="mb-2">'
+            "    <strong>Information sur la régularisation des PASS IAE pour les AI :</strong>"
+            "</p>"
+        )
+
+        post_data = {
+            "end_at": approval.end_at + relativedelta(days=90),
+            "reason": ProlongationReason.RQTH,
+            "email": self.prescriber.email,
+            "prescriber_organization": self.prescriber_organization.pk,
+            "report_file": self.xlsx_file,
+            "preview": "1",
+        }
+
+        # test approval prolongation for AI, with approval end_at - current date <= 30 days
+        company.kind = CompanyKind.AI
+        company.save()
+
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 200
+        assert response.context["ai_renew_approval_display_message"] is True
+        self.assertContains(response, html_message, html=True)
+
+        # test approval prolongation for AI, with approval end_at - current date > 30 days
+        approval.end_at += relativedelta(days=1)
+        approval.save()
+
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 200
+        assert response.context["ai_renew_approval_display_message"] is False
+        self.assertNotContains(response, html_message, html=True)
+
+        # test approval prolongation not for AI, with approval end_at - current date <= 30 days
+        approval.end_at = timezone.localdate() + relativedelta(days=10)
+        approval.save()
+
+        for kind in [kind for kind in CompanyKind if kind != CompanyKind.AI]:
+            company.kind = kind
+            company.save()
+            response = self.client.post(url, data=post_data)
+            assert response.status_code == 200
+            assert response.context["ai_renew_approval_display_message"] is False
