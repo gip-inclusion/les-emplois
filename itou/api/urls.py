@@ -35,7 +35,7 @@ urlpatterns = [
     path("token-auth/", ObtainAuthToken.as_view(), name="token-auth"),
     # Needed for Browsable API (dev)
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
-    path("candidatures-geiq/", GeiqJobApplicationListView.as_view(), name="geiq_jobapplication_list"),
+    path("embauches-geiq/", GeiqJobApplicationListView.as_view(), name="geiq_jobapplication_list"),
     # OpenAPI
     # See: https://www.django-rest-framework.org/topics/documenting-your-api/
     # OAS 3 YAML schema (downloadable)

@@ -4,7 +4,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries
 from rest_framework.test import APIClient
 
-from itou.api.geiq.serializers import GeiqJobApplicationSerializer
+from itou.api.geiq import serializers
 from itou.api.geiq.views import GeiqApiAnonymousUser
 from itou.api.models import CompanyApiToken
 from itou.companies.enums import CompanyKind
@@ -174,9 +174,34 @@ def test_candidatures_geiq_nominal(snapshot):
 
 
 def test_serializer_method_defaults():
-    ja = JobApplicationFactory(
-        with_geiq_eligibility_diagnosis=False,
-    )
-    serializer = GeiqJobApplicationSerializer()
+    ja = JobApplicationFactory(with_geiq_eligibility_diagnosis=False)
+    serializer = serializers.GeiqJobApplicationSerializer()
     assert serializer.get_criteres_eligibilite(ja) == []
     assert serializer.get_niveau_formation(ja) is None
+
+
+@pytest.mark.parametrize(
+    "title,outcome",
+    [("M", "H"), ("MME", "F"), ("FOO", None)],
+)
+def test_civilite_mapping(title, outcome):
+    serializer = serializers.GeiqJobApplicationSerializer()
+    ja = JobApplicationFactory.build(job_seeker__title=title)
+    assert serializer.get_civilite(ja) == outcome
+
+
+@pytest.mark.parametrize(
+    "choices_class,mapping",
+    [
+        (serializers.LabelCivilite, serializers.EMPLOIS_TO_LABEL_CIVILITE),
+        (serializers.LabelContractType, serializers.EMPLOIS_TO_LABEL_CONTRACT_TYPE),
+        (serializers.LabelDiagAuthorKind, serializers.EMPLOIS_TO_LABEL_DIAG_AUTHOR_KIND),
+        (serializers.LabelEducationLevel, serializers.ASP_TO_LABEL_EDUCATION_LEVELS),
+        (serializers.LabelEducationLevel, serializers.EMPLOIS_TO_LABEL_QUALIFICATION_LEVEL),
+        (serializers.LabelPrequalification, serializers.EMPLOIS_TO_LABEL_PREQUALIFICATION),
+        (serializers.LabelProfessionalSituationExperience, serializers.EMPLOIS_TO_LABEL_PRO_SITU_EXP),
+        (serializers.LabelQualificationType, serializers.EMPLOIS_TO_LABEL_QUALIFICATION_TYPE),
+    ],
+)
+def test_label_mappings(choices_class, mapping):
+    assert set(choices_class.values) == set(mapping.values())

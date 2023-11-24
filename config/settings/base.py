@@ -500,6 +500,8 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "Documentation de l'API **emplois.inclusion.beta.gouv.fr**",
     "VERSION": "1.0.0",
     "ENUM_NAME_OVERRIDES": {
+        "Civilite": "itou.users.enums.Title",
+        "NiveauQualificationEnum": "itou.api.geiq.serializers.LabelEducationLevel",
         "CompanyKindEnum": "itou.companies.enums.CompanyKind",
         "PrescriberOrganizationKindEnum": "itou.prescribers.enums.PrescriberOrganizationKind",
     },
