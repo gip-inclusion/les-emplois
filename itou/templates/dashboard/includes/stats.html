@@ -11,7 +11,7 @@
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Voir le suivi du cofinancement de mon ACI</span>
                         </a>
-                        <span class="badge badge-base rounded-pill bg-important my-3">Nouveau</span>
+                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                 {% endif %}
                 {% if can_view_stats_siae_etp %}
@@ -36,14 +36,14 @@
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Focus auto-prescription</span>
                         </a>
-                        <span class="badge badge-base rounded-pill bg-important my-3">Nouveau</span>
+                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_siae_follow_siae_evaluation' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Suivre le contrôle a posteriori</span>
                         </a>
-                        <span class="badge badge-base rounded-pill bg-important my-3">Nouveau</span>
+                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                 {% endif %}
                 {% if can_view_stats_cd %}
@@ -52,14 +52,14 @@
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Voir les données facilitation de l'embauche</span>
                         </a>
-                        <span class="badge badge-base rounded-pill bg-important my-3">Nouveau</span>
+                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_cd_brsa' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Suivre les prescriptions des accompagnateurs des publics bRSA</span>
                         </a>
-                        <span class="badge badge-base rounded-pill bg-important my-3">Nouveau</span>
+                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                 {% endif %}
                 {% if can_view_stats_pe %}
@@ -136,7 +136,7 @@
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Suivre les prescriptions des AHI de ma région</span>
                         </a>
-                        <span class="badge badge-base rounded-pill bg-important my-3">Nouveau</span>
+                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                 {% endif %}
                 {% if can_view_stats_ddets_log %}
@@ -165,7 +165,7 @@
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Suivre les demandes de prolongation</span>
                         </a>
-                        <span class="badge badge-base rounded-pill bg-important my-3">Nouveau</span>
+                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                     <!-- Stats temporarily suspended until we stabilize them
                         <li class="d-flex justify-content-between align-items-center mb-3">
@@ -206,7 +206,7 @@
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Suivre les demandes de prolongation</span>
                         </a>
-                        <span class="badge badge-base rounded-pill bg-important my-3">Nouveau</span>
+                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dgefp_iae' %}" class="btn-link btn-ico">
@@ -235,7 +235,7 @@
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Suivre les prescriptions des AHI</span>
                         </a>
-                        <span class="badge badge-base rounded-pill bg-important my-3">Nouveau</span>
+                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                 {% endif %}
                 {% if can_view_stats_iae_network %}
@@ -244,7 +244,7 @@
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Voir les données de candidatures des adhérents de mon réseau IAE</span>
                         </a>
-                        <span class="badge badge-base rounded-pill bg-important my-3">Nouveau</span>
+                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                 {% endif %}
                 <li class="d-flex justify-content-between align-items-center mb-3">
