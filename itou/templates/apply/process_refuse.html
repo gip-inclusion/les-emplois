@@ -24,6 +24,9 @@
    data-bs-toggle="tooltip"
    data-bs-placement="top"
    title="L'embauche empêche l'atteinte des engagements contractuels avec les parties prenantes à la convention de financement mise en place par l'État."></i>
+                                {% elif radio.data.value == RefusalReason.NO_POSITION %}
+                                    {{ radio.choice_label }}&nbsp;<i class="ri-question-fill ri-xl text-button ms-1" data-bs-toggle="tooltip" data-bs-placement="right" title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
+
                                 {% else %}
                                     {{ radio.choice_label }}
                                 {% endif %}
