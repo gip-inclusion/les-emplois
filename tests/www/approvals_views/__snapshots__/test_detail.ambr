@@ -73,10 +73,8 @@
                                   <!-- djlint:off --><!-- djlint:on -->
                                   
                                       <br/>
-                                      <small>
-                                          <a href="/approvals/suspension/1/action/edit/?back_url=/approvals/detail/1">Modifier la suspension</a>
-                                          <a class="ms-1" href="/approvals/suspension/1/action/?back_url=/approvals/detail/1">Supprimer la suspension</a>
-                                      </small>
+                                      <a class="btn btn-link ps-0" href="/approvals/suspension/1/action/edit/?back_url=/approvals/detail/1">Modifier la suspension</a>
+                                      <a class="btn btn-link" href="/approvals/suspension/1/action/?back_url=/approvals/detail/1">Supprimer la suspension</a>
                                   
                               
                           </li>
@@ -97,8 +95,8 @@
 # ---
 # name: TestApprovalDetailView.test_remove_approval_button[bouton de suppression d'un PASS IAE]
   '''
-  <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-outline-warning" href="https://tally.so/r/3je84Q?siaeID=999999&amp;nomSIAE=Aci+de+la+rochelle&amp;prenomemployeur=Milady&amp;nomemployeur=de+Winter&amp;emailemployeur=oph%40dewinter.com&amp;userID=123456&amp;numPASS=XXXXX+12+34568&amp;prenomsalarie=Doe&amp;nomsalarie=John" id="approval-deletion-link" target="_blank">
-                                          Clôturer
-                                      </a>
+  <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-block btn-outline-warning" href="https://tally.so/r/3je84Q?siaeID=999999&amp;nomSIAE=Aci+de+la+rochelle&amp;prenomemployeur=Milady&amp;nomemployeur=de+Winter&amp;emailemployeur=oph%40dewinter.com&amp;userID=123456&amp;numPASS=XXXXX+12+34568&amp;prenomsalarie=Doe&amp;nomsalarie=John" id="approval-deletion-link" target="_blank">
+                                              Clôturer
+                                          </a>
   '''
 # ---

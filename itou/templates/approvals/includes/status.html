@@ -111,10 +111,8 @@ Arguments:
                                 <!-- djlint:off -->{% call_method suspensions.last_in_progress "can_be_handled_by_siae" request.current_organization as can_be_handled %}<!-- djlint:on -->
                                 {% if can_be_handled %}
                                     <br>
-                                    <small>
-                                        <a href="{% url 'approvals:suspension_update' suspension_id=suspensions.last_in_progress.pk %}?back_url={{ request.get_full_path|urlencode }}">Modifier la suspension</a>
-                                        <a class="ms-1" href="{% url 'approvals:suspension_action_choice' suspension_id=suspensions.last_in_progress.pk %}?back_url={{ request.get_full_path|urlencode }}">Supprimer la suspension</a>
-                                    </small>
+                                    <a class="btn btn-link ps-0" href="{% url 'approvals:suspension_update' suspension_id=suspensions.last_in_progress.pk %}?back_url={{ request.get_full_path|urlencode }}">Modifier la suspension</a>
+                                    <a class="btn btn-link" href="{% url 'approvals:suspension_action_choice' suspension_id=suspensions.last_in_progress.pk %}?back_url={{ request.get_full_path|urlencode }}">Supprimer la suspension</a>
                                 {% endif %}
                             {% endif %}
                         </li>
