@@ -389,9 +389,9 @@ django-extensions==3.2.3 \
     --hash=sha256:44d27919d04e23b3f40231c4ab7af4e61ce832ef46d610cc650d53e68328410a \
     --hash=sha256:9600b7562f79a92cbf1fde6403c04fee314608fefbb595502e34383ae8203401
     # via -r requirements/dev.in
-django-filter==23.3 \
-    --hash=sha256:015fe155582e1805b40629344e4a6cf3cc40450827d294d040b4b8c1749a9fa6 \
-    --hash=sha256:65bc5d1d8f4fff3aaf74cb5da537b6620e9214fb4b3180f6c560776b1b6dccd0
+django-filter==23.4 \
+    --hash=sha256:526954f18bd7d6423f232a9a7974f58fbc6863908b9fc160de075e01adcc2a5f \
+    --hash=sha256:bed070b38359dce7d2dbe057b165d59773057986356cb809ded983b36c77a976
     # via -r requirements/test.txt
 django-formtools==2.4.1 \
     --hash=sha256:21f8d5dac737f1e636fa8a0a10969c1c32f525a6dfa27c29592827ba70d9643a \
