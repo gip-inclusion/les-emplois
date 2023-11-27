@@ -22,41 +22,36 @@
                             <strong>Étape 1/2</strong> : Choix de l'action
                         </p>
                     </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <section class="s-section">
-        <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12 col-lg-8">
-                    <div class="card c-card">
-                        <div class="card-body">
-                            <p class="card-text">
-                                <strong>Quelle action souhaitez-vous faire ?</strong>
-                            </p>
-                            <form method="post">
-                                {% csrf_token %}
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="action" id="endDateRadios" value="update_enddate" checked>
-                                    <label class="form-check-label" for="endDateRadios">
-                                        Lever la suspension pour <strong class="text-success">réintégrer ce candidat</strong>
-                                    </label>
+                    <div class="c-form">
+                        <p class="fw-bold">Quelle action souhaitez-vous faire ?</p>
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="action" id="endDateRadios" value="update-enddate" checked>
+                                <label class="form-check-label" for="endDateRadios">
+                                    Lever la suspension pour <strong class="text-success">réintégrer ce candidat</strong>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="action" id="deleteRadios" value="delete">
+                                <label class="form-check-label" for="deleteRadios">
+                                    Confirmer la <strong class="text-danger">suppression définitive</strong> de cette suspension
+                                </label>
+                            </div>
+                            <hr>
+                            <div class="form-row align-items-center gx-3">
+                                <div class="form-group col-12 col-lg order-2 order-lg-1">
+                                    <a href="{{ back_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto">
+                                        <i class="ri-arrow-go-back-line ri-lg"></i>
+                                        <span>Retour</span>
+                                    </a>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="action" id="deleteRadios" value="delete">
-                                    <label class="form-check-label" for="deleteRadios">
-                                        Confirmer la <strong class="text-danger">suppression définitive</strong> de cette suspension
-                                    </label>
-                                </div>
-                                <hr>
-                                <div class="text-end">
-                                    <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
+                                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
                                     {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary" %}
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>

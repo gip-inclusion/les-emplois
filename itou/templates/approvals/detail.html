@@ -15,38 +15,49 @@
 
                         {# Approval actions. #}
                         {% if approval and request.user.is_employer %}
-                            <div class="d-flex justify-content-between mb-3">
+                            <div class="row justify-content-end g-3">
                                 {% if approval_can_be_suspended_by_siae %}
-                                    <a href="{% url 'approvals:suspend' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                       class="btn btn-outline-primary"
-                                       aria-label="Suspendre le PASS IAE de {{ approval.user.get_full_name }}">
-                                        Suspendre
-                                    </a>
+                                    <div class="col-12 col-lg-auto">
+                                        <a href="{% url 'approvals:suspend' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
+                                           class="btn btn-block btn-outline-primary"
+                                           aria-label="Suspendre le PASS IAE de {{ approval.user.get_full_name }}">
+                                            Suspendre
+                                        </a>
+                                    </div>
                                 {% elif hire_by_other_siae %}
-                                    <span class="btn btn-link disabled text-muted">Suspendre</span>
-                                    <i class="btn btn-link ri-information-line ri-xl text-info ps-2 pe-3 font-weight-medium" data-bs-toggle="tooltip" title="La suspension n’est pas possible car un autre employeur a embauché le candidat."></i>
+                                    <div class="col-12 col-lg-auto">
+                                        <span class="btn btn-block btn-link disabled text-muted">Suspendre</span>
+                                        <i class="btn btn-link ri-information-line ri-xl text-info ps-2 pe-3 font-weight-medium" data-bs-toggle="tooltip" title="La suspension n’est pas possible car un autre employeur a embauché le candidat."></i>
+                                    </div>
                                 {% endif %}
                                 {% if approval_can_be_prolonged %}
-                                    <a href="{% url 'approvals:declare_prolongation' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                       class="btn btn-outline-primary"
-                                       aria-label="Prolonger le PASS IAE de {{ approval.user.get_full_name }}">
-                                        Prolonger
-                                    </a>
+                                    <div class="col-12 col-lg-auto">
+                                        <a href="{% url 'approvals:declare_prolongation' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
+                                           class="btn btn-block btn-outline-primary"
+                                           aria-label="Prolonger le PASS IAE de {{ approval.user.get_full_name }}">
+                                            Prolonger
+                                        </a>
+                                    </div>
                                 {% endif %}
                                 {% if approval_deletion_form_url %}
-                                    <a href="{{ approval_deletion_form_url }}" id="approval-deletion-link" class="btn btn-outline-warning" target="_blank" aria-label="Mettre fin au PASS IAE de {{ approval.user.get_full_name }}">
-                                        Clôturer
-                                    </a>
+                                    <div class="col-12 col-lg-auto">
+                                        <a href="{{ approval_deletion_form_url }}" id="approval-deletion-link" class="btn btn-block btn-outline-warning" target="_blank" aria-label="Mettre fin au PASS IAE de {{ approval.user.get_full_name }}">
+                                            Clôturer
+                                        </a>
+                                    </div>
                                 {% endif %}
-                                <a class="btn btn-primary matomo-event"
-                                   data-matomo-action="telechargement-pdf"
-                                   data-matomo-category="agrement"
-                                   data-matomo-option="detail-agrement"
-                                   href="{% url 'approvals:display_printable_approval' approval_id=approval.id %}"
-                                   target="_blank"
-                                   aria-label="Afficher le PASS IAE de {{ approval.user.get_full_name }}">
-                                    Afficher l'attestation
-                                </a>
+                                <div class="col-12 col-lg-auto">
+                                    <a class="btn btn-primary btn-block btn-ico matomo-event"
+                                       data-matomo-action="telechargement-pdf"
+                                       data-matomo-category="agrement"
+                                       data-matomo-option="detail-agrement"
+                                       href="{% url 'approvals:display_printable_approval' approval_id=approval.id %}"
+                                       target="_blank"
+                                       aria-label="Afficher le PASS IAE de {{ approval.user.get_full_name }}">
+                                        <i class="ri-eye-line ri-xl font-weight-medium" aria-hidden="true"></i>
+                                        <span>Afficher l'attestation</span>
+                                    </a>
+                                </div>
                             </div>
                         {% endif %}
                     </div>

@@ -50,13 +50,19 @@
 
                                 {% bootstrap_field form.reason_explanation %}
 
-                                <hr class="my-4">
-                                <div class="form-group">
-                                    <a class="btn btn-outline-primary" href="{{ back_url }}" aria-label="Retour à l'étape précédente">Retour</a>
-                                    {# Enable preview mode: preview=1. #}
-                                    <button type="submit" class="btn btn-primary" name="preview" value="1" aria-label="Valider la suspension du PASS IAE de {{ approval.user.get_full_name }}">
-                                        Valider la suspension
-                                    </button>
+                                <hr>
+                                <div class="form-row align-items-center gx-3">
+                                    <div class="form-group col-12 col-lg order-2 order-lg-1">
+                                        <a href="{{ back_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto">
+                                            <i class="ri-arrow-go-back-line ri-lg"></i>
+                                            <span>Retour</span>
+                                        </a>
+                                    </div>
+                                    <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                                        <button type="submit" class="btn btn-primary" name="preview" value="1" aria-label="Valider la suspension du PASS IAE de {{ approval.user.get_full_name }}">
+                                            Valider la suspension
+                                        </button>
+                                    </div>
                                 </div>
 
                             </form>
@@ -96,13 +102,19 @@
                                         En confirmant cette demande je certifie sur l'honneur que le motif de suspension choisi correspond à la situation du salarié.
                                     </p>
                                     {# Allow the user to modify the suspension: edit=1. #}
-                                    <button type="submit" class="btn btn-secondary" aria-label="Annuler la suspension du PASS IAE de {{ approval.user.get_full_name }}" name="edit" value="1">
-                                        Annuler
-                                    </button>
-                                    {# Create a suspension: save=1. #}
-                                    <button type="submit" class="btn btn-primary" aria-label="Confirmer la suspension du PASS IAE de {{ approval.user.get_full_name }}"name="save" value="1">
-                                        Confirmer la suspension
-                                    </button>
+                                    <div class="d-flex justify-content-end gap-3">
+                                        <div>
+                                            <button type="submit" class="btn btn-outline-primary" aria-label="Annuler la suspension du PASS IAE de {{ approval.user.get_full_name }}" name="edit" value="1">
+                                                Annuler
+                                            </button>
+                                        </div>
+                                        {# Create a suspension: save=1. #}
+                                        <div>
+                                            <button type="submit" class="btn btn-primary" aria-label="Confirmer la suspension du PASS IAE de {{ approval.user.get_full_name }}"name="save" value="1">
+                                                Confirmer la suspension
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
 
                             </form>
