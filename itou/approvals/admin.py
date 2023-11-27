@@ -462,8 +462,20 @@ class ProlongationCommonAdmin(ItouModelAdmin):
 
 @admin.register(models.ProlongationRequest)
 class ProlongationRequestAdmin(ProlongationCommonAdmin):
-    list_display = ProlongationCommonAdmin.list_display + ("status", "processed_at")
-    list_filter = ("status", "declared_by_siae__kind", "processed_at") + ProlongationCommonAdmin.list_filter
+    list_display = (
+        "pk",
+        "approval",
+        "created_at",
+        "start_at",
+        "end_at",
+        "declared_by",
+        "validated_by",
+        "reason",
+        "status",
+        "processed_at",
+    )
+
+    list_filter = ("status", "declared_by_siae__kind", "created_at") + ProlongationCommonAdmin.list_filter
 
     @admin.display(description="prolongation créée")
     def prolongation(self, obj):
