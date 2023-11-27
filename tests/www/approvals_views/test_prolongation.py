@@ -456,11 +456,8 @@ class ApprovalProlongationTest(TestCase):
         self.client.force_login(employer)
         url = reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.pk})
 
-        html_message = (
-            '<p class="mb-2">'
-            "    <strong>Information sur la régularisation des PASS IAE pour les AI :</strong>"
-            "</p>"
-        )
+        message_1 = "<strong>Mise à jour de la date de fin du PASS IAE :</strong>"
+        message_2 = "L'aide au poste est maintenue pendant ce délai."
 
         post_data = {
             "end_at": approval.end_at + relativedelta(days=90),
@@ -478,7 +475,8 @@ class ApprovalProlongationTest(TestCase):
         response = self.client.post(url, data=post_data)
         assert response.status_code == 200
         assert response.context["ai_renew_approval_display_message"] is True
-        self.assertContains(response, html_message, html=True)
+        self.assertContains(response, message_1, html=True)
+        self.assertContains(response, message_2)
 
         # test approval prolongation for AI, with approval end_at - current date > 30 days
         approval.end_at += relativedelta(days=1)
@@ -487,7 +485,8 @@ class ApprovalProlongationTest(TestCase):
         response = self.client.post(url, data=post_data)
         assert response.status_code == 200
         assert response.context["ai_renew_approval_display_message"] is False
-        self.assertNotContains(response, html_message, html=True)
+        self.assertNotContains(response, message_2, html=True)
+        self.assertNotContains(response, message_2)
 
         # test approval prolongation not for AI, with approval end_at - current date <= 30 days
         approval.end_at = timezone.localdate() + relativedelta(days=10)
