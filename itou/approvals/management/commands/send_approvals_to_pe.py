@@ -10,8 +10,9 @@ from itou.utils.apis import enums as api_enums
 
 
 # arbitrary value, set so that we don't run the cron for too long.
-# if the delay is set to 1 second, then this would take approximately 20 seconds
-MAX_APPROVALS_PER_RUN = 10
+# if the delay is set to 1 second, then this would take approximately 200 seconds
+# Since the cron runs every 5 minutes, it should be fine
+MAX_APPROVALS_PER_RUN = 100
 
 
 class Command(BaseCommand):

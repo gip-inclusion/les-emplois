@@ -566,6 +566,8 @@ class ApprovalsSendToPeManagementTestCase(TestCase):
     @patch.object(CancelledApproval, "notify_pole_emploi")
     @patch.object(Approval, "notify_pole_emploi")
     @patch("itou.approvals.management.commands.send_approvals_to_pe.sleep")
+    # smaller batch to ease testing
+    @patch("itou.approvals.management.commands.send_approvals_to_pe.MAX_APPROVALS_PER_RUN", 10)
     def test_invalid_job_seeker_for_pole_emploi(self, sleep_mock, notify_mock, cancelled_notify_mock):
         stdout = io.StringIO()
         # create ignored Approvals, will not even be counted in the batch. the cron will wait for
