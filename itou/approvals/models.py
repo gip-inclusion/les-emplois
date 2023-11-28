@@ -352,14 +352,14 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
     )
     user_id_national_pe = models.CharField(verbose_name="identifiant national PE", blank=True, null=True)
 
-    siae_siret = models.CharField(verbose_name="siret siae", max_length=14)
-    siae_kind = models.CharField(verbose_name="type siae", choices=companies_enums.CompanyKind.choices)
+    origin_siae_siret = models.CharField(verbose_name="siret siae", max_length=14)
+    origin_siae_kind = models.CharField(verbose_name="type siae", choices=companies_enums.CompanyKind.choices)
 
-    sender_kind = models.CharField(
+    origin_sender_kind = models.CharField(
         verbose_name="origine de la candidature",
         choices=job_application_enums.SenderKind.choices,
     )
-    prescriber_kind = models.CharField(
+    origin_prescriber_organization_kind = models.CharField(
         verbose_name="typologie prescripteur",
         choices=prescribers_enums.PrescriberOrganizationKind.choices,
     )
@@ -386,9 +386,11 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
             )
             return
 
-        type_siae = companies_enums.siae_kind_to_pe_type_siae(self.siae_kind)
+        type_siae = companies_enums.siae_kind_to_pe_type_siae(self.origin_siae_kind)
         if not type_siae:
-            self.pe_log_err("could not find PE type for siae_siret={} siae_kind={}", self.siae_siret, self.siae_kind)
+            self.pe_log_err(
+                "could not find PE type for siae_siret={} siae_kind={}", self.origin_siae_siret, self.origin_siae_kind
+            )
             self.pe_save_error(
                 None,
                 api_enums.PEApiPreliminaryCheckFailureReason.INVALID_SIAE_KIND,
@@ -432,10 +434,10 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
             self.save(update_fields=["user_id_national_pe"])
         self.pe_maj_pass(
             id_national_pe=self.user_id_national_pe,
-            siae_siret=self.siae_siret,
-            siae_kind=self.siae_kind,
-            sender_kind=self.sender_kind,
-            prescriber_kind=self.prescriber_kind,
+            siae_siret=self.origin_siae_siret,
+            siae_kind=self.origin_siae_kind,
+            sender_kind=self.origin_sender_kind,
+            prescriber_kind=self.origin_prescriber_organization_kind,
             at=at,
         )
 
@@ -623,10 +625,10 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             user_nir=self.user.nir,
             user_birthdate=self.user.birthdate,
             user_id_national_pe=self.user.jobseeker_profile.pe_obfuscated_nir,
-            siae_siret=siae_siret,
-            siae_kind=siae_kind,
-            sender_kind=sender_kind,
-            prescriber_kind=prescriber_organization_kind,
+            origin_siae_siret=siae_siret,
+            origin_siae_kind=siae_kind,
+            origin_sender_kind=sender_kind,
+            origin_prescriber_organization_kind=prescriber_organization_kind,
         ).save()
         super().delete()
 
