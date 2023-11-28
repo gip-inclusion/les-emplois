@@ -3,8 +3,8 @@
   '''
   > about to resolve first_name and last_name for count=1 users.
   > only count=1 users have the necessary data to be resolved.
-  ! could not find a match for pk=424242 first_name=Yoder last_name=Olson birthdate=1994-02-22 nir=194022734304328 error=PoleEmploiAPIBadResponse(code=R010)
-  ! no match found either for first_name=Olson last_name=Yoder exc=PoleEmploiAPIBadResponse(code=R010)
+  ! could not find a match for pk=424242 error=PoleEmploiAPIBadResponse(code=R010)
+  ! no match found either for pk=424242 when swapping last and first names exc=PoleEmploiAPIBadResponse(code=R010)
   > count=1 users have been examined.
   > count=0 users have been certified.
   > count=1 users could not be certified.
@@ -27,7 +27,7 @@
   list([
     '> about to resolve first_name and last_name for count=1 users.',
     '> only count=1 users have the necessary data to be resolved.',
-    '! could not find a match for pk=424243 first_name=Balthazar last_name=Durand birthdate=1987-06-21 nir=187062112345678 error=PoleEmploiAPIBadResponse(code=R010)',
+    '! could not find a match for pk=424243 error=PoleEmploiAPIBadResponse(code=R010)',
     '> SWAP DETECTED! user pk=424243 id_certifie=ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ',
     '> certified user pk=424243 id_certifie=ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ',
     '> count=1 users have been examined.',

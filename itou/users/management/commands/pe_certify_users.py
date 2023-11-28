@@ -77,16 +77,12 @@ class Command(BaseCommand):
             try:
                 response = pe_check_user_details(user)
             except (RequestError, PoleEmploiAPIException, PoleEmploiAPIBadResponse) as exc:
-                self.stdout.write(
-                    f"! could not find a match for pk={user.pk} first_name={user.first_name} "
-                    f"last_name={user.last_name} birthdate={user.birthdate} nir={user.nir} error={exc}"
-                )
+                self.stdout.write(f"! could not find a match for pk={user.pk} error={exc}")
                 try:
                     response2 = pe_check_user_details(user, swap=True)
                 except (RequestError, PoleEmploiAPIException, PoleEmploiAPIBadResponse) as exc:
                     self.stdout.write(
-                        f"! no match found either for first_name={user.last_name} last_name={user.first_name} "
-                        f"exc={exc}"
+                        f"! no match found either for pk={user.pk} when swapping last and first names exc={exc}"
                     )
                 else:
                     self.stdout.write(f"> SWAP DETECTED! user pk={user.pk} id_certifie={response2}")
