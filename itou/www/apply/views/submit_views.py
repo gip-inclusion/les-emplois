@@ -1461,6 +1461,7 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
 def eligibility_for_hire(request, company_pk, job_seeker_pk, template_name="apply/submit/eligibility_for_hire.html"):
     company = get_object_or_404(Company.objects.member_required(request.user), pk=company_pk)
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
+    _check_job_seeker_approval(request, job_seeker, company)
     next_url = reverse("apply:hire_confirmation", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
     bypass_eligibility_conditions = [
         # Don't perform an eligibility diagnosis is the SIAE doesn't need it,
@@ -1532,6 +1533,7 @@ def hire_confirmation(request, company_pk, job_seeker_pk, template_name="apply/s
         geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, company).first()
         eligibility_diagnosis = None
     else:
+        _check_job_seeker_approval(request, job_seeker, company)
         # General IAE eligibility case
         eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker, for_siae=company)
         geiq_eligibility_diagnosis = None
