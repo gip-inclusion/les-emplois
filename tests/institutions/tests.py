@@ -1,7 +1,11 @@
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects
 
-from tests.institutions.factories import InstitutionWith2MembershipFactory, InstitutionWithMembershipFactory
+from tests.institutions.factories import (
+    InstitutionMembershipFactory,
+    InstitutionWith2MembershipFactory,
+    InstitutionWithMembershipFactory,
+)
 from tests.users.factories import ItouStaffFactory
 from tests.utils.test import TestCase
 
@@ -22,17 +26,21 @@ class InstitutionModelTest(TestCase):
 
     def test_active_members(self):
         institution = InstitutionWith2MembershipFactory(membership2__is_active=False)
-        user_with_active_membership = institution.members.first()
-        user_with_inactive_membership = institution.members.last()
+        active_user_with_active_membership = institution.members.first()
+        active_user_with_inactive_membership = institution.members.last()
+        inactive_user_with_active_membership = InstitutionMembershipFactory(
+            institution=institution, user__is_active=False
+        )
 
-        assert user_with_inactive_membership not in institution.active_members
-        assert user_with_active_membership in institution.active_members
+        assert active_user_with_active_membership in institution.active_members
+        assert active_user_with_inactive_membership not in institution.active_members
+        assert inactive_user_with_active_membership not in institution.active_members
 
-        # Deactivate a user
-        user_with_active_membership.is_active = False
-        user_with_active_membership.save()
+        # Deactivate a membership
+        active_user_with_active_membership.is_active = False
+        active_user_with_active_membership.save()
 
-        assert user_with_active_membership not in institution.active_members
+        assert active_user_with_active_membership not in institution.active_members
 
 
 def test_deactivate_last_admin(client):

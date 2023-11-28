@@ -16,6 +16,7 @@ from itou.job_applications.models import JobApplicationWorkflow
 from tests.companies.factories import (
     CompanyAfterGracePeriodFactory,
     CompanyFactory,
+    CompanyMembershipFactory,
     CompanyPendingGracePeriodFactory,
     CompanyWith2MembershipsFactory,
     CompanyWith4MembershipsFactory,
@@ -120,17 +121,19 @@ class SiaeModelTest(TestCase):
 
     def test_active_members(self):
         company = CompanyWith2MembershipsFactory(membership2__is_active=False)
-        user_with_active_membership = company.members.first()
-        user_with_inactive_membership = company.members.last()
+        active_user_with_active_membership = company.members.first()
+        active_user_with_inactive_membership = company.members.last()
+        inactive_user_with_active_membership = CompanyMembershipFactory(company=company, user__is_active=False)
 
-        assert user_with_inactive_membership not in company.active_members
-        assert user_with_active_membership in company.active_members
+        assert active_user_with_active_membership in company.active_members
+        assert active_user_with_inactive_membership not in company.active_members
+        assert inactive_user_with_active_membership not in company.active_members
 
-        # Deactivate a user
-        user_with_active_membership.is_active = False
-        user_with_active_membership.save()
+        # Deactivate a membership
+        active_user_with_active_membership.is_active = False
+        active_user_with_active_membership.save()
 
-        assert user_with_active_membership not in company.active_members
+        assert active_user_with_active_membership not in company.active_members
 
     def test_active_admin_members(self):
         """

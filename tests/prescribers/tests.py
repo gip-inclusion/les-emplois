@@ -21,6 +21,7 @@ from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications import factories as job_applications_factories
 from tests.prescribers.factories import (
+    PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
@@ -159,17 +160,19 @@ class PrescriberOrganizationModelTest(TestCase):
 
     def test_active_members(self):
         org = PrescriberOrganizationWith2MembershipFactory(membership2__is_active=False)
-        user_with_active_membership = org.members.first()
-        user_with_inactive_membership = org.members.last()
+        active_user_with_active_membership = org.members.first()
+        active_user_with_inactive_membership = org.members.last()
+        inactive_user_with_active_membership = PrescriberMembershipFactory(organization=org, user__is_active=False)
 
-        assert user_with_inactive_membership not in org.active_members
-        assert user_with_active_membership in org.active_members
+        assert active_user_with_active_membership in org.active_members
+        assert active_user_with_inactive_membership not in org.active_members
+        assert inactive_user_with_active_membership not in org.active_members
 
-        # Deactivate a user
-        user_with_active_membership.is_active = False
-        user_with_active_membership.save()
+        # Deactivate a membership
+        active_user_with_active_membership.is_active = False
+        active_user_with_active_membership.save()
 
-        assert user_with_active_membership not in org.active_members
+        assert active_user_with_active_membership not in org.active_members
 
     def test_add_member(self):
         org = PrescriberOrganizationFactory()
