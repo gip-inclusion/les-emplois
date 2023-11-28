@@ -55,6 +55,7 @@ PUBLIC_DASHBOARDS = {
     "cartographies-iae": "tb 218 - Cartographie de l'IAE",
     "conventionnements-iae": "tb 287 - Conventionnements IAE",
     "zoom-esat": "tb 306 - Zoom sur les ESAT",
+    "analyses-conventionnements-iae": "tb 325 - Analyses autour des conventionnements IAE",
     "suivi-demandes-prolongation": "tb 336 - Suivi des prolongations",
     # Note: keep those commented for reference. They're not used anymore but if we ever
     # need to regenerate values for the Q1 2022 or before, they're going to be required.
