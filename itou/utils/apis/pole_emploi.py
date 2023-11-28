@@ -176,7 +176,7 @@ class PoleEmploiApiClient:
         Anything else (other HTTP code, or different codeSortie) means that our notification has been discarded.
         """
         params = {
-            "dateDebutPassIAE": approval.start_at.strftime(DATE_FORMAT) if approval.start_at else "",
+            "dateDebutPassIAE": approval.start_at.strftime(DATE_FORMAT),
             "dateFinPassIAE": approval.get_pe_end_at(),
             "idNational": encrypted_identifier,
             "numPassIAE": approval.number,
