@@ -58,6 +58,11 @@ from tests.utils.test import TestCase, assertMessages, parse_response_to_soup
 
 DISABLED_NIR = 'disabled id="id_nir"'
 PRIOR_ACTION_SECTION_TITLE = "Action préalable à l'embauche"
+REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE = "L’employeur a refusé la candidature avec le motif “Autre”."
+REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY = (
+    "Si les détails apportés dans le message de réponse ne vous ont pas permis d’en savoir plus,"
+    " vous pouvez contacter l’employeur."
+)
 
 
 class ProcessViewsTest(TestCase):
@@ -420,6 +425,106 @@ class ProcessViewsTest(TestCase):
         self.assertContains(response, '<h4 class="h6 mt-3">Commentaire privé de l\'employeur</h4>')
         self.assertContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
         self.assertContains(response, "<b>Motif de refus :</b> Autre (détails dans le message ci-dessous)")
+
+    def test_company_information_displayed_for_prescriber_when_refused(self, *args, **kwargs):
+        """
+        As a prescriber, the company's contact details are displayed
+        when the application is refused for the "other" reason
+        """
+
+        job_application = JobApplicationFactory(
+            to_company__with_membership=True,
+            to_company__email="refused_job_application@example.com",
+            sent_by_authorized_prescriber_organisation=True,
+            state=JobApplicationWorkflow.STATE_REFUSED,
+            answer="abc",
+            answer_to_prescriber="undisclosed",
+            refusal_reason=job_applications_enums.RefusalReason.OTHER,
+        )
+        prescriber = job_application.sender_prescriber_organization.members.first()
+        self.client.force_login(prescriber)
+        url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+
+        with self.subTest("Test without workflow logging"):
+            response = self.client.get(url)
+            self.assertTrue(response.context["display_refusal_info"])
+            self.assertIsNone(response.context["refused_by"])
+            self.assertEqual(response.context["refusal_contact_email"], "refused_job_application@example.com")
+            self.assertContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE)
+            self.assertContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY)
+
+        with self.subTest("Test with the log of the workflow to retrieve the user who refused the application"):
+            company_user = job_application.to_company.members.first()
+            job_application.logs.create(
+                transition=JobApplicationWorkflow.TRANSITION_REFUSE,
+                from_state=JobApplicationWorkflow.STATE_NEW,
+                to_state=JobApplicationWorkflow.STATE_REFUSED,
+                user=company_user,
+            )
+            url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+            response = self.client.get(url)
+            self.assertTrue(response.context["display_refusal_info"])
+            self.assertEqual(response.context["refused_by"], company_user)
+            self.assertEqual(response.context["refusal_contact_email"], company_user.email)
+            self.assertContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE)
+            self.assertContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY)
+
+        # With any other reason, the section should not be displayed
+        for refusal_reason in job_applications_enums.RefusalReason.values:
+            if refusal_reason == job_applications_enums.RefusalReason.OTHER:
+                continue
+            with self.subTest("Test all other refused reasons", refusal_reason=refusal_reason):
+                job_application.refusal_reason = refusal_reason
+                job_application.save()
+                url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+                response = self.client.get(url)
+                self.assertFalse(response.context["display_refusal_info"])
+                self.assertIsNone(response.context["refused_by"])
+                self.assertEqual(response.context["refusal_contact_email"], "")
+                self.assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE)
+                self.assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY)
+
+    def test_company_information_not_displayed_for_job_seeker_when_refused(self, *args, **kwargs):
+        """As a job seeker, I can't see the company's contact details when the application is refused"""
+
+        job_application = JobApplicationFactory(
+            to_company__with_membership=True,
+            to_company__email="refused_job_application@example.com",
+            sent_by_authorized_prescriber_organisation=True,
+            state=JobApplicationWorkflow.STATE_REFUSED,
+            answer="abc",
+            answer_to_prescriber="undisclosed",
+            refusal_reason=job_applications_enums.RefusalReason.OTHER,
+        )
+        self.client.force_login(job_application.job_seeker)
+        url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertNotIn("display_refusal_info", response.context)
+        self.assertNotIn("refused_by", response.context)
+        self.assertNotIn("refusal_contact_email", response.context)
+        self.assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE)
+        self.assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY)
+
+    def test_company_information_not_displayed_for_company_when_refused(self, *args, **kwargs):
+        """As the company's employee, I don't see my own company's contact details when the application is refused"""
+
+        job_application = JobApplicationFactory(
+            to_company__with_membership=True,
+            to_company__email="refused_job_application@example.com",
+            sent_by_authorized_prescriber_organisation=True,
+            state=JobApplicationWorkflow.STATE_REFUSED,
+            answer="abc",
+            answer_to_prescriber="undisclosed",
+            refusal_reason=job_applications_enums.RefusalReason.OTHER,
+        )
+        self.client.force_login(job_application.to_company.members.first())
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertNotIn("display_refusal_info", response.context)
+        self.assertNotIn("refused_by", response.context)
+        self.assertNotIn("refusal_contact_email", response.context)
+        self.assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE)
+        self.assertNotContains(response, REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY)
 
     def test_process(self, *args, **kwargs):
         """Ensure that the `process` transition is triggered."""

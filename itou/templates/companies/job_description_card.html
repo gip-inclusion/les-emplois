@@ -51,7 +51,7 @@
                                     <span>Postuler</span>
                                 </a>
                             {% endif %}
-                            {% include 'includes/copy_to_clipboard.html' with content=job.get_absolute_url text="Copier le lien de cette fiche" placement="bottom" css_classes="btn btn-outline-primary btn-block" %}
+                            {% include 'includes/copy_to_clipboard.html' with content=job.get_absolute_url text="Copier le lien de cette fiche" placement="bottom" css_classes="btn btn-ico btn-outline-primary btn-block" %}
                         </div>
                         <div class="c-box">
                             <span class="fs-xs lh-sm">{{ siae.kind }} - {{ siae.get_kind_display }}</span>

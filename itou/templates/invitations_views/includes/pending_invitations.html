@@ -31,7 +31,7 @@
                         <td>{{ invitation.sent_at|date:"d F Y à H:i" }}</td>
                         <td>{{ invitation.expiration_date|date:"d F Y à H:i" }}</td>
                         <td>
-                            {% include 'includes/copy_to_clipboard.html' with content=invitation.acceptance_link css_classes="btn-outline-primary btn-sm" %}
+                            {% include 'includes/copy_to_clipboard.html' with content=invitation.acceptance_link css_classes="btn btn-ico btn-outline-primary btn-sm" %}
                         </td>
                     </tr>
                 {% endfor %}
