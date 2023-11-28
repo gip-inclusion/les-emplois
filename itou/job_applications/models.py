@@ -798,6 +798,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return self.logs.select_related("user").filter(to_state=JobApplicationWorkflow.STATE_ACCEPTED).last().user
 
     @property
+    def refused_by(self):
+        if self.state.is_refused and (
+            last_log := self.logs.select_related("user").filter(to_state=JobApplicationWorkflow.STATE_REFUSED).last()
+        ):
+            return last_log.user
+
+    @property
     def can_be_cancelled(self):
         if self.origin == Origin.AI_STOCK:
             return False
@@ -829,6 +836,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.state == JobApplicationWorkflow.STATE_REFUSED
             and self.refusal_reason == RefusalReason.DEACTIVATION.value
         )
+
+    @property
+    def is_refused_for_other_reason(self):
+        return self.state.is_refused and self.refusal_reason == RefusalReason.OTHER
 
     @property
     def hiring_starts_in_future(self):

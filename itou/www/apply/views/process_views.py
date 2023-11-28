@@ -183,6 +183,14 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         .first()
     )
 
+    # Refused applications information is providen to prescribers
+    if display_refusal_info := job_application.is_refused_for_other_reason:
+        refused_by = job_application.refused_by
+        refusal_contact_email = refused_by.email if refused_by else job_application.to_company.email
+    else:
+        refused_by = None
+        refusal_contact_email = ""
+
     context = {
         "can_view_personal_information": request.user.can_view_personal_information(job_application.job_seeker),
         "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
@@ -192,6 +200,9 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         "transition_logs": transition_logs,
         "back_url": back_url,
         "matomo_custom_title": "Candidature",
+        "display_refusal_info": display_refusal_info,
+        "refused_by": refused_by,
+        "refusal_contact_email": refusal_contact_email,
     }
 
     return render(request, template_name, context)

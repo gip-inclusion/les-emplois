@@ -100,6 +100,14 @@ class JobApplicationModelTest(TestCase):
         job_application.accept(user=user)
         assert job_application.accepted_by == user
 
+    def test_refused_by(self):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+        )
+        user = job_application.to_company.members.first()
+        job_application.refuse(user=user)
+        assert job_application.refused_by == user
+
     def test_is_sent_by_authorized_prescriber(self):
         job_application = JobApplicationSentByJobSeekerFactory()
         assert not job_application.is_sent_by_authorized_prescriber
@@ -114,6 +122,21 @@ class JobApplicationModelTest(TestCase):
 
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         assert job_application.is_sent_by_authorized_prescriber
+
+    def test_is_refused_for_other_reason(self):
+        job_application = JobApplicationFactory()
+        for state, state_label in JobApplicationWorkflow.STATE_CHOICES:
+            for refusal_reason in RefusalReason.values:
+                with self.subTest(
+                    "Test state and refusal_reason permutations", state=state, refusal_reason=refusal_reason
+                ):
+                    job_application.state = state
+                    job_application.refusal_reason = refusal_reason
+
+                    if state == JobApplicationWorkflow.STATE_REFUSED and refusal_reason == RefusalReason.OTHER:
+                        assert job_application.is_refused_for_other_reason
+                    else:
+                        assert not job_application.is_refused_for_other_reason
 
     def test_can_be_archived(self):
         """
