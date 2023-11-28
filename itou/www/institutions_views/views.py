@@ -16,10 +16,7 @@ def member_list(request, template_name="institutions/members.html"):
     institution = get_current_institution_or_404(request)
 
     members = (
-        institution.institutionmembership_set.filter(is_active=True)
-        .select_related("user")
-        .all()
-        .order_by("-is_admin", "joined_at")
+        institution.institutionmembership_set.active().select_related("user").all().order_by("-is_admin", "joined_at")
     )
 
     pending_invitations = None

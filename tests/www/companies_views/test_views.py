@@ -14,6 +14,7 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEO
 from tests.cities.factories import create_city_vannes
 from tests.companies.factories import (
     CompanyFactory,
+    CompanyMembershipFactory,
     CompanyWith2MembershipsFactory,
     CompanyWithMembershipAndJobsFactory,
     JobDescriptionFactory,
@@ -1096,6 +1097,25 @@ class MembersTest(TestCase):
         url = reverse("companies_views:members")
         response = self.client.get(url)
         assert response.status_code == 200
+
+    def test_active_members(self):
+        company = CompanyFactory()
+        active_member_active_user = CompanyMembershipFactory(company=company)
+        active_member_inactive_user = CompanyMembershipFactory(company=company, user__is_active=False)
+        inactive_member_active_user = CompanyMembershipFactory(company=company, is_active=False)
+        inactive_member_inactive_user = CompanyMembershipFactory(
+            company=company, is_active=False, user__is_active=False
+        )
+
+        self.client.force_login(active_member_active_user.user)
+        url = reverse("companies_views:members")
+        response = self.client.get(url)
+        assert response.status_code == 200
+        assert len(response.context["members"]) == 1
+        assert active_member_active_user in response.context["members"]
+        assert active_member_inactive_user not in response.context["members"]
+        assert inactive_member_active_user not in response.context["members"]
+        assert inactive_member_inactive_user not in response.context["members"]
 
 
 class UserMembershipDeactivationTest(TestCase):
