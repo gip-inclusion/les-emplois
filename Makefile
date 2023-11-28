@@ -103,6 +103,14 @@ shell_on_django_container_as_root:
 shell_on_postgres_container:
 	docker exec -ti itou_postgres /bin/bash
 
+# Database.
+# =============================================================================
+
+.PHONY: restore_latest_backup
+
+restore_latest_backup:
+	./scripts/restore_latest_backup.sh $(PGDATABASE)
+
 # Deployment
 # =============================================================================
 
