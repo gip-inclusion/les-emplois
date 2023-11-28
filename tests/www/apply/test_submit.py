@@ -46,6 +46,7 @@ from tests.users.factories import (
     JobSeekerWithAddressFactory,
     PrescriberFactory,
 )
+from tests.users.test_models import user_with_approval_in_waiting_period
 from tests.utils.test import TestCase, assertMessages
 
 
@@ -236,6 +237,22 @@ class HireTest(TestCase):
             url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_pk": prescriber.pk})
             response = self.client.get(url)
             assert response.status_code == 404
+
+    def test_403_when_trying_to_hire_a_jobseeker_with_invalid_approval(self):
+        company = CompanyFactory(with_membership=True)
+        job_seeker = user_with_approval_in_waiting_period()
+        self.client.force_login(company.members.first())
+        for viewname in (
+            "apply:check_job_seeker_info_for_hire",
+            "apply:check_prev_applications_for_hire",
+            "apply:eligibility_for_hire",
+            "apply:hire_confirmation",
+        ):
+            url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+            response = self.client.get(url)
+            self.assertContains(
+                response, "Le candidat a terminé un parcours il y a moins de deux ans", status_code=403
+            )
 
 
 def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
