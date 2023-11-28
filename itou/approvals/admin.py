@@ -572,7 +572,7 @@ class CancelledApprovalAdmin(ItouModelAdmin):
         "user_last_name",
         "user_first_name",
         "user_nir",
-        "siae_siret",
+        "origin_siae_siret",
         "created_at",
     )
     search_fields = (
@@ -580,9 +580,9 @@ class CancelledApprovalAdmin(ItouModelAdmin):
         "user_first_name",
         "user_last_name",
         "user_nir",
-        "siae_siret",
+        "origin_siae_siret",
     )
-    list_filter = ("siae_kind", "sender_kind", "prescriber_kind")
+    list_filter = ("origin_siae_kind", "origin_sender_kind", "origin_prescriber_organization_kind")
 
     def has_change_permission(self, request, obj=None):
         return False

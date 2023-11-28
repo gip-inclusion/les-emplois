@@ -91,10 +91,10 @@ class CancelledApprovalFactory(factory.django.DjangoModelFactory):
     user_last_name = factory.Faker("last_name")
     user_birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
 
-    siae_kind = factory.fuzzy.FuzzyChoice(SIAE_WITH_CONVENTION_KINDS)
-    siae_siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
-    sender_kind = SenderKind.EMPLOYER
-    prescriber_kind = ""
+    origin_siae_kind = factory.fuzzy.FuzzyChoice(SIAE_WITH_CONVENTION_KINDS)
+    origin_siae_siret = factory.fuzzy.FuzzyText(length=13, chars=string.digits, prefix="1")
+    origin_sender_kind = SenderKind.EMPLOYER
+    origin_prescriber_organization_kind = ""
 
     @factory.lazy_attribute
     def user_nir(self):

@@ -374,7 +374,7 @@ class CancelledApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             200, json=API_RECHERCHE_RESULT_KNOWN
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
-        cancelled_approval = CancelledApprovalFactory(siae_kind=CompanyKind.EI)
+        cancelled_approval = CancelledApprovalFactory(origin_siae_kind=CompanyKind.EI)
         with freeze_time() as frozen_now:
             cancelled_approval.notify_pole_emploi()
         cancelled_approval.refresh_from_db()
@@ -384,7 +384,7 @@ class CancelledApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             "dateFinPassIAE": cancelled_approval.start_at.isoformat(),
             "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
             "numPassIAE": cancelled_approval.number,
-            "numSIRETsiae": cancelled_approval.siae_siret,
+            "numSIRETsiae": cancelled_approval.origin_siae_siret,
             "origineCandidature": "EMPL",
             "statutReponsePassIAE": "A",
             "typeSIAE": 838,
@@ -398,7 +398,7 @@ class CancelledApprovalNotifyPoleEmploiIntegrationTest(TestCase):
     def test_notification_accepted_with_id_national(self):
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         cancelled_approval = CancelledApprovalFactory(
-            siae_kind=CompanyKind.ACI, user_id_national_pe="ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
+            origin_siae_kind=CompanyKind.ACI, user_id_national_pe="ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
         )
         with freeze_time() as frozen_now:
             cancelled_approval.notify_pole_emploi()
@@ -409,7 +409,7 @@ class CancelledApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             "dateFinPassIAE": cancelled_approval.start_at.isoformat(),
             "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
             "numPassIAE": cancelled_approval.number,
-            "numSIRETsiae": cancelled_approval.siae_siret,
+            "numSIRETsiae": cancelled_approval.origin_siae_siret,
             "origineCandidature": "EMPL",
             "statutReponsePassIAE": "A",
             "typeSIAE": 836,
@@ -426,9 +426,9 @@ class CancelledApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         cancelled_approval = CancelledApprovalFactory(
-            siae_kind=CompanyKind.ACI,
-            sender_kind=SenderKind.PRESCRIBER,
-            prescriber_kind=PrescriberOrganizationKind.CAF,
+            origin_siae_kind=CompanyKind.ACI,
+            origin_sender_kind=SenderKind.PRESCRIBER,
+            origin_prescriber_organization_kind=PrescriberOrganizationKind.CAF,
         )
         with freeze_time() as frozen_now:
             cancelled_approval.notify_pole_emploi()
@@ -439,7 +439,7 @@ class CancelledApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             "dateFinPassIAE": cancelled_approval.start_at.isoformat(),
             "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
             "numPassIAE": cancelled_approval.number,
-            "numSIRETsiae": cancelled_approval.siae_siret,
+            "numSIRETsiae": cancelled_approval.origin_siae_siret,
             "origineCandidature": "PRES",
             "statutReponsePassIAE": "A",
             "typeSIAE": 836,
@@ -457,9 +457,9 @@ class CancelledApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         cancelled_approval = CancelledApprovalFactory(
-            siae_kind=CompanyKind.ACI,
-            sender_kind=SenderKind.PRESCRIBER,
-            prescriber_kind=PrescriberOrganizationKind.SPIP,
+            origin_siae_kind=CompanyKind.ACI,
+            origin_sender_kind=SenderKind.PRESCRIBER,
+            origin_prescriber_organization_kind=PrescriberOrganizationKind.SPIP,
         )
         with freeze_time() as frozen_now:
             cancelled_approval.notify_pole_emploi()
@@ -470,7 +470,7 @@ class CancelledApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             "dateFinPassIAE": cancelled_approval.start_at.isoformat(),
             "idNational": "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ",
             "numPassIAE": cancelled_approval.number,
-            "numSIRETsiae": cancelled_approval.siae_siret,
+            "numSIRETsiae": cancelled_approval.origin_siae_siret,
             "origineCandidature": "PRES",
             "statutReponsePassIAE": "A",
             "typeSIAE": 836,
@@ -552,7 +552,7 @@ class CancelledApprovalNotifyPoleEmploiIntegrationTest(TestCase):
             200, json=API_RECHERCHE_RESULT_KNOWN
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_ERROR)
-        cancelled_approval = CancelledApprovalFactory(siae_kind="FOO")  # unknown kind
+        cancelled_approval = CancelledApprovalFactory(origin_siae_kind="FOO")  # unknown kind
         with freeze_time() as frozen_now:
             cancelled_approval.notify_pole_emploi()
         cancelled_approval.refresh_from_db()

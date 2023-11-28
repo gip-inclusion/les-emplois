@@ -635,8 +635,8 @@ class ApprovalModelTest(TestCase):
         assert Approval.objects.first() is None
         # And the cancelled approval kept the original values (from the first application)
         cancelled_approval = CancelledApproval.objects.get()
-        assert cancelled_approval.siae_kind == CompanyKind.EI
-        assert cancelled_approval.siae_siret == origin_siae.siret
+        assert cancelled_approval.origin_siae_kind == CompanyKind.EI
+        assert cancelled_approval.origin_siae_siret == origin_siae.siret
 
     def test_deleting_an_approval_without_application_linked(self):
         job_application = JobApplicationFactory(
@@ -657,8 +657,8 @@ class ApprovalModelTest(TestCase):
         assert Approval.objects.first() is None
         # And the cancelled approval kept the original values (from the first application)
         cancelled_approval = CancelledApproval.objects.get()
-        assert cancelled_approval.siae_kind == origin_siae.kind
-        assert cancelled_approval.siae_siret == origin_siae.siret
+        assert cancelled_approval.origin_siae_kind == origin_siae.kind
+        assert cancelled_approval.origin_siae_siret == origin_siae.siret
 
     def test_date_modification_causes_notification_pending(self):
         approval = ApprovalFactory(pe_notification_status=api_enums.PEApiNotificationStatus.SUCCESS)
