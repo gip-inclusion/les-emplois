@@ -54,10 +54,7 @@ def member_list(request, template_name="prescribers/members.html"):
     organization = get_current_org_or_404(request)
 
     members = (
-        organization.prescribermembership_set.filter(is_active=True)
-        .select_related("user")
-        .all()
-        .order_by("-is_admin", "joined_at")
+        organization.prescribermembership_set.active().select_related("user").all().order_by("-is_admin", "joined_at")
     )
     pending_invitations = organization.invitations.pending()
 

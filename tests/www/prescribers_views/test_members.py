@@ -3,6 +3,8 @@ from django.urls import reverse
 
 from tests.prescribers.factories import (
     PrescriberFactory,
+    PrescriberMembershipFactory,
+    PrescriberOrganizationFactory,
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
@@ -17,6 +19,25 @@ class MembersTest(TestCase):
         url = reverse("prescribers_views:members")
         response = self.client.get(url)
         assert response.status_code == 200
+
+    def test_active_members(self):
+        organization = PrescriberOrganizationFactory()
+        active_member_active_user = PrescriberMembershipFactory(organization=organization)
+        active_member_inactive_user = PrescriberMembershipFactory(organization=organization, user__is_active=False)
+        inactive_member_active_user = PrescriberMembershipFactory(organization=organization, is_active=False)
+        inactive_member_inactive_user = PrescriberMembershipFactory(
+            organization=organization, is_active=False, user__is_active=False
+        )
+
+        self.client.force_login(active_member_active_user.user)
+        url = reverse("prescribers_views:members")
+        response = self.client.get(url)
+        assert response.status_code == 200
+        assert len(response.context["members"]) == 1
+        assert active_member_active_user in response.context["members"]
+        assert active_member_inactive_user not in response.context["members"]
+        assert inactive_member_active_user not in response.context["members"]
+        assert inactive_member_inactive_user not in response.context["members"]
 
 
 class UserMembershipDeactivationTest(TestCase):
