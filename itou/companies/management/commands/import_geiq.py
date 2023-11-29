@@ -1,8 +1,6 @@
-import warnings
-
 import numpy as np
 import pandas as pd
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 from itou.common_apps.address.departments import department_from_postcode
 from itou.companies.enums import CompanyKind
@@ -150,10 +148,13 @@ class Command(BaseCommand):
         self.stdout.write("-" * 80)
         self.stdout.write("Done.")
 
+        warning_messages = []
         if info_stats["rows_with_empty_email"] > 20:
-            warnings.warn(f"Too many missing emails: {info_stats['rows_with_empty_email']}")
+            warning_messages.append(f"Too many missing emails: {info_stats['rows_with_empty_email']}")
         if info_stats["not_created_because_of_missing_email"]:
-            warnings.warn(
+            warning_messages.append(
                 f"Structure(s) not created because of a missing email: "
                 f"{info_stats['not_created_because_of_missing_email']}"
             )
+        if warning_messages:
+            raise CommandError("\n".join(warning_messages))
