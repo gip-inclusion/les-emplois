@@ -210,14 +210,17 @@ def list_employee_records(request, template_name="employee_record/list.html"):
             data = [ja for ja in data if str(ja.job_seeker_id) in job_seekers]
 
         for item in data:
-            need_manual_regularization |= item.has_suspension or item.has_prolongation
-            need_manual_regularization |= item.job_seeker.lack_of_nir_reason == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
+            item.date_were_not_transmitted = item.has_suspension or item.has_prolongation
             item.nir_tally_params = f"?jobapplication={item.pk}"
             for e in item.employee_record.all():
+                item.date_were_not_transmitted = False
                 if e.status == Status.NEW:
                     item.employee_record_new = e
                     item.nir_tally_params = f"?employeerecord={e.pk}"
                     break
+            # Flag for the global message alert
+            need_manual_regularization |= item.date_were_not_transmitted
+            need_manual_regularization |= item.job_seeker.lack_of_nir_reason == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
 
         employee_records_list = False
     else:
