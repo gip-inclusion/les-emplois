@@ -14,7 +14,7 @@ and thus we need a proper tool to manage columns by their
 name instead of hardcoding column numbers as in `field = row[42]`.
 
 """
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
@@ -337,7 +337,10 @@ class Command(BaseCommand):
         self.check_whether_signup_is_possible_for_all_siaes()
 
         if self.fatal_errors >= 1:
-            raise RuntimeError(
+            raise CommandError(
+                "*** FATAL ERROR(S) ***"
                 "The command completed all its actions successfully but at least one fatal error needs "
                 "manual resolution, see command output"
             )
+
+        self.stdout.write("All done!")
