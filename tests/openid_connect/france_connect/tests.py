@@ -273,7 +273,8 @@ class FranceConnectTest(TestCase):
 
     @respx.mock
     def test_callback(self):
-        mock_oauth_dance(self.client)
+        # New created job seeker has no title and is redirected to complete its infos
+        mock_oauth_dance(self.client, expected_route="dashboard:edit_user_info")
         assert User.objects.count() == 1
         user = User.objects.get(email=FC_USERINFO["email"])
         assert user.first_name == FC_USERINFO["given_name"]
@@ -312,7 +313,8 @@ class FranceConnectTest(TestCase):
         When ac IC user wants to log out from his local account,
         he should be logged out too from IC.
         """
-        response = mock_oauth_dance(self.client)
+        # New created job seeker has no title and is redirected to complete its infos
+        response = mock_oauth_dance(self.client, expected_route="dashboard:edit_user_info")
         assert auth.get_user(self.client).is_authenticated
         logout_url = reverse("account_logout")
         self.assertContains(response, logout_url)

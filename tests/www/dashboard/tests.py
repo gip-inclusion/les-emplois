@@ -732,6 +732,19 @@ class DashboardViewTest(TestCase):
             f"&source={settings.ITOU_ENVIRONMENT}",
         )
 
+    def test_job_seeker_without_title_redirected(self):
+        user = JobSeekerFactory(title="")
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertRedirects(response, reverse("dashboard:edit_user_info"))
+
+        user.title = Title.M
+        user.save(update_fields=("title",))
+
+        response = self.client.get(reverse("dashboard:index"))
+        assert response.status_code == 200
+
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class EditUserInfoViewTest(InclusionConnectBaseTestCase):

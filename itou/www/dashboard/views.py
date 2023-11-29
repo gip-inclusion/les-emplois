@@ -178,6 +178,10 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 context["active_campaigns"].append(campaign)
             else:
                 context["closed_campaigns"].append(campaign)
+    elif request.user.is_job_seeker:
+        # Force the job seeker to fill its title to use the site
+        if not request.user.title:
+            return HttpResponseRedirect(reverse("dashboard:edit_user_info"))
 
     return render(request, template_name, context)
 
