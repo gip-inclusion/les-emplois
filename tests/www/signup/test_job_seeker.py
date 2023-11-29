@@ -299,7 +299,8 @@ class JobSeekerSignupTest(TestCase):
         fc_url = reverse("france_connect:authorize")
         self.assertContains(response, fc_url)
 
-        mock_oauth_dance(self.client)
+        # New created job seeker has no title and is redirected to complete its infos
+        mock_oauth_dance(self.client, expected_route="dashboard:edit_user_info")
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
         assert nir == job_seeker.nir
         assert job_seeker.has_jobseeker_profile
@@ -324,7 +325,8 @@ class JobSeekerSignupTest(TestCase):
         fc_url = reverse("france_connect:authorize")
         self.assertContains(response, fc_url)
 
-        mock_oauth_dance(self.client)
+        # New created job seeker has no title and is redirected to complete its infos
+        mock_oauth_dance(self.client, expected_route="dashboard:edit_user_info")
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
         assert not job_seeker.nir
         assert job_seeker.has_jobseeker_profile

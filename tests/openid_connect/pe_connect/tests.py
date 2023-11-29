@@ -241,7 +241,8 @@ class TestPoleEmploiConnect:
     @pytest.mark.django_db(transaction=True)
     @respx.mock
     def test_callback(self, client):
-        response = mock_oauth_dance(client)
+        # New created job seeker has no title and is redirected to complete its infos
+        mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
         user = User.objects.get()
         assert user.email == PEAMU_USERINFO["email"]
         assert user.first_name == PEAMU_USERINFO["given_name"]
@@ -252,13 +253,12 @@ class TestPoleEmploiConnect:
         assert user.nir == ""
         assert user.birthdate == datetime.date(2000, 1, 1)
         assert user.externaldataimport_set.pe_sources().get().status == ExternalDataImport.STATUS_OK
-        assertRedirects(response, reverse("dashboard:index"))
 
         user.birthdate = datetime.date(2001, 1, 1)
         user.save()
 
         # Don't call import_user_pe_data on second login (and don't update user data)
-        response = mock_oauth_dance(client)
+        mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
         assert user.externaldataimport_set.pe_sources().count() == 1
         assert user.birthdate == datetime.date(2001, 1, 1)
 
@@ -284,7 +284,8 @@ class TestPoleEmploiConnect:
         assert global_constants.ITOU_SESSION_NIR_KEY in list(client.session.keys())
         assert client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
 
-        mock_oauth_dance(client)
+        # New created job seeker has no title and is redirected to complete its infos
+        mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
         user = User.objects.get()
         assert user.email == PEAMU_USERINFO["email"]
         assert user.nir == nir
@@ -319,7 +320,8 @@ class TestPoleEmploiConnect:
         When ac IC user wants to log out from his local account,
         he should be logged out too from IC.
         """
-        response = mock_oauth_dance(client)
+        # New created job seeker has no title and is redirected to complete its infos
+        response = mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
         assert auth.get_user(client).is_authenticated
         logout_url = reverse("account_logout")
         assertContains(response, logout_url)
