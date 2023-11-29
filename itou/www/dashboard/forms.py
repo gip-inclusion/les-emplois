@@ -60,6 +60,7 @@ class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, 
         ]
         help_texts = {
             "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978",
+            "phone": "L'ajout du numéro de téléphone permet à l'employeur de vous contacter plus facilement.",
         }
 
     def __init__(self, *args, **kwargs):
