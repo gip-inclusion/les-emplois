@@ -100,24 +100,6 @@ class ModelTest(TestCase):
         prescribermembership = PrescriberMembershipFactory(user=prescriber, organization__is_authorized=True)
         assert prescriber.is_prescriber_of_authorized_organization(prescribermembership.organization_id)
 
-    def test_is_orienter(self):
-        job_seeker = JobSeekerFactory()
-        assert job_seeker.is_orienter is False
-
-        employer = EmployerFactory()
-        assert employer.is_orienter is False
-
-        label_inspector = LaborInspectorFactory()
-        assert label_inspector.is_orienter is False
-
-        # PrescriberFactory create the simplest form of prescriber: an orienter
-        orienter = PrescriberFactory()
-        assert orienter.is_orienter is True
-
-        # PrescriberFactory does not create a prescriber organization
-        prescriber = PrescriberOrganizationWithMembershipFactory()
-        assert prescriber.members.first().is_orienter is True
-
     def test_generate_unique_username(self):
         unique_username = User.generate_unique_username()
         assert unique_username == uuid.UUID(unique_username, version=4).hex

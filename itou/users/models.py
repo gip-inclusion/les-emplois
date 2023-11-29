@@ -396,12 +396,6 @@ class User(AbstractUser, AddressMixin):
         return self.kind == UserKind.PRESCRIBER
 
     @property
-    def is_orienter(self):
-        # Covers both "orienteur" (unauthorized prescriber)
-        # and "orienteur solo" (unauthorized prescriber without organization)
-        return self.is_prescriber and not self.is_prescriber_with_authorized_org
-
-    @property
     def is_employer(self):
         return self.kind == UserKind.EMPLOYER
 
