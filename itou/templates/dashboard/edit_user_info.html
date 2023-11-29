@@ -25,6 +25,33 @@
                 <div class="col-12 col-lg-8">
                     <div class="c-form">
                         <h2>Informations personnelles</h2>
+                        {% if request.user.is_job_seeker and not request.user.title %}
+                            <div id="missing-infos-warning" class="alert alert-warning" role="status">
+                                <div class="row">
+                                    <div class="col-auto pe-0">
+                                        <i class="ri-information-line ri-xl text-warning"></i>
+                                    </div>
+                                    <div class="col">
+                                        <p class="mb-2">
+                                            <strong>Informations manquantes</strong>
+                                        </p>
+                                        <p>Une ou plusieurs informations de votre profil sont nécessaires pour utiliser votre espace candidat.</p>
+                                        <p class="mb-0">
+                                            Les champs suivants ne sont pas renseignés :
+                                            <ul>
+                                                {% for field in form %}
+                                                    {% if field.field.required and not field.value or field.name == 'phone' and not field.value %}
+                                                        <li>
+                                                            <strong>{{ field.label }}</strong>
+                                                        </li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </ul>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                         {% if request.user.is_job_seeker %}
                             {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url=prev_url submit_label="Enregistrer et quitter" %}
                         {% else %}
