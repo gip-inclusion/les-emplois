@@ -43,6 +43,7 @@ class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, 
         model = User
         fields = [
             "email",
+            "title",
             "first_name",
             "last_name",
             "nir",
@@ -66,6 +67,7 @@ class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, 
         super().__init__(*args, **kwargs)
         assert self.instance.is_job_seeker, self.instance
 
+        self.fields["title"].required = True
         self.fields["birthdate"].required = True
         self.fields["birthdate"].widget = DuetDatePickerWidget(
             attrs={

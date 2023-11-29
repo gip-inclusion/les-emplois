@@ -753,6 +753,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
 
         post_data = {
             "email": "bob@saintclar.net",
+            "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
@@ -779,6 +780,30 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         # Ensure that the job seeker cannot edit email here.
         assert user.email != post_data["email"]
 
+    def test_edit_title_required(self):
+        user = JobSeekerFactory()
+        self.client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+        response = self.client.get(url)
+        post_data = {
+            "email": user.email,
+            "title": "",
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "birthdate": "20/12/1978",
+            "phone": user.phone,
+            "lack_of_pole_emploi_id_reason": user.lack_of_pole_emploi_id_reason,
+            "address_line_1": "10, rue du Gué",
+            "address_line_2": "Sous l'escalier",
+            "post_code": "35400",
+            "city": "Saint-Malo",
+            "lack_of_nir": False,
+            "nir": user.nir,
+        }
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 200
+        assert response.context["form"].errors.get("title") == ["Ce champ est obligatoire."]
+
     def test_edit_with_lack_of_nir_reason(self):
         user = JobSeekerFactory(nir="", lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER)
         self.client.force_login(user)
@@ -792,6 +817,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         NEW_NIR = "1 970 13625838386"
         post_data = {
             "email": "bob@saintclar.net",
+            "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
@@ -823,6 +849,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         NEW_NIR = "1 970 13625838386"
         post_data = {
             "email": "bob@saintclar.net",
+            "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
@@ -856,6 +883,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
 
         post_data = {
             "email": "bob@saintclar.net",
+            "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
@@ -981,6 +1009,7 @@ class EditJobSeekerInfo(TestCase):
 
         post_data = {
             "email": "bob@saintclar.net",
+            "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
@@ -1041,6 +1070,7 @@ class EditJobSeekerInfo(TestCase):
         NEW_NIR = "1 970 13625838386"
         post_data = {
             "email": "bob@saintclar.net",
+            "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
@@ -1085,6 +1115,7 @@ class EditJobSeekerInfo(TestCase):
 
         post_data = {
             "email": "bob@saintclar.net",
+            "title": "M",
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "birthdate": "20/12/1978",
@@ -1226,6 +1257,7 @@ class EditJobSeekerInfo(TestCase):
         self.assertContains(response, "Adresse électronique")
 
         post_data = {
+            "title": "M",
             "email": new_email,
             "birthdate": "20/12/1978",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
@@ -1276,6 +1308,7 @@ class EditJobSeekerInfo(TestCase):
         self.assertNotContains(response, "Adresse électronique")
 
         post_data = {
+            "title": "M",
             "email": new_email,
             "birthdate": "20/12/1978",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
@@ -1318,6 +1351,7 @@ class EditJobSeekerInfo(TestCase):
         self.client.force_login(user)
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
         post_data = {
+            "title": "M",
             "email": user.email,
             "birthdate": "20/12/1978",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
