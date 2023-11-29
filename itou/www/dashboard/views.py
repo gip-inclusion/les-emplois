@@ -25,7 +25,6 @@ from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.openid_connect.inclusion_connect import constants as ic_constants
-from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
@@ -188,8 +187,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "closed_campaigns": closed_campaigns,
         "evaluated_siae_notifications": evaluated_siae_notifications,
         "siae_suspension_text_with_dates": siae_suspension_text_with_dates,
-        "precriber_kind_pe": PrescriberOrganizationKind.PE,
-        "precriber_kind_dept": PrescriberOrganizationKind.DEPT,
         "show_dora_banner": (
             any([request.user.is_employer, request.user.is_prescriber])
             and current_org
