@@ -12,6 +12,7 @@ from itou.utils.templatetags import format_filters
 from tests.approvals import factories as approvals_factories
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.employee_record import factories as employee_record_factories
+from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase
 
@@ -110,12 +111,36 @@ class ListEmployeeRecordsTest(TestCase):
 
         response = self.client.get(self.url + "?status=NEW")
 
+        # Global message alert
         self.assertContains(response, "Une action de votre part est nécessaire")
         self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salarié")
+        # Item message alert
         self.assertContains(
             response, "Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure."
         )
         self.assertContains(response, "Mettre à jour")
+        self.assertNotContains(response, "Désactiver la fiche salarié")
+        self.assertNotContains(response, "Compléter la fiche salarié")
+
+    def test_existing_employee_records_with_a_suspension_does_not_show_need_to_be_updated_message(self):
+        self.client.force_login(self.user)
+        EmployeeRecordFactory(job_application=self.job_application)
+        approvals_factories.SuspensionFactory(
+            approval=self.job_application.approval, siae=self.job_application.to_company
+        )
+
+        response = self.client.get(self.url + "?status=NEW")
+
+        # Global message alert
+        self.assertNotContains(response, "Une action de votre part est nécessaire")
+        self.assertNotContains(response, "Attention, nous avons détecté une ou plusieurs fiches salarié")
+        # Item message alert
+        self.assertNotContains(
+            response, "Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure."
+        )
+        self.assertNotContains(response, "Mettre à jour")
+        self.assertContains(response, "Désactiver la fiche salarié")
+        self.assertContains(response, "Compléter la fiche salarié")
 
     def test_employee_records_with_a_prolongation_need_to_be_updated(self):
         self.client.force_login(self.user)
@@ -126,12 +151,37 @@ class ListEmployeeRecordsTest(TestCase):
 
         response = self.client.get(self.url + "?status=NEW")
 
+        # Global message alert
         self.assertContains(response, "Une action de votre part est nécessaire")
         self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salarié")
+        # Item message alert
         self.assertContains(
             response, "Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure."
         )
         self.assertContains(response, "Mettre à jour")
+        self.assertNotContains(response, "Désactiver la fiche salarié")
+        self.assertNotContains(response, "Compléter la fiche salarié")
+
+    def test_existing_employee_records_with_a_prolongation_does_not_show_need_to_be_updated_message(self):
+        self.client.force_login(self.user)
+        EmployeeRecordFactory(job_application=self.job_application)
+        approvals_factories.ProlongationFactory(
+            approval=self.job_application.approval,
+            declared_by_siae=self.job_application.to_company,
+        )
+
+        response = self.client.get(self.url + "?status=NEW")
+
+        # Global message alert
+        self.assertNotContains(response, "Une action de votre part est nécessaire")
+        self.assertNotContains(response, "Attention, nous avons détecté une ou plusieurs fiches salarié")
+        # Item message alert
+        self.assertNotContains(
+            response, "Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure."
+        )
+        self.assertNotContains(response, "Mettre à jour")
+        self.assertContains(response, "Désactiver la fiche salarié")
+        self.assertContains(response, "Compléter la fiche salarié")
 
     def test_employee_record_to_disable(self):
         self.client.force_login(self.user)
