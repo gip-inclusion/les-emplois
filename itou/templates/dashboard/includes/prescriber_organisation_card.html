@@ -34,7 +34,7 @@
                         <span>Gérer les collaborateurs</span>
                     </a>
                 </li>
-                {% if request.current_organization.kind == precriber_kind_dept and request.is_current_organization_admin %}
+                {% if request.current_organization.kind == PrescriberOrganizationKind.DEPT and request.is_current_organization_admin %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'prescribers_views:list_accredited_organizations' %}" class="btn-link btn-ico">
                             <i class="ri-list-unordered ri-lg ri-lg font-weight-normal"></i>
