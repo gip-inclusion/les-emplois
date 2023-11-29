@@ -28,7 +28,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import Sanctions
-from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, UserKind
+from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.models import InclusiveDateRange
@@ -57,7 +57,13 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import (
+    DEFAULT_PASSWORD,
+    EmployerFactory,
+    JobSeekerFactory,
+    JobSeekerWithAddressFactory,
+    PrescriberFactory,
+)
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 
 
@@ -727,6 +733,7 @@ class DashboardViewTest(TestCase):
         )
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class EditUserInfoViewTest(InclusionConnectBaseTestCase):
     def setUp(self):
         super().setUp()
@@ -909,6 +916,39 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         assert user.last_name != post_data["last_name"]
         assert user.birthdate.strftime("%d/%m/%Y") != post_data["birthdate"]
         assert user.email != post_data["email"]
+
+    def test_edit_without_title(self):
+        MISSING_INFOS_WARNING_ID = "missing-infos-warning"
+        user = JobSeekerWithAddressFactory(title="", phone="", address_line_1="")
+        self.client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+
+        # No phone and no title and no address
+        response = self.client.get(url)
+        warning_text = parse_response_to_soup(response, selector=f"#{MISSING_INFOS_WARNING_ID}")
+        assert str(warning_text) == self.snapshot(name="missing title warning with phone and address")
+
+        # Phone but no title and no birthdate
+        user.phone = "0123456789"
+        user.address_line_1 = "123 rue de"
+        user.birthdate = None
+        user.save(
+            update_fields=(
+                "address_line_1",
+                "birthdate",
+                "phone",
+            )
+        )
+        response = self.client.get(url)
+        warning_text = parse_response_to_soup(response, selector=f"#{MISSING_INFOS_WARNING_ID}")
+        assert str(warning_text) == self.snapshot(name="missing title warning without phone and with birthdate")
+
+        # No phone but title
+        user.phone = ""
+        user.title = Title.MME
+        user.save(update_fields=("phone", "title"))
+        response = self.client.get(url)
+        self.assertNotContains(response, MISSING_INFOS_WARNING_ID)
 
     def test_edit_as_prescriber(self):
         user = PrescriberFactory()

@@ -1,4 +1,134 @@
 # serializer version: 1
+# name: EditUserInfoViewTest.test_edit_without_title[missing title warning with phone and address]
+  '''
+  <div class="alert alert-warning" id="missing-infos-warning" role="status">
+                                  <div class="row">
+                                      <div class="col-auto pe-0">
+                                          <i class="ri-information-line ri-xl text-warning"></i>
+                                      </div>
+                                      <div class="col">
+                                          <p class="mb-2">
+                                              <strong>Informations manquantes</strong>
+                                          </p>
+                                          <p>Une ou plusieurs informations de votre profil sont nécessaires pour utiliser votre espace candidat.</p>
+                                          <p class="mb-0">
+                                              Les champs suivants ne sont pas renseignés :
+                                              </p><ul>
+                                                  
+                                                      
+                                                  
+                                                      
+                                                          <li>
+                                                              <strong>Civilité</strong>
+                                                          </li>
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                          <li>
+                                                              <strong>Téléphone</strong>
+                                                          </li>
+                                                      
+                                                  
+                                                      
+                                                          <li>
+                                                              <strong>Adresse</strong>
+                                                          </li>
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                              </ul>
+                                          <p></p>
+                                      </div>
+                                  </div>
+                              </div>
+  '''
+# ---
+# name: EditUserInfoViewTest.test_edit_without_title[missing title warning without phone and with birthdate]
+  '''
+  <div class="alert alert-warning" id="missing-infos-warning" role="status">
+                                  <div class="row">
+                                      <div class="col-auto pe-0">
+                                          <i class="ri-information-line ri-xl text-warning"></i>
+                                      </div>
+                                      <div class="col">
+                                          <p class="mb-2">
+                                              <strong>Informations manquantes</strong>
+                                          </p>
+                                          <p>Une ou plusieurs informations de votre profil sont nécessaires pour utiliser votre espace candidat.</p>
+                                          <p class="mb-0">
+                                              Les champs suivants ne sont pas renseignés :
+                                              </p><ul>
+                                                  
+                                                      
+                                                  
+                                                      
+                                                          <li>
+                                                              <strong>Civilité</strong>
+                                                          </li>
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                          <li>
+                                                              <strong>Date de naissance</strong>
+                                                          </li>
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                                      
+                                                  
+                                              </ul>
+                                          <p></p>
+                                      </div>
+                                  </div>
+                              </div>
+  '''
+# ---
 # name: test_alert_message_for_ai_stock_prolongation[AI]
   '''
   <div class="alert alert-info" id="AIStockProlongationAlert">
