@@ -33,7 +33,6 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
-from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
 from itou.www.dashboard.forms import (
     EditJobSeekerInfoForm,
@@ -142,9 +141,14 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
     if request.user.is_employer:
         context.update(_employer_dashboard_context(request))
     elif request.user.is_prescriber:
-        try:
-            current_org = get_current_org_or_404(request)
-        except Http404:
+        if current_org := request.current_organization:
+            context["show_dora_banner"] = current_org.department in SHOW_DORA_DEPARTMENTS
+            if current_org.is_authorized:
+                context["pending_prolongation_requests"] = ProlongationRequest.objects.filter(
+                    prescriber_organization=current_org,
+                    status=ProlongationRequestStatus.PENDING,
+                ).count()
+        else:
             # User is a prescriber without organization (orienter)
             if request.user.is_prescriber_with_org:
                 # Prescriber can be removed from an organization while logged-in
@@ -174,13 +178,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                         f"vous pouvez ignorer ce message."
                     ),
                 )
-        else:
-            context["show_dora_banner"] = current_org.department in SHOW_DORA_DEPARTMENTS
-            if current_org.is_authorized:
-                context["pending_prolongation_requests"] = ProlongationRequest.objects.filter(
-                    prescriber_organization=current_org,
-                    status=ProlongationRequestStatus.PENDING,
-                ).count()
     elif request.user.is_labor_inspector:
         current_org = get_current_institution_or_404(request)
         for campaign in EvaluationCampaign.objects.for_institution(current_org).viewable():
