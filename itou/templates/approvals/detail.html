@@ -41,7 +41,12 @@
                                 {% endif %}
                                 {% if approval_deletion_form_url %}
                                     <div class="col-12 col-lg-auto">
-                                        <a href="{{ approval_deletion_form_url }}" id="approval-deletion-link" class="btn btn-block btn-outline-warning" target="_blank" aria-label="Mettre fin au PASS IAE de {{ approval.user.get_full_name }}">
+                                        <a href="{{ approval_deletion_form_url }}"
+                                           id="approval-deletion-link"
+                                           class="btn btn-block btn-outline-warning"
+                                           target="_blank"
+                                           rel="noopener"
+                                           aria-label="Mettre fin au PASS IAE de {{ approval.user.get_full_name }}">
                                             Clôturer
                                         </a>
                                     </div>
@@ -53,6 +58,7 @@
                                        data-matomo-option="detail-agrement"
                                        href="{% url 'approvals:display_printable_approval' approval_id=approval.id %}"
                                        target="_blank"
+                                       rel="noopener"
                                        aria-label="Afficher le PASS IAE de {{ approval.user.get_full_name }}">
                                         <i class="ri-eye-line ri-xl font-weight-medium" aria-hidden="true"></i>
                                         <span>Afficher l'attestation</span>

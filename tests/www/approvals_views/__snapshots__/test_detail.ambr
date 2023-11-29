@@ -95,7 +95,7 @@
 # ---
 # name: TestApprovalDetailView.test_remove_approval_button[bouton de suppression d'un PASS IAE]
   '''
-  <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-block btn-outline-warning" href="https://tally.so/r/3je84Q?siaeID=999999&amp;nomSIAE=Aci+de+la+rochelle&amp;prenomemployeur=Milady&amp;nomemployeur=de+Winter&amp;emailemployeur=oph%40dewinter.com&amp;userID=123456&amp;numPASS=XXXXX+12+34568&amp;prenomsalarie=Doe&amp;nomsalarie=John" id="approval-deletion-link" target="_blank">
+  <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-block btn-outline-warning" href="https://tally.so/r/3je84Q?siaeID=999999&amp;nomSIAE=Aci+de+la+rochelle&amp;prenomemployeur=Milady&amp;nomemployeur=de+Winter&amp;emailemployeur=oph%40dewinter.com&amp;userID=123456&amp;numPASS=XXXXX+12+34568&amp;prenomsalarie=Doe&amp;nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
                                               Clôturer
                                           </a>
   '''
