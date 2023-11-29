@@ -44,26 +44,36 @@ from itou.www.dashboard.forms import (
 from itou.www.stats import utils as stats_utils
 
 
-@login_required
-def dashboard(request, template_name="dashboard/dashboard.html"):
-    can_show_financial_annexes = False
-    can_show_employee_records = False
-    job_applications_categories = []
-    num_rejected_employee_records = 0
-    pending_prolongation_requests = None
-    active_campaigns = []
-    closed_campaigns = []
-    evaluated_siae_notifications = EvaluatedSiae.objects.none()
-    siae_suspension_text_with_dates = None
+SHOW_DORA_DEPARTMENTS = ["26", "30", "74", "91"]
 
-    # `current_org` can be a Siae, a PrescriberOrganization or an Institution.
-    current_org = None
 
-    if request.user.is_employer:
-        current_org = get_current_company_or_404(request)
-        can_show_financial_annexes = current_org.convention_can_be_accessed_by(request.user)
-        can_show_employee_records = current_org.can_use_employee_record
-        active_campaigns = (
+def _employer_dashboard_context(request):
+    current_org = get_current_company_or_404(request)
+    states_to_process = [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_PROCESSING]
+    if current_org.can_have_prior_action:
+        states_to_process.append(JobApplicationWorkflow.STATE_PRIOR_TO_HIRE)
+
+    job_applications_categories = [
+        {
+            "name": "À traiter",
+            "states": states_to_process,
+            "icon": "ri-notification-4-line",
+            "badge": "bg-info-lighter",
+        },
+        {
+            "name": "En attente",
+            "states": [JobApplicationWorkflow.STATE_POSTPONED],
+            "icon": "ri-time-line",
+            "badge": "bg-info-lighter",
+        },
+    ]
+    job_applications = current_org.job_applications_received.values("state").all()
+    for category in job_applications_categories:
+        category["counter"] = len([ja for ja in job_applications if ja["state"] in category["states"]])
+        category["url"] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
+
+    return {
+        "active_campaigns": (
             EvaluatedSiae.objects.for_company(current_org)
             .in_progress()
             .select_related("evaluation_campaign")
@@ -71,8 +81,11 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 "evaluated_job_applications",
                 "evaluated_job_applications__evaluated_administrative_criteria",
             )
-        )
-        evaluated_siae_notifications = (
+        ),
+        "can_create_siae_antenna": request.user.can_create_siae_antenna(parent_siae=current_org),
+        "can_show_employee_records": current_org.can_use_employee_record,
+        "can_show_financial_annexes": current_org.convention_can_be_accessed_by(request.user),
+        "evaluated_siae_notifications": (
             EvaluatedSiae.objects.for_company(current_org)
             .exclude(notified_at=None)
             .filter(
@@ -80,41 +93,55 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 | Q(evaluation_campaign__ended_at__gte=timezone.now() - CAMPAIGN_VIEWABLE_DURATION)
             )
             .select_related("evaluation_campaign")
-        )
-
-        states_to_process = [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_PROCESSING]
-        if current_org.can_have_prior_action:
-            states_to_process.append(JobApplicationWorkflow.STATE_PRIOR_TO_HIRE)
-
-        job_applications_categories = [
-            {
-                "name": "À traiter",
-                "states": states_to_process,
-                "icon": "ri-notification-4-line",
-                "badge": "bg-info-lighter",
-            },
-            {
-                "name": "En attente",
-                "states": [JobApplicationWorkflow.STATE_POSTPONED],
-                "icon": "ri-time-line",
-                "badge": "bg-info-lighter",
-            },
-        ]
-        job_applications = current_org.job_applications_received.values("state").all()
-        for category in job_applications_categories:
-            category["counter"] = len([ja for ja in job_applications if ja["state"] in category["states"]])
-            category[
-                "url"
-            ] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
-
-        num_rejected_employee_records = (
+        ),
+        "job_applications_categories": job_applications_categories,
+        "num_rejected_employee_records": (
             EmployeeRecord.objects.for_company(current_org).filter(status=Status.REJECTED).count()
-        )
-        if current_org.is_subject_to_eligibility_rules:
+        ),
+        "show_dora_banner": current_org.department in SHOW_DORA_DEPARTMENTS,
+        "siae_suspension_text_with_dates": (
+            current_org.get_active_suspension_text_with_dates()
             # Otherwise they cannot be suspended
-            siae_suspension_text_with_dates = current_org.get_active_suspension_text_with_dates()
+            if current_org.is_subject_to_eligibility_rules
+            else None
+        ),
+        "states_to_process": states_to_process,
+    }
 
-    if request.user.is_prescriber:
+
+@login_required
+def dashboard(request, template_name="dashboard/dashboard.html"):
+    context = {
+        "active_campaigns": [],
+        "closed_campaigns": [],
+        "job_applications_categories": [],
+        # FIXME(vperron): I think there's a rising need for a revamped permission system.
+        "can_create_siae_antenna": False,
+        "can_show_financial_annexes": False,
+        "can_show_employee_records": False,
+        "can_view_stats_dashboard_widget": stats_utils.can_view_stats_dashboard_widget(request),
+        "can_view_stats_siae": stats_utils.can_view_stats_siae(request),
+        "can_view_stats_siae_aci": stats_utils.can_view_stats_siae_aci(request),
+        "can_view_stats_siae_etp": stats_utils.can_view_stats_siae_etp(request),
+        "can_view_stats_cd": stats_utils.can_view_stats_cd(request),
+        "can_view_stats_pe": stats_utils.can_view_stats_pe(request),
+        "can_view_stats_ddets_iae": stats_utils.can_view_stats_ddets_iae(request),
+        "can_view_stats_ddets_log": stats_utils.can_view_stats_ddets_log(request),
+        "can_view_stats_dreets_iae": stats_utils.can_view_stats_dreets_iae(request),
+        "can_view_stats_dgefp": stats_utils.can_view_stats_dgefp(request),
+        "can_view_stats_dihal": stats_utils.can_view_stats_dihal(request),
+        "can_view_stats_drihl": stats_utils.can_view_stats_drihl(request),
+        "can_view_stats_iae_network": stats_utils.can_view_stats_iae_network(request),
+        "num_rejected_employee_records": 0,
+        "pending_prolongation_requests": None,
+        "evaluated_siae_notifications": EvaluatedSiae.objects.none(),
+        "show_dora_banner": False,
+        "siae_suspension_text_with_dates": None,
+    }
+
+    if request.user.is_employer:
+        context.update(_employer_dashboard_context(request))
+    elif request.user.is_prescriber:
         try:
             current_org = get_current_org_or_404(request)
         except Http404:
@@ -148,51 +175,19 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                     ),
                 )
         else:
+            context["show_dora_banner"] = current_org.department in SHOW_DORA_DEPARTMENTS
             if current_org.is_authorized:
-                pending_prolongation_requests = ProlongationRequest.objects.filter(
+                context["pending_prolongation_requests"] = ProlongationRequest.objects.filter(
                     prescriber_organization=current_org,
                     status=ProlongationRequestStatus.PENDING,
                 ).count()
-
-    if request.user.is_labor_inspector:
+    elif request.user.is_labor_inspector:
         current_org = get_current_institution_or_404(request)
         for campaign in EvaluationCampaign.objects.for_institution(current_org).viewable():
             if campaign.ended_at is None:
-                active_campaigns.append(campaign)
+                context["active_campaigns"].append(campaign)
             else:
-                closed_campaigns.append(campaign)
-
-    context = {
-        "job_applications_categories": job_applications_categories,
-        # FIXME(vperron): I think there's a rising need for a revamped permission system.
-        "can_create_siae_antenna": request.user.can_create_siae_antenna(parent_siae=current_org),
-        "can_show_financial_annexes": can_show_financial_annexes,
-        "can_show_employee_records": can_show_employee_records,
-        "can_view_stats_dashboard_widget": stats_utils.can_view_stats_dashboard_widget(request),
-        "can_view_stats_siae": stats_utils.can_view_stats_siae(request),
-        "can_view_stats_siae_aci": stats_utils.can_view_stats_siae_aci(request),
-        "can_view_stats_siae_etp": stats_utils.can_view_stats_siae_etp(request),
-        "can_view_stats_cd": stats_utils.can_view_stats_cd(request),
-        "can_view_stats_pe": stats_utils.can_view_stats_pe(request),
-        "can_view_stats_ddets_iae": stats_utils.can_view_stats_ddets_iae(request),
-        "can_view_stats_ddets_log": stats_utils.can_view_stats_ddets_log(request),
-        "can_view_stats_dreets_iae": stats_utils.can_view_stats_dreets_iae(request),
-        "can_view_stats_dgefp": stats_utils.can_view_stats_dgefp(request),
-        "can_view_stats_dihal": stats_utils.can_view_stats_dihal(request),
-        "can_view_stats_drihl": stats_utils.can_view_stats_drihl(request),
-        "can_view_stats_iae_network": stats_utils.can_view_stats_iae_network(request),
-        "num_rejected_employee_records": num_rejected_employee_records,
-        "pending_prolongation_requests": pending_prolongation_requests,
-        "active_campaigns": active_campaigns,
-        "closed_campaigns": closed_campaigns,
-        "evaluated_siae_notifications": evaluated_siae_notifications,
-        "siae_suspension_text_with_dates": siae_suspension_text_with_dates,
-        "show_dora_banner": (
-            any([request.user.is_employer, request.user.is_prescriber])
-            and current_org
-            and current_org.department in ["91", "26", "74", "30"]
-        ),
-    }
+                context["closed_campaigns"].append(campaign)
 
     return render(request, template_name, context)
 
