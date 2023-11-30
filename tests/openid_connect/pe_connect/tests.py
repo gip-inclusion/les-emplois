@@ -270,6 +270,13 @@ class TestPoleEmploiConnect:
         assert not User.objects.exists()
 
     @respx.mock
+    def test_callback_other_missing_data(self, client):
+        user_info = PEAMU_USERINFO.copy()
+        del user_info["given_name"]
+        mock_oauth_dance(client, user_info=user_info, expected_route="search:employers_home")
+        assert not User.objects.exists()
+
+    @respx.mock
     def test_callback_with_nir(self, client):
         # Complete signup with NIR is tested in JobSeekerSignupTest.test_job_seeker_nir
         nir = "141068078200557"
