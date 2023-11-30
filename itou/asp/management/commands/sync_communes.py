@@ -1,8 +1,10 @@
 import csv
+import json
 from datetime import datetime
 
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.management.base import BaseCommand
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import transaction
 from django.db.models import F, Q
 from django.db.models.deletion import RestrictedError
@@ -96,7 +98,8 @@ class Command(BaseCommand):
                 self.stdout.write(f"{item.label}\n")
             elif item.kind == DiffItemKind.DELETION:
                 communes_removed_by_csv.add(item.db_obj.pk)
-                self.stdout.write(f"{item.label} code={item.db_obj.code} start_date={item.db_obj.start_date}\n")
+                data = {key: getattr(item.db_obj, key) for key in ("code", "name", "start_date", "end_date")}
+                self.stdout.write(f"\tREMOVED {json.dumps(data, ensure_ascii=False, cls=DjangoJSONEncoder)}")
 
         if wet_run:
             with transaction.atomic():
