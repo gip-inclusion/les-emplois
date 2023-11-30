@@ -193,6 +193,23 @@
     <div class="row">
         <div class="col-12 col-lg-8">
             {% bootstrap_field form.resume %}
+            {% if request.user.is_prescriber or request.user.is_job_seeker %}
+                <div class="c-info p-3 mb-4">
+                    {% if request.user.is_prescriber %}
+                        <p class="font-weight-bold fs-sm mb-1">Ce candidat n’a pas encore de CV ?</p>
+                        <p class="fs-sm mb-2">Accompagnez-le dans la création de son CV grâce à notre partenaire Diagoriente.</p>
+                    {% else %}
+                        <p class="font-weight-bold fs-sm mb-1">Vous n’avez pas de CV ?</p>
+                        <p class="fs-sm mb-2">Créez-en un grâce à notre partenaire Diagoriente.</p>
+                    {% endif %}
+                    <a href="https://diagoriente.beta.gouv.fr"
+                       rel="noopener"
+                       target="_blank"
+                       aria-label="Créer un CV avec Diagoriente (ouverture dans un nouvel onglet)"
+                       class="btn btn-partner btn-partner--diagoriente fs-sm"
+                       {% matomo_event "partners" "clic" "open_diagoriente" %}>Créer un CV avec Diagoriente</a>
+                </div>
+            {% endif %}
             {% if resume_is_recommended %}
                 <div class="alert alert-warning">
                     <div class="row">

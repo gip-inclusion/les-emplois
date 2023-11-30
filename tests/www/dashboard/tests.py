@@ -584,6 +584,36 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, "Référencer vos services")
         self.assertContains(response, "Suggérer un service partenaire")
 
+    def test_diagoriente_info_is_shown_in_sidebar_for_job_seeker(self):
+        user = JobSeekerFactory()
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, "Vous n’avez pas encore de CV ?")
+        self.assertContains(response, "Créez-en un grâce à notre partenaire Diagoriente.")
+        self.assertContains(response, "https://diagoriente.beta.gouv.fr")
+
+    def test_diagoriente_card_is_not_shown_for_job_seeker(self):
+        user = JobSeekerFactory()
+        self.client.force_login(user)
+
+        with self.assertTemplateNotUsed("dashboard/includes/diagoriente_card.html"):
+            self.client.get(reverse("dashboard:index"))
+
+    def test_diagoriente_card_is_shown_for_employer(self):
+        company = CompanyFactory(with_membership=True)
+        self.client.force_login(company.members.first())
+
+        with self.assertTemplateUsed("dashboard/includes/diagoriente_card.html"):
+            self.client.get(reverse("dashboard:index"))
+
+    def test_diagoriente_card_is_shown_for_prescriber(self):
+        prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory()
+        self.client.force_login(prescriber_organization.members.first())
+
+        with self.assertTemplateUsed("dashboard/includes/diagoriente_card.html"):
+            self.client.get(reverse("dashboard:index"))
+
     def test_dora_banner_is_not_shown_for_job_seeker(self):
         user = JobSeekerFactory()
         self.client.force_login(user)

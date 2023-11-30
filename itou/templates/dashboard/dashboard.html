@@ -331,6 +331,7 @@
 
                     {% if user.is_employer or user.is_prescriber %}
                         {% include "dashboard/includes/dora_card.html" with siret=request.current_organization.siret|default:"" tracker="utm_source=LesEmplois&utm_medium=blocLesEmplois&utm_campaign=dashboard" only %}
+                        {% include "dashboard/includes/diagoriente_card.html" %}
                     {% endif %}
                 </div>
             {% endif %}
