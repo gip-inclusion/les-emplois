@@ -7,7 +7,7 @@
     '\tADDED {"code": "37200", "name": "RIVARENNES", "start_date": "1900-01-01", "end_date": "1999-12-31"}',
     '\tADDED {"code": "41016", "name": "BILLY", "start_date": "1942-01-01", "end_date": "1999-12-31"}',
     '\tREMOVED BILLY code=41016 start_date=1900-01-01',
-    '> successfully deleted count=1 communes insee_codes=[76027]',
+    '> successfully deleted count=1 communes',
     '> successfully updated count=2 communes',
     '> successfully created count=3 new communes',
     '> REALIGN birth_place for code=41016 name=BILLY at=1990-01-01 found with new_name=BILLY and start_date=1942-01-01',
@@ -102,14 +102,14 @@
     '\tREMOVED MORANGIS code=91432 start_date=1968-01-01',
     '\tREMOVED MORANGIS code=91432 start_date=2000-01-01',
     '\tREMOVED CAPESTERRE-DE-MARIE-GALANT code=97108 start_date=1900-01-01',
-    '> successfully deleted count=50 communes insee_codes=[4521, 4522, 5883, 5884, 8709, 8710, 9216, 30394, 30395, 33842, 33843, 48057, 48058, 48273, 48274, 48391, 48392, 51887, 51888, 52499, 52500, 52589, 52590, 52965, 52966, 55184, 55185, 57089, 57090, 57705, 57706, 59177, 59178, 65739, 65740, 70768, 70769, 70840, 70841, 71481, 71482, 72190, 72191, 72619, 72620, 73122, 73123, 75231, 75232, 76017]',
+    '> successfully deleted count=50 communes',
     '> successfully updated count=0 communes',
     '> successfully created count=35 new communes',
   ])
 # ---
 # name: test_sync_commune[with_cities]
   list([
-    '> successfully deleted count=0 communes insee_codes=[]',
+    '> successfully deleted count=0 communes',
     '> successfully updated count=0 communes',
     '> successfully created count=0 new communes',
   ])
