@@ -23,51 +23,46 @@
             </div>
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    <div class="card my-4">
-                        <div class="card-body">
-                            <h2>Informations personnelles</h2>
-                            <hr class="my-4">
-                            <div class="c-form">
-                                {% if request.user.is_job_seeker %}
-                                    {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url=prev_url submit_label="Enregistrer et quitter" %}
+                    <div class="c-form">
+                        <h2>Informations personnelles</h2>
+                        {% if request.user.is_job_seeker %}
+                            {% include "dashboard/includes/edit_job_seeker_info_form.html" with prev_url=prev_url submit_label="Enregistrer et quitter" %}
+                        {% else %}
+                            <form method="post" class="js-prevent-multiple-submit">
+                                {% csrf_token %}
+                                {% if ic_account_url %}
+                                    <div>
+                                        Prénom : <strong>{{ user.first_name|title }}</strong>
+                                        <br>
+                                        Nom : <strong>{{ user.last_name|upper }}</strong>
+                                        <br>
+                                        Adresse e-mail : <strong>{{ user.email }}</strong>
+                                    </div>
+                                    <a class="btn btn-outline-primary btn-ico btn-sm mt-2" href="{{ ic_account_url }}">
+                                        <i class="ri-pencil-line me-2"></i>Modifier ces informations
+                                    </a>
+                                    <hr class="my-4">
+                                    {% bootstrap_form_errors form type="all" %}
                                 {% else %}
-                                    <form method="post" class="js-prevent-multiple-submit">
-                                        {% csrf_token %}
-                                        {% if ic_account_url %}
-                                            <div>
-                                                Prénom : <strong>{{ user.first_name|title }}</strong>
-                                                <br>
-                                                Nom : <strong>{{ user.last_name|upper }}</strong>
-                                                <br>
-                                                Adresse e-mail : <strong>{{ user.email }}</strong>
-                                            </div>
-                                            <a class="btn btn-outline-primary btn-ico btn-sm mt-2" href="{{ ic_account_url }}">
-                                                <i class="ri-pencil-line me-2"></i>Modifier ces informations
-                                            </a>
-                                            <hr class="my-4">
-                                            {% bootstrap_form_errors form type="all" %}
-                                        {% else %}
-                                            {% bootstrap_form_errors form type="all" %}
-                                            {% bootstrap_field form.first_name %}
-                                            {% bootstrap_field form.last_name %}
-                                        {% endif %}
-                                        {% bootstrap_field form.phone %}
-                                        {% bootstrap_field form.address_line_1 %}
-                                        {% bootstrap_field form.address_line_2 %}
-                                        <div class="row">
-                                            <div class="col-3">{% bootstrap_field form.post_code %}</div>
-                                            <div class="col-9">{% bootstrap_field form.city %}</div>
-                                        </div>
-
-                                        <hr class="my-4">
-                                        <div class="form-group text-end">
-                                            <a class="btn btn-link" href="{{ prev_url }}">Annuler</a>
-                                            {% bootstrap_button "Enregistrer et quitter" button_type="submit" button_class="btn btn-primary" %}
-                                        </div>
-                                    </form>
+                                    {% bootstrap_form_errors form type="all" %}
+                                    {% bootstrap_field form.first_name %}
+                                    {% bootstrap_field form.last_name %}
                                 {% endif %}
-                            </div>
-                        </div>
+                                {% bootstrap_field form.phone %}
+                                {% bootstrap_field form.address_line_1 %}
+                                {% bootstrap_field form.address_line_2 %}
+                                <div class="row">
+                                    <div class="col-3">{% bootstrap_field form.post_code %}</div>
+                                    <div class="col-9">{% bootstrap_field form.city %}</div>
+                                </div>
+
+                                <hr class="my-4">
+                                <div class="form-group text-end">
+                                    <a class="btn btn-link" href="{{ prev_url }}">Annuler</a>
+                                    {% bootstrap_button "Enregistrer et quitter" button_type="submit" button_class="btn btn-primary" %}
+                                </div>
+                            </form>
+                        {% endif %}
                     </div>
                 </div>
             </div>
