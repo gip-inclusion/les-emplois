@@ -834,6 +834,7 @@ pytest==7.4.3 \
     #   -r requirements/test.in
     #   pytest-django
     #   pytest-mock
+    #   pytest-randomly
     #   pytest-subtests
     #   pytest-timeout
     #   pytest-xdist
@@ -845,6 +846,10 @@ pytest-django==4.7.0 \
 pytest-mock==3.12.0 \
     --hash=sha256:0972719a7263072da3a21c7f4773069bcc7486027d7e8e1f81d98a47e701bc4f \
     --hash=sha256:31a40f038c22cad32287bb43932054451ff5583ff094bca6f675df2f8bc1a6e9
+    # via -r requirements/test.in
+pytest-randomly==3.15.0 \
+    --hash=sha256:0516f4344b29f4e9cdae8bce31c4aeebf59d0b9ef05927c33354ff3859eeeca6 \
+    --hash=sha256:b908529648667ba5e54723088edd6f82252f540cc340d748d1fa985539687047
     # via -r requirements/test.in
 pytest-subtests==0.11.0 \
     --hash=sha256:453389984952eec85ab0ce0c4f026337153df79587048271c7fd0f49119c07e4 \
