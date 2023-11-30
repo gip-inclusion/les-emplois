@@ -1,25 +1,31 @@
 {% load format_filters %}
 
-<hr>
-<ul class="list-unstyled">
+<hr class="my-3">
+<ul class="list-unstyled lh-sm {% if is_sm %}fs-sm{% endif %}">
     {% if siae.email %}
-        <li>
-            <i class="ri-mail-line ri-xl me-2"></i>
-            <a aria-label="Contact par mail" href="mailto:{{ siae.email }}" class="font-weight-bold">{{ siae.email }}</a>
+        <li class="{% if is_sm %}mb-1{% else %}mb-2{% endif %}">
+            <a aria-label="Contact par mail" href="mailto:{{ siae.email }}" class="btn-link btn-ico">
+                <i class="ri-mail-line font-weight-normal"></i>
+                <span>{{ siae.email }}</span>
+            </a>
         </li>
     {% endif %}
 
     {% if siae.phone %}
-        <li>
-            <i class="ri-phone-line ri-xl me-2"></i>
-            <a aria-label="Contact téléphonique" href="tel:{{ siae.phone|cut:" " }}" class="font-weight-bold">{{ siae.phone|format_phone }}</a>
+        <li class="{% if is_sm %}mb-1{% else %}mb-2{% endif %}">
+            <a aria-label="Contact téléphonique" href="tel:{{ siae.phone|cut:" " }}" class="btn-link btn-ico">
+                <i class="ri-phone-line font-weight-normal"></i>
+                <span>{{ siae.phone|format_phone }}</span>
+            </a>
         </li>
     {% endif %}
 
     {% if siae.website %}
-        <li>
-            <i class="ri-global-line ri-xl me-2"></i>
-            <a aria-label="Site web (ouverture dans un nouvel onglet)" href="{{ siae.website }}" rel="noopener" target="_blank" class="font-weight-bold">{{ siae.website }}</a>
+        <li class="{% if is_sm %}mb-1{% else %}mb-2{% endif %}">
+            <a aria-label="Site web (ouverture dans un nouvel onglet)" href="{{ siae.website }}" rel="noopener" target="_blank" class="btn-link btn-ico">
+                <i class="ri-global-line font-weight-normal"></i>
+                <span>{{ siae.website }}</span>
+            </a>
         </li>
     {% endif %}
 </ul>

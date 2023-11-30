@@ -264,7 +264,6 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
 
         post_data = {
             "appellation": "11076",  # Must be a non existing one for the company
-            "custom_name": "custom_name",
             "location": self.paris_city.pk,
             "hours_per_week": 35,
             "contract_type": ContractType.OTHER.value,
@@ -301,7 +300,6 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         # Step 3: preview and validation
         response = self.client.get(self.edit_preview_url)
 
-        self.assertContains(response, "custom_name")
         self.assertContains(response, "description")
         self.assertContains(response, "profile_description")
         self.assertContains(response, "Curriculum Vitae")
@@ -335,7 +333,6 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         post_data = {
             "appellation": "11076",  # Must be a non existing one for the company
             "market_context_description": "Whatever market description",
-            "custom_name": "custom_name",
             "location": self.paris_city.pk,
             "hours_per_week": 35,
             "contract_type": ContractType.OTHER.value,
@@ -373,7 +370,6 @@ class EditJobDescriptionViewTest(JobDescriptionAbstractTest):
         # Step 3: preview and validation
         response = self.client.get(self.edit_preview_url)
 
-        self.assertContains(response, "custom_name")
         self.assertContains(response, "description")
         self.assertContains(response, "profile_description")
         self.assertContains(response, "Whatever market description")

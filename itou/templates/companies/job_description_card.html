@@ -11,64 +11,100 @@
     {% include "layout/breadcrumbs_from_dashboard.html" %}
 {% endblock %}
 
-{% block content_title %}<h1>Description du poste</h1>{% endblock %}
+{% block content_title %}
+    <h1>{{ job.display_name }}</h1>
+    {% if job.is_active %}
+        <span class="badge rounded-pill bg-success">
+            {{ job.open_positions }} poste{{ job.open_positions|pluralizefr }} ouvert{{ job.open_positions|pluralizefr }} au recrutement
+        </span>
+    {% endif %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
-                <div class="col-12 col-lg-8">
-                    <div class="c-box">
-                        {% include "companies/includes/_job_description_details.html" %}
-                        <hr>
-                        <div>
-                            {% if can_update_job_description %}
-                                <div class="form-row align-items-center gx-3 mb-4">
-                                    <div class="form-group col-12 col-lg order-2 order-lg-1">
-                                        <a href="{% url "companies_views:job_description_list" %}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retour vers la liste des postes">
-                                            <i class="ri-arrow-go-back-line ri-lg"></i>
-                                            <span>Retour</span>
-                                        </a>
-                                    </div>
-                                    <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                                        <a href="{% url "companies_views:update_job_description" job_description_id=job.pk %}" class="btn btn-primary btn-block" aria-label="Modifier la fiche de poste">
-                                            Modifier
-                                        </a>
-                                    </div>
-                                </div>
-                            {% else %}
-                                <div class="row mb-4">
-                                    <div class="col">
-                                        {% include 'includes/copy_to_clipboard.html' with content=job.get_absolute_url text="Copier le lien de cette fiche métier" css_classes="btn-outline-primary btn-sm" %}
-                                    </div>
-                                    {% if job.is_active and not siae.block_job_applications %}
-                                        <div class="col-auto text-end">
-                                            <a href="{% url "apply:start" company_pk=siae.pk %}?job_description_id={{ job.pk }}"
-                                               class="btn btn-sm btn-primary"
-                                               {% matomo_event "candidature" "clic" "start_application" %}
-                                               aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
-                                                Postuler
-                                            </a>
-                                        </div>
-                                    {% endif %}
-                                </div>
-
-                                {% if others_active_jobs and not siae.block_job_applications %}
-                                    <hr>
-                                    <h2>
-                                        Consulter le{{ others_active_jobs|pluralizefr }} recrutement{{ others_active_jobs|pluralizefr }} en cours dans cette structure
-                                    </h2>
-                                    <ul class="list-group list-group-flush mb-4">
-                                        {% for other_job in others_active_jobs %}
-                                            {% include "companies/includes/_list_siae_actives_jobs_row.html" with job=other_job %}
-                                        {% endfor %}
-                                    </ul>
-                                {% endif %}
-                            {% endif %}
+                <div class="col-12 col-lg-8 order-2 order-lg-1 mt-3 mt-lg-0">
+                    <div class="c-box">{% include "companies/includes/_job_description_details.html" %}</div>
+                </div>
+                <div class="col-12 col-lg-4 order-1 order-lg-2 d-flex flex-column">
+                    <h2 class="visually-hidden">Actions rapides</h2>
+                    {% if can_update_job_description %}
+                        <div class="c-box mb-3 mb-lg-5">
+                            <a href="{% url "companies_views:update_job_description" job_description_id=job.pk %}" class="btn btn-primary btn-block btn-ico" aria-label="Modifier la fiche de poste">
+                                <i class="ri-pencil-line ri-lg"></i>
+                                <span>Modifier</span>
+                            </a>
+                            <a href="{% url "companies_views:job_description_list" %}" class="btn btn-outline-primary btn-block btn-ico mt-3">
+                                <i class="ri-arrow-go-back-line ri-lg"></i>
+                                <span>Retour vers la liste des postes</span>
+                            </a>
                         </div>
-                    </div>
+                    {% else %}
+                        <div class="c-box mb-3 mb-lg-5">
+                            {% if job.is_active and not siae.block_job_applications %}
+                                <a href="{% url "apply:start" company_pk=siae.pk %}?job_description_id={{ job.pk }}"
+                                   class="btn btn-primary btn-block btn-ico mb-3"
+                                   {% matomo_event "candidature" "clic" "start_application" %}
+                                   aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                                    <i class="ri-draft-line ri-lg"></i>
+                                    <span>Postuler</span>
+                                </a>
+                            {% endif %}
+                            {% include 'includes/copy_to_clipboard.html' with content=job.get_absolute_url text="Copier le lien de cette fiche" css_classes="btn btn-outline-primary btn-block" %}
+                        </div>
+                        <div class="c-box">
+                            <span class="fs-xs lh-sm">{{ siae.kind }} - {{ siae.get_kind_display }}</span>
+                            <h2 class="h3 mb-2">{{ siae.display_name }}</h2>
+                            <div class="d-flex fs-sm lh-sm text-secondary">
+                                <i class="ri-map-pin-2-line me-2"></i>
+                                <address class="m-0">{{ siae.address_on_one_line }}</address>
+                            </div>
+                            {% if siae.email or siae.phone or siae.website %}
+                                {% include "companies/includes/_siae_details.html" with is_sm=True %}
+                            {% endif %}
+                            <a href="{% url 'companies_views:card' siae_id=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}" class="btn btn-secondary btn-ico btn-block mt-2">
+                                <i class="ri-eye-line"></i>
+                                <span>Voir la fiche de l'entreprise</span>
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </section>
+
+    {% if others_active_jobs and not siae.block_job_applications %}
+        <section class="s-tabs-01 mt-0 pt-0">
+            <div class="s-tabs-01__container container">
+                <div class="s-tabs-01__row row">
+                    <div class="s-tabs-01__col col-12">
+                        <h2 class="visually-hidden" id="metiers-title">Métiers de la structure</h2>
+                        <ul class="s-tabs-01__nav nav nav-tabs" role="tablist" aria-labelledby="metiers-title">
+                            <li class="nav-item" role="presentation">
+                                <a id="recrutements-en-cours-tab" class="nav-link active" role="tab" href="#recrutements-en-cours" data-bs-toggle="tab" aria-selected="true" aria-controls="recrutements-en-cours">
+                                    Recrutement{{ others_active_jobs|pluralizefr }} en cours dans cette structure <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">{{ others_active_jobs_descriptions|length }}</span>
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="recrutements-en-cours" class="tab-pane fade active show" aria-labelledby="recrutements-en-cours-tab" role="tabpanel">
+                                {% if other_jobs_descriptions %}
+                                    <ul class="list-group list-group-flush list-group-link">
+                                        {% for other_job in others_active_jobs %}
+                                            {% include "companies/includes/_list_siae_actives_jobs_row.html" with job=other_job %}
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p>Pour le moment, il n’y a aucun recrutement en cours dans cette structure.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+
 {% endblock %}
