@@ -1,46 +1,42 @@
 {% load str_filters %}
 
-{% include "companies/includes/_siae_info.html" %}
-
-{% if job.is_active %}
-    <p class="badge rounded-pill bg-success mb-4">
-        {{ job.open_positions }} poste{{ job.open_positions|pluralizefr }} ouvert{{ job.open_positions|pluralizefr }} au recrutement
-    </p>
-{% endif %}
-
-<h2 class="mb-4">{{ job.display_name }}</h2>
-
-<div class="mb-4">
+<h3>Informations générales</h3>
+<ul class="list-unstyled mb-5">
     {% if job.display_contract_type %}
-        <span class="badge rounded-pill bg-emploi-light text-primary">{{ job.display_contract_type }}</span>
+        <li class="d-flex align-items-center mb-2">
+            <i class="ri-file-list-3-line me-1"></i>
+            {{ job.display_contract_type }}
+        </li>
     {% endif %}
     {% if job.hours_per_week %}
-        <span class="badge rounded-pill bg-emploi-light text-primary">{{ job.hours_per_week }}h / semaine</span>
+        <li class="d-flex align-items-center mb-2">
+            <i class="ri-time-line me-1"></i>
+            {{ job.hours_per_week }}h / semaine
+        </li>
     {% endif %}
-</div>
-
-<p class="text-secondary font-weight-bold">
-    <i class="ri-map-pin-line ri-lg"></i>
-    {{ job.display_location }}
-</p>
-
-<hr>
+    <li class="d-flex align-items-center mb-2">
+        <i class="ri-map-pin-line me-1"></i>
+        {{ job.display_location }}
+    </li>
+</ul>
 
 {% if siae.is_opcs %}
+    <hr>
     <h3>Contexte du marché</h3>
-    <div class="mb-4">{{ job.market_context_description|linebreaks }}</div>
+    <div class="mb-5">{{ job.market_context_description|linebreaks }}</div>
 {% endif %}
 
 {% with no_content_message="La structure n'a pas encore renseigné cette rubrique" %}
+    <hr>
     <h3>Description du poste</h3>
-    <div class="mb-4">{{ job.description|default:no_content_message|linebreaks }}</div>
-
+    <div class="mb-5">{{ job.description|default:no_content_message|linebreaks }}</div>
+    <hr>
     <h3>Profil recherché et prérequis</h3>
-    <div class="mb-4">{{ job.profile_description|default:no_content_message|linebreaks }}</div>
+    <div class="mb-5">{{ job.profile_description|default:no_content_message|linebreaks }}</div>
 {% endwith %}
 
 {% if job.is_resume_mandatory %}
-    <div class="alert alert-warning mb-4">
+    <div class="alert alert-warning mb-3">
         <div class="row">
             <div class="col-auto pe-0">
                 <i class="ri-file-list-3-line ri-xl text-warning"></i>
@@ -55,7 +51,7 @@
 {% endif %}
 
 {% if siae.is_opcs and job.is_qpv_mandatory %}
-    <div class="alert alert-warning mb-4">
+    <div class="alert alert-warning mb-3">
         <div class="row">
             <div class="col-auto pe-0">
                 <i class="ri-information-line ri-xl text-warning"></i>
@@ -70,8 +66,4 @@
             </div>
         </div>
     </div>
-{% endif %}
-
-{% if siae.email or siae.phone or siae.website %}
-    {% include "companies/includes/_siae_details.html" %}
 {% endif %}

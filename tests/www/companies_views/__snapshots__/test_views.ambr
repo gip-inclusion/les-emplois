@@ -33,7 +33,7 @@
                               <div class="s-title-01__col col-12">
                                   
       <h1>Acme inc.</h1>
-      <h2 class="h5">Entreprise d'insertion</h2>
+      <h2>Entreprise d'insertion</h2>
   
                               </div>
                           </div>
@@ -74,29 +74,30 @@
                           
                           
                       </div>
-                      <div class="c-box flex-grow-1">
-                          <h2 class="h3">Coordonnées</h2>
-                          <ul class="list-unstyled mb-0">
-                              <li class="my-2">
-                                  <div class="d-flex align-items-start">
-                                      <i class="ri-map-pin-2-line ri-xl me-2"></i>
-                                      <address class="font-weight-bold m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
-                                  </div>
-                              </li>
+                      <div class="c-box">
+                          <h3 class="mb-2">Coordonnées</h3>
+                          <div class="d-flex text-secondary fs-sm">
+                              <i class="ri-map-pin-2-line me-2"></i>
+                              <address class="m-0 lh-sm">112 rue de la Croix-Nivert, 75015 Paris</address>
+                          </div>
+                          <hr class="my-3"/>
+                          <ul class="fs-sm list-unstyled mb-0">
                               
-                                  <li class="my-2">
-                                      <i class="ri-mail-line ri-xl me-2"></i>
-                                      <a aria-label="Contact par mail" class="font-weight-bold" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
+                                  <li>
+                                      <a aria-label="Contact par mail" class="btn-link btn-ico" href="mailto:contact@acmeinc.com">
+                                          <i class="ri-mail-line font-weight-normal"></i>
+                                          <span>contact@acmeinc.com</span>
+                                      </a>
                                   </li>
                               
-  
                               
-                                  <li class="my-2">
-                                      <i class="ri-phone-line ri-xl me-2"></i>
-                                      <a aria-label="Contact téléphonique" class="font-weight-bold" href="tel:0612345678">06 12 34 56 78</a>
+                                  <li>
+                                      <a aria-label="Contact téléphonique" class="btn-link btn-ico" href="tel:0612345678">
+                                          <i class="ri-phone-line font-weight-normal"></i>
+                                          <span>06 12 34 56 78</span>
+                                      </a>
                                   </li>
                               
-  
                               
                           </ul>
                       </div>

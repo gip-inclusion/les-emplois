@@ -8,7 +8,7 @@
 
 {% block content_title %}
     <h1>{{ siae.display_name }}</h1>
-    <h2 class="h5">{{ siae.get_kind_display }}</h2>
+    <h2>{{ siae.get_kind_display }}</h2>
 {% endblock %}
 
 {% block content %}
@@ -52,7 +52,7 @@
                         {% if not siae.has_active_members %}
                             <p class="mb-0">Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne.</p>
                         {% elif not siae.block_job_applications %}
-                            <a class="btn btn-primary btn-block btn-ico justify-content-center"
+                            <a class="btn btn-primary btn-block btn-ico"
                                href="{% url 'apply:start' company_pk=siae.pk %}"
                                {% matomo_event "candidature" "clic" "start_application" %}
                                aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
@@ -61,39 +61,42 @@
                             </a>
                         {% endif %}
                         {% if active_jobs_descriptions or other_jobs_descriptions %}
-                            <a href="#metiers" class="btn btn-outline-primary btn-block btn-ico mt-3 justify-content-center">
+                            <a href="#metiers" class="btn btn-outline-primary btn-block btn-ico mt-3">
                                 <i class="ri-eye-line"></i>
                                 <span>Voir les métiers</span>
                             </a>
                         {% endif %}
                     </div>
-                    <div class="c-box flex-grow-1">
-                        <h2 class="h3">Coordonnées</h2>
-                        <ul class="list-unstyled mb-0">
-                            <li class="my-2">
-                                <div class="d-flex align-items-start">
-                                    <i class="ri-map-pin-2-line ri-xl me-2"></i>
-                                    <address class="font-weight-bold m-0">{{ siae.address_on_one_line }}</address>
-                                </div>
-                            </li>
+                    <div class="c-box">
+                        <h3 class="mb-2">Coordonnées</h3>
+                        <div class="d-flex text-secondary fs-sm">
+                            <i class="ri-map-pin-2-line me-2"></i>
+                            <address class="m-0">{{ siae.address_on_one_line }}</address>
+                        </div>
+                        <hr class="my-3">
+                        <ul class="fs-sm list-unstyled mb-0">
                             {% if siae.email %}
-                                <li class="my-2">
-                                    <i class="ri-mail-line ri-xl me-2"></i>
-                                    <a aria-label="Contact par mail" href="mailto:{{ siae.email }}" class="font-weight-bold">{{ siae.email }}</a>
+                                <li>
+                                    <a href="mailto:{{ siae.email }}" class="btn-link btn-ico" aria-label="Contact par mail">
+                                        <i class="ri-mail-line font-weight-normal"></i>
+                                        <span>{{ siae.email }}</span>
+                                    </a>
                                 </li>
                             {% endif %}
-
                             {% if siae.phone %}
-                                <li class="my-2">
-                                    <i class="ri-phone-line ri-xl me-2"></i>
-                                    <a aria-label="Contact téléphonique" href="tel:{{ siae.phone|cut:" " }}" class="font-weight-bold">{{ siae.phone|format_phone }}</a>
+                                <li>
+                                    <a href="tel:{{ siae.phone|cut:" " }}" class="btn-link btn-ico" aria-label="Contact téléphonique">
+                                        <i class="ri-phone-line font-weight-normal"></i>
+                                        <span>{{ siae.phone|format_phone }}</span>
+                                    </a>
                                 </li>
                             {% endif %}
-
                             {% if siae.website %}
-                                <li class="my-2">
-                                    <i class="ri-global-line ri-xl me-2"></i>
-                                    <a aria-label="Site web (ouverture dans un nouvel onglet)" href="{{ siae.website }}" rel="noopener" target="_blank" class="font-weight-bold">{{ siae.website }}</a>
+                                <li>
+                                    <a href="{{ siae.website }}" rel="noopener" target="_blank" class="btn-link btn-ico" aria-label="Site web (ouverture dans un nouvel onglet)">
+                                        <i class="ri-global-line font-weight-normal"></i>
+                                        <span>{{ siae.website }}</span>
+                                    </a>
                                 </li>
                             {% endif %}
                         </ul>
