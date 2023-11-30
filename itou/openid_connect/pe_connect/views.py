@@ -121,7 +121,7 @@ def pe_connect_callback(request):
         if "email" in e.args:
             return HttpResponseRedirect(reverse("pe_connect:no_email"))
         messages.error(request, "Une erreur technique est survenue, impossible de vous connecter avec Pôle Emploi.")
-        return HttpResponseRedirect("search:employers_home")
+        return HttpResponseRedirect(reverse("search:employers_home"))
 
     try:
         # At this step, we can update the user's fields in DB and create a session if required
