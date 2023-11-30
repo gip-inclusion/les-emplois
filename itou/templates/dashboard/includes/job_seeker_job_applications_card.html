@@ -1,9 +1,11 @@
+{% load matomo %}
+
 <div class="col-md-4 mb-3 mb-md-5">
-    <div class="c-box p-0 h-100">
+    <div class="c-box p-0 h-100 d-flex flex-column align-items-start">
         <div class="p-3 p-lg-4">
             <span class="h4 mb-0">Candidatures</span>
         </div>
-        <div class="px-3 px-lg-4">
+        <div class="px-3 px-lg-4 h-100">
             <ul class="list-unstyled mb-lg-5">
                 <li class="d-flex justify-content-between align-items-center mb-3">
                     <a href="{% url 'apply:list_for_job_seeker' %}" class="btn-link btn-ico">
@@ -18,6 +20,16 @@
                     </a>
                 </li>
             </ul>
+        </div>
+        <div class="c-info m-3 p-3">
+            <p class="font-weight-bold fs-sm mb-1">Vous n’avez pas encore de CV ?</p>
+            <p class="fs-sm mb-2">Créez-en un grâce à notre partenaire Diagoriente.</p>
+            <a href="https://diagoriente.beta.gouv.fr"
+               rel="noopener"
+               target="_blank"
+               aria-label="Créer un CV avec Diagoriente (ouverture dans un nouvel onglet)"
+               class="btn btn-partner btn-partner--diagoriente fs-sm"
+               {% matomo_event "partners" "clic" "open_diagoriente" %}>Créer un CV avec Diagoriente</a>
         </div>
     </div>
 </div>

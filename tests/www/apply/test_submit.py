@@ -2450,6 +2450,14 @@ class ApplyAsOtherTest(TestCase):
 
 
 class ApplicationViewTest(TestCase):
+    DIAGORIENTE_JOB_SEEKER_TITLE = "Vous n’avez pas de CV ?"
+    DIAGORIENTE_JOB_SEEKER_DESCRIPTION = "Créez-en un grâce à notre partenaire Diagoriente."
+    DIAGORIENTE_PRESCRIBER_TITLE = "Ce candidat n’a pas encore de CV ?"
+    DIAGORIENTE_PRESCRIBER_DESCRIPTION = (
+        "Accompagnez-le dans la création de son CV grâce à notre partenaire Diagoriente."
+    )
+    DIAGORIENTE_URL = "https://diagoriente.beta.gouv.fr"
+
     def test_application_jobs_use_previously_selected_jobs(self):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True, with_jobs=True)
 
@@ -2489,6 +2497,49 @@ class ApplicationViewTest(TestCase):
         )
         self.assertContains(response, 'name="selected_jobs"')
         self.assertContains(response, 'name="resume"')
+
+    def test_application_resume_diagoriente_shown_as_job_seeker(self):
+        company = CompanyFactory(with_membership=True, with_jobs=True)
+        job_seeker = JobSeekerFactory()
+        self.client.force_login(job_seeker)
+
+        response = self.client.get(
+            reverse("apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+        )
+        self.assertContains(response, self.DIAGORIENTE_JOB_SEEKER_TITLE)
+        self.assertContains(response, self.DIAGORIENTE_JOB_SEEKER_DESCRIPTION)
+        self.assertNotContains(response, self.DIAGORIENTE_PRESCRIBER_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_PRESCRIBER_DESCRIPTION)
+        self.assertContains(response, self.DIAGORIENTE_URL)
+
+    def test_application_resume_diagoriente_not_shown_as_company(self):
+        company = CompanyFactory(with_membership=True, with_jobs=True)
+        job_seeker = JobSeekerFactory()
+        self.client.force_login(company.members.first())
+
+        response = self.client.get(
+            reverse("apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+        )
+        self.assertNotContains(response, self.DIAGORIENTE_JOB_SEEKER_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_JOB_SEEKER_DESCRIPTION)
+        self.assertNotContains(response, self.DIAGORIENTE_PRESCRIBER_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_PRESCRIBER_DESCRIPTION)
+        self.assertNotContains(response, self.DIAGORIENTE_URL)
+
+    def test_application_resume_diagoriente_shown_as_prescriber(self):
+        company = CompanyFactory(with_membership=True, with_jobs=True)
+        prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
+        job_seeker = JobSeekerFactory()
+        self.client.force_login(prescriber)
+
+        response = self.client.get(
+            reverse("apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+        )
+        self.assertNotContains(response, self.DIAGORIENTE_JOB_SEEKER_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_JOB_SEEKER_DESCRIPTION)
+        self.assertContains(response, self.DIAGORIENTE_PRESCRIBER_TITLE)
+        self.assertContains(response, self.DIAGORIENTE_PRESCRIBER_DESCRIPTION)
+        self.assertContains(response, self.DIAGORIENTE_URL)
 
     def test_application_eligibility_is_bypassed_for_company_not_subject_to_eligibility_rules(self):
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True)

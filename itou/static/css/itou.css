@@ -421,3 +421,12 @@ _:-ms-fullscreen,
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
 }
+
+.c-box__header--diagoriente {
+    background-image: url("../img/dashboard/card-header-bg-diagoriente.png");
+    background-repeat: no-repeat;
+    background-position: center right;
+    background-size: 100% auto;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+}
