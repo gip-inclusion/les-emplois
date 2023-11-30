@@ -119,10 +119,7 @@ class Command(BaseCommand):
                             fields=["birth_place", "hexa_commune"],
                         )
                         commune.delete()
-                self.stdout.write(
-                    f"> successfully deleted count={len(communes_removed_by_csv)} communes "
-                    f"insee_codes={sorted(communes_removed_by_csv)}"
-                )
+                self.stdout.write(f"> successfully deleted count={len(communes_removed_by_csv)} communes")
 
                 n_objs = Commune.objects.bulk_update(
                     communes_updated_by_csv,
