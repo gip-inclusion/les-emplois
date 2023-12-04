@@ -587,6 +587,19 @@ class ApprovalsSendToPeManagementTestCase(TestCase):
         ]
 
         # other approvals
+        error_approval = ApprovalFactory(
+            start_at=datetime.datetime.today().date() - datetime.timedelta(days=2),
+            with_jobapplication=True,
+            pe_notification_status=api_enums.PEApiNotificationStatus.ERROR,
+            pe_notification_endpoint=api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU,
+        )
+        error_approval_with_obfuscated_nir = ApprovalFactory(
+            start_at=datetime.datetime.today().date() - datetime.timedelta(days=2),
+            with_jobapplication=True,
+            pe_notification_status=api_enums.PEApiNotificationStatus.ERROR,
+            pe_notification_endpoint=api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU,
+            user__jobseeker_profile__pe_obfuscated_nir="something",
+        )
         retry_approval = ApprovalFactory(
             start_at=datetime.datetime.today().date() - datetime.timedelta(days=1),
             with_jobapplication=True,
@@ -600,30 +613,34 @@ class ApprovalsSendToPeManagementTestCase(TestCase):
             stdout=stdout,
         )
         assert stdout.getvalue().split("\n") == [
-            "approvals needing to be sent count=2, batch count=10",
+            "approvals needing to be sent count=3, batch count=10",
             f"approvals={pending_approval} start_at={pending_approval.start_at.isoformat()} "
             "pe_state=notification_ready",
             f"approvals={retry_approval} start_at={retry_approval.start_at.isoformat()} "
             "pe_state=notification_should_retry",
-            "cancelled approvals needing to be sent count=10, batch count=8",
+            f"approvals={error_approval_with_obfuscated_nir} "
+            f"start_at={error_approval_with_obfuscated_nir.start_at.isoformat()} pe_state=notification_ready",
+            "cancelled approvals needing to be sent count=10, batch count=7",
         ] + [
             f"cancelled_approval={cancelled_approval} start_at={cancelled_approval.start_at.isoformat()} "
             "pe_state=notification_ready"
-            for cancelled_approval in cancelled_approvals[:8]
+            for cancelled_approval in cancelled_approvals[:7]
         ] + [
             "",
         ]
         sleep_mock.assert_called_with(3)
         assert sleep_mock.call_count == 10
-        assert notify_mock.call_count == 2
-        assert cancelled_notify_mock.call_count == 8
+        assert notify_mock.call_count == 3
+        assert cancelled_notify_mock.call_count == 7
         for approval in [no_jobapp, missing_user_data1, missing_user_data2, future, cancelled_approval_future]:
             approval.refresh_from_db()
             assert approval.pe_notification_status == api_enums.PEApiNotificationStatus.PENDING
         # Since the notify_pole_emploi have been mocked, the READY/SHOULD_RETRY approvals kept their statuses
         retry_approval.refresh_from_db()
         assert retry_approval.pe_notification_status == api_enums.PEApiNotificationStatus.SHOULD_RETRY
-        for approval in [pending_approval, *cancelled_approvals]:
+        error_approval.refresh_from_db()
+        assert error_approval.pe_notification_status == api_enums.PEApiNotificationStatus.ERROR
+        for approval in [pending_approval, error_approval_with_obfuscated_nir, *cancelled_approvals]:
             approval.refresh_from_db()
             assert approval.pe_notification_status == api_enums.PEApiNotificationStatus.READY
 
