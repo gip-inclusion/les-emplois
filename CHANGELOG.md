@@ -1,5 +1,19 @@
 # Journal des modifications
 
+## [76] - 2023-12-03
+
+### Ajouté
+- PASS IAE AI : message pour les pass arrivant à expiration dans moins de 30 jours #3377 et #3384
+- PASS IAE AI : Ajout d’information dans le PASS IAE pour une Prolongation en cours #3323
+- PASS IAE AI Admin : filtrer les demandes refusées par date pour les AI #3381 et #3390
+- PASS IAE : renvoi à pole emploi lors des changements de dates #3383
+
+### Modifié
+- PASS IAE : annuler une suspension #3327
+
+### Supprimé
+- Dashboard : retrait du sondage maze #3370
+
 ## [75] - 2023-11-19
 
 ### Ajouté
