@@ -25,6 +25,14 @@ class Command(BaseCommand):
     def handle(self, *, wet_run, delay, **options):
         today = timezone.localdate()
 
+        # Check if approvals in ERROR on endpoint rech_individu are now linked to an user
+        # with a pe_obfuscated_nir (meaning the error is likely to be fixed)
+        approvals_models.Approval.objects.filter(
+            pe_notification_status=api_enums.PEApiNotificationStatus.ERROR,
+            pe_notification_endpoint=api_enums.PEApiEndpoint.RECHERCHE_INDIVIDU,
+            user__jobseeker_profile__pe_obfuscated_nir__isnull=False,
+        ).update(pe_notification_status=api_enums.PEApiNotificationStatus.PENDING)
+
         # Check if pending approvals are now READY to be sent
         approvals_models.Approval.objects.filter(
             pe_notification_status=api_enums.PEApiNotificationStatus.PENDING,
