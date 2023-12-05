@@ -442,7 +442,6 @@ def test_populate_job_applications():
         assert rows == [
             (
                 ja.pk,
-                hash_content(ja.pk),
                 ja.created_at.date(),
                 ja.hiring_start_at,
                 "Nouvelle candidature",
