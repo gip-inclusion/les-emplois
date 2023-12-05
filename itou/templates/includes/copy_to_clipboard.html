@@ -1,7 +1,7 @@
 <button class="js-copy-to-clipboard btn btn-ico {{ css_classes }}"
         data-copy-to-clipboard="{{ content }}"
         data-bs-toggle="tooltip"
-        data-bs-placement="top"
+        data-bs-placement="{{ placement|default:"top" }}"
         data-bs-trigger="manual"
         data-bs-original-title="Copié !">
     <i class="ri-file-copy-line ri-lg font-weight-normal"></i>

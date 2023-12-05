@@ -35,7 +35,7 @@
                                 <i class="ri-pencil-line ri-lg"></i>
                                 <span>Modifier</span>
                             </a>
-                            <a href="{% url "companies_views:job_description_list" %}" class="btn btn-outline-primary btn-block btn-ico mt-3">
+                            <a href="{% url "companies_views:job_description_list" %}" class="btn btn-link btn-block btn-ico mt-3">
                                 <i class="ri-arrow-go-back-line ri-lg"></i>
                                 <span>Retour vers la liste des postes</span>
                             </a>
@@ -51,7 +51,7 @@
                                     <span>Postuler</span>
                                 </a>
                             {% endif %}
-                            {% include 'includes/copy_to_clipboard.html' with content=job.get_absolute_url text="Copier le lien de cette fiche" css_classes="btn btn-outline-primary btn-block" %}
+                            {% include 'includes/copy_to_clipboard.html' with content=job.get_absolute_url text="Copier le lien de cette fiche" placement="bottom" css_classes="btn btn-outline-primary btn-block" %}
                         </div>
                         <div class="c-box">
                             <span class="fs-xs lh-sm">{{ siae.kind }} - {{ siae.get_kind_display }}</span>
@@ -79,24 +79,24 @@
             <div class="s-tabs-01__container container">
                 <div class="s-tabs-01__row row">
                     <div class="s-tabs-01__col col-12">
-                        <h2 class="visually-hidden" id="metiers-title">Métiers de la structure</h2>
-                        <ul class="s-tabs-01__nav nav nav-tabs" role="tablist" aria-labelledby="metiers-title">
+                        <h2 class="visually-hidden" id="recrutements-title">Recrutements de la structure</h2>
+                        <ul class="s-tabs-01__nav nav nav-tabs" role="tablist" aria-labelledby="recrutements-title">
                             <li class="nav-item" role="presentation">
                                 <a id="recrutements-en-cours-tab" class="nav-link active" role="tab" href="#recrutements-en-cours" data-bs-toggle="tab" aria-selected="true" aria-controls="recrutements-en-cours">
-                                    Recrutement{{ others_active_jobs|pluralizefr }} en cours dans cette structure <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">{{ others_active_jobs_descriptions|length }}</span>
+                                    Recrutement{{ others_active_jobs|pluralizefr }} en cours dans cette structure <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">{{ others_active_jobs|length }}</span>
                                 </a>
                             </li>
                         </ul>
                         <div class="tab-content">
                             <div id="recrutements-en-cours" class="tab-pane fade active show" aria-labelledby="recrutements-en-cours-tab" role="tabpanel">
-                                {% if other_jobs_descriptions %}
+                                {% if others_active_jobs %}
                                     <ul class="list-group list-group-flush list-group-link">
                                         {% for other_job in others_active_jobs %}
-                                            {% include "companies/includes/_list_siae_actives_jobs_row.html" with job=other_job %}
+                                            {% include "companies/includes/_siae_jobdescription.html" with job=other_job %}
                                         {% endfor %}
                                     </ul>
                                 {% else %}
-                                    <p>Pour le moment, il n’y a aucun recrutement en cours dans cette structure.</p>
+                                    <p class="mb-0">Pour le moment, il n’y a aucun recrutement en cours dans cette structure.</p>
                                 {% endif %}
                             </div>
                         </div>
@@ -105,6 +105,5 @@
             </div>
         </section>
     {% endif %}
-
 
 {% endblock %}

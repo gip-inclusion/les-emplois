@@ -9,7 +9,7 @@
 .s-home-search__row {
     display: flex;
     align-content: center;
-    min-height: 25rem;
+    min-height: 23rem;
 }
 
 .s-home-search__form {
