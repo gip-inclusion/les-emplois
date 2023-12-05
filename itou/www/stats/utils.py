@@ -22,6 +22,8 @@ def can_view_stats_dashboard_widget(request):
     """
     return (
         can_view_stats_siae(request)
+        or can_view_stats_siae_aci(request)
+        or can_view_stats_siae_etp(request)
         or can_view_stats_cd(request)
         or can_view_stats_pe(request)
         or can_view_stats_ddets_iae(request)
