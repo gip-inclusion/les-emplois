@@ -73,10 +73,6 @@ def get_params_for_region(region):
     return params
 
 
-def get_params_for_idf_region():
-    return get_params_for_region("Île-de-France")
-
-
 def get_params_for_whole_country():
     return {
         mb.DEPARTMENT_FILTER_KEY: list(DEPARTMENTS.values()),
@@ -619,7 +615,7 @@ def stats_drihl_state(request):
     context = {
         "page_title": "Suivi des prescriptions des AHI",
     }
-    return render_stats(request=request, context=context, params=get_params_for_idf_region())
+    return render_stats(request=request, context=context, params=get_params_for_region("Île-de-France"))
 
 
 @login_required
