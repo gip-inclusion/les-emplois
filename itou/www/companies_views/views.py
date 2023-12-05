@@ -32,7 +32,9 @@ ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
 
 
 def job_description_card(request, job_description_id, template_name="companies/job_description_card.html"):
-    job_description = get_object_or_404(JobDescription.objects.select_related("location"), pk=job_description_id)
+    job_description = get_object_or_404(
+        JobDescription.objects.select_related("appellation", "company", "location"), pk=job_description_id
+    )
     back_url = get_safe_url(request, "back_url")
     company = job_description.company
     can_update_job_description = (

@@ -22,7 +22,7 @@ from tests.companies.factories import (
 )
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory
-from tests.utils.test import TestCase, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
@@ -550,7 +550,12 @@ class JobDescriptionCardViewTest(TestCase):
         job_description.open_positions = 1234
         job_description.save()
         url = reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
-        response = self.client.get(url)
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # select jobdescription (get_object_or_404)
+            + 1  # select other jobdescription (others_active_jobs)
+        ):
+            response = self.client.get(url)
         assert response.context["job"] == job_description
         assert response.context["siae"] == company
         self.assertContains(response, job_description.description)
