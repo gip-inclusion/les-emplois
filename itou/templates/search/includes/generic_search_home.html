@@ -1,11 +1,12 @@
-<section class="bg-emploi-light container-search pt-5 pb-6">
-
-    <div class="container container-max-lg">
-        <h1 class="lh-sm text-center">{{ title }}</h1>
-
-        <form method="get" action="{% url url_search %}" role="search">
-            {% include template_form_name with form=form align="center" %}
-        </form>
+<section class="s-home-search py-5">
+    <div class="s-home-search__container container container-max-md">
+        <div class="s-home-search__row row">
+            <div class="s-home-search__col col-12">
+                <h1 class="lh-sm text-center text-tertiary">{{ title }}</h1>
+                <form method="get" action="{% url url_search %}" role="search" class="s-home-search__form">
+                    {% include template_form_name with form=form align="center" %}
+                </form>
+            </div>
+        </div>
     </div>
-
 </section>

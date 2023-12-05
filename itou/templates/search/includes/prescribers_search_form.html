@@ -9,18 +9,18 @@
             <div class="input-group-text bg-white rounded-start">
                 {# Loading #}
                 <span class="js-city-autocomplete-loading d-none">
-                    <i class="ri-restart-line ri-spinner" role="status" aria-hidden="true"></i>
+                    <i class="ri-restart-line ri-spinner ri-lg text-tertiary" role="status" aria-hidden="true"></i>
                     <span class="visually-hidden">Chargement...</span>
                 </span>
                 {# No loading #}
                 <span class="js-city-autocomplete-no-loading">
-                    <i class="ri-map-pin-line" aria-hidden="true"></i>
+                    <i class="ri-map-pin-line ri-xl text-tertiary" aria-hidden="true"></i>
                 </span>
             </div>
             {{ form.city_name }}
         </div>
     </div>
-    <div class="col-12 col-md-3 col-lg-2 mb-2 ps-md-3">
+    <div class="col-12 col-md-3 mb-2 ps-md-3">
         <button class="btn btn-primary form-control js-search-button" aria-label="Rechercher">Rechercher</button>
     </div>
 </div>

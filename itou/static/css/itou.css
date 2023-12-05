@@ -1,14 +1,39 @@
-.container-search {
-    background-position: top left, top right;
+.s-home-search {
+    background-position: center left, center right;
     background-repeat: no-repeat;
-    min-height: 17rem;
-    background-image: url(../img/search-bg-left.svg),
-        url(../img/search-bg-right.svg);
+    background-color: var(--bs-emploi-lighter);
+    background-image: url(../img/search-bg-left.png),
+        url(../img/search-bg-right.png);
+}
+
+.s-home-search__row {
+    display: flex;
+    align-content: center;
+    min-height: 25rem;
+}
+
+.s-home-search__form {
+    background-color: var(--bs-white);
+    padding: 1rem 1rem 0.5rem 1rem;
+    border-radius: 8px;
+}
+
+.s-home-search__form .input-group-text,
+.s-home-search__form .form-control {
+    border-color: var(--bs-white) !important;
+}
+
+.s-home-search__form .input-group-text {
+    padding-left: 8px !important;
 }
 
 @media only screen and (max-width: 992px) {
-    .container-search {
+    .s-home-search {
         background-image: none;
+    }
+
+    .s-home-search__row {
+        min-height: initial;
     }
 }
 
@@ -17,7 +42,7 @@
 }
 
 .container-breadcrumb:empty {
-    background-color: red;
+    background-color: var(--bs-red);
     display: none !important;
 }
 
@@ -91,7 +116,7 @@ duet-date-picker.is-invalid ~ .invalid-feedback {
 
 .file-dropzone {
     width: 100%;
-    border: 2px dashed #80829c;
+    border: 2px dashed var(--bs-gray-700);
     border-radius: 0.25rem;
     text-align: center;
     padding: 1rem;
@@ -368,7 +393,7 @@ _:-ms-fullscreen,
 /* Inclusion connect
 --------------------------------------------------------------------------- */
 .p-inclusion-connect .s-main {
-    background-color: #fff !important;
+    background-color: var(--bs-white) !important;
     background-image: url("../img/illustration-bg-ic.svg");
     background-repeat: no-repeat;
     background-position: top -120px left;
@@ -396,5 +421,3 @@ _:-ms-fullscreen,
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
 }
-
-
