@@ -78,7 +78,7 @@
                           <h3 class="mb-2">Coordonnées</h3>
                           <div class="d-flex text-secondary fs-sm">
                               <i class="ri-map-pin-2-line me-2"></i>
-                              <address class="m-0 lh-sm">112 rue de la Croix-Nivert, 75015 Paris</address>
+                              <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
                           </div>
                           <hr class="my-3"/>
                           <ul class="fs-sm list-unstyled mb-0">
