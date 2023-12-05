@@ -1,4 +1,4 @@
-from itou.metabase.tables.utils import MetabaseTable, hash_content
+from itou.metabase.tables.utils import MetabaseTable
 
 
 TABLE = MetabaseTable(name="fiches_de_poste_par_candidature")
@@ -15,13 +15,6 @@ TABLE.add_columns(
             "type": "uuid",
             "comment": "ID de la candidature",
             "fn": lambda o: o["pk"],
-        },
-        {
-            # TODO @dejafait : eventually drop this obsolete field
-            "name": "id_anonymisé_candidature",
-            "type": "varchar",
-            "comment": "ID anonymisé de la candidature",
-            "fn": lambda o: hash_content(o["pk"]),
         },
     ]
 )

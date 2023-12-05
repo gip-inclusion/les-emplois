@@ -490,7 +490,6 @@ def test_populate_job_applications():
             (
                 job.pk,
                 ja.pk,
-                hash_content(ja.pk),
                 datetime.date(2023, 2, 1),
             ),
         ]
