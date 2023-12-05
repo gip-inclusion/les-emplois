@@ -199,13 +199,6 @@ TABLE.add_columns(
             "fn": lambda o: o.job_seeker_id,
         },
         {
-            # TODO @dejafait : eventually drop this obsolete field
-            "name": "id_candidat_anonymisé",
-            "type": "varchar",
-            "comment": "ID anonymisé du candidat",
-            "fn": lambda o: hash_content(o.job_seeker_id),
-        },
-        {
             "name": "id_structure",
             "type": "integer",
             "comment": "ID de la structure destinaire de la candidature",

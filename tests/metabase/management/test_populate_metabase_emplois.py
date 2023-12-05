@@ -453,7 +453,6 @@ def test_populate_job_applications():
                 None,
                 None,
                 ja.job_seeker_id,
-                hash_content(ja.job_seeker_id),
                 ja.to_company_id,
                 ja.to_company.kind,
                 ja.to_company.display_name,
