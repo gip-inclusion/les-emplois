@@ -1,6 +1,6 @@
 from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
-from itou.metabase.tables.utils import MetabaseTable, get_choice, get_department_and_region_columns, hash_content
+from itou.metabase.tables.utils import MetabaseTable, get_choice, get_department_and_region_columns
 from itou.prescribers.enums import PrescriberOrganizationKind
 
 
@@ -119,13 +119,6 @@ TABLE.add_columns(
             "type": "uuid",
             "comment": "ID C1 de la candidature",
             "fn": lambda o: o.pk,
-        },
-        {
-            # TODO @dejafait : eventually drop this obsolete field
-            "name": "id_anonymisé",
-            "type": "varchar",
-            "comment": "ID anonymisé de la candidature",
-            "fn": lambda o: hash_content(o.pk),
         },
         {
             "name": "date_candidature",
