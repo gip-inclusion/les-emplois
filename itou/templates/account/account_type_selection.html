@@ -4,14 +4,24 @@
 
 {% block title %}Connexion {{ block.super }}{% endblock %}
 
-{% block content_title_wrapper %}{% endblock %}
+{% block content_title_wrapper %}
+    <section class="s-title-01">
+        <div class="s-title-01__container container">
+            <div class="s-title-01__row row">
+                <div class="s-title-01__col col-12">
+                    <h1>Connexion</h1>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
 
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
-                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 text-center mt-5 g-5">
+                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 text-center g-5">
                         <div class="col">
                             <div class="card c-card p-md-5 has-one-link-inside h-100 w-100">
                                 <div class="card-body">

@@ -122,7 +122,7 @@ class CardViewTest(TestCase):
                   class="tab-pane fade active show"
                   id="recrutements-en-cours"
                   role="tabpanel">
-              <p>
+              <p class="mb-0">
                Pour le moment, il n&rsquo;y a aucun recrutement en cours dans cette structure.
               </p>
              </div>
@@ -501,7 +501,7 @@ class CardViewTest(TestCase):
                   class="tab-pane fade active show"
                   id="recrutements-en-cours"
                   role="tabpanel">
-              <p>
+              <p class="mb-0">
                Pour le moment, il n&rsquo;y a aucun recrutement en cours dans cette structure.
               </p>
              </div>

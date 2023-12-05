@@ -126,7 +126,7 @@
                       <div class="tab-content">
                           <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
                               
-                                  <p>Pour le moment, il n’y a aucun recrutement en cours dans cette structure.</p>
+                                  <p class="mb-0">Pour le moment, il n’y a aucun recrutement en cours dans cette structure.</p>
                               
                           </div>
                           
