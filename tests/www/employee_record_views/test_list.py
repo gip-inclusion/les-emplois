@@ -14,7 +14,7 @@ from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.employee_record import factories as employee_record_factories
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase
+from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages, parse_response_to_soup
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
@@ -112,19 +112,20 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url + "?status=NEW")
 
         # Global message alert
-        self.assertContains(response, "Une action de votre part est nécessaire")
-        self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salarié")
+        assert str(parse_response_to_soup(response, selector=".s-title-01 .alert")) == self.snapshot(name="alert")
+
         # Item message alert
-        self.assertContains(
-            response, "Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure."
-        )
-        self.assertContains(response, "Mettre à jour")
-        self.assertNotContains(response, "Désactiver la fiche salarié")
-        self.assertNotContains(response, "Compléter la fiche salarié")
+        assert str(
+            parse_response_to_soup(
+                response,
+                selector=".employee-records-list .card-body > div:last-child",
+                replace_objects_pk_in_href=[self.job_application],
+            )
+        ) == self.snapshot(name="action")
 
     def test_existing_employee_records_with_a_suspension_does_not_show_need_to_be_updated_message(self):
         self.client.force_login(self.user)
-        EmployeeRecordFactory(job_application=self.job_application)
+        employee_record = EmployeeRecordFactory(job_application=self.job_application)
         approvals_factories.SuspensionFactory(
             approval=self.job_application.approval, siae=self.job_application.to_company
         )
@@ -132,15 +133,19 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url + "?status=NEW")
 
         # Global message alert
-        self.assertNotContains(response, "Une action de votre part est nécessaire")
-        self.assertNotContains(response, "Attention, nous avons détecté une ou plusieurs fiches salarié")
+        assertMessages(response, [])
+
         # Item message alert
-        self.assertNotContains(
-            response, "Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure."
+        assert (
+            str(
+                parse_response_to_soup(
+                    response,
+                    selector=".employee-records-list .card-body > div:last-child",
+                    replace_objects_pk_in_href=[self.job_application, employee_record],
+                )
+            )
+            == self.snapshot()
         )
-        self.assertNotContains(response, "Mettre à jour")
-        self.assertContains(response, "Désactiver la fiche salarié")
-        self.assertContains(response, "Compléter la fiche salarié")
 
     def test_employee_records_with_a_prolongation_need_to_be_updated(self):
         self.client.force_login(self.user)
@@ -152,19 +157,19 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url + "?status=NEW")
 
         # Global message alert
-        self.assertContains(response, "Une action de votre part est nécessaire")
-        self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salarié")
+        assert str(parse_response_to_soup(response, selector=".s-title-01 .alert")) == self.snapshot(name="alert")
         # Item message alert
-        self.assertContains(
-            response, "Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure."
-        )
-        self.assertContains(response, "Mettre à jour")
-        self.assertNotContains(response, "Désactiver la fiche salarié")
-        self.assertNotContains(response, "Compléter la fiche salarié")
+        assert str(
+            parse_response_to_soup(
+                response,
+                selector=".employee-records-list .card-body > div:last-child",
+                replace_objects_pk_in_href=[self.job_application],
+            )
+        ) == self.snapshot(name="action")
 
     def test_existing_employee_records_with_a_prolongation_does_not_show_need_to_be_updated_message(self):
         self.client.force_login(self.user)
-        EmployeeRecordFactory(job_application=self.job_application)
+        employee_record = EmployeeRecordFactory(job_application=self.job_application)
         approvals_factories.ProlongationFactory(
             approval=self.job_application.approval,
             declared_by_siae=self.job_application.to_company,
@@ -173,24 +178,35 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url + "?status=NEW")
 
         # Global message alert
-        self.assertNotContains(response, "Une action de votre part est nécessaire")
-        self.assertNotContains(response, "Attention, nous avons détecté une ou plusieurs fiches salarié")
+        assertMessages(response, [])
         # Item message alert
-        self.assertNotContains(
-            response, "Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure."
+        assert (
+            str(
+                parse_response_to_soup(
+                    response,
+                    selector=".employee-records-list .card-body > div:last-child",
+                    replace_objects_pk_in_href=[self.job_application, employee_record],
+                )
+            )
+            == self.snapshot()
         )
-        self.assertNotContains(response, "Mettre à jour")
-        self.assertContains(response, "Désactiver la fiche salarié")
-        self.assertContains(response, "Compléter la fiche salarié")
 
     def test_employee_record_to_disable(self):
         self.client.force_login(self.user)
-        employee_record_factories.EmployeeRecordFactory(job_application=self.job_application)
+        employee_record = employee_record_factories.EmployeeRecordFactory(job_application=self.job_application)
 
         response = self.client.get(self.url + "?status=NEW")
 
-        self.assertContains(response, "Désactiver la fiche salarié")
-        self.assertContains(response, "Compléter la fiche salarié")
+        assert (
+            str(
+                parse_response_to_soup(
+                    response,
+                    selector=".employee-records-list .card-body > div:last-child",
+                    replace_objects_pk_in_href=[self.job_application, employee_record],
+                )
+            )
+            == self.snapshot()
+        )
 
     @override_settings(TALLY_URL="https://tally.so")
     def test_employee_records_with_nir_associated_to_other(self):
@@ -202,11 +218,16 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url + "?status=NEW")
 
         self.assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
-        self.assertContains(response, "Une action de votre part est nécessaire")
-        self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salarié")
-        self.assertContains(response, "demander la régularisation du numéro de sécurité sociale")
-        self.assertContains(response, f'href="https://tally.so/r/wzxQlg?jobapplication={ self.job_application.pk }"')
-        self.assertNotContains(response, "Mettre à jour")
+        # Global message alert
+        assert str(parse_response_to_soup(response, selector=".s-title-01 .alert")) == self.snapshot(name="alert")
+        # Item message alert
+        assert str(
+            parse_response_to_soup(
+                response,
+                selector=".employee-records-list .card-body > div:last-child",
+                replace_objects_pk_in_href=[self.job_application],
+            )
+        ) == self.snapshot(name="action")
 
     @override_settings(TALLY_URL="https://tally.so")
     def test_employee_record_to_disable_with_nir_associated_to_other(self):
@@ -219,12 +240,16 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.url + "?status=NEW")
 
         self.assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
-        self.assertContains(response, "Une action de votre part est nécessaire")
-        self.assertContains(response, "Attention, nous avons détecté une ou plusieurs fiches salarié")
-        self.assertContains(response, "demander la régularisation du numéro de sécurité sociale")
-        self.assertContains(response, f'href="https://tally.so/r/wzxQlg?employeerecord={ new_er.pk }"')
-        self.assertNotContains(response, "Désactiver la fiche salarié")
-        self.assertNotContains(response, "Compléter la fiche salarié")
+        # Global message alert
+        assert str(parse_response_to_soup(response, selector=".s-title-01 .alert")) == self.snapshot(name="alert")
+        # Item message alert
+        assert str(
+            parse_response_to_soup(
+                response,
+                selector=".employee-records-list .card-body > div:last-child",
+                replace_objects_pk_in_href=[new_er],
+            )
+        ) == self.snapshot(name="action")
 
     def test_rejected_without_custom_message(self):
         self.client.force_login(self.user)
