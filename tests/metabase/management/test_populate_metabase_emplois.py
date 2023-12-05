@@ -223,7 +223,6 @@ def test_populate_job_seekers():
     assert rows == [
         (
             2010,
-            "7ee747dfcdd882876c5ca6759dca3f927618bd6192e0be2fd9e5e122435d881a",
             "28e41a0abf44151d54b9006aa6308d71d15284f7cc83a200b8fc6a9ffdf58352",
             "Homme",
             79,
@@ -275,7 +274,6 @@ def test_populate_job_seekers():
         ),
         (
             15752,
-            "60cddb9b00716b793cc5ebc61500e796722e486a169c3d2c9dde3026c13a8412",
             "d4d74522c83e8371e4ccafa994a70bb802b59d8e143177cf048e71c9b9d2e34a",
             "Femme",
             71,
@@ -327,7 +325,6 @@ def test_populate_job_seekers():
         ),
         (
             26587,
-            "70898ff70d3b980b644ed25a0e1c93bd92f8f93ba9e27e2580bd970a1dc12bb4",
             "2eb53772722d3026b539173c62ba7adc1756e5ab1f03b95ce4026c27d177bd34",
             "Femme",
             97,

@@ -190,13 +190,6 @@ def get_table():
                 "fn": lambda o: o.pk,
             },
             {
-                # TODO @dejafait : eventually drop this obsolete field
-                "name": "id_anonymisé",
-                "type": "varchar",
-                "comment": "ID anonymisé du candidat",
-                "fn": lambda o: hash_content(o.pk),
-            },
-            {
                 "name": "hash_nir",
                 "type": "varchar",
                 "comment": "Version obfusquée du NIR",
