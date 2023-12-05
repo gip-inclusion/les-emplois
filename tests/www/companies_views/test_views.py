@@ -567,6 +567,11 @@ class JobDescriptionCardViewTest(TestCase):
         self.assertContains(response, escape(company.display_name))
         self.assertNotContains(response, OPEN_POSITION_TEXT)
 
+        # Check other jobs
+        assert response.context["others_active_jobs"].count() == 3
+        for other_active_job in response.context["others_active_jobs"]:
+            self.assertContains(response, other_active_job.display_name, html=True)
+
 
 class ShowAndSelectFinancialAnnexTest(TestCase):
     def test_asp_source_siae_admin_can_see_but_cannot_select_af(self):

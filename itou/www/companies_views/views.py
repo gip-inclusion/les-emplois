@@ -41,7 +41,7 @@ def job_description_card(request, job_description_id, template_name="companies/j
 
     # select_related on company, location useful for _list_siae_actives_jobs_row.html template
     others_active_jobs = (
-        JobDescription.objects.select_related("appellation", "location", "siae")
+        JobDescription.objects.select_related("appellation", "company", "location")
         .filter(is_active=True, company=company)
         .exclude(id=job_description_id)
         .order_by("-updated_at", "-created_at")
