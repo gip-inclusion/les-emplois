@@ -55,7 +55,7 @@ def mock_oauth_dance(client, expected_route="dashboard:index"):
 
     state = FranceConnectState.save_state()
     url = reverse("france_connect:callback")
-    response = client.get(url, data={"code": "123", "state": state})
+    response = client.get(url, data={"code": "123", "state": state}, follow=True)
     assertRedirects(response, reverse(expected_route))
     return response
 
@@ -314,8 +314,6 @@ class FranceConnectTest(TestCase):
         """
         response = mock_oauth_dance(self.client)
         assert auth.get_user(self.client).is_authenticated
-        # Follow the redirection.
-        response = self.client.get(response.url)
         logout_url = reverse("account_logout")
         self.assertContains(response, logout_url)
         assert self.client.session.get(constants.FRANCE_CONNECT_SESSION_TOKEN)

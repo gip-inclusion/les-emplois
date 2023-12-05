@@ -66,7 +66,7 @@ def mock_oauth_dance(
 
     state = PoleEmploiConnectState.save_state()
     url = reverse("pe_connect:callback")
-    response = client.get(url, data={"code": "123", "state": state})
+    response = client.get(url, data={"code": "123", "state": state}, follow=True)
     assertRedirects(response, reverse(expected_route))
     return response
 
@@ -321,8 +321,6 @@ class TestPoleEmploiConnect:
         """
         response = mock_oauth_dance(client)
         assert auth.get_user(client).is_authenticated
-        # Follow the redirection.
-        response = client.get(response.url)
         logout_url = reverse("account_logout")
         assertContains(response, logout_url)
         assert client.session.get(constants.PE_CONNECT_SESSION_TOKEN)
