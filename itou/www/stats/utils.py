@@ -18,10 +18,15 @@ def can_view_stats_dashboard_widget(request):
     """
     Whether a stats section should be displayed on the user's dashboard.
 
-    It should be displayed if one or more stats sections are available for the user.
+    It should be displayed for all professional users (employers, prescribers and labor inspectors).
     """
     return (
-        can_view_stats_siae(request)
+        request.user.is_employer
+        or request.user.is_prescriber
+        or request.user.is_labor_inspector
+        # All conditions below are useless/redundant with the main conditions above as they are
+        # all sub cases of them. We still include them to keep things as explicit as possible.
+        or can_view_stats_siae(request)
         or can_view_stats_siae_aci(request)
         or can_view_stats_siae_etp(request)
         or can_view_stats_cd(request)
