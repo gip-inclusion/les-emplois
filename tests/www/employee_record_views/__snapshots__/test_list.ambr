@@ -1,0 +1,193 @@
+# serializer version: 1
+# name: ListEmployeeRecordsTest.test_employee_record_to_disable
+  '''
+  <div class="text-end">
+                      
+                          <a class="btn btn-sm btn-outline-primary mt-2" href="/employee_record/disable/[PK of EmployeeRecord]">Désactiver la fiche salarié</a>
+                      
+                      <a class="btn btn-sm btn-outline-primary mt-2" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">Compléter la fiche salarié</a>
+                  </div>
+  '''
+# ---
+# name: ListEmployeeRecordsTest.test_employee_record_to_disable_with_nir_associated_to_other[action]
+  '''
+  <div class="alert alert-warning" role="status">
+                      <div class="row">
+                          <div class="col-auto pe-0">
+                              <i class="ri-error-warning-line ri-xl text-warning"></i>
+                          </div>
+                          <div class="col">
+                              <p class="mb-2">
+                                  <strong>Informations manquantes</strong>
+                              </p>
+                              <p class="mb-0">Pour créer cette fiche salarié, veuillez demander la régularisation du numéro de sécurité sociale.</p>
+                          </div>
+                          <div class="col-auto align-self-center">
+                              <a class="btn btn-sm btn-primary" href="https://tally.so/r/wzxQlg?employeerecord=[PK of EmployeeRecord]" rel="noopener" target="_blank">Régulariser le n° de sécurité sociale</a>
+                          </div>
+                      </div>
+                  </div>
+  '''
+# ---
+# name: ListEmployeeRecordsTest.test_employee_record_to_disable_with_nir_associated_to_other[alert]
+  '''
+  <div class="alert alert-warning">
+              <div class="row">
+                  <div class="col-auto pe-0">
+                      <i class="ri-error-warning-line ri-xl text-danger"></i>
+                  </div>
+                  <div class="col">
+                      <p class="mb-0">
+                          <strong>Une action de votre part est nécessaire</strong>
+                      </p>
+                      <p class="mb-0">
+                          Attention, nous avons détecté une ou plusieurs fiches salarié qui nécessitent une régularisation manuelle de votre part.
+                      </p>
+                  </div>
+              </div>
+          </div>
+  '''
+# ---
+# name: ListEmployeeRecordsTest.test_employee_records_with_a_prolongation_need_to_be_updated[action]
+  '''
+  <div class="alert alert-warning" role="status">
+                      <div class="row">
+                          <div class="col-auto pe-0">
+                              <i class="ri-error-warning-line ri-xl text-warning"></i>
+                          </div>
+                          <div class="col">
+                              <p class="mb-2">
+                                  <strong>Une action de votre part est nécessaire</strong>
+                              </p>
+                              <p class="mb-0">
+                                  La nouvelle date de fin du PASS IAE n’a pas pu être transmise automatiquement à l’Extranet IAE 2.0 de l’ASP.
+                                  Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure.
+                              </p>
+                          </div>
+                          <div class="col-auto align-self-center">
+                              <a class="btn btn-sm btn-primary" href="/employee_record/create/[PK of JobApplication]">Mettre à jour</a>
+                          </div>
+                      </div>
+                  </div>
+  '''
+# ---
+# name: ListEmployeeRecordsTest.test_employee_records_with_a_prolongation_need_to_be_updated[alert]
+  '''
+  <div class="alert alert-warning">
+              <div class="row">
+                  <div class="col-auto pe-0">
+                      <i class="ri-error-warning-line ri-xl text-danger"></i>
+                  </div>
+                  <div class="col">
+                      <p class="mb-0">
+                          <strong>Une action de votre part est nécessaire</strong>
+                      </p>
+                      <p class="mb-0">
+                          Attention, nous avons détecté une ou plusieurs fiches salarié qui nécessitent une régularisation manuelle de votre part.
+                      </p>
+                  </div>
+              </div>
+          </div>
+  '''
+# ---
+# name: ListEmployeeRecordsTest.test_employee_records_with_a_suspension_need_to_be_updated[action]
+  '''
+  <div class="alert alert-warning" role="status">
+                      <div class="row">
+                          <div class="col-auto pe-0">
+                              <i class="ri-error-warning-line ri-xl text-warning"></i>
+                          </div>
+                          <div class="col">
+                              <p class="mb-2">
+                                  <strong>Une action de votre part est nécessaire</strong>
+                              </p>
+                              <p class="mb-0">
+                                  La nouvelle date de fin du PASS IAE n’a pas pu être transmise automatiquement à l’Extranet IAE 2.0 de l’ASP.
+                                  Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure.
+                              </p>
+                          </div>
+                          <div class="col-auto align-self-center">
+                              <a class="btn btn-sm btn-primary" href="/employee_record/create/[PK of JobApplication]">Mettre à jour</a>
+                          </div>
+                      </div>
+                  </div>
+  '''
+# ---
+# name: ListEmployeeRecordsTest.test_employee_records_with_a_suspension_need_to_be_updated[alert]
+  '''
+  <div class="alert alert-warning">
+              <div class="row">
+                  <div class="col-auto pe-0">
+                      <i class="ri-error-warning-line ri-xl text-danger"></i>
+                  </div>
+                  <div class="col">
+                      <p class="mb-0">
+                          <strong>Une action de votre part est nécessaire</strong>
+                      </p>
+                      <p class="mb-0">
+                          Attention, nous avons détecté une ou plusieurs fiches salarié qui nécessitent une régularisation manuelle de votre part.
+                      </p>
+                  </div>
+              </div>
+          </div>
+  '''
+# ---
+# name: ListEmployeeRecordsTest.test_employee_records_with_nir_associated_to_other[action]
+  '''
+  <div class="alert alert-warning" role="status">
+                      <div class="row">
+                          <div class="col-auto pe-0">
+                              <i class="ri-error-warning-line ri-xl text-warning"></i>
+                          </div>
+                          <div class="col">
+                              <p class="mb-2">
+                                  <strong>Informations manquantes</strong>
+                              </p>
+                              <p class="mb-0">Pour créer cette fiche salarié, veuillez demander la régularisation du numéro de sécurité sociale.</p>
+                          </div>
+                          <div class="col-auto align-self-center">
+                              <a class="btn btn-sm btn-primary" href="https://tally.so/r/wzxQlg?jobapplication=[PK of JobApplication]" rel="noopener" target="_blank">Régulariser le n° de sécurité sociale</a>
+                          </div>
+                      </div>
+                  </div>
+  '''
+# ---
+# name: ListEmployeeRecordsTest.test_employee_records_with_nir_associated_to_other[alert]
+  '''
+  <div class="alert alert-warning">
+              <div class="row">
+                  <div class="col-auto pe-0">
+                      <i class="ri-error-warning-line ri-xl text-danger"></i>
+                  </div>
+                  <div class="col">
+                      <p class="mb-0">
+                          <strong>Une action de votre part est nécessaire</strong>
+                      </p>
+                      <p class="mb-0">
+                          Attention, nous avons détecté une ou plusieurs fiches salarié qui nécessitent une régularisation manuelle de votre part.
+                      </p>
+                  </div>
+              </div>
+          </div>
+  '''
+# ---
+# name: ListEmployeeRecordsTest.test_existing_employee_records_with_a_prolongation_does_not_show_need_to_be_updated_message
+  '''
+  <div class="text-end">
+                      
+                          <a class="btn btn-sm btn-outline-primary mt-2" href="/employee_record/disable/[PK of EmployeeRecord]">Désactiver la fiche salarié</a>
+                      
+                      <a class="btn btn-sm btn-outline-primary mt-2" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">Compléter la fiche salarié</a>
+                  </div>
+  '''
+# ---
+# name: ListEmployeeRecordsTest.test_existing_employee_records_with_a_suspension_does_not_show_need_to_be_updated_message
+  '''
+  <div class="text-end">
+                      
+                          <a class="btn btn-sm btn-outline-primary mt-2" href="/employee_record/disable/[PK of EmployeeRecord]">Désactiver la fiche salarié</a>
+                      
+                      <a class="btn btn-sm btn-outline-primary mt-2" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">Compléter la fiche salarié</a>
+                  </div>
+  '''
+# ---
