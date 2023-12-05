@@ -89,13 +89,6 @@ TABLE.add_columns(
             "fn": lambda o: o.user_id if isinstance(o, Approval) else None,
         },
         {
-            # TODO @dejafait : eventually drop this obsolete field
-            "name": "id_candidat_anonymisé",
-            "type": "varchar",
-            "comment": "ID anonymisé du candidat",
-            "fn": lambda o: hash_content(o.user_id) if isinstance(o, Approval) else None,
-        },
-        {
             "name": "id_structure",
             "type": "integer",
             "comment": "ID structure qui a embauché si PASS IAE",
