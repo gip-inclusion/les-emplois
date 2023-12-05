@@ -51,7 +51,7 @@ def test_can_view_stats_cd():
     )
     request = get_request(org.members.get())
     assert not utils.can_view_stats_cd(request)
-    assert not utils.can_view_stats_dashboard_widget(request)
+    assert utils.can_view_stats_dashboard_widget(request)
 
     # Admin prescriber of authorized CD can access.
     org = PrescriberOrganizationWithMembershipFactory(
@@ -79,7 +79,7 @@ def test_can_view_stats_cd():
     )
     request = get_request(org.members.get())
     assert not utils.can_view_stats_cd(request)
-    assert not utils.can_view_stats_dashboard_widget(request)
+    assert utils.can_view_stats_dashboard_widget(request)
 
     # Non CD organization does not give access.
     org = PrescriberOrganizationWithMembershipFactory(
@@ -89,12 +89,12 @@ def test_can_view_stats_cd():
     )
     request = get_request(org.members.get())
     assert not utils.can_view_stats_cd(request)
-    assert not utils.can_view_stats_dashboard_widget(request)
+    assert utils.can_view_stats_dashboard_widget(request)
 
     # Prescriber without organization cannot access.
     request = get_request(PrescriberFactory())
     assert not utils.can_view_stats_cd(request)
-    assert not utils.can_view_stats_dashboard_widget(request)
+    assert utils.can_view_stats_dashboard_widget(request)
 
 
 def test_can_view_stats_pe_as_regular_pe_agency():
@@ -202,7 +202,7 @@ def test_can_view_stats_ddets_iae():
     institution = InstitutionWithMembershipFactory(kind=InstitutionKind.OTHER, department="93")
     request = get_request(institution.members.get())
     assert not utils.can_view_stats_ddets_iae(request)
-    assert not utils.can_view_stats_dashboard_widget(request)
+    assert utils.can_view_stats_dashboard_widget(request)
 
 
 def test_can_view_stats_dreets_iae():
@@ -224,7 +224,7 @@ def test_can_view_stats_dreets_iae():
     institution = InstitutionWithMembershipFactory(kind=InstitutionKind.OTHER, department="93")
     request = get_request(institution.members.get())
     assert not utils.can_view_stats_dreets_iae(request)
-    assert not utils.can_view_stats_dashboard_widget(request)
+    assert utils.can_view_stats_dashboard_widget(request)
 
 
 def test_can_view_stats_dgefp():
@@ -246,4 +246,4 @@ def test_can_view_stats_dgefp():
     institution = InstitutionWithMembershipFactory(kind=InstitutionKind.OTHER, department="93")
     request = get_request(institution.members.get())
     assert not utils.can_view_stats_dgefp(request)
-    assert not utils.can_view_stats_dashboard_widget(request)
+    assert utils.can_view_stats_dashboard_widget(request)
