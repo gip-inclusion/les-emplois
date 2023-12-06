@@ -25,7 +25,7 @@
    data-bs-placement="top"
    title="L'embauche empêche l'atteinte des engagements contractuels avec les parties prenantes à la convention de financement mise en place par l'État."></i>
                                 {% elif radio.data.value == RefusalReason.NO_POSITION %}
-                                    {{ radio.choice_label }}&nbsp;<i class="ri-question-fill ri-xl text-button ms-1" data-bs-toggle="tooltip" data-bs-placement="right" title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
+                                    {{ radio.choice_label }}&nbsp;<i class="ri-information-line ri-xl text-button ms-1" data-bs-toggle="tooltip" data-bs-placement="right" title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
 
                                 {% else %}
                                     {{ radio.choice_label }}
@@ -34,6 +34,9 @@
                         </li>
                     {% endfor %}
                 </ul>
+                <div class="c-info refusal-reason-no-position-info d-none">
+                    <span class="c-info__summary">En choisissant ce motif, les fiches de postes associées seront dépubliées.</span>
+                </div>
             </div>
 
             {% if form.answer_to_prescriber %}
@@ -57,4 +60,19 @@
 
         </form>
     </div>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script nonce="{{ CSP_NONCE }}">
+        $(document).ready(function() {
+            $('input[name="refusal_reason"]').change(function() {
+                if (this.value === 'no_position') {
+                    $('.refusal-reason-no-position-info').removeClass('d-none');
+                } else {
+                    $('.refusal-reason-no-position-info').addClass('d-none');
+                }
+            });
+        });
+    </script>
 {% endblock %}
