@@ -31,7 +31,7 @@ from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import PoleEmploiApprovalFactory
 from tests.cities.factories import create_city_in_zrr, create_test_cities
-from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWithMembershipAndJobsFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from tests.geo.factories import ZRRFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
@@ -1143,6 +1143,36 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         assert response.status_code == 200
 
+    def test_cannot_create_job_seeker_with_pole_emploi_email(self):
+        company = CompanyMembershipFactory().company
+
+        prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        user = prescriber_organization.members.first()
+        self.client.force_login(user)
+
+        nir_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk})
+        response = self.client.get(nir_url)
+        assert response.status_code == 200
+
+        response = self.client.post(nir_url, data={"nir": JobSeekerFactory.build().nir, "confirm": 1})
+        assert response.status_code == 302
+
+        session_uuid = str(resolve(response.url).kwargs["session_uuid"])
+        email_url = reverse(
+            "apply:search_by_email_for_sender", kwargs={"company_pk": company.pk, "session_uuid": session_uuid}
+        )
+        assert response.url == email_url
+
+        # Step get job seeker e-mail.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(email_url)
+        assert response.status_code == 200
+
+        response = self.client.post(email_url, data={"email": "toto@pole-emploi.fr", "confirm": "1"})
+        assert response.status_code == 200
+        self.assertContains(response, "Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
+
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class ApplyAsPrescriberTest(TestCase):
@@ -1876,6 +1906,36 @@ class ApplyAsCompanyTest(TestCase):
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
         assert response.status_code == 200
+
+    def test_cannot_create_job_seeker_with_pole_emploi_email(self):
+        # It's unlikely to happen
+        membership = CompanyMembershipFactory()
+        company = membership.company
+        user = membership.user
+        self.client.force_login(user)
+
+        nir_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk})
+        response = self.client.get(nir_url)
+        assert response.status_code == 200
+
+        response = self.client.post(nir_url, data={"nir": JobSeekerFactory.build().nir, "confirm": 1})
+        assert response.status_code == 302
+
+        session_uuid = str(resolve(response.url).kwargs["session_uuid"])
+        email_url = reverse(
+            "apply:search_by_email_for_sender", kwargs={"company_pk": company.pk, "session_uuid": session_uuid}
+        )
+        assert response.url == email_url
+
+        # Step get job seeker e-mail.
+        # ----------------------------------------------------------------------
+
+        response = self.client.get(email_url)
+        assert response.status_code == 200
+
+        response = self.client.post(email_url, data={"email": "toto@pole-emploi.fr", "confirm": "1"})
+        assert response.status_code == 200
+        self.assertContains(response, "Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
 
 
 class DirectHireFullProcessTest(TestCase):
