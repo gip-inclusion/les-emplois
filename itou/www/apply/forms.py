@@ -50,6 +50,8 @@ class JobSeekerExistsForm(forms.Form):
         email = self.cleaned_data["email"]
         if email.endswith(global_constants.POLE_EMPLOI_EMAIL_SUFFIX):
             raise ValidationError("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
+        if email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
+            raise ValidationError("Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
         self.user = User.objects.filter(email__iexact=email).first()
         if self.user:
             if not self.user.is_active:

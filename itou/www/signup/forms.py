@@ -148,6 +148,8 @@ class JobSeekerSignupForm(FullnameFormMixin, SignupForm):
         email = super().clean_email()
         if email.endswith(global_constants.POLE_EMPLOI_EMAIL_SUFFIX):
             raise ValidationError("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
+        if email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX):
+            raise ValidationError("Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
         if User.objects.filter(email=email).exists():
             raise ValidationError("Un autre utilisateur utilise déjà cette adresse e-mail.")
         return email
