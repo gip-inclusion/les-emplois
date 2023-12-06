@@ -932,8 +932,6 @@ class FilterJobApplicationsForm(forms.Form):
                 pass_status_filter |= Q(has_suspended_approval=True)
             filters.append(pass_status_filter)
 
-        if data.get("eligibility_validated"):
-            filters.append(Q(jobseeker_eligibility_diagnosis__isnull=False))
         if start_date := data.get("start_date"):
             filters.append(Q(created_at__gte=start_date))
         if end_date := data.get("end_date"):
@@ -1015,6 +1013,9 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
 
     def filter(self, queryset):
         queryset = super().filter(queryset)
+        if self.cleaned_data.get("eligibility_validated"):
+            queryset = queryset.eligibility_validated()
+
         if senders := self.cleaned_data.get("senders"):
             queryset = queryset.filter(sender__id__in=senders)
 
