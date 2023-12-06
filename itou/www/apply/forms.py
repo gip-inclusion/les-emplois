@@ -5,6 +5,7 @@ from operator import itemgetter
 import sentry_sdk
 from dateutil.relativedelta import relativedelta
 from django import forms
+from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db.models import Q
 from django.db.models.fields import BLANK_CHOICE_DASH
@@ -47,6 +48,8 @@ class JobSeekerExistsForm(forms.Form):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
+        if email.endswith(global_constants.POLE_EMPLOI_EMAIL_SUFFIX):
+            raise ValidationError("Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
         self.user = User.objects.filter(email__iexact=email).first()
         if self.user:
             if not self.user.is_active:
