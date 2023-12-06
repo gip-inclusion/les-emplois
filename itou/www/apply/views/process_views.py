@@ -17,7 +17,6 @@ from itou.companies.models import Company
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
-from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import AcceptForm, AnswerForm, PriorActionForm, RefusalForm
@@ -534,9 +533,7 @@ def delete_prior_action(request, job_application_id, prior_action_id):
         if state_changed
         else ""
     )
-    return HttpResponse(
-        content, headers=hx_trigger_modal_control(f"delete_prior_action_{ prior_action_id }_modal", "hide")
-    )
+    return HttpResponse(content)
 
 
 @login_required
