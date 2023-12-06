@@ -304,6 +304,8 @@ class ProcessViewsTest(TestCase):
         # phone sender is hidden for job seeker
         self.assertNotContains(response, format_phone(job_application.sender.phone))
 
+        assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
+
     def test_details_for_job_seeker_as_other_user(self, *args, **kwargs):
         job_application = JobApplicationFactory()
         url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
@@ -1726,6 +1728,56 @@ def test_details_for_prescriber_geiq(client):
     assert response.status_code == 200
 
     assert response.context["geiq_eligibility_diagnosis"] == job_application.geiq_eligibility_diagnosis
+    assertContains(response, PRIOR_ACTION_SECTION_TITLE)
+
+
+def test_details_for_prescriber_geiq_with_prior_actions(client):
+    job_application = JobApplicationFactory(
+        sent_by_authorized_prescriber_organisation=True,
+        state=JobApplicationWorkflow.STATE_PROCESSING,
+        with_geiq_eligibility_diagnosis_from_prescriber=True,
+    )
+    prior_action = PriorActionFactory(
+        job_application=job_application, action=job_applications_enums.Prequalification.AFPR
+    )
+    prescriber = job_application.sender_prescriber_organization.members.first()
+    delete_button = (
+        '<button class="btn btn-link" data-bs-toggle="modal" '
+        f'data-bs-target="#delete_prior_action_{prior_action.id}_modal">'
+    )
+    client.force_login(prescriber)
+
+    url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+    response = client.get(url)
+
+    assertContains(response, PRIOR_ACTION_SECTION_TITLE)
+    assertContains(response, prior_action.action.label)
+    assertNotContains(response, delete_button)
+
+
+def test_details_for_jobseeker_geiq_with_prior_actions(client):
+    job_application = JobApplicationFactory(
+        sent_by_authorized_prescriber_organisation=True,
+        state=JobApplicationWorkflow.STATE_PROCESSING,
+        with_geiq_eligibility_diagnosis_from_prescriber=True,
+    )
+    prior_action = PriorActionFactory(
+        job_application=job_application, action=job_applications_enums.Prequalification.AFPR
+    )
+    job_seeker = job_application.job_seeker
+    delete_button = (
+        '<button class="btn btn-link" data-bs-toggle="modal" '
+        f'data-bs-target="#delete_prior_action_{prior_action.id}_modal">'
+    )
+
+    client.force_login(job_seeker)
+
+    url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
+    response = client.get(url)
+
+    assertContains(response, PRIOR_ACTION_SECTION_TITLE)
+    assertContains(response, prior_action.action.label)
+    assertNotContains(response, delete_button)
 
 
 def test_accept_button(client):

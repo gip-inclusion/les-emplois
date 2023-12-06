@@ -30,6 +30,15 @@
         <h3>Candidature envoyée par</h3>
         {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
 
+        {# Prior actions info #}
+        {% if job_application.can_have_prior_action %}
+            <hr>
+            <h3>Action préalable à l'embauche</h3>
+            {% for prior_action in job_application.prior_actions.all %}
+                {% include "apply/includes/job_application_prior_action.html" with job_application=job_application prior_action=prior_action add_prior_action_form=None hide_final_hr=forloop.last %}
+            {% endfor %}
+        {% endif %}
+
         {# Negative answers ------------------------------------------------------------------------- #}
         {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
 
