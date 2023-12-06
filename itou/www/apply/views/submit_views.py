@@ -39,8 +39,8 @@ from itou.www.apply.forms import (
     CreateOrUpdateJobSeekerStep1Form,
     CreateOrUpdateJobSeekerStep2Form,
     CreateOrUpdateJobSeekerStep3Form,
+    JobSeekerExistsForm,
     SubmitJobApplicationForm,
-    UserExistsForm,
 )
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
@@ -347,7 +347,7 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSend
     def setup(self, request, *args, **kwargs):
         self.job_seeker_session = SessionNamespace(request.session, kwargs["session_uuid"])
         super().setup(request, *args, **kwargs)
-        self.form = UserExistsForm(initial=self.job_seeker_session.get("user", {}), data=request.POST or None)
+        self.form = JobSeekerExistsForm(initial=self.job_seeker_session.get("user", {}), data=request.POST or None)
 
     def post(self, request, *args, **kwargs):
         can_add_nir = False

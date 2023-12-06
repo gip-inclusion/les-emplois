@@ -35,7 +35,7 @@ from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.companies_views.forms import JobAppellationAndLocationMixin
 
 
-class UserExistsForm(forms.Form):
+class JobSeekerExistsForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = None

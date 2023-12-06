@@ -37,7 +37,7 @@ from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX
 from itou.utils.urls import get_safe_url
-from itou.www.apply.forms import UserExistsForm
+from itou.www.apply.forms import JobSeekerExistsForm
 from itou.www.approvals_views.forms import (
     ApprovalForm,
     PoleEmploiApprovalSearchForm,
@@ -745,7 +745,7 @@ def pe_approval_search_user(request, pe_approval_id, template_name="approvals/pe
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
 
-    form = UserExistsForm(data=None)
+    form = JobSeekerExistsForm(data=None)
 
     context = {"back_url": back_url, "form": form, "pe_approval": pe_approval}
     return render(request, template_name, context)
@@ -761,7 +761,7 @@ def pe_approval_create(request, pe_approval_id):
     siae = get_current_company_or_404(request)
     pe_approval = get_object_or_404(PoleEmploiApproval, pk=pe_approval_id)
 
-    form = UserExistsForm(data=request.POST or None)
+    form = JobSeekerExistsForm(data=request.POST or None)
     if request.method != "POST" or not form.is_valid():
         next_url = reverse(
             "approvals:pe_approval_search_user",
