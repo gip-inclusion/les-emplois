@@ -290,6 +290,24 @@ class ApprovalSuspendActionChoiceViewTest(TestCase):
         assert response.context["suspension"] == self.suspension
         assert response.context["back_url"] == reverse("approvals:detail", kwargs={"pk": self.suspension.approval_id})
 
+    def test_input_action_names(self):
+        self.client.force_login(self.employer)
+
+        response = self.client.get(self.url)
+        assertContains(
+            response,
+            (
+                '<input class="form-check-input" type="radio" name="action" '
+                'id="endDateRadios" value="update_enddate" checked>'
+            ),
+            status_code=200,
+        )
+        assertContains(
+            response,
+            '<input class="form-check-input" type="radio" name="action" id="deleteRadios" value="delete">',
+            status_code=200,
+        )
+
     def test_post_delete(self):
         self.client.force_login(self.employer)
 
