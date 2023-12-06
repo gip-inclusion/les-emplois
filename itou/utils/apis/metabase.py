@@ -51,6 +51,9 @@ METABASE_DASHBOARDS = {
     "stats_cd_brsa": {
         "dashboard_id": 330,
     },
+    "stats_cd_aci": {
+        "dashboard_id": 327,
+    },
     #
     # Prescriber stats - PE.
     #
@@ -114,6 +117,9 @@ METABASE_DASHBOARDS = {
         "dashboard_id": 310,
         "tally_popup_form_id": "w2az2j",
         "tally_embed_form_id": "3Nlvzl",
+    },
+    "stats_ddets_iae_aci": {
+        "dashboard_id": 327,
     },
     #
     # Institution stats - DDETS LOG - department level.

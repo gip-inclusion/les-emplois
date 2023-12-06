@@ -28,6 +28,7 @@ from itou.common_apps.address.departments import (
     format_region_and_department_for_matomo,
     format_region_for_matomo,
 )
+from itou.companies import models as companies_models
 from itou.utils import constants as global_constants
 from itou.utils.apis import metabase as mb
 from itou.utils.perms.company import get_current_company_or_404
@@ -81,6 +82,23 @@ def get_params_for_whole_country():
     return {
         mb.DEPARTMENT_FILTER_KEY: list(DEPARTMENTS.values()),
         mb.REGION_FILTER_KEY: list(REGIONS.keys()),
+    }
+
+
+def get_params_aci_asp_ids_for_department(department):
+    return {
+        mb.ASP_SIAE_FILTER_KEY_FLAVOR2: list(
+            companies_models.Company.objects.filter(
+                kind=companies_models.CompanyKind.ACI,
+                department=department,
+                # By only taking ASP-imported SIAE and because we are using the `asp_id`:
+                # - antennas in the department with a convention signed in another department are filter out
+                # - antennas not in the department with a convention signed in the department are included
+                source=companies_models.Company.SOURCE_ASP,
+            )
+            .select_related("convention")
+            .values_list("convention__asp_id", flat=True)
+        )
     }
 
 
@@ -244,16 +262,16 @@ def stats_siae_follow_siae_evaluation(request):
     return render_stats_siae(request=request, page_title="Suivi du contrôle a posteriori")
 
 
-def render_stats_cd(request, page_title):
+def render_stats_cd(request, page_title, params=None):
     """
     CD ("Conseil Départemental") stats shown to relevant members.
     They can only view data for their own departement.
     """
     current_org = get_current_org_or_404(request)
-    if not utils.can_view_stats_cd_whitelist(request):
+    if not utils.can_view_stats_cd(request):
         raise PermissionDenied
     department = current_org.department
-    params = get_params_for_departement(department)
+    params = get_params_for_departement(department) if params is None else params
     context = {
         "page_title": f"{page_title} de mon département : {DEPARTMENTS[department]}",
         "department": department,
@@ -264,12 +282,29 @@ def render_stats_cd(request, page_title):
 
 @login_required
 def stats_cd_hiring(request):
+    if not utils.can_view_stats_cd_whitelist(request):
+        raise PermissionDenied
     return render_stats_cd(request=request, page_title="Facilitation des embauches en IAE")
 
 
 @login_required
 def stats_cd_brsa(request):
+    if not utils.can_view_stats_cd_whitelist(request):
+        raise PermissionDenied
     return render_stats_cd(request=request, page_title="Suivi des prescriptions des accompagnateurs des publics bRSA")
+
+
+@login_required
+def stats_cd_aci(request):
+    current_org = get_current_org_or_404(request)
+    if not utils.can_view_stats_cd_aci(request):
+        raise PermissionDenied
+
+    return render_stats_cd(
+        request=request,
+        page_title="Suivi du cofinancement des ACI",
+        params=get_params_aci_asp_ids_for_department(current_org.department),
+    )
 
 
 def render_stats_pe(request, page_title, extra_params=None):
@@ -391,7 +426,7 @@ def stats_pe_tension(request):
     )
 
 
-def render_stats_ddets(request, page_title, extra_context, extend_stats_to_whole_region):
+def render_stats_ddets(request, page_title, extra_context, extend_stats_to_whole_region, params=None):
     current_org = get_current_institution_or_404(request)
     department = current_org.department
     department_label = DEPARTMENTS[department]
@@ -405,11 +440,15 @@ def render_stats_ddets(request, page_title, extra_context, extend_stats_to_whole
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
     context.update(extra_context)
-    params = get_params_for_region(region) if extend_stats_to_whole_region else get_params_for_departement(department)
+    if params is None:
+        if extend_stats_to_whole_region:
+            params = get_params_for_region(region)
+        else:
+            params = get_params_for_departement(department)
     return render_stats(request=request, context=context, params=params)
 
 
-def render_stats_ddets_iae(request, page_title, extra_context=None, extend_stats_to_whole_region=False):
+def render_stats_ddets_iae(request, page_title, extra_context=None, extend_stats_to_whole_region=False, params=None):
     if extra_context is None:
         # Do not use mutable default arguments,
         # see https://florimond.dev/en/posts/2018/08/python-mutable-defaults-are-the-source-of-all-evil/
@@ -422,6 +461,7 @@ def render_stats_ddets_iae(request, page_title, extra_context=None, extend_stats
         page_title=page_title,
         extra_context=extra_context,
         extend_stats_to_whole_region=extend_stats_to_whole_region,
+        params=params,
     )
 
 
@@ -470,6 +510,19 @@ def stats_ddets_iae_state(request):
         request=request,
         page_title="Suivi des prescriptions des AHI de ma région",
         extend_stats_to_whole_region=True,
+    )
+
+
+@login_required
+def stats_ddets_iae_aci(request):
+    current_org = get_current_institution_or_404(request)
+    if not utils.can_view_stats_ddets_iae_aci(request):
+        raise PermissionDenied
+
+    return render_stats_ddets_iae(
+        request=request,
+        page_title="Suivi du cofinancement des ACI",
+        params=get_params_aci_asp_ids_for_department(current_org.department),
     )
 
 

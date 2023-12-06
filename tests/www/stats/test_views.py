@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 
+import factory
 import pytest
 from django.test import override_settings
 from django.urls import reverse
@@ -8,8 +9,11 @@ from pytest_django.asserts import assertQuerySetEqual
 
 from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION
+from itou.companies.enums import CompanyKind
+from itou.companies.models import Company
 from itou.institutions.enums import InstitutionKind
 from itou.utils.apis.metabase import METABASE_DASHBOARDS
+from itou.www.stats.views import get_params_aci_asp_ids_for_department
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
@@ -266,3 +270,25 @@ def test_stats_dgefp_log_visit(client, view_name):
             datetime(2023, 3, 10, tzinfo=timezone.utc),
         ),
     )
+
+
+def test_get_params_aci_asp_ids_for_department():
+    company = CompanyFactory(kind=CompanyKind.ACI, department=factory.fuzzy.FuzzyChoice([31, 84]))
+    assert get_params_aci_asp_ids_for_department(company.department) == {
+        "id_asp_de_la_siae": [company.convention.asp_id]
+    }
+    assert get_params_aci_asp_ids_for_department(42) == {"id_asp_de_la_siae": []}
+
+
+def test_get_params_aci_asp_ids_for_department_when_only_the_antenna_is_in_the_department():
+    company = CompanyFactory(kind=CompanyKind.ACI, department=42)
+    antenna = CompanyFactory(
+        kind=CompanyKind.ACI,
+        department=factory.fuzzy.FuzzyChoice([31, 84]),
+        convention=company.convention,
+        source=Company.SOURCE_USER_CREATED,
+    )
+    assert get_params_aci_asp_ids_for_department(antenna.department) == {"id_asp_de_la_siae": []}
+    assert get_params_aci_asp_ids_for_department(company.department) == {
+        "id_asp_de_la_siae": [company.convention.asp_id]
+    }
