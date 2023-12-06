@@ -114,7 +114,9 @@
                                                                         {% csrf_token %}
                                                                         <input type="hidden" name="action" value="delete" />
                                                                         <input type="hidden" name="job_description_id" value="{{ job_description.id }}" />
-                                                                        <button class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" aria-label="Annuler">Annuler</button>
+                                                                        <button class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" aria-label="Annuler" type="button">
+                                                                            Annuler
+                                                                        </button>
                                                                         <button class="btn btn-primary btn-sm" aria-label="Supprimer">Supprimer</button>
                                                                     </form>
                                                                 </div>
