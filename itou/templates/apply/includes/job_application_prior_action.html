@@ -11,7 +11,7 @@
     <div>
         Date de fin : <b>{{ prior_action.dates.upper }}</b>
     </div>
-    {% if job_application.can_change_prior_actions %}
+    {% if job_application.can_change_prior_actions and request.user.is_employer %}
         <div class="my-3">
             {# Delete button with its confirmation modal #}
             <button class="btn btn-link" data-bs-toggle="modal" data-bs-target="#delete_prior_action_{{ prior_action.pk }}_modal">
@@ -55,7 +55,7 @@
                     hx-swap="outerHTML">Modifier les informations</button>
         </div>
     {% endif %}
-    {% if job_application.can_change_prior_actions or not hide_final_hr %}<hr>{% endif %}
+    {% if job_application.can_change_prior_actions and request.user.is_employer or not hide_final_hr %}<hr>{% endif %}
 </div>
 {% if add_prior_action_form %}
     {# A new prior action has been added and is being swapped to replace the add form: we now need a new one #}
