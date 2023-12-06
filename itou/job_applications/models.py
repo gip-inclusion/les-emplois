@@ -228,6 +228,20 @@ class JobApplicationQuerySet(models.QuerySet):
         )
         return self.annotate(jobseeker_eligibility_diagnosis=Coalesce(F("eligibility_diagnosis"), sub_query, None))
 
+    def eligibility_validated(self):
+        return self.filter(
+            Exists(
+                Approval.objects.filter(
+                    user=OuterRef("job_seeker"),
+                ).valid()
+            )
+            | Exists(
+                EligibilityDiagnosis.objects.for_job_seeker_and_siae(
+                    job_seeker=OuterRef("job_seeker"), siae=OuterRef("to_company")
+                ).valid()
+            )
+        )
+
     def with_eligibility_diagnosis_criterion(self, criterion):
         """
         Create an annotation by criterion given (used in the filters form).

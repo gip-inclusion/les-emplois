@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
@@ -12,10 +14,10 @@ from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.utils.widgets import DuetDatePickerWidget
-from tests.approvals.factories import SuspensionFactory
+from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory
+from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
@@ -576,11 +578,44 @@ class ProcessListSiaeTest(ProcessListTest):
         response = self.client.get(self.siae_base_url, params)
         assert len(response.context["job_applications_page"].object_list) == 0
 
-        EligibilityDiagnosisFactory(job_seeker=self.maggie)
-
+        # Authorized prescriber diagnosis
+        diagnosis = EligibilityDiagnosisFactory(job_seeker=self.maggie)
         response = self.client.get(self.siae_base_url, params)
         # Maggie has two applications, one created in the state loop and the other created by SentByPrescriberFactory
         assert len(response.context["job_applications_page"].object_list) == 2
+
+        # Make sure the diagnostic expired - it should be ignored
+        diagnosis.expires_at = timezone.now() - datetime.timedelta(days=diagnosis.EXPIRATION_DELAY_MONTHS * 31 + 1)
+        diagnosis.save(update_fields=("expires_at",))
+        response = self.client.get(self.siae_base_url, params)
+        assert len(response.context["job_applications_page"].object_list) == 0
+
+        # Diagnosis made by eddie_hit_pit's SIAE
+        diagnosis.delete()
+        diagnosis = EligibilityDiagnosisMadeBySiaeFactory(job_seeker=self.maggie, author_siae=self.hit_pit)
+        response = self.client.get(self.siae_base_url, params)
+        # Maggie has two applications, one created in the state loop and the other created by SentByPrescriberFactory
+        assert len(response.context["job_applications_page"].object_list) == 2
+
+        # Diagnosis made by an other SIAE - it should be ignored
+        diagnosis.delete()
+        diagnosis = EligibilityDiagnosisMadeBySiaeFactory(job_seeker=self.maggie)
+        response = self.client.get(self.siae_base_url, params)
+        assert len(response.context["job_applications_page"].object_list) == 0
+
+        # With a valid approval
+        approval = ApprovalFactory(user=self.maggie, with_origin_values=True)  # origin_values needed to delete it
+        response = self.client.get(self.siae_base_url, params)
+        # Maggie has two applications, one created in the state loop and the other created by SentByPrescriberFactory
+        assert len(response.context["job_applications_page"].object_list) == 2
+
+        # With an expired approval
+        approval_diagnosis = approval.eligibility_diagnosis
+        approval.delete()
+        approval_diagnosis.delete()
+        approval = ApprovalFactory(expired=True)
+        response = self.client.get(self.siae_base_url, params)
+        assert len(response.context["job_applications_page"].object_list) == 0
 
     def test_view__filtered_by_administrative_criteria(self):
         """
