@@ -417,7 +417,6 @@ ACI_CONVERGENCE_SIRET_WHITELIST = json.loads(os.getenv("ACI_CONVERGENCE_SIRET_WH
 
 # Specific experimental stats are progressively being deployed to more and more users and/or companies.
 # Kept as a setting to not let User pks or Company asp_ids in clear in the code.
-STATS_SIAE_ASP_ID_WHITELIST = json.loads(os.getenv("STATS_SIAE_ASP_ID_WHITELIST", "[]"))
 STATS_SIAE_USER_PK_WHITELIST = json.loads(os.getenv("STATS_SIAE_USER_PK_WHITELIST", "[]"))
 STATS_CD_DEPARTMENT_WHITELIST = ["13", "18", "37", "38", "41", "45", "49", "93"]
 

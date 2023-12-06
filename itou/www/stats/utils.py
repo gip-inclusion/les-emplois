@@ -46,8 +46,7 @@ def can_view_stats_siae_aci(request):
     return (
         can_view_stats_siae(request)
         and request.current_organization.kind == CompanyKind.ACI
-        and request.current_organization.convention is not None
-        and request.current_organization.convention.asp_id in settings.STATS_SIAE_ASP_ID_WHITELIST
+        and request.current_organization.department in ["31", "84"]
     )
 
 
