@@ -252,23 +252,22 @@
                             {% if request.current_organization %}{{ request.current_organization.display_name }}{% endif %}
                         </h1>
 
-                        {% if user.is_prescriber and request.current_organization %}
+                        {% if request.current_organization %}
                             <p class="my-1">
-                                {% if request.current_organization.is_authorized %}
-                                    <span class="badge rounded-pill badge-sm bg-warning">Prescripteur habilité</span>
-                                {% endif %}
-                                {% if request.current_organization.code_safir_pole_emploi %}
-                                    <span class="badge rounded-pill badge-sm bg-light">Code SAFIR {{ request.current_organization.code_safir_pole_emploi }}</span>
-                                {% endif %}
-                                {% if request.current_organization.siret %}
-                                    <span class="badge rounded-pill badge-sm bg-light">SIRET {{ request.current_organization.siret|format_siret }}</span>
+                                {% if user.is_prescriber %}
+                                    {% if request.current_organization.code_safir_pole_emploi %}
+                                        {% if request.current_organization.is_authorized %}Prescripteur habilité -{% endif %}
+                                        Code SAFIR {{ request.current_organization.code_safir_pole_emploi }}
+                                    {% elif request.current_organization.siret %}
+                                        {% if request.current_organization.is_authorized %}Prescripteur habilité -{% endif %}
+                                        SIRET {{ request.current_organization.siret|format_siret }}
+                                    {% endif %}
+                                {% elif user.is_employer %}
+                                    SIRET {{ request.current_organization.siret|format_siret }}
                                 {% endif %}
                             </p>
                         {% endif %}
 
-                        {% if user.is_employer and request.current_organization %}
-                            <p class="mb-0">SIRET {{ request.current_organization.siret|format_siret }}</p>
-                        {% endif %}
                     </div>
                 </div>
             </div>
