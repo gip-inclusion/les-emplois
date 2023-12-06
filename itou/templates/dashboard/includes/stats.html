@@ -60,6 +60,15 @@
                         {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                 {% endif %}
+                {% if can_view_stats_cd_aci %}
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_cd_aci' %}" class="btn-link btn-ico">
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                            <span>Suivi du cofinancement des ACI</span>
+                        </a>
+                        {% include "dashboard/includes/stats_new_badge.html" %}
+                    </li>
+                {% endif %}
                 {% if can_view_stats_pe %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="https://plateforme-inclusion.notion.site/Guide-d-analyse-des-tableaux-de-bord-P-le-emploi-dad8530e64af47bd99787a6d4e81f6b9"
@@ -136,6 +145,15 @@
                         </a>
                         {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
+                    {% if can_view_stats_ddets_iae_aci %}
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'stats:stats_ddets_iae_aci' %}" class="btn-link btn-ico">
+                                <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                                <span>Suivi du cofinancement des ACI</span>
+                            </a>
+                            {% include "dashboard/includes/stats_new_badge.html" %}
+                        </li>
+                    {% endif %}
                 {% endif %}
                 {% if can_view_stats_ddets_log %}
                     <li class="d-flex justify-content-between align-items-center mb-3">

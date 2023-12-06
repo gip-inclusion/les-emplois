@@ -419,6 +419,7 @@ ACI_CONVERGENCE_SIRET_WHITELIST = json.loads(os.getenv("ACI_CONVERGENCE_SIRET_WH
 # Kept as a setting to not let User pks or Company asp_ids in clear in the code.
 STATS_SIAE_USER_PK_WHITELIST = json.loads(os.getenv("STATS_SIAE_USER_PK_WHITELIST", "[]"))
 STATS_CD_DEPARTMENT_WHITELIST = ["13", "18", "37", "38", "41", "45", "49", "93"]
+STATS_ACI_DEPARTMENT_WHITELIST = ["31", "84"]
 
 # Slack notifications sent by Metabase cronjobs.
 SLACK_CRON_WEBHOOK_URL = os.getenv("SLACK_CRON_WEBHOOK_URL")

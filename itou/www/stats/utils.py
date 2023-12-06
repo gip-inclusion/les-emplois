@@ -46,7 +46,7 @@ def can_view_stats_siae_aci(request):
     return (
         can_view_stats_siae(request)
         and request.current_organization.kind == CompanyKind.ACI
-        and request.current_organization.department in ["31", "84"]
+        and request.current_organization.department in settings.STATS_ACI_DEPARTMENT_WHITELIST
     )
 
 
@@ -57,7 +57,7 @@ def can_view_stats_siae_etp(request):
     return can_view_stats_siae(request) and request.user.pk in settings.STATS_SIAE_USER_PK_WHITELIST
 
 
-def can_view_stats_cd_whitelist(request):
+def can_view_stats_cd(request):
     """
     Users of a real CD can view the confidential CD stats for their department only.
 
@@ -78,7 +78,20 @@ def can_view_stats_cd_whitelist(request):
         and request.current_organization.is_authorized
         and request.current_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
         and not request.current_organization.is_brsa
+    )
+
+
+def can_view_stats_cd_whitelist(request):
+    return (
+        can_view_stats_cd(request)
         and request.current_organization.department in settings.STATS_CD_DEPARTMENT_WHITELIST
+    )
+
+
+def can_view_stats_cd_aci(request):
+    return (
+        can_view_stats_cd(request)
+        and request.current_organization.department in settings.STATS_ACI_DEPARTMENT_WHITELIST
     )
 
 
@@ -100,6 +113,16 @@ def can_view_stats_ddets_iae(request):
         request.user.is_labor_inspector
         and isinstance(request.current_organization, Institution)
         and request.current_organization.kind == InstitutionKind.DDETS_IAE
+    )
+
+
+def can_view_stats_ddets_iae_aci(request):
+    """
+    Users of a DDETS IAE can view the confidential DDETS IAE stats of their department only.
+    """
+    return (
+        can_view_stats_ddets_iae(request)
+        and request.current_organization.department in settings.STATS_ACI_DEPARTMENT_WHITELIST
     )
 
 
