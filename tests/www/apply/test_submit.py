@@ -1173,6 +1173,10 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         assert response.status_code == 200
         self.assertContains(response, "Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
 
+        response = self.client.post(email_url, data={"email": "titi@francetravail.fr", "confirm": "1"})
+        assert response.status_code == 200
+        self.assertContains(response, "Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
+
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class ApplyAsPrescriberTest(TestCase):
@@ -1936,6 +1940,10 @@ class ApplyAsCompanyTest(TestCase):
         response = self.client.post(email_url, data={"email": "toto@pole-emploi.fr", "confirm": "1"})
         assert response.status_code == 200
         self.assertContains(response, "Vous ne pouvez pas utiliser un e-mail Pôle emploi pour un candidat.")
+
+        response = self.client.post(email_url, data={"email": "titi@francetravail.fr", "confirm": "1"})
+        assert response.status_code == 200
+        self.assertContains(response, "Vous ne pouvez pas utiliser un e-mail France Travail pour un candidat.")
 
 
 class DirectHireFullProcessTest(TestCase):
