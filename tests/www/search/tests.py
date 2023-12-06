@@ -56,9 +56,9 @@ class SearchCompanyTest(TestCase):
         ):
             response = self.client.get(self.url, {"city": city_slug})
 
-        self.assertContains(response, "Employeurs solidaires à 25 km du centre de Paris (75)")
+        self.assertContains(response, "Emplois inclusifs à 25 km du centre de Paris (75)")
         # look for the matomo_custom_title
-        self.assertContains(response, "Recherche d&#x27;employeurs solidaires")
+        self.assertContains(response, "Rechercher un emploi inclusif")
         self.assertContains(
             response,
             """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
@@ -307,7 +307,7 @@ class JobDescriptionSearchViewTest(TestCase):
         ):
             response = self.client.get(self.url, {"city": city_slug})
 
-        self.assertContains(response, "Employeurs solidaires à 25 km du centre de Paris (75)")
+        self.assertContains(response, "Emplois inclusifs à 25 km du centre de Paris (75)")
         self.assertContains(
             response,
             """

@@ -3,14 +3,15 @@
 
 {% block title %}
     {% if form.is_valid %}
-        Employeurs solidaires à {{ distance }} km du centre de {{ city }}
+        Emplois inclusifs à {{ distance }} km du centre de {{ city }}
+        {% include "includes/pagination_for_title.html" with page=results_page only %}
     {% else %}
-        Recherche d'employeurs solidaires
+        Rechercher un emploi inclusif
     {% endif %}
     {{ block.super }}
 {% endblock %}
 
-{% block content_title %}<h1>Rechercher des employeurs solidaires</h1>{% endblock %}
+{% block content_title %}<h1>Rechercher un emploi inclusif</h1>{% endblock %}
 
 {% block content %}
     <section class="s-tabs-01">
