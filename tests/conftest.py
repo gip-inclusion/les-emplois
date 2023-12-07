@@ -39,6 +39,18 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(pytest.mark.django_db)
 
 
+@pytest.hookimpl(trylast=True)
+def pytest_configure(config) -> None:
+    # Make sure pytest-randomly's pytest_collection_modifyitems hook runs before pytest-django's one
+    # Note: _hookimpls execution order is reversed meaning that the last ones are run first
+    config.pluginmanager.hook.pytest_collection_modifyitems._hookimpls.sort(
+        key=lambda hook_impl: (
+            hook_impl.wrapper or hook_impl.hookwrapper,  # Keep hookwrappers last
+            hook_impl.plugin_name == "randomly",  # Then pytest-randomly's and after that all the other ones
+        )
+    )
+
+
 @pytest.fixture
 def admin_client():
     client = NoInlineClient()
