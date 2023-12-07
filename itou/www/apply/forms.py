@@ -919,14 +919,18 @@ class FilterJobApplicationsForm(forms.Form):
 
         if data.get("states"):
             filters["state__in"] = data.get("states")
-        if data.get("pass_iae_suspended"):
-            # Filter on the `has_suspended_approval` annotation, which is set in `with_list_related_data()`.
-            filters["has_suspended_approval"] = True
+
         if data.get("pass_iae_active"):
             # Simplification of CommonApprovalQuerySet.valid_lookup()
             filters["approval__end_at__gte"] = timezone.localdate()
             # The date is not enough to know if an approval is valid or not
             filters["has_suspended_approval"] = False
+        elif data.get("pass_iae_suspended"):
+            # This is NOT what we want but how things work currently:
+            # if you check pass_iae_active, the value of pass_iae_suspended is ignored
+            # Filter on the `has_suspended_approval` annotation, which is set in `with_list_related_data()`.
+            filters["has_suspended_approval"] = True
+
         if data.get("eligibility_validated"):
             filters["jobseeker_eligibility_diagnosis__isnull"] = False
         if data.get("start_date"):
