@@ -185,15 +185,17 @@ class EmployeeRecordModelTest(TestCase):
         assert result.id == employee_record.id
 
     def test_archivable(self):
+        six_months_ago = timezone.now() - relativedelta(months=6)
+        one_month_ago = timezone.now() - relativedelta(months=1)
         parameters = itertools.product(
-            [False, True],
+            [True, False],
             [
-                self.faker.date_time_between(start_date="-1y", end_date="-6M", tzinfo=datetime.UTC),
-                self.faker.date_time_between(start_date="-6M", tzinfo=datetime.UTC),
+                self.faker.date_time_between(end_date=six_months_ago, tzinfo=datetime.UTC),
+                self.faker.date_time_between(start_date=six_months_ago, tzinfo=datetime.UTC),
             ],
             [
-                self.faker.date_time_between(start_date="-1y", end_date="-1M", tzinfo=datetime.UTC),
-                self.faker.date_time_between(start_date="-1M", tzinfo=datetime.UTC),
+                self.faker.date_time_between(end_date=one_month_ago, tzinfo=datetime.UTC),
+                self.faker.date_time_between(start_date=one_month_ago, tzinfo=datetime.UTC),
             ],
         )
         for expired, created_at, updated_at in parameters:
