@@ -914,40 +914,39 @@ class FilterJobApplicationsForm(forms.Form):
         """
         Get filters to be applied to a query set.
         """
-        filters = {}
+        filters = []
         data = self.cleaned_data
 
-        if data.get("states"):
-            filters["state__in"] = data.get("states")
+        if states := data.get("states"):
+            filters.append(Q(state__in=states))
 
         if data.get("pass_iae_active"):
-            # Simplification of CommonApprovalQuerySet.valid_lookup()
-            filters["approval__end_at__gte"] = timezone.localdate()
-            # The date is not enough to know if an approval is valid or not
-            filters["has_suspended_approval"] = False
+            filters.append(
+                # Simplification of CommonApprovalQuerySet.valid_lookup()
+                # The date is not enough to know if an approval is valid or not
+                Q(approval__end_at__gte=timezone.localdate(), has_suspended_approval=False)
+            )
         elif data.get("pass_iae_suspended"):
             # This is NOT what we want but how things work currently:
             # if you check pass_iae_active, the value of pass_iae_suspended is ignored
             # Filter on the `has_suspended_approval` annotation, which is set in `with_list_related_data()`.
-            filters["has_suspended_approval"] = True
+            filters.append(Q(has_suspended_approval=True))
 
         if data.get("eligibility_validated"):
-            filters["jobseeker_eligibility_diagnosis__isnull"] = False
-        if data.get("start_date"):
-            filters["created_at__gte"] = data.get("start_date")
-        if data.get("end_date"):
-            filters["created_at__lte"] = data.get("end_date")
-        if data.get("departments"):
-            filters["job_seeker__department__in"] = data.get("departments")
-        if data.get("selected_jobs"):
-            filters["selected_jobs__appellation__code__in"] = data.get("selected_jobs")
-        if data.get("criteria"):
+            filters.append(Q(jobseeker_eligibility_diagnosis__isnull=False))
+        if start_date := data.get("start_date"):
+            filters.append(Q(created_at__gte=start_date))
+        if end_date := data.get("end_date"):
+            filters.append(Q(created_at__lte=end_date))
+        if departments := data.get("departments"):
+            filters.append(Q(job_seeker__department__in=departments))
+        if selected_jobs := data.get("selected_jobs"):
+            filters.append(Q(selected_jobs__appellation__code__in=selected_jobs))
+        if criteria := data.get("criteria"):
             # Filter on the `eligibility_diagnosis_criterion_{criterion}` annotation,
             # which is set in `with_list_related_data()`.
-            for criterion in data.get("criteria"):
-                filters[f"eligibility_diagnosis_criterion_{criterion}"] = True
-
-        filters = [Q(**filters)]
+            for criterion in criteria:
+                filters.append(Q(**{f"eligibility_diagnosis_criterion_{criterion}": True}))
 
         return filters
 
@@ -1016,18 +1015,11 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
 
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
-        data = self.cleaned_data
-        senders = data.get("senders")
-        job_seekers = data.get("job_seekers")
+        if senders := self.cleaned_data.get("senders"):
+            qs_list.append(Q(sender__id__in=senders))
 
-        if senders:
-            qs = Q(sender__id__in=senders)
-            qs_list.append(qs)
-
-        if job_seekers:
-            qs = Q(job_seeker__id__in=job_seekers)
-            qs_list.append(qs)
-
+        if job_seekers := self.cleaned_data.get("job_seekers"):
+            qs_list.append(Q(job_seeker__id__in=job_seekers))
         return qs_list
 
 
@@ -1057,13 +1049,8 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
 
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
-        data = self.cleaned_data
-        sender_organizations = data.get("sender_organizations")
-
-        if sender_organizations:
-            qs = Q(sender_prescriber_organization__id__in=sender_organizations)
-            qs_list.append(qs)
-
+        if sender_organizations := self.cleaned_data.get("sender_organizations"):
+            qs_list.append(Q(sender_prescriber_organization__id__in=sender_organizations))
         return qs_list
 
     def get_sender_organization_choices(self):
@@ -1086,13 +1073,8 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
 
     def get_qs_filters(self):
         qs_list = super().get_qs_filters()
-        data = self.cleaned_data
-        to_companies = data.get("to_companies")
-
-        if to_companies:
-            qs = Q(to_company__id__in=to_companies)
-            qs_list.append(qs)
-
+        if to_companies := self.cleaned_data.get("to_companies"):
+            qs_list.append(Q(to_company__id__in=to_companies))
         return qs_list
 
     def get_to_companies_choices(self):
