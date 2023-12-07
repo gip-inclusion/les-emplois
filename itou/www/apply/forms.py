@@ -947,16 +947,11 @@ class FilterJobApplicationsForm(forms.Form):
 
         return filters
 
-    def get_qs_filters_counter(self, qs_filters):
+    def get_qs_filters_counter(self):
         """
-        Get number of filters to be applied to a query set.
+        Get number of filters selected.
         """
-        filters_counter = 0
-        for qs_filter in qs_filters:
-            for filters in qs_filter.children:
-                filters_counter += len(filters[1]) if isinstance(filters[1], list) else 1
-
-        return filters_counter
+        return sum(bool(self.cleaned_data.get(field.name)) for field in self)
 
 
 class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):

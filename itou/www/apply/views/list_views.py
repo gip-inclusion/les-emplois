@@ -79,7 +79,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     if filters_form.is_valid():
         qs_filters = filters_form.get_qs_filters()
         job_applications = job_applications.filter(*qs_filters)
-        filters_counter = filters_form.get_qs_filters_counter(qs_filters)
+        filters_counter = filters_form.get_qs_filters_counter()
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
     _add_pending_for_weeks(job_applications_page)
@@ -112,7 +112,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
     if filters_form.is_valid():
         qs_filters = filters_form.get_qs_filters()
         job_applications = job_applications.filter(*qs_filters)
-        filters_counter = filters_form.get_qs_filters_counter(qs_filters)
+        filters_counter = filters_form.get_qs_filters_counter()
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
     _add_pending_for_weeks(job_applications_page)
@@ -186,7 +186,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     if filters_form.is_valid():
         qs_filters = filters_form.get_qs_filters()
         job_applications = job_applications.filter(*qs_filters)
-        filters_counter = filters_form.get_qs_filters_counter(qs_filters)
+        filters_counter = filters_form.get_qs_filters_counter()
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
     _add_pending_for_weeks(job_applications_page)
