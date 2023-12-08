@@ -920,17 +920,19 @@ class FilterJobApplicationsForm(forms.Form):
         if states := data.get("states"):
             filters.append(Q(state__in=states))
 
-        if data.get("pass_iae_active"):
-            filters.append(
+        if data.get("pass_iae_active") or data.get("pass_iae_suspended"):
+            pass_status_filter = Q()
+            if data.get("pass_iae_active"):
                 # Simplification of CommonApprovalQuerySet.valid_lookup()
                 # The date is not enough to know if an approval is valid or not
-                Q(approval__end_at__gte=timezone.localdate(), has_suspended_approval=False)
-            )
-        elif data.get("pass_iae_suspended"):
-            # This is NOT what we want but how things work currently:
-            # if you check pass_iae_active, the value of pass_iae_suspended is ignored
-            # Filter on the `has_suspended_approval` annotation, which is set in `with_list_related_data()`.
-            filters.append(Q(has_suspended_approval=True))
+                pass_status_filter |= Q(approval__end_at__gte=timezone.localdate(), has_suspended_approval=False)
+
+            if data.get("pass_iae_suspended"):
+                # This is NOT what we want but how things work currently:
+                # if you check pass_iae_active, the value of pass_iae_suspended is ignored
+                # Filter on the `has_suspended_approval` annotation, which is set in `with_list_related_data()`.
+                pass_status_filter |= Q(has_suspended_approval=True)
+            filters.append(pass_status_filter)
 
         if data.get("eligibility_validated"):
             filters.append(Q(jobseeker_eligibility_diagnosis__isnull=False))
