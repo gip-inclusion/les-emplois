@@ -509,16 +509,13 @@ class ProcessListSiaeTest(ProcessListTest):
         now = timezone.now()
         yesterday = (now - timezone.timedelta(days=1)).date()
         self.client.force_login(self.eddie_hit_pit)
+        states_filter = {"states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW]}
 
-        response = self.client.get(
-            self.siae_base_url,
-            {
-                "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW],
-                "pass_iae_active": True,
-            },
-        )
+        # Without approval
+        response = self.client.get(self.siae_base_url, {**states_filter, "pass_iae_active": True})
         assert len(response.context["job_applications_page"].object_list) == 0
 
+        # With a job_application with an approval
         job_application = JobApplicationFactory(
             with_approval=True,
             state=JobApplicationWorkflow.STATE_ACCEPTED,
@@ -526,30 +523,43 @@ class ProcessListSiaeTest(ProcessListTest):
             approval__start_at=yesterday,
             to_company=self.hit_pit,
         )
+        response = self.client.get(self.siae_base_url, {**states_filter, "pass_iae_active": True})
+        applications = response.context["job_applications_page"].object_list
+        assert len(applications) == 1
+        assert job_application in applications
+
+        # Check that adding pass_iae_suspended does not hide the application
         response = self.client.get(
             self.siae_base_url,
             {
-                "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW],
+                **states_filter,
                 "pass_iae_active": True,
+                "pass_iae_suspended": True,
             },
         )
         applications = response.context["job_applications_page"].object_list
         assert len(applications) == 1
         assert job_application in applications
 
-        params = {
-            "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW],
-            "pass_iae_suspended": True,
-        }
-        response = self.client.get(self.siae_base_url, params)
+        # But pass_iae_suspended alone does not show the application
+        suspended_filter = {**states_filter, "pass_iae_suspended": True}
+        response = self.client.get(self.siae_base_url, suspended_filter)
         assert len(response.context["job_applications_page"].object_list) == 0
 
+        # Now with a suspension
         SuspensionFactory(
             approval=job_application.approval,
             start_at=yesterday,
             end_at=now + timezone.timedelta(days=2),
         )
-        response = self.client.get(self.siae_base_url, params)
+        response = self.client.get(self.siae_base_url, suspended_filter)
+
+        applications = response.context["job_applications_page"].object_list
+        assert len(applications) == 1
+        assert job_application in applications
+
+        # Check that adding pass_iae_active does not hide the application
+        response = self.client.get(self.siae_base_url, {**suspended_filter, "pass_iae_active": True})
 
         applications = response.context["job_applications_page"].object_list
         assert len(applications) == 1
