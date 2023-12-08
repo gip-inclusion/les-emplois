@@ -8,7 +8,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 from itou.approvals.enums import ProlongationReason
 from itou.files.models import File
 from itou.utils.admin import get_admin_view_link
-from tests.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
+from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import ItouStaffFactory
 from tests.utils.test import parse_response_to_soup
@@ -78,3 +78,22 @@ def test_assigned_company(admin_client):
     siae = approval.jobapplication_set.get().to_company
     response = admin_client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
     assertContains(response, get_admin_view_link(siae, content=siae.display_name), count=2)
+
+
+def test_send_approvals_to_pe_stats(admin_client):
+    ApprovalFactory(pe_notification_status="notification_error")
+    CancelledApprovalFactory(pe_notification_status="notification_should_retry")
+
+    approval_stats_url = reverse("admin:approvals_approval_sent_to_pe_stats")
+    response = admin_client.get(reverse("admin:approvals_approval_changelist"))
+    assertContains(response, approval_stats_url)
+    response = admin_client.get(approval_stats_url)
+    assertContains(response, "<h2>PASS IAE : 1</h2>")
+    assertContains(response, "<h2>PASS IAE annulés : 1</h2>")
+
+    cancelledapproval_stats_url = reverse("admin:approvals_cancelledapproval_sent_to_pe_stats")
+    response = admin_client.get(reverse("admin:approvals_cancelledapproval_changelist"))
+    assertContains(response, cancelledapproval_stats_url)
+    response = admin_client.get(cancelledapproval_stats_url)
+    assertContains(response, "<h2>PASS IAE : 1</h2>")
+    assertContains(response, "<h2>PASS IAE annulés : 1</h2>")
