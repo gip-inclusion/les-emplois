@@ -918,6 +918,7 @@ class FilterJobApplicationsForm(forms.Form):
             filters.append(Q(state__in=states))
 
         if data.get("pass_iae_active") or data.get("pass_iae_suspended"):
+            queryset = queryset.with_has_suspended_approval()
             pass_status_filter = Q()
             if data.get("pass_iae_active"):
                 # Simplification of CommonApprovalQuerySet.valid_lookup()

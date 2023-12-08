@@ -459,7 +459,6 @@ class JobApplicationQuerySetTest(TestCase):
         assert hasattr(qs, "sender_prescriber_organization")
         assert hasattr(qs, "to_company")
         assert hasattr(qs, "selected_jobs")
-        assert hasattr(qs, "has_suspended_approval")
         assert hasattr(qs, "jobseeker_eligibility_diagnosis")
         assert hasattr(qs, f"eligibility_diagnosis_criterion_{level1_criterion.pk}")
         assert hasattr(qs, f"eligibility_diagnosis_criterion_{level2_criterion.pk}")
