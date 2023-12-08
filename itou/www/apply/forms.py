@@ -911,12 +911,6 @@ class FilterJobApplicationsForm(forms.Form):
         return end_date
 
     def filter(self, queryset):
-        return queryset.filter(*self.get_qs_filters())
-
-    def get_qs_filters(self):
-        """
-        Get filters to be applied to a query set.
-        """
         filters = []
         data = self.cleaned_data
 
@@ -953,7 +947,7 @@ class FilterJobApplicationsForm(forms.Form):
             for criterion in criteria:
                 filters.append(Q(**{f"eligibility_diagnosis_criterion_{criterion}": True}))
 
-        return filters
+        return queryset.filter(*filters)
 
     def get_qs_filters_counter(self):
         """
@@ -1018,14 +1012,14 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
                 jobs.add((job.appellation.code, job.appellation.name))
         return sorted(jobs, key=lambda job: job[1])
 
-    def get_qs_filters(self):
-        qs_list = super().get_qs_filters()
+    def filter(self, queryset):
+        queryset = super().filter(queryset)
         if senders := self.cleaned_data.get("senders"):
-            qs_list.append(Q(sender__id__in=senders))
+            queryset = queryset.filter(sender__id__in=senders)
 
         if job_seekers := self.cleaned_data.get("job_seekers"):
-            qs_list.append(Q(job_seeker__id__in=job_seekers))
-        return qs_list
+            queryset = queryset.filter(job_seeker__id__in=job_seekers)
+        return queryset
 
 
 class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsForm):
@@ -1052,11 +1046,11 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
                 (k, v) for k, v in self.fields["states"].choices if k != JobApplicationWorkflow.STATE_PRIOR_TO_HIRE
             ]
 
-    def get_qs_filters(self):
-        qs_list = super().get_qs_filters()
+    def filter(self, queryset):
+        queryset = super().filter(queryset)
         if sender_organizations := self.cleaned_data.get("sender_organizations"):
-            qs_list.append(Q(sender_prescriber_organization__id__in=sender_organizations))
-        return qs_list
+            queryset = queryset.filter(sender_prescriber_organization__id__in=sender_organizations)
+        return queryset
 
     def get_sender_organization_choices(self):
         sender_orgs = self.job_applications_qs.get_unique_fk_objects("sender_prescriber_organization")
@@ -1076,11 +1070,11 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
         super().__init__(job_applications_qs, *args, **kwargs)
         self.fields["to_companies"].choices += self.get_to_companies_choices()
 
-    def get_qs_filters(self):
-        qs_list = super().get_qs_filters()
+    def filter(self, queryset):
+        queryset = super().filter(queryset)
         if to_companies := self.cleaned_data.get("to_companies"):
-            qs_list.append(Q(to_company__id__in=to_companies))
-        return qs_list
+            queryset = queryset.filter(to_company__id__in=to_companies)
+        return queryset
 
     def get_to_companies_choices(self):
         to_companies = self.job_applications_qs.get_unique_fk_objects("to_company")
