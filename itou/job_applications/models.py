@@ -259,7 +259,7 @@ class JobApplicationQuerySet(models.QuerySet):
             Prefetch("job_seeker__approvals", queryset=Approval.objects.order_by("-start_at")),
         )
 
-        qs = qs.with_has_suspended_approval().with_last_change().with_jobseeker_eligibility_diagnosis()
+        qs = qs.with_last_change().with_jobseeker_eligibility_diagnosis()
 
         # Adding an annotation by selected criterion
         for criterion in criteria:
