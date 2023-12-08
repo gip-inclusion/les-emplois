@@ -77,8 +77,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
 
     filters_counter = 0
     if filters_form.is_valid():
-        qs_filters = filters_form.get_qs_filters()
-        job_applications = job_applications.filter(*qs_filters)
+        job_applications = filters_form.filter(job_applications)
         filters_counter = filters_form.get_qs_filters_counter()
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
@@ -110,8 +109,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
 
     filters_counter = 0
     if filters_form.is_valid():
-        qs_filters = filters_form.get_qs_filters()
-        job_applications = job_applications.filter(*qs_filters)
+        job_applications = filters_form.filter(job_applications)
         filters_counter = filters_form.get_qs_filters_counter()
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
@@ -184,8 +182,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
 
     filters_counter = 0
     if filters_form.is_valid():
-        qs_filters = filters_form.get_qs_filters()
-        job_applications = job_applications.filter(*qs_filters)
+        job_applications = filters_form.filter(job_applications)
         filters_counter = filters_form.get_qs_filters_counter()
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)

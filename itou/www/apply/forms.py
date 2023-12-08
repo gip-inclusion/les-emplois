@@ -910,6 +910,9 @@ class FilterJobApplicationsForm(forms.Form):
             end_date = timezone.make_aware(end_date)
         return end_date
 
+    def filter(self, queryset):
+        return queryset.filter(*self.get_qs_filters())
+
     def get_qs_filters(self):
         """
         Get filters to be applied to a query set.
