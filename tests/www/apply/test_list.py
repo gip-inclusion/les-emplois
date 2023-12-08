@@ -2,7 +2,6 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.http import urlencode
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNumQueries
 
@@ -141,9 +140,7 @@ class ProcessListJobSeekerTest(ProcessListTest):
         """
         self.client.force_login(self.maggie)
         expected_state = self.maggie.job_applications.last().state
-        params = urlencode({"states": [expected_state]}, True)
-        url = f"{self.job_seeker_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(self.job_seeker_base_url, {"states": [expected_state]})
 
         # Count job applications used by the template
         applications = response.context["job_applications_page"].object_list
@@ -171,14 +168,13 @@ class ProcessListJobSeekerTest(ProcessListTest):
 
         start_date = now - timezone.timedelta(days=5)
         end_date = now - timezone.timedelta(days=1)
-        query = urlencode(
+        response = self.client.get(
+            self.job_seeker_base_url,
             {
                 "start_date": timezone.localdate(start_date).strftime(date_format),
                 "end_date": timezone.localdate(end_date).strftime(date_format),
-            }
+            },
         )
-        url = f"{self.job_seeker_base_url}?{query}"
-        response = self.client.get(url)
         applications = response.context["job_applications_page"].object_list
 
         assert len(applications) == 2
@@ -306,10 +302,8 @@ class ProcessListSiaeTest(ProcessListTest):
 
         self.client.force_login(self.eddie_hit_pit)
         # Only show maggie's applications
-        job_seekers_ids = [self.maggie.id]
-        params = urlencode({"job_seekers": job_seekers_ids}, True)
-        url = f"{self.siae_base_url}?{params}"
-        response = self.client.get(url)
+        params = {"job_seekers": [self.maggie.id]}
+        response = self.client.get(self.siae_base_url, params)
 
         # 4 criteria: all are shown
         self.assertContains(response, "<li>Allocataire AAH</li>", html=True)
@@ -321,7 +315,7 @@ class ProcessListSiaeTest(ProcessListTest):
         # Add a 5th criterion to the diagnosis
         diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(name="DETLD (+ 24 mois)"))
 
-        response = self.client.get(url)
+        response = self.client.get(self.siae_base_url, params)
         # Only the 3 first are shown (ordered by level & name)
         # The 4th line has been replaced by "+ 2 autres critères"
         self.assertContains(response, "<li>Allocataire AAH</li>", html=True)
@@ -341,10 +335,6 @@ class ProcessListSiaeTest(ProcessListTest):
         CRITERION = "<li>Allocataire AAH</li>"
 
         self.client.force_login(self.eddie_hit_pit)
-        # Only show maggie's applications
-        job_seekers_ids = [self.maggie.id]
-        params = urlencode({"job_seekers": job_seekers_ids}, True)
-        url = f"{self.siae_base_url}?{params}"
 
         expect_to_see_criteria = {
             CompanyKind.EA: False,
@@ -361,7 +351,8 @@ class ProcessListSiaeTest(ProcessListTest):
             with self.subTest(kind=kind):
                 self.hit_pit.kind = kind
                 self.hit_pit.save(update_fields=("kind",))
-                response = self.client.get(url)
+                # Only show maggie's applications
+                response = self.client.get(self.siae_base_url, {"job_seekers": [self.maggie.id]})
                 if expect_to_see_criteria[kind]:
                     self.assertContains(response, TITLE, html=True)
                     self.assertContains(response, CRITERION, html=True)
@@ -375,9 +366,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         self.client.force_login(self.eddie_hit_pit)
         state_accepted = JobApplicationWorkflow.STATE_ACCEPTED
-        params = urlencode({"states": [state_accepted]}, True)
-        url = f"{self.siae_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(self.siae_base_url, {"states": [state_accepted]})
 
         applications = response.context["job_applications_page"].object_list
 
@@ -388,13 +377,12 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         Eddie wants to see only job applications in prior_to_hire state
         """
-        params = urlencode({"states": [JobApplicationWorkflow.STATE_PRIOR_TO_HIRE]}, True)
-        url = f"{self.siae_base_url}?{params}"
         PRIOR_TO_HIRE_LABEL = "Action préalable à l’embauche</label>"
 
         # prior_to_hire filter doesn't exist for non-GEIQ SIAE and is ignored
         self.client.force_login(self.eddie_hit_pit)
-        response = self.client.get(url)
+        params = {"states": [JobApplicationWorkflow.STATE_PRIOR_TO_HIRE]}
+        response = self.client.get(self.siae_base_url, params)
         self.assertNotContains(response, PRIOR_TO_HIRE_LABEL)
 
         applications = response.context["job_applications_page"].object_list
@@ -403,7 +391,7 @@ class ProcessListSiaeTest(ProcessListTest):
         # With a GEIQ user, the filter is present and works
         self.hit_pit.kind = CompanyKind.GEIQ
         self.hit_pit.save()
-        response = self.client.get(url)
+        response = self.client.get(self.siae_base_url, params)
         self.assertContains(response, PRIOR_TO_HIRE_LABEL)
 
         applications = response.context["job_applications_page"].object_list
@@ -416,9 +404,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         self.client.force_login(self.eddie_hit_pit)
         job_applications_states = [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_PROCESSING]
-        params = urlencode({"states": job_applications_states}, True)
-        url = f"{self.siae_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(self.siae_base_url, {"states": job_applications_states})
 
         applications = response.context["job_applications_page"].object_list
 
@@ -437,14 +423,13 @@ class ProcessListSiaeTest(ProcessListTest):
 
         # Negative indexing is not allowed in querysets
         end_date = jobs_in_range[len(jobs_in_range) - 1].created_at
-        query = urlencode(
+        response = self.client.get(
+            self.siae_base_url,
             {
                 "start_date": timezone.localdate(start_date).strftime(date_format),
                 "end_date": timezone.localdate(end_date).strftime(date_format),
-            }
+            },
         )
-        url = f"{self.siae_base_url}?{query}"
-        response = self.client.get(url)
         applications = response.context["job_applications_page"].object_list
 
         assert len(applications) == 6
@@ -458,8 +443,7 @@ class ProcessListSiaeTest(ProcessListTest):
         Make sure the template loads all available job applications if fields are empty.
         """
         self.client.force_login(self.eddie_hit_pit)
-        url = f"{self.siae_base_url}?start_date=&end_date="
-        response = self.client.get(url)
+        response = self.client.get(f"{self.siae_base_url}?start_date=&end_date=")
         total_applications = len(response.context["job_applications_page"].object_list)
 
         assert total_applications == self.hit_pit.job_applications_received.not_archived().count()
@@ -470,9 +454,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         self.client.force_login(self.eddie_hit_pit)
         sender_organization = self.pole_emploi
-        params = urlencode({"sender_organizations": [sender_organization.id]}, True)
-        url = f"{self.siae_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(self.siae_base_url, {"sender_organizations": [sender_organization.id]})
 
         applications = response.context["job_applications_page"].object_list
 
@@ -485,9 +467,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         self.client.force_login(self.eddie_hit_pit)
         sender = self.thibault_pe
-        params = urlencode({"senders": [sender.id]}, True)
-        url = f"{self.siae_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(self.siae_base_url, {"senders": [sender.id]})
 
         applications = response.context["job_applications_page"].object_list
 
@@ -500,9 +480,7 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         self.client.force_login(self.eddie_hit_pit)
         job_seekers_ids = [self.maggie.id]
-        params = urlencode({"job_seekers": job_seekers_ids}, True)
-        url = f"{self.siae_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(self.siae_base_url, {"job_seekers": job_seekers_ids})
 
         applications = response.context["job_applications_page"].object_list
 
@@ -515,9 +493,9 @@ class ProcessListSiaeTest(ProcessListTest):
         """
         self.client.force_login(self.eddie_hit_pit)
         senders_ids = [self.pole_emploi.id, self.l_envol.id]
-        params = urlencode({"sender_organizations": [self.thibault_pe.id, self.audrey_envol.id]}, True)
-        url = f"{self.siae_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(
+            self.siae_base_url, {"sender_organizations": [self.thibault_pe.id, self.audrey_envol.id]}
+        )
 
         applications = response.context["job_applications_page"].object_list
 
@@ -532,14 +510,13 @@ class ProcessListSiaeTest(ProcessListTest):
         yesterday = (now - timezone.timedelta(days=1)).date()
         self.client.force_login(self.eddie_hit_pit)
 
-        params = urlencode(
+        response = self.client.get(
+            self.siae_base_url,
             {
                 "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW],
                 "pass_iae_active": True,
             },
-            True,
         )
-        response = self.client.get(f"{self.siae_base_url}?{params}")
         assert len(response.context["job_applications_page"].object_list) == 0
 
         job_application = JobApplicationFactory(
@@ -549,19 +526,22 @@ class ProcessListSiaeTest(ProcessListTest):
             approval__start_at=yesterday,
             to_company=self.hit_pit,
         )
-        response = self.client.get(f"{self.siae_base_url}?{params}")
+        response = self.client.get(
+            self.siae_base_url,
+            {
+                "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW],
+                "pass_iae_active": True,
+            },
+        )
         applications = response.context["job_applications_page"].object_list
         assert len(applications) == 1
         assert job_application in applications
 
-        params = urlencode(
-            {
-                "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW],
-                "pass_iae_suspended": True,
-            },
-            True,
-        )
-        response = self.client.get(f"{self.siae_base_url}?{params}")
+        params = {
+            "states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW],
+            "pass_iae_suspended": True,
+        }
+        response = self.client.get(self.siae_base_url, params)
         assert len(response.context["job_applications_page"].object_list) == 0
 
         SuspensionFactory(
@@ -569,7 +549,7 @@ class ProcessListSiaeTest(ProcessListTest):
             start_at=yesterday,
             end_at=now + timezone.timedelta(days=2),
         )
-        response = self.client.get(f"{self.siae_base_url}?{params}")
+        response = self.client.get(self.siae_base_url, params)
 
         applications = response.context["job_applications_page"].object_list
         assert len(applications) == 1
@@ -581,16 +561,14 @@ class ProcessListSiaeTest(ProcessListTest):
         the diagnosis of eligibility has been validated.
         """
         self.client.force_login(self.eddie_hit_pit)
+        params = {"eligibility_validated": True}
 
-        params = urlencode({"eligibility_validated": True})
-        url = f"{self.siae_base_url}?{params}"
-
-        response = self.client.get(url)
+        response = self.client.get(self.siae_base_url, params)
         assert len(response.context["job_applications_page"].object_list) == 0
 
         EligibilityDiagnosisFactory(job_seeker=self.maggie)
 
-        response = self.client.get(url)
+        response = self.client.get(self.siae_base_url, params)
         # Maggie has two applications, one created in the state loop and the other created by SentByPrescriberFactory
         assert len(response.context["job_applications_page"].object_list) == 2
 
@@ -614,30 +592,22 @@ class ProcessListSiaeTest(ProcessListTest):
         diagnosis.save()
 
         # Filter by level1 criterion
-        params = urlencode({"criteria": [level1_criterion.pk]}, True)
-        url = f"{self.siae_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(self.siae_base_url, {"criteria": [level1_criterion.pk]})
         applications = response.context["job_applications_page"].object_list
         assert len(applications) == 2
 
         # Filter by level2 criterion
-        params = urlencode({"criteria": [level2_criterion.pk]}, True)
-        url = f"{self.siae_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(self.siae_base_url, {"criteria": [level2_criterion.pk]})
         applications = response.context["job_applications_page"].object_list
         assert len(applications) == 2
 
         # Filter by two criteria
-        params = urlencode({"criteria": [level1_criterion.pk, level2_criterion.pk]}, True)
-        url = f"{self.siae_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(self.siae_base_url, {"criteria": [level1_criterion.pk, level2_criterion.pk]})
         applications = response.context["job_applications_page"].object_list
         assert len(applications) == 2
 
         # Filter by other criteria
-        params = urlencode({"criteria": [level1_other_criterion.pk]}, True)
-        url = f"{self.siae_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(self.siae_base_url, {"criteria": [level1_other_criterion.pk]})
         applications = response.context["job_applications_page"].object_list
         assert len(applications) == 0
 
@@ -651,9 +621,7 @@ class ProcessListSiaeTest(ProcessListTest):
         self.maggie.post_code = "37000"
         self.maggie.save()
 
-        params = urlencode({"departments": ["37"]}, True)
-        url = f"{self.siae_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(self.siae_base_url, {"departments": ["37"]})
         applications = response.context["job_applications_page"].object_list
 
         # Maggie has two applications and is the only one living in department 37.
@@ -670,9 +638,7 @@ class ProcessListSiaeTest(ProcessListTest):
         JobApplicationSentByJobSeekerFactory(to_company=self.hit_pit, selected_jobs=[appellation1])
         JobApplicationSentByJobSeekerFactory(to_company=self.hit_pit, selected_jobs=[appellation2])
 
-        params = urlencode({"selected_jobs": [appellation1.pk]}, True)
-        url = f"{self.siae_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(self.siae_base_url, {"selected_jobs": [appellation1.pk]})
         applications = response.context["job_applications_page"].object_list
 
         assert len(applications) == 1
@@ -820,9 +786,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         """
         self.client.force_login(self.thibault_pe)
         expected_state = JobApplicationWorkflow.initial_state
-        params = urlencode({"states": [expected_state]}, True)
-        url = f"{self.prescriber_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(self.prescriber_base_url, {"states": [expected_state]})
 
         applications = response.context["job_applications_page"].object_list
         assert len(applications) == 2
@@ -835,9 +799,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         """
         self.client.force_login(self.thibault_pe)
         sender_id = self.laurie_pe.id
-        params = urlencode({"senders": sender_id})
-        url = f"{self.prescriber_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(self.prescriber_base_url, {"senders": sender_id})
 
         applications = response.context["job_applications_page"].object_list
         assert len(applications) == 1
@@ -849,9 +811,7 @@ class ProcessListPrescriberTest(ProcessListTest):
         """
         self.client.force_login(self.thibault_pe)
         job_seekers_ids = [self.maggie.id]
-        params = urlencode({"job_seekers": job_seekers_ids}, True)
-        url = f"{self.prescriber_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(self.prescriber_base_url, {"job_seekers": job_seekers_ids})
 
         applications = response.context["job_applications_page"].object_list
         assert len(applications) == 2
@@ -865,9 +825,7 @@ class ProcessListPrescriberTest(ProcessListTest):
 
         self.client.force_login(self.thibault_pe)
         to_companies_ids = [self.hit_pit.pk]
-        params = urlencode({"to_companies": to_companies_ids}, True)
-        url = f"{self.prescriber_base_url}?{params}"
-        response = self.client.get(url)
+        response = self.client.get(self.prescriber_base_url, {"to_companies": to_companies_ids})
 
         applications = response.context["job_applications_page"].object_list
         assert len(applications) == 9
