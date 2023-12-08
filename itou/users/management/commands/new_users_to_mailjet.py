@@ -6,7 +6,7 @@ import httpx
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.core.management import BaseCommand
-from django.db.models import Exists, OuterRef
+from django.db.models import Exists, OuterRef, Q
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
@@ -14,7 +14,7 @@ from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.companies.models import CompanyMembership
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership
-from itou.users.enums import UserKind
+from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils.iterators import chunks
 
@@ -113,7 +113,8 @@ class Command(BaseCommand):
                         primary=True,
                         verified=True,
                     )
-                ),
+                )
+                | Q(identity_provider=IdentityProvider.INCLUSION_CONNECT),  # IC verifies emails on its own
                 date_joined__gte=self.campaign_start(),
                 is_active=True,
             )

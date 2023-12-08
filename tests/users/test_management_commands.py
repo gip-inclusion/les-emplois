@@ -17,6 +17,7 @@ from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.models import JobApplication
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.users.enums import IdentityProvider
 from itou.users.management.commands.new_users_to_mailjet import (
     MAILJET_API_URL,
     NEW_ORIENTEURS_LISTID,
@@ -343,10 +344,12 @@ class TestCommandNewUsersToMailJet:
         # Job seekers are ignored.
         JobSeekerFactory(with_verified_email=True)
         for kind in set(CompanyKind) - set(SIAE_WITH_CONVENTION_KINDS):
-            CompanyMembershipFactory(user__with_verified_email=True, company__kind=kind)
-        # Missing verified email.
-        CompanyMembershipFactory(company__kind=CompanyKind.EI)
-        not_primary = CompanyMembershipFactory(company__kind=CompanyKind.EI).user
+            CompanyMembershipFactory(company__kind=kind, user__identity_provider=IdentityProvider.INCLUSION_CONNECT)
+        # Missing verified email and not using IC
+        CompanyMembershipFactory(company__kind=CompanyKind.EI, user__identity_provider=IdentityProvider.DJANGO)
+        not_primary = CompanyMembershipFactory(
+            company__kind=CompanyKind.EI, user__identity_provider=IdentityProvider.DJANGO
+        ).user
         EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
         # Past users are ignored.
         CompanyMembershipFactory(
@@ -358,8 +361,12 @@ class TestCommandNewUsersToMailJet:
         CompanyMembershipFactory(user__with_verified_email=True, company__kind=CompanyKind.EI, is_active=False)
         # Inactive users are ignored.
         CompanyMembershipFactory(user__with_verified_email=True, user__is_active=False, company__kind=CompanyKind.EI)
-        # New email not verified is ignored.
-        changed_email = CompanyMembershipFactory(user__with_verified_email=True, company__kind=CompanyKind.EI).user
+        # New email not verified is ignored when not using IC
+        changed_email = CompanyMembershipFactory(
+            user__with_verified_email=True,
+            company__kind=CompanyKind.EI,
+            user__identity_provider=IdentityProvider.DJANGO,
+        ).user
         changed_email.email = "changed@mailinator.com"
         changed_email.save(update_fields=["email"])
 
@@ -367,31 +374,31 @@ class TestCommandNewUsersToMailJet:
             first_name="Annie",
             last_name="Amma",
             email="annie.amma@mailinator.com",
-            with_verified_email=True,
+            identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
         bob = EmployerFactory(
             first_name="Bob",
             last_name="Bailey",
             email="bob.bailey@mailinator.com",
-            with_verified_email=True,
+            identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
         cindy = EmployerFactory(
             first_name="Cindy",
             last_name="Cinnamon",
             email="cindy.cinnamon@mailinator.com",
-            with_verified_email=True,
+            identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
         dave = EmployerFactory(
             first_name="Dave",
             last_name="Doll",
             email="dave.doll@mailinator.com",
-            with_verified_email=True,
+            identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
         eve = EmployerFactory(
             first_name="Eve",
             last_name="Ebi",
             email="eve.ebi@mailinator.com",
-            with_verified_email=True,
+            identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
         CompanyMembershipFactory(user=annie, company__kind=CompanyKind.EI)
         CompanyMembershipFactory(user=bob, company__kind=CompanyKind.AI)
@@ -494,20 +501,22 @@ class TestCommandNewUsersToMailJet:
             first_name="Alice",
             last_name="Aamar",
             email="alice.aamar@mailinator.com",
-            with_verified_email=True,
+            identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
         PrescriberMembershipFactory(user=alice, organization=pe)
         justin = PrescriberFactory(
             first_name="Justin",
             last_name="Wood",
             email="justin.wood@mailinator.com",
-            with_verified_email=True,
+            identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
         PrescriberMembershipFactory(user=justin, organization=other_org)
 
         for organization in [pe, other_org]:
             # Ignored, email is not the primary email.
-            not_primary = PrescriberMembershipFactory(organization=organization).user
+            not_primary = PrescriberMembershipFactory(
+                organization=organization, user__identity_provider=IdentityProvider.DJANGO
+            ).user
             EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
             # Past users are ignored.
             PrescriberMembershipFactory(
@@ -519,8 +528,12 @@ class TestCommandNewUsersToMailJet:
             PrescriberMembershipFactory(
                 user__is_active=False, user__with_verified_email=True, organization=organization
             )
-            # New email not verified is ignored.
-            changed_email = PrescriberMembershipFactory(user__with_verified_email=True, organization=organization).user
+            # New email not verified is ignored when not using IC
+            changed_email = PrescriberMembershipFactory(
+                user__with_verified_email=True,
+                organization=organization,
+                user__identity_provider=IdentityProvider.DJANGO,
+            ).user
             changed_email.email = f"changed+{organization}@mailinator.com"
             changed_email.save(update_fields=["email"])
 
@@ -632,13 +645,13 @@ class TestCommandNewUsersToMailJet:
             first_name="Billy",
             last_name="Boo",
             email="billy.boo@mailinator.com",
-            with_verified_email=True,
+            identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
         sonny = PrescriberFactory(
             first_name="Sonny",
             last_name="Sunder",
             email="sonny.sunder@mailinator.com",
-            with_verified_email=True,
+            identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
         # Inactive memberships are considered orienteur.
         PrescriberMembershipFactory(user=sonny, is_active=False)
@@ -647,7 +660,7 @@ class TestCommandNewUsersToMailJet:
             first_name="Timmy",
             last_name="Timber",
             email="timmy.timber@mailinator.com",
-            with_verified_email=True,
+            identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
         timmy = PrescriberMembershipFactory(user=timmy, organization__kind=PrescriberOrganizationKind.OTHER)
         # Past users are ignored.
@@ -658,11 +671,11 @@ class TestCommandNewUsersToMailJet:
             is_active=False,
             date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.UTC),
         )
-        # Ignored, email is not the primary email.
-        not_primary = PrescriberFactory()
+        # Ignored, email is not the primary email when not using IC
+        not_primary = PrescriberFactory(identity_provider=IdentityProvider.DJANGO)
         EmailAddress.objects.create(user=not_primary, email=not_primary.email, primary=False, verified=True)
         # New email not verified is ignored.
-        changed_email = PrescriberFactory(with_verified_email=True)
+        changed_email = PrescriberFactory(with_verified_email=True, identity_provider=IdentityProvider.DJANGO)
         changed_email.email = "changed@mailinator.com"
         changed_email.save(update_fields=["email"])
 
@@ -732,13 +745,11 @@ class TestCommandNewUsersToMailJet:
             first_name="Annie",
             last_name="Amma",
             email="annie.amma@mailinator.com",
-            with_verified_email=True,
         )
         bob = EmployerFactory(
             first_name="Bob",
             last_name="Bailey",
             email="bob.bailey@mailinator.com",
-            with_verified_email=True,
         )
         CompanyMembershipFactory(user=annie, company__kind=CompanyKind.EI)
         CompanyMembershipFactory(user=bob, company__kind=CompanyKind.AI)
@@ -850,7 +861,6 @@ class TestCommandNewUsersToMailJet:
             first_name="Annie",
             last_name="Amma",
             email="annie.amma@mailinator.com",
-            with_verified_email=True,
         )
         CompanyMembershipFactory(user=annie, company__kind=CompanyKind.EI)
         post_mock = respx_mock.post(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts").mock(
@@ -925,7 +935,6 @@ class TestCommandNewUsersToMailJet:
         # Past users are ignored.
         CompanyMembershipFactory(
             user__date_joined=datetime.datetime(2025, 5, 1, tzinfo=datetime.UTC),
-            user__with_verified_email=True,
             company__kind=CompanyKind.EI,
         )
         post_mock = respx_mock.post(f"{MAILJET_API_URL}REST/contactslist/{NEW_SIAE_LISTID}/managemanycontacts")
