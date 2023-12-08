@@ -1,0 +1,8 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools-items %}
+    <li>
+        <a href="{{ cl.model_admin.stats_url }}">Stats envoi PE</a>
+    </li>
+    {{ block.super }}
+{% endblock %}

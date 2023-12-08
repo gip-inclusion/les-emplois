@@ -1,12 +1,12 @@
 from django.contrib import admin, messages
 from django.core.files.storage import default_storage
-from django.urls import path
+from django.urls import path, reverse_lazy
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from itou.approvals import models
 from itou.approvals.admin_forms import ApprovalAdminForm
-from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval
+from itou.approvals.admin_views import manually_add_approval, manually_refuse_approval, send_approvals_to_pe_stats
 from itou.approvals.enums import Origin, ProlongationRequestStatus
 from itou.companies.models import Company
 from itou.employee_record import enums as employee_record_enums
@@ -227,6 +227,8 @@ class ApprovalAdmin(ItouModelAdmin):
         JobApplicationInline,
         PkSupportRemarkInline,
     )
+    change_list_template = "admin/approvals/change_list_with_stats.html"
+    stats_url = reverse_lazy("admin:approvals_approval_sent_to_pe_stats")
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -297,6 +299,11 @@ class ApprovalAdmin(ItouModelAdmin):
                 "<uuid:job_application_id>/refuse_approval",
                 self.admin_site.admin_view(self.manually_refuse_approval),
                 name="approvals_approval_manually_refuse_approval",
+            ),
+            path(
+                "sent-to-pe-stats",
+                self.admin_site.admin_view(send_approvals_to_pe_stats),
+                name="approvals_approval_sent_to_pe_stats",
             ),
         ]
         return additional_urls + super().get_urls()
@@ -583,6 +590,8 @@ class CancelledApprovalAdmin(ItouModelAdmin):
         "origin_siae_siret",
     )
     list_filter = ("origin_siae_kind", "origin_sender_kind", "origin_prescriber_organization_kind")
+    change_list_template = "admin/approvals/change_list_with_stats.html"
+    stats_url = reverse_lazy("admin:approvals_cancelledapproval_sent_to_pe_stats")
 
     def has_change_permission(self, request, obj=None):
         return False
@@ -592,3 +601,13 @@ class CancelledApprovalAdmin(ItouModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def get_urls(self):
+        additional_urls = [
+            path(
+                "sent-to-pe-stats",
+                self.admin_site.admin_view(send_approvals_to_pe_stats),
+                name="approvals_cancelledapproval_sent_to_pe_stats",
+            ),
+        ]
+        return additional_urls + super().get_urls()

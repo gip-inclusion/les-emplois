@@ -1,0 +1,40 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+
+    <div id="content-main">
+
+        <div class="module">
+            {% for stat in stats %}
+                <h2>{{ stat.name }} : {{ stat.total }}</h2>
+                <ul>
+                    {% for status, status_infos in stat.infos.items %}
+                        <li>
+                            <a href="{{ status_infos.url }}">{{ status }}</a> : {{ status_infos.value }}
+                            {% if status_infos.infos %}
+                                <ul>
+                                    {% for reason, reason_info in status_infos.infos.items %}
+                                        <li>
+                                            <a href="{{ reason_info.url }}">{{ reason }}</a> : {{ reason_info.value }}
+                                            {% if reason_info.infos %}
+                                                <ul>
+                                                    {% for error, error_info in reason_info.infos.items %}
+                                                        <li>
+                                                            <a href="{{ error_info.url }}">{{ error }}</a> : {{ error_info.value }}
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}
