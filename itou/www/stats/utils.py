@@ -18,27 +18,10 @@ def can_view_stats_dashboard_widget(request):
     """
     Whether a stats section should be displayed on the user's dashboard.
 
-    It should be displayed for all professional users (employers, prescribers and labor inspectors).
+    It should be displayed to all professional users, even when no specific can_view_stats_* condition
+    is available to them.
     """
-    return (
-        request.user.is_employer
-        or request.user.is_prescriber
-        or request.user.is_labor_inspector
-        # All conditions below are useless/redundant with the main conditions above as they are
-        # all sub cases of them. We still include them to keep things as explicit as possible.
-        or can_view_stats_siae(request)
-        or can_view_stats_siae_aci(request)
-        or can_view_stats_siae_etp(request)
-        or can_view_stats_cd(request)
-        or can_view_stats_pe(request)
-        or can_view_stats_ddets_iae(request)
-        or can_view_stats_ddets_log(request)
-        or can_view_stats_dreets_iae(request)
-        or can_view_stats_dgefp(request)
-        or can_view_stats_dihal(request)
-        or can_view_stats_drihl(request)
-        or can_view_stats_iae_network(request)
-    )
+    return request.user.is_employer or request.user.is_prescriber or request.user.is_labor_inspector
 
 
 def can_view_stats_siae(request):
