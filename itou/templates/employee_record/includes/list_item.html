@@ -29,7 +29,7 @@
         </div>
 
         {# ASP error #}
-        {% if form.status.value == "REJECTED" %}
+        {% if employee_record and employee_record.status == "REJECTED" %}
             <div class="alert alert-warning">
                 <p class="mb-0">
                     <b>Informations sur l'erreur de traitement :</b>
@@ -86,7 +86,7 @@
         {% endif %}
 
         {# Actions #}
-        {% if form.status.value == "NEW" %}
+        {% if not employee_record %}
             {% if item.job_seeker.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
                 <div class="alert alert-warning" role="status">
                     <div class="row">
@@ -129,22 +129,19 @@
                     {% if item.employee_record_new %}
                         <a href="{% url "employee_record_views:disable" item.employee_record_new.id %}" class="btn btn-sm btn-outline-primary mt-2">Désactiver la fiche salarié</a>
                     {% endif %}
-                    <a href="{% url "employee_record_views:create" item.id %}?from_status=NEW" class="btn btn-sm btn-outline-primary mt-2">Compléter la fiche salarié</a>
+                    <a href="{% url "employee_record_views:create" item.id %}?from_status=NEW" class="btn btn-sm btn-primary mt-2">Compléter la fiche salarié</a>
                 </div>
             {% endif %}
         {% else %}
             <div class="text-end">
-                {% if form.status.value == "REJECTED" or form.status.value == "PROCESSED" %}
+                {% if employee_record.status == "DISABLED" %}
+                    <a href="{% url "employee_record_views:reactivate" employee_record.id %}" class="btn btn-sm btn-outline-primary mt-2">Réactiver la fiche salarié</a>
+                {% elif employee_record.can_be_disabled %}
                     <a href="{% url "employee_record_views:disable" employee_record.id %}" class="btn btn-sm btn-outline-primary mt-2">Désactiver la fiche salarié</a>
                 {% endif %}
-                {% if form.status.value == "REJECTED" %}
-                    <a href="{% url "employee_record_views:create" item.id %}?from_status=REJECTED" class="btn btn-sm btn-outline-primary mt-2">Modifier la fiche salarié</a>
-                {% endif %}
-                {% if form.status.value and form.status.value != "REJECTED" and form.status.value != "DISABLED" %}
-                    <a href="{% url "employee_record_views:summary" employee_record.id %}" class="btn btn-sm btn-outline-primary mt-2">Voir le détail de la fiche salarié</a>
-                {% endif %}
-                {% if form.status.value == "DISABLED" %}
-                    <a href="{% url "employee_record_views:reactivate" employee_record.id %}" class="btn btn-sm btn-outline-primary mt-2">Réactiver la fiche salarié</a>
+                <a href="{% url "employee_record_views:summary" employee_record.id %}" class="btn btn-sm btn-outline-primary mt-2">Voir le détail de la fiche salarié</a>
+                {% if employee_record.status == "REJECTED" %}
+                    <a href="{% url "employee_record_views:create" item.id %}?from_status={{ employee_record.status }}" class="btn btn-sm btn-primary mt-2">Modifier la fiche salarié</a>
                 {% endif %}
             </div>
         {% endif %}
