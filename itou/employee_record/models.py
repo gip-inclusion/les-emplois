@@ -189,7 +189,7 @@ class EmployeeRecord(ASPExchangeInformation):
 
     # These fields are duplicated to act as constraint fields on DB level
     approval_number = models.CharField(max_length=12, verbose_name="numéro d'agrément")
-    asp_id = models.PositiveIntegerField(verbose_name="identifiant ASP de la SIAE")
+    asp_id = models.PositiveIntegerField(verbose_name="identifiant ASP de la SIAE")  # TODO(rsebille): Remove it.
     asp_measure = models.CharField(verbose_name="mesure ASP de la SIAE", choices=SiaeMeasure.choices)
 
     # If the SIAE is an "antenna",
@@ -218,15 +218,15 @@ class EmployeeRecord(ASPExchangeInformation):
         verbose_name_plural = "fiches salarié"
         constraints = ASPExchangeInformation.Meta.constraints + [
             models.UniqueConstraint(
-                fields=["asp_id", "approval_number", "asp_measure"],
-                name="unique_asp_id_approval_number_asp_measure",
+                fields=["asp_measure", "siret", "approval_number"],
+                name="unique_asp_measure_siret_approval_number",
             ),
         ]
 
     def __str__(self):
         return (
             f"PK:{self.pk} PASS:{self.approval_number} SIRET:{self.siret} JA:{self.job_application} "
-            f"JOBSEEKER:{self.job_seeker} STATUS:{self.status} ASP_ID:{self.asp_id}"
+            f"JOBSEEKER:{self.job_seeker} STATUS:{self.status}"
         )
 
     def _clean_job_application(self):

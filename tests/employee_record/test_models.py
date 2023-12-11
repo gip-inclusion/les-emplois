@@ -618,7 +618,7 @@ class TestEmployeeRecordQueryset:
 
         assert EmployeeRecord.objects.asp_duplicates().count() == 1
 
-    def test_for_siae(self):
+    def test_for_company(self):
         employee_record_1, employee_record_2 = EmployeeRecordFactory.create_batch(2)
 
         assert (
@@ -627,13 +627,6 @@ class TestEmployeeRecordQueryset:
         assert (
             EmployeeRecord.objects.for_company(employee_record_2.job_application.to_company).get() == employee_record_2
         )
-
-    def test_for_siae_with_different_asp_id(self):
-        employee_record = EmployeeRecordFactory(asp_id=0)
-
-        assert list(EmployeeRecord.objects.for_company(employee_record.job_application.to_company)) == [
-            employee_record
-        ]
 
 
 @pytest.mark.parametrize("factory", [BareEmployeeRecordFactory, BareEmployeeRecordUpdateNotificationFactory])
