@@ -102,14 +102,6 @@ def test_existing_new_employee_records():
     ]
 
 
-def test_existing_new_employee_records_are_eligible_with_a_different_asp_id():
-    employee_record = EmployeeRecordWithProfileFactory(status=er_enums.Status.NEW, asp_id=0)
-
-    assert list(JobApplication.objects.eligible_as_employee_record(employee_record.job_application.to_company)) == [
-        employee_record.job_application
-    ]
-
-
 @pytest.mark.parametrize("field", ["asp_measure", "siret", "approval_number"])
 def test_existing_new_employee_records_are_eligible_with_a_different_value_for_field(field):
     employee_record = EmployeeRecordWithProfileFactory(status=er_enums.Status.NEW, **{field: ""})
