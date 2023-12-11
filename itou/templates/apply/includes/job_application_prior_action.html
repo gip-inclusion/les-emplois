@@ -40,10 +40,13 @@
                                   class="d-block js-prevent-multiple-submit">
                                 {% csrf_token %}
                                 <div class="text-end">
-                                    <button class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" aria-label="Annuler" type="button">
+                                    <button class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" aria-label="Annuler la suppression de l'action préalable à l'embauche" type="button">
                                         Annuler
                                     </button>
-                                    <button class="btn btn-danger btn-sm" data-bs-dismiss="modal" aria-label="Supprimer">Supprimer</button>
+                                    <button class="btn btn-danger btn-sm" data-bs-dismiss="modal" aria-label="Supprimer l'action préalable à l'embauche">
+                                        <i class="ri-delete-bin-line font-weight-normal" aria-hidden="true"></i>
+                                        <span>Supprimer</span>
+                                    </button>
                                 </div>
                             </form>
                         </div>

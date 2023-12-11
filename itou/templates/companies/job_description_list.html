@@ -114,10 +114,13 @@
                                                                         {% csrf_token %}
                                                                         <input type="hidden" name="action" value="delete" />
                                                                         <input type="hidden" name="job_description_id" value="{{ job_description.id }}" />
-                                                                        <button class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" aria-label="Annuler" type="button">
+                                                                        <button class="btn btn-outline-primary btn-sm" data-bs-dismiss="modal" aria-label="Annuler la suppression de la fiche de poste" type="button">
                                                                             Annuler
                                                                         </button>
-                                                                        <button class="btn btn-primary btn-sm" aria-label="Supprimer">Supprimer</button>
+                                                                        <button class="btn btn-sm btn-ico btn-danger" aria-label="Supprimer la fiche de poste">
+                                                                            <i class="ri-delete-bin-line font-weight-normal" aria-hidden="true"></i>
+                                                                            <span>Supprimer</span>
+                                                                        </button>
                                                                     </form>
                                                                 </div>
                                                             </div>
