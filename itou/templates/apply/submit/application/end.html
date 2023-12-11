@@ -58,7 +58,17 @@
                                     <p>
                                         <span class="text-muted">N&deg; de téléphone</span>
                                         <br />
-                                        <b>{{ job_application.job_seeker.phone|format_phone|default:"Non renseigné" }}</b>
+                                        {% if job_application.job_seeker.phone %}
+                                            <b>{{ job_application.job_seeker.phone|format_phone }}</b>
+                                        {% elif request.user.is_job_seeker %}
+                                            <b>Non renseigné</b>
+                                            <p class="text-warning fst-italic">
+                                                L’ajout du numéro de téléphone permet à l’employeur de vous contacter plus facilement.
+                                            </p>
+                                        {% else %}
+                                            <b>Non renseigné</b>
+                                            <p class="text-warning fst-italic">L’ajout du numéro de téléphone facilitera la prise de contact avec le candidat.</p>
+                                        {% endif %}
                                     </p>
                                 </div>
                             </div>

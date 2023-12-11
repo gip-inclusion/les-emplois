@@ -36,7 +36,10 @@ from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibi
 from tests.geo.factories import ZRRFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import (
+    PrescriberOrganizationWithMembershipFactory,
+    PrescriberPoleEmploiWithMembershipFactory,
+)
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -614,6 +617,68 @@ class ApplyAsJobSeekerTest(TestCase):
             count=1,
         )
         assert JobApplication.objects.exists() is False
+
+    def test_apply_end_view_wo_phone_number_as_job_seeker(self):
+        application = JobApplicationFactory(
+            sender_kind=SenderKind.JOB_SEEKER, sender_company=None, job_seeker__phone=""
+        )
+        expected_html = (
+            '<p class="text-warning fst-italic">L’ajout du numéro de téléphone permet à l’employeur de vous '
+            "contacter plus facilement.</p>"
+        )
+        self.client.force_login(application.job_seeker)
+        response = self.client.get(
+            reverse(
+                "apply:application_end",
+                kwargs={
+                    "company_pk": application.to_company.pk,
+                    "application_pk": application.pk,
+                },
+            )
+        )
+        self.assertContains(response, expected_html, html=True)
+
+    def test_apply_end_view_wo_phone_number_as_employer(self):
+        application = JobApplicationFactory(
+            sender_kind=SenderKind.EMPLOYER, sender_company=CompanyFactory(), job_seeker__phone=""
+        )
+        expected_html = (
+            '<p class="text-warning fst-italic">L’ajout du numéro de téléphone facilitera '
+            "la prise de contact avec le candidat.</p>"
+        )
+        self.client.force_login(application.to_company.members.first())
+        response = self.client.get(
+            reverse(
+                "apply:application_end",
+                kwargs={
+                    "company_pk": application.to_company.pk,
+                    "application_pk": application.pk,
+                },
+            )
+        )
+        self.assertContains(response, expected_html, html=True)
+
+    def test_apply_end_view_wo_phone_number_as_prescriber(self):
+        application = JobApplicationFactory(
+            sender_kind=SenderKind.PRESCRIBER,
+            sender_prescriber_organization=PrescriberPoleEmploiWithMembershipFactory(),
+            job_seeker__phone="",
+        )
+        expected_html = (
+            '<p class="text-warning fst-italic">L’ajout du numéro de téléphone facilitera '
+            "la prise de contact avec le candidat.</p>"
+        )
+        self.client.force_login(application.sender_prescriber_organization.members.first())
+        response = self.client.get(
+            reverse(
+                "apply:application_end",
+                kwargs={
+                    "company_pk": application.to_company.pk,
+                    "application_pk": application.pk,
+                },
+            )
+        )
+        self.assertContains(response, expected_html, html=True)
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
