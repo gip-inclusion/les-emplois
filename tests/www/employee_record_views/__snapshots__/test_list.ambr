@@ -5,7 +5,7 @@
                       
                           <a class="btn btn-sm btn-outline-primary mt-2" href="/employee_record/disable/[PK of EmployeeRecord]">Désactiver la fiche salarié</a>
                       
-                      <a class="btn btn-sm btn-outline-primary mt-2" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">Compléter la fiche salarié</a>
+                      <a class="btn btn-sm btn-primary mt-2" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">Compléter la fiche salarié</a>
                   </div>
   '''
 # ---
@@ -177,7 +177,7 @@
                       
                           <a class="btn btn-sm btn-outline-primary mt-2" href="/employee_record/disable/[PK of EmployeeRecord]">Désactiver la fiche salarié</a>
                       
-                      <a class="btn btn-sm btn-outline-primary mt-2" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">Compléter la fiche salarié</a>
+                      <a class="btn btn-sm btn-primary mt-2" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">Compléter la fiche salarié</a>
                   </div>
   '''
 # ---
@@ -187,7 +187,7 @@
                       
                           <a class="btn btn-sm btn-outline-primary mt-2" href="/employee_record/disable/[PK of EmployeeRecord]">Désactiver la fiche salarié</a>
                       
-                      <a class="btn btn-sm btn-outline-primary mt-2" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">Compléter la fiche salarié</a>
+                      <a class="btn btn-sm btn-primary mt-2" href="/employee_record/create/[PK of JobApplication]?from_status=NEW">Compléter la fiche salarié</a>
                   </div>
   '''
 # ---

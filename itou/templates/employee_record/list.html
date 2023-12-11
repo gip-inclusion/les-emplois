@@ -152,21 +152,19 @@
                         <div class="employee-records-list">
                             {% if employee_records_list %}
                                 {% for employee_record in navigation_pages %}
-                                    {% include "employee_record/includes/list_item.html" with employee_record=employee_record item=employee_record.job_application form=form only %}
+                                    {% include "employee_record/includes/list_item.html" with employee_record=employee_record item=employee_record.job_application only %}
                                 {% endfor %}
                                 {# New employee records i.e. job applications #}
                             {% else %}
                                 {% for job_application in navigation_pages %}
-                                    {% include "employee_record/includes/list_item.html" with employee_record=None item=job_application form=form %}
+                                    {% include "employee_record/includes/list_item.html" with employee_record=None item=job_application only %}
                                 {% endfor %}
                             {% endif %}
                         </div>
 
                         {% if not navigation_pages %}<p class="my-3 my-md-4">Aucune fiche salarié avec le statut selectionné.</p>{% endif %}
+                        {% include "includes/pagination.html" with page=navigation_pages %}
                     </div>
-
-                    {% include "includes/pagination.html" with page=navigation_pages %}
-
                 </div>
             </div>
         </div>
