@@ -5,9 +5,7 @@ from django.core import management
 from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind
-from itou.employee_record.models import EmployeeRecord
 from tests.companies import factories as companies_factories
-from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.test import TestCase
 
@@ -36,43 +34,6 @@ class MoveSiaeDataTest(TestCase):
         assert company_1.members.count() == 0
         assert company_2.jobs.count() == 4
         assert company_2.members.count() == 1
-
-    def test_orphan_employee_records_are_cloned(self):
-        old_company, new_company = companies_factories.CompanyFactory.create_batch(2)
-        EmployeeRecordFactory(job_application__to_company=old_company)
-
-        management.call_command(
-            "move_company_data",
-            from_id=old_company.pk,
-            to_id=new_company.pk,
-            stdout=io.StringIO(),
-            stderr=io.StringIO(),
-            wet_run=True,
-        )
-
-        assert EmployeeRecord.objects.for_company(old_company).count() == 0
-        assert EmployeeRecord.objects.orphans().count() == 1
-        assert EmployeeRecord.objects.for_company(new_company).count() == 1
-        assert EmployeeRecord.objects.count() == 2
-
-    def test_employee_records_are_accessible_when_the_convention_is_the_same(self):
-        old_company = companies_factories.CompanyFactory()
-        new_company = companies_factories.CompanyFactory(convention=old_company.convention)
-        EmployeeRecordFactory(job_application__to_company=old_company)
-
-        management.call_command(
-            "move_company_data",
-            from_id=old_company.pk,
-            to_id=new_company.pk,
-            stdout=io.StringIO(),
-            stderr=io.StringIO(),
-            wet_run=True,
-        )
-
-        assert EmployeeRecord.objects.for_company(old_company).count() == 0
-        assert EmployeeRecord.objects.orphans().count() == 0
-        assert EmployeeRecord.objects.for_company(new_company).count() == 1
-        assert EmployeeRecord.objects.count() == 1
 
 
 def test_update_companies_job_app_score():

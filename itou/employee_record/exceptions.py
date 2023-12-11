@@ -4,11 +4,3 @@ class SerializationError(Exception):
 
 class InvalidStatusError(Exception):
     """Raised when changing status from an invalid previous status value."""
-
-
-class CloningError(Exception):
-    """This employee record can't be cloned."""
-
-
-class DuplicateCloningError(CloningError):
-    """This employee record can't be cloned because it's a duplicate"""
