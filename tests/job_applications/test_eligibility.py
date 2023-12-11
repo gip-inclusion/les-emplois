@@ -91,12 +91,6 @@ class EmployeeRecordEligibilityTest(TestCase):
 
 
 def test_existing_new_employee_records():
-    # An employee record:
-    # - in 'NEW' state,
-    # - linked to the exact same SIAE (via convention.asp_id),
-    # - and with an approval
-    # must be displayed to users for update / completion tasks.
-    # This about displaying "unfinished" and uncomplete employee records.
     company = CompanyFactory()
     expected_employee_record = EmployeeRecordWithProfileFactory(
         job_application__to_company=company, status=er_enums.Status.NEW
@@ -108,10 +102,12 @@ def test_existing_new_employee_records():
     ]
 
 
-def test_existing_new_employee_records_are_not_eligible_with_a_different_asp_id():
+def test_existing_new_employee_records_are_eligible_with_a_different_asp_id():
     employee_record = EmployeeRecordWithProfileFactory(status=er_enums.Status.NEW, asp_id=0)
 
-    assert list(JobApplication.objects.eligible_as_employee_record(employee_record.job_application.to_company)) == []
+    assert list(JobApplication.objects.eligible_as_employee_record(employee_record.job_application.to_company)) == [
+        employee_record.job_application
+    ]
 
 
 @pytest.mark.parametrize("field", ["asp_measure", "siret", "approval_number"])

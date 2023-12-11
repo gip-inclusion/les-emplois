@@ -47,28 +47,6 @@ class Command(BaseCommand):
 
             self.stdout.write(" - done!")
 
-    def _check_orphans(self, dry_run):
-        # Exclude the ones that are already ARCHIVED as they are already unusable
-        orphans = EmployeeRecord.objects.orphans().exclude(status__in=[Status.ARCHIVED])
-
-        self.stdout.write("* Checking orphans employee records:")
-
-        orphans_count = orphans.count()
-        if not orphans_count:
-            self.stdout.write(" - none found (great!)")
-        else:
-            self.stdout.write(f" - found {orphans_count} orphan(s)")
-
-            if dry_run:
-                return
-
-            self.stdout.write(" - fixing orphans: switching status to ARCHIVED")
-
-            with transaction.atomic():
-                orphans.update(status=Status.ARCHIVED)
-
-            self.stdout.write(" - done!")
-
     def _check_jobseeker_profiles(self, dry_run):
         # Check incoherence in user profile leading to validation errors at processing time.
         # Employee records in this case are switched back to status DISABLED for further processing by end-user.
@@ -152,7 +130,6 @@ class Command(BaseCommand):
             .filter(
                 status=Status.ARCHIVED,
                 job_application__approval__end_at__gte=prolongation_cutoff,  # Take approvals that can still be used
-                asp_id=F("job_application__to_company__convention__asp_id"),  # Exclude orphans
                 last_employee_record_snapshot__lt=F("last_approval_change"),
             )
             .order_by(
@@ -184,7 +161,6 @@ class Command(BaseCommand):
         self._check_approvals(dry_run)
         self._check_jobseeker_profiles(dry_run)
         self._check_3436_error_code(dry_run)
-        self._check_orphans(dry_run)
         self._check_missed_notifications(dry_run)
 
         self.stdout.write("+ Employee records sanitizing done. Have a great day!")

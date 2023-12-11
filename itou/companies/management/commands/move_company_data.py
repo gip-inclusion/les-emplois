@@ -7,7 +7,6 @@ from django.utils import timezone
 from itou.approvals import models as approvals_models
 from itou.companies import models as companies_models
 from itou.eligibility import models as eligibility_models
-from itou.employee_record.exceptions import DuplicateCloningError
 from itou.employee_record.models import EmployeeRecord
 from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
@@ -97,7 +96,7 @@ class Command(BaseCommand):
 
         self.stdout.write(
             "MOVE {} OF company.id={} - {} {} - {}\n".format(
-                "DATA" if move_all_data else "JOB APPLICATIONS AND EMPLOYEE RECORDS",
+                "DATA" if move_all_data else "JOB APPLICATIONS",
                 from_company.pk,
                 from_company.kind,
                 from_company.siret,
@@ -218,25 +217,6 @@ class Command(BaseCommand):
 
             job_applications_sent.update(sender_company_id=to_id)
             job_applications_received.update(to_company_id=to_id)
-            # Also move employee records
-            employee_records_to_clone = (
-                # Not reusing the previous queryset, so we can use the updated to_company and only take the orphans
-                # (the ones with a different `asp_id`), in case of a SIRET change the employer can (should)
-                # reactivate/deactivate the employee record to resend it to the ASP with the new SIRET.
-                EmployeeRecord.objects.filter(job_application__to_company_id=to_id)
-                .orphans()
-                # Deduplicate to avoid errors because of the UNIQUE CONSTRAINT (asp_id, approval_number)
-                .distinct("approval_number")
-                .order_by("approval_number", "-job_application__hiring_start_at", "-pk")
-            )
-            self.stdout.write(
-                f"| Cloning {len(employee_records_to_clone)}/{employee_records_created_count} employee records"
-            )
-            for employee_record in employee_records_to_clone:
-                try:
-                    employee_record.clone()
-                except DuplicateCloningError as e:
-                    self.stdout.write(f"| + Failed to clone {employee_record}: {e}")
 
             if move_all_data:
                 # do not move duplicated job_descriptions
@@ -264,7 +244,7 @@ class Command(BaseCommand):
 
         self.stdout.write(
             "MOVE {} OF company.id={} FINISHED\n".format(
-                "DATA" if move_all_data else "JOB APPLICATIONS AND EMPLOYEE RECORDS", from_company.pk
+                "DATA" if move_all_data else "JOB APPLICATIONS", from_company.pk
             )
         )
         orig_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_company_id=from_id)

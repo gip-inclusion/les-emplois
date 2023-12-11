@@ -4,7 +4,6 @@ import json
 from datetime import date, timedelta
 from unittest import mock
 
-import freezegun
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
@@ -12,7 +11,7 @@ from django.utils import timezone
 
 from itou.approvals.models import Approval
 from itou.employee_record.enums import Status
-from itou.employee_record.exceptions import CloningError, DuplicateCloningError, InvalidStatusError
+from itou.employee_record.exceptions import InvalidStatusError
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.mocks.address_format import mock_get_geocoding_data
@@ -273,63 +272,6 @@ def test_asp_prescriber_type_for_authorized_organization(kind, expected):
         job_application__sender_prescriber_organization__kind=kind,
     )
     assert employee_record.asp_prescriber_type == expected
-
-
-@pytest.mark.parametrize("status", list(Status))
-def test_clone_for_orphan_employee_record(status):
-    # Check employee record clone features and properties
-    employee_record = EmployeeRecordFactory(orphan=True, status=status)
-
-    assert employee_record.is_orphan
-    with freezegun.freeze_time():
-        clone = employee_record.clone()
-    assert not clone.is_orphan
-
-    # Check fields that changes during cloning
-    assert clone.pk != employee_record.pk
-    assert clone.status == Status.NEW
-    assert clone.asp_processing_label == f"Fiche salarié clonée (pk origine: {employee_record.pk})"
-    assert clone.created_at != employee_record.created_at
-    assert clone.updated_at == clone.created_at
-
-    # Check fields that are copied or possibly overwritten
-    assert clone.job_application == employee_record.job_application
-    assert clone.approval_number == employee_record.approval_number
-    assert clone.asp_id == employee_record.job_application.to_company.convention.asp_id
-    assert clone.siret == employee_record.job_application.to_company.siret
-
-    # Check fields that should be empty
-    assert clone.asp_processing_code is None
-    assert clone.asp_batch_file is None
-    assert clone.asp_batch_line_number is None
-    assert clone.archived_json is None
-    assert clone.processed_at is None
-    assert clone.financial_annex is None
-    assert clone.processed_as_duplicate is False
-
-    # Check cloned employee record
-    assert employee_record.is_orphan
-    if employee_record.can_be_disabled:
-        assert employee_record.status == Status.DISABLED
-
-
-def test_clone_when_a_duplicate_exists():
-    employee_record = EmployeeRecordFactory()
-    with pytest.raises(DuplicateCloningError, match=r"The clone is a duplicate of"):
-        employee_record.clone()
-
-
-def test_clone_without_primary_key():
-    employee_record = BareEmployeeRecordFactory.build()
-    with pytest.raises(CloningError) as exc_info:
-        employee_record.clone()
-    assert str(exc_info.value) == "This employee record has not been saved yet (no PK)."
-
-
-def test_clone_without_convention():
-    employee_record = EmployeeRecordFactory(orphan=True, job_application__to_company__convention=None)
-    with pytest.raises(CloningError, match=r"SIAE \d{14} has no convention"):
-        employee_record.clone()
 
 
 class EmployeeRecordBatchTest(TestCase):
@@ -664,23 +606,6 @@ class EmployeeRecordJobApplicationConstraintsTest(TestCase):
 
 
 class TestEmployeeRecordQueryset:
-    @pytest.mark.parametrize("status", list(Status))
-    def test_orphans(self, status):
-        # Check orphans employee records
-        # (asp_id in object different from actual SIAE convention asp_id field)
-        employee_record = EmployeeRecordFactory(status=status)
-
-        # Not an orphan, yet
-        assert employee_record.is_orphan is False
-        assert EmployeeRecord.objects.orphans().count() == 0
-
-        # Whatever int different from asp_id will do, but factory sets this field at 0
-        employee_record.asp_id += 1
-        employee_record.save()
-
-        assert employee_record.is_orphan is True
-        assert EmployeeRecord.objects.orphans().count() == 1
-
     def test_asp_duplicates(self):
         # Filter REJECTED employee records with error code 3436
         EmployeeRecordWithProfileFactory(status=Status.REJECTED)
@@ -704,11 +629,11 @@ class TestEmployeeRecordQueryset:
         )
 
     def test_for_siae_with_different_asp_id(self):
-        employee_record = EmployeeRecordFactory(
-            asp_id=0,
-        )
+        employee_record = EmployeeRecordFactory(asp_id=0)
 
-        assert list(EmployeeRecord.objects.for_company(employee_record.job_application.to_company)) == []
+        assert list(EmployeeRecord.objects.for_company(employee_record.job_application.to_company)) == [
+            employee_record
+        ]
 
 
 @pytest.mark.parametrize("factory", [BareEmployeeRecordFactory, BareEmployeeRecordUpdateNotificationFactory])

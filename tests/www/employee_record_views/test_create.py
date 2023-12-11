@@ -601,7 +601,7 @@ class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
 
     def test_retrieved_employee_record_is_the_most_recent_one(self):
         older_employee_record = EmployeeRecordFactory(
-            orphan=True,
+            asp_id=0,
             job_application=self.job_application,
             created_at=self.faker.date_time(end_datetime="-1d", tzinfo=datetime.UTC),
         )
@@ -650,7 +650,7 @@ class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
 
     def test_retrieved_employee_record_is_the_most_recent_one(self):
         older_employee_record = EmployeeRecordFactory(
-            orphan=True,
+            asp_id=0,
             job_application=self.job_application,
             created_at=self.faker.date_time(end_datetime="-1d", tzinfo=datetime.UTC),
         )

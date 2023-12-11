@@ -55,7 +55,6 @@ class EmployeeRecordFactory(BareEmployeeRecordFactory):
             created_at=factory.Faker("date_time_between", end_date="-6M", tzinfo=datetime.UTC),
             updated_at=factory.Faker("date_time_between", end_date="-3M", tzinfo=datetime.UTC),
         )
-        orphan = factory.Trait(asp_id=0)
         with_batch_information = factory.Trait(
             asp_batch_file=factory.Faker("asp_batch_filename"), asp_batch_line_number=factory.Sequence(int)
         )

@@ -74,9 +74,7 @@ class JobApplicationInline(ItouStackedInline):
                 ", ".join(
                     get_admin_view_link(
                         er,
-                        content=mark_safe(
-                            f"<b>{er.get_status_display()} (ID: {er.pk}{', ORPHAN' if er.is_orphan else ''})</b>"
-                        ),
+                        content=mark_safe(f"<b>{er.get_status_display()} (ID: {er.pk})</b>"),
                     )
                     for er in obj.employee_record.all()
                 )

@@ -1,13 +1,12 @@
 import contextlib
 import json
 
-import django.db.utils
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Exists, OuterRef
 from django.db.models.manager import Manager
-from django.db.models.query import F, Q, QuerySet
+from django.db.models.query import Q, QuerySet
 from django.utils import timezone
 from rest_framework.authtoken.admin import User
 
@@ -19,7 +18,7 @@ from itou.users.models import JobSeekerProfile
 from itou.utils.validators import validate_siret
 
 from .enums import MovementType, NotificationStatus, Status
-from .exceptions import CloningError, DuplicateCloningError, InvalidStatusError
+from .exceptions import InvalidStatusError
 
 
 # Validators
@@ -114,10 +113,7 @@ class EmployeeRecordQuerySet(models.QuerySet):
 
     # Search queries
     def for_company(self, siae):
-        return self.filter(
-            job_application__to_company=siae,
-            asp_id=F("job_application__to_company__convention__asp_id"),
-        )
+        return self.filter(job_application__to_company=siae)
 
     def find_by_batch(self, filename, line_number):
         """
@@ -146,13 +142,6 @@ class EmployeeRecordQuerySet(models.QuerySet):
         These employee records are considered as duplicates by ASP.
         """
         return self.filter(status=Status.REJECTED).filter(asp_processing_code=EmployeeRecord.ASP_DUPLICATE_ERROR_CODE)
-
-    def orphans(self):
-        """
-        Employee records with an `asp_id` different from their hiring SIAE.
-        Could occur when using `siae.move_company_data` management command.
-        """
-        return self.exclude(job_application__to_company__convention__asp_id=F("asp_id"))
 
 
 class EmployeeRecord(ASPExchangeInformation):
@@ -403,41 +392,6 @@ class EmployeeRecord(ASPExchangeInformation):
 
         self.save()
 
-    def clone(self):
-        """
-        Create and return a NEW copy of an employee record, this is useful when orphans are detected.
-        If cloning is successful, current employee record is DISABLED (if possible) to avoid conflicts.
-
-        Raises `CloningError` if cloning conditions are not met.
-        """
-        if not self.pk:
-            raise CloningError("This employee record has not been saved yet (no PK).")
-
-        if not self.job_application.to_company.convention:
-            raise CloningError(f"SIAE {self.job_application.to_company.siret} has no convention")
-
-        # Cleanup clone fields
-        er_copy = EmployeeRecord(
-            status=Status.NEW,
-            job_application=self.job_application,
-            asp_processing_label=f"Fiche salarié clonée (pk origine: {self.pk})",
-        )
-        er_copy._fill_denormalized_fields()
-
-        try:
-            with transaction.atomic():
-                er_copy.save()
-        except django.db.utils.IntegrityError as ex:
-            raise DuplicateCloningError(
-                f"The clone is a duplicate of ({er_copy.asp_id=}, {er_copy.approval_number=})"
-            ) from ex
-
-        # Disable current object to avoid conflicts
-        if self.can_be_disabled:
-            self.update_as_disabled()
-
-        return er_copy
-
     @property
     def can_be_disabled(self):
         return self.status in self.CAN_BE_DISABLED_STATES
@@ -527,11 +481,6 @@ class EmployeeRecord(ASPExchangeInformation):
         Mapping between ASP and itou models for SIAE kind ("Mesure")
         """
         return SiaeMeasure.from_siae_kind(self.job_application.to_company.kind)
-
-    @property
-    def is_orphan(self):
-        """Orphan employee records have different stored and actual `asp_id` fields."""
-        return self.job_application.to_company.convention.asp_id != self.asp_id
 
     @staticmethod
     def siret_from_asp_source(siae):

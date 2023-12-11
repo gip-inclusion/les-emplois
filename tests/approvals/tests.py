@@ -1103,12 +1103,6 @@ class CustomApprovalAdminViewsTest(TestCase):
         msg = JobApplicationInline.employee_record_status(job_application)
         assert msg == "En attente de création (doublon)"
 
-        # When the employee record is an orphan
-        employee_record = EmployeeRecordFactory(orphan=True)
-        url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.id])
-        msg = JobApplicationInline.employee_record_status(employee_record.job_application)
-        assert msg == f'<a href="{url}"><b>Nouvelle (ID: {employee_record.pk}, ORPHAN)</b></a>'
-
         # When employee record creation is disabled for that job application
         job_application = JobApplicationFactory(create_employee_record=False)
         msg = JobApplicationInline.employee_record_status(job_application)

@@ -304,31 +304,18 @@ class JobApplicationQuerySet(models.QuerySet):
 
     def _eligible_job_applications_with_employee_record(self, siae):
         """
-        Eligible job applications for employee record query: part 1
-
-        Eligible job applications linked to an employee record,
-        provided that the employee record linked to these job applications:
-            - has the same ASP_ID of hiring structure,
-            - has the same approval,
-            - is in `NEW` state.
-
-        Otherwise, these employee records will be rejected by ASP as duplicates.
+        Eligible job applications with a `NEW` employee record,
 
         Not a public API: use `eligible_as_employee_record`.
         """
         return self.filter(
             to_company=siae,
             employee_record__status=employeerecord_enums.Status.NEW,
-            employee_record__asp_id=F("to_company__convention__asp_id"),
         )
 
     def _eligible_job_applications_without_employee_record(self, siae):
         """
-        Eligible job applications for employee record query: part 2
-
-        Eligible job applications WITHOUT any employee record linked.
-
-        See `eligible_as_employee_record` method for an explanation of business and technical rules.
+        Eligible job applications without any employee records linked.
 
         Not a public API: use `eligible_as_employee_record`.
         """
