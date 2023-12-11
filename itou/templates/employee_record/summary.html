@@ -48,13 +48,16 @@
                         </div>
                     {% endif %}
                     <div class="c-box">
-                        {% with job_application=employee_record.job_application %}
-                            <p>
-                                <b>PASS IAE :</b>
-                                <br>
-                                {{ job_application.approval.number|format_approval_number }}
-                            </p>
-                        {% endwith %}
+                        <p>
+                            <b>PASS IAE :</b>
+                            <br>
+                            {{ employee_record.approval_number|format_approval_number }}
+                        </p>
+                        <p>
+                            <b>SIRET (mesure) :</b>
+                            <br>
+                            {{ employee_record.siret|format_siret }} ({{ employee_record.asp_measure }})
+                        </p>
                         {% if employee_record.asp_batch_file %}
                             <hr class="my-3">
                             <p>
