@@ -217,6 +217,7 @@ class ProcessListSiaeTest(ProcessListTest):
             + 1  # fetch django session
             + 1  # fetch user
             + 2  # check for membership & infos
+            + 1  # count new + processing + postponed applications
             #
             # SiaeFilterJobApplicationsForm:
             + 1  # get list of senders (distinct sender_id)
@@ -679,6 +680,28 @@ class ProcessListSiaeTest(ProcessListTest):
 
 
 class TestListForSiae:
+    @pytest.mark.parametrize("filter_state", JobApplicationWorkflow.states)
+    def test_message_when_company_got_no_new_nor_processing_nor_postponed_application(self, db, client, filter_state):
+        company = CompanyFactory(with_membership=True)
+        client.force_login(company.members.get())
+        response = client.get(reverse("apply:list_for_siae"), {"states": [filter_state.name]})
+        assertContains(response, "Aucune candidature pour le moment")
+
+    @pytest.mark.parametrize("state", JobApplicationWorkflow.PENDING_STATES)
+    @pytest.mark.parametrize("filter_state", JobApplicationWorkflow.states)
+    def test_message_when_company_got_new_or_processing_or_postponed_application(
+        self, db, client, state, filter_state
+    ):
+        company = CompanyFactory(with_membership=True, kind=CompanyKind.GEIQ)
+        ja = JobApplicationFactory(to_company=company, state=state)
+        client.force_login(company.members.get())
+
+        response = client.get(reverse("apply:list_for_siae"), {"states": [filter_state.name]})
+        if filter_state.name == state:
+            assertContains(response, reverse("apply:details_for_company", kwargs={"job_application_id": ja.id}))
+        else:
+            assertContains(response, "Aucune candidature ne correspond aux filtres sélectionnés")
+
     @freeze_time("2023-04-13")
     def test_warns_about_long_awaiting_applications(self, client, snapshot):
         hit_pit = CompanyFactory(pk=42, name="Hit Pit", with_membership=True)

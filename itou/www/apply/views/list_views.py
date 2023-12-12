@@ -171,6 +171,9 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     """
     company = get_current_company_or_404(request)
     job_applications = company.job_applications_received
+    pending_states_job_applications_count = job_applications.filter(
+        state__in=JobApplicationWorkflow.PENDING_STATES
+    ).count()
 
     filters_form = CompanyFilterJobApplicationsForm(job_applications, company, request.GET or None)
 
@@ -199,6 +202,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "job_applications_page": job_applications_page,
         "filters_form": filters_form,
         "filters_counter": filters_counter,
+        "pending_states_job_applications_count": pending_states_job_applications_count,
     }
     return render(request, template_name, context)
 

@@ -77,7 +77,13 @@
                             <div class="text-center my-3 my-md-4">
                                 <img class="img-fluid" src="{% static 'img/illustration-siae-card-no-result.svg' %}" alt="" loading="lazy">
                                 <p class="mb-1 mt-3">
-                                    <strong>Aucune candidature pour le moment</strong>
+                                    <strong>
+                                        {% if pending_states_job_applications_count == 0 %}
+                                            Aucune candidature pour le moment
+                                        {% else %}
+                                            Aucune candidature ne correspond aux filtres sélectionnés
+                                        {% endif %}
+                                    </strong>
                                 </p>
                                 <p>
                                     <i>
