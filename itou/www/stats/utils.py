@@ -58,7 +58,7 @@ def can_view_stats_siae_etp(request):
     return can_view_stats_siae(request) and request.user.pk in settings.STATS_SIAE_USER_PK_WHITELIST
 
 
-def can_view_stats_cd(request):
+def can_view_stats_cd_whitelist(request):
     """
     Users of a real CD can view the confidential CD stats for their department only.
 
