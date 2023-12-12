@@ -1,15 +1,20 @@
+import datetime
 import random
 from itertools import product
 
+import factory
 import pytest
 from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
+from django.contrib import messages
+from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
 from django.utils.http import urlencode
 from django.utils.timezone import localtime
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateUsed
 
 from itou.approvals.models import Approval, Suspension
@@ -48,7 +53,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import TestCase, parse_response_to_soup
+from tests.utils.test import TestCase, assertMessages, parse_response_to_soup
 
 
 DISABLED_NIR = 'disabled id="id_nir"'
@@ -56,6 +61,26 @@ PRIOR_ACTION_SECTION_TITLE = "Action préalable à l'embauche"
 
 
 class ProcessViewsTest(TestCase):
+    DIAGORIENTE_INVITE_TITLE = "Ce candidat n’a pas de CV ?"
+    DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE = "Invitez le prescripteur à en créer un via notre partenaire Diagoriente."
+    DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE = "Invitez-le à en créer un via notre partenaire Diagoriente."
+    DIAGORIENTE_INVITE_BUTTON_TITLE = "Inviter à créer un CV avec Diagoriente"
+    DIAGORIENTE_INVITE_TOOLTIP = "Vous avez invité l'émetteur de cette candidature à créer un CV sur Diagoriente le"
+    DIAGORIENTE_INVITE_EMAIL_SUBJECT = "Créer un CV avec Diagoriente"
+    DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_1 = (
+        "L’entreprise {company_name} vous propose d’utiliser Diagoriente pour valoriser "
+        "les expériences de votre candidat : {job_seeker_name}."
+    )
+    DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_2 = (
+        "Vous pourrez lui créer un compte en cliquant sur ce lien : https://diagoriente.beta.gouv.fr"
+    )
+    DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_1 = (
+        "L’entreprise {company_name} vous propose d’utiliser Diagoriente pour valoriser vos expériences."
+    )
+    DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 = (
+        "Vous pourrez créer votre compte en cliquant sur ce lien : https://diagoriente.beta.gouv.fr"
+    )
+
     @classmethod
     def setUpTestData(cls):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
@@ -1364,6 +1389,326 @@ class ProcessViewsTest(TestCase):
 
         job_application.refresh_from_db()
         assert job_application.hidden_for_company
+
+    def test_diagoriente_section_as_job_seeker(self):
+        job_application = JobApplicationFactory(with_approval=True, resume_link="", job_seeker__resume_link="")
+
+        self.client.force_login(job_application.job_seeker)
+        response = self.client.get(
+            reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
+        )
+        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+
+    def test_diagoriente_section_as_prescriber(self):
+        job_application = JobApplicationFactory(
+            with_approval=True,
+            sent_by_authorized_prescriber_organisation=True,
+            resume_link="",
+            job_seeker__resume_link="",
+        )
+        prescriber = job_application.sender_prescriber_organization.members.first()
+        self.client.force_login(prescriber)
+
+        response = self.client.get(
+            reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+        )
+        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+
+        # Un-authorize prescriber (ie. considered as "orienteur")
+        job_application.sender_prescriber_organization.is_authorized = False
+        job_application.sender_prescriber_organization.save(update_fields=["is_authorized"])
+        response = self.client.get(
+            reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+        )
+        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+
+        # Remove prescriber's organization membership (ie. considered as "orienteur solo")
+        job_application.sender_prescriber_organization.members.clear()
+        job_application.sender_prescriber_organization = None
+        job_application.save(update_fields=["sender_prescriber_organization"])
+        response = self.client.get(
+            reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+        )
+        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+
+    def test_diagoriente_section_as_employee_for_prescriber(self):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            resume_link="https://myresume.com/me",
+            job_seeker__resume_link="https://myresume.com/me",
+        )
+        company = job_application.to_company
+        employee = company.members.first()
+        self.client.force_login(employee)
+
+        # Test with resume
+        response = self.client.get(
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        )
+        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+
+        # Unset resume on job application (still providen through job seeker profile)
+        job_application.resume_link = ""
+        job_application.save(update_fields=["resume_link"])
+        response = self.client.get(
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        )
+        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+
+        # Unset resume on user, should now include Diagoriente section
+        job_application.job_seeker.resume_link = ""
+        job_application.job_seeker.save(update_fields=["resume_link"])
+        response = self.client.get(
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        )
+        self.assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        self.assertContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        self.assertContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        self.assertContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
+
+    def test_diagoriente_section_as_employee_for_job_seeker(self):
+        job_application = JobApplicationFactory(
+            with_approval=True,
+            resume_link="https://myresume.com/me",
+            job_seeker__resume_link="https://myresume.com/me",
+            sender=factory.SelfAttribute(".job_seeker"),
+        )
+        company = job_application.to_company
+        employee = company.members.first()
+        self.client.force_login(employee)
+
+        # Test with resume
+        response = self.client.get(
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        )
+        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+
+        # Unset resume on job application (still providen through job seeker profile)
+        job_application.resume_link = ""
+        job_application.save(update_fields=["resume_link"])
+        response = self.client.get(
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        )
+        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+
+        # Unset resume on user, should now include Diagoriente section
+        job_application.job_seeker.resume_link = ""
+        job_application.job_seeker.save(update_fields=["resume_link"])
+        response = self.client.get(
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        )
+        self.assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        self.assertContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        self.assertContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        self.assertContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
+
+    def test_diagoriente_invite_as_job_seeker(self):
+        job_application = JobApplicationFactory(with_approval=True, resume_link="", job_seeker__resume_link="")
+
+        self.client.force_login(job_application.job_seeker)
+        response = self.client.post(
+            reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk})
+        )
+        assert response.status_code == 404
+        assert len(mail.outbox) == 0
+
+    def test_diagoriente_invite_as_job_prescriber(self):
+        job_application = JobApplicationFactory(
+            with_approval=True,
+            sent_by_authorized_prescriber_organisation=True,
+            resume_link="",
+            job_seeker__resume_link="",
+        )
+        prescriber = job_application.sender_prescriber_organization.members.first()
+
+        self.client.force_login(prescriber)
+        response = self.client.post(
+            reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk})
+        )
+        assert response.status_code == 404
+        assert len(mail.outbox) == 0
+
+    def test_diagoriente_invite_as_employee_for_authorized_prescriber(self):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            resume_link="https://myresume.com/me",
+            job_seeker__resume_link="",
+        )
+        company = job_application.to_company
+        employee = company.members.first()
+        self.client.force_login(employee)
+
+        # Should not perform any action if a resume is set
+        response = self.client.post(
+            reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
+            follow=True,
+        )
+        assertMessages(response, [])
+        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
+        job_application.refresh_from_db()
+        assert job_application.diagoriente_invite_sent_at is None
+        assert len(mail.outbox) == 0
+
+        # Unset resume, should now update the timestamp and send the mail
+        job_application.resume_link = ""
+        job_application.save(update_fields=["resume_link"])
+        with freeze_time("2023-12-12 13:37:00") as initial_invite_time:
+            response = self.client.post(
+                reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
+                follow=True,
+            )
+        assertMessages(response, [(messages.SUCCESS, "L'invitation à utiliser Diagoriente a été envoyée.")])
+        self.assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+        self.assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
+        job_application.refresh_from_db()
+        assert job_application.diagoriente_invite_sent_at == initial_invite_time().replace(tzinfo=datetime.UTC)
+        assert len(mail.outbox) == 1
+        assert self.DIAGORIENTE_INVITE_EMAIL_SUBJECT in mail.outbox[0].subject
+        assert (
+            self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_1.format(
+                company_name=job_application.to_company.display_name,
+                job_seeker_name=job_application.job_seeker.get_full_name(),
+            )
+            in mail.outbox[0].body
+        )
+        assert self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_2 in mail.outbox[0].body
+        assert (
+            self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_1.format(
+                company_name=job_application.to_company.display_name
+            )
+            not in mail.outbox[0].body
+        )
+        assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 not in mail.outbox[0].body
+
+        # Concurrent/subsequent calls should not perform any action
+        response = self.client.post(
+            reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
+            follow=True,
+        )
+        assertMessages(response, [])
+        self.assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+        self.assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
+        job_application.refresh_from_db()
+        assert job_application.diagoriente_invite_sent_at == initial_invite_time().replace(tzinfo=datetime.UTC)
+        assert len(mail.outbox) == 1
+
+    def test_diagoriente_invite_as_employee_for_unauthorized_prescriber(self):
+        job_application = JobApplicationFactory(
+            sender_prescriber_organization__is_authorized=False,
+            resume_link="",
+            job_seeker__resume_link="",
+        )
+        company = job_application.to_company
+        employee = company.members.first()
+        self.client.force_login(employee)
+
+        with freeze_time("2023-12-12 13:37:00") as initial_invite_time:
+            response = self.client.post(
+                reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
+                follow=True,
+            )
+        assertMessages(response, [(messages.SUCCESS, "L'invitation à utiliser Diagoriente a été envoyée.")])
+        self.assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+        self.assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
+        job_application.refresh_from_db()
+        assert job_application.diagoriente_invite_sent_at == initial_invite_time().replace(tzinfo=datetime.UTC)
+        assert len(mail.outbox) == 1
+        assert self.DIAGORIENTE_INVITE_EMAIL_SUBJECT in mail.outbox[0].subject
+        assert (
+            self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_1.format(
+                company_name=job_application.to_company.display_name,
+                job_seeker_name=job_application.job_seeker.get_full_name(),
+            )
+            in mail.outbox[0].body
+        )
+        assert self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_2 in mail.outbox[0].body
+        assert (
+            self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_1.format(
+                company_name=job_application.to_company.display_name
+            )
+            not in mail.outbox[0].body
+        )
+        assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 not in mail.outbox[0].body
+
+    def test_diagoriente_invite_as_employee_for_job_seeker(self):
+        job_application = JobApplicationFactory(
+            with_approval=True,
+            resume_link="",
+            job_seeker__resume_link="",
+            sender=factory.SelfAttribute(".job_seeker"),
+        )
+        company = job_application.to_company
+        employee = company.members.first()
+        self.client.force_login(employee)
+
+        with freeze_time("2023-12-12 13:37:00") as initial_invite_time:
+            response = self.client.post(
+                reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
+                follow=True,
+            )
+        assertMessages(response, [(messages.SUCCESS, "L'invitation à utiliser Diagoriente a été envoyée.")])
+        self.assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE)
+        self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
+        self.assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
+        job_application.refresh_from_db()
+        assert job_application.diagoriente_invite_sent_at == initial_invite_time().replace(tzinfo=datetime.UTC)
+        assert len(mail.outbox) == 1
+        assert self.DIAGORIENTE_INVITE_EMAIL_SUBJECT in mail.outbox[0].subject
+        assert (
+            self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_1.format(
+                company_name=job_application.to_company.display_name,
+                job_seeker_name=job_application.job_seeker.get_full_name(),
+            )
+            not in mail.outbox[0].body
+        )
+        assert self.DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_2 not in mail.outbox[0].body
+        assert (
+            self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_1.format(
+                company_name=job_application.to_company.display_name
+            )
+            in mail.outbox[0].body
+        )
+        assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 in mail.outbox[0].body
 
 
 class ProcessTemplatesTest(TestCase):

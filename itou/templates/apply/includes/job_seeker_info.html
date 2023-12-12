@@ -58,6 +58,9 @@
                 <a href="{{ job_application.get_resume_link }}">Télécharger le CV</a>
             {% else %}
                 <span>Non renseigné</span>
+                {% if job_application.diagoriente_invite_sent_at %}
+                    <i class="ri-information-line ri-xl text-info ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Vous avez invité l'émetteur de cette candidature à créer un CV sur Diagoriente le {{ job_application.diagoriente_invite_sent_at|date:"d/m/Y" }}"></i>
+                {% endif %}
             {% endif %}
         </li>
     {% endif %}
