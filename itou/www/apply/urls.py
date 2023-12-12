@@ -272,6 +272,12 @@ urlpatterns = [
         edit_views.edit_contract_start_date,
         name="edit_contract_start_date",
     ),
+    # Diagoriente
+    path(
+        "<uuid:job_application_id>/siae/diagoriente/send_invite",
+        process_views.send_diagoriente_invite,
+        name="send_diagoriente_invite",
+    ),
     # HTMX fragments loading
     # TODO(xfernandez): remove the job_application_id version in a week
     path(

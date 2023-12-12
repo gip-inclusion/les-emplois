@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirec
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 from django.views.generic.base import TemplateView
@@ -438,6 +439,27 @@ def transfer(request, job_application_id):
         )
 
     return HttpResponseRedirect(back_url)
+
+
+@login_required
+@require_POST
+def send_diagoriente_invite(request, job_application_id):
+    """
+    As a company member, I can send a Diagoriente invite to the prescriber or the job seeker.
+    """
+    queryset = JobApplication.objects.is_active_company_member(request.user)
+    job_application = get_object_or_404(queryset.select_for_update(), pk=job_application_id)
+    if not job_application.get_resume_link() and not job_application.diagoriente_invite_sent_at:
+        if job_application.is_sent_by_proxy:
+            job_application.email_diagoriente_invite_for_prescriber.send()
+        else:
+            job_application.email_diagoriente_invite_for_job_seeker.send()
+        job_application.diagoriente_invite_sent_at = timezone.now()
+        job_application.save(update_fields=["diagoriente_invite_sent_at"])
+        messages.success(request, "L'invitation à utiliser Diagoriente a été envoyée.")
+
+    redirect_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application_id})
+    return HttpResponseRedirect(redirect_url)
 
 
 @login_required

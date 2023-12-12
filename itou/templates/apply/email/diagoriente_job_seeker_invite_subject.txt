@@ -1,0 +1,1 @@
+{% extends "apply/email/diagoriente_prescriber_invite_subject.txt" %}

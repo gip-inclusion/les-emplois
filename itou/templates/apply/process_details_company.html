@@ -30,6 +30,11 @@
         <h3>Candidature envoyée par</h3>
         {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
 
+        {# Diagoriente invite #}
+        {% if not job_application.get_resume_link %}
+            {% include "apply/includes/job_application_diagoriente_invite.html" with job_application=job_application %}
+        {% endif %}
+
         {# Prior actions info #}
         {% if job_application.can_have_prior_action %}
             <hr>

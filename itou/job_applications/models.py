@@ -674,6 +674,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         null=True,
     )
 
+    # Diagoriente
+    diagoriente_invite_sent_at = models.DateTimeField(
+        verbose_name="date d'envoi de l'invitation à utiliser Diagoriente",
+        null=True,
+        editable=False,
+    )
+
     objects = JobApplicationQuerySet.as_manager()
 
     class Meta:
@@ -1140,6 +1147,22 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         context = {"job_application": self}
         subject = "approvals/email/refuse_manually_subject.txt"
         body = "approvals/email/refuse_manually_body.txt"
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_diagoriente_invite_for_prescriber(self):
+        to = [self.sender.email]
+        subject = "apply/email/diagoriente_prescriber_invite_subject.txt"
+        body = "apply/email/diagoriente_prescriber_invite_body.txt"
+        context = {"job_application": self}
+        return get_email_message(to, context, subject, body)
+
+    @property
+    def email_diagoriente_invite_for_job_seeker(self):
+        to = [self.sender.email]
+        subject = "apply/email/diagoriente_job_seeker_invite_subject.txt"
+        body = "apply/email/diagoriente_job_seeker_invite_body.txt"
+        context = {"job_application": self}
         return get_email_message(to, context, subject, body)
 
     def _get_transfer_email(self, to, subject, body, transferred_by, origin_company, target_company):

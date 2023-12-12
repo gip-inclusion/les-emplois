@@ -1,0 +1,4 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+Créer un CV avec Diagoriente
+{% endblock %}

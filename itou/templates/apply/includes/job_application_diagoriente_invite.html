@@ -1,0 +1,22 @@
+{% load django_bootstrap5 %}
+
+{% if not job_application.diagoriente_invite_sent_at %}
+    <div class="c-info d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 p-3 fs-sm">
+        <div class="w-100 w-md-50 text-center text-md-start">
+            <p class="fw-bold mb-2">Ce candidat n’a pas de CV ?</p>
+            <p class="m-0">
+                {% if job_application.is_sent_by_proxy %}
+                    Invitez le prescripteur à en créer un via notre partenaire Diagoriente.
+                {% else %}
+                    Invitez-le à en créer un via notre partenaire Diagoriente.
+                {% endif %}
+            </p>
+        </div>
+        <div class="w-100 w-md-50 text-center text-md-end mt-3 mt-md-0">
+            <form method="post" action="{% url 'apply:send_diagoriente_invite' job_application_id=job_application.id %}">
+                {% csrf_token %}
+                {% bootstrap_button "Inviter à créer un CV avec Diagoriente" button_type="submit" button_class="btn btn-partner btn-partner--diagoriente fs-sm" %}
+            </form>
+        </div>
+    </div>
+{% endif %}
