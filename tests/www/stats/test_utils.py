@@ -41,7 +41,7 @@ def test_can_view_stats_siae():
 
 
 @override_settings(STATS_CD_DEPARTMENT_WHITELIST=["93"])
-def test_can_view_stats_cd():
+def test_can_view_stats_cd_whitelist():
     """
     CD as in "Conseil Départemental".
     """
@@ -50,7 +50,7 @@ def test_can_view_stats_cd():
         authorized=True, kind=PrescriberOrganizationKind.DEPT, department="01"
     )
     request = get_request(org.members.get())
-    assert not utils.can_view_stats_cd(request)
+    assert not utils.can_view_stats_cd_whitelist(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
     # Admin prescriber of authorized CD can access.
@@ -58,7 +58,7 @@ def test_can_view_stats_cd():
         authorized=True, kind=PrescriberOrganizationKind.DEPT, department="93"
     )
     request = get_request(org.members.get())
-    assert utils.can_view_stats_cd(request)
+    assert utils.can_view_stats_cd_whitelist(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
     # Non admin prescriber can access as well.
@@ -69,7 +69,7 @@ def test_can_view_stats_cd():
         department="93",
     )
     request = get_request(org.members.get())
-    assert utils.can_view_stats_cd(request)
+    assert utils.can_view_stats_cd_whitelist(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
     # Non authorized organization does not give access.
@@ -78,7 +78,7 @@ def test_can_view_stats_cd():
         department="93",
     )
     request = get_request(org.members.get())
-    assert not utils.can_view_stats_cd(request)
+    assert not utils.can_view_stats_cd_whitelist(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
     # Non CD organization does not give access.
@@ -88,12 +88,12 @@ def test_can_view_stats_cd():
         department="93",
     )
     request = get_request(org.members.get())
-    assert not utils.can_view_stats_cd(request)
+    assert not utils.can_view_stats_cd_whitelist(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
     # Prescriber without organization cannot access.
     request = get_request(PrescriberFactory())
-    assert not utils.can_view_stats_cd(request)
+    assert not utils.can_view_stats_cd_whitelist(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
 

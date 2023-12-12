@@ -250,7 +250,7 @@ def render_stats_cd(request, page_title):
     They can only view data for their own departement.
     """
     current_org = get_current_org_or_404(request)
-    if not utils.can_view_stats_cd(request):
+    if not utils.can_view_stats_cd_whitelist(request):
         raise PermissionDenied
     department = current_org.department
     params = get_params_for_departement(department)
