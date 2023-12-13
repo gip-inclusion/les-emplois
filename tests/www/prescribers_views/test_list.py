@@ -34,6 +34,11 @@ def test_list_accredited_organizations(client):
         kind=PrescriberOrganizationKind.OTHER,
         is_brsa=True,
     )
+    non_authorized_org = PrescriberOrganizationFactory(
+        department=organization.department,
+        kind=PrescriberOrganizationKind.OTHER,
+        is_brsa=True,
+    )
     authorized_but_not_brsa_org = PrescriberOrganizationFactory(
         authorized=True,
         department=organization.department,
@@ -44,6 +49,7 @@ def test_list_accredited_organizations(client):
     response = client.get(reverse("prescribers_views:list_accredited_organizations"))
     assertContains(response, accredited_org.display_name)
     assertNotContains(response, accredited_org_from_other_department.display_name)
+    assertNotContains(response, non_authorized_org.display_name)
     assertNotContains(response, authorized_but_not_brsa_org.display_name)
 
 
