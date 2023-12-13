@@ -61,6 +61,15 @@ class CommonApprovalMixin(models.Model):
 
     class Meta:
         abstract = True
+        constraints = [
+            # Prevent start == end because:
+            # - it was the behavior implemented in clean()
+            # - when sent to pole emploi, start == end is interpreted as a cancelled approval
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_start_before_end",
+                check=models.Q(start_at__lt=models.F("end_at")),
+            ),
+        ]
 
     def is_valid(self):
         now = timezone.now().date()
@@ -368,6 +377,7 @@ class CancelledApproval(PENotificationMixin, CommonApprovalMixin):
         verbose_name = "PASS IAE annulé"
         verbose_name_plural = "PASS IAE annulés"
         ordering = ["-created_at"]
+        constraints = CommonApprovalMixin.Meta.constraints
 
     def __str__(self):
         return self.number
@@ -521,7 +531,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         verbose_name = "PASS IAE"
         verbose_name_plural = "PASS IAE"
         ordering = ["-created_at"]
-        constraints = [
+        constraints = CommonApprovalMixin.Meta.constraints + [
             models.CheckConstraint(
                 name="approval_eligibility_diagnosis",
                 check=models.Q(origin__in=[Origin.ADMIN, Origin.DEFAULT], eligibility_diagnosis__isnull=False)
