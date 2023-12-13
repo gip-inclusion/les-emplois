@@ -662,7 +662,7 @@ class TestCommandNewUsersToMailJet:
             email="timmy.timber@mailinator.com",
             identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
-        timmy = PrescriberMembershipFactory(user=timmy, organization__kind=PrescriberOrganizationKind.OTHER)
+        PrescriberMembershipFactory(user=timmy, organization__kind=PrescriberOrganizationKind.OTHER)
         # Past users are ignored.
         PrescriberFactory(with_verified_email=True, date_joined=datetime.datetime(2023, 1, 12, tzinfo=datetime.UTC))
         # Inactive users are ignored.
