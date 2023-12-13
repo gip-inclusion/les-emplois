@@ -42,7 +42,7 @@ class PrescriberOrganizationManager(models.Manager):
         Returns organizations accredited by the given organization.
         """
         if org.kind == PrescriberOrganizationKind.DEPT and org.is_authorized:
-            return self.filter(department=org.department, is_brsa=True)
+            return self.filter(department=org.department, is_brsa=True, is_authorized=True)
         return self.none()
 
     def create_organization(self, attributes):
