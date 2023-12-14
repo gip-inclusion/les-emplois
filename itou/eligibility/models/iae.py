@@ -25,9 +25,7 @@ class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
         return self.filter(models.Q(author_kind=AuthorKind.PRESCRIBER) | models.Q(author_siae=for_siae))
 
     def for_job_seeker(self, job_seeker):
-        return self.filter(job_seeker=job_seeker).select_related(
-            "author", "author_siae", "author_prescriber_organization"
-        )
+        return self.filter(job_seeker=job_seeker)
 
     def has_approval(self):
         """
@@ -72,7 +70,11 @@ class EligibilityDiagnosisManager(models.Manager):
         diagnosis already exists.
         """
 
-        query = self.for_job_seeker(job_seeker).order_by("-created_at")
+        query = (
+            self.for_job_seeker(job_seeker)
+            .select_related("author", "author_siae", "author_prescriber_organization")
+            .order_by("-created_at")
+        )
         if not job_seeker.has_valid_common_approval:
             query = query.valid()
         # Otherwise, a diagnosis is considered valid for the duration of an
@@ -101,7 +103,11 @@ class EligibilityDiagnosisManager(models.Manager):
         """
 
         last = None
-        query = self.for_job_seeker(job_seeker).order_by("created_at")
+        query = (
+            self.for_job_seeker(job_seeker)
+            .select_related("author", "author_siae", "author_prescriber_organization")
+            .order_by("created_at")
+        )
 
         # check if no diagnosis has considered valid
         if not self.has_considered_valid(job_seeker=job_seeker, for_siae=for_siae):
