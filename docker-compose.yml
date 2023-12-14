@@ -52,6 +52,7 @@ services:
       - PYTHONPATH=.
       - ITOU_LOG_LEVEL=DEBUG
       - CELLAR_ADDON_HOST=minio:9000
+      - VIRTUAL_ENV=/app/.venv-docker
     depends_on:
       - postgres
     build:

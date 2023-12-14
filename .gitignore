@@ -71,7 +71,7 @@ coverage.xml
 .env
 
 # virtualenv
-.venv
+.venv*
 venv/
 ENV/
 Pipfile*
