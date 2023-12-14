@@ -21,9 +21,6 @@ logger = logging.getLogger(__name__)
 
 
 class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
-    def authored_by_siae(self, for_siae):
-        return self.filter(author_siae=for_siae)
-
     def by_author_kind_prescriber_or_siae(self, for_siae):
         return self.filter(models.Q(author_kind=AuthorKind.PRESCRIBER) | models.Q(author_siae=for_siae))
 
