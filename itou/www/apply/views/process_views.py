@@ -178,6 +178,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
         and GEIQEligibilityDiagnosis.objects.valid()
         .filter(author_prescriber_organization__isnull=False)
         .for_job_seeker(job_application.job_seeker)
+        .select_related("author", "author_geiq", "author_prescriber_organization")
         .first()
     )
 

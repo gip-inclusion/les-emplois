@@ -37,9 +37,7 @@ from .common import (
 
 class GEIQEligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
     def for_job_seeker(self, job_seeker):
-        return self.filter(job_seeker=job_seeker).select_related(
-            "author", "author_geiq", "author_prescriber_organization"
-        )
+        return self.filter(job_seeker=job_seeker)
 
     def authored_by_prescriber_or_geiq(self, geiq):
         # In ordering, priority is given to prescriber authored diagnoses
@@ -52,6 +50,7 @@ class GEIQEligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
         return (
             self.for_job_seeker(job_seeker)
             .authored_by_prescriber_or_geiq(for_geiq)
+            .select_related("author", "author_geiq", "author_prescriber_organization")
             .prefetch_related("administrative_criteria")
         )
 
