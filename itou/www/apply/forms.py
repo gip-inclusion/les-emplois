@@ -1040,6 +1040,8 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
 
         if company.kind not in SIAE_WITH_CONVENTION_KINDS:
             del self.fields["eligibility_validated"]
+            del self.fields["pass_iae_active"]
+            del self.fields["pass_iae_suspended"]
 
         if not company.can_have_prior_action:
             # Drop "pré-embauche" state from filter for non-GEIQ companies
