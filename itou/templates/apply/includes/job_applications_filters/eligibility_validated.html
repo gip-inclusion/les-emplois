@@ -1,6 +1,7 @@
 {% load django_bootstrap5 %}
 
 {% if filters_form.eligibility_validated %}
+    <hr>
     <fieldset>
         <legend>Éligibilité IAE</legend>
         {% bootstrap_field filters_form.eligibility_validated %}

@@ -104,31 +104,29 @@
       </ul>
   </fieldset>
   
-                                      <hr/>
                                       
   
   
+      <hr/>
       <fieldset>
           <div class="form-group"><label class="form-label" for="id_job_seekers">Nom du candidat</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_job_seekers" lang="fr" multiple="" name="job_seekers">
   </select></div>
       </fieldset>
   
   
-                                      <hr/>
                                       
   
   
   
-                                      <hr/>
                                       
   
   
   
-                                      <hr/>
                                       
   
   
   
+      <hr/>
       <fieldset>
           <legend>Critères administratifs déclarés</legend>
           <div class=""><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
@@ -172,8 +170,8 @@
       </fieldset>
   
   
-                                      <hr/>
                                       
+      <hr/>
       <fieldset>
           <legend>Département du candidat</legend>
           
@@ -182,17 +180,17 @@
       </fieldset>
   
   
-                                      <hr/>
                                       
   
+  <hr/>
   <fieldset>
       <legend>Date d'envoi de la candidature</legend>
       <div class="form-group"><label class="form-label" for="id_start_date">À partir du</label><duet-date-picker class="" identifier="id_start_date" name="start_date" placeholder="À partir du"></duet-date-picker></div>
       <div class="form-group"><label class="form-label" for="id_end_date">Jusqu'au</label><duet-date-picker class="" identifier="id_end_date" name="end_date" placeholder="Jusqu'au"></duet-date-picker></div>
   </fieldset>
   
-                                      <hr/>
                                       
+      <hr/>
       <fieldset>
           <legend>Fiches de poste</legend>
           
@@ -201,10 +199,10 @@
       </fieldset>
   
   
-                                      <hr/>
                                       
   
   
+      <hr/>
       <fieldset>
           <legend>Émetteur</legend>
       
@@ -288,30 +286,30 @@
       </ul>
   </fieldset>
   
-                                      <hr/>
                                       
   
   
+      <hr/>
       <fieldset>
           <div class="form-group"><label class="form-label" for="id_job_seekers">Nom du candidat</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_job_seekers" lang="fr" multiple="" name="job_seekers">
   </select></div>
       </fieldset>
   
   
-                                      <hr/>
                                       
   
   
+      <hr/>
       <fieldset>
           <legend>Éligibilité IAE</legend>
           <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Éligibilité validée</label></div></div>
       </fieldset>
   
   
-                                      <hr/>
                                       
   
   
+      <hr/>
       <fieldset>
           <legend>Statut du PASS IAE</legend>
           <div class="mb-2"><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Actif</label></div></div>
@@ -319,11 +317,11 @@
       </fieldset>
   
   
-                                      <hr/>
                                       
   
   
   
+      <hr/>
       <fieldset>
           <legend>Critères administratifs déclarés</legend>
           <div class=""><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
@@ -367,8 +365,8 @@
       </fieldset>
   
   
-                                      <hr/>
                                       
+      <hr/>
       <fieldset>
           <legend>Département du candidat</legend>
           
@@ -377,17 +375,17 @@
       </fieldset>
   
   
-                                      <hr/>
                                       
   
+  <hr/>
   <fieldset>
       <legend>Date d'envoi de la candidature</legend>
       <div class="form-group"><label class="form-label" for="id_start_date">À partir du</label><duet-date-picker class="" identifier="id_start_date" name="start_date" placeholder="À partir du"></duet-date-picker></div>
       <div class="form-group"><label class="form-label" for="id_end_date">Jusqu'au</label><duet-date-picker class="" identifier="id_end_date" name="end_date" placeholder="Jusqu'au"></duet-date-picker></div>
   </fieldset>
   
-                                      <hr/>
                                       
+      <hr/>
       <fieldset>
           <legend>Fiches de poste</legend>
           
@@ -396,10 +394,10 @@
       </fieldset>
   
   
-                                      <hr/>
                                       
   
   
+      <hr/>
       <fieldset>
           <legend>Émetteur</legend>
       
@@ -483,31 +481,29 @@
       </ul>
   </fieldset>
   
-                                      <hr/>
                                       
   
   
+      <hr/>
       <fieldset>
           <div class="form-group"><label class="form-label" for="id_job_seekers">Nom du candidat</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_job_seekers" lang="fr" multiple="" name="job_seekers">
   </select></div>
       </fieldset>
   
   
-                                      <hr/>
                                       
   
   
   
-                                      <hr/>
                                       
   
   
   
-                                      <hr/>
                                       
   
   
   
+      <hr/>
       <fieldset>
           <legend>Critères administratifs déclarés</legend>
           <div class=""><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
@@ -551,8 +547,8 @@
       </fieldset>
   
   
-                                      <hr/>
                                       
+      <hr/>
       <fieldset>
           <legend>Département du candidat</legend>
           
@@ -561,17 +557,17 @@
       </fieldset>
   
   
-                                      <hr/>
                                       
   
+  <hr/>
   <fieldset>
       <legend>Date d'envoi de la candidature</legend>
       <div class="form-group"><label class="form-label" for="id_start_date">À partir du</label><duet-date-picker class="" identifier="id_start_date" name="start_date" placeholder="À partir du"></duet-date-picker></div>
       <div class="form-group"><label class="form-label" for="id_end_date">Jusqu'au</label><duet-date-picker class="" identifier="id_end_date" name="end_date" placeholder="Jusqu'au"></duet-date-picker></div>
   </fieldset>
   
-                                      <hr/>
                                       
+      <hr/>
       <fieldset>
           <legend>Fiches de poste</legend>
           
@@ -580,10 +576,10 @@
       </fieldset>
   
   
-                                      <hr/>
                                       
   
   
+      <hr/>
       <fieldset>
           <legend>Émetteur</legend>
       
@@ -1381,20 +1377,20 @@
       </ul>
   </fieldset>
   
-                                      <hr/>
                                       
   
   
+      <hr/>
       <fieldset>
           <div class="form-group"><label class="form-label" for="id_job_seekers">Nom du candidat</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_job_seekers" lang="fr" multiple="" name="job_seekers">
   </select></div>
       </fieldset>
   
   
-                                      <hr/>
                                       
   
   
+      <hr/>
       <fieldset>
           <legend>Structure destinataire</legend>
           <div class="form-group"><label class="visually-hidden" for="id_to_companies">Structure</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_to_companies" lang="fr" multiple="" name="to_companies">
@@ -1403,10 +1399,10 @@
   
   
   
-                                      <hr/>
                                       
   
   
+      <hr/>
       <fieldset>
           <legend>Émetteur</legend>
       
@@ -1420,17 +1416,17 @@
   
       </fieldset>
   
-                                      <hr/>
                                       
   
+  <hr/>
   <fieldset>
       <legend>Date d'envoi de la candidature</legend>
       <div class="form-group"><label class="form-label" for="id_start_date">À partir du</label><duet-date-picker class="" identifier="id_start_date" name="start_date" placeholder="À partir du"></duet-date-picker></div>
       <div class="form-group"><label class="form-label" for="id_end_date">Jusqu'au</label><duet-date-picker class="" identifier="id_end_date" name="end_date" placeholder="Jusqu'au"></duet-date-picker></div>
   </fieldset>
   
-                                      <hr/>
                                       
+      <hr/>
       <fieldset>
           <legend>Fiches de poste</legend>
           
@@ -1439,10 +1435,10 @@
       </fieldset>
   
   
-                                      <hr/>
                                       
   
   
+      <hr/>
       <fieldset>
           <legend>Statut du PASS IAE</legend>
           <div class="mb-2"><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Actif</label></div></div>
@@ -1450,21 +1446,21 @@
       </fieldset>
   
   
-                                      <hr/>
                                       
   
   
+      <hr/>
       <fieldset>
           <legend>Éligibilité IAE</legend>
           <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Éligibilité validée</label></div></div>
       </fieldset>
   
   
-                                      <hr/>
                                       
   
   
   
+      <hr/>
       <fieldset>
           <legend>Critères administratifs déclarés</legend>
           <div class=""><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
@@ -1508,8 +1504,8 @@
       </fieldset>
   
   
-                                      <hr/>
                                       
+      <hr/>
       <fieldset>
           <legend>Département du candidat</legend>
           
