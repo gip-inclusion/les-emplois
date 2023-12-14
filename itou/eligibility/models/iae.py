@@ -3,7 +3,7 @@ import logging
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db import models, transaction
-from django.db.models import Exists, OuterRef
+from django.db.models import Case, Exists, OuterRef, When
 from django.utils import timezone
 
 from itou.approvals.models import Approval
@@ -73,7 +73,8 @@ class EligibilityDiagnosisManager(models.Manager):
         query = (
             self.for_job_seeker(job_seeker)
             .select_related("author", "author_siae", "author_prescriber_organization")
-            .order_by("-created_at")
+            .annotate(from_prescriber=Case(When(author_kind=AuthorKind.PRESCRIBER, then=1), default=0))
+            .order_by("-from_prescriber", "-created_at")
         )
         if not job_seeker.has_valid_common_approval:
             query = query.valid()
@@ -85,15 +86,7 @@ class EligibilityDiagnosisManager(models.Manager):
         if for_siae:
             filter |= models.Q(author_siae=for_siae)
 
-        last = None
-        for diagnosis in query.filter(filter):
-            # Prescriber diagnosis have precedence over SIAE diagnosis.
-            if diagnosis.author_kind == AuthorKind.PRESCRIBER:
-                last = diagnosis
-                break
-            elif for_siae and not last:
-                last = diagnosis
-        return last
+        return query.filter(filter).first()
 
     def last_expired(self, job_seeker, for_siae=None):
         """
