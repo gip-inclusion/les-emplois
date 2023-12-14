@@ -1,6 +1,7 @@
 {% load django_bootstrap5 %}
 
 {% if filters_form.to_companies %}
+    <hr>
     <fieldset>
         <legend>Structure destinataire</legend>
         {% bootstrap_field filters_form.to_companies show_label=False %}

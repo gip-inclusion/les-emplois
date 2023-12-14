@@ -1,6 +1,7 @@
 {% load django_bootstrap5 %}
 
 {% if filters_form.pass_iae_suspended %}
+    <hr>
     <fieldset>
         <legend>Statut du PASS IAE</legend>
         {% bootstrap_field filters_form.pass_iae_active wrapper_class="mb-2" %}
