@@ -45,7 +45,9 @@ RUN apt-get update && apt-get install -y \
 # Add new user to run the whole thing as non-root.
 RUN set -ex \
     && addgroup $APP_USER \
-    && adduser --ingroup $APP_USER --home $APP_DIR --disabled-password $APP_USER;
+    && adduser --ingroup $APP_USER --home /home --disabled-password $APP_USER;
+
+RUN echo '. "$VIRTUAL_ENV"/bin/activate' >> /home/.bashrc
 
 # Setup the entrypoint
 COPY --chown=$APP_USER:$APP_USER --chmod=755 ./docker/dev/django/entrypoint.sh /entrypoint.sh
