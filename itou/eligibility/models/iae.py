@@ -21,11 +21,14 @@ logger = logging.getLogger(__name__)
 
 
 class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
-    def by_author_kind_prescriber_or_siae(self, for_siae):
-        return self.filter(models.Q(author_kind=AuthorKind.PRESCRIBER) | models.Q(author_siae=for_siae))
-
     def for_job_seeker(self, job_seeker):
         return self.filter(job_seeker=job_seeker)
+
+    def for_job_seeker_and_siae(self, *, job_seeker, siae=None):
+        author_filter = models.Q(author_kind=AuthorKind.PRESCRIBER)
+        if siae is not None:
+            author_filter |= models.Q(author_siae=siae)
+        return self.for_job_seeker(job_seeker).filter(author_filter)
 
     def has_approval(self):
         """
@@ -71,7 +74,7 @@ class EligibilityDiagnosisManager(models.Manager):
         """
 
         query = (
-            self.for_job_seeker(job_seeker)
+            self.for_job_seeker_and_siae(job_seeker=job_seeker, siae=for_siae)
             .select_related("author", "author_siae", "author_prescriber_organization")
             .annotate(from_prescriber=Case(When(author_kind=AuthorKind.PRESCRIBER, then=1), default=0))
             .order_by("-from_prescriber", "-created_at")
@@ -81,12 +84,7 @@ class EligibilityDiagnosisManager(models.Manager):
         # Otherwise, a diagnosis is considered valid for the duration of an
         # approval, we just retrieve the last one no matter if it's valid or
         # not.
-
-        filter = models.Q(author_kind=AuthorKind.PRESCRIBER)
-        if for_siae:
-            filter |= models.Q(author_siae=for_siae)
-
-        return query.filter(filter).first()
+        return query.first()
 
     def last_expired(self, job_seeker, for_siae=None):
         """
@@ -97,7 +95,7 @@ class EligibilityDiagnosisManager(models.Manager):
 
         last = None
         query = (
-            self.for_job_seeker(job_seeker)
+            self.expired()
             .select_related("author", "author_siae", "author_prescriber_organization")
             .order_by("created_at")
         )
@@ -106,10 +104,10 @@ class EligibilityDiagnosisManager(models.Manager):
         if not self.has_considered_valid(job_seeker=job_seeker, for_siae=for_siae):
             if for_siae:
                 # get the last one made by this siae or a prescriber
-                last = query.expired().by_author_kind_prescriber_or_siae(for_siae=for_siae).last()
+                last = query.for_job_seeker_and_siae(job_seeker=job_seeker, siae=for_siae).last()
             else:
                 # get the last one no matter who did it
-                last = query.expired().last()
+                last = query.for_job_seeker(job_seeker).last()
 
         return last
 
