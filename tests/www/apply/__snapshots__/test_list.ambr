@@ -37,6 +37,588 @@
           </div>
   '''
 # ---
+# name: TestListForSiae.test_filter_for_different_kind[geiq]
+  '''
+  <form id="js-job-applications-filters-form" method="get">
+                                  <div class="c-aside-filters__card__body">
+                                      <fieldset>
+      <legend>Statut candidature</legend>
+      <ul>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
+                      <label class="form-check-label" for="id_states_0">Nouvelle candidature</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="processing"/>
+                      <label class="form-check-label" for="id_states_1">Candidature à l'étude</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="postponed"/>
+                      <label class="form-check-label" for="id_states_2">Candidature en attente</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="prior_to_hire"/>
+                      <label class="form-check-label" for="id_states_3">Action préalable à l’embauche</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_4" name="states" type="checkbox" value="accepted"/>
+                      <label class="form-check-label" for="id_states_4">Candidature acceptée</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_5" name="states" type="checkbox" value="refused"/>
+                      <label class="form-check-label" for="id_states_5">Candidature déclinée</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_6" name="states" type="checkbox" value="cancelled"/>
+                      <label class="form-check-label" for="id_states_6">Embauche annulée</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_7" name="states" type="checkbox" value="obsolete"/>
+                      <label class="form-check-label" for="id_states_7">Embauché ailleurs</label>
+                  </div>
+              </li>
+          
+      </ul>
+  </fieldset>
+  
+                                      <hr/>
+                                      
+  
+  
+      <fieldset>
+          <div class="form-group"><label class="form-label" for="id_job_seekers">Nom du candidat</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_job_seekers" lang="fr" multiple="" name="job_seekers">
+  </select></div>
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  
+  
+                                      <hr/>
+                                      
+  
+  
+      <fieldset>
+          <legend>Statut du PASS IAE</legend>
+          <div class="mb-2"><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Actif</label></div></div>
+          <div class=""><div class="form-check"><input class="form-check-input" id="id_pass_iae_suspended" name="pass_iae_suspended" type="checkbox"/><label class="form-check-label" for="id_pass_iae_suspended">Suspendu</label></div></div>
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  
+  
+      <fieldset>
+          <legend>Critères administratifs déclarés</legend>
+          <div class=""><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
+    <option value="1">Bénéficiaire du RSA</option>
+  
+    <option value="2">Allocataire ASS</option>
+  
+    <option value="3">Allocataire AAH</option>
+  
+    <option value="4">DETLD (+ 24 mois)</option>
+  
+    <option value="5">Niveau d'étude 3 (CAP, BEP) ou infra</option>
+  
+    <option value="6">Senior (+50 ans)</option>
+  
+    <option value="7">Jeune (-26 ans)</option>
+  
+    <option value="8">Sortant de l'ASE</option>
+  
+    <option value="9">DELD (12-24 mois)</option>
+  
+    <option value="10">Travailleur handicapé</option>
+  
+    <option value="11">Parent isolé</option>
+  
+    <option value="12">Personne sans hébergement ou hébergée ou ayant un parcours de rue</option>
+  
+    <option value="13">Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile</option>
+  
+    <option value="14">Résident ZRR</option>
+  
+    <option value="15">Résident QPV</option>
+  
+    <option value="16">Sortant de détention ou personne placée sous main de justice</option>
+  
+    <option value="17">Maîtrise de la langue française</option>
+  
+    <option value="18">Mobilité</option>
+  
+  </select></div>
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+      <fieldset>
+          <legend>Département du candidat</legend>
+          
+              <p class="mb-2">Aucun département renseigné.</p>
+          
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  <fieldset>
+      <legend>Date d'envoi de la candidature</legend>
+      <div class="form-group"><label class="form-label" for="id_start_date">À partir du</label><duet-date-picker class="" identifier="id_start_date" name="start_date" placeholder="À partir du"></duet-date-picker></div>
+      <div class="form-group"><label class="form-label" for="id_end_date">Jusqu'au</label><duet-date-picker class="" identifier="id_end_date" name="end_date" placeholder="Jusqu'au"></duet-date-picker></div>
+  </fieldset>
+  
+                                      <hr/>
+                                      
+      <fieldset>
+          <legend>Fiches de poste</legend>
+          
+              <p class="mb-2">Aucune candidature n'est rattachée à une fiche de poste.</p>
+          
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  
+      <fieldset>
+          <legend>Émetteur</legend>
+      
+  
+      
+          <div class="form-group"><label class="form-label" for="id_senders">Nom de la personne</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
+  </select></div>
+      
+  
+      
+          <div class="form-group"><label class="form-label" for="id_sender_organizations">Nom de l'organisme prescripteur</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_organizations" lang="fr" multiple="" name="sender_organizations">
+  </select></div>
+      
+  
+      </fieldset>
+  
+                                      <button aria-label="Appliquer les filtres" class="btn btn-block btn-primary mt-3" id="js-job-applications-filters-apply-button">
+                                          Appliquer
+                                      </button>
+                                  </div>
+                              </form>
+  '''
+# ---
+# name: TestListForSiae.test_filter_for_different_kind[iae]
+  '''
+  <form id="js-job-applications-filters-form" method="get">
+                                  <div class="c-aside-filters__card__body">
+                                      <fieldset>
+      <legend>Statut candidature</legend>
+      <ul>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
+                      <label class="form-check-label" for="id_states_0">Nouvelle candidature</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="processing"/>
+                      <label class="form-check-label" for="id_states_1">Candidature à l'étude</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="postponed"/>
+                      <label class="form-check-label" for="id_states_2">Candidature en attente</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="accepted"/>
+                      <label class="form-check-label" for="id_states_3">Candidature acceptée</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_4" name="states" type="checkbox" value="refused"/>
+                      <label class="form-check-label" for="id_states_4">Candidature déclinée</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_5" name="states" type="checkbox" value="cancelled"/>
+                      <label class="form-check-label" for="id_states_5">Embauche annulée</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_6" name="states" type="checkbox" value="obsolete"/>
+                      <label class="form-check-label" for="id_states_6">Embauché ailleurs</label>
+                  </div>
+              </li>
+          
+      </ul>
+  </fieldset>
+  
+                                      <hr/>
+                                      
+  
+  
+      <fieldset>
+          <div class="form-group"><label class="form-label" for="id_job_seekers">Nom du candidat</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_job_seekers" lang="fr" multiple="" name="job_seekers">
+  </select></div>
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  
+      <fieldset>
+          <legend>Éligibilité IAE</legend>
+          <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Éligibilité validée</label></div></div>
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  
+      <fieldset>
+          <legend>Statut du PASS IAE</legend>
+          <div class="mb-2"><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Actif</label></div></div>
+          <div class=""><div class="form-check"><input class="form-check-input" id="id_pass_iae_suspended" name="pass_iae_suspended" type="checkbox"/><label class="form-check-label" for="id_pass_iae_suspended">Suspendu</label></div></div>
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  
+  
+      <fieldset>
+          <legend>Critères administratifs déclarés</legend>
+          <div class=""><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
+    <option value="1">Bénéficiaire du RSA</option>
+  
+    <option value="2">Allocataire ASS</option>
+  
+    <option value="3">Allocataire AAH</option>
+  
+    <option value="4">DETLD (+ 24 mois)</option>
+  
+    <option value="5">Niveau d'étude 3 (CAP, BEP) ou infra</option>
+  
+    <option value="6">Senior (+50 ans)</option>
+  
+    <option value="7">Jeune (-26 ans)</option>
+  
+    <option value="8">Sortant de l'ASE</option>
+  
+    <option value="9">DELD (12-24 mois)</option>
+  
+    <option value="10">Travailleur handicapé</option>
+  
+    <option value="11">Parent isolé</option>
+  
+    <option value="12">Personne sans hébergement ou hébergée ou ayant un parcours de rue</option>
+  
+    <option value="13">Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile</option>
+  
+    <option value="14">Résident ZRR</option>
+  
+    <option value="15">Résident QPV</option>
+  
+    <option value="16">Sortant de détention ou personne placée sous main de justice</option>
+  
+    <option value="17">Maîtrise de la langue française</option>
+  
+    <option value="18">Mobilité</option>
+  
+  </select></div>
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+      <fieldset>
+          <legend>Département du candidat</legend>
+          
+              <p class="mb-2">Aucun département renseigné.</p>
+          
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  <fieldset>
+      <legend>Date d'envoi de la candidature</legend>
+      <div class="form-group"><label class="form-label" for="id_start_date">À partir du</label><duet-date-picker class="" identifier="id_start_date" name="start_date" placeholder="À partir du"></duet-date-picker></div>
+      <div class="form-group"><label class="form-label" for="id_end_date">Jusqu'au</label><duet-date-picker class="" identifier="id_end_date" name="end_date" placeholder="Jusqu'au"></duet-date-picker></div>
+  </fieldset>
+  
+                                      <hr/>
+                                      
+      <fieldset>
+          <legend>Fiches de poste</legend>
+          
+              <p class="mb-2">Aucune candidature n'est rattachée à une fiche de poste.</p>
+          
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  
+      <fieldset>
+          <legend>Émetteur</legend>
+      
+  
+      
+          <div class="form-group"><label class="form-label" for="id_senders">Nom de la personne</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
+  </select></div>
+      
+  
+      
+          <div class="form-group"><label class="form-label" for="id_sender_organizations">Nom de l'organisme prescripteur</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_organizations" lang="fr" multiple="" name="sender_organizations">
+  </select></div>
+      
+  
+      </fieldset>
+  
+                                      <button aria-label="Appliquer les filtres" class="btn btn-block btn-primary mt-3" id="js-job-applications-filters-apply-button">
+                                          Appliquer
+                                      </button>
+                                  </div>
+                              </form>
+  '''
+# ---
+# name: TestListForSiae.test_filter_for_different_kind[non_iae]
+  '''
+  <form id="js-job-applications-filters-form" method="get">
+                                  <div class="c-aside-filters__card__body">
+                                      <fieldset>
+      <legend>Statut candidature</legend>
+      <ul>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
+                      <label class="form-check-label" for="id_states_0">Nouvelle candidature</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="processing"/>
+                      <label class="form-check-label" for="id_states_1">Candidature à l'étude</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="postponed"/>
+                      <label class="form-check-label" for="id_states_2">Candidature en attente</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="accepted"/>
+                      <label class="form-check-label" for="id_states_3">Candidature acceptée</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_4" name="states" type="checkbox" value="refused"/>
+                      <label class="form-check-label" for="id_states_4">Candidature déclinée</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_5" name="states" type="checkbox" value="cancelled"/>
+                      <label class="form-check-label" for="id_states_5">Embauche annulée</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_6" name="states" type="checkbox" value="obsolete"/>
+                      <label class="form-check-label" for="id_states_6">Embauché ailleurs</label>
+                  </div>
+              </li>
+          
+      </ul>
+  </fieldset>
+  
+                                      <hr/>
+                                      
+  
+  
+      <fieldset>
+          <div class="form-group"><label class="form-label" for="id_job_seekers">Nom du candidat</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_job_seekers" lang="fr" multiple="" name="job_seekers">
+  </select></div>
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  
+  
+                                      <hr/>
+                                      
+  
+  
+      <fieldset>
+          <legend>Statut du PASS IAE</legend>
+          <div class="mb-2"><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Actif</label></div></div>
+          <div class=""><div class="form-check"><input class="form-check-input" id="id_pass_iae_suspended" name="pass_iae_suspended" type="checkbox"/><label class="form-check-label" for="id_pass_iae_suspended">Suspendu</label></div></div>
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  
+  
+      <fieldset>
+          <legend>Critères administratifs déclarés</legend>
+          <div class=""><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
+    <option value="1">Bénéficiaire du RSA</option>
+  
+    <option value="2">Allocataire ASS</option>
+  
+    <option value="3">Allocataire AAH</option>
+  
+    <option value="4">DETLD (+ 24 mois)</option>
+  
+    <option value="5">Niveau d'étude 3 (CAP, BEP) ou infra</option>
+  
+    <option value="6">Senior (+50 ans)</option>
+  
+    <option value="7">Jeune (-26 ans)</option>
+  
+    <option value="8">Sortant de l'ASE</option>
+  
+    <option value="9">DELD (12-24 mois)</option>
+  
+    <option value="10">Travailleur handicapé</option>
+  
+    <option value="11">Parent isolé</option>
+  
+    <option value="12">Personne sans hébergement ou hébergée ou ayant un parcours de rue</option>
+  
+    <option value="13">Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile</option>
+  
+    <option value="14">Résident ZRR</option>
+  
+    <option value="15">Résident QPV</option>
+  
+    <option value="16">Sortant de détention ou personne placée sous main de justice</option>
+  
+    <option value="17">Maîtrise de la langue française</option>
+  
+    <option value="18">Mobilité</option>
+  
+  </select></div>
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+      <fieldset>
+          <legend>Département du candidat</legend>
+          
+              <p class="mb-2">Aucun département renseigné.</p>
+          
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  <fieldset>
+      <legend>Date d'envoi de la candidature</legend>
+      <div class="form-group"><label class="form-label" for="id_start_date">À partir du</label><duet-date-picker class="" identifier="id_start_date" name="start_date" placeholder="À partir du"></duet-date-picker></div>
+      <div class="form-group"><label class="form-label" for="id_end_date">Jusqu'au</label><duet-date-picker class="" identifier="id_end_date" name="end_date" placeholder="Jusqu'au"></duet-date-picker></div>
+  </fieldset>
+  
+                                      <hr/>
+                                      
+      <fieldset>
+          <legend>Fiches de poste</legend>
+          
+              <p class="mb-2">Aucune candidature n'est rattachée à une fiche de poste.</p>
+          
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  
+      <fieldset>
+          <legend>Émetteur</legend>
+      
+  
+      
+          <div class="form-group"><label class="form-label" for="id_senders">Nom de la personne</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
+  </select></div>
+      
+  
+      
+          <div class="form-group"><label class="form-label" for="id_sender_organizations">Nom de l'organisme prescripteur</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_sender_organizations" lang="fr" multiple="" name="sender_organizations">
+  </select></div>
+      
+  
+      </fieldset>
+  
+                                      <button aria-label="Appliquer les filtres" class="btn btn-block btn-primary mt-3" id="js-job-applications-filters-apply-button">
+                                          Appliquer
+                                      </button>
+                                  </div>
+                              </form>
+  '''
+# ---
 # name: TestListForSiae.test_warns_about_long_awaiting_applications[JOB SEEKER - no warnings]
   '''
   <section aria-labelledby="results">
@@ -742,5 +1324,216 @@
   
                           
                       </section>
+  '''
+# ---
+# name: test_filter_for_prescriber
+  '''
+  <form id="js-job-applications-filters-form" method="get">
+                                  <div class="c-aside-filters__card__body">
+                                      <fieldset>
+      <legend>Statut candidature</legend>
+      <ul>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
+                      <label class="form-check-label" for="id_states_0">Nouvelle candidature</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="processing"/>
+                      <label class="form-check-label" for="id_states_1">Candidature à l'étude</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="postponed"/>
+                      <label class="form-check-label" for="id_states_2">Candidature en attente</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="prior_to_hire"/>
+                      <label class="form-check-label" for="id_states_3">Action préalable à l’embauche</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_4" name="states" type="checkbox" value="accepted"/>
+                      <label class="form-check-label" for="id_states_4">Candidature acceptée</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_5" name="states" type="checkbox" value="refused"/>
+                      <label class="form-check-label" for="id_states_5">Candidature déclinée</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_6" name="states" type="checkbox" value="cancelled"/>
+                      <label class="form-check-label" for="id_states_6">Embauche annulée</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_7" name="states" type="checkbox" value="obsolete"/>
+                      <label class="form-check-label" for="id_states_7">Embauché ailleurs</label>
+                  </div>
+              </li>
+          
+      </ul>
+  </fieldset>
+  
+                                      <hr/>
+                                      
+  
+  
+      <fieldset>
+          <div class="form-group"><label class="form-label" for="id_job_seekers">Nom du candidat</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_job_seekers" lang="fr" multiple="" name="job_seekers">
+  </select></div>
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  
+      <fieldset>
+          <legend>Structure destinataire</legend>
+          <div class="form-group"><label class="visually-hidden" for="id_to_companies">Structure</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_to_companies" lang="fr" multiple="" name="to_companies">
+  </select></div>
+      </fieldset>
+  
+  
+  
+                                      <hr/>
+                                      
+  
+  
+      <fieldset>
+          <legend>Émetteur</legend>
+      
+  
+      
+          <div class="form-group"><label class="form-label" for="id_senders">Nom de la personne</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
+  </select></div>
+      
+  
+      
+  
+      </fieldset>
+  
+                                      <hr/>
+                                      
+  
+  <fieldset>
+      <legend>Date d'envoi de la candidature</legend>
+      <div class="form-group"><label class="form-label" for="id_start_date">À partir du</label><duet-date-picker class="" identifier="id_start_date" name="start_date" placeholder="À partir du"></duet-date-picker></div>
+      <div class="form-group"><label class="form-label" for="id_end_date">Jusqu'au</label><duet-date-picker class="" identifier="id_end_date" name="end_date" placeholder="Jusqu'au"></duet-date-picker></div>
+  </fieldset>
+  
+                                      <hr/>
+                                      
+      <fieldset>
+          <legend>Fiches de poste</legend>
+          
+              <p class="mb-2">Aucune candidature n'est rattachée à une fiche de poste.</p>
+          
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  
+      <fieldset>
+          <legend>Statut du PASS IAE</legend>
+          <div class="mb-2"><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Actif</label></div></div>
+          <div class=""><div class="form-check"><input class="form-check-input" id="id_pass_iae_suspended" name="pass_iae_suspended" type="checkbox"/><label class="form-check-label" for="id_pass_iae_suspended">Suspendu</label></div></div>
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  
+      <fieldset>
+          <legend>Éligibilité IAE</legend>
+          <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Éligibilité validée</label></div></div>
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+  
+  
+  
+      <fieldset>
+          <legend>Critères administratifs déclarés</legend>
+          <div class=""><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
+    <option value="1">Bénéficiaire du RSA</option>
+  
+    <option value="2">Allocataire ASS</option>
+  
+    <option value="3">Allocataire AAH</option>
+  
+    <option value="4">DETLD (+ 24 mois)</option>
+  
+    <option value="5">Niveau d'étude 3 (CAP, BEP) ou infra</option>
+  
+    <option value="6">Senior (+50 ans)</option>
+  
+    <option value="7">Jeune (-26 ans)</option>
+  
+    <option value="8">Sortant de l'ASE</option>
+  
+    <option value="9">DELD (12-24 mois)</option>
+  
+    <option value="10">Travailleur handicapé</option>
+  
+    <option value="11">Parent isolé</option>
+  
+    <option value="12">Personne sans hébergement ou hébergée ou ayant un parcours de rue</option>
+  
+    <option value="13">Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile</option>
+  
+    <option value="14">Résident ZRR</option>
+  
+    <option value="15">Résident QPV</option>
+  
+    <option value="16">Sortant de détention ou personne placée sous main de justice</option>
+  
+    <option value="17">Maîtrise de la langue française</option>
+  
+    <option value="18">Mobilité</option>
+  
+  </select></div>
+      </fieldset>
+  
+  
+                                      <hr/>
+                                      
+      <fieldset>
+          <legend>Département du candidat</legend>
+          
+              <p class="mb-2">Aucun département renseigné.</p>
+          
+      </fieldset>
+  
+  
+                                      <button aria-label="Appliquer les filtres" class="btn btn-block btn-primary mt-3" id="js-job-applications-filters-apply-button">
+                                          Appliquer
+                                      </button>
+                                  </div>
+                              </form>
   '''
 # ---

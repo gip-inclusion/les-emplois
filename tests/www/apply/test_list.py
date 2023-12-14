@@ -728,6 +728,28 @@ class TestListForSiae:
         results_section = parse_response_to_soup(response, selector="section[aria-labelledby='results']")
         assert str(results_section) == snapshot(name="JOB SEEKER - no warnings")
 
+    def test_filter_for_different_kind(self, client, snapshot):
+        company = CompanyFactory(with_membership=True)
+        client.force_login(company.members.get())
+        kind_snapshot = {
+            CompanyKind.EA: "non_iae",
+            CompanyKind.EATT: "non_iae",
+            CompanyKind.EI: "iae",
+            CompanyKind.GEIQ: "geiq",
+            CompanyKind.OPCS: "non_iae",
+            CompanyKind.ACI: "iae",
+            CompanyKind.AI: "iae",
+            CompanyKind.EITI: "iae",
+            CompanyKind.ETTI: "iae",
+        }
+        for kind in CompanyKind:
+            company.kind = kind
+            company.save(update_fields=("kind",))
+            response = client.get(reverse("apply:list_for_siae"))
+            assert response.status_code == 200
+            filter_form = parse_response_to_soup(response, "#js-job-applications-filters-form")
+            assert str(filter_form) == snapshot(name=kind_snapshot[kind])
+
 
 ####################################################
 ################### Prescriber #####################  # noqa E266
@@ -879,6 +901,15 @@ def test_list_for_unauthorized_prescriber_view(client):
     assertContains(response, '<h3 class="h3 mb-1">S… U…</h3>', html=True)
     # Unfortunately, the job seeker's name is available in the filters
     # assertNotContains(response, "Supersecretname")
+
+
+def test_filter_for_prescriber(client, snapshot):
+    prescriber = PrescriberFactory()
+    client.force_login(prescriber)
+    response = client.get(reverse("apply:list_for_prescriber"))
+    assert response.status_code == 200
+    filter_form = parse_response_to_soup(response, "#js-job-applications-filters-form")
+    assert str(filter_form) == snapshot()
 
 
 ####################################################
