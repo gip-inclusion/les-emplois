@@ -129,9 +129,9 @@ class _SituationSerializer(serializers.Serializer):
     salarieSansEmploiDepuis = NullIfEmptyCharField(source="job_seeker.jobseeker_profile.unemployed_since")
     salarieSansRessource = serializers.BooleanField(source="job_seeker.jobseeker_profile.resourceless")
 
-    inscritPoleEmploi = serializers.BooleanField(source="job_seeker.pole_emploi_id")
+    inscritPoleEmploi = serializers.BooleanField(source="job_seeker.jobseeker_profile.pole_emploi_id")
     inscritPoleEmploiDepuis = NullIfEmptyCharField(source="job_seeker.jobseeker_profile.pole_emploi_since")
-    numeroIDE = serializers.CharField(source="job_seeker.pole_emploi_id")
+    numeroIDE = serializers.CharField(source="job_seeker.jobseeker_profile.pole_emploi_id")
 
     salarieRQTH = serializers.BooleanField(source="job_seeker.jobseeker_profile.rqth_employee")
     salarieOETH = serializers.BooleanField(source="job_seeker.jobseeker_profile.oeth_employee")

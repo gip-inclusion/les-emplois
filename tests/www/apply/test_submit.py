@@ -378,7 +378,7 @@ class ApplyAsJobSeekerTest(TestCase):
         assert user.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
         assert user.phone == post_data["phone"]
 
-        assert user.pole_emploi_id == post_data["pole_emploi_id"]
+        assert user.jobseeker_profile.pole_emploi_id == post_data["pole_emploi_id"]
 
         next_url = reverse(
             "apply:step_check_prev_applications", kwargs={"company_pk": company.pk, "job_seeker_pk": user.pk}
@@ -834,6 +834,8 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
         expected_job_seeker_session["profile"] = post_data | {
+            "pole_emploi_id": "",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "resourceless": False,
             "rqth_employee": False,
             "oeth_employee": False,
@@ -849,10 +851,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "ass_allocation_since": "",
             "aah_allocation": False,
             "aah_allocation_since": "",
-        }
-        expected_job_seeker_session["user"] |= {
-            "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         }
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1085,6 +1083,8 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
         expected_job_seeker_session["profile"] = post_data | {
+            "pole_emploi_id": "",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "resourceless": False,
             "rqth_employee": False,
             "oeth_employee": False,
@@ -1100,10 +1100,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "ass_allocation_since": "",
             "aah_allocation": False,
             "aah_allocation_since": "",
-        }
-        expected_job_seeker_session["user"] |= {
-            "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         }
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1404,6 +1400,8 @@ class ApplyAsPrescriberTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
         expected_job_seeker_session["profile"] = post_data | {
+            "pole_emploi_id": "",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "resourceless": False,
             "rqth_employee": False,
             "oeth_employee": False,
@@ -1419,10 +1417,6 @@ class ApplyAsPrescriberTest(TestCase):
             "ass_allocation_since": "",
             "aah_allocation": False,
             "aah_allocation_since": "",
-        }
-        expected_job_seeker_session["user"] |= {
-            "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         }
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1579,7 +1573,9 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         """
         job_seeker = JobSeekerFactory(nir="", with_pole_emploi_id=True)
         # Create an approval to bypass the eligibility diagnosis step.
-        PoleEmploiApprovalFactory(birthdate=job_seeker.birthdate, pole_emploi_id=job_seeker.pole_emploi_id)
+        PoleEmploiApprovalFactory(
+            birthdate=job_seeker.birthdate, pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id
+        )
         company, user = self.create_test_data()
         self.client.force_login(user)
 
@@ -1648,7 +1644,9 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
             with_pole_emploi_id=True,
         )
         # Create an approval to bypass the eligibility diagnosis step.
-        PoleEmploiApprovalFactory(birthdate=job_seeker.birthdate, pole_emploi_id=job_seeker.pole_emploi_id)
+        PoleEmploiApprovalFactory(
+            birthdate=job_seeker.birthdate, pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id
+        )
         siae, user = self.create_test_data()
         self.client.force_login(user)
 
@@ -1866,6 +1864,8 @@ class ApplyAsCompanyTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
         expected_job_seeker_session["profile"] = post_data | {
+            "pole_emploi_id": "",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "resourceless": False,
             "rqth_employee": False,
             "oeth_employee": False,
@@ -1881,10 +1881,6 @@ class ApplyAsCompanyTest(TestCase):
             "ass_allocation_since": "",
             "aah_allocation": False,
             "aah_allocation_since": "",
-        }
-        expected_job_seeker_session["user"] |= {
-            "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         }
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -2176,6 +2172,8 @@ class DirectHireFullProcessTest(TestCase):
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
         expected_job_seeker_session["profile"] = post_data | {
+            "pole_emploi_id": "",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "resourceless": False,
             "rqth_employee": False,
             "oeth_employee": False,
@@ -2191,10 +2189,6 @@ class DirectHireFullProcessTest(TestCase):
             "ass_allocation_since": "",
             "aah_allocation": False,
             "aah_allocation_since": "",
-        }
-        expected_job_seeker_session["user"] |= {
-            "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         }
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -2254,8 +2248,8 @@ class DirectHireFullProcessTest(TestCase):
         post_data = {
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": "",
-            "pole_emploi_id": new_job_seeker.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": new_job_seeker.lack_of_pole_emploi_id_reason,
+            "pole_emploi_id": new_job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": new_job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
             "answer": "",
             "address_line_1": new_job_seeker.address_line_1,
             "post_code": new_job_seeker.post_code,
@@ -2381,8 +2375,8 @@ class DirectHireFullProcessTest(TestCase):
         post_data = {
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": "",
-            "pole_emploi_id": job_seeker.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": job_seeker.lack_of_pole_emploi_id_reason,
+            "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
             "answer": "",
             "address_line_1": job_seeker.address_line_1,
             "post_code": job_seeker.post_code,
@@ -2867,6 +2861,8 @@ class UpdateJobSeekerBaseTestCase(TestCase):
 
         # Data is stored in the session but user & profiles are untouched
         expected_job_seeker_session["profile"] = post_data | {
+            "pole_emploi_id": "",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "resourceless": False,
             "rqth_employee": False,
             "oeth_employee": False,
@@ -2882,10 +2878,6 @@ class UpdateJobSeekerBaseTestCase(TestCase):
             "ass_allocation_since": "",
             "aah_allocation": False,
             "aah_allocation_since": "",
-        }
-        expected_job_seeker_session["user"] |= {
-            "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         }
         assert self.client.session[self.job_seeker_session_key] == expected_job_seeker_session
         self.job_seeker.refresh_from_db()
@@ -2961,6 +2953,8 @@ class UpdateJobSeekerBaseTestCase(TestCase):
 
         # Data is stored in the session but user & profiles are untouched
         expected_job_seeker_session["profile"] = post_data | {
+            "pole_emploi_id": "",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "resourceless": False,
             "rqth_employee": False,
             "oeth_employee": False,
@@ -2976,10 +2970,6 @@ class UpdateJobSeekerBaseTestCase(TestCase):
             "ass_allocation_since": "",
             "aah_allocation": False,
             "aah_allocation_since": "",
-        }
-        expected_job_seeker_session["user"] |= {
-            "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         }
         assert self.client.session[self.job_seeker_session_key] == expected_job_seeker_session
         self.job_seeker.refresh_from_db()
@@ -4077,8 +4067,8 @@ class HireConfirmationTestCase(TestCase):
         post_data = {
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": "",
-            "pole_emploi_id": self.job_seeker.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": self.job_seeker.lack_of_pole_emploi_id_reason,
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
             "answer": "",
             "address_line_1": self.job_seeker.address_line_1,
             "post_code": self.job_seeker.post_code,
@@ -4125,8 +4115,8 @@ class HireConfirmationTestCase(TestCase):
         post_data = {
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": "",
-            "pole_emploi_id": self.job_seeker.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": self.job_seeker.lack_of_pole_emploi_id_reason,
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
             "answer": "",
             "address_line_1": "1, Adress Line",
             "post_code": "Post code",

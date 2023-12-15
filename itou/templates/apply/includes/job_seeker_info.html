@@ -45,8 +45,8 @@
 
         <li>
             Identifiant Pôle emploi :
-            {% if job_seeker.pole_emploi_id %}
-                <b>{{ job_seeker.pole_emploi_id }}</b>
+            {% if job_seeker.jobseeker_profile.pole_emploi_id %}
+                <b>{{ job_seeker.jobseeker_profile.pole_emploi_id }}</b>
             {% else %}
                 <span>Non renseigné</span>
             {% endif %}

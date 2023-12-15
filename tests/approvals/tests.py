@@ -180,7 +180,9 @@ class CommonApprovalMixinTest(TestCase):
     def test_is_pass_iae(self):
         # PoleEmploiApproval.
         user = JobSeekerFactory()
-        approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
+        approval = PoleEmploiApprovalFactory(
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.birthdate
+        )
         assert not approval.is_pass_iae
         # Approval.
         approval = ApprovalFactory(user=user)
@@ -321,7 +323,7 @@ class ApprovalModelTest(TestCase):
         user = JobSeekerFactory(with_pole_emploi_id=True)
         job_application = JobApplicationFactory(job_seeker=user)
         valid_pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id,
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
             birthdate=user.birthdate,
             number="625741810182",
         )
@@ -735,7 +737,7 @@ class PoleEmploiApprovalModelTest(TestCase):
 
 class PoleEmploiApprovalManagerTest(TestCase):
     def test_find_for_no_queries(self):
-        user = JobSeekerFactory(pole_emploi_id="")
+        user = JobSeekerFactory(jobseeker_profile__pole_emploi_id="")
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
         assert search_results.count() == 0
@@ -748,7 +750,9 @@ class PoleEmploiApprovalManagerTest(TestCase):
     def test_find_for_user(self):
         # given a User, ensure we can find a PE approval using its pole_emploi_id and not the others.
         user = JobSeekerFactory(with_pole_emploi_id=True)
-        pe_approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
+        pe_approval = PoleEmploiApprovalFactory(
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.birthdate
+        )
         # just another approval, to be sure we don't find the other one "by chance"
         PoleEmploiApprovalFactory()
         with self.assertNumQueries(0):
@@ -757,7 +761,9 @@ class PoleEmploiApprovalManagerTest(TestCase):
         assert search_results.first() == pe_approval
 
         # ensure we can find **all** PE approvals using their pole_emploi_id and not the others.
-        other_valid_approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
+        other_valid_approval = PoleEmploiApprovalFactory(
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.birthdate
+        )
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
         assert search_results.count() == 2
@@ -785,7 +791,7 @@ class PoleEmploiApprovalManagerTest(TestCase):
 
         # ensure it's not an issue if the PE approval matches both NIR, pole_emploi_id and birthdate.
         nir_approval.birthdate = user.birthdate
-        nir_approval.pole_emploi_id = user.pole_emploi_id
+        nir_approval.pole_emploi_id = user.jobseeker_profile.pole_emploi_id
         nir_approval.save()
 
         with self.assertNumQueries(0):
@@ -980,8 +986,8 @@ class CustomApprovalAdminViewsTest(TestCase):
         # with a manual verification.
         job_seeker = JobSeekerFactory(
             nir="",
-            pole_emploi_id="",
-            lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
+            jobseeker_profile__pole_emploi_id="",
+            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,

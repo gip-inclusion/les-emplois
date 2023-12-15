@@ -370,7 +370,7 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
     context = {
         "job_application": job_application,
         "form": form,
-        "is_registered_to_pole_emploi": bool(job_application.job_seeker.pole_emploi_id),
+        "is_registered_to_pole_emploi": bool(job_application.job_seeker.jobseeker_profile.pole_emploi_id),
         "steps": STEPS,
         "step": 3,
         "matomo_custom_title": "Nouvelle fiche salarié ASP - Étape 3",

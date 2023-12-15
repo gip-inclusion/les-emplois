@@ -61,17 +61,17 @@ class ItouUserManager(UserManager):
         Implemented as a manager method to make unit testing easier.
         """
         return (
-            self.values("pole_emploi_id")
+            self.values("jobseeker_profile__pole_emploi_id")
             .filter(kind=UserKind.JOB_SEEKER)
             # Skip empty `pole_emploi_id`.
-            .exclude(pole_emploi_id="")
+            .exclude(jobseeker_profile__pole_emploi_id="")
             # Skip 31 cases where `00000000` was used as the `pole_emploi_id`.
-            .exclude(pole_emploi_id="00000000")
+            .exclude(jobseeker_profile__pole_emploi_id="00000000")
             # Group by.
-            .values("pole_emploi_id")
-            .annotate(num_of_duplications=Count("pole_emploi_id"))
+            .values("jobseeker_profile__pole_emploi_id")
+            .annotate(num_of_duplications=Count("jobseeker_profile__pole_emploi_id"))
             .filter(num_of_duplications__gt=1)
-            .values_list("pole_emploi_id", flat=True)
+            .values_list("jobseeker_profile__pole_emploi_id", flat=True)
         )
 
     def get_duplicates_by_pole_emploi_id(self, prefetch_related_lookups=None):
@@ -88,13 +88,13 @@ class ItouUserManager(UserManager):
         Used in the `deduplicate_job_seekers` management command.
         Implemented as a manager method to make unit testing easier.
         """
-        users = self.filter(pole_emploi_id__in=self.get_duplicated_pole_emploi_ids())
+        users = self.filter(jobseeker_profile__pole_emploi_id__in=self.get_duplicated_pole_emploi_ids())
         if prefetch_related_lookups:
             users = users.prefetch_related(*prefetch_related_lookups)
 
         result = dict()
         for user in users:
-            result.setdefault(user.pole_emploi_id, []).append(user)
+            result.setdefault(user.jobseeker_profile.pole_emploi_id, []).append(user)
 
         pe_id_to_remove = []
 
@@ -736,9 +736,11 @@ class User(AbstractUser, AddressMixin):
             "first_name": pole_emploi_approval.first_name,
             "last_name": pole_emploi_approval.last_name,
             "birthdate": pole_emploi_approval.birthdate,
-            "pole_emploi_id": pole_emploi_approval.pole_emploi_id,
         }
-        return cls.create_job_seeker_by_proxy(proxy_user, **job_seeker_data)
+        user = cls.create_job_seeker_by_proxy(proxy_user, **job_seeker_data)
+        user.jobseeker_profile.pole_emploi_id = pole_emploi_approval.pole_emploi_id
+        user.jobseeker_profile.save(update_fields=("pole_emploi_id",))
+        return user
 
     @classmethod
     def generate_unique_username(cls):

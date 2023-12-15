@@ -842,7 +842,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             "last_name": user.last_name,
             "birthdate": "20/12/1978",
             "phone": user.phone,
-            "lack_of_pole_emploi_id_reason": user.lack_of_pole_emploi_id_reason,
+            "lack_of_pole_emploi_id_reason": user.jobseeker_profile.lack_of_pole_emploi_id_reason,
             "address_line_1": "10, rue du Gué",
             "address_line_2": "Sous l'escalier",
             "post_code": "35400",

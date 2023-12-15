@@ -337,7 +337,7 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
             self.initial[field] = getattr(self.instance, field + "_since")
 
         # Pôle emploi (collapsible section)
-        pole_emploi_id = self.instance.user.pole_emploi_id
+        pole_emploi_id = self.instance.user.jobseeker_profile.pole_emploi_id
 
         if pole_emploi_id:
             self.initial["pole_emploi_id"] = pole_emploi_id
@@ -354,7 +354,7 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
         super().clean()
 
         # Pôle emploi
-        if self.instance.user.pole_emploi_id:
+        if self.instance.user.jobseeker_profile.pole_emploi_id:
             if not self.cleaned_data["pole_emploi_since"]:
                 raise forms.ValidationError("La durée d'inscription à Pôle emploi est obligatoire")
 
@@ -362,7 +362,7 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
                 # This field is validated and may not exist in `cleaned_data`
                 raise forms.ValidationError("L'identifiant Pôle emploi est obligatoire")
 
-            self.instance.user.pole_emploi_id = self.cleaned_data["pole_emploi_id"]
+            self.instance.user.jobseeker_profile.pole_emploi_id = self.cleaned_data["pole_emploi_id"]
             self.instance.user.save()
         else:
             # Reset "inner" fields
@@ -399,7 +399,7 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
             self.instance.has_rsa_allocation = self.cleaned_data["rsa_markup"]
 
         if self.cleaned_data["pole_emploi"]:
-            self.instance.user.pole_emploi_id = self.cleaned_data["pole_emploi_id"]
+            self.instance.user.jobseeker_profile.pole_emploi_id = self.cleaned_data["pole_emploi_id"]
 
         super().save(*args, **kwargs)
 

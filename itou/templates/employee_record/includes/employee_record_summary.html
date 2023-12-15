@@ -25,7 +25,9 @@
         <ul class="list-unstyled">
             <li>{{ profile.get_education_level_display }}</li>
             {% if profile.pole_emploi_since %}
-                <li>Inscrit à Pôle emploi depuis {{ profile.get_pole_emploi_since_display|lower }} ({{ employee.pole_emploi_id }})</li>
+                <li>
+                    Inscrit à Pôle emploi depuis {{ profile.get_pole_emploi_since_display|lower }} ({{ employee.jobseeker_profile.pole_emploi_id }})
+                </li>
             {% endif %}
             {% if profile.resourceless %}<li>Le salarié ne dispose d'aucune ressource</li>{% endif %}
             {% if profile.unemployed_since %}

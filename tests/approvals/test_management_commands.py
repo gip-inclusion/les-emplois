@@ -51,7 +51,7 @@ class ExportPEApiRejectionsTestCase(TestCase):
                 "2022-08-31 00:00:00+00:00",
                 "FOOBAR",
                 approval.user.nir,
-                approval.user.pole_emploi_id,
+                approval.user.jobseeker_profile.pole_emploi_id,
                 "Pers,e",
                 'Jul"ie',
                 str(approval.user.birthdate),

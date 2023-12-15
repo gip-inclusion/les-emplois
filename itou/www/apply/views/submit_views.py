@@ -546,33 +546,20 @@ class CreateJobSeekerStep3ForSenderView(CreateJobSeekerForSenderBaseView):
 
         self.form = CreateOrUpdateJobSeekerStep3Form(
             data=request.POST or None,
-            initial=self.job_seeker_session.get("profile", {})
-            | {
+            # TODO(xfernandez): drop fallback to user dict from job_seeker_session
+            # in a few weeks
+            initial={
                 "pole_emploi_id": self.job_seeker_session.get("user").get("pole_emploi_id"),
                 "lack_of_pole_emploi_id_reason": self.job_seeker_session.get("user").get(
                     "lack_of_pole_emploi_id_reason"
                 ),
-            },
+            }
+            | self.job_seeker_session.get("profile", {}),
         )
 
     def post(self, request, *args, **kwargs):
         if self.form.is_valid():
-            self.job_seeker_session.set(
-                "profile",
-                {
-                    k: v
-                    for k, v in self.form.cleaned_data.items()
-                    if k not in ["pole_emploi_id", "lack_of_pole_emploi_id_reason"]
-                },
-            )
-            self.job_seeker_session.set(
-                "user",
-                self.job_seeker_session.get("user")
-                | {
-                    "pole_emploi_id": self.form.cleaned_data.get("pole_emploi_id"),
-                    "lack_of_pole_emploi_id_reason": self.form.cleaned_data.get("lack_of_pole_emploi_id_reason"),
-                },
-            )
+            self.job_seeker_session.set("profile", self.form.cleaned_data)
             return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
@@ -684,7 +671,8 @@ class CheckJobSeekerInformations(ApplicationBaseView):
     def get(self, request, *args, **kwargs):
         # Check required info that will allow us to find a pre-existing approval.
         has_required_info = self.job_seeker.birthdate and (
-            self.job_seeker.pole_emploi_id or self.job_seeker.lack_of_pole_emploi_id_reason
+            self.job_seeker.jobseeker_profile.pole_emploi_id
+            or self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason
         )
         if has_required_info:
             return HttpResponseRedirect(
@@ -1325,17 +1313,21 @@ class UpdateJobSeekerStep3View(UpdateJobSeekerBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        session_pole_emploi_id = self.job_seeker_session.get("user").get("pole_emploi_id")
-        session_lack_of_pole_emploi_id_reason = self.job_seeker_session.get("user").get(
-            "lack_of_pole_emploi_id_reason"
+        # TODO(xfernandez): drop fallback on job_seeker_session user dict for pole_emploi
+        # fields in a few weeks
+        session_pole_emploi_id = self.job_seeker_session.get("profile", {}).get(
+            "pole_emploi_id", self.job_seeker_session.get("user").get("pole_emploi_id")
+        )
+        session_lack_of_pole_emploi_id_reason = self.job_seeker_session.get("profile", {}).get(
+            "lack_of_pole_emploi_id_reason", self.job_seeker_session.get("user").get("lack_of_pole_emploi_id_reason")
         )
         initial_form_data = self.job_seeker_session.get("profile", {}) | {
             "pole_emploi_id": session_pole_emploi_id
             if session_pole_emploi_id is not None
-            else self.job_seeker.pole_emploi_id,
+            else self.job_seeker.jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": session_lack_of_pole_emploi_id_reason
             if session_lack_of_pole_emploi_id_reason is not None
-            else self.job_seeker.lack_of_pole_emploi_id_reason,
+            else self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
         }
         self.form = CreateOrUpdateJobSeekerStep3Form(
             instance=self.job_seeker.jobseeker_profile if self.job_seeker.has_jobseeker_profile else None,
@@ -1345,22 +1337,7 @@ class UpdateJobSeekerStep3View(UpdateJobSeekerBaseView):
 
     def post(self, request, *args, **kwargs):
         if self.form.is_valid():
-            self.job_seeker_session.set(
-                "profile",
-                {
-                    k: v
-                    for k, v in self.form.cleaned_data.items()
-                    if k not in ["pole_emploi_id", "lack_of_pole_emploi_id_reason"]
-                },
-            )
-            self.job_seeker_session.set(
-                "user",
-                self.job_seeker_session.get("user")
-                | {
-                    "pole_emploi_id": self.form.cleaned_data.get("pole_emploi_id"),
-                    "lack_of_pole_emploi_id_reason": self.form.cleaned_data.get("lack_of_pole_emploi_id_reason"),
-                },
-            )
+            self.job_seeker_session.set("profile", self.form.cleaned_data)
             return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
@@ -1401,7 +1378,7 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        allowed_user_fields_to_update = ["pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+        allowed_user_fields_to_update = []
         if self.request.user.can_edit_personal_information(self.job_seeker):
             allowed_user_fields_to_update.extend(CreateOrUpdateJobSeekerStep1Form.Meta.fields)
             allowed_user_fields_to_update.extend(CreateOrUpdateJobSeekerStep2Form.Meta.fields)

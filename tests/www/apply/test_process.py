@@ -124,7 +124,7 @@ class ProcessViewsTest(TestCase):
             post_data = {
                 "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
                 "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+                "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
                 "answer": "",
                 "address_line_1": job_application.job_seeker.address_line_1,
                 "post_code": job_application.job_seeker.post_code,
@@ -167,14 +167,14 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         self.assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
         self.assertContains(response, format_nir(job_application.job_seeker.nir))
-        self.assertContains(response, job_application.job_seeker.pole_emploi_id)
+        self.assertContains(response, job_application.job_seeker.jobseeker_profile.pole_emploi_id)
         self.assertContains(response, job_application.job_seeker.phone.replace(" ", ""))
         self.assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)  # the company is not a GEIQ
 
         job_application.job_seeker.created_by = employer
         job_application.job_seeker.phone = ""
         job_application.job_seeker.nir = ""
-        job_application.job_seeker.pole_emploi_id = ""
+        job_application.job_seeker.jobseeker_profile.pole_emploi_id = ""
         job_application.job_seeker.save()
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
@@ -633,7 +633,7 @@ class ProcessViewsTest(TestCase):
                 hiring_start_at = today
                 post_data = {
                     # Data for `JobSeekerPersonalDataForm`.
-                    "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+                    "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
                     # Data for `AcceptForm`.
                     "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
                     "answer": "",
@@ -708,7 +708,7 @@ class ProcessViewsTest(TestCase):
         hiring_end_at = Approval.get_default_end_date(hiring_start_at)
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
-            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
             # Data for `AcceptForm`.
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -730,7 +730,7 @@ class ProcessViewsTest(TestCase):
         )
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
-            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
             # Data for `AcceptForm`.
             "hiring_start_at": today.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "answer": "",
@@ -750,7 +750,7 @@ class ProcessViewsTest(TestCase):
         job_application.job_seeker.eligibility_diagnoses.all().delete()
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
-            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
             # Data for `AcceptForm`.
             "hiring_start_at": today.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "answer": "",
@@ -808,7 +808,7 @@ class ProcessViewsTest(TestCase):
 
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
-            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
+            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
             # Data for `AcceptForm`.
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -839,8 +839,8 @@ class ProcessViewsTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             # The state of the 3 `pole_emploi_*` fields will trigger a manual delivery.
             job_seeker__nir="",
-            job_seeker__pole_emploi_id="",
-            job_seeker__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
+            job_seeker__jobseeker_profile__pole_emploi_id="",
+            job_seeker__jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
 
         employer = job_application.to_company.members.first()
@@ -848,8 +848,8 @@ class ProcessViewsTest(TestCase):
 
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
-            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": job_application.job_seeker.lack_of_pole_emploi_id_reason,
+            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
             "lack_of_nir": True,
             "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
             # Data for `UserAddressForm`.
@@ -877,7 +877,7 @@ class ProcessViewsTest(TestCase):
             "post_code": job_seeker.post_code,
             "city": city.name,
             "city_slug": city.slug,
-            "pole_emploi_id": job_seeker.pole_emploi_id,
+            "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
             "answer": "",
         }
         hiring_start_at = timezone.localdate() + relativedelta(months=2)
@@ -980,7 +980,7 @@ class ProcessViewsTest(TestCase):
 
         # Create a "PE Approval" that will be converted to a PASS IAE when accepting the process
         pole_emploi_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate
+            pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id, birthdate=job_seeker.birthdate
         )
 
         # Accept the job application for the first job seeker.
@@ -997,7 +997,9 @@ class ProcessViewsTest(TestCase):
 
         # Now generate a job seeker that is "almost the same"
         almost_same_job_seeker = JobSeekerWithAddressFactory(
-            city=city.name, pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate
+            city=city.name,
+            jobseeker_profile__pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
+            birthdate=job_seeker.birthdate,
         )
         another_job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
@@ -1067,8 +1069,8 @@ class ProcessViewsTest(TestCase):
 
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
-            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": job_application.job_seeker.lack_of_pole_emploi_id_reason,
+            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
             # Data for `UserAddressForm`.
             "address_line_1": "11 rue des Lilas",
             "post_code": "57000",
@@ -1116,8 +1118,8 @@ class ProcessViewsTest(TestCase):
 
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
-            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": job_application.job_seeker.lack_of_pole_emploi_id_reason,
+            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
             "nir": other_job_seeker.nir,
             # Data for `UserAddressForm`.
             "address_line_1": "11 rue des Lilas",
@@ -1156,8 +1158,8 @@ class ProcessViewsTest(TestCase):
 
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
-            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": job_application.job_seeker.lack_of_pole_emploi_id_reason,
+            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
             # Data for `UserAddressForm`.
             "address_line_1": "11 rue des Lilas",
             "post_code": "57000",
@@ -1209,8 +1211,8 @@ class ProcessViewsTest(TestCase):
             # Data for `JobSeekerPersonalDataForm`.
             "nir": NEW_NIR,
             "lack_of_nir_reason": job_application.job_seeker.lack_of_nir_reason,
-            "pole_emploi_id": job_application.job_seeker.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": job_application.job_seeker.lack_of_pole_emploi_id_reason,
+            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
             # Data for `UserAddressForm`.
             "address_line_1": "11 rue des Lilas",
             "post_code": "57000",

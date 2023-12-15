@@ -996,7 +996,9 @@ class JobApplicationNotificationsTest(TestCase):
     def test_manually_deliver_approval(self, *args, **kwargs):
         staff_member = ItouStaffFactory()
         job_seeker = JobSeekerFactory(
-            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN
+            nir="",
+            jobseeker_profile__pole_emploi_id="",
+            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationFactory(
@@ -1019,7 +1021,9 @@ class JobApplicationNotificationsTest(TestCase):
     def test_manually_refuse_approval(self):
         staff_member = ItouStaffFactory()
         job_seeker = JobSeekerFactory(
-            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN
+            nir="",
+            jobseeker_profile__pole_emploi_id="",
+            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
@@ -1192,7 +1196,7 @@ class JobApplicationWorkflowTest(TestCase):
         """
         job_seeker = JobSeekerFactory(with_pole_emploi_id=True)
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
-        assert job_seeker.pole_emploi_id != ""
+        assert job_seeker.jobseeker_profile.pole_emploi_id != ""
 
         kwargs = {
             "job_seeker": job_seeker,
@@ -1262,7 +1266,7 @@ class JobApplicationWorkflowTest(TestCase):
         """
         job_seeker = JobSeekerFactory(with_pole_emploi_id=True)
         pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate
+            pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id, birthdate=job_seeker.birthdate
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
@@ -1285,7 +1289,7 @@ class JobApplicationWorkflowTest(TestCase):
         assert self.sent_pass_email_subject in mail.outbox[1].subject
 
     def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval_with_nir(self):
-        job_seeker = JobSeekerFactory(pole_emploi_id="", birthdate=None)
+        job_seeker = JobSeekerFactory(jobseeker_profile__pole_emploi_id="", birthdate=None)
         pe_approval = PoleEmploiApprovalFactory(nir=job_seeker.nir)
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
@@ -1312,7 +1316,9 @@ class JobApplicationWorkflowTest(TestCase):
         When a Pôle emploi ID is forgotten, a manual approval delivery is triggered.
         """
         job_seeker = JobSeekerFactory(
-            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN
+            nir="",
+            jobseeker_profile__pole_emploi_id="",
+            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
@@ -1329,7 +1335,7 @@ class JobApplicationWorkflowTest(TestCase):
 
     def test_accept_job_application_sent_by_job_seeker_with_a_nir_no_pe_approval(self):
         job_seeker = JobSeekerFactory(
-            pole_emploi_id="",
+            jobseeker_profile__pole_emploi_id="",
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
@@ -1366,7 +1372,9 @@ class JobApplicationWorkflowTest(TestCase):
 
     def test_accept_job_application_sent_by_job_seeker_unregistered_no_pe_approval(self):
         job_seeker = JobSeekerFactory(
-            nir="", pole_emploi_id="", lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_NOT_REGISTERED
+            nir="",
+            jobseeker_profile__pole_emploi_id="",
+            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
@@ -1393,7 +1401,7 @@ class JobApplicationWorkflowTest(TestCase):
             job_seeker__with_pole_emploi_id=True,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
-        assert job_application.job_seeker.pole_emploi_id != ""
+        assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
         job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
@@ -1424,7 +1432,7 @@ class JobApplicationWorkflowTest(TestCase):
             job_seeker__with_pole_emploi_id=True,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
-        assert job_application.job_seeker.pole_emploi_id != ""
+        assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
         job_application.accept(user=job_application.to_company.members.first())
         assert job_application.to_company.is_subject_to_eligibility_rules
         assert job_application.approval is not None
@@ -1455,7 +1463,10 @@ class JobApplicationWorkflowTest(TestCase):
         end_at = datetime.date.today() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
         approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, start_at=start_at, end_at=end_at
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=start_at,
+            end_at=end_at,
         )
         assert approval.is_in_waiting_period
         job_application = JobApplicationFactory(
@@ -1464,7 +1475,7 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
-        assert job_application.job_seeker.pole_emploi_id != ""
+        assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
         job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
@@ -1494,7 +1505,10 @@ class JobApplicationWorkflowTest(TestCase):
         end_at = datetime.date.today() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
         approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, start_at=start_at, end_at=end_at
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=start_at,
+            end_at=end_at,
         )
         assert approval.is_in_waiting_period
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
@@ -1515,7 +1529,10 @@ class JobApplicationWorkflowTest(TestCase):
         end_at = datetime.date.today() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
         approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate, start_at=start_at, end_at=end_at
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
+            birthdate=user.birthdate,
+            start_at=start_at,
+            end_at=end_at,
         )
         assert approval.is_in_waiting_period
 
@@ -1551,7 +1568,7 @@ class JobApplicationWorkflowTest(TestCase):
             job_seeker__with_pole_emploi_id=True,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
-        assert job_application.job_seeker.pole_emploi_id != ""
+        assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
         job_application.accept(user=job_application.to_company.members.first())
         assert job_application.to_company.is_subject_to_eligibility_rules
         assert job_application.approval is None
@@ -1606,7 +1623,7 @@ class JobApplicationWorkflowTest(TestCase):
         )
 
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
-        assert job_seeker.pole_emploi_id != ""
+        assert job_seeker.jobseeker_profile.pole_emploi_id != ""
 
         job_application.accept(user=to_employer_member)
         assert job_application.to_company.is_subject_to_eligibility_rules

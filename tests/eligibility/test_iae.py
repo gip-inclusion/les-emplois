@@ -63,7 +63,9 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert has_considered_valid
 
     def test_pole_emploi_diagnosis(self):
-        PoleEmploiApprovalFactory(pole_emploi_id=self.job_seeker.pole_emploi_id, birthdate=self.job_seeker.birthdate)
+        PoleEmploiApprovalFactory(
+            pole_emploi_id=self.job_seeker.jobseeker_profile.pole_emploi_id, birthdate=self.job_seeker.birthdate
+        )
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=self.job_seeker)
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=self.job_seeker)
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=self.job_seeker)
@@ -75,7 +77,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
         end_at = datetime.date.today() - relativedelta(years=2)
         start_at = end_at - relativedelta(years=2)
         PoleEmploiApprovalFactory(
-            pole_emploi_id=self.job_seeker.pole_emploi_id,
+            pole_emploi_id=self.job_seeker.jobseeker_profile.pole_emploi_id,
             birthdate=self.job_seeker.birthdate,
             start_at=start_at,
             end_at=end_at,

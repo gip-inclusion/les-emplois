@@ -236,7 +236,7 @@ def get_table():
                 "name": "pe_inscrit",
                 "type": "boolean",
                 "comment": "Le candidat a un identifiant PE",
-                "fn": lambda o: o.pole_emploi_id != "",
+                "fn": lambda o: o.jobseeker_profile.pole_emploi_id != "",
             },
             {
                 "name": "date_dernière_connexion",
