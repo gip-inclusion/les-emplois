@@ -16,3 +16,8 @@ repos:
         entry: djlint --reformat
         types: [html]
         language: system
+      - id: shellcheck
+        name: ShellCheck
+        entry: shellcheck
+        types: [shell]
+        language: system
