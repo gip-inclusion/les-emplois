@@ -5,3 +5,4 @@
 
 ## 2023-12-18
 - Déplacement du _virtual env_ utilisé par le container de `.venv` à `.venv-docker`.
+- Ajout de ShellCheck à la configuration de pre-commit.
