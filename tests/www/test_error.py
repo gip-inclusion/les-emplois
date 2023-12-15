@@ -5,6 +5,7 @@ from django.test import RequestFactory
 from django.urls import reverse
 from pytest_django.asserts import assertContains
 
+from itou.utils import constants as global_constants
 from itou.www.error import server_error
 from tests.utils.tests import get_response_for_middlewaremixin
 
@@ -37,3 +38,4 @@ def test_handler500_view():
         "Notre équipe technique a été informée du problème et s'en occupera le plus rapidement possible.",
         status_code=500,
     )
+    assertContains(response, global_constants.ITOU_HELP_CENTER_URL, status_code=500)
