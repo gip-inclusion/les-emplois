@@ -49,14 +49,14 @@
             Inscrit à Pôle emploi depuis : <b>{{ profile.get_pole_emploi_since_display|lower }}</b>
         </li>
     {% endif %}
-    {% if profile.user.pole_emploi_id or profile.user.lack_of_pole_emploi_id_reason %}
+    {% if profile.user.jobseeker_profile.pole_emploi_id or profile.user.jobseeker_profile.lack_of_pole_emploi_id_reason %}
         <li class="mb-3">
             Identifiant Pôle emploi :
             <b>
-                {% if profile.user.pole_emploi_id %}
-                    {{ profile.user.pole_emploi_id }}
+                {% if profile.user.jobseeker_profile.pole_emploi_id %}
+                    {{ profile.user.jobseeker_profile.pole_emploi_id }}
                 {% else %}
-                    {{ profile.user.get_lack_of_pole_emploi_id_reason_display }}
+                    {{ profile.user.jobseeker_profile.get_lack_of_pole_emploi_id_reason_display }}
                 {% endif %}
             </b>
         </li>

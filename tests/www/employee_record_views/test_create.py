@@ -99,7 +99,7 @@ class AbstractCreateEmployeeRecordTest(TestCase):
             # Factory user is registed to Pôle emploi: all fields must be filled
             "pole_emploi_since": "02",
             # "pole_emploi_id": "1234567X",
-            "pole_emploi_id": self.job_seeker.pole_emploi_id,
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
             "pole_emploi": True,
         }
         response = self.client.post(url, data)
@@ -453,7 +453,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         # POST will fail because if education_level is not filled
         data = {
             "pole_emploi": True,
-            "pole_emploi_id": self.job_seeker.pole_emploi_id,
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
             "pole_emploi_since": "01",
             "education_level": "00",
         }
@@ -478,7 +478,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
             "unemployed_since": "02",
             "education_level": "00",
             "pole_emploi": True,
-            "pole_emploi_id": self.job_seeker.pole_emploi_id,
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
             "pole_emploi_since": "01",
         }
         response = self.client.post(self.url, data)
@@ -503,7 +503,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
             "rsa_markup": "OUI-M",
             "education_level": "00",
             "pole_emploi": True,
-            "pole_emploi_id": self.job_seeker.pole_emploi_id,
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
             "pole_emploi_since": "01",
         }
         response = self.client.post(self.url, data)
@@ -527,7 +527,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
             "ass_allocation_since": "03",
             "education_level": "00",
             "pole_emploi": True,
-            "pole_emploi_id": self.job_seeker.pole_emploi_id,
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
             "pole_emploi_since": "01",
         }
         response = self.client.post(self.url, data)
@@ -551,7 +551,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
             # Factory user is registed to Pôle emploi: all fields must be filled
             "pole_emploi_since": "02",
             # "pole_emploi_id": "1234567X",
-            "pole_emploi_id": self.job_seeker.pole_emploi_id,
+            "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
             "pole_emploi": True,
         }
 

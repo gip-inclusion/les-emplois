@@ -138,7 +138,7 @@ def test_populate_job_seekers():
         pk=2010,
         created_by=PrescriberFactory(),
         identity_provider=IdentityProvider.PE_CONNECT,
-        pole_emploi_id="",
+        jobseeker_profile__pole_emploi_id="",
         last_login=timezone.now(),
         nir="179038704133768",
         post_code="33360",

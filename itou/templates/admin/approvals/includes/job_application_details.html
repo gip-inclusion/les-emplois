@@ -34,21 +34,21 @@
             {{ job_seeker.phone|format_phone }}
         </li>
     {% endif %}
-    {% if job_seeker.pole_emploi_id %}
+    {% if job_seeker.jobseeker_profile.pole_emploi_id %}
         <li>
             <b>Identifiant Pôle emploi : </b>
-            {{ job_seeker.pole_emploi_id }}
+            {{ job_seeker.jobseeker_profile.pole_emploi_id }}
             <small>
-                (<a href="{% url "admin:approvals_poleemploiapproval_changelist" %}?q={{ job_seeker.pole_emploi_id|urlencode }}" target="_blank">
+                (<a href="{% url "admin:approvals_poleemploiapproval_changelist" %}?q={{ job_seeker.jobseeker_profile.pole_emploi_id|urlencode }}" target="_blank">
                 rechercher dans les agréments Pôle emploi
             </a>)
         </small>
     </li>
 {% endif %}
-{% if job_seeker.lack_of_pole_emploi_id_reason %}
+{% if job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason %}
     <li>
         <b>Raison de l'absence d'identifiant Pôle emploi : </b>
-        {{ job_seeker.get_lack_of_pole_emploi_id_reason_display }}
+        {{ job_seeker.jobseeker_profile.get_lack_of_pole_emploi_id_reason_display }}
     </li>
 {% endif %}
 </ul>

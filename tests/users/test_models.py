@@ -47,16 +47,16 @@ from tests.utils.test import TestCase
 class ManagerTest(TestCase):
     def test_get_duplicated_pole_emploi_ids(self):
         # Unique user.
-        JobSeekerFactory(pole_emploi_id="5555555A")
+        JobSeekerFactory(jobseeker_profile__pole_emploi_id="5555555A")
 
         # 2 users using the same `pole_emploi_id`.
-        JobSeekerFactory(pole_emploi_id="6666666B")
-        JobSeekerFactory(pole_emploi_id="6666666B")
+        JobSeekerFactory(jobseeker_profile__pole_emploi_id="6666666B")
+        JobSeekerFactory(jobseeker_profile__pole_emploi_id="6666666B")
 
         # 3 users using the same `pole_emploi_id`.
-        JobSeekerFactory(pole_emploi_id="7777777C")
-        JobSeekerFactory(pole_emploi_id="7777777C")
-        JobSeekerFactory(pole_emploi_id="7777777C")
+        JobSeekerFactory(jobseeker_profile__pole_emploi_id="7777777C")
+        JobSeekerFactory(jobseeker_profile__pole_emploi_id="7777777C")
+        JobSeekerFactory(jobseeker_profile__pole_emploi_id="7777777C")
 
         duplicated_pole_emploi_ids = User.objects.get_duplicated_pole_emploi_ids()
 
@@ -65,19 +65,19 @@ class ManagerTest(TestCase):
 
     def test_get_duplicates_by_pole_emploi_id(self):
         # 2 users using the same `pole_emploi_id` and different birthdates.
-        JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(1988, 2, 2))
-        JobSeekerFactory(pole_emploi_id="6666666B", birthdate=datetime.date(2001, 12, 12))
+        JobSeekerFactory(jobseeker_profile__pole_emploi_id="6666666B", birthdate=datetime.date(1988, 2, 2))
+        JobSeekerFactory(jobseeker_profile__pole_emploi_id="6666666B", birthdate=datetime.date(2001, 12, 12))
 
         # 2 users using the same `pole_emploi_id` and the same birthdates.
-        user1 = JobSeekerFactory(pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
-        user2 = JobSeekerFactory(pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
+        user1 = JobSeekerFactory(jobseeker_profile__pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
+        user2 = JobSeekerFactory(jobseeker_profile__pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
 
         # 3 users using the same `pole_emploi_id` and the same birthdates.
-        user3 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
-        user4 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
-        user5 = JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
+        user3 = JobSeekerFactory(jobseeker_profile__pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
+        user4 = JobSeekerFactory(jobseeker_profile__pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
+        user5 = JobSeekerFactory(jobseeker_profile__pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
         # + 1 user using the same `pole_emploi_id` but a different birthdate.
-        JobSeekerFactory(pole_emploi_id="8888888C", birthdate=datetime.date(1978, 12, 20))
+        JobSeekerFactory(jobseeker_profile__pole_emploi_id="8888888C", birthdate=datetime.date(1978, 12, 20))
 
         duplicated_users = User.objects.get_duplicates_by_pole_emploi_id()
 
@@ -126,42 +126,47 @@ class ModelTest(TestCase):
 
     def test_clean_pole_emploi_fields(self):
         # Both fields cannot be empty.
-        job_seeker = JobSeekerFactory(pole_emploi_id="", lack_of_pole_emploi_id_reason="")
+        job_seeker = JobSeekerFactory(
+            jobseeker_profile__pole_emploi_id="", jobseeker_profile__lack_of_pole_emploi_id_reason=""
+        )
         cleaned_data = {
-            "pole_emploi_id": job_seeker.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": job_seeker.lack_of_pole_emploi_id_reason,
+            "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
         }
         with pytest.raises(ValidationError):
             JobSeekerProfile.clean_pole_emploi_fields(cleaned_data)
 
         # If both fields are present at the same time, `pole_emploi_id` takes precedence.
         job_seeker = JobSeekerFactory(
-            pole_emploi_id="69970749",
-            lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
+            jobseeker_profile__pole_emploi_id="69970749",
+            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
         cleaned_data = {
-            "pole_emploi_id": job_seeker.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": job_seeker.lack_of_pole_emploi_id_reason,
+            "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
         }
         JobSeekerProfile.clean_pole_emploi_fields(cleaned_data)
-        assert cleaned_data["pole_emploi_id"] == job_seeker.pole_emploi_id
+        assert cleaned_data["pole_emploi_id"] == job_seeker.jobseeker_profile.pole_emploi_id
         assert cleaned_data["lack_of_pole_emploi_id_reason"] == ""
 
         # No exception should be raised for the following cases.
 
-        job_seeker = JobSeekerFactory(pole_emploi_id="62723349", lack_of_pole_emploi_id_reason="")
+        job_seeker = JobSeekerFactory(
+            jobseeker_profile__pole_emploi_id="62723349", jobseeker_profile__lack_of_pole_emploi_id_reason=""
+        )
         cleaned_data = {
-            "pole_emploi_id": job_seeker.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": job_seeker.lack_of_pole_emploi_id_reason,
+            "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
         }
         JobSeekerProfile.clean_pole_emploi_fields(cleaned_data)
 
         job_seeker = JobSeekerFactory(
-            pole_emploi_id="", lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN
+            jobseeker_profile__pole_emploi_id="",
+            jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
         cleaned_data = {
-            "pole_emploi_id": job_seeker.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": job_seeker.lack_of_pole_emploi_id_reason,
+            "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
         }
         JobSeekerProfile.clean_pole_emploi_fields(cleaned_data)
 
@@ -819,7 +824,7 @@ class JobSeekerProfileModelTest(TestCase):
         #    self.profile._clean_job_seeker_situation()
 
         # Both PE fields are provided: OK
-        user.pole_emploi_id = "1234567"
+        user.jobseeker_profile.pole_emploi_id = "1234567"
         self.profile._clean_job_seeker_situation()
 
     def test_job_seeker_details_complete(self):
@@ -944,7 +949,7 @@ class LatestApprovalTestCase(TestCase):
 
         # PoleEmploiApproval 1.
         pe_approval_1 = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id,
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
             birthdate=user.birthdate,
             start_at=datetime.date(2018, 12, 20),
             end_at=datetime.date(2020, 12, 20),
@@ -954,7 +959,7 @@ class LatestApprovalTestCase(TestCase):
         # Same `start_at` as PoleEmploiApproval 1.
         # But `end_at` earlier than PoleEmploiApproval 1.
         PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id,
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
             birthdate=user.birthdate,
             start_at=datetime.date(2018, 12, 20),
             end_at=datetime.date(2019, 12, 19),
@@ -971,7 +976,7 @@ class LatestApprovalTestCase(TestCase):
 
         # PoleEmploiApproval 1.
         PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id,
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
             birthdate=user.birthdate,
             start_at=datetime.date(2020, 3, 17),
             end_at=datetime.date(2020, 6, 16),
@@ -981,7 +986,7 @@ class LatestApprovalTestCase(TestCase):
         # `start_at` earlier than PoleEmploiApproval 1.
         # `end_at` after PoleEmploiApproval 1.
         pe_approval_2 = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id,
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
             birthdate=user.birthdate,
             start_at=datetime.date(2020, 3, 2),
             end_at=datetime.date(2022, 3, 2),
@@ -1006,14 +1011,14 @@ class LatestApprovalTestCase(TestCase):
 
         # PoleEmploiApproval
         PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id,
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
             birthdate=user.birthdate,
             start_at=start_at,
             end_at=end_at + relativedelta(days=1),
         )
 
         PoleEmploiApprovalFactory(
-            pole_emploi_id=user.pole_emploi_id,
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
             birthdate=user.birthdate,
             start_at=start_at,
             end_at=end_at + relativedelta(days=2),
@@ -1055,7 +1060,9 @@ class LatestApprovalTestCase(TestCase):
 
     def test_status_with_valid_pole_emploi_approval(self):
         user = JobSeekerFactory(with_pole_emploi_id=True)
-        pe_approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
+        pe_approval = PoleEmploiApprovalFactory(
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.birthdate
+        )
         assert not user.has_no_common_approval
         assert user.has_valid_common_approval
         assert not user.has_common_approval_in_waiting_period

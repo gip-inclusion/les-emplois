@@ -262,7 +262,7 @@ class JobApplicationQuerySet(models.QuerySet):
 
         qs = self.select_related(
             "approval",
-            "job_seeker",
+            "job_seeker__jobseeker_profile",
             "sender",
             "sender_company",
             "sender_prescriber_organization",
@@ -995,10 +995,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     self.approval.update_start_date(new_start_date=self.hiring_start_at)
                 emails.append(self.email_deliver_approval(accepted_by))
             elif (
-                self.job_seeker.has_no_common_approval and (self.job_seeker.nir or self.job_seeker.pole_emploi_id)
+                self.job_seeker.has_no_common_approval
+                and (self.job_seeker.nir or self.job_seeker.jobseeker_profile.pole_emploi_id)
             ) or (
-                self.job_seeker.pole_emploi_id
-                or self.job_seeker.lack_of_pole_emploi_id_reason == LackOfPoleEmploiId.REASON_NOT_REGISTERED
+                self.job_seeker.jobseeker_profile.pole_emploi_id
+                or self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason
+                == LackOfPoleEmploiId.REASON_NOT_REGISTERED
             ):
                 # Security check: it's supposed to be blocked upstream.
                 if self.eligibility_diagnosis is None:
@@ -1015,8 +1017,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 self.approval = new_approval
                 emails.append(self.email_deliver_approval(accepted_by))
             elif not self.job_seeker.nir or (
-                not self.job_seeker.pole_emploi_id
-                and self.job_seeker.lack_of_pole_emploi_id_reason == LackOfPoleEmploiId.REASON_FORGOTTEN
+                not self.job_seeker.jobseeker_profile.pole_emploi_id
+                and self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason
+                == LackOfPoleEmploiId.REASON_FORGOTTEN
             ):
                 # Trigger a manual approval creation.
                 self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL

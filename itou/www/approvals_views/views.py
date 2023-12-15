@@ -91,7 +91,7 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
 
 class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
     model = Approval
-    queryset = Approval.objects.select_related("user").prefetch_related(
+    queryset = Approval.objects.select_related("user__jobseeker_profile").prefetch_related(
         "suspension_set",
         Prefetch(
             "prolongationrequest_set",

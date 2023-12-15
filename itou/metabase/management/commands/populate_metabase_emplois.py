@@ -262,6 +262,7 @@ class Command(BaseCommand):
         """
         queryset = (
             User.objects.filter(kind=UserKind.JOB_SEEKER)
+            .select_related("jobseeker_profile")
             .prefetch_related(
                 Prefetch(
                     "eligibility_diagnoses",

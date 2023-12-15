@@ -79,7 +79,7 @@ def _format_pass_worksheet(wb):
     # Write data rows
     for row_idx, ja in enumerate(job_applications.iterator(), 2):
         row = [
-            ja.job_seeker.pole_emploi_id,
+            ja.job_seeker.jobseeker_profile.pole_emploi_id,
             ja.job_seeker.first_name,
             ja.job_seeker.last_name,
             _format_date(ja.job_seeker.birthdate),

@@ -6,7 +6,6 @@ import sentry_sdk
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.exceptions import ValidationError
-from django.core.validators import MinLengthValidator
 from django.db.models import Q
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse
@@ -27,11 +26,12 @@ from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
 from itou.users.enums import LackOfPoleEmploiId, UserKind
+from itou.users.forms import JobSeekerProfileFieldsMixin
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
 from itou.utils.types import InclusiveDateRange
-from itou.utils.validators import validate_nir, validate_pole_emploi_id
+from itou.utils.validators import validate_nir
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.companies_views.forms import JobAppellationAndLocationMixin
 
@@ -132,14 +132,14 @@ class CheckJobSeekerNirForm(forms.Form):
         return self.job_seeker
 
 
-class CheckJobSeekerInfoForm(forms.ModelForm):
+class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):
+    PROFILE_FIELDS = ["pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+
     class Meta:
         model = User
         fields = [
             "birthdate",
             "phone",
-            "pole_emploi_id",
-            "lack_of_pole_emploi_id_reason",
         ]
         help_texts = {
             "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978.",
@@ -231,13 +231,7 @@ class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
     ass_allocation = forms.BooleanField(required=False, label="Bénéficiaire de l'ASS")
     aah_allocation = forms.BooleanField(required=False, label="Bénéficiaire de l'AAH")
 
-    # Fields from the User model
     pole_emploi_id_forgotten = forms.BooleanField(required=False, label="Identifiant Pôle emploi oublié")
-    pole_emploi_id = forms.CharField(
-        label="Identifiant Pôle emploi",
-        required=False,
-        validators=[validate_pole_emploi_id, MinLengthValidator(8)],
-    )
 
     # This field is a subset of the possible choices of `has_rsa_allocation` model field
     has_rsa_allocation = forms.ChoiceField(
@@ -251,6 +245,7 @@ class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
         fields = [
             "education_level",
             "resourceless",
+            "pole_emploi_id",
             "pole_emploi_since",
             "unemployed_since",
             "rqth_employee",
@@ -831,14 +826,16 @@ class EditHiringDateForm(forms.ModelForm):
         return cleaned_data
 
 
-class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, forms.ModelForm):
+class JobSeekerPersonalDataForm(JobSeekerProfileFieldsMixin, JobSeekerNIRUpdateMixin, forms.ModelForm):
     """
     Info that will be used to search for an existing Pôle emploi approval.
     """
 
+    PROFILE_FIELDS = ["pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+
     class Meta:
         model = User
-        fields = ["nir", "lack_of_nir_reason", "birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+        fields = ["nir", "lack_of_nir_reason", "birthdate"]
         help_texts = {"birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978."}
 
     def __init__(self, *args, **kwargs):

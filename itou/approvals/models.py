@@ -1786,8 +1786,8 @@ class PoleEmploiApprovalManager(models.Manager):
             # Allow duplicated NIR within PE approvals, but that will most probably change with the
             # ApprovalsWrapper code revamp later on. For now there is no unicity constraint on this column.
             filters.append(Q(nir=user.nir))
-        if user.pole_emploi_id and user.birthdate:
-            filters.append(Q(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate))
+        if user.jobseeker_profile.pole_emploi_id and user.birthdate:
+            filters.append(Q(pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.birthdate))
         if not filters:
             return self.none()
         or_filters = functools.reduce(operator.__or__, filters)

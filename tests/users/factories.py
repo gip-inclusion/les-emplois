@@ -135,7 +135,7 @@ class JobSeekerFactory(UserFactory):
             jobseeker_profile__birth_country=factory.SubFactory(CountryFranceFactory),
         )
         with_pole_emploi_id = factory.Trait(
-            pole_emploi_id=factory.fuzzy.FuzzyText(length=8, chars=string.digits),
+            jobseeker_profile__pole_emploi_id=factory.fuzzy.FuzzyText(length=8, chars=string.digits),
             jobseeker_profile__pole_emploi_since=AllocationDuration.MORE_THAN_24_MONTHS,
         )
 

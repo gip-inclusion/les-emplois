@@ -9,6 +9,7 @@ from itou.job_applications.notifications import (
     NewSpontaneousJobAppEmployersNotification,
 )
 from itou.users.enums import IdentityProvider
+from itou.users.forms import JobSeekerProfileFieldsMixin
 from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.apis.exceptions import AddressLookupError
@@ -28,10 +29,14 @@ class SSOReadonlyMixin:
                     self.fields[name].disabled = True
 
 
-class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, SSOReadonlyMixin, forms.ModelForm):
+class EditJobSeekerInfoForm(
+    JobSeekerProfileFieldsMixin, JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, SSOReadonlyMixin, forms.ModelForm
+):
     """
     Edit a job seeker profile.
     """
+
+    PROFILE_FIELDS = ["pole_emploi_id", "lack_of_pole_emploi_id_reason"]
 
     email = forms.EmailField(
         label="Adresse électronique",
@@ -55,8 +60,6 @@ class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, 
             "post_code",
             "city",
             "city_slug",
-            "pole_emploi_id",
-            "lack_of_pole_emploi_id_reason",
         ]
         help_texts = {
             "birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978",
