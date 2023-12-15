@@ -21,7 +21,7 @@ from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import Origin
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
-from itou.users.models import User
+from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.companies.factories import CompanyFactory
@@ -132,7 +132,7 @@ class ModelTest(TestCase):
             "lack_of_pole_emploi_id_reason": job_seeker.lack_of_pole_emploi_id_reason,
         }
         with pytest.raises(ValidationError):
-            User.clean_pole_emploi_fields(cleaned_data)
+            JobSeekerProfile.clean_pole_emploi_fields(cleaned_data)
 
         # If both fields are present at the same time, `pole_emploi_id` takes precedence.
         job_seeker = JobSeekerFactory(
@@ -143,7 +143,7 @@ class ModelTest(TestCase):
             "pole_emploi_id": job_seeker.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": job_seeker.lack_of_pole_emploi_id_reason,
         }
-        User.clean_pole_emploi_fields(cleaned_data)
+        JobSeekerProfile.clean_pole_emploi_fields(cleaned_data)
         assert cleaned_data["pole_emploi_id"] == job_seeker.pole_emploi_id
         assert cleaned_data["lack_of_pole_emploi_id_reason"] == ""
 
@@ -154,7 +154,7 @@ class ModelTest(TestCase):
             "pole_emploi_id": job_seeker.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": job_seeker.lack_of_pole_emploi_id_reason,
         }
-        User.clean_pole_emploi_fields(cleaned_data)
+        JobSeekerProfile.clean_pole_emploi_fields(cleaned_data)
 
         job_seeker = JobSeekerFactory(
             pole_emploi_id="", lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN
@@ -163,7 +163,7 @@ class ModelTest(TestCase):
             "pole_emploi_id": job_seeker.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": job_seeker.lack_of_pole_emploi_id_reason,
         }
-        User.clean_pole_emploi_fields(cleaned_data)
+        JobSeekerProfile.clean_pole_emploi_fields(cleaned_data)
 
     def test_email_already_exists(self):
         JobSeekerFactory(email="foo@bar.com")

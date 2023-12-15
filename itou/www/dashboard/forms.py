@@ -9,7 +9,7 @@ from itou.job_applications.notifications import (
     NewSpontaneousJobAppEmployersNotification,
 )
 from itou.users.enums import IdentityProvider
-from itou.users.models import User
+from itou.users.models import JobSeekerProfile, User
 from itou.utils import constants as global_constants
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.widgets import DuetDatePickerWidget
@@ -94,7 +94,7 @@ class EditJobSeekerInfoForm(JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, 
 
     def clean(self):
         super().clean()
-        self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
+        JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
 
         if address_line_1 := self.cleaned_data.get("address_line_1"):
             # Update job seeker geolocation

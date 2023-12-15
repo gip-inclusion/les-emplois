@@ -772,24 +772,6 @@ class User(AbstractUser, AddressMixin):
             queryset = queryset.exclude(pk=exclude_pk)
         return queryset.exists()
 
-    @staticmethod
-    def clean_pole_emploi_fields(cleaned_data):
-        """
-        Validate Pôle emploi fields that depend on each other.
-        Only for users with kind == job_seeker.
-        It must be used in forms and modelforms that manipulate job seekers.
-        """
-        pole_emploi_id = cleaned_data["pole_emploi_id"]
-        lack_of_pole_emploi_id_reason = cleaned_data["lack_of_pole_emploi_id_reason"]
-        # One or the other must be filled.
-        if not pole_emploi_id and not lack_of_pole_emploi_id_reason:
-            raise ValidationError("Renseignez soit un identifiant Pôle emploi, soit la raison de son absence.")
-        # If both are filled, `pole_emploi_id` takes precedence (Trello #1724).
-        if pole_emploi_id and lack_of_pole_emploi_id_reason:
-            # Take advantage of the fact that `cleaned_data` is passed by sharing:
-            # the object is shared between the caller and the called routine.
-            cleaned_data["lack_of_pole_emploi_id_reason"] = ""
-
     def get_kind_display(self):
         return UserKind(self.kind).label
 
@@ -1051,6 +1033,24 @@ class JobSeekerProfile(models.Model):
 
     def __str__(self):
         return str(self.user)
+
+    @staticmethod
+    def clean_pole_emploi_fields(cleaned_data):
+        """
+        Validate Pôle emploi fields that depend on each other.
+        Only for users with kind == job_seeker.
+        It must be used in forms and modelforms that manipulate job seekers.
+        """
+        pole_emploi_id = cleaned_data["pole_emploi_id"]
+        lack_of_pole_emploi_id_reason = cleaned_data["lack_of_pole_emploi_id_reason"]
+        # One or the other must be filled.
+        if not pole_emploi_id and not lack_of_pole_emploi_id_reason:
+            raise ValidationError("Renseignez soit un identifiant Pôle emploi, soit la raison de son absence.")
+        # If both are filled, `pole_emploi_id` takes precedence (Trello #1724).
+        if pole_emploi_id and lack_of_pole_emploi_id_reason:
+            # Take advantage of the fact that `cleaned_data` is passed by sharing:
+            # the object is shared between the caller and the called routine.
+            cleaned_data["lack_of_pole_emploi_id_reason"] = ""
 
     def _clean_job_seeker_details(self):
         # Title is not mandatory for User, but it is for ASP

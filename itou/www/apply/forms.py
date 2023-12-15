@@ -157,7 +157,7 @@ class CheckJobSeekerInfoForm(forms.ModelForm):
 
     def clean(self):
         super().clean()
-        self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
+        JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
 
 
 class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, forms.ModelForm):
@@ -852,7 +852,7 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, forms.ModelForm):
 
     def clean(self):
         super().clean()
-        self._meta.model.clean_pole_emploi_fields(self.cleaned_data)
+        JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
 
 
 class UserAddressForm(MandatoryAddressFormMixin, forms.ModelForm):
