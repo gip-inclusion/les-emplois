@@ -6,6 +6,7 @@ from django.views.generic import TemplateView
 from itou.utils import redirect_legacy_views
 from itou.utils.urls import SiretConverter
 from itou.www.dashboard import views as dashboard_views
+from itou.www.error import server_error
 from itou.www.login import views as login_views
 from itou.www.signup import views as signup_views
 
@@ -87,3 +88,6 @@ if settings.DEBUG and "debug_toolbar" in settings.INSTALLED_APPS:
     import debug_toolbar
 
     urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
+
+
+handler500 = server_error
