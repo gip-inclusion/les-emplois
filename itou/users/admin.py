@@ -322,8 +322,6 @@ class ItouUserAdmin(UserAdmin):
                     "kind",
                     "nir",
                     "lack_of_nir_reason",
-                    "pole_emploi_id",
-                    "lack_of_pole_emploi_id_reason",
                     "created_by",
                     "identity_provider",
                     "jobseeker_profile_link",
@@ -666,7 +664,6 @@ class JobSeekerProfileAdmin(ItouModelAdmin):
 
     readonly_fields = (
         "nir",
-        "pole_emploi_id",
         "hexa_lane_type",
         "hexa_post_code",
         "hexa_commune",
@@ -686,6 +683,7 @@ class JobSeekerProfileAdmin(ItouModelAdmin):
                     "education_level",
                     "nir",
                     "pole_emploi_id",
+                    "lack_of_pole_emploi_id_reason",
                     "pole_emploi_since",
                     "unemployed_since",
                     "resourceless",
@@ -739,10 +737,6 @@ class JobSeekerProfileAdmin(ItouModelAdmin):
     @admin.display(description="nom complet")
     def username(self, obj):
         return obj.user.get_full_name()
-
-    @admin.display(description="identifiant Pôle emploi")
-    def pole_emploi_id(self, obj):
-        return obj.user.pole_emploi_id or "-"
 
     @admin.display(boolean=True, description="profil certifié par Pôle emploi")
     def is_pe_certified(self, obj):
