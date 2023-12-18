@@ -1960,15 +1960,3 @@ def test_prolongation_requests_badge(client):
         f"""a[href^='{reverse("approvals:prolongation_requests_list")}'] + .badge""",
     )
     assert soup.text == "3"
-
-
-@pytest.mark.parametrize("kind", CompanyKind)
-def test_alert_message_for_ai_stock_prolongation(client, snapshot, kind):
-    employer = CompanyMembershipFactory(company__kind=kind).user
-    client.force_login(employer)
-
-    response = client.get(reverse("dashboard:index"))
-    if kind is CompanyKind.AI:
-        assert str(parse_response_to_soup(response, "#AIStockProlongationAlert")) == snapshot
-    else:
-        assertNotContains(response, "AIStockProlongationAlert")

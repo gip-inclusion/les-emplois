@@ -26,7 +26,6 @@ from itou.approvals.models import (
     ProlongationRequestDenyInformation,
     Suspension,
 )
-from itou.companies.enums import CompanyKind
 from itou.files.models import File
 from itou.job_applications.enums import Origin, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
@@ -247,7 +246,6 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
 
     back_url = prolongation_back_url(request)
     preview = False
-    ai_renew_approval_display_message = False
 
     form = get_prolongation_form(
         approval=approval,
@@ -281,11 +279,6 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
                 request.session[session_key] = default_storage.save(
                     f"{TEMPORARY_STORAGE_PREFIX}/{prolongation_report.name}", prolongation_report
                 )
-            if (
-                request.current_organization.kind == CompanyKind.AI.name
-                and (approval.end_at - timezone.localdate()).days <= 30
-            ):
-                ai_renew_approval_display_message = True
         elif request.POST.get("save"):
             if siae.can_upload_prolongation_report:
                 try:
@@ -312,7 +305,6 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         "preview": preview,
         "unfold_details": form.data.get("reason") in PROLONGATION_REPORT_FILE_REASONS,
         "can_upload_prolongation_report": siae.can_upload_prolongation_report,
-        "ai_renew_approval_display_message": ai_renew_approval_display_message,
     }
 
     return render(request, template_name, context)
