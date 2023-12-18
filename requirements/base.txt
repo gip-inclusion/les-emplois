@@ -335,9 +335,9 @@ djangorestframework==3.14.0 \
     #   -r requirements/base.in
     #   django-datadog-logger
     #   drf-spectacular
-drf-spectacular==0.26.5 \
-    --hash=sha256:aee55330a774ba8a9cbdb125714d1c9ee05a8aafd3ce3be8bfd26527649aeb44 \
-    --hash=sha256:c0002a820b11771fdbf37853deb371947caf0159d1afeeffe7598e964bc1db94
+drf-spectacular==0.27.0 \
+    --hash=sha256:18d7ae74b2b5d533fd31f1c591ebaa5cce1447e0976ced927401e3163040dea9 \
+    --hash=sha256:6ab2d20674244e8c940c2883f744b43c34fc68c70ea3aefa802f574108c9699b
     # via -r requirements/base.in
 et-xmlfile==1.1.0 \
     --hash=sha256:8eb9e2bc2f8c97e37a2dc85a09ecdcdec9d8a396530a6d5a33b30b9a92da0c5c \
