@@ -318,7 +318,7 @@ class ApprovalModelTest(TestCase):
 
         # With an existing valid `PoleEmploiApproval`.
 
-        user = JobSeekerFactory()
+        user = JobSeekerFactory(with_pole_emploi_id=True)
         job_application = JobApplicationFactory(job_seeker=user)
         valid_pe_approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.pole_emploi_id,
@@ -747,7 +747,7 @@ class PoleEmploiApprovalManagerTest(TestCase):
 
     def test_find_for_user(self):
         # given a User, ensure we can find a PE approval using its pole_emploi_id and not the others.
-        user = JobSeekerFactory()
+        user = JobSeekerFactory(with_pole_emploi_id=True)
         pe_approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
         # just another approval, to be sure we don't find the other one "by chance"
         PoleEmploiApprovalFactory()

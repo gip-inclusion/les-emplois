@@ -1167,7 +1167,7 @@ class JobApplicationWorkflowTest(TestCase):
         """
         When a job seeker's application is accepted, the others are marked obsolete.
         """
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerFactory(with_pole_emploi_id=True)
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_seeker.pole_emploi_id != ""
 
@@ -1237,7 +1237,7 @@ class JobApplicationWorkflowTest(TestCase):
         """
         When a Pôle emploi approval already exists, it is reused.
         """
-        job_seeker = JobSeekerFactory()
+        job_seeker = JobSeekerFactory(with_pole_emploi_id=True)
         pe_approval = PoleEmploiApprovalFactory(
             pole_emploi_id=job_seeker.pole_emploi_id, birthdate=job_seeker.birthdate
         )
@@ -1327,6 +1327,7 @@ class JobApplicationWorkflowTest(TestCase):
     def test_accept_job_application_sent_by_job_seeker_with_a_pole_emploi_id_no_pe_approval(self):
         job_seeker = JobSeekerFactory(
             nir="",
+            with_pole_emploi_id=True,
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
@@ -1366,6 +1367,7 @@ class JobApplicationWorkflowTest(TestCase):
         """
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
+            job_seeker__with_pole_emploi_id=True,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.pole_emploi_id != ""
@@ -1396,6 +1398,7 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             state=JobApplicationWorkflow.STATE_PROCESSING,
+            job_seeker__with_pole_emploi_id=True,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.pole_emploi_id != ""
@@ -1424,7 +1427,7 @@ class JobApplicationWorkflowTest(TestCase):
         """
         An authorized prescriber can bypass the waiting period.
         """
-        user = JobSeekerFactory()
+        user = JobSeekerFactory(with_pole_emploi_id=True)
         # Ended 1 year ago.
         end_at = datetime.date.today() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
@@ -1520,7 +1523,10 @@ class JobApplicationWorkflowTest(TestCase):
         Basically the same as the 'accept' part, except we don't create an approval
         and we don't notify
         """
-        job_application = JobApplicationWithoutApprovalFactory(state=JobApplicationWorkflow.STATE_PROCESSING)
+        job_application = JobApplicationWithoutApprovalFactory(
+            state=JobApplicationWorkflow.STATE_PROCESSING,
+            job_seeker__with_pole_emploi_id=True,
+        )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.pole_emploi_id != ""
         job_application.accept(user=job_application.to_company.members.first())
@@ -1565,6 +1571,7 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             to_company__kind=CompanyKind.EI,
             eligibility_diagnosis=None,
+            job_seeker__with_pole_emploi_id=True,
         )
 
         to_company = job_application.to_company

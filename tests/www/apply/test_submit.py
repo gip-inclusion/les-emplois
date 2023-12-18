@@ -478,7 +478,7 @@ class ApplyAsJobSeekerTest(TestCase):
         """
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
-        user = JobSeekerFactory(nir="")
+        user = JobSeekerFactory(nir="", with_pole_emploi_id=True)
         self.client.force_login(user)
 
         # Entry point.
@@ -1572,7 +1572,7 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         This NIR account is empty.
         An update is expected.
         """
-        job_seeker = JobSeekerFactory(nir="")
+        job_seeker = JobSeekerFactory(nir="", with_pole_emploi_id=True)
         # Create an approval to bypass the eligibility diagnosis step.
         PoleEmploiApprovalFactory(birthdate=job_seeker.birthdate, pole_emploi_id=job_seeker.pole_emploi_id)
         company, user = self.create_test_data()
@@ -1637,7 +1637,11 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         assert job_seeker.nir == nir
 
     def test_one_account_lack_of_nir_reason(self):
-        job_seeker = JobSeekerFactory(nir="", lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER)
+        job_seeker = JobSeekerFactory(
+            nir="",
+            lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+            with_pole_emploi_id=True,
+        )
         # Create an approval to bypass the eligibility diagnosis step.
         PoleEmploiApprovalFactory(birthdate=job_seeker.birthdate, pole_emploi_id=job_seeker.pole_emploi_id)
         siae, user = self.create_test_data()
@@ -3994,7 +3998,7 @@ class GEIQEligibilityForHireTestCase(TestCase):
 class HireConfirmationTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.job_seeker = JobSeekerWithAddressFactory(first_name="Clara", last_name="Sion")
+        cls.job_seeker = JobSeekerWithAddressFactory(first_name="Clara", last_name="Sion", with_pole_emploi_id=True)
         [cls.city] = create_test_cities(["67"], num_per_department=1)
 
     def _reverse(self, view_name):

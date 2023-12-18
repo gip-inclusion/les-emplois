@@ -119,7 +119,6 @@ class LaborInspectorFactory(UserFactory):
 class JobSeekerFactory(UserFactory):
     title = random.choice(Title.values)
     kind = UserKind.JOB_SEEKER
-    pole_emploi_id = factory.fuzzy.FuzzyText(length=8, chars=string.digits)
 
     class Params:
         # Reminder : ASP models are "read-only", they must not be saved.
@@ -134,6 +133,7 @@ class JobSeekerFactory(UserFactory):
             with_birth_place=True,
             jobseeker_profile__birth_country=factory.SubFactory(CountryFranceFactory),
         )
+        with_pole_emploi_id = factory.Trait(pole_emploi_id=factory.fuzzy.FuzzyText(length=8, chars=string.digits))
 
     @factory.lazy_attribute
     def nir(self):
