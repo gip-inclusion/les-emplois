@@ -300,9 +300,9 @@ django-formtools==2.4.1 \
     --hash=sha256:21f8d5dac737f1e636fa8a0a10969c1c32f525a6dfa27c29592827ba70d9643a \
     --hash=sha256:49ea8a64ddef4728a558bf5f8f622c0f4053b979edcf193bf00dd80432ab2f12
     # via -r requirements/base.in
-django-hijack==3.4.4 \
-    --hash=sha256:272a0121f8adb4411b3219903b2042b885bccc90e23a8a260976dc7c8b6fd2c7 \
-    --hash=sha256:c78dd661a414f8b33ef5ff044d1d240eb4162fa6554c7ef17aec6262a4c60fae
+django-hijack==3.4.5 \
+    --hash=sha256:129cbe75444b163135871a947d38ffb72181f4f2583544703fc9efe083c9ddad \
+    --hash=sha256:7e45b1de786bdc130628e4230b359dde6d8744ecd3bcd668d2b27c5d614a071c
     # via -r requirements/base.in
 django-htmx==1.17.2 \
     --hash=sha256:4089f2ed38727e9846c2f4cd1daddf6b010c7be8d834cfbcffc8c5ecf445c04e \
