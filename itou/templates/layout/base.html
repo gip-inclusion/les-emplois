@@ -267,18 +267,6 @@
                     <img class="give-my-advice" src="{% static 'img/je-donne-mon-avis.svg' %}" alt="Je donne mon avis sur cette démarche">
                 </a>
             </div>
-        {% else %}
-            {# Sticky FAQ link is not displayed on HP and on small devices #}
-            <div class="rounded-pill bg-white shadow fixed-sm-bottom d-none d-sm-inline-block m-3 py-2 px-3 text-center text-md-right">
-                <a href="{{ ITOU_HELP_CENTER_URL }}"
-                   rel="noopener"
-                   target="_blank"
-                   class="has-external-link text-decoration-none matomo-event"
-                   aria-label="Besoin d'aide ? (ouverture dans un nouvel onglet)"
-                   data-matomo-category="help"
-                   data-matomo-action="clic"
-                   data-matomo-option="sticky_documentation">Besoin d'aide ?</a>
-            </div>
         {% endif %}
     </body>
 </html>
