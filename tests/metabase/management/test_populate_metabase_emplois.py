@@ -155,6 +155,7 @@ def test_populate_job_seekers():
         nir="271049232724647",
         geocoding_score=1,
         coords=Point(0, 0),  # QPV utils is mocked
+        with_pole_emploi_id=True,
     )
     job_application_2 = JobApplicationFactory(
         with_approval=True,
@@ -172,6 +173,7 @@ def test_populate_job_seekers():
     user_3 = JobSeekerFactory(
         pk=26587,
         nir="297016314515713",
+        with_pole_emploi_id=True,
     )
     job_application_3 = JobApplicationFactory(
         job_seeker=user_3,

@@ -473,7 +473,7 @@ class ProcessViewsTest(TestCase):
         city = self.get_random_city()
         today = timezone.localdate()
 
-        job_seeker = JobSeekerWithAddressFactory(city=city.name)
+        job_seeker = JobSeekerWithAddressFactory(city=city.name, with_pole_emploi_id=True)
         address = {
             "address_line_1": job_seeker.address_line_1,
             "post_code": job_seeker.post_code,
@@ -640,7 +640,7 @@ class ProcessViewsTest(TestCase):
         city = self.get_random_city()
         today = timezone.localdate()
         # the old job of job seeker
-        job_seeker_user = JobSeekerWithAddressFactory()
+        job_seeker_user = JobSeekerWithAddressFactory(with_pole_emploi_id=True)
         old_job_application = JobApplicationFactory(
             with_approval=True,
             job_seeker=job_seeker_user,
@@ -741,7 +741,7 @@ class ProcessViewsTest(TestCase):
 
     def test_accept_and_update_hiring_start_date_of_two_job_applications(self, *args, **kwargs):
         city = self.get_random_city()
-        job_seeker = JobSeekerWithAddressFactory()
+        job_seeker = JobSeekerWithAddressFactory(with_pole_emploi_id=True)
         base_for_post_data = {
             "address_line_1": job_seeker.address_line_1,
             "post_code": job_seeker.post_code,
@@ -841,7 +841,7 @@ class ProcessViewsTest(TestCase):
         city = self.get_random_city()
 
         company = CompanyFactory(with_membership=True)
-        job_seeker = JobSeekerWithAddressFactory(city=city.name)
+        job_seeker = JobSeekerWithAddressFactory(city=city.name, with_pole_emploi_id=True)
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker=job_seeker,
@@ -923,6 +923,7 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__nir="",
+            job_seeker__with_pole_emploi_id=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -975,6 +976,7 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__nir="",
+            job_seeker__with_pole_emploi_id=True,
         )
         other_job_seeker = JobSeekerWithAddressFactory()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
@@ -1015,6 +1017,7 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__nir="",
+            job_seeker__with_pole_emploi_id=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -1058,6 +1061,7 @@ class ProcessViewsTest(TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__nir="",
             job_seeker__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+            job_seeker__with_pole_emploi_id=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -1317,7 +1321,7 @@ class ProcessViewsTest(TestCase):
         # A canceled job application is not linked to an approval
         # unless the job seeker has an accepted job application.
         city = self.get_random_city()
-        job_seeker = JobSeekerWithAddressFactory(city=city.name)
+        job_seeker = JobSeekerWithAddressFactory(city=city.name, with_pole_emploi_id=True)
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_CANCELLED,
             job_seeker=job_seeker,

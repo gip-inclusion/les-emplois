@@ -945,7 +945,7 @@ def user_with_approval_in_waiting_period():
 class LatestApprovalTestCase(TestCase):
     @freezegun.freeze_time("2022-08-10")
     def test_merge_approvals_timeline_case1(self):
-        user = JobSeekerFactory()
+        user = JobSeekerFactory(with_pole_emploi_id=True)
 
         ApprovalFactory(
             user=user,
@@ -978,7 +978,7 @@ class LatestApprovalTestCase(TestCase):
 
     @freezegun.freeze_time("2022-08-10")
     def test_merge_approvals_timeline_case2(self):
-        user = JobSeekerFactory()
+        user = JobSeekerFactory(with_pole_emploi_id=True)
 
         # PoleEmploiApproval 1.
         PoleEmploiApprovalFactory(
@@ -1065,7 +1065,7 @@ class LatestApprovalTestCase(TestCase):
         assert user.latest_approval is None
 
     def test_status_with_valid_pole_emploi_approval(self):
-        user = JobSeekerFactory()
+        user = JobSeekerFactory(with_pole_emploi_id=True)
         pe_approval = PoleEmploiApprovalFactory(pole_emploi_id=user.pole_emploi_id, birthdate=user.birthdate)
         assert not user.has_no_common_approval
         assert user.has_valid_common_approval

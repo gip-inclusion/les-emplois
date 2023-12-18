@@ -43,7 +43,7 @@ class EligibilityDiagnosisQuerySetTest(TestCase):
 class EligibilityDiagnosisManagerTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.job_seeker = JobSeekerFactory()
+        cls.job_seeker = JobSeekerFactory(with_pole_emploi_id=True)
 
     def test_no_diagnosis(self):
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=self.job_seeker)

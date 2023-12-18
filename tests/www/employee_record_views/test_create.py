@@ -420,7 +420,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
-            job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True),
+            job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True, with_pole_emploi_id=True),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
