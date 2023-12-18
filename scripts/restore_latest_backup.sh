@@ -5,6 +5,14 @@
 # For example: `./restore_latest_backup.sh itou-test`
 # Make sure you installed the `itou-backups` project before. Also, check that a database server is running.
 # $PATH_TO_ITOU_BACKUPS is mandatory.
+
+if [ ! -f "$PATH_TO_ITOU_BACKUPS/.env" ]; then
+    echo "Itou backups .env file not found. Stopping here."
+    exit 0
+fi
+
+# https://www.shellcheck.net/wiki/SC1091
+# shellcheck disable=SC1091
 source "$PATH_TO_ITOU_BACKUPS/.env"
 
 db_name="${1:-$PGDATABASE}"
