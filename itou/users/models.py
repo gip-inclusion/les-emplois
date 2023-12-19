@@ -592,7 +592,9 @@ class User(AbstractUser, AddressMixin):
     def is_prescriber_with_authorized_org(self):
         return (
             self.is_prescriber
-            and self.prescriberorganization_set.filter(is_authorized=True, members__is_active=True).exists()
+            and self.prescribermembership_set.filter(
+                is_active=True, organization__is_authorized=True, user__is_active=True
+            ).exists()
         )
 
     def is_prescriber_of_authorized_organization(self, organization_id):
