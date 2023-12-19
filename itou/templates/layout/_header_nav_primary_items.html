@@ -1,4 +1,5 @@
 {% load redirection_fields %}
+{% load matomo %}
 
 <ul>
     <li class="dropdown">
@@ -30,6 +31,18 @@
                        data-matomo-action="clic"
                        data-matomo-option="header_comprendre-liae">Qui peut bénéficier des contrats d'IAE&nbsp;?</a>
                 </li>
+                {% if user.is_authenticated %}
+                    {% if user.is_employer or user.is_prescriber_with_authorized_org %}
+                        <li>
+                            <a href="https://travail-emploi.gouv.fr/actualites/l-actualite-du-ministere/article/guide-pratique-la-prescription-de-parcours-d-insertion-par-l-activite"
+                               rel="noopener"
+                               class="dropdown-item has-external-link matomo-event"
+                               target="_blank"
+                               aria-label="Prescrire un parcours IAE (guide pratique) (ouverture dans un nouvel onglet)"
+                               {% matomo_event "help" "clic" "header_prescrire-parcours-iae-guide" %}>Prescrire un parcours IAE (guide pratique)</a>
+                        </li>
+                    {% endif %}
+                {% endif %}
             </ul>
         </div>
     </li>
