@@ -172,7 +172,7 @@ class TestTransferUserData:
         assertContains(response, str(approval))
 
         response = admin_client.post(transfer_url_2, data={"fields_to_transfer": ["job_applications", "approvals"]})
-        assertRedirects(response, reverse("admin:users_user_change", kwargs={"object_id": to_user.pk}))
+        assertRedirects(response, reverse("admin:users_user_change", kwargs={"object_id": from_user.pk}))
 
         job_application.refresh_from_db()
         approval.refresh_from_db()
