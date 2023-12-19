@@ -591,7 +591,7 @@ class ItouUserAdmin(UserAdmin):
                 return redirect(
                     reverse(
                         "admin:users_user_change",
-                        kwargs={"object_id": to_user.pk},
+                        kwargs={"object_id": from_user.pk},
                     )
                 )
         title = f"Transfert des données de { from_user }"
