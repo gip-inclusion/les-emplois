@@ -597,13 +597,6 @@ class User(AbstractUser, AddressMixin):
             ).exists()
         )
 
-    def is_prescriber_of_authorized_organization(self, organization_id):
-        return self.prescriberorganization_set.filter(
-            pk=organization_id,
-            is_authorized=True,
-            prescribermembership__is_active=True,
-        ).exists()
-
     @property
     def has_external_data(self):
         return self.is_job_seeker and hasattr(self, "jobseekerexternaldata")
