@@ -1,0 +1,11 @@
+Bonjour {{ job_seeker.get_full_name }},
+
+Le {{ job_seeker.upcoming_deletion_notified_at }} nous vous avons transmis un e-mail afin de vous alerter au sujet de la suppression prochaine de votre compte.
+
+A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte candidat.
+
+En cas de besoin, vous pouvez toujours vous réinscrire.
+
+
+Cordialement,
+L'équipe des emplois de l’inclusion

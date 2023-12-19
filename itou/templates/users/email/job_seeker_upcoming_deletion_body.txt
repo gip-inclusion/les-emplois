@@ -1,0 +1,11 @@
+Bonjour {{ job_seeker.get_full_name }},
+
+Nous n’avons détecté aucune activité sur votre compte depuis le {{ job_seeker.last_activity }}.
+Sans connexion de votre part avant le {{ upcoming_deletion_date }}, votre espace personnel sera supprimé ainsi que toutes les données associées (données personnelles, candidatures…).
+Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous connecter à votre espace candidat sur https://emplois.inclusion.beta.gouv.fr/ .
+
+En cas de perte ou d'oubli de mot de passe, vous pouvez le réinitialiser en cliquant sur le lien suivant : {{ reset_password_url }} .
+
+
+Cordialement,
+L'équipe des emplois de l’inclusion
