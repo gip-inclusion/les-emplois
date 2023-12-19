@@ -1333,3 +1333,16 @@ def test_jobseeker_factory_works_alongside_user_has_data_changed():
     profile = JobSeekerProfile.objects.get(user=js)
     assert profile.pe_obfuscated_nir == "JAIME_LES_CHATS"
     assert profile.pk == js.jobseeker_profile.pk
+
+
+@pytest.mark.parametrize("user_active", [False, True])
+@pytest.mark.parametrize("membership_active", [False, True])
+@pytest.mark.parametrize("organization_authorized", [False, True])
+def test_is_prescriber_with_authorized_org(user_active, membership_active, organization_authorized):
+    prescriber = PrescriberFactory(is_active=user_active)
+    PrescriberMembershipFactory(
+        is_active=membership_active, user=prescriber, organization__is_authorized=organization_authorized
+    )
+    assert prescriber.is_prescriber_with_authorized_org is all(
+        [user_active, membership_active, organization_authorized]
+    )
