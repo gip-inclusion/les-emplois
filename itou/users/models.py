@@ -208,6 +208,11 @@ class User(AbstractUser, AddressMixin):
     )
 
     last_checked_at = models.DateTimeField(verbose_name="date de dernière vérification", default=timezone.now)
+    upcoming_deletion_notified_at = models.DateTimeField(
+        verbose_name="date de notification d'une suppression prochaine",
+        blank=True,
+        null=True,
+    )
 
     public_id = models.UUIDField(
         verbose_name="identifiant public opaque, pour les API",
