@@ -4,6 +4,7 @@
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           
   
+  
   <ul>
       <li class="dropdown">
           <button aria-controls="helpDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-link dropdown-toggle" data-bs-toggle="dropdown" type="button">Besoin d'aide ?</button>
@@ -15,6 +16,13 @@
                   <li>
                       <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link matomo-event" data-matomo-action="clic" data-matomo-category="help" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">Qui peut bénéficier des contrats d'IAE ?</a>
                   </li>
+                  
+                      
+                          <li>
+                              <a aria-label="Prescrire un parcours IAE (guide pratique) (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link matomo-event" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_prescrire-parcours-iae-guide" href="https://travail-emploi.gouv.fr/actualites/l-actualite-du-ministere/article/guide-pratique-la-prescription-de-parcours-d-insertion-par-l-activite" rel="noopener" target="_blank">Prescrire un parcours IAE (guide pratique)</a>
+                          </li>
+                      
+                  
               </ul>
           </div>
       </li>
@@ -79,6 +87,7 @@
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           
   
+  
   <ul>
       <li class="dropdown">
           <button aria-controls="helpDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-link dropdown-toggle" data-bs-toggle="dropdown" type="button">Besoin d'aide ?</button>
@@ -90,6 +99,13 @@
                   <li>
                       <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link matomo-event" data-matomo-action="clic" data-matomo-category="help" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">Qui peut bénéficier des contrats d'IAE ?</a>
                   </li>
+                  
+                      
+                          <li>
+                              <a aria-label="Prescrire un parcours IAE (guide pratique) (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link matomo-event" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_prescrire-parcours-iae-guide" href="https://travail-emploi.gouv.fr/actualites/l-actualite-du-ministere/article/guide-pratique-la-prescription-de-parcours-d-insertion-par-l-activite" rel="noopener" target="_blank">Prescrire un parcours IAE (guide pratique)</a>
+                          </li>
+                      
+                  
               </ul>
           </div>
       </li>
@@ -165,6 +181,7 @@
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           
   
+  
   <ul>
       <li class="dropdown">
           <button aria-controls="helpDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-link dropdown-toggle" data-bs-toggle="dropdown" type="button">Besoin d'aide ?</button>
@@ -176,6 +193,9 @@
                   <li>
                       <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link matomo-event" data-matomo-action="clic" data-matomo-category="help" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">Qui peut bénéficier des contrats d'IAE ?</a>
                   </li>
+                  
+                      
+                  
               </ul>
           </div>
       </li>
@@ -247,6 +267,7 @@
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           
   
+  
   <ul>
       <li class="dropdown">
           <button aria-controls="helpDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-link dropdown-toggle" data-bs-toggle="dropdown" type="button">Besoin d'aide ?</button>
@@ -258,6 +279,9 @@
                   <li>
                       <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link matomo-event" data-matomo-action="clic" data-matomo-category="help" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">Qui peut bénéficier des contrats d'IAE ?</a>
                   </li>
+                  
+                      
+                  
               </ul>
           </div>
       </li>
@@ -329,6 +353,7 @@
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           
   
+  
   <ul>
       <li class="dropdown">
           <button aria-controls="helpDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-link dropdown-toggle" data-bs-toggle="dropdown" type="button">Besoin d'aide ?</button>
@@ -340,6 +365,9 @@
                   <li>
                       <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link matomo-event" data-matomo-action="clic" data-matomo-category="help" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">Qui peut bénéficier des contrats d'IAE ?</a>
                   </li>
+                  
+                      
+                  
               </ul>
           </div>
       </li>
@@ -404,6 +432,7 @@
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           
   
+  
   <ul>
       <li class="dropdown">
           <button aria-controls="helpDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-link dropdown-toggle" data-bs-toggle="dropdown" type="button">Besoin d'aide ?</button>
@@ -415,6 +444,9 @@
                   <li>
                       <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link matomo-event" data-matomo-action="clic" data-matomo-category="help" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">Qui peut bénéficier des contrats d'IAE ?</a>
                   </li>
+                  
+                      
+                  
               </ul>
           </div>
       </li>
@@ -479,6 +511,7 @@
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           
   
+  
   <ul>
       <li class="dropdown">
           <button aria-controls="helpDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-link dropdown-toggle" data-bs-toggle="dropdown" type="button">Besoin d'aide ?</button>
@@ -490,6 +523,7 @@
                   <li>
                       <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link matomo-event" data-matomo-action="clic" data-matomo-category="help" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">Qui peut bénéficier des contrats d'IAE ?</a>
                   </li>
+                  
               </ul>
           </div>
       </li>

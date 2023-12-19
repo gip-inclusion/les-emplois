@@ -46,6 +46,7 @@ def test_list_view(snapshot, client):
         + 1  # check user memberships
         + 1  # fetch prolongation requests rows
         + 1  # count prolongation requests rows (from pager)
+        + 1  # `is_prescriber_with_authorized_org()` in nav
         + 3  # savepoint, update session, release savepoint
     )
     with assertNumQueries(num_queries):

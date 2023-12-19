@@ -583,6 +583,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             + 1  # fetch user
             + 1  # fetch user memberships
             + 1  # fetch companies_jobdescription (get_object_or_404)
+            + 1  # `is_prescriber_with_authorized_org()` in nav
             + 1  # fetch companies_jobdescription (others_active_jobs)
             + 3  # update session
         ):
