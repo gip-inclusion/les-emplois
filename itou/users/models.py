@@ -585,10 +585,6 @@ class User(AbstractUser, AddressMixin):
         return False
 
     @cached_property
-    def is_prescriber_with_org(self):
-        return self.is_prescriber and self.prescribermembership_set.filter(is_active=True).exists()
-
-    @cached_property
     def is_prescriber_with_authorized_org(self):
         return (
             self.is_prescriber
