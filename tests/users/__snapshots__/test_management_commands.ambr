@@ -1,4 +1,32 @@
 # serializer version: 1
+# name: TestCommandNotifyAndDeleteInactiveJobSeekers.test_notify[deletion email body]
+  '''
+  Bonjour Jen SUIPLULA,
+  
+  Le 1 décembre 2023 01:00 nous vous avons transmis un e-mail afin de vous alerter au sujet de la suppression prochaine de votre compte.
+  
+  A ce jour, nous n’avons détecté aucune connexion, par conséquent nous avons supprimé l’intégralité des données associées à votre compte candidat.
+  
+  En cas de besoin, vous pouvez toujours vous réinscrire.
+  
+  Cordialement,
+  L'équipe des emplois de l’inclusion
+  '''
+# ---
+# name: TestCommandNotifyAndDeleteInactiveJobSeekers.test_notify[upcoming deletion email body]
+  '''
+  Bonjour Jen MANVAI,
+  
+  Nous n’avons détecté aucune activité sur votre compte depuis le 19 août 2022 02:00.
+  Sans connexion de votre part avant le 31 janvier 2024 01:00, votre espace personnel sera supprimé ainsi que toutes les données associées (données personnelles, candidatures…).
+  Si vous souhaitez conserver votre espace personnel, nous vous invitons à vous connecter à votre espace candidat sur https://emplois.inclusion.beta.gouv.fr/ .
+  
+  En cas de perte ou d'oubli de mot de passe, vous pouvez le réinitialiser en cliquant sur le lien suivant : /accounts/password/reset/ .
+  
+  Cordialement,
+  L'équipe des emplois de l’inclusion
+  '''
+# ---
 # name: test_pe_certify_users
   '''
   > about to resolve first_name and last_name for count=1 users.
