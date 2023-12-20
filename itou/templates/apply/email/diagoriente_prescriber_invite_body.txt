@@ -3,7 +3,7 @@
 {% if job_application.sender.title %}Bonjour {{ job_application.sender.get_title_display }} {{ job_application.sender.last_name }},{% else %}Bonjour {{ job_application.sender.get_full_name }},{% endif %}
 
 {% block header %}L’entreprise {{ job_application.to_company.display_name }} vous propose d’utiliser Diagoriente pour valoriser les expériences de votre candidat : {{ job_application.job_seeker.get_full_name }}.
-Vous pourrez lui créer un compte en cliquant sur ce lien : https://diagoriente.beta.gouv.fr{% endblock header %}
+Vous pourrez lui créer un compte en cliquant sur ce lien : https://plateforme.diagoriente.beta.gouv.fr{% endblock header %}
 
 {% block content %}Diagoriente propose différents services pour accompagner les personnes en transition professionnelle. Tous ces services partagent le même souci d’aider chacun à valoriser ce qu’il sait faire pour élargir ses perspectives professionnelles.
 La démarche repose sur l’analyse de ses expériences, tous domaines confondus (personnel, professionnel, engagement, etc.). L’application en ligne vous aide notamment à traduire ces expériences en compétences, puis à construire un CV qui met l’accent sur ces compétences.

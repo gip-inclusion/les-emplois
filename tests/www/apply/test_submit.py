@@ -2465,7 +2465,7 @@ class ApplicationViewTest(TestCase):
     DIAGORIENTE_PRESCRIBER_DESCRIPTION = (
         "Accompagnez-le dans la création de son CV grâce à notre partenaire Diagoriente."
     )
-    DIAGORIENTE_URL = "https://diagoriente.beta.gouv.fr"
+    DIAGORIENTE_URL = "https://plateforme.diagoriente.beta.gouv.fr"
 
     def test_application_jobs_use_previously_selected_jobs(self):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True, with_jobs=True)
