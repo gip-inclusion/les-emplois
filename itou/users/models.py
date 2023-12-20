@@ -312,6 +312,10 @@ class User(AbstractUser, AddressMixin):
             ),
         ]
 
+    def __init__(self, *args, _auto_create_job_seeker_profile=True, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._auto_create_job_seeker_profile = _auto_create_job_seeker_profile
+
     def __str__(self):
         return f"{self.get_full_name()} — {self.email}"
 
@@ -342,7 +346,7 @@ class User(AbstractUser, AddressMixin):
             raise ValidationError("Inclusion connect n'est utilisable que par un prescripteur ou employeur.")
 
     def save(self, *args, **kwargs):
-        must_create_profile = self._state.adding
+        must_create_profile = self._state.adding and self._auto_create_job_seeker_profile
 
         if not self.is_job_seeker:
             self.asp_uid = None  # Needs to be done before the call to .validate_unique()
