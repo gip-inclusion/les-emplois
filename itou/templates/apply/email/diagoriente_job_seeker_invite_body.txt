@@ -1,6 +1,6 @@
 {% extends "apply/email/diagoriente_prescriber_invite_body.txt" %}
 
 {% block header %}L’entreprise {{ job_application.to_company.display_name }} vous propose d’utiliser Diagoriente pour valoriser vos expériences.
-Vous pourrez créer votre compte en cliquant sur ce lien : https://diagoriente.beta.gouv.fr{% endblock header %}
+Vous pourrez créer votre compte en cliquant sur ce lien : https://plateforme.diagoriente.beta.gouv.fr{% endblock header %}
 
 {% block footer %}Si vous avez besoin d’aide, contactez votre conseiller.{% endblock footer %}
