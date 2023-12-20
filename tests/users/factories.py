@@ -250,6 +250,8 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.JobSeekerProfile
 
+    user = factory.SubFactory(JobSeekerFactory)
+
 
 class JobSeekerProfileWithHexaAddressFactory(JobSeekerProfileFactory):
     education_level = random.choice(EducationLevel.values)
