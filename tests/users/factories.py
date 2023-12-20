@@ -134,7 +134,10 @@ class JobSeekerFactory(UserFactory):
             with_birth_place=True,
             jobseeker_profile__birth_country=factory.SubFactory(CountryFranceFactory),
         )
-        with_pole_emploi_id = factory.Trait(pole_emploi_id=factory.fuzzy.FuzzyText(length=8, chars=string.digits))
+        with_pole_emploi_id = factory.Trait(
+            pole_emploi_id=factory.fuzzy.FuzzyText(length=8, chars=string.digits),
+            jobseeker_profile__pole_emploi_since=AllocationDuration.MORE_THAN_24_MONTHS,
+        )
 
     @factory.lazy_attribute
     def nir(self):
@@ -255,8 +258,6 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
 
 class JobSeekerProfileWithHexaAddressFactory(JobSeekerProfileFactory):
     education_level = random.choice(EducationLevel.values)
-    # JobSeeker are created with a Pôle emploi ID
-    pole_emploi_since = AllocationDuration.MORE_THAN_24_MONTHS
     # Adding a minimum profile with all mandatory fields
     # will avoid many mocks and convolutions during testing.
     hexa_lane_type = random.choice(LaneType.values)
