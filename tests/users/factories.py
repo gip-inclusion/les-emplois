@@ -228,6 +228,8 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
 class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
     # Needs ASP test fixtures installed
 
+    born_in_france = True
+
     @factory.post_generation
     def set_approval_user(self, create, extracted, **kwargs):
         if not create:
@@ -242,10 +244,6 @@ class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
         self.insee_code = address.get("insee_code")
         self.city = address.get("city")
         self.save()
-
-        self.jobseeker_profile.birth_place = CommuneFactory()
-        self.jobseeker_profile.birth_country = CountryFranceFactory()
-        self.jobseeker_profile.save()
 
 
 class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
