@@ -187,5 +187,7 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
     Suitable for employee records tests
     """
 
-    job_seeker = factory.SubFactory(JobSeekerWithMockedAddressFactory, with_hexa_address=True)
+    job_seeker = factory.SubFactory(
+        JobSeekerWithMockedAddressFactory, with_hexa_address=True, jobseeker_profile__with_education_level=True
+    )
     sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)

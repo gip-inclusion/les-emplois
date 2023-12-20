@@ -174,7 +174,10 @@ def test_candidatures_geiq_nominal(snapshot):
 
 
 def test_serializer_method_defaults():
-    ja = JobApplicationFactory(with_geiq_eligibility_diagnosis=False)
+    ja = JobApplicationFactory(
+        with_geiq_eligibility_diagnosis=False,
+        job_seeker__jobseeker_profile__education_level="",
+    )
     serializer = serializers.GeiqJobApplicationSerializer()
     assert serializer.get_criteres_eligibilite(ja) == []
     assert serializer.get_niveau_formation(ja) is None
