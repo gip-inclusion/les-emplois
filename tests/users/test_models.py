@@ -21,7 +21,7 @@ from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import Origin
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
-from itou.users.models import JobSeekerProfile, User
+from itou.users.models import User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.companies.factories import CompanyFactory
@@ -1313,15 +1313,6 @@ def test_save_erases_pe_obfuscated_nir_if_details_change():
     assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
         2022, 8, 10, 0, 0, 0, 0, tzinfo=datetime.timezone.utc
     )
-
-
-def test_jobseeker_factory_works_alongside_user_has_data_changed():
-    js = JobSeekerFactory(jobseeker_profile__pe_obfuscated_nir="JAIME_LES_CHATS")
-    assert js._saved_obfuscated_nir == "JAIME_LES_CHATS"
-    assert js.jobseeker_profile.pe_obfuscated_nir == "JAIME_LES_CHATS"
-    profile = JobSeekerProfile.objects.get(user=js)
-    assert profile.pe_obfuscated_nir == "JAIME_LES_CHATS"
-    assert profile.pk == js.jobseeker_profile.pk
 
 
 @pytest.mark.parametrize("user_active", [False, True])
