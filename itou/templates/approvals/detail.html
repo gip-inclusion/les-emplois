@@ -26,8 +26,10 @@
                                     </div>
                                 {% elif hire_by_other_siae %}
                                     <div class="col-12 col-lg-auto">
-                                        <span class="btn btn-block btn-link disabled text-muted">Suspendre</span>
-                                        <i class="btn btn-link ri-information-line ri-xl text-info ps-2 pe-3 font-weight-medium" data-bs-toggle="tooltip" title="La suspension n’est pas possible car un autre employeur a embauché le candidat."></i>
+                                        <div class="btn btn-ico">
+                                            <span class="disabled">Suspendre</span>
+                                            <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" title="La suspension n’est pas possible car un autre employeur a embauché le candidat."></i>
+                                        </div>
                                     </div>
                                 {% endif %}
                                 {% if approval_can_be_prolonged %}
