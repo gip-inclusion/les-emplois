@@ -228,24 +228,23 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
 
         return kwargs
 
-
-class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
-    # Needs ASP test fixtures installed
-
     @factory.post_generation
-    def set_approval_user(self, create, extracted, **kwargs):
-        if not create:
-            # Simple build, do nothing.
+    def with_mocked_address(self, create, extracted, **kwargs):
+        # Needs ASP test fixtures installed
+        if not extracted:
+            # Do nothing
             return
 
-        # Format user address randomly from an API mock: these are all valid addresses
         address = get_random_geocoding_api_result()
 
         self.address_line_1 = address.get("address_line_1")
         self.post_code = address.get("post_code")
         self.insee_code = address.get("insee_code")
         self.city = address.get("city")
-        self.save()
+        self.geocoding_score = address.get("score")
+        self.coords = f"POINT({address.get('longitude')} {address.get('latitude')})"
+        if create:
+            self.save()
 
 
 class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
