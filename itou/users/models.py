@@ -207,34 +207,6 @@ class User(AbstractUser, AddressMixin):
         blank=True,
     )
 
-    # The two following Pôle emploi fields are reserved for job seekers.
-    # They are used in the process of delivering an approval.
-    # They depend on each other: one or the other must be filled but not both.
-
-    # Pôle emploi ID is not guaranteed to be unique.
-    # At least, we haven't received any confirmation of its uniqueness.
-    # It looks like it pre-dates the national merger and may be unique
-    # by user and by region…
-    pole_emploi_id = models.CharField(
-        verbose_name="identifiant Pôle emploi",
-        help_text="7 chiffres suivis d'une 1 lettre ou d'un chiffre.",
-        max_length=8,
-        validators=[validate_pole_emploi_id, MinLengthValidator(8)],
-        blank=True,
-    )
-    lack_of_pole_emploi_id_reason = models.CharField(
-        verbose_name="pas d'identifiant Pôle emploi ?",
-        help_text=mark_safe(
-            "Indiquez la raison de l'absence d'identifiant Pôle emploi.<br>"
-            "Renseigner l'identifiant Pôle emploi des candidats inscrits "
-            "permet d'instruire instantanément votre demande.<br>"
-            "Dans le cas contraire un délai de deux jours est nécessaire "
-            "pour effectuer manuellement les vérifications d’usage."
-        ),
-        max_length=30,
-        choices=LackOfPoleEmploiId.choices,
-        blank=True,
-    )
     resume_link = models.URLField(max_length=500, verbose_name="lien vers un CV", blank=True)
 
     identity_provider = models.CharField(
