@@ -54,6 +54,7 @@ class AbstractCreateEmployeeRecordTest(TestCase):
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
             job_seeker_with_address=True,
+            job_seeker__born_in_france=True,
         )
 
         self.job_seeker = self.job_application.job_seeker

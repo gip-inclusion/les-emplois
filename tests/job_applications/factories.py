@@ -188,6 +188,9 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
     """
 
     job_seeker = factory.SubFactory(
-        JobSeekerWithMockedAddressFactory, with_hexa_address=True, jobseeker_profile__with_education_level=True
+        JobSeekerWithMockedAddressFactory,
+        with_hexa_address=True,
+        jobseeker_profile__with_education_level=True,
+        born_in_france=True,
     )
     sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
