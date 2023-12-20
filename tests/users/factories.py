@@ -232,8 +232,6 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
 class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
     # Needs ASP test fixtures installed
 
-    born_in_france = True
-
     @factory.post_generation
     def set_approval_user(self, create, extracted, **kwargs):
         if not create:
