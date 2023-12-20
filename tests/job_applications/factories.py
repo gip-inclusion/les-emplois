@@ -192,7 +192,7 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
     job_seeker = factory.SubFactory(
         JobSeekerWithAddressFactory,
         with_mocked_address=True,
-        with_hexa_address=True,
+        jobseeker_profile__with_hexa_address=True,
         jobseeker_profile__with_education_level=True,
         born_in_france=True,
     )

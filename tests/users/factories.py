@@ -138,7 +138,6 @@ class JobSeekerFactory(UserFactory):
             pole_emploi_id=factory.fuzzy.FuzzyText(length=8, chars=string.digits),
             jobseeker_profile__pole_emploi_since=AllocationDuration.MORE_THAN_24_MONTHS,
         )
-        with_hexa_address = factory.Trait(jobseeker_profile__with_hexa_address=True)
 
     @factory.lazy_attribute
     def nir(self):
