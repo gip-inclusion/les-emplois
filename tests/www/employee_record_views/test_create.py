@@ -15,7 +15,7 @@ from tests.asp.factories import CommuneFactory, CountryFranceFactory, CountryOut
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
-from tests.users.factories import JobSeekerWithAddressFactory, JobSeekerWithMockedAddressFactory
+from tests.users.factories import JobSeekerWithAddressFactory
 from tests.utils.test import TestCase
 
 
@@ -421,7 +421,9 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
-            job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True, with_pole_emploi_id=True),
+            job_seeker=JobSeekerWithAddressFactory(
+                born_in_france=True, with_pole_emploi_id=True, with_mocked_address=True
+            ),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
@@ -590,7 +592,7 @@ class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
-            job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True),
+            job_seeker=JobSeekerWithAddressFactory(born_in_france=True, with_mocked_address=True),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_4", args=(self.job_application.id,))
@@ -620,7 +622,7 @@ class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
-            job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True),
+            job_seeker=JobSeekerWithAddressFactory(born_in_france=True, with_mocked_address=True),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_5", args=(self.job_application.id,))
@@ -668,7 +670,7 @@ class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
-            job_seeker=JobSeekerWithMockedAddressFactory(born_in_france=True),
+            job_seeker=JobSeekerWithAddressFactory(born_in_france=True, with_mocked_address=True),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_5", args=(self.job_application.id,))
