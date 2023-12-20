@@ -258,11 +258,15 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.JobSeekerProfile
 
+    class Params:
+        with_education_level = factory.Trait(education_level=factory.fuzzy.FuzzyChoice(EducationLevel.values))
+
     user = factory.SubFactory(JobSeekerFactory)
+
+    education_level = factory.fuzzy.FuzzyChoice(EducationLevel.values + [""])
 
 
 class JobSeekerProfileWithHexaAddressFactory(JobSeekerProfileFactory):
-    education_level = random.choice(EducationLevel.values)
     # Adding a minimum profile with all mandatory fields
     # will avoid many mocks and convolutions during testing.
     hexa_lane_type = random.choice(LaneType.values)

@@ -703,7 +703,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.client.force_login(user)
 
         dummy_job_seeker = JobSeekerWithAddressFactory.build()
-        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build()
+        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build(with_education_level=True)
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -965,7 +965,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         self.client.force_login(user)
 
         dummy_job_seeker = JobSeekerWithAddressFactory.build()
-        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build()
+        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build(with_education_level=True)
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -1279,7 +1279,7 @@ class ApplyAsPrescriberTest(TestCase):
         self.client.force_login(user)
 
         dummy_job_seeker = JobSeekerWithAddressFactory.build()
-        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build()
+        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build(with_education_level=True)
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -1740,7 +1740,7 @@ class ApplyAsCompanyTest(TestCase):
         self.client.force_login(user)
 
         dummy_job_seeker = JobSeekerWithAddressFactory.build()
-        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build()
+        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build(with_education_level=True)
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -2061,7 +2061,7 @@ class DirectHireFullProcessTest(TestCase):
         self.client.force_login(user)
 
         dummy_job_seeker = JobSeekerWithAddressFactory.build()
-        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build()
+        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build(with_education_level=True)
 
         # Step determine the job seeker with a NIR.
         # ----------------------------------------------------------------------
