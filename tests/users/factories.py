@@ -138,11 +138,7 @@ class JobSeekerFactory(UserFactory):
             pole_emploi_id=factory.fuzzy.FuzzyText(length=8, chars=string.digits),
             jobseeker_profile__pole_emploi_since=AllocationDuration.MORE_THAN_24_MONTHS,
         )
-        with_hexa_address = factory.Trait(
-            jobseeker_profile=factory.RelatedFactory(
-                "tests.users.factories.JobSeekerProfileWithHexaAddressFactory", "user"
-            )
-        )
+        with_hexa_address = factory.Trait(jobseeker_profile__with_hexa_address=True)
 
     @factory.lazy_attribute
     def nir(self):
@@ -260,16 +256,13 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
 
     class Params:
         with_education_level = factory.Trait(education_level=factory.fuzzy.FuzzyChoice(EducationLevel.values))
+        with_hexa_address = factory.Trait(
+            hexa_lane_type=factory.fuzzy.FuzzyChoice(LaneType.values),
+            hexa_lane_name=factory.Faker("street_address", locale="fr_FR"),
+            hexa_post_code=factory.Faker("postalcode"),
+            hexa_commune=factory.SubFactory(CommuneFactory),
+        )
 
     user = factory.SubFactory(JobSeekerFactory)
 
     education_level = factory.fuzzy.FuzzyChoice(EducationLevel.values + [""])
-
-
-class JobSeekerProfileWithHexaAddressFactory(JobSeekerProfileFactory):
-    # Adding a minimum profile with all mandatory fields
-    # will avoid many mocks and convolutions during testing.
-    hexa_lane_type = random.choice(LaneType.values)
-    hexa_lane_name = factory.Faker("street_address", locale="fr_FR")
-    hexa_post_code = factory.Faker("postalcode")
-    hexa_commune = factory.SubFactory(CommuneFactory)
