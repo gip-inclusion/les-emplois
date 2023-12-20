@@ -12,7 +12,6 @@ from itou.job_applications.enums import Prequalification, ProfessionalSituationE
 from itou.jobs.models import Appellation
 from itou.utils.types import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory
-from tests.asp.factories import CommuneFactory, CountryFranceFactory
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from tests.prescribers.factories import (
@@ -21,7 +20,6 @@ from tests.prescribers.factories import (
 )
 from tests.users.factories import (
     JobSeekerFactory,
-    JobSeekerProfileWithHexaAddressFactory,
     JobSeekerWithMockedAddressFactory,
     PrescriberFactory,
 )
@@ -189,23 +187,5 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
     Suitable for employee records tests
     """
 
-    job_seeker = factory.SubFactory(JobSeekerWithMockedAddressFactory)
+    job_seeker = factory.SubFactory(JobSeekerWithMockedAddressFactory, with_hexa_address=True)
     sender_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory)
-
-    @factory.post_generation
-    def set_job_seeker_profile(self, create, extracted, **kwargs):
-        if not create:
-            # Simple build, do nothing.
-            return
-        # Create a profile for current user
-        # NOTE(vperron): We have to remove the profile after its creation because our new behaviour in User.save()
-        # forces us to have a JobSeekerProfile ready, immediately. We don't want to adapt the save() to handle a
-        # case that can only happen in tests though.
-        self.job_seeker.jobseeker_profile.delete()
-        self.job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory(
-            user=self.job_seeker,
-            birth_place=CommuneFactory(),
-            birth_country=CountryFranceFactory(),
-        )
-
-        self.job_seeker.save()
