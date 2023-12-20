@@ -119,6 +119,7 @@ class LaborInspectorFactory(UserFactory):
 class JobSeekerFactory(UserFactory):
     title = random.choice(Title.values)
     kind = UserKind.JOB_SEEKER
+    jobseeker_profile = factory.RelatedFactory("tests.users.factories.JobSeekerProfileFactory", "user")
 
     class Params:
         # Reminder : ASP models are "read-only", they must not be saved.
@@ -154,25 +155,12 @@ class JobSeekerFactory(UserFactory):
         validate_nir(nir)
         return nir
 
-    @factory.post_generation
-    def jobseeker_profile(obj, create, extracted, **kwargs):
-        if not create:
-            obj.jobseeker_profile = models.JobSeekerProfile(user=obj)
-        for k, v in kwargs.items():
-            if "__" in k:
-                raise ValueError("This is not a factory: __xxx are not supported")
-            setattr(obj.jobseeker_profile, k, v)
-
-        if create:
-            if extracted is False:
-                # Note: we should never use this lightly. This is only kept for backward compatibility
-                # with JobApplicationWithCompleteJobSeekerProfileFactory that needs the creation of a specific
-                # profile, that can not easily be created from a test (because notably of Faker) and would
-                # make a lot of code less DRY.
-                obj.jobseeker_profile.delete()
-                obj.jobseeker_profile = None
-            else:
-                obj.jobseeker_profile.save(update_fields=kwargs.keys())
+    @classmethod
+    def _adjust_kwargs(cls, **kwargs):
+        # Deactivate automatic creation of JobSeekerProfile in User.save
+        # since the RelatedFactory will take care of it
+        kwargs["_auto_create_job_seeker_profile"] = False
+        return kwargs
 
 
 class JobSeekerWithAddressFactory(JobSeekerFactory):
@@ -220,6 +208,7 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
 
     @classmethod
     def _adjust_kwargs(cls, **kwargs):
+        kwargs = super()._adjust_kwargs(**kwargs)
         # Using ZRR or QPV means that we must have some factories / data ready beforehand
         # Did not find a better way to do Traits additional setup...
         if kwargs.get("with_address_in_qpv"):
@@ -259,10 +248,12 @@ class JobSeekerWithMockedAddressFactory(JobSeekerFactory):
         self.jobseeker_profile.save()
 
 
-class JobSeekerProfileWithHexaAddressFactory(factory.django.DjangoModelFactory):
+class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.JobSeekerProfile
 
+
+class JobSeekerProfileWithHexaAddressFactory(JobSeekerProfileFactory):
     education_level = random.choice(EducationLevel.values)
     # JobSeeker are created with a Pôle emploi ID
     pole_emploi_since = AllocationDuration.MORE_THAN_24_MONTHS
