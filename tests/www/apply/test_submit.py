@@ -45,7 +45,6 @@ from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
-    JobSeekerProfileWithHexaAddressFactory,
     JobSeekerWithAddressFactory,
     PrescriberFactory,
 )
@@ -702,8 +701,10 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         user = prescriber_organization.members.first()
         self.client.force_login(user)
 
-        dummy_job_seeker = JobSeekerWithAddressFactory.build()
-        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build(with_education_level=True)
+        dummy_job_seeker = JobSeekerWithAddressFactory.build(
+            jobseeker_profile__with_hexa_address=True,
+            jobseeker_profile__with_education_level=True,
+        )
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -964,8 +965,10 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         user = prescriber_organization.members.first()
         self.client.force_login(user)
 
-        dummy_job_seeker = JobSeekerWithAddressFactory.build()
-        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build(with_education_level=True)
+        dummy_job_seeker = JobSeekerWithAddressFactory.build(
+            jobseeker_profile__with_hexa_address=True,
+            jobseeker_profile__with_education_level=True,
+        )
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -1278,8 +1281,10 @@ class ApplyAsPrescriberTest(TestCase):
         user = PrescriberFactory()
         self.client.force_login(user)
 
-        dummy_job_seeker = JobSeekerWithAddressFactory.build()
-        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build(with_education_level=True)
+        dummy_job_seeker = JobSeekerWithAddressFactory.build(
+            jobseeker_profile__with_hexa_address=True,
+            jobseeker_profile__with_education_level=True,
+        )
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -1739,8 +1744,10 @@ class ApplyAsCompanyTest(TestCase):
         user = company.members.first()
         self.client.force_login(user)
 
-        dummy_job_seeker = JobSeekerWithAddressFactory.build()
-        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build(with_education_level=True)
+        dummy_job_seeker = JobSeekerWithAddressFactory.build(
+            jobseeker_profile__with_hexa_address=True,
+            jobseeker_profile__with_education_level=True,
+        )
 
         # Entry point.
         # ----------------------------------------------------------------------
@@ -2060,8 +2067,10 @@ class DirectHireFullProcessTest(TestCase):
         user = company.members.first()
         self.client.force_login(user)
 
-        dummy_job_seeker = JobSeekerWithAddressFactory.build()
-        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build(with_education_level=True)
+        dummy_job_seeker = JobSeekerWithAddressFactory.build(
+            jobseeker_profile__with_hexa_address=True,
+            jobseeker_profile__with_education_level=True,
+        )
 
         # Step determine the job seeker with a NIR.
         # ----------------------------------------------------------------------
@@ -3770,8 +3779,9 @@ class FindJobSeekerForHireViewTestCase(TestCase):
         user = self.company.members.first()
         self.client.force_login(user)
 
-        dummy_job_seeker = JobSeekerWithAddressFactory.build()
-        dummy_job_seeker.jobseeker_profile = JobSeekerProfileWithHexaAddressFactory.build()
+        dummy_job_seeker = JobSeekerWithAddressFactory.build(
+            jobseeker_profile__with_hexa_address=True,
+        )
 
         response = self.client.get(self.check_nir_url)
         self.assertContains(response, "Déclarer une embauche")
