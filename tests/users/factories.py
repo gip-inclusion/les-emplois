@@ -172,7 +172,6 @@ class JobSeekerFactory(UserFactory):
                 obj.jobseeker_profile.delete()
                 obj.jobseeker_profile = None
             else:
-                obj._saved_obfuscated_nir = obj.jobseeker_profile.pe_obfuscated_nir
                 obj.jobseeker_profile.save(update_fields=kwargs.keys())
 
 
