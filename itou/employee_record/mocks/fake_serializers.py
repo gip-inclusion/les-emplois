@@ -10,8 +10,9 @@ class TestEmployeeRecordSerializer(EmployeeRecordSerializer):
     def to_representation(self, instance):
         """
         Test version of the employee record serializer
-        Basically uses the ASP_ID -> SIRET mapping to be aligned with ASP test platform
-        (only a limited predefined set of SIAE/SIRET/Financial annex number is possible)
+
+        Align data with the ASP's "validation" platform as only a limited
+        predefined set of SIAE/SIRET/Financial annex number is possible.
         """
 
         result = super().to_representation(instance)
@@ -29,9 +30,10 @@ class TestEmployeeRecordBatchSerializer(EmployeeRecordBatchSerializer):
 class TestEmployeeRecordUpdateNotificationSerializer(EmployeeRecordUpdateNotificationSerializer):
     def to_representation(self, instance):
         """
-        Test version of the employee record serializer
-        Basically uses the ASP_ID -> SIRET mapping to be aligned with ASP test platform
-        (only a limited predefined set of SIAE/SIRET/Financial annex number is possible)
+        Test version of the employee record notification serializer
+
+        Align data with the ASP's "validation" platform as only a limited
+        predefined set of SIAE/SIRET/Financial annex number is possible.
         """
 
         result = super().to_representation(instance)
