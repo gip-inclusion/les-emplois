@@ -48,27 +48,24 @@ class Command(BaseCommand):
             self.stdout.write(" - done!")
 
     def _check_orphans(self, dry_run):
-        # Report all orphans employee records (bad asp_id)
-
-        # Exclude the one that are already DISABLED, and also the ARCHIVED ones as they are now unusable
-        orphans = EmployeeRecord.objects.orphans().exclude(status__in=[Status.DISABLED, Status.ARCHIVED])
+        # Exclude the ones that are already ARCHIVED as they are already unusable
+        orphans = EmployeeRecord.objects.orphans().exclude(status__in=[Status.ARCHIVED])
 
         self.stdout.write("* Checking orphans employee records:")
 
-        if len(orphans) == 0:
+        orphans_count = orphans.count()
+        if not orphans_count:
             self.stdout.write(" - none found (great!)")
         else:
-            self.stdout.write(f" - found {len(orphans)} orphan(s)")
+            self.stdout.write(f" - found {orphans_count} orphan(s)")
 
             if dry_run:
                 return
 
-            self.stdout.write(" - fixing orphans: switching status to DISABLED")
+            self.stdout.write(" - fixing orphans: switching status to ARCHIVED")
 
             with transaction.atomic():
-                for orphan in orphans:
-                    if orphan.can_be_disabled:
-                        orphan.update_as_disabled()
+                orphans.update(status=Status.ARCHIVED)
 
             self.stdout.write(" - done!")
 
