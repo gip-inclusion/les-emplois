@@ -61,7 +61,7 @@ class ApplicantsAPITest(APITestCase):
         assert response.status_code == 403
 
     def test_login_as_siae(self):
-        # Connect with an admin user with member of a sigle SIAE
+        # Connect with an admin user with member of a single SIAE
         user = CompanyFactory(with_membership=True).members.first()
         self.client.force_authenticate(user)
 
