@@ -20,6 +20,7 @@ urlpatterns = [
         name="stats_siae_follow_siae_evaluation",
     ),
     # Prescriber stats - CD.
+    path("cd/iae", views.stats_cd_iae, name="stats_cd_iae"),
     path("cd/hiring", views.stats_cd_hiring, name="stats_cd_hiring"),
     path("cd/brsa", views.stats_cd_brsa, name="stats_cd_brsa"),
     path("cd/aci", views.stats_cd_aci, name="stats_cd_aci"),

@@ -44,20 +44,27 @@
                         </a>
                     </li>
                 {% endif %}
+                {% if can_view_stats_cd %}
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_cd_iae' %}" class="btn-link btn-ico">
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                            <span>Voir les données IAE de mon département</span>
+                        </a>
+                        {% include "dashboard/includes/stats_new_badge.html" %}
+                    </li>
+                {% endif %}
                 {% if can_view_stats_cd_whitelist %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_cd_hiring' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Voir les données facilitation de l'embauche</span>
                         </a>
-                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_cd_brsa' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Suivre les prescriptions des accompagnateurs des publics bRSA</span>
                         </a>
-                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                 {% endif %}
                 {% if can_view_stats_cd_aci %}
@@ -66,7 +73,6 @@
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Suivi du cofinancement des ACI</span>
                         </a>
-                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                 {% endif %}
                 {% if can_view_stats_pe %}

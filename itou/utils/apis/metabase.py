@@ -45,6 +45,11 @@ METABASE_DASHBOARDS = {
     #
     # Prescriber stats - CD.
     #
+    "stats_cd_iae": {
+        "dashboard_id": 118,
+        "tally_popup_form_id": "npD4g8",
+        "tally_embed_form_id": "m6ZrqY",
+    },
     "stats_cd_hiring": {
         "dashboard_id": 346,
     },
