@@ -281,6 +281,11 @@ def render_stats_cd(request, page_title, params=None):
 
 
 @login_required
+def stats_cd_iae(request):
+    return render_stats_cd(request=request, page_title="Données IAE")
+
+
+@login_required
 def stats_cd_hiring(request):
     if not utils.can_view_stats_cd_whitelist(request):
         raise PermissionDenied
