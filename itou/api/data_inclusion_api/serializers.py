@@ -84,7 +84,7 @@ class CompanySerializer(serializers.ModelSerializer):
             # for this asp_id on another siae : use the oldest.
             a_parent_siae = (
                 Company.objects.exclude(source=Company.SOURCE_USER_CREATED)
-                .filter(convention__asp_id=obj.asp_id)
+                .filter(convention=obj.convention, siret__startswith=obj.siren)
                 .order_by("created_at", "pk")
                 .first()
             )
