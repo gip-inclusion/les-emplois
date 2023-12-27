@@ -309,12 +309,6 @@ class Company(AddressMixin, OrganizationAbstract):
         return self.convention and self.convention.is_active
 
     @property
-    def asp_id(self):
-        if self.convention:
-            return self.convention.asp_id
-        return None
-
-    @property
     def is_opcs(self):
         return self.kind == CompanyKind.OPCS
 

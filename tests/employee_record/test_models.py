@@ -515,7 +515,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         old_company = self.employee_record.job_application.to_company
 
         assert self.employee_record.siret == old_company.siret
-        assert self.employee_record.asp_id == old_company.asp_id
+        assert self.employee_record.asp_id == old_company.convention.asp_id
 
         self.employee_record.update_as_sent(self.faker.unique.asp_batch_filename(), 1, None)
         self.employee_record.update_as_processed("", "", None)
@@ -529,7 +529,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.employee_record.update_as_new()
 
         assert self.employee_record.siret == new_company.siret
-        assert self.employee_record.asp_id == new_company.asp_id
+        assert self.employee_record.asp_id == new_company.convention.asp_id
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",

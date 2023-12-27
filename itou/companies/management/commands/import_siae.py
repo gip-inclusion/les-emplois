@@ -139,7 +139,7 @@ class Command(BaseCommand):
         ):
             assert siae.should_have_convention
 
-            asp_id = siae.asp_id
+            asp_id = siae.convention.asp_id
             row = ASP_ID_TO_SIAE_ROW.get(asp_id)
 
             if row is None:
