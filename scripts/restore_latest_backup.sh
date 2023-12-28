@@ -17,11 +17,10 @@ source "$PATH_TO_ITOU_BACKUPS/.env"
 
 db_name="${1:-$PGDATABASE}"
 backup_folder="${PATH_TO_ITOU_BACKUPS}/backups"
-default_rclone_conf="$HOME/.config/rclone/rclone.conf"
-rclone_conf="${PATH_TO_RCLONE_CONF:-$default_rclone_conf}"
+export RCLONE_CONFIG=${RCLONE_CONFIG:-"$PATH_TO_ITOU_BACKUPS/rclone.conf"}
 
-rclone_last_backup="$(rclone lsf --config "$rclone_conf" --files-only --max-age 24h emplois:/encrypted-backups)"
-rclone copy  --config "$rclone_conf" --max-age 24h --progress "emplois:/encrypted-backups/${rclone_last_backup}" "$backup_folder"
+rclone_last_backup="$(rclone lsf --files-only --max-age 24h emplois:/encrypted-backups)"
+rclone copy --max-age 24h --progress "emplois:/encrypted-backups/${rclone_last_backup}" "$backup_folder"
 backup_file="${backup_folder}/${rclone_last_backup}"
 echo "Restoring ${backup_file} to ${db_name} database"
 pg_restore --dbname="${db_name}" --format=c --clean --no-owner --jobs=4 --verbose "${backup_file}"
