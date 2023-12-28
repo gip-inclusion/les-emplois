@@ -8,7 +8,7 @@
                 {% if job_description.is_from_pole_emploi %}
                     <span class="font-weight-bold">{{ job_description.market_context_description | default:"Entreprise anonyme" }}</span>
                     {% if job_description.is_pec_offer %}
-                        <span class="badge rounded-pill badge-sm bg-accent-02-lighter font-weight-normal">Réservé au public éligible au contrat PEC</span>
+                        <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary">Réservé au public éligible au contrat PEC</span>
                     {% endif %}
                 {% else %}
                     <a class="matomo-event btn btn-sm btn-ico btn-link text-start p-0 mh-auto"
@@ -25,7 +25,7 @@
             </div>
             {% if job_description.company.kind in ea_eatt_kinds %}
                 <div>
-                    <span class="badge rounded-pill badge-sm bg-accent-01-lightest text-accent-01">Priorité aux bénéficiaires de la RQTH</span>
+                    <span class="badge badge-sm rounded-pill bg-accent-01-lightest text-accent-01">Priorité aux bénéficiaires de la RQTH</span>
                 </div>
             {% endif %}
         </div>
