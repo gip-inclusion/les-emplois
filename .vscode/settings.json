@@ -18,14 +18,14 @@
         "comments": false,
         "strings": true
     },
-    "editor.wordBasedSuggestions": true,
+    "editor.wordBasedSuggestions": "matchingDocuments",
     "files.trimTrailingWhitespace": true,
     "html.format.enable": true,
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter",
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
-            "source.organizeImports": true
+            "source.organizeImports": "explicit"
         }
     },
     "explorer.confirmDragAndDrop": false,
