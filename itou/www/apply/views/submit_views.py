@@ -587,6 +587,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         return {
             k: v
             for k, v in self.job_seeker_session.get("user").items()
+            # TODO(xfernandez): remove pole_emploi_id & lack_of_pole_emploi_id_reason in a few weeks
             if k not in ["city_slug", "lack_of_nir", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
         }
 
