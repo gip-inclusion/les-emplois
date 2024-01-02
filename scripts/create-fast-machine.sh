@@ -14,19 +14,10 @@ if [[ ! $RUN_DIRECTORY =~ "scripts" ]]; then
    exit 1
 fi
 
-# If the script is loaded from the root we can import the local environment variables
-# shellcheck source=/dev/null
-source .env
-if [ -z "$CLEVER_TOKEN" ]; then
-  echo "please add 'CLEVER_TOKEN=some_token' in .env at the root of the project in order to run this script. You can find its value with 'clever login'"
+if [ ! -f "$HOME/.config/clever-cloud/clever-tools.json" ]; then
+  echo "clever-tools doesn't seems to be initialized, run 'clever login' to do so."
   exit 1
 fi
-if [ -z "$CLEVER_SECRET" ]; then
-  echo "please add 'CLEVER_SECRET=some_secret' in .env at the root of the project in order to run this script. You can find its value with 'clever login'"
-  exit 1
-fi
-
-clever login --token "$CLEVER_TOKEN" --secret "$CLEVER_SECRET"
 
 APP_NAME=c1-fast-machine-$(date +%y-%m-%d-%Hh-%M)
 
