@@ -584,7 +584,11 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         self.profile = None
 
     def _get_user_data_from_session(self):
-        return {k: v for k, v in self.job_seeker_session.get("user").items() if k not in ["city_slug", "lack_of_nir"]}
+        return {
+            k: v
+            for k, v in self.job_seeker_session.get("user").items()
+            if k not in ["city_slug", "lack_of_nir", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+        }
 
     def _get_profile_data_from_session(self):
         # Dummy fields used by CreateOrUpdateJobSeekerStep3Form()
