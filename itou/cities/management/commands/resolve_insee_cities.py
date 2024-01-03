@@ -19,7 +19,7 @@ import logging
 from django.core.management.base import BaseCommand
 
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE, resolve_insee_city
-from itou.companies.models import Siae
+from itou.companies.models import Company
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -46,15 +46,15 @@ class Command(BaseCommand):
             action="store",
             dest="mode",
             type=str,
-            choices=["siaes", "prescribers", "job_seekers"],
+            choices=["companies", "prescribers", "job_seekers"],
             required=True,
         )
 
     def handle(self, wet_run, mode, **options):
-        if mode == "siaes":
-            queryset = Siae.objects.active()
-            model = Siae
-            model_name = "SIAE"
+        if mode == "companies":
+            queryset = Company.objects.active()
+            model = Company
+            model_name = "Company"
         elif mode == "prescribers":
             queryset = PrescriberOrganization.objects.filter(members__is_active=True)
             model = PrescriberOrganization

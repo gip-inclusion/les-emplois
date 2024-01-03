@@ -8,7 +8,7 @@
   "10 * * * * $ROOT/clevercloud/run_management_command.sh pe_certify_users --wet-run",
   "15 * * * * $ROOT/clevercloud/run_management_command.sh sanitize_employee_records",
 
-  "0 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=siaes",
+  "0 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=companies",
   "20 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=prescribers",
   "40 * * * * $ROOT/clevercloud/run_management_command.sh resolve_insee_cities --wet-run --mode=job_seekers",
 

@@ -7,12 +7,12 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
     dependencies = [
         ("cities", "0003_city_edition_mode"),
-        ("companies", "0005_siaejobdescription_creation_source"),
+        ("companies", "0011_rename_siae_companymembership_company_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name="siae",
+            model_name="company",
             name="insee_city",
             field=models.ForeignKey(
                 blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to="cities.city"

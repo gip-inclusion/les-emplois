@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
     dependencies = [
         ("cities", "0003_city_edition_mode"),
-        ("institutions", "0007_create_all_ddets_log"),
+        ("institutions", "0008_alter_institution_kind"),
     ]
 
     operations = [
