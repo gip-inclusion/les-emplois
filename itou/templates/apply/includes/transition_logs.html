@@ -1,13 +1,10 @@
-<ul id="transition_logs_{{ job_application.pk }}"{% if out_of_band_swap %} hx-swap-oob="true"{% endif %}>
+<ul class="list-step" id="transition_logs_{{ job_application.pk }}"{% if out_of_band_swap %} hx-swap-oob="true"{% endif %}>
     {% for log in transition_logs %}
         <li>
-            Passé en "<b>{{ log.pretty_to_state }}</b>"
-            <ul>
-                {% if log.to_state != job_application.state.workflow.STATE_OBSOLETE and not request.user.is_job_seeker %}
-                    <li>Par {{ log.user.get_full_name }}</li>
-                {% endif %}
-                <li>Le {{ log.timestamp|date:"d F Y à H:i" }}</li>
-            </ul>
+            <time datetime="{{ log.timestamp|date:"d F Y à H:i" }}">Le {{ log.timestamp|date:"d F Y à H:i" }}</time>
+            <span>
+                Passé en "<b>{{ log.pretty_to_state }}</b>"
+            </span>
         </li>
     {% endfor %}
 </ul>

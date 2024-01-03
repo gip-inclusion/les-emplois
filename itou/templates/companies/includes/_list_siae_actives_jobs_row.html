@@ -1,6 +1,6 @@
 {% comment %} takes 2 arguments: job=<JobDescription> is_appended=<Bool> {% endcomment %}
 
-<li class="list-group-item list-group-item-action px-0 py-2 {% if is_appended %}border-top{% endif %}">
+<li class="list-group-item list-group-item-action py-2 {% if is_appended %}border-top{% endif %}">
     <a class="d-flex flex-wrap align-items-center text-decoration-none matomo-event"
        href="{% if job.pk %}{{ job.get_absolute_url }}{% else %}#{% endif %}?back_url={{ request.get_full_path|urlencode }}"
        data-matomo-category="candidature"

@@ -180,11 +180,17 @@ class ProcessViewsTest(TestCase):
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertContains(response, "Modifier les informations")
-        self.assertContains(response, "Adresse : <span>Non renseignée</span>", html=True)
-        self.assertContains(response, "Téléphone : <span>Non renseigné</span>", html=True)
-        self.assertContains(response, "CV : <span>Non renseigné</span>", html=True)
-        self.assertContains(response, "Identifiant Pôle emploi : <span>Non renseigné</span>", html=True)
-        self.assertContains(response, "Numéro de sécurité sociale : <span>Non renseigné</span>", html=True)
+        self.assertContains(response, '<small>Adresse</small><i class="text-disabled">Non renseignée</i>', html=True)
+        self.assertContains(response, '<small>Téléphone</small><i class="text-disabled">Non renseigné</i>', html=True)
+        self.assertContains(
+            response, '<small>Curriculum vitae</small><i class="text-disabled">Non renseigné</i>', html=True
+        )
+        self.assertContains(
+            response, '<small>Identifiant Pôle emploi</small><i class="text-disabled">Non renseigné</i>', html=True
+        )
+        self.assertContains(
+            response, '<small>Numéro de sécurité sociale</small><i class="text-disabled">Non renseigné</i>', html=True
+        )
 
         job_application.job_seeker.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
         job_application.job_seeker.save()
@@ -201,7 +207,9 @@ class ProcessViewsTest(TestCase):
         )
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertNotContains(response, "CV : <span>Non renseigné</span>", html=True)
+        self.assertNotContains(
+            response, '<small>Curriculum vitae</small><i class="text-disabled">Non renseigné</i>', html=True
+        )
         self.assertContains(response, resume_link)
 
         # 2/ Job application was sent with an attached resume
@@ -260,13 +268,17 @@ class ProcessViewsTest(TestCase):
         # Sender phone is displayed
         self.assertContains(response, format_phone(job_application.sender.phone))
 
-        self.assertContains(response, "Adresse : <span>Non renseignée</span>", html=True)
-        self.assertContains(response, "CV : <span>Non renseigné</span>", html=True)
+        self.assertContains(response, '<small>Adresse</small><i class="text-disabled">Non renseignée</i>', html=True)
+        self.assertContains(
+            response, '<small>Curriculum vitae</small><i class="text-disabled">Non renseigné</i>', html=True
+        )
 
         job_application.job_seeker.nir = ""
         job_application.job_seeker.save()
         response = self.client.get(url)
-        self.assertContains(response, "Numéro de sécurité sociale : <span>Non renseigné</span>", html=True)
+        self.assertContains(
+            response, '<small>Numéro de sécurité sociale</small><i class="text-disabled">Non renseigné</i>', html=True
+        )
 
         job_application.job_seeker.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
         job_application.job_seeker.save()
@@ -298,9 +310,9 @@ class ProcessViewsTest(TestCase):
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertContains(response, format_nir(job_application.job_seeker.nir))
-        self.assertContains(response, "Prénom : <b>S…</b>", html=True)
-        self.assertContains(response, "Nom : <b>U…</b>", html=True)
-        self.assertContains(response, '<span class="text-muted">S… U…</span>', html=True)
+        self.assertContains(response, "<small>Prénom</small><strong>S…</strong>", html=True)
+        self.assertContains(response, "<small>Nom</small><strong>U…</strong>", html=True)
+        self.assertContains(response, "S… U…")
         self.assertNotContains(response, job_application.job_seeker.email)
         self.assertNotContains(response, job_application.job_seeker.phone)
         self.assertNotContains(response, job_application.job_seeker.post_code)
@@ -323,11 +335,11 @@ class ProcessViewsTest(TestCase):
         self.assertContains(response, job_seeker.post_code)
         self.assertContains(response, job_seeker.address_line_1)
         self.assertContains(response, job_seeker.city)
-        self.assertContains(response, f"Prénom : <b>{job_seeker.first_name}</b>", html=True)
-        self.assertContains(response, f"Nom : <b>{job_seeker.last_name}</b>", html=True)
+        self.assertContains(response, f"<small>Prénom</small><strong>{job_seeker.first_name}</strong>", html=True)
+        self.assertContains(response, f"<small>Nom</small><strong>{job_seeker.last_name}</strong>", html=True)
         self.assertContains(
             response,
-            f'<span class="text-muted">{job_seeker.first_name} {job_seeker.last_name.upper()}</span>',
+            f"{job_seeker.first_name} {job_seeker.last_name.upper()}",
             html=True,
         )
 
@@ -368,8 +380,9 @@ class ProcessViewsTest(TestCase):
 
         self.assertIsNotNone(html_fragment)
         self.assertEqual(html_fragment.b.string, jatl.pretty_to_state)
-        self.assertTrue(html_fragment.find("li", string=f"Par {jatl.user.get_full_name()}"))
-        self.assertTrue(html_fragment.find("li", string=f'Le {date_format(localtime(jatl.timestamp), "d F Y à H:i")}'))
+        self.assertTrue(
+            html_fragment.find("time", string=f'Le {date_format(localtime(jatl.timestamp), "d F Y à H:i")}')
+        )
 
     def test_details_for_job_seeker_with_transition_logs(self, *args, **kwargs):
         """As a prescriber, I can access transition logs for job_applications details for prescribers."""
@@ -388,8 +401,9 @@ class ProcessViewsTest(TestCase):
         self.assertIsNotNone(html_fragment)
         self.assertEqual(html_fragment.b.string, jatl.pretty_to_state)
         # transition logs user is hidden for job seeker
-        self.assertFalse(html_fragment.find("li", string=f"Par {jatl.user.get_full_name()}"))
-        self.assertTrue(html_fragment.find("li", string=f'Le {date_format(localtime(jatl.timestamp), "d F Y à H:i")}'))
+        self.assertTrue(
+            html_fragment.find("time", string=f'Le {date_format(localtime(jatl.timestamp), "d F Y à H:i")}')
+        )
 
     def test_details_for_job_seeker_when_refused(self, *args, **kwargs):
         job_application = JobApplicationFactory(
@@ -402,11 +416,15 @@ class ProcessViewsTest(TestCase):
         self.client.force_login(job_application.job_seeker)
         url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertContains(response, '<h4 class="h6 mt-3">Message envoyé au candidat</h4>', html=True)
+        self.assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
         self.assertContains(response, f"<p>{job_application.answer}</p>", html=True)
-        self.assertNotContains(response, '<h4 class="h6 mt-3">Commentaire privé de l\'employeur</h4>')
+        self.assertNotContains(response, "<small>Commentaire privé de l'employeur</small>")
         self.assertNotContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
-        self.assertNotContains(response, "<b>Motif de refus :</b> Autre (détails dans le message ci-dessous)")
+        self.assertNotContains(
+            response,
+            "<small>Motif de refus</small><strong>Autre (détails dans le message ci-dessous)</strong>",
+            html=True,
+        )
 
     def test_details_for_prescriber_when_refused(self, *args, **kwargs):
         job_application = JobApplicationFactory(
@@ -420,11 +438,15 @@ class ProcessViewsTest(TestCase):
         self.client.force_login(prescriber)
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertContains(response, '<h4 class="h6 mt-3">Message envoyé au candidat</h4>', html=True)
+        self.assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
         self.assertContains(response, f"<p>{job_application.answer}</p>", html=True)
-        self.assertContains(response, '<h4 class="h6 mt-3">Commentaire privé de l\'employeur</h4>')
+        self.assertContains(response, "<small>Commentaire privé de l'employeur</small>")
         self.assertContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
-        self.assertContains(response, "<b>Motif de refus :</b> Autre (détails dans le message ci-dessous)")
+        self.assertContains(
+            response,
+            "<small>Motif de refus</small><strong>Autre (détails dans le message ci-dessous)</strong>",
+            html=True,
+        )
 
     def test_company_information_displayed_for_prescriber_when_refused(self, *args, **kwargs):
         """
@@ -653,9 +675,15 @@ class ProcessViewsTest(TestCase):
                 response = self.client.get(next_url)
                 # test case hiring_end_at
                 if hiring_end_at:
-                    self.assertContains(response, f"Fin : {hiring_end_at:%d}")
+                    self.assertContains(
+                        response,
+                        f"<small>Fin</small><strong>{date_format(hiring_end_at, 'd F Y')}</strong>",
+                        html=True,
+                    )
                 else:
-                    self.assertContains(response, "Fin : Non renseigné")
+                    self.assertContains(
+                        response, '<small>Fin</small><i class="text-disabled">Non renseigné</i>', html=True
+                    )
                 # last_checked_at has been updated
                 assert job_application.job_seeker.last_checked_at > previous_last_checked_at
 

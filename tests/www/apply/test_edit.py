@@ -1,6 +1,6 @@
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import dateformat, timezone
 
 from itou.job_applications.models import JobApplication
 from itou.utils.widgets import DuetDatePickerWidget
@@ -85,7 +85,9 @@ class EditContractTest(TestCase):
 
         # test how hiring_end_date is displayed
         response = self.client.get(next_url)
-        self.assertContains(response, f"Fin : {future_end_date:%d}")
+        self.assertContains(
+            response, f"<small>Fin</small><strong>{dateformat.format(future_end_date, 'd F Y')}</strong>", html=True
+        )
 
     def test_future_contract_date_without_hiring_end_at(self):
         """
@@ -131,7 +133,7 @@ class EditContractTest(TestCase):
 
         # test how hiring_end_date is displayed
         response = self.client.get(next_url)
-        self.assertContains(response, "Fin : Non renseigné")
+        self.assertContains(response, '<small>Fin</small><i class="text-disabled">Non renseigné</i>', html=True)
 
     def test_past_contract_date(self):
         """

@@ -10,10 +10,12 @@
 {% endblock %}
 
 {% block content_title %}
-    <h1>
-        Candidature de <span class="text-muted">{{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}</span>
-    </h1>
-    <p>{% state_badge job_application %}</p>
+    <div class="d-md-flex align-items-center mb-3">
+        <h1 class="mb-1 mb-md-0 me-3">
+            Candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+        </h1>
+        {% state_badge job_application extra_class="badge-base" %}
+    </div>
 {% endblock %}
 
 {% block content %}

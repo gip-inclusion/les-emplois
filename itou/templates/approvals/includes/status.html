@@ -14,18 +14,18 @@ Arguments:
 {% endcomment %}
 
 {% if common_approval.is_pass_iae %}
-    <p class="text-center">
+    <div class="text-center mb-3">
         {% if common_approval.is_suspended %}
-            <img src="{% static 'img/pass_iae/logo_pass_iae_suspended.svg' %}" alt="Logo du PASS IAE">
+            <img src="{% static 'img/pass_iae/logo_pass_iae_suspended.svg' %}" width="180" alt="Logo du PASS IAE">
             <br>
             <span class="badge badge-base rounded-pill bg-success-lighter text-success">
                 <i class="ri-pass-pending-line" aria-hidden="true"></i>
                 Valide (suspendu)
             </span>
         {% else %}
-            <img src="{% static 'img/pass_iae/logo_pass_iae.svg' %}" alt="Logo du PASS IAE">
+            <img src="{% static 'img/pass_iae/logo_pass_iae.svg' %}" width="180" alt="Logo du PASS IAE">
         {% endif %}
-    </p>
+    </div>
 {% endif %}
 
 <div class="ps-3 border-start approval-left-border">
