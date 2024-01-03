@@ -8,7 +8,7 @@ register = template.Library()
 
 
 @register.simple_tag
-def state_badge(job_application, *, hx_swap_oob=False):
+def state_badge(job_application, *, hx_swap_oob=False, extra_class="badge-sm mb-1"):
     state_classes = {
         JobApplicationWorkflow.STATE_ACCEPTED: "bg-success",
         JobApplicationWorkflow.STATE_CANCELLED: "bg-primary",
@@ -21,7 +21,7 @@ def state_badge(job_application, *, hx_swap_oob=False):
     }[job_application.state]
     attrs = [
         f'id="state_{ job_application.pk }"',
-        f'class="badge badge-sm rounded-pill text-wrap mb-1 { state_classes }"',
+        f'class="badge rounded-pill text-wrap { extra_class } { state_classes }"',
     ]
     if hx_swap_oob:
         attrs.append('hx-swap-oob="true"')

@@ -1,10 +1,9 @@
 {% load django_bootstrap5 %}
 {% load format_filters %}
 
-<div>
-    {# Job application accepted: details -------------------------------------------------------------------- #}
-    {% if job_application.state.is_accepted %}
-        <hr>
+{# Job application accepted: details -------------------------------------------------------------------- #}
+{% if job_application.state.is_accepted %}
+    <div class="c-box mb-4">
         <h3>Détails du contrat de travail</h3>
 
         {# GEIQ only #}
@@ -15,26 +14,41 @@
             </p>
         {% endif %}
 
-        <p>
-            Poste retenu :
-            {% if job_application.hired_job %}
-                {{ job_application.hired_job }} à {{ job_application.hired_job.display_location }}
-            {% else %}
-                non renseigné
-            {% endif %}
-        </p>
+        <ul class="list-data">
+            <li>
+                <small>Poste retenu</small>
+                {% if job_application.hired_job %}
+                    <strong>{{ job_application.hired_job }} à {{ job_application.hired_job.display_location }}</strong>
+                {% else %}
+                    <i class="text-disabled">Non renseigné</i>
+                {% endif %}
+            </li>
+        </ul>
 
-        <ul>
-            <li>Début : {{ job_application.hiring_start_at|date:"d F Y" }}</li>
-            <li>Fin : {{ job_application.hiring_end_at|date:"d F Y"|default:"Non renseigné" }}</li>
+        <ul class="list-data list-data__two-column-lg">
+            <li>
+                <small>Début</small>
+                {% if job_application.hiring_start_at %}
+                    <strong>{{ job_application.hiring_start_at|date:"d F Y" }}</strong>
+                {% else %}
+                    <i class="text-disabled">Non renseigné</i>
+                {% endif %}
+            </li>
+            <li>
+                <small>Fin</small>
+                {% if job_application.hiring_end_at %}
+                    <strong>{{ job_application.hiring_end_at|date:"d F Y" }}</strong>
+                {% else %}
+                    <i class="text-disabled">Non renseigné</i>
+                {% endif %}
+            </li>
         </ul>
 
         {% if job_application.can_update_hiring_start %}
-            <p>
-                <a href="{% url 'apply:edit_contract_start_date' job_application_id=job_application.pk %}" class="btn btn-outline-primary btn-block">
-                    Modifier la période du contrat de travail
-                </a>
-            </p>
+            <a href="{% url 'apply:edit_contract_start_date' job_application_id=job_application.pk %}" class="btn btn-ico btn-secondary">
+                <i class="ri-pencil-line font-weight-medium" aria-hidden="true"></i>
+                <span>Modifier la période du contrat de travail</span>
+            </a>
         {% endif %}
-    {% endif %}
-</div>
+    </div>
+{% endif %}

@@ -1,33 +1,60 @@
 {% load str_filters %}
-<ul>
+
+<ul class="list-data list-data__two-column-lg">
     {% if request.user.is_prescriber or request.user.is_job_seeker %}
         <li>
-            Employeur : <b>{{ job_application.to_company.display_name }}</b>
+            <small>Employeur</small>
+            <strong>{{ job_application.to_company.display_name }}</strong>
         </li>
     {% endif %}
     <li>
-        Date de la candidature : <b>{{ job_application.created_at|date:"d F Y à H:i" }}</b>
+        <small>Date de candidature</small>
+        <strong>{{ job_application.created_at|date:"d F Y à H:i" }}</strong>
     </li>
-
     {% with jobs=job_application.selected_jobs.all %}
-        {% if jobs %}
+        {% if not jobs %}
             <li>
-                Métier{{ jobs|pluralizefr }} recherché{{ jobs|pluralizefr }} :
-                <ul>
-                    {% for job in jobs %}
-                        <li>
-                            <b>{{ job.display_name }}</b> ({{ job.appellation.rome_id }})
-                        </li>
-                    {% endfor %}
-                </ul>
+                <small>Type de candidature</small>
+                <strong>Candidature spontanée</strong>
             </li>
-        {% else %}
-            <li>Candidature spontanée</li>
         {% endif %}
     {% endwith %}
 </ul>
 
-<h4 class="h6">Message de candidature envoyé à l'employeur</h4>
-<blockquote class="bg-info-lightest rounded font-italic px-3 pt-3 pb-1">
-    {{ job_application.message|linebreaks }}
-</blockquote>
+{% if job_application.message %}
+    <ul class="list-data">
+        <li>
+            <small>Message de candidature</small>
+            <blockquote class="blockquote mt-2 mb-0">
+                {{ job_application.message|linebreaks }}
+            </blockquote>
+        </li>
+    </ul>
+{% endif %}
+
+{% with jobs=job_application.selected_jobs.all %}
+    {% if jobs %}
+        <span class="d-block fs-sm">{{ jobs|length }} Métier{{ jobs|pluralizefr }} recherché{{ jobs|pluralizefr }}</span>
+        <ul class="list-group list-group-flush">
+            {% for job in jobs %}
+                <li class="list-group-item list-group-item-action py-2">
+                    <a class="d-flex flex-wrap align-items-center text-decoration-none" href="{{ job.get_absolute_url }}">
+                        <div class="d-inline">
+                            <span class="font-weight-bold me-1 me-md-2">{{ job.display_name }} ({{ job.appellation.rome_id }})</span>
+                        </div>
+                        <div class="d-inline ms-lg-auto">
+                            <span class="fs-sm text-nowrap">
+                                <i class="ri-map-pin-2-line ri-sm"></i>
+                                {% if job.location %}
+                                    {{ job.location }}
+                                {% else %}
+                                    {{ job.company.city|title }} ({{ job.company.department }})
+                                {% endif %}
+                            </span>
+                        </div>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}

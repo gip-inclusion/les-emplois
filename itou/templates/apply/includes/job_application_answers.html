@@ -1,80 +1,85 @@
 {% load matomo %}
 
 {% if job_application.answer or job_application.state.is_refused %}
-    <hr>
-    <h3>Réponse de l'employeur</h3>
-    {% if job_application.refusal_reason and not request.user.is_job_seeker %}
-        <p>
-            <b>Motif de refus :</b> {{ job_application.get_refusal_reason_display }}
-        </p>
-    {% endif %}
+    <div class="c-box mb-4">
+        <h3>Réponse de l'employeur</h3>
+        <ul class="list-data">
+            {% if job_application.refusal_reason and not request.user.is_job_seeker %}
+                <li>
+                    <small>Motif de refus</small>
+                    <strong>{{ job_application.get_refusal_reason_display }}</strong>
+                </li>
+            {% endif %}
+            {% if job_application.answer_to_prescriber and not request.user.is_job_seeker %}
+                <li>
+                    <small>Commentaire privé de l'employeur</small>
+                    <blockquote class="blockquote mt-2 mb-0">
+                        {{ job_application.answer_to_prescriber|linebreaks }}
+                    </blockquote>
+                </li>
+            {% endif %}
+            {% if job_application.answer %}
+                <li>
+                    <small>Message envoyé au candidat</small>
+                    <blockquote class="blockquote mt-2 mb-0">
+                        {{ job_application.answer|linebreaks }}
+                    </blockquote>
+                </li>
+            {% endif %}
+        </ul>
 
-    {% if job_application.answer_to_prescriber and not request.user.is_job_seeker %}
-        <h4 class="h6 mt-3">Commentaire privé de l'employeur</h4>
-        <blockquote class="bg-info-lightest rounded font-italic px-3 pt-3 pb-1 mb-3">
-            {{ job_application.answer_to_prescriber|linebreaks }}
-        </blockquote>
-    {% endif %}
+        {% if display_refusal_info %}
+            <div class="c-info">
+                <button class="c-info__summary collapsed"
+                        {% matomo_event "candidature" "clic" "prescriber_displayed_company_details" %}
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseInfoExample"
+                        aria-expanded="false"
+                        aria-controls="collapseInfoExample">
+                    <span>Contactez l’employeur pour en savoir plus</span>
+                </button>
+                <div class="c-info__detail collapse" id="collapseInfoExample">
+                    <p>
+                        L’employeur a refusé la candidature avec le motif “Autre”.
+                        <br>
+                        Si les détails apportés dans le message de réponse ne vous ont pas permis d’en savoir plus, vous pouvez contacter l’employeur.
+                    </p>
 
-    {% if job_application.answer %}
-        <h4 class="h6 mt-3">Message envoyé au candidat</h4>
-        <blockquote class="bg-info-lightest rounded font-italic px-3 pt-3 pb-1">
-            {{ job_application.answer|linebreaks }}
-        </blockquote>
-    {% endif %}
-
-    {% if display_refusal_info %}
-        <div class="c-info">
-            <button class="c-info__summary collapsed"
-                    {% matomo_event "candidature" "clic" "prescriber_displayed_company_details" %}
-                    data-bs-toggle="collapse"
-                    data-bs-target="#collapseInfoExample"
-                    aria-expanded="false"
-                    aria-controls="collapseInfoExample">
-                <span>Contactez l’employeur pour en savoir plus</span>
-            </button>
-            <div class="c-info__detail collapse" id="collapseInfoExample">
-                <p>
-                    L’employeur a refusé la candidature avec le motif “Autre”.
-                    <br>
-                    Si les détails apportés dans le message de réponse ne vous ont pas permis d’en savoir plus, vous pouvez contacter l’employeur.
-                </p>
-
-                <p class="text-primary fs-sm font-weight-bold my-3">Coordonnées de l’employeur :</p>
-                <ul class="list-unstyled">
-                    {% if refused_by %}
+                    <p class="text-primary fs-sm font-weight-bold my-3">Coordonnées de l’employeur :</p>
+                    <ul class="list-unstyled">
+                        {% if refused_by %}
+                            <li class="d-flex justify-content-start align-items-center">
+                                <a href="{% url 'companies_views:card' siae_id=job_application.to_company.pk %}" class="btn-link btn-ico">
+                                    <i class="ri-user-line ri-lg font-weight-normal"></i>
+                                    <span>{{ refused_by.get_full_name }}</span>
+                                </a>
+                            </li>
+                        {% endif %}
                         <li class="d-flex justify-content-start align-items-center">
                             <a href="{% url 'companies_views:card' siae_id=job_application.to_company.pk %}" class="btn-link btn-ico">
-                                <i class="ri-user-line ri-lg font-weight-normal"></i>
-                                <span>{{ refused_by.get_full_name }}</span>
+                                <i class="ri-community-line ri-lg font-weight-normal"></i>
+                                <span>{{ job_application.to_company.display_name }}</span>
                             </a>
                         </li>
-                    {% endif %}
-                    <li class="d-flex justify-content-start align-items-center">
-                        <a href="{% url 'companies_views:card' siae_id=job_application.to_company.pk %}" class="btn-link btn-ico">
-                            <i class="ri-community-line ri-lg font-weight-normal"></i>
-                            <span>{{ job_application.to_company.display_name }}</span>
-                        </a>
-                    </li>
-                    <li class="d-flex justify-content-start align-items-center">
-                        <a href="mailto:{{ refusal_contact_email }}" class="btn-link btn-ico">
-                            <i class="ri-mail-line ri-lg font-weight-normal"></i>
-                            <span>{{ refusal_contact_email }}</span>
-                        </a>
-                        {% matomo_event "candidature" "clic" "prescriber_copied_company_email" as matomo_event_attrs %}
-                        {% include "includes/copy_to_clipboard.html" with content=refusal_contact_email css_classes="btn-ico btn-link btn-sm ms-2 py-0" matomo_event_attrs=matomo_event_attrs placement="right" %}
-                    </li>
-                    <li class="d-flex justify-content-start align-items-center">
-                        <a href="tel:{{ job_application.to_company.phone|cut:" " }}" class="btn-link btn-ico">
-                            <i class="ri-phone-line ri-lg font-weight-normal"></i>
-                            <span>{{ job_application.to_company.phone }}</span>
-                        </a>
-                        {% matomo_event "candidature" "clic" "prescriber_copied_company_phone" as matomo_event_attrs %}
-                        {% include "includes/copy_to_clipboard.html" with content=job_application.to_company.phone css_classes="btn-ico btn-link btn-sm ms-2 py-0" matomo_event_attrs=matomo_event_attrs placement="right" %}
-                    </li>
-                </ul>
+                        <li class="d-flex justify-content-start align-items-center">
+                            <a href="mailto:{{ refusal_contact_email }}" class="btn-link btn-ico">
+                                <i class="ri-mail-line ri-lg font-weight-normal"></i>
+                                <span>{{ refusal_contact_email }}</span>
+                            </a>
+                            {% matomo_event "candidature" "clic" "prescriber_copied_company_email" as matomo_event_attrs %}
+                            {% include "includes/copy_to_clipboard.html" with content=refusal_contact_email css_classes="btn-ico btn-link btn-sm ms-2 py-0" matomo_event_attrs=matomo_event_attrs placement="right" %}
+                        </li>
+                        <li class="d-flex justify-content-start align-items-center">
+                            <a href="tel:{{ job_application.to_company.phone|cut:" " }}" class="btn-link btn-ico">
+                                <i class="ri-phone-line ri-lg font-weight-normal"></i>
+                                <span>{{ job_application.to_company.phone }}</span>
+                            </a>
+                            {% matomo_event "candidature" "clic" "prescriber_copied_company_phone" as matomo_event_attrs %}
+                            {% include "includes/copy_to_clipboard.html" with content=job_application.to_company.phone css_classes="btn-ico btn-link btn-sm ms-2 py-0" matomo_event_attrs=matomo_event_attrs placement="right" %}
+                        </li>
+                    </ul>
+                </div>
             </div>
-        </div>
-    {% endif %}
-
+        {% endif %}
+    </div>
 {% endif %}

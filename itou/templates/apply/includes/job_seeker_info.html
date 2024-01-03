@@ -1,82 +1,133 @@
 {% load format_filters %}
 {% load str_filters %}
 {% load matomo %}
-<ul>
+
+<ul class="list-data list-data__two-column-lg">
     <li>
-        Prénom : <b>{{ job_seeker.first_name|mask_unless:can_view_personal_information }}</b>
+        <small>Prénom</small>
+        <strong>{{ job_seeker.first_name|mask_unless:can_view_personal_information }}</strong>
     </li>
     <li>
-        Nom : <b>{{ job_seeker.last_name|mask_unless:can_view_personal_information }}</b>
+        <small>Nom</small>
+        <strong>{{ job_seeker.last_name|mask_unless:can_view_personal_information }}</strong>
     </li>
     <li>
-        Numéro de sécurité sociale :
+        <small>Numéro de sécurité sociale</small>
         {% if job_seeker.nir %}
-            <b>{{ job_seeker.nir|format_nir }}</b>
+            <strong>{{ job_seeker.nir|format_nir }}</strong>
+            <button class="btn-link" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="manual" data-bs-title="Copié!" data-it-clipboard-button="copy" data-it-copy-to-clipboard="{{ job_seeker.nir }}">
+                <i class="ri-file-copy-line"></i>
+            </button>
         {% elif job_seeker.lack_of_nir_reason %}
-            <b>{{ job_seeker.get_lack_of_nir_reason_display }}</b>
+            <strong>{{ job_seeker.get_lack_of_nir_reason_display }}</strong>
+            <button class="btn-link"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-trigger="manual"
+                    data-bs-title="Copié!"
+                    data-it-clipboard-button="copy"
+                    data-it-copy-to-clipboard="{{ job_seeker.get_lack_of_nir_reason_display }}">
+                <i class="ri-file-copy-line"></i>
+            </button>
         {% else %}
-            <span>Non renseigné</span>
+            <i class="text-disabled">Non renseigné</i>
         {% endif %}
     </li>
     {% if can_view_personal_information %}
         <li>
-            Date de naissance : <b>{{ job_seeker.birthdate|date:"d/m/Y" }}</b>
+            <small>Date de naissance</small>
+            <strong>{{ job_seeker.birthdate|date:"d/m/Y" }}</strong>
         </li>
         <li>
-            Adresse e-mail : <a href="mailto:{{ job_seeker.email }}">{{ job_seeker.email }}</a>
+            <small>Adresse e-mail</small>
+            <strong>{{ job_seeker.email }}</strong>
+            <button class="btn-link"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    data-bs-trigger="manual"
+                    data-bs-title="Copié!"
+                    data-it-clipboard-button="copy"
+                    data-it-copy-to-clipboard="{{ job_seeker.email }}"
+                    {% matomo_event "candidature" "clic" "copied_jobseeker_email" %}>
+                <i class="ri-file-copy-line"></i>
+            </button>
         </li>
-
         <li>
-            Téléphone :
+            <small>Téléphone</small>
             {% if job_seeker.phone %}
-                <a href="tel:{{ job_seeker.phone|cut:" " }}">{{ job_seeker.phone|format_phone }}</a>
+                <strong>{{ job_seeker.phone|format_phone }}</strong>
+                <button class="btn-link"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-trigger="manual"
+                        data-bs-title="Copié!"
+                        data-it-clipboard-button="copy"
+                        data-it-copy-to-clipboard="{{ job_seeker.phone|cut:" " }}"
+                        {% matomo_event "candidature" "clic" "copied_sender_phonel" %}>
+                    <i class="ri-file-copy-line"></i>
+                </button>
             {% else %}
-                <span>Non renseigné</span>
+                <i class="text-disabled">Non renseigné</i>
             {% endif %}
         </li>
-
         <li>
-            Adresse :
+            <small>Adresse</small>
             {% if job_seeker.address_on_one_line %}
-                <b>{{ job_seeker.address_on_one_line }}</b>
+                <address>{{ job_seeker.address_on_one_line }}</address>
             {% else %}
-                <span>Non renseignée</span>
+                <i class="text-disabled">Non renseignée</i>
             {% endif %}
         </li>
-
         <li>
-            Identifiant Pôle emploi :
+            <small>Identifiant Pôle emploi</small>
             {% if job_seeker.jobseeker_profile.pole_emploi_id %}
-                <b>{{ job_seeker.jobseeker_profile.pole_emploi_id }}</b>
+                <strong>{{ job_seeker.jobseeker_profile.pole_emploi_id }}</strong>
+                <button class="btn-link"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-trigger="manual"
+                        data-bs-title="Copié!"
+                        data-it-clipboard-button="copy"
+                        data-it-copy-to-clipboard="{{ job_seeker.jobseeker_profile.pole_emploi_id }}">
+                    <i class="ri-file-copy-line"></i>
+                </button>
             {% else %}
-                <span>Non renseigné</span>
+                <i class="text-disabled">Non renseigné</i>
             {% endif %}
         </li>
-
         <li>
-            CV :
+            <small>Curriculum vitae</small>
             {% if job_application.get_resume_link %}
-                <a href="{{ job_application.get_resume_link }}">Télécharger le CV</a>
+                <a href="{{ job_application.get_resume_link }}" class="btn-link btn-ico">
+                    <span>Télécharger le CV</span>
+                    <i class="ri-download-2-line"></i>
+                </a>
             {% else %}
-                <span>Non renseigné</span>
                 {% if job_application.diagoriente_invite_sent_at %}
-                    <i class="ri-information-line ri-xl text-info ms-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Vous avez invité l'émetteur de cette candidature à créer un CV sur Diagoriente le {{ job_application.diagoriente_invite_sent_at|date:"d/m/Y" }}"></i>
+                    <i class="text-disabled">Non renseigné</i>
+                    <small>Vous avez invité l'émetteur de cette candidature à créer un CV sur Diagoriente le {{ job_application.diagoriente_invite_sent_at|date:"d/m/Y" }}</small>
+                {% else %}
+                    <i class="text-disabled">Non renseigné</i>
                 {% endif %}
             {% endif %}
         </li>
     {% endif %}
 </ul>
-<p>
-    <a href="{% if can_edit_personal_information %}{% url 'dashboard:edit_job_seeker_info' job_seeker_pk=job_seeker.pk %}?back_url={{ request.get_full_path|urlencode }}{% if job_application %}&from_application={{ job_application.pk }}{% endif %}{% endif %}"
-       class="btn btn-outline-primary{% if not can_edit_personal_information %} disabled{% endif %}"
-       {% if with_matomo_event %}{% matomo_event "salaries" "clic" "modifier-les-informations-personnelles" %}{% endif %}
-       aria-label="Modifier les informations personnelles de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}">
-        Modifier les informations personnelles
-    </a>
-    {% if not can_edit_personal_information %}
-        <i class="ri-information-line ri-xl text-info ms-1"
-           data-bs-toggle="tooltip"
-           data-bs-placement="top"
-           title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
-    {% endif %}
-</p>
+{# Diagoriente invite #}
+{% if request.user.is_employer and job_application and not job_application.get_resume_link %}
+    {% include "apply/includes/job_application_diagoriente_invite.html" with job_application=job_application %}
+{% endif %}
+
+<a href="{% if can_edit_personal_information %}{% url 'dashboard:edit_job_seeker_info' job_seeker_pk=job_seeker.pk %}?back_url={{ request.get_full_path|urlencode }}{% if job_application %}&from_application={{ job_application.pk }}{% endif %}{% endif %}"
+   class="btn btn-ico btn-secondary{% if not can_edit_personal_information %} disabled{% endif %}"
+   {% if with_matomo_event %}{% matomo_event "salaries" "clic" "modifier-les-informations-personnelles" %}{% endif %}
+   aria-label="Modifier les informations personnelles de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}">
+    <i class="ri-pencil-line font-weight-medium" aria-hidden="true"></i>
+    <span>Modifier les informations personnelles</span>
+</a>
+{% if not can_edit_personal_information %}
+    <i class="ri-information-line ri-xl text-info ms-1"
+       data-bs-toggle="tooltip"
+       data-bs-placement="top"
+       title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
+{% endif %}

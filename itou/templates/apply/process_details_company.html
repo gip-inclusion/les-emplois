@@ -5,10 +5,8 @@
 {% block content_extend %}
     {# Job seeker info ------------------------------------------------------------------------- #}
     <div class="c-box mb-4">
-        <h2>Candidat</h2>
-        <hr>
         <h3>Informations personnelles</h3>
-        {% include "apply/includes/job_seeker_info.html" with job_seeker=job_application.job_seeker job_application=job_application can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request with_matomo_event=True only %}
+        {% include "apply/includes/job_seeker_info.html" with job_seeker=job_application.job_seeker job_application=job_application can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request with_matomo_event=True csrf_token=csrf_token only %}
         {% if job_application.to_company.kind == CompanyKind.GEIQ %}
             {# GEIQ eligibility details #}
             {% include "apply/includes/geiq/geiq_diagnosis_details.html" with diagnosis=geiq_eligibility_diagnosis %}
@@ -18,22 +16,16 @@
         {% endif %}
     </div>
 
+    {# hiring details ------------------------------------------------------------------------ #}
+    {% include "apply/includes/siae_hiring_details.html" %}
+
     {# Job application info ------------------------------------------------------------------------- #}
     <div class="c-box mb-4">
-        <h2>Candidature</h2>
-        <hr>
-        <h3>Détails de la candidature</h3>
-        {% include "apply/includes/job_application_info.html" with job_application=job_application %}
-
-        <hr>
+        <h3>Candidature</h3>
         {# Sender info ------------------------------------------------------------------------- #}
-        <h3>Candidature envoyée par</h3>
         {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
 
-        {# Diagoriente invite #}
-        {% if not job_application.get_resume_link %}
-            {% include "apply/includes/job_application_diagoriente_invite.html" with job_application=job_application %}
-        {% endif %}
+        {% include "apply/includes/job_application_info.html" with job_application=job_application %}
 
         {# Prior actions info #}
         {% if job_application.can_have_prior_action %}
@@ -47,20 +39,19 @@
                 {% include "apply/includes/job_application_prior_action_form.html" with job_application=job_application form=add_prior_action_form main_div_id="add_prior_action" form_url=add_prior_action_url %}
             {% endif %}
         {% endif %}
+    </div>
 
-        {# Negative answers ------------------------------------------------------------------------- #}
-        {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
+    {# Negative answers ------------------------------------------------------------------------- #}
+    {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
 
-        {# hiring details ------------------------------------------------------------------------ #}
-        {% include "apply/includes/siae_hiring_details.html" %}
 
-        {# History ------------------------------------------------------ #}
-        {% if transition_logs %}
-            <hr>
+    {# History ------------------------------------------------------ #}
+    {% if transition_logs %}
+        <div class="c-box mb-4">
             <h3>Historique des modifications</h3>
             {% include "apply/includes/transition_logs.html" with job_application=job_application transition_logs=transition_logs %}
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block actions %}

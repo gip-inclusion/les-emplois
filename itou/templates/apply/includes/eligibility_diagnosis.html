@@ -6,8 +6,7 @@
                 hiérarchisée afin de ne pas induire les employeurs en erreur.
                 Avec des critères hiérarchisés, ils ont tendance à penser que le candidat n'est pas éligible car pas suffisamment de critère de niveau 2 par exemple
             {% endcomment %}
-
-            <hr>
+            <hr class="my-4">
             <h3>Éligibilité à l'IAE</h3>
             <p>
                 Confirmée par
@@ -40,9 +39,9 @@
                 </i>
             </p>
         {% else %}
-            <hr>
 
             {% if eligibility_diagnosis is not None %}
+                <hr class="my-4">
                 <h3>Critères d'éligibilité</h3>
                 <p>
                     Validés par
@@ -87,21 +86,18 @@
         {% endif %}
 
     {% elif job_seeker.latest_pe_approval and job_seeker.latest_pe_approval.is_valid %}
-
-        <hr>
+        <hr class="my-4">
         <h3>Critères d'éligibilité</h3>
         <p>
             Validés par <b>Pôle emploi</b>.
         </p>
 
     {% elif expired_eligibility_diagnosis %}
-        <hr>
+        <hr class="my-4">
         <h3>Éligibilité à l'IAE</h3>
-        <div class="alert alert-warning" role="status">
-            <p class="mb-0">
-                Le diagnostic d'éligibilité IAE de ce candidat a expiré le {{ expired_eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}, vous devez valider les critères d'éligibilité.
-            </p>
-        </div>
+        <p class="mb-0">
+            Le diagnostic d'éligibilité IAE de ce candidat a expiré le {{ expired_eligibility_diagnosis.considered_to_expire_at|date:"d/m/Y" }}, vous devez valider les critères d'éligibilité pour accepter sa candidature.
+        </p>
     {% endif %}
 
 {% endif %}

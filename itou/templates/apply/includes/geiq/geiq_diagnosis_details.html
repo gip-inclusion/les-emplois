@@ -1,8 +1,9 @@
 {% if diagnosis.is_valid %}
-    <hr>
     {% if diagnosis.eligibility_confirmed %}
+        <hr class="my-4">
         <h3>Éligibilité public prioritaire GEIQ validée</h3>
     {% else %}
+        <hr class="my-4">
         <h3>Éligibilité public prioritaire GEIQ non confirmée</h3>
     {% endif %}
 
@@ -77,14 +78,14 @@
 {% else %}
     {# Diagnosis either does not exist or has expired : this part is for GEIQ only #}
     {% if request.user.is_employer %}
-        <hr>
-        <div class="row ">
-            <div class="col-auto pt-2">
-                <h3>Éligibilité public prioritaire GEIQ non confirmée</h3>
+        <hr class="my-4">
+        <div class="row align-items-center">
+            <div class="col-12 col-md">
+                <h3 class="mb-2 mb-md-0">Éligibilité public prioritaire GEIQ non confirmée</h3>
             </div>
-            <div class="col text-end">
+            <div class="col-12 col-md-auto">
                 {% with back_and_next_url=request.get_full_path|urlencode %}
-                    <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}" class="btn btn-outline-primary">
+                    <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}" class="btn btn-secondary">
                         Vérifier
                     </a>
                 {% endwith %}
