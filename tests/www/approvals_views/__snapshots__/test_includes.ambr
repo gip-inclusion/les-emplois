@@ -1,0 +1,374 @@
+# serializer version: 1
+# name: TestStatusInclude.test_expired_approval_with_eligibility_diagnosis_for_employer[expired_approval_with_eligibility_diagnosis_for_employer]
+  '''
+  
+  
+  
+  
+  
+  
+  
+      <p class="text-center">
+          
+              <img src="/static/img/pass_iae/logo_pass_iae.svg" alt="Logo du PASS IAE">
+          
+      </p>
+  
+  
+  <div class="ps-3 border-start approval-left-border">
+      <p class="mb-1">
+          
+              Numéro de PASS IAE :
+          
+          
+              
+              <b>pour obtenir son numéro, vous devez valider l'embauche et demander l'obtention d'un PASS IAE.</b>
+          
+      </p>
+  
+      
+          <p class="mb-1">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
+      
+  
+      
+          
+              
+  
+              <p>
+                  <b>Un diagnostic d'éligibilité valide existe pour ce candidat. Vous pouvez obtenir un PASS IAE.</b>
+              </p>
+          
+      
+  </div>
+  
+  
+  
+  '''
+# ---
+# name: TestStatusInclude.test_expired_approval_with_eligibility_diagnosis_for_jobseeker[expired_approval_with_eligibility_diagnosis_for_jobseeker]
+  '''
+  
+  
+  
+  
+  
+  
+  
+      <p class="text-center">
+          
+              <img src="/static/img/pass_iae/logo_pass_iae.svg" alt="Logo du PASS IAE">
+          
+      </p>
+  
+  
+  <div class="ps-3 border-start approval-left-border">
+      <p class="mb-1">
+          
+              Numéro de PASS IAE :
+          
+          
+              <b><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></b>
+          
+      </p>
+  
+      
+          <p class="mb-1">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
+      
+  
+      
+          
+              <p class="text-danger">
+                  <b>Expiré</b> le 01/01/2022 (depuis 1 semaine, 2 jours)
+              </p>
+          
+      
+  </div>
+  
+  
+  
+  '''
+# ---
+# name: TestStatusInclude.test_expired_approval_with_eligibility_diagnosis_for_prescriber[expired_approval_with_eligibility_diagnosis_for_prescriber]
+  '''
+  
+  
+  
+  
+  
+  
+  
+      <p class="text-center">
+          
+              <img src="/static/img/pass_iae/logo_pass_iae.svg" alt="Logo du PASS IAE">
+          
+      </p>
+  
+  
+  <div class="ps-3 border-start approval-left-border">
+      <p class="mb-1">
+          
+              Numéro de PASS IAE :
+          
+          
+              <b><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></b>
+          
+      </p>
+  
+      
+          <p class="mb-1">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
+      
+  
+      
+          
+              <p class="text-danger">
+                  <b>Expiré</b> le 01/01/2022 (depuis 1 semaine, 2 jours)
+              </p>
+          
+      
+  </div>
+  
+  
+  
+  '''
+# ---
+# name: TestStatusInclude.test_expired_approval_without_eligibility_diagnosis_for_employer[expired_approval_without_eligibility_diagnosis_for_employer]
+  '''
+  
+  
+  
+  
+  
+  
+  
+      <p class="text-center">
+          
+              <img src="/static/img/pass_iae/logo_pass_iae.svg" alt="Logo du PASS IAE">
+          
+      </p>
+  
+  
+  <div class="ps-3 border-start approval-left-border">
+      <p class="mb-1">
+          
+              Numéro de PASS IAE :
+          
+          
+              <b><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></b>
+          
+      </p>
+  
+      
+          <p class="mb-1">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
+      
+  
+      
+          
+              <p class="text-danger">
+                  <b>Expiré</b> le 01/01/2022 (depuis 1 semaine, 2 jours)
+              </p>
+          
+      
+  </div>
+  
+  
+  
+  '''
+# ---
+# name: TestStatusInclude.test_valid_approval_for_employer[valid_approval_for_employer]
+  '''
+  
+  
+  
+  
+  
+  
+  
+      <p class="text-center">
+          
+              <img src="/static/img/pass_iae/logo_pass_iae.svg" alt="Logo du PASS IAE">
+          
+      </p>
+  
+  
+  <div class="ps-3 border-start approval-left-border">
+      <p class="mb-1">
+          
+              Numéro de PASS IAE :
+          
+          
+              <b><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></b>
+          
+      </p>
+  
+      
+          <p class="mb-1">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
+      
+  
+      
+          <p class="mb-1">Date de début : 01/01/2000</p>
+          <ul class="list-unstyled">
+              <li class="h4 mt-4 mb-2">
+                  Nombre de jours restants sur le PASS IAE : 357198 jours
+                  <i class="ri-information-line ri-xl text-info"
+                     data-bs-toggle="tooltip"
+                     title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
+              </li>
+  
+              
+  
+              
+                  <li class="pb-2">
+                      Date de fin prévisionnelle : 01/01/3000
+                      <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" title="Cette date de fin est susceptible d'évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i>
+                  </li>
+              
+          </ul>
+      
+  </div>
+  
+  
+      
+      
+          
+      
+  
+      
+      
+          
+      
+  
+  
+  '''
+# ---
+# name: TestStatusInclude.test_valid_approval_for_prescriber[expired_approval_for_employer]
+  '''
+  
+  
+  
+  
+  
+  
+  
+      <p class="text-center">
+          
+              <img src="/static/img/pass_iae/logo_pass_iae.svg" alt="Logo du PASS IAE">
+          
+      </p>
+  
+  
+  <div class="ps-3 border-start approval-left-border">
+      <p class="mb-1">
+          
+              Numéro de PASS IAE :
+          
+          
+              <b><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></b>
+          
+      </p>
+  
+      
+          <p class="mb-1">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
+      
+  
+      
+          <p class="mb-1">Date de début : 01/01/2000</p>
+          <ul class="list-unstyled">
+              <li class="h4 mt-4 mb-2">
+                  Nombre de jours restants sur le PASS IAE : 357198 jours
+                  <i class="ri-information-line ri-xl text-info"
+                     data-bs-toggle="tooltip"
+                     title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
+              </li>
+  
+              
+  
+              
+                  <li class="pb-2">
+                      Date de fin prévisionnelle : 01/01/3000
+                      <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" title="Cette date de fin est susceptible d'évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i>
+                  </li>
+              
+          </ul>
+      
+  </div>
+  
+  
+      
+      
+          
+      
+  
+      
+      
+          
+      
+  
+  
+  '''
+# ---
+# name: TestStatusInclude.test_valid_approval_for_prescriber[valid_approval_for_prescriber]
+  '''
+  
+  
+  
+  
+  
+  
+  
+      <p class="text-center">
+          
+              <img src="/static/img/pass_iae/logo_pass_iae.svg" alt="Logo du PASS IAE">
+          
+      </p>
+  
+  
+  <div class="ps-3 border-start approval-left-border">
+      <p class="mb-1">
+          
+              Numéro de PASS IAE :
+          
+          
+              <b><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></b>
+          
+      </p>
+  
+      
+          <p class="mb-1">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
+      
+  
+      
+          <p class="mb-1">Date de début : 01/01/2000</p>
+          <ul class="list-unstyled">
+              <li class="h4 mt-4 mb-2">
+                  Nombre de jours restants sur le PASS IAE : 357198 jours
+                  <i class="ri-information-line ri-xl text-info"
+                     data-bs-toggle="tooltip"
+                     title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
+              </li>
+  
+              
+  
+              
+                  <li class="pb-2">
+                      Date de fin prévisionnelle : 01/01/3000
+                      <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" title="Cette date de fin est susceptible d'évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i>
+                  </li>
+              
+          </ul>
+      
+  </div>
+  
+  
+      
+      
+          
+      
+  
+      
+      
+          
+      
+  
+  
+  '''
+# ---
