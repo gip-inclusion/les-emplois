@@ -35,7 +35,7 @@ Arguments:
         {% else %}
             Numéro d'agrément :
         {% endif %}
-        {% if user.is_employer and hiring_pending %}
+        {% if user.is_employer and common_approval.is_in_waiting_period and common_approval.user.has_valid_diagnosis %}
             {% comment %}
             If the PASS IAE number is displayed at this time, some employers think that there is
             no need to validate the application because a number is already assigned.
@@ -74,25 +74,26 @@ Arguments:
             {% endif %}
         </ul>
     {% elif common_approval.is_in_waiting_period %}
-        <p class="text-danger">
-            <b>Expiré</b> le {{ common_approval.end_at|date:"d/m/Y" }} (depuis {{ common_approval.end_at|timesince }})
-        </p>
-
-        {% if user.is_employer %}
-            {% if hiring_pending and job_application.get_eligibility_diagnosis.is_valid %}
-                {% comment %}
+        {% if user.is_employer and common_approval.user.has_valid_diagnosis %}
+            {% comment %}
             When an authorized prescriber bypasses the waiting period and sends a candidate
             with an "expired" approval, the employer receives the application with the mention
             "expired". He thinks that the hiring is impossible when he just has to validate
             the job application to get a new PASS IAE.
 
             Show a message explaining that.
-                {% endcomment %}
 
-                <p>
-                    <b>Un diagnostic d'éligibilité valide existe pour ce candidat. Vous pouvez obtenir un PASS IAE.</b>
-                </p>
-            {% endif %}
+            vincentporte 12.12.2023 : also considering the case when an employer hiring a candidate
+            with an expired approval, but with a valid diagnosis made by authorized prescriber.
+            {% endcomment %}
+
+            <p>
+                <b>Un diagnostic d'éligibilité valide existe pour ce candidat. Vous pouvez obtenir un PASS IAE.</b>
+            </p>
+        {% else %}
+            <p class="text-danger">
+                <b>Expiré</b> le {{ common_approval.end_at|date:"d/m/Y" }} (depuis {{ common_approval.end_at|timesince }})
+            </p>
         {% endif %}
     {% endif %}
 </div>
