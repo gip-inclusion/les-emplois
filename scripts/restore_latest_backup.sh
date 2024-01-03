@@ -23,7 +23,7 @@ rclone_last_backup="$(rclone lsf --files-only --max-age 24h emplois:/encrypted-b
 rclone copy --max-age 24h --progress "emplois:/encrypted-backups/${rclone_last_backup}" "$backup_folder"
 backup_file="${backup_folder}/${rclone_last_backup}"
 echo "Restoring ${backup_file} to ${db_name} database"
-pg_restore --dbname="${db_name}" --format=c --clean --no-owner --jobs=4 --verbose "${backup_file}"
+pg_restore --dbname="${db_name}" --format=c --clean --no-owner --jobs="$(nproc --all --ignore=1)" --verbose "${backup_file}"
 # Make sure we don't keep a copy for too long.
 rm "$backup_file"
 echo "Restoration is over!"
