@@ -1,5 +1,27 @@
 # Journal des modifications
 
+## [78] - 2024-01-07
+
+### Ajouté
+- Informations pour la création de CV avec le service partenaire _Diagoriente_
+- Stats : Publier le TB327 (Suivi du cofinancement des ACI) aux DDETS et CD du 31 et du 84
+- En tant que prescripteur qui reçoit un refus pour motif autre je suis invité à contacter l’employeur si je souhaite en savoir +
+- Ajout d'une vue d'erreur personnalisée
+- Ajout du guide a la prescription dans la navigation pour les employeurs et les prescripteurs habilités
+- Métriques : ajout de nouveaux tags matomo sur le tableaud de bord employeur
+
+### Modifié
+- Correction du filtre "Éligibilité à valider"
+- API GEIQ : Utiliser les codes _LABEL_ au lieu des codes _ITOU_
+- Admin : Fonction “transfert” des objets puis arriver sur la bonne page
+- Déplacement des champs `pole_emploid_id` / `lack_of_pole_emploi_id_reason` vers le modèle `JobSeekerProfile`
+- Améliorations UI/UX
+- Candidatures : modification du widget des départements & fiches de poste
+- Connexion : suppression du lien "Mot de passe oublié" en double
+
+### Supprimé
+- Fiches salarié : Suppression de la notion de "FS Orpheline"
+
 ## [76] - 2023-12-03
 
 ### Ajouté
