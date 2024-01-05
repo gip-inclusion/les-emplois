@@ -239,7 +239,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         created, ignored = [], []
 
         for job_application in queryset:
-            if job_application.employee_record.for_company(job_application.to_company).exists():
+            if job_application.employee_record.for_asp_company(job_application.to_company).exists():
                 ignored.append(job_application)
                 continue
 

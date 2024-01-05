@@ -10,6 +10,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from itou.approvals.models import Approval
+from itou.companies.models import Company
 from itou.employee_record.enums import Status
 from itou.employee_record.exceptions import InvalidStatusError
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
@@ -626,6 +627,23 @@ class TestEmployeeRecordQueryset:
         )
         assert (
             EmployeeRecord.objects.for_company(employee_record_2.job_application.to_company).get() == employee_record_2
+        )
+
+    def test_for_asp_company(self):
+        employee_record_1, employee_record_2 = EmployeeRecordFactory.create_batch(2)
+        employee_record_in_antenna = EmployeeRecordFactory(
+            job_application__to_company__convention=employee_record_1.job_application.to_company.convention,
+            job_application__to_company__source=Company.SOURCE_USER_CREATED,
+            job_application__approval=employee_record_1.job_application.approval,
+        )
+
+        assert set(EmployeeRecord.objects.for_asp_company(employee_record_1.job_application.to_company)) == {
+            employee_record_1,
+            employee_record_in_antenna,
+        }
+        assert (
+            EmployeeRecord.objects.for_asp_company(employee_record_2.job_application.to_company).get()
+            == employee_record_2
         )
 
 

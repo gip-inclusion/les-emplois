@@ -15,6 +15,7 @@ from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval, CancelledApproval
 from itou.companies.enums import CompanyKind, ContractType
+from itou.companies.models import Company
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
@@ -534,6 +535,14 @@ class JobApplicationQuerySetTest(TestCase):
             approval=job_app.approval,
         )
         assert second_job_app not in JobApplication.objects.eligible_as_employee_record(second_job_app.to_company)
+        # Create a third job application to an antenna SIAE
+        third_job_app = JobApplicationFactory(
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            to_company__convention=job_app.to_company.convention,
+            to_company__source=Company.SOURCE_USER_CREATED,
+            approval=job_app.approval,
+        )
+        assert third_job_app not in JobApplication.objects.eligible_as_employee_record(third_job_app.to_company)
 
         # No employee record, but with a suspension
         job_app = JobApplicationFactory(
