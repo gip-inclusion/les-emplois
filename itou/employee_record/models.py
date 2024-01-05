@@ -115,6 +115,9 @@ class EmployeeRecordQuerySet(models.QuerySet):
     def for_company(self, siae):
         return self.filter(job_application__to_company=siae)
 
+    def for_asp_company(self, siae):
+        return self.filter(job_application__to_company__in=siae.convention.siaes.all())
+
     def find_by_batch(self, filename, line_number):
         """
         Fetch a single employee record with ASP batch file input parameters

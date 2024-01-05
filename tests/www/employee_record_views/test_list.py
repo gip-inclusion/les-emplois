@@ -346,6 +346,7 @@ class ListEmployeeRecordsTest(TestCase):
         num_queries += 3  # Get current user and siae
         num_queries += 1  # Select job seeker for filters
         num_queries += 1  # Select employee_records status count
+        num_queries += 1  # Lazy load of SIAE convention in `.eligible_as_employee_record()`
         num_queries += 1  # Select ordered job applications
         num_queries += 1  # Select EmployeeRecords
         with self.assertNumQueries(num_queries):

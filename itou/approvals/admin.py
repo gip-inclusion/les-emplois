@@ -84,7 +84,9 @@ class JobApplicationInline(ItouStackedInline):
         already_exists = None
         if obj.approval:
             already_exists = (
-                EmployeeRecord.objects.for_company(obj.to_company).filter(approval_number=obj.approval.number).exists()
+                EmployeeRecord.objects.for_asp_company(obj.to_company)
+                .filter(approval_number=obj.approval.number)
+                .exists()
             )
 
         if JobApplication.objects.eligible_as_employee_record(siae=obj.to_company).filter(pk=obj.pk).exists():
