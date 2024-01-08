@@ -1,3 +1,5 @@
+{% load matomo %}
+
 <div class="col mb-3 mb-md-5">
     <div class="c-box p-0 h-100">
         <div class="p-3 p-lg-4">
@@ -21,21 +23,21 @@
                             <span class="disabled">Déclarer une embauche</span>
                         </span>
                     {% else %}
-                        <a href="{% url 'apply:check_nir_for_hire' company_pk=request.current_organization.pk %}" class="btn-link btn-ico">
+                        <a href="{% url 'apply:check_nir_for_hire' company_pk=request.current_organization.pk %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "declarer-embauche" %}>
                             <i class="ri-user-follow-line ri-lg font-weight-normal"></i>
                             <span>Déclarer une embauche</span>
                         </a>
                     {% endif %}
                 </li>
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'approvals:list' %}" data-matomo-category="salaries" data-matomo-action="clic" data-matomo-option="gestion-des-salaries-et-pass-iae" class="matomo-event btn-link btn-ico">
+                    <a href="{% url 'approvals:list' %}"  class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-liste-agrements" %}>
                         <i class="ri-contacts-book-line ri-lg font-weight-normal"></i>
                         <span>Gérer les salariés et PASS IAE</span>
                     </a>
                 </li>
                 {% if can_show_employee_records %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'employee_record_views:list' %}?status=NEW" class="btn-link btn-ico">
+                        <a href="{% url 'employee_record_views:list' %}?status=NEW" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-liste-fiches-salaries" %}>
                             <i class="ri-article-line ri-lg font-weight-normal"></i>
                             <span>Gérer les fiches salarié (ASP)</span>
                         </a>
@@ -45,7 +47,7 @@
                     </li>
                 {% endif %}
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'approvals:pe_approval_search' %}" class="btn-link btn-ico">
+                    <a href="{% url 'approvals:pe_approval_search' %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "recherche-agrement" %}>
                         <i class="ri-arrow-left-right-line ri-lg font-weight-normal align-self-start"></i>
                         <span>Prolonger/suspendre un agrément émis par Pôle emploi</span>
                     </a>
