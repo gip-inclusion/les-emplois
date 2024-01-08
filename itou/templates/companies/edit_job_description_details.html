@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load static %}
 {% load django_bootstrap5 %}
+{% load matomo %}
 
 {% block title %}Modifier les détails de la fiche de poste {{ block.super }}{% endblock %}
 
@@ -94,7 +95,9 @@
                                     </a>
                                 </div>
                                 <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                                    <button class="btn btn-primary btn-block" aria-label="Passer à l'étape suivante">Suivant</button>
+                                    <button class="btn btn-primary btn-block" aria-label="Passer à l'étape suivante" {% matomo_event "employeurs" "submit" "edit-description-fiche-poste" %}>
+                                        Suivant
+                                    </button>
                                 </div>
                             </div>
                         </form>

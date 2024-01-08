@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load static %}
+{% load matomo %}
 
 {% block title %}Validation de la fiche de poste {{ block.super }}{% endblock %}
 
@@ -60,7 +61,7 @@
                                     </a>
                                 </div>
                                 <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                                    <button class="btn btn-primary btn-block matomo-event" aria-label="Publier la fiche de poste" data-matomo-category="employeurs" data-matomo-action="submit" data-matomo-option="publier-fiche-poste">
+                                    <button class="btn btn-primary btn-block" aria-label="Publier la fiche de poste" {% matomo_event "employeurs" "submit" "publier-fiche-poste" %}>
                                         Publier la fiche de poste
                                     </button>
                                 </div>
