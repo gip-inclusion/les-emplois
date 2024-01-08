@@ -2,6 +2,7 @@
 {% load django_bootstrap5 %}
 {% load static %}
 {% load theme_inclusion %}
+{% load matomo %}
 
 {% block title %}Modifier les coordonnées de votre structure {{ block.super }}{% endblock %}
 
@@ -75,7 +76,9 @@
                                     </a>
                                 </div>
                                 <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                                    <button class="btn btn-primary btn-block" aria-label="Vers l'étape suivante du formulaire">Suivant</button>
+                                    <button class="btn btn-primary btn-block" aria-label="Vers l'étape suivante du formulaire" {% matomo_event "employeurs" "submit" "maj-contact-structure" %}>
+                                        Suivant
+                                    </button>
                                 </div>
                             </div>
                         </form>
