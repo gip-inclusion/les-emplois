@@ -2,6 +2,7 @@
 {% load static %}
 {% load django_bootstrap5 %}
 {% load str_filters %}
+{% load matomo %}
 
 {% block title %}Vos fiches de postes {{ block.super }}{% endblock %}
 
@@ -38,7 +39,7 @@
                                         </button>
                                     </form>
                                 {% endif %}
-                                <a class="btn btn-primary btn-ico justify-content-center mt-3 mt-md-0" href="{% url "companies_views:edit_job_description" %}">
+                                <a class="btn btn-primary btn-ico justify-content-center mt-3 mt-md-0" href="{% url "companies_views:edit_job_description" %}" {% matomo_event "employers" "clic" "creer-fiche-de-poste" %}>
                                     <i class="ri-add-line ri-lg" aria-hidden="true"></i>
                                     <span>Créer une nouvelle fiche de poste</span>
                                 </a>
