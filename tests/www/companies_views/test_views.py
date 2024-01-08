@@ -64,115 +64,17 @@ class CardViewTest(TestCase):
         )
         url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         response = self.client.get(url)
-        self.assertContains(
+
+        nav_tabs_soup = parse_response_to_soup(response, selector=".s-tabs-01__nav")
+        assert str(nav_tabs_soup) == self.snapshot(name="nav-tabs")
+
+        tab_content_soup = parse_response_to_soup(
             response,
-            """
-            <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" role="tablist">
-             <li class="nav-item" role="presentation">
-              <a aria-controls="recrutements-en-cours"
-                 aria-selected="true"
-                 class="nav-link active"
-                 data-bs-toggle="tab"
-                 href="#recrutements-en-cours"
-                 id="recrutements-en-cours-tab"
-                 role="tab">
-               Recrutement en cours
-               <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">
-                0
-               </span>
-              </a>
-             </li>
-             <li class="nav-item" role="presentation">
-              <a aria-controls="autres-metiers"
-                 aria-selected="false"
-                 class="nav-link"
-                 data-bs-toggle="tab"
-                 href="#autres-metiers"
-                 id="autres-metiers-tab"
-                 role="tab">
-               Autre m&eacute;tier exerc&eacute;
-               <span class="badge badge-sm rounded-pill bg-info-light text-dark ms-2">
-                1
-               </span>
-              </a>
-             </li>
-             <li class="nav-item-dropdown dropdown" role="presentation">
-              <a aria-expanded="false"
-                 class="nav-link dropdown-toggle"
-                 data-bs-toggle="dropdown"
-                 href="#"
-                 id="sTabs01DropdownMoreLink"
-                 role="button">
-               <i class="ri-more-line">
-               </i>
-              </a>
-              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-end">
-              </div>
-             </li>
-            </ul>
-            """,
-            html=True,
-            count=1,
+            selector=".tab-content",
+            replace_objects_pk_in_href=[job_description, company, company],
         )
-        self.assertContains(
-            response,
-            f"""
-            <div class="tab-content">
-             <div aria-labelledby="recrutements-en-cours-tab"
-                  class="tab-pane fade active show"
-                  id="recrutements-en-cours"
-                  role="tabpanel">
-              <p class="mb-0">
-               Pour le moment, il n&rsquo;y a aucun recrutement en cours dans cette structure.
-              </p>
-             </div>
-             <div aria-labelledby="autres-metiers-tab" class="tab-pane fade" id="autres-metiers" role="tabpanel">
-              <ul class="list-group list-group-flush list-group-link">
-               <li class="list-group-item list-group-item-action">
-                <div class="d-flex align-items-center">
-                 <div>
-                  <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                   <a class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
-                      data-matomo-action="clic"
-                      data-matomo-category="candidature"
-                      data-matomo-option="clic-metiers"
-                      href="{job_description.get_absolute_url()}?back_url=/company/{company.pk}/card">
-                    Plaquiste
-                   </a>
-                  </div>
-                  <span class="fs-sm mt-1 d-flex align-items-center">
-                   <i class="ri-map-pin-2-line ri-sm me-1">
-                   </i>
-                   Vannes (56)
-                  </span>
-                 </div>
-                 <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
-                  <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">
-                   CDI
-                  </span>
-                 </div>
-                </div>
-               </li>
-              </ul>
-             </div>
-             <div class="d-flex justify-content-end mt-3">
-              <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
-                 href="/apply/{company.pk}/start"
-                 data-matomo-event=true data-matomo-category=candidature data-matomo-action=clic
-                 data-matomo-option=start_application
-                 aria-label="Postuler aupr&egrave;s de l'employeur solidaire Les petits jardins">
-               <i class="ri-draft-line">
-               </i>
-               <span>
-                Postuler
-               </span>
-              </a>
-             </div>
-            </div>
-            """,
-            html=True,
-            count=1,
-        )
+        assert str(tab_content_soup) == self.snapshot(name="tab-content")
+
         self.assertContains(response, self.APPLY)
 
     def test_card_no_other_jobs(self):
@@ -185,96 +87,17 @@ class CardViewTest(TestCase):
         )
         url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         response = self.client.get(url)
-        self.assertContains(
+
+        nav_tabs_soup = parse_response_to_soup(response, selector=".s-tabs-01__nav")
+        assert str(nav_tabs_soup) == self.snapshot(name="nav-tabs")
+
+        tab_content_soup = parse_response_to_soup(
             response,
-            """
-            <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" role="tablist">
-             <li class="nav-item" role="presentation">
-              <a aria-controls="recrutements-en-cours"
-                 aria-selected="true"
-                 class="nav-link active"
-                 data-bs-toggle="tab"
-                 href="#recrutements-en-cours"
-                 id="recrutements-en-cours-tab"
-                 role="tab">
-               Recrutement en cours
-               <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">
-                1
-               </span>
-              </a>
-             </li>
-             <li class="nav-item-dropdown dropdown" role="presentation">
-              <a aria-expanded="false"
-                 class="nav-link dropdown-toggle"
-                 data-bs-toggle="dropdown"
-                 href="#"
-                 id="sTabs01DropdownMoreLink"
-                 role="button">
-               <i class="ri-more-line">
-               </i>
-              </a>
-              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-end">
-              </div>
-             </li>
-            </ul>
-            """,
-            html=True,
-            count=1,
+            selector=".tab-content",
+            replace_objects_pk_in_href=[job_description, company, company],
         )
-        self.assertContains(
-            response,
-            f"""
-            <div class="tab-content">
-             <div aria-labelledby="recrutements-en-cours-tab"
-                  class="tab-pane fade active show"
-                  id="recrutements-en-cours"
-                  role="tabpanel">
-              <ul class="list-group list-group-flush list-group-link">
-               <li class="list-group-item list-group-item-action">
-                <div class="d-flex align-items-center">
-                 <div>
-                  <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                   <a class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
-                      data-matomo-action="clic"
-                      data-matomo-category="candidature"
-                      data-matomo-option="clic-metiers"
-                      href="{job_description.get_absolute_url()}?back_url=/company/{company.pk}/card">
-                    Plaquiste
-                   </a>
-                  </div>
-                  <span class="fs-sm mt-1 d-flex align-items-center">
-                   <i class="ri-map-pin-2-line ri-sm me-1">
-                   </i>
-                   Vannes (56)
-                  </span>
-                 </div>
-                 <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
-                  <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">
-                   CDI
-                  </span>
-                 </div>
-                </div>
-               </li>
-              </ul>
-             </div>
-             <div class="d-flex justify-content-end mt-3">
-              <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
-                 href="/apply/{company.pk}/start"
-                 data-matomo-event=true data-matomo-category=candidature data-matomo-action=clic
-                 data-matomo-option=start_application
-                 aria-label="Postuler aupr&egrave;s de l'employeur solidaire Les petits jardins">
-               <i class="ri-draft-line">
-               </i>
-               <span>
-                Postuler
-               </span>
-              </a>
-             </div>
-            </div>
-            """,
-            html=True,
-            count=1,
-        )
+        assert str(tab_content_soup) == self.snapshot(name="tab-content")
+
         self.assertContains(response, self.APPLY)
 
     def test_card_active_and_other_jobs(self):
@@ -298,139 +121,17 @@ class CardViewTest(TestCase):
         )
         url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         response = self.client.get(url)
-        self.assertContains(
+
+        nav_tabs_soup = parse_response_to_soup(response, selector=".s-tabs-01__nav")
+        assert str(nav_tabs_soup) == self.snapshot(name="nav-tabs")
+
+        tab_content_soup = parse_response_to_soup(
             response,
-            """
-            <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" role="tablist">
-             <li class="nav-item" role="presentation">
-              <a aria-controls="recrutements-en-cours"
-                 aria-selected="true"
-                 class="nav-link active"
-                 data-bs-toggle="tab"
-                 href="#recrutements-en-cours"
-                 id="recrutements-en-cours-tab"
-                 role="tab">
-               Recrutement en cours
-               <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">
-                1
-               </span>
-              </a>
-             </li>
-             <li class="nav-item" role="presentation">
-              <a aria-controls="autres-metiers"
-                 aria-selected="false"
-                 class="nav-link"
-                 data-bs-toggle="tab"
-                 href="#autres-metiers"
-                 id="autres-metiers-tab"
-                 role="tab">
-               Autre m&eacute;tier exerc&eacute;
-               <span class="badge badge-sm rounded-pill bg-info-light text-dark ms-2">
-                1
-               </span>
-              </a>
-             </li>
-             <li class="nav-item-dropdown dropdown" role="presentation">
-              <a aria-expanded="false"
-                 class="nav-link dropdown-toggle"
-                 data-bs-toggle="dropdown"
-                 href="#"
-                 id="sTabs01DropdownMoreLink"
-                 role="button">
-               <i class="ri-more-line">
-               </i>
-              </a>
-              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-end">
-              </div>
-             </li>
-            </ul>
-            """,
-            html=True,
-            count=1,
+            selector=".tab-content",
+            replace_objects_pk_in_href=[active_job_description, company, other_job_description, company, company],
         )
-        self.assertContains(
-            response,
-            f"""
-            <div class="tab-content">
-             <div aria-labelledby="recrutements-en-cours-tab"
-                  class="tab-pane fade active show"
-                  id="recrutements-en-cours"
-                  role="tabpanel">
-              <ul class="list-group list-group-flush list-group-link">
-               <li class="list-group-item list-group-item-action">
-                <div class="d-flex align-items-center">
-                 <div>
-                  <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                   <a class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
-                      data-matomo-action="clic"
-                      data-matomo-category="candidature"
-                      data-matomo-option="clic-metiers"
-                      href="{active_job_description.get_absolute_url()}?back_url=/company/{company.pk}/card">
-                    Plaquiste
-                   </a>
-                  </div>
-                  <span class="fs-sm mt-1 d-flex align-items-center">
-                   <i class="ri-map-pin-2-line ri-sm me-1">
-                   </i>
-                   Vannes (56)
-                  </span>
-                 </div>
-                 <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
-                  <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">
-                   CDI
-                  </span>
-                 </div>
-                </div>
-               </li>
-              </ul>
-             </div>
-             <div aria-labelledby="autres-metiers-tab" class="tab-pane fade" id="autres-metiers" role="tabpanel">
-              <ul class="list-group list-group-flush list-group-link">
-               <li class="list-group-item list-group-item-action">
-                <div class="d-flex align-items-center">
-                 <div>
-                  <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                   <a class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
-                      data-matomo-action="clic"
-                      data-matomo-category="candidature"
-                      data-matomo-option="clic-metiers"
-                      href="{other_job_description.get_absolute_url()}?back_url=/company/{company.pk}/card">
-                    Peintre
-                   </a>
-                  </div>
-                  <span class="fs-sm mt-1 d-flex align-items-center">
-                   <i class="ri-map-pin-2-line ri-sm me-1">
-                   </i>
-                   Vannes (56)
-                  </span>
-                 </div>
-                 <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
-                  <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">
-                   CDI
-                  </span>
-                 </div>
-                </div>
-               </li>
-              </ul>
-             </div>
-             <div class="d-flex justify-content-end mt-3">
-              <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
-                 href="/apply/{company.pk}/start"
-                 data-matomo-event=true data-matomo-category=candidature data-matomo-action=clic
-                 data-matomo-option=start_application
-                 aria-label="Postuler aupr&egrave;s de l'employeur solidaire Les petits jardins">
-               <i class="ri-draft-line">
-               </i>
-               <span>
-                Postuler
-               </span>
-              </a>
-             </div>
-            </div>
-            """,
-            html=True,
-            count=1,
-        )
+        assert str(tab_content_soup) == self.snapshot(name="tab-content")
+
         self.assertContains(response, self.APPLY)
 
     def test_block_job_applications(self):
@@ -443,102 +144,17 @@ class CardViewTest(TestCase):
         )
         url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         response = self.client.get(url)
-        self.assertContains(
+
+        nav_tabs_soup = parse_response_to_soup(response, selector=".s-tabs-01__nav")
+        assert str(nav_tabs_soup) == self.snapshot(name="nav-tabs")
+
+        tab_content_soup = parse_response_to_soup(
             response,
-            """
-            <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" role="tablist">
-             <li class="nav-item" role="presentation">
-              <a aria-controls="recrutements-en-cours"
-                 aria-selected="true"
-                 class="nav-link active"
-                 data-bs-toggle="tab"
-                 href="#recrutements-en-cours"
-                 id="recrutements-en-cours-tab"
-                 role="tab">
-               Recrutement en cours
-               <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">
-                0
-               </span>
-              </a>
-             </li>
-             <li class="nav-item" role="presentation">
-              <a aria-controls="autres-metiers"
-                 aria-selected="false"
-                 class="nav-link"
-                 data-bs-toggle="tab"
-                 href="#autres-metiers"
-                 id="autres-metiers-tab"
-                 role="tab">
-               Autre m&eacute;tier exerc&eacute;
-               <span class="badge badge-sm rounded-pill bg-info-light text-dark ms-2">
-                1
-               </span>
-              </a>
-             </li>
-             <li class="nav-item-dropdown dropdown" role="presentation">
-              <a aria-expanded="false"
-                 class="nav-link dropdown-toggle"
-                 data-bs-toggle="dropdown"
-                 href="#"
-                 id="sTabs01DropdownMoreLink"
-                 role="button">
-               <i class="ri-more-line">
-               </i>
-              </a>
-              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-end">
-              </div>
-             </li>
-            </ul>
-            """,
-            html=True,
-            count=1,
+            selector=".tab-content",
+            replace_objects_pk_in_href=[job_description, company, company],
         )
-        self.assertContains(
-            response,
-            f"""
-            <div class="tab-content">
-             <div aria-labelledby="recrutements-en-cours-tab"
-                  class="tab-pane fade active show"
-                  id="recrutements-en-cours"
-                  role="tabpanel">
-              <p class="mb-0">
-               Pour le moment, il n&rsquo;y a aucun recrutement en cours dans cette structure.
-              </p>
-             </div>
-             <div aria-labelledby="autres-metiers-tab" class="tab-pane fade" id="autres-metiers" role="tabpanel">
-              <ul class="list-group list-group-flush list-group-link">
-               <li class="list-group-item list-group-item-action">
-                <div class="d-flex align-items-center">
-                 <div>
-                  <div class="d-flex flex-column flex-lg-row align-items-lg-center">
-                   <a class="font-weight-bold stretched-link order-2 order-md-1 matomo-event"
-                      data-matomo-action="clic"
-                      data-matomo-category="candidature"
-                      data-matomo-option="clic-metiers"
-                      href="{job_description.get_absolute_url()}?back_url=/company/{company.pk}/card">
-                    Plaquiste
-                   </a>
-                  </div>
-                  <span class="fs-sm mt-1 d-flex align-items-center">
-                   <i class="ri-map-pin-2-line ri-sm me-1">
-                   </i>
-                   Vannes (56)
-                  </span>
-                 </div>
-                 <div class="mt-lg-0 ms-auto d-flex flex-column align-items-end justify-content-center">
-                  <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">
-                   CDI
-                  </span>
-                 </div>
-                </div>
-               </li>
-              </ul>
-             </div>
-            </div>
-            """,
-            html=True,
-            count=1,
-        )
+        assert str(tab_content_soup) == self.snapshot(name="tab-content")
+
         self.assertNotContains(response, self.APPLY)
 
 
