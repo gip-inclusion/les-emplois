@@ -1,3 +1,5 @@
+{% load matomo %}
+
 <div class="col mb-3 mb-md-5">
     <div class="c-box p-0 h-100">
         <div class="d-flex p-3 p-lg-4">
@@ -11,28 +13,28 @@
         <div class="px-3 px-lg-4">
             <ul class="list-unstyled mb-lg-5">
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{{ request.current_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="btn-link btn-ico">
+                    <a href="{{ request.current_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-infos-entreprise" %}>
                         <i class="ri-eye-line ri-lg font-weight-normal"></i>
                         <span>Voir la fiche publique</span>
                     </a>
                 </li>
                 {% if request.is_current_organization_admin %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'companies_views:edit_company_step_contact_infos' %}" class="btn-link btn-ico">
+                        <a href="{% url 'companies_views:edit_company_step_contact_infos' %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "modifier-infos-entreprise" %}>
                             <i class="ri-pencil-line ri-lg font-weight-normal"></i>
                             <span>Modifier les informations</span>
                         </a>
                     </li>
                 {% endif %}
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'companies_views:job_description_list' %}" class="btn-link btn-ico">
+                    <a href="{% url 'companies_views:job_description_list' %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-liste-metiers" %}>
                         <i class="ri-briefcase-line ri-lg font-weight-normal"></i>
                         <span>Gérer les métiers et recrutements</span>
                     </a>
                 </li>
                 {% if request.current_organization.is_active %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
-                        <a href="{% url 'companies_views:members' %}" class="btn-link btn-ico">
+                        <a href="{% url 'companies_views:members' %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "gerer-collaborateurs" %}>
                             <i class="ri-team-line ri-lg font-weight-normal"></i>
                             <span>Gérer les collaborateurs</span>
                         </a>
