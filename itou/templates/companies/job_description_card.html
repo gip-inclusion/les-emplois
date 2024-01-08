@@ -31,7 +31,10 @@
                     <h2 class="visually-hidden">Actions rapides</h2>
                     {% if can_update_job_description %}
                         <div class="c-box mb-3 mb-lg-5">
-                            <a href="{% url "companies_views:update_job_description" job_description_id=job.pk %}" class="btn btn-primary btn-block btn-ico" aria-label="Modifier la fiche de poste">
+                            <a href="{% url "companies_views:update_job_description" job_description_id=job.pk %}"
+                               class="btn btn-primary btn-block btn-ico"
+                               aria-label="Modifier la fiche de poste"
+                               {% matomo_event "employeurs" "clic" "edit-fiche-de-poste" %}>
                                 <i class="ri-pencil-line ri-lg"></i>
                                 <span>Modifier</span>
                             </a>

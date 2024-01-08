@@ -65,6 +65,7 @@
                                                 <td>
                                                     <a href="{% url "companies_views:job_description_card" job_description_id=job_description.id %}"
                                                        class="btn-link"
+                                                       {% matomo_event "candidature" "clic" "clic-metiers" %}
                                                        aria-label="Lien vers fiche de poste : '{{ job_description.display_name }}'"
                                                        title="{{ job_description.display_name }}">
                                                         {{ job_description.display_name|truncatechars:50 }}
