@@ -257,16 +257,5 @@
             <script src="{% static "js/matomo.js" %}"></script>
         {% endif %}
 
-
-        {# Display "Je donne mon avis" only on HP. #}
-        {# The rationale behind it: "Je donne mon avis" is imposed by DINUM but is redundant with Hotjar. #}
-        {# Hotjar is way more powerful. Compromise: display "Je donne mon avis" only on HP. #}
-        {% if request.path == "/" %}
-            <div class="fixed-sm-bottom text-center text-sm-right p-3 pe-sm-2 pb-sm-2">
-                <a href="https://voxusagers.numerique.gouv.fr/Demarches/2436?&view-mode=formulaire-avis&nd_mode=en-ligne-enti%C3%A8rement&nd_source=button&key=ca117c905602fb63fda68b31ee0f5bdd" target="_blank">
-                    <img class="give-my-advice" src="{% static 'img/je-donne-mon-avis.svg' %}" alt="Je donne mon avis sur cette démarche">
-                </a>
-            </div>
-        {% endif %}
     </body>
 </html>
