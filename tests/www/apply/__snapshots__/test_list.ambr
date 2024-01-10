@@ -171,12 +171,12 @@
   
   
                                       
+  
+  
       <hr/>
       <fieldset>
-          <legend>Département du candidat</legend>
-          
-              <p class="mb-2">Aucun département renseigné.</p>
-          
+          <div class="form-group"><label class="form-label" for="id_departments">Département du candidat</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_departments" lang="fr" multiple="" name="departments">
+  </select></div>
       </fieldset>
   
   
@@ -190,12 +190,12 @@
   </fieldset>
   
                                       
+  
+  
       <hr/>
       <fieldset>
-          <legend>Fiches de poste</legend>
-          
-              <p class="mb-2">Aucune candidature n'est rattachée à une fiche de poste.</p>
-          
+          <div class="form-group"><label class="form-label" for="id_selected_jobs">Fiches de poste</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_selected_jobs" lang="fr" multiple="" name="selected_jobs">
+  </select></div>
       </fieldset>
   
   
@@ -366,12 +366,12 @@
   
   
                                       
+  
+  
       <hr/>
       <fieldset>
-          <legend>Département du candidat</legend>
-          
-              <p class="mb-2">Aucun département renseigné.</p>
-          
+          <div class="form-group"><label class="form-label" for="id_departments">Département du candidat</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_departments" lang="fr" multiple="" name="departments">
+  </select></div>
       </fieldset>
   
   
@@ -385,12 +385,12 @@
   </fieldset>
   
                                       
+  
+  
       <hr/>
       <fieldset>
-          <legend>Fiches de poste</legend>
-          
-              <p class="mb-2">Aucune candidature n'est rattachée à une fiche de poste.</p>
-          
+          <div class="form-group"><label class="form-label" for="id_selected_jobs">Fiches de poste</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_selected_jobs" lang="fr" multiple="" name="selected_jobs">
+  </select></div>
       </fieldset>
   
   
@@ -548,12 +548,12 @@
   
   
                                       
+  
+  
       <hr/>
       <fieldset>
-          <legend>Département du candidat</legend>
-          
-              <p class="mb-2">Aucun département renseigné.</p>
-          
+          <div class="form-group"><label class="form-label" for="id_departments">Département du candidat</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_departments" lang="fr" multiple="" name="departments">
+  </select></div>
       </fieldset>
   
   
@@ -567,12 +567,12 @@
   </fieldset>
   
                                       
+  
+  
       <hr/>
       <fieldset>
-          <legend>Fiches de poste</legend>
-          
-              <p class="mb-2">Aucune candidature n'est rattachée à une fiche de poste.</p>
-          
+          <div class="form-group"><label class="form-label" for="id_selected_jobs">Fiches de poste</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_selected_jobs" lang="fr" multiple="" name="selected_jobs">
+  </select></div>
       </fieldset>
   
   
@@ -1426,12 +1426,12 @@
   </fieldset>
   
                                       
+  
+  
       <hr/>
       <fieldset>
-          <legend>Fiches de poste</legend>
-          
-              <p class="mb-2">Aucune candidature n'est rattachée à une fiche de poste.</p>
-          
+          <div class="form-group"><label class="form-label" for="id_selected_jobs">Fiches de poste</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_selected_jobs" lang="fr" multiple="" name="selected_jobs">
+  </select></div>
       </fieldset>
   
   
@@ -1505,12 +1505,12 @@
   
   
                                       
+  
+  
       <hr/>
       <fieldset>
-          <legend>Département du candidat</legend>
-          
-              <p class="mb-2">Aucun département renseigné.</p>
-          
+          <div class="form-group"><label class="form-label" for="id_departments">Département du candidat</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_departments" lang="fr" multiple="" name="departments">
+  </select></div>
       </fieldset>
   
   

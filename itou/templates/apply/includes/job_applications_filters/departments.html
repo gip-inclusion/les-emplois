@@ -1,20 +1,8 @@
+{% load django_bootstrap5 %}
+
 {% if filters_form.departments %}
     <hr>
     <fieldset>
-        <legend>Département du candidat</legend>
-        {% if filters_form.departments|length > 0 %}
-            <ul>
-                {% for choice in filters_form.departments %}
-                    <li>
-                        <div class="form-check">
-                            <input id="{{ choice.id_for_label }}" class="form-check-input" name="{{ choice.data.name }}" type="checkbox" value="{{ choice.data.value }}" {% if choice.data.selected %}checked=""{% endif %}>
-                            <label for="{{ choice.id_for_label }}" class="form-check-label">{{ choice.choice_label }}</label>
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p class="mb-2">Aucun département renseigné.</p>
-        {% endif %}
+        {% bootstrap_field filters_form.departments %}
     </fieldset>
 {% endif %}
