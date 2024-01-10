@@ -1,6 +1,8 @@
 from allauth.account.forms import LoginForm
 from django import forms
 from django.conf import settings
+from django.urls import reverse
+from django.utils.html import format_html
 
 from itou.users.models import User
 
@@ -12,6 +14,10 @@ class ItouLoginForm(LoginForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["password"].widget.attrs["placeholder"] = "**********"
+        self.fields["password"].help_text = format_html(
+            '<a href="{}" class="btn-link fs-sm">Mot de passe oublié ?</a>',
+            reverse("account_reset_password"),
+        )
         self.fields["login"].widget.attrs["placeholder"] = "adresse@email.fr"
         self.fields["login"].label = "Adresse e-mail"
         self.fields["login"].widget.attrs["autofocus"] = True
