@@ -967,11 +967,9 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     departments = forms.MultipleChoiceField(
         required=False,
         label="Département du candidat",
-        widget=forms.CheckboxSelectMultiple,
+        widget=Select2MultipleWidget,
     )
-    selected_jobs = forms.MultipleChoiceField(
-        required=False, label="Fiches de poste", widget=forms.CheckboxSelectMultiple
-    )
+    selected_jobs = forms.MultipleChoiceField(required=False, label="Fiches de poste", widget=Select2MultipleWidget)
 
     @sentry_sdk.trace
     def __init__(self, job_applications_qs, *args, **kwargs):
