@@ -71,7 +71,7 @@ class CardViewTest(TestCase):
         tab_content_soup = parse_response_to_soup(
             response,
             selector=".tab-content",
-            replace_objects_pk_in_href=[job_description, company, company],
+            replace_objects_pk_in_href=[job_description, company],
         )
         assert str(tab_content_soup) == self.snapshot(name="tab-content")
 
@@ -94,7 +94,7 @@ class CardViewTest(TestCase):
         tab_content_soup = parse_response_to_soup(
             response,
             selector=".tab-content",
-            replace_objects_pk_in_href=[job_description, company, company],
+            replace_objects_pk_in_href=[job_description, company],
         )
         assert str(tab_content_soup) == self.snapshot(name="tab-content")
 
@@ -128,7 +128,7 @@ class CardViewTest(TestCase):
         tab_content_soup = parse_response_to_soup(
             response,
             selector=".tab-content",
-            replace_objects_pk_in_href=[active_job_description, company, other_job_description, company, company],
+            replace_objects_pk_in_href=[active_job_description, other_job_description, company],
         )
         assert str(tab_content_soup) == self.snapshot(name="tab-content")
 
@@ -151,7 +151,7 @@ class CardViewTest(TestCase):
         tab_content_soup = parse_response_to_soup(
             response,
             selector=".tab-content",
-            replace_objects_pk_in_href=[job_description, company, company],
+            replace_objects_pk_in_href=[job_description, company],
         )
         assert str(tab_content_soup) == self.snapshot(name="tab-content")
 
