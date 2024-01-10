@@ -10,10 +10,7 @@
                 {% bootstrap_form_errors form type="all" %}
                 {% redirection_input_field value=redirect_field_value %}
                 {% bootstrap_field form.login %}
-                {% bootstrap_field form.password wrapper_class="mb-1" %}
-                <div class="form-group">
-                    <a href="{% url 'account_reset_password' %}" class="btn-link fs-sm">Mot de passe oublié ?</a>
-                </div>
+                {% bootstrap_field form.password wrapper_class="mb-3" %}
             </div>
         </div>
     </fieldset>
