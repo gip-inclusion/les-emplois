@@ -135,7 +135,7 @@ class JobApplicationInline(ItouTabularInline):
     can_delete = False
     fields = ("pk_link", "sender_kind", "to_company_link", "state")
     readonly_fields = fields
-    list_select_related = ("to_company",)
+    list_select_related = ("to_company", "job_seeker")
 
     def has_change_permission(self, request, obj=None):
         return False

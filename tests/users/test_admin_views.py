@@ -4,8 +4,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertRedirects
 
+from itou.job_applications.enums import SenderKind
 from itou.users.enums import UserKind
 from itou.users.models import IdentityProvider, User
 from itou.utils.models import PkSupportRemark
@@ -16,7 +17,7 @@ from tests.users.factories import (
     JobSeekerFactory,
     PrescriberFactory,
 )
-from tests.utils.test import assertMessages
+from tests.utils.test import BASE_NUM_QUERIES, assertMessages
 
 
 def test_add_user(client):
@@ -266,3 +267,40 @@ def test_free_ic_email(admin_client):
     assert employer.is_active is False
     assert employer.username == "old_ic_uuid_username"
     assert employer.email == "ic_user@email.com_old"
+
+
+def test_num_queries(admin_client):
+    prescriber = PrescriberFactory()
+    sent_job_application1 = JobApplicationFactory(
+        sender=prescriber,
+        sender_kind=SenderKind.PRESCRIBER,
+    )
+    JobApplicationFactory(
+        job_seeker=sent_job_application1.job_seeker,
+        sender=prescriber,
+        sender_kind=SenderKind.PRESCRIBER,
+    )
+    # prewarm ContentType cache if needed to avoid extra query
+    ContentType.objects.get_for_model(prescriber)
+    with assertNumQueries(
+        BASE_NUM_QUERIES
+        + 1  # Load Django session
+        + 1  # Load admin user
+        + 2  # savepoint & release
+        + 1  # load user
+        + 1  # users_user_groups
+        + 1  # auth_permission
+        + 1  # companies_companymembership
+        + 1  # institutions_institutionmembership
+        + 1  # eligibility_eligibilitydiagnosis
+        + 1  # eligibility_geiqeligibilitydiagnosis
+        + 1  # approvals_approval
+        + 1  # account_emailaddress
+        + 1  # job_applications_jobapplication
+        + 1  # prescribers_prescribermembership
+        + 1  # utils_pksupportremark
+        + 2  # auth_group & auth_permission
+        + 3  # savepoint, session update & release
+    ):
+        response = admin_client.get(reverse("admin:users_user_change", kwargs={"object_id": prescriber.pk}))
+    assert response.status_code == 200
