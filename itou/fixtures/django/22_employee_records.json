@@ -6,6 +6,7 @@
       "asp_batch_file": "RIAE_FS_20210512102743.json",
       "asp_batch_line_number": 4,
       "asp_id": 3430,
+      "asp_measure": "",
       "asp_processing_code": null,
       "asp_processing_label": null,
       "created_at": "2021-05-12T10:16:09.639Z",
@@ -15,7 +16,7 @@
       "processed_at": null,
       "siret": "99999999999991",
       "status": "SENT",
-      "updated_at": "2021-05-12T10:27:43.343Z"
+      "updated_at": "2024-01-10T13:12:47.080Z"
     },
     "model": "employee_record.employeerecord",
     "pk": 1
@@ -27,6 +28,7 @@
       "asp_batch_file": "RIAE_FS_20210512102743.json",
       "asp_batch_line_number": 3,
       "asp_id": 3430,
+      "asp_measure": "",
       "asp_processing_code": "0000",
       "asp_processing_label": "OK",
       "created_at": "2021-05-12T10:16:55.551Z",
@@ -36,7 +38,7 @@
       "processed_at": null,
       "siret": "99999999999992",
       "status": "PROCESSED",
-      "updated_at": "2021-05-12T15:12:05.098Z"
+      "updated_at": "2024-01-10T13:12:47.080Z"
     },
     "model": "employee_record.employeerecord",
     "pk": 2
@@ -48,6 +50,7 @@
       "asp_batch_file": "RIAE_FS_20210512102743.json",
       "asp_batch_line_number": 2,
       "asp_id": 3430,
+      "asp_measure": "",
       "asp_processing_code": null,
       "asp_processing_label": null,
       "created_at": "2021-05-12T10:17:33.420Z",
@@ -57,7 +60,7 @@
       "processed_at": null,
       "siret": "99999999999993",
       "status": "SENT",
-      "updated_at": "2021-05-12T10:27:43.333Z"
+      "updated_at": "2024-01-10T13:12:47.080Z"
     },
     "model": "employee_record.employeerecord",
     "pk": 3
@@ -69,6 +72,7 @@
       "asp_batch_file": "RIAE_FS_20210512102743.json",
       "asp_batch_line_number": 1,
       "asp_id": 3430,
+      "asp_measure": "",
       "asp_processing_code": "0012",
       "asp_processing_label": "JSON Invalide",
       "created_at": "2021-05-12T10:17:57Z",
@@ -78,7 +82,7 @@
       "processed_at": null,
       "siret": "99999999999994",
       "status": "REJECTED",
-      "updated_at": "2021-05-12T14:45:55.281Z"
+      "updated_at": "2024-01-10T13:12:47.080Z"
     },
     "model": "employee_record.employeerecord",
     "pk": 4
