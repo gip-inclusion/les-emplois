@@ -82,7 +82,12 @@
     {% else %}
         <form method="post" novalidate>
             {% csrf_token %}
-            <div class="form-row">{{ form }}</div>
+            <div class="form-row">
+                {{ form }}
+                {% if to_user %}
+                    <strong>Dans le cas d’un transfert partiel des objets : merci de vérifier que les objets ne seront pas orphelins. Ex : transfert d’un pass sans le diag associé.</strong>
+                {% endif %}
+            </div>
             <div class="submit-row">
                 <input class="default{% if to_user %} with-confirm{% endif %}" type="submit" value="Valider">
             </div>
