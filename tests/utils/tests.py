@@ -8,6 +8,7 @@ from datetime import date
 
 import faker
 import pytest
+from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Permission
@@ -1462,3 +1463,32 @@ def test_job_application_state_badge_processing(state, snapshot):
 def test_job_application_state_badge_oob_swap(snapshot):
     job_application = JobApplicationFactory(id="00000000-0000-0000-0000-000000000000")
     assert job_applications.state_badge(job_application, hx_swap_oob=True) == snapshot
+
+
+class UtilsParseResponseToSoupTest(TestCase):
+    def test_parse_wo_selector(self):
+        html = '<html><head></head><body><div id="foo">bar</div></body></html>'
+        response = HttpResponse(html)
+        assert parse_response_to_soup(response) == BeautifulSoup(html, "html.parser")
+
+    def test_parse_with_selector(self):
+        response = HttpResponse('<html><head></head><body><div id="foo">bar</div></body></html>')
+        assert str(parse_response_to_soup(response, selector="#foo")) == '<div id="foo">bar</div>'
+
+    def test_replace_in_href_mixing_tuple_and_object(self):
+        jobseeker = JobSeekerFactory()
+        response = HttpResponse(
+            "<html><head></head><body>"
+            f'<div><a href="http://server.com/{jobseeker.pk}/">salmon</a></div>'
+            '<div><a href="http://server.com/bream/">bream</a></div>'
+            '<div><a href="http://server.com/red_mullet/">red mullet</a></div>'
+            "</body></html>"
+        )
+        soup = parse_response_to_soup(response, replace_in_href=[jobseeker, ("red_mullet", "slug2")])
+        assert str(soup) == (
+            "<html><head></head><body>"
+            '<div><a href="http://server.com/[PK of User]/">salmon</a></div>'
+            '<div><a href="http://server.com/bream/">bream</a></div>'
+            '<div><a href="http://server.com/slug2/">red mullet</a></div>'
+            "</body></html>"
+        )
