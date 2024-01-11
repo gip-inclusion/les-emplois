@@ -14,7 +14,8 @@ def _clean_orphans_duplicate(apps, schema_editor):
     print(f"Found {ja_with_multiple_er.count()} job applications with more than 1 employee record")
     for ja_pk in ja_with_multiple_er:
         all_related_er = EmployeeRecord.objects.filter(job_application=ja_pk)
-        orphaned_er = all_related_er.orphans()
+        # This exclude is what we called orphaned ER
+        orphaned_er = all_related_er.exclude(job_application__to_company__convention__asp_id=F("asp_id"))
 
         # Fewer orphans than non-orphans, we can safely delete the orphans
         if orphaned_er.count() < all_related_er.count():
