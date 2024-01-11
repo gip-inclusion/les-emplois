@@ -71,7 +71,14 @@ class CardViewTest(TestCase):
         tab_content_soup = parse_response_to_soup(
             response,
             selector=".tab-content",
-            replace_objects_pk_in_href=[job_description, company],
+            replace_in_href=[
+                (
+                    f"/company/job_description/{job_description.pk}/card",
+                    "/company/job_description/[PK of JobDescription]/card",
+                ),
+                (f"?back_url=/company/{company.pk}/card", "?back_url=/company/[PK of Company]/card"),
+                (f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
+            ],
         )
         assert str(tab_content_soup) == self.snapshot(name="tab-content")
 
@@ -94,7 +101,14 @@ class CardViewTest(TestCase):
         tab_content_soup = parse_response_to_soup(
             response,
             selector=".tab-content",
-            replace_objects_pk_in_href=[job_description, company],
+            replace_in_href=[
+                (
+                    f"/company/job_description/{job_description.pk}/card",
+                    "/company/job_description/[PK of JobDescription]/card",
+                ),
+                (f"?back_url=/company/{company.pk}/card", "?back_url=/company/[PK of Company]/card"),
+                (f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
+            ],
         )
         assert str(tab_content_soup) == self.snapshot(name="tab-content")
 
@@ -128,7 +142,18 @@ class CardViewTest(TestCase):
         tab_content_soup = parse_response_to_soup(
             response,
             selector=".tab-content",
-            replace_objects_pk_in_href=[active_job_description, other_job_description, company],
+            replace_in_href=[
+                (
+                    f"/company/job_description/{active_job_description.pk}/card",
+                    "/company/job_description/[PK of JobDescription]/card",
+                ),
+                (
+                    f"/company/job_description/{other_job_description.pk}/card",
+                    "/company/job_description/[PK of JobDescription]/card",
+                ),
+                (f"?back_url=/company/{company.pk}/card", "?back_url=/company/[PK of Company]/card"),
+                (f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
+            ],
         )
         assert str(tab_content_soup) == self.snapshot(name="tab-content")
 
@@ -151,7 +176,14 @@ class CardViewTest(TestCase):
         tab_content_soup = parse_response_to_soup(
             response,
             selector=".tab-content",
-            replace_objects_pk_in_href=[job_description, company],
+            replace_in_href=[
+                (
+                    f"/company/job_description/{job_description.pk}/card",
+                    "/company/job_description/[PK of JobDescription]/card",
+                ),
+                (f"?back_url=/company/{company.pk}/card", "?back_url=/company/[PK of Company]/card"),
+                (f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
+            ],
         )
         assert str(tab_content_soup) == self.snapshot(name="tab-content")
 
