@@ -119,7 +119,7 @@ class ListEmployeeRecordsTest(TestCase):
             parse_response_to_soup(
                 response,
                 selector=".employee-records-list .card-body > div:last-child",
-                replace_objects_pk_in_href=[self.job_application],
+                replace_in_href=[self.job_application],
             )
         ) == self.snapshot(name="action")
 
@@ -141,7 +141,7 @@ class ListEmployeeRecordsTest(TestCase):
                 parse_response_to_soup(
                     response,
                     selector=".employee-records-list .card-body > div:last-child",
-                    replace_objects_pk_in_href=[self.job_application, employee_record],
+                    replace_in_href=[self.job_application, employee_record],
                 )
             )
             == self.snapshot()
@@ -163,7 +163,7 @@ class ListEmployeeRecordsTest(TestCase):
             parse_response_to_soup(
                 response,
                 selector=".employee-records-list .card-body > div:last-child",
-                replace_objects_pk_in_href=[self.job_application],
+                replace_in_href=[self.job_application],
             )
         ) == self.snapshot(name="action")
 
@@ -185,7 +185,7 @@ class ListEmployeeRecordsTest(TestCase):
                 parse_response_to_soup(
                     response,
                     selector=".employee-records-list .card-body > div:last-child",
-                    replace_objects_pk_in_href=[self.job_application, employee_record],
+                    replace_in_href=[self.job_application, employee_record],
                 )
             )
             == self.snapshot()
@@ -202,7 +202,7 @@ class ListEmployeeRecordsTest(TestCase):
                 parse_response_to_soup(
                     response,
                     selector=".employee-records-list .card-body > div:last-child",
-                    replace_objects_pk_in_href=[self.job_application, employee_record],
+                    replace_in_href=[self.job_application, employee_record],
                 )
             )
             == self.snapshot()
@@ -225,7 +225,7 @@ class ListEmployeeRecordsTest(TestCase):
             parse_response_to_soup(
                 response,
                 selector=".employee-records-list .card-body > div:last-child",
-                replace_objects_pk_in_href=[self.job_application],
+                replace_in_href=[self.job_application],
             )
         ) == self.snapshot(name="action")
 
@@ -247,7 +247,7 @@ class ListEmployeeRecordsTest(TestCase):
             parse_response_to_soup(
                 response,
                 selector=".employee-records-list .card-body > div:last-child",
-                replace_objects_pk_in_href=[new_er],
+                replace_in_href=[new_er],
             )
         ) == self.snapshot(name="action")
 

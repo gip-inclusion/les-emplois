@@ -53,7 +53,7 @@ def pprint_html(response, **selectors):
     print("\n\n".join([elt.prettify() for elt in parser.find_all(**selectors)]))
 
 
-def parse_response_to_soup(response, selector=None, no_html_body=False, replace_objects_pk_in_href=None):
+def parse_response_to_soup(response, selector=None, no_html_body=False, replace_in_href=None):
     soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
     if no_html_body:
         # If the provided HTML does not contain <html><body> tags
@@ -68,9 +68,9 @@ def parse_response_to_soup(response, selector=None, no_html_body=False, replace_
         soup["nonce"] = "NORMALIZED_CSP_NONCE"
     for csp_nonce_script in soup.find_all("script", {"nonce": True}):
         csp_nonce_script["nonce"] = "NORMALIZED_CSP_NONCE"
-    if replace_objects_pk_in_href:
+    if replace_in_href:
         for links in soup.find_all(attrs={"href": True}):
-            for obj in replace_objects_pk_in_href:
+            for obj in replace_in_href:
                 links.attrs["href"] = links.attrs["href"].replace(str(obj.pk), f"[PK of {type(obj).__name__}]")
     return soup
 
