@@ -69,9 +69,14 @@ def parse_response_to_soup(response, selector=None, no_html_body=False, replace_
     for csp_nonce_script in soup.find_all("script", {"nonce": True}):
         csp_nonce_script["nonce"] = "NORMALIZED_CSP_NONCE"
     if replace_in_href:
+        replacements = [
+            replacement
+            if isinstance(replacement, tuple)
+            else (str(replacement.pk), f"[PK of {type(replacement).__name__}]")
+            for replacement in replace_in_href
+        ]
         for links in soup.find_all(attrs={"href": True}):
-            for obj in replace_in_href:
-                links.attrs["href"] = links.attrs["href"].replace(str(obj.pk), f"[PK of {type(obj).__name__}]")
+            [links.attrs.update({"href": links.attrs["href"].replace(*replacement)}) for replacement in replacements]
     return soup
 
 
