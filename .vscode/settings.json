@@ -31,5 +31,5 @@
     "explorer.confirmDragAndDrop": false,
     "vim.handleKeys": {
         "<C-p>": false
-     }
+    }
 }
