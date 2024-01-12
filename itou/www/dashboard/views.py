@@ -5,6 +5,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.db.models import F
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
@@ -366,7 +367,9 @@ def api_token(request, template_name="dashboard/api_token.html"):
     context = {
         "login_string": TOKEN_ID_STR,
         "token": token,
-        "siaes_names": request.user.companymembership_set.active_admin().values_list("company__name", flat=True),
+        "companies": request.user.companymembership_set.active_admin().values(
+            name=F("company__name"), uid=F("company__uid")
+        ),
     }
 
     return render(request, template_name, context)

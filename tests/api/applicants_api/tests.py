@@ -1,5 +1,7 @@
+import factory
 from django.urls import reverse_lazy
 from rest_framework.test import APIClient, APITestCase
+from unittest_parametrize import ParametrizedTestCase, parametrize
 
 from tests.asp.factories import CommuneFactory, CountryFactory
 from tests.companies.factories import CompanyFactory
@@ -10,7 +12,7 @@ from tests.users.factories import JobSeekerFactory
 from tests.utils.test import BASE_NUM_QUERIES
 
 
-class ApplicantsAPITest(APITestCase):
+class ApplicantsAPITest(APITestCase, ParametrizedTestCase):
     URL = reverse_lazy("v1:applicants-list")
 
     def setUp(self):
@@ -67,13 +69,77 @@ class ApplicantsAPITest(APITestCase):
 
         with self.assertNumQueries(
             BASE_NUM_QUERIES
-            + 1  # companymembership check (ApplicantsAPIPermission)
-            + 1  # siaes_companymembership fetch for request.user (get_queryset)
-            + 1  # count users
+            + 1  # companymembership.is_admin check (ApplicantsAPIPermission)
+            + 1  # get_queryset: job_application subquery (job_applications__to_company_id__in)
+            + 1  # get queryset main query.
         ):
             response = self.client.get(self.URL, format="json")
         assert response.status_code == 200
         assert response.json().get("results") == []
+
+    @parametrize(
+        ("mode_multi_structures", "uid_structures", "expected_first_names"),
+        [
+            ("", "", ["Bob", "Dylan"]),
+            ("1", "", ["Bob", "Dylan", "Casper", "Nicholas"]),
+            ("", "76c51a19-0ae9-420c-b2e3-0ab33836bd50", ["Bob", "Dylan"]),
+            (
+                "",
+                "76c51a19-0ae9-420c-b2e3-0ab33836bd50,87c9e1d8-4498-40d7-a1df-1d3412378c87",
+                ["Bob", "Dylan", "Casper", "Nicholas"],
+            ),
+            ("1", "76c51a19-0ae9-420c-b2e3-0ab33836bd50", ["Bob", "Dylan"]),
+            ("", "I-am-not-a-uid", []),
+            ("", "326dea3d-d17d-4f2c-9ffa-8e9cb305ae44", []),
+        ],
+    )
+    def test_login_as_siae_multiple_memberships(self, mode_multi_structures, uid_structures, expected_first_names):
+        # Populate database with extra data to make sure filters work.
+        JobApplicationFactory.create_batch(2, to_company_id=CompanyFactory().pk)
+
+        # First company: 2 applicants, 3 job applications.
+        company_1 = CompanyFactory(uid="76c51a19-0ae9-420c-b2e3-0ab33836bd50", with_membership=True)
+        employer = company_1.members.first()
+        JobApplicationFactory(job_seeker__first_name="Bob", to_company=company_1).job_seeker
+        dylan = JobApplicationFactory(job_seeker__first_name="Dylan", to_company=company_1).job_seeker
+        JobApplicationFactory(to_company_id=company_1.pk, job_seeker_id=dylan.pk)
+
+        # Second company: 3 applicants, including one that is already in company_1.
+        company_2 = CompanyFactory(
+            uid="87c9e1d8-4498-40d7-a1df-1d3412378c87",
+            with_membership=True,
+            membership__is_admin=True,
+            membership__user=employer,
+        )
+        JobApplicationFactory.create_batch(
+            2, to_company_id=company_2.pk, job_seeker__first_name=factory.Iterator(["Casper", "Nicholas"])
+        )
+        JobApplicationFactory(to_company_id=company_2.pk, job_seeker_id=dylan.pk)
+
+        num_queries = (
+            BASE_NUM_QUERIES
+            + 1  # companymembership check (ApplicantsAPIPermission)
+            + 1  # get_queryset: job_application subquery (job_applications__to_company_id__in)
+        )
+        if len(expected_first_names) > 0:
+            # Subquery returned results, so the main query is executed.
+            num_queries = num_queries + 1 + 1  # User & UserProfile
+
+        self.client.force_authenticate(employer)
+
+        with self.assertNumQueries(num_queries):
+            response = self.client.get(
+                self.URL,
+                format="json",
+                data={
+                    "mode_multi_structures": mode_multi_structures,
+                    "uid_structures": uid_structures,
+                },
+            )
+            assert response.status_code == 200
+            results = response.json().get("results")
+            assert sorted(expected_first_names) == sorted([result["prenom"] for result in results])
+            assert len(results) == len(expected_first_names)
 
     def test_applicant_data(self):
         company = CompanyFactory(with_membership=True)
@@ -107,7 +173,6 @@ class ApplicantsAPITest(APITestCase):
             BASE_NUM_QUERIES
             + 1  # companymembership check (ApplicantsAPIPermission)
             + 1  # siaes_companymembership fetch for request.user (get_queryset)
-            + 1  # count users
             + 1  # fetch users
             + 1  # prefetch linked job applications
         ):
