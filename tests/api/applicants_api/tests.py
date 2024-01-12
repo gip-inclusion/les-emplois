@@ -67,13 +67,54 @@ class ApplicantsAPITest(APITestCase):
 
         with self.assertNumQueries(
             BASE_NUM_QUERIES
-            + 1  # companymembership check (ApplicantsAPIPermission)
+            + 1  # companymembership.is_admin check (ApplicantsAPIPermission)
             + 1  # siaes_companymembership fetch for request.user (get_queryset)
-            + 1  # count users
         ):
             response = self.client.get(self.URL, format="json")
         assert response.status_code == 200
         assert response.json().get("results") == []
+
+    def test_login_as_siae_multiple_memberships(self):
+        num_queries = BASE_NUM_QUERIES + 1 + 1  # companymembership check (ApplicantsAPIPermission)  # get_queryset
+        # Connect with an admin user with member of multiple SIAE
+        company1 = CompanyFactory(with_membership=True)
+        employer = company1.members.first()
+        company2 = CompanyFactory(with_membership=True, membership__is_admin=True, membership__user=employer)
+        self.client.force_authenticate(employer)
+        memberships = employer.active_or_in_grace_period_company_memberships()
+        assert all(memberships.values_list("is_admin", flat=True)) is True
+
+        with self.assertNumQueries(num_queries):
+            response = self.client.get(self.url, format="json")
+            assert response.status_code == 200
+            assert response.json().get("results") == []
+
+        job_seeker1 = JobApplicationFactory(to_company=company1).job_seeker
+        JobApplicationFactory(to_company=company1, job_seeker=job_seeker1)
+        job_seeker2 = JobApplicationFactory(to_company=company2).job_seeker
+        JobApplicationFactory(to_company=company2, job_seeker=job_seeker2)
+
+        # When job applications sent to member's companies exist,
+        # the ORM adds 2 queries.
+        additional_queries = 1 + 1  # job applications  # users details
+        # Get job applications sent to the first company the user is member of if no argument passed
+        # (for legacy reasons).
+        with self.assertNumQueries(num_queries + additional_queries):
+            response = self.client.get(self.url, format="json")
+            assert response.status_code == 200
+            assert len(response.json().get("results")) == 2
+
+        # Get job applications sent to every companies the user is member of.
+        with self.assertNumQueries(num_queries + additional_queries):
+            response = self.client.get(
+                self.url,
+                format="json",
+                data={"mode_multi_structures": "1"},
+            )
+        assert response.status_code == 200
+        results = response.json().get("results")
+        assert len(results) == 4
+        assert job_seeker1.last_name, job_seeker2.last_name in [result["nom"] for result in results]
 
     def test_applicant_data(self):
         company = CompanyFactory(with_membership=True)
@@ -107,7 +148,6 @@ class ApplicantsAPITest(APITestCase):
             BASE_NUM_QUERIES
             + 1  # companymembership check (ApplicantsAPIPermission)
             + 1  # siaes_companymembership fetch for request.user (get_queryset)
-            + 1  # count users
             + 1  # fetch users
             + 1  # prefetch linked job applications
         ):
