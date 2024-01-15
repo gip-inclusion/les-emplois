@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from itou.utils.command import BaseCommand
 
-from ... import approvals, employee_record
+from ... import approvals, employee_record, users
 from ...models import Datum
 
 
@@ -35,6 +35,7 @@ class Command(BaseCommand):
         return {
             **approvals.collect_analytics_data(before),
             **employee_record.collect_analytics_data(before),
+            **users.collect_analytics_data(before),
         }
 
     def show_data(self, data):

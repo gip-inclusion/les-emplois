@@ -24,6 +24,13 @@ class DatumCode(models.TextChoices):
     APPROVAL_PE_NOTIFY_PENDING = "AP-102", "PASS IAE en attente de synchronisation avec pole emploi"
     APPROVAL_PE_NOTIFY_ERROR = "AP-103", "PASS IAE en erreur de synchronisation avec pole emploi"
     APPROVAL_PE_NOTIFY_READY = "AP-104", "PASS IAE prêts à être synchronisés avec pole emploi"
+    # Users
+    USER_COUNT = "US-001", "Nombre d'utilisateurs"
+    USER_JOB_SEEKER_COUNT = "US-011", "Nombre de demandeurs d'emploi"
+    USER_PRESCRIBER_COUNT = "US-012", "Nombre de prescripteurs"
+    USER_EMPLOYER_COUNT = "US-013", "Nombre d'employeurs"
+    USER_LABOR_INSPECTOR_COUNT = "US-014", "Nombre d'inspecteurs du travail"
+    USER_ITOU_STAFF_COUNT = "US-015", "Nombre d'administrateurs"
 
 
 class Datum(models.Model):
