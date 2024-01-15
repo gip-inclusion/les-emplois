@@ -703,7 +703,7 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(response, capfirst(job_pec.display_name))
 
         self.assertContains(response, "Contrat PEC - Parcours Emploi Compétences")
-        self.assertContains(response, "logo-pole-emploi.svg")
+        self.assertContains(response, "logo-france-travail.svg")
         self.assertContains(response, "Offre proposée et gérée par pole-emploi.fr")
         self.assertContains(response, "https://external.pec.link/fuuuu")
 
