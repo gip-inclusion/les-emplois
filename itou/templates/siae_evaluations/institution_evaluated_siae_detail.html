@@ -49,9 +49,13 @@
                             </h3>
                             <p>
                                 Numéro de téléphone à utiliser au besoin :
-                                <a aria-label="Contact téléphonique" href="tel:{{ evaluated_siae.siae.phone|cut:" " }}">
-                                    {{ evaluated_siae.siae.phone|format_phone }}
-                                </a>
+                                {% if evaluated_siae.siae.phone %}
+                                    <a aria-label="Contact téléphonique" href="tel:{{ evaluated_siae.siae.phone|cut:" " }}">
+                                        {{ evaluated_siae.siae.phone|format_phone }}
+                                    </a>
+                                {% else %}
+                                    <span>Non renseigné</span>
+                                {% endif %}
                             </p>
                             {% if not evaluated_siae.evaluation_is_final %}
                                 <div class="row">
