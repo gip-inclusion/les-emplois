@@ -18,7 +18,7 @@ from itou.siae_evaluations.models import (
     EvaluationCampaign,
     Sanctions,
 )
-from itou.utils.templatetags.format_filters import format_approval_number
+from itou.utils.templatetags.format_filters import format_approval_number, format_phone
 from itou.utils.types import InclusiveDateRange
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
@@ -963,6 +963,8 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
         self.assertContains(response, formatted_number, html=True, count=1)
         self.assertContains(response, evaluated_job_application.job_application.job_seeker.get_full_name())
+        self.assertContains(response, format_phone(evaluated_siae.siae.phone))
+
         assert response.context["back_url"] == reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",
             kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
@@ -980,6 +982,13 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             """,
             html=True,
             count=1,
+        )
+        # Check without phone now
+        evaluated_siae.siae.phone = ""
+        evaluated_siae.siae.save(update_fields=("phone",))
+        response = self.client.get(url)
+        self.assertContains(
+            response, """<p>Numéro de téléphone à utiliser au besoin :<span>Non renseigné</span>""", html=True
         )
 
         # EvaluatedAdministrativeCriteria uploaded
