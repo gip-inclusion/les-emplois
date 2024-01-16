@@ -9,6 +9,10 @@ class JobApplicationAdminForm(forms.ModelForm):
     class Meta:
         model = JobApplication
         fields = "__all__"
+        labels = {
+            "sender_company": "Entreprise émettrice (si type est Employeur)",
+            "sender_prescriber_organization": "Organisation émettrice (si type est Prescripteur)",
+        }
 
     def clean(self):
         sender = self.cleaned_data["sender"]

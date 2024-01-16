@@ -67,7 +67,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.SET_NULL,
                         related_name="job_applications_sent",
                         to=settings.AUTH_USER_MODEL,
-                        verbose_name="émetteur",
+                        verbose_name="utilisateur émetteur",
                     ),
                 ),
                 (

@@ -112,10 +112,6 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                     "state",
                     "job_seeker",
                     "to_company",
-                    "sender_kind",
-                    "sender",
-                    "sender_company",
-                    "sender_prescriber_organization",
                     "message",
                     "resume_link",
                     "refusal_reason",
@@ -125,6 +121,17 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                     "hiring_end_at",
                     "hidden_for_company",
                     "create_employee_record",
+                ]
+            },
+        ),
+        (
+            "Origine",
+            {
+                "fields": [
+                    "sender",
+                    "sender_kind",
+                    "sender_company",
+                    "sender_prescriber_organization",
                 ]
             },
         ),
