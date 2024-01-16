@@ -1,3 +1,4 @@
+{% load matomo %}
 <div class="alert alert-info">
     <p class="mb-0">Confirmez votre choix en renseignant quelques informations supplémentaires.</p>
 </div>
@@ -19,7 +20,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
-                <button class="btn btn-sm btn-primary" hx-post={{ request.path }} hx-vals='{"confirmed": "True"}' hx-include="#acceptForm">Confirmer
+                <button class="btn btn-sm btn-primary" hx-post={{ request.path }} hx-vals='{"confirmed": "True"}' hx-include="#acceptForm" {% matomo_event "candidature" "submit" "accept_application" %}>Confirmer
                 </button>
             </div>
         </div>
