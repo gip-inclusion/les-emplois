@@ -122,7 +122,7 @@ def siae_kind_to_pe_type_siae(siae_kind):
 
 
 class JobSource(models.TextChoices):
-    PE_API = "PE_API", "API Pôle Emploi"
+    PE_API = "PE_API", "API France Travail"
 
 
 # SIRET of the POLE EMPLOI structure as of January 2023

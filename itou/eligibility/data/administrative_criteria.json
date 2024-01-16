@@ -47,8 +47,8 @@
     "fields": {
       "level": "1",
       "name": "DETLD (+ 24 mois)",
-      "desc": "Demandeur d'emploi de très longue durée (inscrit à Pôle emploi)",
-      "written_proof": "Attestation Pôle emploi",
+      "desc": "Demandeur d'emploi de très longue durée (inscrit à France Travail)",
+      "written_proof": "Attestation France Travail (ex pôle emploi)",
       "written_proof_url": "",
       "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 4,
@@ -117,8 +117,8 @@
     "fields": {
       "level": "2",
       "name": "DELD (12-24 mois)",
-      "desc": "Demandeur d'emploi de longue durée (inscrit à Pôle emploi)",
-      "written_proof": "Attestation Pôle emploi",
+      "desc": "Demandeur d'emploi de longue durée (inscrit à France Travail)",
+      "written_proof": "Attestation France Travail (ex pôle emploi)",
       "written_proof_url": "",
       "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 5,

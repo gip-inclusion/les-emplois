@@ -642,7 +642,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
 
 
 class IsPECertifiedFilter(admin.SimpleListFilter):
-    title = "Certifié par Pôle Emploi"
+    title = "Certifié par France Travail"
     parameter_name = "is_pe_certified"
 
     def lookups(self, request, model_admin):
@@ -766,7 +766,7 @@ class JobSeekerProfileAdmin(ItouModelAdmin):
     def username(self, obj):
         return obj.user.get_full_name()
 
-    @admin.display(boolean=True, description="profil certifié par Pôle emploi")
+    @admin.display(boolean=True, description="profil certifié par France Travail")
     def is_pe_certified(self, obj):
         return obj.pe_obfuscated_nir is not None
 

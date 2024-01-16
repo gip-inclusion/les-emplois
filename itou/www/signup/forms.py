@@ -109,7 +109,7 @@ class JobSeekerSituationForm(forms.Form):
         ("rsa", "Bénéficiaire du RSA (revenu de solidarité active)"),
         ("ass", "Allocataire ASS (allocation spécifique de solidarité)"),
         ("aah", "Allocataire AAH (allocation adulte handicapé) ou bénéficiaire d'une RQTH"),
-        ("pe", "Inscrit à Pôle emploi depuis plus de 2 ans (inscription en continu)"),
+        ("pe", "Inscrit à France Travail depuis plus de 2 ans (inscription en continu)"),
         ("autre", "Autre"),
     )
 

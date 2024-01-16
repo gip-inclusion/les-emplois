@@ -228,7 +228,7 @@ class Migration(migrations.Migration):
                     "code_safir_pole_emploi",
                     models.CharField(
                         blank=True,
-                        help_text="Code unique d'une agence Pole emploi.",
+                        help_text="Code unique d'une agence France Travail.",
                         max_length=5,
                         null=True,
                         unique=True,
@@ -267,7 +267,7 @@ class Migration(migrations.Migration):
                                 "Organisation délégataire d'un Conseil Départemental (Orientation et suivi des BRSA)",
                             ),
                             ("PENSION", "Pension de famille / résidence accueil"),
-                            ("PE", "Pôle emploi"),
+                            ("PE", "France Travail"),
                             ("RS_FJT", "Résidence sociale / FJT - Foyer de Jeunes Travailleurs"),
                             ("PREVENTION", "Service ou club de prévention"),
                             ("DEPT", "Service social du conseil départemental"),

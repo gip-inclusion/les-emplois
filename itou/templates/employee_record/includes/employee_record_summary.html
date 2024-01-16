@@ -26,7 +26,7 @@
             <li>{{ profile.get_education_level_display }}</li>
             {% if profile.pole_emploi_since %}
                 <li>
-                    Inscrit à Pôle emploi depuis {{ profile.get_pole_emploi_since_display|lower }} ({{ employee.jobseeker_profile.pole_emploi_id }})
+                    Inscrit à France Travail depuis {{ profile.get_pole_emploi_since_display|lower }} ({{ employee.jobseeker_profile.pole_emploi_id }})
                 </li>
             {% endif %}
             {% if profile.resourceless %}<li>Le salarié ne dispose d'aucune ressource</li>{% endif %}

@@ -19,7 +19,7 @@ def create_pole_emploi_company(*args, **kwargs):
     Company._base_manager.get_or_create(
         siret=enums.POLE_EMPLOI_SIRET,
         defaults={
-            "name": "POLE EMPLOI",
+            "name": "France Travail",
             "kind": enums.COMPANY_KIND_RESERVED,
             "source": enums.COMPANY_SOURCE_ADMIN_CREATED,
         },

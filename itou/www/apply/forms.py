@@ -225,13 +225,13 @@ class CreateOrUpdateJobSeekerStep2Form(MandatoryAddressFormMixin, forms.ModelFor
 
 class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
     # A set of transient checkboxes used to collapse optional blocks
-    pole_emploi = forms.BooleanField(required=False, label="Inscrit à Pôle emploi")
+    pole_emploi = forms.BooleanField(required=False, label="Inscrit à France Travail")
     unemployed = forms.BooleanField(required=False, label="Sans emploi")
     rsa_allocation = forms.BooleanField(required=False, label="Bénéficiaire du RSA")
     ass_allocation = forms.BooleanField(required=False, label="Bénéficiaire de l'ASS")
     aah_allocation = forms.BooleanField(required=False, label="Bénéficiaire de l'AAH")
 
-    pole_emploi_id_forgotten = forms.BooleanField(required=False, label="Identifiant Pôle emploi oublié")
+    pole_emploi_id_forgotten = forms.BooleanField(required=False, label="Identifiant France Travail oublié")
 
     # This field is a subset of the possible choices of `has_rsa_allocation` model field
     has_rsa_allocation = forms.ChoiceField(
@@ -279,7 +279,7 @@ class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
 
         # Handle the 'since' fields, which is most of them.
         collapsible_errors = {
-            "pole_emploi": "La durée d'inscription à Pôle emploi est obligatoire",
+            "pole_emploi": "La durée d'inscription à France Travail est obligatoire",
             "unemployed": "La période sans emploi est obligatoire",
             "rsa_allocation": "La durée d'allocation du RSA est obligatoire",
             "ass_allocation": "La durée d'allocation de l'ASS est obligatoire",
@@ -307,7 +307,7 @@ class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
                 # also don't stack a 'missing field' error if an error already exists ('wrong format' in this case)
                 self.add_error(
                     "pole_emploi_id",
-                    forms.ValidationError("L'identifiant Pôle emploi est obligatoire"),
+                    forms.ValidationError("L'identifiant France Travail (ex pôle emploi) est obligatoire"),
                 )
         else:
             self.cleaned_data["pole_emploi_id_forgotten"] = ""

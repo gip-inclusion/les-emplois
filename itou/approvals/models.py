@@ -1815,7 +1815,7 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
     """
 
     # Matches prescriber_organization.code_safir_pole_emploi.
-    pe_structure_code = models.CharField("code structure Pôle emploi", max_length=5)
+    pe_structure_code = models.CharField("code structure France Travail", max_length=5)
 
     # - first 5 digits = code SAFIR of the PE agency of the consultant creating the approval
     # - next 2 digits = 2-digit year of delivery
@@ -1824,7 +1824,7 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
     #     - decisions starting with 0 are reserved for "Reprise des décisions", e.g.: 75631 14 00001
     number = models.CharField(verbose_name="numéro", max_length=12, unique=True)
 
-    pole_emploi_id = models.CharField("identifiant Pôle emploi", max_length=8)
+    pole_emploi_id = models.CharField("identifiant France Travail (ex pôle emploi)", max_length=8)
     first_name = models.CharField("prénom", max_length=150)
     last_name = models.CharField("nom", max_length=150)
     birth_name = models.CharField("nom de naissance", max_length=150)
@@ -1925,7 +1925,7 @@ class OriginalPoleEmploiApproval(CommonApprovalMixin):
         S = "suspension", "Suspension"
 
     # All those fields are copied from PoleEmploiApproval
-    pe_structure_code = models.CharField("code structure Pôle emploi", max_length=5)
+    pe_structure_code = models.CharField("code structure France Travail", max_length=5)
 
     # Parts of an "original" PE Approval number:
     #     - first 5 digits = code SAFIR of the PE agency of the consultant creating the approval
@@ -1944,7 +1944,7 @@ class OriginalPoleEmploiApproval(CommonApprovalMixin):
     # Suffixes are not taken into account in Itou.
     number = models.CharField(verbose_name="numéro", max_length=15, unique=True)
 
-    pole_emploi_id = models.CharField("identifiant Pôle emploi", max_length=8)
+    pole_emploi_id = models.CharField("identifiant France Travail (ex pôle emploi)", max_length=8)
     first_name = models.CharField("prénom", max_length=150)
     last_name = models.CharField("nom", max_length=150)
     birth_name = models.CharField("nom de naissance", max_length=150)

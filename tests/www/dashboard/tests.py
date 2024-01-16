@@ -70,7 +70,7 @@ from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 class DashboardViewTest(TestCase):
     NO_PRESCRIBER_ORG_MSG = "Votre compte utilisateur n’est rattaché à aucune organisation."
     NO_PRESCRIBER_ORG_FOR_PE_MSG = (
-        "Votre compte utilisateur n’est rattaché à aucune agence Pôle emploi, "
+        "Votre compte utilisateur n’est rattaché à aucune agence France Travail, "
         "par conséquent vous ne pouvez pas bénéficier du statut de prescripteur habilité."
     )
 

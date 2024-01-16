@@ -48,7 +48,7 @@
                 <li class="d-block">délivré par les emplois de l'inclusion</li>
                 <li class="d-block">Date de début : {{ approval.start_at|date:"d/m/Y" }}</li>
                 {% if approval.user.jobseeker_profile.pole_emploi_id %}
-                    <li class="d-block">Identifiant Pôle emploi : {{ approval.user.jobseeker_profile.pole_emploi_id }}</li>
+                    <li class="d-block">Identifiant France Travail : {{ approval.user.jobseeker_profile.pole_emploi_id }}</li>
                 {% endif %}
             </ul>
         </section>

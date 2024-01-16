@@ -149,9 +149,9 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             messages.info(
                 request,
                 mark_safe(
-                    f"Votre compte utilisateur n’est rattaché à aucune agence Pôle emploi, "
+                    f"Votre compte utilisateur n’est rattaché à aucune agence France Travail, "
                     f"par conséquent vous ne pouvez pas bénéficier du statut de prescripteur habilité.<br>"
-                    f"Rejoignez l’espace de travail de votre agence Pôle emploi "
+                    f"Rejoignez l’espace de travail de votre agence France Travail "
                     f"<a href='{reverse('signup:prescriber_pole_emploi_safir_code')}'>en cliquant ici</a>."
                 ),
             )
