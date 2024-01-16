@@ -107,6 +107,9 @@ METABASE_DASHBOARDS = {
     "stats_ddets_iae_follow_prolongation": {
         "dashboard_id": 357,
     },
+    "stats_ddets_iae_tension": {
+        "dashboard_id": 389,
+    },
     "stats_ddets_iae_iae": {
         "dashboard_id": 117,
     },
@@ -149,6 +152,9 @@ METABASE_DASHBOARDS = {
     },
     "stats_dreets_iae_follow_prolongation": {
         "dashboard_id": 357,
+    },
+    "stats_dreets_iae_tension": {
+        "dashboard_id": 389,
     },
     "stats_dreets_iae_iae": {
         "dashboard_id": 117,
