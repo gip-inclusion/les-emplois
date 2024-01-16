@@ -486,6 +486,11 @@ def stats_ddets_iae_follow_prolongation(request):
 
 
 @login_required
+def stats_ddets_iae_tension(request):
+    return render_stats_ddets_iae(request=request, page_title="SIAE qui peinent à recruter sur le territoire")
+
+
+@login_required
 def stats_ddets_iae_iae(request):
     return render_stats_ddets_iae(request=request, page_title="Données IAE de mon département")
 
@@ -576,6 +581,11 @@ def stats_dreets_iae_follow_siae_evaluation(request):
 @login_required
 def stats_dreets_iae_follow_prolongation(request):
     return render_stats_dreets_iae(request=request, page_title="Suivi des demandes de prolongation")
+
+
+@login_required
+def stats_dreets_iae_tension(request):
+    return render_stats_dreets_iae(request=request, page_title="SIAE qui peinent à recruter sur le territoire")
 
 
 @login_required

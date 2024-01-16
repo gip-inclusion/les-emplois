@@ -139,6 +139,13 @@
                         </li>
                     -->
                     <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_ddets_iae_tension' %}" class="btn-link btn-ico">
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                            <span>Voir les données des fiches de poste en tension</span>
+                        </a>
+                        {% include "dashboard/includes/stats_new_badge.html" %}
+                    </li>
+                    <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ddets_iae_hiring' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Voir les données facilitation de l'embauche</span>
@@ -149,7 +156,6 @@
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Suivre les prescriptions des AHI de ma région</span>
                         </a>
-                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                     {% if can_view_stats_ddets_iae_aci %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
@@ -187,7 +193,6 @@
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Suivre les demandes de prolongation</span>
                         </a>
-                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                     <!-- Stats temporarily suspended until we stabilize them
                         <li class="d-flex justify-content-between align-items-center mb-3">
@@ -197,6 +202,13 @@
                             </a>
                         </li>
                     -->
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_dreets_iae_tension' %}" class="btn-link btn-ico">
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                            <span>Voir les données des fiches de poste en tension</span>
+                        </a>
+                        {% include "dashboard/includes/stats_new_badge.html" %}
+                    </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dreets_iae_hiring' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
