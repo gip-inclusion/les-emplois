@@ -491,7 +491,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # Who send the job application. It can be the same user as `job_seeker`
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        verbose_name="émetteur",
+        verbose_name="utilisateur émetteur",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
