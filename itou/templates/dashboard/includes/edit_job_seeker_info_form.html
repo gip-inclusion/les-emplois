@@ -6,6 +6,7 @@
 {% endcomment %}
 
 {% load django_bootstrap5 %}
+{% load matomo %}
 <form method="post" class="js-prevent-multiple-submit js-format-nir">
     {% csrf_token %}
 
@@ -31,7 +32,9 @@
     <hr class="my-4">
     <div class="form-group text-end">
         <a class="btn btn-link" href="{{ prev_url }}">Annuler</a>
-        {% bootstrap_button submit_label button_type="submit" button_class="btn btn-primary" %}
+        <button type="submit" class="btn btn-primary" {% matomo_event "salaries" "submit" "modifier-les-informations-personnelles" %}>
+            {{ submit_label }}
+        </button>
     </div>
 
 </form>
