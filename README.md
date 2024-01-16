@@ -25,7 +25,7 @@ sont définis dans le projet `itou-secrets`.
 
 L’application est développée avec [Django](https://www.djangoproject.com/), la
 base de données est gérée par [PostgreSQL](https://www.postgresql.org/) et le
-stockage objet type *S3* [MinIO](https://min.io/).
+stockage objet type _S3_ [MinIO](https://min.io/).
 
 _Les instructions ci-dessous vous permettront d’obtenir un environnement de
 développement pratique à utiliser au quotidien. Pour obtenir un environnement
@@ -34,7 +34,7 @@ instructions [containerization](./docs/Docker.md)._
 
 ### Services nécessaires
 
-Les dépendances (base de données PostgreSQL et le stockage objet type *S3*)
+Les dépendances (base de données PostgreSQL et le stockage objet type _S3_)
 sont rendues disponibles par [Docker](https://docs.docker.com/) et
 [Docker Compose](https://docs.docker.com/compose/).
 
@@ -42,6 +42,7 @@ sont rendues disponibles par [Docker](https://docs.docker.com/) et
 - [Installer Docker Compose](https://docs.docker.com/compose/install/)
 
 Démarrez les dépendances de développement avec la commande :
+
 ```sh
 docker compose up
 ```
@@ -74,16 +75,17 @@ $ make venv
 Dans un `virtualenv`, vous pouvez utiliser les commandes Django habituelles
 (`./manage.py`) mais également les recettes du [Makefile](./Makefile).
 
-### Création des *buckets S3*
+### Création des _buckets S3_
 
-Les fichiers téléversés sont enregistrés dans un stockage objet type *S3*. En
+Les fichiers téléversés sont enregistrés dans un stockage objet type _S3_. En
 local, le service est rendu par [MinIO](https://min.io/). Sa console
 d’administration est disponible à l’adresse http://localhost:9001/.
 
 Login : `minioadmin`
 Password : `minioadmin`
 
-Afin de créer les *buckets* nécessaires au développement et aux tests, lancer la commande :
+Afin de créer les _buckets_ nécessaires au développement et aux tests, lancer la commande :
+
 ```sh
 $ make buckets
 ```
@@ -142,11 +144,13 @@ $ pre-commit install
 Le projet utilise [pytest](https://docs.pytest.org/).
 
 Lancer la suite complète, comme sur la CI :
+
 ```sh
 make test
 ```
 
 Lancer un test en particulier :
+
 ```sh
 pytest itou/utils/tests.py::JSONTest::test_encoder
 ```
@@ -164,9 +168,9 @@ deux options :
 1. Définir la variable d’environnement `PYTEST_TIMEOUT`, par exemple à une
    valeur de `60` secondes.
 2. Utiliser `--timeout` lors de l’invocation de `pytest` :
-    ```sh
-    pytest --timeout 60
-    ```
+   ```sh
+   pytest --timeout 60
+   ```
 
 ## Mettre à jour les dépendances Python
 
@@ -180,7 +184,7 @@ $ PIP_COMPILE_OPTIONS="-P flake8" make compile-deps
 ```
 
 Si les changements paraissent corrects, ils peuvent être ajoutés à `git` et
-*commit*.
+_commit_.
 
 ## Front-end
 
