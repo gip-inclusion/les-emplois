@@ -1,5 +1,6 @@
 {% load format_filters %}
 {% load str_filters %}
+{% load matomo %}
 <ul>
     <li>
         Prénom : <b>{{ job_seeker.first_name|mask_unless:can_view_personal_information }}</b>
@@ -67,8 +68,8 @@
 </ul>
 <p>
     <a href="{% if can_edit_personal_information %}{% url 'dashboard:edit_job_seeker_info' job_seeker_pk=job_seeker.pk %}?back_url={{ request.get_full_path|urlencode }}{% if job_application %}&from_application={{ job_application.pk }}{% endif %}{% endif %}"
-       class="btn btn-outline-primary{% if with_matomo_event %} matomo-event{% endif %}{% if not can_edit_personal_information %} disabled{% endif %}"
-       {% if with_matomo_event %}data-matomo-category="salaries" data-matomo-action="clic" data-matomo-option="modfifier-les-informations-personnelles"{% endif %}
+       class="btn btn-outline-primary{% if not can_edit_personal_information %} disabled{% endif %}"
+       {% if with_matomo_event %}{% matomo_event "salaries" "clic" "modfifier-les-informations-personnelles" %}{% endif %}
        aria-label="Modifier les informations personnelles de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}">
         Modifier les informations personnelles
     </a>
