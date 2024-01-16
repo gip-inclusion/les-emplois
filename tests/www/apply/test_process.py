@@ -2242,10 +2242,14 @@ def test_accept_button(client):
         to_company__kind=CompanyKind.GEIQ,
     )
     accept_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-    DIRECT_ACCEPT_BUTTON = f"""<a href="{accept_url}" class="btn btn-primary btn-block btn-ico">
-            <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
-            <span>Accepter cette candidature</span>
-        </a>"""
+    DIRECT_ACCEPT_BUTTON = (
+        f'<a href="{accept_url}" class="btn btn-primary btn-block btn-ico" '
+        'data-matomo-event="true" data-matomo-category="candidature" '
+        'data-matomo-action="clic" data-matomo-option="accept_application">'
+        '\n            <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>'
+        "\n            <span>Accepter cette candidature</span>"
+        "\n        </a>"
+    )
     client.force_login(job_application.to_company.members.first())
     response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
     # GEIQ without GEIQ diagnosis: we get the modals
