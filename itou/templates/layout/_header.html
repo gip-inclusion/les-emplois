@@ -21,9 +21,11 @@
                         {% include 'layout/_header_nav_primary_items.html' %}
                     </nav>
                 </div>
-                <div class="s-header__col s-header__col--burger col d-flex align-items-center justify-content-end d-xl-none" data-bs-toggle="burger">
-                    <i class="ri-menu-line" id="open" role="button" tabindex="0" aria-label="Ouverture du menu de navigation principale pour mobile"></i>
-                    <i class="ri-close-line" id="close" role="button" tabindex="0" aria-label="Fermeture du menu de navigation principale pour mobile"></i>
+                <div class="s-header__col s-header__col--burger col d-flex align-items-center justify-content-end d-xl-none">
+                    <button data-bs-toggle="burger" aria-expanded="false" aria-label="Ouverture et fermeture du menu de navigation principale pour mobile">
+                        <i class="ri-menu-line" id="open" aria-hidden="true"></i>
+                        <i class="ri-close-line" id="close" aria-hidden="true"></i>
+                    </button>
                 </div>
                 <div id="burgerNav">
                     <nav role="navigation" aria-label="Navigation principale pour mobile">
