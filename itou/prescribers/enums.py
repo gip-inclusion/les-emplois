@@ -7,7 +7,7 @@ class PrescriberOrganizationKind(models.TextChoices):
     OIL = "OIL", "Opérateur d'intermédiation locative"
     ODC = "ODC", "Organisation délégataire d'un Conseil Départemental (Orientation et suivi des BRSA)"
     PENSION = "PENSION", "Pension de famille / résidence accueil"
-    PE = "PE", "Pôle emploi"
+    PE = "PE", "France Travail"  # Previously pôle emploi
     RS_FJT = "RS_FJT", "Résidence sociale / FJT - Foyer de Jeunes Travailleurs"
     PREVENTION = "PREVENTION", "Service ou club de prévention"
     DEPT = "DEPT", "Service social du conseil départemental"

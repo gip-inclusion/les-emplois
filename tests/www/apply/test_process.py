@@ -186,7 +186,9 @@ class ProcessViewsTest(TestCase):
             response, '<small>Curriculum vitae</small><i class="text-disabled">Non renseigné</i>', html=True
         )
         self.assertContains(
-            response, '<small>Identifiant Pôle emploi</small><i class="text-disabled">Non renseigné</i>', html=True
+            response,
+            '<small>Identifiant France Travail (ex pôle emploi)</small><i class="text-disabled">Non renseigné</i>',
+            html=True,
         )
         self.assertContains(
             response, '<small>Numéro de sécurité sociale</small><i class="text-disabled">Non renseigné</i>', html=True

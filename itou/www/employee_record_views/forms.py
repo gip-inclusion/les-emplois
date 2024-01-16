@@ -279,9 +279,9 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
     - social allowances
     """
 
-    pole_emploi = forms.BooleanField(required=False, label="Inscrit à Pôle emploi ?")
+    pole_emploi = forms.BooleanField(required=False, label="Inscrit à France Travail ?")
     pole_emploi_id = forms.CharField(
-        label="Identifiant Pôle emploi",
+        label="Identifiant France Travail (ex pôle emploi)",
         required=False,
         validators=[validate_pole_emploi_id, MinLengthValidator(8)],
     )
@@ -356,11 +356,11 @@ class NewEmployeeRecordStep3Form(forms.ModelForm):
         # Pôle emploi
         if self.instance.user.jobseeker_profile.pole_emploi_id:
             if not self.cleaned_data["pole_emploi_since"]:
-                raise forms.ValidationError("La durée d'inscription à Pôle emploi est obligatoire")
+                raise forms.ValidationError("La durée d'inscription à France Travail est obligatoire")
 
             if not self.cleaned_data.get("pole_emploi_id"):
                 # This field is validated and may not exist in `cleaned_data`
-                raise forms.ValidationError("L'identifiant Pôle emploi est obligatoire")
+                raise forms.ValidationError("L'identifiant France Travail (ex pôle emploi) est obligatoire")
 
             self.instance.user.jobseeker_profile.pole_emploi_id = self.cleaned_data["pole_emploi_id"]
             self.instance.user.save()

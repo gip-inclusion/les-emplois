@@ -147,7 +147,7 @@
         'niveau_qualification': 'N3',
         'nom': 'Dupont',
         'poste_occupe': None,
-        'precision_prescripteur': 'Pôle emploi',
+        'precision_prescripteur': 'France Travail',
         'prenom': 'Sacha',
         'prequalifications': list([
         ]),

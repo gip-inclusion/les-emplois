@@ -46,12 +46,12 @@
     {% endif %}
     {% if profile.pole_emploi_since %}
         <li class="mb-3">
-            Inscrit à Pôle emploi depuis : <b>{{ profile.get_pole_emploi_since_display|lower }}</b>
+            Inscrit à France Travail depuis : <b>{{ profile.get_pole_emploi_since_display|lower }}</b>
         </li>
     {% endif %}
     {% if profile.user.jobseeker_profile.pole_emploi_id or profile.user.jobseeker_profile.lack_of_pole_emploi_id_reason %}
         <li class="mb-3">
-            Identifiant Pôle emploi :
+            Identifiant France Travail (ex pôle emploi) :
             <b>
                 {% if profile.user.jobseeker_profile.pole_emploi_id %}
                     {{ profile.user.jobseeker_profile.pole_emploi_id }}

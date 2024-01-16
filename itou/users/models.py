@@ -808,7 +808,7 @@ class JobSeekerProfile(models.Model):
 
     ERROR_JOBSEEKER_TITLE = "La civilité du demandeur d'emploi est obligatoire"
     ERROR_JOBSEEKER_EDUCATION_LEVEL = "Le niveau de formation du demandeur d'emploi est obligatoire"
-    ERROR_JOBSEEKER_PE_FIELDS = "L'identifiant et la durée d'inscription à Pôle emploi vont de pair"
+    ERROR_JOBSEEKER_PE_FIELDS = "L'identifiant et la durée d'inscription à France Travail vont de pair"
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -844,17 +844,17 @@ class JobSeekerProfile(models.Model):
     # It looks like it pre-dates the national merger and may be unique
     # by user and by region…
     pole_emploi_id = models.CharField(
-        verbose_name="identifiant Pôle emploi",
+        verbose_name="identifiant France Travail (ex pôle emploi)",
         help_text="7 chiffres suivis d'une 1 lettre ou d'un chiffre.",
         max_length=8,
         validators=[validate_pole_emploi_id, MinLengthValidator(8)],
         blank=True,
     )
     lack_of_pole_emploi_id_reason = models.CharField(
-        verbose_name="pas d'identifiant Pôle emploi ?",
+        verbose_name="pas d'identifiant France Travail (ex pôle emploi) ?",
         help_text=mark_safe(
-            "Indiquez la raison de l'absence d'identifiant Pôle emploi.<br>"
-            "Renseigner l'identifiant Pôle emploi des candidats inscrits "
+            "Indiquez la raison de l'absence d'identifiant France Travail.<br>"
+            "Renseigner l'identifiant France Travail des candidats inscrits "
             "permet d'instruire instantanément votre demande.<br>"
             "Dans le cas contraire un délai de deux jours est nécessaire "
             "pour effectuer manuellement les vérifications d’usage."
@@ -885,7 +885,7 @@ class JobSeekerProfile(models.Model):
 
     pole_emploi_since = models.CharField(
         max_length=2,
-        verbose_name="inscrit à Pôle emploi depuis",
+        verbose_name="inscrit à France Travail depuis",
         blank=True,
         choices=AllocationDuration.choices,
     )
@@ -977,14 +977,14 @@ class JobSeekerProfile(models.Model):
     )
 
     pe_obfuscated_nir = models.CharField(
-        verbose_name="identifiant PE chiffré",
+        verbose_name="identifiant France Travail (ex pôle emploi) chiffré",
         null=True,
         blank=True,
         max_length=48,
         help_text=(
-            "Identifiant PE chiffré, utilisé dans la communication à PE. Son existence implique "
-            "que le nom, prénom, date de naissance et NIR de ce candidat sont connus et valides "
-            "du point de vue de Pôle Emploi.",
+            "Identifiant France Travail chiffré, utilisé dans la communication à France Travail. "
+            "Son existence implique que le nom, prénom, date de naissance et NIR de ce candidat "
+            "sont connus et valides du point de vue de France Travail.",
         ),
     )
 
@@ -1012,7 +1012,9 @@ class JobSeekerProfile(models.Model):
         lack_of_pole_emploi_id_reason = cleaned_data["lack_of_pole_emploi_id_reason"]
         # One or the other must be filled.
         if not pole_emploi_id and not lack_of_pole_emploi_id_reason:
-            raise ValidationError("Renseignez soit un identifiant Pôle emploi, soit la raison de son absence.")
+            raise ValidationError(
+                "Renseignez soit un identifiant France Travail (ex pôle emploi), soit la raison de son absence."
+            )
         # If both are filled, `pole_emploi_id` takes precedence (Trello #1724).
         if pole_emploi_id and lack_of_pole_emploi_id_reason:
             # Take advantage of the fact that `cleaned_data` is passed by sharing:

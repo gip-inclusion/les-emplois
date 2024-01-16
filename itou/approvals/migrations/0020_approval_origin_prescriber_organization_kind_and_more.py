@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
                     ("OIL", "Opérateur d'intermédiation locative"),
                     ("ODC", "Organisation délégataire d'un Conseil Départemental (Orientation et suivi des BRSA)"),
                     ("PENSION", "Pension de famille / résidence accueil"),
-                    ("PE", "Pôle emploi"),
+                    ("PE", "France Travail"),
                     ("RS_FJT", "Résidence sociale / FJT - Foyer de Jeunes Travailleurs"),
                     ("PREVENTION", "Service ou club de prévention"),
                     ("DEPT", "Service social du conseil départemental"),

@@ -48,5 +48,5 @@ class LackOfNIRReason(models.TextChoices):
 
 
 class LackOfPoleEmploiId(models.TextChoices):
-    REASON_FORGOTTEN = "FORGOTTEN", "Identifiant Pôle emploi oublié"
-    REASON_NOT_REGISTERED = "NOT_REGISTERED", "Non inscrit auprès de Pôle emploi"
+    REASON_FORGOTTEN = "FORGOTTEN", "Identifiant France Travail oublié"
+    REASON_NOT_REGISTERED = "NOT_REGISTERED", "Non inscrit auprès de France Travail"

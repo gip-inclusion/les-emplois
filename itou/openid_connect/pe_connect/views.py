@@ -120,7 +120,7 @@ def pe_connect_callback(request):
     except KeyError as e:
         if "email" in e.args:
             return HttpResponseRedirect(reverse("pe_connect:no_email"))
-        messages.error(request, "Une erreur technique est survenue, impossible de vous connecter avec Pôle Emploi.")
+        messages.error(request, "Une erreur technique est survenue, impossible de vous connecter avec France Travail.")
         return HttpResponseRedirect(reverse("search:employers_home"))
 
     try:

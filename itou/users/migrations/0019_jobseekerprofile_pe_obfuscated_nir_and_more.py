@@ -15,13 +15,13 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 blank=True,
                 help_text=(
-                    "Identifiant PE chiffré, utilisé dans la communication à PE. Son existence implique "
-                    "que le nom, prénom, date de naissance et NIR de ce candidat sont connus et valides "
-                    "du point de vue de Pôle Emploi.",
+                    "Identifiant France Travail chiffré, utilisé dans la communication à France Travail. "
+                    "Son existence implique que le nom, prénom, date de naissance et NIR de ce candidat "
+                    "sont connus et valides du point de vue de France Travail.",
                 ),
                 max_length=48,
                 null=True,
-                verbose_name="identifiant PE chiffré",
+                verbose_name="identifiant France Travail (ex pôle emploi) chiffré",
             ),
         ),
         migrations.AddField(

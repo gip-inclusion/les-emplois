@@ -139,7 +139,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
     )
     code_safir_pole_emploi = models.CharField(
         verbose_name="code Safir",
-        help_text="Code unique d'une agence Pole emploi.",
+        help_text="Code unique d'une agence France Travail.",
         validators=[validate_code_safir],
         max_length=5,
         blank=True,
@@ -195,7 +195,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         A code SAFIR can only be set for PE agencies.
         """
         if self.kind != PrescriberOrganizationKind.PE and self.code_safir_pole_emploi:
-            raise ValidationError({"code_safir_pole_emploi": "Le Code Safir est réservé aux agences Pôle emploi."})
+            raise ValidationError({"code_safir_pole_emploi": "Le Code Safir est réservé aux agences France Travail."})
 
     def clean_siret(self):
         """

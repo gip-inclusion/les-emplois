@@ -31622,7 +31622,7 @@
   {
     "fields": {
       "full_text": "'conseil':1 'conseiller':2 'emploi':5 'k1801':6 'pol':4",
-      "name": "Conseiller / Conseillère de pôle emploi",
+      "name": "Conseiller / Conseillère de France Travail",
       "rome": "K1801",
       "updated_at": "2022-12-05T15:40:51.604Z"
     },
@@ -40392,7 +40392,7 @@
   {
     "fields": {
       "full_text": "'agenc':4 'directeur':1 'directric':2 'emploi':8 'local':5 'm1302':9 'pol':7",
-      "name": "Directeur / Directrice d'agence locale du pôle emploi",
+      "name": "Directeur / Directrice d'agence locale du France Travail",
       "rome": "M1302",
       "updated_at": "2022-12-05T15:40:51.604Z"
     },

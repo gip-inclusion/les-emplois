@@ -247,7 +247,7 @@ def _compute_send_approvals_to_pe_stats(model, list_url):
 def send_approvals_to_pe_stats(request):
     context_data = {
         **admin.site.each_context(request),
-        "title": "État de synchronisation avec pole emploi",
+        "title": "État de synchronisation avec France Travail",
         "stats": [
             _compute_send_approvals_to_pe_stats(Approval, list_url=reverse("admin:approvals_approval_changelist")),
             _compute_send_approvals_to_pe_stats(

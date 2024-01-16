@@ -18,17 +18,17 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 blank=True,
                 choices=[
-                    ("FORGOTTEN", "Identifiant Pôle emploi oublié"),
-                    ("NOT_REGISTERED", "Non inscrit auprès de Pôle emploi"),
+                    ("FORGOTTEN", "Identifiant France Travail oublié"),
+                    ("NOT_REGISTERED", "Non inscrit auprès de France Travail"),
                 ],
                 help_text=(
-                    "Indiquez la raison de l'absence d'identifiant Pôle emploi.<br>"
-                    "Renseigner l'identifiant Pôle emploi des candidats inscrits permet "
+                    "Indiquez la raison de l'absence d'identifiant France Travail.<br>"
+                    "Renseigner l'identifiant France Travail des candidats inscrits permet "
                     "d'instruire instantanément votre demande.<br>Dans le cas contraire "
                     "un délai de deux jours est nécessaire pour effectuer manuellement "
                     "les vérifications d’usage."
                 ),
-                verbose_name="pas d'identifiant Pôle emploi\xa0?",
+                verbose_name="pas d'identifiant France Travail (ex pôle emploi)\xa0?",
             ),
         ),
         migrations.AddField(
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                     itou.utils.validators.validate_pole_emploi_id,
                     django.core.validators.MinLengthValidator(8),
                 ],
-                verbose_name="identifiant Pôle emploi",
+                verbose_name="identifiant France Travail (ex pôle emploi)",
             ),
         ),
     ]

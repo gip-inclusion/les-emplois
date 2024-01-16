@@ -346,7 +346,7 @@ class Migration(migrations.Migration):
                 (
                     "source_kind",
                     models.CharField(
-                        choices=[("PE_API", "API Pôle Emploi")],
+                        choices=[("PE_API", "API France Travail")],
                         max_length=30,
                         null=True,
                         verbose_name="source de la donnée",

@@ -3,5 +3,5 @@
 
 <form method="post" action="{% url 'pe_connect:authorize' %}">
     {% csrf_token %}
-    <input type="image" src="{% static 'img/peamu_btn.svg' %}" alt="Se connecter avec votre compte Pôle emploi" {% matomo_event "inscription-candidat" "clic" "se-connecter-avec-pe" %}>
+    <input type="image" src="{% static 'img/peamu_btn.svg' %}" alt="Se connecter avec votre compte France Travail" {% matomo_event "inscription-candidat" "clic" "se-connecter-avec-pe" %}>
 </form>

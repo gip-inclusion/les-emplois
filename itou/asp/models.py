@@ -339,7 +339,7 @@ class PrescriberType(models.TextChoices):
 
     ML = "01", "Mission locale"
     CAP_EMPLOI = "02", "Cap emploi"
-    PE = "03", "Pôle emploi"
+    PE = "03", "France Travail"
     PLIE = "04", "PLIE - Plan local pour l'insertion et l'emploi"
     DEPT = "05", "Service social du conseil départemental"
     OTHER_AUTHORIZED_PRESCRIBERS = "06", "Autre prescripteurs habilité"
