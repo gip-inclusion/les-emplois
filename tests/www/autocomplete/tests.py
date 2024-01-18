@@ -356,6 +356,18 @@ class Select2CitiesAutocompleteTest(TestCase):
             ]
         }
 
+        # Try with slug parameter
+        response = self.client.get(url, {"term": "sai", "select2": "", "slug": ""})
+        assert response.status_code == 200
+        assert response.json() == {
+            "results": [
+                {"id": "saint-genis-pouilly-01", "text": "Saint-Genis-Pouilly (01)"},
+                {"id": "saint-jean-de-gonville-01", "text": "Saint-Jean-de-Gonville (01)"},
+                {"id": "saint-sulpice-01", "text": "Saint-Sulpice (01)"},
+                {"id": "le-pre-saint-gervais-93", "text": "Le Pré-Saint-Gervais (93)"},
+            ]
+        }
+
         # the request still finds results when dashes were forgotten
         response = self.client.get(url, {"term": "saint g", "select2": ""})
         assert response.status_code == 200

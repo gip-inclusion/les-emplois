@@ -1,19 +1,19 @@
 from django import forms
 from django.urls import reverse_lazy
 from django.utils.datastructures import MultiValueDict
+from django.utils.text import format_lazy
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, DEPARTMENTS_WITH_DISTRICTS, format_district
 from itou.companies.enums import CompanyKind, ContractNature, ContractType
 from itou.jobs.models import ROME_DOMAINS
+from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
 
 class SiaeSearchForm(forms.Form):
     DISTANCES = [5, 10, 15, 25, 50, 75, 100]
     DISTANCE_CHOICES = [(i, (f"{i} km")) for i in DISTANCES]
     DISTANCE_DEFAULT = 25
-
-    CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
 
     KIND_CHOICES = [(k, f"{k} - {v}") for k, v in CompanyKind.choices]
 
@@ -25,18 +25,16 @@ class SiaeSearchForm(forms.Form):
         widget=forms.RadioSelect,
     )
 
-    # The hidden `city` field is populated by the autocomplete JavaScript mechanism,
-    # see `city_autocomplete_field.js`.
-    city = forms.CharField(widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
-    city_name = forms.CharField(
+    city = forms.ModelChoiceField(
+        queryset=City.objects,
         label="Ville",
-        required=False,
-        widget=forms.TextInput(
+        to_field_name="slug",
+        widget=RemoteAutocompleteSelect2Widget(
             attrs={
-                "class": "js-city-autocomplete-input form-control",
-                "data-autocomplete-source-url": CITY_AUTOCOMPLETE_SOURCE_URL,
-                "placeholder": "Autour de (Arras, Bobigny, Strasbourg…)",
-                "autocomplete": "off",
+                "class": "form-control",
+                "data-ajax--url": format_lazy("{}?select2=&slug=", reverse_lazy("autocomplete:cities")),
+                "data-minimum-input-length": 2,
+                "data-placeholder": "Autour de (Arras, Bobigny, Strasbourg…)",
             }
         ),
     )
@@ -61,13 +59,6 @@ class SiaeSearchForm(forms.Form):
         if not distance:
             distance = self.fields["distance"].initial
         return distance
-
-    def clean_city(self):
-        slug = self.cleaned_data["city"]
-        try:
-            return City.objects.get(slug=slug)
-        except City.DoesNotExist as e:
-            raise forms.ValidationError(f"La ville « {slug} » n'existe pas.") from e
 
     def add_field_departements(self, departments):
         # Build list of choices
@@ -123,8 +114,6 @@ class PrescriberSearchForm(forms.Form):
     DISTANCE_CHOICES = [(i, (f"{i} km")) for i in DISTANCES]
     DISTANCE_DEFAULT = 5
 
-    CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
-
     distance = forms.ChoiceField(
         label="Distance",
         required=False,
@@ -133,18 +122,16 @@ class PrescriberSearchForm(forms.Form):
         widget=forms.RadioSelect,
     )
 
-    # The hidden `city` field is populated by the autocomplete JavaScript mechanism,
-    # see `city_autocomplete_field.js`.
-    city = forms.CharField(widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"}))
-    city_name = forms.CharField(
+    city = forms.ModelChoiceField(
+        queryset=City.objects,
         label="Ville",
-        required=False,
-        widget=forms.TextInput(
+        to_field_name="slug",
+        widget=RemoteAutocompleteSelect2Widget(
             attrs={
-                "class": "js-city-autocomplete-input form-control",
-                "data-autocomplete-source-url": CITY_AUTOCOMPLETE_SOURCE_URL,
-                "placeholder": "Autour de (Arras, Bobigny, Strasbourg…)",
-                "autocomplete": "off",
+                "class": "form-control",
+                "data-ajax--url": format_lazy("{}?select2=&slug=", reverse_lazy("autocomplete:cities")),
+                "data-minimum-input-length": 2,
+                "data-placeholder": "Autour de (Arras, Bobigny, Strasbourg…)",
             }
         ),
     )
@@ -162,10 +149,3 @@ class PrescriberSearchForm(forms.Form):
         if not distance:
             distance = self.fields["distance"].initial
         return distance
-
-    def clean_city(self):
-        slug = self.cleaned_data["city"]
-        try:
-            return City.objects.get(slug=slug)
-        except City.DoesNotExist as e:
-            raise forms.ValidationError("La ville  « {slug} » n'existe pas.") from e
