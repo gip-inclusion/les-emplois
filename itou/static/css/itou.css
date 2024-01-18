@@ -19,7 +19,9 @@
 }
 
 .s-home-search__form .input-group-text,
-.s-home-search__form .form-control {
+.s-home-search__form .form-control,
+.s-home-search__form .select2-selection,
+.s-home-search__form .select2-selection--single {
     border-color: var(--bs-white) !important;
 }
 
