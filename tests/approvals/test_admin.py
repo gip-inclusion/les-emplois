@@ -1,6 +1,7 @@
 from io import BytesIO
 
 import pytest
+from django.contrib.admin import helpers
 from django.urls import reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains
@@ -10,8 +11,8 @@ from itou.files.models import File
 from itou.utils.admin import get_admin_view_link
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.users.factories import ItouStaffFactory
-from tests.utils.test import parse_response_to_soup
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory
+from tests.utils.test import assertMessages, parse_response_to_soup
 
 
 class TestApprovalAdmin:
@@ -97,3 +98,45 @@ def test_send_approvals_to_pe_stats(admin_client):
     response = admin_client.get(cancelledapproval_stats_url)
     assertContains(response, "<h2>PASS IAE : 1</h2>")
     assertContains(response, "<h2>PASS IAE annulés : 1</h2>")
+
+
+def test_check_inconsistency_check(admin_client):
+    consistent_approval = ApprovalFactory()
+
+    response = admin_client.post(
+        reverse("admin:approvals_approval_changelist"),
+        {
+            "action": "check_inconsistencies",
+            helpers.ACTION_CHECKBOX_NAME: [consistent_approval.pk],
+        },
+        follow=True,
+    )
+    assertContains(response, "Aucune incohérence trouvée")
+
+    inconsistent_approval = ApprovalFactory()
+    inconsistent_approval.eligibility_diagnosis.job_seeker = JobSeekerFactory()
+    inconsistent_approval.eligibility_diagnosis.save()
+
+    response = admin_client.post(
+        reverse("admin:approvals_approval_changelist"),
+        {
+            "action": "check_inconsistencies",
+            helpers.ACTION_CHECKBOX_NAME: [consistent_approval.pk, inconsistent_approval.pk],
+        },
+        follow=True,
+    )
+    assertMessages(
+        response,
+        [
+            (
+                "WARNING",
+                (
+                    '1 objet incohérent: <ul><li class="warning">'
+                    f'<a href="/admin/approvals/approval/{inconsistent_approval.pk}/change/">'
+                    f"PASS IAE - {inconsistent_approval.pk}"
+                    "</a>: PASS IAE lié au diagnostic d&#x27;un autre candidat"
+                    "</li></ul>"
+                ),
+            )
+        ],
+    )

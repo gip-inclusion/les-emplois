@@ -22,7 +22,13 @@ from itou.prescribers.models import PrescriberMembership
 from itou.users import models
 from itou.users.admin_forms import ChooseFieldsToTransfer, ItouUserCreationForm, SelectTargetUserForm, UserAdminForm
 from itou.users.enums import IdentityProvider, UserKind
-from itou.utils.admin import ItouModelAdmin, ItouTabularInline, PkSupportRemarkInline, get_admin_view_link
+from itou.utils.admin import (
+    InconsistencyCheckMixin,
+    ItouModelAdmin,
+    ItouTabularInline,
+    PkSupportRemarkInline,
+    get_admin_view_link,
+)
 from itou.utils.models import PkSupportRemark
 
 
@@ -269,7 +275,7 @@ def add_support_remark_to_user(user, text):
 
 
 @admin.register(models.User)
-class ItouUserAdmin(UserAdmin):
+class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
     show_full_result_count = False
     add_form = ItouUserCreationForm
     change_form_template = "admin/users/change_user_form.html"
@@ -352,6 +358,27 @@ class ItouUserAdmin(UserAdmin):
             },
         ),
     )
+
+    INCONSISTENCY_CHECKS = [
+        (
+            "Candidature liée au PASS IAE d'un autre candidat",
+            lambda q: JobApplication.objects.filter(job_seeker__in=q).inconsistent_approval_user(),
+        ),
+        (
+            "Candidature liée au diagnostic d'un autre candidat",
+            lambda q: JobApplication.objects.filter(job_seeker__in=q).inconsistent_eligibility_diagnosis_job_seeker(),
+        ),
+        (
+            "Candidature liée au diagnostic GEIQ d'un autre candidat",
+            lambda q: JobApplication.objects.filter(
+                job_seeker__in=q
+            ).inconsistent_geiq_eligibility_diagnosis_job_seeker(),
+        ),
+        (
+            "PASS IAE lié au diagnostic d'un autre candidat",
+            lambda q: Approval.objects.filter(user__in=q).inconsistent_eligibility_diagnosis_job_seeker(),
+        ),
+    ]
 
     @admin.display(boolean=True, description="email validé", ordering="_has_verified_email")
     def has_verified_email(self, obj):

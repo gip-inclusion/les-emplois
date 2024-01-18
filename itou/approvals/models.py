@@ -11,7 +11,7 @@ from django.contrib.postgres.fields import ArrayField, RangeBoundary, RangeOpera
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator
 from django.db import models, transaction
-from django.db.models import Case, Count, OuterRef, Q, Subquery, When
+from django.db.models import Case, Count, F, OuterRef, Q, Subquery, When
 from django.db.models.functions import Now, TruncDate
 from django.utils import timezone
 from django.utils.functional import cached_property
@@ -228,6 +228,9 @@ class ApprovalQuerySet(CommonApprovalQuerySet):
             .with_assigned_company()
             .filter(assigned_company=company_id)
         )
+
+    def inconsistent_eligibility_diagnosis_job_seeker(self):
+        return self.filter(eligibility_diagnosis__isnull=False).exclude(eligibility_diagnosis__job_seeker=F("user"))
 
 
 class PENotificationMixin(models.Model):
