@@ -51,6 +51,7 @@ class SearchCompanyTest(TestCase):
             + 1  # select the city
             + 1  # fetch initial companies (to extract the filters afterwards)
             + 2  # two counts for the tab headers
+            + 1  # refetch the city for widget rendering
             + 1  # actual select of the companies, with related objects and annotated distance
             + 1  # prefetch active job descriptions
         ):
@@ -195,6 +196,7 @@ class SearchCompanyTest(TestCase):
             + 1  # find companies
             + 1  # count companies
             + 1  # count job descriptions
+            + 1  # refetch the city for widget rendering
             + 1  # get companies infos
             + 1  # get job descriptions infos
         ):
@@ -303,6 +305,7 @@ class JobDescriptionSearchViewTest(TestCase):
             + 1  # select the city
             + 1  # fetch initial job descriptions to add to the form fields
             + 2  # count the number of results for companies & job descriptions
+            + 1  # refetch the city for widget rendering
             + 1  # select the job descriptions for the page
         ):
             response = self.client.get(self.url, {"city": city_slug})

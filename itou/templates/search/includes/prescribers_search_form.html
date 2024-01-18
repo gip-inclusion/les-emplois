@@ -3,21 +3,14 @@
 {% bootstrap_form_errors form type="all" %}
 <div class="row g-0{% if align == 'center' %} justify-content-sm-center{% endif %}">
     <div class="col-12 col-md mb-2">
-        {{ form.city }}
-        <label for="{{ form.city_name.id_for_label }}" class="visually-hidden">{{ form.city_name.label }}</label>
+        <label for="{{ form.city.id_for_label }}" class="visually-hidden">{{ form.city.label }}</label>
         <div class="input-group">
             <div class="input-group-text bg-white rounded-start">
-                {# Loading #}
-                <span class="js-city-autocomplete-loading d-none">
-                    <i class="ri-restart-line ri-spinner ri-lg text-tertiary" role="status" aria-hidden="true"></i>
-                    <span class="visually-hidden">Chargement...</span>
-                </span>
-                {# No loading #}
-                <span class="js-city-autocomplete-no-loading">
+                <span>
                     <i class="ri-map-pin-line ri-xl text-tertiary" aria-hidden="true"></i>
                 </span>
             </div>
-            {{ form.city_name }}
+            {{ form.city }}
         </div>
     </div>
     <div class="col-12 col-md-3 mb-2 ps-md-3">
