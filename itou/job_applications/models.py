@@ -415,6 +415,19 @@ class JobApplicationQuerySet(models.QuerySet):
             .order_by("-hiring_start_at")
         )
 
+    def inconsistent_approval_user(self):
+        return self.filter(approval__isnull=False).exclude(approval__user=F("job_seeker"))
+
+    def inconsistent_eligibility_diagnosis_job_seeker(self):
+        return self.filter(eligibility_diagnosis__isnull=False).exclude(
+            eligibility_diagnosis__job_seeker=F("job_seeker")
+        )
+
+    def inconsistent_geiq_eligibility_diagnosis_job_seeker(self):
+        return self.filter(geiq_eligibility_diagnosis__isnull=False).exclude(
+            geiq_eligibility_diagnosis__job_seeker=F("job_seeker")
+        )
+
 
 class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     """

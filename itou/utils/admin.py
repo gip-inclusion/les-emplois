@@ -3,10 +3,12 @@ from unittest import mock
 from django.contrib.admin import ModelAdmin, StackedInline, TabularInline
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.contrib.gis.forms import fields as gis_fields
+from django.contrib.messages import WARNING
 from django.urls import reverse
-from django.utils.html import format_html
+from django.utils.html import format_html, format_html_join
 
 from itou.utils.models import PkSupportRemark, UUIDSupportRemark
+from itou.utils.templatetags.str_filters import pluralizefr
 from itou.utils.widgets import OSMWidget
 
 
@@ -53,6 +55,50 @@ class ItouTabularInline(TabularInline):
 
 class ItouStackedInline(StackedInline, ItouTabularInline):
     pass
+
+
+class InconsistencyCheckMixin:
+    INCONSISTENCY_CHECKS = []
+
+    def check_inconsistencies(self, request, queryset):
+        inconsistencies = {}
+        for title, check in self.INCONSISTENCY_CHECKS:
+            for item in check(queryset):
+                inconsistencies.setdefault(item, []).append(title)
+        if inconsistencies:
+            s = pluralizefr(len(inconsistencies))
+            title = f"{len(inconsistencies)} objet{s} incohérent{s}"
+            self.message_user(
+                request,
+                format_html(
+                    "{}: <ul>{}</ul>",
+                    title,
+                    format_html_join(
+                        "",
+                        '<li class="warning">{}: {}</li>',
+                        [
+                            (
+                                get_admin_view_link(item, content=f"{item._meta.verbose_name} - {item.pk}"),
+                                ", ".join(item_inconsistencies),
+                            )
+                            for item, item_inconsistencies in inconsistencies.items()
+                        ],
+                    ),
+                ),
+                level=WARNING,
+            )
+        else:
+            self.message_user(request, "Aucune incohérence trouvée")
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if self.INCONSISTENCY_CHECKS:
+            actions["check_inconsistencies"] = (
+                InconsistencyCheckMixin.check_inconsistencies,
+                "check_inconsistencies",
+                "Vérifier la cohérence des objets",
+            )
+        return actions
 
 
 class ItouModelAdmin(ModelAdmin):

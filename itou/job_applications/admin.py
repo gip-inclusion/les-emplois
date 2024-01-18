@@ -10,7 +10,13 @@ from itou.job_applications import models
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import Origin
 from itou.users.models import User
-from itou.utils.admin import ItouModelAdmin, ItouTabularInline, UUIDSupportRemarkInline, get_admin_view_link
+from itou.utils.admin import (
+    InconsistencyCheckMixin,
+    ItouModelAdmin,
+    ItouTabularInline,
+    UUIDSupportRemarkInline,
+    get_admin_view_link,
+)
 from itou.utils.templatetags.str_filters import pluralizefr
 
 
@@ -58,7 +64,7 @@ class ManualApprovalDeliveryRequiredFilter(admin.SimpleListFilter):
 
 
 @admin.register(models.JobApplication)
-class JobApplicationAdmin(ItouModelAdmin):
+class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
     form = JobApplicationAdminForm
     list_display = ("pk", "job_seeker", "state", "sender_kind", "created_at")
     show_full_result_count = False
@@ -166,6 +172,21 @@ class JobApplicationAdmin(ItouModelAdmin):
                     "updated_at",
                 ]
             },
+        ),
+    ]
+
+    INCONSISTENCY_CHECKS = [
+        (
+            "Candidature liée au PASS IAE d'un autre candidat",
+            lambda q: q.inconsistent_approval_user(),
+        ),
+        (
+            "Candidature liée au diagnostic d'un autre candidat",
+            lambda q: q.inconsistent_eligibility_diagnosis_job_seeker(),
+        ),
+        (
+            "Candidature liée au diagnostic GEIQ d'un autre candidat",
+            lambda q: q.inconsistent_geiq_eligibility_diagnosis_job_seeker(),
         ),
     ]
 

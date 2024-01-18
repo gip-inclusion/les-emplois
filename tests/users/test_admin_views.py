@@ -304,3 +304,45 @@ def test_num_queries(admin_client):
     ):
         response = admin_client.get(reverse("admin:users_user_change", kwargs={"object_id": prescriber.pk}))
     assert response.status_code == 200
+
+
+def test_check_inconsistency_check(admin_client):
+    job_seeker = JobSeekerFactory()
+
+    response = admin_client.post(
+        reverse("admin:users_user_changelist"),
+        {
+            "action": "check_inconsistencies",
+            helpers.ACTION_CHECKBOX_NAME: [job_seeker.pk],
+        },
+        follow=True,
+    )
+    assertContains(response, "Aucune incohérence trouvée")
+
+    inconsistent_job_app = JobApplicationFactory(
+        with_approval=True,
+        approval__user=job_seeker,
+    )
+    response = admin_client.post(
+        reverse("admin:users_user_changelist"),
+        {
+            "action": "check_inconsistencies",
+            helpers.ACTION_CHECKBOX_NAME: [inconsistent_job_app.job_seeker.pk],
+        },
+        follow=True,
+    )
+    assertMessages(
+        response,
+        [
+            (
+                "WARNING",
+                (
+                    '1 objet incohérent: <ul><li class="warning">'
+                    f'<a href="/admin/job_applications/jobapplication/{inconsistent_job_app.pk}/change/">'
+                    f"candidature - {inconsistent_job_app.pk}"
+                    "</a>: Candidature liée au PASS IAE d&#x27;un autre candidat"
+                    "</li></ul>"
+                ),
+            )
+        ],
+    )

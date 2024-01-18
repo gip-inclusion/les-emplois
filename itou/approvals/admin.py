@@ -14,6 +14,7 @@ from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.utils.admin import (
+    InconsistencyCheckMixin,
     ItouModelAdmin,
     ItouStackedInline,
     ItouTabularInline,
@@ -177,7 +178,7 @@ class StartDateFilter(admin.SimpleListFilter):
 
 
 @admin.register(models.Approval)
-class ApprovalAdmin(ItouModelAdmin):
+class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
     form = ApprovalAdminForm
     list_display = (
         "pk",
@@ -227,6 +228,13 @@ class ApprovalAdmin(ItouModelAdmin):
     )
     change_list_template = "admin/approvals/change_list_with_stats.html"
     stats_url = reverse_lazy("admin:approvals_approval_sent_to_pe_stats")
+
+    INCONSISTENCY_CHECKS = [
+        (
+            "PASS IAE lié au diagnostic d'un autre candidat",
+            lambda q: q.inconsistent_eligibility_diagnosis_job_seeker(),
+        ),
+    ]
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)

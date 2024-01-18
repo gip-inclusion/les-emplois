@@ -64,3 +64,58 @@ def test_create_job_application_does_not_crash(admin_client):
     )
     assertContains(response, "Corrigez les erreurs ci-dessous")
     assertContains(response, "Emetteur prescripteur manquant")
+
+
+def test_check_inconsistency_check(admin_client):
+    consistent_application = factories.JobApplicationFactory()
+
+    response = admin_client.post(
+        reverse("admin:job_applications_jobapplication_changelist"),
+        {
+            "action": "check_inconsistencies",
+            helpers.ACTION_CHECKBOX_NAME: [consistent_application.pk],
+        },
+        follow=True,
+    )
+    assertContains(response, "Aucune incohérence trouvée")
+
+    inconsistent_application_1 = factories.JobApplicationFactory(with_approval=True)
+    inconsistent_application_1.approval.user = JobSeekerFactory()
+    inconsistent_application_1.approval.save()
+
+    inconsistent_application_2 = factories.JobApplicationFactory(with_approval=True)
+    inconsistent_application_2.eligibility_diagnosis.job_seeker = JobSeekerFactory()
+    inconsistent_application_2.eligibility_diagnosis.save()
+
+    response = admin_client.post(
+        reverse("admin:job_applications_jobapplication_changelist"),
+        {
+            "action": "check_inconsistencies",
+            helpers.ACTION_CHECKBOX_NAME: [
+                consistent_application.pk,
+                inconsistent_application_1.pk,
+                inconsistent_application_2.pk,
+            ],
+        },
+        follow=True,
+    )
+    assertMessages(
+        response,
+        [
+            (
+                "WARNING",
+                (
+                    "2 objets incohérents: <ul>"
+                    '<li class="warning">'
+                    f'<a href="/admin/job_applications/jobapplication/{inconsistent_application_1.pk}/change/">'
+                    f"candidature - {inconsistent_application_1.pk}"
+                    "</a>: Candidature liée au PASS IAE d&#x27;un autre candidat</li>"
+                    '<li class="warning">'
+                    f'<a href="/admin/job_applications/jobapplication/{inconsistent_application_2.pk}/change/">'
+                    f"candidature - {inconsistent_application_2.pk}"
+                    "</a>: Candidature liée au diagnostic d&#x27;un autre candidat</li>"
+                    "</ul>"
+                ),
+            )
+        ],
+    )
