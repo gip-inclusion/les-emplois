@@ -180,7 +180,25 @@ class TestTransferUserData:
         assert job_application.job_seeker == to_user
         assert approval.user == to_user
         assertMessages(
-            response, [("INFO", f"Transfert effectué avec succès de l'utilisateur {from_user} vers {to_user}.")]
+            response,
+            [
+                ("INFO", f"Transfert effectué avec succès de l'utilisateur {from_user} vers {to_user}."),
+                (
+                    "WARNING",
+                    (
+                        "2 objets incohérents: <ul>"
+                        '<li class="warning">'
+                        f'<a href="/admin/job_applications/jobapplication/{job_application.pk}/change/">'
+                        f"candidature - {job_application.pk}"
+                        "</a>: Candidature liée au diagnostic d&#x27;un autre candidat</li>"
+                        '<li class="warning">'
+                        f'<a href="/admin/approvals/approval/{job_application.approval.pk}/change/">'
+                        f"PASS IAE - {job_application.approval.pk}"
+                        "</a>: PASS IAE lié au diagnostic d&#x27;un autre candidat</li>"
+                        "</ul>"
+                    ),
+                ),
+            ],
         )
         user_content_type = ContentType.objects.get_for_model(User)
         to_user_remark = PkSupportRemark.objects.filter(content_type=user_content_type, object_id=to_user.pk).first()

@@ -613,6 +613,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
                     )
                     messages.info(request, message)
 
+                self.check_inconsistencies(request, models.User.objects.filter(pk__in=(from_user.pk, to_user.pk)))
                 return redirect(
                     reverse(
                         "admin:users_user_change",
