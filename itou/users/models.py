@@ -193,22 +193,6 @@ class User(AbstractUser, AddressMixin):
         unique=True,
     )
 
-    # Don’t need to specify db_index because unique implies the creation of an index.
-    nir = models.CharField(
-        verbose_name="NIR",
-        max_length=15,
-        validators=[validate_nir],
-        blank=True,
-    )
-
-    lack_of_nir_reason = models.CharField(
-        verbose_name="pas de NIR ?",
-        help_text="Indiquez la raison de l'absence de NIR.",
-        max_length=30,
-        choices=LackOfNIRReason.choices,
-        blank=True,
-    )
-
     identity_provider = models.CharField(
         max_length=20,
         verbose_name="fournisseur d'identité (SSO)",
@@ -255,15 +239,6 @@ class User(AbstractUser, AddressMixin):
                 check=models.Q(~models.Q(kind=UserKind.ITOU_STAFF) & models.Q(is_staff=False, is_superuser=False))
                 | models.Q(kind=UserKind.ITOU_STAFF, is_staff=True),
             ),
-            # Make sure that if you have a lack_of_nir_reason value, you cannot have a nir value
-            # (but we'll have a lot of users lacking both nir & lack_of_nir_reason values)
-            models.CheckConstraint(
-                check=Q(lack_of_nir_reason="") | Q(nir=""),
-                name="user_lack_of_nir_reason_or_nir",
-                violation_error_message=(
-                    "Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de son NIR."
-                ),
-            ),
             models.CheckConstraint(
                 name="has_kind",
                 violation_error_message="Le type d’utilisateur est incorrect.",
@@ -274,13 +249,6 @@ class User(AbstractUser, AddressMixin):
                     | models.Q(kind=UserKind.EMPLOYER)
                     | models.Q(kind=UserKind.LABOR_INSPECTOR)
                 ),
-            ),
-            UniqueConstraintWithErrorCode(
-                "nir",
-                name="unique_nir_if_not_empty",
-                condition=~Q(nir=""),
-                validation_error_code="unique_nir_if_not_empty",
-                violation_error_message="Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.",
             ),
         ]
 
