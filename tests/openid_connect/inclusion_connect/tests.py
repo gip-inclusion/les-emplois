@@ -20,6 +20,7 @@ from pytest_django.asserts import assertRedirects
 
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.openid_connect.inclusion_connect import constants
+from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
 from itou.openid_connect.inclusion_connect.models import (
     InclusionConnectEmployerData,
     InclusionConnectPrescriberData,
@@ -32,6 +33,7 @@ from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.urls import add_url_params, get_absolute_url
+from tests.job_applications.factories import JobApplicationSentByPrescriberPoleEmploiFactory
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.users.factories import (
     DEFAULT_PASSWORD,
@@ -743,3 +745,35 @@ class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
 
         response = self.client.post(reverse("account_logout"))
         self.assertRedirects(response, reverse("search:employers_home"))
+
+
+class InclusionConnectmapChannelTest(InclusionConnectBaseTestCase):
+    @respx.mock
+    def test_happy_path(self):
+        job_application = JobApplicationSentByPrescriberPoleEmploiFactory()
+        prescriber = job_application.sender
+        prescriber.email = OIDC_USERINFO["email"]
+        prescriber.username = OIDC_USERINFO["sub"]
+        prescriber.save()
+        url_from_map = "{path}?channel={channel}".format(
+            path=reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk}),
+            channel=InclusionConnectChannel.MAP_CONSEILLER.value,
+        )
+
+        response = self.client.get(url_from_map, follow=True)
+        # Starting point of both the oauth_dance and `mock_oauth_dance()`.
+        ic_endpoint = response.redirect_chain[-1][0]
+        assert ic_endpoint.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE)
+        assert f"channel={InclusionConnectChannel.MAP_CONSEILLER.value}" in ic_endpoint
+
+        response = mock_oauth_dance(
+            self.client,
+            UserKind.PRESCRIBER,
+            next_url=url_from_map,
+            expected_redirect_url=url_from_map,
+            channel=InclusionConnectChannel.MAP_CONSEILLER,
+        )
+        assert auth.get_user(self.client).is_authenticated
+
+        response = self.client.get(response.url)
+        assert response.status_code == 200
