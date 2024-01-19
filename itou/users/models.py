@@ -833,6 +833,26 @@ class JobSeekerProfile(models.Model):
         on_delete=models.RESTRICT,
     )
 
+    # Don’t need to specify db_index because unique implies the creation of an index.
+    nir = models.CharField(
+        verbose_name="NIR",
+        max_length=15,
+        validators=[validate_nir],
+        blank=True,
+        default="",
+        null=True,
+    )
+
+    lack_of_nir_reason = models.CharField(
+        verbose_name="pas de NIR ?",
+        help_text="Indiquez la raison de l'absence de NIR.",
+        max_length=30,
+        choices=LackOfNIRReason.choices,
+        blank=True,
+        default="",
+        null=True,
+    )
+
     # The two following Pôle emploi fields are reserved for job seekers.
     # They are used in the process of delivering an approval.
     # They depend on each other: one or the other must be filled but not both.
