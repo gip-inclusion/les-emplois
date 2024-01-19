@@ -1,10 +1,14 @@
+from urllib.parse import urlencode
+
 from allauth.account.views import LoginView
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 
+from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
 from itou.users.enums import MATOMO_ACCOUNT_TYPE, UserKind
-from itou.utils.urls import add_url_params, get_safe_url
+from itou.utils.urls import add_url_params, get_safe_url, get_url_param_value
 from itou.www.login.forms import ItouLoginForm
 
 
@@ -50,6 +54,18 @@ class ItouLoginView(LoginView):
             "inclusion_connect_url": self._get_inclusion_connect_url(context),
         }
         return context | extra_context
+
+    def dispatch(self, request, *args, **kwargs):
+        if next_url := request.GET.get("next"):
+            if get_url_param_value(next_url, "channel") == InclusionConnectChannel.MAP_CONSEILLER:
+                params = {
+                    "user_kind": UserKind.PRESCRIBER,
+                    "next_url": next_url,
+                    "channel": InclusionConnectChannel.MAP_CONSEILLER.value,
+                }
+                redirect_to = f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}"
+                return HttpResponseRedirect(redirect_to)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class PrescriberLoginView(ItouLoginView):

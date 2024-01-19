@@ -82,11 +82,13 @@ def _generate_inclusion_params_from_session(ic_data):
         "state": state,
         "nonce": crypto.get_random_string(length=12),
     }
-    if (user_email := ic_data.get("user_email")) is not None:
+    if channel := ic_data.get("channel"):
+        data["channel"] = channel
+    if user_email := ic_data.get("user_email"):
         data["login_hint"] = user_email
-    if (lastname := ic_data.get("user_lastname")) is not None:
+    if lastname := ic_data.get("user_lastname"):
         data["lastname"] = lastname
-    if (firstname := ic_data.get("user_firstname")) is not None:
+    if firstname := ic_data.get("user_firstname"):
         data["firstname"] = firstname
     return data
 
@@ -121,11 +123,11 @@ def inclusion_connect_authorize(request):
         user_kind=user_kind, previous_url=previous_url, next_url=next_url, is_login=not register
     )
 
-    user_email = request.GET.get("user_email")
-    channel = request.GET.get("channel")
-    if user_email:
-        ic_data.user_email = user_email
+    if channel := request.GET.get("channel"):
         ic_data.channel = channel
+
+    if user_email := request.GET.get("user_email"):
+        ic_data.user_email = user_email
         ic_data.user_firstname = request.GET.get("user_firstname")
         ic_data.user_lastname = request.GET.get("user_lastname")
 
