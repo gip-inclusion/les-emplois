@@ -69,6 +69,8 @@ coverage.xml
 
 # dotenv
 .env
+# direnv
+/.envrc.local
 
 # virtualenv
 .venv*
