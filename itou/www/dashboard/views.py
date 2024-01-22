@@ -5,11 +5,9 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
-from django.utils import timezone
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
@@ -26,7 +24,6 @@ from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.openid_connect.inclusion_connect import constants as ic_constants
 from itou.prescribers.models import PrescriberOrganization
-from itou.siae_evaluations.constants import CAMPAIGN_VIEWABLE_DURATION
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.users.enums import MATOMO_ACCOUNT_TYPE, IdentityProvider, UserKind
 from itou.users.models import User
@@ -87,10 +84,7 @@ def _employer_dashboard_context(request):
         "evaluated_siae_notifications": (
             EvaluatedSiae.objects.for_company(current_org)
             .exclude(notified_at=None)
-            .filter(
-                Q(evaluation_campaign__ended_at=None)
-                | Q(evaluation_campaign__ended_at__gte=timezone.now() - CAMPAIGN_VIEWABLE_DURATION)
-            )
+            .viewable()
             .select_related("evaluation_campaign")
         ),
         "job_applications_categories": job_applications_categories,
