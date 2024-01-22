@@ -1,5 +1,6 @@
 {% load django_bootstrap5 %}
 {% load str_filters %}
+{% load matomo %}
 <div class="c-form">
     <form id="acceptForm" method="post" hx-post="{{ request.path }}" hx-swap="outerHTML show:#acceptForm:top" hx-select="#acceptForm" class="js-format-nir">
         {% if has_form_error %}
@@ -57,7 +58,9 @@
                     <a class="btn btn-block btn-outline-primary" href="{{ back_url }}">Retour</a>
                 </div>
                 <div class="form-group mb-0 col-6 col-lg-auto">
-                    <button class="btn btn-ico btn-block btn-primary" aria-label="Valider l’embauche de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}">
+                    <button class="btn btn-ico btn-block btn-primary"
+                            aria-label="Valider l’embauche de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}"
+                            {% matomo_event "candidature" "submit" "accept_application_submit" %}>
                         <i class="ri-check-line ri-xl"></i>
                         <span>Valider l’embauche</span>
                     </button>
