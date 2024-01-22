@@ -74,6 +74,27 @@ def add_url_params(url: str, params: dict[str, str]) -> str:
     return new_url
 
 
+def get_url_param_value(url: str, key: str) -> str:
+    """Get a parameter value from a provided URL..
+
+    :param url: string of target URL
+    :param key: key of the requested param
+    :return: value of the requested param
+
+    >> url = 'http://localhost:8000/?channel=map_conseiller
+    >> key = "channel"
+    >> get_url_param_value(url, key)
+    'map_conseiller'
+    """
+    from urllib.parse import parse_qs, urlparse
+
+    parsed_url = urlparse(url)
+    key_list = parse_qs(parsed_url.query).get(key)
+    if key_list:
+        return key_list[0]
+    return None
+
+
 class SiretConverter:
     """
     Custom path converter for Siret.

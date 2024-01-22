@@ -51,6 +51,7 @@ from itou.utils.urls import (
     get_external_link_markup,
     get_safe_url,
     get_tally_form_url,
+    get_url_param_value,
 )
 from itou.utils.validators import (
     alphanumeric,
@@ -890,6 +891,21 @@ class UtilsUrlsTestCase(TestCase):
             f'<a href="{url}" rel="noopener" target="_blank" aria-label="Ouverture dans un nouvel onglet">{text}</a>'
         )
         assert get_external_link_markup(url=url, text=text) == expected
+
+
+@pytest.mark.parametrize(
+    "url,expected_value",
+    [
+        ("https://domain.com/hey_there?channel=map_conseiller", "map_conseiller"),
+        ("https://domain.com/hey_there?channel=", ""),
+        ("https://domain.com/hey_there", None),
+        ("https://[::1/", None),
+        ("that-is-not-a-url", None),
+        ("12345", None),
+    ],
+)
+def test_get_url_param_value(url, expected_value):
+    assert get_url_param_value(url, "channel") == expected_value
 
 
 class MockedCompanySignupTokenGenerator(CompanySignupTokenGenerator):
