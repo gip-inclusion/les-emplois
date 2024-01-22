@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 
 from django.conf import settings
@@ -133,7 +134,11 @@ class EvaluationCampaignQuerySet(models.QuerySet):
 
     def viewable(self):
         recent_q = Q(ended_at__gte=timezone.now() - CAMPAIGN_VIEWABLE_DURATION)
-        return self.filter(self.in_progress_q | recent_q)
+        return (
+            self.filter(self.in_progress_q | recent_q)
+            # Ignore first evaluation campaigns, they were a test.
+            .exclude(evaluated_period_end_at__lt=datetime.date(2022, 1, 1))
+        )
 
 
 class EvaluationCampaign(models.Model):

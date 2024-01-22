@@ -1,5 +1,3 @@
-import datetime
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -219,8 +217,6 @@ def evaluation_campaign_data_context(evaluated_siae):
         EvaluatedSiae.objects.viewable()
         .filter(siae=evaluated_siae.siae_id)
         .exclude(pk=evaluated_siae.pk)
-        # Ignore first evaluation campaigns, they were a test.
-        .exclude(evaluation_campaign__evaluated_period_end_at__lt=datetime.date(2022, 1, 1))
         .order_by("-evaluation_campaign__evaluated_period_start_at")
         .select_related("evaluation_campaign", "sanctions")
         .prefetch_related("evaluated_job_applications__evaluated_administrative_criteria")
