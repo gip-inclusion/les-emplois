@@ -95,8 +95,7 @@ class JobSeekerNirForm(forms.Form):
 
     def clean_nir(self):
         nir = self.cleaned_data["nir"].replace(" ", "")
-        user_exists = User.nir_already_exists(nir=nir)
-        if user_exists:
+        if User.objects.filter(nir=nir).exists():
             raise ValidationError("Un compte avec ce numéro existe déjà.")
         return nir
 

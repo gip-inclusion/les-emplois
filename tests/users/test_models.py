@@ -175,11 +175,6 @@ class ModelTest(TestCase):
         assert User.email_already_exists("foo@bar.com")
         assert User.email_already_exists("FOO@bar.com")
 
-    def test_nir_already_exists(self):
-        user = JobSeekerFactory()
-        assert User.nir_already_exists(user.nir)
-        assert not User.nir_already_exists(JobSeekerFactory.build().nir)
-
     def test_save_for_unique_email_on_create_and_update(self):
         """
         Ensure `email` is unique when using the save() method for creating or updating a User instance.
