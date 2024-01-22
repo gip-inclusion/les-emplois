@@ -98,7 +98,7 @@ class UserAdminFormTest(TestCase):
 
         form = UserAdminForm(data_new_user)
         assert not form.is_valid()
-        assert "Le NIR de ce candidat est déjà associé à un autre utilisateur." in form.errors["__all__"]
+        assert "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur." in form.errors["__all__"]
 
         # updating user - nir not modified
         form = UserAdminForm(data=data_user, instance=user)
@@ -118,4 +118,4 @@ class UserAdminFormTest(TestCase):
         data_user["nir"] = existing_nir
         form = UserAdminForm(data=data_user, instance=user)
         assert not form.is_valid()
-        assert "Le NIR de ce candidat est déjà associé à un autre utilisateur." in form.errors["__all__"]
+        assert "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur." in form.errors["__all__"]

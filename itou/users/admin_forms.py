@@ -38,10 +38,6 @@ class UserAdminForm(UserChangeForm):
             if self.instance.email_already_exists(email, exclude_pk=self.instance.pk):
                 raise ValidationError(User.ERROR_EMAIL_ALREADY_EXISTS)
 
-        nir = self.cleaned_data["nir"]
-        if nir and self.instance.nir_already_exists(nir=nir, exclude_pk=self.instance.pk):
-            raise ValidationError("Le NIR de ce candidat est déjà associé à un autre utilisateur.")
-
         if self.instance.is_job_seeker:
             # Update job seeker geolocation
             try:
