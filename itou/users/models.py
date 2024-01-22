@@ -728,13 +728,6 @@ class User(AbstractUser, AddressMixin):
         return uuid.uuid4().hex
 
     @classmethod
-    def nir_already_exists(cls, nir, exclude_pk=None):
-        queryset = cls.objects.filter(nir=nir)
-        if exclude_pk:
-            queryset = queryset.exclude(pk=exclude_pk)
-        return queryset.exists()
-
-    @classmethod
     def email_already_exists(cls, email, exclude_pk=None):
         """
         RFC 5321 Part 2.4 states that only the domain portion of an email
