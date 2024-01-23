@@ -56,20 +56,36 @@
                             {% endif %}
                             {% include 'includes/copy_to_clipboard.html' with content=job.get_absolute_url text="Copier le lien de cette fiche" placement="bottom" css_classes="btn btn-ico btn-outline-primary btn-block" %}
                         </div>
-                        <div class="c-box">
-                            <span class="fs-xs lh-sm">{{ siae.kind }} - {{ siae.get_kind_display }}</span>
-                            <h2 class="h3 mb-2">{{ siae.display_name }}</h2>
-                            <div class="d-flex fs-sm lh-sm text-secondary">
-                                <i class="ri-map-pin-2-line me-2"></i>
-                                <address class="m-0">{{ siae.address_on_one_line }}</address>
+                        <div class="c-box c-box--structure">
+                            <div class="c-box--structure__summary">
+                                <i class="ri-community-line"></i>
+                                <div>
+                                    <span data-bs-toggle="tooltip" data-bs-title="{{ siae.get_kind_display }}">{{ siae.kind }}</span>
+                                </div>
+                                <h3>{{ siae.display_name }}</h3>
                             </div>
-                            {% if siae.email or siae.phone or siae.website %}
-                                {% include "companies/includes/_siae_details.html" with is_sm=True %}
-                            {% endif %}
-                            <a href="{% url 'companies_views:card' siae_id=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}" class="btn btn-secondary btn-ico btn-block mt-2">
-                                <i class="ri-eye-line"></i>
-                                <span>Voir la fiche de l'entreprise</span>
-                            </a>
+                            <div class="c-box--structure__detail">
+                                <hr class="my-4">
+                                <ul class="c-box--structure__list-contact">
+                                    <li>
+                                        <i class="ri-map-pin-2-line font-weight-normal me-2"></i>
+                                        <address class="m-0">{{ siae.address_on_one_line }}</address>
+                                        <button class="btn-link font-weight-medium ms-1"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                data-bs-trigger="manual"
+                                                data-bs-title="Copié!"
+                                                data-it-clipboard-button="copy"
+                                                data-it-copy-to-clipboard="{{ siae.address_on_one_line }}">
+                                            <i class="ri-file-copy-line"></i>
+                                        </button>
+                                    </li>
+                                    {% if siae.email or siae.phone or siae.website %}
+                                        {% include "companies/includes/_siae_details.html" %}
+                                    {% endif %}
+                                </ul>
+                                <a href="{% url 'companies_views:card' siae_id=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}" class="btn btn-secondary btn-block mt-4">Voir la fiche de l'entreprise</a>
+                            </div>
                         </div>
                     {% endif %}
                 </div>

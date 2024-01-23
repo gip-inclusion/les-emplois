@@ -1,15 +1,31 @@
-<div class="card c-card c-card--emploi mb-3 mb-lg-5">
-    <div class="card-body">
-        <p>
-            <i class="ri-home-7-line ri-xl me-2"></i>{{ siae.kind }} - {{ siae.get_kind_display }}
-        </p>
-        <hr>
-        <p class="h2">
-            <a href="{% url 'companies_views:card' siae_id=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}">
-                {{ siae.display_name }}
-            </a>
-        </p>
-        {# Display non-user-edited name too. #}
-        <address class="fs-lg">{{ siae.address_on_one_line }}</address>
+<div class="c-box c-box--structure mb-3 mb-lg-5">
+    <div class="c-box--structure__summary" data-bs-toggle="collapse" data-bs-target="#collapseBoxStructure" aria-expanded="false" aria-controls="collapseBoxStructure">
+        <i class="ri-community-line"></i>
+        <div>
+            <span data-bs-toggle="tooltip" data-bs-title="{{ siae.get_kind_display }}">{{ siae.kind }}</span>
+        </div>
+        <h3>{{ siae.display_name }}</h3>
+    </div>
+    <div class="c-box--structure__detail collapse" id="collapseBoxStructure">
+        <hr class="my-4">
+        <ul class="c-box--structure__list-contact">
+            <li>
+                <i class="ri-map-pin-2-line font-weight-normal me-2"></i>
+                <address class="m-0">{{ siae.address_on_one_line }}</address>
+                <button class="btn-link font-weight-medium ms-1"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="top"
+                        data-bs-trigger="manual"
+                        data-bs-title="Copié!"
+                        data-it-clipboard-button="copy"
+                        data-it-copy-to-clipboard="{{ siae.address_on_one_line }}">
+                    <i class="ri-file-copy-line"></i>
+                </button>
+            </li>
+            {% if siae.email or siae.phone or siae.website %}
+                {% include "companies/includes/_siae_details.html" %}
+            {% endif %}
+        </ul>
+        <a href="{% url 'companies_views:card' siae_id=siae.pk %}" class="btn btn-secondary btn-block mt-4">Voir la fiche de l'entreprise</a>
     </div>
 </div>
