@@ -1,31 +1,40 @@
 {% load format_filters %}
 
-<hr class="my-3">
-<ul class="list-unstyled lh-sm {% if is_sm %}fs-sm{% endif %}">
-    {% if siae.email %}
-        <li class="{% if is_sm %}mb-1{% else %}mb-2{% endif %}">
-            <a aria-label="Contact par mail" href="mailto:{{ siae.email }}" class="btn-link btn-ico">
-                <i class="ri-mail-line font-weight-normal"></i>
-                <span>{{ siae.email }}</span>
-            </a>
-        </li>
-    {% endif %}
+{% if siae.email %}
+    <li>
+        <i class="ri-mail-line font-weight-normal me-2"></i>
+        {{ siae.email }}
+        <button class="btn-link font-weight-medium ms-1"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                data-bs-trigger="manual"
+                data-bs-title="Copié!"
+                data-it-clipboard-button="copy"
+                data-it-copy-to-clipboard="{{ siae.email }}">
+            <i class="ri-file-copy-line"></i>
+        </button>
+    </li>
+{% endif %}
 
-    {% if siae.phone %}
-        <li class="{% if is_sm %}mb-1{% else %}mb-2{% endif %}">
-            <a aria-label="Contact téléphonique" href="tel:{{ siae.phone|cut:" " }}" class="btn-link btn-ico">
-                <i class="ri-phone-line font-weight-normal"></i>
-                <span>{{ siae.phone|format_phone }}</span>
-            </a>
-        </li>
-    {% endif %}
+{% if siae.phone %}
+    <li>
+        <i class="ri-phone-line font-weight-normal me-2"></i>
+        {{ siae.phone|format_phone }}
+        <button class="btn-link font-weight-medium ms-1"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                data-bs-trigger="manual"
+                data-bs-title="Copié!"
+                data-it-clipboard-button="copy"
+                data-it-copy-to-clipboard="{{ siae.phone|cut:" " }}">
+            <i class="ri-file-copy-line"></i>
+        </button>
+    </li>
+{% endif %}
 
-    {% if siae.website %}
-        <li class="{% if is_sm %}mb-1{% else %}mb-2{% endif %}">
-            <a aria-label="Site web (ouverture dans un nouvel onglet)" href="{{ siae.website }}" rel="noopener" target="_blank" class="btn-link btn-ico">
-                <i class="ri-global-line font-weight-normal"></i>
-                <span>{{ siae.website }}</span>
-            </a>
-        </li>
-    {% endif %}
-</ul>
+{% if siae.website %}
+    <li>
+        <i class="ri-global-line font-weight-normal me-2"></i>
+        <a href="{{ siae.website }}" rel="noopener" target="_blank" class="btn-link font-weight-medium has-external-link" aria-label="Site web (ouverture dans un nouvel onglet)">{{ siae.website }}</a>
+    </li>
+{% endif %}
