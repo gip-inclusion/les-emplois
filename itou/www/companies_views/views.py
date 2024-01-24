@@ -1,10 +1,16 @@
+import random
+from urllib.parse import urljoin
+
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.html import format_html
 
 from itou.cities.models import City
@@ -14,6 +20,7 @@ from itou.companies.models import Company, JobDescription, SiaeFinancialAnnex
 from itou.jobs.models import Appellation
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.apis.data_inclusion import DataInclusionApiClient
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
@@ -27,6 +34,42 @@ NB_ITEMS_PER_PAGE = 10
 
 ITOU_SESSION_EDIT_COMPANY_KEY = "edit_siae_session_key"
 ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
+
+DATA_INCLUSION_API_CACHE_PREFIX = "data_inclusion_api_results"
+
+
+def dora_url(source, id):
+    return urljoin(settings.DORA_BASE_URL, f"/services/di--{source}--{id}")
+
+
+def displayable_thematique(thematique):
+    """Remove the sub-themes (anything after the "--"), capitalize and use spaces instead of dashes."""
+    return thematique.split("--")[0].upper().replace("-", " ")
+
+
+def get_data_inclusion_services(code_insee):
+    """Returns 3 random DI services, in a 'stable' way: for a given city and day so that an user
+    who refreshes the page or shares the URL would not get different services in the same day.
+    """
+    if not code_insee:
+        return []
+    cache_key = f"{DATA_INCLUSION_API_CACHE_PREFIX}:{code_insee}:{timezone.localdate()}"
+    results = cache.get(cache_key)
+    if results is None:
+        client = DataInclusionApiClient(settings.API_DATA_INCLUSION_BASE_URL, settings.API_DATA_INCLUSION_TOKEN)
+        services = client.services(code_insee)
+        results = random.sample(services, min(len(services), 3))
+        results = [
+            r
+            | {
+                "dora_di_url": dora_url(r["source"], r["id"]),
+                "thematiques_display": {displayable_thematique(t) for t in r["thematiques"]},
+            }
+            for r in results
+        ]
+        cache.set(cache_key, results, 60 * 60 * 24)
+    return results
+
 
 ### Job description views
 
@@ -66,6 +109,13 @@ def job_description_card(request, job_description_id, template_name="companies/j
         }
     )
 
+    if job_description.location:
+        code_insee = job_description.location.code_insee
+    elif company.insee_city:
+        code_insee = company.insee_city.code_insee
+    else:
+        code_insee = None
+
     context = {
         "job": job_description,
         "siae": company,
@@ -74,6 +124,7 @@ def job_description_card(request, job_description_id, template_name="companies/j
         "back_url": back_url,
         "breadcrumbs": breadcrumbs,
         "matomo_custom_title": "Détails de la fiche de poste",
+        "code_insee": code_insee,
     }
     return render(request, template_name, context)
 
@@ -444,12 +495,14 @@ def card(request, siae_id, template_name="companies/card.html"):
                 active_jobs_descriptions.append(job_desc)
             else:
                 other_jobs_descriptions.append(job_desc)
+
     context = {
         "siae": company,
         "back_url": back_url,
         "active_jobs_descriptions": active_jobs_descriptions,
         "other_jobs_descriptions": other_jobs_descriptions,
         "matomo_custom_title": "Fiche de la structure d'insertion",
+        "code_insee": company.insee_city.code_insee if company.insee_city else None,
     }
     return render(request, template_name, context)
 
@@ -628,4 +681,12 @@ def update_admin_role(request, action, user_id, template_name="companies/update_
         "target_member": target_member,
     }
 
+    return render(request, template_name, context)
+
+
+def hx_dora_services(request, code_insee, template_name="companies/hx_dora_services.html"):
+    context = {
+        "data_inclusion_services": get_data_inclusion_services(code_insee),
+        "dora_base_url": settings.DORA_BASE_URL,
+    }
     return render(request, template_name, context)

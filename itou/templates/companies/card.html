@@ -166,4 +166,8 @@
             </div>
         </div>
     </section>
+
+    {% if code_insee %}
+        <div hx-get="{% url "companies_views:hx_dora_services" code_insee=code_insee %}" hx-trigger="load"></div>
+    {% endif %}
 {% endblock %}
