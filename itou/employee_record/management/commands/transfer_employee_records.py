@@ -154,6 +154,7 @@ class Command(EmployeeRecordTransferCommand):
                             if approval.suspension_set.exists() or approval.prolongation_set.exists():
                                 # Mimic the SQL trigger function "create_employee_record_notification()"
                                 EmployeeRecordUpdateNotification.objects.update_or_create(
+                                    status=Status.NEW,
                                     employee_record=employee_record,
                                     defaults={"updated_at": timezone.now},
                                 )
