@@ -361,6 +361,10 @@ API_INSEE_CONSUMER_SECRET = os.getenv("API_INSEE_CONSUMER_SECRET")
 # https://api.insee.fr/catalogue/site/themes/wso2/subthemes/insee/pages/item-info.jag?name=Sirene&version=V3&provider=insee
 API_INSEE_SIRENE_BASE_URL = f"{API_INSEE_BASE_URL}/entreprises/sirene/V3"
 
+API_DATA_INCLUSION_BASE_URL = os.getenv("API_DATA_INCLUSION_BASE_URL")
+API_DATA_INCLUSION_TOKEN = os.getenv("API_DATA_INCLUSION_TOKEN")
+API_DATA_INCLUSION_SOURCES = os.getenv("API_DATA_INCLUSION_SOURCES", "").split(",")
+
 # Pôle emploi's Emploi Store Dev aka ESD. There is a production AND a recette environment.
 # Key and secrets are stored on pole-emploi.io (prod and recette) accounts, the values are not the
 # same depending on the environment
@@ -622,3 +626,5 @@ AIRFLOW_BASE_URL = os.getenv("AIRFLOW_BASE_URL")
 FORCE_IC_LOGIN = True
 
 C4_TOKEN = os.getenv("C4_TOKEN", None)
+
+DORA_BASE_URL = os.getenv("DORA_BASE_URL", "https://dora.inclusion.beta.gouv.fr")

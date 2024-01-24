@@ -1,0 +1,50 @@
+{% load theme_inclusion %}
+
+{% if data_inclusion_services and dora_base_url %}
+    <section class="s-section" data-track-content data-content-name="dora-di-banner">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="c-box">
+                        <h3 class="mb-3 mb-lg-4">Découvrez l'offre d'insertion disponible sur votre territoire</h3>
+                        <div class="row">
+                            <div class="col-12 col-lg-3 mb-3 mb-lg-0">
+                                <div class="mb-2">
+                                    <img src="{% static_theme_images 'logo-Dora-Horizontal-Couleur.png' %}" height="60" alt="DORA - Plateforme de l'inclusion">
+                                </div>
+                                <p class="fs-sm">
+                                    Identifiez rapidement les services répondant aux difficultés et aux besoins des personnes que vous accompagnez
+                                </p>
+                                <a href="{{ dora_base_url }}?mtm_campaign=LesEmplois&mtm_kwd=GeneriqueDecouvrirService" rel="noopener" target="_blank" class="btn-link btn-ico has-external-link">Découvrir tous les services</a>
+                            </div>
+                            <div class="col-12 col-lg-9">
+                                <div class="vstack gap-3">
+                                    {% for service in data_inclusion_services %}
+                                        <div class="card c-card has-links-inside">
+                                            <div class="card-body">
+                                                <a href="{{ service.dora_di_url }}?mtm_campaign=LesEmplois&mtm_kwd=CardServiceFicheDePoste" rel="noopener" target="_blank" class="btn-link mb-2">{{ service.nom | truncatechars:60 }}</a>
+                                                <ul class="list-unstyled list-inline fs-sm">
+                                                    <li class="list-inline-item">{{ service.structure.nom | truncatechars:60 }}</li>
+                                                    <li class="list-inline-item">
+                                                        <i class="ri ri-map-pin-2-line me-2" aria-hidden="true"></i>{{ service.structure.code_postal }} {{ service.structure.commune }}
+                                                    </li>
+                                                </ul>
+                                                <div class="badge-group">
+                                                    {% for thematique in service.thematiques_display %}
+                                                        <span class="badge badge-sm bg-info-lighter text-info text-uppercase text-decoration-none">{{ thematique }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+{% endif %}

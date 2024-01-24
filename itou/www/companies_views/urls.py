@@ -36,4 +36,5 @@ urlpatterns = [
     re_path(
         "admin_role/(?P<action>add|remove)/(?P<user_id>[0-9]+)", views.update_admin_role, name="update_admin_role"
     ),
+    path("dora-services/<str:code_insee>", views.hx_dora_services, name="hx_dora_services"),
 ]

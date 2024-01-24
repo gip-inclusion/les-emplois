@@ -1,5 +1,7 @@
+import random
 from unittest import mock
 
+import freezegun
 import pytest
 from django.core import mail
 from django.urls import reverse
@@ -11,6 +13,7 @@ from itou.companies.models import Company
 from itou.jobs.models import Appellation
 from itou.utils import constants as global_constants
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
+from itou.www.companies_views import views
 from tests.cities.factories import create_city_vannes
 from tests.companies.factories import (
     CompanyFactory,
@@ -1036,3 +1039,67 @@ class CompanyAdminMembersManagementTest(TestCase):
         # update: less test with RE_PATH
         with pytest.raises(NoReverseMatch):
             reverse("companies_views:update_admin_role", kwargs={"action": suspicious_action, "user_id": admin.id})
+
+
+def test_dora_url(settings):
+    settings.DORA_BASE_URL = "https://dora.fake.gouv.fr/"
+    assert views.dora_url("toto", "superb-id") == "https://dora.fake.gouv.fr/services/di--toto--superb-id"
+
+
+def test_displayable_thematique():
+    assert views.displayable_thematique("une-thematique-comme-ça--et-une-sous-thematique") == "UNE THEMATIQUE COMME ÇA"
+
+
+def test_get_data_inclusion_services(settings, respx_mock):
+    settings.API_DATA_INCLUSION_BASE_URL = "https://fake.api.gouv.fr/"
+    api_mock = respx_mock.get("https://fake.api.gouv.fr/search/services")
+    api_mock.respond(
+        200,
+        json={
+            "items": [
+                {"service": {"id": "svc1", "source": "fake", "thematiques": ["a--b"]}, "distance": 1},
+                {"service": {"id": "svc2", "source": "fake", "thematiques": ["a--b"]}, "distance": 3},
+                {"service": {"id": "svc3", "source": "fake", "thematiques": ["a--b"]}, "distance": 2},
+                {"service": {"id": "svc4", "source": "fake", "thematiques": ["a--b"]}, "distance": 5},
+            ]
+        },
+    )
+
+    assert views.get_data_inclusion_services(None) == []
+    random.seed(0)  # ensure the mock data is stable
+    mocked_final_response = [
+        {
+            "dora_di_url": "https://dora.inclusion.beta.gouv.fr/services/di--fake--svc4",
+            "id": "svc4",
+            "source": "fake",
+            "thematiques": ["a--b"],
+            "thematiques_display": {"A"},
+        },
+        {
+            "dora_di_url": "https://dora.inclusion.beta.gouv.fr/services/di--fake--svc2",
+            "id": "svc2",
+            "source": "fake",
+            "thematiques": ["a--b"],
+            "thematiques_display": {"A"},
+        },
+        {
+            "dora_di_url": "https://dora.inclusion.beta.gouv.fr/services/di--fake--svc1",
+            "id": "svc1",
+            "source": "fake",
+            "thematiques": ["a--b"],
+            "thematiques_display": {"A"},
+        },
+    ]
+    with freezegun.freeze_time("2024-01-01") as frozen_datetime:
+        # make the actual API request
+        assert views.get_data_inclusion_services("75056") == mocked_final_response
+        assert api_mock.call_count == 1
+        # hit the cache on the second call
+        assert views.get_data_inclusion_services("75056") == mocked_final_response
+        assert api_mock.call_count == 1
+
+        # expire the cache key
+        frozen_datetime.move_to("2024-01-02")
+        random.seed(0)  # ensure the mock data is stable
+        assert views.get_data_inclusion_services("75056") == mocked_final_response
+        assert api_mock.call_count == 2
