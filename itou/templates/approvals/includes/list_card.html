@@ -1,5 +1,6 @@
 {% load format_filters %}
 {% load str_filters %}
+{% load matomo %}
 
 <div class="c-card card my-4 has-links-inside">
     <div class="card-header pb-3">
@@ -31,10 +32,8 @@
 
     <div class="card-footer text-end bg-light">
         <a href="{% url 'approvals:detail' pk=approval.id %}"
-           class="btn btn-sm btn-outline-primary bg-white matomo-event"
-           data-matomo-category="salaries"
-           data-matomo-action="clic"
-           data-matomo-option="details-salarie"
+           class="btn btn-sm btn-outline-primary bg-white"
+           {% matomo_event "salaries" "clic" "details-salarie" %}
            aria-label="Voir le profil de {{ approval.user.get_full_name }}">Voir son profil</a>
     </div>
 </div>

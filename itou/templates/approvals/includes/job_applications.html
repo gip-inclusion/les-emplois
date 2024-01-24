@@ -1,3 +1,4 @@
+{% load matomo %}
 <div class="card c-card has-links-inside my-4">
     <div class="card-body">
         {% include "approvals/includes/job_description_creation.html" with job_application=job_application %}
@@ -6,10 +7,8 @@
 
     <div class="card-footer text-end bg-light">
         <a href="{% url 'apply:details_for_company' job_application_id=job_application.id %}"
-           class="btn btn-sm btn-outline-primary bg-white matomo-event"
-           data-matomo-category="salaries"
-           data-matomo-action="clic"
-           data-matomo-option="detail-candidature"
+           class="btn btn-sm btn-outline-primary bg-white"
+           {% matomo_event "salaries" "clic" "detail-candidature" %}
            aria-label="Voir la candidature de {{ job_application.sender.get_full_name }}">Voir sa candidature</a>
     </div>
 </div>

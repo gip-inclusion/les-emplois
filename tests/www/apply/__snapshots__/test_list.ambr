@@ -880,7 +880,7 @@
   
                                       <div class="card-footer text-end bg-light">
                                           
-                                          <a aria-label="Gérer la candidature de J… H…" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/apply/prescriber/list">Voir sa candidature</a>
+                                          <a aria-label="Gérer la candidature de J… H…" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/apply/prescriber/list">Voir sa candidature</a>
                                       </div>
                                   </div>
                               
@@ -948,7 +948,7 @@
                                                   En attente de réponse depuis 3 semaines.
                                               </span>
                                           
-                                          <a aria-label="Gérer la candidature de J… H…" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-option="voir_candidature_prescripteur" href="/apply/22222222-2222-2222-2222-222222222222/prescriber/details?back_url=/apply/prescriber/list">Voir sa candidature</a>
+                                          <a aria-label="Gérer la candidature de J… H…" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/22222222-2222-2222-2222-222222222222/prescriber/details?back_url=/apply/prescriber/list">Voir sa candidature</a>
                                       </div>
                                   </div>
                               
@@ -1016,7 +1016,7 @@
                                                   En attente de réponse depuis 8 semaines.
                                               </span>
                                           
-                                          <a aria-label="Gérer la candidature de J… H…" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-option="voir_candidature_prescripteur" href="/apply/33333333-3333-3333-3333-333333333333/prescriber/details?back_url=/apply/prescriber/list">Voir sa candidature</a>
+                                          <a aria-label="Gérer la candidature de J… H…" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/33333333-3333-3333-3333-333333333333/prescriber/details?back_url=/apply/prescriber/list">Voir sa candidature</a>
                                       </div>
                                   </div>
                               
@@ -1116,8 +1116,7 @@
   
                                       <div class="card-footer text-end bg-light">
                                           
-                                          <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/11111111-1111-1111-1111-111111111111/siae/details?back_url=/apply/siae/list">
-                                          Voir sa candidature</a>
+                                          <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/11111111-1111-1111-1111-111111111111/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
                                       </div>
                                   </div>
   
@@ -1221,8 +1220,7 @@
                                                   En attente de réponse depuis 3 semaines.
                                               </span>
                                           
-                                          <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/22222222-2222-2222-2222-222222222222/siae/details?back_url=/apply/siae/list">
-                                          Voir sa candidature</a>
+                                          <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/22222222-2222-2222-2222-222222222222/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
                                       </div>
                                   </div>
   
@@ -1296,8 +1294,7 @@
                                                   En attente de réponse depuis 8 semaines.
                                               </span>
                                           
-                                          <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/33333333-3333-3333-3333-333333333333/siae/details?back_url=/apply/siae/list">
-                                          Voir sa candidature</a>
+                                          <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/33333333-3333-3333-3333-333333333333/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
                                       </div>
                                   </div>
   

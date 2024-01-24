@@ -1,5 +1,6 @@
 {% load static %}
 {% load theme_inclusion %}
+{% load matomo %}
 
 <h2>Créez un compte les emplois de l’inclusion avec Inclusion Connect</h2>
 <p class="mt-5">
@@ -9,11 +10,7 @@
 
 {% if inclusion_connect_url %}
     <div class="text-center">
-        <a href="{{ inclusion_connect_url }}"
-           class="btn-inclusion-connect matomo-event"
-           data-matomo-category="inscription {{ matomo_account_type }}"
-           data-matomo-action="clic"
-           data-matomo-option="se-connecter-avec-inclusion-connect">
+        <a href="{{ inclusion_connect_url }}" class="btn-inclusion-connect" {% matomo_event "inscription "|add:matomo_account_type "clic" "se-connecter-avec-inclusion-connect" %}>
             <picture>
                 <source srcset="{% static_theme_images 'logo-inclusion-connect-one-line.svg' %}" height="14" width="286" type="image/svg+xml" media="(min-width: 30em)">
                 <img src="{% static_theme_images 'logo-inclusion-connect-two-lines.svg' %}" height="37" width="142" alt="Se connecter avec Inclusion Connect">

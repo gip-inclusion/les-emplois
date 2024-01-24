@@ -105,8 +105,7 @@
                                         <a class="btn btn-sm btn-outline-primary bg-white"
                                            href="{% url 'apply:details_for_company' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
                                            aria-label="Gérer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}"
-                                           {% matomo_event "candidature" "clic" "voir-candidature-employeur" %}>
-                                        Voir sa candidature</a>
+                                           {% matomo_event "candidature" "clic" "voir-candidature-employeur" %}>Voir sa candidature</a>
                                     </div>
                                 </div>
 

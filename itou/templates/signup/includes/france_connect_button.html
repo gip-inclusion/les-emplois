@@ -1,4 +1,5 @@
 {% load static %}
+{% load matomo %}
 
 <p class="mb-0">
     <strong>Utilisez FranceConnect pour vous connecter ou créer un compte</strong>.
@@ -7,12 +8,7 @@
     FranceConnect est la solution proposée par l’État pour sécuriser et simplifier la connexion à vos services en ligne.
 </p>
 <div class="text-center">
-    <a href="{% url 'france_connect:authorize' %}"
-       aria-label="S'identifier avec FranceConnect"
-       class="matomo-event"
-       data-matomo-category="inscription-candidat"
-       data-matomo-action="clic"
-       data-matomo-option="se-connecter-avec-france-connect">
+    <a href="{% url 'france_connect:authorize' %}" aria-label="S'identifier avec FranceConnect" {% matomo_event "inscription-candidat" "clic" "se-connecter-avec-france-connect" %}>
         <img class="img-fluid mb-1 itou-france-connect" alt="">
     </a>
     <br>

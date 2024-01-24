@@ -1,3 +1,4 @@
+{% load matomo %}
 <button data-bs-toggle="modal" data-bs-target="#delete-job-application" class="btn btn-outline-primary btn-block btn-ico">
     <i class="ri-delete-bin-line ri-lg"></i>
     <span>Supprimer cette candidature</span>
@@ -28,10 +29,8 @@
                 <div class="modal-footer">
                     <a href="#" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" aria-label="Non">Non</a>
                     <input type="submit"
-                           class="btn btn-sm btn-danger matomo-event"
-                           data-matomo-category="employeurs"
-                           data-matomo-action="clic"
-                           data-matomo-option="suppression-candidature"
+                           class="btn btn-sm btn-danger"
+                           {% matomo_event "employeurs" "clic" "suppression-candidature" %}
                            rel="noopener"
                            aria-label="Oui, je souhaite supprimer cette candidature"
                            value="Oui, je souhaite supprimer cette candidature">

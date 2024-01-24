@@ -14,22 +14,18 @@
                 <li>
                     <a href="{{ ITOU_HELP_CENTER_URL }}"
                        rel="noopener"
-                       class="dropdown-item has-external-link matomo-event"
+                       class="dropdown-item has-external-link"
                        target="_blank"
                        aria-label="Accéder à l'espace de documentation (nouvel onglet)"
-                       data-matomo-category="help"
-                       data-matomo-action="clic"
-                       data-matomo-option="header_documentation">Documentation</a>
+                       {% matomo_event "help" "clic" "header_documentation" %}>Documentation</a>
                 </li>
                 <li>
                     <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14733403281937--Comprendre-l-IAE"
                        rel="noopener"
-                       class="dropdown-item has-external-link matomo-event"
+                       class="dropdown-item has-external-link"
                        target="_blank"
                        aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)"
-                       data-matomo-category="help"
-                       data-matomo-action="clic"
-                       data-matomo-option="header_comprendre-liae">Qui peut bénéficier des contrats d'IAE&nbsp;?</a>
+                       {% matomo_event "help" "clic" "header_comprendre-liae" %}>Qui peut bénéficier des contrats d'IAE&nbsp;?</a>
                 </li>
                 {% if user.is_authenticated %}
                     {% if user.is_employer or user.is_prescriber_with_authorized_org %}

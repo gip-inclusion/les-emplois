@@ -1,6 +1,7 @@
 {% load django_bootstrap5 %}
 {% load format_filters %}
 {% load static %}
+{% load matomo %}
 
 <div class="row">
     <div class="col-12 col-lg-8 order-2 order-lg-1">
@@ -63,10 +64,8 @@
                         <span>Suspendre</span>
                     </a>
                 {% endif %}
-                <a class="btn btn-outline-primary btn-block matomo-event"
-                   data-matomo-action="telechargement-pdf"
-                   data-matomo-category="agrement"
-                   data-matomo-option="detail-agrement"
+                <a class="btn btn-outline-primary btn-block"
+                   {% matomo_event "telechargement-pdf" "agrement" "detail-agrement" %}
                    href="{% url 'approvals:display_printable_approval' approval_id=job_application.approval.id %}"
                    target="_blank">Afficher le PASS IAE</a>
             {% endwith %}
