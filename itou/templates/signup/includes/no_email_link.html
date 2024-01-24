@@ -1,4 +1,5 @@
 {% load static %}
+{% load matomo %}
 
 <a href="#" data-bs-toggle="modal" data-bs-target="#no-email-modal">
     {% if link_text %}
@@ -31,10 +32,8 @@
             <div class="modal-footer">
                 <a aria-label="Ouverture dans un nouvel onglet"
                    href="https://compte.laposte.net/inscription/index.do?srv_gestion=POLEEMPLOI"
-                   class="btn btn-sm btn-primary btn-ico matomo-event"
-                   data-matomo-category="inscription-candidat"
-                   data-matomo-action="clic"
-                   data-matomo-option="je-n-ai-pas-d-adresse-email"
+                   class="btn btn-sm btn-primary btn-ico"
+                   {% matomo_event "inscription-candidat" "clic" "je-n-ai-pas-d-adresse-email" %}
                    rel="noopener"
                    target="_blank">
                     <span>Créer une adresse e-mail</span>

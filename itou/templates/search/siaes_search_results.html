@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load str_filters %}
+{% load matomo %}
 
 {% block title %}
     {% if form.is_valid %}
@@ -27,10 +28,8 @@
                         {% endif %}
                         <ul class="s-tabs-01__nav nav nav-tabs mt-3 mt-md-5">
                             <li class="nav-item" role="presentation">
-                                <a class="matomo-event nav-link {% if request.resolver_match.view_name == "search:employers_results" %}active{% endif %}"
-                                   data-matomo-category="candidature"
-                                   data-matomo-action="clic"
-                                   data-matomo-option="clic-onglet-employeur"
+                                <a class="nav-link {% if request.resolver_match.view_name == "search:employers_results" %}active{% endif %}"
+                                   {% matomo_event "candidature" "clic" "clic-onglet-employeur" %}
                                    href="{% url "search:employers_results" %}?{{ filters_query_string }}">
                                     <i class="ri-hotel-line ri-xl font-weight-normal me-1"></i>
                                     <span>
@@ -39,10 +38,8 @@
                                 </a>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <a class="matomo-event nav-link {% if request.resolver_match.view_name == "search:job_descriptions_results" %}active{% endif %}"
-                                   data-matomo-category="candidature"
-                                   data-matomo-action="clic"
-                                   data-matomo-option="clic-onglet-fichesdeposte"
+                                <a class="nav-link {% if request.resolver_match.view_name == "search:job_descriptions_results" %}active{% endif %}"
+                                   {% matomo_event "candidature" "clic" "clic-onglet-fichesdeposte" %}
                                    href="{% url "search:job_descriptions_results" %}?{{ filters_query_string }}">
                                     <i class="ri-briefcase-4-line ri-xl font-weight-normal me-1"></i>
                                     <span class="d-inline d-lg-none">

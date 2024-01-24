@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load format_filters %}
 {% load static tally %}
+{% load matomo %}
 {% block title %}Tableau de bord {{ block.super }}{% endblock %}
 
 {% block messages %}
@@ -132,11 +133,7 @@
                                     </p>
                                     <div class="row g-0">
                                         <div class="col-12 col-md-auto mt-2">
-                                            <a href="{{ ic_activate_url }}"
-                                               class="btn btn-primary btn-block matomo-event"
-                                               data-matomo-category="activation {{ request.user.kind }}"
-                                               data-matomo-action="clic"
-                                               data-matomo-option="activer-son-compte-inclusion-connect-bandeau">Activer Inclusion Connect</a>
+                                            <a href="{{ ic_activate_url }}" class="btn btn-primary btn-block" {% matomo_event "activation "|add:request.user.kind "clic" "activer-son-compte-inclusion-connect-bandeau" %}>Activer Inclusion Connect</a>
                                         </div>
                                         <div class="col-12 col-md-auto mt-2">
                                             <a class="btn btn-link btn-block"

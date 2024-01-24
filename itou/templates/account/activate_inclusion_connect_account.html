@@ -4,6 +4,7 @@
 {% load redirection_fields %}
 {% load static %}
 {% load theme_inclusion %}
+{% load matomo %}
 
 {% block title %}Connexion {{ block.super }}{% endblock %}
 
@@ -26,11 +27,7 @@
                             Il vous permettra d'accéder aux différents services partenaires avec <b>le même identifiant et le même mot de passe.</b>
                         </p>
                         <p>Il vous suffit de cliquer sur le bouton ci-desous pour activer votre compte</p>
-                        <a href="{{ inclusion_connect_url }}"
-                           class="btn btn-block btn-primary matomo-event"
-                           data-matomo-category="activation {{ matomo_account_type }}"
-                           data-matomo-action="clic"
-                           data-matomo-option="activer-son-compte-inclusion-connect">
+                        <a href="{{ inclusion_connect_url }}" class="btn btn-block btn-primary" {% matomo_event "activation "|add:matomo_account_type "clic" "activer-son-compte-inclusion-connect" %}>
                             Activer mon compte Inclusion Connect
                         </a>
                         <a class="btn btn-link btn-block"

@@ -1,4 +1,5 @@
 {% load static %}
+{% load matomo %}
 
 {% comment %} takes argument siae <Siae>{% endcomment %}
 <div class="card c-card has-links-inside mb-3 mb-md-4">
@@ -11,11 +12,9 @@
                         <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary">Réservé au public éligible au contrat PEC</span>
                     {% endif %}
                 {% else %}
-                    <a class="matomo-event btn btn-sm btn-ico btn-link text-start p-0 mh-auto"
+                    <a class="btn btn-sm btn-ico btn-link text-start p-0 mh-auto"
                        href="{{ job_description.company.get_card_url }}?back_url={{ request.get_full_path|urlencode }}"
-                       data-matomo-category="candidature"
-                       data-matomo-action="clic"
-                       data-matomo-option="clic-structure-fichedeposte"
+                       {% matomo_event "candidature" "clic" "clic-structure-fichedeposte" %}
                        target="_blank"
                        aria-label="Ouvrir la page de la structure dans un nouvel onglet">
                         <span>{{ job_description.company.kind }} - {{ job_description.company.display_name }}</span>
@@ -39,11 +38,9 @@
         <div class="mb-3">
             {# Do not use is_external as it might evolve, and do not use a specific property. Covered by a test. #}
             {% if job_description.is_from_pole_emploi %}Offre proposée et gérée par pole-emploi.fr{% endif %}
-            <a class="matomo-event d-block h3 mb-2"
+            <a class="d-block h3 mb-2"
                href="{{ job_description.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}"
-               data-matomo-category="candidature"
-               data-matomo-action="clic"
-               {% if job_description.is_external %} rel="noopener" target="_blank" data-matomo-option="clic-card-fichedeposte-externe" aria-label="Visiter l'offre sur le site d'origine" {% else %} data-matomo-option="clic-card-fichedeposte" aria-label="Aller vers la description de ce poste"  {% endif %}>
+               {% if job_description.is_external %} {% matomo_event "candidature" "clic" "clic-card-fichedeposte-externe" %} rel="noopener" target="_blank" aria-label="Visiter l'offre sur le site d'origine" {% else %} {% matomo_event "candidature" "clic" "clic-card-fichedeposte" %} aria-label="Aller vers la description de ce poste" {% endif %}>
                 {{ job_description.display_name | capfirst }}
                 {% if job_description.is_external %}<i class="ri-external-link-line ri-lg ms-1"></i>{% endif %}
             </a>

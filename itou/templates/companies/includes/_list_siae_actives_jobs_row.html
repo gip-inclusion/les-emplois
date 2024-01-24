@@ -1,11 +1,10 @@
+{% load matomo %}
 {% comment %} takes 2 arguments: job=<JobDescription> is_appended=<Bool> {% endcomment %}
 
 <li class="list-group-item list-group-item-action py-2 {% if is_appended %}border-top{% endif %}">
-    <a class="d-flex flex-wrap align-items-center text-decoration-none matomo-event"
+    <a class="d-flex flex-wrap align-items-center text-decoration-none"
        href="{% if job.pk %}{{ job.get_absolute_url }}{% else %}#{% endif %}?back_url={{ request.get_full_path|urlencode }}"
-       data-matomo-category="candidature"
-       data-matomo-action="clic"
-       data-matomo-option="clic-metiers">
+       {% matomo_event "candidature" "clic" "clic-metiers" %}>
         <div class="d-inline">
             <span class="font-weight-bold me-1 me-md-2">{{ job.display_name }}</span>
             {% if job.is_popular %}

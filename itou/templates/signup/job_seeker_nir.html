@@ -2,6 +2,7 @@
 {% load django_bootstrap5 %}
 {% load redirection_fields %}
 {% load static %}
+{% load matomo %}
 
 {% block title %}Inscription candidat {{ block.super }}{% endblock %}
 
@@ -29,7 +30,7 @@
                             {% if form.errors %}
                                 <div class="alert alert-info">
                                     Vous possédez un numéro de sécurité sociale temporaire ?
-                                    <button name="skip" value="1" class="btn btn-link p-0 matomo-event" data-matomo-category="nir-temporaire" data-matomo-action="etape-suivante" data-matomo-option="inscription">
+                                    <button name="skip" value="1" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "inscription" %}>
                                         Cliquez ici pour accéder à l'étape suivante.
                                     </button>
                                 </div>

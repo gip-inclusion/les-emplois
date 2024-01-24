@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load matomo %}
 
 {% block title %}Profil salarié - {{ approval.user.get_full_name }} {{ block.super }}{% endblock %}
 
@@ -54,10 +55,8 @@
                                     </div>
                                 {% endif %}
                                 <div class="col-12 col-lg-auto">
-                                    <a class="btn btn-primary btn-block btn-ico matomo-event"
-                                       data-matomo-action="telechargement-pdf"
-                                       data-matomo-category="agrement"
-                                       data-matomo-option="detail-agrement"
+                                    <a class="btn btn-primary btn-block btn-ico"
+                                       {% matomo_event "telechargement-pdf" "agrement" "detail-agrement" %}
                                        href="{% url 'approvals:display_printable_approval' approval_id=approval.id %}"
                                        target="_blank"
                                        rel="noopener"
