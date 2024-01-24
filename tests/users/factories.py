@@ -259,6 +259,6 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
             hexa_commune=factory.SubFactory(CommuneFactory),
         )
 
-    user = factory.SubFactory(JobSeekerFactory)
+    user = factory.SubFactory(JobSeekerFactory, jobseeker_profile=None)
 
     education_level = factory.fuzzy.FuzzyChoice(EducationLevel.values + [""])
