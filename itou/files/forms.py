@@ -7,6 +7,7 @@ from django.utils.html import format_html
 from openpyxl import load_workbook
 
 from itou.utils.constants import ITOU_HELP_CENTER_URL, MB
+from itou.utils.templatetags.matomo import matomo_event
 
 
 class ItouFileInput(forms.FileInput):
@@ -91,15 +92,14 @@ class ItouFileField(forms.FileField):
                        target="_blank"
                        rel="noopener"
                        class="matomo-event has-external-link"
-                       matomo-category="ajout-fichier-candidature"
-                       matomo-action="clic"
-                       matomo-option="clic-sur-lien-aide-pdf"
+                       %s
                        aria-label="Découvrez comment le convertir (ouverture dans un nouvel onglet)">
                         Découvrez comment le convertir.
                     </a>
                 </p>
                """,
                 f"{ITOU_HELP_CENTER_URL}/articles/16875396981777--Convertir-votre-document-en-format-PDF",
+                matomo_event("ajout-fichier-candidature", "clic", "clic-sur-lien-aide-pdf"),
             )
 
     def clean(self, data, initial=None):
