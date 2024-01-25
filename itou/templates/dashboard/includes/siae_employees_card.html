@@ -6,6 +6,10 @@
             <span class="h4 m-0">Salariés</span>
         </div>
         <div class="px-3 px-lg-4">
+            <a href="{% url 'approvals:list' %}"  class="btn btn-outline-primary btn-block btn-ico mb-3" {% matomo_event "employeurs" "clic" "voir-liste-agrements" %}>
+                <i class="ri-contacts-book-line ri-lg font-weight-normal"></i>
+                <span>Gérer les salariés et PASS IAE</span>
+            </a>
             <ul class="list-unstyled mb-lg-5">
                 {% comment %}
                 NOTE(vperron):
@@ -28,12 +32,6 @@
                             <span>Déclarer une embauche</span>
                         </a>
                     {% endif %}
-                </li>
-                <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'approvals:list' %}"  class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-liste-agrements" %}>
-                        <i class="ri-contacts-book-line ri-lg font-weight-normal"></i>
-                        <span>Gérer les salariés et PASS IAE</span>
-                    </a>
                 </li>
                 {% if can_show_employee_records %}
                     <li class="d-flex justify-content-between align-items-center mb-3">

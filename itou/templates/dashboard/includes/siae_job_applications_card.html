@@ -6,6 +6,10 @@
             <span class="h4 mb-0">Candidatures</span>
         </div>
         <div class="px-3 px-lg-4">
+            <a href="{% url 'apply:list_for_siae' %}" class="btn btn-outline-primary btn-block btn-ico mb-3" {% matomo_event "employeurs" "clic" "voir-liste-candidatures" %}>
+                <i class="ri-file-user-line ri-lg font-weight-normal"></i>
+                <span>Voir toutes les candidatures</span>
+            </a>
             <ul class="list-unstyled mb-lg-5">
                 {% for category in job_applications_categories %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
@@ -16,12 +20,6 @@
                         <span class="badge rounded-pill badge-xs {{ category.badge }} text-info">{{ category.counter }}</span>
                     </li>
                 {% endfor %}
-                <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'apply:list_for_siae' %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-liste-candidatures" %}>
-                        <i class="ri-file-user-line ri-lg font-weight-normal"></i>
-                        <span>Voir toutes les candidatures</span>
-                    </a>
-                </li>
                 {% if request.current_organization.kind == CompanyKind.GEIQ %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'apply:check_nir_for_hire' company_pk=request.current_organization.pk %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "declarer-embauche" %}>

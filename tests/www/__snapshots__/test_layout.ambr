@@ -535,7 +535,7 @@
               </a>
           </li>
           <li class="dropdown">
-              <button aria-controls="loginUserDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-icon btn-primary" data-bs-toggle="dropdown">
+              <button aria-controls="loginUserDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-ico btn-primary" data-bs-toggle="dropdown">
                   <i aria-hidden="true" class="ri-login-box-line"></i>
                   <span>Se connecter</span>
               </button>
