@@ -1,5 +1,29 @@
 # Journal des modifications
 
+## [79] - 2024-01-28
+
+### Ajouté
+
+- Admin : ajout d'une action pour détecter les incohérences
+- Métriques : ajout de nouveaux tags matomo sur les pages de gestion des candidatures
+
+### Modifié
+
+- Admin : ajout d'un texte appelant à la vigilance sur la cohérence des données lors d'un tranfert d'objets entre candidats
+- Admin : amélioration de la disposition des champs concernant l'origine d'une candidature
+- Contrôle a posteriori : ajout de la mention "Non renseigné" lorsque le téléphone de la SIAE n’est pas connu
+- Déclaration d'embauche : masquer l'alerte sur le PASS expiré
+- Fiches salarié : Ne plus proposer des créations si une fiche salarié existe déjà dans une des SIAE attachées à la convention 
+- Métriques : amélioration des tags matomo
+- Page de détail des candidatures : amélioration de la hiérarchisation des données
+- Remplacement du logo pôle emploi par celui de France Travail
+- Thème : MaJ du thème itou
+
+### Supprimé
+
+- Attestation PASS IAE: suppression du logo pôle emploi
+- Contrôle a posteriori: suppression des liens vers la campagne de test de 2021
+
 ## [78] - 2024-01-07
 
 ### Ajouté
