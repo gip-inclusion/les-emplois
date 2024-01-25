@@ -8,7 +8,7 @@
 - En tant que prescripteur qui reçoit un refus pour motif autre je suis invité à contacter l’employeur si je souhaite en savoir +
 - Ajout d'une vue d'erreur personnalisée
 - Ajout du guide a la prescription dans la navigation pour les employeurs et les prescripteurs habilités
-- Métriques : ajout de nouveaux tags matomo sur le tableaud de bord employeur
+- Métriques : ajout de nouveaux tags matomo sur le tableau de bord employeur
 
 ### Modifié
 - Correction du filtre "Éligibilité à valider"
