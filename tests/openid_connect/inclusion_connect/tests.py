@@ -28,6 +28,7 @@ from itou.openid_connect.inclusion_connect.models import (
 )
 from itou.openid_connect.inclusion_connect.views import InclusionConnectSession
 from itou.openid_connect.models import InvalidKindException
+from itou.prescribers.models import PrescriberOrganization
 from itou.users import enums as users_enums
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
@@ -35,6 +36,7 @@ from itou.utils import constants as global_constants
 from itou.utils.urls import add_url_params, get_absolute_url
 from tests.job_applications.factories import JobApplicationSentByPrescriberPoleEmploiFactory
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
+from tests.prescribers.factories import PrescriberPoleEmploiFactory
 from tests.users.factories import (
     DEFAULT_PASSWORD,
     EmployerFactory,
@@ -53,6 +55,10 @@ OIDC_USERINFO = {
     "sub": "af6b26f9-85cd-484e-beb9-bea5be13e30f",
 }
 
+OIDC_USERINFO_WITH_ORG = OIDC_USERINFO | {
+    "structure_pe": "95021",  # SAFIR
+}
+
 
 # Make sure this decorator is before test definition, not here.
 # @respx.mock
@@ -67,6 +73,7 @@ def mock_oauth_dance(
     channel=None,
     register=True,
     other_client=None,
+    oidc_userinfo=None,
 ):
     assert user_kind, "Letting this filed empty is not allowed"
     # Authorize params depend on user kind.
@@ -94,7 +101,7 @@ def mock_oauth_dance(
     token_json = {"access_token": "access_token", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
     respx.post(constants.INCLUSION_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
-    user_info = OIDC_USERINFO.copy()
+    user_info = oidc_userinfo or OIDC_USERINFO.copy()
     if user_info_email:
         user_info["email"] = user_info_email
     respx.get(constants.INCLUSION_CONNECT_ENDPOINT_USERINFO).mock(return_value=httpx.Response(200, json=user_info))
@@ -206,6 +213,31 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
         )
         with pytest.raises(ValidationError):
             ic_user_data.create_or_update_user()
+
+    def test_join_org(self):
+        # New membership.
+        organization = PrescriberPoleEmploiFactory()
+        assert organization.active_members.count() == 0
+        ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
+        user, _ = ic_user_data.create_or_update_user()
+        ic_user_data.join_org(user=user, safir=organization.code_safir_pole_emploi)
+
+        assert organization.active_members.count() == 1
+        assert organization.has_admin(user)
+
+        # User is already a member.
+        ic_user_data.join_org(user=user, safir=organization.code_safir_pole_emploi)
+        assert organization.active_members.count() == 1
+        assert organization.has_admin(user)
+
+        # Oganization does not exist.
+        safir = "12345"
+        with pytest.raises(PrescriberOrganization.DoesNotExist), self.assertLogs() as logs:
+            ic_user_data.join_org(user=user, safir=safir)
+
+        assert f"Organization with SAFIR {safir} does not exist. Unable to add user {user.email}." in logs.output[0]
+        assert organization.active_members.count() == 1
+        assert organization.has_admin(user)
 
     def test_get_existing_user_with_same_email_django(self):
         """
@@ -750,7 +782,9 @@ class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
 class InclusionConnectmapChannelTest(InclusionConnectBaseTestCase):
     @respx.mock
     def test_happy_path(self):
-        job_application = JobApplicationSentByPrescriberPoleEmploiFactory()
+        job_application = JobApplicationSentByPrescriberPoleEmploiFactory(
+            sender_prescriber_organization__code_safir_pole_emploi=OIDC_USERINFO_WITH_ORG["structure_pe"]
+        )
         prescriber = job_application.sender
         prescriber.email = OIDC_USERINFO["email"]
         prescriber.username = OIDC_USERINFO["sub"]
@@ -777,3 +811,87 @@ class InclusionConnectmapChannelTest(InclusionConnectBaseTestCase):
 
         response = self.client.get(response.url)
         assert response.status_code == 200
+
+    @respx.mock
+    def test_create_user(self):
+        # Application sent by a colleague from the same agency but not by the prescriber himself.
+        job_application = JobApplicationSentByPrescriberPoleEmploiFactory(
+            sender_prescriber_organization__code_safir_pole_emploi=OIDC_USERINFO_WITH_ORG["structure_pe"]
+        )
+
+        # Prescriber does not belong to this organization on Itou but
+        # IC says that he is allowed to join it.
+        # A new user should be created automatically, only when coming from MAP conseiller,
+        # and then be able to see a job application details.
+        url_from_map = "{path}?channel={channel}".format(
+            path=reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk}),
+            channel=InclusionConnectChannel.MAP_CONSEILLER.value,
+        )
+
+        response = self.client.get(url_from_map, follow=True)
+        # Starting point of both the oauth_dance and `mock_oauth_dance()`.
+        ic_endpoint = response.redirect_chain[-1][0]
+        assert ic_endpoint.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE)
+
+        response = mock_oauth_dance(
+            self.client,
+            UserKind.PRESCRIBER,
+            next_url=url_from_map,
+            expected_redirect_url=url_from_map,
+            channel=InclusionConnectChannel.MAP_CONSEILLER,
+            oidc_userinfo=OIDC_USERINFO_WITH_ORG.copy(),
+        )
+        assert job_application.sender_prescriber_organization.members.count() == 2
+        assert auth.get_user(self.client).is_authenticated
+
+        response = self.client.get(response.url)
+        assert response.status_code == 200
+
+    @respx.mock
+    def test_create_user_organization_not_found(self):
+        # Application sent by a colleague from the same agency but not by the prescriber himself.
+        job_application = JobApplicationSentByPrescriberPoleEmploiFactory(
+            sender_prescriber_organization__code_safir_pole_emploi=OIDC_USERINFO_WITH_ORG["structure_pe"]
+        )
+
+        # Prescriber does not belong to this organization on Itou but
+        # IC says that he is allowed to join it.
+        # A new user should be created automatically and redirected to the job application details page.
+        url_from_map = "{path}?channel={channel}".format(
+            path=reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk}),
+            channel=InclusionConnectChannel.MAP_CONSEILLER.value,
+        )
+
+        response = self.client.get(url_from_map, follow=True)
+        # Starting point of both the oauth_dance and `mock_oauth_dance()`.
+        ic_endpoint = response.redirect_chain[-1][0]
+        assert ic_endpoint.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE)
+
+        oid_userinfo = OIDC_USERINFO_WITH_ORG.copy() | {"structure_pe": "12345"}
+        response = mock_oauth_dance(
+            self.client,
+            UserKind.PRESCRIBER,
+            next_url=url_from_map,
+            expected_redirect_url=add_url_params(
+                reverse("inclusion_connect:logout"), {"redirect_url": reverse("search:employers_home")}
+            ),
+            channel=InclusionConnectChannel.MAP_CONSEILLER,
+            oidc_userinfo=oid_userinfo,
+        )
+        assert job_application.sender_prescriber_organization.members.count() == 1
+        assert not auth.get_user(self.client).is_authenticated
+
+        response = self.client.get(reverse("search:employers_home"))
+        assert response.status_code == 200
+        assertMessages(
+            response,
+            [
+                (
+                    messages.ERROR,
+                    "Nous sommes au regret de vous informer que votre agence n'est pas référencée dans notre service. "
+                    f"Nous vous invitons à <a href='{global_constants.ITOU_HELP_CENTER_URL}'>contacter le support</a> "
+                    f"en indiquant votre code SAFIR ({oid_userinfo['structure_pe']}) pour de plus "
+                    "amples informations.",
+                )
+            ],
+        )

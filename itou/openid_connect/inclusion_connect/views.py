@@ -11,6 +11,7 @@ from django.utils import crypto
 from django.utils.html import format_html
 from django.utils.http import urlencode
 
+from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -20,11 +21,14 @@ from itou.utils.urls import add_url_params, get_absolute_url
 from ..models import InvalidKindException, MultipleUsersFoundException
 from . import constants
 from .enums import InclusionConnectChannel
-from .models import InclusionConnectEmployerData, InclusionConnectPrescriberData, InclusionConnectState
+from .models import (
+    InclusionConnectEmployerData,
+    InclusionConnectPrescriberData,
+    InclusionConnectState,
+)
 
 
 logger = logging.getLogger(__name__)
-
 
 USER_DATA_CLASSES = {
     KIND_PRESCRIBER: InclusionConnectPrescriberData,
@@ -264,8 +268,9 @@ def inclusion_connect_callback(request):
         messages.error(request, error)
         is_successful = False
 
+    user_created = False
     try:
-        user, _ = ic_user_data.create_or_update_user(is_login=ic_state.data.get("is_login"))
+        user, user_created = ic_user_data.create_or_update_user(is_login=ic_state.data.get("is_login"))
     except InvalidKindException:
         existing_user = User.objects.get(email=user_data["email"])
         _add_user_kind_error_message(request, existing_user, user_kind)
@@ -286,6 +291,24 @@ def inclusion_connect_callback(request):
             ),
         )
         user = e.users[0]
+
+    code_safir_pole_emploi = user_data.get("structure_pe")
+    # Only handle user creation for the moment, not updates.
+    if is_successful and user_created and code_safir_pole_emploi:
+        try:
+            ic_user_data.join_org(user=user, safir=code_safir_pole_emploi)
+        except PrescriberOrganization.DoesNotExist:
+            messages.error(
+                request,
+                format_html(
+                    "Nous sommes au regret de vous informer que votre agence n'est pas référencée dans notre service. "
+                    "Nous vous invitons à <a href='{}'>contacter le support</a> en indiquant votre code SAFIR ({}) "
+                    "pour de plus amples informations.",
+                    global_constants.ITOU_HELP_CENTER_URL,
+                    code_safir_pole_emploi,
+                ),
+            )
+            is_successful = False
 
     if not is_successful:
         logout_url_params = {
