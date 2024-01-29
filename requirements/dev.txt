@@ -409,9 +409,9 @@ django-htmx==1.17.2 \
     --hash=sha256:4089f2ed38727e9846c2f4cd1daddf6b010c7be8d834cfbcffc8c5ecf445c04e \
     --hash=sha256:f4971432d2ca45dbb31d9b58add1c50ae54354afe4bf59cafd591b1711b502c0
     # via -r requirements/test.txt
-django-import-export==3.3.5 \
-    --hash=sha256:56b4196d85677989f3d6b15863c23ac351b21d973e53ddaa226f62510acdc034 \
-    --hash=sha256:81bd7a6b35c0ee3c78b99e2bedb7f320c13d551d9482f968864c83f8a24daf58
+django-import-export==3.3.6 \
+    --hash=sha256:12edb7ba1f7f9b392d0257a2ae68086020e53ab2c7bd2b21a56ec17fbb83826b \
+    --hash=sha256:b1b7385627ed61063cd9764e8c19cce3ce8945626f7953262df8162b0feec376
     # via -r requirements/test.txt
 django-pgtrigger==4.11.0 \
     --hash=sha256:35843058d6fb6e0077d26e111f121852130b2e1d77e739077efbb2dae3d67f80 \
