@@ -13,6 +13,7 @@ then "Partager et intégrer" then "Intégrer ce dashboard dans une application" 
 make sure that the correct filters are "Verrouillé".
 
 """
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
@@ -437,9 +438,9 @@ def render_stats_ddets(request, page_title, extra_context, extend_stats_to_whole
     department_label = DEPARTMENTS[department]
     region = current_org.region
     context = {
-        "page_title": f"{page_title} ({region})"
-        if extend_stats_to_whole_region
-        else f"{page_title} ({department_label})",
+        "page_title": (
+            f"{page_title} ({region})" if extend_stats_to_whole_region else f"{page_title} ({department_label})"
+        ),
         # Tracking is always based on department even if we show stats for the whole region.
         "department": department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),

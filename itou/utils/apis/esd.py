@@ -2,6 +2,7 @@
     Pôle emploi's Emploi Store Dev aka ESD.
     https://www.emploi-store-dev.fr/portail-developpeur/catalogueapi
 """
+
 import collections
 import datetime
 import logging

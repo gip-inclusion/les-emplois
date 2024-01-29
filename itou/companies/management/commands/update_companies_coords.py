@@ -18,6 +18,7 @@ We could run this script regularly for structures too, and encourage our users
 to edit the addresses manually since our ASP import script does not update the
 address of a structure, only stores it upon its creation.
 """
+
 import logging
 
 from itou.common_apps.address.models import geolocate_qs

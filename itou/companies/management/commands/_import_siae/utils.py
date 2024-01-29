@@ -3,6 +3,7 @@
 Various helpers shared by the import_siae, import_geiq and import_ea_eatt scripts.
 
 """
+
 import csv
 import gzip
 import os

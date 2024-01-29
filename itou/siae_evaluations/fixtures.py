@@ -137,12 +137,17 @@ def load_data():
         evaluation_campaign = EvaluationCampaign.objects.get(institution=institution)
 
         # eligible_job_applications must return a queryset, not a list.
-        with mock.patch(
-            "itou.siae_evaluations.models.EvaluationCampaign.eligible_job_applications", return_value=job_applications
-        ), mock.patch(
-            "itou.siae_evaluations.enums.EvaluationJobApplicationsBoundariesNumber.SELECTION_PERCENTAGE", 100
-        ), mock.patch(
-            "itou.siae_evaluations.models.EvaluationCampaign.number_of_siaes_to_select",
-            return_value=controlled_siaes.count(),
+        with (
+            mock.patch(
+                "itou.siae_evaluations.models.EvaluationCampaign.eligible_job_applications",
+                return_value=job_applications,
+            ),
+            mock.patch(
+                "itou.siae_evaluations.enums.EvaluationJobApplicationsBoundariesNumber.SELECTION_PERCENTAGE", 100
+            ),
+            mock.patch(
+                "itou.siae_evaluations.models.EvaluationCampaign.number_of_siaes_to_select",
+                return_value=controlled_siaes.count(),
+            ),
         ):
             evaluation_campaign.populate(timezone.now())

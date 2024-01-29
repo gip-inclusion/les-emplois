@@ -2,6 +2,7 @@
 Helper methods for manipulating dataframes used by both populate_metabase_emplois and
 populate_metabase_fluxiae scripts.
 """
+
 import numpy as np
 import pandas as pd
 from psycopg import sql

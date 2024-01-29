@@ -1,6 +1,7 @@
 """
 Functions used in organization views.
 """
+
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 

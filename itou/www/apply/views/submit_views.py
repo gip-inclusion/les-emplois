@@ -1327,12 +1327,16 @@ class UpdateJobSeekerStep3View(UpdateJobSeekerBaseView):
             "lack_of_pole_emploi_id_reason", self.job_seeker_session.get("user").get("lack_of_pole_emploi_id_reason")
         )
         initial_form_data = self.job_seeker_session.get("profile", {}) | {
-            "pole_emploi_id": session_pole_emploi_id
-            if session_pole_emploi_id is not None
-            else self.job_seeker.jobseeker_profile.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": session_lack_of_pole_emploi_id_reason
-            if session_lack_of_pole_emploi_id_reason is not None
-            else self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
+            "pole_emploi_id": (
+                session_pole_emploi_id
+                if session_pole_emploi_id is not None
+                else self.job_seeker.jobseeker_profile.pole_emploi_id
+            ),
+            "lack_of_pole_emploi_id_reason": (
+                session_lack_of_pole_emploi_id_reason
+                if session_lack_of_pole_emploi_id_reason is not None
+                else self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason
+            ),
         }
         self.form = CreateOrUpdateJobSeekerStep3Form(
             instance=self.job_seeker.jobseeker_profile if self.job_seeker.has_jobseeker_profile else None,

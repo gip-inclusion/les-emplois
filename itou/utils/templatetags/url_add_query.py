@@ -1,6 +1,7 @@
 """
 https://docs.djangoproject.com/en/dev/howto/custom-template-tags/
 """
+
 from urllib.parse import urlsplit, urlunsplit
 
 from django import template

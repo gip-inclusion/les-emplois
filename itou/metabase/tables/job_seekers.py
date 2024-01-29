@@ -294,29 +294,35 @@ def get_table():
                 "name": "id_auteur_diagnostic_prescripteur",
                 "type": "integer",
                 "comment": "ID auteur diagnostic si prescripteur",
-                "fn": lambda o: get_latest_diagnosis(o).author_prescriber_organization.id
-                if get_latest_diagnosis(o)
-                and get_latest_diagnosis(o).author_kind == AuthorKind.PRESCRIBER
-                and get_latest_diagnosis(o).author_prescriber_organization
-                else None,
+                "fn": lambda o: (
+                    get_latest_diagnosis(o).author_prescriber_organization.id
+                    if get_latest_diagnosis(o)
+                    and get_latest_diagnosis(o).author_kind == AuthorKind.PRESCRIBER
+                    and get_latest_diagnosis(o).author_prescriber_organization
+                    else None
+                ),
             },
             {
                 "name": "id_auteur_diagnostic_employeur",
                 "type": "integer",
                 "comment": "ID auteur diagnostic si employeur",
-                "fn": lambda o: get_latest_diagnosis(o).author_siae.id
-                if get_latest_diagnosis(o)
-                and get_latest_diagnosis(o).author_kind == AuthorKind.EMPLOYER
-                and get_latest_diagnosis(o).author_siae
-                else None,
+                "fn": lambda o: (
+                    get_latest_diagnosis(o).author_siae.id
+                    if get_latest_diagnosis(o)
+                    and get_latest_diagnosis(o).author_kind == AuthorKind.EMPLOYER
+                    and get_latest_diagnosis(o).author_siae
+                    else None
+                ),
             },
             {
                 "name": "type_auteur_diagnostic",
                 "type": "varchar",
                 "comment": "Type auteur du dernier diagnostic",
-                "fn": lambda o: get_choice(choices=AUTHOR_KIND_CHOICES, key=get_latest_diagnosis(o).author_kind)
-                if get_latest_diagnosis(o)
-                else None,
+                "fn": lambda o: (
+                    get_choice(choices=AUTHOR_KIND_CHOICES, key=get_latest_diagnosis(o).author_kind)
+                    if get_latest_diagnosis(o)
+                    else None
+                ),
             },
             {
                 "name": "sous_type_auteur_diagnostic",

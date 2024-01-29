@@ -970,13 +970,13 @@ class EvaluatedSiaeModelTest(TestCase):
 
         # NOT REVIEWED
         # one Pending, one Refused, one Accepted
-        evaluated_administrative_criteria[
-            1
-        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+        evaluated_administrative_criteria[1].review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+        )
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
-        evaluated_administrative_criteria[
-            2
-        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_administrative_criteria[2].review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        )
         evaluated_administrative_criteria[2].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
         del evaluated_siae.state_from_applications
@@ -984,9 +984,9 @@ class EvaluatedSiaeModelTest(TestCase):
         # one Refused, two Accepted
         evaluated_siae.reviewed_at = fake_now
         evaluated_siae.save(update_fields=["reviewed_at"])
-        evaluated_administrative_criteria[
-            0
-        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_administrative_criteria[0].review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        )
         evaluated_administrative_criteria[0].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
         del evaluated_siae.state_from_applications
@@ -994,9 +994,9 @@ class EvaluatedSiaeModelTest(TestCase):
         # three Accepted
         evaluated_siae.final_reviewed_at = fake_now
         evaluated_siae.save(update_fields=["final_reviewed_at"])
-        evaluated_administrative_criteria[
-            1
-        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_administrative_criteria[1].review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        )
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ACCEPTED == evaluated_siae.state
         del evaluated_siae.state_from_applications
@@ -1008,25 +1008,25 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_siae.save(update_fields=["reviewed_at"])
 
         # one Pending, one Refused, one Accepted
-        evaluated_administrative_criteria[
-            0
-        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
+        evaluated_administrative_criteria[0].review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
+        )
         evaluated_administrative_criteria[0].save(update_fields=["review_state"])
-        evaluated_administrative_criteria[
-            1
-        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+        evaluated_administrative_criteria[1].review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+        )
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
-        evaluated_administrative_criteria[
-            2
-        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_administrative_criteria[2].review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        )
         evaluated_administrative_criteria[2].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
         del evaluated_siae.state_from_applications
 
         # one Refused, two Accepted
-        evaluated_administrative_criteria[
-            0
-        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_administrative_criteria[0].review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        )
         evaluated_administrative_criteria[0].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
         del evaluated_siae.state_from_applications
@@ -1034,9 +1034,9 @@ class EvaluatedSiaeModelTest(TestCase):
         # three Accepted
         evaluated_siae.final_reviewed_at = evaluated_siae.reviewed_at + relativedelta(days=1)
         evaluated_siae.save(update_fields=["final_reviewed_at"])
-        evaluated_administrative_criteria[
-            1
-        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_administrative_criteria[1].review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        )
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ACCEPTED == evaluated_siae.state
         del evaluated_siae.state_from_applications
@@ -1048,25 +1048,25 @@ class EvaluatedSiaeModelTest(TestCase):
         evaluated_siae.save(update_fields=["reviewed_at"])
 
         # one Pending, one Refused, one Accepted
-        evaluated_administrative_criteria[
-            0
-        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
+        evaluated_administrative_criteria[0].review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
+        )
         evaluated_administrative_criteria[0].save(update_fields=["review_state"])
-        evaluated_administrative_criteria[
-            1
-        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+        evaluated_administrative_criteria[1].review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED
+        )
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
-        evaluated_administrative_criteria[
-            2
-        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_administrative_criteria[2].review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        )
         evaluated_administrative_criteria[2].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.SUBMITTED == evaluated_siae.state
         del evaluated_siae.state_from_applications
 
         # one Refused, two Accepted
-        evaluated_administrative_criteria[
-            0
-        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_administrative_criteria[0].review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        )
         evaluated_administrative_criteria[0].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE == evaluated_siae.state
         del evaluated_siae.state_from_applications
@@ -1074,9 +1074,9 @@ class EvaluatedSiaeModelTest(TestCase):
         # three Accepted
         evaluated_siae.final_reviewed_at = fake_now
         evaluated_siae.save(update_fields=["final_reviewed_at"])
-        evaluated_administrative_criteria[
-            1
-        ].review_state = evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        evaluated_administrative_criteria[1].review_state = (
+            evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED
+        )
         evaluated_administrative_criteria[1].save(update_fields=["review_state"])
         assert evaluation_enums.EvaluatedSiaeState.ACCEPTED == evaluated_siae.state
         del evaluated_siae.state_from_applications

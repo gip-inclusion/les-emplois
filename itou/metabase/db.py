@@ -1,6 +1,7 @@
 """
 Helper methods for manipulating tables used by both populate_metabase_emplois and populate_metabase_fluxiae scripts.
 """
+
 import copy
 import gc
 import os

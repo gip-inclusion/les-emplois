@@ -11,6 +11,7 @@ It contains almost all data to build a siae from scratch with 2 exceptions:
 - it does not contain the auth_email (see "Liste Correspondants technique" instead).
 
 """
+
 import numpy as np
 
 from itou.companies.management.commands._import_siae.utils import get_fluxiae_df, remap_columns

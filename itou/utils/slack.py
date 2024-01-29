@@ -4,6 +4,7 @@ Send notifications to Slack.
 Thanks to
 https://gist.github.com/devStepsize/b1b795309a217d24566dcc0ad136f784
 """
+
 import json
 
 import httpx
