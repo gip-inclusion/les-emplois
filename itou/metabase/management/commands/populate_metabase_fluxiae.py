@@ -58,6 +58,7 @@ One mission has many EMI.
 An EMI does not necessarily have a mission.
 
 """
+
 # FIXME(vperron): Those helpers are shared between populate_metabase and import_siae.
 # It would make a lot more sense, to avoid eventual circular imports, to move everything
 # related to the fluxiae logic in its own application. Some architecture still needs to be thought of there.

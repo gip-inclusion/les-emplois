@@ -70,9 +70,11 @@ def parse_response_to_soup(response, selector=None, no_html_body=False, replace_
         csp_nonce_script["nonce"] = "NORMALIZED_CSP_NONCE"
     if replace_in_href:
         replacements = [
-            replacement
-            if isinstance(replacement, tuple)
-            else (str(replacement.pk), f"[PK of {type(replacement).__name__}]")
+            (
+                replacement
+                if isinstance(replacement, tuple)
+                else (str(replacement.pk), f"[PK of {type(replacement).__name__}]")
+            )
             for replacement in replace_in_href
         ]
         for links in soup.find_all(attrs={"href": True}):

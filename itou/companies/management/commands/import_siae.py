@@ -14,6 +14,7 @@ and thus we need a proper tool to manage columns by their
 name instead of hardcoding column numbers as in `field = row[42]`.
 
 """
+
 from django.core.management.base import CommandError
 from django.utils import timezone
 

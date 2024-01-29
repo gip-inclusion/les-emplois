@@ -3,6 +3,7 @@
 SiaeFinancialAnnex object logic used by the import_siae.py script is gathered here.
 
 """
+
 from django.utils import timezone
 
 from itou.companies.management.commands._import_siae.vue_af import AF_NUMBER_TO_ROW

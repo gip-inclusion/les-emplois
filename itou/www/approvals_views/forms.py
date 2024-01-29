@@ -382,9 +382,9 @@ class ProlongationRequestDenyInformationReasonForm(forms.ModelForm):
     def __init__(self, *args, employee, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields[
-            "reason"
-        ].label = f"Pour quel motif refusez-vous la prolongation du parcours IAE de {employee.get_full_name()} ?"
+        self.fields["reason"].label = (
+            f"Pour quel motif refusez-vous la prolongation du parcours IAE de {employee.get_full_name()} ?"
+        )
 
 
 class ProlongationRequestDenyInformationReasonExplanationForm(forms.ModelForm):

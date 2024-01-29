@@ -1,6 +1,7 @@
 """
 https://docs.djangoproject.com/en/dev/howto/custom-template-tags/
 """
+
 import re
 import string
 

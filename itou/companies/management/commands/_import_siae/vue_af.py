@@ -17,6 +17,7 @@ For convenience we systematically call such an (asp_id, kind) identifier
 an "siae_key" throughout the import_siae.py script code.
 
 """
+
 from django.utils import timezone
 
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS

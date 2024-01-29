@@ -2,6 +2,7 @@
 Base settings to build other settings files upon.
 https://docs.djangoproject.com/en/dev/ref/settings
 """
+
 import json
 import os
 

@@ -1,6 +1,7 @@
 """
 Handle multiple user types sign up with django-allauth.
 """
+
 import logging
 
 from allauth.account.adapter import get_adapter

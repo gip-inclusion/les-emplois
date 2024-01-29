@@ -4,6 +4,7 @@ This script exports ASP reference files into fixtures.
 This could be a "one shot" action but we don't know for sure
 if these reference files are likely to change.
 """
+
 import json
 import os
 from datetime import datetime

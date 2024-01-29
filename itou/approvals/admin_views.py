@@ -6,6 +6,7 @@ We should keep those to a minimum to avoid a future maintenance nightmare.
 https://docs.djangoproject.com/en/dev/ref/contrib/admin/#adding-views-to-admin-sites
 https://github.com/django/django/blob/master/django/contrib/admin/templates/admin/change_form.html
 """
+
 from collections import defaultdict
 
 from django.contrib import admin, messages

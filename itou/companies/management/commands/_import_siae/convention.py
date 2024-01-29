@@ -3,6 +3,7 @@
 SiaeConvention object logic used by the import_siae.py script is gathered here.
 
 """
+
 from django.utils import timezone
 
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
