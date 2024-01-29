@@ -89,7 +89,7 @@ class OrganizationAbstract(models.Model):
 
     @property
     def display_name(self):
-        return self.name.capitalize()
+        return self.name
 
     @property
     def has_members(self):
