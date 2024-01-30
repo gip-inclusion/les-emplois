@@ -25,6 +25,8 @@ class SearchCompanyTest(TestCase):
     def test_not_existing(self):
         response = self.client.get(self.url, {"city": "foo-44"})
         self.assertContains(response, "Aucun résultat avec les filtres actuels.")
+        # The optional company filter isn't visible when no result is available
+        assert "company" not in response.context["form"]
 
     @override_settings(MATOMO_BASE_URL="https://matomo.example.com")
     def test_district(self):
@@ -255,6 +257,73 @@ class SearchCompanyTest(TestCase):
         response = self.client.get(self.url, {"city": city.slug})
         self.assertContains(response, hiring_str)
         self.assertNotContains(response, no_hiring_str)
+
+    def test_company(self):
+        # 3 companies in two departments to test distance and department filtering
+        vannes = create_city_vannes()
+        COMPANY_VANNES = "Entreprise Vannes"
+        CompanyFactory(
+            name=COMPANY_VANNES, department="56", coords=vannes.coords, post_code="56760", kind=CompanyKind.AI
+        )
+
+        guerande = create_city_guerande()
+        COMPANY_GUERANDE = "Entreprise Guérande"
+        guerande_company = CompanyFactory(
+            name=COMPANY_GUERANDE, department="44", coords=guerande.coords, post_code="44350", kind=CompanyKind.AI
+        )
+        saint_andre = create_city_saint_andre()
+        COMPANY_SAINT_ANDRE = "Entreprise Saint André des Eaux"
+        CompanyFactory(
+            name=COMPANY_SAINT_ANDRE,
+            department="44",
+            coords=saint_andre.coords,
+            post_code="44117",
+            kind=CompanyKind.AI,
+        )
+
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # find city (city form field cleaning)
+            + 1  # find companies (add_form_choices)
+            + 1  # count companies (paginator)
+            + 1  # count job descriptions (job_descriptions_count from context)
+            + 1  # refetch the city for widget rendering
+            + 1  # get companies infos for page
+            + 1  # get job descriptions infos (prefetch with is_popular annotation)
+        ):
+            response = self.client.get(self.url, {"city": guerande.slug, "distance": 100})
+        self.assertContains(
+            response,
+            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>""",
+            html=True,
+        )
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # find city (city form field cleaning)
+            + 1  # find companies (add_form_choices)
+            + 1  # count companies (paginator)
+            + 1  # count companies (siaes_count from context): _result_cache invalidated by new filter
+            + 1  # count job descriptions (job_descriptions_count from context)
+            + 1  # refetch the city for widget rendering
+            + 1  # get companies infos for page
+            + 1  # get job descriptions infos (prefetch with is_popular annotation)
+        ):
+            response = self.client.get(
+                self.url, {"city": guerande.slug, "distance": 100, "company": guerande_company.pk}
+            )
+        self.assertContains(
+            response,
+            """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
+            html=True,
+        )
+
+        # Check that invalid value doesn't crash
+        response = self.client.get(self.url, {"city": guerande.slug, "distance": 100, "company": "foobar"})
+        self.assertContains(
+            response,
+            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>""",
+            html=True,
+        )
 
 
 class SearchPrescriberTest(TestCase):
