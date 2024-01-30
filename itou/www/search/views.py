@@ -99,6 +99,15 @@ class EmployerSearchBaseView(FormView):
                 query |= Q(appellation__rome__code__startswith=domain)
             job_descriptions = job_descriptions.filter(query)
 
+        company = self.request.GET.get("company")
+        if company:
+            try:
+                clean_company_pk = int(company)
+            except ValueError:
+                clean_company_pk = None
+            else:
+                siaes = siaes.filter(pk=clean_company_pk)
+
         context = {
             "form": form,
             "ea_eatt_kinds": [CompanyKind.EA, CompanyKind.EATT],
@@ -137,7 +146,9 @@ class EmployerSearchView(EmployerSearchBaseView):
         # The DB contains around 4k SIAE (always fast in Python and no need of iterator())
         departments = set()
         departments_districts = defaultdict(set)
+        company_choices = []
         for siae in siaes:
+            company_choices.append((siae.pk, siae.display_name))
             # Extract the department of SIAE
             if siae.department:
                 departments.add(siae.department)
@@ -155,6 +166,9 @@ class EmployerSearchView(EmployerSearchBaseView):
             for department, districts in departments_districts.items():
                 districts = sorted(districts)
                 form.add_field_districts(department, districts)
+
+        if company_choices:
+            form.add_field_company(company_choices)
 
     def get_results_page(self, siaes, _job_descriptions):
         siaes = (

@@ -40,6 +40,13 @@
                 </fieldset>
             {% endif %}
 
+            {% if form.company %}
+                <hr>
+                <fieldset>
+                    {% bootstrap_field form.company wrapper_class="form-group mb-0" label_class="d-block font-weight-bold mb-3" %}
+                </fieldset>
+            {% endif %}
+
             <hr>
             <fieldset>
                 {% bootstrap_field form.kinds wrapper_class="form-group mb-0" label_class="d-block font-weight-bold mb-3" %}
