@@ -42,12 +42,18 @@ class ApprovalForm(forms.Form):
     status_future = forms.BooleanField(label="PASS IAE valide (non démarré)", required=False)
     status_expired = forms.BooleanField(label="PASS IAE expiré", required=False)
 
-    EXPIRY_CHOICES = [("1", "Moins d'1 mois"), ("3", "Moins de 3 mois"), ("7", "Moins de 7 mois"), ("0", "Tous")]
+    DEFAULT_EXPIRY = "0"
+    EXPIRY_CHOICES = [
+        ("1", "Moins d'1 mois"),
+        ("3", "Moins de 3 mois"),
+        ("7", "Moins de 7 mois"),
+        (DEFAULT_EXPIRY, "Tous"),
+    ]
     expiry = forms.ChoiceField(
         label="Fin du parcours en IAE",
         choices=EXPIRY_CHOICES,
         widget=forms.RadioSelect,
-        initial="0",
+        initial=DEFAULT_EXPIRY,
     )
 
     def __init__(self, siae_pk, data, *args, **kwargs):
