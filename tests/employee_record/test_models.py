@@ -214,6 +214,33 @@ class EmployeeRecordModelTest(TestCase):
         )
         assert EmployeeRecord.objects.archivable().count() == 0
 
+    def test_unarchive_with_wrong_status(self):
+        for status in set(Status) - {Status.ARCHIVED}:
+            with self.subTest(status=status):
+                employee_record = BareEmployeeRecordFactory(status=status)
+                with pytest.raises(
+                    InvalidStatusError, match="La fiche salarié n'est pas dans l'état requis pour cette action"
+                ):
+                    employee_record.unarchive()
+
+    def test_unarchive(self):
+        specs = {
+            None: Status.NEW,
+            "0000": Status.PROCESSED,
+            self.faker.numerify("31##"): Status.ARCHIVED,
+            self.faker.numerify("32##"): Status.REJECTED,
+            self.faker.numerify("33##"): Status.REJECTED,
+            self.faker.numerify("340#"): Status.REJECTED,
+            "3436": Status.PROCESSED,
+            self.faker.numerify("35##"): Status.ARCHIVED,
+        }
+
+        for code, expected_status in specs.items():
+            with self.subTest(code=code):
+                employee_record = BareEmployeeRecordFactory(status=Status.ARCHIVED, asp_processing_code=code)
+                employee_record.unarchive()
+                assert employee_record.status == expected_status
+
 
 @pytest.mark.parametrize(
     "factory,expected",
