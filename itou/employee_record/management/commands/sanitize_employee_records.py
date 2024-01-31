@@ -149,6 +149,9 @@ class Command(BaseCommand):
                     defaults={"updated_at": timezone.now},
                 )
                 total_created += int(created)
+                # Unarchive the employee record so next time we don't miss the notification
+                if employee_record.status == Status.ARCHIVED:
+                    employee_record.unarchive()
             self.stdout.write(f" - {total_created} notification(s) created")
         self.stdout.write(" - done!")
 

@@ -4,6 +4,7 @@ import io
 import pytest
 
 from itou.employee_record import models
+from itou.employee_record.enums import Status
 from itou.employee_record.management.commands import sanitize_employee_records
 from tests.approvals import factories as approvals_factories
 from tests.employee_record import factories
@@ -130,14 +131,13 @@ def test_missed_notifications(command, faker):
         created_at=faker.date_time_between(start_date="+1d", end_date="+30d", tzinfo=datetime.UTC),
     )
 
+    wrongly_archived_employee_records = [employee_record_with_prolongation, employee_record_before_approval_creation]
     # Various cases are now set up, finally check the behavior
     command._check_missed_notifications(dry_run=False)
-    assert (
-        models.EmployeeRecordUpdateNotification.objects.filter(
-            employee_record__in=[employee_record_with_prolongation, employee_record_before_approval_creation],
-        ).count()
-        == 2
-    )
+    for employee_record in wrongly_archived_employee_records:
+        assert employee_record.update_notifications.count() == 1
+        employee_record.refresh_from_db()
+        assert employee_record.status != Status.ARCHIVED
     assert command.stdout.getvalue().split("\n") == [
         "* Checking missing employee records notifications:",
         " - found 2 missing notification(s)",
