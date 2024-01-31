@@ -373,6 +373,21 @@ class EmployeeRecord(ASPExchangeInformation):
         with transaction.atomic():  # In case we failed a constraint (i.e: the unique one)
             self.save()
 
+    def unarchive(self):
+        if self.status != Status.ARCHIVED:
+            raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+
+        match self.asp_processing_code:
+            case None:  # Acknowledgement never received, start anew
+                self.status = Status.NEW
+            case "0000" | "3436":
+                self.status = Status.PROCESSED
+            case code:
+                if code[:2] in ["32", "33", "34"]:
+                    self.status = Status.REJECTED
+
+        self.save(update_fields=["status"])
+
     def update_as_processed_as_duplicate(self, archive):
         """
         Force status to `PROCESSED` if the employee record has been marked
