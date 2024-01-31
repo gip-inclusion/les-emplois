@@ -37,6 +37,12 @@
         <link rel="stylesheet" href="{% static "vendor/jquery-ui/jquery-ui.min.css" %}" type="text/css">
         <link rel="stylesheet" href="{% static "vendor/theme-inclusion/stylesheets/app.css" %}" type="text/css">
         <link rel="stylesheet" href="{% static "css/itou.css" %}" type="text/css">
+        {% if not debug %}
+            {# Sentry loader script, dynamically and lazily loads the Sentry SDK on errors. #}
+            {# Served from Sentry CDN to allows dynamic loading. #}
+            {# The script is not necessary for features on the site. #}
+            <script src="https://js.sentry-cdn.com/d6b350eab2a54e5fab388bade8c9bbad.min.js" crossorigin="anonymous"></script>
+        {% endif %}
         {% block extra_head %}{% endblock %}
     </head>
     <body class="{% block body_class %}{% endblock %}">
