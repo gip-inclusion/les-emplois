@@ -170,7 +170,12 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         if self.siae:
-            self.form = ApprovalForm(self.siae.pk, self.request.GET or None)
+            form_data = self.request.GET or None
+            if form_data and "expiry" not in form_data:
+                # Use this as default to handle the case where page=XX is provided
+                # disabling the initial values of the form
+                form_data |= {"expiry": ApprovalForm.DEFAULT_EXPIRY}
+            self.form = ApprovalForm(self.siae.pk, form_data)
 
     def get_queryset(self):
         form_filters = [self.form.get_approvals_qs_filter()]

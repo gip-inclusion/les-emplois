@@ -3,9 +3,10 @@ from django.urls import reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertRedirects
 
+from itou.www.approvals_views.views import ApprovalListView
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory
-from tests.utils.test import BASE_NUM_QUERIES
+from tests.utils.test import BASE_NUM_QUERIES, parse_response_to_soup
 
 
 class TestApprovalsListView:
@@ -293,3 +294,24 @@ class TestApprovalsListView:
         url = f"{reverse('approvals:list')}?expiry=7&status_expired=on"
         response = client.get(url)
         assertContains(response, "0 résultat")
+
+    def test_approval_expiry_filter_default(self, client):
+        company = CompanyFactory(with_membership=True)
+        # Make sure we have access to page 2
+        ApprovalFactory.create_batch(
+            ApprovalListView.paginate_by + 1,
+            with_jobapplication=True,
+            with_jobapplication__to_company=company,
+        )
+        employer = company.members.first()
+        client.force_login(employer)
+
+        list_url = reverse("approvals:list")
+        response = client.get(list_url)
+        # Check that the default "Fin du parcours en IAE" value "Tous" is selected
+        expiry_all_input = parse_response_to_soup(response, "input[name='expiry'][value='0']")
+        assert expiry_all_input.get("checked")
+        response = client.get(f"{list_url}?page=2")
+        # Check that the default "Fin du parcours en IAE" value "Tous" is selected
+        expiry_all_input = parse_response_to_soup(response, "input[name='expiry'][value='0']")
+        assert expiry_all_input.get("checked")
