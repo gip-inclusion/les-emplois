@@ -325,3 +325,25 @@
         </div>
     </section>
 {% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {% if user.is_employer %}
+        <script async src="https://tally.so/widgets/embed.js"></script>
+        <script nonce="{{ CSP_NONCE }}">
+            window.TallyConfig = {
+                "formId": "3EWMbq",
+                "popup": {
+                    "emoji": {
+                        "text": "👋",
+                        "animation": "wave"
+                    },
+                    "showOnce": true,
+                    "doNotShowAfterSubmit": true,
+                    "autoClose": 0
+                }
+            };
+        </script>
+    {% endif %}
+
+{% endblock %}
