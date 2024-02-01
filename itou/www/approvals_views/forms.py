@@ -5,7 +5,7 @@ from functools import reduce
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db.models import Exists, OuterRef, Q
+from django.db.models import Exists, OuterRef, Q, TextChoices
 from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.html import format_html
@@ -35,6 +35,13 @@ from itou.utils.validators import MaxDateValidator, MinDateValidator
 from itou.utils.widgets import DuetDatePickerWidget
 
 
+class ApprovalExpiry(TextChoices):
+    LESS_THAN_1_MONTH = "1", "Moins d'1 mois"
+    LESS_THAN_3_MONTHS = "3", "Moins de 3 mois"
+    LESS_THAN_7_MONTHS = "7", "Moins de 7 mois"
+    ALL = "0", "Tous"
+
+
 class ApprovalForm(forms.Form):
     users = forms.MultipleChoiceField(required=False, label="Nom", widget=Select2MultipleWidget)
     status_valid = forms.BooleanField(label="PASS IAE valide", required=False)
@@ -42,18 +49,11 @@ class ApprovalForm(forms.Form):
     status_future = forms.BooleanField(label="PASS IAE valide (non démarré)", required=False)
     status_expired = forms.BooleanField(label="PASS IAE expiré", required=False)
 
-    DEFAULT_EXPIRY = "0"
-    EXPIRY_CHOICES = [
-        ("1", "Moins d'1 mois"),
-        ("3", "Moins de 3 mois"),
-        ("7", "Moins de 7 mois"),
-        (DEFAULT_EXPIRY, "Tous"),
-    ]
     expiry = forms.ChoiceField(
         label="Fin du parcours en IAE",
-        choices=EXPIRY_CHOICES,
+        choices=ApprovalExpiry.choices,
         widget=forms.RadioSelect,
-        initial=DEFAULT_EXPIRY,
+        initial=ApprovalExpiry.ALL,
     )
 
     def __init__(self, siae_pk, data, *args, **kwargs):
