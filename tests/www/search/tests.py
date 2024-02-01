@@ -302,7 +302,6 @@ class SearchCompanyTest(TestCase):
             + 1  # find city (city form field cleaning)
             + 1  # find companies (add_form_choices)
             + 1  # count companies (paginator)
-            + 1  # count companies (siaes_count from context): _result_cache invalidated by new filter
             + 1  # count job descriptions (job_descriptions_count from context)
             + 1  # refetch the city for widget rendering
             + 1  # get companies infos for page

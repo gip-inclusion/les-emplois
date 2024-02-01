@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from urllib.parse import urlencode
 
 from django.contrib.gis.db.models.functions import Distance
@@ -16,6 +16,9 @@ from itou.www.search.forms import JobDescriptionSearchForm, PrescriberSearchForm
 
 # INSEE codes for the french cities that do have districts.
 INSEE_CODES_WITH_DISTRICTS = {"13055", "75056", "69123"}
+
+
+PageAndCounts = namedtuple("PageAndCounts", ("results_page", "siaes_count", "job_descriptions_count"))
 
 
 def employer_search_home(request, template_name="search/siaes_search_home.html"):
@@ -108,6 +111,8 @@ class EmployerSearchBaseView(FormView):
             else:
                 siaes = siaes.filter(pk=clean_company_pk)
 
+        results_and_counts = self.get_results_page_and_counts(siaes, job_descriptions)
+
         context = {
             "form": form,
             "ea_eatt_kinds": [CompanyKind.EA, CompanyKind.EATT],
@@ -125,9 +130,9 @@ class EmployerSearchBaseView(FormView):
                 },
                 doseq=True,
             ),
-            "results_page": self.get_results_page(siaes, job_descriptions),
-            "siaes_count": siaes.count(),
-            "job_descriptions_count": job_descriptions.count(),
+            "results_page": results_and_counts.results_page,
+            "siaes_count": results_and_counts.siaes_count,
+            "job_descriptions_count": results_and_counts.job_descriptions_count,
             "matomo_custom_title": "Recherche d'employeurs solidaires",
         }
         return render(self.request, self.template_name, context)
@@ -170,7 +175,7 @@ class EmployerSearchView(EmployerSearchBaseView):
         if company_choices:
             form.add_field_company(company_choices)
 
-    def get_results_page(self, siaes, _job_descriptions):
+    def get_results_page_and_counts(self, siaes, job_descriptions):
         siaes = (
             siaes.prefetch_related(
                 Prefetch(
@@ -202,7 +207,12 @@ class EmployerSearchView(EmployerSearchBaseView):
             .order_by("-has_active_members", "block_job_applications", "job_app_score", "pk")
         )
 
-        return pager(siaes, self.request.GET.get("page"), items_per_page=10)
+        page = pager(siaes, self.request.GET.get("page"), items_per_page=10)
+        return PageAndCounts(
+            results_page=page,
+            siaes_count=page.paginator.count,
+            job_descriptions_count=job_descriptions.count(),
+        )
 
 
 class JobDescriptionSearchView(EmployerSearchBaseView):
@@ -230,12 +240,17 @@ class JobDescriptionSearchView(EmployerSearchBaseView):
             departments = sorted(departments)
             form.add_field_departements(departments)
 
-    def get_results_page(self, _siaes, job_descriptions):
+    def get_results_page_and_counts(self, siaes, job_descriptions):
         job_descriptions = job_descriptions.with_annotation_is_popular().order_by(
             F("source_kind").asc(nulls_first=True), "-updated_at", "-created_at"
         )
 
-        return pager(job_descriptions, self.request.GET.get("page"), items_per_page=10)
+        page = pager(job_descriptions, self.request.GET.get("page"), items_per_page=10)
+        return PageAndCounts(
+            results_page=page,
+            siaes_count=siaes.count(),
+            job_descriptions_count=page.paginator.count,
+        )
 
 
 def search_prescribers_home(request, template_name="search/prescribers_search_home.html"):
