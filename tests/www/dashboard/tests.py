@@ -993,6 +993,40 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         response = self.client.get(url)
         self.assertNotContains(response, MISSING_INFOS_WARNING_ID)
 
+    def test_edit_with_invalid_pole_emploi_id(self):
+        user = JobSeekerFactory()
+        self.client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+        response = self.client.get(url)
+        post_data = {
+            "email": user.email,
+            "title": user.title,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "birthdate": "20/12/1978",
+            "phone": user.phone,
+            "pole_emploi_id": "trop long",
+            "lack_of_pole_emploi_id_reason": "",
+            "address_line_1": "10, rue du Gué",
+            "address_line_2": "Sous l'escalier",
+            "post_code": "35400",
+            "city": "Saint-Malo",
+            "lack_of_nir": False,
+            "nir": user.nir,
+        }
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 200
+        self.assertFormError(
+            response.context["form"],
+            "pole_emploi_id",
+            "Assurez-vous que cette valeur comporte au plus 8 caractères (actuellement 9).",
+        )
+        self.assertFormError(
+            response.context["form"],
+            None,
+            "Renseignez soit un identifiant France Travail (ex pôle emploi), soit la raison de son absence.",
+        )
+
     def test_edit_as_prescriber(self):
         user = PrescriberFactory()
         self.client.force_login(user)
