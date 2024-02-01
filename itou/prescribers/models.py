@@ -184,6 +184,28 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         # OK =>  org1: (kind="ML", siret="12345678900000") + org2; (kind="PLIE", siret="12345678900000")
         # NOK => org1: (kind="ML", siret="12345678900000") + org2; (kind="ML", siret="12345678900000")
         unique_together = ("siret", "kind")
+        constraints = [
+            models.CheckConstraint(
+                name="validated_odc_is_brsa",
+                check=~models.Q(
+                    authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+                    kind=PrescriberOrganizationKind.ODC,
+                    is_brsa=False,
+                ),
+                violation_error_message=(
+                    "Une organisation habilitée délégataire d'un Conseil Départemental "
+                    "doit être conventionnée pour le suivi des BRSA."
+                ),
+            )
+        ]
+
+    def save(self, *args, **kwargs):
+        if (
+            self.authorization_status == PrescriberAuthorizationStatus.VALIDATED
+            and self.kind == PrescriberOrganizationKind.ODC
+        ):
+            self.is_brsa = True
+        return super().save(*args, **kwargs)
 
     def clean(self, *args, **kwargs):
         super().clean()
