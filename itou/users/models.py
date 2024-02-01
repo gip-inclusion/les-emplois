@@ -1008,8 +1008,8 @@ class JobSeekerProfile(models.Model):
         Only for users with kind == job_seeker.
         It must be used in forms and modelforms that manipulate job seekers.
         """
-        pole_emploi_id = cleaned_data["pole_emploi_id"]
-        lack_of_pole_emploi_id_reason = cleaned_data["lack_of_pole_emploi_id_reason"]
+        pole_emploi_id = cleaned_data.get("pole_emploi_id")
+        lack_of_pole_emploi_id_reason = cleaned_data.get("lack_of_pole_emploi_id_reason")
         # One or the other must be filled.
         if not pole_emploi_id and not lack_of_pole_emploi_id_reason:
             raise ValidationError(
