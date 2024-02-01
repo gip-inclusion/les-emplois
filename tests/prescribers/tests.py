@@ -9,6 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
+from django.db import IntegrityError
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.timezone import get_current_timezone
@@ -595,6 +596,51 @@ class PrescriberOrganizationAdminTest(TestCase):
         self.assertNotContains(response, self.REFUSE_BUTTON_LABEL)
         self.assertNotContains(response, self.ACCEPT_AFTER_REFUSAL_BUTTON_LABEL)
 
+    def test_accept_prescriber_habilitation_odc_to_is_brsa(self):
+        self.client.force_login(self.user)
+
+        prescriberorganization = PrescriberOrganizationFactory(
+            siret="83987278500010",
+            department="14",
+            post_code="14000",
+            authorization_updated_at=datetime.now(tz=get_current_timezone()),
+            authorization_status=PrescriberAuthorizationStatus.NOT_SET,
+            kind=PrescriberOrganizationKind.ODC,
+            is_authorized=False,
+            is_brsa=False,
+        )
+
+        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
+        response = self.client.get(url)
+        self.assertContains(response, self.ACCEPT_BUTTON_LABEL)
+
+        assert not prescriberorganization.is_brsa
+        post_data = {
+            "id": prescriberorganization.pk,
+            "post_code": prescriberorganization.post_code,
+            "department": prescriberorganization.department,
+            "kind": prescriberorganization.kind,
+            "name": prescriberorganization.name,
+            "siret": prescriberorganization.siret,
+            "prescribermembership_set-TOTAL_FORMS": 1,
+            "prescribermembership_set-INITIAL_FORMS": 0,
+            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
+            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
+            "is_authorized": prescriberorganization.is_authorized,
+            "authorization_status": prescriberorganization.authorization_status,
+            "_authorization_action_validate": "Valider+l'habilitation",
+        }
+
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 302
+
+        updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
+        assert updated_prescriberorganization.is_authorized
+        assert updated_prescriberorganization.kind == prescriberorganization.kind
+        assert updated_prescriberorganization.authorization_updated_by == self.user
+        assert updated_prescriberorganization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
+        assert updated_prescriberorganization.is_brsa
+
 
 class UpdateRefusedPrescriberOrganizationKindManagementCommandsTest(TestCase):
     def test_update_kind(self):
@@ -681,3 +727,13 @@ def test_organization_kind_to_PE_typologie_prescripteur(organization_kind):
         PrescriberOrganizationKind.SPIP: "Autre",
     }
     assert organization_kind.to_PE_typologie_prescripteur() == EXPECTED_TYPOLOGIE[organization_kind]
+
+
+def test_validated_odc_is_brsa_constraint():
+    organization = PrescriberOrganizationFactory(
+        kind=PrescriberOrganizationKind.ODC,
+        authorized=True,
+    )
+    assert organization.is_brsa
+    with pytest.raises(IntegrityError):
+        PrescriberOrganization.objects.filter(pk=organization.pk).update(is_brsa=False)
