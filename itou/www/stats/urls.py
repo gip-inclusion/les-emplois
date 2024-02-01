@@ -40,6 +40,11 @@ urlpatterns = [
         name="stats_ddets_iae_auto_prescription",
     ),
     path(
+        "ddets/ph_prescription",
+        views.stats_ddets_iae_ph_prescription,
+        name="stats_ddets_iae_ph_prescription",
+    ),
+    path(
         "ddets/follow_siae_evaluation",
         views.stats_ddets_iae_follow_siae_evaluation,
         name="stats_ddets_iae_follow_siae_evaluation",
@@ -66,6 +71,11 @@ urlpatterns = [
         "dreets/auto_prescription",
         views.stats_dreets_iae_auto_prescription,
         name="stats_dreets_iae_auto_prescription",
+    ),
+    path(
+        "dreets/ph_prescription",
+        views.stats_dreets_iae_ph_prescription,
+        name="stats_dreets_iae_ph_prescription",
     ),
     path(
         "dreets/follow_siae_evaluation",

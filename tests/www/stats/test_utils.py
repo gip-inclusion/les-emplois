@@ -1,8 +1,11 @@
+import itertools
+
 import factory.fuzzy
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory, override_settings
 
+from itou.common_apps.address import departments
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.companies.enums import CompanyKind
 from itou.institutions.enums import InstitutionKind
@@ -309,6 +312,54 @@ def test_can_view_stats_ddets_iae_aci():
     assert utils.can_view_stats_dashboard_widget(request)
 
 
+def test_can_view_stats_ddets_iae_ph_prescription():
+    # Admin member of DDETS IAE can access.
+    institution = InstitutionWithMembershipFactory(
+        kind=InstitutionKind.DDETS_IAE,
+        department=factory.fuzzy.FuzzyChoice(
+            itertools.chain(
+                departments.REGIONS["Pays de la Loire"],
+                departments.REGIONS["Nouvelle-Aquitaine"],
+                departments.REGIONS["Île-de-France"],
+            )
+        ),
+    )
+    request = get_request(institution.members.get())
+    assert utils.can_view_stats_ddets_iae_ph_prescription(request)
+    assert utils.can_view_stats_dashboard_widget(request)
+
+    # Non admin member of DDETS IAE can access as well.
+    institution = InstitutionWithMembershipFactory(
+        kind=InstitutionKind.DDETS_IAE,
+        membership__is_admin=False,
+        department=factory.fuzzy.FuzzyChoice(
+            itertools.chain(
+                departments.REGIONS["Pays de la Loire"],
+                departments.REGIONS["Nouvelle-Aquitaine"],
+                departments.REGIONS["Île-de-France"],
+            )
+        ),
+    )
+    request = get_request(institution.members.get())
+    assert utils.can_view_stats_ddets_iae_ph_prescription(request)
+    assert utils.can_view_stats_dashboard_widget(request)
+
+    # Member of institution of wrong kind cannot access.
+    institution = InstitutionWithMembershipFactory(
+        kind=InstitutionKind.OTHER,
+        department=factory.fuzzy.FuzzyChoice(
+            itertools.chain(
+                departments.REGIONS["Pays de la Loire"],
+                departments.REGIONS["Nouvelle-Aquitaine"],
+                departments.REGIONS["Île-de-France"],
+            )
+        ),
+    )
+    request = get_request(institution.members.get())
+    assert not utils.can_view_stats_ddets_iae_ph_prescription(request)
+    assert utils.can_view_stats_dashboard_widget(request)
+
+
 def test_can_view_stats_dreets_iae():
     # Admin member of DREETS IAE can access.
     institution = InstitutionWithMembershipFactory(kind=InstitutionKind.DREETS_IAE, department="93")
@@ -328,6 +379,54 @@ def test_can_view_stats_dreets_iae():
     institution = InstitutionWithMembershipFactory(kind=InstitutionKind.OTHER, department="93")
     request = get_request(institution.members.get())
     assert not utils.can_view_stats_dreets_iae(request)
+    assert utils.can_view_stats_dashboard_widget(request)
+
+
+def test_can_view_stats_dreets_iae_ph_prescription():
+    # Admin member of DREETS IAE can access.
+    institution = InstitutionWithMembershipFactory(
+        kind=InstitutionKind.DREETS_IAE,
+        department=factory.fuzzy.FuzzyChoice(
+            itertools.chain(
+                departments.REGIONS["Pays de la Loire"],
+                departments.REGIONS["Nouvelle-Aquitaine"],
+                departments.REGIONS["Île-de-France"],
+            )
+        ),
+    )
+    request = get_request(institution.members.get())
+    assert utils.can_view_stats_dreets_iae_ph_prescription(request)
+    assert utils.can_view_stats_dashboard_widget(request)
+
+    # Non admin member of DREETS IAE can access as well.
+    institution = InstitutionWithMembershipFactory(
+        kind=InstitutionKind.DREETS_IAE,
+        membership__is_admin=False,
+        department=factory.fuzzy.FuzzyChoice(
+            itertools.chain(
+                departments.REGIONS["Pays de la Loire"],
+                departments.REGIONS["Nouvelle-Aquitaine"],
+                departments.REGIONS["Île-de-France"],
+            )
+        ),
+    )
+    request = get_request(institution.members.get())
+    assert utils.can_view_stats_dreets_iae_ph_prescription(request)
+    assert utils.can_view_stats_dashboard_widget(request)
+
+    # Member of institution of wrong kind cannot access.
+    institution = InstitutionWithMembershipFactory(
+        kind=InstitutionKind.OTHER,
+        department=factory.fuzzy.FuzzyChoice(
+            itertools.chain(
+                departments.REGIONS["Pays de la Loire"],
+                departments.REGIONS["Nouvelle-Aquitaine"],
+                departments.REGIONS["Île-de-France"],
+            )
+        ),
+    )
+    request = get_request(institution.members.get())
+    assert not utils.can_view_stats_dreets_iae_ph_prescription(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
 

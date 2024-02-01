@@ -118,6 +118,15 @@
                             <span>Focus auto-prescription</span>
                         </a>
                     </li>
+                    {% if can_view_stats_ddets_iae_ph_prescription %}
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'stats:stats_ddets_iae_ph_prescription' %}" class="btn-link btn-ico">
+                                <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                                <span>Suivi des prescriptions des prescripteurs habilités</span>
+                            </a>
+                            {% include "dashboard/includes/stats_new_badge.html" %}
+                        </li>
+                    {% endif %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ddets_iae_follow_siae_evaluation' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
@@ -143,7 +152,6 @@
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Voir les données des fiches de poste en tension</span>
                         </a>
-                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ddets_iae_hiring' %}" class="btn-link btn-ico">
@@ -163,7 +171,6 @@
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                                 <span>Suivi du cofinancement des ACI</span>
                             </a>
-                            {% include "dashboard/includes/stats_new_badge.html" %}
                         </li>
                     {% endif %}
                 {% endif %}
@@ -182,6 +189,15 @@
                             <span>Focus auto-prescription</span>
                         </a>
                     </li>
+                    {% if can_view_stats_dreets_iae_ph_prescription %}
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'stats:stats_dreets_iae_ph_prescription' %}" class="btn-link btn-ico">
+                                <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                                <span>Suivi des prescriptions des prescripteurs habilités</span>
+                            </a>
+                            {% include "dashboard/includes/stats_new_badge.html" %}
+                        </li>
+                    {% endif %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dreets_iae_follow_siae_evaluation' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
@@ -207,7 +223,6 @@
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Voir les données des fiches de poste en tension</span>
                         </a>
-                        {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dreets_iae_hiring' %}" class="btn-link btn-ico">
