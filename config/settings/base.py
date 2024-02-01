@@ -425,15 +425,12 @@ STATS_ACI_DEPARTMENT_WHITELIST = ["31", "84"]
 # Slack notifications sent by Metabase cronjobs.
 SLACK_CRON_WEBHOOK_URL = os.getenv("SLACK_CRON_WEBHOOK_URL")
 
-# Production instances (`PROD`, `DEMO`, `FAST-MACHINE`, ...) share the same redis but different DB
-REDIS_URL = os.getenv("REDIS_URL")
-REDIS_DB = os.getenv("REDIS_DB")
-
+redis_url = os.getenv("REDIS_URL")
 HUEY = {
     "name": "ITOU",
     # Don't store task results (see our Redis Post-Morten in documentation for more information)
     "results": False,
-    "url": f"{REDIS_URL}/?db={REDIS_DB}",
+    "url": f"{redis_url}/?db={os.getenv('REDIS_DB_HUEY')}",
     "consumer": {
         "workers": 2,
         "worker_type": "thread",
