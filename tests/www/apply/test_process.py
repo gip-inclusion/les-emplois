@@ -202,25 +202,11 @@ class ProcessViewsTest(TestCase):
         self.assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label)
 
         # Test resume presence:
-        # 1/ Job seeker has a personal resume (technical debt).
-        resume_link = "https://server.com/rockie-balboa.pdf"
-        job_application = JobApplicationSentByJobSeekerFactory(
-            job_seeker__resume_link=resume_link, resume_link="", to_company=company
-        )
+        resume_link = "https://server.com/sylvester-stallone.pdf"
+        job_application = JobApplicationSentByJobSeekerFactory(to_company=company, resume_link=resume_link)
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertNotContains(
-            response, '<small>Curriculum vitae</small><i class="text-disabled">Non renseigné</i>', html=True
-        )
         self.assertContains(response, resume_link)
-
-        # 2/ Job application was sent with an attached resume
-        new_resume_link = "https://server.com/sylvester-stallone.pdf"
-        job_application = JobApplicationSentByJobSeekerFactory(to_company=company, resume_link=new_resume_link)
-        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        self.assertContains(response, new_resume_link)
-        self.assertNotContains(response, resume_link)
 
     def test_details_for_company_hidden(self, *args, **kwargs):
         """A hidden job_application is not displayed."""
@@ -1528,7 +1514,7 @@ class ProcessViewsTest(TestCase):
         assert job_application.hidden_for_company
 
     def test_diagoriente_section_as_job_seeker(self):
-        job_application = JobApplicationFactory(with_approval=True, resume_link="", job_seeker__resume_link="")
+        job_application = JobApplicationFactory(with_approval=True, resume_link="")
 
         self.client.force_login(job_application.job_seeker)
         response = self.client.get(
@@ -1545,7 +1531,6 @@ class ProcessViewsTest(TestCase):
             with_approval=True,
             sent_by_authorized_prescriber_organisation=True,
             resume_link="",
-            job_seeker__resume_link="",
         )
         prescriber = job_application.sender_prescriber_organization.members.first()
         self.client.force_login(prescriber)
@@ -1588,7 +1573,6 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             resume_link="https://myresume.com/me",
-            job_seeker__resume_link="https://myresume.com/me",
         )
         company = job_application.to_company
         employee = company.members.first()
@@ -1600,17 +1584,9 @@ class ProcessViewsTest(TestCase):
         )
         self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
 
-        # Unset resume on job application (still providen through job seeker profile)
+        # Unset resume on job application, should now include Diagoriente section
         job_application.resume_link = ""
         job_application.save(update_fields=["resume_link"])
-        response = self.client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        )
-        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
-
-        # Unset resume on user, should now include Diagoriente section
-        job_application.job_seeker.resume_link = ""
-        job_application.job_seeker.save(update_fields=["resume_link"])
         response = self.client.get(
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         )
@@ -1625,7 +1601,6 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             with_approval=True,
             resume_link="https://myresume.com/me",
-            job_seeker__resume_link="https://myresume.com/me",
             sender=factory.SelfAttribute(".job_seeker"),
         )
         company = job_application.to_company
@@ -1638,17 +1613,9 @@ class ProcessViewsTest(TestCase):
         )
         self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
 
-        # Unset resume on job application (still providen through job seeker profile)
+        # Unset resume on job application, should now include Diagoriente section
         job_application.resume_link = ""
         job_application.save(update_fields=["resume_link"])
-        response = self.client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        )
-        self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
-
-        # Unset resume on user, should now include Diagoriente section
-        job_application.job_seeker.resume_link = ""
-        job_application.job_seeker.save(update_fields=["resume_link"])
         response = self.client.get(
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         )
@@ -1660,7 +1627,7 @@ class ProcessViewsTest(TestCase):
         self.assertNotContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
 
     def test_diagoriente_invite_as_job_seeker(self):
-        job_application = JobApplicationFactory(with_approval=True, resume_link="", job_seeker__resume_link="")
+        job_application = JobApplicationFactory(with_approval=True, resume_link="")
 
         self.client.force_login(job_application.job_seeker)
         response = self.client.post(
@@ -1674,7 +1641,6 @@ class ProcessViewsTest(TestCase):
             with_approval=True,
             sent_by_authorized_prescriber_organisation=True,
             resume_link="",
-            job_seeker__resume_link="",
         )
         prescriber = job_application.sender_prescriber_organization.members.first()
 
@@ -1689,7 +1655,6 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             resume_link="https://myresume.com/me",
-            job_seeker__resume_link="",
         )
         company = job_application.to_company
         employee = company.members.first()
@@ -1766,7 +1731,6 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             sender_prescriber_organization__is_authorized=False,
             resume_link="",
-            job_seeker__resume_link="",
         )
         company = job_application.to_company
         employee = company.members.first()
@@ -1808,7 +1772,6 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             with_approval=True,
             resume_link="",
-            job_seeker__resume_link="",
             sender=factory.SelfAttribute(".job_seeker"),
         )
         company = job_application.to_company
