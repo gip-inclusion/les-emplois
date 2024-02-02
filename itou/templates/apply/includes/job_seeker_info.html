@@ -97,8 +97,8 @@
         </li>
         <li>
             <small>Curriculum vitae</small>
-            {% if job_application.get_resume_link %}
-                <a href="{{ job_application.get_resume_link }}" class="btn-link btn-ico">
+            {% if job_application.resume_link %}
+                <a href="{{ job_application.resume_link }}" class="btn-link btn-ico">
                     <span>Télécharger le CV</span>
                     <i class="ri-download-2-line"></i>
                 </a>
@@ -114,7 +114,7 @@
     {% endif %}
 </ul>
 {# Diagoriente invite #}
-{% if request.user.is_employer and job_application and not job_application.get_resume_link %}
+{% if request.user.is_employer and job_application and not job_application.resume_link %}
     {% include "apply/includes/job_application_diagoriente_invite.html" with job_application=job_application %}
 {% endif %}
 
