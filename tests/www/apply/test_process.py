@@ -1332,7 +1332,7 @@ class ProcessViewsTest(TestCase):
             f"{criterion3.key}": "true",
         }
         response = self.client.post(url, data=post_data)
-        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        next_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         self.assertRedirects(response, next_url)
 
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(

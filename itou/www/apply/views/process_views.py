@@ -490,7 +490,7 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
         job_application.to_company,
         job_application.job_seeker,
         cancel_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id}),
-        next_url=reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id}),
+        next_url=reverse("apply:accept", kwargs={"job_application_id": job_application.id}),
         template_name=template_name,
         extra_context={"job_application": job_application},
     )
