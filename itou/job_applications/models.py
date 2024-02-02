@@ -945,11 +945,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # business rules may still prioritize one diagnosis over another.
         return EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, for_siae=self.to_company)
 
-    def get_resume_link(self):
-        if self.resume_link:
-            return self.resume_link
-        return None
-
     # Workflow transitions.
 
     @xwf_models.transition()

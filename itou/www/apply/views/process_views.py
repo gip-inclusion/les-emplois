@@ -460,7 +460,7 @@ def send_diagoriente_invite(request, job_application_id):
     """
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset.select_for_update(), pk=job_application_id)
-    if not job_application.get_resume_link() and not job_application.diagoriente_invite_sent_at:
+    if not job_application.resume_link and not job_application.diagoriente_invite_sent_at:
         if job_application.is_sent_by_proxy:
             job_application.email_diagoriente_invite_for_prescriber.send()
         else:
