@@ -86,7 +86,6 @@ class ApplicantsAPITest(APITestCase):
         job_seeker1.address_line_2 = "address 2"
         job_seeker1.post_code = "37000"
         job_seeker1.city = "TOURS"
-        job_seeker1.resume_link = "https://myresume.com/me"
         job_seeker1.save()
         job_seeker1.jobseeker_profile.birth_place = CommuneFactory()
         job_seeker1.jobseeker_profile.birth_country = CountryFactory()
@@ -96,7 +95,6 @@ class ApplicantsAPITest(APITestCase):
         job_seeker2.address_line_2 = "2nd address 2"
         job_seeker2.post_code = "59000"
         job_seeker2.city = "LILLE"
-        job_seeker2.resume_link = "https://myresume.com/you"
         job_seeker2.save()
         job_seeker2.jobseeker_profile.birth_place = CommuneFactory()
         job_seeker2.jobseeker_profile.birth_country = CountryFactory()
@@ -136,5 +134,5 @@ class ApplicantsAPITest(APITestCase):
                 "date_naissance": str(job_seeker.birthdate),
                 "lieu_naissance": job_seeker.jobseeker_profile.birth_place.name,
                 "pays_naissance": job_seeker.jobseeker_profile.birth_country.name,
-                "lien_cv": job_seeker.resume_link,
+                "lien_cv": None,
             } == result

@@ -18,7 +18,7 @@ class ApplicantSerializer(serializers.ModelSerializer):
     date_naissance = serializers.DateField(source="birthdate")
     lieu_naissance = serializers.CharField(source="jobseeker_profile.birth_place")
     pays_naissance = serializers.CharField(source="jobseeker_profile.birth_country")
-    lien_cv = serializers.CharField(source="resume_link")
+    lien_cv = serializers.CharField(default=None)  # Deprecated field
 
     class Meta:
         model = User
