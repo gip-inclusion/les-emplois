@@ -1,8 +1,9 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
+from itou.eligibility.models import EligibilityDiagnosis
 from itou.job_applications.enums import SenderKind
-from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 
 
 class JobApplicationAdminForm(forms.ModelForm):
@@ -14,7 +15,43 @@ class JobApplicationAdminForm(forms.ModelForm):
             "sender_prescriber_organization": "Organisation émettrice (si type est Prescripteur)",
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance is None:
+            self._initial_job_application_state = None
+        else:
+            self._initial_job_application_state = self.instance.state
+        self._job_application_to_accept = False
+
     def clean(self):
+        target_state = self.cleaned_data.get("state")
+        if (
+            target_state == JobApplicationWorkflow.STATE_ACCEPTED
+            and target_state != self._initial_job_application_state
+        ):
+            self._job_application_to_accept = True
+            self.cleaned_data["state"] = self._initial_job_application_state or JobApplicationWorkflow.STATE_NEW
+
+        if self._job_application_to_accept and not self.cleaned_data.get("hiring_start_at"):
+            self.add_error("hiring_start_at", "Ce champ est obligatoire pour les candidatures acceptées.")
+
+        if (
+            self._job_application_to_accept
+            and (to_company := self.cleaned_data.get("to_company"))
+            and to_company.is_subject_to_eligibility_rules
+            and self.cleaned_data.get("hiring_without_approval") is not True
+            and (job_seeker := self.cleaned_data.get("job_seeker"))
+            and not job_seeker.has_valid_common_approval
+            and not EligibilityDiagnosis.objects.last_considered_valid(job_seeker, for_siae=to_company)
+        ):
+            self.add_error(
+                None,
+                (
+                    "Un diagnostic d'éligibilité valide pour ce candidat "
+                    "et cette SIAE est obligatoire pour pouvoir créer un PASS IAE."
+                ),
+            )
+
         sender = self.cleaned_data["sender"]
         sender_kind = self.cleaned_data["sender_kind"]
         sender_company = self.cleaned_data.get("sender_company")
