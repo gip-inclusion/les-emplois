@@ -1,32 +1,10 @@
 {% extends "layout/base.html" %}
 {% load redirection_fields %}
 {% load static %}
-{% load matomo %}
 
 {% block title %}Les emplois de l'inclusion{% endblock %}
 
 {% block content_title_wrapper %}{% endblock %}
-
-{% block messages %}
-    {{ block.super }}
-
-    <div class="alert alert-communaute alert-dismissible fade show mb-0 mb-3" role="status">
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-        <div class="row">
-            <div class="col">
-                <p class="h4 mb-0">L'inclusion aujourd'hui, les défis de demain</p>
-                <p class="mb-0">
-                    Le jeudi 01 février 2024, les professionnels de l'inclusion ont rendez-vous de 09h à 17h
-                    <br class="d-none d-lg-inline">
-                    pour un événement en ligne incontournable.
-                </p>
-            </div>
-            <div class="col-12 col-md-auto mt-2 mt-md-0 d-flex align-items-center justify-content-center">
-                <a href="https://www.inclusion-demain.fr/" target="_blank" class="btn btn-sm btn-primary has-external-link" {% matomo_event "promotion-partenaires" "clic" "inclusion-demain" %}>Je m'inscris</a>
-            </div>
-        </div>
-    </div>
-{% endblock %}
 
 {% block content %}
 
