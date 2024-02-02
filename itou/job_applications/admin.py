@@ -269,6 +269,11 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
             obj.origin = Origin.ADMIN
 
         super().save_model(request, obj, form, change)
+        if form._job_application_to_accept:
+            if obj.state.is_new:
+                # The new -> accepted transition doesn't exist
+                obj.process(user=request.user)
+            obj.accept(user=request.user)
 
     def get_form(self, request, obj=None, **kwargs):
         """
