@@ -27,6 +27,10 @@ class Migration(migrations.Migration):
                                 "DURATION",
                                 "La durée de prolongation demandée n’est pas adaptée à la situation du candidat.",
                             ),
+                            (
+                                "REASON",
+                                "Le motif de prolongation demandé n’est pas adapté à la situation du candidat.",
+                            ),
                         ],
                         verbose_name="motif de refus",
                     ),

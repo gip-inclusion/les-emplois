@@ -57,6 +57,7 @@ class ProlongationRequestDenyReason(models.TextChoices):
     IAE = "IAE", "L’IAE ne correspond plus aux besoins / à la situation de la personne."
     SIAE = "SIAE", "La typologie de SIAE ne correspond plus aux besoins / à la situation de la personne."
     DURATION = "DURATION", "La durée de prolongation demandée n’est pas adaptée à la situation du candidat."
+    REASON = "REASON", "Le motif de prolongation demandé n’est pas adapté à la situation du candidat."
 
 
 class ProlongationRequestDenyProposedAction(models.TextChoices):
