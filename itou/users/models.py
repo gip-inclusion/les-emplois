@@ -207,8 +207,6 @@ class User(AbstractUser, AddressMixin):
         blank=True,
     )
 
-    resume_link = models.URLField(max_length=500, verbose_name="lien vers un CV", blank=True)
-
     identity_provider = models.CharField(
         max_length=20,
         verbose_name="fournisseur d'identité (SSO)",
