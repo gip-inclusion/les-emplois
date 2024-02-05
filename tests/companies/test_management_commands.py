@@ -1,16 +1,17 @@
 import datetime
 import io
+import operator
 
+import pytest
 from django.core import management
 from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind
 from tests.companies import factories as companies_factories
 from tests.job_applications.factories import JobApplicationFactory
-from tests.utils.test import TestCase
 
 
-class MoveSiaeDataTest(TestCase):
+class TestMoveCompanyData:
     def test_uses_wet_run(self):
         company_1 = companies_factories.CompanyWithMembershipAndJobsFactory()
         company_2 = companies_factories.CompanyFactory()
@@ -34,6 +35,27 @@ class MoveSiaeDataTest(TestCase):
         assert company_1.members.count() == 0
         assert company_2.jobs.count() == 4
         assert company_2.members.count() == 1
+
+    @pytest.mark.parametrize(
+        "preserve,predicate",
+        [
+            (True, operator.ne),
+            (False, operator.eq),
+        ],
+    )
+    def test_preserve_to_company_data(self, preserve, predicate):
+        company_1, company_2 = companies_factories.CompanyFactory.create_batch(2, with_informations=True)
+
+        management.call_command(
+            "move_company_data",
+            from_id=company_1.pk,
+            to_id=company_2.pk,
+            preserve_to_company_data=preserve,
+            wet_run=True,
+        )
+        company_2.refresh_from_db()
+        for field in ["brand", "description", "phone", "coords", "geocoding_score"]:
+            assert predicate(getattr(company_2, field), getattr(company_1, field))
 
 
 def test_update_companies_job_app_score():

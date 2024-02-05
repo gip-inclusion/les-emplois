@@ -226,7 +226,7 @@ class Command(BaseCommand):
                 prolongations.update(declared_by_siae_id=to_id)
                 suspensions.update(siae_id=to_id)
                 invitations.update(company_id=to_id)
-                if preserve_to_company_data:
+                if not preserve_to_company_data:
                     to_company_qs.update(
                         brand=from_company.display_name,
                         description=from_company.description,
