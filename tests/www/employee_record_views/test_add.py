@@ -56,12 +56,9 @@ def test_wizard(snapshot, client):
 
 def test_done_step_when_the_employee_record_need_to_be_created(client):
     company = CompanyFactory(with_membership=True)
-    approval = ApprovalFactory(for_snapshot=True, pk=1, user__pk=1)
     job_application = JobApplicationFactory(
         to_company=company,
-        job_seeker=approval.user,
         with_approval=True,
-        approval=approval,
     )
     client.force_login(company.members.first())
 
@@ -87,13 +84,10 @@ def test_done_step_when_the_employee_record_need_to_be_created(client):
 
 def test_done_step_when_a_new_employee_record_already_exists(client):
     company = CompanyFactory(with_membership=True)
-    approval = ApprovalFactory(for_snapshot=True, pk=1, user__pk=1)
     job_application = JobApplicationFactory(
         to_company=company,
         to_company__use_employee_record=True,
-        job_seeker=approval.user,
         with_approval=True,
-        approval=approval,
     )
     EmployeeRecordFactory(job_application=job_application, status=Status.NEW)
 
@@ -122,13 +116,10 @@ def test_done_step_when_a_new_employee_record_already_exists(client):
 
 def test_done_step_when_a_other_than_new_employee_record_already_exists(client):
     company = CompanyFactory(with_membership=True)
-    approval = ApprovalFactory(for_snapshot=True, pk=1, user__pk=1)
     job_application = JobApplicationFactory(
         to_company=company,
         to_company__use_employee_record=True,
-        job_seeker=approval.user,
         with_approval=True,
-        approval=approval,
     )
     employee_record = EmployeeRecordFactory(job_application=job_application, status=Status.PROCESSED)
 
