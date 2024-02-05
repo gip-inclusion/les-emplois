@@ -3,19 +3,20 @@
 
 {% bootstrap_form_errors form type="all" %}
 
-<div class="row g-0{% if align == 'center' %} justify-content-sm-center{% endif %}">
-    <div class="col-12 col-md mb-2">
+<div class="row">
+    <div class="col-12">
         <label for="{{ form.city.id_for_label }}" class="visually-hidden">{{ form.city.label }}</label>
-        <div class="input-group">
-            <div class="input-group-text bg-white rounded-start">
-                <span>
-                    <i class="ri-map-pin-line ri-lg text-tertiary" aria-hidden="true"></i>
-                </span>
+        <div class="input-group {% if is_home %}input-group-lg{% else %}input-group-xl input-group-search{% endif %} flex-nowrap">
+            <div class="input-group-text bg-white rounded-start {% if is_home %}ps-0{% else %}ps-3{% endif %} pe-2">
+                <i class="ri-map-pin-line ri-lg text-disabled" aria-hidden="true"></i>
             </div>
             {{ form.city }}
+            <div class="input-group-text bg-white p-0">
+                <button class="btn btn-ico {% if is_home %}btn-primary{% else %}btn-link{% endif %}">
+                    <i class="ri-search-line font-weight-bold" aria-hidden="true"></i>
+                    <span>Rechercher</span>
+                </button>
+            </div>
         </div>
-    </div>
-    <div class="col-12 col-md-3 mb-2 ps-md-3">
-        <button class="btn btn-primary btn-block js-search-button" aria-label="Rechercher">Rechercher</button>
     </div>
 </div>
