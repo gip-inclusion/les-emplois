@@ -9,7 +9,4 @@ class Migration(migrations.Migration):
         ("users", "0031_remove_user_resume_link"),
     ]
 
-    operations = [
-        # This migration can be merged into 0031 once run in production
-        migrations.RunSQL('ALTER TABLE "users_user" DROP COLUMN resume_link;'),
-    ]
+    operations = []
