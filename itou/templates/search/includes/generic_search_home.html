@@ -4,7 +4,7 @@
             <div class="s-home-search__col col-12">
                 <h1 class="lh-sm text-center text-tertiary">{{ title }}</h1>
                 <form method="get" action="{% url url_search %}" role="search" class="s-home-search__form">
-                    {% include template_form_name with form=form align="center" %}
+                    {% include template_form_name with form=form is_home=True %}
                 </form>
             </div>
         </div>
