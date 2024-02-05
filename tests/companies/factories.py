@@ -98,6 +98,15 @@ class CompanyFactory(factory.django.DjangoModelFactory):
             membership=factory.RelatedFactory("tests.companies.factories.CompanyMembershipFactory", "company"),
         )
         with_jobs = factory.Trait(romes=factory.PostGeneration(_create_job_from_rome_code))
+        with_geocoding = factory.Trait(
+            coords=factory.Faker("geopoint"),
+            geocoding_score=factory.fuzzy.FuzzyFloat(0.0, 1.0, precision=3),
+        )
+        with_informations = factory.Trait(
+            with_geocoding=True,
+            brand=factory.Faker("company", locale="fr_FR"),
+            description=factory.Faker("paragraph", locale="fr_FR"),
+        )
         for_snapshot = factory.Trait(
             name="ACME Inc.",
             address_line_1="112 rue de la Croix-Nivert",
