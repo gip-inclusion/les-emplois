@@ -20,7 +20,7 @@
                               <input id="id_add_view-current_step" name="add_view-current_step" type="hidden" value="choose-approval"/>
   
                               <div class="form-group form-group-required"><label class="form-label" for="id_choose-approval-approval">PASS IAE de John DOE</label><select class="form-select" id="id_choose-approval-approval" name="choose-approval-approval">
-    <option value="1">999999999999 — Du 01/01/2000 au 01/01/3000</option>
+    <option value="[PK of Approval]">999999999999 — Du 01/01/2000 au 01/01/3000</option>
   
   </select><div class="form-text">Le PASS IAE concerné par le transfert de données vers l'Extranet IAE 2.0 de l'ASP</div>
   </div>

@@ -11,7 +11,7 @@ from tests.utils.test import parse_response_to_soup
 
 def test_wizard(snapshot, client):
     company = CompanyFactory(with_membership=True)
-    approval = ApprovalFactory(for_snapshot=True, pk=1, user__pk=1)
+    approval = ApprovalFactory(for_snapshot=True)
     job_application = JobApplicationFactory(
         to_company=company,
         job_seeker=approval.user,
@@ -40,9 +40,10 @@ def test_wizard(snapshot, client):
     assertRedirects(response, choose_approval_url)
 
     # Submit data for the "choose-approval" step
-    assert str(parse_response_to_soup(client.get(choose_approval_url), selector="#main .s-section")) == snapshot(
-        name="choose-approval"
-    )
+    soup = parse_response_to_soup(client.get(choose_approval_url), selector="#main .s-section")
+    assert soup.find(id="id_choose-approval-approval").option["value"] == str(approval.pk)
+    soup.find(id="id_choose-approval-approval").option["value"] = "[PK of Approval]"
+    assert str(soup) == snapshot(name="choose-approval")
     response = client.post(
         choose_approval_url,
         {
