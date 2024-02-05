@@ -176,11 +176,11 @@ def test_deny_view_for_reasons(snapshot, client, reason):
     assertRedirects(response, reason_explanation_url)
 
     # Submit data for the "reason_explanation" step
-    assert str(parse_response_to_soup(client.get(reason_url), selector="#main .s-section")) == snapshot(
+    assert str(parse_response_to_soup(client.get(reason_explanation_url), selector="#main .s-section")) == snapshot(
         name="reason_explanation"
     )
     response = client.post(
-        reason_url,
+        reason_explanation_url,
         {
             "reason_explanation-reason_explanation": "Lorem ipsum",
             "prolongation_request_deny_view-current_step": "reason_explanation",
@@ -190,12 +190,12 @@ def test_deny_view_for_reasons(snapshot, client, reason):
 
     if reason is ProlongationRequestDenyReason.IAE:
         assertRedirects(response, proposed_actions_url)
-        assert str(parse_response_to_soup(client.get(reason_url), selector="#main .s-section")) == snapshot(
+        assert str(parse_response_to_soup(client.get(proposed_actions_url), selector="#main .s-section")) == snapshot(
             name="proposed_actions"
         )
         # Submit data for the "proposed_actions" step
         response = client.post(
-            reason_url,
+            proposed_actions_url,
             {
                 "proposed_actions-proposed_actions": list(ProlongationRequestDenyProposedAction),
                 "proposed_actions-proposed_actions_explanation": "Lorem ipsum",
