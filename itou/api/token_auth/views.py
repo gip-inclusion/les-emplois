@@ -23,7 +23,7 @@ class ObtainAuthToken(drf_authtoken_views.ObtainAuthToken):
                 logger.info(
                     "Auth with special user '%s' failed: unknown token received (len=%s)",
                     TOKEN_ID_STR,
-                    len(password),
+                    len(password) if password is not None else None,
                 )
                 raise serializers.ValidationError(
                     "Impossible de se connecter avec le token fourni.", code="authorization"

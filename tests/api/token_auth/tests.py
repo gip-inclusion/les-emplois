@@ -27,3 +27,7 @@ def test_token_auth_with_token(client):
     token.save()
     response = client.post(url, data={"username": "__token__", "password": token.key})
     assert response.json() == {"token": token.key}
+
+    # Don't crash on missing field
+    response = client.post(url, data={"username": "__token__"})
+    assert response.status_code == 400
