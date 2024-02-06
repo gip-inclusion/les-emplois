@@ -209,7 +209,7 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
 
         if siae.source == Company.SOURCE_USER_CREATED:
             # When an employer creates an antenna, it is normal that this antenna cannot be found in official exports.
-            # Thus we never attempt to delete it, as long as it has data.
+            # Thus we never attempt to delete it.
             deletable_skipped_count += 1
             continue
 
