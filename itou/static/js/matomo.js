@@ -9,7 +9,7 @@ htmx.onLoad((target) => {
             <a href="#" data-matomo-event="true" data-matomo-category="MyCategory"
             data-matomo-action="MyAction" data-matomo-option="MyOption" >
     ********************************************************************/
-    $('data-matomo-event="true"', target).on("click", function() {
+    $('[data-matomo-event=true]', target).on("click", function() {
         var category = $(this).data("matomo-category");
         var action = $(this).data("matomo-action");
         var option = $(this).data("matomo-option");
