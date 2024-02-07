@@ -2,6 +2,7 @@ import random
 from unittest import mock
 
 import freezegun
+import httpcore
 import pytest
 from django.core import mail
 from django.urls import reverse
@@ -1105,3 +1106,7 @@ def test_get_data_inclusion_services(settings, respx_mock):
         random.seed(0)  # ensure the mock data is stable
         assert views.get_data_inclusion_services("75056") == mocked_final_response
         assert api_mock.call_count == 2
+
+    with freezegun.freeze_time("2024-01-01") as frozen_datetime:
+        api_mock.mock(side_effect=httpcore.TimeoutException)
+        assert views.get_data_inclusion_services("89000") == []
