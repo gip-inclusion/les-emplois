@@ -343,6 +343,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         assert job_application.inverted_vae_contract
 
     def test_apply_with_past_hiring_date(self):
+        CANNOT_BACKDATE_TEXT = "Il n'est pas possible d'antidater un contrat."
         # GEIQ can temporarily accept job applications with a past hiring date
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
 
@@ -372,7 +373,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
 
         assert response.status_code == 200
-        assertContains(response, "Il n'est pas possible d'antidater un contrat.")
+        assertContains(response, CANNOT_BACKDATE_TEXT)
         # Testing a redirect with HTMX is really incomplete, so we also check hiring status
         job_application.refresh_from_db()
         assert job_application.state == JobApplicationWorkflow.STATE_PROCESSING
@@ -387,7 +388,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data, follow=True)
 
         assert response.status_code == 200
-        assertNotContains(response, "Il n'est pas possible d'antidater un contrat.")
+        assertNotContains(response, CANNOT_BACKDATE_TEXT)
         job_application.refresh_from_db()
         assert job_application.state == JobApplicationWorkflow.STATE_ACCEPTED
 

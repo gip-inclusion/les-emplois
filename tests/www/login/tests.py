@@ -26,6 +26,9 @@ from tests.users.factories import (
 from tests.utils.test import TestCase, assertMessages, reload_module
 
 
+CONNECT_WITH_IC = "Se connecter avec Inclusion Connect"
+
+
 class ItouLoginTest(TestCase):
     def test_generic_view(self):
         # If a user type cannot be determined, don't prevent login.
@@ -67,7 +70,7 @@ class PrescriberLoginTest(InclusionConnectBaseTestCase):
     def test_login_options(self):
         url = reverse("login:prescriber")
         response = self.client.get(url)
-        self.assertContains(response, "Se connecter avec Inclusion Connect")
+        self.assertContains(response, CONNECT_WITH_IC)
         params = {
             "user_kind": UserKind.PRESCRIBER,
             "previous_url": url,
@@ -117,10 +120,11 @@ class PrescriberLoginTest(InclusionConnectBaseTestCase):
 
 
 class EmployerLoginTest(InclusionConnectBaseTestCase):
+
     def test_login_options(self):
         url = reverse("login:employer")
         response = self.client.get(url)
-        self.assertContains(response, "Se connecter avec Inclusion Connect")
+        self.assertContains(response, CONNECT_WITH_IC)
         params = {
             "user_kind": UserKind.EMPLOYER,
             "previous_url": url,
@@ -173,7 +177,7 @@ class LaborInspectorLoginTest(TestCase):
     def test_login_options(self):
         url = reverse("login:labor_inspector")
         response = self.client.get(url)
-        self.assertNotContains(response, "S'identifier avec Inclusion Connect")
+        self.assertNotContains(response, CONNECT_WITH_IC)
         self.assertContains(response, "Adresse e-mail")
         self.assertContains(response, "Mot de passe")
 
