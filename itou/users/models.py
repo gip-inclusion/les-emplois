@@ -841,8 +841,6 @@ class JobSeekerProfile(models.Model):
         max_length=15,
         validators=[validate_nir],
         blank=True,
-        default="",
-        null=True,
     )
 
     lack_of_nir_reason = models.CharField(
@@ -851,8 +849,6 @@ class JobSeekerProfile(models.Model):
         max_length=30,
         choices=LackOfNIRReason.choices,
         blank=True,
-        default="",
-        null=True,
     )
 
     # The two following Pôle emploi fields are reserved for job seekers.
@@ -1017,6 +1013,25 @@ class JobSeekerProfile(models.Model):
     class Meta:
         verbose_name = "profil demandeur d'emploi"
         verbose_name_plural = "profils demandeur d'emploi"
+
+        constraints = [
+            # Make sure that if you have a lack_of_nir_reason value, you cannot have a nir value
+            # (but we'll have a lot of users lacking both nir & lack_of_nir_reason values)
+            models.CheckConstraint(
+                check=Q(lack_of_nir_reason="") | Q(nir=""),
+                name="jobseekerprofile_lack_of_nir_reason_or_nir",
+                violation_error_message=(
+                    "Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de son NIR."
+                ),
+            ),
+            UniqueConstraintWithErrorCode(
+                "nir",
+                name="jobseekerprofile_unique_nir_if_not_empty",
+                condition=~Q(nir=""),
+                validation_error_code="unique_nir_if_not_empty",
+                violation_error_message="Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.",
+            ),
+        ]
 
     def __str__(self):
         return str(self.user)
