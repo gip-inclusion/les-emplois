@@ -26,7 +26,10 @@ from itou.companies.management.commands._import_siae.convention import (
     update_existing_conventions,
 )
 from itou.companies.management.commands._import_siae.financial_annex import get_creatable_and_deletable_afs
-from itou.companies.management.commands._import_siae.siae import build_siae, should_siae_be_created
+from itou.companies.management.commands._import_siae.siae import (
+    build_siae,
+    does_siae_have_an_active_convention,
+)
 from itou.companies.management.commands._import_siae.utils import could_siae_be_deleted
 from itou.companies.management.commands._import_siae.vue_af import (
     get_active_siae_keys,
@@ -259,7 +262,7 @@ class Command(BaseCommand):
 
             siae = build_siae(active_siae_keys, siret_to_asp_id, row=row, kind=kind)
 
-            if should_siae_be_created(active_siae_keys, siret_to_asp_id, siae):
+            if does_siae_have_an_active_convention(active_siae_keys, siret_to_asp_id, siae):
                 assert siae not in creatable_siaes
                 creatable_siaes.append(siae)
 

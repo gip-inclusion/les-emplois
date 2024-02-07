@@ -17,10 +17,6 @@ def does_siae_have_an_active_convention(active_siae_keys, siret_to_asp_id, siae)
     return siae_key in active_siae_keys
 
 
-def should_siae_be_created(active_siae_keys, siret_to_asp_id, siae):
-    return does_siae_have_an_active_convention(active_siae_keys, siret_to_asp_id, siae)
-
-
 def build_siae(active_siae_keys, siret_to_asp_id, row, kind):
     """
     Build a siae object from a dataframe row.
@@ -67,7 +63,7 @@ def build_siae(active_siae_keys, siret_to_asp_id, row, kind):
     siae.post_code = row.post_code
     siae.department = department_from_postcode(siae.post_code)
 
-    if should_siae_be_created(active_siae_keys, siret_to_asp_id, siae):
+    if does_siae_have_an_active_convention(active_siae_keys, siret_to_asp_id, siae):
         siae = geocode_siae(siae)
 
     return siae
