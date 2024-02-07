@@ -17,21 +17,23 @@ from django.urls import reverse
 from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind
+from itou.companies.management.commands import import_siae
 from itou.companies.management.commands._import_siae.utils import anonymize_fluxiae_df, could_siae_be_deleted
+from itou.companies.management.commands._import_siae.vue_af import (
+    get_active_siae_keys,
+    get_af_number_to_row,
+    get_vue_af_df,
+)
+from itou.companies.management.commands._import_siae.vue_structure import (
+    get_asp_id_to_siae_row,
+    get_asp_id_to_siret_signature,
+    get_siret_to_asp_id,
+    get_vue_structure_df,
+)
 from itou.companies.models import Company
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory, SiaeConventionFactory
 from tests.eligibility.factories import EligibilityDiagnosisMadeBySiaeFactory
-
-
-def lazy_import_siae_command():
-    # Has to be lazy-loaded to benefit from the file mock, this management command does crazy stuff at import.
-    from itou.companies.management.commands import import_siae
-
-    instance = import_siae.Command()
-    # Required otherwise the variable is undefined and throws an exception when incrementend the first time.
-    instance.fatal_errors = 0
-    return instance
 
 
 @unittest.skipUnless(
@@ -71,9 +73,17 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         cls.mod = None
 
     def test_uncreatable_conventions_for_active_siae_with_active_convention(self):
+        vue_structure_df = get_vue_structure_df()
+        asp_id_to_siret_signature = get_asp_id_to_siret_signature(vue_structure_df)
+        siret_to_asp_id = get_siret_to_asp_id(vue_structure_df)
+        vue_af_df = get_vue_af_df()
+        active_siae_keys = get_active_siae_keys(vue_af_df)
+
         company = CompanyFactory(source=Company.SOURCE_ASP)
         assert company.is_active
-        assert not self.mod.get_creatable_conventions()
+        assert not self.mod.get_creatable_conventions(
+            vue_af_df, siret_to_asp_id, asp_id_to_siret_signature, active_siae_keys
+        )
 
     def test_uncreatable_conventions_when_convention_exists_for_asp_id_and_kind(self):
         # siae without convention, but a convention already exists for this
@@ -81,18 +91,32 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         SIRET = "26290411300061"
         ASP_ID = 190
 
+        vue_structure_df = get_vue_structure_df()
+        asp_id_to_siret_signature = get_asp_id_to_siret_signature(vue_structure_df)
+        siret_to_asp_id = get_siret_to_asp_id(vue_structure_df)
+        vue_af_df = get_vue_af_df()
+        active_siae_keys = get_active_siae_keys(vue_af_df)
+
         company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, convention=None)
         SiaeConventionFactory(kind=company.kind, asp_id=ASP_ID)
 
         with pytest.raises(AssertionError):
-            self.mod.get_creatable_conventions()
+            self.mod.get_creatable_conventions(vue_af_df, siret_to_asp_id, asp_id_to_siret_signature, active_siae_keys)
 
     def test_creatable_conventions_for_active_siae_where_siret_equals_siret_signature(self):
         SIRET = SIRET_SIGNATURE = "21540323900019"
         ASP_ID = 112
 
+        vue_structure_df = get_vue_structure_df()
+        asp_id_to_siret_signature = get_asp_id_to_siret_signature(vue_structure_df)
+        siret_to_asp_id = get_siret_to_asp_id(vue_structure_df)
+        vue_af_df = get_vue_af_df()
+        active_siae_keys = get_active_siae_keys(vue_af_df)
+
         company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
-        results = self.mod.get_creatable_conventions()
+        results = self.mod.get_creatable_conventions(
+            vue_af_df, siret_to_asp_id, asp_id_to_siret_signature, active_siae_keys
+        )
 
         assert len(results) == 1
 
@@ -111,8 +135,16 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         SIRET_SIGNATURE = "34950857200048"
         ASP_ID = 768
 
+        vue_structure_df = get_vue_structure_df()
+        asp_id_to_siret_signature = get_asp_id_to_siret_signature(vue_structure_df)
+        siret_to_asp_id = get_siret_to_asp_id(vue_structure_df)
+        vue_af_df = get_vue_af_df()
+        active_siae_keys = get_active_siae_keys(vue_af_df)
+
         company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.AI, convention=None)
-        results = self.mod.get_creatable_conventions()
+        results = self.mod.get_creatable_conventions(
+            vue_af_df, siret_to_asp_id, asp_id_to_siret_signature, active_siae_keys
+        )
 
         assert len(results) == 1
 
@@ -129,8 +161,17 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
     def test_creatable_conventions_inactive_siae(self):
         SIRET = SIRET_SIGNATURE = "41294123900011"
         ASP_ID = 1780
+
+        vue_structure_df = get_vue_structure_df()
+        asp_id_to_siret_signature = get_asp_id_to_siret_signature(vue_structure_df)
+        siret_to_asp_id = get_siret_to_asp_id(vue_structure_df)
+        vue_af_df = get_vue_af_df()
+        active_siae_keys = get_active_siae_keys(vue_af_df)
+
         company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
-        company = self.mod.get_creatable_conventions()
+        company = self.mod.get_creatable_conventions(
+            vue_af_df, siret_to_asp_id, asp_id_to_siret_signature, active_siae_keys
+        )
 
         assert len(company) == 1
 
@@ -145,11 +186,13 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         assert (company.source, company.siret, company.kind) == (Company.SOURCE_ASP, SIRET, CompanyKind.ACI)
 
     def test_get_creatable_and_deletable_afs(self):
+        af_number_to_row = get_af_number_to_row(get_vue_af_df())
+
         existing_convention = SiaeConventionFactory(kind=CompanyKind.ACI, asp_id=2855)
         # Get AF created by SiaeConventionFactory
         deletable_af = existing_convention.financial_annexes.first()
         financial_annex = importlib.import_module("itou.companies.management.commands._import_siae.financial_annex")
-        to_create, to_delete = financial_annex.get_creatable_and_deletable_afs()
+        to_create, to_delete = financial_annex.get_creatable_and_deletable_afs(af_number_to_row)
         assert to_delete == [deletable_af]
         # This list comes from the fixture file
         assert sorted((af.number, af.start_at.isoformat(), af.end_at.isoformat()) for af in to_create) == [
@@ -174,21 +217,21 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         ]
 
     def test_check_signup_possible_for_a_siae_without_members_but_with_auth_email(self):
-        instance = lazy_import_siae_command()
+        instance = import_siae.Command()
         CompanyFactory(auth_email="tadaaa")
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
         assert instance.fatal_errors == 0
 
     def test_check_signup_possible_for_a_siae_without_members_nor_auth_email(self):
-        instance = lazy_import_siae_command()
+        instance = import_siae.Command()
         CompanyFactory(auth_email="")
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
         assert instance.fatal_errors == 1
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_one(self):
-        instance = lazy_import_siae_command()
+        instance = import_siae.Command()
         CompanyWith2MembershipsFactory(
             auth_email="",
             membership1__is_active=False,
@@ -199,7 +242,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         assert instance.fatal_errors == 0
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_two(self):
-        instance = lazy_import_siae_command()
+        instance = import_siae.Command()
         CompanyWith2MembershipsFactory(
             auth_email="",
             membership1__is_active=False,
@@ -212,15 +255,22 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         assert instance.fatal_errors == 1
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_three(self):
-        instance = lazy_import_siae_command()
+        instance = import_siae.Command()
         CompanyWith2MembershipsFactory(auth_email="")
         with self.assertNumQueries(1):
             instance.check_whether_signup_is_possible_for_all_siaes()
         assert instance.fatal_errors == 0
 
     def test_activate_your_account_email_for_a_siae_without_members_but_with_auth_email(self):
-        instance = lazy_import_siae_command()
-        instance.create_new_siaes()
+        vue_structure_df = get_vue_structure_df()
+        vue_af_df = get_vue_af_df()
+
+        instance = import_siae.Command()
+        instance.create_new_siaes(
+            get_asp_id_to_siae_row(vue_structure_df),
+            get_siret_to_asp_id(vue_structure_df),
+            get_active_siae_keys(vue_af_df),
+        )
         assert reverse("signup:company_select") in mail.outbox[0].body
         assert collections.Counter(mail.subject for mail in mail.outbox) == collections.Counter(
             f"Activez le compte de votre {kind} {name} sur les emplois de l'inclusion"
