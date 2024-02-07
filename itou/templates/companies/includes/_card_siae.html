@@ -16,7 +16,7 @@
             {% endif %}
         </p>
         <h3 class="mb-2">
-            <a href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" {% matomo_event "candidature" "clic" "clic-structure" %}>{{ siae.display_name }}</a>
+            <a href="{{ siae.get_card_url }}" {% matomo_event "candidature" "clic" "clic-structure" %}>{{ siae.display_name }}</a>
             {# Display non-user-edited name too, but only if it's not the same text #}
             {% if siae.brand and siae.brand|lower != siae.name|lower %}
                 <small class="text-muted">({{ siae.name|title }})</small>
@@ -36,7 +36,7 @@
                 <span class="text-muted fs-sm ms-1">de votre lieu de recherche.</span>
             </span>
             {% if siae.active_job_descriptions %}
-                <a class="d-none d-md-inline font-weight-bold mt-3 mt-md-0" href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}#metiers" {% matomo_event "candidature" "clic" "clic-metiers" %}>
+                <a class="d-none d-md-inline font-weight-bold mt-3 mt-md-0" href="{{ siae.get_card_url }}#metiers" {% matomo_event "candidature" "clic" "clic-metiers" %}>
                     Voir tous les métiers ({{ siae.active_job_descriptions|length }})
                 </a>
             {% endif %}
