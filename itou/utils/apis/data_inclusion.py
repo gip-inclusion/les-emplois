@@ -19,6 +19,10 @@ API_THEMATIQUES = [
 ]
 
 
+class DataInclusionApiException(Exception):
+    pass
+
+
 class DataInclusionApiClient:
     def __init__(self, base_url, token):
         self.base_url = base_url
@@ -40,6 +44,8 @@ class DataInclusionApiClient:
             return [r["service"] for r in response.json()["items"]]
         except httpx.RequestError as exc:
             logger.info("data.inclusion request error code_insee=%s error=%s", code_insee, exc)
+            raise DataInclusionApiException()
         except KeyError as exc:
             logger.info("data.inclusion result error code_insee=%s error=%s", code_insee, exc)
+            raise DataInclusionApiException()
         return []
