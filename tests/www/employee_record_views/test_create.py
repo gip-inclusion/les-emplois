@@ -253,6 +253,10 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
 
 
 class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
+
+    NO_ADDRESS_FILLED_IN = "Aucune adresse n'a été saisie sur les emplois de l'inclusion !"
+    ADDRESS_COULD_NOT_BE_AUTO_CHECKED = "L'adresse du salarié n'a pu être vérifiée automatiquement."
+
     def setUp(self):
         super().setUp()
         self.url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
@@ -272,8 +276,8 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
         response = self.client.get(url)
 
-        self.assertContains(response, "Aucune adresse n'a été saisie sur les emplois de l'inclusion !")
-        self.assertContains(response, "L'adresse du salarié n'a pu être vérifiée automatiquement.")
+        self.assertContains(response, self.NO_ADDRESS_FILLED_IN)
+        self.assertContains(response, self.ADDRESS_COULD_NOT_BE_AUTO_CHECKED)
 
     @mock.patch(
         "itou.common_apps.address.format.get_geocoding_data",
@@ -285,8 +289,8 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         url = reverse("employee_record_views:create_step_3", args=(self.job_application.pk,))
         response = self.client.get(url)
 
-        self.assertNotContains(response, "L'adresse du salarié n'a pu être vérifiée automatiquement.")
-        self.assertNotContains(response, "Aucune adresse n'a été saisie sur les emplois de l'inclusion !")
+        self.assertNotContains(response, self.ADDRESS_COULD_NOT_BE_AUTO_CHECKED)
+        self.assertNotContains(response, self.NO_ADDRESS_FILLED_IN)
 
     def test_job_seeker_address_not_geolocated(self):
         # Job seeker has an address filled but can't be geolocated
@@ -302,8 +306,8 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
 
         # Check that when lookup fails, user is properly notified
         # to input employee address manually
-        self.assertContains(response, "L'adresse du salarié n'a pu être vérifiée automatiquement.")
-        self.assertNotContains(response, "Aucune adresse n'a été saisie sur les emplois de l'inclusion !")
+        self.assertContains(response, self.ADDRESS_COULD_NOT_BE_AUTO_CHECKED)
+        self.assertNotContains(response, self.NO_ADDRESS_FILLED_IN)
 
         # Force the way without a profile should raise a PermissionDenied
         url = reverse("employee_record_views:create_step_3", args=(self.job_application.pk,))

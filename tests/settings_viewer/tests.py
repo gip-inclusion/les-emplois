@@ -6,6 +6,9 @@ from pytest_django.asserts import assertContains, assertNotContains
 from tests.users.factories import ItouStaffFactory
 
 
+APP_VERBOSE_NAME = "Affichage des settings"
+
+
 @pytest.mark.filterwarnings(
     "ignore:"
     "The DEFAULT_FILE_STORAGE setting is deprecated. Use STORAGES instead.:"
@@ -23,7 +26,7 @@ def test_as_superuser(client):
     admin_user = ItouStaffFactory(is_superuser=True)
     client.force_login(admin_user)
     response = client.get(reverse("admin:index"))
-    assertContains(response, "Affichage des settings")
+    assertContains(response, APP_VERBOSE_NAME)
     response = client.get(reverse("admin:settings_viewer_setting_changelist"))
     assertContains(response, "ALLOWED_HOSTS")
     assertContains(response, "DATABASES")
@@ -35,6 +38,6 @@ def test_as_staff(client):
     admin_user = ItouStaffFactory(is_superuser=False)
     client.force_login(admin_user)
     response = client.get(reverse("admin:index"))
-    assertNotContains(response, "Affichage des settings")
+    assertNotContains(response, APP_VERBOSE_NAME)
     response = client.get(reverse("admin:settings_viewer_setting_changelist"))
     assert response.status_code == 302
