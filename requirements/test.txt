@@ -316,9 +316,9 @@ diff-match-patch==20230430 \
     # via
     #   -r requirements/base.txt
     #   django-import-export
-django==4.2.9 \
-    --hash=sha256:12498cc3cb8bc8038539fef9e90e95f507502436c1f0c3a673411324fa675d14 \
-    --hash=sha256:2cc2fc7d1708ada170ddd6c99f35cc25db664f165d3794bc7723f46b2f8c8984
+django==4.2.10 \
+    --hash=sha256:a2d4c4d4ea0b6f0895acde632071aff6400bfc331228fc978b05452a0ff3e9f1 \
+    --hash=sha256:b1260ed381b10a11753c73444408e19869f3241fc45c985cd55a30177c789d13
     # via
     #   -r requirements/base.txt
     #   django-allauth
