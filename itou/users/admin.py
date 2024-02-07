@@ -139,7 +139,7 @@ class JobApplicationInline(ItouTabularInline):
     fk_name = "job_seeker"
     extra = 0
     can_delete = False
-    fields = ("pk_link", "sender_kind", "to_company_link", "state")
+    fields = ("pk_link", "created_at", "sender_kind", "to_company_link", "state")
     readonly_fields = fields
     list_select_related = ("to_company", "job_seeker")
 
