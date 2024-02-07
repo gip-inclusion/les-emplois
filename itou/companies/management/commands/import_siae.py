@@ -16,13 +16,13 @@ name instead of hardcoding column numbers as in `field = row[42]`.
 """
 
 from django.core.management.base import CommandError
+from django.db import transaction
 from django.utils import timezone
 
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.companies.management.commands._import_siae.convention import (
     check_convention_data_consistency,
     get_creatable_conventions,
-    get_deletable_conventions,
     update_existing_conventions,
 )
 from itou.companies.management.commands._import_siae.financial_annex import get_creatable_and_deletable_afs
@@ -295,11 +295,11 @@ class Command(BaseCommand):
             assert convention.siaes.filter(source=Company.SOURCE_ASP).count() == 1
 
     @timeit
+    @transaction.atomic()
     def delete_conventions(self):
-        deletable_conventions = get_deletable_conventions()
+        deletable_conventions = SiaeConvention.objects.filter(siaes__isnull=True)
         self.stdout.write(f"will delete {len(deletable_conventions)} conventions")
         for convention in deletable_conventions:
-            assert convention.siaes.count() == 0
             # This will delete the related financial annexes as well.
             convention.delete()
 

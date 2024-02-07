@@ -155,10 +155,6 @@ def get_creatable_conventions():
     return creatable_conventions
 
 
-def get_deletable_conventions():
-    return SiaeConvention.objects.filter(siaes__isnull=True)
-
-
 def check_convention_data_consistency():
     """
     Check data consistency of conventions, not only versus siaes of ASP source,
