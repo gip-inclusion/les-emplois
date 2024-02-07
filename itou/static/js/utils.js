@@ -61,18 +61,6 @@ htmx.onLoad((target) => {
     $('a.btn', this).attr("aria-disabled", $(selector).length !== 0 || null)
   })
 
-  /**
-   * JS to copy some text from the DOM into the clipboard.
-   */
-  $(".js-copy-to-clipboard", target).on("click", function(event) {
-    navigator.clipboard.writeText(event.currentTarget.dataset.copyToClipboard).then(function () {
-      $(event.currentTarget).tooltip('show')
-    })
-  })
-  $(".js-copy-to-clipboard", target).on("blur", function (event) {
-    $(event.currentTarget).tooltip('hide')
-  })
-
   /*
    * File selector.
    */
