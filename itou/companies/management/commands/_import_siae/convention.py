@@ -17,7 +17,7 @@ from itou.companies.models import Company, SiaeConvention
 CONVENTION_DEACTIVATION_THRESHOLD = 200
 
 
-def update_existing_conventions(siret_to_asp_id, asp_id_to_siret_signature, active_siae_keys):
+def update_existing_conventions(siret_to_asp_id, asp_id_to_siae_row, active_siae_keys):
     """
     Update existing conventions, mainly the is_active field,
     and check data integrity on the fly.
@@ -43,9 +43,7 @@ def update_existing_conventions(siret_to_asp_id, asp_id_to_siret_signature, acti
             continue
 
         asp_id = siret_to_asp_id[siae.siret]
-        siret_signature = asp_id_to_siret_signature[asp_id]
-
-        assert asp_id in asp_id_to_siret_signature
+        siret_signature = asp_id_to_siae_row[asp_id].siret_signature
 
         # Sometimes the same siret is attached to one asp_id in one export and to another asp_id in the next export.
         # In other words, the siae convention asp_id has changed and should be updated.
@@ -108,7 +106,7 @@ def update_existing_conventions(siret_to_asp_id, asp_id_to_siret_signature, acti
     print(f"{len(conventions_to_deactivate)} conventions have been deactivated")
 
 
-def get_creatable_conventions(vue_af_df, siret_to_asp_id, asp_id_to_siret_signature, active_siae_keys):
+def get_creatable_conventions(vue_af_df, siret_to_asp_id, asp_id_to_siae_row, active_siae_keys):
     """
     Get conventions which should be created.
 
@@ -123,14 +121,12 @@ def get_creatable_conventions(vue_af_df, siret_to_asp_id, asp_id_to_siret_signat
 
     for siae in Company.objects.filter(source=Company.SOURCE_ASP, convention__isnull=True):
         asp_id = siret_to_asp_id.get(siae.siret)
-        if asp_id not in asp_id_to_siret_signature:
+        if asp_id not in asp_id_to_siae_row:
             # Some inactive siaes are absent in the latest ASP exports but
             # are still present in db because they have members and/or job applications.
             # We cannot build a convention object for those.
             assert not siae.is_active
             continue
-
-        siret_signature = asp_id_to_siret_signature.get(asp_id)
 
         is_active = does_siae_have_an_active_convention(active_siae_keys, siret_to_asp_id, siae)
 
@@ -149,7 +145,7 @@ def get_creatable_conventions(vue_af_df, siret_to_asp_id, asp_id_to_siret_signat
             deactivated_at = convention_end_date
 
         convention = SiaeConvention(
-            siret_signature=siret_signature,
+            siret_signature=asp_id_to_siae_row.get(asp_id).siret_signature,
             kind=siae.kind,
             is_active=is_active,
             asp_id=asp_id,
