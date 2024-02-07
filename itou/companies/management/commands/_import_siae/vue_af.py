@@ -129,30 +129,24 @@ def get_vue_af_df():
     return df
 
 
-VUE_AF_DF = get_vue_af_df()
-
-
 @timeit
-def get_af_number_to_row():
+def get_af_number_to_row(vue_af_df):
     af_number_to_row = {}
-    for _, row in VUE_AF_DF.iterrows():
+    for _, row in vue_af_df.iterrows():
         af_number = row.number
         assert af_number not in af_number_to_row
         af_number_to_row[af_number] = row
     return af_number_to_row
 
 
-AF_NUMBER_TO_ROW = get_af_number_to_row()
-
-
 @timeit
-def get_siae_key_to_convention_end_date():
+def get_siae_key_to_convention_end_date(vue_af_df):
     """
     For each siae_key (asp_id+kind) we figure out the convention end date.
     This convention end date (future or past) is eventually stored as siae.convention_end_date.
     """
     siae_key_to_convention_end_date = {}
-    af_df = VUE_AF_DF.copy()  # Leave the main dataframe untouched!
+    af_df = vue_af_df.copy()  # Leave the main dataframe untouched!
     af_df = af_df[af_df.has_active_state]
     for _, row in af_df.iterrows():
         convention_end_date = row.end_date
@@ -165,14 +159,10 @@ def get_siae_key_to_convention_end_date():
     return siae_key_to_convention_end_date
 
 
-ACTIVE_SIAE_KEYS = [
-    siae_key
-    for siae_key, convention_end_date in get_siae_key_to_convention_end_date().items()
-    if timezone.now() < timezone.make_aware(convention_end_date)
-]
-
-INACTIVE_SIAE_LIST = [
-    (siae_key, convention_end_date)
-    for siae_key, convention_end_date in get_siae_key_to_convention_end_date().items()
-    if siae_key not in ACTIVE_SIAE_KEYS
-]
+@timeit
+def get_active_siae_keys(vue_af_df):
+    return [
+        siae_key
+        for siae_key, convention_end_date in get_siae_key_to_convention_end_date(vue_af_df).items()
+        if timezone.now() < timezone.make_aware(convention_end_date)
+    ]

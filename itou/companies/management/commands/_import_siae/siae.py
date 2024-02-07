@@ -8,22 +8,20 @@ All these helpers are specific to SIAE logic (not GEIQ, EA, EATT).
 
 from itou.common_apps.address.departments import department_from_postcode
 from itou.companies.management.commands._import_siae.utils import geocode_siae
-from itou.companies.management.commands._import_siae.vue_af import ACTIVE_SIAE_KEYS
-from itou.companies.management.commands._import_siae.vue_structure import SIRET_TO_ASP_ID
 from itou.companies.models import Company
 
 
-def does_siae_have_an_active_convention(siae):
-    asp_id = SIRET_TO_ASP_ID.get(siae.siret)
+def does_siae_have_an_active_convention(active_siae_keys, siret_to_asp_id, siae):
+    asp_id = siret_to_asp_id.get(siae.siret)
     siae_key = (asp_id, siae.kind)
-    return siae_key in ACTIVE_SIAE_KEYS
+    return siae_key in active_siae_keys
 
 
-def should_siae_be_created(siae):
-    return does_siae_have_an_active_convention(siae)
+def should_siae_be_created(active_siae_keys, siret_to_asp_id, siae):
+    return does_siae_have_an_active_convention(active_siae_keys, siret_to_asp_id, siae)
 
 
-def build_siae(row, kind):
+def build_siae(active_siae_keys, siret_to_asp_id, row, kind):
     """
     Build a siae object from a dataframe row.
 
@@ -69,7 +67,7 @@ def build_siae(row, kind):
     siae.post_code = row.post_code
     siae.department = department_from_postcode(siae.post_code)
 
-    if should_siae_be_created(siae):
+    if should_siae_be_created(active_siae_keys, siret_to_asp_id, siae):
         siae = geocode_siae(siae)
 
     return siae

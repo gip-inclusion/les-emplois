@@ -6,11 +6,10 @@ SiaeFinancialAnnex object logic used by the import_siae.py script is gathered he
 
 from django.utils import timezone
 
-from itou.companies.management.commands._import_siae.vue_af import AF_NUMBER_TO_ROW
 from itou.companies.models import SiaeConvention, SiaeFinancialAnnex
 
 
-def get_creatable_and_deletable_afs():
+def get_creatable_and_deletable_afs(af_number_to_row):
     """
     Get AFs which should be created / deleted.
 
@@ -18,7 +17,7 @@ def get_creatable_and_deletable_afs():
 
     Output : (creatable_afs, deletable_afs).
     """
-    vue_af_numbers = set(AF_NUMBER_TO_ROW.keys())
+    vue_af_numbers = set(af_number_to_row.keys())
     db_af_numbers = set()
     deletable_afs = []
 
@@ -30,7 +29,7 @@ def get_creatable_and_deletable_afs():
             continue
 
         # The AF already exists in db. Let's check if some of its fields have changed.
-        row = AF_NUMBER_TO_ROW[af.number]
+        row = af_number_to_row[af.number]
         assert af.number == row.number
         assert af.convention.kind == row.kind
 
@@ -63,7 +62,7 @@ def get_creatable_and_deletable_afs():
 
     creatable_af_numbers = vue_af_numbers - db_af_numbers
 
-    creatable_afs = [build_financial_annex_from_number(number) for number in creatable_af_numbers]
+    creatable_afs = [build_financial_annex_from_number(af_number_to_row, number) for number in creatable_af_numbers]
 
     # Drop None values (AFs without preexisting convention).
     creatable_afs = [af for af in creatable_afs if af]
@@ -71,8 +70,8 @@ def get_creatable_and_deletable_afs():
     return (creatable_afs, deletable_afs)
 
 
-def build_financial_annex_from_number(number):
-    row = AF_NUMBER_TO_ROW[number]
+def build_financial_annex_from_number(af_number_to_row, number):
+    row = af_number_to_row[number]
     convention_query = SiaeConvention.objects.filter(asp_id=row.asp_id, kind=row.kind)
     if not convention_query.exists():
         # There is no point in storing an AF in db if there is no related convention.
