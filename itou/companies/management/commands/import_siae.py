@@ -37,7 +37,6 @@ from itou.companies.management.commands._import_siae.vue_af import (
     get_vue_af_df,
 )
 from itou.companies.management.commands._import_siae.vue_structure import (
-    get_siret_to_asp_id,
     get_siret_to_siae_row,
     get_vue_structure_df,
 )
@@ -209,7 +208,7 @@ class Command(BaseCommand):
         self.stdout.write(f"{blocked_deletions} siaes past their grace period cannot be deleted")
 
     @timeit
-    def create_new_siaes(self, siret_to_siae_row, siret_to_asp_id, active_siae_keys):
+    def create_new_siaes(self, siret_to_siae_row, active_siae_keys):
         asp_id_to_siae_row = {row.asp_id: row for row in siret_to_siae_row.values()}
         creatable_siae_keys = [(asp_id, kind) for (asp_id, kind) in active_siae_keys if asp_id in asp_id_to_siae_row]
 
@@ -260,9 +259,9 @@ class Command(BaseCommand):
 
             assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=kind).exists()
 
-            siae = build_siae(active_siae_keys, siret_to_asp_id, row=row, kind=kind)
+            siae = build_siae(active_siae_keys, siret_to_siae_row, row=row, kind=kind)
 
-            if does_siae_have_an_active_convention(active_siae_keys, siret_to_asp_id, siae):
+            if does_siae_have_an_active_convention(active_siae_keys, siret_to_siae_row, siae):
                 assert siae not in creatable_siaes
                 creatable_siaes.append(siae)
 
@@ -297,10 +296,8 @@ class Command(BaseCommand):
             self.fatal_errors += 1
 
     @timeit
-    def create_conventions(self, vue_af_df, siret_to_asp_id, siret_to_siae_row, active_siae_keys):
-        creatable_conventions = get_creatable_conventions(
-            vue_af_df, siret_to_asp_id, siret_to_siae_row, active_siae_keys
-        )
+    def create_conventions(self, vue_af_df, siret_to_siae_row, active_siae_keys):
+        creatable_conventions = get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
         self.stdout.write(f"will create {len(creatable_conventions)} conventions")
         for convention, siae in creatable_conventions:
             assert not SiaeConvention.objects.filter(asp_id=convention.asp_id, kind=convention.kind).exists()
@@ -333,9 +330,7 @@ class Command(BaseCommand):
 
     @timeit
     def handle(self, **options):
-        vue_structure_df = get_vue_structure_df()
-        siret_to_siae_row = get_siret_to_siae_row(vue_structure_df)
-        siret_to_asp_id = get_siret_to_asp_id(vue_structure_df)
+        siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
 
         vue_af_df = get_vue_af_df()
         af_number_to_row = get_af_number_to_row(vue_af_df)
@@ -344,15 +339,15 @@ class Command(BaseCommand):
         self.delete_user_created_siaes_without_members()
         self.manage_staff_created_siaes()
         self.update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row)
-        update_existing_conventions(siret_to_siae_row, siret_to_asp_id, active_siae_keys)
-        self.create_new_siaes(siret_to_siae_row, siret_to_asp_id, active_siae_keys)
-        self.create_conventions(vue_af_df, siret_to_asp_id, siret_to_siae_row, active_siae_keys)
+        update_existing_conventions(siret_to_siae_row, active_siae_keys)
+        self.create_new_siaes(siret_to_siae_row, active_siae_keys)
+        self.create_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
         self.delete_conventions()
         self.manage_financial_annexes(af_number_to_row)
         self.cleanup_siaes_after_grace_period()
 
         # Run some updates a second time.
-        update_existing_conventions(siret_to_siae_row, siret_to_asp_id, active_siae_keys)
+        update_existing_conventions(siret_to_siae_row, active_siae_keys)
         self.update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row)
         self.delete_conventions()
 
