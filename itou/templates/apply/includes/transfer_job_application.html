@@ -1,16 +1,16 @@
 {# Transfer job application to other SIAE #}
 {% if request.organizations|length != 1 %}
-    <div class="text-center">
-        <button id="transfer_to_button" class="btn btn-link dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
+    <div class="dropdown dropdown-structure">
+        <button id="transfer_to_button" class="btn btn-block btn-link dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
             Transférer cette candidature vers
         </button>
-        <div class="dropdown-menu" aria-labelledby="transfer_to_button">
+        <div class="dropdown-menu w-100" aria-labelledby="transfer_to_button">
             {% for siae in request.organizations %}
                 {% if siae != request.current_organization %}
-                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#transfer_confirmation_modal_{{ siae.pk }}">
-                        <div>
-                            <span class="badge badge-xs rounded-pill bg-primary">{{ siae.kind }}</span> <span>{{ siae.display_name }}</span>
-                        </div>
+                    <a class="dropdown-item dropdown-item__summary" data-bs-toggle="modal" data-bs-target="#transfer_confirmation_modal_{{ siae.pk }}">
+                        <i class="ri-community-line"></i>
+                        <span>{{ siae.kind }}</span>
+                        <strong>{{ siae.display_name }}</strong>
                     </a>
                 {% endif %}
             {% endfor %}
