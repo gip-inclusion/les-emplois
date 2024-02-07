@@ -44,25 +44,27 @@
     </li>
     {% if user.is_authenticated %}
         {% if request.organizations|length > 1 %}
-            <li class="dropdown">
+            <li class="dropdown dropdown-structure">
                 <button type="button"
-                        class="btn btn-outline-primary dropdown-toggle"
+                        class="btn btn-outline-primary btn-ico dropdown-toggle"
                         data-bs-toggle="dropdown"
                         aria-haspopup="true"
                         aria-controls="switchUserDropdown{% if is_mobile %}Mobile{% endif %}"
                         aria-expanded="false">
-                    ({{ request.current_organization.kind }}) {{ request.current_organization.display_name|truncatechars:40 }}
+                    <i class="ri-community-line" aria-hidden="true"></i>
+                    <span>{{ request.current_organization.kind }} - {{ request.current_organization.display_name|truncatechars:40 }}</span>
                 </button>
-                <div class="dropdown-menu" id="switchUserDropdown{% if is_mobile %}Mobile{% endif %}">
+                <div class="dropdown-menu {% if is_mobile %}w-auto{% else %}w-100{% endif %}" id="switchUserDropdown{% if is_mobile %}Mobile{% endif %}">
                     <form action="{% url 'dashboard:switch_organization' %}" method="post">
                         {% csrf_token %}
                         <ul class="list-unstyled">
                             {% for org in request.organizations %}
                                 {% if org.pk != request.current_organization.pk %}
                                     <li>
-                                        <button class="dropdown-item font-weight-bold" name="organization_id" value="{{ org.pk }}">
-                                            <span class="badge rounded-pill badge-xs bg-primary me-1">{{ org.kind }}</span>
-                                            {{ org.display_name|truncatechars:50 }}
+                                        <button class="dropdown-item dropdown-item__summary" name="organization_id" value="{{ org.pk }}">
+                                            <i class="ri-community-line" aria-hidden="true"></i>
+                                            <span>{{ org.kind }}</span>
+                                            <strong>{{ org.display_name|truncatechars:50 }}</strong>
                                         </button>
                                     </li>
                                 {% endif %}
