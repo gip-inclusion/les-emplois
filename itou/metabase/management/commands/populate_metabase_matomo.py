@@ -57,6 +57,7 @@ PUBLIC_DASHBOARDS = {
     "zoom-esat": "tb 306 - Zoom sur les ESAT",
     "analyses-conventionnements-iae": "tb 325 - Analyses autour des conventionnements IAE",
     "suivi-demandes-prolongation": "tb 336 - Suivi des prolongations",
+    "bilan-candidatures-iae": "tb 337 - Bilan de la phase de candidatures en IAE",
     # Note: keep those commented for reference. They're not used anymore but if we ever
     # need to regenerate values for the Q1 2022 or before, they're going to be required.
     # "recrutement": "tb 116 - Recrutement",
