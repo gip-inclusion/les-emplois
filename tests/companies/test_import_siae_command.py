@@ -26,7 +26,6 @@ from itou.companies.management.commands._import_siae.vue_af import (
 )
 from itou.companies.management.commands._import_siae.vue_structure import (
     get_asp_id_to_siae_row,
-    get_asp_id_to_siret_signature,
     get_siret_to_asp_id,
     get_vue_structure_df,
 )
@@ -74,16 +73,14 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
 
     def test_uncreatable_conventions_for_active_siae_with_active_convention(self):
         vue_structure_df = get_vue_structure_df()
-        asp_id_to_siret_signature = get_asp_id_to_siret_signature(vue_structure_df)
+        asp_id_to_siae_row = get_asp_id_to_siae_row(vue_structure_df)
         siret_to_asp_id = get_siret_to_asp_id(vue_structure_df)
         vue_af_df = get_vue_af_df()
         active_siae_keys = get_active_siae_keys(vue_af_df)
 
         company = CompanyFactory(source=Company.SOURCE_ASP)
         assert company.is_active
-        assert not self.mod.get_creatable_conventions(
-            vue_af_df, siret_to_asp_id, asp_id_to_siret_signature, active_siae_keys
-        )
+        assert not self.mod.get_creatable_conventions(vue_af_df, siret_to_asp_id, asp_id_to_siae_row, active_siae_keys)
 
     def test_uncreatable_conventions_when_convention_exists_for_asp_id_and_kind(self):
         # siae without convention, but a convention already exists for this
@@ -92,7 +89,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         ASP_ID = 190
 
         vue_structure_df = get_vue_structure_df()
-        asp_id_to_siret_signature = get_asp_id_to_siret_signature(vue_structure_df)
+        asp_id_to_siae_row = get_asp_id_to_siae_row(vue_structure_df)
         siret_to_asp_id = get_siret_to_asp_id(vue_structure_df)
         vue_af_df = get_vue_af_df()
         active_siae_keys = get_active_siae_keys(vue_af_df)
@@ -101,22 +98,20 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         SiaeConventionFactory(kind=company.kind, asp_id=ASP_ID)
 
         with pytest.raises(AssertionError):
-            self.mod.get_creatable_conventions(vue_af_df, siret_to_asp_id, asp_id_to_siret_signature, active_siae_keys)
+            self.mod.get_creatable_conventions(vue_af_df, siret_to_asp_id, asp_id_to_siae_row, active_siae_keys)
 
     def test_creatable_conventions_for_active_siae_where_siret_equals_siret_signature(self):
         SIRET = SIRET_SIGNATURE = "21540323900019"
         ASP_ID = 112
 
         vue_structure_df = get_vue_structure_df()
-        asp_id_to_siret_signature = get_asp_id_to_siret_signature(vue_structure_df)
+        asp_id_to_siae_row = get_asp_id_to_siae_row(vue_structure_df)
         siret_to_asp_id = get_siret_to_asp_id(vue_structure_df)
         vue_af_df = get_vue_af_df()
         active_siae_keys = get_active_siae_keys(vue_af_df)
 
         company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
-        results = self.mod.get_creatable_conventions(
-            vue_af_df, siret_to_asp_id, asp_id_to_siret_signature, active_siae_keys
-        )
+        results = self.mod.get_creatable_conventions(vue_af_df, siret_to_asp_id, asp_id_to_siae_row, active_siae_keys)
 
         assert len(results) == 1
 
@@ -136,15 +131,13 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         ASP_ID = 768
 
         vue_structure_df = get_vue_structure_df()
-        asp_id_to_siret_signature = get_asp_id_to_siret_signature(vue_structure_df)
+        asp_id_to_siae_row = get_asp_id_to_siae_row(vue_structure_df)
         siret_to_asp_id = get_siret_to_asp_id(vue_structure_df)
         vue_af_df = get_vue_af_df()
         active_siae_keys = get_active_siae_keys(vue_af_df)
 
         company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.AI, convention=None)
-        results = self.mod.get_creatable_conventions(
-            vue_af_df, siret_to_asp_id, asp_id_to_siret_signature, active_siae_keys
-        )
+        results = self.mod.get_creatable_conventions(vue_af_df, siret_to_asp_id, asp_id_to_siae_row, active_siae_keys)
 
         assert len(results) == 1
 
@@ -163,15 +156,13 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         ASP_ID = 1780
 
         vue_structure_df = get_vue_structure_df()
-        asp_id_to_siret_signature = get_asp_id_to_siret_signature(vue_structure_df)
+        asp_id_to_siae_row = get_asp_id_to_siae_row(vue_structure_df)
         siret_to_asp_id = get_siret_to_asp_id(vue_structure_df)
         vue_af_df = get_vue_af_df()
         active_siae_keys = get_active_siae_keys(vue_af_df)
 
         company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
-        company = self.mod.get_creatable_conventions(
-            vue_af_df, siret_to_asp_id, asp_id_to_siret_signature, active_siae_keys
-        )
+        company = self.mod.get_creatable_conventions(vue_af_df, siret_to_asp_id, asp_id_to_siae_row, active_siae_keys)
 
         assert len(company) == 1
 

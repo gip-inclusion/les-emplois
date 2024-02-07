@@ -103,18 +103,6 @@ def get_asp_id_to_siae_row(vue_structure_df):
 
 
 @timeit
-def get_asp_id_to_siret_signature(vue_structure_df):
-    """
-    Provide the siret_signature from the "Vue Structure" matching the given asp_id.
-    """
-    asp_id_to_siret_signature = {}
-    for _, row in vue_structure_df.iterrows():
-        assert row.asp_id not in asp_id_to_siret_signature
-        asp_id_to_siret_signature[row.asp_id] = row.siret_signature
-    return asp_id_to_siret_signature
-
-
-@timeit
 def get_siret_to_asp_id(vue_structure_df):
     """
     Provide the asp_id from the "Vue Structure" matching the given siret (i.e. siret_actualise).
