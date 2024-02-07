@@ -58,6 +58,5 @@ def build_siae(active_siae_keys, row, kind):
     siae.department = department_from_postcode(siae.post_code)
 
     if (row.asp_id, siae.kind) in active_siae_keys:
-        siae = geocode_siae(siae)
-
+        geocode_siae(siae)
     return siae
