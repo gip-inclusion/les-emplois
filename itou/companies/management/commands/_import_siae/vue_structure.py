@@ -91,18 +91,6 @@ def get_vue_structure_df():
 
 
 @timeit
-def get_asp_id_to_siae_row(vue_structure_df):
-    """
-    Provide the row from the "Vue Structure" matching the given asp_id.
-    """
-    asp_id_to_siae_row = {}
-    for _, row in vue_structure_df.iterrows():
-        assert row.asp_id not in asp_id_to_siae_row
-        asp_id_to_siae_row[row.asp_id] = row
-    return asp_id_to_siae_row
-
-
-@timeit
 def get_siret_to_asp_id(vue_structure_df):
     """
     Provide the asp_id from the "Vue Structure" matching the given siret (i.e. siret_actualise).
@@ -118,3 +106,11 @@ def get_siret_to_asp_id(vue_structure_df):
     for _, row in vue_structure_df.iterrows():
         siret_to_asp_id[row.siret] = row.asp_id
     return siret_to_asp_id
+
+
+@timeit
+def get_siret_to_siae_row(vue_structure_df):
+    """
+    Provide the row from the "Vue Structure" matching the given asp_id.
+    """
+    return {row.siret: row for _, row in vue_structure_df.iterrows()}

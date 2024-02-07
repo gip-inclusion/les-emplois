@@ -34,8 +34,8 @@ from itou.companies.management.commands._import_siae.vue_af import (
     get_vue_af_df,
 )
 from itou.companies.management.commands._import_siae.vue_structure import (
-    get_asp_id_to_siae_row,
     get_siret_to_asp_id,
+    get_siret_to_siae_row,
     get_vue_structure_df,
 )
 from itou.companies.models import Company, SiaeConvention
@@ -142,15 +142,16 @@ class Command(BaseCommand):
         siae.save()
 
     @timeit
-    def update_siret_and_auth_email_of_existing_siaes(self, asp_id_to_siae_row):
+    def update_siret_and_auth_email_of_existing_siaes(self, siret_to_siae_row):
         auth_email_updates = 0
+
+        asp_id_to_siae_row = {row.asp_id: row for row in siret_to_siae_row.values()}
         for siae in Company.objects.select_related("convention").filter(
             source=Company.SOURCE_ASP, convention__isnull=False
         ):
             assert siae.should_have_convention
 
-            asp_id = siae.convention.asp_id
-            row = asp_id_to_siae_row.get(asp_id)
+            row = asp_id_to_siae_row[siae.convention.asp_id]
 
             if row is None:
                 continue
@@ -205,7 +206,8 @@ class Command(BaseCommand):
         self.stdout.write(f"{blocked_deletions} siaes past their grace period cannot be deleted")
 
     @timeit
-    def create_new_siaes(self, asp_id_to_siae_row, siret_to_asp_id, active_siae_keys):
+    def create_new_siaes(self, siret_to_siae_row, siret_to_asp_id, active_siae_keys):
+        asp_id_to_siae_row = {row.asp_id: row for row in siret_to_siae_row.values()}
         creatable_siae_keys = [(asp_id, kind) for (asp_id, kind) in active_siae_keys if asp_id in asp_id_to_siae_row]
 
         creatable_siaes = []
@@ -292,9 +294,9 @@ class Command(BaseCommand):
             self.fatal_errors += 1
 
     @timeit
-    def create_conventions(self, vue_af_df, siret_to_asp_id, asp_id_to_siae_row, active_siae_keys):
+    def create_conventions(self, vue_af_df, siret_to_asp_id, siret_to_siae_row, active_siae_keys):
         creatable_conventions = get_creatable_conventions(
-            vue_af_df, siret_to_asp_id, asp_id_to_siae_row, active_siae_keys
+            vue_af_df, siret_to_asp_id, siret_to_siae_row, active_siae_keys
         )
         self.stdout.write(f"will create {len(creatable_conventions)} conventions")
         for convention, siae in creatable_conventions:
@@ -329,7 +331,7 @@ class Command(BaseCommand):
     @timeit
     def handle(self, **options):
         vue_structure_df = get_vue_structure_df()
-        asp_id_to_siae_row = get_asp_id_to_siae_row(vue_structure_df)
+        siret_to_siae_row = get_siret_to_siae_row(vue_structure_df)
         siret_to_asp_id = get_siret_to_asp_id(vue_structure_df)
 
         vue_af_df = get_vue_af_df()
@@ -338,17 +340,17 @@ class Command(BaseCommand):
 
         self.delete_user_created_siaes_without_members()
         self.manage_staff_created_siaes()
-        self.update_siret_and_auth_email_of_existing_siaes(asp_id_to_siae_row)
-        update_existing_conventions(siret_to_asp_id, asp_id_to_siae_row, active_siae_keys)
-        self.create_new_siaes(asp_id_to_siae_row, siret_to_asp_id, active_siae_keys)
-        self.create_conventions(vue_af_df, siret_to_asp_id, asp_id_to_siae_row, active_siae_keys)
+        self.update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row)
+        update_existing_conventions(siret_to_siae_row, siret_to_asp_id, active_siae_keys)
+        self.create_new_siaes(siret_to_siae_row, siret_to_asp_id, active_siae_keys)
+        self.create_conventions(vue_af_df, siret_to_asp_id, siret_to_siae_row, active_siae_keys)
         self.delete_conventions()
         self.manage_financial_annexes(af_number_to_row)
         self.cleanup_siaes_after_grace_period()
 
         # Run some updates a second time.
-        update_existing_conventions(siret_to_asp_id, asp_id_to_siae_row, active_siae_keys)
-        self.update_siret_and_auth_email_of_existing_siaes(asp_id_to_siae_row)
+        update_existing_conventions(siret_to_siae_row, siret_to_asp_id, active_siae_keys)
+        self.update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row)
         self.delete_conventions()
 
         # Final checks.

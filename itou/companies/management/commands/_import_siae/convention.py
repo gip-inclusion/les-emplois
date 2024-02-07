@@ -17,7 +17,7 @@ from itou.companies.models import Company, SiaeConvention
 CONVENTION_DEACTIVATION_THRESHOLD = 200
 
 
-def update_existing_conventions(siret_to_asp_id, asp_id_to_siae_row, active_siae_keys):
+def update_existing_conventions(siret_to_siae_row, siret_to_asp_id, active_siae_keys):
     """
     Update existing conventions, mainly the is_active field,
     and check data integrity on the fly.
@@ -33,7 +33,7 @@ def update_existing_conventions(siret_to_asp_id, asp_id_to_siae_row, active_siae
         assert convention.kind == siae.kind
         assert convention.siren_signature == siae.siren
 
-        if siae.siret not in siret_to_asp_id:
+        if siae.siret not in siret_to_siae_row:
             # At some point, old C1 siaes stop existing in the latest FluxIAE file.
             # If they still have C1 data they could not be deleted in an earlier step and thus will stay in
             # the C1 database forever, we should leave them untouched.
@@ -42,31 +42,30 @@ def update_existing_conventions(siret_to_asp_id, asp_id_to_siae_row, active_siae
                 conventions_to_deactivate.append(convention)
             continue
 
-        asp_id = siret_to_asp_id[siae.siret]
-        siret_signature = asp_id_to_siae_row[asp_id].siret_signature
+        row = siret_to_siae_row[siae.siret]
 
         # Sometimes the same siret is attached to one asp_id in one export and to another asp_id in the next export.
         # In other words, the siae convention asp_id has changed and should be updated.
         # Ideally this should never happen because the asp_id is supposed to be an immutable id of the structure
         # in ASP data, but one can only hope.
-        if convention.asp_id != asp_id:
+        if convention.asp_id != row.asp_id:
             print(
                 f"convention.id={convention.id} has changed asp_id from "
-                f"{convention.asp_id} to {asp_id} (will be updated)"
+                f"{convention.asp_id} to {row.asp_id} (will be updated)"
             )
-            assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=siae.kind).exists()
-            convention.asp_id = asp_id
+            assert not SiaeConvention.objects.filter(asp_id=row.asp_id, kind=siae.kind).exists()
+            convention.asp_id = row.asp_id
             convention.save()
             continue
 
         # Siret_signature can change from one export to the next!
         # e.g. asp_id=4948 has changed from 81051848000027 to 81051848000019
-        if convention.siret_signature != siret_signature:
+        if convention.siret_signature != row.siret_signature:
             print(
                 f"convention.id={convention.id} has changed siret_signature from "
-                f"{convention.siret_signature} to {siret_signature} (will be updated)"
+                f"{convention.siret_signature} to {row.siret_signature} (will be updated)"
             )
-            convention.siret_signature = siret_signature
+            convention.siret_signature = row.siret_signature
             convention.save()
 
         should_be_active = does_siae_have_an_active_convention(active_siae_keys, siret_to_asp_id, siae)
@@ -106,7 +105,7 @@ def update_existing_conventions(siret_to_asp_id, asp_id_to_siae_row, active_siae
     print(f"{len(conventions_to_deactivate)} conventions have been deactivated")
 
 
-def get_creatable_conventions(vue_af_df, siret_to_asp_id, asp_id_to_siae_row, active_siae_keys):
+def get_creatable_conventions(vue_af_df, siret_to_asp_id, siret_to_siae_row, active_siae_keys):
     """
     Get conventions which should be created.
 
@@ -120,23 +119,23 @@ def get_creatable_conventions(vue_af_df, siret_to_asp_id, asp_id_to_siae_row, ac
     ]
 
     for siae in Company.objects.filter(source=Company.SOURCE_ASP, convention__isnull=True):
-        asp_id = siret_to_asp_id.get(siae.siret)
-        if asp_id not in asp_id_to_siae_row:
+        if siae.siret not in siret_to_siae_row:
             # Some inactive siaes are absent in the latest ASP exports but
             # are still present in db because they have members and/or job applications.
             # We cannot build a convention object for those.
             assert not siae.is_active
             continue
 
+        row = siret_to_siae_row[siae.siret]
         is_active = does_siae_have_an_active_convention(active_siae_keys, siret_to_asp_id, siae)
 
         # convention is to be unique for an asp_id and a SIAE kind
-        assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=siae.kind).exists()
+        assert not SiaeConvention.objects.filter(asp_id=row.asp_id, kind=siae.kind).exists()
 
         if is_active:
             deactivated_at = None
         else:
-            siae_key = (asp_id, siae.kind)
+            siae_key = (row.asp_id, siae.kind)
             convention_end_date_list = list(filter(lambda x: siae_key in x, inactive_siae_list))
             if convention_end_date_list:
                 _, convention_end_date = convention_end_date_list[0]
@@ -145,10 +144,10 @@ def get_creatable_conventions(vue_af_df, siret_to_asp_id, asp_id_to_siae_row, ac
             deactivated_at = convention_end_date
 
         convention = SiaeConvention(
-            siret_signature=asp_id_to_siae_row.get(asp_id).siret_signature,
+            siret_signature=row.siret_signature,
             kind=siae.kind,
             is_active=is_active,
-            asp_id=asp_id,
+            asp_id=row.asp_id,
             deactivated_at=deactivated_at,
         )
         creatable_conventions.append((convention, siae))
