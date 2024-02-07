@@ -7,7 +7,6 @@ SiaeConvention object logic used by the import_siae.py script is gathered here.
 from django.utils import timezone
 
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
-from itou.companies.management.commands._import_siae.siae import does_siae_have_an_active_convention
 from itou.companies.management.commands._import_siae.vue_af import (
     get_siae_key_to_convention_end_date,
 )
@@ -38,7 +37,6 @@ def update_existing_conventions(siret_to_siae_row, active_siae_keys):
             # If they still have C1 data they could not be deleted in an earlier step and thus will stay in
             # the C1 database forever, we should leave them untouched.
             if convention.is_active:
-                assert not does_siae_have_an_active_convention(active_siae_keys, siret_to_siae_row, siae)
                 conventions_to_deactivate.append(convention)
             continue
 
@@ -68,7 +66,7 @@ def update_existing_conventions(siret_to_siae_row, active_siae_keys):
             convention.siret_signature = row.siret_signature
             convention.save()
 
-        should_be_active = does_siae_have_an_active_convention(active_siae_keys, siret_to_siae_row, siae)
+        should_be_active = (row.asp_id, siae.kind) in active_siae_keys
 
         if convention.is_active != should_be_active:
             if should_be_active:
@@ -127,7 +125,7 @@ def get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys):
             continue
 
         row = siret_to_siae_row[siae.siret]
-        is_active = does_siae_have_an_active_convention(active_siae_keys, siret_to_siae_row, siae)
+        is_active = (row.asp_id, siae.kind) in active_siae_keys
 
         # convention is to be unique for an asp_id and a SIAE kind
         assert not SiaeConvention.objects.filter(asp_id=row.asp_id, kind=siae.kind).exists()

@@ -11,12 +11,7 @@ from itou.companies.management.commands._import_siae.utils import geocode_siae
 from itou.companies.models import Company
 
 
-def does_siae_have_an_active_convention(active_siae_keys, siret_to_siae_row, siae):
-    siae_key = (siret_to_siae_row.get(siae.siret).asp_id, siae.kind)
-    return siae_key in active_siae_keys
-
-
-def build_siae(active_siae_keys, siret_to_siae_row, row, kind):
+def build_siae(active_siae_keys, row, kind):
     """
     Build a siae object from a dataframe row.
 
@@ -62,7 +57,7 @@ def build_siae(active_siae_keys, siret_to_siae_row, row, kind):
     siae.post_code = row.post_code
     siae.department = department_from_postcode(siae.post_code)
 
-    if does_siae_have_an_active_convention(active_siae_keys, siret_to_siae_row, siae):
+    if (row.asp_id, siae.kind) in active_siae_keys:
         siae = geocode_siae(siae)
 
     return siae
