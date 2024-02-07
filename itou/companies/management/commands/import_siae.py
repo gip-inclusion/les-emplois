@@ -28,7 +28,6 @@ from itou.companies.management.commands._import_siae.convention import (
 from itou.companies.management.commands._import_siae.financial_annex import get_creatable_and_deletable_afs
 from itou.companies.management.commands._import_siae.siae import (
     build_siae,
-    does_siae_have_an_active_convention,
 )
 from itou.companies.management.commands._import_siae.utils import could_siae_be_deleted
 from itou.companies.management.commands._import_siae.vue_af import (
@@ -259,9 +258,9 @@ class Command(BaseCommand):
 
             assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=kind).exists()
 
-            siae = build_siae(active_siae_keys, siret_to_siae_row, row=row, kind=kind)
+            siae = build_siae(active_siae_keys, row=row, kind=kind)
 
-            if does_siae_have_an_active_convention(active_siae_keys, siret_to_siae_row, siae):
+            if (row.asp_id, siae.kind) in active_siae_keys:
                 assert siae not in creatable_siaes
                 creatable_siaes.append(siae)
 
