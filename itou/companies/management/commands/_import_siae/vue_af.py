@@ -55,7 +55,7 @@ def get_vue_af_df():
         "af_id_structure": "asp_id",
         "af_mesure_dispositif_code": "kind",
         "af_date_debut_effet": "start_at",
-        "af_date_fin_effet": "end_date",
+        "af_date_fin_effet": "end_at",
         "af_etat_annexe_financiere_code": "state",
     }
     df = remap_columns(df, column_mapping=column_mapping)
@@ -81,7 +81,7 @@ def get_vue_af_df():
     # A ValidationError will be raised if any number is incorrect.
     df.number.apply(validate_af_number)
 
-    df["ends_in_the_future"] = df.end_date.apply(timezone.make_aware) > timezone.now()
+    df["ends_in_the_future"] = df.end_at.apply(timezone.make_aware) > timezone.now()
     df["has_active_state"] = df.state.isin(SiaeFinancialAnnex.STATES_ACTIVE)
     df["is_active"] = df.has_active_state & df.ends_in_the_future
 
@@ -113,7 +113,7 @@ def get_vue_af_df():
         # - the active one if there is one
         # - if there is no active one, the one with an active state and the latest end_date
         # - if there is none with an active state, the one with any state and the latest end_date
-        by=["is_active", "has_active_state", "end_date"],
+        by=["is_active", "has_active_state", "end_at"],
         ascending=[False, False, False],
         inplace=True,
     )
@@ -149,7 +149,7 @@ def get_siae_key_to_convention_end_date(vue_af_df):
     af_df = vue_af_df.copy()  # Leave the main dataframe untouched!
     af_df = af_df[af_df.has_active_state]
     for _, row in af_df.iterrows():
-        convention_end_date = row.end_date
+        convention_end_date = row.end_at
         siae_key = (row.asp_id, row.kind)
         if siae_key in siae_key_to_convention_end_date:
             if convention_end_date > siae_key_to_convention_end_date[siae_key]:

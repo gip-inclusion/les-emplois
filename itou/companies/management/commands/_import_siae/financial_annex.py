@@ -39,8 +39,8 @@ def get_creatable_and_deletable_afs(af_number_to_row):
             af.save()
 
         # Sometimes an AF end date changes.
-        if af.end_at != timezone.make_aware(row.end_date):
-            af.end_at = timezone.make_aware(row.end_date)
+        if af.end_at != timezone.make_aware(row.end_at):
+            af.end_at = timezone.make_aware(row.end_at)
             af.save()
 
         # Sometimes an AF state changes.
@@ -80,6 +80,6 @@ def build_financial_annex_from_number(af_number_to_row, number):
         number=row.number,
         state=row.state,
         start_at=timezone.make_aware(row.start_at),
-        end_at=timezone.make_aware(row.end_date),
+        end_at=timezone.make_aware(row.end_at),
         convention=convention_query.get(),
     )
