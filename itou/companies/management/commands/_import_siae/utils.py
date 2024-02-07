@@ -117,7 +117,7 @@ def could_siae_be_deleted(siae):
 
 def geocode_siae(siae):
     if siae.geocoding_address is None:
-        return siae
+        return
 
     try:
         geocoding_data = get_geocoding_data(siae.geocoding_address, post_code=siae.post_code)
@@ -136,8 +136,6 @@ def geocode_siae(siae):
         siae.coords = geocoding_data["coords"]
     except GeocodingDataError:
         pass
-
-    return siae
 
 
 def sync_structures(df, source, kinds, build_structure, wet_run=False):

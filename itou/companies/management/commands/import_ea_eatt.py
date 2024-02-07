@@ -154,8 +154,7 @@ def build_ea_eatt(row):
     company.city = row.city
     company.department = row.department
 
-    company = geocode_siae(company)
-
+    geocode_siae(company)
     return company
 
 
