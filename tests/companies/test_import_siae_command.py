@@ -71,8 +71,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         cls.mod = None
 
     def test_uncreatable_conventions_for_active_siae_with_active_convention(self):
-        vue_structure_df = get_vue_structure_df()
-        siret_to_siae_row = get_siret_to_siae_row(vue_structure_df)
+        siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
         vue_af_df = get_vue_af_df()
         active_siae_keys = get_active_siae_keys(vue_af_df)
 
@@ -86,8 +85,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         SIRET = "26290411300061"
         ASP_ID = 190
 
-        vue_structure_df = get_vue_structure_df()
-        siret_to_siae_row = get_siret_to_siae_row(vue_structure_df)
+        siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
         vue_af_df = get_vue_af_df()
         active_siae_keys = get_active_siae_keys(vue_af_df)
 
@@ -101,8 +99,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         SIRET = SIRET_SIGNATURE = "21540323900019"
         ASP_ID = 112
 
-        vue_structure_df = get_vue_structure_df()
-        siret_to_siae_row = get_siret_to_siae_row(vue_structure_df)
+        siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
         vue_af_df = get_vue_af_df()
         active_siae_keys = get_active_siae_keys(vue_af_df)
 
@@ -126,8 +123,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         SIRET_SIGNATURE = "34950857200048"
         ASP_ID = 768
 
-        vue_structure_df = get_vue_structure_df()
-        siret_to_siae_row = get_siret_to_siae_row(vue_structure_df)
+        siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
         vue_af_df = get_vue_af_df()
         active_siae_keys = get_active_siae_keys(vue_af_df)
 
@@ -150,8 +146,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         SIRET = SIRET_SIGNATURE = "41294123900011"
         ASP_ID = 1780
 
-        vue_structure_df = get_vue_structure_df()
-        siret_to_siae_row = get_siret_to_siae_row(vue_structure_df)
+        siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
         vue_af_df = get_vue_af_df()
         active_siae_keys = get_active_siae_keys(vue_af_df)
 
@@ -247,13 +242,10 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         assert instance.fatal_errors == 0
 
     def test_activate_your_account_email_for_a_siae_without_members_but_with_auth_email(self):
-        vue_structure_df = get_vue_structure_df()
-        vue_af_df = get_vue_af_df()
-
         instance = import_siae.Command()
         instance.create_new_siaes(
-            get_siret_to_siae_row(vue_structure_df),
-            get_active_siae_keys(vue_af_df),
+            get_siret_to_siae_row(get_vue_structure_df()),
+            get_active_siae_keys(get_vue_af_df()),
         )
         assert reverse("signup:company_select") in mail.outbox[0].body
         assert collections.Counter(mail.subject for mail in mail.outbox) == collections.Counter(
