@@ -20,7 +20,7 @@ from itou.companies.models import Company, JobDescription, SiaeFinancialAnnex
 from itou.jobs.models import Appellation
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from itou.utils.apis.data_inclusion import DataInclusionApiClient
+from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiException
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
@@ -59,7 +59,13 @@ def get_data_inclusion_services(code_insee):
     results = cache.get(cache_key)
     if results is None:
         client = DataInclusionApiClient(settings.API_DATA_INCLUSION_BASE_URL, settings.API_DATA_INCLUSION_TOKEN)
-        services = client.services(code_insee)
+        try:
+            services = client.services(code_insee)
+        except DataInclusionApiException:
+            # 15 minutes seems like a reasonable amount of time for DI to get back on track
+            cache.set(cache_key, [], 60 * 15)
+            return []
+
         results = random.sample(services, min(len(services), 3))
         results = [
             r
