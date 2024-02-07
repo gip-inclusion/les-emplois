@@ -1044,6 +1044,8 @@ class CompanyAdminMembersManagementTest(TestCase):
 def test_dora_url(settings):
     settings.DORA_BASE_URL = "https://dora.fake.gouv.fr/"
     assert views.dora_url("toto", "superb-id") == "https://dora.fake.gouv.fr/services/di--toto--superb-id"
+    assert views.dora_url("dora", "superb-id") == "https://dora.fake.gouv.fr/services/di--dora--superb-id"
+    assert views.dora_url("dora", "superb-id", "foobar") == "foobar"
 
 
 def test_displayable_thematique():

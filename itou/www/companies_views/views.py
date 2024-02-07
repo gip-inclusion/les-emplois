@@ -38,7 +38,9 @@ ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
 DATA_INCLUSION_API_CACHE_PREFIX = "data_inclusion_api_results"
 
 
-def dora_url(source, id):
+def dora_url(source, id, original_url=None):
+    if source == "dora" and original_url:
+        return original_url
     return urljoin(settings.DORA_BASE_URL, f"/services/di--{source}--{id}")
 
 
@@ -62,7 +64,7 @@ def get_data_inclusion_services(code_insee):
         results = [
             r
             | {
-                "dora_di_url": dora_url(r["source"], r["id"]),
+                "dora_di_url": dora_url(r["source"], r["id"], r.get("lien_source", None)),
                 "thematiques_display": {displayable_thematique(t) for t in r["thematiques"]},
             }
             for r in results
