@@ -11,11 +11,14 @@ from itou.companies.management.commands._import_siae.utils import geocode_siae
 from itou.companies.models import Company
 
 
-def build_siae(active_siae_keys, row, kind):
+def build_siae(row, kind, *, is_active):
     """
     Build a siae object from a dataframe row.
 
     Only for SIAE, not for GEIQ nor EA nor EATT.
+
+    Using `is_active=True` will try to geocode the SIAE's address,
+    if successful it will be visible in search results, hence active.
     """
     siae = Company()
     siae.siret = row.siret
@@ -57,6 +60,6 @@ def build_siae(active_siae_keys, row, kind):
     siae.post_code = row.post_code
     siae.department = department_from_postcode(siae.post_code)
 
-    if (row.asp_id, siae.kind) in active_siae_keys:
+    if is_active:
         geocode_siae(siae)
     return siae

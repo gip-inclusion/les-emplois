@@ -258,11 +258,8 @@ class Command(BaseCommand):
 
             assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=kind).exists()
 
-            siae = build_siae(active_siae_keys, row=row, kind=kind)
-
-            if (row.asp_id, siae.kind) in active_siae_keys:
-                assert siae not in creatable_siaes
-                creatable_siaes.append(siae)
+            if (row.asp_id, kind) in active_siae_keys:
+                creatable_siaes.append(build_siae(row, kind, is_active=True))
 
         self.stdout.write("--- beginning of CSV output of all creatable_siaes ---")
         self.stdout.write("siret;kind;department;name;address")
