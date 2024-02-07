@@ -220,7 +220,9 @@ def list_employee_records(request, template_name="employee_record/list.html"):
                     break
             # Flag for the global message alert
             need_manual_regularization |= item.date_were_not_transmitted
-            need_manual_regularization |= item.job_seeker.lack_of_nir_reason == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
+            need_manual_regularization |= (
+                item.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
+            )
 
         employee_records_list = False
     else:

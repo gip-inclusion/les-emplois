@@ -140,7 +140,7 @@ def test_populate_job_seekers():
         identity_provider=IdentityProvider.PE_CONNECT,
         jobseeker_profile__pole_emploi_id="",
         last_login=timezone.now(),
-        nir="179038704133768",
+        jobseeker_profile__nir="179038704133768",
         post_code="33360",
         geocoding_score=1,
         coords=coords_to_geometry("48.85592", "2.41299"),
@@ -152,7 +152,7 @@ def test_populate_job_seekers():
     user_2 = JobSeekerFactory(
         pk=15752,
         created_by=EmployerFactory(),
-        nir="271049232724647",
+        jobseeker_profile__nir="271049232724647",
         geocoding_score=1,
         coords=Point(0, 0),  # QPV utils is mocked
         with_pole_emploi_id=True,
@@ -172,7 +172,7 @@ def test_populate_job_seekers():
     #  - not an AI
     user_3 = JobSeekerFactory(
         pk=26587,
-        nir="297016314515713",
+        jobseeker_profile__nir="297016314515713",
         with_pole_emploi_id=True,
     )
     job_application_3 = JobApplicationFactory(

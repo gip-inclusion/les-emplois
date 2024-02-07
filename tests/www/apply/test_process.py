@@ -187,16 +187,17 @@ class ProcessViewsTest(TestCase):
         with self.assertNumQueries(18):
             response = self.client.get(url)
         self.assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
-        self.assertContains(response, format_nir(job_application.job_seeker.nir))
+        self.assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
         self.assertContains(response, job_application.job_seeker.jobseeker_profile.pole_emploi_id)
         self.assertContains(response, job_application.job_seeker.phone.replace(" ", ""))
         self.assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)  # the company is not a GEIQ
 
         job_application.job_seeker.created_by = employer
         job_application.job_seeker.phone = ""
-        job_application.job_seeker.nir = ""
-        job_application.job_seeker.jobseeker_profile.pole_emploi_id = ""
         job_application.job_seeker.save()
+        job_application.job_seeker.jobseeker_profile.nir = ""
+        job_application.job_seeker.jobseeker_profile.pole_emploi_id = ""
+        job_application.job_seeker.jobseeker_profile.save()
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
@@ -215,8 +216,8 @@ class ProcessViewsTest(TestCase):
             response, '<small>Numéro de sécurité sociale</small><i class="text-disabled">Non renseigné</i>', html=True
         )
 
-        job_application.job_seeker.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
-        job_application.job_seeker.save()
+        job_application.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
+        job_application.job_seeker.jobseeker_profile.save()
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
@@ -271,7 +272,7 @@ class ProcessViewsTest(TestCase):
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         # Job seeker nir is displayed
-        self.assertContains(response, format_nir(job_application.job_seeker.nir))
+        self.assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
         # Approval is displayed
         self.assertContains(response, "Numéro de PASS IAE")
         # Sender phone is displayed
@@ -282,15 +283,15 @@ class ProcessViewsTest(TestCase):
             response, '<small>Curriculum vitae</small><i class="text-disabled">Non renseigné</i>', html=True
         )
 
-        job_application.job_seeker.nir = ""
-        job_application.job_seeker.save()
+        job_application.job_seeker.jobseeker_profile.nir = ""
+        job_application.job_seeker.jobseeker_profile.save()
         response = self.client.get(url)
         self.assertContains(
             response, '<small>Numéro de sécurité sociale</small><i class="text-disabled">Non renseigné</i>', html=True
         )
 
-        job_application.job_seeker.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
-        job_application.job_seeker.save()
+        job_application.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
+        job_application.job_seeker.jobseeker_profile.save()
         response = self.client.get(url)
         self.assertContains(response, LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER.label, html=True)
 
@@ -318,7 +319,7 @@ class ProcessViewsTest(TestCase):
         self.client.force_login(prescriber)
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        self.assertContains(response, format_nir(job_application.job_seeker.nir))
+        self.assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
         self.assertContains(response, "<small>Prénom</small><strong>S…</strong>", html=True)
         self.assertContains(response, "<small>Nom</small><strong>U…</strong>", html=True)
         self.assertContains(response, "S… U…")
@@ -359,7 +360,7 @@ class ProcessViewsTest(TestCase):
         # 16. RELEASE SAVEPOINT
         with self.assertNumQueries(16):
             response = self.client.get(url)
-        self.assertContains(response, format_nir(job_seeker.nir))
+        self.assertContains(response, format_nir(job_seeker.jobseeker_profile.nir))
         self.assertContains(response, job_seeker.email)
         self.assertContains(response, job_seeker.post_code)
         self.assertContains(response, job_seeker.address_line_1)
@@ -895,7 +896,7 @@ class ProcessViewsTest(TestCase):
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             # The state of the 3 `pole_emploi_*` fields will trigger a manual delivery.
-            job_seeker__nir="",
+            job_seeker__jobseeker_profile__nir="",
             job_seeker__jobseeker_profile__pole_emploi_id="",
             job_seeker__jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
@@ -1111,7 +1112,7 @@ class ProcessViewsTest(TestCase):
 
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            job_seeker__nir="",
+            job_seeker__jobseeker_profile__nir="",
             job_seeker__with_pole_emploi_id=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
@@ -1156,15 +1157,15 @@ class ProcessViewsTest(TestCase):
         post_data["nir"] = NEW_NIR
 
         self.accept_job_application(job_application=job_application, post_data=post_data)
-        job_application.job_seeker.refresh_from_db()
-        assert job_application.job_seeker.nir == NEW_NIR
+        job_application.job_seeker.jobseeker_profile.refresh_from_db()
+        assert job_application.job_seeker.jobseeker_profile.nir == NEW_NIR
 
     def test_accept_no_nir_other_user(self, *args, **kwargs):
         city = self.get_random_city()
 
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            job_seeker__nir="",
+            job_seeker__jobseeker_profile__nir="",
             job_seeker__with_pole_emploi_id=True,
         )
         other_job_seeker = JobSeekerWithAddressFactory()
@@ -1177,7 +1178,7 @@ class ProcessViewsTest(TestCase):
             # Data for `JobSeekerPersonalDataForm`.
             "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
-            "nir": other_job_seeker.nir,
+            "nir": other_job_seeker.jobseeker_profile.nir,
             # Data for `UserAddressForm`.
             "address_line_1": "11 rue des Lilas",
             "post_code": "57000",
@@ -1205,7 +1206,7 @@ class ProcessViewsTest(TestCase):
 
         job_application = JobApplicationSentByJobSeekerFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            job_seeker__nir="",
+            job_seeker__jobseeker_profile__nir="",
             job_seeker__with_pole_emploi_id=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
@@ -1241,15 +1242,15 @@ class ProcessViewsTest(TestCase):
         post_data["lack_of_nir_reason"] = LackOfNIRReason.NO_NIR
         self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
         job_application.job_seeker.refresh_from_db()
-        assert job_application.job_seeker.lack_of_nir_reason == LackOfNIRReason.NO_NIR
+        assert job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NO_NIR
 
     def test_accept_lack_of_nir_reason_update(self, *args, **kwargs):
         city = self.get_random_city()
 
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            job_seeker__nir="",
-            job_seeker__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+            job_seeker__jobseeker_profile__nir="",
+            job_seeker__jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
             job_seeker__with_pole_emploi_id=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
@@ -1267,7 +1268,7 @@ class ProcessViewsTest(TestCase):
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
             "nir": NEW_NIR,
-            "lack_of_nir_reason": job_application.job_seeker.lack_of_nir_reason,
+            "lack_of_nir_reason": job_application.job_seeker.jobseeker_profile.lack_of_nir_reason,
             "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
             # Data for `UserAddressForm`.
@@ -1286,15 +1287,15 @@ class ProcessViewsTest(TestCase):
         self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
         job_application.job_seeker.refresh_from_db()
         # New NIR is set and the lack_of_nir_reason is cleaned
-        assert not job_application.job_seeker.lack_of_nir_reason
-        assert job_application.job_seeker.nir == NEW_NIR
+        assert not job_application.job_seeker.jobseeker_profile.lack_of_nir_reason
+        assert job_application.job_seeker.jobseeker_profile.nir == NEW_NIR
 
     @override_settings(TALLY_URL="https://tally.so")
     def test_accept_lack_of_nir_reason_other_user(self, *args, **kwargs):
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
-            job_seeker__nir="",
-            job_seeker__lack_of_nir_reason=LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER,
+            job_seeker__jobseeker_profile__nir="",
+            job_seeker__jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 

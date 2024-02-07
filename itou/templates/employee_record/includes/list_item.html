@@ -87,7 +87,7 @@
 
         {# Actions #}
         {% if not employee_record %}
-            {% if item.job_seeker.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
+            {% if item.job_seeker.jobseeker_profile.lack_of_nir_reason == "NIR_ASSOCIATED_TO_OTHER" %}
                 <div class="alert alert-warning" role="status">
                     <div class="row">
                         <div class="col-auto pe-0">

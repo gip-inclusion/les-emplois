@@ -245,7 +245,7 @@ class CheckNIRForJobSeekerView(ApplyStepBaseView):
 
     def get(self, request, *args, **kwargs):
         # The NIR already exists, go to next step
-        if self.job_seeker.nir:
+        if self.job_seeker.jobseeker_profile.nir:
             return HttpResponseRedirect(
                 reverse(
                     "apply:step_check_job_seeker_info",
@@ -265,9 +265,9 @@ class CheckNIRForJobSeekerView(ApplyStepBaseView):
             )
 
         if self.form.is_valid():
-            self.job_seeker.nir = self.form.cleaned_data["nir"]
-            self.job_seeker.lack_of_nir_reason = ""
-            self.job_seeker.save()
+            self.job_seeker.jobseeker_profile.nir = self.form.cleaned_data["nir"]
+            self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
+            self.job_seeker.jobseeker_profile.save()
             return HttpResponseRedirect(
                 reverse(
                     "apply:step_check_job_seeker_info",
@@ -304,7 +304,7 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
         if self.form.data.get("skip"):
             # Redirect to search by e-mail address.
             job_seeker_session = SessionNamespace.create_temporary(request.session)
-            job_seeker_session.init({"user": {"nir": ""}})
+            job_seeker_session.init({"profile": {"nir": ""}})
             return self.redirect_to_check_email(job_seeker_session.name)
 
         context = {}
@@ -314,7 +314,7 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
             # No user found with that NIR, save the NIR in the session and redirect to search by e-mail address.
             if not job_seeker:
                 job_seeker_session = SessionNamespace.create_temporary(request.session)
-                job_seeker_session.init({"user": {"nir": self.form.cleaned_data["nir"]}})
+                job_seeker_session.init({"profile": {"nir": self.form.cleaned_data["nir"]}})
                 return self.redirect_to_check_email(job_seeker_session.name)
 
             # The NIR we found is correct
@@ -356,14 +356,19 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSend
 
         if self.form.is_valid():
             job_seeker = self.form.get_user()
-            nir = self.job_seeker_session.get("user", {}).get("nir", "")
+            # TODO(xfernandez): remove fallback on user infos for NIR
+            nir = self.job_seeker_session.get("profile", {}).get(
+                "nir", self.job_seeker_session.get("user", {}).get("nir", "")
+            )
             can_add_nir = nir and self.sender.can_add_nir(job_seeker)
 
             # No user found with that email, redirect to create a new account.
             if not job_seeker:
                 user_infos = self.job_seeker_session.get("user", {})
-                user_infos.update({"email": self.form.cleaned_data["email"], "nir": nir})
-                self.job_seeker_session.update({"user": user_infos})
+                user_infos.update({"email": self.form.cleaned_data["email"]})
+                profile_infos = self.job_seeker_session.get("profile", {})
+                profile_infos.update({"nir": nir})
+                self.job_seeker_session.update({"user": user_infos, "profile": profile_infos})
                 view_name = (
                     "apply:create_job_seeker_step_1_for_hire"
                     if self.hire_process
@@ -386,9 +391,9 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSend
                     return self.redirect_to_check_infos(job_seeker.pk)
 
                 try:
-                    job_seeker.nir = nir
-                    job_seeker.lack_of_nir_reason = ""
-                    job_seeker.save(update_fields=["nir", "lack_of_nir_reason"])
+                    job_seeker.jobseeker_profile.nir = nir
+                    job_seeker.jobseeker_profile.lack_of_nir_reason = ""
+                    job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
                 except ValidationError:
                     msg = format_html(
                         "Le<b> numéro de sécurité sociale</b> renseigné ({}) est "
@@ -419,7 +424,7 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSend
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
-            "nir": self.job_seeker_session.get("user", {}).get("nir"),
+            "nir": self.job_seeker_session.get("profile", {}).get("nir"),
             "siae": self.company,
         }
 
@@ -464,8 +469,22 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        # TODO(xfernandez): drop fallback on job_seeker_session user dict for pole_emploi
+        # fields in a few weeks
+        session_nir = self.job_seeker_session.get("profile", {}).get(
+            "nir", self.job_seeker_session.get("user", {}).get("nir")
+        )
+        session_lack_of_nir_reason = self.job_seeker_session.get("profile", {}).get(
+            "lack_of_nir_reason", self.job_seeker_session.get("user", {}).get("lack_of_nir_reason")
+        )
+
         self.form = CreateOrUpdateJobSeekerStep1Form(
-            data=request.POST or None, initial=self.job_seeker_session.get("user", {})
+            data=request.POST or None,
+            initial=self.job_seeker_session.get("user", {})
+            | {
+                "nir": session_nir if session_nir is not None else None,
+                "lack_of_nir_reason": session_lack_of_nir_reason if session_lack_of_nir_reason is not None else None,
+            },
         )
 
     def post(self, request, *args, **kwargs):
@@ -485,7 +504,14 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
                 context["email_to_create"] = self.job_seeker_session.get("user", {}).get("email", "")
 
             if not context["confirmation_needed"]:
-                self.job_seeker_session.set("user", self.job_seeker_session.get("user", {}) | self.form.cleaned_data)
+                self.job_seeker_session.set(
+                    "user",
+                    self.job_seeker_session.get("user", {}) | self.form.cleaned_data_without_profile_fields,
+                )
+                self.job_seeker_session.set(
+                    "profile",
+                    self.job_seeker_session.get("profile", {}) | self.form.cleaned_data_from_profile_fields,
+                )
                 return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(context)
@@ -559,7 +585,7 @@ class CreateJobSeekerStep3ForSenderView(CreateJobSeekerForSenderBaseView):
 
     def post(self, request, *args, **kwargs):
         if self.form.is_valid():
-            self.job_seeker_session.set("profile", self.form.cleaned_data)
+            self.job_seeker_session.set("profile", self.job_seeker_session.get("profile", {}) | self.form.cleaned_data)
             return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
@@ -600,6 +626,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             "unemployed",
             "ass_allocation",
             "aah_allocation",
+            "lack_of_nir",
         ]
         return {k: v for k, v in self.job_seeker_session.get("profile").items() if k not in fields_to_exclude}
 
@@ -627,16 +654,16 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
 
     def post(self, request, *args, **kwargs):
         try:
-            user = User.create_job_seeker_by_proxy(self.sender, **self._get_user_data_from_session())
+            with transaction.atomic():
+                user = User.create_job_seeker_by_proxy(self.sender, **self._get_user_data_from_session())
+                self.profile = user.jobseeker_profile
+                for k, v in self._get_profile_data_from_session().items():
+                    setattr(self.profile, k, v)
+                self.profile.save()
         except ValidationError as e:
             messages.error(request, " ".join(e.messages))
             url = reverse("dashboard:index")
         else:
-            self.profile = user.jobseeker_profile
-            for k, v in self._get_profile_data_from_session().items():
-                setattr(self.profile, k, v)
-            self.profile.save()
-
             try:
                 user.set_coords(user.address_line_1, user.post_code)
             except AddressLookupError:
@@ -1233,6 +1260,9 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
         super().__init__()
         self.form = None
 
+    def get_job_seeker_queryset(self):
+        return super().get_job_seeker_queryset().select_related("jobseeker_profile")
+
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         if not request.user.is_authenticated:
@@ -1240,10 +1270,26 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
             return
         if not self.job_seeker_session.exists():
             self.job_seeker_session.init({"user": {}})
+        # TODO(xfernandez): drop fallback on job_seeker_session user dict for pole_emploi
+        # fields in a few weeks
+        session_nir = self.job_seeker_session.get("profile", {}).get(
+            "nir", self.job_seeker_session.get("user").get("nir")
+        )
+        session_lack_of_nir_reason = self.job_seeker_session.get("profile", {}).get(
+            "lack_of_nir_reason", self.job_seeker_session.get("user").get("lack_of_nir_reason")
+        )
 
         self.form = CreateOrUpdateJobSeekerStep1Form(
             instance=self.job_seeker,
-            initial=self.job_seeker_session.get("user", {}),
+            initial=self.job_seeker_session.get("user", {})
+            | {
+                "nir": session_nir if session_nir is not None else self.job_seeker.jobseeker_profile.nir,
+                "lack_of_nir_reason": (
+                    session_lack_of_nir_reason
+                    if session_lack_of_nir_reason is not None
+                    else self.job_seeker.jobseeker_profile.lack_of_nir_reason
+                ),
+            },
             data=request.POST or None,
         )
         if not self.request.user.can_edit_personal_information(self.job_seeker):
@@ -1253,7 +1299,14 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
         if not self.request.user.can_edit_personal_information(self.job_seeker):
             return HttpResponseRedirect(self.get_next_url())
         if self.form.is_valid():
-            self.job_seeker_session.set("user", self.job_seeker_session.get("user", {}) | self.form.cleaned_data)
+            self.job_seeker_session.set(
+                "user",
+                self.job_seeker_session.get("user", {}) | self.form.cleaned_data_without_profile_fields,
+            )
+            self.job_seeker_session.set(
+                "profile",
+                self.job_seeker_session.get("profile", {}) | self.form.cleaned_data_from_profile_fields,
+            )
             return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
@@ -1353,7 +1406,7 @@ class UpdateJobSeekerStep3View(UpdateJobSeekerBaseView):
 
     def post(self, request, *args, **kwargs):
         if self.form.is_valid():
-            self.job_seeker_session.set("profile", self.form.cleaned_data)
+            self.job_seeker_session.set("profile", self.job_seeker_session.get("profile", {}) | self.form.cleaned_data)
             return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
@@ -1388,6 +1441,7 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
             "unemployed",
             "ass_allocation",
             "aah_allocation",
+            "lack_of_nir",
         ]
         return {k: v for k, v in self.job_seeker_session.get("profile", {}).items() if k not in fields_to_exclude}
 

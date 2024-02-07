@@ -45,7 +45,7 @@ class PoleEmploiAPIClientTest(TestCase):
         )
         with pytest.raises(PoleEmploiAPIException) as ctx:
             self.api_client.recherche_individu_certifie(
-                job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.nir
+                job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.jobseeker_profile.nir
             )
         assert ctx.value.error_code == "http_error"
 
@@ -56,7 +56,7 @@ class PoleEmploiAPIClientTest(TestCase):
             200, json=pole_emploi_api_mocks.API_RECHERCHE_RESULT_KNOWN
         )
         id_national = self.api_client.recherche_individu_certifie(
-            job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.nir
+            job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.jobseeker_profile.nir
         )
         assert id_national == "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
 
@@ -64,7 +64,7 @@ class PoleEmploiAPIClientTest(TestCase):
         job_seeker.first_name = "marié%{-christine}  aéïèêë " + "a" * 50
         job_seeker.last_name = "gh'îkñ Bind-n'qici " + "b" * 50
         id_national = self.api_client.recherche_individu_certifie(
-            job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.nir
+            job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.jobseeker_profile.nir
         )
         payload = json.loads(respx.calls.last.request.content)
         assert payload["nomNaissance"] == "GH'IKN BIND-N'QICI BBBBBB"  # 25 chars
@@ -78,7 +78,7 @@ class PoleEmploiAPIClientTest(TestCase):
         )
         with pytest.raises(PoleEmploiAPIBadResponse) as ctx:
             self.api_client.recherche_individu_certifie(
-                job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.nir
+                job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.jobseeker_profile.nir
             )
         assert ctx.value.response_code == "R010"
 
@@ -89,14 +89,14 @@ class PoleEmploiAPIClientTest(TestCase):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(401, json="")
         with pytest.raises(PoleEmploiAPIException) as ctx:
             self.api_client.recherche_individu_certifie(
-                job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.nir
+                job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.jobseeker_profile.nir
             )
         assert ctx.value.error_code == 401
 
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(429, json="")
         with pytest.raises(PoleEmploiRateLimitException) as ctx:
             self.api_client.recherche_individu_certifie(
-                job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.nir
+                job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.jobseeker_profile.nir
             )
 
         job_seeker = JobSeekerFactory()
@@ -105,7 +105,7 @@ class PoleEmploiAPIClientTest(TestCase):
         )
         with pytest.raises(PoleEmploiAPIException) as ctx:
             self.api_client.recherche_individu_certifie(
-                job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.nir
+                job_seeker.first_name, job_seeker.last_name, job_seeker.birthdate, job_seeker.jobseeker_profile.nir
             )
         assert ctx.value.error_code == "http_error"
 

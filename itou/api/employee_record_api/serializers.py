@@ -26,7 +26,7 @@ class _API_PersonSerializer(_PersonSerializer):
     Specific fields added to the API (not used in ASP transfers)
     """
 
-    NIR = serializers.CharField(source="job_seeker.nir")
+    NIR = serializers.CharField(source="job_seeker.jobseeker_profile.nir")
 
 
 class EmployeeRecordAPISerializer(EmployeeRecordSerializer):

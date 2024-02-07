@@ -30,13 +30,13 @@ class SSOReadonlyMixin:
 
 
 class EditJobSeekerInfoForm(
-    JobSeekerProfileFieldsMixin, JobSeekerNIRUpdateMixin, MandatoryAddressFormMixin, SSOReadonlyMixin, forms.ModelForm
+    JobSeekerNIRUpdateMixin, JobSeekerProfileFieldsMixin, MandatoryAddressFormMixin, SSOReadonlyMixin, forms.ModelForm
 ):
     """
     Edit a job seeker profile.
     """
 
-    PROFILE_FIELDS = ["pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+    PROFILE_FIELDS = ["pole_emploi_id", "lack_of_pole_emploi_id_reason", "nir", "lack_of_nir_reason"]
 
     email = forms.EmailField(
         label="Adresse électronique",
@@ -51,8 +51,6 @@ class EditJobSeekerInfoForm(
             "title",
             "first_name",
             "last_name",
-            "nir",
-            "lack_of_nir_reason",
             "birthdate",
             "phone",
             "address_line_1",

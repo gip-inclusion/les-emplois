@@ -45,6 +45,7 @@ from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
+    JobSeekerProfileFactory,
     JobSeekerWithAddressFactory,
     PrescriberFactory,
 )
@@ -262,7 +263,11 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
 
     company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
-    user = JobSeekerFactory(birthdate=None, nir="", lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER)
+    user = JobSeekerFactory(
+        birthdate=None,
+        jobseeker_profile__nir="",
+        jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+    )
     client.force_login(user)
 
     # Entry point.
@@ -291,9 +296,9 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
     response = client.post(next_url, data=post_data)
     assert response.status_code == 302
 
-    user.refresh_from_db()
-    assert user.nir == nir
-    assert user.lack_of_nir_reason == ""
+    user.jobseeker_profile.refresh_from_db()
+    assert user.jobseeker_profile.nir == nir
+    assert user.jobseeker_profile.lack_of_nir_reason == ""
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
@@ -311,7 +316,7 @@ class ApplyAsJobSeekerTest(TestCase):
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
         )
 
-        user = JobSeekerFactory(birthdate=None, nir="")
+        user = JobSeekerFactory(birthdate=None, jobseeker_profile__nir="")
         self.client.force_login(user)
 
         response = self.client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
@@ -325,7 +330,7 @@ class ApplyAsJobSeekerTest(TestCase):
 
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
-        user = JobSeekerFactory(birthdate=None, nir="")
+        user = JobSeekerFactory(birthdate=None, jobseeker_profile__nir="")
         self.client.force_login(user)
 
         # Entry point.
@@ -353,7 +358,7 @@ class ApplyAsJobSeekerTest(TestCase):
         assert response.status_code == 302
 
         user = User.objects.get(pk=user.pk)
-        assert user.nir == nir
+        assert user.jobseeker_profile.nir == nir
 
         session_data = self.client.session[f"job_application-{company.pk}"]
         assert session_data == self.default_session_data
@@ -477,7 +482,7 @@ class ApplyAsJobSeekerTest(TestCase):
         """
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
-        user = JobSeekerFactory(nir="", with_pole_emploi_id=True)
+        user = JobSeekerFactory(jobseeker_profile__nir="", with_pole_emploi_id=True)
         self.client.force_login(user)
 
         # Entry point.
@@ -501,8 +506,8 @@ class ApplyAsJobSeekerTest(TestCase):
             "apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_pk": user.pk}
         )
 
-        user.refresh_from_db()
-        assert not user.nir
+        user.jobseeker_profile.refresh_from_db()
+        assert not user.jobseeker_profile.nir
 
     def test_apply_as_job_seeker_on_sender_tunnel(self):
         company = CompanyFactory()
@@ -734,7 +739,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         assert response.status_code == 200
 
-        response = self.client.post(next_url, data={"nir": dummy_job_seeker.nir, "confirm": 1})
+        response = self.client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data
         assert response.status_code == 302
 
@@ -744,7 +749,9 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
-        assert self.client.session[job_seeker_session_name] == {"user": {"nir": dummy_job_seeker.nir}}
+        assert self.client.session[job_seeker_session_name] == {
+            "profile": {"nir": dummy_job_seeker.jobseeker_profile.nir}
+        }
 
         # Step get job seeker e-mail.
         # ----------------------------------------------------------------------
@@ -759,8 +766,10 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         expected_job_seeker_session = {
             "user": {
                 "email": dummy_job_seeker.email,
-                "nir": dummy_job_seeker.nir,
-            }
+            },
+            "profile": {
+                "nir": dummy_job_seeker.jobseeker_profile.nir,
+            },
         }
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -775,7 +784,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         response = self.client.get(next_url)
         # The NIR is prefilled
-        self.assertContains(response, dummy_job_seeker.nir)
+        self.assertContains(response, dummy_job_seeker.jobseeker_profile.nir)
         # The back_url is correct
         self.assertContains(
             response,
@@ -795,6 +804,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
+        expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["user"] |= post_data
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -833,9 +843,9 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
-        expected_job_seeker_session["profile"] = post_data | {
+        expected_job_seeker_session["profile"] |= post_data | {
             "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED.value,
             "resourceless": False,
             "rqth_employee": False,
             "oeth_employee": False,
@@ -986,7 +996,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         assert response.status_code == 200
 
-        response = self.client.post(next_url, data={"nir": dummy_job_seeker.nir, "confirm": 1})
+        response = self.client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assert response.status_code == 302
         assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data
 
@@ -1009,8 +1019,10 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         expected_job_seeker_session = {
             "user": {
                 "email": dummy_job_seeker.email,
-                "nir": dummy_job_seeker.nir,
-            }
+            },
+            "profile": {
+                "nir": dummy_job_seeker.jobseeker_profile.nir,
+            },
         }
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1038,12 +1050,14 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "first_name": dummy_job_seeker.first_name,
             "last_name": dummy_job_seeker.last_name,
             "birthdate": dummy_job_seeker.birthdate,
-            "nir": dummy_job_seeker.nir,
+            "nir": dummy_job_seeker.jobseeker_profile.nir,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
+        expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
+        post_data.pop("nir")
         expected_job_seeker_session["user"] |= post_data
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1082,9 +1096,9 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
-        expected_job_seeker_session["profile"] = post_data | {
+        expected_job_seeker_session["profile"] |= post_data | {
             "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED.value,
             "resourceless": False,
             "rqth_employee": False,
             "oeth_employee": False,
@@ -1218,7 +1232,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(nir_url)
         assert response.status_code == 200
 
-        response = self.client.post(nir_url, data={"nir": JobSeekerFactory.build().nir, "confirm": 1})
+        response = self.client.post(nir_url, data={"nir": JobSeekerProfileFactory.build().nir, "confirm": 1})
         assert response.status_code == 302
 
         session_uuid = str(resolve(response.url).kwargs["session_uuid"])
@@ -1300,7 +1314,7 @@ class ApplyAsPrescriberTest(TestCase):
         response = self.client.get(next_url)
         assert response.status_code == 200
 
-        response = self.client.post(next_url, data={"nir": dummy_job_seeker.nir, "confirm": 1})
+        response = self.client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data
         assert response.status_code == 302
 
@@ -1310,7 +1324,9 @@ class ApplyAsPrescriberTest(TestCase):
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
-        assert self.client.session[job_seeker_session_name] == {"user": {"nir": dummy_job_seeker.nir}}
+        assert self.client.session[job_seeker_session_name] == {
+            "profile": {"nir": dummy_job_seeker.jobseeker_profile.nir}
+        }
 
         # Step get job seeker e-mail.
         # ----------------------------------------------------------------------
@@ -1325,8 +1341,10 @@ class ApplyAsPrescriberTest(TestCase):
         expected_job_seeker_session = {
             "user": {
                 "email": dummy_job_seeker.email,
-                "nir": dummy_job_seeker.nir,
-            }
+            },
+            "profile": {
+                "nir": dummy_job_seeker.jobseeker_profile.nir,
+            },
         }
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1341,7 +1359,7 @@ class ApplyAsPrescriberTest(TestCase):
 
         response = self.client.get(next_url)
         # The NIR is prefilled
-        self.assertContains(response, dummy_job_seeker.nir)
+        self.assertContains(response, dummy_job_seeker.jobseeker_profile.nir)
         # Check that the back url is correct
         self.assertContains(
             response,
@@ -1361,6 +1379,7 @@ class ApplyAsPrescriberTest(TestCase):
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
+        expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["user"] |= post_data
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1399,9 +1418,9 @@ class ApplyAsPrescriberTest(TestCase):
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
-        expected_job_seeker_session["profile"] = post_data | {
+        expected_job_seeker_session["profile"] |= post_data | {
             "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED.value,
             "resourceless": False,
             "rqth_employee": False,
             "oeth_employee": False,
@@ -1431,7 +1450,7 @@ class ApplyAsPrescriberTest(TestCase):
 
         # Let's add another job seeker with exactly the same NIR, in the middle of the process.
         # ----------------------------------------------------------------------
-        other_job_seeker = JobSeekerFactory(nir=dummy_job_seeker.nir)
+        other_job_seeker = JobSeekerFactory(jobseeker_profile__nir=dummy_job_seeker.jobseeker_profile.nir)
 
         response = self.client.post(next_url)
         assertMessages(
@@ -1571,7 +1590,7 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         This NIR account is empty.
         An update is expected.
         """
-        job_seeker = JobSeekerFactory(nir="", with_pole_emploi_id=True)
+        job_seeker = JobSeekerFactory(jobseeker_profile__nir="", with_pole_emploi_id=True)
         # Create an approval to bypass the eligibility diagnosis step.
         PoleEmploiApprovalFactory(
             birthdate=job_seeker.birthdate, pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id
@@ -1598,12 +1617,12 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
-        assert self.client.session[job_seeker_session_name] == {"user": {"nir": nir}}
+        assert self.client.session[job_seeker_session_name] == {"profile": {"nir": nir}}
         self.assertRedirects(response, next_url)
 
         # Create a job seeker with this NIR right after the check. Sorry.
         # ----------------------------------------------------------------------
-        other_job_seeker = JobSeekerFactory(nir=nir)
+        other_job_seeker = JobSeekerFactory(jobseeker_profile__nir=nir)
 
         # Enter an existing email.
         # ----------------------------------------------------------------------
@@ -1634,13 +1653,13 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
 
         # Make sure the job seeker NIR is now filled in.
         # ----------------------------------------------------------------------
-        job_seeker.refresh_from_db()
-        assert job_seeker.nir == nir
+        job_seeker.jobseeker_profile.refresh_from_db()
+        assert job_seeker.jobseeker_profile.nir == nir
 
     def test_one_account_lack_of_nir_reason(self):
         job_seeker = JobSeekerFactory(
-            nir="",
-            lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+            jobseeker_profile__nir="",
+            jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
             with_pole_emploi_id=True,
         )
         # Create an approval to bypass the eligibility diagnosis step.
@@ -1668,7 +1687,7 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
             "apply:search_by_email_for_sender", kwargs={"company_pk": siae.pk, "session_uuid": job_seeker_session_name}
         )
         assert response.url == next_url
-        assert self.client.session[job_seeker_session_name] == {"user": {"nir": nir}}
+        assert self.client.session[job_seeker_session_name] == {"profile": {"nir": nir}}
         self.assertRedirects(response, next_url)
 
         # Enter an existing email.
@@ -1689,9 +1708,9 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
 
         # Make sure the job seeker NIR is now filled in.
         # ----------------------------------------------------------------------
-        job_seeker.refresh_from_db()
-        assert job_seeker.nir == nir
-        assert job_seeker.lack_of_nir_reason == ""
+        job_seeker.jobseeker_profile.refresh_from_db()
+        assert job_seeker.jobseeker_profile.nir == nir
+        assert job_seeker.jobseeker_profile.lack_of_nir_reason == ""
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
@@ -1765,7 +1784,7 @@ class ApplyAsCompanyTest(TestCase):
         response = self.client.get(next_url)
         assert response.status_code == 200
 
-        response = self.client.post(next_url, data={"nir": dummy_job_seeker.nir, "confirm": 1})
+        response = self.client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data
         assert response.status_code == 302
 
@@ -1775,7 +1794,9 @@ class ApplyAsCompanyTest(TestCase):
             kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
         )
         assert response.url == next_url
-        assert self.client.session[job_seeker_session_name] == {"user": {"nir": dummy_job_seeker.nir}}
+        assert self.client.session[job_seeker_session_name] == {
+            "profile": {"nir": dummy_job_seeker.jobseeker_profile.nir}
+        }
 
         # Step get job seeker e-mail.
         # ----------------------------------------------------------------------
@@ -1789,8 +1810,10 @@ class ApplyAsCompanyTest(TestCase):
         expected_job_seeker_session = {
             "user": {
                 "email": dummy_job_seeker.email,
-                "nir": dummy_job_seeker.nir,
-            }
+            },
+            "profile": {
+                "nir": dummy_job_seeker.jobseeker_profile.nir,
+            },
         }
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1805,7 +1828,7 @@ class ApplyAsCompanyTest(TestCase):
 
         response = self.client.get(next_url)
         # The NIR is prefilled
-        self.assertContains(response, dummy_job_seeker.nir)
+        self.assertContains(response, dummy_job_seeker.jobseeker_profile.nir)
         # Check that the back url is correct
         self.assertContains(
             response,
@@ -1825,6 +1848,7 @@ class ApplyAsCompanyTest(TestCase):
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
+        expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["user"] |= post_data
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1863,7 +1887,7 @@ class ApplyAsCompanyTest(TestCase):
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
-        expected_job_seeker_session["profile"] = post_data | {
+        expected_job_seeker_session["profile"] |= post_data | {
             "pole_emploi_id": "",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "resourceless": False,
@@ -1994,7 +2018,7 @@ class ApplyAsCompanyTest(TestCase):
         response = self.client.get(nir_url)
         assert response.status_code == 200
 
-        response = self.client.post(nir_url, data={"nir": JobSeekerFactory.build().nir, "confirm": 1})
+        response = self.client.post(nir_url, data={"nir": JobSeekerProfileFactory.build().nir, "confirm": 1})
         assert response.status_code == 302
 
         session_uuid = str(resolve(response.url).kwargs["session_uuid"])
@@ -2075,7 +2099,7 @@ class DirectHireFullProcessTest(TestCase):
         response = self.client.get(check_nir_url)
         assert response.status_code == 200
 
-        response = self.client.post(check_nir_url, data={"nir": dummy_job_seeker.nir, "preview": 1})
+        response = self.client.post(check_nir_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "preview": 1})
         assert response.status_code == 302
 
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
@@ -2097,8 +2121,10 @@ class DirectHireFullProcessTest(TestCase):
         expected_job_seeker_session = {
             "user": {
                 "email": dummy_job_seeker.email,
-                "nir": dummy_job_seeker.nir,
-            }
+            },
+            "profile": {
+                "nir": dummy_job_seeker.jobseeker_profile.nir,
+            },
         }
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -2113,7 +2139,7 @@ class DirectHireFullProcessTest(TestCase):
 
         response = self.client.get(next_url)
         # The NIR is prefilled
-        self.assertContains(response, dummy_job_seeker.nir)
+        self.assertContains(response, dummy_job_seeker.jobseeker_profile.nir)
         # Check that the back url is correct
         self.assertContains(
             response,
@@ -2133,6 +2159,7 @@ class DirectHireFullProcessTest(TestCase):
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
+        expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["user"] |= post_data
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -2171,9 +2198,9 @@ class DirectHireFullProcessTest(TestCase):
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
-        expected_job_seeker_session["profile"] = post_data | {
+        expected_job_seeker_session["profile"] |= post_data | {
             "pole_emploi_id": "",
-            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED.value,
             "resourceless": False,
             "rqth_employee": False,
             "oeth_employee": False,
@@ -2206,6 +2233,7 @@ class DirectHireFullProcessTest(TestCase):
 
         assert job_seeker_session_name not in self.client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
+        assert new_job_seeker.jobseeker_profile.nir
 
         next_url = reverse(
             "apply:eligibility_for_hire", kwargs={"company_pk": company.pk, "job_seeker_pk": new_job_seeker.pk}
@@ -2302,7 +2330,7 @@ class DirectHireFullProcessTest(TestCase):
         response = self.client.get(check_nir_url)
         assert response.status_code == 200
 
-        response = self.client.post(check_nir_url, data={"nir": job_seeker.nir, "confirm": 1})
+        response = self.client.post(check_nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": 1})
         check_infos_url = reverse(
             "apply:check_job_seeker_info_for_hire", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}
         )
@@ -2820,7 +2848,12 @@ class UpdateJobSeekerBaseTestCase(TestCase):
 
         # Data is stored in the session but user is untouched
         # (nir value is retrieved from the job_seeker and stored in the session)
-        expected_job_seeker_session = {"user": post_data | {"nir": self.job_seeker.nir}}
+        lack_of_nir_reason = post_data.pop("lack_of_nir_reason")
+        nir = post_data.pop("nir", None)
+        expected_job_seeker_session = {
+            "user": post_data,
+            "profile": {"nir": nir or self.job_seeker.jobseeker_profile.nir, "lack_of_nir_reason": lack_of_nir_reason},
+        }
         assert self.client.session[self.job_seeker_session_key] == expected_job_seeker_session
         self.job_seeker.refresh_from_db()
         assert self.job_seeker.first_name != NEW_FIRST_NAME
@@ -2889,7 +2922,7 @@ class UpdateJobSeekerBaseTestCase(TestCase):
         assertRedirects(response, self.step_end_url, fetch_redirect_response=False)
 
         # Data is stored in the session but user & profiles are untouched
-        expected_job_seeker_session["profile"] = post_data | {
+        expected_job_seeker_session["profile"] |= post_data | {
             "pole_emploi_id": "",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
             "resourceless": False,
@@ -2940,6 +2973,7 @@ class UpdateJobSeekerBaseTestCase(TestCase):
         assert self.job_seeker.has_jobseeker_profile is True
         assert self.job_seeker.first_name == NEW_FIRST_NAME
         assert self.job_seeker.address_line_1 == NEW_ADDRESS_LINE
+        self.job_seeker.jobseeker_profile.refresh_from_db()
         assert self.job_seeker.jobseeker_profile.education_level == EducationLevel.BAC_LEVEL
 
         assert self.job_seeker.last_checked_at != previous_last_checked_at
@@ -3115,17 +3149,23 @@ class UpdateJobSeekerTestCase(UpdateJobSeekerBaseTestCase):
 
     def test_with_job_seeker_without_nir(self):
         # Make sure the job seeker does not manage its own account (and has no nir)
-        self.job_seeker.nir = ""
-        self.job_seeker.lack_of_nir_reason = ""
+        self.job_seeker.jobseeker_profile.nir = ""
+        self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
+        self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
+
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
-        self.job_seeker.save(update_fields=["created_by", "last_login", "nir", "lack_of_nir_reason"])
+        self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_everything_allowed(
             self.company.members.first(),
-            extra_post_data_1={"nir": "", "lack_of_nir": True, "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER},
+            extra_post_data_1={
+                "nir": "",
+                "lack_of_nir": True,
+                "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER.value,
+            },
         )
         # Check that we could update its NIR infos
-        assert self.job_seeker.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
+        assert self.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
 
     def test_as_company_that_last_step_doesnt_crash_with_direct_access(self):
         # Make sure the job seeker does not manage its own account
@@ -3220,17 +3260,23 @@ class UpdateJobSeekerForHireTestCase(UpdateJobSeekerBaseTestCase):
 
     def test_with_job_seeker_without_nir(self):
         # Make sure the job seeker does not manage its own account (and has no nir)
-        self.job_seeker.nir = ""
-        self.job_seeker.lack_of_nir_reason = ""
+        self.job_seeker.jobseeker_profile.nir = ""
+        self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
+        self.job_seeker.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
+
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
-        self.job_seeker.save(update_fields=["created_by", "last_login", "nir", "lack_of_nir_reason"])
+        self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_everything_allowed(
             self.company.members.first(),
-            extra_post_data_1={"nir": "", "lack_of_nir": True, "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER},
+            extra_post_data_1={
+                "nir": "",
+                "lack_of_nir": True,
+                "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER.value,
+            },
         )
         # Check that we could update its NIR infos
-        assert self.job_seeker.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
+        assert self.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
 
     def test_as_company_that_last_step_doesnt_crash_with_direct_access(self):
         # Make sure the job seeker does not manage its own account
@@ -3282,7 +3328,9 @@ def test_detect_existing_job_seeker(client):
     user = prescriber_organization.members.first()
     client.force_login(user)
 
-    job_seeker = JobSeekerWithAddressFactory(nir="", first_name="Jérémy", email="jeremy@example.com")
+    job_seeker = JobSeekerWithAddressFactory(
+        jobseeker_profile__nir="", first_name="Jérémy", email="jeremy@example.com"
+    )
 
     default_session_data = {
         "selected_jobs": [],
@@ -3315,7 +3363,7 @@ def test_detect_existing_job_seeker(client):
         "apply:search_by_email_for_sender", kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name}
     )
     assert response.url == next_url
-    assert client.session[job_seeker_session_name] == {"user": {"nir": NEW_NIR}}
+    assert client.session[job_seeker_session_name] == {"profile": {"nir": NEW_NIR}}
 
     # Step get job seeker e-mail.
     # ----------------------------------------------------------------------
@@ -3329,8 +3377,10 @@ def test_detect_existing_job_seeker(client):
     expected_job_seeker_session = {
         "user": {
             "email": "wrong-email@example.com",
+        },
+        "profile": {
             "nir": NEW_NIR,
-        }
+        },
     }
     assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -3382,6 +3432,7 @@ def test_detect_existing_job_seeker(client):
     response = client.post(next_url, data=post_data | {"confirm": 1})
 
     # session data is updated and we are correctly redirected to step 2
+    expected_job_seeker_session["profile"] |= {"lack_of_nir_reason": post_data.pop("lack_of_nir_reason", "")}
     expected_job_seeker_session["user"] |= post_data
     assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -3739,12 +3790,12 @@ class FindJobSeekerForHireViewTestCase(TestCase):
         response = self.client.get(self.check_nir_url)
         self.assertContains(response, "Déclarer une embauche")
 
-        response = self.client.post(self.check_nir_url, data={"nir": job_seeker.nir, "preview": 1})
+        response = self.client.post(self.check_nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "preview": 1})
         self.assertContains(response, "Sylvie MARTIN")
         # Confirmation modal is shown
         assert response.context["preview_mode"] is True
 
-        response = self.client.post(self.check_nir_url, data={"nir": job_seeker.nir, "confirm": 1})
+        response = self.client.post(self.check_nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": 1})
         self.assertRedirects(
             response,
             reverse(
@@ -3805,7 +3856,9 @@ class FindJobSeekerForHireViewTestCase(TestCase):
         response = self.client.get(self.check_nir_url)
         self.assertContains(response, "Déclarer une embauche")
 
-        response = self.client.post(self.check_nir_url, data={"nir": dummy_job_seeker.nir, "preview": 1})
+        response = self.client.post(
+            self.check_nir_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "preview": 1}
+        )
         assert response.status_code == 302
 
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
@@ -3818,7 +3871,7 @@ class FindJobSeekerForHireViewTestCase(TestCase):
         response = self.client.get(search_by_email_url)
         self.assertContains(response, "Déclarer une embauche")  # Check page title
         self.assertContains(response, self.check_nir_url)  # Check back button URL
-        self.assertContains(response, dummy_job_seeker.nir)
+        self.assertContains(response, dummy_job_seeker.jobseeker_profile.nir)
 
         response = self.client.post(search_by_email_url, data={"email": dummy_job_seeker.email})
         self.assertRedirects(
@@ -3832,8 +3885,10 @@ class FindJobSeekerForHireViewTestCase(TestCase):
         expected_job_seeker_session = {
             "user": {
                 "email": dummy_job_seeker.email,
-                "nir": dummy_job_seeker.nir,
-            }
+            },
+            "profile": {
+                "nir": dummy_job_seeker.jobseeker_profile.nir,
+            },
         }
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -3844,8 +3899,8 @@ class CheckJobSeekerInformationsForHireTestCase(TestCase):
         job_seeker = JobSeekerFactory(
             first_name="Son prénom",
             last_name="Son nom de famille",
-            nir="",
-            lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+            jobseeker_profile__nir="",
+            jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
         )
         self.client.force_login(company.members.first())
         response = self.client.get(
@@ -3882,8 +3937,8 @@ class CheckJobSeekerInformationsForHireTestCase(TestCase):
         job_seeker = JobSeekerFactory(
             first_name="Son prénom",
             last_name="Son nom de famille",
-            nir="",
-            lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
+            jobseeker_profile__nir="",
+            jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
         )
         self.client.force_login(company.members.first())
         response = self.client.get(
@@ -4214,7 +4269,7 @@ class NewHireProcessInfoTestCase(TestCase):
     def setUpTestData(cls):
         cls.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         cls.geiq = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
-        cls.job_seeker = JobSeekerFactory(nir="")
+        cls.job_seeker = JobSeekerFactory(jobseeker_profile__nir="")
 
     def test_as_job_seeker(self):
         self.client.force_login(self.job_seeker)

@@ -7,10 +7,10 @@
     </li>
     <li class="mb-3">
         Numéro de sécurité sociale : 
-        {% if profile.user.nir %}
-            <b>{{ profile.user.nir|format_nir }}</b>
-        {% elif profile.user.lack_of_nir_reason %}
-            <b>{{ profile.user.get_lack_of_nir_reason_display }}</b>
+        {% if profile.nir %}
+            <b>{{ profile.nir|format_nir }}</b>
+        {% elif profile.lack_of_nir_reason %}
+            <b>{{ profile.get_lack_of_nir_reason_display }}</b>
         {% else %}
             <span>Non renseigné</span>
         {% endif %}

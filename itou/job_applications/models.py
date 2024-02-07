@@ -410,7 +410,7 @@ class JobApplicationQuerySet(models.QuerySet):
         return (
             self.filter(pk__in=eligible_job_applications.values("id"))
             .exclude(approval__number__in=approvals_to_exclude)
-            .select_related("approval", "job_seeker")
+            .select_related("approval", "job_seeker__jobseeker_profile")
             .prefetch_related("employee_record")
             .order_by("-hiring_start_at")
         )
@@ -989,7 +989,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 emails.append(self.email_deliver_approval(accepted_by))
             elif (
                 self.job_seeker.has_no_common_approval
-                and (self.job_seeker.nir or self.job_seeker.jobseeker_profile.pole_emploi_id)
+                and (self.job_seeker.jobseeker_profile.nir or self.job_seeker.jobseeker_profile.pole_emploi_id)
             ) or (
                 self.job_seeker.jobseeker_profile.pole_emploi_id
                 or self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason
@@ -1009,7 +1009,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 new_approval.save()
                 self.approval = new_approval
                 emails.append(self.email_deliver_approval(accepted_by))
-            elif not self.job_seeker.nir or (
+            elif not self.job_seeker.jobseeker_profile.nir or (
                 not self.job_seeker.jobseeker_profile.pole_emploi_id
                 and self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason
                 == LackOfPoleEmploiId.REASON_FORGOTTEN

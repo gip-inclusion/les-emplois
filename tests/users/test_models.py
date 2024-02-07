@@ -36,6 +36,7 @@ from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
+    JobSeekerProfileFactory,
     JobSeekerWithAddressFactory,
     LaborInspectorFactory,
     PrescriberFactory,
@@ -561,7 +562,7 @@ class ModelTest(TestCase):
         prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
         authorized_prescriber = prescriber_org.members.first()
         unauthorized_prescriber = PrescriberFactory()
-        job_seeker_no_nir = JobSeekerFactory(nir="")
+        job_seeker_no_nir = JobSeekerFactory(jobseeker_profile__nir="")
         job_seeker_with_nir = JobSeekerFactory()
 
         assert authorized_prescriber.can_add_nir(job_seeker_no_nir)
@@ -647,21 +648,21 @@ class ModelTest(TestCase):
         assert "inspecteur du travail" == labor_inspector.get_kind_display()
 
     def test_constraint_user_lack_of_nir_reason_or_nir(self):
-        no_nir_user = JobSeekerFactory(nir="")
+        no_nir_profile = JobSeekerProfileFactory(nir="")
         # This works
-        assert no_nir_user.nir == ""
-        no_nir_user.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
-        no_nir_user.save()
+        assert no_nir_profile.nir == ""
+        no_nir_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
+        no_nir_profile.save()
 
-        user = JobSeekerFactory()
+        nir_profile = JobSeekerProfileFactory()
         # This doesn't
-        assert user.nir
-        user.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
+        assert nir_profile.nir
+        nir_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
         with pytest.raises(
             ValidationError,
             match="Un utilisateur ayant un NIR ne peut avoir un motif justifiant l'absence de son NIR.",
         ):
-            user.save()
+            nir_profile.save()
 
     def test_identity_provider_vs_kind(self):
         cases = [
@@ -1127,13 +1128,13 @@ class LatestApprovalTestCase(TestCase):
 
     def test_latest_common_approval_when_only_pe_approval(self):
         user = JobSeekerFactory()
-        pe_approval = PoleEmploiApprovalFactory(nir=user.nir)
+        pe_approval = PoleEmploiApprovalFactory(nir=user.jobseeker_profile.nir)
         assert user.latest_common_approval == pe_approval
 
     def test_latest_common_approval_is_approval_if_valid(self):
         user = JobSeekerFactory()
         approval = ApprovalFactory(user=user)
-        PoleEmploiApprovalFactory(nir=user.nir)
+        PoleEmploiApprovalFactory(nir=user.jobseeker_profile.nir)
         assert user.latest_common_approval == approval
 
     def test_latest_common_approval_is_pe_approval_if_approval_is_expired(self):
@@ -1142,7 +1143,7 @@ class LatestApprovalTestCase(TestCase):
         start_at = end_at - relativedelta(years=2)
         # expired approval
         ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
-        pe_approval = PoleEmploiApprovalFactory(nir=user.nir)
+        pe_approval = PoleEmploiApprovalFactory(nir=user.jobseeker_profile.nir)
         assert user.latest_common_approval == pe_approval
 
     def test_latest_common_approval_is_pe_approval_edge_case(self):
@@ -1151,7 +1152,7 @@ class LatestApprovalTestCase(TestCase):
         start_at = end_at - relativedelta(years=2)
         # approval in waiting period
         ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
-        pe_approval = PoleEmploiApprovalFactory(nir=user.nir)
+        pe_approval = PoleEmploiApprovalFactory(nir=user.jobseeker_profile.nir)
         assert user.latest_common_approval == pe_approval
 
     def test_latest_common_approval_is_none_if_both_expired(self):
@@ -1159,7 +1160,7 @@ class LatestApprovalTestCase(TestCase):
         end_at = timezone.localdate() - relativedelta(years=3)
         start_at = end_at - relativedelta(years=2)
         ApprovalFactory(user=user, start_at=start_at, end_at=end_at)
-        PoleEmploiApprovalFactory(nir=user.nir, start_at=start_at, end_at=end_at)
+        PoleEmploiApprovalFactory(nir=user.jobseeker_profile.nir, start_at=start_at, end_at=end_at)
         assert user.latest_common_approval is None
 
 
@@ -1274,41 +1275,53 @@ def test_save_erases_pe_obfuscated_nir_if_details_change():
     # trigger the .from_db() method, otherwise the factory would not...
     user = User.objects.get(email="foobar@truc.com")
 
-    def reset_profile_and_save_user():
+    def reset_profile():
         user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
         user.jobseeker_profile.pe_obfuscated_nir = "XXX_1234567890123_YYY"
         user.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
-        user.save()  # triggers an eventual change in the profile
-        user.jobseeker_profile.refresh_from_db()
 
-    user.nir = "1234567890123"
-    reset_profile_and_save_user()
-    assert user.jobseeker_profile.pe_obfuscated_nir is None
-    assert user.jobseeker_profile.pe_last_certification_attempt_at is None
+    reset_profile()
+    profile = JobSeekerProfile.objects.get(user__email="foobar@truc.com")
+    profile.nir = "1234567890123"
+    profile.save()
+    profile.refresh_from_db()
+    assert profile.pe_obfuscated_nir is None
+    assert profile.pe_last_certification_attempt_at is None
 
+    reset_profile()
+    user = User.objects.get(email="foobar@truc.com")
     user.birthdate = datetime.date(2018, 8, 22)
-    reset_profile_and_save_user()
+    user.save()
+    user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_obfuscated_nir is None
     assert user.jobseeker_profile.pe_last_certification_attempt_at is None
 
+    reset_profile()
+    user = User.objects.get(email="foobar@truc.com")
     user.first_name = "Wazzzzaaaa"
-    reset_profile_and_save_user()
+    user.save()
+    user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_obfuscated_nir is None
     assert user.jobseeker_profile.pe_last_certification_attempt_at is None
 
+    reset_profile()
+    user = User.objects.get(email="foobar@truc.com")
     user.last_name = "Heyyyyyyyyy"
-    reset_profile_and_save_user()
+    user.save()
+    user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_obfuscated_nir is None
     assert user.jobseeker_profile.pe_last_certification_attempt_at is None
 
+    reset_profile()
     # then reload the user, and don't change anything in the monitored fields
     user = User.objects.get(email="foobar@truc.com")
     user.first_name = "Wazzzzaaaa"
     user.last_name = "Heyyyyyyyyy"
-    user.nir = "1234567890123"
     user.birthdate = datetime.date(2018, 8, 22)
     user.email = "brutal@toto.at"  # change the email though
-    reset_profile_and_save_user()
+    user.save()
+    user.jobseeker_profile.nir = "1234567890123"
+    user.jobseeker_profile.save()
     assert user.jobseeker_profile.pe_obfuscated_nir == "XXX_1234567890123_YYY"
     assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
         2022, 8, 10, 0, 0, 0, 0, tzinfo=datetime.timezone.utc

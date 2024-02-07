@@ -635,7 +635,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             number=self.number,
             user_last_name=self.user.last_name,
             user_first_name=self.user.first_name,
-            user_nir=self.user.nir,
+            user_nir=self.user.jobseeker_profile.nir,
             user_birthdate=self.user.birthdate,
             user_id_national_pe=self.user.jobseeker_profile.pe_obfuscated_nir,
             origin_siae_siret=siae_siret,
@@ -929,11 +929,11 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             [
                 self.user.first_name,
                 self.user.last_name,
-                self.user.nir,
+                self.user.jobseeker_profile.nir,
                 self.user.birthdate,
             ]
         ):
-            self.pe_log_err("had an invalid user={} nir={}", self.user, self.user.nir)
+            self.pe_log_err("had an invalid user={} nir={}", self.user, self.user.jobseeker_profile.nir)
             # we save those as pending since the cron will ignore those cases anyway and thus has
             # no chance to block itself.
             self.pe_save_pending(
@@ -946,7 +946,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             id_national = self.pe_rech_individu(
                 self.user.first_name,
                 self.user.last_name,
-                self.user.nir,
+                self.user.jobseeker_profile.nir,
                 self.user.birthdate,
                 now,
             )
@@ -1785,10 +1785,10 @@ class PoleEmploiApprovalManager(models.Manager):
         Their input formats can be checked to limit the risk of errors.
         """
         filters = []
-        if user.nir:
+        if user.jobseeker_profile.nir:
             # Allow duplicated NIR within PE approvals, but that will most probably change with the
             # ApprovalsWrapper code revamp later on. For now there is no unicity constraint on this column.
-            filters.append(Q(nir=user.nir))
+            filters.append(Q(nir=user.jobseeker_profile.nir))
         if user.jobseeker_profile.pole_emploi_id and user.birthdate:
             filters.append(Q(pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.birthdate))
         if not filters:

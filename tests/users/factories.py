@@ -139,25 +139,6 @@ class JobSeekerFactory(UserFactory):
             jobseeker_profile__pole_emploi_since=AllocationDuration.MORE_THAN_24_MONTHS,
         )
 
-    @factory.lazy_attribute
-    def nir(self):
-        gender = random.choice([1, 2])
-        if self.birthdate:
-            year = self.birthdate.strftime("%y")
-            month = self.birthdate.strftime("%m")
-        else:
-            year = "87"
-            month = "06"
-        department = str(random.randint(1, 99)).zfill(2)
-        random_1 = str(random.randint(0, 399)).zfill(3)
-        random_2 = str(random.randint(0, 399)).zfill(3)
-        incomplete_nir = f"{gender}{year}{month}{department}{random_1}{random_2}"
-        assert len(incomplete_nir) == 13
-        control_key = str(97 - int(incomplete_nir) % 97).zfill(2)
-        nir = f"{incomplete_nir}{control_key}"
-        validate_nir(nir)
-        return nir
-
     @classmethod
     def _adjust_kwargs(cls, **kwargs):
         # Deactivate automatic creation of JobSeekerProfile in User.save
@@ -195,7 +176,7 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
             first_name="Sacha",
             last_name="Dupont",
             birthdate="1990-05-01",
-            nir="290010101010125",
+            jobseeker_profile__for_snapshot=True,
             address_line_1="Rue du clos de la Grange",
             post_code="91234",
             city="Choufleury",
@@ -258,7 +239,29 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
             hexa_post_code=factory.Faker("postalcode"),
             hexa_commune=factory.SubFactory(CommuneFactory),
         )
+        for_snapshot = factory.Trait(
+            nir="290010101010125",
+        )
 
     user = factory.SubFactory(JobSeekerFactory, jobseeker_profile=None)
 
     education_level = factory.fuzzy.FuzzyChoice(EducationLevel.values + [""])
+
+    @factory.lazy_attribute
+    def nir(self):
+        gender = random.choice([1, 2])
+        if self.user.birthdate:
+            year = self.user.birthdate.strftime("%y")
+            month = self.user.birthdate.strftime("%m")
+        else:
+            year = "87"
+            month = "06"
+        department = str(random.randint(1, 99)).zfill(2)
+        random_1 = str(random.randint(0, 399)).zfill(3)
+        random_2 = str(random.randint(0, 399)).zfill(3)
+        incomplete_nir = f"{gender}{year}{month}{department}{random_1}{random_2}"
+        assert len(incomplete_nir) == 13
+        control_key = str(97 - int(incomplete_nir) % 97).zfill(2)
+        nir = f"{incomplete_nir}{control_key}"
+        validate_nir(nir)
+        return nir

@@ -105,7 +105,7 @@ def _serialize_job_application(job_application):
         approval_end_date = approval.end_at
 
     return [
-        _resolve_title(job_seeker.title, job_seeker.nir),
+        _resolve_title(job_seeker.title, job_seeker.jobseeker_profile.nir),
         job_seeker.last_name,
         job_seeker.first_name,
         job_seeker.email,

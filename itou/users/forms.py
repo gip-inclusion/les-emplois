@@ -6,7 +6,7 @@ class JobSeekerProfileFieldsMixin:
 
     PROFILE_FIELDS = []
 
-    def __init__(self, *args, instance, **kwargs):
+    def __init__(self, *args, instance=None, **kwargs):
         profile_initial = {}
         if instance:
             for field in self.PROFILE_FIELDS:
@@ -22,3 +22,11 @@ class JobSeekerProfileFieldsMixin:
             setattr(user.jobseeker_profile, field, self.cleaned_data[field])
         if commit:
             user.jobseeker_profile.save(update_fields=self.PROFILE_FIELDS)
+
+    @property
+    def cleaned_data_from_profile_fields(self):
+        return {k: v for k, v in self.cleaned_data.items() if k in self.PROFILE_FIELDS}
+
+    @property
+    def cleaned_data_without_profile_fields(self):
+        return {k: v for k, v in self.cleaned_data.items() if k not in self.PROFILE_FIELDS}

@@ -39,7 +39,7 @@ class Command(XlsxExportMixin, BaseCommand):
                     approval.number,
                     approval.pe_notification_time.isoformat(sep=" "),
                     approval.pe_notification_exit_code,
-                    approval.user.nir,
+                    approval.user.jobseeker_profile.nir,
                     approval.user.jobseeker_profile.pole_emploi_id,
                     approval.user.last_name,
                     approval.user.first_name,

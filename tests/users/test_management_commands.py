@@ -61,19 +61,19 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         }
 
         # Create `user1`.
-        job_app1 = JobApplicationFactory(with_approval=True, job_seeker__nir="", **kwargs)
+        job_app1 = JobApplicationFactory(with_approval=True, job_seeker__jobseeker_profile__nir="", **kwargs)
         user1 = job_app1.job_seeker
 
-        assert user1.nir == ""
+        assert user1.jobseeker_profile.nir == ""
         assert 1 == user1.approvals.count()
         assert 1 == user1.job_applications.count()
         assert 1 == user1.eligibility_diagnoses.count()
 
         # Create `user2`.
-        job_app2 = JobApplicationFactory(job_seeker__nir="", **kwargs)
+        job_app2 = JobApplicationFactory(job_seeker__jobseeker_profile__nir="", **kwargs)
         user2 = job_app2.job_seeker
 
-        assert user2.nir == ""
+        assert user2.jobseeker_profile.nir == ""
         assert 0 == user2.approvals.count()
         assert 1 == user2.job_applications.count()
         assert 1 == user2.eligibility_diagnoses.count()
@@ -81,9 +81,9 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         # Create `user3`.
         job_app3 = JobApplicationFactory(**kwargs)
         user3 = job_app3.job_seeker
-        expected_nir = user3.nir
+        expected_nir = user3.jobseeker_profile.nir
 
-        assert user3.nir
+        assert user3.jobseeker_profile.nir
         assert 0 == user3.approvals.count()
         assert 1 == user3.job_applications.count()
         assert 1 == user3.eligibility_diagnoses.count()
@@ -94,7 +94,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         # If only one NIR exists for all the duplicates, it should
         # be reassigned to the target account.
         user1.refresh_from_db()
-        assert user1.nir == expected_nir
+        assert user1.jobseeker_profile.nir == expected_nir
 
         assert 3 == user1.job_applications.count()
         assert 3 == user1.eligibility_diagnoses.count()
@@ -123,21 +123,21 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         }
 
         # Create `user1` through a job application sent by him.
-        job_app1 = JobApplicationSentByJobSeekerFactory(job_seeker__nir="", **kwargs)
+        job_app1 = JobApplicationSentByJobSeekerFactory(job_seeker__jobseeker_profile__nir="", **kwargs)
         user1 = job_app1.job_seeker
 
         assert 1 == user1.job_applications.count()
         assert job_app1.sender == user1
 
         # Create `user2` through a job application sent by him.
-        job_app2 = JobApplicationSentByJobSeekerFactory(job_seeker__nir="", **kwargs)
+        job_app2 = JobApplicationSentByJobSeekerFactory(job_seeker__jobseeker_profile__nir="", **kwargs)
         user2 = job_app2.job_seeker
 
         assert 1 == user2.job_applications.count()
         assert job_app2.sender == user2
 
         # Create `user3` through a job application sent by a prescriber.
-        job_app3 = JobApplicationFactory(job_seeker__nir="", **kwargs)
+        job_app3 = JobApplicationFactory(job_seeker__jobseeker_profile__nir="", **kwargs)
         user3 = job_app3.job_seeker
         assert job_app3.sender != user3
         job_app3_sender = job_app3.sender  # The sender is a prescriber.
@@ -184,11 +184,13 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         }
 
         # Create `user1`.
-        job_app1 = JobApplicationFactory(with_approval=True, job_seeker__nir="", **kwargs)
+        job_app1 = JobApplicationFactory(with_approval=True, job_seeker__jobseeker_profile__nir="", **kwargs)
         user1 = job_app1.job_seeker
 
         # Create `user2` through a job application sent by him.
-        job_app2 = JobApplicationSentByJobSeekerFactory(with_approval=True, job_seeker__nir="", **kwargs)
+        job_app2 = JobApplicationSentByJobSeekerFactory(
+            with_approval=True, job_seeker__jobseeker_profile__nir="", **kwargs
+        )
         user2 = job_app2.job_seeker
 
         # Launch command
@@ -1054,7 +1056,7 @@ def test_pe_certify_users(settings, respx_mock, capsys, snapshot):
         first_name="Yoder",
         last_name="Olson",
         birthdate=datetime.date(1994, 2, 22),
-        nir="194022734304328",
+        jobseeker_profile__nir="194022734304328",
     )
     settings.API_ESD = {
         "BASE_URL": "https://pe.fake",
@@ -1108,7 +1110,7 @@ def test_pe_certify_users_with_swap(settings, respx_mock, capsys, snapshot):
         first_name="Balthazar",
         last_name="Durand",
         birthdate=datetime.date(1987, 6, 21),
-        nir="187062112345678",
+        jobseeker_profile__nir="187062112345678",
     )
     settings.API_ESD = {
         "BASE_URL": "https://pe.fake",

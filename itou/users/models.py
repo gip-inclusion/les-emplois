@@ -349,7 +349,7 @@ class User(AbstractUser, AddressMixin):
             if must_create_profile:
                 JobSeekerProfile.objects.create(user=self)
 
-            if self.has_data_changed(["nir", "birthdate", "last_name", "first_name"]):
+            if self.has_data_changed(["birthdate", "last_name", "first_name"]):
                 self.jobseeker_profile.pe_obfuscated_nir = None
                 self.jobseeker_profile.pe_last_certification_attempt_at = None
                 self.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
@@ -410,7 +410,9 @@ class User(AbstractUser, AddressMixin):
         return False
 
     def can_add_nir(self, job_seeker):
-        return (self.is_prescriber_with_authorized_org or self.is_employer) and (job_seeker and not job_seeker.nir)
+        return (self.is_prescriber_with_authorized_org or self.is_employer) and (
+            job_seeker and not job_seeker.jobseeker_profile.nir
+        )
 
     def is_created_by(self, user):
         return bool(self.created_by_id and self.created_by_id == user.pk)
@@ -1018,6 +1020,28 @@ class JobSeekerProfile(models.Model):
 
     def __str__(self):
         return str(self.user)
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        instance = super().from_db(db, field_names, values)
+        instance._old_values = dict(zip(field_names, values))
+        return instance
+
+    def has_data_changed(self, fields):
+        if hasattr(self, "_old_values"):
+            for field in fields:
+                if getattr(self, field) != self._old_values[field]:
+                    return True
+        return False
+
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        self.validate_constraints()
+        if self.pe_obfuscated_nir and self.has_data_changed(["nir"]):
+            self.pe_obfuscated_nir = None
+            self.pe_last_certification_attempt_at = None
+            if update_fields is not None:
+                update_fields = set(update_fields) | {"pe_obfuscated_nir", "pe_last_certification_attempt_at"}
+        super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
     @staticmethod
     def clean_pole_emploi_fields(cleaned_data):

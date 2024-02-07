@@ -44,7 +44,7 @@ class Command(BaseCommand):
                 user.first_name if not swap else user.last_name,
                 user.last_name if not swap else user.first_name,
                 user.birthdate,
-                user.nir,
+                user.jobseeker_profile.nir,
             )
 
         active_job_seekers = (
@@ -59,7 +59,9 @@ class Command(BaseCommand):
         )  # most recent users first, they are the top priority.
         self.stdout.write(f"> about to resolve first_name and last_name for count={active_job_seekers.count()} users.")
 
-        eligible_users = active_job_seekers.exclude(Q(nir="") | Q(birthdate=None) | Q(first_name="") | Q(last_name=""))
+        eligible_users = active_job_seekers.exclude(
+            Q(jobseeker_profile__nir="") | Q(birthdate=None) | Q(first_name="") | Q(last_name="")
+        )
         self.stdout.write(f"> only count={eligible_users.count()} users have the necessary data to be resolved.")
 
         examined_profiles = []

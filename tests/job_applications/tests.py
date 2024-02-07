@@ -1005,7 +1005,7 @@ class JobApplicationNotificationsTest(TestCase):
     def test_manually_deliver_approval(self, *args, **kwargs):
         staff_member = ItouStaffFactory()
         job_seeker = JobSeekerFactory(
-            nir="",
+            jobseeker_profile__nir="",
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
@@ -1030,7 +1030,7 @@ class JobApplicationNotificationsTest(TestCase):
     def test_manually_refuse_approval(self):
         staff_member = ItouStaffFactory()
         job_seeker = JobSeekerFactory(
-            nir="",
+            jobseeker_profile__nir="",
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
@@ -1299,7 +1299,7 @@ class JobApplicationWorkflowTest(TestCase):
 
     def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval_with_nir(self):
         job_seeker = JobSeekerFactory(jobseeker_profile__pole_emploi_id="", birthdate=None)
-        pe_approval = PoleEmploiApprovalFactory(nir=job_seeker.nir)
+        pe_approval = PoleEmploiApprovalFactory(nir=job_seeker.jobseeker_profile.nir)
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
         )
@@ -1325,7 +1325,7 @@ class JobApplicationWorkflowTest(TestCase):
         When a Pôle emploi ID is forgotten, a manual approval delivery is triggered.
         """
         job_seeker = JobSeekerFactory(
-            nir="",
+            jobseeker_profile__nir="",
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
@@ -1364,7 +1364,7 @@ class JobApplicationWorkflowTest(TestCase):
 
     def test_accept_job_application_sent_by_job_seeker_with_a_pole_emploi_id_no_pe_approval(self):
         job_seeker = JobSeekerFactory(
-            nir="",
+            jobseeker_profile__nir="",
             with_pole_emploi_id=True,
         )
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -1381,7 +1381,7 @@ class JobApplicationWorkflowTest(TestCase):
 
     def test_accept_job_application_sent_by_job_seeker_unregistered_no_pe_approval(self):
         job_seeker = JobSeekerFactory(
-            nir="",
+            jobseeker_profile__nir="",
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_NOT_REGISTERED,
         )
