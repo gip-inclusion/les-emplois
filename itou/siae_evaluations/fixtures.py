@@ -85,11 +85,11 @@ def load_data():
                 last_name=last_name,
                 username=f"siae_evaluations_{i}",
                 kind=users_enums.KIND_JOB_SEEKER,
-                nir=nir,
                 title=random.choice(users_enums.Title.values),
             )
+            job_seeker.jobseeker_profile.nir = nir
             job_seeker.jobseeker_profile.pole_emploi_id = pe_id
-            job_seeker.jobseeker_profile.save(update_fields=["pole_emploi_id"])
+            job_seeker.jobseeker_profile.save(update_fields=["nir", "pole_emploi_id"])
             level = str((i % 2) + 1)
             # See AdministrativeCriteriaForm
             level2_criteria_count = 2 if controlled_siae.kind in [CompanyKind.AI, CompanyKind.ETTI] else 3
