@@ -145,9 +145,9 @@ def pe_connect_callback(request):
 
     nir = request.session.get(global_constants.ITOU_SESSION_NIR_KEY)
     if nir:
-        user.nir = nir
-        user.lack_of_nir_reason = ""
-        user.save(update_fields=["nir", "lack_of_nir_reason"])
+        user.jobseeker_profile.nir = nir
+        user.jobseeker_profile.lack_of_nir_reason = ""
+        user.jobseeker_profile.save(update_fields=["nir", "lack_of_nir_reason"])
 
     # Fetch external data if never done
     latest_pe_data_import = user.externaldataimport_set.pe_sources().first()

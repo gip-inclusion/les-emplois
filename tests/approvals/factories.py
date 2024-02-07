@@ -29,7 +29,7 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory
 
 
 fake = Faker("fr_FR")
@@ -98,7 +98,7 @@ class CancelledApprovalFactory(factory.django.DjangoModelFactory):
 
     @factory.lazy_attribute
     def user_nir(self):
-        return JobSeekerFactory.build(birthdate=self.user_birthdate).nir
+        return JobSeekerProfileFactory.build(user__birthdate=self.user_birthdate).nir
 
 
 class SuspensionFactory(factory.django.DjangoModelFactory):

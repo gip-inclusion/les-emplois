@@ -40,7 +40,12 @@ class Command(BaseCommand):
             # those with no accepted job application would also fail and stay pending.
             # also removes the approvals without any job application yet.
             jobapplication__state=JobApplicationWorkflow.STATE_ACCEPTED,
-        ).exclude(Q(user__nir="") | Q(user__birthdate=None) | Q(user__first_name="") | Q(user__last_name="")).update(
+        ).exclude(
+            Q(user__jobseeker_profile__nir="")
+            | Q(user__birthdate=None)
+            | Q(user__first_name="")
+            | Q(user__last_name="")
+        ).update(
             pe_notification_status=api_enums.PEApiNotificationStatus.READY
         )
         approvals_models.CancelledApproval.objects.filter(

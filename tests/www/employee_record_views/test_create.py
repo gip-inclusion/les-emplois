@@ -137,9 +137,9 @@ class AbstractCreateEmployeeRecordTest(TestCase):
 
     def test_access_denied_nir_associated_to_other(self):
         self.job_seeker = self.job_application.job_seeker
-        self.job_seeker.nir = ""
-        self.job_seeker.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
-        self.job_seeker.save(update_fields=("nir", "lack_of_nir_reason"))
+        self.job_seeker.jobseeker_profile.nir = ""
+        self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
+        self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
 
         self.client.force_login(self.user)
         response = self.client.get(self.url)

@@ -19,7 +19,7 @@ from tests.job_applications.factories import (
     JobApplicationSentByPrescriberFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory
 from tests.utils.test import TestCase
 
 
@@ -29,7 +29,7 @@ faker = Faker()
 class CheckJobSeekerNirFormTest(TestCase):
     def test_form_job_seeker_not_found(self):
         # This NIR is unique.
-        nir = JobSeekerFactory.build().nir
+        nir = JobSeekerProfileFactory.build().nir
         form_data = {"nir": nir}
         form = apply_forms.CheckJobSeekerNirForm(data=form_data)
         assert form.is_valid()
@@ -38,15 +38,15 @@ class CheckJobSeekerNirFormTest(TestCase):
     def test_form_job_seeker_found(self):
         # A job seeker with this NIR already exists.
         nir = "141062A78200555"
-        job_seeker = JobSeekerFactory(nir=nir)
-        form_data = {"nir": job_seeker.nir}
+        job_seeker = JobSeekerFactory(jobseeker_profile__nir=nir)
+        form_data = {"nir": job_seeker.jobseeker_profile.nir}
         form = apply_forms.CheckJobSeekerNirForm(data=form_data)
         # A job seeker has been found.
         assert form.is_valid()
         assert form.job_seeker == job_seeker
 
         # NIR should be case insensitive.
-        form_data = {"nir": job_seeker.nir.lower()}
+        form_data = {"nir": job_seeker.jobseeker_profile.nir.lower()}
         form = apply_forms.CheckJobSeekerNirForm(data=form_data)
         # A job seeker has been found.
         assert form.is_valid()
@@ -56,7 +56,7 @@ class CheckJobSeekerNirFormTest(TestCase):
         # Application sent by a job seeker whose NIR is already used by another account.
         existing_account = JobSeekerFactory(email="unlikely@random.tld")
         user = JobSeekerFactory()
-        form_data = {"nir": existing_account.nir}
+        form_data = {"nir": existing_account.jobseeker_profile.nir}
         form = apply_forms.CheckJobSeekerNirForm(job_seeker=user, data=form_data)
         assert not form.is_valid()
         error_msg = form.errors["nir"][0]
@@ -64,8 +64,9 @@ class CheckJobSeekerNirFormTest(TestCase):
         assert existing_account.email not in error_msg
         assert "u*******@r*****.t**" in error_msg
 
-        existing_account = PrescriberFactory(nir=JobSeekerFactory.build().nir)
-        form_data = {"nir": existing_account.nir}
+        existing_account = PrescriberFactory()
+        profile = JobSeekerProfileFactory(user=existing_account)  # This should not be possible
+        form_data = {"nir": profile.nir}
         form = apply_forms.CheckJobSeekerNirForm(data=form_data)
         assert not form.is_valid()
         assert (

@@ -101,11 +101,11 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
         # If only one NIR exists for all the duplicates, it is reassigned to
         # the target account. This must be executed at the end because of the
         # uniqueness constraint.
-        if len(nirs) == 1 and not target.nir:
-            target.nir = nirs[0]
-            target.lack_of_nir_reason = ""
+        if len(nirs) == 1 and not target.jobseeker_profile.nir:
+            target.jobseeker_profile.nir = nirs[0]
+            target.jobseeker_profile.lack_of_nir_reason = ""
             if self.wet_run:
-                target.save()
+                target.jobseeker_profile.save()
 
     def handle_hard_duplicates(self, duplicates):
         """
@@ -129,7 +129,7 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
                 self.HARD_DUPLICATES_COUNT,
                 len(duplicates),
                 duplicate.email,
-                duplicate.nir,
+                duplicate.jobseeker_profile.nir,
                 duplicate.birthdate,
                 approval.number if approval else "",
                 approval.start_at.strftime("%d/%m/%Y") if approval else "",
@@ -190,7 +190,7 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
             # Ensure all users have the same birthdate.
             assert all(user.birthdate == duplicates[0].birthdate for user in duplicates)
 
-            nirs = [u.nir for u in duplicates if u.nir]
+            nirs = [u.jobseeker_profile.nir for u in duplicates if u.jobseeker_profile.nir]
             if len(nirs) > 1:
                 self.NIR_DUPLICATES_COUNT += 1
                 self.handle_nir_duplicates(duplicates)

@@ -138,8 +138,8 @@ def format_criteria_name_as_column_name(criteria):
 
 
 def get_gender_from_nir(job_seeker):
-    if job_seeker.nir:
-        match job_seeker.nir[0]:
+    if job_seeker.jobseeker_profile.nir:
+        match job_seeker.jobseeker_profile.nir[0]:
             case "1":
                 return "Homme"
             case "2":
@@ -150,16 +150,16 @@ def get_gender_from_nir(job_seeker):
 
 
 def get_birth_year_from_nir(job_seeker):
-    if job_seeker.nir:
+    if nir := job_seeker.jobseeker_profile.nir:
         # It will be our data analysts' job to decide whether `05` means `1905` or `2005`.
-        birth_year = int(job_seeker.nir[1:3])
+        birth_year = int(nir[1:3])
         return birth_year
     return None
 
 
 def get_birth_month_from_nir(job_seeker):
-    if job_seeker.nir:
-        birth_month = int(job_seeker.nir[3:5])
+    if nir := job_seeker.jobseeker_profile.nir:
+        birth_month = int(nir[3:5])
         if not 1 <= birth_month <= 12:
             # Exotic values means the birth month is unknown, as the 31-42 range was never observed in our data.
             # https://fr.wikipedia.org/wiki/Num%C3%A9ro_de_s%C3%A9curit%C3%A9_sociale_en_France#ancrage_B
@@ -193,7 +193,7 @@ def get_table():
                 "name": "hash_nir",
                 "type": "varchar",
                 "comment": "Version obfusquée du NIR",
-                "fn": lambda o: hash_content(o.nir) if o.nir else None,
+                "fn": lambda o: hash_content(o.jobseeker_profile.nir) if o.jobseeker_profile.nir else None,
             },
             {
                 "name": "sexe_selon_nir",

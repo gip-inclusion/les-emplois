@@ -857,14 +857,16 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             "post_code": "35400",
             "city": "Saint-Malo",
             "lack_of_nir": False,
-            "nir": user.nir,
+            "nir": user.jobseeker_profile.nir,
         }
         response = self.client.post(url, data=post_data)
         assert response.status_code == 200
         assert response.context["form"].errors.get("title") == ["Ce champ est obligatoire."]
 
     def test_edit_with_lack_of_nir_reason(self):
-        user = JobSeekerFactory(nir="", lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER)
+        user = JobSeekerFactory(
+            jobseeker_profile__nir="", jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER
+        )
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
@@ -892,12 +894,12 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
 
-        user.refresh_from_db()
-        assert user.lack_of_nir_reason == ""
-        assert user.nir == NEW_NIR.replace(" ", "")
+        user.jobseeker_profile.refresh_from_db()
+        assert user.jobseeker_profile.lack_of_nir_reason == ""
+        assert user.jobseeker_profile.nir == NEW_NIR.replace(" ", "")
 
     def test_edit_without_nir_information(self):
-        user = JobSeekerFactory(nir="", lack_of_nir_reason="")
+        user = JobSeekerFactory(jobseeker_profile__nir="", jobseeker_profile__lack_of_nir_reason="")
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
@@ -924,9 +926,9 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
 
-        user.refresh_from_db()
-        assert user.lack_of_nir_reason == ""
-        assert user.nir == NEW_NIR.replace(" ", "")
+        user.jobseeker_profile.refresh_from_db()
+        assert user.jobseeker_profile.lack_of_nir_reason == ""
+        assert user.jobseeker_profile.nir == NEW_NIR.replace(" ", "")
 
     def test_edit_sso(self):
         user = JobSeekerFactory(
@@ -1021,7 +1023,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             "post_code": "35400",
             "city": "Saint-Malo",
             "lack_of_nir": False,
-            "nir": user.nir,
+            "nir": user.jobseeker_profile.nir,
         }
         response = self.client.post(url, data=post_data)
         assert response.status_code == 200
@@ -1182,7 +1184,8 @@ class EditJobSeekerInfo(TestCase):
 
     def test_edit_by_company_with_lack_of_nir_reason(self):
         job_application = JobApplicationSentByPrescriberFactory(
-            job_seeker__nir="", job_seeker__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER
+            job_seeker__jobseeker_profile__nir="",
+            job_seeker__jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
         )
         user = job_application.to_company.members.first()
 
@@ -1222,14 +1225,16 @@ class EditJobSeekerInfo(TestCase):
         assert response.url == back_url
 
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
-        assert job_seeker.lack_of_nir_reason == ""
-        assert job_seeker.nir == NEW_NIR.replace(" ", "")
+        assert job_seeker.jobseeker_profile.lack_of_nir_reason == ""
+        assert job_seeker.jobseeker_profile.nir == NEW_NIR.replace(" ", "")
 
         # last_checked_at should have been updated
         assert job_seeker.last_checked_at > previous_last_checked_at
 
     def test_edit_by_company_without_nir_information(self):
-        job_application = JobApplicationSentByPrescriberFactory(job_seeker__nir="", job_seeker__lack_of_nir_reason="")
+        job_application = JobApplicationSentByPrescriberFactory(
+            job_seeker__jobseeker_profile__nir="", job_seeker__jobseeker_profile__lack_of_nir_reason=""
+        )
         user = job_application.to_company.members.first()
 
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
@@ -1277,8 +1282,8 @@ class EditJobSeekerInfo(TestCase):
         response = self.client.post(url, data=post_data)
         self.assertRedirects(response, expected_url=back_url)
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
-        assert job_seeker.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
-        assert job_seeker.nir == ""
+        assert job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
+        assert job_seeker.jobseeker_profile.nir == ""
 
         post_data.update(
             {
@@ -1300,8 +1305,8 @@ class EditJobSeekerInfo(TestCase):
         self.assertRedirects(response, expected_url=back_url)
 
         job_seeker.refresh_from_db()
-        assert job_seeker.lack_of_nir_reason == ""
-        assert job_seeker.nir == NEW_NIR.replace(" ", "")
+        assert job_seeker.jobseeker_profile.lack_of_nir_reason == ""
+        assert job_seeker.jobseeker_profile.nir == NEW_NIR.replace(" ", "")
 
         # last_checked_at should have been updated
         assert job_seeker.last_checked_at > previous_last_checked_at

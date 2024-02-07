@@ -325,8 +325,6 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
                     "city",
                     "address_in_qpv",
                     "kind",
-                    "nir",
-                    "lack_of_nir_reason",
                     "created_by",
                     "identity_provider",
                     "jobseeker_profile_link",
@@ -477,7 +475,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
                 search_fields.append("asp_uid__exact")
         if search_term.isdecimal():
             search_fields.append("pk__exact")
-            search_fields.append("nir__exact")
+            search_fields.append("jobseeker__nir__exact")
         else:
             search_fields.append("email")
             if "@" not in search_term:
@@ -690,7 +688,6 @@ class JobSeekerProfileAdmin(ItouModelAdmin):
     )
 
     readonly_fields = (
-        "nir",
         "hexa_lane_type",
         "hexa_post_code",
         "hexa_commune",
@@ -709,6 +706,7 @@ class JobSeekerProfileAdmin(ItouModelAdmin):
                     "birth_country",
                     "education_level",
                     "nir",
+                    "lack_of_nir_reason",
                     "pole_emploi_id",
                     "lack_of_pole_emploi_id_reason",
                     "pole_emploi_since",
@@ -756,10 +754,6 @@ class JobSeekerProfileAdmin(ItouModelAdmin):
     @admin.display(description="date de naissance")
     def birthdate(self, obj):
         return obj.user.birthdate
-
-    @admin.display(description="NIR")
-    def nir(self, obj):
-        return obj.user.nir or "-"
 
     @admin.display(description="nom complet")
     def username(self, obj):

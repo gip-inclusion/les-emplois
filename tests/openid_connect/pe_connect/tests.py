@@ -250,7 +250,7 @@ class TestPoleEmploiConnect:
         assert user.username == PEAMU_USERINFO["sub"]
         assert user.has_sso_provider
         assert user.identity_provider == IdentityProvider.PE_CONNECT
-        assert user.nir == ""
+        assert user.jobseeker_profile.nir == ""
         assert user.birthdate == datetime.date(2000, 1, 1)
         assert user.externaldataimport_set.pe_sources().get().status == ExternalDataImport.STATUS_OK
 
@@ -288,7 +288,7 @@ class TestPoleEmploiConnect:
         mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
         user = User.objects.get()
         assert user.email == PEAMU_USERINFO["email"]
-        assert user.nir == nir
+        assert user.jobseeker_profile.nir == nir
 
     @respx.mock
     def test_callback_redirect_on_too_many_kind_exception(self, client):

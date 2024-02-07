@@ -165,15 +165,15 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
                 continue
 
             if not self.dry_run:
-                job_seeker.nir = row[NIR_COL]
-                if job_seeker.nir:
-                    job_seeker.lack_of_nir_reason = ""
+                job_seeker.jobseeker_profile.nir = row[NIR_COL]
+                if job_seeker.jobseeker_profile.nir:
+                    job_seeker.jobseeker_profile.lack_of_nir_reason = ""
                 nb_updated_job_seekers += 1
 
             if not self.dry_run:
-                job_seeker.save()
+                job_seeker.jobseeker_profile.save()
 
-        self.logger.info(f"{nb_updated_job_seekers} updated job seekers.")
+        self.logger.info(f"{nb_updated_job_seekers} updated job seeker profiles.")
         self.logger.info(f"{len(not_updated_job_seekers)} rows not existing in database.")
         self.log_to_csv(csv_name="inexistent_users", logs=not_updated_job_seekers)
         self.logger.info(f"Inexistent users exported to {settings.EXPORT_DIR}/inexistent_users.csv.")

@@ -94,7 +94,7 @@ class CheckJobSeekerNirForm(forms.Form):
     def clean_nir(self):
         nir = self.cleaned_data["nir"].upper()
         nir = nir.replace(" ", "")
-        existing_account = User.objects.filter(nir=nir).first()
+        existing_account = User.objects.filter(jobseeker_profile__nir=nir).first()
 
         # Job application sent by autonomous job seeker.
         if self.job_seeker:
@@ -160,7 +160,7 @@ class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):
         JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
 
 
-class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, forms.ModelForm):
+class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, JobSeekerProfileFieldsMixin, forms.ModelForm):
     REQUIRED_FIELDS = [
         "title",
         "first_name",
@@ -168,11 +168,11 @@ class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, forms.ModelForm)
         "birthdate",
     ]
 
+    PROFILE_FIELDS = ["nir", "lack_of_nir_reason"]
+
     class Meta:
         model = User
         fields = [
-            "nir",
-            "lack_of_nir_reason",
             "title",
             "first_name",
             "last_name",
@@ -826,16 +826,16 @@ class EditHiringDateForm(forms.ModelForm):
         return cleaned_data
 
 
-class JobSeekerPersonalDataForm(JobSeekerProfileFieldsMixin, JobSeekerNIRUpdateMixin, forms.ModelForm):
+class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileFieldsMixin, forms.ModelForm):
     """
     Info that will be used to search for an existing Pôle emploi approval.
     """
 
-    PROFILE_FIELDS = ["pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+    PROFILE_FIELDS = ["pole_emploi_id", "lack_of_pole_emploi_id_reason", "nir", "lack_of_nir_reason"]
 
     class Meta:
         model = User
-        fields = ["nir", "lack_of_nir_reason", "birthdate"]
+        fields = ["birthdate"]
         help_texts = {"birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978."}
 
     def __init__(self, *args, **kwargs):
@@ -850,6 +850,10 @@ class JobSeekerPersonalDataForm(JobSeekerProfileFieldsMixin, JobSeekerNIRUpdateM
     def clean(self):
         super().clean()
         JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
+        # TODO(xfernandez): switch this form to a JobSeekerProfile ModelForm
+        for field in self.PROFILE_FIELDS:
+            setattr(self.instance.jobseeker_profile, field, self.cleaned_data.get(field))
+        self.instance.jobseeker_profile.validate_constraints()
 
 
 class UserAddressForm(MandatoryAddressFormMixin, forms.ModelForm):

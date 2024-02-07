@@ -124,7 +124,7 @@ class JobSeekerSignupTest(TestCase):
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
         job_seeker = User.objects.get(email=post_data["email"])
-        assert nir == job_seeker.nir
+        assert nir == job_seeker.jobseeker_profile.nir
         assert job_seeker.title == "M"
         assert job_seeker.has_jobseeker_profile
 
@@ -179,7 +179,7 @@ class JobSeekerSignupTest(TestCase):
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
         job_seeker = User.objects.get(email=post_data["email"])
-        assert job_seeker.nir == ""
+        assert job_seeker.jobseeker_profile.nir == ""
         assert job_seeker.title == "M"
         assert job_seeker.has_jobseeker_profile
 
@@ -302,7 +302,7 @@ class JobSeekerSignupTest(TestCase):
         # New created job seeker has no title and is redirected to complete its infos
         mock_oauth_dance(self.client, expected_route="dashboard:edit_user_info")
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
-        assert nir == job_seeker.nir
+        assert nir == job_seeker.jobseeker_profile.nir
         assert job_seeker.has_jobseeker_profile
 
     @respx.mock
@@ -328,5 +328,5 @@ class JobSeekerSignupTest(TestCase):
         # New created job seeker has no title and is redirected to complete its infos
         mock_oauth_dance(self.client, expected_route="dashboard:edit_user_info")
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
-        assert not job_seeker.nir
+        assert not job_seeker.jobseeker_profile.nir
         assert job_seeker.has_jobseeker_profile

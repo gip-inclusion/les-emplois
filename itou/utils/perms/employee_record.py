@@ -56,7 +56,7 @@ def can_create_employee_record(request, job_application_id) -> JobApplication:
         to_company=company,
     )
 
-    if job_application.job_seeker.lack_of_nir_reason == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER:
+    if job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER:
         raise PermissionDenied(
             "Cette fiche salarié ne peut pas être modifiée. "
             "Veuillez d'abord régulariser le numéro de sécurité sociale."

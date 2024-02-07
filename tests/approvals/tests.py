@@ -771,7 +771,7 @@ class PoleEmploiApprovalManagerTest(TestCase):
         assert search_results[1] == other_valid_approval
 
         # ensure we **also** find PE approvals using the user's NIR.
-        nir_approval = PoleEmploiApprovalFactory(nir=user.nir)
+        nir_approval = PoleEmploiApprovalFactory(nir=user.jobseeker_profile.nir)
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
         assert search_results.count() == 3
@@ -780,7 +780,7 @@ class PoleEmploiApprovalManagerTest(TestCase):
         assert search_results[2] == nir_approval
 
         # since we can have multiple PE approvals with the same nir, let's fetch them all
-        other_nir_approval = PoleEmploiApprovalFactory(nir=user.nir)
+        other_nir_approval = PoleEmploiApprovalFactory(nir=user.jobseeker_profile.nir)
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
         assert search_results.count() == 4
@@ -810,7 +810,7 @@ class PoleEmploiApprovalManagerTest(TestCase):
         assert search_results[3] == nir_approval
 
     def test_find_for_no_nir(self):
-        user = JobSeekerFactory(nir="")
+        user = JobSeekerFactory(jobseeker_profile__nir="")
         PoleEmploiApprovalFactory(nir=None)  # entirely unrelated
         with self.assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
@@ -985,7 +985,7 @@ class CustomApprovalAdminViewsTest(TestCase):
         # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
         # with a manual verification.
         job_seeker = JobSeekerFactory(
-            nir="",
+            jobseeker_profile__nir="",
             jobseeker_profile__pole_emploi_id="",
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
