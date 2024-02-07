@@ -484,7 +484,6 @@ def select_financial_annex(request, template_name="companies/select_financial_an
 def card(request, siae_id, template_name="companies/card.html"):
     company = get_object_or_404(Company.objects.with_has_active_members(), pk=siae_id)
     jobs_descriptions = JobDescription.objects.filter(company=company).select_related("appellation", "location")
-    back_url = get_safe_url(request, "back_url")
     active_jobs_descriptions = []
     if company.block_job_applications:
         other_jobs_descriptions = jobs_descriptions
@@ -498,7 +497,6 @@ def card(request, siae_id, template_name="companies/card.html"):
 
     context = {
         "siae": company,
-        "back_url": back_url,
         "active_jobs_descriptions": active_jobs_descriptions,
         "other_jobs_descriptions": other_jobs_descriptions,
         "matomo_custom_title": "Fiche de la structure d'insertion",

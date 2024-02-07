@@ -13,7 +13,7 @@
                     {% endif %}
                 {% else %}
                     <a class="btn btn-sm btn-ico btn-link text-start p-0 mh-auto"
-                       href="{{ job_description.company.get_card_url }}?back_url={{ request.get_full_path|urlencode }}"
+                       href="{{ job_description.company.get_card_url }}"
                        {% matomo_event "candidature" "clic" "clic-structure-fichedeposte" %}
                        target="_blank"
                        aria-label="Ouvrir la page de la structure dans un nouvel onglet">
