@@ -1,4 +1,6 @@
-from itou.utils.apis.data_inclusion import DataInclusionApiClient
+import pytest
+
+from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiException
 
 
 def test_data_inclusion_client(settings, respx_mock):
@@ -36,7 +38,9 @@ def test_data_inclusion_client(settings, respx_mock):
 
     # check exceptions
     api_mock.respond(200, json={"something": "else"})
-    assert client.services("fake-insee-code") == []
+    with pytest.raises(DataInclusionApiException):
+        client.services("fake-insee-code")
 
     api_mock.respond(403, json={"something": "else"})
-    assert client.services("fake-insee-code") == []
+    with pytest.raises(DataInclusionApiException):
+        client.services("fake-insee-code")
