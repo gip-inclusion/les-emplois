@@ -17,7 +17,7 @@ from itou.companies.models import Company, SiaeConvention
 CONVENTION_DEACTIVATION_THRESHOLD = 200
 
 
-def update_existing_conventions(siret_to_siae_row, siret_to_asp_id, active_siae_keys):
+def update_existing_conventions(siret_to_siae_row, active_siae_keys):
     """
     Update existing conventions, mainly the is_active field,
     and check data integrity on the fly.
@@ -38,7 +38,7 @@ def update_existing_conventions(siret_to_siae_row, siret_to_asp_id, active_siae_
             # If they still have C1 data they could not be deleted in an earlier step and thus will stay in
             # the C1 database forever, we should leave them untouched.
             if convention.is_active:
-                assert not does_siae_have_an_active_convention(active_siae_keys, siret_to_asp_id, siae)
+                assert not does_siae_have_an_active_convention(active_siae_keys, siret_to_siae_row, siae)
                 conventions_to_deactivate.append(convention)
             continue
 
@@ -68,7 +68,7 @@ def update_existing_conventions(siret_to_siae_row, siret_to_asp_id, active_siae_
             convention.siret_signature = row.siret_signature
             convention.save()
 
-        should_be_active = does_siae_have_an_active_convention(active_siae_keys, siret_to_asp_id, siae)
+        should_be_active = does_siae_have_an_active_convention(active_siae_keys, siret_to_siae_row, siae)
 
         if convention.is_active != should_be_active:
             if should_be_active:
@@ -105,7 +105,7 @@ def update_existing_conventions(siret_to_siae_row, siret_to_asp_id, active_siae_
     print(f"{len(conventions_to_deactivate)} conventions have been deactivated")
 
 
-def get_creatable_conventions(vue_af_df, siret_to_asp_id, siret_to_siae_row, active_siae_keys):
+def get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys):
     """
     Get conventions which should be created.
 
@@ -127,7 +127,7 @@ def get_creatable_conventions(vue_af_df, siret_to_asp_id, siret_to_siae_row, act
             continue
 
         row = siret_to_siae_row[siae.siret]
-        is_active = does_siae_have_an_active_convention(active_siae_keys, siret_to_asp_id, siae)
+        is_active = does_siae_have_an_active_convention(active_siae_keys, siret_to_siae_row, siae)
 
         # convention is to be unique for an asp_id and a SIAE kind
         assert not SiaeConvention.objects.filter(asp_id=row.asp_id, kind=siae.kind).exists()

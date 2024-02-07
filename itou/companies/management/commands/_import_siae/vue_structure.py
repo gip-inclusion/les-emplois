@@ -91,24 +91,6 @@ def get_vue_structure_df():
 
 
 @timeit
-def get_siret_to_asp_id(vue_structure_df):
-    """
-    Provide the asp_id from the "Vue Structure" matching the given siret (i.e. siret_actualise).
-
-    Asp_id is a permanent immutable structure ID in ASP exports used to identify a structure à la ASP (an ACI and
-    an EI sharing the same SIRET being considered as a single structure à la ASP). Note that both siret_actualise and
-    siret_signature can change over time thus none of them can act as a good immutable structure ID.
-
-    The SIRET (siret_actualise) => asp_id match is very important to make sure all itou siaes
-    are matched to their correct ASP counterpart.
-    """
-    siret_to_asp_id = {}
-    for _, row in vue_structure_df.iterrows():
-        siret_to_asp_id[row.siret] = row.asp_id
-    return siret_to_asp_id
-
-
-@timeit
 def get_siret_to_siae_row(vue_structure_df):
     """
     Provide the row from the "Vue Structure" matching the given asp_id.
