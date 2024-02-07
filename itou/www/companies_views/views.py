@@ -66,6 +66,7 @@ def get_data_inclusion_services(code_insee):
             cache.set(cache_key, [], 60 * 15)
             return []
 
+        services = [s for s in services if s["modes_accueil"] == ["en-presentiel"]]
         results = random.sample(services, min(len(services), 3))
         results = [
             r

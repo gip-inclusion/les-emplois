@@ -1060,10 +1060,45 @@ def test_get_data_inclusion_services(settings, respx_mock):
         200,
         json={
             "items": [
-                {"service": {"id": "svc1", "source": "fake", "thematiques": ["a--b"]}, "distance": 1},
-                {"service": {"id": "svc2", "source": "fake", "thematiques": ["a--b"]}, "distance": 3},
-                {"service": {"id": "svc3", "source": "fake", "thematiques": ["a--b"]}, "distance": 2},
-                {"service": {"id": "svc4", "source": "fake", "thematiques": ["a--b"]}, "distance": 5},
+                {
+                    "service": {
+                        "id": "svc1",
+                        "source": "dora",
+                        "thematiques": ["a--b"],
+                        "modes_accueil": ["a-distance"],
+                        "lien_source": "https://fake.api.gouv.fr/services/svc1",
+                    },
+                    "distance": 1,
+                },
+                {
+                    "service": {
+                        "id": "svc2",
+                        "source": "fake",
+                        "thematiques": ["a--b"],
+                        "modes_accueil": ["en-presentiel"],
+                        "lien_source": "https://fake.api.gouv.fr/services/svc2",
+                    },
+                    "distance": 3,
+                },
+                {
+                    "service": {
+                        "id": "svc3",
+                        "source": "dora",
+                        "thematiques": ["a--b"],
+                        "modes_accueil": ["en-presentiel", "a-distance"],
+                    },
+                    "distance": 2,
+                },
+                {
+                    "service": {
+                        "id": "svc4",
+                        "source": "fake",
+                        "thematiques": ["a--b"],
+                        "modes_accueil": ["en-presentiel"],
+                        "lien_source": "https://fake.api.gouv.fr/services/svc4",
+                    },
+                    "distance": 5,
+                },
             ]
         },
     )
@@ -1074,6 +1109,8 @@ def test_get_data_inclusion_services(settings, respx_mock):
         {
             "dora_di_url": "https://dora.inclusion.beta.gouv.fr/services/di--fake--svc4",
             "id": "svc4",
+            "lien_source": "https://fake.api.gouv.fr/services/svc4",
+            "modes_accueil": ["en-presentiel"],
             "source": "fake",
             "thematiques": ["a--b"],
             "thematiques_display": {"A"},
@@ -1081,13 +1118,8 @@ def test_get_data_inclusion_services(settings, respx_mock):
         {
             "dora_di_url": "https://dora.inclusion.beta.gouv.fr/services/di--fake--svc2",
             "id": "svc2",
-            "source": "fake",
-            "thematiques": ["a--b"],
-            "thematiques_display": {"A"},
-        },
-        {
-            "dora_di_url": "https://dora.inclusion.beta.gouv.fr/services/di--fake--svc1",
-            "id": "svc1",
+            "lien_source": "https://fake.api.gouv.fr/services/svc2",
+            "modes_accueil": ["en-presentiel"],
             "source": "fake",
             "thematiques": ["a--b"],
             "thematiques_display": {"A"},
