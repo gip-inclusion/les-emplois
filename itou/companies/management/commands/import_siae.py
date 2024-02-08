@@ -102,7 +102,7 @@ class Command(BaseCommand):
         for siae in staff_created_siaes.filter(convention__isnull=False):
             self.stdout.write(f"converted staff created siae.id={siae.id} to user created siae as it has a convention")
             siae.source = Company.SOURCE_USER_CREATED
-            siae.save()
+            siae.save(update_fields={"source"})
 
         recent_unconfirmed_siaes = staff_created_siaes.filter(created_at__gte=three_months_ago)
         self.stdout.write(
@@ -138,11 +138,12 @@ class Command(BaseCommand):
             if siae.convention.asp_id not in asp_id_to_siae_row:
                 continue
             row = asp_id_to_siae_row[siae.convention.asp_id]
+            updated_fields = set()
 
             auth_email = row.auth_email or siae.auth_email
             if siae.auth_email != auth_email:
                 siae.auth_email = auth_email
-                siae.save()
+                updated_fields.add("auth_email")
                 auth_email_updates += 1
 
             if siae.siret != row.siret:
@@ -169,7 +170,10 @@ class Command(BaseCommand):
                     f"siae.id={siae.id} has changed siret from {siae.siret} to {row.siret} (will be updated)"
                 )
                 siae.siret = row.siret
-                siae.save()
+                updated_fields.add("siret")
+
+            if updated_fields:
+                siae.save(update_fields=updated_fields)
 
         self.stdout.write(f"{auth_email_updates} siae.auth_email fields have been updated")
 
@@ -234,7 +238,7 @@ class Command(BaseCommand):
                 )
                 existing_siae.source = Company.SOURCE_ASP
                 existing_siae.convention = None
-                existing_siae.save()
+                existing_siae.save(update_fields={"source", "convention"})
 
         self.stdout.write("--- beginning of CSV output of all creatable_siaes ---")
         self.stdout.write("siret;kind;department;name;address")
@@ -269,7 +273,7 @@ class Command(BaseCommand):
             convention.save()
             assert convention.siaes.count() == 0
             siae.convention = convention
-            siae.save()
+            siae.save(update_fields={"convention"})
             assert convention.siaes.filter(source=Company.SOURCE_ASP).count() == 1
 
     @timeit
