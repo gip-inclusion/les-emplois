@@ -6,33 +6,21 @@
         <div class="px-3 px-lg-4 pt-3 pt-lg-4">
             <ul class="list-unstyled mb-lg-5">
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="https://dora.fabrique.social.gouv.fr/?{{ tracker }}"
-                       rel="noopener"
-                       target="_blank"
-                       aria-label="Consulter les services d'insertion de votre territoire (ouverture dans un nouvel onglet)"
-                       class="btn-link btn-ico">
+                    <a href="{{ DORA_BASE_URL }}?{{ tracker }}" rel="noopener" target="_blank" aria-label="Consulter les services d'insertion de votre territoire (ouverture dans un nouvel onglet)" class="btn-link btn-ico">
                         <i class="ri-search-eye-line ri-lg font-weight-normal align-self-start"></i>
                         <span>Consulter les services d'insertion de votre territoire</span>
                         <i class="ri-external-link-line font-weight-normal ms-2"></i>
                     </a>
                 </li>
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="https://dora.fabrique.social.gouv.fr/auth/rattachement?siret={{ siret }}&{{ tracker }}"
-                       rel="noopener"
-                       target="_blank"
-                       aria-label="Référencer vos services (ouverture dans un nouvel onglet)"
-                       class="btn-link btn-ico">
+                    <a href="{{ DORA_BASE_URL }}?siret={{ siret }}&{{ tracker }}" rel="noopener" target="_blank" aria-label="Référencer vos services (ouverture dans un nouvel onglet)" class="btn-link btn-ico">
                         <i class="ri-file-add-line ri-lg font-weight-normal"></i>
                         <span>Référencer vos services</span>
                         <i class="ri-external-link-line font-weight-normal ms-2"></i>
                     </a>
                 </li>
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="https://dora.fabrique.social.gouv.fr/contribuer?{{ tracker }}"
-                       rel="noopener"
-                       target="_blank"
-                       aria-label="Suggérer un service partenaire (ouverture dans un nouvel onglet)"
-                       class="btn-link btn-ico">
+                    <a href="{{ DORA_BASE_URL }}?{{ tracker }}" rel="noopener" target="_blank" aria-label="Suggérer un service partenaire (ouverture dans un nouvel onglet)" class="btn-link btn-ico">
                         <i class="ri-lightbulb-line ri-lg font-weight-normal"></i>
                         <span>Suggérer un service partenaire</span>
                         <i class="ri-external-link-line font-weight-normal ms-2"></i>
