@@ -4,6 +4,7 @@ SiaeConvention object logic used by the import_siae.py script is gathered here.
 
 """
 
+from django.db import transaction
 from django.utils import timezone
 
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
@@ -11,6 +12,7 @@ from itou.companies.management.commands._import_siae.vue_af import (
     get_siae_key_to_convention_end_date,
 )
 from itou.companies.models import Company, SiaeConvention
+from itou.utils.python import timeit
 
 
 CONVENTION_DEACTIVATION_THRESHOLD = 200
@@ -188,3 +190,27 @@ def check_convention_data_consistency():
         convention__isnull=True,
     ).count()
     assert user_created_siaes_without_convention == 0
+
+
+@timeit
+def create_conventions(vue_af_df, siret_to_siae_row, active_siae_keys):
+    creatable_conventions = get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
+    print(f"will create {len(creatable_conventions)} conventions")
+
+    for convention, siae in creatable_conventions:
+        assert not SiaeConvention.objects.filter(asp_id=convention.asp_id, kind=convention.kind).exists()
+        convention.save()
+        assert convention.siaes.count() == 0
+        siae.convention = convention
+        siae.save(update_fields={"convention"})
+        assert convention.siaes.filter(source=Company.SOURCE_ASP).count() == 1
+
+
+@timeit
+@transaction.atomic()
+def delete_conventions():
+    deletable_conventions = SiaeConvention.objects.filter(siaes__isnull=True)
+    print(f"will delete {len(deletable_conventions)} conventions")
+    for convention in deletable_conventions:
+        # This will delete the related financial annexes as well.
+        convention.delete()
