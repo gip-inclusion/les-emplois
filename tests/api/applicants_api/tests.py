@@ -141,6 +141,7 @@ class ApplicantsAPITest(APITestCase):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         self.client.force_authenticate(user)
+        # settings.REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"]["user"]
         for _ in range(12):
             response = self.client.get(self.url, format="json")
             assert response.status_code == 200
