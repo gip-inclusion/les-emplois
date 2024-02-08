@@ -168,7 +168,7 @@
                                 <div class="row g-0">
                                     <div class="col-12 col-md-auto mt-2">
                                         <a class="btn btn-primary btn-block btn-ico"
-                                           href="https://dora.fabrique.social.gouv.fr/?utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
+                                           href="{{ DORA_BASE_URL }}?mtm_campaign=LesEmplois&mtm_kwd=Dashboard"
                                            aria-label="Consulter les services (ouverture dans un nouvel onglet)"
                                            rel="noopener"
                                            target="_blank">
@@ -178,7 +178,7 @@
                                     </div>
                                     <div class="col-12 col-md-auto mt-2">
                                         <a class="btn btn-link btn-block btn-ico"
-                                           href="https://dora.fabrique.social.gouv.fr/contribuer?utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
+                                           href="{{ DORA_BASE_URL }}/contribuer?mtm_campaign=LesEmplois&mtm_kwd=Dashboard"
                                            aria-label="Suggérer les services de vos partenaires (ouverture dans un nouvel onglet)"
                                            rel="noopener"
                                            target="_blank">
@@ -195,7 +195,7 @@
                                 <div class="row g-0">
                                     <div class="col-12 col-md-auto mt-2">
                                         <a class="btn btn-primary btn-block btn-ico"
-                                           href="https://dora.fabrique.social.gouv.fr/auth/rattachement?siret={{ request.current_organization.siret }}&utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
+                                           href="{{ DORA_BASE_URL }}/auth/rattachement?siret={{ request.current_organization.siret }}&mtm_campaign=LesEmplois&mtm_kwd=Dashboard"
                                            aria-label="Référencer un service (ouverture dans un nouvel onglet)"
                                            rel="noopener"
                                            target="_blank">
@@ -205,7 +205,7 @@
                                     </div>
                                     <div class="col-12 col-md-auto mt-2">
                                         <a class="btn btn-link btn-block btn-ico"
-                                           href="https://dora.fabrique.social.gouv.fr/?utm_source=LesEmplois&utm_medium=banniereLesEmplois&utm_campaign=dashboard"
+                                           href="{{ DORA_BASE_URL }}?mtm_campaign=LesEmplois&mtm_kwd=Dashboard"
                                            aria-label="Découvrir DORA (ouverture dans un nouvel onglet)"
                                            rel="noopener"
                                            target="_blank">
@@ -307,7 +307,7 @@
                     {% endif %}
 
                     {% if user.is_employer or user.is_prescriber %}
-                        {% include "dashboard/includes/dora_card.html" with siret=request.current_organization.siret|default:"" tracker="utm_source=LesEmplois&utm_medium=blocLesEmplois&utm_campaign=dashboard" only %}
+                        {% include "dashboard/includes/dora_card.html" with siret=request.current_organization.siret|default:"" tracker="mtm_campaign=LesEmplois&mtm_kwd=Dashboard" %}
                         {% include "dashboard/includes/diagoriente_card.html" %}
                     {% endif %}
                 </div>
