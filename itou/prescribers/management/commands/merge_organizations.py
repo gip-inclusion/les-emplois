@@ -38,6 +38,7 @@ def _model_sanity_check():
         "prescribermembership",
         "prolongation",
         "prolongationrequest",
+        "notification_settings",
     }
     if relation_fields != expected_fields:
         raise RuntimeError(

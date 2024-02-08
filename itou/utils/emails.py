@@ -49,9 +49,12 @@ def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FR
     )
 
 
-def send_email_messages(email_messages):
-    with mail.get_connection() as connection:
+def send_email_messages(email_messages, connection=None):
+    if connection:
         connection.send_messages(email_messages)
+    else:
+        with mail.get_connection() as connection:
+            connection.send_messages(email_messages)
 
 
 def redact_email_address(email):

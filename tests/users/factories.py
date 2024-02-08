@@ -9,6 +9,7 @@ from django.contrib.auth.hashers import make_password
 
 from itou.asp.models import AllocationDuration, EducationLevel, LaneType
 from itou.common_apps.address.departments import DEPARTMENTS
+from itou.communications.models import NotificationRecord, NotificationSettings
 from itou.users import models
 from itou.users.enums import IdentityProvider, Title, UserKind
 from itou.utils.mocks.address_format import get_random_geocoding_api_result
@@ -62,6 +63,12 @@ class UserFactory(factory.django.DjangoModelFactory):
     birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
     phone = factory.Faker("phone_number", locale="fr_FR")
 
+    @factory.post_generation
+    def with_disabled_notifications(obj, create, extracted, **kwargs):
+        if create and extracted is True:
+            settings, _ = NotificationSettings.get_or_create(obj)
+            settings.disabled_notifications.set(NotificationRecord.objects.all())
+
 
 class ItouStaffFactory(UserFactory):
     kind = UserKind.ITOU_STAFF
@@ -81,6 +88,15 @@ class PrescriberFactory(UserFactory):
 
             PrescriberMembershipFactory(user=self, **kwargs)
 
+    @factory.post_generation
+    def with_disabled_notifications(obj, create, extracted, **kwargs):
+        from tests.prescribers.factories import PrescriberMembershipFactory
+
+        if create and extracted is True:
+            organization = obj.prescriberorganization_set.first() or PrescriberMembershipFactory(user=obj).organization
+            settings, _ = NotificationSettings.get_or_create(obj, organization)
+            settings.disabled_notifications.set(NotificationRecord.objects.all())
+
 
 class EmployerFactory(UserFactory):
     kind = UserKind.EMPLOYER
@@ -92,6 +108,15 @@ class EmployerFactory(UserFactory):
 
         if created and extracted is True:
             CompanyMembershipFactory(user=self)
+
+    @factory.post_generation
+    def with_disabled_notifications(obj, create, extracted, **kwargs):
+        from tests.companies.factories import CompanyMembershipFactory
+
+        if create and extracted is True:
+            company = obj.company_set.first() or CompanyMembershipFactory(user=obj).company
+            settings, _ = NotificationSettings.get_or_create(obj, company)
+            settings.disabled_notifications.set(NotificationRecord.objects.all())
 
 
 class LaborInspectorFactory(UserFactory):
