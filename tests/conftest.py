@@ -181,12 +181,13 @@ def itou_faker_provider(_session_faker):
 
 
 @pytest.fixture(scope="function")
-def unittest_compatibility(request, faker, pdf_file, snapshot, mocker, xlsx_file):
+def unittest_compatibility(request, faker, pdf_file, snapshot, mocker, xlsx_file, tmp_path):
     request.instance.faker = faker
     request.instance.pdf_file = pdf_file
     request.instance.snapshot = snapshot
     request.instance.mocker = mocker
     request.instance.xlsx_file = xlsx_file
+    request.instance.tmp_path = tmp_path
 
 
 @pytest.fixture(autouse=True)
