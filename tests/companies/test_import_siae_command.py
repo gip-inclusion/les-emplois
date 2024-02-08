@@ -41,9 +41,9 @@ class ImportSiaeManagementCommandsTest(TestCase):
     def setUp(self):
         super().setUp()
 
-        data_dir = self.tmp_path / "data"
-        data_dir.mkdir()
-        self.mocker.patch("itou.companies.management.commands._import_siae.utils.CURRENT_DIR", data_dir)
+        instance = override_settings(ASP_FLUX_IAE_DIR=self.tmp_path)
+        instance.enable()
+        self.addCleanup(instance.disable)
 
         # Beware : fluxIAE_Structure_22022022_112211.csv.gz ends with .gz but is compressed with pkzip.
         # Since it happened once, and the code now allows it, we also want to test it.
@@ -51,7 +51,7 @@ class ImportSiaeManagementCommandsTest(TestCase):
             x for x in Path(settings.APPS_DIR).joinpath("./companies/fixtures").glob("fluxIAE_*.csv.gz") if x.is_file()
         ]
         for file in files:
-            shutil.copy(file, data_dir)
+            shutil.copy(file, self.tmp_path)
 
     def test_uncreatable_conventions_for_active_siae_with_active_convention(self):
         siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())

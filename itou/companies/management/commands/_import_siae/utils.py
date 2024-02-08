@@ -10,6 +10,7 @@ import os
 import zipfile
 
 import pandas as pd
+from django.conf import settings
 from django.utils import timezone
 
 from itou.common_apps.address.models import AddressMixin
@@ -20,17 +21,14 @@ from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.apis.geocoding import get_geocoding_data
 
 
-CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
-
-
 def get_fluxiae_referential_filenames():
-    path = f"{CURRENT_DIR}/../data"
+    assert settings.ASP_FLUX_IAE_DIR is not None, "ASP_FLUX_IAE_DIR is not defined"
 
     filename_prefixes = [
         # Example of raw filename: fluxIAE_RefCategorieJuridique_29032021_090124.csv.gz
         # Let's drop the digits and keep the first relevant part only.
         "_".join(filename.split("_")[:2])
-        for filename in os.listdir(path)
+        for filename in os.listdir(settings.ASP_FLUX_IAE_DIR)
         if filename.startswith("fluxIAE_Ref")
     ]
 
@@ -47,13 +45,14 @@ def get_filename(filename_prefix, filename_extension, description=None):
     e.g. fluxIAE_Structure_14122020_075350.csv
     e.g. fluxIAE_AnnexeFinanciere_14122020_063002.csv.gz
     """
+    assert settings.ASP_FLUX_IAE_DIR is not None, "ASP_FLUX_IAE_DIR is not defined"
+
     if description is None:
         description = filename_prefix
 
     filenames = []
     extensions = (filename_extension, f"{filename_extension}.gz")
-    path = f"{CURRENT_DIR}/../data"
-    for filename in os.listdir(path):
+    for filename in os.listdir(settings.ASP_FLUX_IAE_DIR):
         if filename.startswith(f"{filename_prefix}_") and filename.endswith(extensions):
             filenames.append(filename)
 
@@ -65,7 +64,7 @@ def get_filename(filename_prefix, filename_extension, description=None):
 
     filename = filenames[0]
     print(f"Selected file {filename} for {description}.")
-    return os.path.join(path, filename)
+    return os.path.join(settings.ASP_FLUX_IAE_DIR, filename)
 
 
 def clean_string(s):
