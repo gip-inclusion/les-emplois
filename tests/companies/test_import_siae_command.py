@@ -1,6 +1,5 @@
 import collections
 import datetime
-import importlib
 import os
 import shutil
 import tempfile
@@ -17,6 +16,8 @@ from django.urls import reverse
 from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind
+from itou.companies.management.commands._import_siae.convention import get_creatable_conventions
+from itou.companies.management.commands._import_siae.financial_annex import get_creatable_and_deletable_afs
 from itou.companies.management.commands._import_siae.siae import (
     check_whether_signup_is_possible_for_all_siaes,
     create_new_siaes,
@@ -44,7 +45,6 @@ from tests.eligibility.factories import EligibilityDiagnosisMadeBySiaeFactory
 class ImportSiaeManagementCommandsTest(TransactionTestCase):
     path_source = "./companies/fixtures"
     app_dir_path = Path(settings.APPS_DIR)
-    mod = None
 
     @classmethod
     def setUpClass(cls):
@@ -66,13 +66,6 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         for file in files:
             shutil.copy(file, data_dir)
 
-        cls.mod = importlib.import_module("itou.companies.management.commands._import_siae.convention")
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        cls.mod = None
-
     def test_uncreatable_conventions_for_active_siae_with_active_convention(self):
         siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
         vue_af_df = get_vue_af_df()
@@ -80,7 +73,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
 
         company = CompanyFactory(source=Company.SOURCE_ASP)
         assert company.is_active
-        assert not self.mod.get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
+        assert not get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
 
     def test_uncreatable_conventions_when_convention_exists_for_asp_id_and_kind(self):
         # siae without convention, but a convention already exists for this
@@ -96,7 +89,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         SiaeConventionFactory(kind=company.kind, asp_id=ASP_ID)
 
         with pytest.raises(AssertionError):
-            self.mod.get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
+            get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
 
     def test_creatable_conventions_for_active_siae_where_siret_equals_siret_signature(self):
         SIRET = SIRET_SIGNATURE = "21540323900019"
@@ -107,7 +100,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         active_siae_keys = get_active_siae_keys(vue_af_df)
 
         company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
-        results = self.mod.get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
+        results = get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
 
         assert len(results) == 1
 
@@ -131,7 +124,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         active_siae_keys = get_active_siae_keys(vue_af_df)
 
         company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.AI, convention=None)
-        results = self.mod.get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
+        results = get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
 
         assert len(results) == 1
 
@@ -154,7 +147,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         active_siae_keys = get_active_siae_keys(vue_af_df)
 
         company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
-        company = self.mod.get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
+        company = get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
 
         assert len(company) == 1
 
@@ -174,8 +167,7 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         existing_convention = SiaeConventionFactory(kind=CompanyKind.ACI, asp_id=2855)
         # Get AF created by SiaeConventionFactory
         deletable_af = existing_convention.financial_annexes.first()
-        financial_annex = importlib.import_module("itou.companies.management.commands._import_siae.financial_annex")
-        to_create, to_delete = financial_annex.get_creatable_and_deletable_afs(af_number_to_row)
+        to_create, to_delete = get_creatable_and_deletable_afs(af_number_to_row)
         assert to_delete == [deletable_af]
         # This list comes from the fixture file
         assert sorted((af.number, af.start_at.isoformat(), af.end_at.isoformat()) for af in to_create) == [
