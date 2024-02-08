@@ -105,6 +105,7 @@ INSTALLED_APPS = [
     "itou.scripts",
     "itou.settings_viewer",
     "itou.analytics",
+    "itou.communications",
 ]
 
 # TODO: Remove with Django 6.0

@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.gis.measure import D
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
@@ -265,6 +266,14 @@ class Company(AddressMixin, OrganizationAbstract):
 
     job_app_score = models.FloatField(
         verbose_name="score de recommandation (ratio de candidatures récentes vs nombre d'offres d'emploi)", null=True
+    )
+
+    # Use the generic relation to let NotificationSettings being collected on deletion
+    notification_settings = GenericRelation(
+        "communications.NotificationSettings",
+        content_type_field="structure_type",
+        object_id_field="structure_pk",
+        related_query_name="company",
     )
 
     objects = CompanyManager()
