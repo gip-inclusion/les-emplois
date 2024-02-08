@@ -2,7 +2,7 @@ import logging
 import re
 
 import httpx
-from django.core.cache import cache
+from django.core.cache import caches
 from unidecode import unidecode
 
 
@@ -101,7 +101,7 @@ class PoleEmploiApiClient:
         response.raise_for_status()
         auth_data = response.json()
         token = f"{auth_data['token_type']} {auth_data['access_token']}"
-        cache.set(
+        caches["failsafe"].set(
             CACHE_API_TOKEN_KEY,
             token,
             auth_data["expires_in"]
@@ -111,7 +111,7 @@ class PoleEmploiApiClient:
 
     def _request(self, url, data=None, params=None, method="POST"):
         try:
-            token = cache.get(CACHE_API_TOKEN_KEY)
+            token = caches["failsafe"].get(CACHE_API_TOKEN_KEY)
             if not token:
                 token = self._refresh_token()
 

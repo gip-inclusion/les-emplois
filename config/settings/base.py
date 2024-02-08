@@ -431,14 +431,26 @@ STATS_PH_PRESCRIPTION_REGION_WHITELIST = ["Pays de la Loire", "Nouvelle-Aquitain
 SLACK_CRON_WEBHOOK_URL = os.getenv("SLACK_CRON_WEBHOOK_URL")
 
 # Production instances (`PROD`, `DEMO`, `FAST-MACHINE`, ...) share the same redis but different DB
-REDIS_URL = os.getenv("REDIS_URL")
-REDIS_DB = os.getenv("REDIS_DB")
+redis_url = os.getenv("REDIS_URL")
+redis_db = os.getenv("REDIS_DB")
+redis_django_settings = {
+    "LOCATION": redis_url,
+    "KEY_PREFIX": "django",
+    "OPTIONS": {
+        "db": redis_db,
+    },
+}
+
+CACHES = {
+    "default": {"BACKEND": "django.core.cache.backends.redis.RedisCache", **redis_django_settings},
+    "failsafe": {"BACKEND": "itou.utils.cache.FailSafeRedisCache", **redis_django_settings},
+}
 
 HUEY = {
     "name": "ITOU",
     # Don't store task results (see our Redis Post-Morten in documentation for more information)
     "results": False,
-    "url": f"{REDIS_URL}/?db={REDIS_DB}",
+    "url": f"{redis_url}/?db={redis_db}",
     "consumer": {
         "workers": 2,
         "worker_type": "thread",
@@ -489,8 +501,8 @@ REST_FRAMEWORK = {
     # Throttling:
     # See: https://www.django-rest-framework.org/api-guide/throttling/
     "DEFAULT_THROTTLE_CLASSES": [
-        "rest_framework.throttling.AnonRateThrottle",
-        "rest_framework.throttling.UserRateThrottle",
+        "itou.api.throttling.FailSafeAnonRateThrottle",
+        "itou.api.throttling.FailSafeUserRateThrottle",
     ],
     # Default values for throttling rates:
     # - overridden in custom throttling classes,

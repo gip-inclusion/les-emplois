@@ -42,6 +42,13 @@ services:
     ports:
       - "127.0.0.1:${POSTGRES_PORT_ON_DOCKER_HOST:-5432}:5432"
 
+  redis:
+    image: redis
+    container_name: itou_redis
+    restart: always
+    ports:
+      - "127.0.0.1:6379:6379"
+
   django:
     profiles: ["django"]
     container_name: itou_django

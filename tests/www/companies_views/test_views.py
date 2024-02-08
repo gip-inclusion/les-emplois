@@ -5,7 +5,7 @@ import freezegun
 import httpcore
 import pytest
 from django.core import mail
-from django.core.cache import cache
+from django.core.cache import caches
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import escape
@@ -1172,7 +1172,7 @@ def test_hx_dora_services(htmx_client, snapshot, settings, respx_mock):
     dora_service_card = parse_response_to_soup(response, selector=".card-body")
     assert str(dora_service_card) == snapshot(name="Dora service card")
 
-    cache.clear()
+    caches["failsafe"].clear()
     base_service["code_postal"] = "75056"
     base_service["commune"] = "Paris"
     api_mock.respond(

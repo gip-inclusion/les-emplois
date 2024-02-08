@@ -4,7 +4,7 @@ from urllib.parse import urljoin
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.cache import cache
+from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
@@ -56,6 +56,7 @@ def get_data_inclusion_services(code_insee):
     if not code_insee:
         return []
     cache_key = f"{DATA_INCLUSION_API_CACHE_PREFIX}:{code_insee}:{timezone.localdate()}"
+    cache = caches["failsafe"]
     results = cache.get(cache_key)
     if results is None:
         client = DataInclusionApiClient(settings.API_DATA_INCLUSION_BASE_URL, settings.API_DATA_INCLUSION_TOKEN)
