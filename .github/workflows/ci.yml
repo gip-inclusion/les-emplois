@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DJANGO_SETTINGS_MODULE: config.settings.test
+      REDIS_URL: redis://127.0.0.1:6379
       REQUIREMENTS_PATH: requirements/test.txt
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
@@ -22,6 +23,11 @@ jobs:
           MINIO_ROOT_PASSWORD: minioadmin
         ports:
           - 9000:9000
+
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
 
       postgres:
         # Docker Hub image

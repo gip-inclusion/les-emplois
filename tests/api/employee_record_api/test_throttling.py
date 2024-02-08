@@ -1,5 +1,3 @@
-from django.core.cache import cache
-from django.test.utils import override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
@@ -11,13 +9,8 @@ from tests.users.factories import DEFAULT_PASSWORD
 ENDPOINT_URL = reverse("v1:employee-records-list")
 
 
-@override_settings(CACHES={"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}})
 class EmployeeRecordThrottleTest(APITestCase):
     # This a simple smoke test, goal is *not* testing DRF throttling
-
-    def setUp(self):
-        super().setUp()
-        cache.clear()
 
     def test_basic_ko_throttling(self):
         client = APIClient()

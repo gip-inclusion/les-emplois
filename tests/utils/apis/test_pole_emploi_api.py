@@ -1,13 +1,15 @@
 import json
+import math
+import time
 
 import httpx
 import pytest
 import respx
-from django.core.cache import cache
-from freezegun import freeze_time
+from django.core.cache import caches
 
 from itou.utils.apis.pole_emploi import (
     CACHE_API_TOKEN_KEY,
+    REFRESH_TOKEN_MARGIN_SECONDS,
     PoleEmploiAPIBadResponse,
     PoleEmploiApiClient,
     PoleEmploiAPIException,
@@ -20,22 +22,24 @@ from tests.utils.test import TestCase
 
 
 class PoleEmploiAPIClientTest(TestCase):
+    CACHE_EXPIRY = 3600
+
     def setUp(self) -> None:
         super().setUp()
         self.api_client = PoleEmploiApiClient("https://pe.fake", "https://auth.fr", "foobar", "pe-secret")
         respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
-            200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
+            200, json={"token_type": "foo", "access_token": "batman", "expires_in": self.CACHE_EXPIRY}
         )
 
     @respx.mock
     def test_get_token_nominal(self):
-        with freeze_time("2022-12-02 18:00:00") as frozen_time:
-            self.api_client._refresh_token()
-            assert cache.get(CACHE_API_TOKEN_KEY) == "foo batman"
-            frozen_time.move_to("2022-12-02 18:59:49")
-            assert cache.get(CACHE_API_TOKEN_KEY) == "foo batman"
-            frozen_time.move_to("2022-12-02 18:59:50")
-            assert cache.get(CACHE_API_TOKEN_KEY) is None
+        start = math.floor(time.time())  # Ignore microseconds.
+        self.api_client._refresh_token()
+        cache = caches["failsafe"]
+        assert cache.get(CACHE_API_TOKEN_KEY) == "foo batman"
+        redis_client = cache._cache.get_client()
+        expiry = redis_client.expiretime(cache.make_key(CACHE_API_TOKEN_KEY))
+        assert start + self.CACHE_EXPIRY - REFRESH_TOKEN_MARGIN_SECONDS <= expiry <= start + self.CACHE_EXPIRY
 
     @respx.mock
     def test_get_token_fails(self):

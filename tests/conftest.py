@@ -1,3 +1,4 @@
+import copy
 import os
 import uuid
 
@@ -9,7 +10,6 @@ import pytest
 from django.conf import settings
 from django.contrib.gis.db.models.fields import get_srid_info
 from django.core import management
-from django.core.cache import cache
 from django.core.files.storage import default_storage, storages
 from django.core.management import call_command
 from django.db import connection
@@ -125,6 +125,14 @@ def storage_prefix_per_test():
     public_storage.location = original_public_location
 
 
+@pytest.fixture(autouse=True)
+def cache_per_test(settings):
+    caches = copy.deepcopy(settings.CACHES)
+    for cache in caches.values():
+        cache["KEY_PREFIX"] = f"{uuid.uuid4()}"
+    settings.CACHES = caches
+
+
 @pytest.fixture
 def temporary_bucket():
     with override_settings(AWS_STORAGE_BUCKET_NAME=f"tests-{uuid.uuid4()}"):
@@ -155,11 +163,6 @@ def django_loaddata_fixture(django_db_setup, django_db_blocker):
                 "test_asp_INSEE_countries_factory.json",
             },
         )
-
-
-@pytest.fixture(autouse=True)
-def reset_cache():
-    cache.clear()
 
 
 @pytest.fixture(autouse=True, scope="session")

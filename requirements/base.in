@@ -80,7 +80,11 @@ xlrd==2.0.*  # https://pypi.org/project/xlrd/
 # Huey for async processing
 # https://huey.readthedocs.io/en/latest/
 huey  # https://github.com/coleifer/huey
+
 redis  # https://github.com/redis/redis-py
+# https://docs.djangoproject.com/en/5.0/topics/cache/#redis
+# > Installing hiredis-py is also recommended.
+hiredis  # https://github.com/redis/hiredis-py
 
 # Embedding Metabase signed dashboards
 PyJWT  # https://github.com/jpadilla/pyjwt
