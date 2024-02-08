@@ -31,13 +31,16 @@ if [[ ! -f "$CONTACT_EA_FILE" ]]; then
     exit 0
 fi
 
+FLUX_IAE_DIR=$(realpath "itou/companies/management/commands/data/")
+export FLUX_IAE_DIR
+
 # Create the "data" directory inside of the app and clear it of any previously existing data
-mkdir -p itou/companies/management/commands/data/
-rm -rf itou/companies/management/commands/data/*
+mkdir -p "$FLUX_IAE_DIR"
+rm -rf "$FLUX_IAE_DIR"*
 
 # Unzip ASP files
-unzip -P "$ASP_UNZIP_PASSWORD" "$FLUX_IAE_FILE" -d itou/companies/management/commands/data/
-unzip -P "$ASP_UNZIP_PASSWORD" "$CONTACT_EA_FILE" -d itou/companies/management/commands/data/
+unzip -P "$ASP_UNZIP_PASSWORD" "$FLUX_IAE_FILE" -d "$FLUX_IAE_DIR"
+unzip -P "$ASP_UNZIP_PASSWORD" "$CONTACT_EA_FILE" -d "$FLUX_IAE_DIR"
 
 # Perform the necessary data imports
 mkdir -p $OUTPUT_PATH/populate_metabase_fluxiae
@@ -49,7 +52,7 @@ time ./manage.py import_siae --verbosity=2 |& tee -a "$OUTPUT_PATH/import_siae/o
 time ./manage.py import_ea_eatt --wet-run --verbosity=2 |& tee -a "$OUTPUT_PATH/import_ea_eatt/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
 
 # Destroy the cleartext ASP data
-rm -rf itou/companies/management/commands/data/
+rm -rf "$FLUX_IAE_DIR"
 
 # Remove ASP files older than 3 weeks
 find asp_shared_bucket/ -name '*.zip' -type f -mtime +20 -delete

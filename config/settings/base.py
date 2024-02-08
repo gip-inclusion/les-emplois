@@ -561,6 +561,7 @@ LOGIN_REDIRECT_URL = "/dashboard/"
 
 EXPORT_DIR = os.getenv("SCRIPT_EXPORT_PATH", f"{ROOT_DIR}/exports")
 IMPORT_DIR = os.getenv("SCRIPT_IMPORT_PATH", f"{ROOT_DIR}/imports")
+ASP_FLUX_IAE_DIR = os.getenv("ASP_FLUX_IAE_DIR")
 
 MATOMO_BASE_URL = os.getenv("MATOMO_BASE_URL")
 MATOMO_AUTH_TOKEN = os.getenv("MATOMO_AUTH_TOKEN")
