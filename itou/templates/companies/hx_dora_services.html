@@ -25,9 +25,11 @@
                                                 <a href="{{ service.dora_di_url }}?mtm_campaign=LesEmplois&mtm_kwd=CardServiceFicheDePoste" rel="noopener" target="_blank" class="btn-link mb-2">{{ service.nom | truncatechars:60 }}</a>
                                                 <ul class="list-unstyled list-inline fs-sm">
                                                     <li class="list-inline-item">{{ service.structure.nom | truncatechars:60 }}</li>
-                                                    <li class="list-inline-item">
-                                                        <i class="ri ri-map-pin-2-line me-2" aria-hidden="true"></i>{{ service.structure.code_postal }} {{ service.structure.commune }}
-                                                    </li>
+                                                    {% if service.code_postal and service.commune %}
+                                                        <li class="list-inline-item">
+                                                            <i class="ri ri-map-pin-2-line me-2" aria-hidden="true"></i>{{ service.code_postal }} {{ service.commune }}
+                                                        </li>
+                                                    {% endif %}
                                                 </ul>
                                                 <div class="badge-group">
                                                     {% for thematique in service.thematiques_display %}
