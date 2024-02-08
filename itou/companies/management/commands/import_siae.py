@@ -56,10 +56,6 @@ class Command(BaseCommand):
     help = "Update and sync SIAE data based on latest ASP exports."
     fatal_errors = 0
 
-    def delete_siae(self, siae):
-        assert could_siae_be_deleted(siae)
-        siae.delete()
-
     @timeit
     def delete_user_created_siaes_without_members(self):
         """
@@ -75,7 +71,7 @@ class Command(BaseCommand):
             if not siae.has_members:
                 if could_siae_be_deleted(siae):
                     self.stdout.write(f"siae.id={siae.id} is user created and has no member thus will be deleted")
-                    self.delete_siae(siae)
+                    siae.delete()
                 else:
                     self.stdout.write(
                         f"FATAL ERROR: siae.id={siae.id} is user created and "
@@ -123,7 +119,7 @@ class Command(BaseCommand):
         for siae in old_unconfirmed_siaes:
             if could_siae_be_deleted(siae):
                 self.stdout.write(f"deleted unconfirmed siae.id={siae.id} created by staff a while ago")
-                self.delete_siae(siae)
+                siae.delete()
             else:
                 self.stdout.write(
                     f"FATAL ERROR: Please fix unconfirmed staff created siae.id={siae.id}"
@@ -198,7 +194,7 @@ class Command(BaseCommand):
             if not siae.grace_period_has_expired:
                 continue
             if could_siae_be_deleted(siae):
-                self.delete_siae(siae)
+                siae.delete()
                 deletions += 1
                 continue
             blocked_deletions += 1
