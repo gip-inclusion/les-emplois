@@ -25,9 +25,10 @@ def update_existing_conventions(siret_to_siae_row, active_siae_keys):
     reactivations = 0
     three_months_ago = timezone.now() - timezone.timedelta(days=90)
 
-    for siae in Company.objects.filter(source=Company.SOURCE_ASP, convention__isnull=False).select_related(
-        "convention"
-    ):
+    managed_siaes_with_conventions = Company.objects.filter(
+        source=Company.SOURCE_ASP, convention__isnull=False
+    ).select_related("convention")
+    for siae in managed_siaes_with_conventions:
         convention = siae.convention
         assert convention.kind == siae.kind
         assert convention.siren_signature == siae.siren
@@ -67,7 +68,6 @@ def update_existing_conventions(siret_to_siae_row, active_siae_keys):
             convention.save()
 
         should_be_active = (row.asp_id, siae.kind) in active_siae_keys
-
         if convention.is_active != should_be_active:
             if should_be_active:
                 # Inactive convention should be activated.
@@ -164,9 +164,7 @@ def check_convention_data_consistency():
         if convention.is_active:
             assert len(asp_siaes) == 1
         else:
-            assert len(asp_siaes) in [0, 1]
-
-        if not convention.is_active:
+            assert 0 <= len(asp_siaes) <= 1
             # Check that each inactive convention has a grace period start date.
             assert convention.deactivated_at is not None
 
