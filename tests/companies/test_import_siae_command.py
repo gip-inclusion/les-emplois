@@ -2,10 +2,8 @@ import collections
 import datetime
 import os
 import shutil
-import tempfile
 import unittest
 from pathlib import Path
-from unittest import mock
 
 import pandas as pd
 import pytest
@@ -42,27 +40,21 @@ from tests.eligibility.factories import EligibilityDiagnosisMadeBySiaeFactory
     os.getenv("CI", "False"), "Slow and scarcely updated management command, no need for constant testing!"
 )
 @freeze_time("2022-10-10")
+@pytest.mark.usefixtures("unittest_compatibility")
 class ImportSiaeManagementCommandsTest(TransactionTestCase):
-    path_source = "./companies/fixtures"
-    app_dir_path = Path(settings.APPS_DIR)
 
-    @classmethod
-    def setUpClass(cls):
-        """We need to setup fake files before loading any `import_siae` related script,
-        since it does rely on dynamic file loading upon startup (!)
-        """
-        super().setUpClass()
-        path_dest = tempfile.mkdtemp()
-        cls.addClassCleanup(shutil.rmtree, path_dest)
-        data_dir = Path(path_dest) / "data"
+    def setUp(self):
+        super().setUp()
+
+        data_dir = self.tmp_path / "data"
         data_dir.mkdir()
-        data_dir_mock = mock.patch("itou.companies.management.commands._import_siae.utils.CURRENT_DIR", data_dir)
-        data_dir_mock.start()
-        cls.addClassCleanup(data_dir_mock.stop)
+        self.mocker.patch("itou.companies.management.commands._import_siae.utils.CURRENT_DIR", data_dir)
 
         # Beware : fluxIAE_Structure_22022022_112211.csv.gz ends with .gz but is compressed with pkzip.
         # Since it happened once, and the code now allows it, we also want to test it.
-        files = [x for x in cls.app_dir_path.joinpath(cls.path_source).glob("fluxIAE_*.csv.gz") if x.is_file()]
+        files = [
+            x for x in Path(settings.APPS_DIR).joinpath("./companies/fixtures").glob("fluxIAE_*.csv.gz") if x.is_file()
+        ]
         for file in files:
             shutil.copy(file, data_dir)
 
