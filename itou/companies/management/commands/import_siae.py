@@ -127,17 +127,6 @@ class Command(BaseCommand):
                 )
                 self.fatal_errors += 1
 
-    def update_siae_auth_email(self, siae, new_auth_email):
-        assert siae.auth_email != new_auth_email
-        siae.auth_email = new_auth_email
-        siae.save()
-
-    def update_siae_siret(self, siae, new_siret):
-        assert siae.siret != new_siret
-        self.stdout.write(f"siae.id={siae.id} has changed siret from {siae.siret} to {new_siret} (will be updated)")
-        siae.siret = new_siret
-        siae.save()
-
     @timeit
     def update_siret_and_auth_email_of_existing_siaes(self, siret_to_siae_row):
         auth_email_updates = 0
@@ -156,7 +145,8 @@ class Command(BaseCommand):
             new_auth_email = row.auth_email
             auth_email_has_changed = new_auth_email and siae.auth_email != new_auth_email
             if auth_email_has_changed:
-                self.update_siae_auth_email(siae, new_auth_email)
+                siae.auth_email = new_auth_email
+                siae.save()
                 auth_email_updates += 1
 
             siret_has_changed = row.siret != siae.siret
@@ -168,7 +158,11 @@ class Command(BaseCommand):
             existing_siae = Company.objects.filter(siret=new_siret, kind=siae.kind).first()
 
             if not existing_siae:
-                self.update_siae_siret(siae, new_siret)
+                self.stdout.write(
+                    f"siae.id={siae.id} has changed siret from {siae.siret} to {new_siret} (will be updated)"
+                )
+                siae.siret = new_siret
+                siae.save()
                 continue
 
             def fmt(siae):
