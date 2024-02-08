@@ -1,5 +1,6 @@
 from rest_framework import authentication, generics
 
+from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
 from itou.users.enums import UserKind
 from itou.users.models import User
 
@@ -8,33 +9,6 @@ from .serializers import ApplicantSerializer
 
 
 class ApplicantsView(generics.ListAPIView):
-    """
-    # Liste des candidats par structure
-
-    Cette API retourne la liste de tous les demandeurs d'emploi liés à une candidature pour la structure en cours.
-
-    Les candidats sont triés par date de création dans la base des emplois de l'inclusion,
-    du plus récent au plus ancien.
-
-    # Permissions
-
-    L'utilisation de cette API nécessite un jeton d'autorisation (`token`).
-
-    Pour l'obtention d'un jeton, veuillez utiliser **les identifiants d'un compte administrateur de la structure.**
-
-    Voir l'entrée d'API `token-auth` pour obtenir un jeton.
-
-    Ce compte ne doit être *uniquement membre* de la structure dont on souhaite récupérer la liste de candidats.
-
-    Dans l'idéal, il s'agit d'un compte dédié à l'utilisation de l'API.
-
-
-    # Paramètres
-
-    Cette api ne dispose pas de paramètres de filtrage ou de recherche :
-        elle retourne l'intégralité des candidats de la structure.
-    """
-
     authentication_classes = (
         authentication.TokenAuthentication,
         authentication.SessionAuthentication,
@@ -52,3 +26,30 @@ class ApplicantsView(generics.ListAPIView):
             .prefetch_related("job_applications")
             .order_by("-pk")
         )
+
+
+ApplicantsView.__doc__ = f"""\
+# Liste des candidats par structure
+
+Cette API retourne la liste de tous les demandeurs d'emploi liés à une candidature pour la structure en cours.
+
+Les candidats sont triés par date de création dans la base des emplois de l'inclusion,
+du plus récent au plus ancien.
+
+# Permissions
+
+L'utilisation de cette API nécessite un jeton d'autorisation (`token`) :
+
+{AUTH_TOKEN_EXPLANATION_TEXT}
+
+Le compte administrateur utilisé ne doit être membre **que** de la structure
+dont on souhaite récupérer la liste de candidats, et non membre de plusieurs
+structures.
+
+Dans l'idéal, il s'agit d'un compte dédié à l'utilisation de l'API.
+
+# Paramètres
+
+Cette API ne dispose pas de paramètres de filtrage ou de recherche :
+    elle retourne l'intégralité des candidats de la structure.
+"""

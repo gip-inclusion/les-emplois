@@ -5,6 +5,8 @@ from rest_framework.authtoken import views as drf_authtoken_views
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 
+from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
+
 
 logger = logging.getLogger(__name__)
 
@@ -30,3 +32,13 @@ class ObtainAuthToken(drf_authtoken_views.ObtainAuthToken):
                 )
 
         return super().post(request, *args, **kwargs)
+
+
+ObtainAuthToken.__doc__ = f"""\
+**Route majoritairement utilisée pour les comptes n’ayant pas activé Inclusion Connect.**
+
+Si vous avez activé Inclusion Connect pour votre compte, vous pouvez obtenir un jeton d’accès aux
+APIs depuis un **compte administrateur de la structure** de la manière suivante :
+
+{AUTH_TOKEN_EXPLANATION_TEXT}
+"""

@@ -6,6 +6,7 @@ from rest_framework import viewsets
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.throttling import UserRateThrottle
 
+from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification, Status
 from itou.employee_record.serializers import EmployeeRecordUpdateNotificationSerializer
 
@@ -49,64 +50,6 @@ def _annotate_convert_created_at(queryset):
 
 
 class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
-    """
-    # API fiches salarié
-
-    Cette API retourne la liste des fiches salarié saisies par les SIAE :
-
-    - dans l'état `PROCESSED` (par défaut)
-    - pour toutes les embauches / candidatures des SIAE liées au token d'identification
-    - classées par date de création (plus récent au plus ancien)
-
-    Il est également possible d'obtenir le détail d'une fiche salarié par son
-    identifiant (dans les mêmes conditions d'autorisation que pour la liste complète)
-
-    # Permissions
-
-    L'utilisation externe de cette API nécessite l'utilisation d'un token d'autorisation
-
-    Ce token peut être généré, et récupéré depuis votre tableau de bord sur le site des emplois.
-    Cliquez sur "Mon espace" puis "Token d'API"
-
-    L'API peut également être utilisée dans un navigateur :
-
-    - seulement dans un environnement de développement
-    - si l'utilisateur connecté est membre d'une ou plusieurs SIAE éligible aux fiches salarié
-
-    # Paramètres
-    Les paramètres suivants sont :
-    - utilisables en paramètres de requête (query string),
-    - chainables : il est possible de préciser un ou plusieurs de ces paramètres pour affiner la recherche.
-
-    Sans paramètre fourni, la liste de résultats contient les fiches salarié en l'état
-
-    - `PROCESSED` (intégrées par l'ASP).
-
-    ## `status` : par statut des fiches salarié
-    Ce paramètre est un tableau permettant de filtrer les fiches retournées par leur statut
-
-    Les valeurs possibles pour ce paramètre sont :
-
-    - `NEW` : nouvelle fiche en cours de saisie,
-    - `READY` : la fiche est prête à être transmise à l'ASP,
-    - `SENT` : la fiche a été transmise et est en attente de traitement,
-    - `PROCESSED` : la fiche a correctement été intégrée par l'ASP,
-    - `REJECTED` : la fiche est retournée en erreur après transmission.
-
-    ### Exemples
-    - ajouter `?status=NEW` à l'URL pour les nouvelles fiches.
-    - ajouter `?status=NEW&status=READY` pour les nouvelles fiches et celles prêtes pour la transmission.
-
-    ## `created` : à date de création
-    Permet de récupérer les fiches salarié créées à la date donnée en paramètre (au format `AAAA-MM-JJ`).
-
-    ## `since` : depuis une certaine date
-    Permet de récupérer les fiches salarié créées depuis date donnée en paramètre (au format `AAAA-MM-JJ`).
-
-    """
-
-    # Above doc section is in French for Swagger / OAS auto doc generation
-
     # If no queryset class parameter is given (f.i. overriding)
     # a `basename` parameter must be set on the router (see local `urls.py` file)
     # See: https://www.django-rest-framework.org/api-guide/routers/
@@ -171,6 +114,70 @@ class EmployeeRecordViewSet(AbstractEmployeeRecordViewSet):
             )
 
 
+# Doc section is in French for Swagger / OAS auto doc generation
+EmployeeRecordViewSet.__doc__ = f"""\
+# API fiches salarié
+
+Cette API retourne la liste des fiches salarié saisies par les SIAE :
+
+- dans l'état `PROCESSED` (par défaut)
+- pour toutes les embauches / candidatures des SIAE liées au token d'identification
+- classées par date de création (plus récent au plus ancien)
+
+Il est également possible d'obtenir le détail d'une fiche salarié par son
+identifiant (dans les mêmes conditions d'autorisation que pour la liste complète).
+
+# Permissions
+
+L'utilisation externe de cette API nécessite un token d'autorisation :
+
+{AUTH_TOKEN_EXPLANATION_TEXT}
+
+L'API peut également être utilisée dans un navigateur :
+
+- seulement dans un environnement de développement
+- si l'utilisateur connecté est membre d'une ou plusieurs SIAE éligible aux fiches salarié
+
+# Paramètres
+
+Les paramètres suivants sont :
+- utilisables en paramètres de requête (query string),
+- chainables : il est possible de préciser un ou plusieurs de ces paramètres pour affiner la recherche.
+
+Sans paramètre fourni, la liste de résultats contient les fiches salarié en l'état
+
+- `PROCESSED` (intégrées par l'ASP).
+
+## `status` : par statut des fiches salarié
+Ce paramètre est un tableau permettant de filtrer les fiches retournées par leur statut
+
+Les valeurs possibles pour ce paramètre sont :
+
+- `NEW` : nouvelle fiche en cours de saisie,
+- `READY` : la fiche est prête à être transmise à l'ASP,
+- `SENT` : la fiche a été transmise et est en attente de traitement,
+- `PROCESSED` : la fiche a correctement été intégrée par l'ASP,
+- `REJECTED` : la fiche est retournée en erreur après transmission.
+
+### Exemples
+- ajouter `?status=NEW` à l'URL pour les nouvelles fiches.
+- ajouter `?status=NEW&status=READY` pour les nouvelles fiches et celles prêtes pour la transmission.
+
+## `created` : à date de création
+Permet de récupérer les fiches salarié créées à la date donnée en paramètre (au format `AAAA-MM-JJ`).
+
+## `since` : depuis une certaine date
+Permet de récupérer les fiches salarié créées depuis date donnée en paramètre (au format `AAAA-MM-JJ`).
+"""
+
+
 class EmployeeRecordUpdateNotificationViewSet(AbstractEmployeeRecordViewSet):
     queryset = EmployeeRecordUpdateNotification.objects.all()
     serializer_class = EmployeeRecordUpdateNotificationSerializer
+
+
+EmployeeRecordUpdateNotificationViewSet.__doc__ = f"""\
+L'utilisation externe de cette API nécessite un token d'autorisation :
+
+{AUTH_TOKEN_EXPLANATION_TEXT}
+"""
