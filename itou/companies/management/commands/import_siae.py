@@ -17,6 +17,7 @@ name instead of hardcoding column numbers as in `field = row[42]`.
 
 from django.core.management.base import CommandError
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
@@ -91,30 +92,27 @@ class Command(BaseCommand):
 
         If the siae cannot be deleted because it has data, a warning will be shown to supportix.
         """
-        # Sometimes our staff creates a siae then later attaches it manually to the correct convention. In that
-        # case it should be converted to a regular user created siae so that the usual convention logic applies.
-        for siae in Company.objects.filter(
-            kind__in=SIAE_WITH_CONVENTION_KINDS, source=Company.SOURCE_STAFF_CREATED, convention__isnull=False
-        ):
-            self.stdout.write(f"converted staff created siae.id={siae.id} to user created siae as it has a convention")
-            siae.source = Company.SOURCE_USER_CREATED
-            siae.save()
-
         three_months_ago = timezone.now() - timezone.timedelta(days=90)
         staff_created_siaes = Company.objects.filter(
             kind__in=SIAE_WITH_CONVENTION_KINDS,
             source=Company.SOURCE_STAFF_CREATED,
         )
+        # Sometimes our staff creates a siae then later attaches it manually to the correct convention. In that
+        # case it should be converted to a regular user created siae so that the usual convention logic applies.
+        for siae in staff_created_siaes.filter(convention__isnull=False):
+            self.stdout.write(f"converted staff created siae.id={siae.id} to user created siae as it has a convention")
+            siae.source = Company.SOURCE_USER_CREATED
+            siae.save()
 
         recent_unconfirmed_siaes = staff_created_siaes.filter(created_at__gte=three_months_ago)
         self.stdout.write(
             f"{recent_unconfirmed_siaes.count()} siaes created recently by staff"
-            f" (still waiting for ASP data to be confirmed)"
+            " (still waiting for ASP data to be confirmed)"
         )
 
         old_unconfirmed_siaes = staff_created_siaes.filter(created_at__lt=three_months_ago)
         self.stdout.write(
-            f"{old_unconfirmed_siaes.count()} siaes created by staff should be deleted as they are unconfirmed"
+            f"{len(old_unconfirmed_siaes)} siaes created by staff should be deleted as they are unconfirmed"
         )
         for siae in old_unconfirmed_siaes:
             if could_siae_be_deleted(siae):
@@ -137,88 +135,81 @@ class Command(BaseCommand):
         ):
             assert siae.should_have_convention
 
+            if siae.convention.asp_id not in asp_id_to_siae_row:
+                continue
             row = asp_id_to_siae_row[siae.convention.asp_id]
 
-            if row is None:
-                continue
-
-            new_auth_email = row.auth_email
-            auth_email_has_changed = new_auth_email and siae.auth_email != new_auth_email
-            if auth_email_has_changed:
-                siae.auth_email = new_auth_email
+            auth_email = row.auth_email or siae.auth_email
+            if siae.auth_email != auth_email:
+                siae.auth_email = auth_email
                 siae.save()
                 auth_email_updates += 1
 
-            siret_has_changed = row.siret != siae.siret
-            if not siret_has_changed:
-                continue
+            if siae.siret != row.siret:
+                assert siae.siren == row.siret[:9]
 
-            new_siret = row.siret
-            assert siae.siren == new_siret[:9]
-            existing_siae = Company.objects.filter(siret=new_siret, kind=siae.kind).first()
+                existing_siae = Company.objects.filter(siret=row.siret, kind=siae.kind).first()
+                if existing_siae:
 
-            if not existing_siae:
+                    def fmt(siae):
+                        msg = f"{siae.source} {siae.siret}"
+                        if siae.convention is None:
+                            return f"{msg} convention=None"
+                        return f"{msg} convention.id={siae.convention.id} asp_id={siae.convention.asp_id}"
+
+                    self.stdout.write(
+                        f"FATAL ERROR: siae.id={siae.id} ({fmt(siae)}) has changed siret from "
+                        f"{siae.siret} to {row.siret} but new siret is already used by "
+                        f"siae.id={existing_siae.id} ({fmt(existing_siae)}) "
+                    )
+                    self.fatal_errors += 1
+                    continue
+
                 self.stdout.write(
-                    f"siae.id={siae.id} has changed siret from {siae.siret} to {new_siret} (will be updated)"
+                    f"siae.id={siae.id} has changed siret from {siae.siret} to {row.siret} (will be updated)"
                 )
-                siae.siret = new_siret
+                siae.siret = row.siret
                 siae.save()
-                continue
 
-            def fmt(siae):
-                if siae.convention is None:
-                    return f"{siae.source} {siae.siret} convention=None"
-                return f"{siae.source} {siae.siret} convention.id={siae.convention.id} asp_id={siae.convention.asp_id}"
-
-            self.stdout.write(
-                f"FATAL ERROR: siae.id={siae.id} ({fmt(siae)}) has changed siret from "
-                f"{siae.siret} to {new_siret} but new siret is already used by "
-                f"siae.id={existing_siae.id} ({fmt(existing_siae)}) "
-            )
-            self.fatal_errors += 1
-
-        self.stdout.write(f"{auth_email_updates} siae.auth_email fields will be updated")
+        self.stdout.write(f"{auth_email_updates} siae.auth_email fields have been updated")
 
     @timeit
     def cleanup_siaes_after_grace_period(self):
-        blocked_deletions = 0
-        deletions = 0
+        deletions, blocked_deletions = 0, 0
 
         for siae in Company.objects.select_related("convention"):
             if not siae.grace_period_has_expired:
                 continue
+
             if could_siae_be_deleted(siae):
                 siae.delete()
                 deletions += 1
-                continue
-            blocked_deletions += 1
+            else:
+                blocked_deletions += 1
 
-        self.stdout.write(f"{deletions} siaes past their grace period will be deleted")
+        self.stdout.write(f"{deletions} siaes past their grace period has been deleted")
         self.stdout.write(f"{blocked_deletions} siaes past their grace period cannot be deleted")
 
     @timeit
     def create_new_siaes(self, siret_to_siae_row, active_siae_keys):
-        asp_id_to_siae_row = {row.asp_id: row for row in siret_to_siae_row.values()}
-        creatable_siae_keys = [(asp_id, kind) for (asp_id, kind) in active_siae_keys if asp_id in asp_id_to_siae_row]
-
         creatable_siaes = []
 
-        for asp_id, kind in creatable_siae_keys:
-            row = asp_id_to_siae_row.get(asp_id)
-            siret = row.siret
+        asp_id_to_siae_row = {row.asp_id: row for row in siret_to_siae_row.values()}
+        for asp_id, kind in active_siae_keys:
+            if asp_id not in asp_id_to_siae_row:
+                continue
+            row = asp_id_to_siae_row[asp_id]
 
-            existing_siae_query = Company.objects.select_related("convention").filter(
-                convention__asp_id=asp_id, kind=kind
-            )
-            if existing_siae_query.exists():
+            existing_siaes = Company.objects.select_related("convention").filter(convention__asp_id=asp_id, kind=kind)
+            if existing_siaes:
                 # Siaes with this asp_id already exist, no need to create one more.
                 total_existing_siaes_with_asp_source = 0
-                for existing_siae in existing_siae_query.all():
+                for existing_siae in existing_siaes:
                     assert existing_siae.should_have_convention
                     if existing_siae.source == Company.SOURCE_ASP:
                         total_existing_siaes_with_asp_source += 1
                         # Siret should have been fixed by update_siret_and_auth_email_of_existing_siaes().
-                        assert existing_siae.siret == siret
+                        assert existing_siae.siret == row.siret
                     else:
                         assert existing_siae.source == Company.SOURCE_USER_CREATED
 
@@ -226,14 +217,14 @@ class Command(BaseCommand):
                 assert total_existing_siaes_with_asp_source == 1
                 continue
 
-            existing_siae_query = Company.objects.filter(siret=siret, kind=kind)
-            if existing_siae_query.exists():
-                existing_siae = existing_siae_query.get()
-                if existing_siae.source == Company.SOURCE_ASP:
-                    # Sometimes the siae already exists but was not detected in the first queryset above because it
-                    # has the wrong asp_id. Such an edge case is fixed in another method `update_existing_conventions`.
-                    continue
-                # Siae with this siret+kind already exists but with wrong source.
+            try:
+                existing_siae = Company.objects.get(~Q(source=Company.SOURCE_ASP), siret=row.siret, kind=kind)
+            except Company.DoesNotExist:
+                assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=kind).exists()
+                if (row.asp_id, kind) in active_siae_keys:
+                    creatable_siaes.append(build_siae(row, kind, is_active=True))
+            else:
+                # Siae with this siret+kind already exists but with the wrong source.
                 assert existing_siae.source in [Company.SOURCE_USER_CREATED, Company.SOURCE_STAFF_CREATED]
                 assert existing_siae.should_have_convention
                 self.stdout.write(
@@ -244,12 +235,6 @@ class Command(BaseCommand):
                 existing_siae.source = Company.SOURCE_ASP
                 existing_siae.convention = None
                 existing_siae.save()
-                continue
-
-            assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=kind).exists()
-
-            if (row.asp_id, kind) in active_siae_keys:
-                creatable_siaes.append(build_siae(row, kind, is_active=True))
 
         self.stdout.write("--- beginning of CSV output of all creatable_siaes ---")
         self.stdout.write("siret;kind;department;name;address")
@@ -260,20 +245,13 @@ class Command(BaseCommand):
 
         send_email_messages(siae.activate_your_account_email() for siae in creatable_siaes)
 
-        self.stdout.write(f"{len(creatable_siaes)} structures will be created")
+        self.stdout.write(f"{len(creatable_siaes)} structures have been created")
         self.stdout.write(f"{len([s for s in creatable_siaes if s.coords])} structures will have geolocation")
 
     @timeit
     def check_whether_signup_is_possible_for_all_siaes(self):
-        for siae in (
-            Company.objects.filter(
-                auth_email="",
-            )
-            .exclude(  # Exclude siae which have at least one active member.
-                companymembership__is_active=True,
-            )
-            .distinct()
-        ):
+        no_signup_siaes = Company.objects.filter(auth_email="").exclude(companymembership__is_active=True).distinct()
+        for siae in no_signup_siaes:
             self.stdout.write(
                 f"FATAL ERROR: signup is impossible for siae.id={siae.id} siret={siae.siret} "
                 f"kind={siae.kind} dpt={siae.department} source={siae.source} "
@@ -285,6 +263,7 @@ class Command(BaseCommand):
     def create_conventions(self, vue_af_df, siret_to_siae_row, active_siae_keys):
         creatable_conventions = get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
         self.stdout.write(f"will create {len(creatable_conventions)} conventions")
+
         for convention, siae in creatable_conventions:
             assert not SiaeConvention.objects.filter(asp_id=convention.asp_id, kind=convention.kind).exists()
             convention.save()
@@ -322,8 +301,10 @@ class Command(BaseCommand):
         af_number_to_row = get_af_number_to_row(vue_af_df)
         active_siae_keys = get_active_siae_keys(vue_af_df)
 
+        # Sanitize data from users
         self.delete_user_created_siaes_without_members()
         self.manage_staff_created_siaes()
+
         self.update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row)
         update_existing_conventions(siret_to_siae_row, active_siae_keys)
         self.create_new_siaes(siret_to_siae_row, active_siae_keys)
