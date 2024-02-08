@@ -39,7 +39,6 @@ from tests.eligibility.factories import EligibilityDiagnosisMadeBySiaeFactory
 @unittest.skipUnless(
     os.getenv("CI", "False"), "Slow and scarcely updated management command, no need for constant testing!"
 )
-@freeze_time("2022-10-10")
 @pytest.mark.usefixtures("unittest_compatibility")
 class ImportSiaeManagementCommandsTest(TransactionTestCase):
 
@@ -89,7 +88,8 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
 
         siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
         vue_af_df = get_vue_af_df()
-        active_siae_keys = get_active_siae_keys(vue_af_df)
+        with freeze_time("2022-10-10"):
+            active_siae_keys = get_active_siae_keys(vue_af_df)
 
         company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
         results = get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
@@ -113,10 +113,12 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
 
         siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
         vue_af_df = get_vue_af_df()
-        active_siae_keys = get_active_siae_keys(vue_af_df)
+        with freeze_time("2022-10-10"):
+            active_siae_keys = get_active_siae_keys(vue_af_df)
 
         company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.AI, convention=None)
-        results = get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
+        with freeze_time("2022-10-10"):
+            results = get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
 
         assert len(results) == 1
 
@@ -219,10 +221,11 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
             assert check_whether_signup_is_possible_for_all_siaes() == 0
 
     def test_activate_your_account_email_for_a_siae_without_members_but_with_auth_email(self):
-        create_new_siaes(
-            get_siret_to_siae_row(get_vue_structure_df()),
-            get_active_siae_keys(get_vue_af_df()),
-        )
+        with freeze_time("2022-10-10"):
+            create_new_siaes(
+                get_siret_to_siae_row(get_vue_structure_df()),
+                get_active_siae_keys(get_vue_af_df()),
+            )
         assert reverse("signup:company_select") in mail.outbox[0].body
         assert collections.Counter(mail.subject for mail in mail.outbox) == collections.Counter(
             f"Activez le compte de votre {kind} {name} sur les emplois de l'inclusion"
