@@ -42,6 +42,7 @@ def update_existing_conventions(siret_to_siae_row, active_siae_keys):
             continue
 
         row = siret_to_siae_row[siae.siret]
+        updated_fields = set()
 
         # Sometimes the same siret is attached to one asp_id in one export and to another asp_id in the next export.
         # In other words, the siae convention asp_id has changed and should be updated.
@@ -54,7 +55,7 @@ def update_existing_conventions(siret_to_siae_row, active_siae_keys):
             )
             assert not SiaeConvention.objects.filter(asp_id=row.asp_id, kind=siae.kind).exists()
             convention.asp_id = row.asp_id
-            convention.save()
+            convention.save(update_fields={"asp_id"})
             continue
 
         # Siret_signature can change from one export to the next!
@@ -65,7 +66,7 @@ def update_existing_conventions(siret_to_siae_row, active_siae_keys):
                 f"{convention.siret_signature} to {row.siret_signature} (will be updated)"
             )
             convention.siret_signature = row.siret_signature
-            convention.save()
+            updated_fields.add("siret_signature")
 
         should_be_active = (row.asp_id, siae.kind) in active_siae_keys
         if convention.is_active != should_be_active:
@@ -73,7 +74,7 @@ def update_existing_conventions(siret_to_siae_row, active_siae_keys):
                 # Inactive convention should be activated.
                 reactivations += 1
                 convention.is_active = True
-                convention.save()
+                updated_fields.add("is_active")
             elif convention.reactivated_at and convention.reactivated_at >= three_months_ago:
                 # Active convention was reactivated recently by support, do not deactivate it even though it should
                 # be according to latest ASP data.
@@ -81,6 +82,9 @@ def update_existing_conventions(siret_to_siae_row, active_siae_keys):
             else:
                 # Active convention should be deactivated.
                 conventions_to_deactivate.append(convention)
+
+        if updated_fields:
+            convention.save(update_fields=updated_fields)
 
     print(f"{reactivations} conventions have been reactivated")
 
