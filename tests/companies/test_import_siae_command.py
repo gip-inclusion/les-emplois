@@ -1,15 +1,13 @@
 import collections
 import datetime
-import os
 import shutil
-import unittest
 from pathlib import Path
 
 import pandas as pd
 import pytest
 from django.conf import settings
 from django.core import mail
-from django.test import TransactionTestCase, override_settings
+from django.test import override_settings
 from django.urls import reverse
 from freezegun import freeze_time
 
@@ -34,13 +32,11 @@ from itou.companies.models import Company
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory, SiaeConventionFactory
 from tests.eligibility.factories import EligibilityDiagnosisMadeBySiaeFactory
+from tests.utils.test import TestCase
 
 
-@unittest.skipUnless(
-    os.getenv("CI", "False"), "Slow and scarcely updated management command, no need for constant testing!"
-)
 @pytest.mark.usefixtures("unittest_compatibility")
-class ImportSiaeManagementCommandsTest(TransactionTestCase):
+class ImportSiaeManagementCommandsTest(TestCase):
 
     def setUp(self):
         super().setUp()
