@@ -17,7 +17,10 @@ from django.urls import reverse
 from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind
-from itou.companies.management.commands import import_siae
+from itou.companies.management.commands._import_siae.siae import (
+    check_whether_signup_is_possible_for_all_siaes,
+    create_new_siaes,
+)
 from itou.companies.management.commands._import_siae.utils import anonymize_fluxiae_df, could_siae_be_deleted
 from itou.companies.management.commands._import_siae.vue_af import (
     get_active_siae_keys,
@@ -197,32 +200,25 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
         ]
 
     def test_check_signup_possible_for_a_siae_without_members_but_with_auth_email(self):
-        instance = import_siae.Command()
         CompanyFactory(auth_email="tadaaa")
         with self.assertNumQueries(1):
-            instance.check_whether_signup_is_possible_for_all_siaes()
-        assert instance.fatal_errors == 0
+            assert check_whether_signup_is_possible_for_all_siaes() == 0
 
     def test_check_signup_possible_for_a_siae_without_members_nor_auth_email(self):
-        instance = import_siae.Command()
         CompanyFactory(auth_email="")
         with self.assertNumQueries(1):
-            instance.check_whether_signup_is_possible_for_all_siaes()
-        assert instance.fatal_errors == 1
+            assert check_whether_signup_is_possible_for_all_siaes() == 1
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_one(self):
-        instance = import_siae.Command()
         CompanyWith2MembershipsFactory(
             auth_email="",
             membership1__is_active=False,
             membership1__user__is_active=False,
         )
         with self.assertNumQueries(1):
-            instance.check_whether_signup_is_possible_for_all_siaes()
-        assert instance.fatal_errors == 0
+            assert check_whether_signup_is_possible_for_all_siaes() == 0
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_two(self):
-        instance = import_siae.Command()
         CompanyWith2MembershipsFactory(
             auth_email="",
             membership1__is_active=False,
@@ -231,19 +227,15 @@ class ImportSiaeManagementCommandsTest(TransactionTestCase):
             membership2__user__is_active=False,
         )
         with self.assertNumQueries(1):
-            instance.check_whether_signup_is_possible_for_all_siaes()
-        assert instance.fatal_errors == 1
+            assert check_whether_signup_is_possible_for_all_siaes() == 1
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_three(self):
-        instance = import_siae.Command()
         CompanyWith2MembershipsFactory(auth_email="")
         with self.assertNumQueries(1):
-            instance.check_whether_signup_is_possible_for_all_siaes()
-        assert instance.fatal_errors == 0
+            assert check_whether_signup_is_possible_for_all_siaes() == 0
 
     def test_activate_your_account_email_for_a_siae_without_members_but_with_auth_email(self):
-        instance = import_siae.Command()
-        instance.create_new_siaes(
+        create_new_siaes(
             get_siret_to_siae_row(get_vue_structure_df()),
             get_active_siae_keys(get_vue_af_df()),
         )
