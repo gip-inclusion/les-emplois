@@ -171,6 +171,34 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         assert 0 == EligibilityDiagnosis.objects.filter(job_seeker=user2).count()
         assert 0 == EligibilityDiagnosis.objects.filter(job_seeker=user3).count()
 
+    def test_hard_deduplicate_job_seekers(self):
+        """
+        Hard case : all the duplicates have their own Approval
+        """
+
+        # Attributes shared by all users.
+        # Deduplication is based on these values.
+        kwargs = {
+            "job_seeker__jobseeker_profile__pole_emploi_id": "6666666B",
+            "job_seeker__birthdate": datetime.date(2002, 12, 12),
+        }
+
+        # Create `user1`.
+        job_app1 = JobApplicationFactory(with_approval=True, job_seeker__nir="", **kwargs)
+        user1 = job_app1.job_seeker
+
+        # Create `user2` through a job application sent by him.
+        job_app2 = JobApplicationSentByJobSeekerFactory(with_approval=True, job_seeker__nir="", **kwargs)
+        user2 = job_app2.job_seeker
+
+        # Launch command
+        call_command("deduplicate_job_seekers", verbosity=0, no_xlsx=True, wet_run=True)
+
+        # It doesn't crash but users haven't been merged
+        self.assertQuerySetEqual(
+            JobApplication.objects.values_list("job_seeker_id", flat=True), [user1.pk, user2.pk], ordered=False
+        )
+
 
 class TestSyncPermsTestCase(TestCase):
     def test_sync_perms(self):
