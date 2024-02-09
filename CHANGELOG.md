@@ -1,5 +1,33 @@
 # Journal des modifications
 
+## [80] - 2024-02-11
+
+### Ajouté
+
+- Recherche d'entreprise : ajout du filtre nom
+- Emploi premium : afficher le lien d’une enquête tally pour les employeurs
+- Prolongations : ajouter un nouveau motif de refus de prolongation (motif pas adapté)
+- Stats : Publication du TB337 (Bilan de la phase de candidature en IAE)
+- Affichage de services Dora dans la description d'un employeur ou d'une fiche de poste
+
+### Modifié
+
+- Refonte UX/UI
+- Arrêt de la capitalisation automatique des noms des structures
+- Renommage de pôle emploi en France Travail
+- Fiches salarié : Sortir d'archive automatiquement les FS dont on a raté la notification
+- Fiches salarié : Correction de la création automatique d'une notification en cas de doublon PASS IAE/SIRET (3436)
+- Liste des PASS IAE : correction du filtre "Fin du parcours en IAE" en combinaison avec la pagination
+- Candidatures : simplification du parcours d'acceptation d'une candidature IAE
+- Les organismes délégataire d'un CD habilités sont conventionnés pour le suivi des BRSA
+- Admin : l'acceptation d'une candidature déclenche les mécanismes d'acceptation (mails, création de PASS, etc)
+- API : mise à jour de la documentation pour générer un jeton
+
+### Supprimé
+
+- Suppression du bandeau de promotion de l'évènement du 1er février
+- Suppression du champ ‘Lien vers un CV’ des utilisateurs
+
 ## [79] - 2024-01-28
 
 ### Ajouté
