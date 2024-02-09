@@ -52,13 +52,15 @@ quality: $(VENV_REQUIREMENT)
 	find * -type f -name '*.sh' -exec shellcheck --external-sources {} +
 	python manage.py makemigrations --check --dry-run --noinput || (echo "⚠ Missing migration ⚠"; exit 1)
 
-fix: $(VENV_REQUIREMENT)
+fast_fix: $(VENV_REQUIREMENT)
 	black $(LINTER_CHECKED_DIRS)
 	ruff check --fix $(LINTER_CHECKED_DIRS)
-	djlint --reformat itou
 	# Use || true because `git apply` exit with an error ("error: unrecognized input") when the pipe is empty,
 	# this happens when there is nothing to fix or shellcheck can't propose a fix.
 	find * -type f -name '*.sh' -exec shellcheck --external-sources --format=diff {} + | git apply || true
+
+fix: fast_fix
+	djlint --reformat itou
 
 # Django.
 # =============================================================================
