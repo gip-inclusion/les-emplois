@@ -10,9 +10,11 @@ from django.template.response import TemplateResponse
 from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 from itou.approvals.models import Approval
 from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
+from itou.communications.models import NotificationSettings
 from itou.companies.models import CompanyMembership
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.geo.models import QPV
@@ -56,7 +58,27 @@ class EmailAddressInline(ItouTabularInline):
         return get_admin_view_link(obj, content=obj.email)
 
 
-class CompanyMembershipInline(ItouTabularInline):
+class DisabledNotificationsMixin:
+    @admin.display(description="Notifications désactivées")
+    def disabled_notifications(self, obj):
+        if obj.user.is_employer:
+            notification_settings, _ = NotificationSettings.get_or_create(obj.user, obj.company)
+        elif obj.user.is_prescriber_with_authorized_org:
+            notification_settings, _ = NotificationSettings.get_or_create(obj.user, obj.organization)
+        else:
+            notification_settings, _ = NotificationSettings.get_or_create(obj.user)
+
+        disabled_notifications = notification_settings.disabled_notifications_names
+        if disabled_notifications:
+            return mark_safe(
+                "<ul class='notifications-summary'>"
+                + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications])
+                + "<ul>"
+            )
+        return "Aucune"
+
+
+class CompanyMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
     model = CompanyMembership
     extra = 0
     raw_id_fields = ("company",)
@@ -65,10 +87,10 @@ class CompanyMembershipInline(ItouTabularInline):
         "joined_at",
         "is_admin",
         "is_active",
+        "disabled_notifications",
         "created_at",
         "updated_at",
         "updated_by",
-        "notifications",
     )
     can_delete = True
     show_change_link = True
@@ -84,7 +106,7 @@ class CompanyMembershipInline(ItouTabularInline):
         return get_admin_view_link(obj.company)
 
 
-class PrescriberMembershipInline(ItouTabularInline):
+class PrescriberMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
     model = PrescriberMembership
     extra = 0
     raw_id_fields = ("organization",)
@@ -93,6 +115,7 @@ class PrescriberMembershipInline(ItouTabularInline):
         "joined_at",
         "is_admin",
         "is_active",
+        "disabled_notifications",
         "created_at",
         "updated_at",
         "updated_by",
@@ -282,6 +305,9 @@ def add_support_remark_to_user(user, text):
 
 @admin.register(models.User)
 class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
+    class Media:
+        css = {"all": ("css/itou-admin.css",)}
+
     show_full_result_count = False
     add_form = ItouUserCreationForm
     change_form_template = "admin/users/change_user_form.html"
@@ -312,6 +338,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
         "address_in_qpv",
         "is_staff",
         "jobseeker_profile_link",
+        "disabled_notifications",
     )
 
     add_fieldsets = (
@@ -384,6 +411,22 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
     @admin.display(description="profil de demandeur d'emploi")
     def jobseeker_profile_link(self, obj):
         return get_admin_view_link(obj.jobseeker_profile) if obj.is_job_seeker else None
+
+    @admin.display(description="Notifications désactivées")
+    def disabled_notifications(self, obj):
+        if obj.is_employer:
+            return "Voir pour chaque structure ci-dessous"
+        if obj.is_prescriber_with_authorized_org:
+            return "Voir pour chaque organisation ci-dessous"
+        notification_settings, _ = NotificationSettings.get_or_create(obj)
+        disabled_notifications = notification_settings.disabled_notifications_names
+        if disabled_notifications:
+            return mark_safe(
+                "<ul class='notifications-summary'>"
+                + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications])
+                + "<ul>"
+            )
+        return "Aucune"
 
     @admin.action(description="Désactiver le compte IC pour changement prescripteur <-> employeur")
     def free_ic_email(self, request, queryset):
@@ -467,6 +510,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
                         "created_by",
                         "identity_provider",
                         "jobseeker_profile_link",
+                        "disabled_notifications",
                     )
                 },
             ),
@@ -677,10 +721,13 @@ class IsPECertifiedFilter(admin.SimpleListFilter):
 
 
 @admin.register(models.JobSeekerProfile)
-class JobSeekerProfileAdmin(InconsistencyCheckMixin, ItouModelAdmin):
+class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin, ItouModelAdmin):
     """
     Inlines would only be possible the other way around
     """
+
+    class Media:
+        css = {"all": ("css/itou-admin.css",)}
 
     form = JobSeekerProfileAdminForm
 
@@ -712,6 +759,7 @@ class JobSeekerProfileAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "pe_obfuscated_nir",
         "pe_last_certification_attempt_at",
         "is_pe_certified",
+        "disabled_notifications",
     )
 
     fieldsets = (
@@ -736,6 +784,7 @@ class JobSeekerProfileAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                     "is_pe_certified",
                     "pe_obfuscated_nir",
                     "pe_last_certification_attempt_at",
+                    "disabled_notifications",
                 )
             },
         ),

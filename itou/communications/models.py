@@ -103,3 +103,7 @@ class NotificationSettings(models.Model):
             structure_pk=structure_pk,
         )
         return notification_settings, created
+
+    @property
+    def disabled_notifications_names(self):
+        return self.disabled_notifications.actives().values_list("name", flat=True)

@@ -9,8 +9,10 @@ import respx
 from allauth.account.models import EmailAddress, EmailConfirmationHMAC
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.geos import Point
 from django.core import mail
+from django.db.models import Count
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -20,13 +22,12 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from rest_framework.authtoken.models import Token
 
 from itou.cities.models import City
+from itou.communications import registry as notifications_registry
+from itou.communications.models import DisabledNotification, NotificationSettings
 from itou.companies.enums import CompanyKind
+from itou.companies.models import Company
 from itou.employee_record.enums import Status
 from itou.institutions.enums import InstitutionKind
-from itou.job_applications.notifications import (
-    NewQualifiedJobAppEmployersNotification,
-    NewSpontaneousJobAppEmployersNotification,
-)
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations import enums as evaluation_enums
@@ -45,7 +46,6 @@ from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
     CompanyPendingGracePeriodFactory,
-    CompanyWithMembershipAndJobsFactory,
 )
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
@@ -65,6 +65,7 @@ from tests.siae_evaluations.factories import (
 from tests.users.factories import (
     DEFAULT_PASSWORD,
     EmployerFactory,
+    ItouStaffFactory,
     JobSeekerFactory,
     JobSeekerWithAddressFactory,
     PrescriberFactory,
@@ -1875,138 +1876,396 @@ class SwitchCompanyTest(TestCase):
         assert response.context["request"].current_organization == company
 
 
-class EditUserPreferencesTest(TestCase):
-    def test_employer_opt_in_company_no_job_description(self):
-        company = CompanyFactory(with_membership=True)
-        user = company.members.first()
-        recipient = user.companymembership_set.get(company=company)
-        form_name = "new_job_app_notification_form"
-
-        self.client.force_login(user)
-
-        # Recipient's notifications are empty for the moment.
-        assert not recipient.notifications
-
+class EditUserNotificationsTest(TestCase):
+    def test_staff_user_not_allowed(self):
+        staff_user = ItouStaffFactory()
+        self.client.force_login(staff_user)
         url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
-        assert response.status_code == 200
-        assertContains(response, "Candidatures spontanées")
+        assert response.status_code == 404
 
-        # Recipients are subscribed to spontaneous notifications by default,
-        # the form should reflect that.
-        assert response.context[form_name].fields["spontaneous"].initial
-
-        data = {"spontaneous": True}
-        response = self.client.post(url, data=data)
-
-        assert response.status_code == 302
-
-        recipient.refresh_from_db()
-        assert recipient.notifications
-        assert NewSpontaneousJobAppEmployersNotification.is_subscribed(recipient=recipient)
-
-    def test_employer_opt_in_company_with_job_descriptions(self):
-        company = CompanyWithMembershipAndJobsFactory()
-        user = company.members.first()
-        job_descriptions_pks = list(company.job_description_through.values_list("pk", flat=True))
-        recipient = user.companymembership_set.get(company=company)
-        form_name = "new_job_app_notification_form"
-        self.client.force_login(user)
-
-        # Recipient's notifications are empty for the moment.
-        assert not recipient.notifications
-
+    def test_labor_inspector_not_allowed(self):
+        labor_inspector = LaborInspectorFactory(membership=True)
+        self.client.force_login(labor_inspector)
         url = reverse("dashboard:edit_user_notifications")
         response = self.client.get(url)
-        assert response.status_code == 200
+        assert response.status_code == 404
 
-        # Recipients are subscribed to spontaneous notifications by default,
-        # the form should reflect that.
-        assert response.context[form_name].fields["qualified"].initial == job_descriptions_pks
-
-        data = {"qualified": job_descriptions_pks}
-        response = self.client.post(url, data=data)
-        assert response.status_code == 302
-
-        recipient.refresh_from_db()
-        assert recipient.notifications
-
-        for pk in job_descriptions_pks:
-            assert NewQualifiedJobAppEmployersNotification.is_subscribed(recipient=recipient, subscribed_pk=pk)
-
-    def test_employer_opt_out_company_no_job_descriptions(self):
-        company = CompanyFactory(with_membership=True)
-        user = company.members.first()
-        recipient = user.companymembership_set.get(company=company)
-        form_name = "new_job_app_notification_form"
-        self.client.force_login(user)
-
-        # Recipient's notifications are empty for the moment.
-        assert not recipient.notifications
-
+    def test_employer_allowed(self):
+        employer = EmployerFactory(with_company=True)
+        self.client.force_login(employer)
         url = reverse("dashboard:edit_user_notifications")
-        response = self.client.get(url)
+        # prewarm ContentType cache if needed to avoid extra query
+        ContentType.objects.get_for_model(Company)
+        with self.assertNumQueries(
+            1  # Load django session
+            + 1  # Load current user
+            + 1  # Load company membership
+            + 1  # Load company
+            + 2  # Savepoint and release
+            + 1  # Load employer notification settings (form init)
+            + 3  # Savepoint, update session and release
+        ):
+            response = self.client.get(url)
         assert response.status_code == 200
 
-        # Recipients are subscribed to spontaneous notifications by default,
-        # the form should reflect that.
-        assert response.context[form_name].fields["spontaneous"].initial
-
-        data = {"spontaneous": False}
-        response = self.client.post(url, data=data)
-
-        assert response.status_code == 302
-
-        recipient.refresh_from_db()
-        assert recipient.notifications
-        assert not NewSpontaneousJobAppEmployersNotification.is_subscribed(recipient=recipient)
-
-    def test_employer_opt_out_company_with_job_descriptions(self):
-        company = CompanyWithMembershipAndJobsFactory()
-        user = company.members.first()
-        job_descriptions_pks = list(company.job_description_through.values_list("pk", flat=True))
-        recipient = user.companymembership_set.get(company=company)
-        form_name = "new_job_app_notification_form"
-        self.client.force_login(user)
-
-        # Recipient's notifications are empty for the moment.
-        assert not recipient.notifications
-
-        url = reverse("dashboard:edit_user_notifications")
-        response = self.client.get(url)
-        assert response.status_code == 200
-
-        # Recipients are subscribed to qualified notifications by default,
-        # the form should reflect that.
-        assert response.context[form_name].fields["qualified"].initial == job_descriptions_pks
-
-        # The recipient opted out from every notification.
-        data = {"spontaneous": False}
-        response = self.client.post(url, data=data)
-        assert response.status_code == 302
-
-        recipient.refresh_from_db()
-        assert recipient.notifications
-
-        for _i, pk in enumerate(job_descriptions_pks):
-            assert not NewQualifiedJobAppEmployersNotification.is_subscribed(recipient=recipient, subscribed_pk=pk)
-
-
-class EditUserPreferencesExceptionsTest(TestCase):
-    def test_not_allowed_user(self):
-        # Only employers can currently access the Preferences page.
-
-        prescriber = PrescriberFactory()
+    def test_prescriber_allowed(self):
+        prescriber = PrescriberFactory(membership=True)
         self.client.force_login(prescriber)
         url = reverse("dashboard:edit_user_notifications")
-        response = self.client.get(url)
-        assert response.status_code == 403
+        # prewarm ContentType cache if needed to avoid extra query
+        ContentType.objects.get_for_model(PrescriberOrganization)
+        with self.assertNumQueries(
+            1  # Load django session
+            + 1  # Load current user
+            + 1  # Load prescriber membership
+            + 2  # Savepoint and release
+            + 1  # Load prescriber notification settings (form init)
+            + 1  # Check prescriber membership exists for this structure (form init)
+            + 3  # Savepoint, update session and release
+        ):
+            response = self.client.get(url)
+        assert response.status_code == 200
 
+    def test_solo_adviser_allowed(self):
+        solo_adviser = PrescriberFactory(membership=False)
+        self.client.force_login(solo_adviser)
+        url = reverse("dashboard:edit_user_notifications")
+        # prewarm ContentType cache if needed to avoid extra query
+        ContentType.objects.get_for_model(PrescriberOrganization)
+        with self.assertNumQueries(
+            1  # Load django session
+            + 1  # Load current user
+            + 1  # Load prescriber membership
+            + 2  # Savepoint and release
+            + 1  # Load prescriber notification settings (form init)
+            + 1  # Check prescriber membership exists for this structure (form init)
+            + 3  # Savepoint, update session and release
+        ):
+            response = self.client.get(url)
+        assert response.status_code == 200
+
+    def test_job_seeker_allowed(self):
         job_seeker = JobSeekerFactory()
         self.client.force_login(job_seeker)
         url = reverse("dashboard:edit_user_notifications")
-        response = self.client.get(url)
-        assert response.status_code == 403
+        with self.assertNumQueries(
+            1  # Load django session
+            + 1  # Load current user
+            + 2  # Savepoint and release
+            + 1  # Load job seeker notification settings (form init)
+            + 3  # Savepoint, update session and release
+        ):
+            response = self.client.get(url)
+        assert response.status_code == 200
+
+    def test_employer_create_update_notification_settings(self):
+        employer = EmployerFactory(with_company=True)
+        company = employer.company_set.first()
+        self.client.force_login(employer)
+        url = reverse("dashboard:edit_user_notifications")
+
+        # Fetch available notifications for this user/company
+        available_notifications = [
+            notification
+            for notification in notifications_registry
+            if notification(employer, company).is_manageable_by_user()
+        ]
+
+        # prewarm ContentType cache if needed to avoid extra query
+        ContentType.objects.get_for_model(Company)
+
+        # No notification settings defined by default
+        assert not NotificationSettings.objects.exists()
+        assert not DisabledNotification.objects.exists()
+
+        with self.assertNumQueries(
+            1  # Load django session
+            + 1  # Load current user
+            + 1  # Load company membership
+            + 1  # Load company
+            + 2  # Savepoint and release
+            + 1  # Load employer notification settings (form init)
+            + 1  # Load employer notification settings (form save)
+            + 3  # Savepoint, create notification settings and release (form save)
+            + 1  # Load notification records (form save)
+            + 3  # Savepoint, update session and release
+        ):
+            response = self.client.post(
+                url, data={notification.__name__: "on" for notification in available_notifications}
+            )
+        assert response.status_code == 302
+        assert response["Location"] == "/dashboard/"
+        self.assertQuerySetEqual(
+            NotificationSettings.objects.all(),
+            [
+                NotificationSettings.objects.get(
+                    user=employer,
+                    structure_type=ContentType.objects.get_for_model(company),
+                    structure_pk=company.pk,
+                    disabled_notifications__isnull=True,
+                )
+            ],
+        )
+        assert not DisabledNotification.objects.exists()
+
+        # Update, disable all notifications
+        with self.assertNumQueries(
+            1  # Load django session
+            + 1  # Load current user
+            + 1  # Load company membership
+            + 1  # Load company
+            + 2  # Savepoint and release
+            + 1  # Load employer notification settings (form init)
+            + 1  # Load employer disabled notification (form init)
+            + 1  # Load employer notification settings (form save)
+            + len(available_notifications)  # Load disabled notification record (form save)
+            + 1  # Load notification records (form save)
+            + 1  # Load disabled notifications' notification records (form save)
+            + 1  # Bulk insert disabled notifications (form save)
+        ):
+            # Send data to bind to the form, otherwise is_valid() returns False
+            response = self.client.post(url, {"foo": "bar"})
+        assert response.status_code == 302
+        assert response["Location"] == "/dashboard/"
+        self.assertQuerySetEqual(
+            NotificationSettings.objects.all(),
+            [
+                NotificationSettings.objects.annotate(Count("disabled_notifications")).get(
+                    user=employer,
+                    structure_type=ContentType.objects.get_for_model(company),
+                    structure_pk=company.pk,
+                    disabled_notifications__count=len(available_notifications),
+                )
+            ],
+        )
+        assert DisabledNotification.objects.count() == len(available_notifications)
+
+    def test_prescriber_create_update_notification_settings(self):
+        prescriber = PrescriberFactory(membership=True)
+        organization = prescriber.prescriberorganization_set.first()
+        self.client.force_login(prescriber)
+        url = reverse("dashboard:edit_user_notifications")
+
+        # Fetch available notifications for this user/organization
+        available_notifications = [
+            notification
+            for notification in notifications_registry
+            if notification(prescriber, organization).is_manageable_by_user()
+        ]
+
+        # prewarm ContentType cache if needed to avoid extra query
+        ContentType.objects.get_for_model(PrescriberOrganization)
+
+        # No notification settings defined by default
+        assert not NotificationSettings.objects.exists()
+        assert not DisabledNotification.objects.exists()
+
+        with self.assertNumQueries(
+            1  # Load django session
+            + 1  # Load current user
+            + 1  # Load organization membership
+            + 2  # Savepoint and release
+            + 1  # Load prescriber notification settings (form init)
+            + 1  # Load prescriber notification settings (form save)
+            + 3  # Savepoint, create notification settings and release (form save)
+            + 1  # Load notification records (form save)
+            + 3  # Savepoint, update session and release
+        ):
+            response = self.client.post(
+                url, data={notification.__name__: "on" for notification in available_notifications}
+            )
+        assert response.status_code == 302
+        assert response["Location"] == "/dashboard/"
+        self.assertQuerySetEqual(
+            NotificationSettings.objects.all(),
+            [
+                NotificationSettings.objects.get(
+                    user=prescriber,
+                    structure_type=ContentType.objects.get_for_model(organization),
+                    structure_pk=organization.pk,
+                    disabled_notifications__isnull=True,
+                )
+            ],
+        )
+        assert not DisabledNotification.objects.exists()
+
+        # Update, disable all notifications
+        with self.assertNumQueries(
+            1  # Load django session
+            + 1  # Load current user
+            + 1  # Load organization membership
+            + 2  # Savepoint and release
+            + 1  # Load prescriber notification settings (form init)
+            + 1  # Load prescriber disabled notification (form init)
+            + 1  # Load prescriber notification settings (form save)
+            + len(available_notifications)  # Load disabled notification record (form save)
+            + 1  # Load notification records (form save)
+            + 1  # Load disabled notifications' notification records (form save)
+            + 1  # Bulk insert disabled notifications (form save)
+        ):
+            # Send data to bind to the form, otherwise is_valid() returns False
+            response = self.client.post(url, {"foo": "bar"})
+        assert response.status_code == 302
+        assert response["Location"] == "/dashboard/"
+        self.assertQuerySetEqual(
+            NotificationSettings.objects.all(),
+            [
+                NotificationSettings.objects.annotate(Count("disabled_notifications")).get(
+                    user=prescriber,
+                    structure_type=ContentType.objects.get_for_model(organization),
+                    structure_pk=organization.pk,
+                    disabled_notifications__count=len(available_notifications),
+                )
+            ],
+        )
+        assert DisabledNotification.objects.count() == len(available_notifications)
+
+    def test_solo_adviser_create_update_notification_settings(self):
+        solo_adviser = PrescriberFactory(membership=False)
+        self.client.force_login(solo_adviser)
+        url = reverse("dashboard:edit_user_notifications")
+
+        # Fetch available notifications for this user
+        available_notifications = [
+            notification
+            for notification in notifications_registry
+            if notification(solo_adviser).is_manageable_by_user()
+        ]
+
+        # No notification settings defined by default
+        assert not NotificationSettings.objects.exists()
+        assert not DisabledNotification.objects.exists()
+
+        with self.assertNumQueries(
+            1  # Load django session
+            + 1  # Load current user
+            + 1  # Load organization membership
+            + 2  # Savepoint and release
+            + 1  # Load prescriber notification settings (form init)
+            + 1  # Load prescriber notification settings (form save)
+            + 3  # Savepoint, create notification settings and release (form save)
+            + 1  # Load notification records (form save)
+        ):
+            response = self.client.post(
+                url, data={notification.__name__: "on" for notification in available_notifications}
+            )
+        assert response.status_code == 302
+        assert response["Location"] == "/dashboard/"
+        self.assertQuerySetEqual(
+            NotificationSettings.objects.all(),
+            [
+                NotificationSettings.objects.get(
+                    user=solo_adviser,
+                    structure_type=None,
+                    structure_pk=None,
+                    disabled_notifications__isnull=True,
+                )
+            ],
+        )
+        assert not DisabledNotification.objects.exists()
+
+        # Update, disable all notifications
+        with self.assertNumQueries(
+            1  # Load django session
+            + 1  # Load current user
+            + 1  # Load organization membership
+            + 2  # Savepoint and release
+            + 1  # Load prescriber notification settings (form init)
+            + 1  # Load prescriber disabled notification (form init)
+            + 1  # Load prescriber notification settings (form save)
+            + len(available_notifications)  # Load disabled notification record (form save)
+            + 1  # Load notification records (form save)
+            + 1  # Load disabled notifications' notification records (form save)
+            + 1  # Bulk insert disabled notifications (form save)
+        ):
+            # Send data to bind to the form, otherwise is_valid() returns False
+            response = self.client.post(url, {"foo": "bar"})
+        assert response.status_code == 302
+        assert response["Location"] == "/dashboard/"
+        self.assertQuerySetEqual(
+            NotificationSettings.objects.all(),
+            [
+                NotificationSettings.objects.annotate(Count("disabled_notifications")).get(
+                    user=solo_adviser,
+                    structure_type=None,
+                    structure_pk=None,
+                    disabled_notifications__count=len(available_notifications),
+                )
+            ],
+        )
+        assert DisabledNotification.objects.count() == len(available_notifications)
+
+    def test_job_seeker_create_update_notification_settings(self):
+        job_seeker = JobSeekerFactory()
+        self.client.force_login(job_seeker)
+        url = reverse("dashboard:edit_user_notifications")
+
+        # Fetch available notifications for this user
+        available_notifications = [
+            notification for notification in notifications_registry if notification(job_seeker).is_manageable_by_user()
+        ]
+
+        # No notification settings defined by default
+        assert not NotificationSettings.objects.exists()
+        assert not DisabledNotification.objects.exists()
+
+        with self.assertNumQueries(
+            1  # Load django session
+            + 1  # Load current user
+            + 2  # Savepoint and release
+            + 1  # Load job seeker notification settings (form init)
+            + 1  # Load job seeker notification settings (form save)
+            + 3  # Savepoint, create notification settings and release (form save)
+            + 1  # Load notification records (form save)
+        ):
+            response = self.client.post(
+                url, data={notification.__name__: "on" for notification in available_notifications}
+            )
+        assert response.status_code == 302
+        assert response["Location"] == "/dashboard/"
+        self.assertQuerySetEqual(
+            NotificationSettings.objects.all(),
+            [
+                NotificationSettings.objects.get(
+                    user=job_seeker,
+                    structure_type=None,
+                    structure_pk=None,
+                    disabled_notifications__isnull=True,
+                )
+            ],
+        )
+        assert not DisabledNotification.objects.exists()
+
+        # Update, disable all notifications
+        with self.assertNumQueries(
+            1  # Load django session
+            + 1  # Load current user
+            + 2  # Savepoint and release
+            + 1  # Load job seeker notification settings (form init)
+            + 1  # Load job seeker disabled notification (form init)
+            + 1  # Load job seeker notification settings (form save)
+            + len(available_notifications)  # Load disabled notification record (form save)
+            + 1  # Load notification records (form save)
+            + 1  # Load disabled notifications' notification records (form save)
+            + 1  # Bulk insert disabled notifications (form save)
+        ):
+            # Send data to bind to the form, otherwise is_valid() returns False
+            response = self.client.post(url, {"foo": "bar"})
+        assert response.status_code == 302
+        assert response["Location"] == "/dashboard/"
+        self.assertQuerySetEqual(
+            NotificationSettings.objects.all(),
+            [
+                NotificationSettings.objects.annotate(Count("disabled_notifications")).get(
+                    user=job_seeker,
+                    structure_type=None,
+                    structure_pk=None,
+                    disabled_notifications__count=len(available_notifications),
+                )
+            ],
+        )
+        assert DisabledNotification.objects.count() == len(available_notifications)
 
 
 class SwitchOrganizationTest(TestCase):
