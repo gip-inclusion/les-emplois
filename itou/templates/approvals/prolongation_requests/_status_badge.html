@@ -1,9 +1,9 @@
-{% with label=prolongation_request.get_status_display base_classes="badge badge-xs rounded-pill" %}
+{% with label=prolongation_request.get_status_display base_classes="badge rounded-pill" %}
     {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}
-        <span class="{{ base_classes }} bg-accent-03 text-primary">{{ label }}</span>
+        <span class="{{ base_classes }} {{ badge_size }} bg-accent-03 text-primary">{{ label }}</span>
     {% elif prolongation_request.status == ProlongationRequestStatus.GRANTED %}
-        <span class="{{ base_classes }} bg-success">{{ label }}</span>
+        <span class="{{ base_classes }} {{ badge_size }} bg-success">{{ label }}</span>
     {% elif prolongation_request.status == ProlongationRequestStatus.DENIED %}
-        <span class="{{ base_classes }} bg-danger">{{ label }}</span>
+        <span class="{{ base_classes }} {{ badge_size }} bg-danger">{{ label }}</span>
     {% endif %}
 {% endwith %}

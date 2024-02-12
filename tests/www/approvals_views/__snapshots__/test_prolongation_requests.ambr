@@ -766,7 +766,7 @@
                                                   <td>John DOE</td>
                                                   <td>
       
-          <span class="badge badge-xs rounded-pill bg-accent-03 text-primary">À traiter</span>
+          <span class="badge rounded-pill badge-xs bg-accent-03 text-primary">À traiter</span>
       
   
   </td>

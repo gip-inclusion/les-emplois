@@ -50,7 +50,7 @@
                                                 <td>{{ prolongation_request.declared_by_siae }}</td>
                                                 <td>{{ prolongation_request.created_at|date:"d/m/Y" }}</td>
                                                 <td>{{ prolongation_request.validated_by.get_full_name }}</td>
-                                                <td>{% include "approvals/prolongation_requests/_status_badge.html" %}</td>
+                                                <td>{% include "approvals/prolongation_requests/_status_badge.html" with badge_size="badge-xs" %}</td>
                                                 <td>
                                                     <a class="btn btn-link btn-outline-primary btn-sm" href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}">
                                                         {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}
