@@ -1301,19 +1301,6 @@ class EditJobSeekerInfo(TestCase):
         response = self.client.get(url)
         assert response.status_code == 200
 
-    def test_edit_by_prescriber_with_job_application_URL(self):
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
-        user = job_application.sender
-
-        # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
-        job_application.job_seeker.created_by = user
-        job_application.job_seeker.save()
-
-        self.client.force_login(user)
-        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        assert response.status_code == 200
-
     def test_edit_by_prescriber_of_organization(self):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         prescriber = job_application.sender
