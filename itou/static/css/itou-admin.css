@@ -4,3 +4,15 @@
 .submit-row input.danger {
     background: #ba2121;
 }
+
+form .aligned ul.notifications-summary,
+form .form-row ul.notifications-summary {
+    margin-top: 0;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+form .aligned ul.notifications-summary li,
+form .form-row ul.notifications-summary li {
+    list-style-type: none;
+}
