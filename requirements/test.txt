@@ -359,9 +359,9 @@ django-csp==3.7 \
     --hash=sha256:01443a07723f9a479d498bd7bb63571aaa771e690f64bde515db6cdb76e8041a \
     --hash=sha256:01eda02ad3f10261c74131cdc0b5a6a62b7c7ad4fd017fbefb7a14776e0a9727
     # via -r requirements/base.txt
-django-datadog-logger==0.6.2 \
-    --hash=sha256:ede870b7e937cfa2bfc62baf2b56a05b6f37453cb2c1dc0c6ed2689e3ae9913a \
-    --hash=sha256:fa2b6d66f7c224ef0d872ce52e61ff89f43a2c3ff5ca986161b0128ef0a42653
+django-datadog-logger==0.6.3 \
+    --hash=sha256:05b1327bfa971be7fc1c21cf081e7b21b52fa244aad1126d9c0342b38a3a5dd2 \
+    --hash=sha256:2b2b03da1431fb5801a7466fb1df81fb0c0dc0a14fcd8c2a3ec170f0b33d0d63
     # via -r requirements/base.txt
 django-filter==23.5 \
     --hash=sha256:67583aa43b91fe8c49f74a832d95f4d8442be628fd4c6d65e9f811f5153a4e5c \
