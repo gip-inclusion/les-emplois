@@ -35,6 +35,24 @@ def test_list_view_access(client, authorized_organization, expected):
     assert response.status_code == expected
 
 
+def test_empty_list_view(snapshot, client):
+    prescriber = prescribers_factories.PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+    client.force_login(prescriber)
+
+    num_queries = (
+        BASE_NUM_QUERIES
+        + 1  # fetch django session
+        + 1  # fetch user
+        + 1  # check user memberships
+        + 1  # count prolongation requests rows (from pager)
+        + 1  # `is_prescriber_with_authorized_org()` in nav
+        + 3  # savepoint, update session, release savepoint
+    )
+    with assertNumQueries(num_queries):
+        response = client.get(reverse("approvals:prolongation_requests_list"))
+    assert str(parse_response_to_soup(response, ".s-section .c-box")) == snapshot
+
+
 def test_list_view(snapshot, client):
     prolongation_request = approvals_factories.ProlongationRequestFactory(for_snapshot=True)
     client.force_login(prolongation_request.validated_by)
