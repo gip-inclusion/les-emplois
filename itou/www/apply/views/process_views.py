@@ -97,8 +97,11 @@ def details_for_company(request, job_application_id, template_name="apply/proces
         JobApplication.objects.is_active_company_member(request.user)
         .not_archived()
         .select_related(
-            "job_seeker",
-            "eligibility_diagnosis",
+            "job_seeker__jobseeker_profile",
+            "eligibility_diagnosis__author",
+            "eligibility_diagnosis__job_seeker__jobseeker_profile",
+            "eligibility_diagnosis__author_siae",
+            "eligibility_diagnosis__author_prescriber_organization",
             "geiq_eligibility_diagnosis",
             "sender",
             "sender_company",
