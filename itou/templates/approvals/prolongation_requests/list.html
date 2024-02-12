@@ -1,13 +1,11 @@
 {% extends "layout/base.html" %}
 {% load format_filters %}
+{% load static %}
 {% load str_filters %}
 
-{% block title %}Prolongations de PASS IAE {{ block.super }}{% endblock %}
+{% block title %}Gérer les prolongations de PASS IAE {{ block.super }}{% endblock %}
 
-{% block content_title %}
-    <h1>Prolongations de PASS IAE</h1>
-    <h2>{{ request.current_organization.display_name }}</h2>
-{% endblock %}
+{% block content_title %}<h1>Gérer les prolongations de PASS IAE</h1>{% endblock %}
 
 {% block content %}
     <section class="s-section" hx-select=".s-section" hx-target=".s-section" hx-swap="outerHTML show:window:top">
@@ -26,48 +24,63 @@
                             </form>
                         </div>
 
-                        <div class="table-responsive-lg mt-3 mt-md-4">
-                            <table class="table">
-                                <caption class="visually-hidden">Liste des prolongations de PASS IAE</caption>
-                                <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">Salarié</th>
-                                        <th scope="col">Numéro de PASS IAE</th>
-                                        <th scope="col">Structure</th>
-                                        <th scope="col">Demandée le</th>
-                                        <th scope="col">
-                                            Adressée à
-                                            <i class="ri-information-line text-info" data-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
-                                        </th>
-                                        <th scope="col">Statut</th>
-                                        <th scope="col">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for prolongation_request in pager %}
+                        {% if pager %}
+                            <div class="table-responsive-lg mt-3 mt-md-4">
+                                <table class="table">
+                                    <caption class="visually-hidden">Liste des prolongations de PASS IAE</caption>
+                                    <thead>
                                         <tr>
-                                            <th scope="row">{{ forloop.counter }}</th>
-                                            <td class="font-weight-bold">{{ prolongation_request.approval.user.get_full_name }}</td>
-                                            <td>{{ prolongation_request.approval.number|format_approval_number }}</td>
-                                            <td>{{ prolongation_request.declared_by_siae }}</td>
-                                            <td>{{ prolongation_request.created_at|date:"d/m/Y" }}</td>
-                                            <td>{{ prolongation_request.validated_by.get_full_name }}</td>
-                                            <td>{% include "approvals/prolongation_requests/_status_badge.html" %}</td>
-                                            <td>
-                                                <a class="btn btn-link btn-outline-primary btn-sm" href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}">
-                                                    {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}
-                                                        Traiter
-                                                    {% else %}
-                                                        Ouvrir
-                                                    {% endif %}
-                                                </a>
-                                            </td>
+                                            <th scope="col">Salarié</th>
+                                            <th scope="col">Numéro de PASS IAE</th>
+                                            <th scope="col">Structure</th>
+                                            <th scope="col">Demandée le</th>
+                                            <th scope="col">
+                                                Adressée à
+                                                <i class="ri-information-line text-info" data-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
+                                            </th>
+                                            <th scope="col">Statut</th>
+                                            <th scope="col">Action</th>
                                         </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody>
+                                        {% for prolongation_request in pager %}
+                                            <tr>
+                                                <td class="font-weight-bold">{{ prolongation_request.approval.user.get_full_name }}</td>
+                                                <td>{{ prolongation_request.approval.number|format_approval_number }}</td>
+                                                <td>{{ prolongation_request.declared_by_siae }}</td>
+                                                <td>{{ prolongation_request.created_at|date:"d/m/Y" }}</td>
+                                                <td>{{ prolongation_request.validated_by.get_full_name }}</td>
+                                                <td>{% include "approvals/prolongation_requests/_status_badge.html" %}</td>
+                                                <td>
+                                                    <a class="btn btn-link btn-outline-primary btn-sm" href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}">
+                                                        {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}
+                                                            Traiter
+                                                        {% else %}
+                                                            Ouvrir
+                                                        {% endif %}
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <hr class="my-3">
+                            <div class="text-center my-3 my-md-4">
+                                <img class="img-fluid" src="{% static 'img/illustration-siae-card-no-result.svg' %}" alt="" loading="lazy">
+                                <p class="mb-1 mt-3">
+                                    <strong>Aucune demande de prolongation pour le moment</strong>
+                                </p>
+                                <p>
+                                    <i>
+                                        Lorsqu'un employeur vous demandera de prolonger un PASS IAE,
+                                        <br class="d-none d-lg-inline">
+                                        vous la retrouverez sur cette page.
+                                    </i>
+                                </p>
+                            </div>
+                        {% endif %}
 
                         {% include "includes/pagination.html" with page=pager boost=True %}
                     </div>
