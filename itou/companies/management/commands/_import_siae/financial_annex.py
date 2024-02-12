@@ -7,7 +7,6 @@ SiaeFinancialAnnex object logic used by the import_siae.py script is gathered he
 from django.utils import timezone
 
 from itou.companies.models import SiaeConvention, SiaeFinancialAnnex
-from itou.utils.python import timeit
 
 
 def get_creatable_and_deletable_afs(af_number_to_row):
@@ -84,7 +83,6 @@ def build_financial_annex_from_number(row):
         )
 
 
-@timeit
 def manage_financial_annexes(af_number_to_row):
     creatable_afs, deletable_afs = get_creatable_and_deletable_afs(af_number_to_row)
 

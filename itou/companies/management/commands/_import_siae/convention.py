@@ -12,7 +12,6 @@ from itou.companies.management.commands._import_siae.vue_af import (
     get_siae_key_to_convention_end_date,
 )
 from itou.companies.models import Company, SiaeConvention
-from itou.utils.python import timeit
 
 
 CONVENTION_DEACTIVATION_THRESHOLD = 200
@@ -192,7 +191,6 @@ def check_convention_data_consistency():
     assert user_created_siaes_without_convention == 0
 
 
-@timeit
 def create_conventions(vue_af_df, siret_to_siae_row, active_siae_keys):
     creatable_conventions = get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
     print(f"will create {len(creatable_conventions)} conventions")
@@ -206,7 +204,6 @@ def create_conventions(vue_af_df, siret_to_siae_row, active_siae_keys):
         assert convention.siaes.filter(source=Company.SOURCE_ASP).count() == 1
 
 
-@timeit
 @transaction.atomic()
 def delete_conventions():
     deletable_conventions = SiaeConvention.objects.filter(siaes__isnull=True)
