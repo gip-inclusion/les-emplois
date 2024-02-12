@@ -700,29 +700,22 @@
                               </form>
                           </div>
   
-                          <div class="table-responsive-lg mt-3 mt-md-4">
-                              <table class="table">
-                                  <caption class="visually-hidden">Liste des prolongations de PASS IAE</caption>
-                                  <thead>
-                                      <tr>
-                                          <th scope="col">#</th>
-                                          <th scope="col">Salarié</th>
-                                          <th scope="col">Numéro de PASS IAE</th>
-                                          <th scope="col">Structure</th>
-                                          <th scope="col">Demandée le</th>
-                                          <th scope="col">
-                                              Adressée à
-                                              <i class="ri-information-line text-info" data-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
-                                          </th>
-                                          <th scope="col">Statut</th>
-                                          <th scope="col">Action</th>
-                                      </tr>
-                                  </thead>
-                                  <tbody>
-                                      
-                                  </tbody>
-                              </table>
-                          </div>
+                          
+                              <hr class="my-3"/>
+                              <div class="text-center my-3 my-md-4">
+                                  <img alt="" class="img-fluid" loading="lazy" src="/static/img/illustration-siae-card-no-result.svg"/>
+                                  <p class="mb-1 mt-3">
+                                      <strong>Aucune demande de prolongation pour le moment</strong>
+                                  </p>
+                                  <p>
+                                      <i>
+                                          Lorsqu'un employeur vous demandera de prolonger un PASS IAE,
+                                          <br class="d-none d-lg-inline"/>
+                                          vous la retrouverez sur cette page.
+                                      </i>
+                                  </p>
+                              </div>
+                          
   
                           
   
@@ -745,51 +738,51 @@
                               </form>
                           </div>
   
-                          <div class="table-responsive-lg mt-3 mt-md-4">
-                              <table class="table">
-                                  <caption class="visually-hidden">Liste des prolongations de PASS IAE</caption>
-                                  <thead>
-                                      <tr>
-                                          <th scope="col">#</th>
-                                          <th scope="col">Salarié</th>
-                                          <th scope="col">Numéro de PASS IAE</th>
-                                          <th scope="col">Structure</th>
-                                          <th scope="col">Demandée le</th>
-                                          <th scope="col">
-                                              Adressée à
-                                              <i class="ri-information-line text-info" data-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
-                                          </th>
-                                          <th scope="col">Statut</th>
-                                          <th scope="col">Action</th>
-                                      </tr>
-                                  </thead>
-                                  <tbody>
-                                      
+                          
+                              <div class="table-responsive-lg mt-3 mt-md-4">
+                                  <table class="table">
+                                      <caption class="visually-hidden">Liste des prolongations de PASS IAE</caption>
+                                      <thead>
                                           <tr>
-                                              <th scope="row">1</th>
-                                              <td class="font-weight-bold">John DOE</td>
-                                              <td><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></td>
-                                              <td>ACME Inc.</td>
-                                              <td>01/01/2000</td>
-                                              <td>John DOE</td>
-                                              <td>
+                                              <th scope="col">Salarié</th>
+                                              <th scope="col">Numéro de PASS IAE</th>
+                                              <th scope="col">Structure</th>
+                                              <th scope="col">Demandée le</th>
+                                              <th scope="col">
+                                                  Adressée à
+                                                  <i class="ri-information-line text-info" data-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
+                                              </th>
+                                              <th scope="col">Statut</th>
+                                              <th scope="col">Action</th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          
+                                              <tr>
+                                                  <td class="font-weight-bold">John DOE</td>
+                                                  <td><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></td>
+                                                  <td>ACME Inc.</td>
+                                                  <td>01/01/2000</td>
+                                                  <td>John DOE</td>
+                                                  <td>
       
           <span class="badge badge-xs rounded-pill bg-accent-03 text-primary">À traiter</span>
       
   
   </td>
-                                              <td>
-                                                  <a class="btn btn-link btn-outline-primary btn-sm" href="/approvals/prolongation/request/666">
-                                                      
-                                                          Traiter
-                                                      
-                                                  </a>
-                                              </td>
-                                          </tr>
-                                      
-                                  </tbody>
-                              </table>
-                          </div>
+                                                  <td>
+                                                      <a class="btn btn-link btn-outline-primary btn-sm" href="/approvals/prolongation/request/666">
+                                                          
+                                                              Traiter
+                                                          
+                                                      </a>
+                                                  </td>
+                                              </tr>
+                                          
+                                      </tbody>
+                                  </table>
+                              </div>
+                          
   
                           
   
