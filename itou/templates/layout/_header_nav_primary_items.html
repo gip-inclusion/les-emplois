@@ -110,7 +110,7 @@
                     <li>
                         <a class="dropdown-item" href="{% url 'dashboard:index' %}">Tableau de bord</a>
                     </li>
-                    {% if user.is_employer %}
+                    {% if not user.is_staff and not user.is_labor_inspector %}
                         <li>
                             <a class="dropdown-item" href="{% url 'dashboard:edit_user_notifications' %}">Mes notifications</a>
                         </li>
