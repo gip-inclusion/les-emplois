@@ -239,7 +239,7 @@ def test_template_status_card(snapshot, status):
 
     assert (
         loader.render_to_string(
-            "approvals/prolongation_requests/_status_card.html",
+            "approvals/prolongation_requests/_status_box.html",
             context={
                 "ProlongationRequestStatus": ProlongationRequestStatus,
                 "prolongation_request": prolongation_request,

@@ -843,68 +843,50 @@
 # ---
 # name: test_template_status_card[DENIED]
   '''
-  <div class="c-card card rounded-lg mb-3 mb-lg-5">
-      <div class="card-body">
-          
-              <div class="card-title">
-                  <h4>Pas de prolongation du PASS IAE</h4>
-              </div>
-              <div class="card-text">
-                  <p class="mb-2">
-                      Demande refusée le 01 janvier 2000 par John DOE
-                  </p>
-              </div>
-          
+  
+      <div class="c-box mb-3 mb-lg-5 border-danger bg-danger-lightest">
+          <h4>Pas de prolongation du PASS IAE</h4>
+          <p class="mb-2">
+              Demande refusée le 01 janvier 2000 par John DOE
+          </p>
       </div>
-  </div>
+  
   
   '''
 # ---
 # name: test_template_status_card[GRANTED]
   '''
-  <div class="c-card card rounded-lg mb-3 mb-lg-5">
-      <div class="card-body">
-          
-              <div class="card-title">
-                  <h4>Prolongation du PASS IAE jusqu’au 31/01/2000</h4>
-              </div>
-              <div class="card-text">
-                  <p class="mb-2">
-                      Demande acceptée le 01 janvier 2000 par John DOE
-                  </p>
-              </div>
-          
+  
+      <div class="c-box mb-3 mb-lg-5 border-success bg-success-lightest">
+          <h4>Prolongation du PASS IAE jusqu’au 31/01/2000</h4>
+          <p class="mb-2">
+              Demande acceptée le 01 janvier 2000 par John DOE
+          </p>
       </div>
-  </div>
+  
   
   '''
 # ---
 # name: test_template_status_card[PENDING]
   '''
-  <div class="c-card card rounded-lg mb-3 mb-lg-5">
-      <div class="card-body">
-          
-              <div class="card-title">
-                  <h4>Prolonger le PASS IAE jusqu’au 31/01/2000</h4>
-              </div>
-              <div class="card-text">
-                  <form method="post" action="/approvals/prolongation/request/666/grant">
-                      
-                      <button class="btn btn-primary btn-block btn-ico justify-content-center">
-                          <i class="ri-check-line"></i>
-                          <span>Accepter</span>
-                      </button>
-                  </form>
-                  <a class="btn btn-outline-primary btn-block btn-ico mt-3 justify-content-center" href="/approvals/prolongation/request/666/deny?reset=1">
-                      <i class="ri-close-line"></i>
-                      <span>Refuser</span>
-                  </a>
-                  <p class="font-weight-bold mt-3">Précision</p>
-                  <p class="mb-2">En cas de refus, vous êtes tenu de proposer une solution au candidat.</p>
-              </div>
-          
+  
+      <div class="c-box mb-3 mb-lg-5">
+          <h4>Prolonger le PASS IAE jusqu’au 31/01/2000</h4>
+          <form method="post" action="/approvals/prolongation/request/666/grant">
+              
+              <button class="btn btn-primary btn-block btn-ico justify-content-center">
+                  <i class="ri-check-line"></i>
+                  <span>Accepter</span>
+              </button>
+          </form>
+          <a class="btn btn-outline-primary btn-block btn-ico mt-3 justify-content-center" href="/approvals/prolongation/request/666/deny?reset=1">
+              <i class="ri-close-line"></i>
+              <span>Refuser</span>
+          </a>
+          <p class="font-weight-bold mt-3">Précision</p>
+          <p class="mb-2">En cas de refus, vous êtes tenu de proposer une solution au candidat.</p>
       </div>
-  </div>
+  
   
   '''
 # ---

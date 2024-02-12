@@ -1,0 +1,32 @@
+{% if prolongation_request.status == ProlongationRequestStatus.PENDING %}
+    <div class="c-box mb-3 mb-lg-5">
+        <h4>Prolonger le PASS IAE jusqu’au {{ prolongation_request.end_at|date:"d/m/Y" }}</h4>
+        <form method="post" action="{% url "approvals:prolongation_request_grant" prolongation_request.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-primary btn-block btn-ico justify-content-center">
+                <i class="ri-check-line"></i>
+                <span>Accepter</span>
+            </button>
+        </form>
+        <a class="btn btn-outline-primary btn-block btn-ico mt-3 justify-content-center" href="{% url "approvals:prolongation_request_deny" prolongation_request.pk %}?reset=1">
+            <i class="ri-close-line"></i>
+            <span>Refuser</span>
+        </a>
+        <p class="font-weight-bold mt-3">Précision</p>
+        <p class="mb-2">En cas de refus, vous êtes tenu de proposer une solution au candidat.</p>
+    </div>
+{% elif prolongation_request.status == ProlongationRequestStatus.GRANTED %}
+    <div class="c-box mb-3 mb-lg-5 border-success bg-success-lightest">
+        <h4>Prolongation du PASS IAE jusqu’au {{ prolongation_request.end_at|date:"d/m/Y" }}</h4>
+        <p class="mb-2">
+            Demande acceptée le {{ prolongation_request.processed_at|date:"d F Y" }} par {{ prolongation_request.processed_by.get_full_name }}
+        </p>
+    </div>
+{% elif prolongation_request.status == ProlongationRequestStatus.DENIED %}
+    <div class="c-box mb-3 mb-lg-5 border-danger bg-danger-lightest">
+        <h4>Pas de prolongation du PASS IAE</h4>
+        <p class="mb-2">
+            Demande refusée le {{ prolongation_request.processed_at|date:"d F Y" }} par {{ prolongation_request.processed_by.get_full_name }}
+        </p>
+    </div>
+{% endif %}
