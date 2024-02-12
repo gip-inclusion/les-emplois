@@ -49,7 +49,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.users.test_models import user_with_approval_in_waiting_period
-from tests.utils.test import TestCase, assertMessages
+from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
 
 
 class ApplyTest(TestCase):
@@ -4059,7 +4059,27 @@ class HireConfirmationTestCase(TestCase):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         EligibilityDiagnosisFactory(job_seeker=self.job_seeker)
         self.client.force_login(self.company.members.first())
-        response = self.client.get(self._reverse("apply:hire_confirmation"))
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # session
+            + 3  # user, memberships & companies information
+            + 1  # get company infos (get_object_or_404)
+            + 1  # get job seeker infos (get_object_or_404)
+            + 1  # get approvals (_check_job_seeker_approval -> has_valid_diagnosis)
+            + 1  # get jobseekerprofile to retrieve pole_emploi_id
+            + 1  # get approvals_poleemploiapproval (has_valid_common_approval)
+            + 1  # eligibility_eligibilitydiagnosis (_check_job_seeker_approval -> last_considered_valid)
+            + 1  # eligibility_eligibilitydiagnosis (EligibilityDiagnosis.objects.last_considered_valid)
+            + 1  # cities_city (UserAddressForm)
+            + 1  # companies_jobdescription (AcceptForm.__init__)
+            + 1  # eligibility_administrativecriteria (/apply/includes/eligibility_diagnosis.html)
+            + 1  # users_user (apply/includes/eligibility_diagnosis.html -> considered_to_expire_at)
+            + 1  # approvals_approval (apply/includes/eligibility_diagnosis.html -> considered_to_expire_at)
+            + 1  # get jobseekerprofile to retrieve pole_emploi_id
+            + 1  # approvals_poleemploiapproval (apply/includes/eligibility_diagnosis.html -> considered_to_expire_at)
+            + 3  # update session with savepoint & release
+        ):
+            response = self.client.get(self._reverse("apply:hire_confirmation"))
         self.assertContains(response, "Déclarer l’embauche de Clara SION")
         self.assertContains(response, "Éligible à l’IAE")
 
