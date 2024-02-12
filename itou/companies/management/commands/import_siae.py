@@ -57,7 +57,7 @@ class Command(BaseCommand):
     help = "Update and sync SIAE data based on latest ASP exports."
 
     def handle(self, **options):
-        fatal_errors = 0
+        errors = 0
 
         siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
 
@@ -66,10 +66,10 @@ class Command(BaseCommand):
         active_siae_keys = get_active_siae_keys(vue_af_df)
 
         # Sanitize data from users
-        fatal_errors += delete_user_created_siaes_without_members()
-        fatal_errors += manage_staff_created_siaes()
+        errors += delete_user_created_siaes_without_members()
+        errors += manage_staff_created_siaes()
 
-        fatal_errors += update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row)
+        errors += update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row)
         update_existing_conventions(siret_to_siae_row, active_siae_keys)
         create_new_siaes(siret_to_siae_row, active_siae_keys)
         create_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
@@ -79,17 +79,17 @@ class Command(BaseCommand):
 
         # Run some updates a second time.
         update_existing_conventions(siret_to_siae_row, active_siae_keys)
-        fatal_errors += update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row)
+        errors += update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row)
         delete_conventions()
 
         # Final checks.
         check_convention_data_consistency()
-        fatal_errors += check_whether_signup_is_possible_for_all_siaes()
+        errors += check_whether_signup_is_possible_for_all_siaes()
 
-        if fatal_errors >= 1:
+        if errors >= 1:
             raise CommandError(
-                "*** FATAL ERROR(S) ***"
-                "The command completed all its actions successfully but at least one fatal error needs "
+                "*** ERROR(S) ***"
+                "The command completed all its actions successfully but at least one error needs "
                 "manual resolution, see command output"
             )
 
