@@ -101,11 +101,9 @@
                     <li>
                         <a class="dropdown-item" href="{% url 'dashboard:index' %}">Tableau de bord</a>
                     </li>
-                    {% if user.is_employer %}
-                        <li>
-                            <a class="dropdown-item" href="{% url 'dashboard:edit_user_notifications' %}">Mes notifications</a>
-                        </li>
-                    {% endif %}
+                    <li>
+                        <a class="dropdown-item" href="{% url 'dashboard:edit_user_notifications' %}">Mes notifications</a>
+                    </li>
                     <li>
                         <div class="dropdown-divider"></div>
                     </li>

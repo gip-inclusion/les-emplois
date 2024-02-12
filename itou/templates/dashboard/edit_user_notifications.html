@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
 {% load buttons_form %}
+{% load theme_inclusion %}
 
 {% block title %}Mes notifications {{ block.super }}{% endblock %}
 
@@ -15,23 +16,95 @@
             <div class="row">
                 <div class="col-12 col-lg-8">
                     <div class="c-form">
-                        <h3>Notifications e-mail</h3>
-                        <h4>Nouvelles candidatures</h4>
+                        <h2>Gestion des notifications</h2>
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
 
-                            {% bootstrap_form_errors new_job_app_notification_form type="all" %}
-                            {% bootstrap_field new_job_app_notification_form.spontaneous field_class="form-check form-switch" %}
-                            {% if new_job_app_notification_form.qualified %}
-                                {% bootstrap_field new_job_app_notification_form.qualified field_class="form-check form-switch" show_label=False %}
-                            {% endif %}
+                            <div class="form-group">
+                                <div class="custom-checkbox wrapping-checkbox">
+                                    <div class="form-check">
+                                        <input type="checkbox" name="notifications-all" class="form-check-input custom-checkbox" id="id_notifications-all">
+                                        <label class="form-check-label font-weight-bold" for="id_notifications-all">Activer toutes les notifications</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mx-3" id="id_notifications">
+                                {% for category_slug, category in notification_form.layout.items %}
+                                    <a class="d-flex justify-content-between font-weight-bold text-decoration-none has-collapse-caret notification-collapse py-3"
+                                       data-bs-toggle="collapse"
+                                       href="#collapse-{{ category_slug }}"
+                                       role="button"
+                                       aria-expanded="false"
+                                       aria-controls="collapse-{{ category_slug }}">
+                                        <span>{{ category.name }}</span>
+                                    </a>
+                                    <div class="collapse notification-group" id="collapse-{{ category_slug }}">
+                                        {% get_form_field notification_form "category-"|add:category_slug|add:"-all" as field %}
+                                        {% bootstrap_field field field_class="custom-checkbox wrapping-checkbox" %}
+
+                                        <div class="px-3 category-notifications">
+                                            {% for field_name in category.notifications %}
+                                                {% get_form_field notification_form field_name as field %}
+                                                {% bootstrap_field field field_class="custom-checkbox notification-checkbox" %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <hr class="mb-0">
+                                {% endfor %}
+                            </div>
 
                             {% comment "back_url may be not useful anymore, remove it from the view" %}{% endcomment %}
-                            {% itou_buttons_form primary_label="Enregistrer" secondary_url=back_url %}
+                            {% itou_buttons_form primary_label="Enregistrer" secondary_url=back_url show_mandatory_fields_mention=False %}
                         </form>
                     </div>
                 </div>
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+
+    <script type="text/javascript" nonce="{{ CSP_NONCE }}">
+        $(document).ready(() => {
+            /**
+             * JS to handle checkboxes
+             **/
+            checkAllChecked = function() {
+                if (!$(".notification-checkbox input").filter(":not(:checked)").length) {
+                    $("#id_notifications-all").prop("checked", true);
+                    $("#id_notifications").find(".notification-collapse").removeClass("show");
+                }
+            }
+            checkAllChecked();
+
+            $("#id_notifications-all").change(function() {
+                $("#id_notifications").find(".wrapping-checkbox input").prop("checked", this.checked);
+                $("#id_notifications").find(".notification-checkbox input").prop("checked", this.checked);
+                $("#id_notifications").find(".notification-collapse").filter(":not(.collapse.show)").collapse(this.checked ? "hide" : "show");
+            });
+
+            $(".wrapping-checkbox input").change(function() {
+                if (this.checked) {
+                    $(this).parents(".notification-group").find(".notification-checkbox input").prop("checked", true);
+                    checkAllChecked();
+                } else {
+                    $(this).parents(".notification-group").find(".notification-checkbox input").prop("checked", false);
+                    $("#id_notifications-all").prop("checked", false);
+                }
+            });
+
+            $(".notification-checkbox input").change(function() {
+                if (this.checked) {
+                    $(this).parents(".notification-group").find(".wrapping-checkbox input").prop("checked", true);
+                    checkAllChecked();
+                } else {
+                    $(this).parents(".notification-group").find(".wrapping-checkbox input").prop("checked", false);
+                    $("#id_notifications-all").prop("checked", false);
+                }
+            });
+        })
+    </script>
 {% endblock %}
