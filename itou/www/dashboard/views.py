@@ -21,7 +21,7 @@ from itou.companies.models import Company
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.openid_connect.inclusion_connect import constants as ic_constants
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
@@ -268,20 +268,10 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
 
 
 @login_required
-def edit_job_seeker_info(
-    request, job_application_id=None, job_seeker_pk=None, template_name="dashboard/edit_job_seeker_info.html"
-):
-    if job_application_id:
-        # TODO(xafer): remove support for this url pattern in a week
-        job_application = get_object_or_404(JobApplication.objects.select_related("job_seeker"), pk=job_application_id)
-        job_seeker = job_application.job_seeker
-        tally_form_query = f"jobapplication={job_application.pk}"
-    elif job_seeker_pk:
-        job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
-        from_application_uuid = request.GET.get("from_application")
-        tally_form_query = from_application_uuid and f"jobapplication={from_application_uuid}"
-    else:
-        raise RuntimeError("We need either job_application_id or job_seeker_pk here")
+def edit_job_seeker_info(request, job_seeker_pk, template_name="dashboard/edit_job_seeker_info.html"):
+    job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
+    from_application_uuid = request.GET.get("from_application")
+    tally_form_query = from_application_uuid and f"jobapplication={from_application_uuid}"
     if not request.user.can_edit_personal_information(job_seeker):
         raise PermissionDenied
 
