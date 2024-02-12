@@ -269,7 +269,9 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
 
 @login_required
 def edit_job_seeker_info(request, job_seeker_pk, template_name="dashboard/edit_job_seeker_info.html"):
-    job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
+    job_seeker = get_object_or_404(
+        User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile"), pk=job_seeker_pk
+    )
     from_application_uuid = request.GET.get("from_application")
     tally_form_query = from_application_uuid and f"jobapplication={from_application_uuid}"
     if not request.user.can_edit_personal_information(job_seeker):

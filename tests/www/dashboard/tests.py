@@ -1114,7 +1114,16 @@ class EditJobSeekerInfo(TestCase):
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
         url = f"{url}?back_url={back_url}&from_application={job_application.pk}"
 
-        response = self.client.get(url)
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # session
+            + 3  # user, memberships, company (ItouCurrentOrganizationMiddleware)
+            + 1  # job seeker infos (get_object_or_404)
+            + 1  # cities_city (EditJobSeekerInfoForm.__init__)
+            + 1  # account_emailaddress (can_edit_email/has_verified_email)
+            + 3  # update session with savepoint & release
+        ):
+            response = self.client.get(url)
         self.assertContains(
             response,
             (
@@ -1298,7 +1307,17 @@ class EditJobSeekerInfo(TestCase):
 
         self.client.force_login(user)
         url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
-        response = self.client.get(url)
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # session
+            + 2  # user, memberships (ItouCurrentOrganizationMiddleware)
+            + 1  # job seeker infos (get_object_or_404)
+            + 1  # prescribers_prescribermembership (can_edit_personal_information/is_prescriber_with_authorized_org)
+            + 1  # cities_city (EditJobSeekerInfoForm.__init__)
+            + 1  # account_emailaddress (can_edit_email/has_verified_email)
+            + 3  # update session with savepoint & release
+        ):
+            response = self.client.get(url)
         assert response.status_code == 200
 
     def test_edit_by_prescriber_of_organization(self):
