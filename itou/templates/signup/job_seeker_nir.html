@@ -63,5 +63,6 @@
 {% endblock %}
 
 {% block script %}
+    {{ block.super }}
     <script src="{% static 'js/split_nir.js' %}"></script>
 {% endblock script %}
