@@ -45,6 +45,7 @@ from itou.companies.management.commands._import_siae.vue_structure import (
     get_vue_structure_df,
 )
 from itou.utils.command import BaseCommand
+from itou.utils.templatetags.str_filters import pluralizefr
 
 
 class Command(BaseCommand):
@@ -97,10 +98,10 @@ class Command(BaseCommand):
             raise CommandError("DRY RUN mode, use --wet-run to apply changes")
 
         if errors >= 1:
+            s = pluralizefr(errors)
             self.stdout.write(
-                "*** ERROR(S) ***"
-                "The command completed all its actions successfully but at least one error needs "
-                "manual resolution, see command output"
+                f"*** ERROR{s.upper()} *** The command completed all its actions successfully "
+                f"but {errors} error{s} needs manual resolution, see the command's output"
             )
         else:
             self.stdout.write("All done!")
