@@ -44,7 +44,6 @@ from itou.companies.management.commands._import_siae.vue_structure import (
     get_vue_structure_df,
 )
 from itou.utils.command import BaseCommand
-from itou.utils.python import timeit
 
 
 class Command(BaseCommand):
@@ -57,7 +56,6 @@ class Command(BaseCommand):
 
     help = "Update and sync SIAE data based on latest ASP exports."
 
-    @timeit
     def handle(self, **options):
         fatal_errors = 0
 

@@ -23,11 +23,9 @@ from django.utils import timezone
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.companies.management.commands._import_siae.utils import get_fluxiae_df, remap_columns
 from itou.companies.models import SiaeFinancialAnnex
-from itou.utils.python import timeit
 from itou.utils.validators import validate_af_number
 
 
-@timeit
 def get_vue_af_df():
     """
     "Vue AF" is short for "Vue Annexes Financières".
@@ -129,7 +127,6 @@ def get_vue_af_df():
     return df
 
 
-@timeit
 def get_af_number_to_row(vue_af_df):
     af_number_to_row = {}
     for _, row in vue_af_df.iterrows():
@@ -139,7 +136,6 @@ def get_af_number_to_row(vue_af_df):
     return af_number_to_row
 
 
-@timeit
 def get_siae_key_to_convention_end_date(vue_af_df):
     """
     For each siae_key (asp_id+kind) we figure out the convention end date.
@@ -159,7 +155,6 @@ def get_siae_key_to_convention_end_date(vue_af_df):
     return siae_key_to_convention_end_date
 
 
-@timeit
 def get_active_siae_keys(vue_af_df):
     return [
         siae_key

@@ -14,7 +14,6 @@ from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.companies.management.commands._import_siae.utils import could_siae_be_deleted, geocode_siae
 from itou.companies.models import Company, SiaeConvention
 from itou.utils.emails import send_email_messages
-from itou.utils.python import timeit
 
 
 def build_siae(row, kind, *, is_active):
@@ -71,7 +70,6 @@ def build_siae(row, kind, *, is_active):
     return siae
 
 
-@timeit
 def update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row):
     auth_email_updates, fatal_errors = 0, 0
 
@@ -123,7 +121,6 @@ def update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row):
     return fatal_errors
 
 
-@timeit
 def create_new_siaes(siret_to_siae_row, active_siae_keys):
     creatable_siaes = []
 
@@ -182,7 +179,6 @@ def create_new_siaes(siret_to_siae_row, active_siae_keys):
     print(f"{len([s for s in creatable_siaes if s.coords])} structures will have geolocation")
 
 
-@timeit
 def cleanup_siaes_after_grace_period():
     deletions, blocked_deletions = 0, 0
 
@@ -200,7 +196,6 @@ def cleanup_siaes_after_grace_period():
     print(f"{blocked_deletions} siaes past their grace period cannot be deleted")
 
 
-@timeit
 def delete_user_created_siaes_without_members():
     """
     Siaes created by a user usually have at least one member, their creator.
@@ -227,7 +222,6 @@ def delete_user_created_siaes_without_members():
     return fatal_errors
 
 
-@timeit
 def manage_staff_created_siaes():
     """
     Itou staff regularly creates siaes manually when ASP data lags behind for some specific employers.
@@ -274,7 +268,6 @@ def manage_staff_created_siaes():
     return fatal_errors
 
 
-@timeit
 def check_whether_signup_is_possible_for_all_siaes():
     fatal_errors = 0
 
