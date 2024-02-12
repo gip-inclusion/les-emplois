@@ -88,7 +88,9 @@ class ItouUserManager(UserManager):
         Used in the `deduplicate_job_seekers` management command.
         Implemented as a manager method to make unit testing easier.
         """
-        users = self.filter(jobseeker_profile__pole_emploi_id__in=self.get_duplicated_pole_emploi_ids())
+        users = self.select_related("jobseeker_profile").filter(
+            jobseeker_profile__pole_emploi_id__in=self.get_duplicated_pole_emploi_ids()
+        )
         if prefetch_related_lookups:
             users = users.prefetch_related(*prefetch_related_lookups)
 
