@@ -1514,7 +1514,9 @@ def geiq_eligibility_criteria_for_hire(request, company_pk, job_seeker_pk):
 @login_required
 def hire_confirmation(request, company_pk, job_seeker_pk, template_name="apply/submit/hire_confirmation.html"):
     company = get_object_or_404(Company.objects.member_required(request.user), pk=company_pk)
-    job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), pk=job_seeker_pk)
+    job_seeker = get_object_or_404(
+        User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile"), pk=job_seeker_pk
+    )
     if company.kind == CompanyKind.GEIQ:
         geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, company).first()
         eligibility_diagnosis = None

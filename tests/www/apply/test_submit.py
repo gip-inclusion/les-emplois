@@ -4066,7 +4066,6 @@ class HireConfirmationTestCase(TestCase):
             + 1  # get company infos (get_object_or_404)
             + 1  # get job seeker infos (get_object_or_404)
             + 1  # get approvals (_check_job_seeker_approval -> has_valid_diagnosis)
-            + 1  # get jobseekerprofile to retrieve pole_emploi_id
             + 1  # get approvals_poleemploiapproval (has_valid_common_approval)
             + 1  # eligibility_eligibilitydiagnosis (_check_job_seeker_approval -> last_considered_valid)
             + 1  # eligibility_eligibilitydiagnosis (EligibilityDiagnosis.objects.last_considered_valid)
