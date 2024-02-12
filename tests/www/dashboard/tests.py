@@ -787,7 +787,16 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         user = JobSeekerFactory()
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
-        response = self.client.get(url)
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # session
+            + 1  # user
+            + 1  # jobseeker_profile
+            + 1  # cities_city (EditJobSeekerInfoForm.__init__)
+            + 1  # external_data_externaldataimport (extra_data)
+            + 3  # update session with savepoint & release
+        ):
+            response = self.client.get(url)
         # There's a specific view to edit the email so we don't show it here
         self.assertNotContains(response, "Adresse électronique")
         # Check that the NIR field is disabled
