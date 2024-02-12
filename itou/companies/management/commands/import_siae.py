@@ -16,6 +16,7 @@ name instead of hardcoding column numbers as in `field = row[42]`.
 """
 
 from django.core.management.base import CommandError
+from django.db import transaction
 
 from itou.companies.management.commands._import_siae.convention import (
     check_convention_data_consistency,
@@ -56,7 +57,13 @@ class Command(BaseCommand):
 
     help = "Update and sync SIAE data based on latest ASP exports."
 
-    def handle(self, **options):
+    def add_arguments(self, parser):
+        super().add_arguments(parser)
+
+        parser.add_argument("--wet-run", dest="wet_run", action="store_true")
+
+    @transaction.atomic
+    def handle(self, wet_run, **options):
         errors = 0
 
         siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
@@ -86,11 +93,14 @@ class Command(BaseCommand):
         check_convention_data_consistency()
         errors += check_whether_signup_is_possible_for_all_siaes()
 
+        if not wet_run:
+            raise CommandError("DRY RUN mode, use --wet-run to apply changes")
+
         if errors >= 1:
-            raise CommandError(
+            self.stdout.write(
                 "*** ERROR(S) ***"
                 "The command completed all its actions successfully but at least one error needs "
                 "manual resolution, see command output"
             )
-
-        self.stdout.write("All done!")
+        else:
+            self.stdout.write("All done!")
