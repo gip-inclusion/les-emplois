@@ -35,9 +35,9 @@ from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
 from itou.www.dashboard.forms import (
     EditJobSeekerInfoForm,
-    EditNewJobAppEmployersNotificationForm,
     EditUserEmailForm,
     EditUserInfoForm,
+    EditUserNotificationForm,
 )
 from itou.www.search.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
@@ -327,27 +327,28 @@ def switch_organization(request):
 
 @login_required
 def edit_user_notifications(request, template_name="dashboard/edit_user_notifications.html"):
-    if not request.user.is_employer:
-        raise PermissionDenied
-
-    current_company_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
-    company = get_object_or_404(Company, pk=current_company_pk)
-    membership = request.user.companymembership_set.get(company=company)
-    new_job_app_notification_form = EditNewJobAppEmployersNotificationForm(
-        recipient=membership, company=company, data=request.POST or None
-    )
+    if request.user.is_staff:
+        raise Http404("L'utilisateur admin ne peut gérer ses notifications.")
+    elif request.user.is_labor_inspector:
+        raise Http404("Ce compte utilisateur ne peut gérer ses notifications.")
+    elif request.user.is_job_seeker:
+        notification_form = EditUserNotificationForm(user=request.user, structure=None, data=request.POST or None)
+    else:
+        notification_form = EditUserNotificationForm(
+            user=request.user, structure=request.current_organization, data=request.POST or None
+        )
 
     dashboard_url = reverse_lazy("dashboard:index")
     back_url = get_safe_url(request, "back_url", fallback_url=dashboard_url)
 
-    if request.method == "POST" and new_job_app_notification_form.is_valid():
-        new_job_app_notification_form.save()
+    if request.method == "POST" and notification_form.is_valid():
+        notification_form.save()
         messages.success(request, "Vos préférences ont été modifiées.")
         success_url = get_safe_url(request, "success_url", fallback_url=dashboard_url)
         return HttpResponseRedirect(success_url)
 
     context = {
-        "new_job_app_notification_form": new_job_app_notification_form,
+        "notification_form": notification_form,
         "back_url": back_url,
     }
 

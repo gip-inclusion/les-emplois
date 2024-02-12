@@ -1,13 +1,12 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.utils.text import slugify
 
 from itou.common_apps.address.forms import JobSeekerAddressForm, OptionalAddressFormMixin
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
-from itou.job_applications.notifications import (
-    NewQualifiedJobAppEmployersNotification,
-    NewSpontaneousJobAppEmployersNotification,
-)
+from itou.communications import registry as notification_registry
+from itou.communications.models import NotificationRecord, NotificationSettings
 from itou.users.enums import IdentityProvider
 from itou.users.forms import JobSeekerProfileFieldsMixin
 from itou.users.models import JobSeekerProfile, User
@@ -158,40 +157,65 @@ class EditUserEmailForm(forms.Form):
         return email
 
 
-class EditNewJobAppEmployersNotificationForm(forms.Form):
-    spontaneous = forms.BooleanField(label="Candidatures spontanées", required=False)
-
-    def __init__(self, recipient, company, *args, **kwargs):
-        self.recipient = recipient
-        self.company = company
+class EditUserNotificationForm(forms.Form):
+    def __init__(self, user, structure, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["spontaneous"].initial = NewSpontaneousJobAppEmployersNotification.is_subscribed(self.recipient)
+        self.user = user
+        self.structure = structure
+        self.layout = {}
 
-        if self.company.job_description_through.exists():
-            default_pks = self.company.job_description_through.values_list("pk", flat=True)
-            self.subscribed_pks = NewQualifiedJobAppEmployersNotification.recipient_subscribed_pks(
-                recipient=self.recipient, default_pks=default_pks
-            )
-            choices = [
-                (job_description.pk, job_description.display_name)
-                for job_description in self.company.job_description_through.all()
+        notification_settings = self.user.notification_settings.for_structure(self.structure).first()
+        if notification_settings:
+            disabled_notifications = [
+                disabled.notification_class for disabled in notification_settings.disabled_notifications.all()
             ]
-            self.fields["qualified"] = forms.MultipleChoiceField(
-                label="Fiches de poste",
-                required=False,
-                widget=forms.CheckboxSelectMultiple(),
-                choices=choices,
-                initial=self.subscribed_pks,
-            )
+        else:
+            disabled_notifications = []
+
+        previous_category = None
+        for notification_class in notification_registry:
+            notification = notification_class(self.user, self.structure)
+            notification_class_name = notification_class.__name__
+            category_slug = slugify(notification.category)
+
+            if notification.is_manageable_by_user():
+                if previous_category is None or previous_category != notification.category:
+                    previous_category = notification.category
+                    self.fields[f"category-{category_slug}-all"] = forms.BooleanField(
+                        required=False,
+                        label="Toutes les notifications",
+                        initial=notification_class_name not in disabled_notifications,
+                        widget=forms.CheckboxInput(
+                            attrs={
+                                "class": f"category-{category_slug} category-grouper",
+                                "data-category-name": notification.category,
+                                "data-category-slug": category_slug,
+                            }
+                        ),
+                    )
+                    self.layout[category_slug] = {"name": notification.category, "notifications": []}
+
+                self.fields[notification_class_name] = forms.BooleanField(
+                    required=False,
+                    label=notification.name,
+                    initial=notification_class_name not in disabled_notifications,
+                    widget=forms.CheckboxInput(
+                        attrs={
+                            "class": f"category-{category_slug}",
+                            "data-category-slug": category_slug,
+                        }
+                    ),
+                )
+                self.layout[category_slug]["notifications"].append(notification_class_name)
 
     def save(self):
-        if self.cleaned_data.get("spontaneous"):
-            NewSpontaneousJobAppEmployersNotification.subscribe(recipient=self.recipient)
-        else:
-            NewSpontaneousJobAppEmployersNotification.unsubscribe(recipient=self.recipient)
+        notification_settings, _ = NotificationSettings.get_or_create(self.user, self.structure)
+        disabled_notifications = []
 
-        if self.company.job_description_through.exists():
-            to_subscribe_pks = self.cleaned_data.get("qualified")
-            NewQualifiedJobAppEmployersNotification.replace_subscriptions(
-                recipient=self.recipient, subscribed_pks=to_subscribe_pks
-            )
+        for field_name, value in self.cleaned_data.items():
+            if field_name.startswith("category-"):
+                continue
+            if not value:
+                disabled_notifications.append(NotificationRecord.objects.get(notification_class=field_name))
+
+        notification_settings.disabled_notifications.set(disabled_notifications)

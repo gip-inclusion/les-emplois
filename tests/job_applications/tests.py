@@ -32,7 +32,6 @@ from itou.job_applications.enums import (
 )
 from itou.job_applications.export import JOB_APPLICATION_CSV_HEADERS, _resolve_title, stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationTransitionLog, JobApplicationWorkflow
-from itou.job_applications.notifications import NewQualifiedJobAppEmployersNotification
 from itou.jobs.models import Appellation
 from itou.users.enums import LackOfPoleEmploiId, Title
 from itou.users.models import User
@@ -44,7 +43,7 @@ from tests.approvals.factories import (
     ProlongationFactory,
     SuspensionFactory,
 )
-from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from tests.employee_record.factories import BareEmployeeRecordFactory, EmployeeRecordFactory
 from tests.job_applications.factories import (
@@ -57,7 +56,7 @@ from tests.job_applications.factories import (
     JobApplicationWithoutApprovalFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase, get_rows_from_streaming_response
 
 
@@ -726,9 +725,10 @@ class JobApplicationNotificationsTest(TestCase):
             sent_by_authorized_prescriber_organisation=True,
             selected_jobs=Appellation.objects.all(),
         )
-        email = NewQualifiedJobAppEmployersNotification(job_application=job_application).email
+        employer = job_application.to_company.members.first()
+        email = job_application.notifications_new_for_employer(employer).build()
         # To.
-        assert job_application.to_company.members.first().email in email.to
+        assert employer.email in email.to
         assert len(email.to) == 1
 
         # Body.
@@ -1097,104 +1097,6 @@ class JobApplicationNotificationsTest(TestCase):
         job_application.cancel(user=cancellation_user)
         [email] = mail.outbox
         assert email.to == [cancellation_user.email]
-
-
-class NewQualifiedJobAppEmployersNotificationTest(TestCase):
-    def test_one_selected_job(self):
-        company = CompanyWithMembershipAndJobsFactory()
-        job_descriptions = company.job_description_through.all()
-
-        selected_job = job_descriptions[0]
-        job_application = JobApplicationFactory(to_company=company, selected_jobs=[selected_job])
-
-        membership = company.companymembership_set.first()
-        assert not membership.notifications
-        NewQualifiedJobAppEmployersNotification.subscribe(recipient=membership, subscribed_pks=[selected_job.pk])
-        assert NewQualifiedJobAppEmployersNotification.is_subscribed(
-            recipient=membership, subscribed_pk=selected_job.pk
-        )
-
-        # Receiver is now subscribed to one kind of notification
-        assert len(NewQualifiedJobAppEmployersNotification._get_recipient_subscribed_pks(recipient=membership)) == 1
-
-        # A job application is sent concerning another job_description.
-        # He should then be subscribed to two different notifications.
-        selected_job = job_descriptions[1]
-        job_application = JobApplicationFactory(to_company=company, selected_jobs=[selected_job])
-
-        NewQualifiedJobAppEmployersNotification.subscribe(recipient=membership, subscribed_pks=[selected_job.pk])
-        assert NewQualifiedJobAppEmployersNotification.is_subscribed(
-            recipient=membership, subscribed_pk=selected_job.pk
-        )
-
-        assert len(NewQualifiedJobAppEmployersNotification._get_recipient_subscribed_pks(recipient=membership)) == 2
-        assert len(membership.notifications) == 1
-
-        notification = NewQualifiedJobAppEmployersNotification(job_application=job_application)
-        recipients = notification.recipients_emails
-        assert len(recipients) == 1
-
-    def test_multiple_selected_jobs_multiple_recipients(self):
-        company = CompanyWithMembershipAndJobsFactory()
-        job_descriptions = company.job_description_through.all()[:2]
-
-        membership = company.companymembership_set.first()
-        NewQualifiedJobAppEmployersNotification.subscribe(
-            recipient=membership, subscribed_pks=[job_descriptions[0].pk]
-        )
-
-        user = EmployerFactory()
-        company.members.add(user)
-        membership = company.companymembership_set.get(user=user)
-        NewQualifiedJobAppEmployersNotification.subscribe(
-            recipient=membership, subscribed_pks=[job_descriptions[1].pk]
-        )
-
-        # Two selected jobs. Each user subscribed to one of them. We should have two recipients.
-        job_application = JobApplicationFactory(to_company=company, selected_jobs=job_descriptions)
-        notification = NewQualifiedJobAppEmployersNotification(job_application=job_application)
-
-        assert len(notification.recipients_emails) == 2
-
-    def test_default_subscription(self):
-        """
-        Unset recipients should receive new job application notifications.
-        """
-        company = CompanyWithMembershipAndJobsFactory()
-        user = EmployerFactory()
-        company.members.add(user)
-
-        selected_job = company.job_description_through.first()
-        job_application = JobApplicationFactory(to_company=company, selected_jobs=[selected_job])
-
-        notification = NewQualifiedJobAppEmployersNotification(job_application=job_application)
-
-        recipients = notification.recipients_emails
-        assert len(recipients) == company.members.count()
-
-    def test_unsubscribe(self):
-        company = CompanyWithMembershipAndJobsFactory()
-        selected_job = company.job_description_through.first()
-        job_application = JobApplicationFactory(to_company=company, selected_jobs=[selected_job])
-        assert company.members.count() == 1
-
-        recipient = company.companymembership_set.first()
-
-        NewQualifiedJobAppEmployersNotification.subscribe(recipient=recipient, subscribed_pks=[selected_job.pk])
-        assert NewQualifiedJobAppEmployersNotification.is_subscribed(
-            recipient=recipient, subscribed_pk=selected_job.pk
-        )
-
-        notification = NewQualifiedJobAppEmployersNotification(job_application=job_application)
-        assert len(notification.recipients_emails) == 1
-
-        NewQualifiedJobAppEmployersNotification.unsubscribe(recipient=recipient, subscribed_pks=[selected_job.pk])
-        assert not NewQualifiedJobAppEmployersNotification.is_subscribed(
-            recipient=recipient, subscribed_pk=selected_job.pk
-        )
-
-        notification = NewQualifiedJobAppEmployersNotification(job_application=job_application)
-        assert len(notification.recipients_emails) == 0
 
 
 @override_settings(
