@@ -223,7 +223,6 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
     id_embauche = serializers.UUIDField(source="pk")
     id_utilisateur = serializers.UUIDField(source="job_seeker.public_id")
     siret_employeur = serializers.CharField(source="to_company.siret")
-    nir = serializers.CharField(source="job_seeker.jobseeker_profile.nir")
     nom = serializers.CharField(source="job_seeker.last_name")
     prenom = serializers.CharField(source="job_seeker.first_name")
     date_naissance = serializers.DateField(source="job_seeker.birthdate")
@@ -260,7 +259,6 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
             "id_embauche",
             "id_utilisateur",
             "siret_employeur",
-            "nir",
             "nom",
             "prenom",
             "date_naissance",
