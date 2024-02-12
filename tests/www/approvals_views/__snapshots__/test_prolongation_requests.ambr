@@ -690,14 +690,14 @@
   '''
   <div class="c-box">
                           <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between">
-                              <h3 class="mb-0">0 résultat</h3>
-                          </div>
-                          <div class="d-flex flex-column flex-md-row mt-3 mt-md-4">
-                              <h4 class="me-4">Filtres :</h4>
-                              <form action="/approvals/prolongation/requests" hx-boost="true" hx-trigger="change">
-                                  <input id="id_only_pending" name="only_pending" type="checkbox"/>
-                                  <label for="id_only_pending">Voir uniquement les demandes à traiter</label>
-                              </form>
+                              <h3 class="h4 mb-3 mb-md-0">0 résultat</h3>
+                              <div class="d-flex align-items-center">
+                                  <strong class="me-2">Filtres :</strong>
+                                  <form action="/approvals/prolongation/requests" hx-boost="true" hx-trigger="change">
+                                      <input id="id_only_pending" name="only_pending" type="checkbox"/>
+                                      <label for="id_only_pending">Voir uniquement les demandes à traiter</label>
+                                  </form>
+                              </div>
                           </div>
   
                           
@@ -728,14 +728,14 @@
   '''
   <div class="c-box">
                           <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between">
-                              <h3 class="mb-0">1 résultat</h3>
-                          </div>
-                          <div class="d-flex flex-column flex-md-row mt-3 mt-md-4">
-                              <h4 class="me-4">Filtres :</h4>
-                              <form action="/approvals/prolongation/requests" hx-boost="true" hx-trigger="change">
-                                  <input id="id_only_pending" name="only_pending" type="checkbox"/>
-                                  <label for="id_only_pending">Voir uniquement les demandes à traiter</label>
-                              </form>
+                              <h3 class="h4 mb-3 mb-md-0">1 résultat</h3>
+                              <div class="d-flex align-items-center">
+                                  <strong class="me-2">Filtres :</strong>
+                                  <form action="/approvals/prolongation/requests" hx-boost="true" hx-trigger="change">
+                                      <input id="id_only_pending" name="only_pending" type="checkbox"/>
+                                      <label for="id_only_pending">Voir uniquement les demandes à traiter</label>
+                                  </form>
+                              </div>
                           </div>
   
                           
@@ -750,7 +750,7 @@
                                               <th scope="col">Demandée le</th>
                                               <th scope="col">
                                                   Adressée à
-                                                  <i class="ri-information-line text-info" data-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
+                                                  <i class="ri-information-line text-info" data-bs-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
                                               </th>
                                               <th scope="col">Statut</th>
                                               <th scope="col">Action</th>
@@ -771,7 +771,7 @@
   
   </td>
                                                   <td>
-                                                      <a class="btn btn-link btn-outline-primary btn-sm" href="/approvals/prolongation/request/666">
+                                                      <a class="btn btn-outline-primary btn-sm" href="/approvals/prolongation/request/666">
                                                           
                                                               Traiter
                                                           

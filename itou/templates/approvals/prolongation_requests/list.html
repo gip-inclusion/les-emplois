@@ -14,14 +14,14 @@
                 <div class="col-12">
                     <div class="c-box">
                         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between">
-                            <h3 class="mb-0">{{ pager.paginator.count }} résultat{{ pager.paginator.count|pluralizefr }}</h3>
-                        </div>
-                        <div class="d-flex flex-column flex-md-row mt-3 mt-md-4">
-                            <h4 class="me-4">Filtres :</h4>
-                            <form action="{% url "approvals:prolongation_requests_list" %}" hx-boost="true" hx-trigger="change">
-                                {{ form.only_pending }}
-                                {{ form.only_pending.label_tag }}
-                            </form>
+                            <h3 class="h4 mb-3 mb-md-0">{{ pager.paginator.count }} résultat{{ pager.paginator.count|pluralizefr }}</h3>
+                            <div class="d-flex align-items-center">
+                                <strong class="me-2">Filtres :</strong>
+                                <form action="{% url "approvals:prolongation_requests_list" %}" hx-boost="true" hx-trigger="change">
+                                    {{ form.only_pending }}
+                                    {{ form.only_pending.label_tag }}
+                                </form>
+                            </div>
                         </div>
 
                         {% if pager %}
@@ -36,7 +36,7 @@
                                             <th scope="col">Demandée le</th>
                                             <th scope="col">
                                                 Adressée à
-                                                <i class="ri-information-line text-info" data-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
+                                                <i class="ri-information-line text-info" data-bs-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
                                             </th>
                                             <th scope="col">Statut</th>
                                             <th scope="col">Action</th>
@@ -52,7 +52,7 @@
                                                 <td>{{ prolongation_request.validated_by.get_full_name }}</td>
                                                 <td>{% include "approvals/prolongation_requests/_status_badge.html" with badge_size="badge-xs" %}</td>
                                                 <td>
-                                                    <a class="btn btn-link btn-outline-primary btn-sm" href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}">
+                                                    <a class="btn btn-outline-primary btn-sm" href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}">
                                                         {% if prolongation_request.status == ProlongationRequestStatus.PENDING %}
                                                             Traiter
                                                         {% else %}
