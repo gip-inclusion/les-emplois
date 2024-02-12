@@ -338,7 +338,27 @@ class ProcessViewsTest(TestCase):
         self.client.force_login(job_seeker)
 
         url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
+        # 1. SELECT django session
+        # 2. Load user
+        # 3. SAVEPOINT
+        # 4. SELECT job_application (and related objects)
+        # 5. Prefetch related selected_jobs
+        ### Fetch last_expired eligibility diagnosis
+        # 6. SELECT last valid approval
+        # 7. SELECT last valid pole emploi approval
+        # 8. SELECT eligibility diagnosis made by this SIAE
+        ### Template apply/includes/eligibility_diagnosis.html
+        # 9. SELECT administrative criteria
+        # 10. SELECT last valid approval (again, for the eligibility diag)
+        # 11. SELECT last valid pole emploi approval (again, for the eligibility diag)
+        ### Template apply/includes/transition_logs.html
+        # 12. SELECT job application transition logs
+        # 13. RELEASE SAVEPOINT
+        # 14. SAVEPOINT
+        # 15. UPDATE django session
+        # 16. RELEASE SAVEPOINT
+        with self.assertNumQueries(16):
+            response = self.client.get(url)
         self.assertContains(response, format_nir(job_seeker.nir))
         self.assertContains(response, job_seeker.email)
         self.assertContains(response, job_seeker.post_code)
