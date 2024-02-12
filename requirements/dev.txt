@@ -449,9 +449,9 @@ djlint==1.34.0 \
     --hash=sha256:60b4f4ca99fd83106603bdd466f35314fda33776f3a6e70ea9d674da9d0ad053 \
     --hash=sha256:bdc26cc607dee8b46e262654eb0fbac7862c34d68172c8adc25a0b56fc7d8173
     # via -r requirements/test.txt
-drf-spectacular==0.27.0 \
-    --hash=sha256:18d7ae74b2b5d533fd31f1c591ebaa5cce1447e0976ced927401e3163040dea9 \
-    --hash=sha256:6ab2d20674244e8c940c2883f744b43c34fc68c70ea3aefa802f574108c9699b
+drf-spectacular==0.27.1 \
+    --hash=sha256:0a4cada4b7136a0bf17233476c066c511a048bc6a485ae2140326ac7ba4003b2 \
+    --hash=sha256:452e0cff3c12ee057b897508a077562967b9e62717992eeec10e62dbbc7b5a33
     # via -r requirements/test.txt
 editorconfig==0.12.3 \
     --hash=sha256:57f8ce78afcba15c8b18d46b5170848c88d56fd38f05c2ec60dbbfcb8996e89e \
