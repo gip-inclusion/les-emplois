@@ -131,6 +131,7 @@
 {% endblock %}
 
 {% block script %}
+    {{ block.super }}
     <script src="{% static 'js/split_nir.js' %}"></script>
     {% if preview_mode %}
         {# Show the confirmation modal after submitting the form. #}
