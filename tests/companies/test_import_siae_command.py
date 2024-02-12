@@ -217,11 +217,13 @@ class ImportSiaeManagementCommandsTest(TestCase):
             assert check_whether_signup_is_possible_for_all_siaes() == 0
 
     def test_activate_your_account_email_for_a_siae_without_members_but_with_auth_email(self):
-        with freeze_time("2022-10-10"):
+        with freeze_time("2022-10-10"), self.captureOnCommitCallbacks(execute=True) as commit_callbacks:
             create_new_siaes(
                 get_siret_to_siae_row(get_vue_structure_df()),
                 get_active_siae_keys(get_vue_af_df()),
             )
+        assert len(commit_callbacks) == 1
+        assert len(mail.outbox) == 6
         assert reverse("signup:company_select") in mail.outbox[0].body
         assert collections.Counter(mail.subject for mail in mail.outbox) == collections.Counter(
             f"Activez le compte de votre {kind} {name} sur les emplois de l'inclusion"
