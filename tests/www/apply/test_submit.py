@@ -210,7 +210,7 @@ class HireTest(TestCase):
                 assert response.status_code == 403
                 assert response.context["exception"] == "A session namespace doesn't exist."
 
-    def test_403_when_trying_to_update_a_prescriber(self):
+    def test_404_when_trying_to_update_a_prescriber(self):
         company = CompanyFactory(with_jobs=True, with_membership=True)
         prescriber = PrescriberFactory()
         self.client.force_login(company.members.first())
@@ -222,7 +222,7 @@ class HireTest(TestCase):
         ):
             url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_pk": prescriber.pk})
             response = self.client.get(url)
-            assert response.status_code == 403
+            assert response.status_code == 404
 
     def test_404_when_trying_to_hire_a_prescriber(self):
         company = CompanyFactory(with_jobs=True, with_membership=True)
@@ -2876,7 +2876,6 @@ class UpdateJobSeekerBaseTestCase(TestCase):
             + (1 if user.is_employer else 0)  # company info (ItouCurrentOrganizationMiddleware)
             + 1  # users_user (get_object_or_404)
             + 1  # companies_company (get_object_or_404)
-            + 1  # jobseeker_profile (UpdateJobSeekerStep3View.setup)
             + 1  # users_user/companies_companymembership (self.company.has_member())
         ):
             response = self.client.get(self.step_3_url)

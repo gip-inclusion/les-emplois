@@ -1174,12 +1174,16 @@ class ApplicationEndView(ApplyStepBaseView):
 
 
 class UpdateJobSeekerBaseView(SessionNamespaceRequiredMixin, ApplyStepBaseView):
+
     def __init__(self):
         super().__init__()
         self.job_seeker_session = None
 
+    def get_job_seeker_queryset(self):
+        return User.objects.filter(kind=UserKind.JOB_SEEKER)
+
     def setup(self, request, *args, **kwargs):
-        self.job_seeker = get_object_or_404(User, pk=kwargs["job_seeker_pk"])
+        self.job_seeker = get_object_or_404(self.get_job_seeker_queryset(), pk=kwargs["job_seeker_pk"])
         self.job_seeker_session = SessionNamespace(request.session, f"job_seeker-{self.job_seeker.pk}")
         if request.user.is_authenticated and (
             request.user.is_job_seeker or not request.user.can_view_personal_information(self.job_seeker)
@@ -1314,6 +1318,9 @@ class UpdateJobSeekerStep3View(UpdateJobSeekerBaseView):
     def __init__(self):
         super().__init__()
         self.form = None
+
+    def get_job_seeker_queryset(self):
+        return super().get_job_seeker_queryset().select_related("jobseeker_profile")
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
