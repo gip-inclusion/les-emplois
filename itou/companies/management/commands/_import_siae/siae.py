@@ -71,7 +71,7 @@ def build_siae(row, kind, *, is_active):
 
 
 def update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row):
-    auth_email_updates, fatal_errors = 0, 0
+    auth_email_updates, errors = 0, 0
 
     asp_id_to_siae_row = {row.asp_id: row for row in siret_to_siae_row.values()}
     for siae in Company.objects.select_related("convention").filter(
@@ -103,11 +103,11 @@ def update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row):
                     return f"{msg} convention.id={siae.convention.id} asp_id={siae.convention.asp_id}"
 
                 print(
-                    f"FATAL ERROR: siae.id={siae.id} ({fmt(siae)}) has changed siret from "
+                    f"ERROR: siae.id={siae.id} ({fmt(siae)}) has changed siret from "
                     f"{siae.siret} to {row.siret} but new siret is already used by "
                     f"siae.id={existing_siae.id} ({fmt(existing_siae)}) "
                 )
-                fatal_errors += 1
+                errors += 1
                 continue
 
             print(f"siae.id={siae.id} has changed siret from {siae.siret} to {row.siret} (will be updated)")
@@ -118,7 +118,7 @@ def update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row):
             siae.save(update_fields=updated_fields)
 
     print(f"{auth_email_updates} siae.auth_email fields have been updated")
-    return fatal_errors
+    return errors
 
 
 def create_new_siaes(siret_to_siae_row, active_siae_keys):
@@ -204,7 +204,7 @@ def delete_user_created_siaes_without_members():
     Those siaes cannot be joined by any way and thus are useless.
     Let's clean them up when possible.
     """
-    fatal_errors = 0
+    errors = 0
     for siae in Company.objects.prefetch_related("memberships").filter(
         members__isnull=True, source=Company.SOURCE_USER_CREATED
     ):
@@ -214,12 +214,12 @@ def delete_user_created_siaes_without_members():
                 siae.delete()
             else:
                 print(
-                    f"FATAL ERROR: siae.id={siae.id} is user created and "
+                    f"ERROR: siae.id={siae.id} is user created and "
                     f"has no member but has job applications thus cannot be deleted"
                 )
-                fatal_errors += 1
+                errors += 1
 
-    return fatal_errors
+    return errors
 
 
 def manage_staff_created_siaes():
@@ -253,31 +253,31 @@ def manage_staff_created_siaes():
 
     old_unconfirmed_siaes = staff_created_siaes.filter(created_at__lt=three_months_ago)
     print(f"{len(old_unconfirmed_siaes)} siaes created by staff should be deleted as they are unconfirmed")
-    fatal_errors = 0
+    errors = 0
     for siae in old_unconfirmed_siaes:
         if could_siae_be_deleted(siae):
             print(f"deleted unconfirmed siae.id={siae.id} created by staff a while ago")
             siae.delete()
         else:
             print(
-                f"FATAL ERROR: Please fix unconfirmed staff created siae.id={siae.id}"
+                f"ERROR: Please fix unconfirmed staff created siae.id={siae.id}"
                 f" by either deleting it or attaching it to the correct convention"
             )
-            fatal_errors += 1
+            errors += 1
 
-    return fatal_errors
+    return errors
 
 
 def check_whether_signup_is_possible_for_all_siaes():
-    fatal_errors = 0
+    errors = 0
 
     no_signup_siaes = Company.objects.filter(auth_email="").exclude(companymembership__is_active=True).distinct()
     for siae in no_signup_siaes:
         print(
-            f"FATAL ERROR: signup is impossible for siae.id={siae.id} siret={siae.siret} "
+            f"ERROR: signup is impossible for siae.id={siae.id} siret={siae.siret} "
             f"kind={siae.kind} dpt={siae.department} source={siae.source} "
             f"created_by={siae.created_by} siae.email={siae.email}"
         )
-        fatal_errors += 1
+        errors += 1
 
-    return fatal_errors
+    return errors
