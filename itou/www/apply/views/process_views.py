@@ -56,7 +56,18 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
     Detail of an application for a JOBSEEKER
     """
     job_application = get_object_or_404(
-        JobApplication, id=job_application_id, job_seeker=request.user, hidden_for_company=False
+        JobApplication.objects.select_related(
+            "job_seeker__jobseeker_profile",
+            "sender",
+            "to_company",
+            "eligibility_diagnosis__author",
+            "eligibility_diagnosis__author_siae",
+            "eligibility_diagnosis__author_prescriber_organization",
+            "eligibility_diagnosis__job_seeker__jobseeker_profile",
+        ).prefetch_related("selected_jobs"),
+        id=job_application_id,
+        job_seeker=request.user,
+        hidden_for_company=False,
     )
 
     transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
