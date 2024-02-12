@@ -2788,7 +2788,17 @@ class UpdateJobSeekerBaseTestCase(TestCase):
         self.client.force_login(user)
 
         # STEP 1
-        response = self.client.get(self.step_1_url)
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # session
+            + 2  # user, memberships (ItouCurrentOrganizationMiddleware)
+            + (1 if user.is_employer else 0)  # company info (ItouCurrentOrganizationMiddleware)
+            + 1  # users_user (get_object_or_404)
+            + 1  # companies_company (get_object_or_404)
+            + 1  # users_user/companies_companymembership (self.company.has_member())
+            + 3  # update session with savepoint & release
+        ):
+            response = self.client.get(self.step_1_url)
         self.assertContains(response, self.job_seeker.first_name)
         self.assertNotContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
 
@@ -2821,7 +2831,17 @@ class UpdateJobSeekerBaseTestCase(TestCase):
         self.assertContains(response, NEW_FIRST_NAME)
 
         # STEP 2
-        response = self.client.get(self.step_2_url)
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # session
+            + 2  # user, memberships (ItouCurrentOrganizationMiddleware)
+            + (1 if user.is_employer else 0)  # company info (ItouCurrentOrganizationMiddleware)
+            + 1  # users_user (get_object_or_404)
+            + 1  # companies_company (get_object_or_404)
+            + 1  # users_user/companies_companymembership (self.company.has_member())
+            + 1  # cities_city (CreateOrUpdateJobSeekerStep2Form.__init__)
+        ):
+            response = self.client.get(self.step_2_url)
         self.assertContains(response, PROCESS_TITLE, html=True)
         self.assertContains(response, self.job_seeker.phone)
         self.assertNotContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
@@ -2849,7 +2869,17 @@ class UpdateJobSeekerBaseTestCase(TestCase):
         self.assertContains(response, NEW_ADDRESS_LINE)
 
         # STEP 3
-        response = self.client.get(self.step_3_url)
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # session
+            + 2  # user, memberships (ItouCurrentOrganizationMiddleware)
+            + (1 if user.is_employer else 0)  # company info (ItouCurrentOrganizationMiddleware)
+            + 1  # users_user (get_object_or_404)
+            + 1  # companies_company (get_object_or_404)
+            + 1  # jobseeker_profile (UpdateJobSeekerStep3View.setup)
+            + 1  # users_user/companies_companymembership (self.company.has_member())
+        ):
+            response = self.client.get(self.step_3_url)
         self.assertContains(response, PROCESS_TITLE, html=True)
         self.assertContains(response, "Niveau de formation")
 
