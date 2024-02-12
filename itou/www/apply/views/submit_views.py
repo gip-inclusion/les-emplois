@@ -1524,6 +1524,9 @@ def hire_confirmation(request, company_pk, job_seeker_pk, template_name="apply/s
         _check_job_seeker_approval(request, job_seeker, company)
         # General IAE eligibility case
         eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker, for_siae=company)
+        if eligibility_diagnosis is not None:
+            # The job_seeker object already contains a lot of information: no need to re-retrieve it
+            eligibility_diagnosis.job_seeker = job_seeker
         geiq_eligibility_diagnosis = None
     return common_views._accept(
         request,

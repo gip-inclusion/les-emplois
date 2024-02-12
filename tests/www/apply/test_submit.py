@@ -4072,10 +4072,6 @@ class HireConfirmationTestCase(TestCase):
             + 1  # cities_city (UserAddressForm)
             + 1  # companies_jobdescription (AcceptForm.__init__)
             + 1  # eligibility_administrativecriteria (/apply/includes/eligibility_diagnosis.html)
-            + 1  # users_user (apply/includes/eligibility_diagnosis.html -> considered_to_expire_at)
-            + 1  # approvals_approval (apply/includes/eligibility_diagnosis.html -> considered_to_expire_at)
-            + 1  # get jobseekerprofile to retrieve pole_emploi_id
-            + 1  # approvals_poleemploiapproval (apply/includes/eligibility_diagnosis.html -> considered_to_expire_at)
             + 3  # update session with savepoint & release
         ):
             response = self.client.get(self._reverse("apply:hire_confirmation"))
