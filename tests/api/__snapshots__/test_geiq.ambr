@@ -103,7 +103,6 @@
           }),
         ]),
         'nb_heures_formation': 1664,
-        'nir': '290010101010125',
         'niveau_formation': 'N3',
         'niveau_qualification': 'SQ',
         'nom': 'Dupont',
@@ -142,7 +141,6 @@
         'mises_en_situation_pro': list([
         ]),
         'nb_heures_formation': 12,
-        'nir': '290010101010125',
         'niveau_formation': 'N3',
         'niveau_qualification': 'N3',
         'nom': 'Dupont',
