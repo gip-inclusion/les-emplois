@@ -591,7 +591,10 @@ class DashboardViewTest(TestCase):
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, "Vous n’avez pas encore de CV ?")
         self.assertContains(response, "Créez-en un grâce à notre partenaire Diagoriente.")
-        self.assertContains(response, "https://plateforme.diagoriente.beta.gouv.fr")
+        self.assertContains(
+            response,
+            "https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-candidat",
+        )
 
     def test_diagoriente_card_is_not_shown_for_job_seeker(self):
         user = JobSeekerFactory()
