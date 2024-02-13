@@ -253,6 +253,8 @@ class CompanyAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
 
     @admin.display(description="Liste des PASS IAE pour cette entreprise")
     def approvals_list(self, obj):
+        if obj.pk is None:
+            return "-"
         url = add_url_params(reverse("admin:approvals_approval_changelist"), {"assigned_company": obj.id, "o": -6})
         count = Approval.objects.is_assigned_to(obj.id).count()
         valid_count = Approval.objects.is_assigned_to(obj.id).valid().count()
