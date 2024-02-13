@@ -1,4 +1,5 @@
 import pytest
+from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -166,6 +167,8 @@ class JobApplicationTransferModelTest(TestCase):
         assert job_application.transferred_from is None
         assert job_application.transferred_at is None
 
+        # prewarm ContentType cache if needed to avoid extra query
+        ContentType.objects.get_for_model(target_company)
         with self.assertNumQueries(
             2  # Check user is in both origin and dest siae
             + 6  # Caused by `full_clean()` : `clean_fields()`
@@ -175,6 +178,7 @@ class JobApplicationTransferModelTest(TestCase):
             + 1  # Check if job applications are linked because of on_delete=set_null
             + 2  # Delete diagnosis and criteria made by the SIAE
             + 1  # Select user for email
+            + 2  # Select notification settings
         ):
             job_application.transfer_to(origin_user, target_company)
 
@@ -264,8 +268,7 @@ class JobApplicationTransferModelTest(TestCase):
         origin_company = CompanyWith2MembershipsFactory()
         target_company = CompanyFactory(with_membership=True)
 
-        origin_user_1 = origin_company.members.all()[0]
-        origin_user_2 = origin_company.members.all()[1]
+        origin_user_1, origin_user_2 = origin_company.members.all()
         target_company.members.add(origin_user_1)
 
         job_application = JobApplicationSentByCompanyFactory(
@@ -278,9 +281,14 @@ class JobApplicationTransferModelTest(TestCase):
         job_application.transfer_to(origin_user_1, target_company)
 
         # Only checking SIAE email
-        assert len(mail.outbox) == 2
-        assert len(mail.outbox[0].to) == 2
-        assert origin_user_1.email in mail.outbox[0].to
-        assert origin_user_2.email in mail.outbox[0].to
+        assert len(mail.outbox) == 3
+        [first_mail_to] = mail.outbox[0].to
+        [second_mail_to] = mail.outbox[1].to
+        assert first_mail_to != second_mail_to
+        assert first_mail_to in [origin_user_1.email, origin_user_2.email]
+        assert second_mail_to in [origin_user_1.email, origin_user_2.email]
         assert f"La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[0].subject
+        assert f"La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[1].subject
         assert "a transféré la candidature de :" in mail.outbox[0].body
+        assert "a transféré la candidature de :" in mail.outbox[1].body
+        assert "Votre candidature a été transférée à une autre structure" == mail.outbox[2].subject
