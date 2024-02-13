@@ -127,15 +127,6 @@ def get_vue_af_df():
     return df
 
 
-def get_af_number_to_row(vue_af_df):
-    af_number_to_row = {}
-    for _, row in vue_af_df.iterrows():
-        af_number = row.number
-        assert af_number not in af_number_to_row
-        af_number_to_row[af_number] = row
-    return af_number_to_row
-
-
 def get_siae_key_to_convention_end_date(vue_af_df):
     """
     For each siae_key (asp_id+kind) we figure out the convention end date.

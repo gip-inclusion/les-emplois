@@ -21,7 +21,6 @@ from itou.companies.management.commands._import_siae.siae import (
 from itou.companies.management.commands._import_siae.utils import anonymize_fluxiae_df, could_siae_be_deleted
 from itou.companies.management.commands._import_siae.vue_af import (
     get_active_siae_keys,
-    get_af_number_to_row,
     get_vue_af_df,
 )
 from itou.companies.management.commands._import_siae.vue_structure import (
@@ -152,7 +151,7 @@ class ImportSiaeManagementCommandsTest(TestCase):
         assert (company.source, company.siret, company.kind) == (Company.SOURCE_ASP, SIRET, CompanyKind.ACI)
 
     def test_get_creatable_and_deletable_afs(self):
-        af_number_to_row = get_af_number_to_row(get_vue_af_df())
+        af_number_to_row = {row.number: row for _, row in get_vue_af_df().iterrows()}
 
         existing_convention = SiaeConventionFactory(kind=CompanyKind.ACI, asp_id=2855)
         # Get AF created by SiaeConventionFactory
