@@ -1,6 +1,13 @@
 from django.db.models import Q
 
 from itou.common_apps.notifications.base_class import BaseNotification
+from itou.communications import registry
+from itou.communications.dispatch import (
+    EmailNotification,
+    EmployerNotification,
+    JobSeekerNotification,
+    PrescriberNotification,
+)
 from itou.utils.emails import get_email_message
 
 
@@ -143,3 +150,134 @@ class NewQualifiedJobAppEmployersNotification(BaseNotification):
         """
         subscribed_pks = recipient.notifications.setdefault(cls.NAME, {}).setdefault(cls.SUB_NAME, set())
         return set(subscribed_pks)
+
+
+@registry.register_notification()
+class JobApplicationNewForJobSeekerNotification(JobSeekerNotification, EmailNotification):
+    """Notification sent to job seeker when created"""
+
+    name = "Confirmation d’envoi de candidature"
+    category = "Candidature"
+    subject_template = "apply/email/new_for_job_seeker_subject.txt"
+    body_template = "apply/email/new_for_job_seeker_body.txt"
+
+
+@registry.register_notification()
+class NewJobApplicationForPrescriberNotification(PrescriberNotification, EmailNotification):
+    """Notification sent to prescriber when created"""
+
+    name = "Confirmation d’envoi de candidature"
+    category = "Candidature"
+    subject_template = "apply/email/new_for_prescriber_subject.txt"
+    body_template = "apply/email/new_for_prescriber_body.txt"
+
+
+@registry.register_notification()
+class JobApplicationNewForEmployerNotification(EmployerNotification, EmailNotification):
+    """Notification sent to new employers when created"""
+
+    name = "Confirmation d’envoi de candidature"
+    category = "Candidature"
+    # FIXME: update template names
+    subject_template = "apply/email/new_for_company_subject.txt"
+    body_template = "apply/email/new_for_company_body.txt"
+
+
+@registry.register_notification()
+class JobApplicationAcceptedForJobSeekerNotification(JobSeekerNotification, EmailNotification):
+    """Notification sent to job seeker when accepted"""
+
+    name = "Confirmation d’acceptation de candidature"
+    category = "Candidature"
+    subject_template = "apply/email/accept_for_job_seeker_subject.txt"
+    body_template = "apply/email/accept_for_job_seeker_body.txt"
+
+
+@registry.register_notification()
+class JobApplicationAcceptedForPrescriberNotification(PrescriberNotification, EmailNotification):
+    """Notification sent to prescriber when accepted"""
+
+    name = "Confirmation d’acceptation de candidature"
+    category = "Candidature"
+    subject_template = "apply/email/accept_for_proxy_subject.txt"
+    body_template = "apply/email/accept_for_proxy_body.txt"
+
+    def get_context(self):
+        context = super().get_context()
+        if context["job_application"].sender_prescriber_organization:
+            # Include the survey link for all prescribers's organizations.
+            context["prescriber_survey_link"] = context[
+                "job_application"
+            ].sender_prescriber_organization.accept_survey_url
+        return context
+
+
+@registry.register_notification()
+class JobApplicationRefusedForJobSeekerNotification(JobSeekerNotification, EmailNotification):
+    """Notification sent to job seeker when transferred"""
+
+    name = "Refus de candidature"
+    category = "Candidature"
+    subject_template = "apply/email/refuse_subject.txt"
+    body_template = "apply/email/refuse_body_for_job_seeker.txt"
+
+
+@registry.register_notification()
+class JobApplicationRefusedForPrescriberNotification(PrescriberNotification, EmailNotification):
+    """Notification sent to prescriber when refused"""
+
+    name = "Refus de candidature"
+    category = "Candidature"
+    subject_template = "apply/email/refuse_subject.txt"
+    body_template = "apply/email/refuse_body_for_proxy.txt"
+
+
+@registry.register_notification()
+class JobApplicationTransferredForJobSeekerNotification(JobSeekerNotification, EmailNotification):
+    """Notification sent to job seeker when transferred"""
+
+    name = "Transfert de candidature"
+    category = "Candidature"
+    subject_template = "apply/email/transfer_job_seeker_subject.txt"
+    body_template = "apply/email/transfer_job_seeker_body.txt"
+
+
+@registry.register_notification()
+class JobApplicationTransferredForPrescriberNotification(PrescriberNotification, EmailNotification):
+    """Notification sent to prescriber when transferred"""
+
+    name = "Transfert de candidature"
+    category = "Candidature"
+    subject_template = "apply/email/transfer_prescriber_subject.txt"
+    body_template = "apply/email/transfer_prescriber_body.txt"
+
+
+@registry.register_notification()
+class JobApplicationTransferredForEmployerNotification(EmployerNotification, EmailNotification):
+    """Notification sent to original employer when transferred"""
+
+    name = "Transfert de candidature"
+    category = "Candidature"
+    # FIXME: update template names
+    subject_template = "apply/email/transfer_origin_company_subject.txt"
+    body_template = "apply/email/transfer_origin_company_body.txt"
+
+
+@registry.register_notification()
+class JobApplicationCanceledForPrescriberNotification(PrescriberNotification, EmailNotification):
+    """Notification sent to prescriber when canceled"""
+
+    name = "Embauche annulée"
+    category = "Candidature"
+    subject_template = "apply/email/cancel_subject.txt"
+    body_template = "apply/email/cancel_body.txt"
+
+
+@registry.register_notification()
+class JobApplicationCanceledForEmployerNotification(EmployerNotification, EmailNotification):
+    """Notification sent to employer when canceled"""
+
+    name = "Embauche annulée"
+    category = "Candidature"
+    subject_template = "apply/email/cancel_subject.txt"
+    body_template = "apply/email/cancel_body.txt"
