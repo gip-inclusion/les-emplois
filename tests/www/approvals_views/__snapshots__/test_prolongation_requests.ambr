@@ -798,7 +798,7 @@
                           <hr/>
                           <h3>
                               Adressé à
-                              <i class="ri-information-line ri-xl" data-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
+                              <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
                           </h3>
                           <p>John DOE a été sollicité pour cette demande.</p>
                           <h3>Date de fin de PASS IAE demandée : 31/01/2000</h3>
