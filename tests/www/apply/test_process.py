@@ -77,13 +77,15 @@ class ProcessViewsTest(TestCase):
         "les expériences de votre candidat : {job_seeker_name}."
     )
     DIAGORIENTE_INVITE_EMAIL_PRESCRIBER_BODY_HEADER_LINE_2 = (
-        "Vous pourrez lui créer un compte en cliquant sur ce lien : https://plateforme.diagoriente.beta.gouv.fr"
+        "Vous pourrez lui créer un compte en cliquant sur ce lien : "
+        "https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-employeur"
     )
     DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_1 = (
         "L’entreprise {company_name} vous propose d’utiliser Diagoriente pour valoriser vos expériences."
     )
     DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 = (
-        "Vous pourrez créer votre compte en cliquant sur ce lien : https://plateforme.diagoriente.beta.gouv.fr"
+        "Vous pourrez créer votre compte en cliquant sur ce lien : "
+        "https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-employeur"
     )
 
     @classmethod

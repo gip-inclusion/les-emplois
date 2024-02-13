@@ -2487,7 +2487,7 @@ class ApplicationViewTest(TestCase):
     DIAGORIENTE_PRESCRIBER_DESCRIPTION = (
         "Accompagnez-le dans la création de son CV grâce à notre partenaire Diagoriente."
     )
-    DIAGORIENTE_URL = "https://plateforme.diagoriente.beta.gouv.fr"
+    DIAGORIENTE_URL = "https://diagoriente.beta.gouv.fr/services/plateforme"
 
     def test_application_jobs_use_previously_selected_jobs(self):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True, with_jobs=True)
@@ -2541,7 +2541,7 @@ class ApplicationViewTest(TestCase):
         self.assertContains(response, self.DIAGORIENTE_JOB_SEEKER_DESCRIPTION)
         self.assertNotContains(response, self.DIAGORIENTE_PRESCRIBER_TITLE)
         self.assertNotContains(response, self.DIAGORIENTE_PRESCRIBER_DESCRIPTION)
-        self.assertContains(response, self.DIAGORIENTE_URL)
+        self.assertContains(response, f"{self.DIAGORIENTE_URL}?utm_source=emploi-inclusion-candidat")
 
     def test_application_resume_diagoriente_not_shown_as_company(self):
         company = CompanyFactory(with_membership=True, with_jobs=True)
@@ -2570,7 +2570,7 @@ class ApplicationViewTest(TestCase):
         self.assertNotContains(response, self.DIAGORIENTE_JOB_SEEKER_DESCRIPTION)
         self.assertContains(response, self.DIAGORIENTE_PRESCRIBER_TITLE)
         self.assertContains(response, self.DIAGORIENTE_PRESCRIBER_DESCRIPTION)
-        self.assertContains(response, self.DIAGORIENTE_URL)
+        self.assertContains(response, f"{self.DIAGORIENTE_URL}?utm_source=emploi-inclusion-prescripteur")
 
     def test_application_eligibility_is_bypassed_for_company_not_subject_to_eligibility_rules(self):
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True)
