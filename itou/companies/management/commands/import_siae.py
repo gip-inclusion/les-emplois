@@ -37,7 +37,6 @@ from itou.companies.management.commands._import_siae.siae import (
 )
 from itou.companies.management.commands._import_siae.vue_af import (
     get_active_siae_keys,
-    get_af_number_to_row,
     get_vue_af_df,
 )
 from itou.companies.management.commands._import_siae.vue_structure import (
@@ -70,7 +69,7 @@ class Command(BaseCommand):
         siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
 
         vue_af_df = get_vue_af_df()
-        af_number_to_row = get_af_number_to_row(vue_af_df)
+        af_number_to_row = {row.number: row for _, row in vue_af_df.iterrows()}
         active_siae_keys = get_active_siae_keys(vue_af_df)
 
         # Sanitize data from users
