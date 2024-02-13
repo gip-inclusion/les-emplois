@@ -132,6 +132,9 @@ def pe_connect_callback(request):
             UserKind.PRESCRIBER: reverse("login:prescriber"),
             UserKind.EMPLOYER: reverse("login:employer"),
             UserKind.LABOR_INSPECTOR: reverse("login:labor_inspector"),
+            # Staff members may have created a job seeker account with the same email
+            # as their staff email on the platform for troubleshooting.
+            UserKind.ITOU_STAFF: reverse("login:job_seeker"),
         }[e.user.kind]
         return HttpResponseRedirect(url)
     except MultipleUsersFoundException as e:
