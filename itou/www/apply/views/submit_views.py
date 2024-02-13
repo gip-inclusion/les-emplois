@@ -23,14 +23,10 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.files.models import File
 from itou.job_applications.models import JobApplication
-from itou.job_applications.notifications import (
-    NewQualifiedJobAppEmployersNotification,
-    NewSpontaneousJobAppEmployersNotification,
-)
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError
-from itou.utils.emails import redact_email_address, send_email_messages
+from itou.utils.emails import redact_email_address
 from itou.utils.session import SessionNamespace, SessionNamespaceRequiredMixin
 from itou.www.apply.forms import (
     ApplicationJobsForm,
@@ -1106,21 +1102,16 @@ class ApplicationResumeView(ApplicationBaseView):
             self.apply_session.delete()
 
             try:
-                # Send email notifications
-                if job_application.is_spontaneous:
-                    notification = NewSpontaneousJobAppEmployersNotification(job_application=job_application)
-                else:
-                    notification = NewQualifiedJobAppEmployersNotification(job_application=job_application)
-
-                notification.send()
-
-                job_application_emails = [job_application.email_new_for_job_seeker()]
-
+                # Send notifications
+                company_recipients = User.objects.filter(
+                    companymembership__company=job_application.to_company,
+                    companymembership__is_active=True,
+                )
+                for employer in company_recipients:
+                    job_application.notifications_new_for_employer(employer).send()
+                job_application.notifications_new_for_job_seeker.send()
                 if request.user.is_prescriber:
-                    job_application_emails.append(job_application.email_new_for_prescriber)
-
-                send_email_messages(job_application_emails)
-
+                    job_application.notifications_new_for_proxy.send()
             finally:
                 # We are done, send to the (mostly) stateless final page as we now have no session.
                 # "company_pk" is kinda useless with "application_pk" but is kept for URL consistency.

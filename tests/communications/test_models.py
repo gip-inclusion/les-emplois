@@ -45,15 +45,6 @@ class NotificationModelTest(TestCase):
 
 class NotificationSettingsModelTest(TestCase):
     def setUp(self):
-        @notifications_registry.register
-        class FirstNotification(BaseNotification):
-            name = "First"
-            category = "First"
-
-        self.addCleanup(notifications_registry.unregister, FirstNotification)
-
-        sync_notifications(NotificationRecord)
-
         self.job_seeker = JobSeekerFactory(first_name="John", last_name="Doe", with_disabled_notifications=True)
         self.employer = EmployerFactory(
             first_name="Alice", last_name="Doe", with_company=True, with_disabled_notifications=True

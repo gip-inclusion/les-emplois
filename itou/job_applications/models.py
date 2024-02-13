@@ -12,6 +12,7 @@ from django.utils import timezone
 from django_xworkflows import models as xwf_models
 
 from itou.approvals.models import Approval, Prolongation, Suspension
+from itou.approvals.notifications import PassAcceptedEmployerNotification
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType
 from itou.companies.models import Company
 from itou.eligibility.enums import AuthorKind
@@ -31,9 +32,11 @@ from itou.job_applications.enums import (
     SenderKind,
 )
 from itou.users.enums import LackOfPoleEmploiId, UserKind
-from itou.utils.emails import get_email_message, send_email_messages
+from itou.utils.emails import get_email_message
 from itou.utils.models import InclusiveDateRangeField
 from itou.utils.urls import get_absolute_url
+
+from . import notifications as job_application_notifications
 
 
 class JobApplicationWorkflow(xwf_models.Workflow):
@@ -921,17 +924,23 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if is_eligibility_diagnosis_made_by_siae:
             eligibility_diagnosis.delete()
 
-        # Always send an email to job seeker and origin SIAE
-        emails = [
-            self.get_email_transfer_origin_company(transferred_by, self.transferred_from, target_company),
-            self.get_email_transfer_job_seeker(transferred_by, self.transferred_from, target_company),
-        ]
+        notification_context = {
+            "job_application": self,
+            "transferred_by": transferred_by,
+            "origin_company": self.transferred_from,
+            "target_company": target_company,
+        }
 
-        # Send email to prescriber or orienter if any
+        # Always send notifications to original SIAE members
+        for previous_employer in self.transferred_from.active_members.all():
+            self.notifications_transfer_for_previous_employer(previous_employer, notification_context).send()
+
+        # Always send notification to job seeker
+        self.notifications_transfer_for_job_seeker(notification_context).send()
+
+        # Send a notification to prescriber or orienter if any
         if self.sender_kind == SenderKind.PRESCRIBER and self.sender_id:  # Sender user may have been deleted.
-            emails.append(self.get_email_transfer_prescriber(transferred_by, self.transferred_from, target_company))
-
-        send_email_messages(emails)
+            self.notifications_transfer_for_proxy(notification_context).send()
 
     def get_eligibility_diagnosis(self):
         """
@@ -959,10 +968,10 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         for job_application in self.job_seeker.job_applications.exclude(pk=self.pk).pending():
             job_application.render_obsolete(*args, **kwargs)
 
-        # Notification emails.
-        emails = [self.email_accept_for_job_seeker]
+        # Notifications & emails.
+        self.notifications_accept_for_job_seeker.send()
         if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
-            emails.append(self.email_accept_for_proxy)
+            self.notifications_accept_for_proxy.send()
 
         # Link to the job seeker's eligibility diagnosis.
         if self.to_company.is_subject_to_eligibility_rules:
@@ -986,7 +995,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     # As a job seeker can have multiple contracts at the same time,
                     # the approval should start at the same time as most recent contract.
                     self.approval.update_start_date(new_start_date=self.hiring_start_at)
-                emails.append(self.email_deliver_approval(accepted_by))
+                self.notifications_deliver_approval(accepted_by).send()
             elif (
                 self.job_seeker.has_no_common_approval
                 and (self.job_seeker.jobseeker_profile.nir or self.job_seeker.jobseeker_profile.pole_emploi_id)
@@ -1008,7 +1017,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 )
                 new_approval.save()
                 self.approval = new_approval
-                emails.append(self.email_deliver_approval(accepted_by))
+                self.notifications_deliver_approval(accepted_by).send()
             elif not self.job_seeker.jobseeker_profile.nir or (
                 not self.job_seeker.jobseeker_profile.pole_emploi_id
                 and self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason
@@ -1016,12 +1025,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             ):
                 # Trigger a manual approval creation.
                 self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
-                emails.append(self.email_manual_approval_delivery_required_notification(accepted_by))
+                self.email_manual_approval_delivery_required_notification(accepted_by).send()
             else:
                 raise xwf_models.AbortTransition("Job seeker has an invalid PE status, cannot issue approval.")
-
-        # Send emails in batch.
-        send_email_messages(emails)
 
         if self.approval:
             self.approval_number_sent_by_email = True
@@ -1032,10 +1038,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @xwf_models.transition()
     def refuse(self, *args, **kwargs):
         # Send notification.
-        emails = [self.email_refuse_for_job_seeker]
+        self.notifications_refuse_for_job_seeker.send()
         if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
-            emails.append(self.email_refuse_for_proxy)
-        send_email_messages(emails)
+            self.notifications_refuse_for_proxy.send()
 
     @xwf_models.transition()
     def cancel(self, *, user):
@@ -1053,7 +1058,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval_manually_delivered_by = None
 
         # Send notification.
-        send_email_messages([self.email_cancel(cancelled_by=user)])
+        self.notifications_cancel_for_employer(user).send()
+        if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
+            self.notifications_cancel_for_proxy.send()
 
     @xwf_models.transition()
     def render_obsolete(self, *args, **kwargs):
@@ -1064,9 +1071,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         self.approval_number_sent_at = timezone.now()
         self.approval_manually_delivered_by = delivered_by
         self.save()
-        # Send email at the end because we can't rollback this operation
-        email = self.email_deliver_approval(self.accepted_by)
-        email.send()
+        # Send notification at the end because we can't rollback this operation
+        self.notifications_deliver_approval(self.accepted_by).send()
 
     def manually_refuse_approval(self, refused_by):
         self.approval_manually_refused_by = refused_by
@@ -1076,78 +1082,104 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         email = self.email_manually_refuse_approval
         email.send()
 
-    # Emails.
-    @property
-    def email_new_for_prescriber(self):
-        to = [self.sender.email]
-        context = {"job_application": self}
-        subject = "apply/email/new_for_prescriber_subject.txt"
-        body = "apply/email/new_for_prescriber_body.txt"
-        return get_email_message(to, context, subject, body)
-
-    def email_new_for_job_seeker(self):
-        to = [self.job_seeker.email]
-        context = {"job_application": self, "base_url": get_absolute_url().rstrip("/")}
-        subject = "apply/email/new_for_job_seeker_subject.txt"
-        body = "apply/email/new_for_job_seeker_body.txt"
-        return get_email_message(to, context, subject, body)
+    # Notifications
+    def notifications_new_for_employer(self, employer):
+        return job_application_notifications.JobApplicationNewForEmployerNotification(
+            employer,
+            self.to_company,
+            job_application=self,
+        )
 
     @property
-    def email_accept_for_job_seeker(self):
-        to = [self.job_seeker.email]
-        context = {"job_application": self}
-        subject = "apply/email/accept_for_job_seeker_subject.txt"
-        body = "apply/email/accept_for_job_seeker_body.txt"
-        return get_email_message(to, context, subject, body)
+    def notifications_new_for_proxy(self):
+        return job_application_notifications.JobApplicationNewForPrescriberNotification(
+            self.sender,
+            self.sender_prescriber_organization,
+            job_application=self,
+        )
 
     @property
-    def email_accept_for_proxy(self):
-        to = [self.sender.email]
-        context = {"job_application": self}
-        if self.sender_prescriber_organization:
-            # Include the survey link for all prescribers's organizations.
-            context["prescriber_survey_link"] = self.sender_prescriber_organization.accept_survey_url
-        subject = "apply/email/accept_for_proxy_subject.txt"
-        body = "apply/email/accept_for_proxy_body.txt"
-        return get_email_message(to, context, subject, body)
+    def notifications_new_for_job_seeker(self):
+        return job_application_notifications.JobApplicationNewForJobSeekerNotification(
+            self.job_seeker,
+            job_application=self,
+            base_url=get_absolute_url().rstrip("/"),
+        )
 
     @property
-    def email_refuse_for_proxy(self):
-        to = [self.sender.email]
-        context = {"job_application": self}
-        subject = "apply/email/refuse_subject.txt"
-        body = "apply/email/refuse_body_for_proxy.txt"
-        return get_email_message(to, context, subject, body)
+    def notifications_accept_for_job_seeker(self):
+        return job_application_notifications.JobApplicationAcceptedForJobSeekerNotification(
+            self.job_seeker,
+            job_application=self,
+        )
 
     @property
-    def email_refuse_for_job_seeker(self):
-        to = [self.job_seeker.email]
-        context = {"job_application": self}
-        subject = "apply/email/refuse_subject.txt"
-        body = "apply/email/refuse_body_for_job_seeker.txt"
-        return get_email_message(to, context, subject, body)
+    def notifications_accept_for_proxy(self):
+        return job_application_notifications.JobApplicationAcceptedForPrescriberNotification(
+            self.sender,
+            self.sender_prescriber_organization,
+            job_application=self,
+        )
 
-    def email_cancel(self, cancelled_by):
-        to = [cancelled_by.email]
-        bcc = []
-        if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
-            bcc.append(self.sender.email)
-        context = {"job_application": self}
-        subject = "apply/email/cancel_subject.txt"
-        body = "apply/email/cancel_body.txt"
-        return get_email_message(to, context, subject, body, bcc=bcc)
+    @property
+    def notifications_refuse_for_proxy(self):
+        return job_application_notifications.JobApplicationRefusedForPrescriberNotification(
+            self.sender,
+            self.sender_prescriber_organization,
+            job_application=self,
+        )
 
-    def email_deliver_approval(self, accepted_by):
-        if not accepted_by:
-            raise RuntimeError("Unable to determine the recipient email address.")
-        if not self.approval:
-            raise RuntimeError("No approval found for this job application.")
-        to = [accepted_by.email]
-        context = {"job_application": self, "siae_survey_link": self.to_company.accept_survey_url}
-        subject = "approvals/email/deliver_subject.txt"
-        body = "approvals/email/deliver_body.txt"
-        return get_email_message(to, context, subject, body)
+    @property
+    def notifications_refuse_for_job_seeker(self):
+        return job_application_notifications.JobApplicationRefusedForJobSeekerNotification(
+            self.job_seeker,
+            job_application=self,
+        )
 
+    def notifications_cancel_for_employer(self, canceled_by):
+        return job_application_notifications.JobApplicationCanceledNotification(
+            canceled_by,
+            self.to_company,
+            job_application=self,
+        )
+
+    @property
+    def notifications_cancel_for_proxy(self):
+        return job_application_notifications.JobApplicationCanceledNotification(
+            self.sender,
+            self.sender_prescriber_organization,
+            job_application=self,
+        )
+
+    def notifications_deliver_approval(self, accepted_by):
+        return PassAcceptedEmployerNotification(
+            accepted_by,
+            self.to_company,
+            job_application=self,
+            siae_survey_link=self.to_company.accept_survey_url,
+        )
+
+    def notifications_transfer_for_previous_employer(self, previous_employer, notification_context):
+        return job_application_notifications.JobApplicationTransferredForEmployerNotification(
+            previous_employer,
+            self.transferred_from,
+            **notification_context,
+        )
+
+    def notifications_transfer_for_job_seeker(self, notification_context):
+        return job_application_notifications.JobApplicationTransferredForJobSeekerNotification(
+            self.job_seeker,
+            **notification_context,
+        )
+
+    def notifications_transfer_for_proxy(self, notification_context):
+        return job_application_notifications.JobApplicationTransferredForPrescriberNotification(
+            self.sender,
+            self.sender_prescriber_organization,
+            **notification_context,
+        )
+
+    # Emails
     def email_manual_approval_delivery_required_notification(self, accepted_by):
         to = [settings.ITOU_EMAIL_CONTACT]
         context = {
@@ -1187,37 +1219,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         body = "apply/email/diagoriente_job_seeker_invite_body.txt"
         context = {"job_application": self}
         return get_email_message(to, context, subject, body)
-
-    def _get_transfer_email(self, to, subject, body, transferred_by, origin_company, target_company):
-        context = {
-            "job_application": self,
-            "transferred_by": transferred_by,
-            "origin_company": origin_company,
-            "target_company": target_company,
-        }
-        return get_email_message(to, context, subject, body)
-
-    def get_email_transfer_origin_company(self, transferred_by, origin_company, target_company):
-        # Send email to every active member of the origin company
-        to = list(origin_company.active_members.values_list("email", flat=True))
-        subject = "apply/email/transfer_origin_company_subject.txt"
-        body = "apply/email/transfer_origin_company_body.txt"
-
-        return self._get_transfer_email(to, subject, body, transferred_by, origin_company, target_company)
-
-    def get_email_transfer_job_seeker(self, transferred_by, origin_company, target_company):
-        to = [self.job_seeker.email]
-        subject = "apply/email/transfer_job_seeker_subject.txt"
-        body = "apply/email/transfer_job_seeker_body.txt"
-
-        return self._get_transfer_email(to, subject, body, transferred_by, origin_company, target_company)
-
-    def get_email_transfer_prescriber(self, transferred_by, origin_company, target_company):
-        to = [self.sender.email]
-        subject = "apply/email/transfer_prescriber_subject.txt"
-        body = "apply/email/transfer_prescriber_body.txt"
-
-        return self._get_transfer_email(to, subject, body, transferred_by, origin_company, target_company)
 
 
 class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):

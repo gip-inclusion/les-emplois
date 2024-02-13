@@ -752,7 +752,7 @@ class JobApplicationNotificationsTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True, selected_jobs=Appellation.objects.all()
         )
-        email = job_application.email_new_for_prescriber
+        email = job_application.notifications_new_for_proxy.build()
         # To.
         assert job_application.sender.email in email.to
         assert len(email.to) == 1
@@ -778,7 +778,7 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.to_company.city in email.body
 
         # Assert the Job Seeker does not have access to confidential information.
-        email = job_application.email_new_for_job_seeker()
+        email = job_application.notifications_new_for_job_seeker.build()
         assert job_application.sender.get_full_name() in email.body
         assert job_application.sender_prescriber_organization.display_name in email.body
         assert job_application.sender.email not in email.body
@@ -787,7 +787,7 @@ class JobApplicationNotificationsTest(TestCase):
 
     def test_new_for_job_seeker(self):
         job_application = JobApplicationSentByJobSeekerFactory(selected_jobs=Appellation.objects.all())
-        email = job_application.email_new_for_job_seeker()
+        email = job_application.notifications_new_for_job_seeker.build()
         # To.
         assert job_application.sender.email in email.to
         assert len(email.to) == 1
@@ -812,7 +812,7 @@ class JobApplicationNotificationsTest(TestCase):
 
     def test_accept_for_job_seeker(self):
         job_application = JobApplicationSentByJobSeekerFactory()
-        email = job_application.email_accept_for_job_seeker
+        email = job_application.notifications_accept_for_job_seeker.build()
         # To.
         assert job_application.job_seeker.email == job_application.sender.email
         assert job_application.job_seeker.email in email.to
@@ -826,7 +826,7 @@ class JobApplicationNotificationsTest(TestCase):
 
     def test_accept_for_proxy(self):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
-        email = job_application.email_accept_for_proxy
+        email = job_application.notifications_accept_for_proxy.build()
         # To.
         assert job_application.to_company.email not in email.to
         assert email.to == [job_application.sender.email]
@@ -847,7 +847,7 @@ class JobApplicationNotificationsTest(TestCase):
 
     def test_accept_for_proxy_without_hiring_end_at(self):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, hiring_end_at=None)
-        email = job_application.email_accept_for_proxy
+        email = job_application.notifications_accept_for_proxy.build()
         assert "Date de fin du contrat : Non renseigné" in email.body
 
     def test_accept_trigger_manual_approval(self):
@@ -895,7 +895,7 @@ class JobApplicationNotificationsTest(TestCase):
             refusal_reason=RefusalReason.DID_NOT_COME,
             answer_to_prescriber="Le candidat n'est pas venu.",
         )
-        email = job_application.email_refuse_for_proxy
+        email = job_application.notifications_refuse_for_proxy.build()
         # To.
         assert job_application.sender.email in email.to
         assert len(email.to) == 1
@@ -911,7 +911,7 @@ class JobApplicationNotificationsTest(TestCase):
             refusal_reason=RefusalReason.DID_NOT_COME,
             answer_to_prescriber="Le candidat n'est pas venu.",
         )
-        email = job_application.email_refuse_for_job_seeker
+        email = job_application.notifications_refuse_for_job_seeker.build()
         # To.
         assert job_application.job_seeker.email == job_application.sender.email
         assert job_application.job_seeker.email in email.to
@@ -936,7 +936,7 @@ class JobApplicationNotificationsTest(TestCase):
         [email] = mail.outbox
         assert email.to == [job_application.job_seeker.email]
 
-    def test_email_deliver_approval(self):
+    def test_notifications_deliver_approval(self):
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationFactory(
@@ -946,7 +946,7 @@ class JobApplicationNotificationsTest(TestCase):
             approval=approval,
         )
         accepted_by = job_application.to_company.members.first()
-        email = job_application.email_deliver_approval(accepted_by)
+        email = job_application.notifications_deliver_approval(accepted_by).build()
         # To.
         assert accepted_by.email in email.to
         assert len(email.to) == 1
@@ -969,7 +969,7 @@ class JobApplicationNotificationsTest(TestCase):
         assert global_constants.ITOU_HELP_CENTER_URL in email.body
         assert job_application.to_company.accept_survey_url in email.body
 
-    def test_email_deliver_approval_without_hiring_end_at(self):
+    def test_notifications_deliver_approval_without_hiring_end_at(self):
         job_seeker = JobSeekerFactory()
         approval = ApprovalFactory(user=job_seeker)
         job_application = JobApplicationFactory(
@@ -980,13 +980,13 @@ class JobApplicationNotificationsTest(TestCase):
             hiring_end_at=None,
         )
         accepted_by = job_application.to_company.members.first()
-        email = job_application.email_deliver_approval(accepted_by)
+        email = job_application.notifications_deliver_approval(accepted_by).build()
         assert "Se terminant le : Non renseigné" in email.body
 
-    def test_email_deliver_approval_when_subject_to_eligibility_rules(self):
+    def test_notifications_deliver_approval_when_subject_to_eligibility_rules(self):
         job_application = JobApplicationFactory(with_approval=True, to_company__subject_to_eligibility=True)
 
-        email = job_application.email_deliver_approval(job_application.to_company.members.first())
+        email = job_application.notifications_deliver_approval(job_application.to_company.members.first()).build()
 
         assert (
             f"PASS IAE pour {job_application.job_seeker.get_full_name()} et avis sur les emplois de l'inclusion"
@@ -994,10 +994,10 @@ class JobApplicationNotificationsTest(TestCase):
         )
         assert "PASS IAE" in email.body
 
-    def test_email_deliver_approval_when_not_subject_to_eligibility_rules(self):
+    def test_notifications_deliver_approval_when_not_subject_to_eligibility_rules(self):
         job_application = JobApplicationFactory(with_approval=True, to_company__not_subject_to_eligibility=True)
 
-        email = job_application.email_deliver_approval(job_application.to_company.members.first())
+        email = job_application.notifications_deliver_approval(job_application.to_company.members.first()).build()
 
         assert "Confirmation de l'embauche" == email.subject
         assert "PASS IAE" not in email.body
@@ -1051,28 +1051,40 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.approval_number_sent_at is None
         assert len(mail.outbox) == 1
 
-    def test_cancel(self):
+    def test_cancel_sent_by_prescriber(self):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_ACCEPTED
         )
 
         cancellation_user = job_application.to_company.active_members.first()
-        email = job_application.email_cancel(cancelled_by=cancellation_user)
-        # To.
-        assert cancellation_user.email in email.to
-        assert job_application.sender.email in email.bcc
-        assert len(email.to) == 1
-        assert len(email.bcc) == 1
-        # Body.
-        assert "annulée" in email.body
-        assert job_application.sender.get_full_name() in email.body
-        assert job_application.job_seeker.get_full_name() in email.body
+        job_application.cancel(user=cancellation_user)
+        assert len(mail.outbox) == 2
 
+        # To.
+        assert [cancellation_user.email] == mail.outbox[0].to
+        assert [job_application.sender.email] == mail.outbox[1].to
+
+        # Body.
+        assert "annulée" in mail.outbox[0].body
+        assert job_application.sender.get_full_name() in mail.outbox[0].body
+        assert job_application.job_seeker.get_full_name() in mail.outbox[0].body
+        assert mail.outbox[0].body == mail.outbox[1].body
+
+    def test_cancel_sent_by_job_seeker(self):
         # When sent by jobseeker.
         job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
-        email = job_application.email_cancel(cancelled_by=cancellation_user)
+
+        cancellation_user = job_application.to_company.active_members.first()
+        job_application.cancel(user=cancellation_user)
+        assert len(mail.outbox) == 1
+
         # To.
-        assert not email.bcc
+        assert [cancellation_user.email] == mail.outbox[0].to
+
+        # Body.
+        assert "annulée" in mail.outbox[0].body
+        assert job_application.sender.get_full_name() in mail.outbox[0].body
+        assert job_application.job_seeker.get_full_name() in mail.outbox[0].body
 
     def test_cancel_without_sender(self):
         job_application = JobApplicationFactory(
