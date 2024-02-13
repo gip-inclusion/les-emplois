@@ -112,7 +112,20 @@
         <script src="{% static "vendor/tarteaucitron/tarteaucitron.js" %}"></script>
         <script src="{% static "vendor/jquery-ui/jquery-ui.min.js" %}"></script>
         <script src="{% static "vendor/theme-inclusion/javascripts/app.js" %}"></script>
-
+        <script src="{% static "vendor/htmx/htmx.min.js" %}"></script>
+        {% if debug %}
+            <script src="{% static "vendor/htmx/ext/debug.js" %}"></script>
+            <script src="{% static "vendor/htmx/ext/event-header.js" %}"></script>
+        {% endif %}
+        <script src="{% static "js/htmx_handlers.js" %}"></script>
+        <script src="{% static "js/modal_control.js" %}"></script>
+        <script src="{% static "js/city_autocomplete_field.js" %}"></script>
+        <script src="{% static "js/prevent_multiple_submit.js" %}"></script>
+        <script src="{% static 'js/utils.js'%}"></script>
+        <script src="{% static "js/duet_date_picker_widget.js" %}"></script>
+        <script src="{% static "admin/js/vendor/select2/select2.full.min.js" %}"></script>
+        <script src="{% static "admin/js/vendor/select2/i18n/fr.js" %}"></script>
+        <script src="{% static "django_select2/django_select2.js" %}"></script>
 
         <script nonce="{{ CSP_NONCE }}">
             // Tarteaucitron's language is set according to the browser configuration
@@ -209,36 +222,18 @@
             (tarteaucitron.job = tarteaucitron.job || []).push('livestorm');
         </script>
 
-        {% block script %}
-            <script src="{% static "vendor/htmx/htmx.min.js" %}"></script>
-            {% if debug %}
-                <script src="{% static "vendor/htmx/ext/debug.js" %}"></script>
-                <script src="{% static "vendor/htmx/ext/event-header.js" %}"></script>
-            {% endif %}
-            <script src="{% static "js/htmx_handlers.js" %}"></script>
-            <script src="{% static "js/modal_control.js" %}"></script>
-            <script src="{% static "js/city_autocomplete_field.js" %}"></script>
-            <script src="{% static "js/prevent_multiple_submit.js" %}"></script>
-            <script src="{% static 'js/utils.js'%}"></script>
-            <script src="{% static "js/duet_date_picker_widget.js" %}"></script>
-            <script src="{% static "admin/js/vendor/select2/select2.full.min.js" %}"></script>
-            <script src="{% static "admin/js/vendor/select2/i18n/fr.js" %}"></script>
-            <script src="{% static "django_select2/django_select2.js" %}"></script>
+        {% if SHOW_DEMO_ACCOUNTS_BANNER %}
+            <script src="{% static 'js/demo_accounts.js'%}"></script>
+        {% endif %}
 
-            {% if SHOW_DEMO_ACCOUNTS_BANNER %}
-                <script src="{% static 'js/demo_accounts.js'%}"></script>
-            {% endif %}
-
-            <script nonce="{{ CSP_NONCE }}">
-                // Show any toasts that is already present in the DOM
-                htmx.onLoad(() => {
-                    $(".toast-placement-wrapper").children(".toast").each(function() {
-                        $(this).toast("show");
-                    });
+        <script nonce="{{ CSP_NONCE }}">
+            // Show any toasts that is already present in the DOM
+            htmx.onLoad(() => {
+                $(".toast-placement-wrapper").children(".toast").each(function() {
+                    $(this).toast("show");
                 });
-            </script>
-
-        {% endblock %}
+            });
+        </script>
 
         {% if MATOMO_BASE_URL %}
             {# Matomo/Piwik open source web analytics #}
@@ -266,5 +261,6 @@
             <script src="{% static "js/matomo.js" %}"></script>
         {% endif %}
 
+        {% block script %}{% endblock %}
     </body>
 </html>
