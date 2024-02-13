@@ -55,7 +55,11 @@ def test_prolongation_request_created_reminder_carbon_copy_list_limit():
 
 def test_prolongation_request_granted_employer(snapshot):
     prolongation_request = ProlongationRequestFactory(for_snapshot=True)
-    email = notifications.ProlongationRequestGrantedEmployer(prolongation_request).email
+    email = notifications.ProlongationRequestGrantedForEmployerNotification(
+        prolongation_request.declared_by,
+        prolongation_request.declared_by_siae,
+        prolongation_request=prolongation_request,
+    ).build()
 
     assert email.to == [prolongation_request.declared_by.email]
     assert email.subject == snapshot(name="subject")
@@ -64,7 +68,10 @@ def test_prolongation_request_granted_employer(snapshot):
 
 def test_prolongation_request_granted_jobseeker(snapshot):
     prolongation_request = ProlongationRequestFactory(for_snapshot=True)
-    email = notifications.ProlongationRequestGrantedJobSeeker(prolongation_request).email
+    email = notifications.ProlongationRequestGrantedForJobSeekerNotification(
+        prolongation_request.approval.user,
+        prolongation_request=prolongation_request,
+    ).build()
 
     assert email.to == [prolongation_request.approval.user.email]
     assert email.subject == snapshot(name="subject")
