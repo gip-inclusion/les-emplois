@@ -34,9 +34,9 @@
         <meta property="twitter:image" content="{{ ITOU_PROTOCOL }}://{{ ITOU_FQDN }}{% static "img/logo_metatags.png" %}">
 
         <link rel="shortcut icon" href="{% static_theme_images "favicon.ico" %}" type="image/ico">
-        <link rel="stylesheet" href="{% static "vendor/jquery-ui/jquery-ui.min.css" %}" type="text/css">
-        <link rel="stylesheet" href="{% static "vendor/theme-inclusion/stylesheets/app.css" %}" type="text/css">
-        <link rel="stylesheet" href="{% static "css/itou.css" %}" type="text/css">
+        <link rel="stylesheet" href="{% static "vendor/jquery-ui/jquery-ui.min.css" %}">
+        <link rel="stylesheet" href="{% static "vendor/theme-inclusion/stylesheets/app.css" %}">
+        <link rel="stylesheet" href="{% static "css/itou.css" %}">
         {% if not debug %}
             {# Sentry loader script, dynamically and lazily loads the Sentry SDK on errors. #}
             {# Served from Sentry CDN to allows dynamic loading. #}
