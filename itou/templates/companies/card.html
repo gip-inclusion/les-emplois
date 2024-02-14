@@ -1,5 +1,4 @@
 {% extends "layout/base.html" %}
-{% load format_filters %}
 {% load str_filters %}
 {% load static %}
 {% load matomo %}
@@ -76,28 +75,13 @@
                         <hr class="my-3">
                         <ul class="fs-sm list-unstyled mb-0">
                             {% if siae.email %}
-                                <li>
-                                    <a href="mailto:{{ siae.email }}" class="btn-link btn-ico" aria-label="Contact par mail">
-                                        <i class="ri-mail-line font-weight-normal"></i>
-                                        <span>{{ siae.email }}</span>
-                                    </a>
-                                </li>
+                                {% include "includes/email_li.html" with email=siae.email only %}
                             {% endif %}
                             {% if siae.phone %}
-                                <li>
-                                    <a href="tel:{{ siae.phone|cut:" " }}" class="btn-link btn-ico" aria-label="Contact téléphonique">
-                                        <i class="ri-phone-line font-weight-normal"></i>
-                                        <span>{{ siae.phone|format_phone }}</span>
-                                    </a>
-                                </li>
+                                {% include "includes/phone_li.html" with phonenumber=siae.phone only %}
                             {% endif %}
                             {% if siae.website %}
-                                <li>
-                                    <a href="{{ siae.website }}" rel="noopener" target="_blank" class="btn-link btn-ico" aria-label="Site web (ouverture dans un nouvel onglet)">
-                                        <i class="ri-global-line font-weight-normal"></i>
-                                        <span>{{ siae.website }}</span>
-                                    </a>
-                                </li>
+                                {% include "includes/website_li.html" with website=siae.website only %}
                             {% endif %}
                         </ul>
                     </div>
