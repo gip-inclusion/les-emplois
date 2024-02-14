@@ -681,12 +681,6 @@ class JobSeekerProfileAdmin(ItouModelAdmin):
 
     list_select_related = ("user",)
 
-    search_fields = (
-        "user__first_name",
-        "user__last_name",
-        "user__email",
-    )
-
     readonly_fields = (
         "hexa_lane_type",
         "hexa_post_code",
@@ -766,6 +760,26 @@ class JobSeekerProfileAdmin(ItouModelAdmin):
     @admin.display(description="utilisateur")
     def user_link(self, obj):
         return get_admin_view_link(obj.user, content=f"🔗 {obj.user.email}")
+
+    def get_search_fields(self, request):
+        search_fields = []
+        search_term = request.GET.get("q", "").strip()
+        if len(search_term) == 30:
+            try:
+                int(search_term, base=16)
+            except ValueError:
+                pass
+            else:
+                search_fields.append("user__asp_uid__exact")
+        if search_term.isdecimal():
+            search_fields.append("pk__exact")
+            search_fields.append("nir__exact")
+        else:
+            search_fields.append("user__email")
+            if "@" not in search_term:
+                search_fields.append("user__first_name")
+                search_fields.append("user__last_name")
+        return search_fields
 
 
 class EmailAddressWithRemarkAdmin(EmailAddressAdmin):
