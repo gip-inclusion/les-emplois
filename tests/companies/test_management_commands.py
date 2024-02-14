@@ -3,6 +3,7 @@ import io
 import operator
 
 import pytest
+from django.contrib.gis.geos import Point
 from django.core import management
 from freezegun import freeze_time
 
@@ -44,7 +45,20 @@ class TestMoveCompanyData:
         ],
     )
     def test_preserve_to_company_data(self, preserve, predicate):
-        company_1, company_2 = companies_factories.CompanyFactory.create_batch(2, with_informations=True)
+        company_1 = companies_factories.CompanyFactory.create(
+            brand="COMPANY 1",
+            description="COMPANY 1",
+            phone="0000000001",
+            coords=Point(-2.3140436, 47.3618584),
+            geocoding_score=0.1,
+        )
+        company_2 = companies_factories.CompanyFactory.create(
+            brand="COMPANY 2",
+            description="COMPANY 2",
+            phone="0000000002",
+            coords=Point(-2.8186843, 47.657641),
+            geocoding_score=0.2,
+        )
 
         management.call_command(
             "move_company_data",
