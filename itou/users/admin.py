@@ -475,7 +475,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
                 search_fields.append("asp_uid__exact")
         if search_term.isdecimal():
             search_fields.append("pk__exact")
-            search_fields.append("jobseeker__nir__exact")
+            search_fields.append("jobseeker_profile__nir__exact")
         else:
             search_fields.append("email")
             if "@" not in search_term:
