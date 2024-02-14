@@ -30,6 +30,10 @@ BATCH_GEOCODE_API_PARAMS = {
 
 
 def call_ban_geocoding_api(address, post_code=None, limit=1):
+    if not settings.API_BAN_BASE_URL:
+        logger.info("API_BAN_BASE_URL is not defined, geocoding will NOT be done")
+        return None
+
     api_url = f"{settings.API_BAN_BASE_URL}/search/"
 
     args = {"q": address, "limit": limit}
