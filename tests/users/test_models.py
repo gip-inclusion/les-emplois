@@ -1163,7 +1163,7 @@ class LatestApprovalTestCase(TestCase):
         assert user.latest_common_approval is None
 
 
-@pytest.mark.parametrize("initial_asp_uid", ("08b4e9f755a688b554a6487d96d2a0", None))
+@pytest.mark.parametrize("initial_asp_uid", ("08b4e9f755a688b554a6487d96d2a0", ""))
 @override_settings(SECRET_KEY="test")
 def test_job_seeker_profile_asp_uid(initial_asp_uid):
     profile = JobSeekerProfileFactory(user__pk=42)

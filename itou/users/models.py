@@ -833,7 +833,6 @@ class JobSeekerProfile(models.Model):
         verbose_name="ID unique envoyé à l'ASP",
         help_text="Si vide, une valeur sera assignée automatiquement.",
         max_length=30,
-        null=True,
         blank=True,
         unique=True,
     )
@@ -1010,15 +1009,16 @@ class JobSeekerProfile(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.validate_constraints()
+        if not self.asp_uid:
+            self.asp_uid = salted_hmac(key_salt="job_seeker.id", value=self.user_id).hexdigest()[:30]
+            if update_fields is not None:
+                update_fields = set(update_fields) | {"asp_uid"}
         if self.pe_obfuscated_nir and self.has_data_changed(["nir"]):
             self.pe_obfuscated_nir = None
             self.pe_last_certification_attempt_at = None
             if update_fields is not None:
                 update_fields = set(update_fields) | {"pe_obfuscated_nir", "pe_last_certification_attempt_at"}
         super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
-        if not self.asp_uid:
-            self.asp_uid = salted_hmac(key_salt="job_seeker.id", value=self.user_id).hexdigest()[:30]
-            super().save(update_fields=["asp_uid"])
 
     @staticmethod
     def clean_pole_emploi_fields(cleaned_data):
