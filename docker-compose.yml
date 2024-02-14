@@ -61,6 +61,7 @@ services:
       - ITOU_CACHE=/app/.cache
       - CELLAR_ADDON_HOST=minio:9000
       - VIRTUAL_ENV=/app/.venv-docker
+      - REDIS_URL=redis://redis:6379
     depends_on:
       - postgres
     build:
