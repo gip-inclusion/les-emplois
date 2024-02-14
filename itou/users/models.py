@@ -184,15 +184,6 @@ class User(AbstractUser, AddressMixin):
 
     kind = models.CharField(max_length=20, verbose_name="type", choices=UserKind.choices, blank=False)
 
-    asp_uid = models.TextField(
-        verbose_name="ID unique envoyé à l'ASP",
-        help_text="Si vide, une valeur sera assignée automatiquement.",
-        max_length=30,
-        null=True,
-        blank=True,
-        unique=True,
-    )
-
     identity_provider = models.CharField(
         max_length=20,
         verbose_name="fournisseur d'identité (SSO)",
@@ -288,11 +279,6 @@ class User(AbstractUser, AddressMixin):
     def save(self, *args, **kwargs):
         must_create_profile = self._state.adding and self._auto_create_job_seeker_profile
 
-        if not self.is_job_seeker:
-            self.asp_uid = None  # Needs to be done before the call to .validate_unique()
-        if self.is_job_seeker and not self.asp_uid and self.id:  # When .kind changes
-            self.asp_uid = salted_hmac(key_salt="job_seeker.id", value=self.id).hexdigest()[:30]
-
         # Update department from postal code (if possible).
         self.department = department_from_postcode(self.post_code)
         self.validate_unique()
@@ -310,12 +296,6 @@ class User(AbstractUser, AddressMixin):
         super().save(*args, **kwargs)
 
         if self.is_job_seeker:
-            if not self.asp_uid:
-                # TODO(rsebille): Replace this by using an uuid4() as default value.
-                #  I am not do it _right now_ because we need to make sure the format will work on ASP side,
-                #  and even if it works we will need the field to store the ID already sent.
-                self.asp_uid = salted_hmac(key_salt="job_seeker.id", value=self.id).hexdigest()[:30]
-                super().save(update_fields=["asp_uid"])
             if must_create_profile:
                 JobSeekerProfile.objects.create(user=self)
 
