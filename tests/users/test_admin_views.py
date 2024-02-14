@@ -364,3 +364,56 @@ def test_check_inconsistency_check(admin_client):
             )
         ],
     )
+
+
+def test_search_fields(admin_client):
+    list_url = reverse("admin:users_jobseekerprofile_changelist")
+    job_seeker1 = JobSeekerFactory(
+        first_name="Jean Michel",
+        last_name="Dupont",
+        email="jean.michel@example.com",
+        jobseeker_profile__nir="190031398700953",
+    )
+    url_1 = reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": job_seeker1.jobseeker_profile.pk})
+    job_seeker2 = JobSeekerFactory(
+        first_name="Pierre François",
+        last_name="Martin",
+        email="pierre.francois@example.com",
+        jobseeker_profile__nir="",
+    )
+    url_2 = reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": job_seeker2.jobseeker_profile.pk})
+
+    # Nothing to hide
+    response = admin_client.get(list_url)
+    assertContains(response, url_1)
+    assertContains(response, url_2)
+
+    # Search by ASP uid
+    response = admin_client.get(list_url, {"q": job_seeker1.asp_uid})
+    assertContains(response, url_1)
+    assertNotContains(response, url_2)
+
+    # Search by pk
+    response = admin_client.get(list_url, {"q": job_seeker2.jobseeker_profile.pk})
+    assertNotContains(response, url_1)
+    assertContains(response, url_2)
+
+    # Search by NIR
+    response = admin_client.get(list_url, {"q": job_seeker1.jobseeker_profile.nir})
+    assertContains(response, url_1)
+    assertNotContains(response, url_2)
+
+    # Search on email
+    response = admin_client.get(list_url, {"q": "michel@example"})
+    assertContains(response, url_1)
+    assertNotContains(response, url_2)
+
+    # Search on first_name
+    response = admin_client.get(list_url, {"q": "françois"})
+    assertNotContains(response, url_1)
+    assertContains(response, url_2)
+
+    # Search on last_name
+    response = admin_client.get(list_url, {"q": "martin"})
+    assertNotContains(response, url_1)
+    assertContains(response, url_2)
