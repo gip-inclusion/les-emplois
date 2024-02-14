@@ -1,0 +1,14 @@
+{% load format_filters %}
+<li>
+    <i class="ri-phone-line font-weight-normal me-2"></i>
+    {{ phonenumber|format_phone }}
+    <button class="btn-link font-weight-medium ms-1"
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            data-bs-trigger="manual"
+            data-bs-title="Copié!"
+            data-it-clipboard-button="copy"
+            data-it-copy-to-clipboard="{{ phonenumber|cut:" " }}">
+        <i class="ri-file-copy-line"></i>
+    </button>
+</li>
