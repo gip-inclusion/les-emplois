@@ -1,7 +1,10 @@
 # Journal des changements techniques majeurs
 
 ## 2024-02-14
-- Redis devient un composant requis de l’infrastructure de dev, et la prod l’utilise pour le cache Django. `docker-compose up redis` devrait suffire dans l’environnement de développement.
+- Redis devient un composant requis de l’infrastructure de dev, et la prod l’utilise pour le cache Django. Pour mettre à jour son environnement de développement :
+
+    1. Mettre à jour son `.env` à partir du `.env.template`
+    2. `docker compose up redis --detach`
 
 ## 2024-01-31
 - Suppression de `CLEVER_TOKEN` et `CLEVER_SECRET`.
