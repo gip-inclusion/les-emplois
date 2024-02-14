@@ -849,6 +849,15 @@ class JobSeekerProfile(models.Model):
         blank=True,
     )
 
+    asp_uid = models.TextField(
+        verbose_name="ID unique envoyé à l'ASP",
+        help_text="Si vide, une valeur sera assignée automatiquement.",
+        max_length=30,
+        null=True,
+        blank=True,
+        unique=True,
+    )
+
     education_level = models.CharField(
         max_length=2,
         verbose_name="niveau de formation (ASP)",
@@ -1027,6 +1036,9 @@ class JobSeekerProfile(models.Model):
             if update_fields is not None:
                 update_fields = set(update_fields) | {"pe_obfuscated_nir", "pe_last_certification_attempt_at"}
         super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        if not self.asp_uid:
+            self.asp_uid = salted_hmac(key_salt="job_seeker.id", value=self.user_id).hexdigest()[:30]
+            super().save(update_fields=["asp_uid"])
 
     @staticmethod
     def clean_pole_emploi_fields(cleaned_data):
