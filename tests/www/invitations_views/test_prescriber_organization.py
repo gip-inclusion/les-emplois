@@ -9,6 +9,7 @@ from django.core import mail
 from django.shortcuts import reverse
 from django.test import Client
 from django.utils.html import escape
+from pytest_django.asserts import assertRedirects
 
 from itou.invitations.models import PrescriberWithOrgInvitation
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -149,33 +150,33 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         self.assert_invalid_user(response, "Cette personne fait déjà partie de votre organisation.")
 
 
-class TestPEOrganizationInvitation(TestCase):
-    def setUp(self):
-        super().setUp()
-        self.organization = PrescriberPoleEmploiFactory()
-        self.organization.members.add(PrescriberFactory())
-        self.sender = self.organization.members.first()
-
-    def test_pe_organization_invitation_successful(self):
+class TestPEOrganizationInvitation:
+    def test_successful(self, client):
+        organization = PrescriberPoleEmploiFactory()
+        organization.members.add(PrescriberFactory())
+        sender = organization.members.first()
         guest = PrescriberFactory.build(email=f"sabine.lagrange{global_constants.POLE_EMPLOI_EMAIL_SUFFIX}")
         post_data = POST_DATA | {
             "form-0-first_name": guest.first_name,
             "form-0-last_name": guest.last_name,
             "form-0-email": guest.email,
         }
-        self.client.force_login(self.sender)
-        response = self.client.post(INVITATION_URL, data=post_data, follow=True)
-        self.assertRedirects(response, INVITATION_URL)
+        client.force_login(sender)
+        response = client.post(INVITATION_URL, data=post_data, follow=True)
+        assertRedirects(response, INVITATION_URL)
 
-    def test_pe_organization_invitation_unsuccessful(self):
-        self.client.force_login(self.sender)
+    def test_unsuccessful(self, client):
+        organization = PrescriberPoleEmploiFactory()
+        organization.members.add(PrescriberFactory())
+        sender = organization.members.first()
+        client.force_login(sender)
         post_data = POST_DATA | {
             "form-0-first_name": "René",
             "form-0-last_name": "Boucher",
             "form-0-email": "rene@example.com",
         }
 
-        response = self.client.post(INVITATION_URL, data=post_data)
+        response = client.post(INVITATION_URL, data=post_data)
         # Make sure form is invalid
         assert not response.context["formset"].is_valid()
         assert (
