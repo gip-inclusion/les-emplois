@@ -2,7 +2,7 @@ from django.db.models import F
 from django.urls import reverse
 
 from itou.common_apps.notifications.base_class import BaseNotification
-from itou.communications import registry
+from itou.communications import registry as notifications_registry
 from itou.communications.dispatch import EmailNotification, EmployerNotification
 from itou.prescribers.models import PrescriberMembership
 from itou.utils.emails import get_email_message
@@ -133,7 +133,7 @@ class ProlongationRequestDeniedJobSeeker(BaseNotification):
         return get_email_message(to, context, subject, body)
 
 
-@registry.register_notification()
+@notifications_registry.register
 class PassAcceptedEmployerNotification(EmployerNotification, EmailNotification):
     name = "PASS IAE accepté"
     category = "PASS IAE"
@@ -149,13 +149,13 @@ class PassAcceptedEmployerNotification(EmployerNotification, EmailNotification):
         context.setdefault("siae_survey_link", context["job_application"].to_company.accept_survey_url)
         return context
 
-    def check_context(self, context):
-        if not context["job_application"].approval:
+    def validate_context(self):
+        if not self.context["job_application"].approval:
             raise RuntimeError("No approval found for this job application.")
-        return context
+        return self.context
 
 
-@registry.register_notification()
+@notifications_registry.register
 class ProlongationRequestGrantedEmployerNotification(EmployerNotification, EmailNotification):
     name = "Demande de prolongation acceptée"
     category = "PASS IAE"

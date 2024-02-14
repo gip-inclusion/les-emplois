@@ -1,8 +1,8 @@
-from itou.communications import registry
+from itou.communications import registry as notifications_registry
 from itou.communications.dispatch import EmailNotification, PrescriberOrEmployerNotification
 
 
-@registry.register_notification()
+@notifications_registry.register
 class InvitationAcceptedNotification(PrescriberOrEmployerNotification, EmailNotification):
     """Notification sent to a user when the invitation is accepted"""
 

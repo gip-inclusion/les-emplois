@@ -1,7 +1,7 @@
 from django.db.models import Q
 
 from itou.common_apps.notifications.base_class import BaseNotification
-from itou.communications import registry
+from itou.communications import registry as notifications_registry
 from itou.communications.dispatch import (
     EmailNotification,
     EmployerNotification,
@@ -152,7 +152,7 @@ class NewQualifiedJobAppEmployersNotification(BaseNotification):
         return set(subscribed_pks)
 
 
-@registry.register_notification()
+@notifications_registry.register
 class JobApplicationNewForJobSeekerNotification(JobSeekerNotification, EmailNotification):
     """Notification sent to job seeker when created"""
 
@@ -162,7 +162,7 @@ class JobApplicationNewForJobSeekerNotification(JobSeekerNotification, EmailNoti
     body_template = "apply/email/new_for_job_seeker_body.txt"
 
 
-@registry.register_notification()
+@notifications_registry.register
 class NewJobApplicationForPrescriberNotification(PrescriberNotification, EmailNotification):
     """Notification sent to prescriber when created"""
 
@@ -172,7 +172,7 @@ class NewJobApplicationForPrescriberNotification(PrescriberNotification, EmailNo
     body_template = "apply/email/new_for_prescriber_body.txt"
 
 
-@registry.register_notification()
+@notifications_registry.register
 class JobApplicationNewForEmployerNotification(EmployerNotification, EmailNotification):
     """Notification sent to new employers when created"""
 
@@ -183,7 +183,7 @@ class JobApplicationNewForEmployerNotification(EmployerNotification, EmailNotifi
     body_template = "apply/email/new_for_company_body.txt"
 
 
-@registry.register_notification()
+@notifications_registry.register
 class JobApplicationAcceptedForJobSeekerNotification(JobSeekerNotification, EmailNotification):
     """Notification sent to job seeker when accepted"""
 
@@ -193,7 +193,7 @@ class JobApplicationAcceptedForJobSeekerNotification(JobSeekerNotification, Emai
     body_template = "apply/email/accept_for_job_seeker_body.txt"
 
 
-@registry.register_notification()
+@notifications_registry.register
 class JobApplicationAcceptedForPrescriberNotification(PrescriberNotification, EmailNotification):
     """Notification sent to prescriber when accepted"""
 
@@ -212,7 +212,7 @@ class JobApplicationAcceptedForPrescriberNotification(PrescriberNotification, Em
         return context
 
 
-@registry.register_notification()
+@notifications_registry.register
 class JobApplicationRefusedForJobSeekerNotification(JobSeekerNotification, EmailNotification):
     """Notification sent to job seeker when transferred"""
 
@@ -222,7 +222,7 @@ class JobApplicationRefusedForJobSeekerNotification(JobSeekerNotification, Email
     body_template = "apply/email/refuse_body_for_job_seeker.txt"
 
 
-@registry.register_notification()
+@notifications_registry.register
 class JobApplicationRefusedForPrescriberNotification(PrescriberNotification, EmailNotification):
     """Notification sent to prescriber when refused"""
 
@@ -232,7 +232,7 @@ class JobApplicationRefusedForPrescriberNotification(PrescriberNotification, Ema
     body_template = "apply/email/refuse_body_for_proxy.txt"
 
 
-@registry.register_notification()
+@notifications_registry.register
 class JobApplicationTransferredForJobSeekerNotification(JobSeekerNotification, EmailNotification):
     """Notification sent to job seeker when transferred"""
 
@@ -242,7 +242,7 @@ class JobApplicationTransferredForJobSeekerNotification(JobSeekerNotification, E
     body_template = "apply/email/transfer_job_seeker_body.txt"
 
 
-@registry.register_notification()
+@notifications_registry.register
 class JobApplicationTransferredForPrescriberNotification(PrescriberNotification, EmailNotification):
     """Notification sent to prescriber when transferred"""
 
@@ -252,7 +252,7 @@ class JobApplicationTransferredForPrescriberNotification(PrescriberNotification,
     body_template = "apply/email/transfer_prescriber_body.txt"
 
 
-@registry.register_notification()
+@notifications_registry.register
 class JobApplicationTransferredForEmployerNotification(EmployerNotification, EmailNotification):
     """Notification sent to original employer when transferred"""
 
@@ -263,7 +263,7 @@ class JobApplicationTransferredForEmployerNotification(EmployerNotification, Ema
     body_template = "apply/email/transfer_origin_company_body.txt"
 
 
-@registry.register_notification()
+@notifications_registry.register
 class JobApplicationCanceledForPrescriberNotification(PrescriberNotification, EmailNotification):
     """Notification sent to prescriber when canceled"""
 
@@ -273,7 +273,7 @@ class JobApplicationCanceledForPrescriberNotification(PrescriberNotification, Em
     body_template = "apply/email/cancel_body.txt"
 
 
-@registry.register_notification()
+@notifications_registry.register
 class JobApplicationCanceledForEmployerNotification(EmployerNotification, EmailNotification):
     """Notification sent to employer when canceled"""
 

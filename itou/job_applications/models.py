@@ -1119,7 +1119,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def notifications_new_for_job_seeker(self):
         return JobApplicationNewForJobSeekerNotification(
             self.job_seeker,
-            None,
             job_application=self,
             base_url=get_absolute_url().rstrip("/"),
         )
@@ -1128,7 +1127,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def notifications_accept_for_job_seeker(self):
         return JobApplicationAcceptedForJobSeekerNotification(
             self.job_seeker,
-            None,
             job_application=self,
         )
 
@@ -1152,7 +1150,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def notifications_refuse_for_job_seeker(self):
         return JobApplicationRefusedForJobSeekerNotification(
             self.job_seeker,
-            None,
             job_application=self,
         )
 
@@ -1188,7 +1185,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def notifications_transfer_for_job_seeker(self, notification_context):
         return JobApplicationTransferredForJobSeekerNotification(
             self.job_seeker,
-            None,
             **notification_context,
         )
 
