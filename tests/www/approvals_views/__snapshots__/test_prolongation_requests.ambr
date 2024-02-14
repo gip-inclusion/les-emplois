@@ -125,7 +125,7 @@
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
                                       
-                                          <button class="btn btn-outline-primary" name="wizard_goto_step" type="submit" value="reason">Retour</button>
+                                          <button class="btn btn-outline-primary" formnovalidate="" name="wizard_goto_step" type="submit" value="reason">Retour</button>
                                       
                                       <button class="btn btn-primary" type="submit">Confirmer le refus</button>
                                   </div>
@@ -211,7 +211,7 @@
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
                                       
-                                          <button class="btn btn-outline-primary" name="wizard_goto_step" type="submit" value="reason_explanation">Retour</button>
+                                          <button class="btn btn-outline-primary" formnovalidate="" name="wizard_goto_step" type="submit" value="reason_explanation">Retour</button>
                                       
                                       <button class="btn btn-primary" type="submit">Confirmer le refus</button>
                                   </div>
@@ -350,7 +350,7 @@
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
                                       
-                                          <button class="btn btn-outline-primary" name="wizard_goto_step" type="submit" value="reason">Retour</button>
+                                          <button class="btn btn-outline-primary" formnovalidate="" name="wizard_goto_step" type="submit" value="reason">Retour</button>
                                       
                                       <button class="btn btn-primary" type="submit">Suivant</button>
                                   </div>
@@ -504,7 +504,7 @@
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
                                       
-                                          <button class="btn btn-outline-primary" name="wizard_goto_step" type="submit" value="reason">Retour</button>
+                                          <button class="btn btn-outline-primary" formnovalidate="" name="wizard_goto_step" type="submit" value="reason">Retour</button>
                                       
                                       <button class="btn btn-primary" type="submit">Confirmer le refus</button>
                                   </div>
@@ -658,7 +658,7 @@
                                   <p class="fs-xs">* champ obligatoire</p>
                                   <div class="form-group text-end">
                                       
-                                          <button class="btn btn-outline-primary" name="wizard_goto_step" type="submit" value="reason">Retour</button>
+                                          <button class="btn btn-outline-primary" formnovalidate="" name="wizard_goto_step" type="submit" value="reason">Retour</button>
                                       
                                       <button class="btn btn-primary" type="submit">Confirmer le refus</button>
                                   </div>
