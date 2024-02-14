@@ -38,11 +38,11 @@ class BaseNotification:
 
     def should_send(self):
         if self.is_manageable_by_user():
-            notification_settings = self.user.notification_settings.for_structure(self.structure)
-            if notification_settings:
-                return not notification_settings.disabled_notifications.filter(
-                    notification_class=self.get_class_path()
-                ).exists()
+            return (
+                self.user.notification_settings.for_structure(self.structure)
+                .filter(disabled_notifications__notification_class=self.get_class_path())
+                .exists()
+            )
         return True
 
     def get_context(self):

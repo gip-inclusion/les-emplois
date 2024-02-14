@@ -2,7 +2,6 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.module_loading import import_string
 
 
 class NotificationQuerySet(models.QuerySet):
@@ -22,11 +21,6 @@ class Notification(models.Model):
     def __str__(self):
         return self.name
 
-    def get_class(self):
-        if self.is_obsolete:
-            return
-        return import_string(self.notification_class)
-
 
 class DisabledNotification(models.Model):
     notification = models.ForeignKey("Notification", on_delete=models.CASCADE)
@@ -41,23 +35,10 @@ class DisabledNotification(models.Model):
 
 class NotificationSettingsQuerySet(models.QuerySet):
     def for_structure(self, structure=None):
+        qs = self.prefetch_related("disabled_notifications")
         if structure is None:
-            return (
-                self.filter(
-                    structure_type=None,
-                    structure_pk=None,
-                )
-                .prefetch_related("disabled_notifications")
-                .first()
-            )
-        return (
-            self.filter(
-                structure_type=ContentType.objects.get_for_model(structure),
-                structure_pk=structure.pk,
-            )
-            .prefetch_related("disabled_notifications")
-            .first()
-        )
+            return qs.filter(structure_type=None, structure_pk=None)
+        return qs.filter(structure_type=ContentType.objects.get_for_model(structure), structure_pk=structure.pk)
 
 
 class NotificationSettings(models.Model):
@@ -92,7 +73,7 @@ class NotificationSettings(models.Model):
         return f"Paramètres de notification de {self.user.get_full_name()}"
 
     @staticmethod
-    def retrieve(user, structure=None):
+    def get_or_create(user, structure=None):
         if structure is None:
             structure_type = None
             structure_pk = None

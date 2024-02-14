@@ -13,7 +13,7 @@ class EmailNotification(BaseNotification, metaclass=NotificationMetaclass):
     body_template = None
     from_email = None
 
-    def __init__(self, user, structure, from_email=None, **kwargs):
+    def __init__(self, user, structure=None, /, *, from_email=None, **kwargs):
         self.user = user
         self.structure = structure
         self.from_email = from_email

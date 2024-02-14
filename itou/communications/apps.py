@@ -22,13 +22,12 @@ def sync_notifications(notification_model):
 
     try:
         with transaction.atomic():
-            # Lock notification table
-            cursor = transaction.get_connection().cursor()
-            cursor.execute(f"LOCK TABLE {notification_model._meta.db_table};")
+            with transaction.get_connection().cursor() as cursor:
+                cursor.execute(f"LOCK TABLE {notification_model._meta.db_table};")
 
             # Add new notifications to database.
             active_notifications = []
-            for index, notification_class in enumerate(registry._registry):
+            for notification_class in registry._registry:
                 notification, created = notification_model.objects.update_or_create(
                     notification_class=notification_class.get_class_path(),
                     defaults={
