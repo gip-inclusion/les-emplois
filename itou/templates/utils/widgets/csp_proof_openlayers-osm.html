@@ -2,7 +2,7 @@
 This is exactly django/contrib/gis/templates/gis/openlayers-osm.html with the added 'nonce="{{ CSP_NONCE }}"'
 {% endcomment %}
 {% load i18n l10n %}
-<style type="text/css">
+<style>
     /* beautify ignore:start */
 {% block map_css %}{% get_current_language_bidi as LANGUAGE_BIDI %}
     #{{ id }}_map { width: {{ map_width }}px; height: {{ map_height }}px; }
