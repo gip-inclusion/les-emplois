@@ -216,7 +216,6 @@ def test_stats_ddets_iae_log_visit(client, settings, view_name):
     )
 
 
-@pytest.mark.xfail
 @freeze_time("2023-03-10")
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
 @pytest.mark.parametrize(
