@@ -11,6 +11,7 @@ import pytest
 from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.contrib.admin import site
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.middleware import MessageMiddleware
@@ -1492,3 +1493,18 @@ class UtilsParseResponseToSoupTest(TestCase):
             '<div><a href="http://server.com/slug2/">red mullet</a></div>'
             "</body></html>"
         )
+
+
+@pytest.mark.parametrize("model", site._registry)
+def test_all_admin(admin_client, model):
+    list_url = reverse(f"admin:{model._meta.app_label}_{model._meta.model_name}_changelist")
+    response = admin_client.get(list_url)
+    assert response.status_code == 200
+    response = admin_client.get(list_url, {"q": "foobar"})
+    assert response.status_code == 200
+    # We sometimes have specialized handling for digit only searches
+    response = admin_client.get(list_url, {"q": "12345"})
+    assert response.status_code == 200
+    # We sometimes have specialized handling for emails
+    response = admin_client.get(list_url, {"q": "test@example.com"})
+    assert response.status_code == 200
