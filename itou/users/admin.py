@@ -20,7 +20,13 @@ from itou.institutions.models import InstitutionMembership
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
 from itou.users import models
-from itou.users.admin_forms import ChooseFieldsToTransfer, ItouUserCreationForm, SelectTargetUserForm, UserAdminForm
+from itou.users.admin_forms import (
+    ChooseFieldsToTransfer,
+    ItouUserCreationForm,
+    JobSeekerProfileAdminForm,
+    SelectTargetUserForm,
+    UserAdminForm,
+)
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils.admin import (
     InconsistencyCheckMixin,
@@ -314,7 +320,6 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
             {
                 "fields": (
                     "pk",
-                    "asp_uid",
                     "title",
                     "birthdate",
                     "phone",
@@ -472,7 +477,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
             except ValueError:
                 pass
             else:
-                search_fields.append("asp_uid__exact")
+                search_fields.append("jobseeker_profile__asp_uid__exact")
         if search_term.isdecimal():
             search_fields.append("pk__exact")
             search_fields.append("jobseeker_profile__nir__exact")
@@ -660,6 +665,8 @@ class JobSeekerProfileAdmin(ItouModelAdmin):
     Inlines would only be possible the other way around
     """
 
+    form = JobSeekerProfileAdminForm
+
     raw_id_fields = (
         "user",
         "birth_place",
@@ -696,6 +703,7 @@ class JobSeekerProfileAdmin(ItouModelAdmin):
             {
                 "fields": (
                     "user",
+                    "asp_uid",
                     "birth_place",
                     "birth_country",
                     "education_level",
@@ -770,7 +778,7 @@ class JobSeekerProfileAdmin(ItouModelAdmin):
             except ValueError:
                 pass
             else:
-                search_fields.append("user__asp_uid__exact")
+                search_fields.append("asp_uid__exact")
         if search_term.isdecimal():
             search_fields.append("pk__exact")
             search_fields.append("nir__exact")

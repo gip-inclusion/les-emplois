@@ -1,5 +1,4 @@
 import datetime
-import itertools
 import json
 import random
 import uuid
@@ -1164,48 +1163,14 @@ class LatestApprovalTestCase(TestCase):
         assert user.latest_common_approval is None
 
 
-@pytest.mark.parametrize(
-    "factory,expected",
-    [
-        (JobSeekerFactory, "08b4e9f755a688b554a6487d96d2a0"),
-        (PrescriberFactory, None),
-        (EmployerFactory, None),
-        (LaborInspectorFactory, None),
-    ],
-)
+@pytest.mark.parametrize("initial_asp_uid", ("08b4e9f755a688b554a6487d96d2a0", None))
 @override_settings(SECRET_KEY="test")
-def test_user_asp_uid(factory, expected):
-    user = factory.build(pk=42, asp_uid="")
-
-    assert user.asp_uid == ""
-    user.save()
-
-    if expected is None:
-        assert user.asp_uid is None
-    else:
-        assert user.asp_uid == expected
-
-
-@pytest.mark.parametrize("from_kind,to_kind", itertools.combinations(UserKind, 2))
-@override_settings(SECRET_KEY="test")
-def test_user_asp_uid_when_its_kind_changes(from_kind, to_kind):
-    user = UserFactory(pk=42, asp_uid="", kind=from_kind)
-    print(user.pk)
-
-    if user.is_job_seeker:
-        assert user.asp_uid == "08b4e9f755a688b554a6487d96d2a0"
-    else:
-        assert user.asp_uid is None
-
-    user.kind = to_kind
-    user.save()
-
-    print(user.pk)
-
-    if user.is_job_seeker:
-        assert user.asp_uid == "08b4e9f755a688b554a6487d96d2a0"
-    else:
-        assert user.asp_uid is None
+def test_job_seeker_profile_asp_uid(initial_asp_uid):
+    profile = JobSeekerProfileFactory(user__pk=42)
+    JobSeekerProfile.objects.filter(pk=profile.pk).update(asp_uid=initial_asp_uid)
+    profile.save()
+    profile.refresh_from_db()
+    assert profile.asp_uid == "08b4e9f755a688b554a6487d96d2a0"
 
 
 @pytest.mark.parametrize(

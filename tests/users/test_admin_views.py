@@ -389,7 +389,7 @@ def test_search_fields(admin_client):
     assertContains(response, url_2)
 
     # Search by ASP uid
-    response = admin_client.get(list_url, {"q": job_seeker1.asp_uid})
+    response = admin_client.get(list_url, {"q": job_seeker1.jobseeker_profile.asp_uid})
     assertContains(response, url_1)
     assertNotContains(response, url_2)
 

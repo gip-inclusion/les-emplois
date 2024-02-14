@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserChangeForm
 from django.core.exceptions import ValidationError
 
 from itou.users.enums import UserKind
-from itou.users.models import User
+from itou.users.models import JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError
 
 
@@ -21,9 +21,6 @@ class UserAdminForm(UserChangeForm):
         model = User
         fields = "__all__"
         exclude = ("public_id",)
-        widgets = {
-            "asp_uid": widgets.AdminTextInputWidget,
-        }
 
     def clean(self):
         self.cleaned_data["is_staff"] = self.instance.kind == UserKind.ITOU_STAFF
@@ -45,6 +42,15 @@ class UserAdminForm(UserChangeForm):
             except AddressLookupError:
                 # Nothing to do: re-raised and already logged as error
                 pass
+
+
+class JobSeekerProfileAdminForm(forms.ModelForm):
+    class Meta:
+        model = JobSeekerProfile
+        fields = "__all__"
+        widgets = {
+            "asp_uid": widgets.AdminTextInputWidget,
+        }
 
 
 FakeField = namedtuple("FakeField", ("name",))
