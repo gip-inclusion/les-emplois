@@ -26,6 +26,7 @@ def _migrate_asp_uid(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
+    atomic = False
 
     dependencies = [
         ("users", "0038_jobseekerprofile_asp_uid"),
