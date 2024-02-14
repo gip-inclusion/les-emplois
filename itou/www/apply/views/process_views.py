@@ -70,7 +70,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
         hidden_for_company=False,
     )
 
-    transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
+    transition_logs = job_application.logs.select_related("user").all()
 
     expired_eligibility_diagnosis = EligibilityDiagnosis.objects.last_expired(
         job_seeker=job_application.job_seeker, for_siae=job_application.to_company
@@ -124,7 +124,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
     )
     job_application = get_object_or_404(queryset, id=job_application_id)
 
-    transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
+    transition_logs = job_application.logs.select_related("user").all()
 
     expired_eligibility_diagnosis = EligibilityDiagnosis.objects.last_expired(
         job_seeker=job_application.job_seeker, for_siae=job_application.to_company
@@ -175,7 +175,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     ).prefetch_related("selected_jobs__appellation")
     job_application = get_object_or_404(queryset, id=job_application_id)
 
-    transition_logs = job_application.logs.select_related("user").all().order_by("timestamp")
+    transition_logs = job_application.logs.select_related("user").all()
 
     # We are looking for the most plausible availability date for eligibility criterions
     before_date = job_application.hiring_end_at
@@ -569,7 +569,7 @@ def delete_prior_action(request, job_application_id, prior_action_id):
             "apply/includes/out_of_band_changes_on_job_application_state_update_siae.html",
             context={
                 "job_application": job_application,
-                "transition_logs": job_application.logs.select_related("user").all().order_by("timestamp"),
+                "transition_logs": job_application.logs.select_related("user").all(),
                 "geiq_eligibility_diagnosis": (
                     _get_geiq_eligibility_diagnosis_for_siae(job_application)
                     if job_application.to_company.kind == CompanyKind.GEIQ
@@ -649,11 +649,7 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
                     "add_prior_action_form": PriorActionForm(action_only=True) if prior_action is None else None,
                     # If out-of-band changes are needed
                     "with_oob_state_update": state_update,
-                    "transition_logs": (
-                        job_application.logs.select_related("user").all().order_by("timestamp")
-                        if state_update
-                        else None
-                    ),
+                    "transition_logs": job_application.logs.select_related("user").all() if state_update else None,
                     "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
                 },
             )

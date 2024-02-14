@@ -76,6 +76,10 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
             sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
             sender_kind=SenderKind.PRESCRIBER,
         )
+        for_snapshot = factory.Trait(
+            pk="11111111-1111-1111-1111-111111111111",
+            to_company__for_snapshot=True,
+        )
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
     to_company = factory.SubFactory(CompanyFactory, with_membership=True)
