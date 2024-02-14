@@ -1,3 +1,5 @@
+from django.core.exceptions import ValidationError
+
 from itou.users.models import JobSeekerProfile
 
 
@@ -30,3 +32,16 @@ class JobSeekerProfileFieldsMixin:
     @property
     def cleaned_data_without_profile_fields(self):
         return {k: v for k, v in self.cleaned_data.items() if k not in self.PROFILE_FIELDS}
+
+    def _post_clean(self):
+        super()._post_clean()
+        if hasattr(self.instance, "jobseeker_profile"):
+            jobseeker_profile = self.instance.jobseeker_profile
+        else:
+            jobseeker_profile = JobSeekerProfile()
+        for k, v in self.cleaned_data_from_profile_fields.items():
+            setattr(jobseeker_profile, k, v)
+        try:
+            jobseeker_profile.validate_constraints()
+        except ValidationError as e:
+            self._update_errors(e)

@@ -831,6 +831,7 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileFieldsM
     Info that will be used to search for an existing Pôle emploi approval.
     """
 
+    # TODO(xfernandez): switch this form to a JobSeekerProfile ModelForm
     PROFILE_FIELDS = ["pole_emploi_id", "lack_of_pole_emploi_id_reason", "nir", "lack_of_nir_reason"]
 
     class Meta:
@@ -850,10 +851,6 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileFieldsM
     def clean(self):
         super().clean()
         JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
-        # TODO(xfernandez): switch this form to a JobSeekerProfile ModelForm
-        for field in self.PROFILE_FIELDS:
-            setattr(self.instance.jobseeker_profile, field, self.cleaned_data.get(field))
-        self.instance.jobseeker_profile.validate_constraints()
 
 
 class UserAddressForm(MandatoryAddressFormMixin, forms.ModelForm):
