@@ -1,6 +1,17 @@
 from django.core.exceptions import ValidationError
 
 from itou.users.models import JobSeekerProfile
+from itou.utils import constants as global_constants
+
+
+def validate_francetravail_email(email):
+    allowed_suffixes = (
+        global_constants.POLE_EMPLOI_EMAIL_SUFFIX,
+        global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX,
+    )
+    if not email.endswith(allowed_suffixes):
+        raise ValidationError("L'adresse e-mail doit être une adresse Pôle emploi ou France Travail.")
+    return email
 
 
 class JobSeekerProfileFieldsMixin:
