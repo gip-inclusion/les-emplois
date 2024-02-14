@@ -11,8 +11,8 @@ from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
-from itou.institutions.enums import InstitutionKind
 from itou.utils.apis.metabase import METABASE_DASHBOARDS
+from itou.www.stats import urls as stats_urls
 from itou.www.stats.views import get_params_aci_asp_ids_for_department
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
@@ -77,18 +77,10 @@ def assert_stats_dashboard_equal(values):
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
 @pytest.mark.parametrize(
     "view_name",
-    [
-        "stats_pe_delay_main",
-        "stats_pe_delay_raw",
-        "stats_pe_conversion_main",
-        "stats_pe_conversion_raw",
-        "stats_pe_state_main",
-        "stats_pe_state_raw",
-        "stats_pe_tension",
-    ],
+    [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_pe_")],
 )
-def test_stats_prescriber_log_visit(client, view_name):
-    prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
+def test_stats_pe_log_visit(client, view_name):
+    prescriber_org = PrescriberOrganizationWithMembershipFactory(kind="PE", authorized=True)
     user = prescriber_org.members.get()
     client.force_login(user)
 
@@ -114,20 +106,53 @@ def test_stats_prescriber_log_visit(client, view_name):
 
 
 @freeze_time("2023-03-10")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
 @pytest.mark.parametrize(
     "view_name",
-    [
-        "stats_siae_etp",
-        "stats_siae_hiring",
-    ],
+    [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_cd_")],
 )
-def test_stats_siae_log_visit(client, view_name, settings):
-    company = CompanyFactory(name="El garaje de la esperanza", with_membership=True)
+def test_stats_cd_log_visit(client, settings, view_name):
+    prescriber_org = PrescriberOrganizationWithMembershipFactory(kind="DEPT", authorized=True)
+    user = prescriber_org.members.get()
+
+    settings.STATS_CD_DEPARTMENT_WHITELIST = [prescriber_org.department]
+    settings.STATS_ACI_DEPARTMENT_WHITELIST = [prescriber_org.department]
+
+    client.force_login(user)
+
+    assertQuerySetEqual(StatsDashboardVisit.objects.all(), [])
+
+    response = client.get(reverse(f"stats:{view_name}"))
+    assert response.status_code == 200
+
+    assert_stats_dashboard_equal(
+        (
+            METABASE_DASHBOARDS.get(view_name)["dashboard_id"],
+            view_name,
+            prescriber_org.department,
+            DEPARTMENT_TO_REGION[prescriber_org.department],
+            None,
+            prescriber_org.pk,
+            None,
+            user.kind,
+            user.pk,
+            datetime(2023, 3, 10, tzinfo=timezone.utc),
+        ),
+    )
+
+
+@freeze_time("2023-03-10")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@pytest.mark.parametrize(
+    "view_name",
+    [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_siae_")],
+)
+def test_stats_siae_log_visit(client, settings, view_name):
+    company = CompanyFactory(name="El garaje de la esperanza", kind="ACI", with_membership=True)
     user = company.members.get()
 
-    settings.METABASE_SITE_URL = "http://metabase.fake"
-    settings.METABASE_SECRET_KEY = "foobar"
     settings.STATS_SIAE_USER_PK_WHITELIST = [user.pk]
+    settings.STATS_ACI_DEPARTMENT_WHITELIST = [company.department]
 
     client.force_login(user)
 
@@ -156,19 +181,15 @@ def test_stats_siae_log_visit(client, view_name, settings):
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
 @pytest.mark.parametrize(
     "view_name",
-    [
-        "stats_ddets_iae_auto_prescription",
-        "stats_ddets_iae_follow_siae_evaluation",
-        "stats_ddets_iae_follow_prolongation",
-        "stats_ddets_iae_tension",
-        "stats_ddets_iae_iae",
-        "stats_ddets_iae_siae_evaluation",
-        "stats_ddets_iae_hiring",
-    ],
+    [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_ddets_iae_")],
 )
-def test_stats_ddets_iae_log_visit(client, view_name):
-    institution = InstitutionWithMembershipFactory(kind=InstitutionKind.DDETS_IAE, department="22")
+def test_stats_ddets_iae_log_visit(client, settings, view_name):
+    institution = InstitutionWithMembershipFactory(kind="DDETS IAE", department="22")
     user = institution.members.get()
+
+    settings.STATS_ACI_DEPARTMENT_WHITELIST = [institution.department]
+    settings.STATS_PH_PRESCRIPTION_REGION_WHITELIST = [institution.region]
+
     client.force_login(user)
 
     assertQuerySetEqual(StatsDashboardVisit.objects.all(), [])
@@ -195,23 +216,51 @@ def test_stats_ddets_iae_log_visit(client, view_name):
     )
 
 
+@pytest.mark.xfail
 @freeze_time("2023-03-10")
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
 @pytest.mark.parametrize(
     "view_name",
-    [
-        "stats_dreets_iae_auto_prescription",
-        "stats_dreets_iae_follow_siae_evaluation",
-        "stats_dreets_iae_follow_prolongation",
-        "stats_dreets_iae_tension",
-        "stats_dreets_iae_iae",
-        "stats_dreets_iae_hiring",
-        "stats_dreets_iae_state",
-    ],
+    [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_ddets_log_")],
 )
-def test_stats_dreets_iae_log_visit(client, view_name):
+def test_stats_ddets_log_log_visit(client, settings, view_name):
+    institution = InstitutionWithMembershipFactory(kind="DDETS LOG")
+    user = institution.members.get()
+    client.force_login(user)
+
+    assertQuerySetEqual(StatsDashboardVisit.objects.all(), [])
+
+    url = reverse(f"stats:{view_name}")
+    response = client.get(url)
+    assert response.status_code == 200
+
+    assert_stats_dashboard_equal(
+        (
+            METABASE_DASHBOARDS.get(view_name)["dashboard_id"],
+            view_name,
+            institution.department,
+            DEPARTMENT_TO_REGION[institution.department],
+            None,
+            None,
+            institution.pk,
+            user.kind,
+            user.pk,
+            datetime(2023, 3, 10, tzinfo=timezone.utc),
+        ),
+    )
+
+
+@freeze_time("2023-03-10")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@pytest.mark.parametrize(
+    "view_name",
+    [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_dreets_iae_")],
+)
+def test_stats_dreets_iae_log_visit(client, settings, view_name):
     institution = InstitutionWithMembershipFactory(kind="DREETS IAE")
     user = institution.members.get()
+
+    settings.STATS_PH_PRESCRIPTION_REGION_WHITELIST = [institution.region]
     client.force_login(user)
 
     assertQuerySetEqual(StatsDashboardVisit.objects.all(), [])
@@ -239,17 +288,106 @@ def test_stats_dreets_iae_log_visit(client, view_name):
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
 @pytest.mark.parametrize(
     "view_name",
-    [
-        "stats_dgefp_auto_prescription",
-        "stats_dgefp_follow_siae_evaluation",
-        "stats_dgefp_follow_prolongation",
-        "stats_dgefp_iae",
-        "stats_dgefp_siae_evaluation",
-        "stats_dgefp_af",
-    ],
+    [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_dgefp_")],
 )
 def test_stats_dgefp_log_visit(client, view_name):
     institution = InstitutionWithMembershipFactory(kind="DGEFP")
+    user = institution.members.get()
+    client.force_login(user)
+
+    assertQuerySetEqual(StatsDashboardVisit.objects.all(), [])
+
+    response = client.get(reverse(f"stats:{view_name}"))
+    assert response.status_code == 200
+
+    assert_stats_dashboard_equal(
+        (
+            METABASE_DASHBOARDS.get(view_name)["dashboard_id"],
+            view_name,
+            None,
+            None,
+            None,
+            None,
+            institution.pk,
+            user.kind,
+            user.pk,
+            datetime(2023, 3, 10, tzinfo=timezone.utc),
+        ),
+    )
+
+
+@freeze_time("2023-03-10")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@pytest.mark.parametrize(
+    "view_name",
+    [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_dihal_")],
+)
+def test_stats_dihal_log_visit(client, view_name):
+    institution = InstitutionWithMembershipFactory(kind="DIHAL")
+    user = institution.members.get()
+    client.force_login(user)
+
+    assertQuerySetEqual(StatsDashboardVisit.objects.all(), [])
+
+    response = client.get(reverse(f"stats:{view_name}"))
+    assert response.status_code == 200
+
+    assert_stats_dashboard_equal(
+        (
+            METABASE_DASHBOARDS.get(view_name)["dashboard_id"],
+            view_name,
+            None,
+            None,
+            None,
+            None,
+            institution.pk,
+            user.kind,
+            user.pk,
+            datetime(2023, 3, 10, tzinfo=timezone.utc),
+        ),
+    )
+
+
+@freeze_time("2023-03-10")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@pytest.mark.parametrize(
+    "view_name",
+    [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_drihl_")],
+)
+def test_stats_drihl_log_visit(client, view_name):
+    institution = InstitutionWithMembershipFactory(kind="DRIHL")
+    user = institution.members.get()
+    client.force_login(user)
+
+    assertQuerySetEqual(StatsDashboardVisit.objects.all(), [])
+
+    response = client.get(reverse(f"stats:{view_name}"))
+    assert response.status_code == 200
+
+    assert_stats_dashboard_equal(
+        (
+            METABASE_DASHBOARDS.get(view_name)["dashboard_id"],
+            view_name,
+            None,
+            None,
+            None,
+            None,
+            institution.pk,
+            user.kind,
+            user.pk,
+            datetime(2023, 3, 10, tzinfo=timezone.utc),
+        ),
+    )
+
+
+@freeze_time("2023-03-10")
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+@pytest.mark.parametrize(
+    "view_name",
+    [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_iae_network_")],
+)
+def test_stats_iae_network_log_visit(client, view_name):
+    institution = InstitutionWithMembershipFactory(kind="Réseau IAE")
     user = institution.members.get()
     client.force_login(user)
 
