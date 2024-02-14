@@ -6,10 +6,22 @@ from django.views import debug
 from django.views.decorators.cache import never_cache
 
 
+IGNORE_SET = {
+    # Cleanup most keys in Django 5
+    "DEFAULT_FILE_STORAGE",
+    "STATICFILES_STORAGE",
+    "USE_L10N",
+}
+
+
 def get_settings_list():
     # Code heavily inspired from django.core.management.commands.diffsettings
     setting_cleanser = debug.SafeExceptionReporterFilter().cleanse_setting
-    return [(k, setting_cleanser(k, getattr(settings, k))) for k in sorted(dir(settings)) if not k.startswith("_")]
+    return [
+        (k, setting_cleanser(k, getattr(settings, k)))
+        for k in sorted(dir(settings))
+        if not k.startswith("_") and k not in IGNORE_SET
+    ]
 
 
 @never_cache
