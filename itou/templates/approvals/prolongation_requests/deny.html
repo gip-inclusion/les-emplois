@@ -60,7 +60,7 @@
                                 <p class="fs-xs">* champ obligatoire</p>
                                 <div class="form-group text-end">
                                     {% if wizard.steps.prev %}
-                                        {% bootstrap_button "Retour" button_type="submit" button_class="btn btn-outline-primary" name="wizard_goto_step" value=wizard.steps.prev %}
+                                        {% bootstrap_button "Retour" button_type="submit" button_class="btn btn-outline-primary" name="wizard_goto_step" value=wizard.steps.prev formnovalidate=True %}
                                     {% else %}
                                         <a class="btn btn-link btn-outline-primary" href="{% url "approvals:prolongation_request_show" prolongation_request.pk %}">Annuler</a>
                                     {% endif %}
