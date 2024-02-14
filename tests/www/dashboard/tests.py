@@ -930,6 +930,39 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         assert user.jobseeker_profile.lack_of_nir_reason == ""
         assert user.jobseeker_profile.nir == NEW_NIR.replace(" ", "")
 
+    def test_edit_existing_nir(self):
+        other_jobseeker = JobSeekerFactory()
+
+        user = JobSeekerFactory(jobseeker_profile__nir="", jobseeker_profile__lack_of_nir_reason="")
+        self.client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+        response = self.client.get(url)
+        # Check that the NIR field is enabled
+        assert not response.context["form"]["nir"].field.disabled
+        self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+
+        post_data = {
+            "email": "bob@saintclar.net",
+            "title": "M",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": "20/12/1978",
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            "address_line_1": "10, rue du Gué",
+            "address_line_2": "Sous l'escalier",
+            "post_code": "35400",
+            "city": "Saint-Malo",
+            "lack_of_nir": False,
+            "nir": other_jobseeker.jobseeker_profile.nir,
+        }
+        response = self.client.post(url, data=post_data)
+        self.assertContains(response, "Le numéro de sécurité sociale est déjà associé à un autre utilisateur")
+
+        user.jobseeker_profile.refresh_from_db()
+        assert user.jobseeker_profile.lack_of_nir_reason == ""
+        assert user.jobseeker_profile.nir == ""
+
     def test_edit_sso(self):
         user = JobSeekerFactory(
             identity_provider=IdentityProvider.FRANCE_CONNECT,
