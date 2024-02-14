@@ -199,7 +199,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "user__first_name",
         "user__last_name",
         "user__email",
-        "user__nir",
+        "user__jobseeker_profile__nir",
     )
     list_filter = (
         IsValidFilter,
