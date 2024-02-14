@@ -38,7 +38,7 @@ class Command(BaseCommand):
         self.stdout.write(f"params: {file_path=}, {wet_run=}")
 
         def check_id_itou(approval: Approval, id_itou: str):
-            actual_hash_id = approval.user.asp_uid
+            actual_hash_id = approval.user.jobseeker_profile.asp_uid
             if actual_hash_id != id_itou:
                 raise ItouHashError(f"User hash ids don't match {id_itou=} {actual_hash_id=}")
 
@@ -60,7 +60,7 @@ class Command(BaseCommand):
             reader = csv.reader(input_file, delimiter=CSV_SEPARATOR)
             for line_number, (id_itou, _, _, approval_number, _, end_date, _) in enumerate(reader, 1):
                 try:
-                    approval = Approval.objects.select_related("user").get(number=approval_number)
+                    approval = Approval.objects.select_related("user__jobseeker_profile").get(number=approval_number)
                     check_id_itou(approval, id_itou)
                     new_end_date = get_end_date_column_value(approval, end_date)
                 except models.ObjectDoesNotExist:
