@@ -6,8 +6,8 @@ from django.forms.models import modelformset_factory
 
 from itou.invitations.models import EmployerInvitation, LaborInspectorInvitation, PrescriberWithOrgInvitation
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.users.forms import validate_francetravail_email
 from itou.users.models import User
-from itou.utils import constants as global_constants
 
 
 ########################################################################
@@ -45,11 +45,8 @@ class PrescriberWithOrgInvitationForm(forms.ModelForm):
         email = self.cleaned_data["email"]
 
         self._invited_user_exists_error(email)
-        if self.organization.kind == PrescriberOrganizationKind.PE and not email.endswith(
-            global_constants.POLE_EMPLOI_EMAIL_SUFFIX
-        ):
-            error = forms.ValidationError("L'adresse e-mail doit être une adresse Pôle emploi")
-            self.add_error("email", error)
+        if self.organization.kind == PrescriberOrganizationKind.PE:
+            validate_francetravail_email(email)
         return email
 
     def save(self, *args, **kwargs):

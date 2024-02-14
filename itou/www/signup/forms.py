@@ -10,6 +10,7 @@ from itou.common_apps.address.departments import DEPARTMENTS
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import Title, UserKind
+from itou.users.forms import validate_francetravail_email
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.apis import api_entreprise, geocoding as api_geocoding
@@ -355,7 +356,4 @@ class PrescriberCheckPEemail(forms.Form):
     )
 
     def clean_email(self):
-        email = self.cleaned_data["email"]
-        if not email.endswith(global_constants.POLE_EMPLOI_EMAIL_SUFFIX):
-            raise ValidationError("L'adresse e-mail doit être une adresse Pôle emploi.")
-        return email
+        return validate_francetravail_email(self.cleaned_data["email"])
