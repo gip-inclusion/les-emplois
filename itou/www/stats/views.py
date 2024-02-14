@@ -445,7 +445,9 @@ def render_stats_ddets(request, page_title, extra_context, extend_stats_to_whole
         "department": department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
-    context.update(extra_context)
+    if extra_context:
+        context.update(extra_context)
+
     if params is None:
         if extend_stats_to_whole_region:
             params = get_params_for_region(region)
@@ -455,10 +457,6 @@ def render_stats_ddets(request, page_title, extra_context, extend_stats_to_whole
 
 
 def render_stats_ddets_iae(request, page_title, extra_context=None, extend_stats_to_whole_region=False, params=None):
-    if extra_context is None:
-        # Do not use mutable default arguments,
-        # see https://florimond.dev/en/posts/2018/08/python-mutable-defaults-are-the-source-of-all-evil/
-        extra_context = {}
     get_current_institution_or_404(request)
     if not utils.can_view_stats_ddets_iae(request):
         raise PermissionDenied
