@@ -87,7 +87,7 @@ class CompanyMembershipInline(ItouTabularInline):
 
     @admin.display(description="Notifications désactivées")
     def disabled_notifications(self, obj):
-        disabled_notifications = NotificationSettings.retrieve(obj.user, obj.company).disabled_notifications_names
+        disabled_notifications = NotificationSettings.get_or_create(obj.user, obj.company).disabled_notifications_names
         return mark_safe(
             "<ul>" + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications]) + "<ul>"
         )
@@ -121,7 +121,9 @@ class PrescriberMembershipInline(ItouTabularInline):
 
     @admin.display(description="Notifications désactivées")
     def disabled_notifications(self, obj):
-        disabled_notifications = NotificationSettings.retrieve(obj.user, obj.organization).disabled_notifications_names
+        disabled_notifications = NotificationSettings.get_or_create(
+            obj.user, obj.organization
+        ).disabled_notifications_names
         return mark_safe(
             "<ul>" + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications]) + "<ul>"
         )
@@ -409,7 +411,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
             return "Voir pour chaque structure ci-dessous"
         if obj.is_prescriber_with_authorized_org:
             return "Voir pour chaque organisation ci-dessous"
-        disabled_notifications = NotificationSettings.retrieve(obj).disabled_notifications_names
+        disabled_notifications = NotificationSettings.get_or_create(obj).disabled_notifications_names
         return mark_safe(
             "<ul>" + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications]) + "<ul>"
         )
@@ -828,7 +830,7 @@ class JobSeekerProfileAdmin(InconsistencyCheckMixin, ItouModelAdmin):
 
     @admin.display(description="Notifications désactivées")
     def disabled_notifications(self, obj):
-        disabled_notifications = NotificationSettings.retrieve(obj.user).disabled_notifications_names
+        disabled_notifications = NotificationSettings.get_or_create(obj.user).disabled_notifications_names
         return mark_safe(
             "<ul>" + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications]) + "<ul>"
         )

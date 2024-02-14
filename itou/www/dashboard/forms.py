@@ -311,7 +311,7 @@ class EditUserNotificationForm(forms.Form):
         self.structure = structure
         self.layout = {}
 
-        notification_settings = self.user.notification_settings.for_structure(self.structure)
+        notification_settings = self.user.notification_settings.for_structure(self.structure).first()
         if notification_settings:
             disabled_notifications = [
                 disabled.notification_class for disabled in notification_settings.disabled_notifications.all()
@@ -356,7 +356,7 @@ class EditUserNotificationForm(forms.Form):
                 self.layout[category_slug]["notifications"].append(notification_class_path)
 
     def save(self):
-        notification_settings = NotificationSettings.retrieve(self.user, self.structure)
+        notification_settings = NotificationSettings.get_or_create(self.user, self.structure)
         disabled_notifications = []
 
         for field_name, value in self.cleaned_data.items():
