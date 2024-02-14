@@ -1,10 +1,17 @@
 <ul class="list-step" id="transition_logs_{{ job_application.pk }}"{% if out_of_band_swap %} hx-swap-oob="true"{% endif %}>
-    {% for log in transition_logs %}
+    {% with dt_format="d F Y à H:i" %}
+        {% for log in transition_logs %}
+            <li>
+                <time datetime="{{ log.timestamp.isoformat }}">Le {{ log.timestamp|date:dt_format }}</time>
+                <span>
+                    Passé en "<b>{{ log.pretty_to_state }}</b>"
+                    {% if log.user %}par {{ log.user.get_full_name }}{% endif %}
+                </span>
+            </li>
+        {% endfor %}
         <li>
-            <time datetime="{{ log.timestamp|date:"d F Y à H:i" }}">Le {{ log.timestamp|date:"d F Y à H:i" }}</time>
-            <span>
-                Passé en "<b>{{ log.pretty_to_state }}</b>"
-            </span>
+            <time datetime="{{ job_application.created_at.isoformat }}">Le {{ job_application.created_at|date:dt_format }}</time>
+            <span>Nouvelle candidature</span>
         </li>
-    {% endfor %}
+    {% endwith %}
 </ul>

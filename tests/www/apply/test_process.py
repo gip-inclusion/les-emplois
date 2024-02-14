@@ -13,7 +13,6 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
 from django.utils.http import urlencode
-from django.utils.timezone import localtime
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateUsed
 
@@ -65,6 +64,7 @@ REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY = (
 )
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class ProcessViewsTest(TestCase):
     DIAGORIENTE_INVITE_TITLE = "Ce candidat n’a pas de CV ?"
     DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE = "Invitez le prescripteur à en créer un via notre partenaire Diagoriente."
@@ -395,11 +395,18 @@ class ProcessViewsTest(TestCase):
 
     def test_details_for_prescriber_with_transition_logs(self, *args, **kwargs):
         """As a prescriber, I can access transition logs for job_applications details for prescribers."""
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
+            job_application = JobApplicationFactory(
+                for_snapshot=True,
+                sent_by_authorized_prescriber_organisation=True,
+            )
 
+        user = job_application.to_company.members.first()
         # transition logs setup
-        job_application.process(user=job_application.to_company.active_members.first())
-        jatl = job_application.logs.first()
+        with freeze_time("2023-12-12 13:37:00", tz_offset=-1):
+            job_application.process(user=user)
+        with freeze_time("2023-12-12 13:38:00", tz_offset=-1):
+            job_application.accept(user=user)
 
         prescriber = job_application.sender_prescriber_organization.members.first()
         self.client.force_login(prescriber)
@@ -408,19 +415,22 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         html_fragment = self._get_transition_logs_content(response, job_application)
 
-        self.assertIsNotNone(html_fragment)
-        self.assertEqual(html_fragment.b.string, jatl.pretty_to_state)
-        self.assertTrue(
-            html_fragment.find("time", string=f'Le {date_format(localtime(jatl.timestamp), "d F Y à H:i")}')
-        )
+        assert str(html_fragment) == self.snapshot
 
     def test_details_for_job_seeker_with_transition_logs(self, *args, **kwargs):
         """As a prescriber, I can access transition logs for job_applications details for prescribers."""
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
+            job_application = JobApplicationFactory(
+                for_snapshot=True,
+                sent_by_authorized_prescriber_organisation=True,
+            )
 
+        user = job_application.to_company.active_members.first()
         # transition logs setup
-        job_application.process(user=job_application.to_company.active_members.first())
-        jatl = job_application.logs.first()
+        with freeze_time("2023-12-12 13:37:00", tz_offset=-1):
+            job_application.process(user=user)
+        with freeze_time("2023-12-12 13:38:00", tz_offset=-1):
+            job_application.accept(user=user)
 
         self.client.force_login(job_application.job_seeker)
 
@@ -428,12 +438,30 @@ class ProcessViewsTest(TestCase):
         response = self.client.get(url)
         html_fragment = self._get_transition_logs_content(response, job_application)
 
-        self.assertIsNotNone(html_fragment)
-        self.assertEqual(html_fragment.b.string, jatl.pretty_to_state)
-        # transition logs user is hidden for job seeker
-        self.assertTrue(
-            html_fragment.find("time", string=f'Le {date_format(localtime(jatl.timestamp), "d F Y à H:i")}')
-        )
+        assert str(html_fragment) == self.snapshot
+
+    def test_details_for_company_with_transition_logs(self, *args, **kwargs):
+        """As a prescriber, I can access transition logs for job_applications details for prescribers."""
+        with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
+            job_application = JobApplicationFactory(
+                for_snapshot=True,
+                sent_by_authorized_prescriber_organisation=True,
+            )
+
+        user = job_application.to_company.active_members.first()
+        # transition logs setup
+        with freeze_time("2023-12-12 13:37:00", tz_offset=-1):
+            job_application.process(user=user)
+        with freeze_time("2023-12-12 13:38:00", tz_offset=-1):
+            job_application.accept(user=user)
+
+        self.client.force_login(user)
+
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        html_fragment = self._get_transition_logs_content(response, job_application)
+
+        assert str(html_fragment) == self.snapshot
 
     def test_details_for_job_seeker_when_refused(self, *args, **kwargs):
         job_application = JobApplicationFactory(
@@ -2314,9 +2342,13 @@ def test_add_prior_action_new(client):
     assert not job_application.prior_actions.exists()
 
 
-def test_add_prior_action_processing(client):
+@freeze_time("2023-12-12 13:37:00", tz_offset=-1)
+def test_add_prior_action_processing(client, snapshot):
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING
+        for_snapshot=True,
+        to_company__kind=CompanyKind.GEIQ,
+        state=JobApplicationWorkflow.STATE_PROCESSING,
+        created_at=datetime.datetime(2023, 12, 10, 10, 11, 11, tzinfo=datetime.timezone.utc),
     )
     client.force_login(job_application.to_company.members.first())
     add_prior_action_url = reverse("apply:add_prior_action", kwargs={"job_application_id": job_application.pk})
@@ -2336,6 +2368,8 @@ def test_add_prior_action_processing(client):
     assert prior_action.action == job_applications_enums.Prequalification.AFPR
     assert prior_action.dates.lower == today
     assert prior_action.dates.upper == today + relativedelta(days=2)
+    soup = parse_response_to_soup(response, selector=f"#transition_logs_{job_application.pk}")
+    assert str(soup) == snapshot
 
     # State is accepted
     job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
@@ -2430,9 +2464,13 @@ def test_delete_prior_action_accepted(client):
 
 
 @pytest.mark.parametrize("with_geiq_diagnosis", [True, False])
-def test_delete_prior_action(client, with_geiq_diagnosis):
+@freeze_time("2023-12-12 13:37:00", tz_offset=-1)
+def test_delete_prior_action(client, snapshot, with_geiq_diagnosis):
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING
+        for_snapshot=True,
+        to_company__kind=CompanyKind.GEIQ,
+        state=JobApplicationWorkflow.STATE_PROCESSING,
+        created_at=datetime.datetime(2023, 12, 10, 10, 11, 11, tzinfo=datetime.timezone.utc),
     )
     prior_action1 = PriorActionFactory(
         job_application=job_application, action=job_applications_enums.Prequalification.AFPR
@@ -2482,6 +2520,8 @@ def test_delete_prior_action(client, with_geiq_diagnosis):
     # Delete second action
     response = client.post(delete_prior_action2_url, data={})
     assert response.status_code == 200
+    soup = parse_response_to_soup(response, selector=f"#transition_logs_{job_application.pk}")
+    assert str(soup) == snapshot
     update_page_with_htmx(
         simulated_page,
         f"#delete_prior_action_{ prior_action2.pk }_modal > div > div > div > form",
