@@ -3,7 +3,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
@@ -41,7 +40,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": "1990-03-13",
       "city": "",
@@ -79,7 +77,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
@@ -117,7 +114,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
@@ -155,7 +151,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
@@ -193,7 +188,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
@@ -231,7 +225,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
@@ -269,7 +262,6 @@
     "fields": {
       "address_line_1": "5, rue Nicolas Poussin",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": "1978-07-14",
       "city": "TOURS",
@@ -307,7 +299,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
@@ -345,7 +336,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
@@ -383,7 +373,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
@@ -421,7 +410,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
@@ -459,7 +447,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
@@ -497,7 +484,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
@@ -535,7 +521,6 @@
     "fields": {
       "address_line_1": "1 rue de l'adresse",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": "2000-01-01",
       "city": "BELFORT",
@@ -573,7 +558,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
@@ -611,7 +595,6 @@
     "fields": {
       "address_line_1": "19, rue du tuyau percé",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": "1970-01-01",
       "city": "Pau",
@@ -649,7 +632,6 @@
     "fields": {
       "address_line_1": "5, rue du Bassin",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": "1950-01-01",
       "city": "Montpellier",
@@ -687,7 +669,6 @@
     "fields": {
       "address_line_1": "5, rue du Bassin",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": "1970-01-01",
       "city": "Montpellier",
@@ -725,7 +706,6 @@
     "fields": {
       "address_line_1": "5, rue du Bassin",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": "1970-01-01",
       "city": "Montpellier",
@@ -763,7 +743,6 @@
     "fields": {
       "address_line_1": "5, rue du Bassin",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": "1970-01-01",
       "city": "Montpellier",
@@ -801,7 +780,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
@@ -839,7 +817,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
@@ -877,7 +854,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
@@ -915,7 +891,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": "1985-03-09",
       "city": "",
@@ -953,7 +928,6 @@
     "fields": {
       "address_line_1": "",
       "address_line_2": "",
-      "asp_uid": null,
       "ban_api_resolved_address": null,
       "birthdate": null,
       "city": "",
