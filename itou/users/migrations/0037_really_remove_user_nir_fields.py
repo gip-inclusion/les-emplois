@@ -9,14 +9,4 @@ class Migration(migrations.Migration):
         ("users", "0036_remove_user_lack_of_nir_reason_remove_user_nir"),
     ]
 
-    operations = [
-        # This migration can be merged into 0036 once run in production
-        migrations.RunSQL(
-            'ALTER TABLE "users_user" DROP COLUMN nir;',
-            elidable=True,
-        ),
-        migrations.RunSQL(
-            'ALTER TABLE "users_user" DROP COLUMN lack_of_nir_reason;',
-            elidable=True,
-        ),
-    ]
+    operations = []
