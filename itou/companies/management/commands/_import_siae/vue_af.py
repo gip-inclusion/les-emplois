@@ -18,6 +18,10 @@ an "siae_key" throughout the import_siae.py script code.
 
 """
 
+import dataclasses
+import datetime
+from collections import defaultdict
+
 from django.utils import timezone
 
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
@@ -127,28 +131,23 @@ def get_vue_af_df():
     return df
 
 
-def get_siae_key_to_convention_end_date(vue_af_df):
-    """
-    For each siae_key (asp_id+kind) we figure out the convention end date.
-    This convention end date (future or past) is eventually stored as siae.convention_end_date.
-    """
-    siae_key_to_convention_end_date = {}
-    af_df = vue_af_df.copy()  # Leave the main dataframe untouched!
-    af_df = af_df[af_df.has_active_state]
-    for _, row in af_df.iterrows():
-        convention_end_date = row.end_at
-        siae_key = (row.asp_id, row.kind)
-        if siae_key in siae_key_to_convention_end_date:
-            if convention_end_date > siae_key_to_convention_end_date[siae_key]:
-                siae_key_to_convention_end_date[siae_key] = convention_end_date
-        else:
-            siae_key_to_convention_end_date[siae_key] = convention_end_date
-    return siae_key_to_convention_end_date
+@dataclasses.dataclass
+class Convention:
+    has_active_state: bool = False
+    end_at: datetime.date = None
+
+    @property
+    def is_active(self):
+        return self.has_active_state and timezone.now().date() <= self.end_at
 
 
-def get_active_siae_keys(vue_af_df):
-    return [
-        siae_key
-        for siae_key, convention_end_date in get_siae_key_to_convention_end_date(vue_af_df).items()
-        if timezone.now() < timezone.make_aware(convention_end_date)
-    ]
+def get_conventions_by_siae_key(vue_af_df):
+    siae_conventions = defaultdict(list)
+    for _, row in vue_af_df.iterrows():
+        siae_conventions[(row.asp_id, row.kind)].append(
+            Convention(
+                has_active_state=row.has_active_state,
+                end_at=timezone.make_aware(row.end_at).date(),
+            )
+        )
+    return {key: max(conventions, key=lambda i: i.end_at) for key, conventions in siae_conventions.items()}

@@ -36,7 +36,7 @@ from itou.companies.management.commands._import_siae.siae import (
     update_siret_and_auth_email_of_existing_siaes,
 )
 from itou.companies.management.commands._import_siae.vue_af import (
-    get_active_siae_keys,
+    get_conventions_by_siae_key,
     get_vue_af_df,
 )
 from itou.companies.management.commands._import_siae.vue_structure import (
@@ -70,22 +70,22 @@ class Command(BaseCommand):
 
         vue_af_df = get_vue_af_df()
         af_number_to_row = {row.number: row for _, row in vue_af_df.iterrows()}
-        active_siae_keys = get_active_siae_keys(vue_af_df)
+        conventions_by_siae_key = get_conventions_by_siae_key(vue_af_df)
 
         # Sanitize data from users
         errors += delete_user_created_siaes_without_members()
         errors += manage_staff_created_siaes()
 
         errors += update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row)
-        update_existing_conventions(siret_to_siae_row, active_siae_keys)
-        create_new_siaes(siret_to_siae_row, active_siae_keys)
-        create_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
+        update_existing_conventions(siret_to_siae_row, conventions_by_siae_key)
+        create_new_siaes(siret_to_siae_row, conventions_by_siae_key)
+        create_conventions(siret_to_siae_row, conventions_by_siae_key)
         delete_conventions()
         manage_financial_annexes(af_number_to_row)
         cleanup_siaes_after_grace_period()
 
         # Run some updates a second time.
-        update_existing_conventions(siret_to_siae_row, active_siae_keys)
+        update_existing_conventions(siret_to_siae_row, conventions_by_siae_key)
         errors += update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row)
         delete_conventions()
 

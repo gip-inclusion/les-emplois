@@ -7,7 +7,6 @@ All these helpers are specific to SIAE logic (not GEIQ, EA, EATT).
 """
 
 from django.db import transaction
-from django.db.models import Q
 from django.utils import timezone
 
 from itou.common_apps.address.departments import department_from_postcode
@@ -122,39 +121,45 @@ def update_siret_and_auth_email_of_existing_siaes(siret_to_siae_row):
     return errors
 
 
-def create_new_siaes(siret_to_siae_row, active_siae_keys):
+def create_new_siaes(siret_to_siae_row, conventions_by_siae_key):
     creatable_siaes = []
 
     asp_id_to_siae_row = {row.asp_id: row for row in siret_to_siae_row.values()}
-    for asp_id, kind in active_siae_keys:
+    for (asp_id, kind), convention in conventions_by_siae_key.items():
         if asp_id not in asp_id_to_siae_row:
             continue
         row = asp_id_to_siae_row[asp_id]
 
         existing_siaes = Company.objects.select_related("convention").filter(convention__asp_id=asp_id, kind=kind)
-        if existing_siaes:
-            # Siaes with this asp_id already exist, no need to create one more.
-            total_existing_siaes_with_asp_source = 0
-            for existing_siae in existing_siaes:
-                assert existing_siae.should_have_convention
-                if existing_siae.source == Company.SOURCE_ASP:
-                    total_existing_siaes_with_asp_source += 1
-                    # Siret should have been fixed by update_siret_and_auth_email_of_existing_siaes().
-                    assert existing_siae.siret == row.siret
-                else:
-                    assert existing_siae.source == Company.SOURCE_USER_CREATED
-
-            # Duplicate siaes should have been deleted.
-            assert total_existing_siaes_with_asp_source == 1
-            continue
+        # Siaes with this asp_id already exist, no need to create one more.
+        for existing_siae in existing_siaes:
+            assert existing_siae.should_have_convention
+            if existing_siae.source == Company.SOURCE_ASP:
+                # Siret should have been fixed by update_siret_and_auth_email_of_existing_siaes().
+                assert existing_siae.siret == row.siret
+                continue
 
         try:
-            existing_siae = Company.objects.get(~Q(source=Company.SOURCE_ASP), siret=row.siret, kind=kind)
+            existing_siae = Company.objects.get(siret=row.siret, kind=kind)
         except Company.DoesNotExist:
-            assert not SiaeConvention.objects.filter(asp_id=asp_id, kind=kind).exists()
-            if (row.asp_id, kind) in active_siae_keys:
-                creatable_siaes.append(build_siae(row, kind, is_active=True))
+            if SiaeConvention.objects.filter(asp_id=asp_id, kind=kind).exists():
+                # Shouldn't happen, if it does it's probably because we messed up at some point
+                print(
+                    f"WARNING: Trying to create a new SIAE {row.siret=} {kind=} "
+                    f"but the convention {asp_id=} {kind=} already exists"
+                )
+                continue
+            if not convention.is_active:
+                # The SIAE doesn't exist in our data *and* is not active either, so don't create it.
+                # Existing SIAE (active or inactive) will be converted into the `else` branch or the `except`.
+                # Be aware that removing this guard will recreate all the previous SIAE that existed at some point
+                # in the ASP's data but have since "disappeared" from ours, SIAE that we moved after a change
+                # of Siret for example.
+                continue
+            creatable_siaes.append(build_siae(row, kind, is_active=True))
         else:
+            if existing_siae.source == Company.SOURCE_ASP:
+                continue
             # Siae with this siret+kind already exists but with the wrong source.
             assert existing_siae.source in [Company.SOURCE_USER_CREATED, Company.SOURCE_STAFF_CREATED]
             assert existing_siae.should_have_convention
