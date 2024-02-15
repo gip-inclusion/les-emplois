@@ -188,8 +188,6 @@ DATABASES = {
     }
 }
 
-SQL_DEBUG = bool(os.getenv("SQL_DEBUG"))
-
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 AUTH_PASSWORD_VALIDATORS = [
