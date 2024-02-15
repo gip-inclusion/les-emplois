@@ -15,6 +15,7 @@ from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
+    JobSeekerProfileFactory,
     PrescriberFactory,
 )
 from tests.utils.test import BASE_NUM_QUERIES, assertMessages
@@ -417,3 +418,44 @@ def test_search_fields(admin_client):
     response = admin_client.get(list_url, {"q": "martin"})
     assertNotContains(response, url_1)
     assertContains(response, url_2)
+
+
+def test_profile_check_inconsistency_check(admin_client):
+    profile = JobSeekerProfileFactory()
+
+    response = admin_client.post(
+        reverse("admin:users_jobseekerprofile_changelist"),
+        {
+            "action": "check_inconsistencies",
+            helpers.ACTION_CHECKBOX_NAME: [profile.pk],
+        },
+        follow=True,
+    )
+    assertContains(response, "Aucune incohérence trouvée")
+
+    prescriber = PrescriberFactory()
+    inconsistent_profile = JobSeekerProfileFactory(user=prescriber)
+
+    response = admin_client.post(
+        reverse("admin:users_jobseekerprofile_changelist"),
+        {
+            "action": "check_inconsistencies",
+            helpers.ACTION_CHECKBOX_NAME: [inconsistent_profile.pk],
+        },
+        follow=True,
+    )
+    assertMessages(
+        response,
+        [
+            (
+                "WARNING",
+                (
+                    '1 objet incohérent: <ul><li class="warning">'
+                    f'<a href="/admin/users/jobseekerprofile/{inconsistent_profile.pk}/change/">'
+                    f"profil demandeur d&#x27;emploi - {inconsistent_profile.pk}"
+                    "</a>: Profil lié à un utilisateur non-candidat"
+                    "</li></ul>"
+                ),
+            )
+        ],
+    )
