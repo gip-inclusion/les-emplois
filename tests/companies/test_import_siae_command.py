@@ -20,7 +20,7 @@ from itou.companies.management.commands._import_siae.siae import (
 )
 from itou.companies.management.commands._import_siae.utils import anonymize_fluxiae_df, could_siae_be_deleted
 from itou.companies.management.commands._import_siae.vue_af import (
-    get_active_siae_keys,
+    get_conventions_by_siae_key,
     get_vue_af_df,
 )
 from itou.companies.management.commands._import_siae.vue_structure import (
@@ -54,12 +54,11 @@ class ImportSiaeManagementCommandsTest(TestCase):
 
     def test_uncreatable_conventions_for_active_siae_with_active_convention(self):
         siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
-        vue_af_df = get_vue_af_df()
-        active_siae_keys = get_active_siae_keys(vue_af_df)
+        conventions_by_siae_key = get_conventions_by_siae_key(get_vue_af_df())
 
         company = CompanyFactory(source=Company.SOURCE_ASP)
         assert company.is_active
-        assert not get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
+        assert not get_creatable_conventions(siret_to_siae_row, conventions_by_siae_key)
 
     def test_uncreatable_conventions_when_convention_exists_for_asp_id_and_kind(self):
         # siae without convention, but a convention already exists for this
@@ -68,27 +67,24 @@ class ImportSiaeManagementCommandsTest(TestCase):
         ASP_ID = 190
 
         siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
-        vue_af_df = get_vue_af_df()
-        active_siae_keys = get_active_siae_keys(vue_af_df)
+        conventions_by_siae_key = get_conventions_by_siae_key(get_vue_af_df())
 
         company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, convention=None)
         SiaeConventionFactory(kind=company.kind, asp_id=ASP_ID)
 
         with pytest.raises(AssertionError):
-            get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
+            get_creatable_conventions(siret_to_siae_row, conventions_by_siae_key)
 
     def test_creatable_conventions_for_active_siae_where_siret_equals_siret_signature(self):
         SIRET = SIRET_SIGNATURE = "21540323900019"
         ASP_ID = 112
+        CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
 
-        siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
-        vue_af_df = get_vue_af_df()
         with freeze_time("2022-10-10"):
-            active_siae_keys = get_active_siae_keys(vue_af_df)
-
-        company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
-        results = get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
-
+            results = get_creatable_conventions(
+                get_siret_to_siae_row(get_vue_structure_df()),
+                get_conventions_by_siae_key(get_vue_af_df()),
+            )
         assert len(results) == 1
 
         convention, company = results[0]
@@ -105,16 +101,13 @@ class ImportSiaeManagementCommandsTest(TestCase):
         SIRET = "34950857200055"
         SIRET_SIGNATURE = "34950857200048"
         ASP_ID = 768
+        CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.AI, convention=None)
 
-        siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
-        vue_af_df = get_vue_af_df()
         with freeze_time("2022-10-10"):
-            active_siae_keys = get_active_siae_keys(vue_af_df)
-
-        company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.AI, convention=None)
-        with freeze_time("2022-10-10"):
-            results = get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
-
+            results = get_creatable_conventions(
+                get_siret_to_siae_row(get_vue_structure_df()),
+                get_conventions_by_siae_key(get_vue_af_df()),
+            )
         assert len(results) == 1
 
         convention, company = results[0]
@@ -130,24 +123,22 @@ class ImportSiaeManagementCommandsTest(TestCase):
     def test_creatable_conventions_inactive_siae(self):
         SIRET = SIRET_SIGNATURE = "41294123900011"
         ASP_ID = 1780
+        CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
 
-        siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
-        vue_af_df = get_vue_af_df()
-        active_siae_keys = get_active_siae_keys(vue_af_df)
+        conventions = get_creatable_conventions(
+            get_siret_to_siae_row(get_vue_structure_df()),
+            get_conventions_by_siae_key(get_vue_af_df()),
+        )
+        assert len(conventions) == 1
 
-        company = CompanyFactory(source=Company.SOURCE_ASP, siret=SIRET, kind=CompanyKind.ACI, convention=None)
-        company = get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
-
-        assert len(company) == 1
-
-        convention, company = company[0]
+        convention, company = conventions[0]
         assert (
             convention.asp_id,
             convention.kind,
             convention.siret_signature,
             convention.is_active,
-            convention.deactivated_at.to_pydatetime(),
-        ) == (ASP_ID, company.kind, SIRET_SIGNATURE, False, datetime.datetime(2020, 2, 29, 0, 0))
+            convention.deactivated_at,
+        ) == (ASP_ID, company.kind, SIRET_SIGNATURE, False, datetime.datetime(2020, 12, 31, tzinfo=datetime.UTC))
         assert (company.source, company.siret, company.kind) == (Company.SOURCE_ASP, SIRET, CompanyKind.ACI)
 
     def test_get_creatable_and_deletable_afs(self):
@@ -219,7 +210,7 @@ class ImportSiaeManagementCommandsTest(TestCase):
         with freeze_time("2022-10-10"), self.captureOnCommitCallbacks(execute=True) as commit_callbacks:
             create_new_siaes(
                 get_siret_to_siae_row(get_vue_structure_df()),
-                get_active_siae_keys(get_vue_af_df()),
+                get_conventions_by_siae_key(get_vue_af_df()),
             )
         assert len(commit_callbacks) == 1
         assert len(mail.outbox) == 6

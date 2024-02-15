@@ -4,20 +4,19 @@ SiaeConvention object logic used by the import_siae.py script is gathered here.
 
 """
 
+import datetime
+
 from django.db import transaction
 from django.utils import timezone
 
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
-from itou.companies.management.commands._import_siae.vue_af import (
-    get_siae_key_to_convention_end_date,
-)
 from itou.companies.models import Company, SiaeConvention
 
 
 CONVENTION_DEACTIVATION_THRESHOLD = 200
 
 
-def update_existing_conventions(siret_to_siae_row, active_siae_keys):
+def update_existing_conventions(siret_to_siae_row, conventions_by_siae_key):
     """
     Update existing conventions, mainly the is_active field,
     and check data integrity on the fly.
@@ -69,7 +68,11 @@ def update_existing_conventions(siret_to_siae_row, active_siae_keys):
             convention.siret_signature = row.siret_signature
             updated_fields.add("siret_signature")
 
-        should_be_active = (row.asp_id, siae.kind) in active_siae_keys
+        try:
+            should_be_active = conventions_by_siae_key[(row.asp_id, siae.kind)].is_active
+        except KeyError:
+            should_be_active = False
+
         if convention.is_active != should_be_active:
             if should_be_active:
                 # Inactive convention should be activated.
@@ -108,18 +111,13 @@ def update_existing_conventions(siret_to_siae_row, active_siae_keys):
     print(f"{len(conventions_to_deactivate)} conventions have been deactivated")
 
 
-def get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys):
+def get_creatable_conventions(siret_to_siae_row, conventions_by_siae_key):
     """
     Get conventions which should be created.
 
     Output : list of (convention, siae) tuples.
     """
     creatable_conventions = []
-    inactive_siae_list = [
-        (siae_key, convention_end_date)
-        for siae_key, convention_end_date in get_siae_key_to_convention_end_date(vue_af_df).items()
-        if siae_key not in active_siae_keys
-    ]
 
     for siae in Company.objects.filter(source=Company.SOURCE_ASP, convention__isnull=True):
         if siae.siret not in siret_to_siae_row:
@@ -130,28 +128,20 @@ def get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys):
             continue
 
         row = siret_to_siae_row[siae.siret]
-        is_active = (row.asp_id, siae.kind) in active_siae_keys
-
         # convention is to be unique for an asp_id and a SIAE kind
         assert not SiaeConvention.objects.filter(asp_id=row.asp_id, kind=siae.kind).exists()
 
-        if is_active:
-            deactivated_at = None
-        else:
-            siae_key = (row.asp_id, siae.kind)
-            convention_end_date_list = list(filter(lambda x: siae_key in x, inactive_siae_list))
-            if convention_end_date_list:
-                _, convention_end_date = convention_end_date_list[0]
-            else:
-                raise ValueError(f"SIAE: {siae_key} is not active, but no convention_end_date found")
-            deactivated_at = convention_end_date
-
+        convention_data = conventions_by_siae_key[(row.asp_id, siae.kind)]
         convention = SiaeConvention(
             siret_signature=row.siret_signature,
             kind=siae.kind,
-            is_active=is_active,
+            is_active=convention_data.is_active,
             asp_id=row.asp_id,
-            deactivated_at=deactivated_at,
+            deactivated_at=(
+                None
+                if convention_data.is_active
+                else datetime.datetime.combine(convention_data.end_at, datetime.datetime.min.time(), datetime.UTC)
+            ),
         )
         creatable_conventions.append((convention, siae))
     return creatable_conventions
@@ -191,8 +181,8 @@ def check_convention_data_consistency():
     assert user_created_siaes_without_convention == 0
 
 
-def create_conventions(vue_af_df, siret_to_siae_row, active_siae_keys):
-    creatable_conventions = get_creatable_conventions(vue_af_df, siret_to_siae_row, active_siae_keys)
+def create_conventions(siret_to_siae_row, conventions_by_siae_key):
+    creatable_conventions = get_creatable_conventions(siret_to_siae_row, conventions_by_siae_key)
     print(f"will create {len(creatable_conventions)} conventions")
 
     for convention, siae in creatable_conventions:
