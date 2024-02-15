@@ -660,7 +660,7 @@ class IsPECertifiedFilter(admin.SimpleListFilter):
 
 
 @admin.register(models.JobSeekerProfile)
-class JobSeekerProfileAdmin(ItouModelAdmin):
+class JobSeekerProfileAdmin(InconsistencyCheckMixin, ItouModelAdmin):
     """
     Inlines would only be possible the other way around
     """
@@ -752,6 +752,13 @@ class JobSeekerProfileAdmin(ItouModelAdmin):
     )
 
     inlines = (PkSupportRemarkInline,)
+
+    INCONSISTENCY_CHECKS = [
+        (
+            "Profil lié à un utilisateur non-candidat",
+            lambda q: q.exclude(user__kind=UserKind.JOB_SEEKER),
+        ),
+    ]
 
     @admin.display(description="date de naissance")
     def birthdate(self, obj):
