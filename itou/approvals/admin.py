@@ -96,7 +96,7 @@ class JobApplicationInline(ItouStackedInline):
             return "Une fiche salarié existe déjà pour ce candidat"
 
         if not obj.to_company.can_use_employee_record:
-            return "La SIAE n'utilise pas les fiches salarié"
+            return "La SIAE ne peut pas utiliser la gestion des fiches salarié"
 
         if not obj.create_employee_record:
             return "Création désactivée"
