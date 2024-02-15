@@ -6,11 +6,12 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 
+from itou.companies.models import Company
 from itou.employee_record.enums import Status
 from itou.users.enums import LackOfNIRReason
 from itou.utils.templatetags import format_filters
 from tests.approvals import factories as approvals_factories
-from tests.companies.factories import CompanyWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJobsFactory
 from tests.employee_record import factories as employee_record_factories
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
@@ -453,3 +454,16 @@ class ListEmployeeRecordsTest(TestCase):
 
         response = self.client.get(self.url + "?status=READY")
         self.assertContains(response, "0 résultat")
+
+
+def test_an_active_siae_without_convention_can_not_access_the_view(client):
+    siae = CompanyFactory(
+        use_employee_record=True,
+        source=Company.SOURCE_STAFF_CREATED,
+        convention=None,
+        with_membership=True,
+    )
+    client.force_login(siae.members.first())
+
+    response = client.get(reverse("employee_record_views:list"))
+    assert response.status_code == 403
