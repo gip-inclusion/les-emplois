@@ -3,6 +3,7 @@ from dateutil.relativedelta import relativedelta
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import dateformat, timezone
+from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
@@ -14,6 +15,7 @@ from tests.prescribers.factories import PrescriberOrganizationWithMembershipFact
 from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
 
 
+@freeze_time("2024-02-15")
 class JobApplicationGEIQEligibilityDetailsTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -115,11 +117,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
             f"Éligibilité GEIQ confirmée par "
             f"<b>{self.author.get_full_name()} ({self.prescriber_org.display_name})</b>",
         )
-        self.assertContains(
-            response,
-            f"<b>Durée de validité du diagnostic :</b> du {self.valid_diagnosis.created_at:%d/%m/%Y} "
-            f"au {self.valid_diagnosis.expires_at:%d/%m/%Y}",
-        )
+        self.assertContains(response, "<b>Durée de validité du diagnostic :</b> du 15/02/2024 au 15/08/2024")
 
     def test_details_as_authorized_prescriber_with_expired_diagnosis(self):
         job_application = JobApplicationFactory(to_company=self.geiq, job_seeker=self.expired_diagnosis.job_seeker)
