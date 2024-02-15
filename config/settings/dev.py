@@ -58,13 +58,6 @@ REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] += [  # noqa: F405
 # ITOU settings
 # -------------
 
-if SQL_DEBUG:  # noqa: F405
-    LOGGING.setdefault("loggers", {})["django.db.backends"] = {  # noqa: F405
-        "level": "DEBUG",
-        "handlers": ["console"],
-        "propagate": False,
-    }
-
 # use almost the same settings for metabase as base PG.
 METABASE_HOST = os.getenv("METABASE_HOST", os.getenv("PGHOST", "127.0.0.1"))  # noqa: F405
 METABASE_PORT = os.getenv("METABASE_PORT", os.getenv("PGPORT", "5432"))  # noqa: F405
