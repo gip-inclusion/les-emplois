@@ -1,6 +1,6 @@
 -r base.txt
 
-pip-tools  # https://github.com/jazzband/pip-tools/
+uv  # https://github.com/astral-sh/uv
 
 # Code quality
 # ------------------------------------------------------------------------------

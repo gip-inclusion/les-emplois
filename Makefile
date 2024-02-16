@@ -23,8 +23,8 @@ runserver: $(VIRTUAL_ENV)
 
 $(VIRTUAL_ENV): $(REQUIREMENTS_PATH)
 	$(PYTHON_VERSION) -m venv $@
-	$@/bin/pip install -r $^
-	$@/bin/pip-sync $^
+	$@/bin/pip install uv
+	$@/bin/uv pip sync --require-hashes $^
 	touch $@
 
 venv: $(VIRTUAL_ENV)
@@ -32,11 +32,11 @@ venv: $(VIRTUAL_ENV)
 buckets: $(VENV_REQUIREMENT)
 	python manage.py configure_bucket
 
-PIP_COMPILE_FLAGS := --allow-unsafe --generate-hashes $(PIP_COMPILE_OPTIONS)
+PIP_COMPILE_FLAGS := --generate-hashes $(PIP_COMPILE_OPTIONS)
 compile-deps: $(VENV_REQUIREMENT)
-	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/base.txt requirements/base.in
-	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/test.txt requirements/test.in
-	pip-compile $(PIP_COMPILE_FLAGS) -o requirements/dev.txt requirements/dev.in
+	uv pip compile $(PIP_COMPILE_FLAGS) -o requirements/base.txt requirements/base.in
+	uv pip compile $(PIP_COMPILE_FLAGS) -o requirements/test.txt requirements/test.in
+	uv pip compile $(PIP_COMPILE_FLAGS) -o requirements/dev.txt requirements/dev.in
 
 clean:
 	find . -type d -name "__pycache__" -depth -exec rm -rf '{}' \;
