@@ -201,8 +201,8 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
     for siret in deletable_sirets:
         siae = Company.objects.get(siret=siret, kind__in=kinds)
 
-        one_week_ago = timezone.now() - timezone.timedelta(days=7)
-        if siae.source == Company.SOURCE_STAFF_CREATED and siae.created_at >= one_week_ago:
+        three_months_ago = timezone.now() - timezone.timedelta(days=90)
+        if siae.source == Company.SOURCE_STAFF_CREATED and siae.created_at >= three_months_ago:
             # When our staff creates a structure, let's give the user sufficient time to join it before deleting it.
             deletable_skipped_count += 1
             continue
