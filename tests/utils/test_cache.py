@@ -17,7 +17,10 @@ class TestFailSafeRedisCache:
             sentry_mock.assert_called_once()
             [args, kwargs] = sentry_mock.call_args
             [exception] = args
-            assert exception.args == (f"Error 111 connecting to localhost:{empty_port}. Connection refused.",)
+            [exc_msg] = exception.args
+            # Message error code depends on the platform (Mac or Linux). Should be a variation of
+            # Error 111 connecting to localhost:{empty_port}. Connection refused.
+            assert "Connection refused." in exc_msg
             assert kwargs == {}
 
     def test_known_public_methods(self):
