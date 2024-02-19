@@ -4,7 +4,7 @@
             <li>
                 <time datetime="{{ log.timestamp.isoformat }}">Le {{ log.timestamp|date:dt_format }}</time>
                 <span>
-                    Passé en "<b>{{ log.pretty_to_state }}</b>"
+                    Passé en "{{ log.pretty_to_state }}"
                     {% if log.user %}par {{ log.user.get_full_name }}{% endif %}
                 </span>
             </li>
