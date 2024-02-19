@@ -38,10 +38,8 @@
     {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
 
     {# History ------------------------------------------------------ #}
-    {% if transition_logs %}
-        <div class="c-box mb-4">
-            <h3>Historique des modifications</h3>
-            {% include "apply/includes/transition_logs.html" with job_application=job_application transition_logs=transition_logs %}
-        </div>
-    {% endif %}
+    <div class="c-box mb-4">
+        <h3>Historique des modifications</h3>
+        {% include "apply/includes/transition_logs.html" with job_application=job_application transition_logs=transition_logs %}
+    </div>
 {% endblock %}
