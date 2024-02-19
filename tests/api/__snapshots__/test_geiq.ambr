@@ -106,7 +106,7 @@
         'niveau_formation': 'N3',
         'niveau_qualification': 'SQ',
         'nom': 'Dupont',
-        'poste_occupe': None,
+        'poste_occupe': 'N1101',
         'precision_prescripteur': "HUDA - Hébergement d'urgence pour demandeurs d'asile",
         'prenom': 'Sacha',
         'prequalifications': list([
@@ -144,7 +144,7 @@
         'niveau_formation': 'N3',
         'niveau_qualification': 'N3',
         'nom': 'Dupont',
-        'poste_occupe': None,
+        'poste_occupe': 'N1101',
         'precision_prescripteur': 'France Travail',
         'prenom': 'Sacha',
         'prequalifications': list([

@@ -78,6 +78,7 @@ class GeiqJobApplicationListView(generics.ListAPIView):
                 "sender_prescriber_organization",
                 "job_seeker__jobseeker_profile",
                 "geiq_eligibility_diagnosis",
+                "hired_job__appellation__rome",
             )
             .prefetch_related(
                 "geiq_eligibility_diagnosis__administrative_criteria",

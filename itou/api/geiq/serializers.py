@@ -240,7 +240,7 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
     prequalifications = PrequalPriorActionSerializer(many=True)
     jours_accompagnement = serializers.IntegerField(source="prehiring_guidance_days", min_value=0)
     type_contrat = serializers.SerializerMethodField()
-    poste_occupe = serializers.SerializerMethodField()
+    poste_occupe = serializers.CharField(source="hired_job.appellation.rome.code", default=None)
     duree_hebdo = serializers.IntegerField(
         source="nb_hours_per_week",
         min_value=enums.GEIQ_MIN_HOURS_PER_WEEK,
@@ -333,15 +333,3 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
     @extend_schema_field(serializers.ChoiceField(choices=sorted(LabelEducationLevel.choices)))
     def get_niveau_qualification(self, obj) -> str | None:
         return EMPLOIS_TO_LABEL_QUALIFICATION_LEVEL.get(obj.qualification_level, None)
-
-    def get_poste_occupe(self, obj) -> str | None:
-        """
-        Ce champ n'est pas encore disponible dans les Emplois de l'inclusion.
-
-        Il sera renvoyé sous forme d'un code d'appellation métier ROME Pôle Emploi.
-
-        Voir https://www.pole-emploi.org/opendata/repertoire-operationnel-des-meti.html?type=article
-        """
-        # FIXME(vperron): Integrate this when the data becomes available, cf. PR #2460.
-        # For the possible values, just point towards the Pole Emploi reference.
-        return None

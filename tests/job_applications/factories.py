@@ -12,7 +12,7 @@ from itou.job_applications.enums import Prequalification, ProfessionalSituationE
 from itou.jobs.models import Appellation
 from itou.utils.types import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory
-from tests.companies.factories import CompanyFactory
+from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
@@ -75,6 +75,11 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
             ),
             sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
             sender_kind=SenderKind.PRESCRIBER,
+        )
+        was_hired = factory.Trait(
+            state="accepted",
+            to_company__with_jobs=True,
+            hired_job=factory.SubFactory(JobDescriptionFactory, company=factory.SelfAttribute("..to_company")),
         )
         for_snapshot = factory.Trait(
             pk="11111111-1111-1111-1111-111111111111",
