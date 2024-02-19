@@ -109,6 +109,9 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 
 DJANGO_MIDDLEWARES = [
+    # Itou health check for Clever Cloud, don’t require requests to match ALLOWED_HOSTS
+    "itou.www.middleware.public_health_check",
+    # Django stack
     "django.middleware.gzip.GZipMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
