@@ -7,14 +7,6 @@
             <strong>{{ job_application.to_company.display_name }}</strong>
         </li>
     {% endif %}
-    {% with jobs=job_application.selected_jobs.all %}
-        {% if not jobs %}
-            <li>
-                <small>Type de candidature</small>
-                <strong>Candidature spontanée</strong>
-            </li>
-        {% endif %}
-    {% endwith %}
 </ul>
 
 {% if job_application.message %}
@@ -29,28 +21,32 @@
 {% endif %}
 
 {% with jobs=job_application.selected_jobs.all %}
-    {% if jobs %}
-        <span class="d-block fs-sm">{{ jobs|length }} Métier{{ jobs|pluralizefr }} recherché{{ jobs|pluralizefr }}</span>
-        <ul class="list-group list-group-flush">
-            {% for job in jobs %}
-                <li class="list-group-item list-group-item-action py-2">
-                    <a class="d-flex flex-wrap align-items-center text-decoration-none" href="{{ job.get_absolute_url }}">
-                        <div class="d-inline">
-                            <span class="font-weight-bold me-1 me-md-2">{{ job.display_name }} ({{ job.appellation.rome_id }})</span>
-                        </div>
-                        <div class="d-inline ms-lg-auto">
-                            <span class="fs-sm text-nowrap">
-                                <i class="ri-map-pin-2-line ri-sm"></i>
-                                {% if job.location %}
-                                    {{ job.location }}
-                                {% else %}
-                                    {{ job.company.city|title }} ({{ job.company.department }})
-                                {% endif %}
-                            </span>
-                        </div>
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+    <span class="d-block fs-sm">
+        {% if jobs %}{{ jobs|length }}{% endif %}
+    Poste{{ jobs|pluralizefr }} recherché{{ jobs|pluralizefr }}</span>
+    <ul class="list-group list-group-flush">
+        {% for job in jobs %}
+            <li class="list-group-item list-group-item-action py-2">
+                <a class="d-flex flex-wrap align-items-center text-decoration-none" href="{{ job.get_absolute_url }}">
+                    <div class="d-inline">
+                        <span class="font-weight-bold me-1 me-md-2">{{ job.display_name }} ({{ job.appellation.rome_id }})</span>
+                    </div>
+                    <div class="d-inline ms-lg-auto">
+                        <span class="fs-sm text-nowrap">
+                            <i class="ri-map-pin-2-line ri-sm"></i>
+                            {% if job.location %}
+                                {{ job.location }}
+                            {% else %}
+                                {{ job.company.city|title }} ({{ job.company.department }})
+                            {% endif %}
+                        </span>
+                    </div>
+                </a>
+            </li>
+        {% empty %}
+            <li class="list-group-item list-group-item-action">
+                <b>Candidature spontanée</b>
+            </li>
+        {% endfor %}
+    </ul>
 {% endwith %}
