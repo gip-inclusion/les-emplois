@@ -7,10 +7,6 @@
             <strong>{{ job_application.to_company.display_name }}</strong>
         </li>
     {% endif %}
-    <li>
-        <small>Date de candidature</small>
-        <strong>{{ job_application.created_at|date:"d F Y à H:i" }}</strong>
-    </li>
     {% with jobs=job_application.selected_jobs.all %}
         {% if not jobs %}
             <li>
