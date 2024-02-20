@@ -463,6 +463,10 @@ class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
         # Start from here as update is a redirect
         self.url = self.list_url
 
+    @staticmethod
+    def initial_location_name(location):
+        return location.name
+
     def test_update_job_description(self):
         response = self._login(self.user)
 
@@ -495,7 +499,7 @@ class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
 
         # Step 1: edit job description
         response = self.client.get(self.edit_url)
-        self.assertContains(response, initial_location.name)
+        self.assertContains(response, self.initial_location_name(initial_location))
 
         post_data = {
             "appellation": self.job_description.appellation.code,
@@ -535,7 +539,7 @@ class UpdateJobDescriptionViewTest(JobDescriptionAbstractTest):
 
         # Step 3: preview
         response = self.client.get(self.edit_preview_url)
-        self.assertNotContains(response, initial_location.name)
+        self.assertNotContains(response, self.initial_location_name(initial_location))
 
         # Step 4: validation
         response = self.client.post(self.edit_preview_url)
@@ -557,21 +561,26 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             },
         )
 
+    @staticmethod
+    def apply_start_url(company):
+        return reverse("apply:start", kwargs={"company_pk": company.pk})
+
+    @staticmethod
+    def update_job_description_url(job_description):
+        return reverse(
+            "companies_views:update_job_description",
+            kwargs={"job_description_id": job_description.pk},
+        )
+
     def test_employer_card_actions(self):
         # Checks if company can update their job descriptions
         response = self._login(self.user)
 
         self.assertContains(response, "Modifier la fiche de poste")
-        self.assertContains(
-            response,
-            reverse(
-                "companies_views:update_job_description",
-                kwargs={"job_description_id": self.job_description.pk},
-            ),
-        )
+        self.assertContains(response, self.update_job_description_url(self.job_description))
         self.assertContains(response, "Retour vers la liste des postes")
         self.assertContains(response, reverse("companies_views:job_description_list"))
-        self.assertNotContains(response, reverse("apply:start", kwargs={"company_pk": self.company.pk}))
+        self.assertNotContains(response, self.apply_start_url(self.company))
 
     def test_prescriber_card_actions(self):
         # Checks if non-employers can apply to opened job descriptions
@@ -590,13 +599,10 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             response = self.client.get(self.url)
 
         self.assertContains(response, "Postuler auprès de l'employeur solidaire")
-        self.assertContains(response, reverse("apply:start", kwargs={"company_pk": self.company.pk}))
+        self.assertContains(response, self.apply_start_url(self.company))
         self.assertNotContains(
             response,
-            reverse(
-                "companies_views:update_job_description",
-                kwargs={"job_description_id": self.job_description.pk},
-            ),
+            self.update_job_description_url(self.job_description),
         )
 
     def test_job_seeker_card_actions(self):
@@ -613,27 +619,15 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             response = self.client.get(self.url)
 
         self.assertContains(response, "Postuler auprès de l'employeur solidaire")
-        self.assertContains(response, reverse("apply:start", kwargs={"company_pk": self.company.pk}))
-        self.assertNotContains(
-            response,
-            reverse(
-                "companies_views:update_job_description",
-                kwargs={"job_description_id": self.job_description.pk},
-            ),
-        )
+        self.assertContains(response, self.apply_start_url(self.company))
+        self.assertNotContains(response, self.update_job_description_url(self.job_description))
 
     def test_anonymous_card_actions(self):
         response = self.client.get(self.url)
 
         self.assertContains(response, "Postuler auprès de l'employeur solidaire")
-        self.assertContains(response, reverse("apply:start", kwargs={"company_pk": self.company.pk}))
-        self.assertNotContains(
-            response,
-            reverse(
-                "companies_views:update_job_description",
-                kwargs={"job_description_id": self.job_description.pk},
-            ),
-        )
+        self.assertContains(response, self.apply_start_url(self.company))
+        self.assertNotContains(response, self.update_job_description_url(self.job_description))
 
     def test_display_placeholder_for_empty_fields(self):
         PLACE_HOLDER = "La structure n'a pas encore renseigné cette rubrique"
