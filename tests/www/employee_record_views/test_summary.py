@@ -33,22 +33,23 @@ class SummaryEmployeeRecordsTest(TestCase):
         )
 
     def test_asp_batch_file_infos(self):
+        HORODATAGE = "Horodatage ASP"
         self.client.force_login(self.user)
         response = self.client.get(self.url)
-        self.assertNotContains(response, "Horodatage ASP")
+        self.assertNotContains(response, HORODATAGE)
 
         self.employee_record.update_as_ready()
         self.employee_record.update_as_sent("RIAE_FS_20210410130000.json", 1, None)
 
         response = self.client.get(self.url)
-        self.assertContains(response, "Horodatage ASP")
+        self.assertContains(response, HORODATAGE)
         self.assertContains(response, "Création : <b>RIAE_FS_20210410130000")
 
         EmployeeRecordUpdateNotificationFactory(
             employee_record=self.employee_record, asp_batch_file="RIAE_FS_20210510130000.json"
         )
         response = self.client.get(self.url)
-        self.assertContains(response, "Horodatage ASP")
+        self.assertContains(response, HORODATAGE)
         self.assertContains(response, "Création : <b>RIAE_FS_20210410130000")
         self.assertContains(response, "Modification : <b>RIAE_FS_20210510130000")
 
