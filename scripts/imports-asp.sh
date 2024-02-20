@@ -51,5 +51,5 @@ time ./manage.py import_ea_eatt --wet-run --verbosity=2 |& tee -a "$OUTPUT_PATH/
 # Destroy the cleartext ASP data
 rm -rf itou/companies/management/commands/data/
 
-# Remove ASP files from 2 weeks ago
-find asp_shared_bucket/ -name '*.zip' -type f -mtime +13 -delete
+# Remove ASP files older than 3 weeks
+find asp_shared_bucket/ -name '*.zip' -type f -mtime +20 -delete
