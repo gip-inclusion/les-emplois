@@ -1,11 +1,3 @@
-__all__ = [
-    "JobSeekerNotification",
-    "EmployerNotification",
-    "PrescriberNotification",
-    "PrescriberOrEmployerNotification",
-]
-
-
 class JobSeekerNotification:
     def is_manageable_by_user(self):
         return super().is_manageable_by_user() and self.user.is_job_seeker
@@ -23,4 +15,4 @@ class PrescriberNotification:
 
 class PrescriberOrEmployerNotification:
     def is_manageable_by_user(self):
-        return super().is_manageable_by_user() and any([self.user.is_prescriber, self.user.is_employer])
+        return super().is_manageable_by_user() and (self.user.is_prescriber or self.user.is_employer)

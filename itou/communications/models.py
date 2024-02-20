@@ -9,6 +9,11 @@ class NotificationQuerySet(models.QuerySet):
         return self.exclude(is_obsolete=True)
 
 
+class NotificationManager(models.Manager.from_queryset(NotificationQuerySet)):
+    def get_queryset(self):
+        return super().get_queryset().actives()
+
+
 class Notification(models.Model):
     notification_class = models.CharField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
@@ -16,7 +21,11 @@ class Notification(models.Model):
     can_be_disabled = models.BooleanField(default=True)
     is_obsolete = models.BooleanField(default=False, db_index=True)
 
-    objects = NotificationQuerySet.as_manager()
+    objects = NotificationManager()
+    include_obsolete = NotificationQuerySet.as_manager()
+
+    class Meta:
+        base_manager_name = "include_obsolete"
 
     def __str__(self):
         return self.name

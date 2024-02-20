@@ -1,2 +1,9 @@
-from .email import *  # noqa
-from .utils import *  # noqa
+# flake8: noqa
+
+from .email import EmailNotification
+from .utils import (
+    EmployerNotification,
+    JobSeekerNotification,
+    PrescriberNotification,
+    PrescriberOrEmployerNotification,
+)

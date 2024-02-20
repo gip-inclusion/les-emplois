@@ -10,21 +10,27 @@ class NotificationMetaclass(type):
         if not parents:
             return new_class
 
-        if not hasattr(new_class, "name"):
-            raise ImproperlyConfigured(f"{name} must define 'name'.")
-        if not hasattr(new_class, "category"):
-            raise ImproperlyConfigured(f"{name} must define 'category'.")
+        missing_required_attrs = []
+        for attr_name in getattr(new_class, "REQUIRED", []):
+            if not hasattr(new_class, attr_name):
+                missing_required_attrs.append(attr_name)
+
+        if missing_required_attrs:
+            missing_required_attrs_str = ", ".join([f"'{attr_name}'" for attr_name in missing_required_attrs])
+            raise ImproperlyConfigured(f"{name} must define the following attrs: {missing_required_attrs_str}.")
 
         return new_class
 
 
 class BaseNotification:
-    user = None
-    structure = None
+    REQUIRED = ["can_be_disabled", "name", "category"]
+
     can_be_disabled = True
-    name = None
-    category = None
-    kwargs = {}
+
+    def __init__(self, user, structure=None, /, **kwargs):
+        self.user = user
+        self.structure = structure
+        self.context = kwargs
 
     def __repr__(self):
         return f"<Notification {self.user.email}: {self.name}>"
@@ -38,7 +44,7 @@ class BaseNotification:
 
     def should_send(self):
         if self.is_manageable_by_user():
-            return (
+            return not (
                 self.user.notification_settings.for_structure(self.structure)
                 .filter(disabled_notifications__notification_class=self.get_class_path())
                 .exists()
@@ -46,7 +52,7 @@ class BaseNotification:
         return True
 
     def get_context(self):
-        return self.check_context(self.kwargs)
+        return self.validate_context()
 
-    def check_context(self, context):
-        return context
+    def validate_context(self):
+        return self.context

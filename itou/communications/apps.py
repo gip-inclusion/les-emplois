@@ -1,4 +1,5 @@
 from django.apps import AppConfig
+from django.conf import settings
 from django.db import OperationalError, ProgrammingError, transaction
 from django.db.models.signals import post_migrate
 
@@ -9,8 +10,10 @@ class CommunicationsConfig(AppConfig):
 
     def ready(self):
         self.module.autodiscover()
-        sync_notifications(self.get_model("Notification"))
         post_migrate.connect(post_communications_migrate_handler, sender=self)
+        if settings.DEBUG:
+            # Sync on every reload during development
+            sync_notifications(self.get_model("Notification"))
 
 
 def post_communications_migrate_handler(sender, app_config, **kwargs):
@@ -27,12 +30,12 @@ def sync_notifications(notification_model):
 
             # Add new notifications to database.
             active_notifications = []
-            for notification_class in registry._registry:
+            for notification_class in registry:
                 notification, created = notification_model.objects.update_or_create(
                     notification_class=notification_class.get_class_path(),
                     defaults={
-                        "name": str(notification_class.name),
-                        "category": str(notification_class.category),
+                        "name": notification_class.name,
+                        "category": notification_class.category,
                         "can_be_disabled": notification_class.can_be_disabled,
                         "is_obsolete": False,
                     },
@@ -44,5 +47,7 @@ def sync_notifications(notification_model):
                 pk__in=[notification.pk for notification in active_notifications]
             ).update(is_obsolete=True)
     except (OperationalError, ProgrammingError):
-        # Ignore if database/table are not created yet
-        pass
+        if settings.DEBUG:
+            # Ignore if database/table are not created yet
+            return
+        raise
