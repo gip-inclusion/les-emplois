@@ -16,6 +16,9 @@ from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase
 
 
+DISTRICTS = "Arrondissements de Paris"
+
+
 class SearchCompanyTest(TestCase):
     def setUp(self):
         super().setUp()
@@ -67,7 +70,7 @@ class SearchCompanyTest(TestCase):
             """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
             html=True,
         )
-        self.assertContains(response, "Arrondissements de Paris")
+        self.assertContains(response, DISTRICTS)
 
         # Filter on district
         response = self.client.get(self.url, {"city": city_slug, "districts_75": ["75001"]})
@@ -80,7 +83,7 @@ class SearchCompanyTest(TestCase):
 
         # Do not get arrondissements when searching the arrondissement directly
         response = self.client.get(self.url, {"city": "paris-10eme-75"})
-        self.assertNotContains(response, "Arrondissements de Paris")
+        self.assertNotContains(response, DISTRICTS)
 
     def test_kind(self):
         city = create_city_saint_andre()
@@ -397,7 +400,7 @@ class JobDescriptionSearchViewTest(TestCase):
         )
 
         # We can't support the city districts for now.
-        self.assertNotContains(response, "Arrondissements de Paris")
+        self.assertNotContains(response, DISTRICTS)
 
         self.assertContains(response, capfirst(job.display_name), html=True)
 
@@ -566,14 +569,35 @@ class JobDescriptionSearchViewTest(TestCase):
             company=company, appellation=appellations[1], contract_type=ContractType.BUSINESS_CREATION
         )
 
-        inactive_company = CompanyFactory(
-            department="45", coords=city.coords, post_code="44117", kind=CompanyKind.EI, convention=None
-        )
+        # Start active to verify it appears in search results.
+        other_company = CompanyFactory(department="45", coords=city.coords, post_code="44117", kind=CompanyKind.EI)
         job3 = JobDescriptionFactory(
-            company=inactive_company,
+            company=other_company,
             appellation=appellations[2],
             contract_type=ContractType.APPRENTICESHIP,
         )
+
+        job1_name = capfirst(job1.display_name)
+        job2_name = capfirst(job2.display_name)
+        job3_name = capfirst(job3.display_name)
+
+        response = self.client.get(self.url, {"city": city.slug})
+        self.assertContains(
+            response,
+            """
+            <span class="d-inline d-lg-none">
+                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>
+            </span>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(response, job1_name, html=True)
+        self.assertContains(response, job2_name, html=True)
+        self.assertContains(response, job3_name, html=True)
+
+        other_company.convention = None
+        other_company.save(update_fields=["convention"])
 
         # no filter: returns everything.
         response = self.client.get(
@@ -590,9 +614,9 @@ class JobDescriptionSearchViewTest(TestCase):
             html=True,
             count=1,
         )
-        self.assertContains(response, capfirst(job1.display_name), html=True)
-        self.assertContains(response, capfirst(job2.display_name), html=True)
-        self.assertNotContains(response, capfirst(job3.display_name), html=True)
+        self.assertContains(response, job1_name, html=True)
+        self.assertContains(response, job2_name, html=True)
+        self.assertNotContains(response, job3_name, html=True)
 
         # pass both contract types, should have the same result.
         response = self.client.get(
@@ -609,9 +633,9 @@ class JobDescriptionSearchViewTest(TestCase):
             html=True,
             count=1,
         )
-        self.assertContains(response, capfirst(job1.display_name), html=True)
-        self.assertContains(response, capfirst(job2.display_name), html=True)
-        self.assertNotContains(response, capfirst(job3.display_name), html=True)
+        self.assertContains(response, job1_name, html=True)
+        self.assertContains(response, job2_name, html=True)
+        self.assertNotContains(response, job3_name, html=True)
 
         # filter it down.
         response = self.client.get(
@@ -628,18 +652,18 @@ class JobDescriptionSearchViewTest(TestCase):
             html=True,
             count=1,
         )
-        self.assertContains(response, capfirst(job1.display_name), html=True)
-        self.assertNotContains(response, capfirst(job2.display_name), html=True)
-        self.assertNotContains(response, capfirst(job3.display_name), html=True)
+        self.assertContains(response, job1_name, html=True)
+        self.assertNotContains(response, job2_name, html=True)
+        self.assertNotContains(response, job3_name, html=True)
 
         response = self.client.get(
             self.url,
             {"city": city.slug, "contract_types": [ContractType.OTHER]},
         )
         self.assertContains(response, "Aucun résultat")
-        self.assertNotContains(response, capfirst(job1.display_name), html=True)
-        self.assertNotContains(response, capfirst(job2.display_name), html=True)
-        self.assertNotContains(response, capfirst(job3.display_name), html=True)
+        self.assertNotContains(response, job1_name, html=True)
+        self.assertNotContains(response, job2_name, html=True)
+        self.assertNotContains(response, job3_name, html=True)
 
     @pytest.mark.ignore_template_errors
     def test_domains(self):
@@ -660,23 +684,39 @@ class JobDescriptionSearchViewTest(TestCase):
             custom_name="Forceur de Nom de Métier",
         )
 
-        inactive_company = CompanyFactory(
-            department="45", coords=city.coords, post_code="44117", kind=CompanyKind.EI, convention=None
-        )
+        # Start active to verify it appears in search results.
+        other_company = CompanyFactory(department="45", coords=city.coords, post_code="44117", kind=CompanyKind.EI)
         job3 = JobDescriptionFactory(
-            company=inactive_company, contract_type=ContractType.APPRENTICESHIP, custom_name="Métier Inutilisé"
-        )
-
-        # no filter: returns everything.
-        response = self.client.get(
-            self.url,
-            {"city": city.slug},
+            company=other_company, contract_type=ContractType.APPRENTICESHIP, custom_name="Métier Inutilisé"
         )
 
         displayed_job_name_1 = capfirst(job1.display_name)
         displayed_job_name_2 = capfirst(job2.display_name)
         displayed_job_name_3 = capfirst(job3.display_name)
 
+        response = self.client.get(self.url, {"city": city.slug})
+        self.assertContains(
+            response,
+            """
+            <span class="d-inline d-lg-none">
+                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>
+            </span>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(response, displayed_job_name_1, html=True)
+        self.assertContains(response, displayed_job_name_2, html=True)
+        self.assertContains(response, displayed_job_name_3, html=True)
+
+        other_company.convention = None
+        other_company.save(update_fields=["convention"])
+
+        # no filter: returns everything.
+        response = self.client.get(
+            self.url,
+            {"city": city.slug},
+        )
         self.assertContains(
             response,
             """
@@ -753,6 +793,9 @@ class JobDescriptionSearchViewTest(TestCase):
             market_context_description="",
         )
 
+        displayed_job_name_1 = capfirst(job1.display_name)
+        displayed_job_pec = capfirst(job_pec.display_name)
+
         # no filter: returns everything.
         response = self.client.get(
             self.url,
@@ -770,8 +813,8 @@ class JobDescriptionSearchViewTest(TestCase):
             count=1,
         )
         assert list(response.context["results_page"]) == [job1, job_pec]
-        self.assertContains(response, capfirst(job1.display_name))
-        self.assertContains(response, capfirst(job_pec.display_name))
+        self.assertContains(response, displayed_job_name_1)
+        self.assertContains(response, displayed_job_pec)
 
         self.assertContains(response, "Contrat PEC - Parcours Emploi Compétences")
         self.assertContains(response, "logo-france-travail.svg")
@@ -780,7 +823,8 @@ class JobDescriptionSearchViewTest(TestCase):
 
         self.assertContains(response, "Entreprise anonyme")
         self.assertContains(response, "Super catégorie de genre de job")
-        self.assertNotContains(response, "Réservé au public éligible au contrat PEC")
+        RESERVED_PEC = "Réservé au public éligible au contrat PEC"
+        self.assertNotContains(response, RESERVED_PEC)
 
         job_pec.contract_nature = ContractNature.PEC_OFFER
         job_pec.save(update_fields=["contract_nature"])
@@ -788,7 +832,7 @@ class JobDescriptionSearchViewTest(TestCase):
             self.url,
             {"city": city.slug},
         )
-        self.assertContains(response, "Réservé au public éligible au contrat PEC")
+        self.assertContains(response, RESERVED_PEC)
 
         # filter with "PEC offer" contract type: only returns the PEC offers
         # (whatever the actual contract_type of those)
@@ -807,8 +851,8 @@ class JobDescriptionSearchViewTest(TestCase):
             html=True,
             count=1,
         )
-        self.assertNotContains(response, capfirst(job1.display_name))
-        self.assertContains(response, capfirst(job_pec.display_name))
+        self.assertNotContains(response, displayed_job_name_1)
+        self.assertContains(response, displayed_job_pec)
 
         # filter with PEC offer, apprenticeship: returns both
         response = self.client.get(
@@ -825,8 +869,8 @@ class JobDescriptionSearchViewTest(TestCase):
             html=True,
             count=1,
         )
-        self.assertContains(response, capfirst(job1.display_name))
-        self.assertContains(response, capfirst(job_pec.display_name))
+        self.assertContains(response, displayed_job_name_1)
+        self.assertContains(response, displayed_job_pec)
 
         # filter with only apprenticeship: PEC offer not displayed (it's fixed term)
         response = self.client.get(
@@ -843,8 +887,8 @@ class JobDescriptionSearchViewTest(TestCase):
             html=True,
             count=1,
         )
-        self.assertContains(response, capfirst(job1.display_name))
-        self.assertNotContains(response, capfirst(job_pec.display_name))
+        self.assertContains(response, displayed_job_name_1)
+        self.assertNotContains(response, displayed_job_pec)
 
         # filter with FIXED_TERM : PEC offer displayed because it's its underlying contract type
         response = self.client.get(
@@ -861,8 +905,8 @@ class JobDescriptionSearchViewTest(TestCase):
             html=True,
             count=1,
         )
-        self.assertNotContains(response, capfirst(job1.display_name))
-        self.assertContains(response, capfirst(job_pec.display_name))
+        self.assertNotContains(response, displayed_job_name_1)
+        self.assertContains(response, displayed_job_pec)
 
         # Show external company name
         job_pec.market_context_description = "MaPetiteEntreprise"
@@ -881,5 +925,5 @@ class JobDescriptionSearchViewTest(TestCase):
             html=True,
             count=1,
         )
-        self.assertContains(response, capfirst(job_pec.display_name))
+        self.assertContains(response, displayed_job_pec)
         self.assertContains(response, "MaPetiteEntreprise")
