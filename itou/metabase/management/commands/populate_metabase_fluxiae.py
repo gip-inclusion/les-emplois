@@ -98,6 +98,7 @@ class Command(BaseCommand):
         self.populate_fluxiae_view(vue_name="fluxIAE_Encadrement")
         self.populate_fluxiae_view(vue_name="fluxIAE_EtatMensuelAgregat")
         self.populate_fluxiae_view(vue_name="fluxIAE_EtatMensuelIndiv")
+        self.populate_fluxiae_view(vue_name="fluxIAE_Financement")
         self.populate_fluxiae_view(vue_name="fluxIAE_Formations")
         self.populate_fluxiae_view(vue_name="fluxIAE_Missions")
         self.populate_fluxiae_view(vue_name="fluxIAE_MissionsEtatMensuelIndiv")
