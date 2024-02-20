@@ -53,7 +53,7 @@ def pprint_html(response, **selectors):
     print("\n\n".join([elt.prettify() for elt in parser.find_all(**selectors)]))
 
 
-def parse_response_to_soup(response, selector=None, no_html_body=False, replace_in_href=None):
+def parse_response_to_soup(response, selector=None, no_html_body=False, replace_in_attr=None):
     soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
     if no_html_body:
         # If the provided HTML does not contain <html><body> tags
@@ -68,17 +68,23 @@ def parse_response_to_soup(response, selector=None, no_html_body=False, replace_
         soup["nonce"] = "NORMALIZED_CSP_NONCE"
     for csp_nonce_script in soup.find_all("script", {"nonce": True}):
         csp_nonce_script["nonce"] = "NORMALIZED_CSP_NONCE"
-    if replace_in_href:
+    if replace_in_attr:
         replacements = [
             (
                 replacement
                 if isinstance(replacement, tuple)
-                else (str(replacement.pk), f"[PK of {type(replacement).__name__}]")
+                else ("href", str(replacement.pk), f"[PK of {type(replacement).__name__}]")
             )
-            for replacement in replace_in_href
+            for replacement in replace_in_attr
         ]
-        for links in soup.find_all(attrs={"href": True}):
-            [links.attrs.update({"href": links.attrs["href"].replace(*replacement)}) for replacement in replacements]
+
+        # Get the list of the attrs (deduplicated) we should search for replacement
+        unique_attrs = set([replace_tuple[0] for replace_tuple in replacements])
+
+        for attr in unique_attrs:
+            for links in soup.find_all(attrs={attr: True}):
+                for _, from_str, to_str in replacements:
+                    links.attrs.update({f"{attr}": links.attrs[attr].replace(from_str, to_str)})
     return soup
 
 

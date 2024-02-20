@@ -55,7 +55,14 @@ class CardViewTest(TestCase):
         company = CompanyFactory(with_membership=False, for_snapshot=True)
         url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         response = self.client.get(url)
-        soup = parse_response_to_soup(response, selector="#main")
+        soup = parse_response_to_soup(
+            response,
+            selector="#main",
+            replace_in_attr=[
+                ("href", f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
+                ("data-it-copy-to-clipboard", f"/company/{company.pk}/card", "/company/[PK of Company]/card"),
+            ],
+        )
         assert str(soup) == self.snapshot()
 
     def test_card_no_active_jobs(self):
@@ -76,13 +83,14 @@ class CardViewTest(TestCase):
         tab_content_soup = parse_response_to_soup(
             response,
             selector=".tab-content",
-            replace_in_href=[
+            replace_in_attr=[
                 (
+                    "href",
                     f"/company/job_description/{job_description.pk}/card",
                     "/company/job_description/[PK of JobDescription]/card",
                 ),
-                (f"?back_url=/company/{company.pk}/card", "?back_url=/company/[PK of Company]/card"),
-                (f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
+                ("href", f"?back_url=/company/{company.pk}/card", "?back_url=/company/[PK of Company]/card"),
+                ("href", f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
             ],
         )
         assert str(tab_content_soup) == self.snapshot(name="tab-content")
@@ -106,13 +114,14 @@ class CardViewTest(TestCase):
         tab_content_soup = parse_response_to_soup(
             response,
             selector=".tab-content",
-            replace_in_href=[
+            replace_in_attr=[
                 (
+                    "href",
                     f"/company/job_description/{job_description.pk}/card",
                     "/company/job_description/[PK of JobDescription]/card",
                 ),
-                (f"?back_url=/company/{company.pk}/card", "?back_url=/company/[PK of Company]/card"),
-                (f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
+                ("href", f"?back_url=/company/{company.pk}/card", "?back_url=/company/[PK of Company]/card"),
+                ("href", f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
             ],
         )
         assert str(tab_content_soup) == self.snapshot(name="tab-content")
@@ -147,17 +156,19 @@ class CardViewTest(TestCase):
         tab_content_soup = parse_response_to_soup(
             response,
             selector=".tab-content",
-            replace_in_href=[
+            replace_in_attr=[
                 (
+                    "href",
                     f"/company/job_description/{active_job_description.pk}/card",
                     "/company/job_description/[PK of JobDescription]/card",
                 ),
                 (
+                    "href",
                     f"/company/job_description/{other_job_description.pk}/card",
                     "/company/job_description/[PK of JobDescription]/card",
                 ),
-                (f"?back_url=/company/{company.pk}/card", "?back_url=/company/[PK of Company]/card"),
-                (f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
+                ("href", f"?back_url=/company/{company.pk}/card", "?back_url=/company/[PK of Company]/card"),
+                ("href", f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
             ],
         )
         assert str(tab_content_soup) == self.snapshot(name="tab-content")
@@ -181,13 +192,14 @@ class CardViewTest(TestCase):
         tab_content_soup = parse_response_to_soup(
             response,
             selector=".tab-content",
-            replace_in_href=[
+            replace_in_attr=[
                 (
+                    "href",
                     f"/company/job_description/{job_description.pk}/card",
                     "/company/job_description/[PK of JobDescription]/card",
                 ),
-                (f"?back_url=/company/{company.pk}/card", "?back_url=/company/[PK of Company]/card"),
-                (f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
+                ("href", f"?back_url=/company/{company.pk}/card", "?back_url=/company/[PK of Company]/card"),
+                ("href", f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
             ],
         )
         assert str(tab_content_soup) == self.snapshot(name="tab-content")

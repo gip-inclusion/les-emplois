@@ -1485,7 +1485,7 @@ class UtilsParseResponseToSoupTest(TestCase):
             '<div><a href="http://server.com/red_mullet/">red mullet</a></div>'
             "</body></html>"
         )
-        soup = parse_response_to_soup(response, replace_in_href=[jobseeker, ("red_mullet", "slug2")])
+        soup = parse_response_to_soup(response, replace_in_attr=[jobseeker, ("href", "red_mullet", "slug2")])
         assert str(soup) == (
             "<html><head></head><body>"
             '<div><a href="http://server.com/[PK of User]/">salmon</a></div>'
