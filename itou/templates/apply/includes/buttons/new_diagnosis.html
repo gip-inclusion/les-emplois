@@ -1,18 +1,16 @@
-<div class="my-2">
-    {% with suspension=job_application.to_company.get_active_suspension_text_with_dates %}
-        {% if suspension %}
-            <button class="btn btn-primary btn-block btn-ico disabled"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    title="Vous ne pouvez pas valider les critères d'éligibilité suite aux mesures prises dans le cadre du contrôle a posteriori. {{ suspension }}">
-                <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
-                <span>Accepter cette candidature</span>
-            </button>
-        {% else %}
-            <a href="{% url 'apply:eligibility' job_application_id=job_application %}" class="btn btn-primary btn-block btn-ico">
-                <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
-                <span>Accepter cette candidature</span>
-            </a>
-        {% endif %}
-    {% endwith %}
-</div>
+{% with suspension=job_application.to_company.get_active_suspension_text_with_dates %}
+    {% if suspension %}
+        <button class="btn btn-lg btn-white btn-block btn-ico disabled"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Vous ne pouvez pas valider les critères d'éligibilité suite aux mesures prises dans le cadre du contrôle a posteriori. {{ suspension }}">
+            <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
+            <span>Accepter</span>
+        </button>
+    {% else %}
+        <a href="{% url 'apply:eligibility' job_application_id=job_application %}" class="btn btn-lg btn-white btn-block btn-ico">
+            <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
+            <span>Accepter</span>
+        </a>
+    {% endif %}
+{% endwith %}

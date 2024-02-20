@@ -3,6 +3,10 @@
 {% load format_filters %}
 {% load matomo %}
 
+{% block actions %}
+    {% include "apply/includes/siae_hiring_actions.html" with job_application=job_application %}
+{% endblock %}
+
 {% block content_extend %}
     {# Job seeker info ------------------------------------------------------------------------- #}
     <div class="c-box mb-4">
@@ -55,9 +59,27 @@
     {% endif %}
 {% endblock %}
 
-{% block actions %}
-    {% include "apply/includes/siae_hiring_actions.html" with job_application=job_application %}
-
+{% block sidebar %}
+    {# Job application accepted: cancel --------------------------------------------------------------------- #}
+    {% if job_application.state.is_accepted and job_application.can_be_cancelled %}
+        <div class="c-box mb-4">
+            {% if job_application.to_company.is_subject_to_eligibility_rules %}
+                <p>
+                    <strong>Rétractation</strong>
+                </p>
+                <p>
+                    Si vous annulez cette embauche, vous ne pourrez pas prétendre à l'aide au poste pour les jours éventuellement travaillés.
+                </p>
+                <p>
+                    {{ job_application.job_seeker.get_full_name }} restera éligible à l'IAE et pourra de nouveau vous envoyer une candidature dans le futur.
+                </p>
+            {% endif %}
+            <a href="{% url 'apply:cancel' job_application_id=job_application.id %}" class="btn btn-danger btn-block btn-ico text-decoration-none">
+                <i class="ri-arrow-go-back-line font-weight-medium" aria-hidden="true"></i>
+                <span>Annuler l'embauche</span>
+            </a>
+        </div>
+    {% endif %}
     {% if job_application.to_company.is_subject_to_eligibility_rules and request.user.is_employer and job_application.state.is_accepted and job_application.approval %}
         <div class="c-box mb-4">
             <p>
@@ -69,20 +91,4 @@
             <a class="btn btn-block btn-primary" href="{% url 'approvals:detail' pk=job_application.approval.id %}" {% matomo_event "salaries" "clic" "detail-salarie-depuis-candidature" %}>Accéder au profil salarié</a>
         </div>
     {% endif %}
-{% endblock %}
-
-{% block script %}
-    {{ block.super }}
-
-    <script nonce="{{ CSP_NONCE }}">
-        htmx.onLoad((target) => {
-            $(".hide-if-empty", target).each(function() {
-                if ($(this).children().length == 0) {
-                    $(this).hide();
-                } else {
-                    $(this).show();
-                }
-            })
-        })
-    </script>
 {% endblock %}

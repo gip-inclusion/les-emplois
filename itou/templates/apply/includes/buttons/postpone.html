@@ -1,7 +1,5 @@
 {% load matomo %}
-<div class="my-2">
-    <a href="{% url 'apply:postpone' job_application_id=job_application.id %}" class="btn btn-secondary btn-block btn-ico" {% matomo_event "candidature" "clic" "postpone_application" %}>
-        <i class="ri-history-line font-weight-medium" aria-hidden="true"></i>
-        <span>Mettre en liste d'attente</span>
-    </a>
-</div>
+<a href="{% url 'apply:postpone' job_application_id=job_application.id %}" class="btn btn-lg btn-link-white btn-block btn-ico" {% matomo_event "candidature" "clic" "postpone_application" %}>
+    <i class="ri-history-line font-weight-medium" aria-hidden="true"></i>
+    <span>Mettre en liste d'attente</span>
+</a>
