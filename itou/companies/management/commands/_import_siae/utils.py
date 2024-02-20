@@ -275,6 +275,11 @@ def anonymize_fluxiae_df(df):
         "salarie_adr_libelle_voie",
         "salarie_adr_cplt_distribution",
         "salarie_adr_qpv_nom",
+        # Sensitive banking information.
+        "iban",  # International Bank Account Number.
+        "bban",  # Basic Bank Account Number.
+        "bic",  # Bank code.
+        "nom_bqe",  # Bank name.
     ]
 
     for column_name in df.columns.tolist():
