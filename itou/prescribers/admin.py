@@ -94,6 +94,7 @@ class PrescriberOrganizationAdmin(ItouGISMixin, OrganizationAdmin):
                     "email",
                     "code_safir_pole_emploi",
                     "is_authorized",
+                    "description",
                 )
             },
         ),
