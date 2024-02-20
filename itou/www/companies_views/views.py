@@ -24,7 +24,7 @@ from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusion
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
-from itou.utils.urls import get_safe_url
+from itou.utils.urls import get_absolute_url, get_safe_url
 from itou.www.companies_views import forms as companies_forms
 
 
@@ -511,6 +511,7 @@ def card(request, siae_id, template_name="companies/card.html"):
         "other_jobs_descriptions": other_jobs_descriptions,
         "matomo_custom_title": "Fiche de la structure d'insertion",
         "code_insee": company.insee_city.code_insee if company.insee_city else None,
+        "siae_card_absolute_url": get_absolute_url(reverse("companies_views:card", kwargs={"siae_id": company.pk})),
     }
     return render(request, template_name, context)
 

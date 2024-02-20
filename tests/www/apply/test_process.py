@@ -2306,23 +2306,23 @@ def test_accept_button(client):
     )
     accept_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
     DIRECT_ACCEPT_BUTTON = (
-        f'<a href="{accept_url}" class="btn btn-primary btn-block btn-ico" '
+        f'<a href="{accept_url}" class="btn btn-lg btn-white btn-block btn-ico" '
         'data-matomo-event="true" data-matomo-category="candidature" '
         'data-matomo-action="clic" data-matomo-option="accept_application">'
         '\n            <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>'
-        "\n            <span>Accepter cette candidature</span>"
+        "\n            <span>Accepter</span>"
         "\n        </a>"
     )
     client.force_login(job_application.to_company.members.first())
     response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
     # GEIQ without GEIQ diagnosis: we get the modals
-    assertNotContains(response, DIRECT_ACCEPT_BUTTON)
+    assertNotContains(response, DIRECT_ACCEPT_BUTTON, html=True)
 
     job_application.to_company.kind = CompanyKind.AI
     job_application.to_company.save(update_fields=("kind",))
 
     response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
-    assertContains(response, DIRECT_ACCEPT_BUTTON)
+    assertContains(response, DIRECT_ACCEPT_BUTTON, html=True)
 
 
 def test_add_prior_action_new(client):

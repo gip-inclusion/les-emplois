@@ -1,18 +1,17 @@
 {% load matomo %}
-<div class="my-2">
-    {% url 'apply:accept' job_application_id=job_application.pk as accept_url %}
-    {% if job_application.to_company.kind != CompanyKind.GEIQ or geiq_eligibility_diagnosis and geiq_eligibility_diagnosis.is_valid %}
-        <a href="{{ accept_url }}" class="btn btn-primary btn-block btn-ico" {% matomo_event "candidature" "clic" "accept_application" %}>
-            <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
-            <span>Accepter cette candidature</span>
-        </a>
-    {% else %}
-        {# GEIQ SIAE without valid geiq_eligibility_diagnosis #}
-        <button class="btn btn-primary btn-block btn-ico" data-bs-toggle="modal" data-bs-target="#confirm_no_allowance_modal">
-            <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
-            <span>Accepter cette candidature</span>
-        </button>
-        {# Confirmation modal for hiring #}
-        {% include "apply/includes/geiq/no_allowance_modal.html" with next_url=accept_url %}
-    {% endif %}
-</div>
+
+{% url 'apply:accept' job_application_id=job_application.pk as accept_url %}
+{% if job_application.to_company.kind != CompanyKind.GEIQ or geiq_eligibility_diagnosis and geiq_eligibility_diagnosis.is_valid %}
+    <a href="{{ accept_url }}" class="btn btn-lg btn-white btn-block btn-ico" {% matomo_event "candidature" "clic" "accept_application" %}>
+        <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
+        <span>Accepter</span>
+    </a>
+{% else %}
+    {# GEIQ SIAE without valid geiq_eligibility_diagnosis #}
+    <button class="btn btn-lg btn-white btn-block btn-ico" data-bs-toggle="modal" data-bs-target="#confirm_no_allowance_modal">
+        <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
+        <span>Accepter</span>
+    </button>
+    {# Confirmation modal for hiring #}
+    {% include "apply/includes/geiq/no_allowance_modal.html" with next_url=accept_url %}
+{% endif %}
