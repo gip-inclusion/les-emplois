@@ -9,7 +9,7 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.core import mail
 from django.test import override_settings
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.html import escape
 from freezegun import freeze_time
@@ -74,6 +74,21 @@ class DashboardViewTest(TestCase):
         "Votre compte utilisateur n’est rattaché à aucune agence France Travail, "
         "par conséquent vous ne pouvez pas bénéficier du statut de prescripteur habilité."
     )
+    DANGER_CLASS = "bg-danger"
+    PROLONG_SUSPEND = "Prolonger/suspendre un agrément émis par Pôle emploi"
+    SUSPEND_TEXT = "Suspendre un PASS IAE"
+    HIRE_LINK_LABEL = "Déclarer une embauche"
+    DORA_LABEL = "DORA"
+    DORA_CARD_MSG = "Consultez l’offre de service de vos partenaires"
+    DORA_HIGHLIGHT_MSG = "Donnez de la visibilité à votre offre d’insertion"
+
+    @staticmethod
+    def apply_start_url(company):
+        return reverse("apply:start", kwargs={"company_pk": company.pk})
+
+    @staticmethod
+    def check_nir_for_hire_url(company):
+        return reverse("apply:check_nir_for_hire", kwargs={"company_pk": company.pk})
 
     def test_dashboard(self):
         company = CompanyFactory(with_membership=True)
@@ -141,7 +156,7 @@ class DashboardViewTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         self.assertContains(response, "Gérer les fiches salarié")
-        self.assertNotContains(response, "bg-danger")
+        self.assertNotContains(response, self.DANGER_CLASS)
         assert response.context["num_rejected_employee_records"] == 0
 
         # create rejected job applications
@@ -161,14 +176,14 @@ class DashboardViewTest(TestCase):
         session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = company.pk
         session.save()
         response = self.client.get(url)
-        self.assertContains(response, "bg-danger")
+        self.assertContains(response, self.DANGER_CLASS)
         assert response.context["num_rejected_employee_records"] == 2
 
         # select the second company's in the session
         session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = other_company.pk
         session.save()
         response = self.client.get(url)
-        self.assertContains(response, "bg-danger")
+        self.assertContains(response, self.DANGER_CLASS)
         assert response.context["num_rejected_employee_records"] == 1
 
         # select the third company's in the session
@@ -210,7 +225,7 @@ class DashboardViewTest(TestCase):
                 self.client.force_login(user)
 
                 response = self.client.get(reverse("dashboard:index"))
-                self.assertContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
+                self.assertContains(response, self.PROLONG_SUSPEND)
 
         for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS]:
             with self.subTest(f"should not display when company_kind={kind}"):
@@ -219,12 +234,11 @@ class DashboardViewTest(TestCase):
                 self.client.force_login(user)
 
                 response = self.client.get(reverse("dashboard:index"))
-                self.assertNotContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
+                self.assertNotContains(response, self.PROLONG_SUSPEND)
                 if kind != CompanyKind.GEIQ:
-                    self.assertNotContains(response, "Déclarer une embauche")
+                    self.assertNotContains(response, self.HIRE_LINK_LABEL)
 
     def test_dashboard_job_applications(self):
-        HIRE_LINK_LABEL = "Déclarer une embauche"
         APPLICATION_SAVE_LABEL = "Enregistrer une candidature"
         display_kinds = [
             CompanyKind.AI,
@@ -242,9 +256,9 @@ class DashboardViewTest(TestCase):
 
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertContains(response, APPLICATION_SAVE_LABEL)
-                self.assertContains(response, reverse("apply:start", kwargs={"company_pk": company.pk}))
-                self.assertContains(response, HIRE_LINK_LABEL)
-                self.assertContains(response, reverse("apply:check_nir_for_hire", kwargs={"company_pk": company.pk}))
+                self.assertContains(response, self.apply_start_url(company))
+                self.assertContains(response, self.HIRE_LINK_LABEL)
+                self.assertContains(response, self.check_nir_for_hire_url(company))
 
         for kind in set(CompanyKind) - set(display_kinds):
             with self.subTest(f"should not display when company_kind={kind}"):
@@ -253,11 +267,9 @@ class DashboardViewTest(TestCase):
                 self.client.force_login(user)
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertNotContains(response, APPLICATION_SAVE_LABEL)
-                self.assertNotContains(response, reverse("apply:start", kwargs={"company_pk": company.pk}))
-                self.assertNotContains(response, HIRE_LINK_LABEL)
-                self.assertNotContains(
-                    response, reverse("apply:check_nir_for_hire", kwargs={"company_pk": company.pk})
-                )
+                self.assertNotContains(response, self.apply_start_url(company))
+                self.assertNotContains(response, self.HIRE_LINK_LABEL)
+                self.assertNotContains(response, self.check_nir_for_hire_url(company))
 
     def test_dashboard_agreements_with_suspension_sanction(self):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
@@ -270,10 +282,10 @@ class DashboardViewTest(TestCase):
         self.client.force_login(user)
 
         response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, "Prolonger/suspendre un agrément émis par Pôle emploi")
+        self.assertContains(response, self.PROLONG_SUSPEND)
         # Check that "Déclarer une embauche" is here, but not its matching link
-        self.assertContains(response, "Déclarer une embauche")
-        self.assertNotContains(response, reverse("apply:start", kwargs={"company_pk": company.pk}))
+        self.assertContains(response, self.HIRE_LINK_LABEL)
+        self.assertNotContains(response, self.apply_start_url(company))
         # Check that the button tooltip is there
         self.assertContains(
             response,
@@ -288,11 +300,8 @@ class DashboardViewTest(TestCase):
 
                 self.client.force_login(user)
                 response = self.client.get(reverse("dashboard:index"))
-
-                if user.can_create_siae_antenna(company):
-                    self.assertContains(response, "Créer/rejoindre une autre structure")
-                else:
-                    self.assertNotContains(response, "Créer/rejoindre une autre structure")
+                assertion = self.assertContains if user.can_create_siae_antenna(company) else assertNotContains
+                assertion(response, "Créer/rejoindre une autre structure")
 
     def test_dashboard_siae_stats(self):
         membership = CompanyMembershipFactory()
@@ -347,65 +356,47 @@ class DashboardViewTest(TestCase):
         user = membershipfactory.user
         institution = membershipfactory.institution
         self.client.force_login(user)
+        evaluation_campaign_label = "Contrôle a posteriori"
+        sample_selection_url = reverse("siae_evaluations_views:samples_selection")
 
         response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Contrôle a posteriori")
-        self.assertNotContains(response, reverse("siae_evaluations_views:samples_selection"))
+        self.assertNotContains(response, evaluation_campaign_label)
+        self.assertNotContains(response, sample_selection_url)
 
         evaluation_campaign = EvaluationCampaignFactory(institution=institution)
         response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, "Contrôle a posteriori")
+        self.assertContains(response, evaluation_campaign_label)
         self.assertContains(response, IN_PROGRESS_LINK)
-        self.assertContains(response, reverse("siae_evaluations_views:samples_selection"))
-        self.assertNotContains(
-            response,
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
-            ),
+        self.assertContains(response, sample_selection_url)
+        evaluated_siae_list_url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_list",
+            kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
         )
+        self.assertNotContains(response, evaluated_siae_list_url)
 
         evaluation_campaign.evaluations_asked_at = timezone.now()
         evaluation_campaign.save(update_fields=["evaluations_asked_at"])
         response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, "Contrôle a posteriori")
-        self.assertNotContains(response, reverse("siae_evaluations_views:samples_selection"))
+        self.assertContains(response, evaluation_campaign_label)
+        self.assertNotContains(response, sample_selection_url)
         self.assertContains(response, IN_PROGRESS_LINK)
-        self.assertContains(
-            response,
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
-            ),
-        )
+        self.assertContains(response, evaluated_siae_list_url)
 
         evaluation_campaign.ended_at = timezone.now()
         evaluation_campaign.save(update_fields=["ended_at"])
         response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, "Contrôle a posteriori")
+        self.assertContains(response, evaluation_campaign_label)
         self.assertNotContains(response, IN_PROGRESS_LINK)
-        self.assertNotContains(response, reverse("siae_evaluations_views:samples_selection"))
-        self.assertContains(
-            response,
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
-            ),
-        )
+        self.assertNotContains(response, sample_selection_url)
+        self.assertContains(response, evaluated_siae_list_url)
 
         evaluation_campaign.ended_at = timezone.now() - CAMPAIGN_VIEWABLE_DURATION
         evaluation_campaign.save(update_fields=["ended_at"])
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, IN_PROGRESS_LINK)
-        self.assertNotContains(response, "Contrôle a posteriori")
-        self.assertNotContains(response, reverse("siae_evaluations_views:samples_selection"))
-        self.assertNotContains(
-            response,
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
-            ),
-        )
+        self.assertNotContains(response, evaluation_campaign_label)
+        self.assertNotContains(response, sample_selection_url)
+        self.assertNotContains(response, evaluated_siae_list_url)
 
     def test_dashboard_siae_evaluation_campaign_notifications(self):
         membership = CompanyMembershipFactory()
@@ -418,8 +409,9 @@ class DashboardViewTest(TestCase):
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.INVALID_PROOF,
             notification_text="A envoyé une photo de son chat. Séparé de son chat pendant une journée.",
         )
+        in_progress_name = "In progress"
         evaluated_siae = EvaluatedSiaeFactory(
-            evaluation_campaign__name="In progress",
+            evaluation_campaign__name=in_progress_name,
             siae=membership.company,
             evaluation_campaign__evaluations_asked_at=timezone.now(),
         )
@@ -430,14 +422,16 @@ class DashboardViewTest(TestCase):
         evaluated_job_app_2 = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app_2)
         EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app_2)
+        not_notified_name = "Not notified"
         EvaluatedSiaeFactory(
-            evaluation_campaign__name="Not notified",
+            evaluation_campaign__name=not_notified_name,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             siae=membership.company,
         )
+        just_closed_name = "Just closed"
         evaluated_siae_campaign_closed = EvaluatedSiaeFactory(
-            evaluation_campaign__name="Just closed",
+            evaluation_campaign__name=just_closed_name,
             complete=True,
             siae=membership.company,
             evaluation_campaign__ended_at=timezone.now() - relativedelta(days=4),
@@ -446,8 +440,9 @@ class DashboardViewTest(TestCase):
             notification_text="Journée de formation.",
         )
         # Long closed.
+        long_closed_name = "Long closed"
         EvaluatedSiaeFactory(
-            evaluation_campaign__name="Long closed",
+            evaluation_campaign__name=long_closed_name,
             complete=True,
             siae=membership.company,
             evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
@@ -503,15 +498,15 @@ class DashboardViewTest(TestCase):
             <a href="/siae_evaluation/evaluated_siae_sanction/{evaluated_siae_campaign_closed.pk}/"
              class="btn-link btn-ico">
                 <i class="ri-file-copy-2-line ri-lg font-weight-normal"></i>
-                <span>Just closed</span>
+                <span>{just_closed_name}</span>
             </a>
             """,
             html=True,
             count=1,
         )
-        self.assertNotContains(response, "Long closed")
-        self.assertNotContains(response, "Not notified")
-        self.assertNotContains(response, "In progress")
+        self.assertNotContains(response, long_closed_name)
+        self.assertNotContains(response, not_notified_name)
+        self.assertNotContains(response, in_progress_name)
 
     def test_dashboard_siae_evaluations_siae_access(self):
         # preset for incoming new pages
@@ -519,13 +514,14 @@ class DashboardViewTest(TestCase):
         user = company.members.first()
         self.client.force_login(user)
 
+        evaluation_campaign_label = "Contrôle a posteriori"
         response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Contrôle a posteriori")
+        self.assertNotContains(response, evaluation_campaign_label)
 
         fake_now = timezone.now()
         evaluated_siae = EvaluatedSiaeFactory(siae=company, evaluation_campaign__evaluations_asked_at=fake_now)
         response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, "Contrôle a posteriori")
+        self.assertContains(response, evaluation_campaign_label)
         TODO_BADGE = (
             '<span class="badge badge-xs rounded-pill bg-warning-lighter text-warning">'
             '<i class="ri-error-warning-line" aria-hidden="true"></i>'
@@ -568,14 +564,14 @@ class DashboardViewTest(TestCase):
         self.client.force_login(user)
 
         response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "DORA")
+        self.assertNotContains(response, self.DORA_LABEL)
 
     def test_dora_card_is_shown_for_employer(self):
         company = CompanyFactory(with_membership=True)
         self.client.force_login(company.members.first())
 
         response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, "DORA")
+        self.assertContains(response, self.DORA_LABEL)
         self.assertContains(response, "Consulter les services d'insertion de votre territoire")
         self.assertContains(response, "Référencer vos services")
         self.assertContains(response, "Suggérer un service partenaire")
@@ -585,7 +581,7 @@ class DashboardViewTest(TestCase):
         self.client.force_login(prescriber_organization.members.first())
 
         response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, "DORA")
+        self.assertContains(response, self.DORA_LABEL)
         self.assertContains(response, "Consulter les services d'insertion de votre territoire")
         self.assertContains(response, "Référencer vos services")
         self.assertContains(response, "Suggérer un service partenaire")
@@ -628,8 +624,8 @@ class DashboardViewTest(TestCase):
         self.client.force_login(user)
 
         response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Consultez l’offre de service de vos partenaires")
-        self.assertNotContains(response, "Donnez de la visibilité à votre offre d’insertion")
+        self.assertNotContains(response, self.DORA_CARD_MSG)
+        self.assertNotContains(response, self.DORA_HIGHLIGHT_MSG)
 
     def test_dora_banner_is_shown_for_employer(self):
         for department in ["91", "26", "74", "30"]:
@@ -642,7 +638,7 @@ class DashboardViewTest(TestCase):
                 self.client.force_login(company.members.first())
 
                 response = self.client.get(reverse("dashboard:index"))
-                self.assertContains(response, "Donnez de la visibilité à votre offre d’insertion")
+                self.assertContains(response, self.DORA_HIGHLIGHT_MSG)
 
     def test_dora_banner_is_shown_for_prescriber(self):
         for department in ["91", "26", "74", "30"]:
@@ -654,14 +650,14 @@ class DashboardViewTest(TestCase):
                 self.client.force_login(prescriber_organization.members.first())
 
                 response = self.client.get(reverse("dashboard:index"))
-                self.assertContains(response, "Consultez l’offre de service de vos partenaires")
+                self.assertContains(response, self.DORA_CARD_MSG)
 
     def test_dora_banner_is_not_shown_for_other_department(self):
         company = CompanyFactory(with_membership=True, department="01")
         self.client.force_login(company.members.first())
 
         response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Donnez de la visibilité à votre offre d’insertion")
+        self.assertNotContains(response, self.DORA_HIGHLIGHT_MSG)
 
         prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
             department="01",
@@ -669,7 +665,7 @@ class DashboardViewTest(TestCase):
         self.client.force_login(prescriber_organization.members.first())
 
         response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Consultez l’offre de service de vos partenaires")
+        self.assertNotContains(response, self.DORA_CARD_MSG)
 
     def test_dashboard_prescriber_without_organization_message(self):
         # An orienter is a prescriber without prescriber organization
@@ -700,29 +696,29 @@ class DashboardViewTest(TestCase):
         assert org_1 == PrescriberOrganization.objects.get(
             pk=self.client.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)
         )
-        self.assertNotContains(response, "Votre compte utilisateur n’est rattaché à aucune organisation.")
+        self.assertNotContains(response, self.NO_PRESCRIBER_ORG_MSG)
 
         org_1.members.remove(prescriber)
         response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Votre compte utilisateur n’est rattaché à aucune organisation.")
+        self.assertNotContains(response, self.NO_PRESCRIBER_ORG_MSG)
 
     def test_dashboard_prescriber_suspend_link(self):
         user = JobSeekerFactory()
         self.client.force_login(user)
         response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Suspendre un PASS IAE")
+        self.assertNotContains(response, self.SUSPEND_TEXT)
 
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         self.client.force_login(user)
         response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Suspendre un PASS IAE")
+        self.assertNotContains(response, self.SUSPEND_TEXT)
 
         membershipfactory = InstitutionMembershipFactory()
         user = membershipfactory.user
         self.client.force_login(user)
         response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Suspendre un PASS IAE")
+        self.assertNotContains(response, self.SUSPEND_TEXT)
 
         prescriber_org = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
             kind=PrescriberOrganizationKind.CAP_EMPLOI
@@ -730,7 +726,7 @@ class DashboardViewTest(TestCase):
         prescriber = prescriber_org.members.first()
         self.client.force_login(prescriber)
         response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, "Suspendre un PASS IAE")
+        self.assertNotContains(response, self.SUSPEND_TEXT)
 
         prescriber_org_pe = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
             authorized=True, kind=PrescriberOrganizationKind.PE
@@ -738,7 +734,7 @@ class DashboardViewTest(TestCase):
         prescriber_pe = prescriber_org_pe.members.first()
         self.client.force_login(prescriber_pe)
         response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, "Suspendre un PASS IAE")
+        self.assertContains(response, self.SUSPEND_TEXT)
 
     @freeze_time("2022-09-15")
     def test_dashboard_access_by_a_jobseeker(self):
@@ -788,6 +784,11 @@ class DashboardViewTest(TestCase):
 @pytest.mark.usefixtures("unittest_compatibility")
 class EditUserInfoViewTest(InclusionConnectBaseTestCase):
     NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
+    EMAIL_LABEL = "Adresse électronique"
+    NIR_FIELD_ID = "id_nir"
+    LACK_OF_NIR_FIELD_ID = "id_lack_of_nir"
+    LACK_OF_NIR_REASON_FIELD_ID = "id_lack_of_nir_reason"
+    BIRTHDATE_FIELD_NAME = "birthdate"
 
     @override_settings(TALLY_URL="https://tally.so")
     def test_edit_with_nir(self):
@@ -805,9 +806,12 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         ):
             response = self.client.get(url)
         # There's a specific view to edit the email so we don't show it here
-        self.assertNotContains(response, "Adresse électronique")
+        self.assertNotContains(response, self.EMAIL_LABEL)
         # Check that the NIR field is disabled
-        self.assertContains(response, 'disabled id="id_nir"')
+        self.assertContains(response, f'disabled id="{self.NIR_FIELD_ID}"')
+        self.assertContains(response, self.LACK_OF_NIR_FIELD_ID)
+        self.assertContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
+        self.assertContains(response, self.BIRTHDATE_FIELD_NAME)
         self.assertContains(
             response,
             (
@@ -980,7 +984,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
-        self.assertContains(response, "Adresse électronique")
+        self.assertContains(response, self.EMAIL_LABEL)
 
         post_data = {
             "email": "bob@saintclar.net",
@@ -1083,10 +1087,10 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
-        self.assertNotContains(response, "id_nir")
-        self.assertNotContains(response, "id_lack_of_nir")
-        self.assertNotContains(response, "id_lack_of_nir_reason")
-        self.assertNotContains(response, "birthdate")
+        self.assertNotContains(response, self.NIR_FIELD_ID)
+        self.assertNotContains(response, self.LACK_OF_NIR_FIELD_ID)
+        self.assertNotContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
+        self.assertNotContains(response, self.BIRTHDATE_FIELD_NAME)
 
         post_data = {
             "first_name": "Bob",
@@ -1112,10 +1116,10 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
-        self.assertNotContains(response, "id_nir")
-        self.assertNotContains(response, "id_lack_of_nir")
-        self.assertNotContains(response, "id_lack_of_nir_reason")
-        self.assertNotContains(response, "birthdate")
+        self.assertNotContains(response, self.NIR_FIELD_ID)
+        self.assertNotContains(response, self.LACK_OF_NIR_FIELD_ID)
+        self.assertNotContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
+        self.assertNotContains(response, self.BIRTHDATE_FIELD_NAME)
         self.assertContains(response, f"Prénom : <strong>{user.first_name.title()}</strong>")
         self.assertContains(response, f"Nom : <strong>{user.last_name.upper()}</strong>")
         self.assertContains(response, f"Adresse e-mail : <strong>{user.email}</strong>")
@@ -1146,6 +1150,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
 
 class EditJobSeekerInfo(TestCase):
     NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
+    EMAIL_LABEL = "Adresse électronique"
 
     @override_settings(TALLY_URL="https://tally.so")
     def test_edit_by_company_with_nir(self):
@@ -1429,7 +1434,7 @@ class EditJobSeekerInfo(TestCase):
         url = f"{url}?back_url={back_url}"
 
         response = self.client.get(url)
-        self.assertContains(response, "Adresse électronique")
+        self.assertContains(response, self.EMAIL_LABEL)
 
         post_data = {
             "title": "M",
@@ -1480,7 +1485,7 @@ class EditJobSeekerInfo(TestCase):
         url = f"{url}?back_url={back_url}"
 
         response = self.client.get(url)
-        self.assertNotContains(response, "Adresse électronique")
+        self.assertNotContains(response, self.EMAIL_LABEL)
 
         post_data = {
             "title": "M",
@@ -1949,6 +1954,7 @@ class SwitchInstitutionTest(TestCase):
 
 
 TOKEN_MENU_STR = "Accès aux APIs"
+API_TOKEN_URL = reverse_lazy("dashboard:api_token")
 
 
 def test_api_token_view_for_company_admin(client):
@@ -1957,24 +1963,22 @@ def test_api_token_view_for_company_admin(client):
 
     assert not Token.objects.exists()
 
-    url = reverse("dashboard:index")
-    response = client.get(url)
+    response = client.get(reverse("dashboard:index"))
 
-    url = reverse("dashboard:api_token")
     assertContains(response, TOKEN_MENU_STR)
-    assertContains(response, url)
+    assertContains(response, API_TOKEN_URL)
 
-    response = client.get(url)
+    response = client.get(API_TOKEN_URL)
     assertContains(response, "Vous n'avez pas encore de token d'API")
     assertContains(response, "Créer un token d'API")
 
-    response = client.post(url)
+    response = client.post(API_TOKEN_URL)
     token = Token.objects.filter(user=employer).get()
     assertContains(response, token.key)
     assertContains(response, "Copier le token")
 
     # Check multi-posts
-    response = client.post(url)
+    response = client.post(API_TOKEN_URL)
     assert Token.objects.filter(user=employer).count() == 1
 
 
@@ -1985,14 +1989,12 @@ def test_api_token_view_for_non_company_admin(client):
 
     assert not Token.objects.exists()
 
-    url = reverse("dashboard:index")
-    response = client.get(url)
+    response = client.get(reverse("dashboard:index"))
 
-    url = reverse("dashboard:api_token")
     assertNotContains(response, TOKEN_MENU_STR)
-    assertNotContains(response, url)
+    assertNotContains(response, API_TOKEN_URL)
 
-    response = client.get(url)
+    response = client.get(API_TOKEN_URL)
     assert response.status_code == 403
 
 
