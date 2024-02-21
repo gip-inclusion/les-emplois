@@ -207,7 +207,7 @@ def delete_user_created_siaes_without_members():
     Siaes created by a user usually have at least one member, their creator.
     However in some cases, itou staff deletes some users, leaving
     potentially user created siaes without member.
-    Those siaes cannot be joined by any way and thus are useless.
+    Those siaes cannot be joined by any means and thus are useless.
     Let's clean them up when possible.
     """
     errors = 0
