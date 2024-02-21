@@ -34,14 +34,16 @@
 
         {# Prior actions info #}
         {% if job_application.can_have_prior_action %}
-            <hr>
-            <h3>Action préalable à l'embauche</h3>
-            {% for prior_action in job_application.prior_actions.all %}
-                {% include "apply/includes/job_application_prior_action.html" with job_application=job_application prior_action=prior_action add_prior_action_form=None hide_final_hr=forloop.last %}
-            {% endfor %}
-            {% if job_application.can_change_prior_actions %}
-                {% url 'apply:add_prior_action' job_application_id=job_application.id as add_prior_action_url %}
-                {% include "apply/includes/job_application_prior_action_form.html" with job_application=job_application form=add_prior_action_form main_div_id="add_prior_action" form_url=add_prior_action_url %}
+            {% if job_application.prior_actions.all or job_application.can_change_prior_actions %}
+                <hr>
+                <h3>Action préalable à l'embauche</h3>
+                {% for prior_action in job_application.prior_actions.all %}
+                    {% include "apply/includes/job_application_prior_action.html" with job_application=job_application prior_action=prior_action add_prior_action_form=None hide_final_hr=forloop.last %}
+                {% endfor %}
+                {% if job_application.can_change_prior_actions %}
+                    {% url 'apply:add_prior_action' job_application_id=job_application.id as add_prior_action_url %}
+                    {% include "apply/includes/job_application_prior_action_form.html" with job_application=job_application form=add_prior_action_form main_div_id="add_prior_action" form_url=add_prior_action_url %}
+                {% endif %}
             {% endif %}
         {% endif %}
     </div>

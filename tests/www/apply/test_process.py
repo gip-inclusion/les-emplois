@@ -231,6 +231,7 @@ class ProcessViewsTest(TestCase):
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
         self.assertContains(response, resume_link)
+        self.assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
 
     def test_details_for_company_hidden(self, *args, **kwargs):
         """A hidden job_application is not displayed."""
@@ -2235,7 +2236,21 @@ def test_refuse_jobapplication_geiq_reasons(client, reason):
     }
 
 
-def test_details_for_prescriber_geiq(client):
+def test_details_for_prescriber_not_can_have_prior_actions(client):
+    kind = random.choice(list(set(CompanyKind) - {CompanyKind.GEIQ}))
+    job_application = JobApplicationFactory(
+        sent_by_authorized_prescriber_organisation=True,
+        state=JobApplicationWorkflow.STATE_PROCESSING,
+        to_company__kind=kind,
+    )
+    client.force_login(job_application.sender)
+
+    url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+    response = client.get(url)
+    assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
+
+
+def test_details_for_prescriber_geiq_without_prior_actions(client):
     job_application = JobApplicationFactory(
         sent_by_authorized_prescriber_organisation=True,
         state=JobApplicationWorkflow.STATE_PROCESSING,
@@ -2249,7 +2264,7 @@ def test_details_for_prescriber_geiq(client):
     assert response.status_code == 200
 
     assert response.context["geiq_eligibility_diagnosis"] == job_application.geiq_eligibility_diagnosis
-    assertContains(response, PRIOR_ACTION_SECTION_TITLE)
+    assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
 
 
 def test_details_for_prescriber_geiq_with_prior_actions(client):
