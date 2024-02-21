@@ -1,6 +1,7 @@
-from urllib.parse import ParseResult, parse_qsl, urlparse
+from urllib.parse import ParseResult, parse_qsl, urlsplit
 
 from django.conf import settings
+from django.http import QueryDict
 from django.utils.http import url_has_allowed_host_and_scheme, urlencode
 from django.utils.safestring import mark_safe
 
@@ -19,7 +20,7 @@ def get_safe_url(request, param_name=None, fallback_url=None, url=None):
             # https://github.com/django/django/blob/525274f/django/utils/http.py#L413
             # As a quick fix, we build a new URL without the port.
 
-            url_info = urlparse(url)
+            url_info = urlsplit(url)
             url_without_port = ParseResult(
                 scheme=url_info.scheme,
                 netloc=url_info.hostname,
@@ -65,7 +66,11 @@ def add_url_params(url: str, params: dict[str, str]) -> str:
 
     # Remove params with None values
     params = {key: params[key] for key in params if params[key] is not None}
-    url_parts = urlparse(url)
+    try:
+        url_parts = urlsplit(url)
+    except ValueError:
+        # URL is invalid so it's useless to continue.
+        return None
     query = dict(parse_qsl(url_parts.query))
     query.update(params)
 
@@ -75,7 +80,7 @@ def add_url_params(url: str, params: dict[str, str]) -> str:
 
 
 def get_url_param_value(url: str, key: str) -> str:
-    """Get a parameter value from a provided URL..
+    """Get a parameter value from a provided URL.
 
     :param url: string of target URL
     :param key: key of the requested param
@@ -86,13 +91,13 @@ def get_url_param_value(url: str, key: str) -> str:
     >> get_url_param_value(url, key)
     'map_conseiller'
     """
-    from urllib.parse import parse_qs, urlparse
+    try:
+        parsed_url = urlsplit(url)
+    except ValueError:
+        # URL is invalid so it's useless to continue.
+        return None
 
-    parsed_url = urlparse(url)
-    key_list = parse_qs(parsed_url.query).get(key)
-    if key_list:
-        return key_list[0]
-    return None
+    return QueryDict(parsed_url.query).get(key)
 
 
 class SiretConverter:
