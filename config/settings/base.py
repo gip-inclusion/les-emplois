@@ -605,9 +605,6 @@ CSP_SCRIPT_SRC = [
     "'self'",
     "https://stats.inclusion.beta.gouv.fr",
     "*.hotjar.com",
-    # https://docs.sentry.io/platforms/javascript/install/loader/#content-security-policy
-    "https://browser.sentry-cdn.com",
-    "https://js.sentry-cdn.com",
     "https://tally.so",
 ]
 # Some browsers don't seem to fallback on script-src if script-src-elem is not there
