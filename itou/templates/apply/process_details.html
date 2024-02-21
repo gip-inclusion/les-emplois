@@ -25,7 +25,7 @@
         {% include "apply/includes/job_application_info.html" with job_application=job_application %}
 
         {# Prior actions info #}
-        {% if job_application.can_have_prior_action %}
+        {% if job_application.can_have_prior_action and job_application.prior_actions.all %}
             <hr>
             <h3>Action préalable à l'embauche</h3>
             {% for prior_action in job_application.prior_actions.all %}
