@@ -9,6 +9,7 @@ from django.views.generic import FormView
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
 from itou.companies.enums import CompanyKind, ContractNature, JobSource
 from itou.companies.models import Company, JobDescription
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.pagination import pager
 from itou.www.search.forms import JobDescriptionSearchForm, PrescriberSearchForm, SiaeSearchForm
@@ -241,11 +242,26 @@ class JobDescriptionSearchView(EmployerSearchBaseView):
             form.add_field_departements(departments)
 
     def get_results_page_and_counts(self, siaes, job_descriptions):
-        job_descriptions = job_descriptions.with_annotation_is_popular().order_by(
+        job_descriptions = job_descriptions.order_by(
             F("source_kind").asc(nulls_first=True), "-updated_at", "-created_at"
         )
 
         page = pager(job_descriptions, self.request.GET.get("page"), items_per_page=10)
+        # Prefer a prefetch_related over annotating the entire queryset with_annotation_is_popular().
+        # That annotation is quite expensive and PostgreSQL runs it on the entire queryset, even
+        # though we don’t sort or group by that column. It would be smarter to apply the limit
+        # before computing the annotation, but that’s not what PostgreSQL 15 does on 2024-02-21.
+        page.object_list = page.object_list.prefetch_related(
+            Prefetch(
+                "jobapplication_set",
+                to_attr="jobapplication_set_pending",
+                queryset=JobApplication.objects.filter(state__in=JobApplicationWorkflow.PENDING_STATES),
+            )
+        )
+        for job_description in page.object_list:
+            job_description.is_popular = (
+                len(job_description.jobapplication_set_pending) >= job_description._meta.model.POPULAR_THRESHOLD
+            )
         return PageAndCounts(
             results_page=page,
             siaes_count=siaes.count(),
