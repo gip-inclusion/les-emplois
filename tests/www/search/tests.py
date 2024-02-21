@@ -376,6 +376,7 @@ class JobDescriptionSearchViewTest(TestCase):
             + 1  # select the city
             + 1  # fetch initial job descriptions to add to the form fields
             + 2  # count the number of results for companies & job descriptions
+            + 1  # prefetch job applications for the is_popular attribute
             + 1  # refetch the city for widget rendering
             + 1  # select the job descriptions for the page
         ):
