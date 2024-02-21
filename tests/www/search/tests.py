@@ -227,20 +227,17 @@ class SearchCompanyTest(TestCase):
         job = JobDescriptionFactory(company=company)
         JobApplicationFactory.create_batch(20, to_company=company, selected_jobs=[job], state="new")
         response = self.client.get(self.URL, {"city": city.slug})
-        self.assertNotContains(response, """20+<span class="ms-1">candidatures</span>""", html=True)
-
-        JobApplicationFactory(to_company=company, selected_jobs=[job], state="new")
-        response = self.client.get(self.URL, {"city": city.slug})
-        self.assertContains(
-            response,
-            """
+        popular_badge = """
             <span class="badge badge-sm rounded-pill bg-pilotage text-primary">
                 <i class="ri-group-line me-1"></i>
                 20+<span class="ms-1">candidatures</span>
             </span>
-            """,
-            html=True,
-        )
+            """
+        self.assertNotContains(response, popular_badge, html=True)
+
+        JobApplicationFactory(to_company=company, selected_jobs=[job], state="new")
+        response = self.client.get(self.URL, {"city": city.slug})
+        self.assertContains(response, popular_badge, html=True)
 
     def test_has_no_active_members(self):
         hiring_str = "recrutements en cours"
@@ -524,22 +521,19 @@ class JobDescriptionSearchViewTest(TestCase):
         city = create_city_saint_andre()
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117")
         job = JobDescriptionFactory(company=company)
-        JobApplicationFactory.create_batch(20, to_company=company, selected_jobs=[job], state="new")
+        JobApplicationFactory.create_batch(19, to_company=company, selected_jobs=[job], state="new")
         response = self.client.get(self.URL, {"city": city.slug})
-        self.assertNotContains(response, """20+<span class="ms-1">candidatures</span>""", html=True)
-
-        JobApplicationFactory(to_company=company, selected_jobs=[job], state="new")
-        response = self.client.get(self.URL, {"city": city.slug})
-        self.assertContains(
-            response,
-            """
+        popular_badge = """
             <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
                 <i class="ri-group-line me-1" aria-hidden="true"></i>
                 20+<span class="ms-1">candidatures</span>
             </span>
-            """,
-            html=True,
-        )
+            """
+        self.assertNotContains(response, popular_badge, html=True)
+
+        JobApplicationFactory(to_company=company, selected_jobs=[job], state="new")
+        response = self.client.get(self.URL, {"city": city.slug})
+        self.assertContains(response, popular_badge, html=True)
 
     def test_no_department(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
