@@ -1794,7 +1794,7 @@ class PoleEmploiApprovalManager(models.Manager):
         if not filters:
             return self.none()
         or_filters = functools.reduce(operator.__or__, filters)
-        return self.filter(or_filters).order_by("-start_at")
+        return self.filter(or_filters).order_by("-start_at", "-number")
 
 
 class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
