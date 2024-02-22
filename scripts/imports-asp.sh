@@ -32,7 +32,6 @@ if [[ ! -f "$CONTACT_EA_FILE" ]]; then
 fi
 
 FLUX_IAE_DIR=$(realpath "itou/companies/management/commands/data/")
-export FLUX_IAE_DIR
 
 # Create the "data" directory inside of the app and clear it of any previously existing data
 mkdir -p "$FLUX_IAE_DIR"
@@ -48,7 +47,7 @@ mkdir -p $OUTPUT_PATH/import_siae
 mkdir -p $OUTPUT_PATH/import_ea_eatt
 
 time ./manage.py populate_metabase_fluxiae --verbosity 2 |& tee -a "$OUTPUT_PATH/populate_metabase_fluxiae/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
-time ./manage.py import_siae --wet-run --verbosity=2 |& tee -a "$OUTPUT_PATH/import_siae/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
+time ASP_FLUX_IAE_DIR="$FLUX_IAE_DIR" ./manage.py import_siae --wet-run --verbosity=2 |& tee -a "$OUTPUT_PATH/import_siae/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
 time ./manage.py import_ea_eatt --wet-run --verbosity=2 |& tee -a "$OUTPUT_PATH/import_ea_eatt/output_$(date '+%Y-%m-%d_%H-%M-%S').log"
 
 # Destroy the cleartext ASP data
