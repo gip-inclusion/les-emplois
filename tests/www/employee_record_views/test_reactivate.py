@@ -1,5 +1,5 @@
 import pytest
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 
 from itou.employee_record.enums import Status
 from itou.utils.templatetags import format_filters
@@ -11,6 +11,8 @@ from tests.utils.test import TestCase
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class ReactivateEmployeeRecordsTest(TestCase):
+    NEXT_URL = reverse_lazy("employee_record_views:list")
+
     def setUp(self):
         super().setUp()
         # User must be super user for UI first part (tmp)
@@ -19,7 +21,6 @@ class ReactivateEmployeeRecordsTest(TestCase):
         self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(to_company=self.company)
         self.employee_record = EmployeeRecordWithProfileFactory(job_application=self.job_application)
         self.url = reverse("employee_record_views:reactivate", args=(self.employee_record.id,))
-        self.next_url = reverse("employee_record_views:list")
 
     def test_reactivate_employee_record(self):
         self.employee_record.update_as_ready()
@@ -33,15 +34,15 @@ class ReactivateEmployeeRecordsTest(TestCase):
         self.assertContains(response, "Confirmer la réactivation")
 
         response = self.client.post(f"{self.url}?status=DISABLED", data={"confirm": "true"}, follow=True)
-        self.assertRedirects(response, f"{self.next_url}?status=DISABLED")
+        self.assertRedirects(response, f"{self.NEXT_URL}?status=DISABLED")
 
         self.employee_record.refresh_from_db()
         assert self.employee_record.status == Status.NEW
 
         approval_number_formatted = format_filters.format_approval_number(self.employee_record.approval_number)
 
-        response = self.client.get(f"{self.next_url}?status=NEW")
+        response = self.client.get(f"{self.NEXT_URL}?status=NEW")
         self.assertContains(response, approval_number_formatted)
 
-        response = self.client.get(f"{self.next_url}?status=DISABLED")
+        response = self.client.get(f"{self.NEXT_URL}?status=DISABLED")
         self.assertNotContains(response, approval_number_formatted)
