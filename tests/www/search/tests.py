@@ -2,7 +2,7 @@ import pytest
 from django.contrib.gis.geos import Point
 from django.template.defaultfilters import capfirst
 from django.test import override_settings
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 
 from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractNature, ContractType, JobSource
@@ -20,13 +20,11 @@ DISTRICTS = "Arrondissements de Paris"
 
 
 class SearchCompanyTest(TestCase):
-    def setUp(self):
-        super().setUp()
-        self.url = reverse("search:employers_results")
+    URL = reverse_lazy("search:employers_results")
 
     @pytest.mark.ignore_template_errors
     def test_not_existing(self):
-        response = self.client.get(self.url, {"city": "foo-44"})
+        response = self.client.get(self.URL, {"city": "foo-44"})
         self.assertContains(response, "Aucun résultat avec les filtres actuels.")
         # The optional company filter isn't visible when no result is available
         assert "company" not in response.context["form"]
@@ -60,7 +58,7 @@ class SearchCompanyTest(TestCase):
             + 1  # actual select of the companies, with related objects and annotated distance
             + 1  # prefetch active job descriptions
         ):
-            response = self.client.get(self.url, {"city": city_slug})
+            response = self.client.get(self.URL, {"city": city_slug})
 
         self.assertContains(response, "Emplois inclusifs à 25 km du centre de Paris (75)")
         # look for the matomo_custom_title
@@ -73,7 +71,7 @@ class SearchCompanyTest(TestCase):
         self.assertContains(response, DISTRICTS)
 
         # Filter on district
-        response = self.client.get(self.url, {"city": city_slug, "districts_75": ["75001"]})
+        response = self.client.get(self.URL, {"city": city_slug, "districts_75": ["75001"]})
         self.assertContains(
             response,
             """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
@@ -82,21 +80,21 @@ class SearchCompanyTest(TestCase):
         self.assertContains(response, company_1.display_name)
 
         # Do not get arrondissements when searching the arrondissement directly
-        response = self.client.get(self.url, {"city": "paris-10eme-75"})
+        response = self.client.get(self.URL, {"city": "paris-10eme-75"})
         self.assertNotContains(response, DISTRICTS)
 
     def test_kind(self):
         city = create_city_saint_andre()
         CompanyFactory(department="44", coords=city.coords, post_code="44117", kind=CompanyKind.AI)
 
-        response = self.client.get(self.url, {"city": city.slug, "kinds": [CompanyKind.AI]})
+        response = self.client.get(self.URL, {"city": city.slug, "kinds": [CompanyKind.AI]})
         self.assertContains(
             response,
             """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
             html=True,
         )
 
-        response = self.client.get(self.url, {"city": city.slug, "kinds": [CompanyKind.EI]})
+        response = self.client.get(self.URL, {"city": city.slug, "kinds": [CompanyKind.EI]})
         self.assertContains(response, "Aucun résultat")
 
     def test_distance(self):
@@ -123,7 +121,7 @@ class SearchCompanyTest(TestCase):
         )
 
         # 100 km
-        response = self.client.get(self.url, {"city": guerande.slug, "distance": 100})
+        response = self.client.get(self.URL, {"city": guerande.slug, "distance": 100})
         self.assertContains(
             response,
             """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>""",
@@ -134,7 +132,7 @@ class SearchCompanyTest(TestCase):
         self.assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
 
         # 15 km
-        response = self.client.get(self.url, {"city": guerande.slug, "distance": 15})
+        response = self.client.get(self.URL, {"city": guerande.slug, "distance": 15})
         self.assertContains(
             response,
             """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
@@ -144,7 +142,7 @@ class SearchCompanyTest(TestCase):
         self.assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
 
         # 100 km and 44
-        response = self.client.get(self.url, {"city": guerande.slug, "distance": 100, "departments": ["44"]})
+        response = self.client.get(self.URL, {"city": guerande.slug, "distance": 100, "departments": ["44"]})
         self.assertContains(
             response,
             """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
@@ -154,7 +152,7 @@ class SearchCompanyTest(TestCase):
         self.assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
 
         # 100 km and 56
-        response = self.client.get(self.url, {"city": vannes.slug, "distance": 100, "departments": ["56"]})
+        response = self.client.get(self.URL, {"city": vannes.slug, "distance": 100, "departments": ["56"]})
         self.assertContains(
             response,
             """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
@@ -205,7 +203,7 @@ class SearchCompanyTest(TestCase):
             + 1  # get companies infos
             + 1  # get job descriptions infos
         ):
-            response = self.client.get(self.url, {"city": guerande.slug})
+            response = self.client.get(self.URL, {"city": guerande.slug})
         companies_results = response.context["results_page"]
 
         assert [company.pk for company in companies_results] == [company.pk for company in created_companies]
@@ -214,7 +212,7 @@ class SearchCompanyTest(TestCase):
         city = create_city_saint_andre()
         CompanyFactory(department="44", coords=city.coords, post_code="44117", kind=CompanyKind.OPCS)
 
-        response = self.client.get(self.url, {"city": city.slug})
+        response = self.client.get(self.URL, {"city": city.slug})
         self.assertContains(
             response,
             """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
@@ -228,11 +226,11 @@ class SearchCompanyTest(TestCase):
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117", with_membership=True)
         job = JobDescriptionFactory(company=company)
         JobApplicationFactory.create_batch(20, to_company=company, selected_jobs=[job], state="new")
-        response = self.client.get(self.url, {"city": city.slug})
+        response = self.client.get(self.URL, {"city": city.slug})
         self.assertNotContains(response, """20+<span class="ms-1">candidatures</span>""", html=True)
 
         JobApplicationFactory(to_company=company, selected_jobs=[job], state="new")
-        response = self.client.get(self.url, {"city": city.slug})
+        response = self.client.get(self.URL, {"city": city.slug})
         self.assertContains(
             response,
             """
@@ -252,12 +250,12 @@ class SearchCompanyTest(TestCase):
         )
         city = create_city_saint_andre()
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117", with_jobs=True)
-        response = self.client.get(self.url, {"city": city.slug})
+        response = self.client.get(self.URL, {"city": city.slug})
         self.assertNotContains(response, hiring_str)
         self.assertContains(response, no_hiring_str)
 
         CompanyMembershipFactory(company=company)
-        response = self.client.get(self.url, {"city": city.slug})
+        response = self.client.get(self.URL, {"city": city.slug})
         self.assertContains(response, hiring_str)
         self.assertNotContains(response, no_hiring_str)
 
@@ -294,7 +292,7 @@ class SearchCompanyTest(TestCase):
             + 1  # get companies infos for page
             + 1  # get job descriptions infos (prefetch with is_popular annotation)
         ):
-            response = self.client.get(self.url, {"city": guerande.slug, "distance": 100})
+            response = self.client.get(self.URL, {"city": guerande.slug, "distance": 100})
         self.assertContains(
             response,
             """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>""",
@@ -311,7 +309,7 @@ class SearchCompanyTest(TestCase):
             + 1  # get job descriptions infos (prefetch with is_popular annotation)
         ):
             response = self.client.get(
-                self.url, {"city": guerande.slug, "distance": 100, "company": guerande_company.pk}
+                self.URL, {"city": guerande.slug, "distance": 100, "company": guerande_company.pk}
             )
         self.assertContains(
             response,
@@ -320,7 +318,7 @@ class SearchCompanyTest(TestCase):
         )
 
         # Check that invalid value doesn't crash
-        response = self.client.get(self.url, {"city": guerande.slug, "distance": 100, "company": "foobar"})
+        response = self.client.get(self.URL, {"city": guerande.slug, "distance": 100, "company": "foobar"})
         self.assertContains(
             response,
             """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>""",
@@ -351,13 +349,11 @@ class SearchPrescriberTest(TestCase):
 
 
 class JobDescriptionSearchViewTest(TestCase):
-    def setUp(self):
-        super().setUp()
-        self.url = reverse("search:job_descriptions_results")
+    URL = reverse_lazy("search:job_descriptions_results")
 
     @pytest.mark.ignore_template_errors
     def test_not_existing(self):
-        response = self.client.get(self.url, {"city": "foo-44"})
+        response = self.client.get(self.URL, {"city": "foo-44"})
         self.assertContains(response, "Aucun résultat avec les filtres actuels.")
 
     def test_district(self):
@@ -379,7 +375,7 @@ class JobDescriptionSearchViewTest(TestCase):
             + 1  # refetch the city for widget rendering
             + 1  # select the job descriptions for the page
         ):
-            response = self.client.get(self.url, {"city": city_slug})
+            response = self.client.get(self.URL, {"city": city_slug})
 
         self.assertContains(response, "Emplois inclusifs à 25 km du centre de Paris (75)")
         self.assertContains(
@@ -409,14 +405,14 @@ class JobDescriptionSearchViewTest(TestCase):
         city = create_city_saint_andre()
         CompanyFactory(department="44", coords=city.coords, post_code="44117", kind=CompanyKind.AI)
 
-        response = self.client.get(self.url, {"city": city.slug, "kinds": [CompanyKind.AI, CompanyKind.ETTI]})
+        response = self.client.get(self.URL, {"city": city.slug, "kinds": [CompanyKind.AI, CompanyKind.ETTI]})
         self.assertContains(
             response,
             """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
             html=True,
         )
 
-        response = self.client.get(self.url, {"city": city.slug, "kinds": [CompanyKind.EI]})
+        response = self.client.get(self.URL, {"city": city.slug, "kinds": [CompanyKind.EI]})
         self.assertContains(response, "Aucun résultat")
 
     def test_distance(self):
@@ -455,7 +451,7 @@ class JobDescriptionSearchViewTest(TestCase):
         )
 
         # 100 km
-        response = self.client.get(self.url, {"city": guerande.slug, "distance": 100})
+        response = self.client.get(self.URL, {"city": guerande.slug, "distance": 100})
         self.assertContains(
             response,
             """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>""",
@@ -466,7 +462,7 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
 
         # 15 km
-        response = self.client.get(self.url, {"city": guerande.slug, "distance": 15})
+        response = self.client.get(self.URL, {"city": guerande.slug, "distance": 15})
         self.assertContains(
             response,
             """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
@@ -476,7 +472,7 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
 
         # 100 km and 44
-        response = self.client.get(self.url, {"city": guerande.slug, "distance": 100, "departments": ["44"]})
+        response = self.client.get(self.URL, {"city": guerande.slug, "distance": 100, "departments": ["44"]})
         self.assertContains(
             response,
             """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
@@ -487,7 +483,7 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(response, "56 - Morbihan")  # the other department is still visible in the filters
 
         # 100 km and 56
-        response = self.client.get(self.url, {"city": vannes.slug, "distance": 100, "departments": ["56"]})
+        response = self.client.get(self.URL, {"city": vannes.slug, "distance": 100, "departments": ["56"]})
         self.assertContains(
             response,
             """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
@@ -506,19 +502,19 @@ class JobDescriptionSearchViewTest(TestCase):
         job2 = JobDescriptionFactory(company=company, appellation=appellations[1])
         job3 = JobDescriptionFactory(company=company, appellation=appellations[2])
 
-        response = self.client.get(self.url, {"city": guerande.slug})
+        response = self.client.get(self.URL, {"city": guerande.slug})
         jobs_results = response.context["results_page"]
 
         assert list(jobs_results) == [job3, job2, job1]
 
         # check updated_at sorting also works
         job2.save()
-        response = self.client.get(self.url, {"city": guerande.slug})
+        response = self.client.get(self.URL, {"city": guerande.slug})
         jobs_results = response.context["results_page"]
         assert list(jobs_results) == [job2, job3, job1]
 
         job1.save()
-        response = self.client.get(self.url, {"city": guerande.slug})
+        response = self.client.get(self.URL, {"city": guerande.slug})
         jobs_results = response.context["results_page"]
         assert list(jobs_results) == [job1, job2, job3]
 
@@ -528,11 +524,11 @@ class JobDescriptionSearchViewTest(TestCase):
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117")
         job = JobDescriptionFactory(company=company)
         JobApplicationFactory.create_batch(20, to_company=company, selected_jobs=[job], state="new")
-        response = self.client.get(self.url, {"city": city.slug})
+        response = self.client.get(self.URL, {"city": city.slug})
         self.assertNotContains(response, """20+<span class="ms-1">candidatures</span>""", html=True)
 
         JobApplicationFactory(to_company=company, selected_jobs=[job], state="new")
-        response = self.client.get(self.url, {"city": city.slug})
+        response = self.client.get(self.URL, {"city": city.slug})
         self.assertContains(
             response,
             """
@@ -553,7 +549,7 @@ class JobDescriptionSearchViewTest(TestCase):
         company = CompanyFactory(department="44", coords=st_andre.coords, post_code="44117", kind=CompanyKind.AI)
         JobDescriptionFactory(company=company_without_dpt, location=None)
         JobDescriptionFactory(company=company)
-        response = self.client.get(self.url, {"city": st_andre.slug})
+        response = self.client.get(self.URL, {"city": st_andre.slug})
         assert response.status_code == 200
 
     def test_contract_type(self):
@@ -581,7 +577,7 @@ class JobDescriptionSearchViewTest(TestCase):
         job2_name = capfirst(job2.display_name)
         job3_name = capfirst(job3.display_name)
 
-        response = self.client.get(self.url, {"city": city.slug})
+        response = self.client.get(self.URL, {"city": city.slug})
         self.assertContains(
             response,
             """
@@ -601,7 +597,7 @@ class JobDescriptionSearchViewTest(TestCase):
 
         # no filter: returns everything.
         response = self.client.get(
-            self.url,
+            self.URL,
             {"city": city.slug},
         )
         self.assertContains(
@@ -620,7 +616,7 @@ class JobDescriptionSearchViewTest(TestCase):
 
         # pass both contract types, should have the same result.
         response = self.client.get(
-            self.url,
+            self.URL,
             {"city": city.slug, "contract_types": [ContractType.APPRENTICESHIP, ContractType.BUSINESS_CREATION]},
         )
         self.assertContains(
@@ -639,7 +635,7 @@ class JobDescriptionSearchViewTest(TestCase):
 
         # filter it down.
         response = self.client.get(
-            self.url,
+            self.URL,
             {"city": city.slug, "contract_types": [ContractType.APPRENTICESHIP]},
         )
         self.assertContains(
@@ -657,7 +653,7 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertNotContains(response, job3_name, html=True)
 
         response = self.client.get(
-            self.url,
+            self.URL,
             {"city": city.slug, "contract_types": [ContractType.OTHER]},
         )
         self.assertContains(response, "Aucun résultat")
@@ -694,7 +690,7 @@ class JobDescriptionSearchViewTest(TestCase):
         displayed_job_name_2 = capfirst(job2.display_name)
         displayed_job_name_3 = capfirst(job3.display_name)
 
-        response = self.client.get(self.url, {"city": city.slug})
+        response = self.client.get(self.URL, {"city": city.slug})
         self.assertContains(
             response,
             """
@@ -714,7 +710,7 @@ class JobDescriptionSearchViewTest(TestCase):
 
         # no filter: returns everything.
         response = self.client.get(
-            self.url,
+            self.URL,
             {"city": city.slug},
         )
         self.assertContains(
@@ -732,7 +728,7 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertNotContains(response, displayed_job_name_3, html=True)
 
         # pass both domains
-        response = self.client.get(self.url, {"city": city.slug, "domains": ["N", "M"]})
+        response = self.client.get(self.URL, {"city": city.slug, "domains": ["N", "M"]})
         self.assertContains(
             response,
             """
@@ -748,7 +744,7 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertNotContains(response, displayed_job_name_3, html=True)
 
         # filter it down.
-        response = self.client.get(self.url, {"city": city.slug, "domains": ["M"]})
+        response = self.client.get(self.URL, {"city": city.slug, "domains": ["M"]})
         self.assertContains(
             response,
             """
@@ -764,7 +760,7 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertNotContains(response, displayed_job_name_3, html=True)
 
         response = self.client.get(
-            self.url,
+            self.URL,
             {"city": city.slug, "domains": ["WAT"]},
         )
         self.assertContains(response, "Aucun résultat")
@@ -798,7 +794,7 @@ class JobDescriptionSearchViewTest(TestCase):
 
         # no filter: returns everything.
         response = self.client.get(
-            self.url,
+            self.URL,
             {"city": city.slug},
         )
 
@@ -829,7 +825,7 @@ class JobDescriptionSearchViewTest(TestCase):
         job_pec.contract_nature = ContractNature.PEC_OFFER
         job_pec.save(update_fields=["contract_nature"])
         response = self.client.get(
-            self.url,
+            self.URL,
             {"city": city.slug},
         )
         self.assertContains(response, RESERVED_PEC)
@@ -838,7 +834,7 @@ class JobDescriptionSearchViewTest(TestCase):
         # (whatever the actual contract_type of those)
         # no filter: returns everything.
         response = self.client.get(
-            self.url,
+            self.URL,
             {"city": city.slug, "contract_types": ["PEC_OFFER"]},
         )
         self.assertContains(
@@ -856,7 +852,7 @@ class JobDescriptionSearchViewTest(TestCase):
 
         # filter with PEC offer, apprenticeship: returns both
         response = self.client.get(
-            self.url,
+            self.URL,
             {"city": city.slug, "contract_types": ["PEC_OFFER", "APPRENTICESHIP"]},
         )
         self.assertContains(
@@ -874,7 +870,7 @@ class JobDescriptionSearchViewTest(TestCase):
 
         # filter with only apprenticeship: PEC offer not displayed (it's fixed term)
         response = self.client.get(
-            self.url,
+            self.URL,
             {"city": city.slug, "contract_types": ["APPRENTICESHIP"]},
         )
         self.assertContains(
@@ -892,7 +888,7 @@ class JobDescriptionSearchViewTest(TestCase):
 
         # filter with FIXED_TERM : PEC offer displayed because it's its underlying contract type
         response = self.client.get(
-            self.url,
+            self.URL,
             {"city": city.slug, "contract_types": ["FIXED_TERM"]},
         )
         self.assertContains(
@@ -912,7 +908,7 @@ class JobDescriptionSearchViewTest(TestCase):
         job_pec.market_context_description = "MaPetiteEntreprise"
         job_pec.save(update_fields=["market_context_description"])
         response = self.client.get(
-            self.url,
+            self.URL,
             {"city": city.slug},
         )
         self.assertContains(
