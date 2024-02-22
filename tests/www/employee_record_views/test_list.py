@@ -3,7 +3,7 @@ import datetime
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.test import override_settings
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 
 from itou.companies.models import Company
@@ -20,6 +20,8 @@ from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages, parse_r
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class ListEmployeeRecordsTest(TestCase):
+    URL = reverse_lazy("employee_record_views:list")
+
     def setUp(self):
         super().setUp()
         # User must be super user for UI first part (tmp)
@@ -31,7 +33,6 @@ class ListEmployeeRecordsTest(TestCase):
         self.user_without_perms = self.company_without_perms.members.get(first_name="Hannibal")
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
         self.job_seeker = self.job_application.job_seeker
-        self.url = reverse("employee_record_views:list")
 
     def test_permissions(self):
         """
@@ -39,7 +40,7 @@ class ListEmployeeRecordsTest(TestCase):
         """
         self.client.force_login(self.user_without_perms)
 
-        response = self.client.get(self.url)
+        response = self.client.get(self.URL)
 
         assert response.status_code == 403
 
@@ -49,7 +50,7 @@ class ListEmployeeRecordsTest(TestCase):
         """
         self.client.force_login(self.user)
 
-        response = self.client.get(self.url)
+        response = self.client.get(self.URL)
 
         self.assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
 
@@ -61,16 +62,16 @@ class ListEmployeeRecordsTest(TestCase):
         self.client.force_login(self.user)
         approval_number_formatted = format_filters.format_approval_number(self.job_application.approval.number)
 
-        response = self.client.get(self.url)
+        response = self.client.get(self.URL)
         self.assertContains(response, approval_number_formatted)
 
         # Or NEW
-        response = self.client.get(self.url + "?status=NEW")
+        response = self.client.get(self.URL + "?status=NEW")
         self.assertContains(response, approval_number_formatted)
 
         # More complete tests to come with fixtures files
         for status in [Status.SENT, Status.REJECTED, Status.PROCESSED]:
-            response = self.client.get(self.url + f"?status={status.value}")
+            response = self.client.get(self.URL + f"?status={status.value}")
             self.assertNotContains(response, approval_number_formatted)
 
     def test_job_seeker_filter(self):
@@ -79,15 +80,15 @@ class ListEmployeeRecordsTest(TestCase):
         other_approval_number_formatted = format_filters.format_approval_number(other_job_application.approval.number)
         self.client.force_login(self.user)
 
-        response = self.client.get(self.url)
+        response = self.client.get(self.URL)
         self.assertContains(response, approval_number_formatted)
         self.assertContains(response, other_approval_number_formatted)
 
-        response = self.client.get(self.url + f"?job_seekers={self.job_seeker.pk}")
+        response = self.client.get(self.URL + f"?job_seekers={self.job_seeker.pk}")
         self.assertContains(response, approval_number_formatted)
         self.assertNotContains(response, other_approval_number_formatted)
 
-        response = self.client.get(self.url + "?job_seekers=0")
+        response = self.client.get(self.URL + "?job_seekers=0")
         self.assertContains(response, "Sélectionnez un choix valide. 0 n’en fait pas partie.")
         self.assertContains(response, approval_number_formatted)
         self.assertContains(response, other_approval_number_formatted)
@@ -99,7 +100,7 @@ class ListEmployeeRecordsTest(TestCase):
         approval.end_at = datetime.date(2024, 10, 11)
         approval.save()
 
-        response = self.client.get(self.url)
+        response = self.client.get(self.URL)
 
         self.assertContains(response, "Date de début : <b>02/09/2023</b>")
         self.assertContains(response, "Date de fin prévisionnelle : <b>11/10/2024</b>")
@@ -110,7 +111,7 @@ class ListEmployeeRecordsTest(TestCase):
             approval=self.job_application.approval, siae=self.job_application.to_company
         )
 
-        response = self.client.get(self.url + "?status=NEW")
+        response = self.client.get(self.URL + "?status=NEW")
 
         # Global message alert
         assert str(parse_response_to_soup(response, selector=".s-title-01 .alert")) == self.snapshot(name="alert")
@@ -131,7 +132,7 @@ class ListEmployeeRecordsTest(TestCase):
             approval=self.job_application.approval, siae=self.job_application.to_company
         )
 
-        response = self.client.get(self.url + "?status=NEW")
+        response = self.client.get(self.URL + "?status=NEW")
 
         # Global message alert
         assertMessages(response, [])
@@ -155,7 +156,7 @@ class ListEmployeeRecordsTest(TestCase):
             declared_by_siae=self.job_application.to_company,
         )
 
-        response = self.client.get(self.url + "?status=NEW")
+        response = self.client.get(self.URL + "?status=NEW")
 
         # Global message alert
         assert str(parse_response_to_soup(response, selector=".s-title-01 .alert")) == self.snapshot(name="alert")
@@ -176,7 +177,7 @@ class ListEmployeeRecordsTest(TestCase):
             declared_by_siae=self.job_application.to_company,
         )
 
-        response = self.client.get(self.url + "?status=NEW")
+        response = self.client.get(self.URL + "?status=NEW")
 
         # Global message alert
         assertMessages(response, [])
@@ -196,7 +197,7 @@ class ListEmployeeRecordsTest(TestCase):
         self.client.force_login(self.user)
         employee_record = employee_record_factories.EmployeeRecordFactory(job_application=self.job_application)
 
-        response = self.client.get(self.url + "?status=NEW")
+        response = self.client.get(self.URL + "?status=NEW")
 
         assert (
             str(
@@ -216,7 +217,7 @@ class ListEmployeeRecordsTest(TestCase):
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
         self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
 
-        response = self.client.get(self.url + "?status=NEW")
+        response = self.client.get(self.URL + "?status=NEW")
 
         self.assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
         # Global message alert
@@ -238,7 +239,7 @@ class ListEmployeeRecordsTest(TestCase):
         self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
         new_er = employee_record_factories.EmployeeRecordFactory(job_application=self.job_application)
 
-        response = self.client.get(self.url + "?status=NEW")
+        response = self.client.get(self.URL + "?status=NEW")
 
         self.assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
         # Global message alert
@@ -260,7 +261,7 @@ class ListEmployeeRecordsTest(TestCase):
         record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
         record.update_as_rejected("0012", "JSON Invalide", None)
 
-        response = self.client.get(self.url + "?status=REJECTED")
+        response = self.client.get(self.URL + "?status=REJECTED")
         self.assertContains(response, "Erreur 0012")
         self.assertContains(response, "JSON Invalide")
 
@@ -296,7 +297,7 @@ class ListEmployeeRecordsTest(TestCase):
                 record.status = Status.SENT
                 record.update_as_rejected(err_code, err_message, "{}")
 
-                response = self.client.get(self.url + "?status=REJECTED")
+                response = self.client.get(self.URL + "?status=REJECTED")
                 self.assertContains(response, f"Erreur {err_code}")
                 self.assertNotContains(response, err_message)
                 self.assertContains(response, custom_err_message)
@@ -331,15 +332,15 @@ class ListEmployeeRecordsTest(TestCase):
         )
 
         # Zzzzz's hiring start is more recent
-        self._check_employee_record_order(self.url, job_applicationZ, job_applicationA)
+        self._check_employee_record_order(self.URL, job_applicationZ, job_applicationA)
 
         # order with -hiring_start_at is the default
-        self._check_employee_record_order(self.url + "?order=-hiring_start_at", job_applicationZ, job_applicationA)
-        self._check_employee_record_order(self.url + "?order=hiring_start_at", job_applicationA, job_applicationZ)
+        self._check_employee_record_order(self.URL + "?order=-hiring_start_at", job_applicationZ, job_applicationA)
+        self._check_employee_record_order(self.URL + "?order=hiring_start_at", job_applicationA, job_applicationZ)
 
         # Zzzzz after Aaaaa
-        self._check_employee_record_order(self.url + "?order=name", job_applicationA, job_applicationZ)
-        self._check_employee_record_order(self.url + "?order=-name", job_applicationZ, job_applicationA)
+        self._check_employee_record_order(self.URL + "?order=name", job_applicationA, job_applicationZ)
+        self._check_employee_record_order(self.URL + "?order=-name", job_applicationZ, job_applicationA)
 
         # Count queries
         num_queries = BASE_NUM_QUERIES
@@ -351,7 +352,7 @@ class ListEmployeeRecordsTest(TestCase):
         num_queries += 1  # Select ordered job applications
         num_queries += 1  # Select EmployeeRecords
         with self.assertNumQueries(num_queries):
-            self.client.get(self.url)
+            self.client.get(self.URL)
 
     def test_rejected_employee_records_sorted(self):
         self.client.force_login(self.user)
@@ -373,29 +374,29 @@ class ListEmployeeRecordsTest(TestCase):
 
         # Zzzzz's hiring start is more recent
         self._check_employee_record_order(
-            self.url + "?status=REJECTED", recordZ.job_application, recordA.job_application
+            self.URL + "?status=REJECTED", recordZ.job_application, recordA.job_application
         )
 
         # order with -hiring_start_at is the default
         self._check_employee_record_order(
-            self.url + "?status=REJECTED&order=-hiring_start_at",
+            self.URL + "?status=REJECTED&order=-hiring_start_at",
             recordZ.job_application,
             recordA.job_application,
         )
         self._check_employee_record_order(
-            self.url + "?status=REJECTED&order=hiring_start_at",
+            self.URL + "?status=REJECTED&order=hiring_start_at",
             recordA.job_application,
             recordZ.job_application,
         )
 
         # Zzzzz after Aaaaa
         self._check_employee_record_order(
-            self.url + "?status=REJECTED&order=name",
+            self.URL + "?status=REJECTED&order=name",
             recordA.job_application,
             recordZ.job_application,
         )
         self._check_employee_record_order(
-            self.url + "?status=REJECTED&order=-name",
+            self.URL + "?status=REJECTED&order=-name",
             recordZ.job_application,
             recordA.job_application,
         )
@@ -417,42 +418,42 @@ class ListEmployeeRecordsTest(TestCase):
             record.update_as_ready()
 
         # Zzzzz's hiring start is more recent
-        self._check_employee_record_order(self.url + "?status=READY", recordZ.job_application, recordA.job_application)
+        self._check_employee_record_order(self.URL + "?status=READY", recordZ.job_application, recordA.job_application)
 
         # order with -hiring_start_at is the default
         self._check_employee_record_order(
-            self.url + "?status=READY&order=-hiring_start_at",
+            self.URL + "?status=READY&order=-hiring_start_at",
             recordZ.job_application,
             recordA.job_application,
         )
         self._check_employee_record_order(
-            self.url + "?status=READY&order=hiring_start_at",
+            self.URL + "?status=READY&order=hiring_start_at",
             recordA.job_application,
             recordZ.job_application,
         )
 
         # Zzzzz after Aaaaa
         self._check_employee_record_order(
-            self.url + "?status=READY&order=name",
+            self.URL + "?status=READY&order=name",
             recordA.job_application,
             recordZ.job_application,
         )
         self._check_employee_record_order(
-            self.url + "?status=READY&order=-name",
+            self.URL + "?status=READY&order=-name",
             recordZ.job_application,
             recordA.job_application,
         )
 
     def test_display_result_count(self):
         self.client.force_login(self.user)
-        response = self.client.get(self.url + "?status=NEW")
+        response = self.client.get(self.URL + "?status=NEW")
         self.assertContains(response, "1 résultat")
 
         JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
-        response = self.client.get(self.url + "?status=NEW")
+        response = self.client.get(self.URL + "?status=NEW")
         self.assertContains(response, "2 résultats")
 
-        response = self.client.get(self.url + "?status=READY")
+        response = self.client.get(self.URL + "?status=READY")
         self.assertContains(response, "0 résultat")
 
 
