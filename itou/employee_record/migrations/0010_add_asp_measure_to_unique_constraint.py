@@ -7,19 +7,20 @@ def _fill_asp_measure(apps, schema_editor):
     EmployeeRecord = apps.get_model("employee_record", "EmployeeRecord")
     objects_to_migrate = (
         EmployeeRecord.objects.filter(asp_measure=None)
-        .select_related("job_application__to_siae")
-        .only("job_application__to_siae__kind")
+        .select_related("job_application__to_company")
+        .only("job_application__to_company__kind")
     )
 
     batch = []
     for er in objects_to_migrate:
-        er.asp_measure = SiaeMeasure.from_siae_kind(er.job_application.to_siae.kind)
+        er.asp_measure = SiaeMeasure.from_siae_kind(er.job_application.to_company.kind)
         batch.append(er)
     EmployeeRecord.objects.bulk_update(batch, fields=["asp_measure"])
 
 
 class Migration(migrations.Migration):
     dependencies = [
+        ("job_applications", "0019_rename_to_siae_jobapplication_to_company"),
         ("employee_record", "0009_employeerecord_asp_measure"),
     ]
 

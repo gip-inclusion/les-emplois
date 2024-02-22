@@ -6,12 +6,20 @@ from itou.asp import models as asp_models
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from tests.job_applications.factories import (
+    JobApplicationFactory,
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
 )
 
 
 class BareEmployeeRecordFactory(factory.django.DjangoModelFactory):
+    job_application = factory.SubFactory(
+        JobApplicationFactory,
+        sender=None,
+        eligibility_diagnosis=None,
+        to_company__with_membership=False,
+        to_company__convention=None,
+    )
     asp_id = factory.Faker("pyint")
     approval_number = factory.Faker("pystr_format", string_format="#" * 12)
 
