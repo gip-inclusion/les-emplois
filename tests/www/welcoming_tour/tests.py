@@ -21,10 +21,6 @@ def get_confirm_email_url(request, email):
 
 
 class WelcomingTourTest(InclusionConnectBaseTestCase):
-    def setUp(self):
-        self.email = None
-        super().setUp()
-
     def verify_email(self, request, email):
         # User verifies its email clicking on the email he received
         confirm_email_url = get_confirm_email_url(request, email)
