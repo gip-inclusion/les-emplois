@@ -781,9 +781,7 @@ class DashboardViewTest(TestCase):
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class EditUserInfoViewTest(InclusionConnectBaseTestCase):
-    def setUp(self):
-        super().setUp()
-        self.NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
+    NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
 
     @override_settings(TALLY_URL="https://tally.so")
     def test_edit_with_nir(self):
@@ -1141,9 +1139,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
 
 
 class EditJobSeekerInfo(TestCase):
-    def setUp(self):
-        super().setUp()
-        self.NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
+    NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
 
     @override_settings(TALLY_URL="https://tally.so")
     def test_edit_by_company_with_nir(self):
