@@ -1,4 +1,4 @@
-from django.urls import reverse
+from django.urls import reverse_lazy
 from rest_framework.test import APIClient, APITestCase
 
 from tests.asp.factories import CommuneFactory, CountryFactory
@@ -11,30 +11,31 @@ from tests.utils.test import BASE_NUM_QUERIES
 
 
 class ApplicantsAPITest(APITestCase):
+    URL = reverse_lazy("v1:applicants-list")
+
     def setUp(self):
         super().setUp()
         self.client = APIClient()
-        self.url = reverse("v1:applicants-list")
 
     def test_login_as_job_seeker(self):
         user = JobSeekerFactory()
         self.client.force_authenticate(user)
 
-        response = self.client.get(self.url, format="json")
+        response = self.client.get(self.URL, format="json")
         assert response.status_code == 403
 
     def test_login_as_prescriber_organisation(self):
         user = PrescriberOrganizationWithMembershipFactory().members.first()
         self.client.force_authenticate(user)
 
-        response = self.client.get(self.url, format="json")
+        response = self.client.get(self.URL, format="json")
         assert response.status_code == 403
 
     def test_login_as_institution(self):
         user = InstitutionWithMembershipFactory().members.first()
         self.client.force_authenticate(user)
 
-        response = self.client.get(self.url, format="json")
+        response = self.client.get(self.URL, format="json")
         assert response.status_code == 403
 
     def test_api_user_has_unique_siae_membership(self):
@@ -43,7 +44,7 @@ class ApplicantsAPITest(APITestCase):
         CompanyFactory(with_membership=True).members.add(user)
 
         self.client.force_authenticate(user)
-        response = self.client.get(self.url, format="json")
+        response = self.client.get(self.URL, format="json")
 
         assert response.status_code == 403
 
@@ -55,7 +56,7 @@ class ApplicantsAPITest(APITestCase):
         membership.save()
 
         self.client.force_authenticate(user)
-        response = self.client.get(self.url, format="json")
+        response = self.client.get(self.URL, format="json")
 
         assert response.status_code == 403
 
@@ -70,7 +71,7 @@ class ApplicantsAPITest(APITestCase):
             + 1  # siaes_companymembership fetch for request.user (get_queryset)
             + 1  # count users
         ):
-            response = self.client.get(self.url, format="json")
+            response = self.client.get(self.URL, format="json")
         assert response.status_code == 200
         assert response.json().get("results") == []
 
@@ -110,7 +111,7 @@ class ApplicantsAPITest(APITestCase):
             + 1  # fetch users
             + 1  # prefetch linked job applications
         ):
-            response = self.client.get(self.url, format="json")
+            response = self.client.get(self.URL, format="json")
 
         assert response.status_code == 200
 
@@ -143,8 +144,8 @@ class ApplicantsAPITest(APITestCase):
         self.client.force_authenticate(user)
         # settings.REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"]["user"]
         for _ in range(12):
-            response = self.client.get(self.url, format="json")
+            response = self.client.get(self.URL, format="json")
             assert response.status_code == 200
-        response = self.client.get(self.url, format="json")
+        response = self.client.get(self.URL, format="json")
         # Rate-limited.
         assert response.status_code == 429
