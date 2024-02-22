@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 
 from itou.approvals import enums as approvals_enums
 from itou.approvals.models import Approval
@@ -14,9 +14,7 @@ from tests.utils.test import TestCase, assertMessages
 
 
 class PoleEmploiApprovalSearchTest(TestCase):
-    def setUp(self):
-        super().setUp()
-        self.url = reverse("approvals:pe_approval_search")
+    URL = reverse_lazy("approvals:pe_approval_search")
 
     def set_up_pe_approval(self, with_job_application=True):
         self.pe_approval = PoleEmploiApprovalFactory()
@@ -44,7 +42,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         membership = CompanyMembershipFactory()
         self.client.force_login(membership.user)
 
-        response = self.client.get(self.url)
+        response = self.client.get(self.URL)
         self.assertContains(response, "Rechercher")
 
     def test_nominal(self):
@@ -56,7 +54,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         self.set_up_pe_approval(with_job_application=False)
         self.client.force_login(self.employer)
 
-        response = self.client.get(self.url, {"number": self.pe_approval.number})
+        response = self.client.get(self.URL, {"number": self.pe_approval.number})
         self.assertContains(response, "Continuer")
 
     def test_number_length(self):
@@ -66,7 +64,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         membership = CompanyMembershipFactory()
         self.client.force_login(membership.user)
 
-        response = self.client.get(self.url, {"number": "1234567890123P01"})
+        response = self.client.get(self.URL, {"number": "1234567890123P01"})
         assert not response.context["form"].is_valid()
 
     def test_no_results(self):
@@ -77,7 +75,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         membership = CompanyMembershipFactory()
         self.client.force_login(membership.user)
 
-        response = self.client.get(self.url, {"number": 123123123123})
+        response = self.client.get(self.URL, {"number": 123123123123})
         self.assertNotContains(response, "Continuer")
 
     def test_has_matching_pass_iae(self):
@@ -89,7 +87,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
 
         self.client.force_login(self.employer)
 
-        response = self.client.get(self.url, {"number": self.approval.number})
+        response = self.client.get(self.URL, {"number": self.approval.number})
         assert response.status_code == 302
 
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.id})
@@ -106,7 +104,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
 
         self.client.force_login(self.employer)
         # Our approval should not be usable without a job application
-        response = self.client.get(self.url, {"number": self.approval.number})
+        response = self.client.get(self.URL, {"number": self.approval.number})
         self.assertNotContains(response, "Continuer")
 
     def test_has_matching_pass_iae_that_belongs_to_another_siae(self):
@@ -138,7 +136,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         self.client.force_login(self.employer)
 
         # The current user should not be able to use the PASS IAE used by another SIAE.
-        response = self.client.get(self.url, {"number": job_application.approval.number})
+        response = self.client.get(self.URL, {"number": job_application.approval.number})
         self.assertNotContains(response, "Continuer")
 
     def test_unlogged_is_not_authorized(self):
@@ -146,7 +144,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         It is not possible to access the search for PE approval screen unlogged
         """
 
-        response = self.client.get(self.url)
+        response = self.client.get(self.URL)
         assert response.status_code == 302
         # TODO: (cms) redirect to prescriber's connection page with a flash message instead.
         # AssertionError: '/login/job_seeker' not found in '/accounts/login/?next=/approvals/pe-approval/search'
@@ -160,7 +158,7 @@ class PoleEmploiApprovalSearchTest(TestCase):
         job_application = JobApplicationFactory(with_approval=True)
         self.client.force_login(job_application.job_seeker)
 
-        response = self.client.get(self.url)
+        response = self.client.get(self.URL)
         assert response.status_code == 404
 
 
