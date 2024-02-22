@@ -11,6 +11,8 @@ class ApplicantsAPIPermission(IsAuthenticated):
 
         if not request.user.is_employer:
             return False
+        # If filter with company id: check permission so that it's not to be done later
+        # (and it should save a query too).
 
         memberships_qs = request.user.active_or_in_grace_period_company_memberships()
 

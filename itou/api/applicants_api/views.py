@@ -18,13 +18,23 @@ class ApplicantsView(generics.ListAPIView):
 
     def get_queryset(self):
         multi_companies_mode = bool(self.request.query_params.get("mode_multi_structures")) is True
-        companies_ids = (
+        companies_uids_params = self.request.query_params.get("uid_structures")
+        memberships = (
             self.request.user.active_or_in_grace_period_company_memberships()
-            .all()
-            .values_list("company_id", flat=True)
+            .order_by("created_at")
+            .values("company_id", "company__uid")
         )
+        if companies_uids_params:
+            companies_uids_params = companies_uids_params.split(",")
+            companies_ids = [
+                membership["company_id"]
+                for membership in memberships
+                if str(membership["company__uid"]) in companies_uids_params
+            ]
+        else:
+            companies_ids = [membership["company_id"] for membership in memberships]
 
-        if not multi_companies_mode:
+        if not multi_companies_mode and not companies_uids_params:
             # Legacy behaviour.
             # Return the first membership available.
             companies_ids = companies_ids[:1]
@@ -32,7 +42,7 @@ class ApplicantsView(generics.ListAPIView):
         return (
             User.objects.filter(job_applications__to_company_id__in=companies_ids, kind=UserKind.JOB_SEEKER)
             .select_related("jobseeker_profile__birth_place", "jobseeker_profile__birth_country")
-            .prefetch_related("job_applications")
+            .distinct()
             .order_by("-pk")
         )
 
@@ -58,6 +68,5 @@ car la première version avait été pensée ainsi.
 
 # Paramètres
 
-- mode_multi_structures : envoie les candidatures envoyées à toutes les organisations auxquelles
-appartient l'utilisateur de l'API.
+- mode_multi_structures : renvoie les candidats de toutes les structures.
 """
