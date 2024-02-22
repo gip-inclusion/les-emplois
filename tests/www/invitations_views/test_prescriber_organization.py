@@ -28,13 +28,6 @@ from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, Prescriber
 from tests.utils.test import TestCase, assertMessages
 
 
-POST_DATA = {
-    "form-TOTAL_FORMS": "1",
-    "form-INITIAL_FORMS": "0",
-    "form-MIN_NUM_FORMS": "",
-    "form-MAX_NUM_FORMS": "",
-}
-
 INVITATION_URL = reverse("invitations_views:invite_prescriber_with_org")
 
 
@@ -44,7 +37,11 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         self.organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.CAP_EMPLOI)
         self.sender = self.organization.members.first()
         self.guest_data = {"first_name": "Léonie", "last_name": "Bathiat", "email": "leonie@example.com"}
-        self.post_data = POST_DATA | {
+        self.post_data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "0",
+            "form-MIN_NUM_FORMS": "",
+            "form-MAX_NUM_FORMS": "",
             "form-0-first_name": self.guest_data["first_name"],
             "form-0-last_name": self.guest_data["last_name"],
             "form-0-email": self.guest_data["email"],
@@ -111,7 +108,6 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         super().setUp()
         self.organization = PrescriberOrganizationWithMembershipFactory(kind=PrescriberOrganizationKind.CAP_EMPLOI)
         self.sender = self.organization.members.first()
-        self.post_data = POST_DATA
 
     def assert_invalid_user(self, response, reason):
         assert not response.context["formset"].is_valid()
@@ -121,20 +117,33 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
     def test_invite_existing_user_is_employer(self):
         guest = CompanyFactory(with_membership=True).members.first()
         self.client.force_login(self.sender)
-        self.post_data.update(
-            {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
-        )
-        response = self.client.post(INVITATION_URL, data=self.post_data)
+        post_data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "0",
+            "form-MIN_NUM_FORMS": "",
+            "form-MAX_NUM_FORMS": "",
+            "form-0-first_name": guest.first_name,
+            "form-0-last_name": guest.last_name,
+            "form-0-email": guest.email,
+        }
+
+        response = self.client.post(INVITATION_URL, data=post_data)
         assert response.status_code == 200
         self.assert_invalid_user(response, "Cet utilisateur n'est pas un prescripteur.")
 
     def test_invite_existing_user_is_job_seeker(self):
         guest = JobSeekerFactory()
         self.client.force_login(self.sender)
-        self.post_data.update(
-            {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
-        )
-        response = self.client.post(INVITATION_URL, data=self.post_data)
+        post_data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "0",
+            "form-MIN_NUM_FORMS": "",
+            "form-MAX_NUM_FORMS": "",
+            "form-0-first_name": guest.first_name,
+            "form-0-last_name": guest.last_name,
+            "form-0-email": guest.email,
+        }
+        response = self.client.post(INVITATION_URL, data=post_data)
         assert response.status_code == 200
         self.assert_invalid_user(response, "Cet utilisateur n'est pas un prescripteur.")
 
@@ -143,10 +152,16 @@ class TestSendPrescriberWithOrgInvitationExceptions(TestCase):
         self.organization.members.add(PrescriberFactory())
         guest = self.organization.members.exclude(email=self.sender.email).first()
         self.client.force_login(self.sender)
-        self.post_data.update(
-            {"form-0-first_name": guest.first_name, "form-0-last_name": guest.last_name, "form-0-email": guest.email}
-        )
-        response = self.client.post(INVITATION_URL, data=self.post_data)
+        post_data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "0",
+            "form-MIN_NUM_FORMS": "",
+            "form-MAX_NUM_FORMS": "",
+            "form-0-first_name": guest.first_name,
+            "form-0-last_name": guest.last_name,
+            "form-0-email": guest.email,
+        }
+        response = self.client.post(INVITATION_URL, data=post_data)
         assert response.status_code == 200
         self.assert_invalid_user(response, "Cette personne fait déjà partie de votre organisation.")
 
@@ -164,7 +179,11 @@ class TestPEOrganizationInvitation:
         organization.members.add(PrescriberFactory())
         sender = organization.members.first()
         guest = PrescriberFactory.build(email=f"sabine.lagrange{suffix}")
-        post_data = POST_DATA | {
+        post_data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "0",
+            "form-MIN_NUM_FORMS": "",
+            "form-MAX_NUM_FORMS": "",
             "form-0-first_name": guest.first_name,
             "form-0-last_name": guest.last_name,
             "form-0-email": guest.email,
@@ -178,7 +197,11 @@ class TestPEOrganizationInvitation:
         organization.members.add(PrescriberFactory())
         sender = organization.members.first()
         client.force_login(sender)
-        post_data = POST_DATA | {
+        post_data = {
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "0",
+            "form-MIN_NUM_FORMS": "",
+            "form-MAX_NUM_FORMS": "",
             "form-0-first_name": "René",
             "form-0-last_name": "Boucher",
             "form-0-email": "rene@example.com",
