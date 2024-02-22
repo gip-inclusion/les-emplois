@@ -12,7 +12,7 @@
         {% elif profile.lack_of_nir_reason %}
             <b>{{ profile.get_lack_of_nir_reason_display }}</b>
         {% else %}
-            <span>Non renseigné</span>
+            <i class="text-disabled">Non renseigné</i>
         {% endif %}
     </li>
     <li class="mb-3">
@@ -24,13 +24,16 @@
 <h2>Coordonnées</h2>
 <ul class="list-unstyled">
     <li class="mb-3">
-        <b>{{ profile.user.address_on_one_line }}</b>
+        Adresse : <b>{{ profile.user.address_on_one_line }}</b>
     </li>
-    {% if profile.user.phone %}
-        <li class="mb-3">
-            Téléphone : <b>{{ profile.user.phone|format_phone }}</b>
-        </li>
-    {% endif %}
+    <li class="mb-3">
+        Téléphone :
+        {% if profile.user.phone %}
+            <b>{{ profile.user.phone|format_phone }}</b>
+        {% else %}
+            <i class="text-disabled">Non renseigné</i>
+        {% endif %}
+    </li>
 </ul>
 <hr class="my-4">
 
