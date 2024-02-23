@@ -1,5 +1,6 @@
 {% load django_bootstrap5 %}
 {% load static %}
+{% load buttons_form %}
 
 <div class="row">
     <div class="col-12 col-lg-8">
@@ -13,25 +14,9 @@
                     </p>
                     {% bootstrap_form form alert_error_type="all" %}
                 </fieldset>
-                <hr class="mb-3">
-                <div class="row">
-                    <div class="col-12">
-                        <div class="form-row align-items-center justify-content-lg-between">
-                            <div class="form-group col-12 col-md-6 col-lg-auto order-3 order-md-1">
-                                <a href="{% url "employee_record_views:create_step_3" job_application.id %}" class="btn btn-block btn-ico btn-link ps-0 justify-content-center" aria-label="Retour à l'étape précédente">
-                                    <i class="ri-arrow-left-line ri-lg"></i>
-                                    <span>Étape précédente</span>
-                                </a>
-                            </div>
-                            <div class="form-group col-12 col-md-6 col-lg-auto order-1 order-md-2">
-                                <button class="btn btn-block btn-ico btn-primary" aria-label="Passer à l'étape suivante">
-                                    <span>Étape suivante</span>
-                                    <i class="ri-arrow-right-line ri-lg"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% url "employee_record_views:create_step_3" job_application.id as secondary_url %}
+                {% url "employee_record_views:list" as reset_url %}
+                {% itou_buttons_form primary_label="Suivant" secondary_url=secondary_url reset_url=reset_url|add:"?status=NEW" %}
             </form>
         </div>
     </div>

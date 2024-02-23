@@ -96,7 +96,11 @@ def test_done_step_when_a_new_employee_record_already_exists(client):
 
     choose_employee_url = reverse("employee_record_views:add", kwargs={"step": "choose-employee"})
     choose_approval_url = reverse("employee_record_views:add", kwargs={"step": "choose-approval"})
-    end_url = reverse("employee_record_views:create", kwargs={"job_application_id": job_application.pk})
+    end_url = (
+        reverse("employee_record_views:create", kwargs={"job_application_id": job_application.pk})
+        + "?back_url="
+        + reverse("employee_record_views:add", kwargs={"step": "choose-employee"})
+    )
 
     client.post(
         choose_employee_url,

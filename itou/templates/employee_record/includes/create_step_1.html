@@ -1,4 +1,5 @@
 {% load django_bootstrap5 %}
+{% load buttons_form %}
 
 <div class="row">
     <div class="col-12 col-lg-8">
@@ -22,28 +23,11 @@
                     </div>
                     {% bootstrap_field form.birth_place %}
                 </fieldset>
-                <hr class="mb-3">
-                <div class="row">
-                    <div class="col-12 mb-3">
-                        <small id="fieldRequired">* champs obligatoires</small>
-                    </div>
-                    <div class="col-12">
-                        <div class="form-row align-items-center justify-content-lg-between">
-                            <div class="form-group col-12 col-md-6 col-lg-auto order-2 order-md-1">
-                                <a href="{% url "employee_record_views:list" %}?status={{ request.GET.from_status|default:"NEW" }}" class="btn btn-block btn-ico btn-link ps-lg-0 justify-content-center">
-                                    <i class="ri-arrow-go-back-line ri-lg"></i>
-                                    <span>Retour à la liste</span>
-                                </a>
-                            </div>
-                            <div class="form-group col-12 col-md-6 col-lg-auto order-1 order-md-2">
-                                <button class="btn btn-block btn-ico btn-primary" aria-label="Passer à l'étape suivante">
-                                    <span>Étape suivante</span>
-                                    <i class="ri-arrow-right-line ri-lg"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% url "employee_record_views:list" as secondary_url %}
+                {% if request.GET.status %}
+                    {% url_add_query secondary_url status=request.GET.status as secondary_url %}
+                {% endif %}
+                {% itou_buttons_form primary_label="Suivant" reset_url=secondary_url secondary_url=back_url %}
             </form>
         </div>
     </div>

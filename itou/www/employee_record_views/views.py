@@ -125,6 +125,8 @@ class AddView(LoginRequiredMixin, NamedUrlSessionWizardView):
                         "employee_record_views:create",
                         kwargs={"job_application_id": employee_record.job_application.pk},
                     )
+                    + "?back_url="
+                    + reverse("employee_record_views:add", kwargs={"step": "choose-employee"})
                 )
             else:  # An employee record exists, show the summary
                 return HttpResponseRedirect(
@@ -270,6 +272,7 @@ def create(request, job_application_id, template_name="employee_record/create.ht
         "steps": STEPS,
         "step": 1,
         "matomo_custom_title": "Nouvelle fiche salarié ASP - Étape 1",
+        "back_url": request.GET.get("back_url"),
     }
 
     return render(request, template_name, context)

@@ -17,22 +17,17 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8 order-2 order-lg-1">
-                    <div class="c-box">
-                        {% include "employee_record/includes/employee_record_summary.html" %}
-                        {% if employee_record.status != "ARCHIVED" %}
-                            <hr class="mb-3">
-                            <div class="row mt-3">
-                                <div class="col-12 col-md-auto">
-                                    <a href="{% url "employee_record_views:list" %}?status={{ employee_record.status }}" class="btn btn-block btn-link ps-lg-0">
-                                        <i class="ri-arrow-go-back-line ri-lg"></i>
-                                        <span>Retour à la liste</span>
-                                    </a>
-                                </div>
-                            </div>
-                        {% endif %}
-                    </div>
+                    <div class="c-box">{% include "employee_record/includes/employee_record_summary.html" %}</div>
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2 mb-3">
+                    {% if employee_record.status != "ARCHIVED" %}
+                        <div class="c-box mb-4">
+                            <a href="{% url "employee_record_views:list" %}?status={{ employee_record.status }}" class="btn btn-block btn-link btn-ico">
+                                <i class="ri-arrow-go-back-line" aria-hidden="true"></i>
+                                <span>Liste des fiches salarié</span>
+                            </a>
+                        </div>
+                    {% endif %}
                     {% if employee_record.status != "READY" and employee_record.status != "SENT" and employee_record.status != "ARCHIVED" %}
                         <div class="c-box mb-4">
                             {% if employee_record.status == "NEW" %}

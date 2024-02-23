@@ -1,4 +1,5 @@
 {% load django_bootstrap5 %}
+{% load buttons_form %}
 
 <div class="row">
     <div class="col-12">
@@ -16,7 +17,7 @@
                                 </p>
                                 <ul>
                                     <li>
-                                        Si elle est correcte, vous pouvez passer à l'étape suivante en cliquant sur le bouton <b>«Étape suivante»</b> en bas de page.
+                                        Si elle est correcte, vous pouvez passer à l'étape suivante en cliquant sur le bouton <b>«Suivant»</b> en bas de page.
                                     </li>
                                     <li>
                                         Si elle ne correspond pas, veuillez la modifier à l'aide du formulaire ci-dessous, puis cliquez
@@ -88,37 +89,14 @@
                 </div>
                 <div class="row">
                     <div class="col-12 col-lg-8">
-                        <hr class="mb-3">
-                        <div class="row">
-                            <div class="col-12 mb-3">
-                                <small id="fieldRequired">* champs obligatoires</small>
-                            </div>
-                            <div class="col-12">
-                                <div class="form-row align-items-center justify-content-lg-between">
-                                    <div class="form-group col-12 col-md-6 col-lg-auto order-3 order-md-1">
-                                        <a href="{% url "employee_record_views:create" job_application.id %}" class="btn btn-block btn-ico btn-link ps-0 justify-content-center" aria-label="Retour à l'étape précédente">
-                                            <i class="ri-arrow-left-line ri-lg"></i>
-                                            <span>Étape précédente</span>
-                                        </a>
-                                    </div>
-                                    {% if profile.hexa_address_filled %}
-                                        <div class="form-group col-12 col-md-6 col-lg-auto order-1 order-md-2">
-                                            <a href="{% url "employee_record_views:create_step_3" job_application.id %}" class="btn btn-block btn-ico btn-primary justify-content-center" aria-label="Passer à l'étape suivante">
-                                                <span>Étape suivante</span>
-                                                <i class="ri-arrow-right-line ri-lg"></i>
-                                            </a>
-                                        </div>
-                                    {% else %}
-                                        <div class="form-group col-12 col-md-6 col-lg-auto order-1 order-md-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Merci de valider l'adresse pour passer à l'étape suivante">
-                                            <button class="btn btn-block btn-ico btn-primary justify-content-center" disabled>
-                                                <span>Étape suivante</span>
-                                                <i class="ri-arrow-right-line ri-lg"></i>
-                                            </button>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
+                        {% url "employee_record_views:create" job_application.id as secondary_url %}
+                        {% url "employee_record_views:list" as reset_url %}
+                        {% if profile.hexa_address_filled %}
+                            {% url "employee_record_views:create_step_3" job_application.id as primary_url %}
+                            {% itou_buttons_form primary_label="Suivant" primary_url=primary_url secondary_url=secondary_url reset_url=reset_url|add:"?status=NEW" %}
+                        {% else %}
+                            {% itou_buttons_form primary_label="Suivant" primary_deactivated=True secondary_url=secondary_url reset_url=reset_url|add:"?status=NEW" %}
+                        {% endif %}
                     </div>
                 </div>
             </form>
