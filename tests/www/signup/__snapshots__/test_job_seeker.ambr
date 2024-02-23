@@ -113,13 +113,15 @@
           <small class="d-inline-block mb-3">* champs obligatoires</small>
           <div class="form-row align-items-center justify-content-end gx-3">
               <div class="form-group col-12 col-lg order-3 order-lg-1">
-                  <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
-                      <i aria-hidden="true" class="ri-close-line ri-lg"></i>
-                      <span>Annuler</span>
-                  </button>
+                  
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/dashboard/">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
               </div>
               
-              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <button aria-label="Passer à l'étape suivante" class="btn btn-block btn-primary" type="submit">
                           <span>Inscription</span>
@@ -133,18 +135,20 @@
   <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
-              <div class="modal-header">
-                  <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
-              </div>
-              <div class="modal-body">
-                  Les informations renseignées ne seront pas enregistrées.
-                  <br/>
-                  Cette action est irréversible.
-              </div>
-              <div class="modal-footer">
-                  <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
-                  <a class="btn btn-sm btn-danger" href="/dashboard/">Confirmer l'annulation</a>
-              </div>
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br/>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
+                      <a class="btn btn-sm btn-danger" href="/dashboard/">Confirmer l'annulation</a>
+                  </div>
+              
           </div>
       </div>
   </div>

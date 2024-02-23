@@ -220,7 +220,7 @@ class ApprovalSuspendViewTest(TestCase):
         response = self.client.get(url)
         assert response.status_code == 200
         form = parse_response_to_soup(
-            response, selector="div.c-form", replace_in_href=[suspension, suspension.approval]
+            response, selector="div.c-form", replace_in_attr=[suspension, suspension.approval]
         )
         assert str(form) == self.snapshot(name="delete_suspension_form")
         assert response.context["reset_url"] == redirect_url
