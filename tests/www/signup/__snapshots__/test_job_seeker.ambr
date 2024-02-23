@@ -1,0 +1,156 @@
+# serializer version: 1
+# name: JobSeekerSignupTest.test_job_seeker_signup[job_seeker_signup_form]
+  '''
+  <form action="/signup/job_seeker" class="js-prevent-multiple-submit" method="post" role="form">
+  
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+  
+                              
+  
+                              
+  
+                              <div class="form-group mb-1 form-group-required"><label class="form-label" for="id_email">Adresse e-mail</label><input autocomplete="email" class="form-control" id="id_email" maxlength="320" name="email" placeholder="adresse@email.fr" required="" type="email"/></div>
+                              <div class="text-end small font-italic mb-0">
+  
+  
+  <a data-bs-target="#no-email-modal" data-bs-toggle="modal" href="#">
+      
+          Pas d'adresse e-mail ?
+      
+  </a>
+  
+  <div aria-labelledby="no-email-modal-label" aria-modal="true" class="modal fade text-start" id="no-email-modal" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title" id="no-email-modal-label">Créer une adresse e-mail</h3>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+              </div>
+              <div class="modal-body">
+                  <div class="container">
+                      <div class="row">
+                          <div class="col text-center">
+                              <img alt="" src="/static/img/no_email.svg"/>
+                          </div>
+                          <div class="col">
+                              <p class="pt-3">Nous vous conseillons de créer une adresse e-mail avec le service de laposte.net.</p>
+                              <p>Une fois l'adresse e-mail créée, vous pourrez l'utiliser ici.</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <a aria-label="Ouverture dans un nouvel onglet" class="btn btn-sm btn-primary btn-ico" data-matomo-action="clic" data-matomo-category="inscription-candidat" data-matomo-event="true" data-matomo-option="je-n-ai-pas-d-adresse-email" href="https://compte.laposte.net/inscription/index.do?srv_gestion=POLEEMPLOI" rel="noopener" target="_blank">
+                      <span>Créer une adresse e-mail</span>
+                      <i class="ri-external-link-line"></i>
+                  </a>
+              </div>
+          </div>
+      </div>
+  </div>
+  </div>
+  
+                              <div class="form-group mt-1 form-group-required"><label class="form-label" for="id_title">Civilité</label><select class="form-select" id="id_title" name="title" required="">
+    <option value="">---------</option>
+  
+    <option selected="" value="M">Monsieur</option>
+  
+    <option value="MME">Madame</option>
+  
+  </select></div>
+                              <div class="form-group form-group-required"><label class="form-label" for="id_last_name">Nom</label><input class="form-control" id="id_last_name" maxlength="150" name="last_name" placeholder="Durand" required="" type="text"/></div>
+                              <div class="form-group form-group-required"><label class="form-label" for="id_first_name">Prénom</label><input class="form-control" id="id_first_name" maxlength="150" name="first_name" placeholder="Dominique" required="" type="text"/></div>
+                              <div class="form-group form-group-required"><label class="form-label" for="id_password1">Mot de passe</label><div class="input-group">
+      <input autocomplete="new-password" class="form-control" id="id_password1" name="password1" placeholder="**********" required="" type="password"/>
+  
+      <div class="input-group-text p-0">
+          <button class="btn btn-sm btn-link btn-ico" data-it-password="toggle" type="button">
+              <i aria-hidden="true" class="ri-eye-line"></i>
+              <span>Afficher</span>
+          </button>
+      </div>
+  </div><div class="form-text">Le mot de passe doit contenir au moins 3 des 4 types suivants : majuscules, minuscules, chiffres, caractères spéciaux.</div>
+  </div>
+                              <div class="form-group form-group-required"><label class="form-label" for="id_password2">Mot de passe (confirmation)</label><div class="input-group">
+      <input autocomplete="new-password" class="form-control" id="id_password2" name="password2" placeholder="**********" required="" type="password"/>
+  
+      <div class="input-group-text p-0">
+          <button class="btn btn-sm btn-link btn-ico" data-it-password="toggle" type="button">
+              <i aria-hidden="true" class="ri-eye-line"></i>
+              <span>Afficher</span>
+          </button>
+      </div>
+  </div></div>
+  
+                              
+                                  <div class="form-group mt-1"><label class="form-label" for="id_nir">Numéro de sécurité sociale</label><input class="form-control" disabled="" id="id_nir" name="nir" placeholder="Numéro de sécurité sociale" type="text" value="141068078200557"/></div>
+                              
+  
+                              <div class="small pb-4 text-secondary">
+                                  Vous pourrez créer et modifier des informations telles que votre adresse ou un lien vers un CV après votre inscription, à partir de votre tableau de bord.
+                              </div>
+  
+                              
+  
+  
+  <p>
+      Pour plus d'information sur le traitement de vos données personnelles ou pour exercer vos droits, consultez
+      <a aria-label="Consultez la section Protection des données (ouverture dans une nouvel onglet)" href="/legal/privacy/" rel="noopener" target="_blank">
+          la section Protection des données
+      </a><i class="ri-external-link-line ms-1"></i>.
+  </p>
+  <p>
+      En cliquant sur le bouton "Inscription", vous acceptez
+      <a aria-label="Acceptez les conditions générales d'utilisation (ouverture dans une nouvel onglet)" href="/legal/terms/" rel="noopener" target="_blank">
+          les conditions générales d'utilisation
+      </a><i class="ri-external-link-line ms-1"></i>.
+  </p>
+  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
+                      <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                      <span>Annuler</span>
+                  </button>
+              </div>
+              
+              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l'étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>Inscription</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+              </div>
+              <div class="modal-body">
+                  Les informations renseignées ne seront pas enregistrées.
+                  <br/>
+                  Cette action est irréversible.
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
+                  <a class="btn btn-sm btn-danger" href="/dashboard/">Confirmer l'annulation</a>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  
+  
+                          </form>
+  '''
+# ---

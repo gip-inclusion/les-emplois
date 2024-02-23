@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 tally str_filters %}
+{% load buttons_form %}
 
 {% block title %}Employeur solidaire - Inscription {{ block.super }}{% endblock %}
 
@@ -21,9 +22,7 @@
 
                         {% bootstrap_form siren_form alert_error_type="all" %}
 
-                        <div class="form-group text-end">
-                            {% bootstrap_button "Rechercher" button_type="submit" button_class="btn btn-primary" %}
-                        </div>
+                        {% itou_buttons_form primary_label="Rechercher" %}
 
                     </form>
 
@@ -114,9 +113,7 @@
                                     <br>
                                     - Pour les GEIQ, il s’agit du correspondant enregistré dans la liste des GEIQ transmises par la FFGEIQ.
                                 </p>
-                                <div class="form-group text-end">
-                                    {% bootstrap_button "Envoyer ma demande de validation" button_type="submit" button_class="btn btn-primary" %}
-                                </div>
+                                {% itou_buttons_form primary_label="Envoyer ma demande de validation" %}
                             </form>
 
                         </div>

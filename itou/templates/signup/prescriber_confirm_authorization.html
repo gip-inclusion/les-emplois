@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
 {% load static %}
+{% load buttons_form %}
 
 {% block title %}Inscription {{ block.super }}{% endblock %}
 
@@ -32,10 +33,7 @@
                                 {% bootstrap_form_errors form type="all" %}
                                 {% bootstrap_field form.confirm_authorization show_label=False %}
 
-                                <div class="form-group">
-                                    <a class="btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
-                                    {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-primary" %}
-                                </div>
+                                {% itou_buttons_form primary_label="Continuer" secondary_url=prev_url %}
 
                             </form>
                         </div>

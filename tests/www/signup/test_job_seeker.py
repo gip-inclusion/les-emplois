@@ -1,5 +1,6 @@
 import uuid
 
+import pytest
 import respx
 from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
@@ -15,9 +16,10 @@ from itou.www.signup.forms import JobSeekerSituationForm
 from tests.cities.factories import create_test_cities
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
-from tests.utils.test import TestCase, reload_module
+from tests.utils.test import TestCase, parse_response_to_soup, reload_module
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class JobSeekerSignupTest(TestCase):
     def setUp(self):
         super().setUp()
@@ -193,7 +195,8 @@ class JobSeekerSignupTest(TestCase):
         url = reverse("signup:job_seeker")
         response = self.client.get(url)
         assert response.status_code == 200
-        self.assertContains(response, '<button type="submit" class="btn btn-primary">Inscription</button>', html=True)
+        form = parse_response_to_soup(response, selector="form.js-prevent-multiple-submit")
+        assert str(form) == self.snapshot(name="job_seeker_signup_form")
 
         address_line_1 = "Test adresse"
         address_line_2 = "Test adresse complémentaire"
