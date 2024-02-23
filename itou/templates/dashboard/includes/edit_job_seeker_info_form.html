@@ -6,7 +6,8 @@
 {% endcomment %}
 
 {% load django_bootstrap5 %}
-{% load matomo %}
+{% load buttons_form %}
+
 <form method="post" class="js-prevent-multiple-submit js-format-nir">
     {% csrf_token %}
 
@@ -29,12 +30,6 @@
     {% bootstrap_field form.pole_emploi_id %}
     {% bootstrap_field form.lack_of_pole_emploi_id_reason %}
 
-    <hr class="my-4">
-    <div class="form-group text-end">
-        <a class="btn btn-link" href="{{ prev_url }}">Annuler</a>
-        <button type="submit" class="btn btn-primary" {% matomo_event "salaries" "submit" "edit_jobseeker_infos_submit" %}>
-            {{ submit_label }}
-        </button>
-    </div>
+    {% itou_buttons_form primary_label=submit_label reset_url=prev_url matomo_category="salaries" matomo_action="submit" matomo_event="edit_jobseeker_infos_submit" %}
 
 </form>
