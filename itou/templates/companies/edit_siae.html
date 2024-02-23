@@ -2,7 +2,7 @@
 {% load django_bootstrap5 %}
 {% load static %}
 {% load theme_inclusion %}
-{% load matomo %}
+{% load buttons_form %}
 
 {% block title %}Modifier les coordonnées de votre structure {{ block.super }}{% endblock %}
 
@@ -74,20 +74,7 @@
                             {% bootstrap_field form.email %}
                             {% bootstrap_field form.website %}
 
-                            <hr>
-                            <div class="form-row align-items-center gx-3">
-                                <div class="form-group col-12 col-lg order-2 order-lg-1">
-                                    <a href="{% url 'dashboard:index' %}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retourner au tableau de bord">
-                                        <i class="ri-arrow-go-back-line ri-lg"></i>
-                                        <span>Retour</span>
-                                    </a>
-                                </div>
-                                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                                    <button class="btn btn-primary btn-block" aria-label="Vers l'étape suivante du formulaire" {% matomo_event "employeurs" "submit" "maj-contact-structure" %}>
-                                        Suivant
-                                    </button>
-                                </div>
-                            </div>
+                            {% itou_buttons_form primary_label="Suivant" matomo_category="employeurs" matomo_action="submit" matomo_event="maj-contact-structure" %}
                         </form>
 
                     </div>

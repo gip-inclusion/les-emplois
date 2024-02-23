@@ -1,7 +1,7 @@
 {% extends "layout/base.html" %}
 {% load static %}
 {% load django_bootstrap5 %}
-{% load matomo %}
+{% load buttons_form %}
 
 {% block title %}Modifier les détails de la fiche de poste {{ block.super }}{% endblock %}
 
@@ -86,20 +86,9 @@
                                 {% bootstrap_field form.is_qpv_mandatory %}
                             {% endif %}
 
-                            <hr>
-                            <div class="form-row align-items-center gx-3">
-                                <div class="form-group col-12 col-lg order-2 order-lg-1">
-                                    <a href="{% url "companies_views:edit_job_description" %}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retourner à l'étape précédente">
-                                        <i class="ri-arrow-go-back-line ri-lg"></i>
-                                        <span>Retour</span>
-                                    </a>
-                                </div>
-                                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                                    <button class="btn btn-primary btn-block" aria-label="Passer à l'étape suivante" {% matomo_event "employeurs" "submit" "edit-description-fiche-poste" %}>
-                                        Suivant
-                                    </button>
-                                </div>
-                            </div>
+                            {% url "companies_views:edit_job_description" as secondary_url %}
+                            {% url "companies_views:job_description_list" as reset_url %}
+                            {% itou_buttons_form primary_label="Suivant" secondary_url=secondary_url reset_url=reset_url matomo_category="employeurs" matomo_action="submit" matomo_event="edit-description-fiche-poste" %}
                         </form>
                     </div>
                 </div>

@@ -1,7 +1,7 @@
 {% extends "layout/base.html" %}
 {% load static %}
 {% load django_bootstrap5 %}
-{% load matomo %}
+{% load buttons_form %}
 
 {% block title %}Enregistrer une fiche de poste {{ block.super }}{% endblock %}
 
@@ -54,20 +54,9 @@
                             <div id="_other_contract_type_group">{% bootstrap_field form.other_contract_type %}</div>
                             {% bootstrap_field form.hours_per_week %}
                             {% bootstrap_field form.open_positions %}
-                            <hr>
-                            <div class="form-row align-items-center gx-3">
-                                <div class="form-group col-12 col-lg order-2 order-lg-1">
-                                    <a href="{% url "companies_views:job_description_list" %}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retourner à la liste des métiers">
-                                        <i class="ri-arrow-go-back-line ri-lg"></i>
-                                        <span>Retour</span>
-                                    </a>
-                                </div>
-                                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                                    <button class="btn btn-primary btn-block" aria-label="Passer à l'étape suivante" {% matomo_event "employeurs" "submit" "edit-infos-fiche-poste" %}>
-                                        Suivant
-                                    </button>
-                                </div>
-                            </div>
+
+                            {% url "companies_views:job_description_list" as reset_url %}
+                            {% itou_buttons_form primary_label="Suivant" reset_url=reset_url matomo_category="employeurs" matomo_action="submit" matomo_event="edit-infos-fiche-poste" %}
                         </form>
                     </div>
                 </div>
