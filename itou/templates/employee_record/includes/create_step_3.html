@@ -1,11 +1,12 @@
 {% load django_bootstrap5 %}
 {% load static %}
 {% load buttons_form %}
+{% load url_add_query %}
 
 <div class="row">
     <div class="col-12 col-lg-8">
         <div class="c-form">
-            <form method="post" action="{% url "employee_record_views:create_step_3" job_application.id %}" class="js-prevent-multiple-submit">
+            <form method="post" class="js-prevent-multiple-submit">
                 {% csrf_token %}
                 <fieldset>
                     <legend>Situation du salarié</legend>
@@ -67,9 +68,17 @@
                         {% bootstrap_field form.aah_allocation_since %}
                     </div>
                 </fieldset>
+
+
+
+
                 {% url "employee_record_views:create_step_2" job_application.id as secondary_url %}
                 {% url "employee_record_views:list" as reset_url %}
-                {% itou_buttons_form primary_label="Suivant" secondary_url=secondary_url reset_url=reset_url|add:"?status=NEW" %}
+                {% if request.GET.status %}
+                    {% url_add_query secondary_url status=request.GET.status as secondary_url %}
+                    {% url_add_query reset_url status=request.GET.status as reset_url %}
+                {% endif %}
+                {% itou_buttons_form primary_label="Suivant" secondary_url=secondary_url reset_url=reset_url %}
             </form>
         </div>
     </div>

@@ -261,10 +261,13 @@ def create(request, job_application_id, template_name="employee_record/create.ht
     """
     job_application = can_create_employee_record(request, job_application_id)
     form = NewEmployeeRecordStep1Form(data=request.POST or None, instance=job_application.job_seeker)
+    query_param = f"?status={request.GET.get('status')}" if request.GET.get("status") else ""
 
     if request.method == "POST" and form.is_valid():
         form.save()
-        return HttpResponseRedirect(reverse("employee_record_views:create_step_2", args=(job_application.pk,)))
+        return HttpResponseRedirect(
+            reverse("employee_record_views:create_step_2", args=(job_application.pk,)) + query_param
+        )
 
     context = {
         "job_application": job_application,
@@ -290,6 +293,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
     profile = job_seeker.jobseeker_profile
     address_filled = job_seeker.post_code and job_seeker.address_line_1
     form = NewEmployeeRecordStep2Form(data=request.POST or None, instance=profile)
+    query_param = f"?status={request.GET.get('status')}" if request.GET.get("status") else ""
 
     # Perform a geolocation of the user address if possible:
     # - success : prefill form with geolocated data
@@ -312,6 +316,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
                     "employee_record_views:create_step_2",
                     args=(job_application.id,),
                 )
+                + query_param
             )
         else:
             profile.clear_hexa_address()
@@ -339,6 +344,7 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
     """
     job_application = can_create_employee_record(request, job_application_id)
     job_seeker = job_application.job_seeker
+    query_param = f"?status={request.GET.get('status')}" if request.GET.get("status") else ""
 
     # At this point, a job seeker profile must have been created
     if not job_seeker.has_jobseeker_profile:
@@ -357,7 +363,9 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
 
         if job_application.employee_record.exists():
             # The EmployeeRecord() object exists, usually its status should be NEW or REJECTED
-            return HttpResponseRedirect(reverse("employee_record_views:create_step_4", args=(job_application.id,)))
+            return HttpResponseRedirect(
+                reverse("employee_record_views:create_step_4", args=(job_application.id,)) + query_param
+            )
 
         # The EmployeeRecord() object doesn't exist, so we create one from the job application
         try:
@@ -370,7 +378,9 @@ def create_step_3(request, job_application_id, template_name="employee_record/cr
                 f"Il est impossible de créer cette fiche salarié pour la raison suivante : {ex.message}.",
             )
         else:
-            return HttpResponseRedirect(reverse("employee_record_views:create_step_4", args=(job_application.id,)))
+            return HttpResponseRedirect(
+                reverse("employee_record_views:create_step_4", args=(job_application.id,)) + query_param
+            )
 
     context = {
         "job_application": job_application,
@@ -392,6 +402,7 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
     Step 4: Financial annex
     """
     job_application = can_create_employee_record(request, job_application_id)
+    query_param = f"?status={request.GET.get('status')}" if request.GET.get("status") else ""
 
     if not job_application.job_seeker.has_jobseeker_profile:
         raise PermissionDenied
@@ -405,7 +416,9 @@ def create_step_4(request, job_application_id, template_name="employee_record/cr
 
     if request.method == "POST" and form.is_valid():
         form.employee_record.save()
-        return HttpResponseRedirect(reverse("employee_record_views:create_step_5", args=(job_application.id,)))
+        return HttpResponseRedirect(
+            reverse("employee_record_views:create_step_5", args=(job_application.id,)) + query_param
+        )
 
     context = {
         "job_application": job_application,
