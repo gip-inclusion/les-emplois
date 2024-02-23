@@ -1,5 +1,6 @@
 {% extends "apply/process_base.html" %}
 {% load django_bootstrap5 %}
+{% load buttons_form %}
 
 {% block content_extend %}
     <div class="alert alert-warning alert-dismissible fade show" role="status">
@@ -25,15 +26,8 @@
 
         <input type="hidden" name="confirm" value="true">
 
-        <hr>
-        <div class="form-row align-items-center justify-content-end">
-            <div class="form-group mb-0 col-6 col-lg-auto">
-                <a class="btn btn-outline-primary btn-block" href="{% url 'apply:details_for_company' job_application_id=job_application.id %}">Retour</a>
-            </div>
-            <div class="form-group mb-0 col-6 col-lg-auto">
-                {% bootstrap_button "Confirmer l'annulation de l'embauche" button_type="submit" button_class="btn btn-danger btn-block" %}
-            </div>
-        </div>
+        {% url 'apply:details_for_company' job_application_id=job_application.id as reset_url %}
+        {% itou_buttons_form primary_label="Confirmer l'annulation de l'embauche" reset_url=reset_url show_mandatory_fields_mention=False %}
 
     </form>
 {% endblock %}

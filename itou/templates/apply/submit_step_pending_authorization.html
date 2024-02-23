@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load buttons_form %}
 
 {% block content_title_wrapper %}{% endblock %}
 
@@ -29,14 +30,9 @@
                             </div>
                             <strong>Êtes-vous certain de vouloir continuer ?</strong>
                         </div>
-                        <div class="form-row align-items-center justify-content-end">
-                            <div class="form-group mb-0 col-6 col-lg-auto">
-                                <a class="btn btn-link btn-block" aria-label="Revenir à la recherche" href="{% url 'search:employers_home' %}">Revenir à la recherche</a>
-                            </div>
-                            <div class="form-group mb-0 col-6 col-lg-auto">
-                                <a href="{% url 'apply:check_nir_for_sender' company_pk=siae.pk %}" class="btn btn-primary btn-block">Suivant</a>
-                            </div>
-                        </div>
+                        {% url 'search:employers_home' as reset_url %}
+                        {% url 'apply:check_nir_for_sender' company_pk=siae.pk as primary_url %}
+                        {% itou_buttons_form primary_label="Suivant" primary_url=primary_url reset_url=reset_url %}
                     </div>
                 </div>
             </div>

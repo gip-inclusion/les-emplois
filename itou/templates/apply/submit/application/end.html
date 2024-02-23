@@ -2,6 +2,7 @@
 {% load django_bootstrap5 %}
 {% load format_filters %}
 {% load str_filters %}
+{% load buttons_form %}
 
 {% block title %}Création du compte candidat {{ block.super }}{% endblock %}
 
@@ -96,11 +97,7 @@
                                         {% bootstrap_field form.phone %}
                                     </fieldset>
 
-                                    <hr class="my-5">
-                                    <div class="form-group text-end">
-                                        <button type="reset" class="btn btn-link" data-swap-element=".c-form">Annuler</button>
-                                        {% bootstrap_button "Enregistrer" button_type="submit" button_class="btn btn-primary" %}
-                                    </div>
+                                    {% itou_buttons_form primary_label="Enregistrer" reset_url=reset_url %}
                                 </form>
                             </div>
                         {% endif %}

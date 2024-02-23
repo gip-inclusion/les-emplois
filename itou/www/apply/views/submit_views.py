@@ -117,6 +117,7 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
             "siae": self.company,
             "back_url": self.get_back_url(),
             "hire_process": self.hire_process,
+            "reset_url": reverse("dashboard:index"),
         }
 
 
@@ -749,6 +750,7 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
         return super().get_context_data(**kwargs) | {
             "profile": self.job_seeker.jobseeker_profile,
             "hiring_pending": True,
+            "back_url": reverse("apply:check_nir_for_hire", kwargs={"company_pk": self.company.pk}),
         }
 
 
@@ -1197,6 +1199,10 @@ class ApplicationEndView(ApplyStepBaseView):
             "can_view_personal_information": self.request.user.can_view_personal_information(
                 self.job_application.job_seeker
             ),
+            "reset_url": reverse(
+                "apply:application_end",
+                kwargs={"company_pk": self.company.pk, "application_pk": self.job_application.pk},
+            ),
         }
 
 
@@ -1226,6 +1232,9 @@ class UpdateJobSeekerBaseView(SessionNamespaceRequiredMixin, ApplyStepBaseView):
             "step_3_url": reverse(
                 "apply:update_job_seeker_step_3_for_hire" if self.hire_process else "apply:update_job_seeker_step_3",
                 kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
+            ),
+            "reset_url": reverse(
+                "apply:application_jobs", kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk}
             ),
         }
 
