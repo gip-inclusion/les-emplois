@@ -140,9 +140,12 @@ class TestSendMultipleCompanyInvitation(TestCase):
         response = self.client.get(INVITATION_URL)
 
         assert response.context["formset"]
-        self.client.post(INVITATION_URL, data=self.post_data)
+        response = self.client.post(INVITATION_URL, data=self.post_data)
         invitations = EmployerInvitation.objects.count()
         assert invitations == 2
+
+        assert response.status_code == 302
+        assert response.url == reverse("companies_views:members")
 
     def test_send_multiple_invitations_duplicated_email(self):
         self.client.force_login(self.sender)
