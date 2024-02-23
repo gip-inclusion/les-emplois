@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
+{% load buttons_form %}
 
 {% block title %}Mes notifications {{ block.super }}{% endblock %}
 
@@ -25,11 +26,8 @@
                                 {% bootstrap_field new_job_app_notification_form.qualified field_class="form-check form-switch" show_label=False %}
                             {% endif %}
 
-                            <div class="form-group">
-                                <a class="btn btn-outline-primary" href="{{ back_url }}">Annuler</a>
-                                {% bootstrap_button "Enregistrer" button_type="submit" button_class="btn btn-primary" %}
-                            </div>
-
+                            {% comment "back_url may be not useful anymore, remove it from the view" %}{% endcomment %}
+                            {% itou_buttons_form primary_label="Enregistrer" secondary_url=back_url %}
                         </form>
                     </div>
                 </div>
