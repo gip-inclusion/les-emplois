@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
 {% load static %}
+{% load buttons_form %}
 
 {% block title %}Prescripteur/Orienteur - Inscription {{ block.super }}{% endblock %}
 
@@ -22,7 +23,7 @@
 
                         {% bootstrap_form form alert_error_type="all" %}
 
-                        <div class="form-group">{% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-primary" %}</div>
+                        {% itou_buttons_form primary_label="Continuer" %}
 
                     </form>
                 </div>

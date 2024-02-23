@@ -3,6 +3,7 @@
 {% load redirection_fields %}
 {% load static %}
 {% load matomo %}
+{% load buttons_form %}
 
 {% block title %}Inscription candidat {{ block.super }}{% endblock %}
 
@@ -36,7 +37,7 @@
                                 </div>
                             {% endif %}
 
-                            <div class="form-group">{% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary" %}</div>
+                            {% itou_buttons_form primary_label="Suivant" %}
 
                         </form>
                         <p class="mt-5">

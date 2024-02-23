@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
 {% load static %}
+{% load buttons_form %}
 
 {% block title %}Prescripteur/Orienteur - Inscription {{ block.super }}{% endblock %}
 
@@ -34,11 +35,7 @@
 
                                 {% bootstrap_form form alert_error_type="all" %}
 
-                                <hr class="my-5">
-                                <div class="form-group text-end">
-                                    <a class="btn btn btn-outline-secondary" href="{{ prev_url }}">Retour</a>
-                                    {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-primary" %}
-                                </div>
+                                {% itou_buttons_form primary_label="Continuer" secondary_url=prev_url %}
 
                             </form>
                         </div>
