@@ -2,6 +2,7 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
 {% load redirection_fields %}
+{% load buttons_form %}
 
 {% block title %}Déconnexion {{ block.super }}{% endblock %}
 
@@ -21,9 +22,8 @@
 
                             {% redirection_input_field value=redirect_field_value %}
 
-                            <div class="form-group">
-                                {% bootstrap_button "Se déconnecter" button_type="submit" button_class="btn btn-primary" %}
-                            </div>
+                            {% url 'home:hp' as reset_url %}
+                            {% itou_buttons_form primary_label="Se déconnecter" reset_url=reset_url %}
                         </form>
                     </div>
                 </div>

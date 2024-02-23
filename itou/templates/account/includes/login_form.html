@@ -1,5 +1,6 @@
 {% load django_bootstrap5 %}
 {% load redirection_fields %}
+{% load buttons_form %}
 
 <form method="post" class="js-prevent-multiple-submit">
     {% csrf_token %}
@@ -15,8 +16,7 @@
         </div>
     </fieldset>
     <div class="form-row justify-content-end">
-        <div class="form-group col-12 col-lg-auto">
-            {% bootstrap_button "Se connecter" button_class="btn btn-primary btn-block" %}
-        </div>
+        {% url 'home:hp' as reset_url %}
+        {% itou_buttons_form primary_label="Se connecter" reset_url=reset_url %}
     </div>
 </form>
