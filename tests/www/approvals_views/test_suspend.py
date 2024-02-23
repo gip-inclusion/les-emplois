@@ -1,5 +1,6 @@
 from unittest import mock
 
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
@@ -14,9 +15,10 @@ from tests.approvals.factories import SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import TestCase
+from tests.utils.test import TestCase, parse_response_to_soup
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class ApprovalSuspendViewTest(TestCase):
     def test_suspend_approval(self):
         """
@@ -216,24 +218,13 @@ class ApprovalSuspendViewTest(TestCase):
         url = f"{url}?{params}"
 
         response = self.client.get(url)
-        assertContains(
-            response,
-            (
-                f'<a class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="{back_url}"> '
-                '<i class="ri-arrow-go-back-line ri-lg"></i><span>Retour</span></a>'
-            ),
-            html=True,
-            status_code=200,
+        assert response.status_code == 200
+        form = parse_response_to_soup(
+            response, selector="div.c-form", replace_in_href=[suspension, suspension.approval]
         )
+        assert str(form) == self.snapshot(name="delete_suspension_form")
+        assert response.context["reset_url"] == redirect_url
 
-        assertContains(
-            response,
-            (
-                '<strong>Action choisie</strong> : Confirmer la <strong class="text-danger">'
-                "suppression définitive</strong> de cette suspension."
-            ),
-            html=True,
-        )
         lost_days = (timezone.localdate() - start_at).days + 1  # including start and end dates
         assertContains(response, f"Réduire la durée restante de ce PASS IAE de {lost_days} jour")
 
@@ -377,6 +368,7 @@ class ApprovalSuspendUpdateEndDateViewTest(TestCase):
         assert response.context["back_url"] == reverse(
             "approvals:suspension_action_choice", kwargs={"suspension_id": self.suspension.id}
         )
+        assert response.context["reset_url"] == reverse("approvals:detail", kwargs={"pk": self.suspension.approval_id})
         assert "form" in response.context
 
         form = response.context["form"]

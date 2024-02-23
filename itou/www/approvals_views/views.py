@@ -638,6 +638,7 @@ def suspension_update_enddate(request, suspension_id, template_name="approvals/s
     context = {
         "suspension": suspension,
         "back_url": back_url,
+        "reset_url": reverse("approvals:detail", kwargs={"pk": suspension.approval_id}),
         "form": form,
     }
     return render(request, template_name, context)
@@ -673,6 +674,7 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
     context = {
         "suspension": suspension,
         "back_url": back_url,
+        "reset_url": reverse("approvals:detail", kwargs={"pk": suspension.approval_id}),
         "lost_days": (timezone.localdate() - suspension.start_at).days + 1,
     }
     return render(request, template_name, context)

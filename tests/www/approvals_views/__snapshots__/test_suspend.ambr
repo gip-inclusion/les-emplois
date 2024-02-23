@@ -1,0 +1,82 @@
+# serializer version: 1
+# name: ApprovalSuspendViewTest.test_delete_suspension[delete_suspension_form]
+  '''
+  <div class="c-form">
+                          <p>
+                              <strong>Action choisie</strong> : Confirmer la <strong class="text-danger">suppression définitive</strong> de cette suspension.
+                          </p>
+                          <div class="alert alert-danger fade show" role="status">
+                              <div class="row">
+                                  <div class="col-auto pe-0">
+                                      <i class="ri-information-line ri-xl text-danger"></i>
+                                  </div>
+                                  <div class="col">
+                                      <p class="mb-0">
+                                          Attention : la suppression définitive de cette suspension aura pour conséquence de :
+                                          </p><ul>
+                                              <li>
+                                                  <strong>Réduire la durée restante de ce PASS IAE de 1 jour.</strong>
+                                              </li>
+                                          </ul>
+                                      <p></p>
+                                  </div>
+                              </div>
+                          </div>
+                          <hr/>
+                          <form class="js-prevent-multiple-submit" method="post">
+                              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                              <input name="confirm" type="hidden" value="true"/>
+                              
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
+                      <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                      <span>Annuler</span>
+                  </button>
+              </div>
+              
+                  <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                      <a aria-label="Retourner à l'étape précédente" class="btn btn-outline-primary" href="/approvals/suspension/[PK of Suspension]/action/">
+                          <span>Retour</span>
+                      </a>
+                  </div>
+              
+              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l'étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>Confirmer la suppression</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+              </div>
+              <div class="modal-body">
+                  Les informations renseignées ne seront pas enregistrées.
+                  <br/>
+                  Cette action est irréversible.
+              </div>
+              <div class="modal-footer">
+                  <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
+                  <a class="btn btn-sm btn-danger" href="/approvals/detail/[PK of Approval]">Confirmer l'annulation</a>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+                          </form>
+                      </div>
+  '''
+# ---
