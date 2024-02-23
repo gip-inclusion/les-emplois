@@ -1,0 +1,90 @@
+{% load matomo %}
+
+<div class="row">
+    <div class="col-12">
+        <hr class="mb-3">
+        {% if show_mandatory_fields_mention %}<small class="d-inline-block mb-3">* champs obligatoires</small>{% endif %}
+        <div class="form-row align-items-center justify-content-end gx-3">
+            <div class="form-group col-12 col-lg order-3 order-lg-1">
+                {% if secondary_url %}
+                    <button type="button" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire" data-bs-toggle="modal" data-bs-target="#confirm_reset_modal">
+                        <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                        <span>Annuler</span>
+                    </button>
+                {% else %}
+                    <a href="{% if reset_url %}{{ reset_url }}{% else %}{% url 'dashboard:index' %}{% endif %}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
+                        <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                        <span>Annuler</span>
+                    </a>
+                {% endif %}
+            </div>
+            {% if secondary_url %}
+                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                    <a href="{{ secondary_url }}"
+                       class="btn btn-outline-primary"
+                       aria-label="{% if secondary_aria_label %}{{ secondary_aria_label }}{% else %}Retourner à l'étape précédente{% endif %}"
+                       {% if secondary_name and secondary_value %}name="{{ secondary_name }}" value="{{ secondary_value }}"{% endif %}>
+                        <span>Retour</span>
+                    </a>
+                </div>
+            {% endif %}
+            <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                {% if primary_deactivated %}
+                    <button type="button" class="btn btn-block btn-primary disabled">
+                        <span>{{ primary_label }}</span>
+                    </button>
+                {% elif primary_url %}
+                    <a href="{{ primary_url }}"
+                       class="btn btn-block btn-primary"
+                       aria-label="{% if primary_aria_label %}{{ primary_aria_label }}{% else %}Passer à l'étape suivante{% endif %}"
+                       {% if primary_name and primary_value %}name="{{ primary_name }}" value="{{ primary_value }}"{% endif %}
+                       {% if matomo_category and matomo_action and matomo_name %}{% matomo_event matomo_category matomo_action matomo_name %}{% endif %}>
+                        <span>{{ primary_label }}</span>
+                    </a>
+                {% else %}
+                    <button type="submit"
+                            class="btn btn-block btn-primary"
+                            aria-label="{% if primary_aria_label %}{{ primary_aria_label }}{% else %}Passer à l'étape suivante{% endif %}"
+                            {% if primary_name and primary_value %}name="{{ primary_name }}" value="{{ primary_value }}"{% endif %}
+                            {% if matomo_category and matomo_action and matomo_name %}{% matomo_event matomo_category matomo_action matomo_name %}{% endif %}>
+                        <span>{{ primary_label }}</span>
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            {% if modal_content_save_and_quit %}
+                <div class="modal-header">
+                    <h3 class="modal-title">Enregistrer et quitter ?</h3>
+                </div>
+                <div class="modal-body">
+                    Les informations renseignées seront enregistrées.
+                    <br>
+                    Vous pourrez terminer de les compléter plus tard.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                    <a href="{% if reset_url %}{{ reset_url }}{% else %}{% url 'dashboard:index' %}{% endif %}" class="btn btn-sm btn-danger">Enregistrer et quitter</a>
+                </div>
+            {% else %}
+                <div class="modal-header">
+                    <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                </div>
+                <div class="modal-body">
+                    Les informations renseignées ne seront pas enregistrées.
+                    <br>
+                    Cette action est irréversible.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                    <a href="{% if reset_url %}{{ reset_url }}{% else %}{% url 'dashboard:index' %}{% endif %}" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
