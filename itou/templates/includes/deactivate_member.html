@@ -1,3 +1,5 @@
+{% load buttons_form %}
+
 <div class="content-small">
     <h1>Retrait d'un collaborateur</h1>
     <div class="mt-4 alert alert-warning">
@@ -18,10 +20,8 @@
     </ul>
 
     <form action="{% url base_url|add:":deactivate_member" target_member.pk %}" method="post">
+        {% url base_url|add:":members" as reset_url %}
         {% csrf_token %}
-        <div class="mt-4 form-group">
-            <a class="btn btn-outline-primary" href="{% url base_url|add:":members" %}">Annuler</a>
-            <button class="btn btn-primary submit">Retirer l'utilisateur</button>
-        </div>
+        {% itou_buttons_form primary_label="Retirer l'utilisateur" reset_url=reset_url %}
     </form>
 </div>

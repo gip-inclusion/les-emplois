@@ -1,3 +1,4 @@
+{% load buttons_form %}
 
 <div class="content-small">
     {% if action == "remove" %}
@@ -21,16 +22,12 @@
     </ul>
 
     <form action="{% url base_url|add:":update_admin_role" action target_member.pk %}" method="post">
+        {% url base_url|add:":members" as reset_url %}
         {% csrf_token %}
-        <div class="mt-4 form-group">
-            <a class="btn btn-outline-primary" href="{% url base_url|add:":members" %}">Annuler</a>
-            <button class="btn btn-primary submit">
-                {% if action == "remove" %}
-                    Retirer les droits administrateur
-                {% else %}
-                    Ajouter les droits administrateur
-                {% endif %}
-            </button>
-        </div>
+        {% if action == "remove" %}
+            {% itou_buttons_form primary_label="Retirer les droits administrateur" reset_url=reset_url %}
+        {% else %}
+            {% itou_buttons_form primary_label="Ajouter les droits administrateur" reset_url=reset_url %}
+        {% endif %}
     </form>
 </div>
