@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
+{% load buttons_form %}
 
 {% block title %}
     {% if update_job_seeker %}
@@ -41,22 +42,11 @@
 
                             {% include "apply/includes/profile_infos.html" %}
 
-                            <hr>
-                            <div class="form-row align-items-center gx-3">
-                                <div class="form-group col-12 col-lg order-2 order-lg-1">
-                                    <a href="{{ back_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retourner à l'étape précédente">
-                                        <i class="ri-arrow-go-back-line ri-lg"></i>
-                                        <span>Retour</span>
-                                    </a>
-                                </div>
-                                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                                    {% if update_job_seeker %}
-                                        {% bootstrap_button "Valider les informations" button_type="submit" button_class="btn btn-primary btn-block" %}
-                                    {% else %}
-                                        {% bootstrap_button "Créer le compte candidat" button_type="submit" button_class="btn btn-primary btn-block" %}
-                                    {% endif %}
-                                </div>
-                            </div>
+                            {% if update_job_seeker %}
+                                {% itou_buttons_form primary_label="Valider les informations" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False %}
+                            {% else %}
+                                {% itou_buttons_form primary_label="Créer le compte candidat" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False %}
+                            {% endif %}
                         </form>
                     </div>
                 </div>

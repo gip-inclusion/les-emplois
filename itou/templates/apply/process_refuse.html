@@ -1,6 +1,6 @@
 {% extends "apply/process_base.html" %}
 {% load django_bootstrap5 %}
-{% load matomo %}
+{% load buttons_form %}
 
 {% block content_extend %}
     <div class="c-form">
@@ -49,17 +49,8 @@
 
             {% bootstrap_field form.answer %}
 
-            <hr>
-            <div class="form-row align-items-center justify-content-end">
-                <div class="form-group mb-0 col-6 col-lg-auto">
-                    <a class="btn btn-outline-primary btn-block" href="{% url 'apply:details_for_company' job_application_id=job_application.id %}">Annuler</a>
-                </div>
-                <div class="form-group mb-0 col-6 col-lg-auto">
-                    <button type="submit" class="btn btn-block btn-danger" {% matomo_event "candidature" "submit" "refuse_application_submit" %}>
-                        Confirmer le refus
-                    </button>
-                </div>
-            </div>
+            {% url 'apply:details_for_company' job_application_id=job_application.id as reset_url %}
+            {% itou_buttons_form primary_label="Confirmer le refus" reset_url=reset_url matomo_category="candidature" matomo_action="submit" matomo_event="refuse_application_submit" %}
 
         </form>
     </div>

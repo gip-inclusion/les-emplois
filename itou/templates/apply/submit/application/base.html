@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
+{% load buttons_form %}
 
 {% block title %}Postuler {{ block.super }}{% endblock %}
 
@@ -112,22 +113,9 @@
 
                             {% block form_content %}{% endblock %}
 
-                            <hr>
-                            <div class="form-row align-items-center gx-3">
-                                {% if back_url %}
-                                    <div class="form-group col-12 col-lg order-2 order-lg-1">
-                                        <a class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="{{ back_url }}" aria-label="Retourner à l'étape précédente">
-                                            <i class="ri-arrow-go-back-line ri-lg"></i>
-                                            <span>Retour</span>
-                                        </a>
-                                    </div>
-                                {% endif %}
-                                {% block form_submit_button %}
-                                    <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                                        <button type="submit" class="btn btn-primary btn-block" aria-label="Passer à l'étape suivante">Suivant</button>
-                                    </div>
-                                {% endblock %}
-                            </div>
+                            {% block form_submit_button %}
+                                {% itou_buttons_form primary_label="Suivant" secondary_url=back_url %}
+                            {% endblock %}
                         </form>
                     </div>
                 </div>

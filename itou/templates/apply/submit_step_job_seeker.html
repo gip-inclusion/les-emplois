@@ -3,6 +3,7 @@
 {% load format_filters %}
 {% load static %}
 {% load str_filters %}
+{% load buttons_form %}
 
 {% block left_column %}
     <form method="post" class="js-prevent-multiple-submit js-format-nir">
@@ -38,18 +39,7 @@
                 {% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" %}
             </div>
 
-            <hr>
-            <div class="form-row align-items-center gx-3">
-                <div class="form-group col-12 col-lg order-2 order-lg-1">
-                    <a href="{{ back_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retourner à l'étape précédente">
-                        <i class="ri-arrow-go-back-line ri-lg"></i>
-                        <span>Retour</span>
-                    </a>
-                </div>
-                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                    {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary btn-block" name="preview" value="1" %}
-                </div>
-            </div>
+            {% itou_buttons_form primary_label="Suivant" secondary_url=back_url primary_name="preview" primary_value="1" %}
         </div>
         {% if preview_mode %}
             <!-- Modal -->

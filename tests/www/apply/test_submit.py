@@ -3930,6 +3930,11 @@ class CheckJobSeekerInformationsForHireTestCase(TestCase):
                 kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk},
             ),
         )
+
+        self.assertContains(
+            response,
+            reverse("apply:check_nir_for_hire", kwargs={"company_pk": company.pk}),
+        )
         self.assertContains(response, reverse("dashboard:index"))
 
     def test_geiq(self):

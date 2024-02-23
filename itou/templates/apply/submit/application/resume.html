@@ -2,6 +2,7 @@
 {% load django_bootstrap5 %}
 {% load static %}
 {% load matomo %}
+{% load buttons_form %}
 
 {% block progress_title %}{{ block.super }} - Message & CV{% endblock %}
 {% block step_title %}Finaliser la candidature{% endblock %}
@@ -232,13 +233,9 @@
 {% endblock %}
 
 {% block form_submit_button %}
-    <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-        <button class="btn btn-primary btn-block" {% matomo_event "candidature" "submit" "candidature_"|add:request.user.get_kind_display %}>
-            {% if request.user.is_employer %}
-                Enregistrer
-            {% else %}
-                Envoyer la candidature
-            {% endif %}
-        </button>
-    </div>
+    {% if request.user.is_employer %}
+        {% itou_buttons_form primary_label="Enregistrer" secondary_url=back_url matomo_category="candidature" matomo_action="submit" matomo_event="candidature_employer" %}
+    {% else %}
+        {% itou_buttons_form primary_label="Envoyer la candidature" secondary_url=back_url matomo_category="candidature" matomo_action="submit" matomo_event="candidature_"|add:request.user.get_kind_display %}
+    {% endif %}
 {% endblock %}

@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
 {% load static %}
+{% load buttons_form %}
 
 {% block title %}
     {% if update_job_seeker %}
@@ -64,21 +65,11 @@
                             {% csrf_token %}
 
                             {% block form_content %}{% endblock %}
-
-                            <hr>
-                            <div class="form-row align-items-center gx-3">
-                                {% if back_url %}
-                                    <div class="form-group col-12 col-lg order-2 order-lg-1">
-                                        <a href="{{ back_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retourner à l'étape précédente">
-                                            <i class="ri-arrow-go-back-line ri-lg"></i>
-                                            <span>Retour</span>
-                                        </a>
-                                    </div>
-                                {% endif %}
-                                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                                    {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary btn-block" %}
-                                </div>
-                            </div>
+                            {% if back_url == reset_url %}
+                                {% itou_buttons_form primary_label="Suivant" reset_url=reset_url %}
+                            {% else %}
+                                {% itou_buttons_form primary_label="Suivant" secondary_url=back_url reset_url=reset_url %}
+                            {% endif %}
                         </form>
                     </div>
                 </div>
@@ -104,3 +95,10 @@
         })
     </script>
 {% endblock %}
+
+
+{% comment %}FAILED tests/www/apply/test_submit.py::ApplyAsPrescriberTest::test_apply_as_prescriber - Failed: Undefined template variable 'reset_url' in '/home/vincentporte/Entreprises/Neuralia.co.Products/betagouv/itou/itou/templates/apply/submit/create_or_update_job_seeker/step_end.html'
+FAILED tests/www/apply/test_submit.py::ApplyAsAuthorizedPrescriberTest::test_apply_as_prescriber_with_pending_authorization - Failed: Undefined template variable 'reset_url' in '/home/vincentporte/Entreprises/Neuralia.co.Products/betagouv/itou/itou/templates/apply/submit/create_or_update_job_seeker/step_end.html'
+FAILED tests/www/apply/test_submit.py::ApplyAsAuthorizedPrescriberTest::test_apply_as_authorized_prescriber - Failed: Undefined template variable 'reset_url' in '/home/vincentporte/Entreprises/Neuralia.co.Products/betagouv/itou/itou/templates/apply/submit/create_or_update_job_seeker/step_end.html'
+FAILED tests/www/apply/test_submit.py::DirectHireFullProcessTest::test_hire_as_company - Failed: Undefined template variable 'reset_url' in '/home/vincentporte/Entreprises/Neuralia.co.Products/betagouv/itou/itou/templates/apply/submit/create_or_update_job_seeker/step_end.html'
+FAILED tests/www/apply/test_submit.py::ApplyAsCompanyTest::test_apply_as_company - Failed: Undefined template variable 'reset_url' in '/home/vincentporte/Entreprises/Neuralia.co.Products/betagouv/itou/itou/templates/apply/submit/create_or_update_job_seeker/step_end.html'{% endcomment %}

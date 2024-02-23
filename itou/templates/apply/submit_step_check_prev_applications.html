@@ -1,5 +1,6 @@
 {% extends "apply/submit_base.html" %}
 {% load django_bootstrap5 %}
+{% load buttons_form %}
 
 {% block content_extend %}
     <div class="alert alert-warning">
@@ -19,14 +20,6 @@
         {% csrf_token %}
         <input type="hidden" name="force_new_application" value="force">
 
-        <hr>
-        <div class="form-row align-items-center justify-content-end">
-            <div class="form-group mb-0 col-6 col-lg-auto">
-                <a class="btn btn-outline-primary btn-block" href="{% url 'dashboard:index' %}">Annuler</a>
-            </div>
-            <div class="form-group mb-0 col-6 col-lg-auto">
-                {% bootstrap_button "Postuler à nouveau" button_type="submit" button_class="btn btn-primary btn-block" %}
-            </div>
-        </div>
+        {% itou_buttons_form primary_label="Postuler à nouveau" %}
     </form>
 {% endblock %}
