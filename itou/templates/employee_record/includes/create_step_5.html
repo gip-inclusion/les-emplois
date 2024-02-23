@@ -3,6 +3,7 @@
 {% load static %}
 {% load matomo %}
 {% load buttons_form %}
+{% load url_add_query %}
 
 <div class="row">
     <div class="col-12 col-lg-8 order-2 order-lg-1">
@@ -28,7 +29,11 @@
                 {% csrf_token %}
                 {% url "employee_record_views:create_step_4" employee_record.job_application.id as secondary_url %}
                 {% url "employee_record_views:list" as reset_url %}
-                {% itou_buttons_form primary_label="Valider la fiche salarié" secondary_url=secondary_url show_mandatory_fields_mention=False reset_url=reset_url|add:"?status=NEW" %}
+                {% if request.GET.status %}
+                    {% url_add_query secondary_url status=request.GET.status as secondary_url %}
+                    {% url_add_query reset_url status=request.GET.status as reset_url %}
+                {% endif %}
+                {% itou_buttons_form primary_label="Valider la fiche salarié" secondary_url=secondary_url show_mandatory_fields_mention=False reset_url=reset_url %}
             </form>
         </div>
     </div>

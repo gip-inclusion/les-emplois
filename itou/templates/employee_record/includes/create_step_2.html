@@ -1,5 +1,6 @@
 {% load django_bootstrap5 %}
 {% load buttons_form %}
+{% load url_add_query %}
 
 <div class="row">
     <div class="col-12">
@@ -89,13 +90,18 @@
                 </div>
                 <div class="row">
                     <div class="col-12 col-lg-8">
+                        {% url "employee_record_views:create_step_3" job_application.id as primary_url %}
                         {% url "employee_record_views:create" job_application.id as secondary_url %}
                         {% url "employee_record_views:list" as reset_url %}
+                        {% if request.GET.status %}
+                            {% url_add_query primary_url status=request.GET.status as primary_url %}
+                            {% url_add_query secondary_url status=request.GET.status as secondary_url %}
+                            {% url_add_query reset_url status=request.GET.status as reset_url %}
+                        {% endif %}
                         {% if profile.hexa_address_filled %}
-                            {% url "employee_record_views:create_step_3" job_application.id as primary_url %}
-                            {% itou_buttons_form primary_label="Suivant" primary_url=primary_url secondary_url=secondary_url reset_url=reset_url|add:"?status=NEW" %}
+                            {% itou_buttons_form primary_label="Suivant" primary_url=primary_url secondary_url=secondary_url reset_url=reset_url %}
                         {% else %}
-                            {% itou_buttons_form primary_label="Suivant" primary_deactivated=True secondary_url=secondary_url reset_url=reset_url|add:"?status=NEW" %}
+                            {% itou_buttons_form primary_label="Suivant" primary_deactivated=True secondary_url=secondary_url reset_url=reset_url %}
                         {% endif %}
                     </div>
                 </div>
