@@ -17,7 +17,7 @@
                   
               </div>
               
-              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
@@ -73,7 +73,7 @@
                   
               </div>
               
-              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
@@ -129,7 +129,7 @@
                   
               </div>
               
-              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
@@ -185,7 +185,7 @@
                   
               </div>
               
-              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
@@ -241,7 +241,7 @@
                   
               </div>
               
-              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
@@ -297,7 +297,7 @@
                   
               </div>
               
-              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
@@ -353,7 +353,7 @@
                   
               </div>
               
-              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
@@ -409,7 +409,7 @@
                   
               </div>
               
-              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
@@ -465,7 +465,7 @@
                   
               </div>
               
-              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <a href="/next"
                          class="btn btn-block btn-primary"
@@ -521,7 +521,7 @@
                   
               </div>
               
-              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <a href="/next"
                          class="btn btn-block btn-primary"
@@ -577,16 +577,16 @@
                   
               </div>
               
-                  <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                  <div class="form-group col col-lg-auto order-1 order-lg-2">
                       <a href="/prev"
-                         class="btn btn-outline-primary"
+                         class="btn btn-block btn-outline-primary"
                          aria-label="label"
                          >
                           <span>Retour</span>
                       </a>
                   </div>
               
-              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
@@ -642,16 +642,16 @@
                   
               </div>
               
-                  <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                  <div class="form-group col col-lg-auto order-1 order-lg-2">
                       <a href="/do"
-                         class="btn btn-outline-primary"
+                         class="btn btn-block btn-outline-primary"
                          aria-label="Retourner à l'étape précédente"
                          name="name" value="1">
                           <span>Retour</span>
                       </a>
                   </div>
               
-              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
@@ -707,16 +707,16 @@
                   
               </div>
               
-                  <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                  <div class="form-group col col-lg-auto order-1 order-lg-2">
                       <a href="/do"
-                         class="btn btn-outline-primary"
+                         class="btn btn-block btn-outline-primary"
                          aria-label="Retourner à l'étape précédente"
                          >
                           <span>Retour</span>
                       </a>
                   </div>
               
-              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
@@ -772,7 +772,7 @@
                   
               </div>
               
-              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
