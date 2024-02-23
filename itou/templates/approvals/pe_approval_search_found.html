@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
 {% load matomo %}
+{% load buttons_form %}
 
 {% block title %}Prolonger ou suspendre un agrément émis par Pôle emploi {{ block.super }}{% endblock %}
 
@@ -44,18 +45,9 @@
                                 </p>
                                 <p>Nous allons l'importer dans votre compte pour vous permettre de le suspendre ou de le prolonger.</p>
                                 <p>Mais avant, nous avons besoin de connaître l'adresse e-mail de votre salarié(e).</p>
-                                <hr>
-                                <div class="form-row align-items-center justify-content-end gx-3">
-                                    <div class="form-group col-6 col-lg-auto">
-                                        <a href="{{ back_url }}" class="btn btn-block btn-ico btn-outline-primary">
-                                            <i class="ri-close-fill ri-lg"></i>
-                                            <span>Annuler</span>
-                                        </a>
-                                    </div>
-                                    <div class="form-group col-6 col-lg-auto">
-                                        <a class="btn btn-primary btn-block" href="{% url 'approvals:pe_approval_search_user' approval.pk %}">Continuer</a>
-                                    </div>
-                                </div>
+
+                                {% url 'approvals:pe_approval_search_user' approval.pk as primary_url %}
+                                {% itou_buttons_form primary_label="Continuer" primary_url=primary_url secondary_url=back_url %}
                             </div>
                         {% endif %}
 

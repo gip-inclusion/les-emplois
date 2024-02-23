@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
+{% load buttons_form %}
 
 {% block title %}Prolonger ou suspendre un agrément émis par Pôle emploi {{ block.super }}{% endblock %}
 
@@ -33,12 +34,7 @@
 
                             {% bootstrap_form form alert_error_type="all" %}
 
-                            <hr>
-                            <div class="form-row align-items-center justify-content-end gx-3">
-                                <div class="form-group col-12 col-lg-auto">
-                                    {% bootstrap_button "Rechercher" button_type="submit" button_class="btn btn-primary w-100 w-lg-auto" %}
-                                </div>
-                            </div>
+                            {% itou_buttons_form primary_label="Rechercher" %}
                         </form>
                     </div>
                 </div>

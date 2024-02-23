@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
+{% load buttons_form %}
 
 {% block title %}Supprimer la suspension du PASS IAE {{ block.super }}{% endblock %}
 
@@ -39,18 +40,7 @@
                                     Confirmer la <strong class="text-danger">suppression définitive</strong> de cette suspension
                                 </label>
                             </div>
-                            <hr>
-                            <div class="form-row align-items-center gx-3">
-                                <div class="form-group col-12 col-lg order-2 order-lg-1">
-                                    <a href="{{ back_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto">
-                                        <i class="ri-arrow-go-back-line ri-lg"></i>
-                                        <span>Retour</span>
-                                    </a>
-                                </div>
-                                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                                    {% bootstrap_button "Suivant" button_type="submit" button_class="btn btn-primary" %}
-                                </div>
-                            </div>
+                            {% itou_buttons_form primary_label="Suivant" reset_url=back_url %}
                         </form>
                     </div>
                 </div>

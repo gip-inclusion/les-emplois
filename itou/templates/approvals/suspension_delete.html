@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
 {% load str_filters %}
+{% load buttons_form %}
 
 {% block title %}Supprimer la suspension du PASS IAE {{ block.super }}{% endblock %}
 
@@ -49,17 +50,7 @@
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
                             <input type="hidden" name="confirm" value="true">
-                            <div class="form-row align-items-center gx-3">
-                                <div class="form-group col-12 col-lg order-2 order-lg-1">
-                                    <a href="{{ back_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto">
-                                        <i class="ri-arrow-go-back-line ri-lg"></i>
-                                        <span>Retour</span>
-                                    </a>
-                                </div>
-                                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                                    {% bootstrap_button "Confirmer la suppression" button_type="submit" button_class="btn btn-primary" %}
-                                </div>
-                            </div>
+                            {% itou_buttons_form primary_label="Confirmer la suppression" secondary_url=back_url reset_url=reset_url %}
                         </form>
                     </div>
                 </div>

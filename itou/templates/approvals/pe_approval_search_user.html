@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
+{% load buttons_form %}
 
 {% block title %}Prolonger ou suspendre un agrément émis par Pôle emploi {{ block.super }}{% endblock %}
 
@@ -25,12 +26,7 @@
                                 {% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" %}
                             </div>
 
-                            <hr>
-                            <div class="form-row align-items-center justify-content-end gx-3">
-                                <div class="form-group col-12 col-lg-auto">
-                                    {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-primary w-100 w-lg-auto" %}
-                                </div>
-                            </div>
+                            {% itou_buttons_form primary_label="Continuer" %}
                         </form>
                     </div>
                 </div>

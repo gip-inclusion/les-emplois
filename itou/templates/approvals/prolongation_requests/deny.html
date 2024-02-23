@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
 {% load theme_inclusion %}
+{% load buttons_form %}
 
 {% block title %}
     Refuser la demande de prolongation - {{ prolongation_request.approval.user.get_full_name }} {{ block.super }}

@@ -1,4 +1,6 @@
 {% load django_bootstrap5 %}
+{% load buttons_form %}
+
 <form id="mainForm" method="post" class="js-prevent-multiple-submit"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
     {% csrf_token %}
 
@@ -9,11 +11,5 @@
 
     {% include "approvals/includes/declaration_upload_panel.html" %}
 
-    <hr />
-
-    <div class="form-group text-end">
-        <a class="btn btn-outline-primary" href="{{ back_url }}">Retour</a>
-        {# Enable preview mode: preview=1. #}
-        {% bootstrap_button "Valider la déclaration" button_type="submit" button_class="btn btn-primary" name="preview" value="1" %}
-    </div>
+    {% itou_buttons_form primary_label="Valider la déclaration" secondary_url=back_url primary_name="preview" primary_value="1" %}
 </form>
