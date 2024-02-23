@@ -3,7 +3,7 @@
 {% load django_bootstrap5 %}
 {% load static %}
 {% load theme_inclusion %}
-{% load matomo %}
+{% load buttons_form %}
 
 {% block title %}Modifier les coordonnées de votre structure {{ block.super }}{% endblock %}
 
@@ -130,19 +130,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-row align-items-center gx-3">
-                                <div class="form-group col-12 col-lg order-2 order-lg-1">
-                                    <a href="{{ prev_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Retourner à l'édition de la description">
-                                        <i class="ri-arrow-go-back-line ri-lg"></i>
-                                        <span>Retour</span>
-                                    </a>
-                                </div>
-                                <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
-                                    <button class="btn btn-primary btn-block" aria-label="Publier le formulaire" {% matomo_event "employeurs" "submit" "publier-infos-structure" %}>
-                                        Publier
-                                    </button>
-                                </div>
-                            </div>
+                            {% itou_buttons_form primary_label="Publier" secondary_url=prev_url secondary_aria_label="Retourner à l'édition de la description" matomo_category="employeurs" matomo_action="submit" matomo_event="publier-infos-structure" %}
                         </form>
                     </div>
                 </div>
