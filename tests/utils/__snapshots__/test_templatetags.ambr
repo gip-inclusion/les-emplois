@@ -1,0 +1,812 @@
+# serializer version: 1
+# name: TestButtonsForm.test_itou_buttons_form[no params]
+  '''
+  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3">
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a href="/dashboard/" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
+                          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                  
+                      <button type="submit"
+                              class="btn btn-block btn-primary"
+                              aria-label="Passer à l'étape suivante"
+                              
+                              >
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                      <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestButtonsForm.test_itou_buttons_form_reset_url[default_reset_url]
+  '''
+  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3">
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a href="/dashboard/" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
+                          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                  
+                      <button type="submit"
+                              class="btn btn-block btn-primary"
+                              aria-label="Passer à l'étape suivante"
+                              
+                              >
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                      <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestButtonsForm.test_itou_buttons_form_reset_url[reset_url]
+  '''
+  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3">
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a href="/reset" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
+                          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                  
+                      <button type="submit"
+                              class="btn btn-block btn-primary"
+                              aria-label="Passer à l'étape suivante"
+                              
+                              >
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                      <a href="/reset" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestButtonsForm.test_itou_buttons_mandatory_fields_mention[no_mandatory_fields_mention]
+  '''
+  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3">
+          
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a href="/dashboard/" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
+                          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                  
+                      <button type="submit"
+                              class="btn btn-block btn-primary"
+                              aria-label="Passer à l'étape suivante"
+                              
+                              >
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                      <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestButtonsForm.test_itou_buttons_matomo_event[matomo_event]
+  '''
+  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3">
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a href="/dashboard/" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
+                          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                  
+                      <button type="submit"
+                              class="btn btn-block btn-primary"
+                              aria-label="Passer à l'étape suivante"
+                              
+                              data-matomo-event="true" data-matomo-category="category" data-matomo-action="action" data-matomo-option="name">
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                      <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestButtonsForm.test_itou_buttons_with_primary_aria_label[with_primary_aria_label]
+  '''
+  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3">
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a href="/dashboard/" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
+                          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                  
+                      <button type="submit"
+                              class="btn btn-block btn-primary"
+                              aria-label="label"
+                              
+                              >
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                      <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestButtonsForm.test_itou_buttons_with_primary_disabled[with_primary_disabled]
+  '''
+  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3">
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a href="/dashboard/" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
+                          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                  
+                      <button type="submit"
+                              class="btn btn-block btn-primary"
+                              aria-label="Passer à l'étape suivante"
+                              
+                              >
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                      <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestButtonsForm.test_itou_buttons_with_primary_name_and_value[with_primary_name_and_value]
+  '''
+  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3">
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a href="/dashboard/" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
+                          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                  
+                      <button type="submit"
+                              class="btn btn-block btn-primary"
+                              aria-label="Passer à l'étape suivante"
+                              name="name" value="1"
+                              >
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                      <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestButtonsForm.test_itou_buttons_with_primary_url[with_primary_url]
+  '''
+  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3">
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a href="/dashboard/" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
+                          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                  
+                      <a href="/next"
+                         class="btn btn-block btn-primary"
+                         aria-label="Passer à l'étape suivante"
+                         
+                         >
+                          <span>Suivant</span>
+                      </a>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                      <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestButtonsForm.test_itou_buttons_with_primary_url_name_value_aria_label_and_matomo_tags[with_primary_url_name_value_aria_label_and_matomo_tags]
+  '''
+  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3">
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a href="/dashboard/" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
+                          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                  
+                      <a href="/next"
+                         class="btn btn-block btn-primary"
+                         aria-label="label"
+                         name="name" value="1"
+                         data-matomo-event="true" data-matomo-category="category" data-matomo-action="action" data-matomo-option="name">
+                          <span>Suivant</span>
+                      </a>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                      <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestButtonsForm.test_itou_buttons_with_secondary_aria_label[with_secondary_aria_label]
+  '''
+  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3">
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <button type="button" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire" data-bs-toggle="modal" data-bs-target="#confirm_reset_modal">
+                          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                          <span>Annuler</span>
+                      </button>
+                  
+              </div>
+              
+                  <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                      <a href="/prev"
+                         class="btn btn-outline-primary"
+                         aria-label="label"
+                         >
+                          <span>Retour</span>
+                      </a>
+                  </div>
+              
+              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                  
+                      <button type="submit"
+                              class="btn btn-block btn-primary"
+                              aria-label="Passer à l'étape suivante"
+                              
+                              >
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                      <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestButtonsForm.test_itou_buttons_with_secondary_name_and_value[with_secondary_name_and_value]
+  '''
+  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3">
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <button type="button" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire" data-bs-toggle="modal" data-bs-target="#confirm_reset_modal">
+                          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                          <span>Annuler</span>
+                      </button>
+                  
+              </div>
+              
+                  <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                      <a href="/do"
+                         class="btn btn-outline-primary"
+                         aria-label="Retourner à l'étape précédente"
+                         name="name" value="1">
+                          <span>Retour</span>
+                      </a>
+                  </div>
+              
+              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                  
+                      <button type="submit"
+                              class="btn btn-block btn-primary"
+                              aria-label="Passer à l'étape suivante"
+                              
+                              >
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                      <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestButtonsForm.test_itou_buttons_with_secondary_url[no_form_title]
+  '''
+  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3">
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <button type="button" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire" data-bs-toggle="modal" data-bs-target="#confirm_reset_modal">
+                          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                          <span>Annuler</span>
+                      </button>
+                  
+              </div>
+              
+                  <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                      <a href="/do"
+                         class="btn btn-outline-primary"
+                         aria-label="Retourner à l'étape précédente"
+                         >
+                          <span>Retour</span>
+                      </a>
+                  </div>
+              
+              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                  
+                      <button type="submit"
+                              class="btn btn-block btn-primary"
+                              aria-label="Passer à l'étape suivante"
+                              
+                              >
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                      <a href="/dashboard/" class="btn btn-sm btn-danger">Confirmer l'annulation</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
+# name: TestButtonsForm.test_save_and_quit_modal_content[save_and_quit_modal_content]
+  '''
+  
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3">
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a href="/dashboard/" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
+                          <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col-12 col-lg-auto order-2 order-lg-3">
+                  
+                      <button type="submit"
+                              class="btn btn-block btn-primary"
+                              aria-label="Passer à l'étape suivante"
+                              
+                              >
+                          <span>Suivant</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div id="confirm_reset_modal" class="modal fade" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Enregistrer et quitter ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées seront enregistrées.
+                      <br>
+                      Vous pourrez terminer de les compléter plus tard.
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                      <a href="/dashboard/" class="btn btn-sm btn-danger">Enregistrer et quitter</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+  '''
+# ---
