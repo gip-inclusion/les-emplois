@@ -2,6 +2,7 @@
 {% load static %}
 {% load format_filters %}
 {% load django_bootstrap5 %}
+{% load buttons_form %}
 
 {% block title %}
     Réactiver la fiche salarié ASP - {{ request.current_organization.display_name }} {{ block.super }}
@@ -48,10 +49,8 @@
                     <form method="post" class="js-prevent-multiple-submit">
                         {% csrf_token %}
                         <input type="hidden" name="confirm" value="true">
-                        <div class="form-group">
-                            <a class="btn btn-outline-primary" href="{% url "employee_record_views:list" %}?status={{ employee_record.status }}">Retour à la liste</a>
-                            {% bootstrap_button "Confirmer la réactivation" button_type="submit" button_class="btn btn-danger" %}
-                        </div>
+                        {% url "employee_record_views:list" as secondary_url %}
+                        {% itou_buttons_form primary_label="Confirmer la réactivation" reset_url=secondary_url|add:"?status="|add:employee_record.status show_mandatory_fields_mention=False %}
                     </form>
                 </div>
             </div>

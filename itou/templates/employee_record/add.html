@@ -4,6 +4,7 @@
 {% load str_filters %}
 {% load theme_inclusion %}
 {% load matomo %}
+{% load buttons_form %}
 
 {% block title %}Créer une fiche salarié {{ block.super }}{% endblock %}
 {% block content_title %}
@@ -49,18 +50,13 @@
                                 </ul>
                             {% endif %}
 
-                            <hr>
-                            <p class="fs-xs">* champ obligatoire</p>
-                            <div class="form-group text-end">
-                                {% if wizard.steps.prev %}
-                                    {% bootstrap_button "Retour" button_type="submit" button_class="btn btn-outline-primary" name="wizard_goto_step" value=wizard.steps.prev %}
-                                {% else %}
-                                    <a class="btn btn-link btn-outline-primary" href="{% url "employee_record_views:list" %}?status=NEW">Annuler</a>
-                                {% endif %}
-                                <button class="btn btn-primary" {% if not wizard.steps.next %}{% matomo_event "fiches-salarié" "submit" "création" %}{% endif %}>
-                                    {{ wizard.steps.next|yesno:"Suivant,Confirmer" }}
-                                </button>
-                            </div>
+                            {% url "employee_record_views:list" as reset_url %}
+                            {% if wizard.steps.prev %}
+                                {% url 'employee_record_views:add' as secondary_url %}
+                                {% itou_buttons_form primary_label=wizard.steps.next|yesno:"Suivant,Confirmer" reset_url=reset_url|add:"?status=NEW" secondary_url=secondary_url|add:wizard.steps.prev secondary_name="wizard_goto_step" secondary_value=wizard.steps.prev matomo_category="fiches-salarié" matomo_action="submit" matomo_event="création" %}
+                            {% else %}
+                                {% itou_buttons_form primary_label=wizard.steps.next|yesno:"Suivant,Confirmer" reset_url=reset_url|add:"?status=NEW" %}
+                            {% endif %}
                         </form>
                     </div>
                 </div>
