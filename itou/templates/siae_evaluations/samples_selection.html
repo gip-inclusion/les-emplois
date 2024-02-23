@@ -2,6 +2,7 @@
 {% load format_filters %}
 {% load django_bootstrap5 %}
 {% load static %}
+{% load buttons_form %}
 
 {% block title %}Sélectionner l’échantillon pour {{ evaluation_campaign }} {{ block.super }}{% endblock %}
 
@@ -85,19 +86,11 @@
                                         <p>{{ min }}% {{ form.chosen_percent }} {{ max }}%</p>
                                     </div>
 
-                                    <div class="form-group text-end">
-                                        {% bootstrap_button "Valider" button_type="submit" button_class="btn btn-primary" %}
-                                    </div>
+                                    {% itou_buttons_form primary_label="Valider" secondary_url=back_url %}
                                 </form>
                             {% endif %}
                         </div>
                     </div>
-
-                    {% if back_url %}
-                        <p class="mt-4">
-                            <a href="{{ back_url }}">Retour</a>
-                        </p>
-                    {% endif %}
                 </div>
             </div>
         </div>
