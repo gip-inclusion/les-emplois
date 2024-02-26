@@ -67,6 +67,7 @@ from tests.users.factories import (
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class DashboardViewTest(TestCase):
     NO_PRESCRIBER_ORG_MSG = "Votre compte utilisateur n’est rattaché à aucune organisation."
     NO_PRESCRIBER_ORG_FOR_PE_MSG = (
@@ -82,6 +83,8 @@ class DashboardViewTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         assert response.status_code == 200
+        cities_search = parse_response_to_soup(response, selector="form[method=get]")
+        assert str(cities_search) == self.snapshot
 
     def test_user_with_inactive_company_can_still_login_during_grace_period(self):
         company = CompanyPendingGracePeriodFactory(with_membership=True)

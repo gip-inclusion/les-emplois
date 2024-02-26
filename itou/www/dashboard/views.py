@@ -37,6 +37,7 @@ from itou.www.dashboard.forms import (
     EditUserEmailForm,
     EditUserInfoForm,
 )
+from itou.www.search.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
 
 
@@ -135,6 +136,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "evaluated_siae_notifications": EvaluatedSiae.objects.none(),
         "show_dora_banner": False,
         "siae_suspension_text_with_dates": None,
+        "siae_search_form": SiaeSearchForm(),
     }
 
     if request.user.is_employer:
