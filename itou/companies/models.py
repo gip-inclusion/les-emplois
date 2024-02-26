@@ -522,7 +522,7 @@ class JobDescriptionQuerySet(models.QuerySet):
         job_apps_filters = {"jobapplication__state__in": JobApplicationWorkflow.PENDING_STATES}
         annotation = self.with_job_applications_count(filters=job_apps_filters).annotate(
             is_popular=Case(
-                When(job_applications_count__gt=self.model.POPULAR_THRESHOLD, then=True),
+                When(job_applications_count__gte=self.model.POPULAR_THRESHOLD, then=True),
                 default=False,
                 output_field=BooleanField(),
             )

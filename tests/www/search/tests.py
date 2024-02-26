@@ -225,7 +225,7 @@ class SearchCompanyTest(TestCase):
         city = create_city_saint_andre()
         company = CompanyFactory(department="44", coords=city.coords, post_code="44117", with_membership=True)
         job = JobDescriptionFactory(company=company)
-        JobApplicationFactory.create_batch(20, to_company=company, selected_jobs=[job], state="new")
+        JobApplicationFactory.create_batch(19, to_company=company, selected_jobs=[job], state="new")
         response = self.client.get(self.URL, {"city": city.slug})
         popular_badge = """
             <span class="badge badge-sm rounded-pill bg-pilotage text-primary">
