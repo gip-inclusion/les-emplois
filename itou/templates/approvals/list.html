@@ -51,7 +51,11 @@
                         {% endif %}
                     </div>
                     {% if not approval_list %}
-                        <p class="my-3 my-md-4">Aucun salarié pour le moment.</p>
+                        <div class="c-box c-box--results my-3 my-md-4">
+                            <div class="c-box--results__body">
+                                <p class="mb-0">Aucun salarié pour le moment.</p>
+                            </div>
+                        </div>
                     {% else %}
                         {% for approval in approval_list %}
                             {% include "approvals/includes/list_card.html" with approval=approval %}

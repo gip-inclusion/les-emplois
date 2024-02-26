@@ -2,38 +2,76 @@
 {% load str_filters %}
 {% load matomo %}
 
-<div class="c-card card my-4 has-links-inside">
-    <div class="card-header pb-3">
-        <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
-            <div class="order-2 order-md-1 flex-fill-1">
-                <h3 class="h3 mb-1">{{ approval.user.get_full_name }}</h3>
-                <p class="fs-sm mb-0">Pass N° {{ approval|format_approval_number }}</p>
+<div class="c-box c-box--results has-links-inside my-3 my-md-4">
+
+    <div class="c-box--results__header">
+
+        <div class="c-box--results__summary">
+            <i class="ri-user-line" aria-hidden="true"></i>
+
+            <div>
+
+                <h3>{{ approval.user.get_full_name }}</h3>
+
+                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                    <span class="badge badge-sm rounded-pill text-wrap {% if approval.state == 'EXPIRED' %} bg-emploi-light text-primary{% else %} bg-success-lighter text-success{% endif %}">
+                        <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %} ri-xl" aria-hidden="true"></i>
+                        PASS IAE {{ approval.get_state_display|lower }}
+                    </span>
+
+                </div>
+
             </div>
-            <div class="order-1 order-md-2 mb-2 mb-md-0">
-                <span class="badge badge-sm rounded-pill text-wrap {% if approval.state == 'EXPIRED' %} bg-emploi-light text-primary{% else %} bg-success-lighter text-success{% endif %}">
-                    <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %} ri-xl" aria-hidden="true"></i>
-                    PASS IAE {{ approval.get_state_display|lower }}
-                </span>
-            </div>
+
         </div>
 
-        <div class="fs-sm">
-            Nombre de jours restants sur le PASS IAE :
-            {% if approval.is_valid %}
-                {{ approval.remainder.days }} jour{{ approval.remainder.days|pluralizefr }}
-            {% else %}
-                0 jour
-            {% endif %}
-            <i class="ri-information-line ri-xl text-info"
-               data-bs-toggle="tooltip"
-               title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
-        </div>
     </div>
 
-    <div class="card-footer text-end bg-light">
-        <a href="{% url 'approvals:detail' pk=approval.id %}"
-           class="btn btn-sm btn-outline-primary bg-white"
-           {% matomo_event "salaries" "clic" "details-salarie" %}
-           aria-label="Voir le profil de {{ approval.user.get_full_name }}">Voir son profil</a>
+    <hr class="m-0">
+
+    <div class="c-box--results__body">
+
+        <ul class="list-data list-data__two-column-md mb-3">
+
+            <li>
+                <small>Numéro de PASS IAE</small>
+                <strong>{{ approval|format_approval_number }}</strong>
+
+                <button class="btn-link" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-trigger="manual" data-bs-title="Copié!" data-it-clipboard-button="copy" data-it-copy-to-clipboard="{{ approval }}">
+                    <i class="ri-file-copy-line"></i>
+                </button>
+
+            </li>
+
+            <li>
+                <small>
+                    Durée de validité
+                    <i class="ri-information-line text-info"
+                       data-bs-toggle="tooltip"
+                       title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
+                <strong class="text-success">
+                    {% if approval.is_valid %}
+                        {{ approval.remainder.days }} jour{{ approval.remainder.days|pluralizefr }}
+                    {% else %}
+                        0 jour
+                    {% endif %}
+                </strong>
+
+            </li>
+
+        </ul>
+
+    </div>
+
+    <div class="c-box--results__footer">
+
+        <div class="d-flex justify-content-md-end">
+            <a href="{% url 'approvals:detail' pk=approval.id %}"
+               class="btn btn-outline-primary btn-block w-100 w-md-auto"
+               {% matomo_event "salaries" "clic" "details-salarie" %}
+               aria-label="Voir les informations de {{ approval.user.get_full_name }}">Voir les informations</a>
+
+        </div>
+
     </div>
 </div>
