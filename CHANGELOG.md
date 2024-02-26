@@ -1,5 +1,59 @@
 # Journal des modifications
 
+## [81] - 2024-02-26
+
+### Ajouté
+
+- Candidatures : état nouvelle candidature ajouté à l’historique
+- API GEIQ : ajouter la donnée “Poste occupé (contrat initial)”
+- Admin : action de vérification de cohérence sur le profil candidat
+- Admin : affichage du champ description des organisations de prescripteurs
+- Stabilité : sonde au déploiement chez CleverCloud, pour éviter une
+  indisponibilité périodique aléatoire de la plateforme après déploiement
+
+### Modifié
+
+- Recherche postes ouverts : amélioration de performance
+- Prescripteurs : autoriser les emails en `@francetravail.fr` à rejoindre les
+  structures France Travail (anciennement Pôle emploi)
+- Prolongations : correction du bouton retour lors du refus de demande de
+  prolongation
+- Prolongations : correction d’interface multiples (titres, retrait de la
+  colonne numéro de demande, taille de badges)
+- Fiches salarié : afficher une erreur lorsqu’une SIAE sans convention essaie
+  d’accéder aux fiches salariées
+- Diagoriente : faire arriver les liens sur la page d’accueil
+- Diagnostique socio-professionnel : bascule du lien d’aide vers la [communauté
+  de
+  l’inclusion](https://communaute.inclusion.beta.gouv.fr/surveys/dsp/create/)
+- Interface : gestion des emails très longs dans les fiches entreprise et de
+  fiches de poste
+- Interface : remplacement de l’encart d’action par une barre d’action sur les
+  pages candidatures, fiche de poste et fiche entreprise
+- Interface : replier les filtres de départements et arrondissements dans la
+  recherche employeur et fiche de poste pour gagner de l’espace vertical
+- Interface : correction de l’affichage du sélecteur de structures lorsque les
+  noms de structures sont courts
+- Interface : masquer la section Actions Préalables à l’embauche lorsqu’elle
+  est vide
+- Page de confidentialité : correction d’une erreur de typographie
+- Candidatures : tri de l’historique du plus récent au plus ancien
+- API : correction des limites de fréquence d’accès
+- Stats : publication du TB289 (Suivi des prescriptions des prescripteurs
+  habilités) aux régions Pays-de-la-Loire, Nouvelle-Aquitaine, Ile-de-France
+- Stats : correction d’une erreur à l’affichage pour les DDETS LOG
+- Import ASP : importer les structures conventionnées rétroactivement
+- Admin : déplacement du champ `ASP_ID` vers le profil candidat
+- Admin : déplacement des champs NIR et raison d’absence de NIR vers le profil
+  candidat
+- Admin : correction de la recherche PASS IAE suite au déplacement du champ NIR
+  vers le profil candidat
+- Admin : amélioration de performances pour la page d’ajout d’entreprise
+
+### Supprimé
+
+- API GEIQ : retrait du NIR
+
 ## [80] - 2024-02-11
 
 ### Ajouté
