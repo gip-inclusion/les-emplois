@@ -252,6 +252,14 @@
                 </div>
             </div>
 
+            <div class="row my-3 my-md-4">
+                <div class="col-12">
+                    <form method="get" action="{% url "search:employers_results" %}" role="search">
+                        {% include "search/includes/siaes_search_form.html" with form=siae_search_form only %}
+                    </form>
+                </div>
+            </div>
+
             <div class="row {% if not user.is_job_seeker %}row-cols-1 row-cols-md-2 row-cols-lg-3{% endif %} mt-3">
 
                 {% if user.is_staff %}
