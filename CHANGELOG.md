@@ -645,7 +645,7 @@
 - Pilotage : Ajout réseaux structures #1478
 - Pilotage : Ouverture nationale des stats PE+Employeur (Le Grand Jour du C2) #1486
 - Pilotage : Les DR PE peuvent maintenant voir les stats de toute leur région #1490
-- Pilotage : Ajout org_prescripteur pour améliorer le filtre par département ( Update 016_candidatures_recues_par_fiche_de_poste.sql #1492 )
+- Pilotage : Ajout org_prescripteur pour améliorer le filtre par département #1492
 - Pilotage : Ajout org_prescripteur ( 015_Metabase : add column id organization #1494 )
 - Pilotage : Taux transformation prescripteurs : ajout département prescripteurs #1495
 - Pilotage : cddr_par_fdp : ajout département prescripteur #1497
