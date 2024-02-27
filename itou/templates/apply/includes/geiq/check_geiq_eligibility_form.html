@@ -3,13 +3,25 @@
 {% include "apply/includes/geiq/geiq_administrative_criteria_form.html" %}
 <hr>
 <div class="text-primary">{% bootstrap_field form.proof_of_eligibility %}</div>
-<hr>
 
-<div class="my-4 text-end">
-    <a href="{{ back_url }}" class="btn btn-link">Annuler</a>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#confirm_geiq_eligibility_modal" {% if not form.proof_of_eligibility.value or form.errors %}disabled{% endif %}>
-        Valider les critères d'éligibilité GEIQ
-    </button>
+<hr class="mb-3">
+<div class="form-row align-items-center justify-content-end gx-3">
+    <div class="form-group col-12 col-lg order-3 order-lg-1">
+        <a href="{{ back_url }}" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire">
+            <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+            <span>Annuler</span>
+        </a>
+    </div>
+    <div class="form-group col col-lg-auto order-2 order-lg-3">
+        <button type="button"
+                class="btn btn-block btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#confirm_geiq_eligibility_modal"
+                aria-label="Continuer sans valider les critères GEIQ"
+                {% if not form.proof_of_eligibility.value or form.errors %}disabled{% endif %}>
+            <span>Valider les critères d'éligibilité GEIQ</span>
+        </button>
+    </div>
 </div>
 
 <div id="confirm_geiq_eligibility_modal" class="modal fade" tabindex="-1" aria-hidden="true">
