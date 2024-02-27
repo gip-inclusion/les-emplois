@@ -226,29 +226,26 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
-                    <div class="mb-3">
-                        <h1 class="h1 mb-0">
-                            {% if user.is_job_seeker and user.get_full_name %}Tableau de bord - {{ user.get_full_name }}{% endif %}
-                            {% if request.current_organization %}{{ request.current_organization.display_name }}{% endif %}
-                        </h1>
+                    <h1 class="h1 mb-0">
+                        {% if user.is_job_seeker and user.get_full_name %}Tableau de bord - {{ user.get_full_name }}{% endif %}
+                        {% if request.current_organization %}{{ request.current_organization.display_name }}{% endif %}
+                    </h1>
 
-                        {% if request.current_organization %}
-                            <p class="my-1">
-                                {% if user.is_prescriber %}
-                                    {% if request.current_organization.code_safir_pole_emploi %}
-                                        {% if request.current_organization.is_authorized %}Prescripteur habilité -{% endif %}
-                                        Code SAFIR {{ request.current_organization.code_safir_pole_emploi }}
-                                    {% elif request.current_organization.siret %}
-                                        {% if request.current_organization.is_authorized %}Prescripteur habilité -{% endif %}
-                                        SIRET {{ request.current_organization.siret|format_siret }}
-                                    {% endif %}
-                                {% elif user.is_employer %}
+                    {% if request.current_organization %}
+                        <p class="m-0">
+                            {% if user.is_prescriber %}
+                                {% if request.current_organization.code_safir_pole_emploi %}
+                                    {% if request.current_organization.is_authorized %}Prescripteur habilité -{% endif %}
+                                    Code SAFIR {{ request.current_organization.code_safir_pole_emploi }}
+                                {% elif request.current_organization.siret %}
+                                    {% if request.current_organization.is_authorized %}Prescripteur habilité -{% endif %}
                                     SIRET {{ request.current_organization.siret|format_siret }}
                                 {% endif %}
-                            </p>
-                        {% endif %}
-
-                    </div>
+                            {% elif user.is_employer %}
+                                SIRET {{ request.current_organization.siret|format_siret }}
+                            {% endif %}
+                        </p>
+                    {% endif %}
                 </div>
             </div>
 
