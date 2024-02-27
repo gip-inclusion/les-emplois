@@ -1,14 +1,20 @@
 {% load matomo %}
-<div class="card c-card has-links-inside my-4">
-    <div class="card-body">
+<div class="c-box c-box--results has-links-inside my-3 my-md-4">
+    <div class="c-box--results__header">
         {% include "approvals/includes/job_description_creation.html" with job_application=job_application %}
-        {% include "approvals/includes/job_description_list.html" with job_application=job_application %}
     </div>
-
-    <div class="card-footer text-end bg-light">
-        <a href="{% url 'apply:details_for_company' job_application_id=job_application.id %}"
-           class="btn btn-sm btn-outline-primary bg-white"
-           {% matomo_event "salaries" "clic" "detail-candidature" %}
-           aria-label="Voir la candidature de {{ job_application.sender.get_full_name }}">Voir sa candidature</a>
+    <hr class="m-0">
+    <div class="c-box--results__body">
+        <div class="c-box--results__list-data">
+            {% include "approvals/includes/job_description_list.html" with job_application=job_application %}
+        </div>
+    </div>
+    <div class="c-box--results__footer">
+        <div class="d-flex justify-content-end">
+            <a href="{% url 'apply:details_for_company' job_application_id=job_application.id %}"
+               class="btn btn-outline-primary btn-block w-100 w-md-auto"
+               {% matomo_event "salaries" "clic" "detail-candidature" %}
+               aria-label="Voir la candidature de {{ job_application.sender.get_full_name }}">Voir sa candidature</a>
+        </div>
     </div>
 </div>

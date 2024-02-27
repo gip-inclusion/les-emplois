@@ -1,57 +1,59 @@
 {% load str_filters %}
 
-<div class="card-body">
+<div class="c-box--results__header">
     {% include "approvals/includes/job_description_creation.html" with job_application=job_application %}
-    {% include "approvals/includes/job_description_list.html" with job_application=job_application %}
-
-    <hr />
-    <div class="row">
-        <div class="col-12 {% if job_application.preloaded_administrative_criteria %}col-lg-5 mb-3 mb-lg-0{% endif %}">
-            <h3 class="h3 mb-1">
-                {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}
-            </h3>
-            {% if job_application.job_seeker.city %}
-                <span class="d-block mb-2 text-nowrap">
-                    {% if job_application.job_seeker.department %}{{ job_application.job_seeker.department }} -{% endif %}
-                    {{ job_application.job_seeker.city }}
-                </span>
-            {% endif %}
-
-            {% if job_application.to_company.is_subject_to_eligibility_rules %}
-                {% with approval=job_application.job_seeker.latest_common_approval %}
-                    {% if approval %}
-                        <span class="badge badge-xs rounded-pill {% if approval.state == 'EXPIRED' %} bg-emploi-light text-primary{% else %} bg-success-lighter text-success{% endif %}">
-                            <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %}" aria-hidden="true"></i>
-                            PASS IAE {{ approval.get_state_display|lower }}
-                        </span>
-                    {% else %}
-                        {% if job_application.eligibility_diagnosis_by_siae_required %}
-                            <span class="badge badge-xs rounded-pill bg-accent-02-lighter text-primary">
-                                <i class="ri-error-warning-line" aria-hidden="true"></i>
-                                Éligibilité IAE à valider
+    <div class="c-box--results__summary">
+        <i class="ri-user-line" aria-hidden="true"></i>
+        <div>
+            <h3>{{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}</h3>
+            <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                {% if job_application.job_seeker.city %}
+                    <span>
+                        <i class="ri-map-pin-2-line font-weight-normal me-1" aria-hidden="true"></i>
+                        {% if job_application.job_seeker.department %}{{ job_application.job_seeker.department }} -{% endif %}
+                        {{ job_application.job_seeker.city|title }}
+                    </span>
+                {% endif %}
+                {% if job_application.to_company.is_subject_to_eligibility_rules %}
+                    {% with approval=job_application.job_seeker.latest_common_approval %}
+                        {% if approval %}
+                            <span class="badge badge-xs rounded-pill {% if approval.state == 'EXPIRED' %} bg-emploi-light text-primary{% else %} bg-success-lighter text-success{% endif %}">
+                                <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %}" aria-hidden="true"></i>
+                                PASS IAE {{ approval.get_state_display|lower }}
                             </span>
                         {% else %}
-                            <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                                <i class="ri-check-line" aria-hidden="true"></i>
-                                Éligible à l’IAE
-                            </span>
+                            {% if job_application.eligibility_diagnosis_by_siae_required %}
+                                <span class="badge badge-xs rounded-pill bg-accent-02-lighter text-primary">
+                                    <i class="ri-error-warning-line" aria-hidden="true"></i>
+                                    Éligibilité IAE à valider
+                                </span>
+                            {% else %}
+                                <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                    <i class="ri-check-line" aria-hidden="true"></i>
+                                    Éligible à l’IAE
+                                </span>
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-
-                {% endwith %}
-            {% endif %}
+                    {% endwith %}
+                {% endif %}
+            </div>
         </div>
+    </div>
+</div>
+<hr class="m-0">
+<div class="c-box--results__body">
+    <div class="c-box--results__list-data">
         {% if job_application.preloaded_administrative_criteria %}
-            <div class="col-12 col-lg-7 mb-3 mb-lg-0">
-                <h4 class="h5 mb-2">Critères administratifs IAE</h4>
-                <ul class="mb-2">
+            <p class="h5">Critères administratifs IAE</p>
+            <div class="mb-3 mb-md-4">
+                <ul>
                     {% for criteria in job_application.preloaded_administrative_criteria %}<li>{{ criteria.name }}</li>{% endfor %}
                 </ul>
                 {% if job_application.preloaded_administrative_criteria_extra_nb %}
-                    + {{ job_application.preloaded_administrative_criteria_extra_nb }} autres critères
+                    <span>+ {{ job_application.preloaded_administrative_criteria_extra_nb }} autres critères</span>
                 {% endif %}
             </div>
         {% endif %}
+        {% include "approvals/includes/job_description_list.html" with job_application=job_application %}
     </div>
-
 </div>

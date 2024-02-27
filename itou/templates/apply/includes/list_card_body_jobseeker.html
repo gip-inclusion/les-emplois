@@ -1,28 +1,31 @@
 {% load str_filters %}
 
-<div class="card-body">
+<div class="c-box--results__header">
     {% include "approvals/includes/job_description_creation.html" with job_application=job_application %}
-    <h3 class="h3 mb-1">
-        <a href="{% url 'companies_views:card' siae_id=job_application.to_company.id %}"><strong>{{ job_application.to_company.display_name }}</strong></a>
-    </h3>
-
-    <hr />
-    <div class="row">
-        <div class="col-12 col-lg-12 mb-3 mb-lg-0">
-            {% include "approvals/includes/job_description_list.html" with job_application=job_application %}
-
+    <div class="c-box--results__summary">
+        <i class="ri-user-line" aria-hidden="true"></i>
+        <div>
+            <span>{{ job_application.to_company.get_kind_display }}</span>
+            <a href="{% url 'companies_views:card' siae_id=job_application.to_company.id %}" class="h3 d-block text-decoration-none">{{ job_application.to_company.display_name }}</a>
         </div>
+    </div>
+</div>
+<hr class="m-0">
+<div class="c-box--results__body">
+    <div class="c-box--results__list-data">
         {% if job_application.preloaded_administrative_criteria %}
             <div class="col-12 col-lg-7 mb-3 mb-lg-0">
-                <h4 class="h5 mb-2">Critères administratifs IAE</h4>
-                <ul class="mb-2">
-                    {% for criteria in job_application.preloaded_administrative_criteria %}<li>{{ criteria.name }}</li>{% endfor %}
-                </ul>
-                {% if job_application.preloaded_administrative_criteria_extra_nb %}
-                    + {{ job_application.preloaded_administrative_criteria_extra_nb }} autres critères
-                {% endif %}
+                <p class="h5">Critères administratifs IAE</p>
+                <div class="mb-3 mb-md-4">
+                    <ul>
+                        {% for criteria in job_application.preloaded_administrative_criteria %}<li>{{ criteria.name }}</li>{% endfor %}
+                    </ul>
+                    {% if job_application.preloaded_administrative_criteria_extra_nb %}
+                        <span>+ {{ job_application.preloaded_administrative_criteria_extra_nb }} autres critères</span>
+                    {% endif %}
+                </div>
             </div>
         {% endif %}
+        {% include "approvals/includes/job_description_list.html" with job_application=job_application %}
     </div>
-
 </div>

@@ -621,169 +621,184 @@
   
                           
                               
-                                  <div class="c-card card my-3 my-md-4 has-links-inside">
+                                  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                                       
   
-  <div class="card-body">
+  <div class="c-box--results__header">
       
-  <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
-      <span class="text-secondary order-2 order-md-1 me-auto">
+  
+  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+      <p class="fs-sm mb-0 flex-grow-1">
           Émise le 30 mars 2023 par
-  
           
-              
-                  <strong class="me-2">Max THROUGHPUT</strong>
-              
-              
-                  <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
-              
+              <span class="text-nowrap">
+                  
+                      <strong>Max THROUGHPUT</strong>
+                  
+                  
+                      <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
+                  
+              </span>
           
           
-  
-      </span>
-      
-      <span class="order-1 order-md-2 ms-auto"><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></span>
+      </p>
+      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></div>
   </div>
   
-      <h3 class="h3 mb-1">
-          <a href="/company/42/card"><strong>Hit pit</strong></a>
-      </h3>
-  
-      <hr/>
-      <div class="row">
-          <div class="col-12 col-lg-12 mb-3 mb-lg-0">
-              
-      <div>
-          
-              <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
-          
-      </div>
-  
-  
-  
+      <div class="c-box--results__summary">
+          <i aria-hidden="true" class="ri-user-line"></i>
+          <div>
+              <span>Entreprise d'insertion</span>
+              <a class="h3 d-block text-decoration-none" href="/company/42/card">Hit pit</a>
           </div>
-          
       </div>
+  </div>
+  <hr class="m-0"/>
+  <div class="c-box--results__body">
+      <div class="c-box--results__list-data">
+          
+          
+      
+          <div class="c-info c-info--secondary">
+              <span class="c-info__summary">Candidature spontanée</span>
+          </div>
+      
   
+  
+      </div>
   </div>
   
-                                      <div class="card-footer text-end bg-light">
-                                          
-                                          <a aria-label="Voir ma candidature" class="btn btn-sm btn-outline-primary bg-white" href="/apply/11111111-1111-1111-1111-111111111111/jobseeker/details?back_url=/apply/job_seeker/list">Voir ma candidature</a>
+                                      <div class="c-box--results__footer">
+                                          <div class="d-flex justify-content-end">
+                                              
+                                              <a class="btn btn-outline-primary" href="/apply/11111111-1111-1111-1111-111111111111/jobseeker/details?back_url=/apply/job_seeker/list">
+                                                  Voir ma candidature
+                                              </a>
+                                          </div>
                                       </div>
                                   </div>
                               
-                                  <div class="c-card card my-3 my-md-4 has-links-inside">
+                                  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                                       
   
-  <div class="card-body">
+  <div class="c-box--results__header">
       
-  <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
-      <span class="text-secondary order-2 order-md-1 me-auto">
+  
+  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+      <p class="fs-sm mb-0 flex-grow-1">
           Émise le 18 mars 2023 par
-  
           
-              
-                  <strong class="me-2">Max THROUGHPUT</strong>
-              
-              
-                  <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
-              
+              <span class="text-nowrap">
+                  
+                      <strong>Max THROUGHPUT</strong>
+                  
+                  
+                      <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
+                  
+              </span>
           
           
-  
-      </span>
-      
-      <span class="order-1 order-md-2 ms-auto"><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></span>
+      </p>
+      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></div>
   </div>
   
-      <h3 class="h3 mb-1">
-          <a href="/company/42/card"><strong>Hit pit</strong></a>
-      </h3>
-  
-      <hr/>
-      <div class="row">
-          <div class="col-12 col-lg-12 mb-3 mb-lg-0">
-              
-      <div>
-          
-              <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
-          
-      </div>
-  
-  
-  
+      <div class="c-box--results__summary">
+          <i aria-hidden="true" class="ri-user-line"></i>
+          <div>
+              <span>Entreprise d'insertion</span>
+              <a class="h3 d-block text-decoration-none" href="/company/42/card">Hit pit</a>
           </div>
-          
       </div>
+  </div>
+  <hr class="m-0"/>
+  <div class="c-box--results__body">
+      <div class="c-box--results__list-data">
+          
+          
+      
+          <div class="c-info c-info--secondary">
+              <span class="c-info__summary">Candidature spontanée</span>
+          </div>
+      
   
+  
+      </div>
   </div>
   
-                                      <div class="card-footer text-end bg-light">
-                                          
-                                              <span class="d-inline-flex align-items-center text-warning fs-sm">
-                                                  <i class="ri-time-line ri-lg me-1"></i>
-                                                  En attente de réponse depuis 3 semaines.
-                                              </span>
-                                          
-                                          <a aria-label="Voir ma candidature" class="btn btn-sm btn-outline-primary bg-white" href="/apply/22222222-2222-2222-2222-222222222222/jobseeker/details?back_url=/apply/job_seeker/list">Voir ma candidature</a>
+                                      <div class="c-box--results__footer">
+                                          <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                                              
+                                                  <p class="text-warning fs-sm mb-3 mb-md-0">
+                                                      <i aria-hidden="true" class="ri-time-line ri-lg me-1"></i>
+                                                      En attente de réponse depuis 3 semaines.
+                                                  </p>
+                                              
+                                              <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/apply/22222222-2222-2222-2222-222222222222/jobseeker/details?back_url=/apply/job_seeker/list">
+                                                  Voir ma candidature
+                                              </a>
+                                          </div>
                                       </div>
                                   </div>
                               
-                                  <div class="c-card card my-3 my-md-4 has-links-inside">
+                                  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                                       
   
-  <div class="card-body">
+  <div class="c-box--results__header">
       
-  <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
-      <span class="text-secondary order-2 order-md-1 me-auto">
+  
+  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+      <p class="fs-sm mb-0 flex-grow-1">
           Émise le 16 février 2023 par
-  
           
-              
-                  <strong class="me-2">Max THROUGHPUT</strong>
-              
-              
-                  <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
-              
+              <span class="text-nowrap">
+                  
+                      <strong>Max THROUGHPUT</strong>
+                  
+                  
+                      <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
+                  
+              </span>
           
           
-  
-      </span>
-      
-      <span class="order-1 order-md-2 ms-auto"><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></span>
+      </p>
+      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></div>
   </div>
   
-      <h3 class="h3 mb-1">
-          <a href="/company/42/card"><strong>Hit pit</strong></a>
-      </h3>
-  
-      <hr/>
-      <div class="row">
-          <div class="col-12 col-lg-12 mb-3 mb-lg-0">
-              
-      <div>
-          
-              <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
-          
-      </div>
-  
-  
-  
+      <div class="c-box--results__summary">
+          <i aria-hidden="true" class="ri-user-line"></i>
+          <div>
+              <span>Entreprise d'insertion</span>
+              <a class="h3 d-block text-decoration-none" href="/company/42/card">Hit pit</a>
           </div>
-          
       </div>
+  </div>
+  <hr class="m-0"/>
+  <div class="c-box--results__body">
+      <div class="c-box--results__list-data">
+          
+          
+      
+          <div class="c-info c-info--secondary">
+              <span class="c-info__summary">Candidature spontanée</span>
+          </div>
+      
   
+  
+      </div>
   </div>
   
-                                      <div class="card-footer text-end bg-light">
-                                          
-                                              <span class="d-inline-flex align-items-center text-warning fs-sm">
-                                                  <i class="ri-time-line ri-lg me-1"></i>
-                                                  En attente de réponse depuis 8 semaines.
-                                              </span>
-                                          
-                                          <a aria-label="Voir ma candidature" class="btn btn-sm btn-outline-primary bg-white" href="/apply/33333333-3333-3333-3333-333333333333/jobseeker/details?back_url=/apply/job_seeker/list">Voir ma candidature</a>
+                                      <div class="c-box--results__footer">
+                                          <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                                              
+                                                  <p class="text-warning fs-sm mb-3 mb-md-0">
+                                                      <i aria-hidden="true" class="ri-time-line ri-lg me-1"></i>
+                                                      En attente de réponse depuis 8 semaines.
+                                                  </p>
+                                              
+                                              <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="/apply/33333333-3333-3333-3333-333333333333/jobseeker/details?back_url=/apply/job_seeker/list">
+                                                  Voir ma candidature
+                                              </a>
+                                          </div>
                                       </div>
                                   </div>
                               
@@ -821,202 +836,217 @@
   
                           
                               
-                                  <div class="c-card card my-3 my-md-4 has-links-inside">
+                                  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                                       
   
-  <div class="card-body">
+  <div class="c-box--results__header">
       
-  <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
-      <span class="text-secondary order-2 order-md-1 me-auto">
+  
+  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+      <p class="fs-sm mb-0 flex-grow-1">
           Émise le 30 mars 2023 par
-  
           
               <strong>Vous</strong>
           
           
-              chez <a href="/company/42/card"><strong>Hit pit</strong></a>
+              <span class="text-nowrap">
+                  chez <a href="/company/42/card"><strong>Hit pit</strong></a>
+              </span>
           
-  
-      </span>
-      
-      <span class="order-1 order-md-2 ms-auto"><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></span>
+      </p>
+      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></div>
   </div>
   
-      
-      <div>
-          
-              <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
-          
-      </div>
-  
-  
-  
-      <hr/>
-      <div class="row">
-          <div class="col-12">
-              <h3 class="h3 mb-1">
-                  J… H…
-              </h3>
-              
-  
-              
+      <div class="c-box--results__summary">
+          <i aria-hidden="true" class="ri-user-line"></i>
+          <div>
+              <h3>J… H…</h3>
+              <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                  
                   
                       
                           
-                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                                  <i aria-hidden="true" class="ri-check-line"></i>
-                                  Éligible à l’IAE
-                              </span>
+                              
+                                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                      <i aria-hidden="true" class="ri-check-line"></i>
+                                      Éligible à l’IAE
+                                  </span>
+                              
                           
                       
-  
                   
-              
+              </div>
           </div>
-          
       </div>
+  </div>
+  <hr class="m-0"/>
+  <div class="c-box--results__body">
+      <div class="c-box--results__list-data">
+          
+          
+      
+          <div class="c-info c-info--secondary">
+              <span class="c-info__summary">Candidature spontanée</span>
+          </div>
+      
   
+  
+      </div>
   </div>
   
-                                      <div class="card-footer text-end bg-light">
-                                          
-                                          <a aria-label="Gérer la candidature de J… H…" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/apply/prescriber/list">Voir sa candidature</a>
+                                      <div class="c-box--results__footer">
+                                          <div class="d-flex justify-content-end">
+                                              
+                                              <a aria-label="Gérer la candidature de J… H…" class="btn btn-outline-primary" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/apply/prescriber/list">
+                                                  Voir sa candidature
+                                              </a>
+                                          </div>
                                       </div>
                                   </div>
                               
-                                  <div class="c-card card my-3 my-md-4 has-links-inside">
+                                  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                                       
   
-  <div class="card-body">
+  <div class="c-box--results__header">
       
-  <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
-      <span class="text-secondary order-2 order-md-1 me-auto">
+  
+  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+      <p class="fs-sm mb-0 flex-grow-1">
           Émise le 18 mars 2023 par
-  
           
               <strong>Vous</strong>
           
           
-              chez <a href="/company/42/card"><strong>Hit pit</strong></a>
+              <span class="text-nowrap">
+                  chez <a href="/company/42/card"><strong>Hit pit</strong></a>
+              </span>
           
-  
-      </span>
-      
-      <span class="order-1 order-md-2 ms-auto"><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></span>
+      </p>
+      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></div>
   </div>
   
-      
-      <div>
-          
-              <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
-          
-      </div>
-  
-  
-  
-      <hr/>
-      <div class="row">
-          <div class="col-12">
-              <h3 class="h3 mb-1">
-                  J… H…
-              </h3>
-              
-  
-              
+      <div class="c-box--results__summary">
+          <i aria-hidden="true" class="ri-user-line"></i>
+          <div>
+              <h3>J… H…</h3>
+              <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                  
                   
                       
                           
-                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                                  <i aria-hidden="true" class="ri-check-line"></i>
-                                  Éligible à l’IAE
-                              </span>
+                              
+                                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                      <i aria-hidden="true" class="ri-check-line"></i>
+                                      Éligible à l’IAE
+                                  </span>
+                              
                           
                       
-  
                   
-              
+              </div>
           </div>
-          
       </div>
+  </div>
+  <hr class="m-0"/>
+  <div class="c-box--results__body">
+      <div class="c-box--results__list-data">
+          
+          
+      
+          <div class="c-info c-info--secondary">
+              <span class="c-info__summary">Candidature spontanée</span>
+          </div>
+      
   
+  
+      </div>
   </div>
   
-                                      <div class="card-footer text-end bg-light">
-                                          
-                                              <span class="d-inline-flex align-items-center text-warning fs-sm">
-                                                  <i class="ri-time-line ri-lg me-1"></i>
-                                                  En attente de réponse depuis 3 semaines.
-                                              </span>
-                                          
-                                          <a aria-label="Gérer la candidature de J… H…" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/22222222-2222-2222-2222-222222222222/prescriber/details?back_url=/apply/prescriber/list">Voir sa candidature</a>
+                                      <div class="c-box--results__footer">
+                                          <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                                              
+                                                  <p class="text-warning fs-sm mb-3 mb-md-0">
+                                                      <i aria-hidden="true" class="ri-time-line ri-lg me-1"></i>
+                                                      En attente de réponse depuis 3 semaines.
+                                                  </p>
+                                              
+                                              <a aria-label="Gérer la candidature de J… H…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/22222222-2222-2222-2222-222222222222/prescriber/details?back_url=/apply/prescriber/list">
+                                                  Voir sa candidature
+                                              </a>
+                                          </div>
                                       </div>
                                   </div>
                               
-                                  <div class="c-card card my-3 my-md-4 has-links-inside">
+                                  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                                       
   
-  <div class="card-body">
+  <div class="c-box--results__header">
       
-  <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
-      <span class="text-secondary order-2 order-md-1 me-auto">
-          Émise le 16 février 2023 par
   
+  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+      <p class="fs-sm mb-0 flex-grow-1">
+          Émise le 16 février 2023 par
           
               <strong>Vous</strong>
           
           
-              chez <a href="/company/42/card"><strong>Hit pit</strong></a>
+              <span class="text-nowrap">
+                  chez <a href="/company/42/card"><strong>Hit pit</strong></a>
+              </span>
           
-  
-      </span>
-      
-      <span class="order-1 order-md-2 ms-auto"><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></span>
+      </p>
+      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></div>
   </div>
   
-      
-      <div>
-          
-              <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
-          
-      </div>
-  
-  
-  
-      <hr/>
-      <div class="row">
-          <div class="col-12">
-              <h3 class="h3 mb-1">
-                  J… H…
-              </h3>
-              
-  
-              
+      <div class="c-box--results__summary">
+          <i aria-hidden="true" class="ri-user-line"></i>
+          <div>
+              <h3>J… H…</h3>
+              <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                  
                   
                       
                           
-                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                                  <i aria-hidden="true" class="ri-check-line"></i>
-                                  Éligible à l’IAE
-                              </span>
+                              
+                                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                      <i aria-hidden="true" class="ri-check-line"></i>
+                                      Éligible à l’IAE
+                                  </span>
+                              
                           
                       
-  
                   
-              
+              </div>
           </div>
-          
       </div>
+  </div>
+  <hr class="m-0"/>
+  <div class="c-box--results__body">
+      <div class="c-box--results__list-data">
+          
+          
+      
+          <div class="c-info c-info--secondary">
+              <span class="c-info__summary">Candidature spontanée</span>
+          </div>
+      
   
+  
+      </div>
   </div>
   
-                                      <div class="card-footer text-end bg-light">
-                                          
-                                              <span class="d-inline-flex align-items-center text-warning fs-sm">
-                                                  <i class="ri-time-line ri-lg me-1"></i>
-                                                  En attente de réponse depuis 8 semaines.
-                                              </span>
-                                          
-                                          <a aria-label="Gérer la candidature de J… H…" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/33333333-3333-3333-3333-333333333333/prescriber/details?back_url=/apply/prescriber/list">Voir sa candidature</a>
+                                      <div class="c-box--results__footer">
+                                          <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                                              
+                                                  <p class="text-warning fs-sm mb-3 mb-md-0">
+                                                      <i aria-hidden="true" class="ri-time-line ri-lg me-1"></i>
+                                                      En attente de réponse depuis 8 semaines.
+                                                  </p>
+                                              
+                                              <a aria-label="Gérer la candidature de J… H…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/33333333-3333-3333-3333-333333333333/prescriber/details?back_url=/apply/prescriber/list">
+                                                  Voir sa candidature
+                                              </a>
+                                          </div>
                                       </div>
                                   </div>
                               
@@ -1054,69 +1084,74 @@
   
                           
                               
-                                  <div class="c-card card my-3 my-md-4 has-links-inside">
+                                  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                                       
   
-  <div class="card-body">
+  <div class="c-box--results__header">
       
-  <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
-      <span class="text-secondary order-2 order-md-1 me-auto">
+  
+  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+      <p class="fs-sm mb-0 flex-grow-1">
           Émise le 30 mars 2023 par
-  
           
-              
-                  <strong class="me-2">Max THROUGHPUT</strong>
-              
-              
-                  <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
-              
+              <span class="text-nowrap">
+                  
+                      <strong>Max THROUGHPUT</strong>
+                  
+                  
+                      <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
+                  
+              </span>
           
           
-  
-      </span>
-      
-      <span class="order-1 order-md-2 ms-auto"><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></span>
+      </p>
+      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></div>
   </div>
   
-      
-      <div>
-          
-              <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
-          
-      </div>
-  
-  
-  
-      <hr/>
-      <div class="row">
-          <div class="col-12">
-              <h3 class="h3 mb-1">
-                  Jacques HENRY
-              </h3>
-              
-  
-              
+      <div class="c-box--results__summary">
+          <i aria-hidden="true" class="ri-user-line"></i>
+          <div>
+              <h3>Jacques HENRY</h3>
+              <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                  
                   
                       
                           
-                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                                  <i aria-hidden="true" class="ri-check-line"></i>
-                                  Éligible à l’IAE
-                              </span>
+                              
+                                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                      <i aria-hidden="true" class="ri-check-line"></i>
+                                      Éligible à l’IAE
+                                  </span>
+                              
                           
                       
-  
                   
-              
+              </div>
           </div>
-          
       </div>
+  </div>
+  <hr class="m-0"/>
+  <div class="c-box--results__body">
+      <div class="c-box--results__list-data">
+          
+          
+      
+          <div class="c-info c-info--secondary">
+              <span class="c-info__summary">Candidature spontanée</span>
+          </div>
+      
   
+  
+      </div>
   </div>
   
-                                      <div class="card-footer text-end bg-light">
-                                          
-                                          <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/11111111-1111-1111-1111-111111111111/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
+                                      <div class="c-box--results__footer">
+                                          <div class="d-flex justify-content-end">
+                                              
+                                              <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-outline-primary" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/11111111-1111-1111-1111-111111111111/siae/details?back_url=/apply/siae/list">
+                                                  Voir sa candidature
+                                              </a>
+                                          </div>
                                       </div>
                                   </div>
   
@@ -1153,148 +1188,158 @@
                                   
   
                               
-                                  <div class="c-card card my-3 my-md-4 has-links-inside">
+                                  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                                       
   
-  <div class="card-body">
+  <div class="c-box--results__header">
       
-  <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
-      <span class="text-secondary order-2 order-md-1 me-auto">
+  
+  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+      <p class="fs-sm mb-0 flex-grow-1">
           Émise le 18 mars 2023 par
-  
           
-              
-                  <strong class="me-2">Max THROUGHPUT</strong>
-              
-              
-                  <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
-              
+              <span class="text-nowrap">
+                  
+                      <strong>Max THROUGHPUT</strong>
+                  
+                  
+                      <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
+                  
+              </span>
           
           
-  
-      </span>
-      
-      <span class="order-1 order-md-2 ms-auto"><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></span>
+      </p>
+      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></div>
   </div>
   
-      
-      <div>
-          
-              <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
-          
-      </div>
-  
-  
-  
-      <hr/>
-      <div class="row">
-          <div class="col-12">
-              <h3 class="h3 mb-1">
-                  Jacques HENRY
-              </h3>
-              
-  
-              
+      <div class="c-box--results__summary">
+          <i aria-hidden="true" class="ri-user-line"></i>
+          <div>
+              <h3>Jacques HENRY</h3>
+              <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                  
                   
                       
                           
-                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                                  <i aria-hidden="true" class="ri-check-line"></i>
-                                  Éligible à l’IAE
-                              </span>
+                              
+                                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                      <i aria-hidden="true" class="ri-check-line"></i>
+                                      Éligible à l’IAE
+                                  </span>
+                              
                           
                       
-  
                   
-              
+              </div>
           </div>
-          
       </div>
+  </div>
+  <hr class="m-0"/>
+  <div class="c-box--results__body">
+      <div class="c-box--results__list-data">
+          
+          
+      
+          <div class="c-info c-info--secondary">
+              <span class="c-info__summary">Candidature spontanée</span>
+          </div>
+      
   
+  
+      </div>
   </div>
   
-                                      <div class="card-footer text-end bg-light">
-                                          
-                                              <span class="d-inline-flex align-items-center text-warning fs-sm">
-                                                  <i class="ri-time-line ri-lg me-1"></i>
-                                                  En attente de réponse depuis 3 semaines.
-                                              </span>
-                                          
-                                          <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/22222222-2222-2222-2222-222222222222/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
+                                      <div class="c-box--results__footer">
+                                          <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                                              
+                                                  <p class="text-warning fs-sm mb-3 mb-md-0">
+                                                      <i aria-hidden="true" class="ri-time-line ri-lg me-1"></i>
+                                                      En attente de réponse depuis 3 semaines.
+                                                  </p>
+                                              
+                                              <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/22222222-2222-2222-2222-222222222222/siae/details?back_url=/apply/siae/list">
+                                                  Voir sa candidature
+                                              </a>
+                                          </div>
                                       </div>
                                   </div>
   
                                   
   
                               
-                                  <div class="c-card card my-3 my-md-4 has-links-inside">
+                                  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                                       
   
-  <div class="card-body">
+  <div class="c-box--results__header">
       
-  <div class="fs-sm d-flex flex-column flex-md-row align-items-center mb-3">
-      <span class="text-secondary order-2 order-md-1 me-auto">
+  
+  <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
+      <p class="fs-sm mb-0 flex-grow-1">
           Émise le 16 février 2023 par
-  
           
-              
-                  <strong class="me-2">Max THROUGHPUT</strong>
-              
-              
-                  <i aria-hidden="true" class="ri-group-line me-2"></i>Orienteur
-              
+              <span class="text-nowrap">
+                  
+                      <strong>Max THROUGHPUT</strong>
+                  
+                  
+                      <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
+                  
+              </span>
           
           
-  
-      </span>
-      
-      <span class="order-1 order-md-2 ms-auto"><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></span>
+      </p>
+      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></div>
   </div>
   
-      
-      <div>
-          
-              <i class="ri-briefcase-line ri-xl me-1"></i><span class="font-weight-bold me-1 me-md-2">Candidature spontanée</span>
-          
-      </div>
-  
-  
-  
-      <hr/>
-      <div class="row">
-          <div class="col-12">
-              <h3 class="h3 mb-1">
-                  Jacques HENRY
-              </h3>
-              
-  
-              
+      <div class="c-box--results__summary">
+          <i aria-hidden="true" class="ri-user-line"></i>
+          <div>
+              <h3>Jacques HENRY</h3>
+              <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
+                  
                   
                       
                           
-                              <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
-                                  <i aria-hidden="true" class="ri-check-line"></i>
-                                  Éligible à l’IAE
-                              </span>
+                              
+                                  <span class="badge badge-xs rounded-pill bg-success-lighter text-success">
+                                      <i aria-hidden="true" class="ri-check-line"></i>
+                                      Éligible à l’IAE
+                                  </span>
+                              
                           
                       
-  
                   
-              
+              </div>
           </div>
-          
       </div>
+  </div>
+  <hr class="m-0"/>
+  <div class="c-box--results__body">
+      <div class="c-box--results__list-data">
+          
+          
+      
+          <div class="c-info c-info--secondary">
+              <span class="c-info__summary">Candidature spontanée</span>
+          </div>
+      
   
+  
+      </div>
   </div>
   
-                                      <div class="card-footer text-end bg-light">
-                                          
-                                              <span class="d-inline-flex align-items-center text-warning fs-sm">
-                                                  <i class="ri-time-line ri-lg me-1"></i>
-                                                  En attente de réponse depuis 8 semaines.
-                                              </span>
-                                          
-                                          <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-sm btn-outline-primary bg-white" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/33333333-3333-3333-3333-333333333333/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
+                                      <div class="c-box--results__footer">
+                                          <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                                              
+                                                  <p class="text-warning fs-sm mb-3 mb-md-0">
+                                                      <i aria-hidden="true" class="ri-time-line ri-lg me-1"></i>
+                                                      En attente de réponse depuis 8 semaines.
+                                                  </p>
+                                              
+                                              <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/33333333-3333-3333-3333-333333333333/siae/details?back_url=/apply/siae/list">
+                                                  Voir sa candidature
+                                              </a>
+                                          </div>
                                       </div>
                                   </div>
   

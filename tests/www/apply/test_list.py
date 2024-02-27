@@ -333,7 +333,7 @@ class ProcessListSiaeTest(ProcessListTest):
         # Level 1 criteria
         diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(name="Allocataire AAH"))
 
-        TITLE = '<h4 class="h5 mb-2">Critères administratifs IAE</h4>'
+        TITLE = '<p class="h5">Critères administratifs IAE</p>'
         CRITERION = "<li>Allocataire AAH</li>"
 
         self.client.force_login(self.eddie_hit_pit)
@@ -933,7 +933,7 @@ def test_list_for_unauthorized_prescriber_view(client):
     ):
         response = client.get(url)
 
-    assertContains(response, '<h3 class="h3 mb-1">S… U…</h3>', html=True)
+    assertContains(response, "<h3>S… U…</h3>", html=True)
     # Unfortunately, the job seeker's name is available in the filters
     # assertNotContains(response, "Supersecretname")
 
