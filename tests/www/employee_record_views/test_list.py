@@ -31,7 +31,10 @@ class ListEmployeeRecordsTest(TestCase):
         )
         self.user = self.company.members.get(first_name="Elliot")
         self.user_without_perms = self.company_without_perms.members.get(first_name="Hannibal")
-        self.job_application = JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
+        self.job_application = JobApplicationWithApprovalNotCancellableFactory(
+            to_company=self.company,
+            for_snapshot=True,
+        )
         self.job_seeker = self.job_application.job_seeker
 
     def test_permissions(self):
@@ -102,8 +105,10 @@ class ListEmployeeRecordsTest(TestCase):
 
         response = self.client.get(self.URL)
 
-        self.assertContains(response, "Date de début : <b>02/09/2023</b>")
-        self.assertContains(response, "Date de fin prévisionnelle : <b>11/10/2024</b>")
+        self.assertContains(response, "<small>Date de début</small><strong>02/09/2023</strong>", html=True)
+        self.assertContains(
+            response, "<small>Date prévisionnelle de fin</small><strong>11/10/2024</strong>", html=True
+        )
 
     def test_employee_records_with_a_suspension_need_to_be_updated(self):
         self.client.force_login(self.user)
@@ -120,7 +125,7 @@ class ListEmployeeRecordsTest(TestCase):
         assert str(
             parse_response_to_soup(
                 response,
-                selector=".employee-records-list .card-body > div:last-child",
+                selector=".employee-records-list .c-box--results__footer",
                 replace_in_attr=[self.job_application],
             )
         ) == self.snapshot(name="action")
@@ -142,7 +147,7 @@ class ListEmployeeRecordsTest(TestCase):
             str(
                 parse_response_to_soup(
                     response,
-                    selector=".employee-records-list .card-body > div:last-child",
+                    selector=".employee-records-list .c-box--results__footer",
                     replace_in_attr=[self.job_application, employee_record],
                 )
             )
@@ -164,7 +169,7 @@ class ListEmployeeRecordsTest(TestCase):
         assert str(
             parse_response_to_soup(
                 response,
-                selector=".employee-records-list .card-body > div:last-child",
+                selector=".employee-records-list .c-box--results__footer",
                 replace_in_attr=[self.job_application],
             )
         ) == self.snapshot(name="action")
@@ -186,7 +191,7 @@ class ListEmployeeRecordsTest(TestCase):
             str(
                 parse_response_to_soup(
                     response,
-                    selector=".employee-records-list .card-body > div:last-child",
+                    selector=".employee-records-list .c-box--results__footer",
                     replace_in_attr=[self.job_application, employee_record],
                 )
             )
@@ -203,7 +208,7 @@ class ListEmployeeRecordsTest(TestCase):
             str(
                 parse_response_to_soup(
                     response,
-                    selector=".employee-records-list .card-body > div:last-child",
+                    selector=".employee-records-list .c-box--results__footer",
                     replace_in_attr=[self.job_application, employee_record],
                 )
             )
@@ -226,7 +231,7 @@ class ListEmployeeRecordsTest(TestCase):
         assert str(
             parse_response_to_soup(
                 response,
-                selector=".employee-records-list .card-body > div:last-child",
+                selector=".employee-records-list .c-box--results__footer",
                 replace_in_attr=[self.job_application],
             )
         ) == self.snapshot(name="action")
@@ -248,7 +253,7 @@ class ListEmployeeRecordsTest(TestCase):
         assert str(
             parse_response_to_soup(
                 response,
-                selector=".employee-records-list .card-body > div:last-child",
+                selector=".employee-records-list .c-box--results__footer",
                 replace_in_attr=[new_er],
             )
         ) == self.snapshot(name="action")
