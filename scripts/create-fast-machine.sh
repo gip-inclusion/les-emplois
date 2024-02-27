@@ -31,6 +31,8 @@ clever service link-addon c1-bucket-config --alias "$APP_NAME"
 clever service link-addon c1-deployment-config --alias "$APP_NAME"
 clever service link-addon c1-imports-config --alias "$APP_NAME"
 clever service link-addon c1-prod-database-encrypted  --alias "$APP_NAME"
+clever service link-addon c1-redis --alias "$APP_NAME"
+clever service link-addon c1-s3 --alias "$APP_NAME"
 
 # Ensure we've got the last version of master_clever
 git fetch
