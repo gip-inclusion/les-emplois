@@ -134,7 +134,7 @@
                                 {% endwith %}
                             </div>
                             <div>
-                                <span class="btn-link fs-sm">Trier par :</span>
+                                <span class="fs-sm">Trier par :</span>
                                 <button type="button" class="btn btn-sm btn-link dropdown-toggle p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     {{ ordered_by_label }}
                                 </button>
@@ -162,7 +162,13 @@
                             {% endif %}
                         </div>
 
-                        {% if not navigation_pages %}<p class="my-3 my-md-4">Aucune fiche salarié avec le statut selectionné.</p>{% endif %}
+                        {% if not navigation_pages %}
+                            <div class="c-box c-box--results my-3 my-md-4">
+                                <div class="c-box--results__body">
+                                    <p class="mb-0">Aucune fiche salarié avec le statut selectionné.</p>
+                                </div>
+                            </div>
+                        {% endif %}
                         {% include "includes/pagination.html" with page=navigation_pages %}
                     </div>
                 </div>
