@@ -2,6 +2,7 @@ from django.conf import Path
 from django.template import Context, Template
 from django.test.client import RequestFactory
 from django.utils.html import escape
+from pytest_django.asserts import assertInHTML
 
 from itou.job_applications.enums import Origin
 from itou.jobs.models import Appellation
@@ -46,7 +47,18 @@ def test_job_application_multiple_jobs():
 
     # We have 3 selected_jobs, so we should display the first one
     # and 2 more
-    assert "Voir les 3 postes" in rendered
+    assertInHTML(
+        f"""
+        <button class="c-info__summary"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapse-job-application-{job_application.pk}"
+                aria-expanded="false"
+                aria-controls="collapse-job-application-{job_application.pk}">
+            <span>3 postes recherchés</span>
+        </button>
+        """,
+        rendered,
+    )
 
 
 def test_job_application_auto_prescription_badge_in_list():

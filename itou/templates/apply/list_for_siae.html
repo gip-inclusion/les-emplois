@@ -93,19 +93,23 @@
                             {% include "apply/includes/rdv_insertion_promo_card.html" %}
                         {% else %}
                             {% for job_application in job_applications_page %}
-                                <div class="c-card card my-3 my-md-4 has-links-inside">
+                                <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                                     {% include "apply/includes/list_card_body_company.html" %}
-                                    <div class="card-footer text-end bg-light">
-                                        {% if job_application.pending_for_weeks >= job_application.WEEKS_BEFORE_CONSIDERED_OLD %}
-                                            <span class="d-inline-flex align-items-center text-warning fs-sm">
-                                                <i class="ri-time-line ri-lg me-1"></i>
-                                                En attente de réponse depuis {{ job_application.pending_for_weeks }} semaines.
-                                            </span>
-                                        {% endif %}
-                                        <a class="btn btn-sm btn-outline-primary bg-white"
-                                           href="{% url 'apply:details_for_company' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                           aria-label="Gérer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}"
-                                           {% matomo_event "candidature" "clic" "voir-candidature-employeur" %}>Voir sa candidature</a>
+                                    <div class="c-box--results__footer">
+                                        <div class="d-flex{% if job_application.pending_for_weeks >= job_application.WEEKS_BEFORE_CONSIDERED_OLD %} flex-column flex-md-row justify-content-md-between align-items-md-center{% else %} justify-content-end{% endif %}">
+                                            {% if job_application.pending_for_weeks >= job_application.WEEKS_BEFORE_CONSIDERED_OLD %}
+                                                <p class="text-warning fs-sm mb-3 mb-md-0">
+                                                    <i class="ri-time-line ri-lg me-1" aria-hidden="true"></i>
+                                                    En attente de réponse depuis {{ job_application.pending_for_weeks }} semaines.
+                                                </p>
+                                            {% endif %}
+                                            <a class="btn btn-outline-primary{% if job_application.pending_for_weeks >= job_application.WEEKS_BEFORE_CONSIDERED_OLD %} btn-block w-100 w-md-auto{% endif %}"
+                                               href="{% url 'apply:details_for_company' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
+                                               aria-label="Gérer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}"
+                                               {% matomo_event "candidature" "clic" "voir-candidature-employeur" %}>
+                                                Voir sa candidature
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
 
