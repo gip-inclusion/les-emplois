@@ -41,7 +41,7 @@ class CommonApprovalMixin(models.Model):
     """
 
     # Default duration of an approval.
-    DEFAULT_APPROVAL_YEARS = 2
+    DEFAULT_APPROVAL_DAYS = 2 * 365
     # `Période de carence` in French.
     # A period after expiry of an Approval during which a person cannot
     # obtain a new one except from an "authorized prescriber".
@@ -878,7 +878,12 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
     @staticmethod
     def get_default_end_date(start_at):
-        return start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS) - relativedelta(days=1)
+        return (
+            start_at
+            + datetime.timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)
+            # end_at is inclusive.
+            - datetime.timedelta(days=1)
+        )
 
     def notify_pole_emploi(self):
         # We do not send approvals that start in the future to PE, because their IS can't handle them.

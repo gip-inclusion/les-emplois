@@ -572,7 +572,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
             self.employee_record.update_as_archived()
 
         # Make the approval expires
-        approval.start_at = timezone.localdate() - relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+        approval.start_at = timezone.localdate() - timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)
         approval.end_at = timezone.localdate() - relativedelta(months=1)
         approval.save()
         assert not approval.is_valid()

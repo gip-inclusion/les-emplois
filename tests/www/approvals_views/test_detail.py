@@ -143,18 +143,18 @@ class TestApprovalDetailView:
         assertContains(response, f"{approval.remainder.days} jours")
         assertNotContains(
             response,
-            "PASS IAE valide jusqu’au 25/04/2025, si le contrat démarre aujourd’hui.",
+            "PASS IAE valide jusqu’au 24/04/2025, si le contrat démarre aujourd’hui.",
         )
 
         url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
         response = client.get(url)
         assertContains(
             response,
-            "PASS IAE valide jusqu’au 25/04/2025, si le contrat démarre aujourd’hui.",
+            "PASS IAE valide jusqu’au 24/04/2025, si le contrat démarre aujourd’hui.",
         )
         assertNotContains(
             response,
-            "Date de fin prévisionnelle : 25/04/2025",
+            "Date de fin prévisionnelle : 24/04/2025",
         )
 
         job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
@@ -162,7 +162,7 @@ class TestApprovalDetailView:
         response = client.get(url)
         assertNotContains(
             response,
-            "PASS IAE valide jusqu’au 25/04/2025, si le contrat démarre aujourd’hui.",
+            "PASS IAE valide jusqu’au 24/04/2025, si le contrat démarre aujourd’hui.",
         )
 
         ## Display suspensions
@@ -293,12 +293,12 @@ class TestApprovalDetailView:
         response = client.get(url)
         assertNotContains(
             response,
-            "PASS IAE valide jusqu’au 30/05/2025, si le contrat démarre aujourd’hui.",
+            "PASS IAE valide jusqu’au 29/05/2025, si le contrat démarre aujourd’hui.",
         )
 
         assertContains(
             response,
-            "Date de fin prévisionnelle : 30/05/2025",
+            "Date de fin prévisionnelle : 29/05/2025",
         )
 
     def test_suspend_button(self, client):
