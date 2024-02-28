@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load static %}
 {% load django_bootstrap5 %}
 {% load buttons_form %}
 {% load theme_inclusion %}
@@ -31,26 +32,23 @@
 
                             <div class="mx-3" id="id_notifications">
                                 {% for category_slug, category in notification_form.layout.items %}
-                                    <a class="d-flex justify-content-between font-weight-bold text-decoration-none has-collapse-caret notification-collapse py-3"
-                                       data-bs-toggle="collapse"
-                                       href="#collapse-{{ category_slug }}"
-                                       role="button"
-                                       aria-expanded="false"
-                                       aria-controls="collapse-{{ category_slug }}">
-                                        <span>{{ category.name }}</span>
-                                    </a>
-                                    <div class="collapse notification-group" id="collapse-{{ category_slug }}">
-                                        {% get_form_field notification_form "category-"|add:category_slug|add:"-all" as field %}
-                                        {% bootstrap_field field field_class="custom-checkbox wrapping-checkbox" %}
+                                    <div class="notification-collapse">
+                                        <a class="d-flex justify-content-between font-weight-bold text-decoration-none has-collapse-caret py-3" role="button" aria-expanded="true" aria-controls="collapse-{{ category_slug }}">
+                                            <span>{{ category.name }}</span>
+                                        </a>
+                                        <div class="collapse">
+                                            {% get_form_field notification_form "category-"|add:category_slug|add:"-all" as field %}
+                                            {% bootstrap_field field field_class="custom-checkbox wrapping-checkbox" %}
 
-                                        <div class="px-3 category-notifications">
-                                            {% for field_name in category.notifications %}
-                                                {% get_form_field notification_form field_name as field %}
-                                                {% bootstrap_field field field_class="custom-checkbox notification-checkbox" %}
-                                            {% endfor %}
+                                            <div class="px-3 category-notifications">
+                                                {% for field_name in category.notifications %}
+                                                    {% get_form_field notification_form field_name as field %}
+                                                    {% bootstrap_field field field_class="custom-checkbox notification-checkbox" %}
+                                                {% endfor %}
+                                            </div>
                                         </div>
+                                        <hr class="mb-0">
                                     </div>
-                                    <hr class="mb-0">
                                 {% endfor %}
                             </div>
 
@@ -66,45 +64,5 @@
 
 {% block script %}
     {{ block.super }}
-
-    <script type="text/javascript" nonce="{{ CSP_NONCE }}">
-        $(document).ready(() => {
-            /**
-             * JS to handle checkboxes
-             **/
-            checkAllChecked = function() {
-                if (!$(".notification-checkbox input").filter(":not(:checked)").length) {
-                    $("#id_notifications-all").prop("checked", true);
-                    $("#id_notifications").find(".notification-collapse").removeClass("show");
-                }
-            }
-            checkAllChecked();
-
-            $("#id_notifications-all").change(function() {
-                $("#id_notifications").find(".wrapping-checkbox input").prop("checked", this.checked);
-                $("#id_notifications").find(".notification-checkbox input").prop("checked", this.checked);
-                $("#id_notifications").find(".notification-collapse").filter(":not(.collapse.show)").collapse(this.checked ? "hide" : "show");
-            });
-
-            $(".wrapping-checkbox input").change(function() {
-                if (this.checked) {
-                    $(this).parents(".notification-group").find(".notification-checkbox input").prop("checked", true);
-                    checkAllChecked();
-                } else {
-                    $(this).parents(".notification-group").find(".notification-checkbox input").prop("checked", false);
-                    $("#id_notifications-all").prop("checked", false);
-                }
-            });
-
-            $(".notification-checkbox input").change(function() {
-                if (this.checked) {
-                    $(this).parents(".notification-group").find(".wrapping-checkbox input").prop("checked", true);
-                    checkAllChecked();
-                } else {
-                    $(this).parents(".notification-group").find(".wrapping-checkbox input").prop("checked", false);
-                    $("#id_notifications-all").prop("checked", false);
-                }
-            });
-        })
-    </script>
+    <script src="{% static 'js/notifications_center.js' %}"></script>
 {% endblock %}
