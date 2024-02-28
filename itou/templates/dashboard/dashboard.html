@@ -29,6 +29,44 @@
         </div>
     {% endif %}
 
+    {% if show_eiti_webinar_banner %}
+        <div class="alert alert-important alert-dismissible-once d-none" role="status" id="alertDismissibleOnceEITIWebinar">
+            <p class="mb-0">
+                Sur décision de la DGEFP et en accord avec l’ASP,<a href="https://app.livestorm.co/itou/webinaire-specifique-aupres-des-eiti?s=43ccee58-03fd-4a84-a741-e9a9a5b76373"
+   target="_blank"
+   rel="noopener"
+   aria-label="S'inscrire au webinaire (ouverture dans un nouvel onglet)">, vous devez déclarer vos fiches salarié à partir du 26/03/2024</a> dans votre tableau de bord des emplois de l’inclusion via l’onglet « gérer les fiches salarié (ASP) ».
+            </p>
+            <p class="mb-0">
+                Pour vous accompagner dans ce changement, nous vous invitons à vous former en participant à <a href="https://app.livestorm.co/itou/webinaire-specifique-aupres-des-eiti?s=43ccee58-03fd-4a84-a741-e9a9a5b76373" rel="noopener" aria-label="S'inscrire au webinaire (ouverture dans un nouvel onglet)">notre webinaire spécifique EITI le 13 mars 2024 à 14h en présence de l’ASP</a>.
+            </p>
+            <p class="mb-0">Nous vous attendons nombreux !</p>
+            <div class="row g-0">
+                <div class="col-12 col-md-auto mt-2">
+                    <a class="btn btn-primary btn-block btn-ico"
+                       href="https://app.livestorm.co/itou/webinaire-specifique-aupres-des-eiti?s=43ccee58-03fd-4a84-a741-e9a9a5b76373"
+                       rel="noopener"
+                       aria-label="S'inscrire au webinaire (ouverture dans un nouvel onglet)"
+                       target="_blank">
+                        <span>S'inscrire au webinaire</span>
+                        <i class="ri-external-link-line ri-lg"></i>
+                    </a>
+                </div>
+                <div class="col-12 col-md-auto mt-2">
+                    <a class="btn btn-link btn-block btn-ico"
+                       href="{{ ITOU_HELP_CENTER_URL }}/sections/15257055244817-Fiches-salari%C3%A9-pour-les-SIAE"
+                       target="_blank"
+                       rel="noopener"
+                       aria-label="Mode d'emploi pour déclarer les fiches salariés">
+                        <span>Découvrir le mode d'emploi</span>
+                        <i class="ri-external-link-line ri-lg"></i>
+                    </a>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        </div>
+    {% endif %}
+
     {# Alerte pour les employeurs en cas d'absence ou de mauvais score de geocoding. #}
     {% if user.is_employer and request.current_organization and not request.current_organization.has_reliable_coords_legacy %}
         <div class="alert alert-warning alert-dismissible show" role="status">
