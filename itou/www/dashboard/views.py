@@ -17,6 +17,7 @@ from rest_framework.authtoken.models import Token
 from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -69,6 +70,8 @@ def _employer_dashboard_context(request):
         category["counter"] = len([ja for ja in job_applications if ja["state"] in category["states"]])
         category["url"] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
 
+    show_eiti_webinar_banner = current_org.kind == CompanyKind.EITI
+
     return {
         "active_campaigns": (
             EvaluatedSiae.objects.for_company(current_org)
@@ -92,7 +95,8 @@ def _employer_dashboard_context(request):
         "num_rejected_employee_records": (
             EmployeeRecord.objects.for_company(current_org).filter(status=Status.REJECTED).count()
         ),
-        "show_dora_banner": current_org.department in SHOW_DORA_DEPARTMENTS,
+        "show_eiti_webinar_banner": show_eiti_webinar_banner,
+        "show_dora_banner": current_org.department in SHOW_DORA_DEPARTMENTS and not show_eiti_webinar_banner,
         "siae_suspension_text_with_dates": (
             current_org.get_active_suspension_text_with_dates()
             # Otherwise they cannot be suspended
@@ -135,6 +139,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "pending_prolongation_requests": None,
         "evaluated_siae_notifications": EvaluatedSiae.objects.none(),
         "show_dora_banner": False,
+        "show_eiti_webinar_banner": False,
         "siae_suspension_text_with_dates": None,
         "siae_search_form": SiaeSearchForm(),
     }
