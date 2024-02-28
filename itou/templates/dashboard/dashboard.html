@@ -7,6 +7,19 @@
 {% block messages %}
     {{ block.super }}
 
+    <div class="alert alert-info alert-dismissible fade show" role="status">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        <div class="row">
+            <div class="col-auto pe-0">
+                <i class="ri-star-s-line ri-xl text-info"></i>
+            </div>
+            <div class="col pl-0">
+                <p class="fw-bold mb-0">Améliorations en cours sur votre espace</p>
+                <p class="mb-0">Un nouveau design va arriver de façon progressive lors des prochains mois.</p>
+            </div>
+        </div>
+    </div>
+
     {% if user.is_employer and request.current_organization and not request.current_organization.jobs.exists %}
         <div class="alert alert-warning alert-dismissible show" role="status">
             <p class="mb-0">
