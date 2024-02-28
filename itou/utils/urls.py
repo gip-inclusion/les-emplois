@@ -1,4 +1,4 @@
-from urllib.parse import ParseResult, parse_qsl, urlsplit
+from urllib.parse import SplitResult, parse_qsl, urlsplit
 
 from django.conf import settings
 from django.http import QueryDict
@@ -21,11 +21,10 @@ def get_safe_url(request, param_name=None, fallback_url=None, url=None):
             # As a quick fix, we build a new URL without the port.
 
             url_info = urlsplit(url)
-            url_without_port = ParseResult(
+            url_without_port = SplitResult(
                 scheme=url_info.scheme,
                 netloc=url_info.hostname,
                 path=url_info.path,
-                params=url_info.params,
                 query=url_info.query,
                 fragment=url_info.fragment,
             ).geturl()
