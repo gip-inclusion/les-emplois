@@ -915,9 +915,9 @@ class JobSeekerProfileModelTest(TestCase):
 def user_with_approval_in_waiting_period():
     user = JobSeekerFactory()
     end_at = timezone.localdate() - relativedelta(days=30)
-    start_at = end_at - relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+    start_at = end_at - datetime.timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)
     # diagnosis.created_at is a datetime, approval.start_at is a date
-    diagnosis_created_at = timezone.now() - relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+    diagnosis_created_at = timezone.now() - datetime.timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)
     approval = ApprovalFactory(
         user=user,
         start_at=start_at,
@@ -993,7 +993,7 @@ class LatestApprovalTestCase(TestCase):
     def test_merge_approvals_pass_and_pe_valid(self):
         user = JobSeekerFactory()
         start_at = timezone.now() - relativedelta(months=2)
-        end_at = start_at + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)
+        end_at = start_at + datetime.timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)
 
         # PASS IAE
         pass_iae = ApprovalFactory(

@@ -508,7 +508,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
                 )
             ),
             "hiring_end_at": "Au format JJ/MM/AAAA, par exemple {}.".format(
-                (datetime.date.today() + relativedelta(years=Approval.DEFAULT_APPROVAL_YEARS)).strftime("%d/%m/%Y")
+                (datetime.date.today() + datetime.timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)).strftime("%d/%m/%Y")
             ),
             "prehiring_guidance_days": """Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche""",
             "contract_type_details": (
