@@ -1746,6 +1746,7 @@ class JobApplicationXlsxExportTest(TestCase):
                 job_application.approval.number,
                 job_application.approval.start_at.strftime("%d/%m/%Y"),
                 job_application.approval.end_at.strftime("%d/%m/%Y"),
+                "Valide",
             ],
         ]
 
@@ -1785,6 +1786,7 @@ class JobApplicationXlsxExportTest(TestCase):
                 job_application.hiring_end_at.strftime("%d/%m/%Y"),
                 "Candidat non joignable",
                 "oui",
+                "",
                 "",
                 "",
                 "",

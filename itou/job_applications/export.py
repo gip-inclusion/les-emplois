@@ -27,6 +27,7 @@ JOB_APPLICATION_CSV_HEADERS = [
     "Numéro PASS IAE",
     "Début PASS IAE",
     "Fin PASS IAE",
+    "Statut PASS IAE",
 ]
 
 DATE_FMT = "%d/%m/%Y"
@@ -98,11 +99,13 @@ def _serialize_job_application(job_application):
     numero_pass_iae = ""
     approval_start_date = None
     approval_end_date = None
+    approval_state = None
     if job_seeker.has_valid_common_approval:
         approval = job_seeker.latest_common_approval
         numero_pass_iae = approval.number
         approval_start_date = approval.start_at
         approval_end_date = approval.end_at
+        approval_state = approval.get_state_display()
 
     return [
         _resolve_title(job_seeker.title, job_seeker.jobseeker_profile.nir),
@@ -128,6 +131,7 @@ def _serialize_job_application(job_application):
         numero_pass_iae,
         _format_date(approval_start_date),
         _format_date(approval_end_date),
+        approval_state,
     ]
 
 
