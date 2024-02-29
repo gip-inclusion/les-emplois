@@ -48,8 +48,8 @@ from tests.utils.test import TestCase, assertMessages
 
 class CommonApprovalQuerySetTest(TestCase):
     def test_valid_for_pole_emploi_approval_model(self):
-        start_at = timezone.localdate() - relativedelta(years=1)
-        end_at = start_at + relativedelta(years=1)
+        start_at = timezone.localdate() - datetime.timedelta(days=365)
+        end_at = start_at + datetime.timedelta(days=365)
         PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
 
         start_at = timezone.localdate() - relativedelta(years=5)
@@ -60,8 +60,8 @@ class CommonApprovalQuerySetTest(TestCase):
         assert 1 == PoleEmploiApproval.objects.valid().count()
 
     def test_valid_for_approval_model(self):
-        start_at = timezone.localdate() - relativedelta(years=1)
-        end_at = start_at + relativedelta(years=1)
+        start_at = timezone.localdate() - datetime.timedelta(days=365)
+        end_at = start_at + datetime.timedelta(days=365)
         ApprovalFactory(start_at=start_at, end_at=end_at)
 
         start_at = timezone.localdate() - relativedelta(years=5)
