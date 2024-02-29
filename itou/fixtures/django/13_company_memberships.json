@@ -238,5 +238,20 @@
     },
     "model": "companies.companymembership",
     "pk": 27
+  },
+  {
+    "fields": {
+      "created_at": "2020-12-01T10:08:03.596Z",
+      "is_active": true,
+      "is_admin": true,
+      "joined_at": "2024-03-05T14:19:59.686Z",
+      "notifications": {},
+      "company": 3611,
+      "updated_at": "2020-12-01T10:08:03.596Z",
+      "updated_by": null,
+      "user": 4
+    },
+    "model": "companies.companymembership",
+    "pk": 28
   }
 ]
