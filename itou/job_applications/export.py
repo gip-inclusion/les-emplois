@@ -100,8 +100,7 @@ def _serialize_job_application(job_application):
     approval_start_date = None
     approval_end_date = None
     approval_state = None
-    if job_seeker.has_valid_common_approval:
-        approval = job_seeker.latest_common_approval
+    if approval := job_seeker.latest_common_approval:
         numero_pass_iae = approval.number
         approval_start_date = approval.start_at
         approval_end_date = approval.end_at

@@ -12,6 +12,7 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
+from freezegun import freeze_time
 
 from itou.approvals.models import Approval, CancelledApproval
 from itou.companies.enums import CompanyKind, ContractType
@@ -1747,6 +1748,52 @@ class JobApplicationXlsxExportTest(TestCase):
                 job_application.approval.start_at.strftime("%d/%m/%Y"),
                 job_application.approval.end_at.strftime("%d/%m/%Y"),
                 "Valide",
+            ],
+        ]
+
+    def test_display_expired_approvals_info(self):
+        """Even expired approval should be displayed."""
+        with freeze_time(timezone.now() - relativedelta(days=Approval.DEFAULT_APPROVAL_DAYS + 2)):
+            create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
+            job_seeker = JobSeekerFactory(title=Title.MME)
+            job_application = JobApplicationSentByJobSeekerFactory(
+                job_seeker=job_seeker,
+                state=JobApplicationWorkflow.STATE_PROCESSING,
+                selected_jobs=Appellation.objects.all(),
+                eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
+            )
+            job_application.accept(user=job_application.to_company.members.first())
+
+        assert job_seeker.approvals.last().is_in_waiting_period
+
+        response = stream_xlsx_export(JobApplication.objects.all(), "filename")
+        assert get_rows_from_streaming_response(response) == [
+            JOB_APPLICATION_CSV_HEADERS,
+            [
+                "MME",
+                job_seeker.last_name,
+                job_seeker.first_name,
+                job_seeker.email,
+                job_seeker.phone,
+                job_seeker.birthdate.strftime("%d/%m/%Y"),
+                job_seeker.city,
+                job_seeker.post_code,
+                job_application.to_company.display_name,
+                str(job_application.to_company.kind),
+                " ".join(a.display_name for a in job_application.selected_jobs.all()),
+                "Candidature spontanée",
+                "",
+                job_application.sender.get_full_name(),
+                job_application.created_at.strftime("%d/%m/%Y"),
+                "Candidature acceptée",
+                job_application.hiring_start_at.strftime("%d/%m/%Y"),
+                job_application.hiring_end_at.strftime("%d/%m/%Y"),
+                "",  # no reafusal reason
+                "non",  # Eligibility status.
+                job_application.approval.number,
+                job_application.approval.start_at.strftime("%d/%m/%Y"),
+                job_application.approval.end_at.strftime("%d/%m/%Y"),
+                "Expiré",
             ],
         ]
 
