@@ -127,7 +127,6 @@ MIDDLEWARE = [
     "django_htmx.middleware.HtmxMiddleware",
     "hijack.middleware.HijackUserMiddleware",
     # Itou specific
-    "itou.utils.new_dns.middleware.NewDnsRedirectMiddleware",
     "itou.utils.perms.middleware.ItouCurrentOrganizationMiddleware",
     "itou.www.middleware.never_cache",
     # Final logger
