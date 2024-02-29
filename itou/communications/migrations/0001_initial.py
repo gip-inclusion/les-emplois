@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ("can_be_disabled", models.BooleanField(default=True)),
                 ("is_obsolete", models.BooleanField(db_index=True, default=False)),
             ],
-            options={"base_manager_name": "include_obsolete"},
+            options={"base_manager_name": "include_obsolete", "ordering": ["category", "name"]},
             managers=[
                 ("objects", django.db.models.manager.Manager()),
                 ("include_obsolete", django.db.models.manager.Manager()),

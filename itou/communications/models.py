@@ -26,6 +26,7 @@ class Notification(models.Model):
 
     class Meta:
         base_manager_name = "include_obsolete"
+        ordering = ["category", "name"]
 
     def __str__(self):
         return self.name

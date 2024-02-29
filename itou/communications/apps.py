@@ -31,7 +31,7 @@ def sync_notifications(notification_model):
             # Add new notifications to database.
             active_notifications = []
             for notification_class in registry:
-                notification, created = notification_model.objects.update_or_create(
+                notification, created = notification_model.include_obsolete.update_or_create(
                     notification_class=notification_class.get_class_path(),
                     defaults={
                         "name": notification_class.name,
