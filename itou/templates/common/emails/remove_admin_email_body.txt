@@ -8,7 +8,10 @@ Structure :
 
 - Nom : {{ structure.display_name }}
 - Type : {{ structure.kind }}
+{# Institutions don't have a contact email address. #}
+{% if structure.email  %}
 - Email de contact : {{ structure.email }}
+{% endif %}
 
 Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs cette structure sur les emplois de l'inclusion.
 
