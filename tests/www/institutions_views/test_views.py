@@ -1,5 +1,6 @@
 from django.urls import reverse
 
+from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.institutions.factories import (
     InstitutionFactory,
     InstitutionMembershipFactory,
@@ -9,6 +10,7 @@ from tests.institutions.factories import (
 from tests.utils.test import TestCase
 
 
+# TODO: convert this to pytest
 class MembersTest(TestCase):
     MORE_ADMIN_MSG = "Nous vous recommandons de nommer plusieurs administrateurs"
 
@@ -69,3 +71,52 @@ class MembersTest(TestCase):
         url = reverse("institutions_views:members")
         response = self.client.get(url)
         self.assertContains(response, self.MORE_ADMIN_MSG)
+
+    def test_add_admin(self):
+        """
+        Check the ability for an admin to add another admin to the company
+        """
+        institution = InstitutionWith2MembershipFactory()
+        admin = institution.members.filter(institutionmembership__is_admin=True).first()
+        guest = institution.members.filter(institutionmembership__is_admin=False).first()
+
+        self.client.force_login(admin)
+        url = reverse("institutions_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
+
+        # Redirection to confirm page
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+        # Confirm action
+        response = self.client.post(url)
+        assert response.status_code == 302
+
+        institution.refresh_from_db()
+        assert_set_admin_role__creation(user=guest, organization=institution)
+
+    def test_remove_admin(self):
+        """
+        Check the ability for an admin to remove another admin
+        """
+        institution = InstitutionWith2MembershipFactory()
+        admin = institution.members.filter(institutionmembership__is_admin=True).first()
+        guest = institution.members.filter(institutionmembership__is_admin=False).first()
+
+        membership = guest.institutionmembership_set.first()
+        membership.is_admin = True
+        membership.save()
+        assert guest in institution.active_admin_members
+
+        self.client.force_login(admin)
+        url = reverse("institutions_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
+
+        # Redirection to confirm page
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+        # Confirm action
+        response = self.client.post(url)
+        assert response.status_code == 302
+
+        institution.refresh_from_db()
+        assert_set_admin_role__removal(user=guest, organization=institution)

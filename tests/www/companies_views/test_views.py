@@ -17,6 +17,7 @@ from itou.utils import constants as global_constants
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
 from itou.www.companies_views import views
 from tests.cities.factories import create_city_vannes
+from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.companies.factories import (
     CompanyFactory,
     CompanyMembershipFactory,
@@ -969,14 +970,7 @@ class CompanyAdminMembersManagementTest(TestCase):
         assert response.status_code == 302
 
         company.refresh_from_db()
-        assert guest in company.active_admin_members
-
-        # The admin should receive a valid email
-        assert len(mail.outbox) == 1
-        email = mail.outbox[0]
-        assert f"[Activation] Vous êtes désormais administrateur de {company.display_name}" == email.subject
-        assert "Vous êtes administrateur d'une structure sur les emplois de l'inclusion" in email.body
-        assert email.to[0] == guest.email
+        assert_set_admin_role__creation(user=guest, organization=company)
 
     def test_remove_admin(self):
         """
@@ -1003,14 +997,7 @@ class CompanyAdminMembersManagementTest(TestCase):
         assert response.status_code == 302
 
         company.refresh_from_db()
-        assert guest not in company.active_admin_members
-
-        # The admin should receive a valid email
-        assert len(mail.outbox) == 1
-        email = mail.outbox[0]
-        assert f"[Désactivation] Vous n'êtes plus administrateur de {company.display_name}" == email.subject
-        assert "Un administrateur vous a retiré les droits d'administrateur d'une structure" in email.body
-        assert email.to[0] == guest.email
+        assert_set_admin_role__removal(user=guest, organization=company)
 
     def test_admin_management_permissions(self):
         """

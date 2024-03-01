@@ -1,8 +1,8 @@
 import pytest
-from django.core import mail
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 
+from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.prescribers.factories import PrescriberOrganizationWith2MembershipFactory
 from tests.utils.test import TestCase
 
@@ -28,14 +28,7 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         assert response.status_code == 302
 
         organization.refresh_from_db()
-        assert guest in organization.active_admin_members
-
-        # The admin should receive a valid email
-        assert len(mail.outbox) == 1
-        email = mail.outbox[0]
-        assert f"[Activation] Vous êtes désormais administrateur de {organization.display_name}" == email.subject
-        assert "Vous êtes administrateur d'une structure sur les emplois de l'inclusion" in email.body
-        assert email.to[0] == guest.email
+        assert_set_admin_role__creation(user=guest, organization=organization)
 
     def test_remove_admin(self):
         """
@@ -62,14 +55,7 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         assert response.status_code == 302
 
         organization.refresh_from_db()
-        assert guest not in organization.active_admin_members
-
-        # The admin should receive a valid email
-        assert len(mail.outbox) == 1
-        email = mail.outbox[0]
-        assert f"[Désactivation] Vous n'êtes plus administrateur de {organization.display_name}" == email.subject
-        assert "Un administrateur vous a retiré les droits d'administrateur d'une structure" in email.body
-        assert email.to[0] == guest.email
+        assert_set_admin_role__removal(user=guest, organization=organization)
 
     def test_admin_management_permissions(self):
         """
