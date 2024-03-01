@@ -13,25 +13,25 @@ class CommunicationsConfig(AppConfig):
         post_migrate.connect(post_communications_migrate_handler, sender=self)
         if settings.DEBUG:
             # Sync on every reload during development
-            sync_notifications(self.get_model("Notification"))
+            sync_notifications(self.get_model("NotificationRecord"))
 
 
 def post_communications_migrate_handler(sender, app_config, **kwargs):
-    sync_notifications(app_config.get_model("Notification"))
+    sync_notifications(app_config.get_model("NotificationRecord"))
 
 
-def sync_notifications(notification_model):
+def sync_notifications(notification_record_model):
     from . import registry
 
     try:
         with transaction.atomic():
             with transaction.get_connection().cursor() as cursor:
-                cursor.execute(f"LOCK TABLE {notification_model._meta.db_table};")
+                cursor.execute(f"LOCK TABLE {notification_record_model._meta.db_table};")
 
             # Add new notifications to database.
-            active_notifications = []
+            active_notification_records = []
             for notification_class in registry:
-                notification, created = notification_model.include_obsolete.update_or_create(
+                notification_record, created = notification_record_model.include_obsolete.update_or_create(
                     notification_class=notification_class.get_class_path(),
                     defaults={
                         "name": notification_class.name,
@@ -40,11 +40,11 @@ def sync_notifications(notification_model):
                         "is_obsolete": False,
                     },
                 )
-                active_notifications.append(notification)
+                active_notification_records.append(notification_record)
 
             # Flag obsolete notifications
-            notification_model.objects.exclude(
-                pk__in=[notification.pk for notification in active_notifications]
+            notification_record_model.objects.exclude(
+                pk__in=[notification_record.pk for notification_record in active_notification_records]
             ).update(is_obsolete=True)
     except (OperationalError, ProgrammingError):
         if settings.DEBUG:

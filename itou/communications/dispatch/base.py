@@ -33,7 +33,7 @@ class BaseNotification:
         self.context = kwargs
 
     def __repr__(self):
-        return f"<Notification {self.user.email}: {self.name}>"
+        return f"<{self.__class__.__name__} {self.user.email}: {self.name}>"
 
     @classmethod
     def get_class_path(cls):

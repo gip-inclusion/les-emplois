@@ -11,7 +11,7 @@ from itou.communications.dispatch.utils import (
     PrescriberNotification,
     PrescriberOrEmployerNotification,
 )
-from itou.communications.models import Notification, NotificationSettings
+from itou.communications.models import NotificationRecord, NotificationSettings
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase
 
@@ -71,7 +71,7 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
         self.ManageableNotification = ManageableNotification
         self.NonManageableNotification = NonManageableNotification
 
-        sync_notifications(Notification)
+        sync_notifications(NotificationRecord)
 
     def test_method_init(self):
         with self.assertRaisesMessage(
@@ -95,7 +95,10 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
         assert notification.context == {"kw1": 1, "kw2": 2}
 
     def test_method_repr(self):
-        assert repr(self.ManageableNotification(self.user)) == "<Notification testuser@beta.gouv.fr: Manageable>"
+        assert (
+            repr(self.ManageableNotification(self.user))
+            == "<ManageableNotification testuser@beta.gouv.fr: Manageable>"
+        )
 
     def test_method_get_class_path(self):
         assert (
@@ -114,7 +117,11 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
         # Even if disabled in db
         settings = NotificationSettings.get_or_create(self.user, self.organization)
         settings.disabled_notifications.set(
-            [Notification.objects.get(notification_class=self.NonManageableNotification(self.user).get_class_path())]
+            [
+                NotificationRecord.objects.get(
+                    notification_class=self.NonManageableNotification(self.user).get_class_path()
+                )
+            ]
         )
         assert self.NonManageableNotification(self.user, self.organization).should_send()
 
@@ -123,7 +130,11 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
 
         # But should not be sent if disabled
         settings.disabled_notifications.set(
-            [Notification.objects.get(notification_class=self.ManageableNotification(self.user).get_class_path())]
+            [
+                NotificationRecord.objects.get(
+                    notification_class=self.ManageableNotification(self.user).get_class_path()
+                )
+            ]
         )
         assert not self.ManageableNotification(self.user, self.organization).should_send()
 
@@ -166,7 +177,7 @@ class EmailNotificationTest(FakeNotificationClassesMixin, TestCase):
         self.ManageableNotification = ManageableNotification
         self.NonManageableNotification = NonManageableNotification
 
-        sync_notifications(Notification)
+        sync_notifications(NotificationRecord)
 
     def test_method_build(self):
         email = self.ManageableNotification(self.user, self.organization).build()

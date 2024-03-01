@@ -1,7 +1,7 @@
 from itou.communications import registry as notifications_registry
 from itou.communications.apps import sync_notifications
 from itou.communications.dispatch.base import BaseNotification, NotificationMetaclass
-from itou.communications.models import Notification, NotificationSettings
+from itou.communications.models import NotificationRecord, NotificationSettings
 from tests.companies.factories import CompanyMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase
@@ -25,19 +25,19 @@ class NotificationModelTest(TestCase):
         self.FirstNotification = FirstNotification
         self.SecondNotification = SecondNotification
 
-        sync_notifications(Notification)
+        sync_notifications(NotificationRecord)
 
     def test_managers(self):
-        assert Notification.objects.filter(category__in=["First", "Second"]).count() == 2
-        assert Notification.include_obsolete.filter(category__in=["First", "Second"]).count() == 2
+        assert NotificationRecord.objects.filter(category__in=["First", "Second"]).count() == 2
+        assert NotificationRecord.include_obsolete.filter(category__in=["First", "Second"]).count() == 2
 
         # Set second notification obsolete, should not be listed by default
-        Notification.objects.filter(category="Second").update(is_obsolete=True)
-        assert Notification.objects.filter(category__in=["First", "Second"]).count() == 1
-        assert Notification.include_obsolete.filter(category__in=["First", "Second"]).count() == 2
+        NotificationRecord.objects.filter(category="Second").update(is_obsolete=True)
+        assert NotificationRecord.objects.filter(category__in=["First", "Second"]).count() == 1
+        assert NotificationRecord.include_obsolete.filter(category__in=["First", "Second"]).count() == 2
 
     def test_str(self):
-        notifications = Notification.objects.filter(category__in=["First", "Second"])
+        notifications = NotificationRecord.objects.filter(category__in=["First", "Second"])
         assert str(notifications[0]) == "First"
         assert str(notifications[1]) == "Second"
 

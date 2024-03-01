@@ -4,42 +4,48 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
 
-class NotificationQuerySet(models.QuerySet):
+class NotificationRecordQuerySet(models.QuerySet):
     def actives(self):
         return self.exclude(is_obsolete=True)
 
 
-class NotificationManager(models.Manager.from_queryset(NotificationQuerySet)):
+class NotificationRecordManager(models.Manager.from_queryset(NotificationRecordQuerySet)):
     def get_queryset(self):
         return super().get_queryset().actives()
 
 
-class Notification(models.Model):
-    notification_class = models.CharField(max_length=255, unique=True)
-    name = models.CharField(max_length=255)
-    category = models.CharField(max_length=255)
-    can_be_disabled = models.BooleanField(default=True)
+class NotificationRecord(models.Model):
+    notification_class = models.CharField(unique=True)
+    name = models.CharField()
+    category = models.CharField()
+    can_be_disabled = models.BooleanField()
     is_obsolete = models.BooleanField(default=False, db_index=True)
 
-    objects = NotificationManager()
-    include_obsolete = NotificationQuerySet.as_manager()
+    objects = NotificationRecordManager()
+    include_obsolete = NotificationRecordQuerySet.as_manager()
 
     class Meta:
         base_manager_name = "include_obsolete"
         ordering = ["category", "name"]
+        constraints = [
+            models.CheckConstraint(
+                name="notificationrecord_category_and_name_required",
+                check=~(models.Q(category="") | models.Q(name="")),
+            ),
+        ]
 
     def __str__(self):
         return self.name
 
 
 class DisabledNotification(models.Model):
-    notification = models.ForeignKey("Notification", on_delete=models.CASCADE)
+    notification_record = models.ForeignKey("NotificationRecord", on_delete=models.CASCADE)
     settings = models.ForeignKey("NotificationSettings", on_delete=models.CASCADE)
     disabled_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         constraints = [
-            models.UniqueConstraint("notification", "settings", name="unique_notification_per_settings"),
+            models.UniqueConstraint("notification_record", "settings", name="unique_notificationrecord_per_settings"),
         ]
 
 
@@ -56,7 +62,7 @@ class NotificationSettings(models.Model):
     structure_type = models.ForeignKey(ContentType, null=True, on_delete=models.CASCADE)
     structure_pk = models.PositiveIntegerField(null=True)
     structure = GenericForeignKey("structure_type", "structure_pk")
-    disabled_notifications = models.ManyToManyField(Notification, through=DisabledNotification, related_name="+")
+    disabled_notifications = models.ManyToManyField(NotificationRecord, through=DisabledNotification, related_name="+")
 
     objects = NotificationSettingsQuerySet.as_manager()
 

@@ -23,13 +23,13 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name="Notification",
+            name="NotificationRecord",
             fields=[
                 ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("notification_class", models.CharField(max_length=255, unique=True)),
-                ("name", models.CharField(max_length=255)),
-                ("category", models.CharField(max_length=255)),
-                ("can_be_disabled", models.BooleanField(default=True)),
+                ("notification_class", models.CharField(unique=True)),
+                ("name", models.CharField()),
+                ("category", models.CharField()),
+                ("can_be_disabled", models.BooleanField()),
                 ("is_obsolete", models.BooleanField(db_index=True, default=False)),
             ],
             options={"base_manager_name": "include_obsolete", "ordering": ["category", "name"]},
@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
                     models.ManyToManyField(
                         related_name="+",
                         through="communications.DisabledNotification",
-                        to="communications.notification",
+                        to="communications.notificationrecord",
                     ),
                 ),
                 (
@@ -72,14 +72,23 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name="disablednotification",
-            name="notification",
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="communications.notification"),
+            name="notification_record",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="communications.notificationrecord"
+            ),
         ),
         migrations.AddField(
             model_name="disablednotification",
             name="settings",
             field=models.ForeignKey(
                 on_delete=django.db.models.deletion.CASCADE, to="communications.notificationsettings"
+            ),
+        ),
+        migrations.AddConstraint(
+            model_name="notificationrecord",
+            constraint=models.CheckConstraint(
+                check=models.Q(("category", ""), ("name", ""), _connector="OR", _negated=True),
+                name="notificationrecord_category_and_name_required",
             ),
         ),
         migrations.AddConstraint(
@@ -103,7 +112,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="disablednotification",
             constraint=models.UniqueConstraint(
-                models.F("notification"), models.F("settings"), name="unique_notification_per_settings"
+                models.F("notification_record"), models.F("settings"), name="unique_notificationrecord_per_settings"
             ),
         ),
     ]

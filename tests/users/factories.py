@@ -9,7 +9,7 @@ from django.contrib.auth.hashers import make_password
 
 from itou.asp.models import AllocationDuration, EducationLevel, LaneType
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.communications.models import Notification, NotificationSettings
+from itou.communications.models import NotificationRecord, NotificationSettings
 from itou.users import models
 from itou.users.enums import IdentityProvider, Title, UserKind
 from itou.utils.mocks.address_format import get_random_geocoding_api_result
@@ -67,7 +67,7 @@ class UserFactory(factory.django.DjangoModelFactory):
     def with_disabled_notification(obj, create, extracted, **kwargs):
         if create and extracted is True:
             settings = NotificationSettings.get_or_create(obj)
-            settings.disabled_notifications.add(Notification.objects.first())
+            settings.disabled_notifications.add(NotificationRecord.objects.first())
 
 
 class ItouStaffFactory(UserFactory):
@@ -95,7 +95,7 @@ class PrescriberFactory(UserFactory):
         if create and extracted is True:
             organization = obj.prescriberorganization_set.first() or PrescriberMembershipFactory(user=obj).organization
             settings = NotificationSettings.get_or_create(obj, organization)
-            settings.disabled_notifications.add(Notification.objects.first())
+            settings.disabled_notifications.add(NotificationRecord.objects.first())
 
 
 class EmployerFactory(UserFactory):
@@ -116,7 +116,7 @@ class EmployerFactory(UserFactory):
         if create and extracted is True:
             company = obj.company_set.first() or CompanyMembershipFactory(user=obj).company
             settings = NotificationSettings.get_or_create(obj, company)
-            settings.disabled_notifications.add(Notification.objects.first())
+            settings.disabled_notifications.add(NotificationRecord.objects.first())
 
 
 class LaborInspectorFactory(UserFactory):

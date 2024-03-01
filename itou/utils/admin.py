@@ -2,6 +2,7 @@ from unittest import mock
 
 from django.contrib.admin import ModelAdmin, StackedInline, TabularInline
 from django.contrib.contenttypes.admin import GenericStackedInline
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.gis.forms import fields as gis_fields
 from django.contrib.messages import WARNING
 from django.urls import reverse
@@ -45,12 +46,21 @@ class ItouTabularInline(TabularInline):
 
     def get_queryset(self, request):
         select_related_fields = set(self.list_select_related or [])
+        prefetch_related_fields = set()
         for field in {field for field in self.model._meta.get_fields() if field.name in self.get_fields(request)}:
             if not field.is_relation or field.auto_created or field.many_to_many:
                 continue
-            select_related_fields.add(field.name)
+            if isinstance(field, GenericRelation):
+                prefetch_related_fields.add(field.name)
+            else:
+                select_related_fields.add(field.name)
 
-        return super().get_queryset(request).select_related(*select_related_fields)
+        return (
+            super()
+            .get_queryset(request)
+            .select_related(*select_related_fields)
+            .prefetch_related(*prefetch_related_fields)
+        )
 
 
 class ItouStackedInline(StackedInline, ItouTabularInline):
@@ -108,7 +118,7 @@ class ItouModelAdmin(ModelAdmin):
             if not field.is_relation or field.auto_created:
                 continue
 
-            if field.many_to_many:
+            if field.many_to_many or isinstance(field, GenericRelation):
                 prefetch_related_fields.add(field.name)
             else:
                 select_related_fields.add(field.name)
