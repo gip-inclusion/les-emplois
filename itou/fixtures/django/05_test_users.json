@@ -312,7 +312,7 @@
       "geocoding_score": null,
       "geocoding_updated_at": null,
       "groups": [],
-      "has_completed_welcoming_tour": false,
+      "has_completed_welcoming_tour": true,
       "identity_provider": "IC",
       "is_active": true,
       "is_staff": false,
