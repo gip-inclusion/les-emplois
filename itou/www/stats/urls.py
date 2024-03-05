@@ -5,6 +5,7 @@ from itou.www.stats import views
 
 app_name = "stats"
 
+
 urlpatterns = [
     # Public stats.
     path("", views.stats_public, name="stats_public"),
@@ -19,6 +20,7 @@ urlpatterns = [
         views.stats_siae_follow_siae_evaluation,
         name="stats_siae_follow_siae_evaluation",
     ),
+    path("siae/hiring_report", views.stats_siae_hiring_report, name="stats_siae_hiring_report"),
     # Prescriber stats - CD.
     path("cd/iae", views.stats_cd_iae, name="stats_cd_iae"),
     path("cd/hiring", views.stats_cd_hiring, name="stats_cd_hiring"),
