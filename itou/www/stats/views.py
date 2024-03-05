@@ -263,6 +263,13 @@ def stats_siae_follow_siae_evaluation(request):
     return render_stats_siae(request=request, page_title="Suivi du contrôle a posteriori")
 
 
+@login_required
+def stats_siae_hiring_report(request):
+    if not utils.can_view_stats_siae_hiring_report(request):
+        raise PermissionDenied
+    return render_stats_siae(request=request, page_title="Déclaration d’embauche")
+
+
 def render_stats_cd(request, page_title, params=None):
     """
     CD ("Conseil Départemental") stats shown to relevant members.
