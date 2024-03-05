@@ -7,7 +7,6 @@ from itou.companies.enums import CompanyKind
 from itou.companies.management.commands._import_siae.utils import (
     clean_string,
     geocode_siae,
-    get_filename,
     remap_columns,
     sync_structures,
 )
@@ -18,9 +17,8 @@ from itou.utils.validators import validate_siret
 
 
 @timeit
-def get_geiq_df():
+def get_geiq_df(filename):
     info_stats = {}
-    filename = get_filename(filename_prefix="Liste_Geiq", filename_extension=".xls", description="Export GEIQ")
 
     df = pd.read_excel(filename, converters={"siret": str, "zip": str})
     info_stats["rows_in_file"] = len(df)
@@ -115,11 +113,12 @@ class Command(BaseCommand):
     help = "Import the content of the GEIQ csv file into the database."
 
     def add_arguments(self, parser):
+        parser.add_argument("filename")
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
     @timeit
-    def handle(self, *, wet_run, **options):
-        geiq_df, info_stats = get_geiq_df()
+    def handle(self, *, filename, wet_run, **options):
+        geiq_df, info_stats = get_geiq_df(filename)
         info_stats |= sync_structures(
             df=geiq_df,
             source=Company.SOURCE_GEIQ,
