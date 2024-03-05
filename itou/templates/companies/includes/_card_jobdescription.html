@@ -2,23 +2,17 @@
 {% load matomo %}
 
 {% comment %} takes argument siae <Siae>{% endcomment %}
-<div class="card c-card has-links-inside mb-3 mb-md-4">
-    <div class="card-header pb-3 bg-light">
-        <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
-            <div>
+<div class="c-box c-box--results has-links-inside my-3 my-md-4">
+    <div class="c-box--results__header">
+        <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+            <div class="flex-grow-1">
                 {% if job_description.is_from_pole_emploi %}
+                    <i class="ri-community-line font-weight-medium me-1" aria-hidden="true"></i>
                     <span class="font-weight-bold">{{ job_description.market_context_description | default:"Entreprise anonyme" }}</span>
-                    {% if job_description.is_pec_offer %}
-                        <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary">Réservé au public éligible au contrat PEC</span>
-                    {% endif %}
                 {% else %}
-                    <a class="btn btn-sm btn-ico btn-link text-start p-0 mh-auto"
-                       href="{{ job_description.company.get_card_url }}"
-                       {% matomo_event "candidature" "clic" "clic-structure-fichedeposte" %}
-                       target="_blank"
-                       aria-label="Ouvrir la page de la structure dans un nouvel onglet">
+                    <a href="{{ job_description.company.get_card_url }}" class="btn-ico btn-link" {% matomo_event "candidature" "clic" "clic-structure-fichedeposte" %}>
+                        <i class="ri-community-line font-weight-medium" aria-hidden="true"></i>
                         <span>{{ job_description.company.kind }} - {{ job_description.company.display_name }}</span>
-                        <i class="ri-external-link-line ri-xl"></i>
                     </a>
                 {% endif %}
             </div>
@@ -29,47 +23,61 @@
             {% endif %}
         </div>
     </div>
-    <div class="card-body">
-        {% if job_description.is_popular %}
-            <div class="mb-2">
-                <span class="badge badge-sm rounded-pill bg-accent-03 text-primary"><i class="ri-group-line"></i>{{ job_description.POPULAR_THRESHOLD }}+ candidatures</span>
+    <hr class="m-0">
+    <div class="c-box--results__body">
+        <ul class="list-group list-group-flush list-group-link">
+            <li class="list-group-item list-group-item-action">
+                <div>
+                    <a href="{{ job_description.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}"
+                       class="font-weight-bold text-decoration-none {% if job_description.is_external %}has-external-link{% else %}stretched-link{% endif %}"
+                       {% if job_description.is_external %} {% matomo_event "candidature" "clic" "clic-card-fichedeposte-externe" %} rel="noopener" target="_blank" aria-label="Visiter l'offre sur le site d'origine" {% else %} {% matomo_event "candidature" "clic" "clic-card-fichedeposte" %} aria-label="Aller vers la description de ce poste" {% endif %}>
+                        {{ job_description.display_name | capfirst }}
+                    </a>
+                    {% if job_description.is_popular %}
+                        <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
+                            <i class="ri-group-line me-1" aria-hidden="true"></i>
+                            {{ job_description.POPULAR_THRESHOLD }}+<span class="ms-1">candidatures</span>
+                        </span>
+                    {% endif %}
+                    <ul class="c-box--results__list-contact flex-md-grow-1 mt-1">
+                        <li>
+                            <i class="ri-navigation-line font-weight-normal me-1"></i>
+                            à <strong class="text-info mx-1">{{ job_description.distance | floatformat:"-1" }}&nbsp;km</strong> de votre lieu de recherche
+                        </li>
+                        <li>
+                            <i class="ri-map-pin-2-line font-weight-normal me-1"></i>
+                            <address class="m-0">
+                                {% if job_description.location %}
+                                    {{ job_description.location }}
+                                {% else %}
+                                    {{ job_description.company.city | title }} - {{ job_description.company.department }}
+                                {% endif %}
+                            </address>
+                        </li>
+                    </ul>
+                    {% if job_description.is_from_pole_emploi %}
+                        <p class="d-flex align-items-center fs-sm mb-0 mt-1 gap-2">
+                            <span>Offre proposée et gérée par <span class="visually-hidden">France Travail</span></span>
+                            <img height="35" src="{% static 'img/logo-france-travail.svg' %}" alt="Logo France Travail">
+                        </p>
+                    {% endif %}
+                </div>
+                {% if job_description.display_contract_type or job_description.hours_per_week %}
+                    <div class="badge-group d-flex flex-column align-items-end">
+                        {% if job_description.display_contract_type %}
+                            <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">{{ job_description.display_contract_type }}</span>
+                        {% endif %}
+                        {% if job_description.hours_per_week %}
+                            <span class="badge badge-xs rounded-pill bg-accent-02-light text-primary">{{ job_description.hours_per_week }}h/semaine</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </li>
+        </ul>
+        {% if job_description.is_pec_offer %}
+            <div class="c-info mt-2">
+                <span class="c-info__summary">Réservé au public éligible au contrat PEC</span>
             </div>
         {% endif %}
-        <div class="mb-3">
-            {# Do not use is_external as it might evolve, and do not use a specific property. Covered by a test. #}
-            {% if job_description.is_from_pole_emploi %}Offre proposée et gérée par pole-emploi.fr{% endif %}
-            <a class="d-block h3 mb-2"
-               href="{{ job_description.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}"
-               {% if job_description.is_external %} {% matomo_event "candidature" "clic" "clic-card-fichedeposte-externe" %} rel="noopener" target="_blank" aria-label="Visiter l'offre sur le site d'origine" {% else %} {% matomo_event "candidature" "clic" "clic-card-fichedeposte" %} aria-label="Aller vers la description de ce poste" {% endif %}>
-                {{ job_description.display_name | capfirst }}
-                {% if job_description.is_external %}<i class="ri-external-link-line ri-lg ms-1"></i>{% endif %}
-            </a>
-            {% if job_description.display_contract_type or job_description.hours_per_week %}
-                {% if job_description.display_contract_type %}
-                    <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">{{ job_description.display_contract_type }}</span>
-                {% endif %}
-                {% if job_description.hours_per_week %}
-                    <span class="badge badge-xs rounded-pill bg-emploi-light text-primary">{{ job_description.hours_per_week }}h/semaine</span>
-                {% endif %}
-            {% endif %}
-        </div>
-        <div class="fs-sm d-flex flex-column flex-lg-row align-items-lg-center">
-            <span class="me-3">
-                <i class="ri-map-pin-2-line me-1"></i>
-                {% if job_description.location %}
-                    {{ job_description.location }}
-                {% else %}
-                    {{ job_description.company.city | title }} ({{ job_description.company.department }})
-                {% endif %}
-            </span>
-            <span class="me-3 flex-md-grow-1">
-                <i class="ri-navigation-line me-1"></i>à <b>{{ job_description.distance | floatformat:"-1" }}&nbsp;km</b> de votre lieu de recherche
-            </span>
-            {% if job_description.is_from_pole_emploi %}
-                <span class="d-none d-lg-inline-flex">
-                    <img height="35" src="{% static 'img/logo-france-travail.svg' %}" alt="Logo France Travail">
-                </span>
-            {% endif %}
-        </div>
     </div>
 </div>
