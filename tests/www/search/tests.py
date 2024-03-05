@@ -15,7 +15,6 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase
 
-
 DISTRICTS = "Arrondissements de Paris"
 
 
@@ -234,8 +233,8 @@ class SearchCompanyTest(TestCase):
         self.assertContains(
             response,
             """
-            <span class="badge badge-sm rounded-pill bg-pilotage text-primary">
-                <i class="ri-group-line me-1"></i>
+            <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
+                <i class="ri-group-line me-1" aria-hidden="true"></i>
                 20+<span class="ms-1">candidatures</span>
             </span>
             """,
@@ -815,7 +814,7 @@ class JobDescriptionSearchViewTest(TestCase):
 
         self.assertContains(response, "Contrat PEC - Parcours Emploi Compétences")
         self.assertContains(response, "logo-france-travail.svg")
-        self.assertContains(response, "Offre proposée et gérée par pole-emploi.fr")
+        self.assertContains(response, "Offre proposée et gérée par")
         self.assertContains(response, "https://external.pec.link/fuuuu")
 
         self.assertContains(response, "Entreprise anonyme")
