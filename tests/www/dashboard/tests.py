@@ -298,7 +298,10 @@ class DashboardViewTest(TestCase):
         membership = CompanyMembershipFactory()
         self.client.force_login(membership.user)
         response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, "Voir les données de candidatures de mes structures")
+        self.assertContains(
+            response,
+            "Suivre le traitement et les résultats des candidatures reçues par ma structure - vision mensuelle",
+        )
         self.assertContains(response, reverse("stats:stats_siae_hiring"))
         self.assertContains(response, "Focus auto-prescription")
         self.assertContains(response, reverse("stats:stats_siae_auto_prescription"))
