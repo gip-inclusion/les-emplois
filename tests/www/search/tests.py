@@ -534,8 +534,8 @@ class JobDescriptionSearchViewTest(TestCase):
             response,
             """
             <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
-                <i class="ri-group-line"></i>
-                20+ candidatures
+                <i class="ri-group-line me-1" aria-hidden="true"></i>
+                20+<span class="ms-1">candidatures</span>
             </span>
             """,
             html=True,
@@ -815,7 +815,11 @@ class JobDescriptionSearchViewTest(TestCase):
 
         self.assertContains(response, "Contrat PEC - Parcours Emploi Compétences")
         self.assertContains(response, "logo-france-travail.svg")
-        self.assertContains(response, "Offre proposée et gérée par pole-emploi.fr")
+        self.assertContains(
+            response,
+            '<span>Offre proposée et gérée par <span class="visually-hidden">France Travail</span></span>',
+            html=True,
+        )
         self.assertContains(response, "https://external.pec.link/fuuuu")
 
         self.assertContains(response, "Entreprise anonyme")
