@@ -301,7 +301,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
                     prolongation.report_file = File.objects.create(key=prolongation_report_key)
             prolongation.save()
             prolongation.notify_authorized_prescriber()
-            messages.success(request, "Déclaration de prolongation enregistrée.")
+            messages.success(request, "Déclaration de prolongation enregistrée.", extra_tags="toast")
             return HttpResponseRedirect(back_url)
 
     context = {
@@ -528,7 +528,7 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
             preview = True
         elif request.POST.get("save"):
             suspension.save()
-            messages.success(request, "Suspension effectuée.")
+            messages.success(request, "Suspension effectuée.", extra_tags="toast")
             return HttpResponseRedirect(back_url)
 
     context = {
@@ -824,6 +824,7 @@ def pe_approval_create(request, pe_approval_id):
     messages.success(
         request,
         "L'agrément a bien été importé, vous pouvez désormais le prolonger ou le suspendre.",
+        extra_tags="toast",
     )
     next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
     return HttpResponseRedirect(next_url)
