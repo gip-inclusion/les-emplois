@@ -679,7 +679,7 @@ class JobDescription(models.Model):
     @property
     def display_location(self):
         if self.location:
-            return f"{self.location.name} ({self.location.department})"
+            return f"{self.location.name} - {self.location.department}"
         return f"{self.company.city} ({self.company.department})"
 
     @property
