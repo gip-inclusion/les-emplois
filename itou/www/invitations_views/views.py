@@ -213,7 +213,7 @@ def invite_employer(request, template_name="invitations_views/create.html"):
                 invitation.send()
 
             s = pluralizefr(len(formset.forms))
-            messages.success(request, f"Invitation{s} envoyée{s}", extra_tags="toasts")
+            messages.success(request, f"Invitation{s} envoyée{s}", extra_tags="toast")
 
             return redirect(back_url)
 
