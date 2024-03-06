@@ -84,6 +84,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
         for_snapshot = factory.Trait(
             pk="11111111-1111-1111-1111-111111111111",
             to_company__for_snapshot=True,
+            job_seeker__for_snapshot=True,
         )
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
