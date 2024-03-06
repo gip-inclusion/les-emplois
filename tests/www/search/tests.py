@@ -228,8 +228,8 @@ class SearchCompanyTest(TestCase):
         JobApplicationFactory.create_batch(19, to_company=company, selected_jobs=[job], state="new")
         response = self.client.get(self.URL, {"city": city.slug})
         popular_badge = """
-            <span class="badge badge-sm rounded-pill bg-pilotage text-primary">
-                <i class="ri-group-line me-1"></i>
+            <span class="badge badge-sm rounded-pill bg-accent-03 text-primary">
+                <i class="ri-group-line me-1" aria-hidden="true"></i>
                 20+<span class="ms-1">candidatures</span>
             </span>
             """
@@ -240,20 +240,22 @@ class SearchCompanyTest(TestCase):
         self.assertContains(response, popular_badge, html=True)
 
     def test_has_no_active_members(self):
-        hiring_str = "recrutements en cours"
+        create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)
         no_hiring_str = (
             "Cet employeur n'est actuellement pas inscrit sur le site des emplois de l’inclusion, "
             "vous ne pouvez pas déposer de candidature en ligne"
         )
         city = create_city_saint_andre()
-        company = CompanyFactory(department="44", coords=city.coords, post_code="44117", with_jobs=True)
+        company = CompanyFactory(department="44", coords=city.coords, post_code="44117")
+        job_description = JobDescriptionFactory(company=company)
+        job_description_str = job_description.get_absolute_url()
         response = self.client.get(self.URL, {"city": city.slug})
-        self.assertNotContains(response, hiring_str)
+        self.assertNotContains(response, job_description_str)
         self.assertContains(response, no_hiring_str)
 
         CompanyMembershipFactory(company=company)
         response = self.client.get(self.URL, {"city": city.slug})
-        self.assertContains(response, hiring_str)
+        self.assertContains(response, job_description_str)
         self.assertNotContains(response, no_hiring_str)
 
     def test_company(self):

@@ -1,68 +1,113 @@
 {% load matomo %}
+{% load str_filters %}
 
 {% comment %} takes argument siae <Siae>{% endcomment %}
-<div class="card c-card has-links-inside mb-3 mb-md-4">
-    <div class="card-header bg-light pb-3">
-        <p class="d-flex flex-wrap fs-sm mb-2">
-            <span class="flex-grow-1 text-primary">
-                {% if siae.is_opcs %}
-                    <span>Offres clauses sociales</span>
-                {% else %}
-                    <b>{{ siae.kind }}</b> - {{ siae.get_kind_display }}
-                {% endif %}
-            </span>
-            {% if siae.kind in ea_eatt_kinds %}
-                <span class="badge badge-sm rounded-pill bg-accent-01-lightest text-accent-01"><b>Priorité aux bénéficiaires de la RQTH</b></span>
-            {% endif %}
-        </p>
-        <h3 class="mb-2">
-            <a href="{{ siae.get_card_url }}" {% matomo_event "candidature" "clic" "clic-structure" %}>{{ siae.display_name }}</a>
-            {# Display non-user-edited name too, but only if it's not the same text #}
-            {% if siae.brand and siae.brand|lower != siae.name|lower %}
-                <small class="text-muted">({{ siae.name|title }})</small>
-            {% endif %}
-        </h3>
-        <p class="mb-2 text-muted">{{ siae.address_on_one_line }}</p>
-        <p class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center mb-0">
-            <span class="align-self-start">
-                <span class="badge badge-sm rounded-pill bg-primary">à {{ siae.distance|floatformat:"-1"|default:"12" }} km</span>
-                {% comment %}
-                The "default" distance of 12 kms above seems a little weird.
-                Having a default distance to any point does not make a lot of sense, either we have one between point A and B, or nothing.
-                But it seems that this template is used when an SIAE looks at itself, and the "distance" span is displayed as well.
-                We should have a chat someday with the designers to remove it, as it is probably confusing to just say 12kms from
-                no given point, all the time.
-                {% endcomment %}
-                <span class="text-muted fs-sm ms-1">de votre lieu de recherche.</span>
-            </span>
-            {% if siae.active_job_descriptions %}
-                <a class="d-none d-md-inline font-weight-bold mt-3 mt-md-0" href="{{ siae.get_card_url }}#metiers" {% matomo_event "candidature" "clic" "clic-metiers" %}>
-                    Voir tous les métiers ({{ siae.active_job_descriptions|length }})
-                </a>
-            {% endif %}
-        </p>
-    </div>
-    <div class="card-body">
-        {% if not siae.has_active_members %}
-            <p class="mb-0">
-                <i>Cet employeur n'est actuellement pas inscrit sur le site des emplois de l’inclusion, vous ne pouvez pas déposer de candidature en ligne</i>
-            </p>
-        {% elif siae.block_job_applications %}
-            <p class="mb-0">
-                <i>Cet employeur ne traite plus de nouvelles candidatures pour le moment</i>
-            </p>
-        {% else %}
-            {% if siae.active_job_descriptions %}
-                {% include "companies/includes/_list_siae_actives_jobs.html" with jobs_descriptions=siae.active_job_descriptions %}
-            {% else %}
-                <div class="d-flex justify-content-between align-items-center">
-                    <span>Cette structure vous intéresse ?</span>
-                    <a class="btn btn-sm btn-primary"
-                       href="{% url 'apply:start' company_pk=siae.pk %}"
-                       {% matomo_event "candidature" "clic" "start_application" %}
-                       aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">Postuler</a>
+<div class="c-box c-box--results has-links-inside mb-3 mb-md-4">
+    <div class="c-box--results__header">
+        {% if siae.kind in ea_eatt_kinds %}<div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">{% endif %}
+            <div class="c-box--results__summary{% if siae.kind in ea_eatt_kinds %} flex-grow-1{% endif %}">
+                <i class="ri-community-line" aria-hidden="true"></i>
+                <div>
+                    {% if siae.is_opcs %}
+                        <span>Offres clauses sociales</span>
+                    {% else %}
+                        <span>
+                            {{ siae.kind }} - {{ siae.get_kind_display }}
+                            {# Display non-user-edited name too, but only if it's not the same text #}
+                            {% if siae.brand and siae.brand|lower != siae.name|lower %}<small>&nbsp;({{ siae.name|title }})</small>{% endif %}
+                        </span>
+                    {% endif %}
+                    <h3>{{ siae.display_name }}</h3>
                 </div>
-            {% endif %}
+            </div>
+            {% if siae.kind in ea_eatt_kinds %}
+                <div>
+                    <span class="badge badge-sm rounded-pill bg-accent-01-lightest text-accent-01">Priorité aux bénéficiaires de la RQTH</span>
+                </div>
+            </div>
         {% endif %}
+        <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
+            <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
+                <li>
+                    <i class="ri-navigation-line font-weight-normal me-1"></i>
+                    à <strong class="text-info mx-1">{{ siae.distance|floatformat:"-1"|default:"12" }}&nbsp;km</strong> de votre lieu de recherche
+                    {% comment %}
+                    The "default" distance of 12 kms above seems a little weird.
+                    Having a default distance to any point does not make a lot of sense, either we have one between point A and B, or nothing.
+                    But it seems that this template is used when an SIAE looks at itself, and the "distance" span is displayed as well.
+                    We should have a chat someday with the designers to remove it, as it is probably confusing to just say 12kms from
+                    no given point, all the time.
+                    {% endcomment %}
+                </li>
+                <li>
+                    <i class="ri-map-pin-2-line font-weight-normal me-1"></i>
+                    <address class="m-0">{{ siae.address_on_one_line }}</address>
+                </li>
+            </ul>
+            <div>
+                <a href="{{ siae.get_card_url }}" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap" {% matomo_event "candidature" "clic" "clic-structure" %}>Voir la fiche de l'entreprise</a>
+            </div>
+        </div>
     </div>
+    <hr class="m-0">
+
+    {% if not siae.has_active_members %}
+        <div class="c-box--results__body">
+            <div class="c-info mt-2">
+                <span class="c-info__summary">Cet employeur n'est actuellement pas inscrit sur le site des emplois de l’inclusion, vous ne pouvez pas déposer de candidature en ligne</span>
+            </div>
+        </div>
+    {% elif siae.block_job_applications %}
+        <div class="c-box--results__body">
+            <div class="c-info mt-2">
+                <span class="c-info__summary">Cet employeur ne traite plus de nouvelles candidatures pour le moment</span>
+            </div>
+        </div>
+    {% elif siae.active_job_descriptions %}
+        <div class="c-box--results__body">
+            <ul class="list-group list-group-flush list-group-link">
+                {% for job in siae.active_job_descriptions|slice:":3" %}
+                    {% include "companies/includes/_list_siae_actives_jobs_row.html" with job=job %}
+                {% endfor %}
+            </ul>
+            {% if siae.active_job_descriptions|length > 3 %}
+                <ul class="list-group list-group-flush list-group-link collapse" id="collapseMoreJobs_{{ siae.pk }}">
+                    {% for job in siae.active_job_descriptions|slice:"3:" %}
+                        {% include "companies/includes/_list_siae_actives_jobs_row.html" with job=job %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if siae.active_job_descriptions and siae.active_job_descriptions|length > 3 %}
+        <div class="c-box--results__footer">
+            <button class="btn btn-link has-collapse-caret btn-block"
+                    type="button"
+                    data-it-collapse-text-show="Voir"
+                    data-it-collapse-text-hide="Masquer"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapseMoreJobs_{{ siae.pk }}"
+                    aria-expanded="false"
+                    aria-controls="collapseMoreJobs_{{ siae.pk }}"
+                    aria-label="Voir ou masquer les autres métiers">
+                les {{ siae.active_job_descriptions|length|add:"-3" }} autres métiers
+            </button>
+        </div>
+    {% endif %}
+
+    {% if siae.has_active_members and not siae.block_job_applications and not siae.active_job_descriptions %}
+        <div class="c-box--results__footer">
+            <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                <p class="mb-3 mb-md-0">Cette structure vous intéresse ?</p>
+                <a class="btn btn-ico btn-primary"
+                   href="{% url 'apply:start' company_pk=siae.pk %}"
+                   {% matomo_event "candidature" "clic" "start_application" %}
+                   aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                    <i class="ri ri-draft-line" aria-hidden="true"></i>
+                    <span>Postuler</span>
+                </a>
+            </div>
+        </div>
+    {% endif %}
 </div>
