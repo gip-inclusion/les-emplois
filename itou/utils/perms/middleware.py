@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
@@ -84,7 +84,7 @@ class ItouCurrentOrganizationMiddleware:
                     # SIAE user has no active SIAE and thus must not be able to access any page,
                     # thus we force a logout with a few exceptions (cf skip_middleware_conditions)
                     if not active_memberships:
-                        redirect_message = format_html(
+                        redirect_message = mark_safe(
                             "Nous sommes désolés, votre compte n'est "
                             "actuellement rattaché à aucune structure.<br>"
                             "Nous espérons cependant avoir l'occasion de vous accueillir de "
@@ -126,7 +126,7 @@ class ItouCurrentOrganizationMiddleware:
                     request.session,
                 )
                 if not request.current_organization:
-                    redirect_message = format_html(
+                    redirect_message = mark_safe(
                         "Nous sommes désolés, votre compte n'est "
                         "actuellement rattaché à aucune structure.<br>"
                         "Nous espérons cependant avoir l'occasion de vous accueillir de "
