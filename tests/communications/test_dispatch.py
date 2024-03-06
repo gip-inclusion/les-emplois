@@ -1,9 +1,8 @@
 from django.core import mail
-from django.core.exceptions import ImproperlyConfigured
 
 from itou.communications import registry as notifications_registry
 from itou.communications.apps import sync_notifications
-from itou.communications.dispatch.base import BaseNotification, NotificationMetaclass
+from itou.communications.dispatch.base import BaseNotification
 from itou.communications.dispatch.email import EmailNotification
 from itou.communications.dispatch.utils import (
     EmployerNotification,
@@ -15,40 +14,7 @@ from itou.communications.models import NotificationRecord, NotificationSettings
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase
 
-
-class FakeNotificationClassesMixin:
-    def setUp(self):
-        class TestNotification(BaseNotification, metaclass=NotificationMetaclass):
-            pass
-
-        class TestOtherNotification(BaseNotification, metaclass=NotificationMetaclass):
-            REQUIRED = BaseNotification.REQUIRED + ["required_attribute"]
-
-        self.TestNotification = TestNotification
-        self.TestOtherNotification = TestOtherNotification
-
-
-class NotificationMetaclassTest(FakeNotificationClassesMixin, TestCase):
-    def test_required_attributes_validation_one(self):
-        expected_message = "ErrorNotification must define the following attrs: 'category'."
-        with self.assertRaisesMessage(ImproperlyConfigured, expected_message):
-
-            class ErrorNotification(self.TestNotification):
-                name = "Test"
-
-    def test_required_attributes_validation_many(self):
-        expected_message = "ErrorNotification must define the following attrs: 'name', 'category'."
-        with self.assertRaisesMessage(ImproperlyConfigured, expected_message):
-
-            class ErrorNotification(self.TestNotification):
-                pass
-
-    def test_required_attributes_validation_others(self):
-        expected_message = "ErrorNotification must define the following attrs: 'name', 'required_attribute'."
-        with self.assertRaisesMessage(ImproperlyConfigured, expected_message):
-
-            class ErrorNotification(self.TestOtherNotification):
-                category = "Test"
+from .utils import FakeNotificationClassesMixin
 
 
 class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
@@ -57,12 +23,12 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
         self.user = PrescriberFactory(email="testuser@beta.gouv.fr", membership=True)
         self.organization = self.user.prescriberorganization_set.first()
 
-        @notifications_registry.register()
+        @notifications_registry.register
         class ManageableNotification(self.TestNotification):
             name = "Manageable"
             category = "Manageable"
 
-        @notifications_registry.register()
+        @notifications_registry.register
         class NonManageableNotification(self.TestNotification):
             name = "NonManageable"
             category = "NonManageable"
@@ -72,6 +38,10 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
         self.NonManageableNotification = NonManageableNotification
 
         sync_notifications(NotificationRecord)
+
+    def tearDown(self):
+        notifications_registry.unregister(self.ManageableNotification)
+        notifications_registry.unregister(self.NonManageableNotification)
 
     def test_method_init(self):
         with self.assertRaisesMessage(
@@ -100,12 +70,6 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
             == "<ManageableNotification testuser@beta.gouv.fr: Manageable>"
         )
 
-    def test_method_get_class_path(self):
-        assert (
-            self.ManageableNotification(self.user).get_class_path()
-            == "tests.communications.test_dispatch.ManageableNotification"
-        )
-
     def test_method_is_manageable_by_user(self):
         assert self.ManageableNotification(self.user, self.organization).is_manageable_by_user()
         assert not self.NonManageableNotification(self.user, self.organization).is_manageable_by_user()
@@ -119,7 +83,7 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
         settings.disabled_notifications.set(
             [
                 NotificationRecord.objects.get(
-                    notification_class=self.NonManageableNotification(self.user).get_class_path()
+                    notification_class=self.NonManageableNotification(self.user).__class__.__name__
                 )
             ]
         )
@@ -132,7 +96,7 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
         settings.disabled_notifications.set(
             [
                 NotificationRecord.objects.get(
-                    notification_class=self.ManageableNotification(self.user).get_class_path()
+                    notification_class=self.ManageableNotification(self.user).__class__.__name__
                 )
             ]
         )
@@ -159,14 +123,14 @@ class EmailNotificationTest(FakeNotificationClassesMixin, TestCase):
         self.user = PrescriberFactory(email="testuser@beta.gouv.fr", membership=True)
         self.organization = self.user.prescriberorganization_set.first()
 
-        @notifications_registry.register()
+        @notifications_registry.register
         class ManageableNotification(EmailNotification):
             name = "Manageable"
             category = "Manageable"
             subject_template = "layout/base_email_text_subject.txt"
             body_template = "layout/base_email_text_body.txt"
 
-        @notifications_registry.register()
+        @notifications_registry.register
         class NonManageableNotification(EmailNotification):
             name = "NonManageable"
             category = "NonManageable"
@@ -178,6 +142,10 @@ class EmailNotificationTest(FakeNotificationClassesMixin, TestCase):
         self.NonManageableNotification = NonManageableNotification
 
         sync_notifications(NotificationRecord)
+
+    def tearDown(self):
+        notifications_registry.unregister(self.ManageableNotification)
+        notifications_registry.unregister(self.NonManageableNotification)
 
     def test_method_build(self):
         email = self.ManageableNotification(self.user, self.organization).build()
@@ -199,18 +167,16 @@ class ProfiledNotificationTest(TestCase):
         self.prescriber = PrescriberFactory(membership=True)
         self.prescriber_structure = self.prescriber.prescriberorganization_set.first()
 
-        class TestJobSeekerNotification(JobSeekerNotification, BaseNotification, metaclass=NotificationMetaclass):
+        class TestJobSeekerNotification(JobSeekerNotification, BaseNotification):
             pass
 
-        class TestEmployerNotification(EmployerNotification, BaseNotification, metaclass=NotificationMetaclass):
+        class TestEmployerNotification(EmployerNotification, BaseNotification):
             pass
 
-        class TestPrescriberNotification(PrescriberNotification, BaseNotification, metaclass=NotificationMetaclass):
+        class TestPrescriberNotification(PrescriberNotification, BaseNotification):
             pass
 
-        class TestPrescriberOrEmployerNotification(
-            PrescriberOrEmployerNotification, BaseNotification, metaclass=NotificationMetaclass
-        ):
+        class TestPrescriberOrEmployerNotification(PrescriberOrEmployerNotification, BaseNotification):
             pass
 
         self.TestJobSeekerNotification = TestJobSeekerNotification

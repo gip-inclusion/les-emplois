@@ -1,6 +1,6 @@
 from itou.communications import registry as notifications_registry
 from itou.communications.apps import sync_notifications
-from itou.communications.dispatch.base import BaseNotification, NotificationMetaclass
+from itou.communications.dispatch.base import BaseNotification
 from itou.communications.models import NotificationRecord, NotificationSettings
 from tests.companies.factories import CompanyMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
@@ -9,15 +9,15 @@ from tests.utils.test import TestCase
 
 class NotificationModelTest(TestCase):
     def setUp(self):
-        class TestNotification(BaseNotification, metaclass=NotificationMetaclass):
+        class TestNotification(BaseNotification):
             pass
 
-        @notifications_registry.register()
+        @notifications_registry.register
         class FirstNotification(TestNotification):
             name = "First"
             category = "First"
 
-        @notifications_registry.register()
+        @notifications_registry.register
         class SecondNotification(TestNotification):
             name = "Second"
             category = "Second"
@@ -26,6 +26,10 @@ class NotificationModelTest(TestCase):
         self.SecondNotification = SecondNotification
 
         sync_notifications(NotificationRecord)
+
+    def tearDown(self):
+        notifications_registry.unregister(self.FirstNotification)
+        notifications_registry.unregister(self.SecondNotification)
 
     def test_managers(self):
         assert NotificationRecord.objects.filter(category__in=["First", "Second"]).count() == 2

@@ -1,5 +1,6 @@
 from operator import attrgetter
 
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import autodiscover_modules
 
 
@@ -10,20 +11,28 @@ class NotificationRegistry:
     def __iter__(self):
         return iter(sorted(self._registry, key=attrgetter("category", "name")))
 
-    def register(self, notification_class=None):
-        def inner(notification_class):
-            from .dispatch.base import BaseNotification
+    def register(self, notification_class):
+        from .dispatch.base import BaseNotification
 
-            if not issubclass(notification_class, BaseNotification):
-                raise ValueError("Notification must subclass BaseNotification.")
+        if not issubclass(notification_class, BaseNotification):
+            raise ValueError("Notification must subclass BaseNotification.")
 
-            self._registry.append(notification_class)
-            return notification_class
+        if notification_class.__name__ in [registered.__name__ for registered in self]:
+            raise NameError(f"'{notification_class.__name__}' is already registered.")
 
-        if callable(notification_class):
-            return inner(notification_class)
-        else:
-            return inner
+        missing_required_attrs = []
+        for attr_name in getattr(notification_class, "REQUIRED", []):
+            if not hasattr(notification_class, attr_name):
+                missing_required_attrs.append(attr_name)
+
+        if missing_required_attrs:
+            missing_required_attrs_str = ", ".join([f"'{attr_name}'" for attr_name in missing_required_attrs])
+            raise ImproperlyConfigured(
+                f"{notification_class.__name__} must define the following attrs: {missing_required_attrs_str}."
+            )
+
+        self._registry.append(notification_class)
+        return notification_class
 
     def unregister(self, notification_class):
         self._registry.remove(notification_class)

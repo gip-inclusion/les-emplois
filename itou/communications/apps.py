@@ -32,7 +32,7 @@ def sync_notifications(notification_record_model):
             active_notification_records = []
             for notification_class in registry:
                 notification_record, created = notification_record_model.include_obsolete.update_or_create(
-                    notification_class=notification_class.get_class_path(),
+                    notification_class=notification_class.__name__,
                     defaults={
                         "name": notification_class.name,
                         "category": notification_class.category,

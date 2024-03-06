@@ -1,27 +1,3 @@
-from django.core.exceptions import ImproperlyConfigured
-
-
-class NotificationMetaclass(type):
-    def __new__(cls, name, bases, attrs, **kwargs):
-        new_class = super().__new__(cls, name, bases, attrs, **kwargs)
-
-        # Ensure initialization is only performed for concrete notification classes.
-        parents = [b for b in bases if isinstance(b, NotificationMetaclass)]
-        if not parents:
-            return new_class
-
-        missing_required_attrs = []
-        for attr_name in getattr(new_class, "REQUIRED", []):
-            if not hasattr(new_class, attr_name):
-                missing_required_attrs.append(attr_name)
-
-        if missing_required_attrs:
-            missing_required_attrs_str = ", ".join([f"'{attr_name}'" for attr_name in missing_required_attrs])
-            raise ImproperlyConfigured(f"{name} must define the following attrs: {missing_required_attrs_str}.")
-
-        return new_class
-
-
 class BaseNotification:
     REQUIRED = ["can_be_disabled", "name", "category"]
 
@@ -35,10 +11,6 @@ class BaseNotification:
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.user.email}: {self.name}>"
 
-    @classmethod
-    def get_class_path(cls):
-        return f"{cls.__module__}.{cls.__name__}"
-
     def is_manageable_by_user(self):
         return self.can_be_disabled
 
@@ -46,7 +18,7 @@ class BaseNotification:
         if self.is_manageable_by_user():
             return not (
                 self.user.notification_settings.for_structure(self.structure)
-                .filter(disabled_notifications__notification_class=self.get_class_path())
+                .filter(disabled_notifications__notification_class=self.__class__.__name__)
                 .exists()
             )
         return True

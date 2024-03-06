@@ -1,9 +1,9 @@
 from itou.utils.emails import get_email_message
 
-from .base import BaseNotification, NotificationMetaclass
+from .base import BaseNotification
 
 
-class EmailNotification(BaseNotification, metaclass=NotificationMetaclass):
+class EmailNotification(BaseNotification):
     REQUIRED = BaseNotification.REQUIRED + ["subject_template", "body_template"]
 
     def build(self):
