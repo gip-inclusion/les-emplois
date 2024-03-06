@@ -322,7 +322,7 @@ class EditUserNotificationForm(forms.Form):
         previous_category = None
         for notification_class in notification_registry:
             notification = notification_class(self.user, self.structure)
-            notification_class_path = notification.get_class_path()
+            notification_class_name = notification_class.__name__
             category_slug = slugify(notification.category)
 
             if notification.is_manageable_by_user():
@@ -331,7 +331,7 @@ class EditUserNotificationForm(forms.Form):
                     self.fields[f"category-{category_slug}-all"] = forms.BooleanField(
                         required=False,
                         label="Toutes les notifications",
-                        initial=False if notification_class_path in disabled_notifications else True,
+                        initial=False if notification_class_name in disabled_notifications else True,
                         widget=forms.CheckboxInput(
                             attrs={
                                 "class": f"category-{category_slug} category-grouper",
@@ -342,10 +342,10 @@ class EditUserNotificationForm(forms.Form):
                     )
                     self.layout[category_slug] = {"name": notification.category, "notifications": []}
 
-                self.fields[notification_class_path] = forms.BooleanField(
+                self.fields[notification_class_name] = forms.BooleanField(
                     required=False,
                     label=notification.name,
-                    initial=False if notification_class_path in disabled_notifications else True,
+                    initial=False if notification_class_name in disabled_notifications else True,
                     widget=forms.CheckboxInput(
                         attrs={
                             "class": f"category-{category_slug}",
@@ -353,7 +353,7 @@ class EditUserNotificationForm(forms.Form):
                         }
                     ),
                 )
-                self.layout[category_slug]["notifications"].append(notification_class_path)
+                self.layout[category_slug]["notifications"].append(notification_class_name)
 
     def save(self):
         notification_settings = NotificationSettings.get_or_create(self.user, self.structure)
