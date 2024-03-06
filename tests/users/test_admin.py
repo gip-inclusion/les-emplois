@@ -13,7 +13,7 @@ def test_filter():
     filter = admin.IsPECertifiedFilter(
         None,
         {"is_pe_certified": "yes"},
-        JobSeekerProfile(),
+        JobSeekerProfile,
         admin.JobSeekerProfileAdmin,
     )
     profiles = filter.queryset(None, JobSeekerProfile.objects.all())
@@ -22,7 +22,7 @@ def test_filter():
     filter = admin.IsPECertifiedFilter(
         None,
         {"is_pe_certified": "no"},
-        JobSeekerProfile(),
+        JobSeekerProfile,
         admin.JobSeekerProfileAdmin,
     )
     profiles = filter.queryset(None, JobSeekerProfile.objects.all())
@@ -31,7 +31,7 @@ def test_filter():
     filter = admin.IsPECertifiedFilter(
         None,
         {},
-        JobSeekerProfile(),
+        JobSeekerProfile,
         admin.JobSeekerProfileAdmin,
     )
     profiles = filter.queryset(None, JobSeekerProfile.objects.all())
