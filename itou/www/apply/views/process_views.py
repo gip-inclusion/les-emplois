@@ -240,7 +240,7 @@ def process(request, job_application_id):
 
 @login_required
 def refuse(request, job_application_id, template_name="apply/process_refuse.html"):
-    queryset = JobApplication.objects.is_active_company_member(request.user)
+    queryset = JobApplication.objects.is_active_company_member(request.user).select_related("job_seeker")
     job_application = get_object_or_404(queryset, id=job_application_id)
 
     form = RefusalForm(job_application=job_application, data=request.POST or None)
@@ -252,7 +252,11 @@ def refuse(request, job_application_id, template_name="apply/process_refuse.html
             job_application.answer = form.cleaned_data["answer"]
             job_application.answer_to_prescriber = form.cleaned_data.get("answer_to_prescriber", "")
             job_application.refuse(user=request.user)
-            messages.success(request, "Modification effectuée.")
+            messages.success(
+                request,
+                f"La candidature de {job_application.job_seeker.get_full_name()} a bien été déclinée.",
+                extra_tags="toast",
+            )
         except xwf_models.InvalidTransitionError:
             messages.error(request, "Action déjà effectuée.")
 
@@ -280,7 +284,11 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
             # After each successful transition, a save() is performed by django-xworkflows.
             job_application.answer = form.cleaned_data["answer"]
             job_application.postpone(user=request.user)
-            messages.success(request, "Modification effectuée.")
+            messages.success(
+                request,
+                f"La candidature de {job_application.job_seeker.get_full_name()} a bien été mise en liste d'attente.",
+                extra_tags="toast",
+            )
         except xwf_models.InvalidTransitionError:
             messages.error(request, "Action déjà effectuée.")
 
