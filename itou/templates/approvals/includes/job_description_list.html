@@ -1,3 +1,5 @@
+{% load str_filters %}
+
 {% with all_jobs=job_application.selected_jobs.all %}
     {% if all_jobs|length == 0 %}
         <div class="c-info c-info--secondary">
@@ -10,13 +12,13 @@
                     data-bs-target="#collapse-job-application-{{ job_application.id }}"
                     aria-expanded="false"
                     aria-controls="collapse-job-application-{{ job_application.id }}">
-                <span>{{ all_jobs|length }} postes recherchés</span>
+                <span>{{ all_jobs|length }} poste{{ all_jobs|pluralizefr }} recherché{{ all_jobs|pluralizefr }}</span>
             </button>
             <div class="c-info__detail collapse" id="collapse-job-application-{{ job_application.id }}">
                 <ul class="list-unstyled">
                     {% for job in all_jobs %}
                         <li class="d-flex gap-2">
-                            <span class="flex-grow-1 has-ellipsis">{{ job.display_name }}<</span>
+                            <span class="flex-grow-1 has-ellipsis">{{ job.display_name }}</span>
                             <span class="text-nowrap">
                                 <i class="ri-map-pin-2-line ri-sm me-1" aria-hidden="true"></i>
                                 {% if job.location %}
