@@ -258,7 +258,7 @@ def refuse(request, job_application_id, template_name="apply/process_refuse.html
                 extra_tags="toast",
             )
         except xwf_models.InvalidTransitionError:
-            messages.error(request, "Action déjà effectuée.")
+            messages.error(request, "Action déjà effectuée.", extra_tags="toast")
 
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
         return HttpResponseRedirect(next_url)
@@ -290,7 +290,7 @@ def postpone(request, job_application_id, template_name="apply/process_postpone.
                 extra_tags="toast",
             )
         except xwf_models.InvalidTransitionError:
-            messages.error(request, "Action déjà effectuée.")
+            messages.error(request, "Action déjà effectuée.", extra_tags="toast")
 
         next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
         return HttpResponseRedirect(next_url)
@@ -395,7 +395,7 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
             job_application.cancel(user=request.user)
             messages.success(request, "L'embauche a bien été annulée.", extra_tags="toast")
         except xwf_models.InvalidTransitionError:
-            messages.error(request, "Action déjà effectuée.")
+            messages.error(request, "Action déjà effectuée.", extra_tags="toast")
         return HttpResponseRedirect(next_url)
 
     context = {
@@ -439,9 +439,9 @@ def archive(request, job_application_id):
             job_application.save()
 
             success_message = f"La candidature de {username} chez {siae_name} a bien été supprimée."
-            messages.success(request, success_message)
+            messages.success(request, success_message, extra_tags="toast")
         except xwf_models.InvalidTransitionError:
-            messages.error(request, "Action déjà effectuée.")
+            messages.error(request, "Action déjà effectuée.", extra_tags="toast")
 
     return HttpResponseRedirect(next_url)
 
@@ -469,6 +469,7 @@ def transfer(request, job_application_id):
             request,
             "Une erreur est survenue lors du transfert de la candidature : "
             f"{ job_application= }, { target_company= }, { ex= }",
+            extra_tags="toast",
         )
 
     return HttpResponseRedirect(back_url)
