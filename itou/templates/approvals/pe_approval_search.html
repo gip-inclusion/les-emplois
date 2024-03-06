@@ -4,36 +4,39 @@
 
 {% block title %}Prolonger ou suspendre un agrément émis par Pôle emploi {{ block.super }}{% endblock %}
 
-{% block content_title %}
-    <h1>Prolonger ou suspendre un agrément émis par Pôle emploi</h1>
-    <p>
-        Cette fonction est destinée à prolonger ou suspendre un agrément émis par Pôle emploi pour un salarié déjà présent dans vos effectifs (donc déjà déclaré dans l’ASP)
-    </p>
-{% endblock %}
+{% block content_title %}<h1>Prolonger ou suspendre un agrément émis par Pôle emploi</h1>{% endblock %}
 
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    {% if number %}
-
-                        <div class="alert alert-danger">
-                            <p class="mb-0">
-                                Nous n'avons pas trouvé d'agrément en cours de validité avec le numéro <strong>{{ number }}</strong>.
-                            </p>
-                        </div>
-                        <p>
-                            S'il s'agit bien d'un numéro d'agrément Pôle emploi, vous pouvez <a href="{{ ITOU_HELP_CENTER_URL }}/requests/new" rel="noopener" target="_blank" aria-label="Contacter le support (ouverture dans un nouvel onglet)">contacter le support</a><i class="ri-external-link-line ms-1"></i>.
-                        </p>
-
-                    {% endif %}
-
                     <div class="c-form">
+                        <p>
+                            Cette fonction est destinée à prolonger ou suspendre un agrément émis par Pôle emploi pour un salarié déjà présent dans vos effectifs (donc déjà déclaré dans l’ASP).
+                        </p>
+                        <hr class="mb-3">
+
+                        {% if number %}
+                            <div class="alert alert-danger">
+                                <div class="row">
+                                    <div class="col-auto pe-0">
+                                        <i class="ri-error-warning-line ri-xl text-danger"></i>
+                                    </div>
+                                    <div class="col">
+                                        <p class="mb-2">
+                                            <strong>Numéro d’agrément introuvable</strong>
+                                        </p>
+                                        <p class="mb-2">Nous n'avons pas trouvé d'agrément en cours de validité avec le numéro {{ number }}.</p>
+                                        <p>
+                                            S'il s'agit bien d'un numéro d'agrément Pôle emploi, vous pouvez <a href="{{ ITOU_HELP_CENTER_URL }}/requests/new" rel="noopener" target="_blank" aria-label="Contacter le support (ouverture dans un nouvel onglet)">contacter le support</a><i class="ri-external-link-line ms-1"></i>.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
                         <form method="get" role="form" class="js-prevent-multiple-submit">
-
                             {% bootstrap_form form alert_error_type="all" %}
-
                             {% itou_buttons_form primary_label="Rechercher" %}
                         </form>
                     </div>

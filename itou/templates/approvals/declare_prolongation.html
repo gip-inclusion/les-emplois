@@ -34,7 +34,7 @@
                             {% endfor %}
 
                             {# Show the user a preview of the prolongation. #}
-                            <div class="card my-3 text-center">
+                            <div class="card my-3">
                                 <div class="card-body">
                                     <h5 class="h4 card-title">
                                         Vous êtes sur le point de déclarer une prolongation de PASS IAE pour la raison suivante :
@@ -53,17 +53,34 @@
                                             ({{ form.instance.validated_by.email }})
                                         </p>
                                     {% endif %}
+                                    <hr>
+                                    <p>
+                                        En confirmant cette déclaration je certifie sur l'honneur que le motif de prolongation choisi correspond à la situation du salarié.
+                                    </p>
+                                    {# TODO(cms): refactor buttons_form template tag to use it here. #}
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="form-row align-items-center justify-content-end gx-3">
+                                                <div class="form-group col-12 col-lg order-3 order-lg-1">
+                                                    <button type="submit" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" aria-label="Annuler la saisie de ce formulaire" name="edit" value="1">
+                                                        <i class="ri-close-line ri-lg" aria-hidden="true"></i>
+                                                        <span>Annuler</span>
+                                                    </button>
+                                                </div>
+                                                <div class="form-group col col-lg-auto order-1 order-lg-2">
+                                                    <a href="{{ back_url }}" class="btn btn-block btn-outline-primary" aria-label="Retourner à l'étape précédente">
+                                                        <span>Retour</span>
+                                                    </a>
+                                                </div>
+                                                <div class="form-group col col-lg-auto order-2 order-lg-3">
+                                                    <button type="submit" class="btn btn-block btn-primary" aria-label="Valider la prolongation" name="save" value="1">
+                                                        <span>Confirmer la déclaration</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div class="alert alert-warning" role="status">
-                                <p>
-                                    En confirmant cette déclaration je certifie sur l'honneur que le motif de prolongation choisi correspond à la situation du salarié.
-                                </p>
-                                {# Allow the user to modify the prolongation: edit=1. #}
-                                {% bootstrap_button "Annuler" button_type="submit" button_class="btn btn-secondary" name="edit" value="1" %}
-                                {# Create a prolongation: save=1. #}
-                                {% bootstrap_button "Confirmer la déclaration" button_type="submit" button_class="btn btn-primary" name="save" value="1" %}
                             </div>
                         </form>
                     {% endif %}
