@@ -72,6 +72,9 @@ from tests.users.factories import (
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 
 
+DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
+
+
 @pytest.mark.usefixtures("unittest_compatibility")
 class DashboardViewTest(TestCase):
     NO_PRESCRIBER_ORG_MSG = "Votre compte utilisateur n’est rattaché à aucune organisation."
@@ -802,7 +805,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         # There's a specific view to edit the email so we don't show it here
         self.assertNotContains(response, self.EMAIL_LABEL)
         # Check that the NIR field is disabled
-        self.assertContains(response, f'disabled id="{self.NIR_FIELD_ID}"')
+        self.assertContains(response, DISABLED_NIR)
         self.assertContains(response, self.LACK_OF_NIR_FIELD_ID)
         self.assertContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
         self.assertContains(response, self.BIRTHDATE_FIELD_NAME)
@@ -978,7 +981,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
         # Check that the NIR field is disabled (it can be reenabled via lack_of_nir check box)
-        self.assertContains(response, 'disabled id="id_nir"')
+        self.assertContains(response, DISABLED_NIR)
         self.assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label, html=True)
         self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
 
@@ -1370,7 +1373,7 @@ class EditJobSeekerInfo(TestCase):
 
         response = self.client.get(url)
         self.assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label, html=True)
-        self.assertContains(response, 'disabled id="id_nir"')
+        self.assertContains(response, DISABLED_NIR)
         self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
 
         NEW_NIR = "1 970 13625838386"

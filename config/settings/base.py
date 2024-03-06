@@ -5,6 +5,7 @@ https://docs.djangoproject.com/en/dev/ref/settings
 
 import json
 import os
+import warnings
 
 from dotenv import load_dotenv
 
@@ -106,6 +107,9 @@ INSTALLED_APPS = [
     "itou.analytics",
 ]
 
+# TODO: Remove with Django 6.0
+warnings.filterwarnings("ignore", "The FORMS_URLFIELD_ASSUME_HTTPS transitional setting is deprecated.")
+FORMS_URLFIELD_ASSUME_HTTPS = True
 
 MIDDLEWARE = [
     # Generate request Id

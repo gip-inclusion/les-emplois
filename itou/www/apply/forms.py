@@ -577,6 +577,8 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
                     job_applications_enums.QualificationLevel.NOT_RELEVANT
                 )
                 self.fields["qualification_level"].choices.pop(idx)
+                # Needed to trigger the property.setter
+                self.fields["qualification_level"].choices = self.fields["qualification_level"].choices
 
             self.fields["inverted_vae_contract"].widget = forms.CheckboxInput()
             self.fields["inverted_vae_contract"].disabled = not (
