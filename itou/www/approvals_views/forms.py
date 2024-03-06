@@ -8,7 +8,6 @@ from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef, Q, TextChoices
 from django.shortcuts import reverse
 from django.utils import timezone
-from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django_select2.forms import Select2MultipleWidget
 
@@ -143,14 +142,14 @@ class CreateProlongationForm(forms.ModelForm):
         },
         ProlongationReason.COMPLETE_TRAINING: {
             "max_duration": timedelta(days=365),
-            "help_text": format_html(
+            "help_text": mark_safe(
                 "12 mois (365 jours) maximum pour chaque demande.<br> "
                 "Renouvellements possibles jusqu’à la fin de l’action de formation."
             ),
         },
         ProlongationReason.RQTH: {
             "max_duration": timedelta(days=365),
-            "help_text": format_html(
+            "help_text": mark_safe(
                 "12 mois (365 jours) maximum pour chaque demande.<br> "
                 "Renouvellements possibles dans la limite de 5 ans de parcours IAE "
                 "(2 ans de parcours initial + 3 ans (1095 jours))."
@@ -158,7 +157,7 @@ class CreateProlongationForm(forms.ModelForm):
         },
         ProlongationReason.SENIOR: {
             "max_duration": timedelta(days=365),
-            "help_text": format_html(
+            "help_text": mark_safe(
                 "12 mois (365 jours) maximum pour chaque demande.<br> "
                 "Renouvellements possibles dans la limite de 7 ans de parcours IAE "
                 "(2 ans de parcours initial + 5 ans (1825 jours))."
@@ -166,7 +165,7 @@ class CreateProlongationForm(forms.ModelForm):
         },
         ProlongationReason.PARTICULAR_DIFFICULTIES: {
             "max_duration": timedelta(days=365),
-            "help_text": format_html(
+            "help_text": mark_safe(
                 "12 mois (365 jours) maximum pour chaque demande.<br> "
                 "Renouvellements possibles dans la limite de 5 ans de parcours IAE "
                 "(2 ans de parcours initial + 3 ans (1095 jours))."
