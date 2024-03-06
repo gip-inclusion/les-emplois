@@ -156,15 +156,6 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
                 job_application.geiq_eligibility_diagnosis = geiq_eligibility_diagnosis
                 job_application.save(update_fields=["geiq_eligibility_diagnosis"])
 
-        external_link = get_external_link_markup(
-            url=job_application.to_company.accept_survey_url,
-            text="Je donne mon avis",
-        )
-        messages.warning(
-            request,
-            mark_safe(f"Êtes-vous satisfait des emplois de l'inclusion ? {external_link}"),
-        )
-
         if creating and siae.is_subject_to_eligibility_rules and job_application.approval:
             final_url = reverse("approvals:detail", kwargs={"pk": job_application.approval.pk})
         else:
