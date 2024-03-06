@@ -1,10 +1,4 @@
 # serializer version: 1
 # name: CreateEmployeeRecordStep5Test.test_employee_record_status
-  Message(
-    extra_tags='toast',
-    level=25,
-    level_tag='success',
-    message="La création de cette fiche salariée est terminée||Vous pouvez suivre l'avancement de son traitement par l'ASP en sélectionnant les différents statuts.",
-    tags='toast success',
-  )
+  Message(level=25, message="La création de cette fiche salariée est terminée||Vous pouvez suivre l'avancement de son traitement par l'ASP en sélectionnant les différents statuts.", extra_tags='toast')
 # ---

@@ -12,7 +12,7 @@ def test_filter():
 
     filter = admin.IsPECertifiedFilter(
         None,
-        {"is_pe_certified": "yes"},
+        {"is_pe_certified": ["yes"]},
         JobSeekerProfile,
         admin.JobSeekerProfileAdmin,
     )
@@ -21,7 +21,7 @@ def test_filter():
 
     filter = admin.IsPECertifiedFilter(
         None,
-        {"is_pe_certified": "no"},
+        {"is_pe_certified": ["no"]},
         JobSeekerProfile,
         admin.JobSeekerProfileAdmin,
     )

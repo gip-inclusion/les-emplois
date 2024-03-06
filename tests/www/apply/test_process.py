@@ -55,7 +55,7 @@ from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import TestCase, assertMessages, parse_response_to_soup
 
 
-DISABLED_NIR = 'disabled id="id_nir"'
+DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
 PRIOR_ACTION_SECTION_TITLE = "Action préalable à l'embauche"
 REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_TITLE = "L’employeur a refusé la candidature avec le motif “Autre”."
 REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY = (
