@@ -193,7 +193,7 @@ def _eligibility(request, siae, job_seeker, cancel_url, next_url, template_name,
             author_organization=request.current_organization,
             administrative_criteria=form_administrative_criteria.cleaned_data,
         )
-        messages.success(request, "Éligibilité confirmée !")
+        messages.success(request, "Éligibilité confirmée !", extra_tags="toast")
         return HttpResponseRedirect(next_url)
 
     context = {
