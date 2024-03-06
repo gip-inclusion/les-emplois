@@ -13,26 +13,32 @@
             Contrôler les pièces justificatives
         {% endif %}
     </h1>
-    {% if campaign_closed_before_final_evaluation %}
-        {% if evaluated_siae.state == "ACCEPTED" %}
-            <div class="alert alert-warning">
-                {{ evaluated_siae|capfirst }} a soumis des justificatifs, mais leur contrôle n’a pas été
-                validé avant la fin de la campagne “{{ evaluated_siae.evaluation_campaign.name }}”, le
-                résultat du contrôle est <b class="text-success">positif</b>.
+    {% if campaign_closed_before_final_evaluation or accepted_by_default %}
+        <div class="alert alert-info">
+            <div class="row">
+                <div class="col-auto pe-0">
+                    <i class="ri-information-line ri-xl text-info"></i>
+                </div>
+                <div class="col">
+                    <p>
+                        {% if campaign_closed_before_final_evaluation %}
+                            {% if evaluated_siae.state == "ACCEPTED" %}
+                                {{ evaluated_siae|capfirst }} a soumis des justificatifs, mais leur contrôle n’a pas été
+                                validé avant la fin de la campagne « {{ evaluated_siae.evaluation_campaign.name }} »,
+                                <b>le résultat du contrôle est positif</b>.
+                            {% else %}
+                                {# REFUSED #}
+                                {{ evaluated_siae|capfirst }} n’a pas soumis de justificatifs avant la fin de la
+                                campagne « {{ evaluated_siae.evaluation_campaign.name }} », <b>le résultat du contrôle
+                                est négatif</b>.
+                            {% endif %}
+                        {% elif accepted_by_default %}
+                            {{ evaluated_siae|capfirst }} a soumis des justificatifs, mais leur contrôle n’a pas été
+                            validé avant la fin de la phase amiable, <b>le résultat du contrôle est positif</b>.
+                        {% endif %}
+                    </p>
+                </div>
             </div>
-        {% else %}
-            {# REFUSED #}
-            <div class="alert alert-warning">
-                {{ evaluated_siae|capfirst }} n’a pas soumis de justificatifs avant la fin de la
-                campagne “{{ evaluated_siae.evaluation_campaign.name }}”, le résultat du contrôle est
-                <b class="text-danger">négatif</b>.
-            </div>
-        {% endif %}
-    {% elif accepted_by_default %}
-        <div class="alert alert-warning">
-            {{ evaluated_siae|capfirst }} a soumis des justificatifs, mais leur contrôle n’a pas été
-            validé avant la fin de la phase amiable, le résultat du contrôle est
-            <b class="text-success">positif</b>.
         </div>
     {% endif %}
 {% endblock %}

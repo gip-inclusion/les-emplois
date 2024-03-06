@@ -625,15 +625,15 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
     submit_text = "Valider"
     forced_positive_text = (
         "Les petits jardins a soumis des justificatifs, mais leur contrôle n’a pas été validé avant la fin de la "
-        'campagne “Contrôle Test”, le résultat du contrôle est <b class="text-success">positif</b>.'
+        "campagne « Contrôle Test », <b>le résultat du contrôle est positif</b>."
     )
     forced_positive_text_transition_to_adversarial_stage = (
         "Les petits jardins a soumis des justificatifs, mais leur contrôle n’a pas été validé avant la fin de la "
-        'phase amiable, le résultat du contrôle est <b class="text-success">positif</b>.'
+        "phase amiable, <b>le résultat du contrôle est positif</b>."
     )
     forced_negative_text = (
-        "Les petits jardins n’a pas soumis de justificatifs avant la fin de la campagne “Contrôle Test”, le résultat "
-        'du contrôle est <b class="text-danger">négatif</b>.'
+        "Les petits jardins n’a pas soumis de justificatifs avant la fin de la campagne « Contrôle Test », "
+        "<b>le résultat du contrôle est négatif</b>."
     )
 
     def setUp(self):
