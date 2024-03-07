@@ -43,6 +43,8 @@ htmx.onLoad((target) => {
         ".category-notifications input.notification-checkbox"
       );
 
+      this.allNotificationsInputElement.checked = this.isAllChecked();
+
       this.collapseInstance = bootstrap.Collapse.getOrCreateInstance(this.collapsibleElement, {
         toggle: false,
       });

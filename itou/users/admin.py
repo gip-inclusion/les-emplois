@@ -88,9 +88,13 @@ class CompanyMembershipInline(ItouTabularInline):
     @admin.display(description="Notifications désactivées")
     def disabled_notifications(self, obj):
         disabled_notifications = NotificationSettings.get_or_create(obj.user, obj.company).disabled_notifications_names
-        return mark_safe(
-            "<ul>" + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications]) + "<ul>"
-        )
+        if disabled_notifications:
+            return mark_safe(
+                "<ul class='notifications-summary'>"
+                + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications])
+                + "<ul>"
+            )
+        return "Aucune"
 
 
 class PrescriberMembershipInline(ItouTabularInline):
@@ -124,9 +128,13 @@ class PrescriberMembershipInline(ItouTabularInline):
         disabled_notifications = NotificationSettings.get_or_create(
             obj.user, obj.organization
         ).disabled_notifications_names
-        return mark_safe(
-            "<ul>" + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications]) + "<ul>"
-        )
+        if disabled_notifications:
+            return mark_safe(
+                "<ul class='notifications-summary'>"
+                + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications])
+                + "<ul>"
+            )
+        return "Aucune"
 
 
 class InstitutionMembershipInline(ItouTabularInline):
@@ -301,6 +309,9 @@ def add_support_remark_to_user(user, text):
 
 @admin.register(models.User)
 class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
+    class Media:
+        css = {"all": ("css/itou-admin.css",)}
+
     show_full_result_count = False
     add_form = ItouUserCreationForm
     change_form_template = "admin/users/change_user_form.html"
@@ -412,9 +423,13 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
         if obj.is_prescriber_with_authorized_org:
             return "Voir pour chaque organisation ci-dessous"
         disabled_notifications = NotificationSettings.get_or_create(obj).disabled_notifications_names
-        return mark_safe(
-            "<ul>" + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications]) + "<ul>"
-        )
+        if disabled_notifications:
+            return mark_safe(
+                "<ul class='notifications-summary'>"
+                + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications])
+                + "<ul>"
+            )
+        return "Aucune"
 
     @admin.action(description="Désactiver le compte IC pour changement prescripteur <-> employeur")
     def free_ic_email(self, request, queryset):
@@ -714,6 +729,9 @@ class JobSeekerProfileAdmin(InconsistencyCheckMixin, ItouModelAdmin):
     Inlines would only be possible the other way around
     """
 
+    class Media:
+        css = {"all": ("css/itou-admin.css",)}
+
     form = JobSeekerProfileAdminForm
 
     raw_id_fields = (
@@ -831,9 +849,13 @@ class JobSeekerProfileAdmin(InconsistencyCheckMixin, ItouModelAdmin):
     @admin.display(description="Notifications désactivées")
     def disabled_notifications(self, obj):
         disabled_notifications = NotificationSettings.get_or_create(obj.user).disabled_notifications_names
-        return mark_safe(
-            "<ul>" + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications]) + "<ul>"
-        )
+        if disabled_notifications:
+            return mark_safe(
+                "<ul class='notifications-summary'>"
+                + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications])
+                + "<ul>"
+            )
+        return "Aucune"
 
     def get_search_fields(self, request):
         search_fields = []
