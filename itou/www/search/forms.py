@@ -36,7 +36,7 @@ class SiaeSearchForm(forms.Form):
                 "class": "form-control",
                 "data-ajax--url": format_lazy("{}?select2=&slug=", reverse_lazy("autocomplete:cities")),
                 "data-minimum-input-length": 2,
-                "data-placeholder": "Un emploi inclusif autour de…",
+                "data-placeholder": "Rechercher un emploi inclusif autour de…",
             }
         ),
     )
@@ -144,7 +144,7 @@ class PrescriberSearchForm(forms.Form):
                 "class": "form-control",
                 "data-ajax--url": format_lazy("{}?select2=&slug=", reverse_lazy("autocomplete:cities")),
                 "data-minimum-input-length": 2,
-                "data-placeholder": "Un prescripteur autour de…",
+                "data-placeholder": "Rechercher un prescripteur autour de…",
             }
         ),
     )
