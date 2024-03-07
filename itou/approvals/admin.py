@@ -99,7 +99,7 @@ class JobApplicationInline(ItouStackedInline):
             return "La SIAE ne peut pas utiliser la gestion des fiches salarié"
 
         if not obj.create_employee_record:
-            return "Création désactivée"
+            return "Non proposé à la création"
 
         if obj.hiring_start_at and obj.hiring_start_at < EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date():
             return "Date de début du contrat avant l'interopérabilité"
