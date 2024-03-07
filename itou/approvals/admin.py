@@ -68,7 +68,7 @@ class JobApplicationInline(ItouStackedInline):
     # there is no direct relation between approvals and employee records
     # (YET...)
     @staticmethod
-    @admin.display(description="fiches salariés")
+    @admin.display(description="situation fiches salariés")
     def employee_record_status(obj):
         if obj.employee_record.exists():
             return mark_safe(
