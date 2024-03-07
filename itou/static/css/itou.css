@@ -49,6 +49,11 @@
     }
 }
 
+.input-group-search .select2-selection__rendered {
+    white-space: nowrap !important;
+}
+
+
 .input-group-search .select2-container--bootstrap-5 .select2-selection--single {
     border-left: 0 !important;
 }

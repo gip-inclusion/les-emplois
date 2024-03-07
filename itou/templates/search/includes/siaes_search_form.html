@@ -12,9 +12,9 @@
             </div>
             {{ form.city }}
             <div class="input-group-text bg-white p-0">
-                <button class="btn btn-ico {% if is_home %}btn-primary{% else %}btn-link{% endif %}">
+                <button class="btn btn-ico {% if is_home %}btn-primary{% else %}btn-link{% endif %}" aria-label="Rechercher un emploi inclusif">
                     <i class="ri-search-line font-weight-bold" aria-hidden="true"></i>
-                    <span>Rechercher</span>
+                    <span {% if is_home %}class="d-none d-sm-inline-flex me-0 me-sm-1"{% endif %}>Rechercher</span>
                 </button>
             </div>
         </div>
