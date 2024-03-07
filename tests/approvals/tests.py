@@ -1110,7 +1110,7 @@ class CustomApprovalAdminViewsTest(TestCase):
         # When employee record creation is disabled for that job application
         job_application = JobApplicationFactory(create_employee_record=False)
         msg = JobApplicationInline.employee_record_status(job_application)
-        assert msg == "Création désactivée"
+        assert msg == "Non proposé à la création"
 
         # When hiring start date is before employee record availability date
         job_application = JobApplicationFactory(hiring_start_at="2021-09-26")

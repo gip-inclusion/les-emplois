@@ -51,7 +51,7 @@ class Command(BaseCommand):
                     elif job_application.origin == Origin.AI_STOCK:
                         info = "Import AI"
                     elif not job_application.create_employee_record:
-                        info = "Création désactivée"
+                        info = "Non proposé à la création"
                     elif (
                         job_application.hiring_start_at
                         and job_application.hiring_start_at < EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date()
