@@ -43,10 +43,6 @@ class EmployeeRecordAdminForm(forms.ModelForm):
 class EmployeeRecordAdmin(ItouModelAdmin):
     form = EmployeeRecordAdminForm
 
-    @admin.action(description="Marquer les fiches salarié selectionnées comme COMPLETÉES")
-    def update_employee_record_as_ready(self, _request, queryset):
-        queryset.update(status=Status.READY)
-
     @admin.action(description="Planifier une notification de changement 'PASS IAE' pour ces fiches salarié")
     def schedule_approval_update_notification(self, request, queryset):
         total_created = 0
@@ -68,7 +64,6 @@ class EmployeeRecordAdmin(ItouModelAdmin):
             messages.success(request, f"{total_updated} notification{s} mise{s} à jour")
 
     actions = [
-        update_employee_record_as_ready,
         schedule_approval_update_notification,
     ]
 
