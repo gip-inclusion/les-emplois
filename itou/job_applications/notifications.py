@@ -1,7 +1,7 @@
 from django.db.models import Q
 
 from itou.common_apps.notifications.base_class import BaseNotification
-from itou.communications import registry as notifications_registry
+from itou.communications import NotificationCategory, registry as notifications_registry
 from itou.communications.dispatch import (
     EmailNotification,
     EmployerNotification,
@@ -157,7 +157,7 @@ class JobApplicationNewForJobSeekerNotification(JobSeekerNotification, EmailNoti
     """Notification sent to job seeker when created"""
 
     name = "Confirmation d’envoi de candidature"
-    category = "Candidature"
+    category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/new_for_job_seeker_subject.txt"
     body_template = "apply/email/new_for_job_seeker_body.txt"
 
@@ -167,7 +167,7 @@ class NewJobApplicationForPrescriberNotification(PrescriberNotification, EmailNo
     """Notification sent to prescriber when created"""
 
     name = "Confirmation d’envoi de candidature"
-    category = "Candidature"
+    category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/new_for_prescriber_subject.txt"
     body_template = "apply/email/new_for_prescriber_body.txt"
 
@@ -177,7 +177,7 @@ class JobApplicationNewForEmployerNotification(EmployerNotification, EmailNotifi
     """Notification sent to new employers when created"""
 
     name = "Confirmation d’envoi de candidature"
-    category = "Candidature"
+    category = NotificationCategory.JOB_APPLICATION
     # FIXME: update template names
     subject_template = "apply/email/new_for_company_subject.txt"
     body_template = "apply/email/new_for_company_body.txt"
@@ -188,7 +188,7 @@ class JobApplicationAcceptedForJobSeekerNotification(JobSeekerNotification, Emai
     """Notification sent to job seeker when accepted"""
 
     name = "Confirmation d’acceptation de candidature"
-    category = "Candidature"
+    category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/accept_for_job_seeker_subject.txt"
     body_template = "apply/email/accept_for_job_seeker_body.txt"
 
@@ -198,7 +198,7 @@ class JobApplicationAcceptedForPrescriberNotification(PrescriberNotification, Em
     """Notification sent to prescriber when accepted"""
 
     name = "Confirmation d’acceptation de candidature"
-    category = "Candidature"
+    category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/accept_for_proxy_subject.txt"
     body_template = "apply/email/accept_for_proxy_body.txt"
 
@@ -217,7 +217,7 @@ class JobApplicationRefusedForJobSeekerNotification(JobSeekerNotification, Email
     """Notification sent to job seeker when transferred"""
 
     name = "Refus de candidature"
-    category = "Candidature"
+    category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/refuse_subject.txt"
     body_template = "apply/email/refuse_body_for_job_seeker.txt"
 
@@ -227,7 +227,7 @@ class JobApplicationRefusedForPrescriberNotification(PrescriberNotification, Ema
     """Notification sent to prescriber when refused"""
 
     name = "Refus de candidature"
-    category = "Candidature"
+    category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/refuse_subject.txt"
     body_template = "apply/email/refuse_body_for_proxy.txt"
 
@@ -237,7 +237,7 @@ class JobApplicationTransferredForJobSeekerNotification(JobSeekerNotification, E
     """Notification sent to job seeker when transferred"""
 
     name = "Transfert de candidature"
-    category = "Candidature"
+    category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/transfer_job_seeker_subject.txt"
     body_template = "apply/email/transfer_job_seeker_body.txt"
 
@@ -247,7 +247,7 @@ class JobApplicationTransferredForPrescriberNotification(PrescriberNotification,
     """Notification sent to prescriber when transferred"""
 
     name = "Transfert de candidature"
-    category = "Candidature"
+    category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/transfer_prescriber_subject.txt"
     body_template = "apply/email/transfer_prescriber_body.txt"
 
@@ -257,7 +257,7 @@ class JobApplicationTransferredForEmployerNotification(EmployerNotification, Ema
     """Notification sent to original employer when transferred"""
 
     name = "Transfert de candidature"
-    category = "Candidature"
+    category = NotificationCategory.JOB_APPLICATION
     # FIXME: update template names
     subject_template = "apply/email/transfer_origin_company_subject.txt"
     body_template = "apply/email/transfer_origin_company_body.txt"
@@ -268,7 +268,7 @@ class JobApplicationCanceledForPrescriberNotification(PrescriberNotification, Em
     """Notification sent to prescriber when canceled"""
 
     name = "Embauche annulée"
-    category = "Candidature"
+    category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/cancel_subject.txt"
     body_template = "apply/email/cancel_body.txt"
 
@@ -278,6 +278,6 @@ class JobApplicationCanceledForEmployerNotification(EmployerNotification, EmailN
     """Notification sent to employer when canceled"""
 
     name = "Embauche annulée"
-    category = "Candidature"
+    category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/cancel_subject.txt"
     body_template = "apply/email/cancel_body.txt"

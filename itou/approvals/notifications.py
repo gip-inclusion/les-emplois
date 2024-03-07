@@ -2,7 +2,7 @@ from django.db.models import F
 from django.urls import reverse
 
 from itou.common_apps.notifications.base_class import BaseNotification
-from itou.communications import registry as notifications_registry
+from itou.communications import NotificationCategory, registry as notifications_registry
 from itou.communications.dispatch import EmailNotification, EmployerNotification
 from itou.prescribers.models import PrescriberMembership
 from itou.utils.emails import get_email_message
@@ -136,12 +136,9 @@ class ProlongationRequestDeniedJobSeeker(BaseNotification):
 @notifications_registry.register
 class PassAcceptedEmployerNotification(EmployerNotification, EmailNotification):
     name = "PASS IAE accepté"
-    category = "PASS IAE"
+    category = NotificationCategory.IAE_PASS
     subject_template = "approvals/email/deliver_subject.txt"
     body_template = "approvals/email/deliver_body.txt"
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def get_context(self):
         context = super().get_context()
@@ -158,6 +155,6 @@ class PassAcceptedEmployerNotification(EmployerNotification, EmailNotification):
 @notifications_registry.register
 class ProlongationRequestGrantedEmployerNotification(EmployerNotification, EmailNotification):
     name = "Demande de prolongation acceptée"
-    category = "PASS IAE"
+    category = NotificationCategory.IAE_PASS
     subject_template = "approvals/email/prolongation_request/granted/employer_subject.txt"
     body_template = "approvals/email/prolongation_request/granted/employer_body.txt"
