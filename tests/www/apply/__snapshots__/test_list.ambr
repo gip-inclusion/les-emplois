@@ -856,7 +856,11 @@
           
           
               <span class="text-nowrap">
-                  chez <a href="/company/42/card"><strong>Hit pit</strong></a>
+                  chez
+                  <a class="btn-ico btn-link" href="/company/42/card">
+                      <i aria-hidden="true" class="ri-community-line font-weight-medium ri-sm me-1"></i>
+                      <span>Hit pit</span>
+                  </a>
               </span>
           
       </p>
@@ -926,7 +930,11 @@
           
           
               <span class="text-nowrap">
-                  chez <a href="/company/42/card"><strong>Hit pit</strong></a>
+                  chez
+                  <a class="btn-ico btn-link" href="/company/42/card">
+                      <i aria-hidden="true" class="ri-community-line font-weight-medium ri-sm me-1"></i>
+                      <span>Hit pit</span>
+                  </a>
               </span>
           
       </p>
@@ -1001,7 +1009,11 @@
           
           
               <span class="text-nowrap">
-                  chez <a href="/company/42/card"><strong>Hit pit</strong></a>
+                  chez
+                  <a class="btn-ico btn-link" href="/company/42/card">
+                      <i aria-hidden="true" class="ri-community-line font-weight-medium ri-sm me-1"></i>
+                      <span>Hit pit</span>
+                  </a>
               </span>
           
       </p>
