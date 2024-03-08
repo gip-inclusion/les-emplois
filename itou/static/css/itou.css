@@ -1,3 +1,25 @@
+.s-main {
+    background-color: var(--bs-light);
+}
+
+.p-home .s-main {
+    background-color: var(--bs-white);
+}
+
+.p-home .has-bg-communaute {
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: right center;
+    background-image: url(../img/home/bg-communaute-mobile.png);
+}
+
+@media (min-width: 768px) {
+    .p-home .has-bg-communaute {
+        background-image: url(../img/home/bg-communaute.png);
+    }
+}
+
+
 .s-home-search {
     background-position: center left, center right;
     background-repeat: no-repeat;

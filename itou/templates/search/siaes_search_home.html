@@ -1,8 +1,11 @@
 {% extends "layout/base.html" %}
 {% load redirection_fields %}
+{% load theme_inclusion %}
 {% load static %}
 
 {% block title %}Les emplois de l'inclusion{% endblock %}
+
+{% block body_class %}p-home{% endblock %}
 
 {% block content_title_wrapper %}{% endblock %}
 
@@ -10,59 +13,87 @@
 
     {% include "search/includes/generic_search_home.html" with form=siae_search_form title="Rechercher un emploi inclusif" url_search="search:employers_results" template_form_name="search/includes/siaes_search_form.html" %}
 
-    {% if not user.is_authenticated %}
-        <section class="bg-white text-center pt-5 pb-6">
-            <div class="container">
-                <h2 class="h1">Nos missions</h2>
-                <p class="lead">
-                    Ce service facilite la mise en relation des personnes les plus éloignées de l'emploi avec les employeurs solidaires (SIAE, GEIQ, EA et EATT) et les accompagnants (orienteurs et prescripteurs habilités).
-                    <br>
-                    Il offre aux utilisateurs un outil mutualisé pour simplifier les procédures, fluidifier les parcours d'insertion entre professionnels et renforcer la qualité de l'accompagnement des personnes.
-                </p>
+    <section class="s-article-figure-01 s-article-figure-01--ltr">
+        <div class="s-article-figure-01__container container container-max-lg">
+            <div class="s-article-figure-01__row row">
+                <div class="s-article-figure-01__col s-article-figure-01__col--figure col-12 col-md-3 col-lg-4 d-flex align-items-center justify-content-center">
+                    <figure class="w-50 w-md-100">
+                        <img src="{% static "img/home/illustration-01.png" %}" class="img-fluid img-fitcover" alt="">
+                    </figure>
+                </div>
+                <div class="s-article-figure-01__col s-article-figure-01__col--article col-12 col-md-9 col-lg-8 d-flex align-items-center">
+                    <article>
+                        <h2 class="h1 text-tertiary">
+                            Qu’est-ce que l’inclusion
+                            <br class="d-none d-lg-inline">
+                            par l’emploi&nbsp;?
+                        </h2>
+                        <p>
+                            L’inclusion par l'emploi est un projet de société gouvernemental qui permet aux personnes les plus fragiles de bénéficier de l’accès à l’emploi et à la formation pour s’insérer dans la société par le travail (Insertion par l'Activité Économique - IAE).
+                        </p>
+                        <p>
+                            C’est un enjeu majeur porté par le Pacte de l’IAE pour lutter contre le chômage longue durée, l'exclusion et la pauvreté.
+                        </p>
+                        <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" class="btn btn-outline-primary w-100 w-md-auto mb-3 mt-4 has-external-link" target="_blank">En savoir plus</a>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                <div class="row row-cols-1 row-cols-md-3 text-center mt-5 g-5">
-                    <div class="col">
-                        <div class="card c-card p-md-5 has-one-link-inside h-100 w-100">
-                            <div class="card-body">
-                                <h3 class="h4 card-title font-weight-light">Inscrivez-vous pour commencer à utiliser la plateforme</h3>
-                            </div>
-                            <div class="card-footer">
-                                <a class="btn btn-primary stretched-link" href="{% url 'account_signup' %}{% redirection_url value=redirect_field_value|default:"" %}">
-                                    Créer un compte
-                                </a>
-                            </div>
+    <section class="s-article-figure-01">
+        <div class="s-article-figure-01__container container container-max-lg">
+            <div class="s-article-figure-01__row row">
+                <div class="s-article-figure-01__col s-article-figure-01__col--figure col-12 col-md-3 col-lg-4 d-flex align-items-center justify-content-center">
+                    <figure class="w-50 w-md-100">
+                        <img src="{% static "img/home/illustration-02.png" %}" class="img-fluid img-fitcover" alt="">
+                    </figure>
+                </div>
+                <div class="s-article-figure-01__col s-article-figure-01__col--article col-12 col-md-9 col-lg-8 d-flex align-items-center">
+                    <article>
+                        <h2 class="h1 text-tertiary">Nos missions</h2>
+                        <p>
+                            Ce service facilite la mise en relation des personnes les plus éloignées de l'emploi avec les employeurs solidaires (SIAE, GEIQ, EA et EATT) et les accompagnants (orienteurs et prescripteurs habilités).
+                        </p>
+                        <p>
+                            Il offre aux utilisateurs un outil numérique mutualisé pour simplifier les procédures, fluidifier les parcours d'insertion entre professionnels et renforcer la qualité de l'accompagnement des personnes.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="s-section mb-7 mb-lg-9">
+        <div class="s-section__container container container-max-lg">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <h2 class="h1 text-tertiary">Discutez entre professionnels</h2>
+                </div>
+            </div>
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <div class="has-bg-communaute rounded-3 p-4 p-md-5 d-flex flex-column flex-md-row align-items-md-center gap-3 gap-md-5">
+                        <div>
+                            <img src="{% static_theme_images "logo-communaute-inclusion.svg" %}" height="80" alt="">
                         </div>
-                    </div>
-                    <div class="col">
-                        <div class="card c-card p-md-5 has-one-link-inside h-100 w-100">
-                            <div class="card-body">
-                                <h3 class="h4 card-title font-weight-light">Discutez entre professionnels sur La communauté de l'inclusion</h3>
-                            </div>
-                            <div class="card-footer">
-                                <a class="btn btn-primary stretched-link" href="https://communaute.inclusion.beta.gouv.fr/">Accéder à La communauté</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="card c-card p-md-5 has-one-link-inside h-100 w-100">
-                            <div class="card-body">
-                                <h3 class="h4 card-title font-weight-light">Découvrez l'espace de documentation pour tout comprendre</h3>
-                            </div>
-                            <div class="card-footer">
-                                <a class="btn btn-primary stretched-link" href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" aria-label="En savoir plus (ouverture dans un nouvel onglet)">
-                                    En savoir plus
-                                </a>
-                            </div>
+                        <div>
+                            <a href="https://communaute.inclusion.beta.gouv.fr" class="btn btn-outline-primary has-external-link" target="_blank">Découvrir</a>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
-    {% endif %}
+        </div>
+    </section>
 
-    <section class="bg-light pt-5 pb-6">
-        <div class="container">
-            <div class="js-tac-livestorm w-100" data-url="https://app.livestorm.co/itou/upcoming?limit=3" title="Événements des emplois de l'inclusion | Livestorm">
+    <section class="s-section mb-7 mb-lg-9">
+        <div class="s-section__container container container-max-lg">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
+                    <h2 class="h1 text-tertiary">Événements à venir</h2>
+                    <div class="js-tac-livestorm w-100" data-url="https://app.livestorm.co/itou/upcoming?limit=3" title="Événements des emplois de l'inclusion | Livestorm">
+                    </div>
+                </div>
             </div>
         </div>
     </section>
