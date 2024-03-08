@@ -1,3 +1,4 @@
+from django.conf import settings
 from rest_framework import authentication, generics
 
 from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
@@ -69,4 +70,41 @@ car la première version avait été pensée ainsi.
 # Paramètres
 
 - mode_multi_structures : renvoie les candidats de toutes les structures.
+- uid_structures : renvoie les candidats des structures demandées.
+
+Attention, le compte doit être administrateur des structures.
+
+# Exemples de requêtes
+
+## Mode multistructures
+
+```bash
+curl
+-L '{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/api/v1/candidats/?mode_multi_structures=1' \
+-H 'Authorization: Token [token]'
+```
+
+## Fitre par structure
+
+Afin de trouver l'identifiant unique d'une structure, connectez-vous à votre espace personnel
+et cliquez sur « Mon espace » > « Accès aux APIs ».
+
+### Une structure
+
+```bash
+curl
+-L '{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/api/v1/candidats/?structures_uid=[uid-1]' \
+-H 'Authorization: Token [token]'
+```
+
+### Plusieurs structures
+
+Séparez les identifiants par des virgules.
+
+```bash
+curl
+-L '{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/api/v1/candidats/?structures_uid=[uid-1,uid-2,uid-3]' \
+-H 'Authorization: Token [token]'
+```
+
 """
