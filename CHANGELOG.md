@@ -1,5 +1,29 @@
 # Journal des modifications
 
+## [82] - 2024-03-11
+
+### Ajouté
+
+- SSO : Prise en charge de MAP pour les conseillers France Travail
+- Export des candidatures : Ajout du statut du PASS IAE
+- Tableau de bord : Barre de recherche "Rechercher un emploi inclusif"
+
+### Modifié
+
+- PASS IAE : Utiliser une durée fixe (730 jours) lors de sa délivrance
+- Message de promotion temporaire sur le tableau de bord des EITI
+- Refonte UX/UI : Message pour prévenir les utilisateurs des changements d'interface
+- Refonte UX/UI : Cartes fiches salariés
+- Refonte UX/UI : Cartes de postes ouverts au recrutement
+- Refonte UX/UI : Cartes salariés et PASS IAE
+- Refonte UX/UI : Cartes prescripteurs
+- Refonte UX/UI : Boutons de formulaire et mention "champs obligatoires"
+- PE Connect : Correction pour restreindre la création de comptes doublons
+
+### Supprimé
+
+- Parcours de bienvenue dans la démo et les recettes jetables
+
 ## [81] - 2024-02-26
 
 ### Ajouté
