@@ -369,9 +369,9 @@ django-datadog-logger==0.6.3 \
     --hash=sha256:05b1327bfa971be7fc1c21cf081e7b21b52fa244aad1126d9c0342b38a3a5dd2 \
     --hash=sha256:2b2b03da1431fb5801a7466fb1df81fb0c0dc0a14fcd8c2a3ec170f0b33d0d63
     # via -r requirements/base.txt
-django-filter==23.5 \
-    --hash=sha256:67583aa43b91fe8c49f74a832d95f4d8442be628fd4c6d65e9f811f5153a4e5c \
-    --hash=sha256:99122a201d83860aef4fe77758b69dda913e874cc5e0eaa50a86b0b18d708400
+django-filter==24.1 \
+    --hash=sha256:335bcae6cbd3e984b024841070f567b22faea57594f27d37c52f8f131f8d8621 \
+    --hash=sha256:65cb43ce272077e5ac6aae1054d76c121cd6b552e296a82a13921e9371baf8c1
     # via -r requirements/base.txt
 django-formtools==2.5.1 \
     --hash=sha256:47cb34552c6efca088863d693284d04fc36eaaf350eb21e1a1d935e0df523c93 \
