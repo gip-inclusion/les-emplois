@@ -1812,7 +1812,7 @@ class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):
     Thus, before Itou can deliver an approval, we have to check this table
     to ensure that there isn't already a valid Pôle emploi's approval.
 
-    This table is populated and updated through the `import_pe_approvals`
+    This table was populated and updated through the `import_pe_approvals`
     admin command on a regular basis with data shared by Pôle emploi.
 
     If a valid Pôle emploi's approval is found, it's copied in the `Approval`
