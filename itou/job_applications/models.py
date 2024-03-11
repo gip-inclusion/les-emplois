@@ -374,7 +374,7 @@ class JobApplicationQuerySet(models.QuerySet):
         Rules of eligibility for a job application:
             - be in 'ACCEPTED' state (valid hiring)
             - to be linked to an approval
-            - hiring SIAE must be one of : AI, EI, ACI, ETTI. EITI will be added as of september 2022
+            - hiring SIAE must be one of : ACI, AI, EI, ETTI.
             - the hiring date must be greater than 2021.09.27 (feature production date)
             - employee record is not blocked via admin (`create_employee_record` field)
 
