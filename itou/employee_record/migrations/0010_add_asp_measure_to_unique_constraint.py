@@ -35,14 +35,14 @@ class Migration(migrations.Migration):
             name="asp_measure",
             field=models.CharField(
                 choices=[
-                    ("AI_DC", "Droit Commun - Association Intermédiaire"),
                     ("ACI_DC", "Droit Commun - Atelier et Chantier d'Insertion"),
+                    ("AI_DC", "Droit Commun - Association Intermédiaire"),
                     ("EI_DC", "Droit Commun -  Entreprise d'Insertion"),
-                    ("ETTI_DC", "Droit Commun - Entreprise de Travail Temporaire d'Insertion"),
                     ("EITI_DC", "Droit Commun - Entreprise d'Insertion par le Travail Indépendant"),
-                    ("FDI_DC", "Droit Commun -  Fonds Départemental pour l'Insertion"),
-                    ("EI_MP", "Milieu Pénitentiaire - Entreprise d'Insertion"),
+                    ("ETTI_DC", "Droit Commun - Entreprise de Travail Temporaire d'Insertion"),
                     ("ACI_MP", "Milieu Pénitentiaire - Atelier et Chantier d'Insertion"),
+                    ("EI_MP", "Milieu Pénitentiaire - Entreprise d'Insertion"),
+                    ("FDI_DC", "Droit Commun -  Fonds Départemental pour l'Insertion"),
                 ],
                 verbose_name="mesure ASP de la SIAE",
             ),

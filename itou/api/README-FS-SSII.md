@@ -16,7 +16,7 @@ Ceci est une documentation publique à destination des logiciels SSII pour la r�
 
 - Il y a au plus une FS par couple (SIRET, PASS IAE). Autrement dit, si une même personne est recrutée pour la seconde fois (avec à chaque fois le même PASS IAE) dans la même SIAE (ou deux structures ayant le même SIRET), cela ne donnera pas lieu à une nouvelle FS.
 
-- Les seules mesures concernées ici sont ACI, AI, EI, ETTI. Donc pas les EITI, GEIQ, EA, EATT.
+- Les seules mesures concernées ici sont ACI, AI, EI, ETTI. Donc pas les EA, EATT, EITI, GEIQ.
 
 ## Exemples techniques complets avec curl
 

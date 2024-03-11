@@ -3,14 +3,14 @@ from django.db import models
 
 
 class CompanyKind(models.TextChoices):
-    EI = "EI", "Entreprise d'insertion"  # Regroupées au sein de la fédération des entreprises d'insertion.
-    AI = "AI", "Association intermédiaire"
     ACI = "ACI", "Atelier chantier d'insertion"
-    ETTI = "ETTI", "Entreprise de travail temporaire d'insertion"
-    EITI = "EITI", "Entreprise d'insertion par le travail indépendant"
-    GEIQ = "GEIQ", "Groupement d'employeurs pour l'insertion et la qualification"
+    AI = "AI", "Association intermédiaire"
     EA = "EA", "Entreprise adaptée"
     EATT = "EATT", "Entreprise adaptée de travail temporaire"
+    EI = "EI", "Entreprise d'insertion"  # Regroupées au sein de la fédération des entreprises d'insertion.
+    EITI = "EITI", "Entreprise d'insertion par le travail indépendant"
+    ETTI = "ETTI", "Entreprise de travail temporaire d'insertion"
+    GEIQ = "GEIQ", "Groupement d'employeurs pour l'insertion et la qualification"
     OPCS = "OPCS", "Organisation porteuse de la clause sociale"
 
 
@@ -19,11 +19,11 @@ class CompanyKind(models.TextChoices):
 # Ported older comment: ASP data is used to keep the siae data of these kinds in sync.
 # These kinds and only these kinds thus have convention/AF logic.
 SIAE_WITH_CONVENTION_KINDS = [
-    CompanyKind.EI.value,
     CompanyKind.AI.value,
     CompanyKind.ACI.value,
-    CompanyKind.ETTI.value,
+    CompanyKind.EI.value,
     CompanyKind.EITI.value,
+    CompanyKind.ETTI.value,
 ]
 
 SIAE_WITH_CONVENTION_CHOICES = [(k, v) for k, v in CompanyKind.choices if k in SIAE_WITH_CONVENTION_KINDS]
@@ -110,14 +110,14 @@ def siae_kind_to_pe_type_siae(siae_kind):
     # « 839 – IAE ITOU ETT »
     # « 840 – IAE ITOU EIT »
     return {
-        CompanyKind.EI: 838,
-        CompanyKind.AI: 837,
         CompanyKind.ACI: 836,
-        CompanyKind.ETTI: 839,
-        CompanyKind.EITI: 840,
-        CompanyKind.GEIQ: 838,
+        CompanyKind.AI: 837,
         CompanyKind.EA: 838,
         CompanyKind.EATT: 840,
+        CompanyKind.EI: 838,
+        CompanyKind.EITI: 840,
+        CompanyKind.ETTI: 839,
+        CompanyKind.GEIQ: 838,
     }.get(siae_kind)
 
 
