@@ -18,12 +18,6 @@ asgiref==3.7.2 \
     #   -r requirements/base.txt
     #   django
     #   django-htmx
-async-timeout==4.0.3 \
-    --hash=sha256:4640d96be84d82d02ed59ea2b7105a0f7b33abe8703703cd0ab0bf87c427522f \
-    --hash=sha256:7405140ff1230c310e51dc27b3145b9092d659ce68ff733fb0cefe3ee42be028
-    # via
-    #   -r requirements/base.txt
-    #   redis
 attrs==23.1.0 \
     --hash=sha256:1f28b4522cdc2fb4256ac1a020c78acf9cba2c6b461ccd2c126f3aa8e8335d04 \
     --hash=sha256:6279836d581513a26f1bf235f9acd333bc9115683f14f7e8fae46c98fc50e015
@@ -1047,9 +1041,9 @@ pyyaml==6.0.1 \
     #   djlint
     #   drf-spectacular
     #   tablib
-redis==5.0.2 \
-    --hash=sha256:3f82cc80d350e93042c8e6e7a5d0596e4dd68715babffba79492733e1f367037 \
-    --hash=sha256:4caa8e1fcb6f3c0ef28dba99535101d80934b7d4cd541bbb47f4a3826ee472d1
+redis==5.0.3 \
+    --hash=sha256:4973bae7444c0fbed64a06b87446f79361cb7e4ec1538c022d696ed7a5015580 \
+    --hash=sha256:5da9b8fe9e1254293756c16c008e8620b3d15fcc6dde6babde9541850e72a32d
     # via -r requirements/base.txt
 referencing==0.29.1 \
     --hash=sha256:90cb53782d550ba28d2166ef3f55731f38397def8832baac5d45235f1995e35e \
