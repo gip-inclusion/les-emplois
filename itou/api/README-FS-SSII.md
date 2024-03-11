@@ -16,7 +16,7 @@ Ceci est une documentation publique à destination des logiciels SSII pour la r�
 
 - Il y a au plus une FS par couple (SIRET, PASS IAE). Autrement dit, si une même personne est recrutée pour la seconde fois (avec à chaque fois le même PASS IAE) dans la même SIAE (ou deux structures ayant le même SIRET), cela ne donnera pas lieu à une nouvelle FS.
 
-- Les seules mesures concernées ici sont ACI, AI, EI, ETTI. Donc pas les EA, EATT, EITI, GEIQ.
+- Les seules mesures concernées ici sont ACI, AI, EI, EITI, ETTI. Donc pas les EA, EATT, GEIQ.
 
 ## Exemples techniques complets avec curl
 
@@ -178,6 +178,7 @@ Tous les référentiels utiles mentionnés dans le JSON ci-dessous sont [disponi
         # Doit être rempli si et seulement si inscritPoleEmploi est true.
         "numeroIDE": "3500000A",
         "salarieRQTH": false,
+        # Toujours "false" pour les EITI
         "salarieOETH": false,
         # Dixit Mélanie : Dans la même idée : ATA n'est pas demandée sur ITOU mais l'est sur l'ASP. Cette aide conditionne le true/false de l'aide sociale.
         "salarieAideSociale": false,

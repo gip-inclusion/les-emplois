@@ -1,9 +1,14 @@
+import factory
 import pytest
 from django.utils.timezone import timedelta
 
 import itou.companies.enums as companies_enums
 import itou.employee_record.enums as er_enums
-from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
+from itou.companies.models import Company
+from itou.employee_record.constants import (
+    EMPLOYEE_RECORD_EITI_AVAILABILITY_DATE,
+    EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
+)
 from itou.job_applications.models import JobApplication
 from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import EmployeeRecordWithProfileFactory
@@ -68,7 +73,24 @@ class EmployeeRecordEligibilityTest(TestCase):
         # Hiring date must be after the employee record feature availability date
         bad_ts = EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE - timedelta(days=1)
         good_ts = EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE + timedelta(days=1)
-        company = CompanyFactory()
+        company = CompanyFactory(
+            kind=factory.fuzzy.FuzzyChoice(set(Company.ASP_EMPLOYEE_RECORD_KINDS) - {companies_enums.CompanyKind.EITI})
+        )
+        non_eligible_job_application = JobApplicationFactory(
+            with_approval=True, to_company=company, hiring_start_at=bad_ts
+        )
+        eligible_job_application = JobApplicationFactory(
+            with_approval=True, to_company=company, hiring_start_at=good_ts
+        )
+
+        assert non_eligible_job_application not in JobApplication.objects.eligible_as_employee_record(company)
+        assert eligible_job_application in JobApplication.objects.eligible_as_employee_record(company)
+
+    def test_hiring_start_date_for_eiti(self):
+        # Hiring date must be after the employee record feature availability date
+        bad_ts = EMPLOYEE_RECORD_EITI_AVAILABILITY_DATE - timedelta(days=1)
+        good_ts = EMPLOYEE_RECORD_EITI_AVAILABILITY_DATE + timedelta(days=1)
+        company = CompanyFactory(kind=companies_enums.CompanyKind.EITI)
         non_eligible_job_application = JobApplicationFactory(
             with_approval=True, to_company=company, hiring_start_at=bad_ts
         )

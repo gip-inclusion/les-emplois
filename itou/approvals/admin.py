@@ -10,7 +10,7 @@ from itou.approvals.admin_views import manually_add_approval, manually_refuse_ap
 from itou.approvals.enums import Origin, ProlongationRequestStatus
 from itou.companies.models import Company
 from itou.employee_record import enums as employee_record_enums
-from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
+from itou.employee_record.constants import get_availability_date_for_kind
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
 from itou.utils.admin import (
@@ -101,7 +101,7 @@ class JobApplicationInline(ItouStackedInline):
         if not obj.create_employee_record:
             return "Non proposé à la création"
 
-        if obj.hiring_start_at and obj.hiring_start_at < EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date():
+        if obj.hiring_start_at and obj.hiring_start_at < get_availability_date_for_kind(obj.to_company.kind).date():
             return "Date de début du contrat avant l'interopérabilité"
 
         return "-"

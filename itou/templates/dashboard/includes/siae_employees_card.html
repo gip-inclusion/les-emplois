@@ -42,6 +42,9 @@
                         {% if num_rejected_employee_records %}
                             <span class="badge rounded-pill badge-xs bg-danger">{{ num_rejected_employee_records }}</span>
                         {% endif %}
+                        {% if request.current_organization.kind == CompanyKind.EITI %}
+                            {% include "dashboard/includes/stats_new_badge.html" %}
+                        {% endif %}
                     </li>
                 {% endif %}
                 <li class="d-flex justify-content-between align-items-center mb-3">

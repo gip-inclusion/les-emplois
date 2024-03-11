@@ -203,7 +203,7 @@ class Company(AddressMixin, OrganizationAbstract):
     )
 
     # These kinds of Companies can use employee record app to send data to ASP
-    ASP_EMPLOYEE_RECORD_KINDS = [CompanyKind.ACI, CompanyKind.AI, CompanyKind.EI, CompanyKind.ETTI]
+    ASP_EMPLOYEE_RECORD_KINDS = [CompanyKind.ACI, CompanyKind.AI, CompanyKind.EI, CompanyKind.EITI, CompanyKind.ETTI]
 
     # Companies have two different SIRET numbers in ASP FluxIAE data ("Vue Structure").
     # The first one is the "SIRET actualisé" which we store as `Company.siret`. It changes rather frequently
