@@ -17,7 +17,7 @@ from itou.companies.models import Company
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import EligibilityDiagnosis, SelectedAdministrativeCriteria
 from itou.employee_record import enums as employeerecord_enums
-from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
+from itou.employee_record.constants import get_availability_date_for_kind
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.enums import (
     GEIQ_MAX_HOURS_PER_WEEK,
@@ -329,7 +329,7 @@ class JobApplicationQuerySet(models.QuerySet):
             # There must be **NO** employee record linked in this part
             employee_record__isnull=True,
             # No employee record is available before this date
-            hiring_start_at__gte=EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
+            hiring_start_at__gte=get_availability_date_for_kind(siae.kind),
         )
 
     def _eligible_job_applications_with_a_suspended_or_extended_approval(self, siae):
@@ -340,14 +340,14 @@ class JobApplicationQuerySet(models.QuerySet):
                     Suspension.objects.filter(
                         siae=OuterRef("to_company"),
                         approval=OuterRef("approval"),
-                        created_at__gte=EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
+                        created_at__gte=get_availability_date_for_kind(siae.kind),
                     )
                 ),
                 has_recent_prolongation=Exists(
                     Prolongation.objects.filter(
                         declared_by_siae=OuterRef("to_company"),
                         approval=OuterRef("approval"),
-                        created_at__gte=EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
+                        created_at__gte=get_availability_date_for_kind(siae.kind),
                     )
                 ),
             )
@@ -374,7 +374,7 @@ class JobApplicationQuerySet(models.QuerySet):
         Rules of eligibility for a job application:
             - be in 'ACCEPTED' state (valid hiring)
             - to be linked to an approval
-            - hiring SIAE must be one of : ACI, AI, EI, ETTI.
+            - hiring SIAE must be one of : ACI, AI, EI, EITI, ETTI.
             - the hiring date must be greater than 2021.09.27 (feature production date)
             - employee record is not blocked via admin (`create_employee_record` field)
 

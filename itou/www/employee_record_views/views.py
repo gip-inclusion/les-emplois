@@ -10,7 +10,7 @@ from django.views.decorators.http import require_safe
 from formtools.wizard.views import NamedUrlSessionWizardView
 
 from itou.approvals.models import Approval, Prolongation, Suspension
-from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
+from itou.employee_record.constants import get_availability_date_for_kind
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
@@ -243,7 +243,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         "employee_records_list": employee_records_list,
         "badges": status_badges,
         "navigation_pages": pager(data, request.GET.get("page"), items_per_page=10),
-        "feature_availability_date": EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
+        "feature_availability_date": get_availability_date_for_kind(siae.kind),
         "need_manual_regularization": need_manual_regularization,
         "ordered_by_label": order_by.label,
         "matomo_custom_title": "Fiches salarié ASP",
