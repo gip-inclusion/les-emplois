@@ -102,3 +102,12 @@ class SiaeAPIFetchListTest(APITestCase):
         body = json.loads(response.content)
         assert body["count"] == 0
         assert response.status_code == 200
+
+    def test_fetch_siae_list_rate_limits(self):
+        query_params = {"code_insee": self.saint_andre.code_insee, "distance_max_km": 100}
+        # Declared in itou.api.siae_api.viewsets.RestrictedUserRateThrottle.
+        for _ in range(12):
+            self.client.get(ENDPOINT_URL, query_params, format="json")
+        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        # Rate limited.
+        assert response.status_code == 429
