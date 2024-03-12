@@ -32,7 +32,7 @@
                                 {% for category_slug, category in notification_form.layout.items %}
                                     <div class="notification-collapse">
                                         <a class="d-flex justify-content-between font-weight-bold text-decoration-none has-collapse-caret py-3" role="button" aria-expanded="true" aria-controls="collapse-{{ category_slug }}">
-                                            <span>{{ category.name }}</span>
+                                            {{ category.name }}
                                         </a>
                                         <div class="collapse">
                                             {% get_form_field notification_form "category-"|add:category_slug|add:"-all" as field %}
