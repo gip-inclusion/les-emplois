@@ -22,15 +22,13 @@
                             {% csrf_token %}
 
                             <div class="form-group">
-                                <div class="custom-checkbox wrapping-checkbox">
-                                    <div class="form-check">
-                                        <input type="checkbox" name="notifications-all" class="form-check-input custom-checkbox" id="id_notifications-all">
-                                        <label class="form-check-label font-weight-bold" for="id_notifications-all">Activer toutes les notifications</label>
-                                    </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="id_notifications-all">
+                                    <label class="form-check-label font-weight-bold" for="id_notifications-all">Activer toutes les notifications</label>
                                 </div>
                             </div>
 
-                            <div class="mx-3" id="id_notifications">
+                            <div class="mx-3">
                                 {% for category_slug, category in notification_form.layout.items %}
                                     <div class="notification-collapse">
                                         <a class="d-flex justify-content-between font-weight-bold text-decoration-none has-collapse-caret py-3" role="button" aria-expanded="true" aria-controls="collapse-{{ category_slug }}">
@@ -38,7 +36,7 @@
                                         </a>
                                         <div class="collapse">
                                             {% get_form_field notification_form "category-"|add:category_slug|add:"-all" as field %}
-                                            {% bootstrap_field field field_class="custom-checkbox wrapping-checkbox" %}
+                                            {% bootstrap_field field %}
 
                                             <div class="px-3 category-notifications">
                                                 {% for field_name in category.notifications %}
