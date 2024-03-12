@@ -1,6 +1,7 @@
 import datetime
 import random
 from itertools import product
+from unittest import mock
 
 import factory
 import pytest
@@ -28,6 +29,7 @@ from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, UserKind
+from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir, format_phone
 from itou.utils.widgets import DuetDatePickerWidget
@@ -101,8 +103,13 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
         return soup.find("ul", attrs={"id": "transition_logs_" + str(job_application.id)})
 
+    @override_settings(API_BAN_BASE_URL="http://ban-api")
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+    )
     def accept_job_application(
-        self, job_application, post_data=None, city=None, assert_successful=True, job_description=None
+        self, _mock, job_application, post_data=None, city=None, assert_successful=True, job_description=None
     ):
         """
         This is not a test. It's a shortcut to process "apply:accept" view steps:
@@ -129,11 +136,17 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
                 "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
                 "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
                 "answer": "",
+                "ban_api_resolved_address": job_application.job_seeker.geocoding_address,
                 "address_line_1": job_application.job_seeker.address_line_1,
-                "post_code": job_application.job_seeker.post_code,
+                "post_code": city.post_codes[0],
+                "insee_code": city.code_insee,
                 "city": city.name,
                 "city_slug": city.slug,
                 "hired_job": job_description.pk,
+                "geocoding_score": 0.9714,
+                "fill_mode": "ban_api",
+                # Select the first and only one option
+                "address_for_autocomplete": "0",
             }
 
         response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
@@ -687,12 +700,20 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         city = self.get_random_city()
         today = timezone.localdate()
 
-        job_seeker = JobSeekerWithAddressFactory(city=city.name, with_pole_emploi_id=True)
+        job_seeker = JobSeekerWithAddressFactory(
+            city=city.name, with_pole_emploi_id=True, with_ban_geoloc_address=True
+        )
+
         address = {
+            "ban_api_resolved_address": job_seeker.geocoding_address,
             "address_line_1": job_seeker.address_line_1,
-            "post_code": job_seeker.post_code,
+            "post_code": city.post_codes[0],
+            "insee_code": city.code_insee,
             "city": city.name,
-            "city_slug": city.slug,
+            "geocoding_score": 0.9714,
+            "fill_mode": "ban_api",
+            # Select the first and only one option
+            "address_for_autocomplete": "0",
         }
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
@@ -807,9 +828,9 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         response, _ = self.accept_job_application(
             job_application=job_application, post_data=post_data, assert_successful=False
         )
-        self.assertFormError(response.context["form_user_address"], "address_line_1", "Ce champ est obligatoire.")
-        self.assertFormError(response.context["form_user_address"], "city", "Ce champ est obligatoire.")
-        self.assertFormError(response.context["form_user_address"], "post_code", "Ce champ est obligatoire.")
+        self.assertFormError(
+            response.context["form_user_address"], "address_for_autocomplete", "Ce champ est obligatoire."
+        )
 
         # No eligibility diagnosis -> if job_seeker has a valid eligibility diagnosis, it's OK
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -860,7 +881,10 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         city = self.get_random_city()
         today = timezone.localdate()
         # the old job of job seeker
-        job_seeker_user = JobSeekerWithAddressFactory(with_pole_emploi_id=True)
+        job_seeker_user = JobSeekerWithAddressFactory(
+            with_pole_emploi_id=True,
+            with_ban_geoloc_address=True,
+        )
         old_job_application = JobApplicationFactory(
             with_approval=True,
             job_seeker=job_seeker_user,
@@ -903,10 +927,15 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "answer": "",
+            "ban_api_resolved_address": job_seeker_user.geocoding_address,
             "address_line_1": job_seeker_user.address_line_1,
-            "post_code": job_seeker_user.post_code,
+            "post_code": city.post_codes[0],
+            "insee_code": city.code_insee,
             "city": city.name,
-            "city_slug": city.slug,
+            "geocoding_score": 0.9714,
+            "fill_mode": "ban_api",
+            # Select the first and only one option
+            "address_for_autocomplete": "0",
         }
         self.accept_job_application(job_application=job_application, post_data=post_data)
         get_job_application = JobApplication.objects.get(pk=job_application.pk)
@@ -931,6 +960,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             job_seeker__jobseeker_profile__nir="",
             job_seeker__jobseeker_profile__pole_emploi_id="",
             job_seeker__jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
+            job_seeker__with_ban_geoloc_address=True,
         )
 
         employer = job_application.to_company.members.first()
@@ -942,11 +972,15 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
             "lack_of_nir": True,
             "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
-            # Data for `UserAddressForm`.
-            "address_line_1": "11 rue des Lilas",
-            "post_code": "57000",
+            "ban_api_resolved_address": job_application.job_seeker.geocoding_address,
+            "address_line_1": job_application.job_seeker.address_line_1,
+            "post_code": city.post_codes[0],
+            "insee_code": city.code_insee,
             "city": city.name,
-            "city_slug": city.slug,
+            "geocoding_score": 0.9714,
+            "fill_mode": "ban_api",
+            # Select the first and only one option
+            "address_for_autocomplete": "0",
             # Data for `AcceptForm`.
             "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": (timezone.localdate() + relativedelta(days=360)).strftime(
@@ -961,12 +995,18 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
 
     def test_accept_and_update_hiring_start_date_of_two_job_applications(self, *args, **kwargs):
         city = self.get_random_city()
-        job_seeker = JobSeekerWithAddressFactory(with_pole_emploi_id=True)
+        job_seeker = JobSeekerWithAddressFactory(with_pole_emploi_id=True, with_ban_geoloc_address=True)
+
         base_for_post_data = {
+            "ban_api_resolved_address": job_seeker.geocoding_address,
             "address_line_1": job_seeker.address_line_1,
-            "post_code": job_seeker.post_code,
+            "post_code": city.post_codes[0],
+            "insee_code": city.code_insee,
             "city": city.name,
-            "city_slug": city.slug,
+            "geocoding_score": 0.9714,
+            "fill_mode": "ban_api",
+            # Select the first and only one option
+            "address_for_autocomplete": "0",
             "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
             "answer": "",
         }
@@ -1061,7 +1101,11 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         city = self.get_random_city()
 
         company = CompanyFactory(with_membership=True)
-        job_seeker = JobSeekerWithAddressFactory(city=city.name, with_pole_emploi_id=True)
+        job_seeker = JobSeekerWithAddressFactory(
+            city=city.name,
+            with_pole_emploi_id=True,
+            with_ban_geoloc_address=True,
+        )
         job_application = JobApplicationFactory(
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker=job_seeker,
@@ -1146,6 +1190,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__jobseeker_profile__nir="",
             job_seeker__with_pole_emploi_id=True,
+            job_seeker__with_ban_geoloc_address=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -1161,17 +1206,21 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             # Data for `JobSeekerPersonalDataForm`.
             "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
-            # Data for `UserAddressForm`.
-            "address_line_1": "11 rue des Lilas",
-            "post_code": "57000",
-            "city": city.name,
-            "city_slug": city.slug,
             # Data for `AcceptForm`.
             "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": (timezone.localdate() + relativedelta(days=360)).strftime(
                 DuetDatePickerWidget.INPUT_DATE_FORMAT
             ),
             "answer": "",
+            "ban_api_resolved_address": job_application.job_seeker.geocoding_address,
+            "address_line_1": job_application.job_seeker.address_line_1,
+            "post_code": city.post_codes[0],
+            "insee_code": city.code_insee,
+            "city": city.name,
+            "geocoding_score": 0.9714,
+            "fill_mode": "ban_api",
+            # Select the first and only one option
+            "address_for_autocomplete": "0",
         }
         response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
         self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
@@ -1240,6 +1289,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             state=JobApplicationWorkflow.STATE_PROCESSING,
             job_seeker__jobseeker_profile__nir="",
             job_seeker__with_pole_emploi_id=True,
+            job_seeker__with_ban_geoloc_address=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -1250,11 +1300,15 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             # Data for `JobSeekerPersonalDataForm`.
             "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
-            # Data for `UserAddressForm`.
-            "address_line_1": "11 rue des Lilas",
-            "post_code": "57000",
+            "ban_api_resolved_address": job_application.job_seeker.geocoding_address,
+            "address_line_1": job_application.job_seeker.address_line_1,
+            "post_code": city.post_codes[0],
+            "insee_code": city.code_insee,
             "city": city.name,
-            "city_slug": city.slug,
+            "geocoding_score": 0.9714,
+            "fill_mode": "ban_api",
+            # Select the first and only one option
+            "address_for_autocomplete": "0",
             # Data for `AcceptForm`.
             "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": (timezone.localdate() + relativedelta(days=360)).strftime(
@@ -1284,6 +1338,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             job_seeker__jobseeker_profile__nir="",
             job_seeker__jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
             job_seeker__with_pole_emploi_id=True,
+            job_seeker__with_ban_geoloc_address=True,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -1303,17 +1358,21 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             "lack_of_nir_reason": job_application.job_seeker.jobseeker_profile.lack_of_nir_reason,
             "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
-            # Data for `UserAddressForm`.
-            "address_line_1": "11 rue des Lilas",
-            "post_code": "57000",
-            "city": city.name,
-            "city_slug": city.slug,
             # Data for `AcceptForm`.
             "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": (timezone.localdate() + relativedelta(days=360)).strftime(
                 DuetDatePickerWidget.INPUT_DATE_FORMAT
             ),
             "answer": "",
+            "ban_api_resolved_address": job_application.job_seeker.geocoding_address,
+            "address_line_1": job_application.job_seeker.address_line_1,
+            "post_code": city.post_codes[0],
+            "insee_code": city.code_insee,
+            "city": city.name,
+            "geocoding_score": 0.9714,
+            "fill_mode": "ban_api",
+            # Select the first and only one option
+            "address_for_autocomplete": "0",
         }
 
         self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
@@ -2943,7 +3002,14 @@ def test_select_job_description_for_job_application(client):
     assertNotContains(response, JOB_DETAILS_LABEL)
 
 
-def test_select_other_job_description_for_job_application(client):
+@override_settings(API_BAN_BASE_URL="http://ban-api")
+def test_select_other_job_description_for_job_application(client, mocker):
+
+    mocker.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+    )
+
     create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
     create_test_cities(["54", "57"], num_per_department=2)
 
@@ -2958,10 +3024,13 @@ def test_select_other_job_description_for_job_application(client):
         "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_FORGOTTEN,
         "lack_of_nir": True,
         "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
-        "address_line_1": "11 rue des Lilas",
-        "post_code": "57000",
+        "address_line_1": "37 B Rue du Général De Gaulle",
+        "post_code": city.post_codes[0],
+        "insee_code": city.code_insee,
         "city": city.name,
-        "city_slug": city.slug,
+        "geocoding_score": 0.9714,
+        # Select the first and only one option
+        "address_for_autocomplete": "0",
     }
 
     client.force_login(user)
