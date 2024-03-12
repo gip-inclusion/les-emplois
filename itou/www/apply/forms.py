@@ -1,4 +1,3 @@
-import contextlib
 import datetime
 from operator import itemgetter
 
@@ -15,9 +14,8 @@ from django_select2.forms import Select2MultipleWidget
 
 from itou.approvals.models import Approval
 from itou.asp import models as asp_models
-from itou.cities.models import City
-from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
-from itou.common_apps.address.forms import MandatoryAddressFormMixin
+from itou.common_apps.address.departments import DEPARTMENTS
+from itou.common_apps.address.forms import JobSeekerAddressForm, MandatoryAddressFormMixin
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType, JobDescriptionSource
 from itou.companies.models import JobDescription
@@ -32,7 +30,7 @@ from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
 from itou.utils.types import InclusiveDateRange
 from itou.utils.validators import validate_nir
-from itou.utils.widgets import DuetDatePickerWidget
+from itou.utils.widgets import DuetDatePickerWidget, JobSeekerAddressAutocompleteWidget
 from itou.www.companies_views.forms import JobAppellationAndLocationMixin
 
 
@@ -194,33 +192,9 @@ class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, JobSeekerProfile
         )
 
 
-class CreateOrUpdateJobSeekerStep2Form(MandatoryAddressFormMixin, forms.ModelForm):
-    class Meta:
-        model = User
-        fields = [
-            "address_line_1",
-            "address_line_2",
-            "post_code",
-            "city_slug",
-            "city",
-            "phone",
-        ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Initial value are overridden in OptionalAddressFormMixin() because we have a model instance,
-        # but that instance is always empty in our case so force the value to the one we have.
-        with contextlib.suppress(KeyError, City.DoesNotExist):
-            city = City.objects.get(slug=kwargs["initial"]["city_slug"])
-            self.initial["city"] = city.display_name
-            self.initial["city_slug"] = city.slug
-
-    def clean(self):
-        super().clean()
-
-        if post_code := self.cleaned_data.get("post_code"):
-            self.cleaned_data["department"] = department_from_postcode(post_code)
+class CreateOrUpdateJobSeekerStep2Form(JobSeekerAddressForm, forms.ModelForm):
+    class Meta(JobSeekerAddressForm.Meta):
+        fields = JobSeekerAddressForm.Meta.fields + ["phone"]
 
 
 class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
@@ -860,9 +834,45 @@ class UserAddressForm(MandatoryAddressFormMixin, forms.ModelForm):
     Add job seeker address in the job application process.
     """
 
+    ban_api_resolved_address = forms.CharField(widget=forms.HiddenInput(), required=False)
+    insee_code = forms.CharField(widget=forms.HiddenInput(), required=False)
+    fill_mode = forms.CharField(widget=forms.HiddenInput(), required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        js_handled_fields = [
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city",
+            "insee_code",
+            "ban_api_resolved_address",
+        ]
+
+        for field_name in js_handled_fields:
+            self.fields[field_name].widget.attrs["class"] = f"js-{field_name.replace('_', '-')}"
+            self.fields[field_name].required = False
+
+        self.fields["address_for_autocomplete"] = forms.CharField(
+            label="Adresse",
+            required=True,
+            widget=JobSeekerAddressAutocompleteWidget(initial_data=kwargs["data"], job_seeker=self.instance),
+            initial=0,
+            help_text=(
+                "Si votre adresse ne s’affiche pas, merci de renseigner votre ville uniquement en utilisant "
+                "votre code postal et d’utiliser le Complément d’adresse pour renseigner vos numéro et nom de rue."
+            ),
+        )
+
     class Meta:
         model = User
-        fields = ["address_line_1", "address_line_2", "post_code", "city_slug", "city"]
+        fields = [
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city",
+            "ban_api_resolved_address",
+        ]
 
 
 class FilterJobApplicationsForm(forms.Form):

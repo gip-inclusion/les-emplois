@@ -88,13 +88,15 @@
                                 <form method="post">
                                     {% csrf_token %}
                                     <fieldset>
+                                        {% bootstrap_field form.address_for_autocomplete %}
                                         {% bootstrap_field form.address_line_1 %}
                                         {% bootstrap_field form.address_line_2 %}
-                                        <div class="form-row">
-                                            {% bootstrap_field form.post_code wrapper_class='form-group col-md-3' %}
-                                            {% bootstrap_field form.city wrapper_class='form-group col-md-9' %}
-                                            {% bootstrap_field form.city_slug %}
-                                        </div>
+                                        {% bootstrap_field form.post_code %}
+                                        {% bootstrap_field form.city %}
+
+                                        {% bootstrap_field form.insee_code %}
+                                        {% bootstrap_field form.ban_api_resolved_address %}
+                                        {% bootstrap_field form.fill_mode %}
                                         {% bootstrap_field form.phone %}
                                     </fieldset>
 
@@ -113,4 +115,10 @@
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    {% comment %} Needed for the AddressAutocompleteWidget {% endcomment %}
+    {{ form.media.js }}
 {% endblock %}

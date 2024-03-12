@@ -9,6 +9,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.messages.test import MessagesTestMixin
 from django.core.files.storage import storages
+from django.test import override_settings
 from django.urls import resolve, reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertRedirects
@@ -26,6 +27,7 @@ from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
 from itou.users.models import User
+from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
 from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params
@@ -698,7 +700,12 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "selected_jobs": [],
         }
 
-    def test_apply_as_prescriber_with_pending_authorization(self):
+    @override_settings(API_BAN_BASE_URL="http://ban-api")
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+    )
+    def test_apply_as_prescriber_with_pending_authorization(self, _mock):
         """Apply as prescriber that has pending authorization."""
 
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
@@ -710,6 +717,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         dummy_job_seeker = JobSeekerWithAddressFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
+            with_ban_geoloc_address=True,
         )
 
         # Entry point.
@@ -819,15 +827,19 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         assert response.status_code == 200
 
         post_data = {
+            "ban_api_resolved_address": dummy_job_seeker.geocoding_address,
             "address_line_1": dummy_job_seeker.address_line_1,
             "post_code": self.city.post_codes[0],
-            "city_slug": self.city.slug,
+            "insee_code": self.city.code_insee,
             "city": self.city.name,
             "phone": dummy_job_seeker.phone,
+            "fill_mode": "ban_api",
         }
+
         response = self.client.post(next_url, data=post_data)
+
         assert response.status_code == 302
-        expected_job_seeker_session["user"] |= post_data | {"department": "67", "address_line_2": ""}
+        expected_job_seeker_session["user"] |= post_data | {"address_line_2": "", "address_for_autocomplete": None}
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
@@ -963,7 +975,12 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         assert response.status_code == 200
 
-    def test_apply_as_authorized_prescriber(self):
+    @override_settings(API_BAN_BASE_URL="http://ban-api")
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+    )
+    def test_apply_as_authorized_prescriber(self, _mock):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
         # test ZRR / QPV template loading
@@ -977,6 +994,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         dummy_job_seeker = JobSeekerWithAddressFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
+            with_ban_geoloc_address=True,
         )
 
         # Entry point.
@@ -1072,15 +1090,18 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         assert response.status_code == 200
 
         post_data = {
+            "ban_api_resolved_address": dummy_job_seeker.geocoding_address,
             "address_line_1": dummy_job_seeker.address_line_1,
-            "post_code": city.post_codes[0],
-            "city_slug": city.slug,
-            "city": city.name,
+            "post_code": self.city.post_codes[0],
+            "insee_code": self.city.code_insee,
+            "city": self.city.name,
             "phone": dummy_job_seeker.phone,
+            "fill_mode": "ban_api",
         }
+
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
-        expected_job_seeker_session["user"] |= post_data | {"department": "12", "address_line_2": ""}
+        expected_job_seeker_session["user"] |= post_data | {"address_for_autocomplete": None, "address_line_2": ""}
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
@@ -1159,10 +1180,17 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         # Step application's eligibility.
         # ----------------------------------------------------------------------
-        response = self.client.get(next_url)
-        assert response.status_code == 200
-        assert not EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=company)
-        self.assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
+
+        # Simulate address in qpv. If the address is in qpv, the known_criteria template
+        # should be used
+        with mock.patch(
+            "itou.common_apps.address.models.AddressMixin.address_in_qpv",
+            return_value=True,
+        ):
+            response = self.client.get(next_url)
+            assert response.status_code == 200
+            assert not EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=company)
+            self.assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
 
         response = self.client.post(next_url, {"level_1_1": True})
         assert response.status_code == 302
@@ -1286,7 +1314,12 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
             response, expected_url=reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk})
         )
 
-    def test_apply_as_prescriber(self):
+    @override_settings(API_BAN_BASE_URL="http://ban-api")
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+    )
+    def test_apply_as_prescriber(self, _mock):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
         user = PrescriberFactory()
@@ -1295,6 +1328,7 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
         dummy_job_seeker = JobSeekerWithAddressFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
+            with_ban_geoloc_address=True,
         )
 
         # Entry point.
@@ -1394,15 +1428,17 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
         assert response.status_code == 200
 
         post_data = {
+            "ban_api_resolved_address": dummy_job_seeker.geocoding_address,
             "address_line_1": dummy_job_seeker.address_line_1,
             "post_code": self.city.post_codes[0],
-            "city_slug": self.city.slug,
+            "insee_code": self.city.code_insee,
             "city": self.city.name,
             "phone": dummy_job_seeker.phone,
+            "fill_mode": "ban_api",
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
-        expected_job_seeker_session["user"] |= post_data | {"department": "67", "address_line_2": ""}
+        expected_job_seeker_session["user"] |= post_data | {"address_line_2": "", "address_for_autocomplete": None}
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
@@ -1759,7 +1795,12 @@ class ApplyAsCompanyTest(TestCase):
             status_code=403,
         )
 
-    def test_apply_as_company(self):
+    @override_settings(API_BAN_BASE_URL="http://ban-api")
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+    )
+    def test_apply_as_company(self, _mock):
         """Apply as company."""
 
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
@@ -1770,6 +1811,7 @@ class ApplyAsCompanyTest(TestCase):
         dummy_job_seeker = JobSeekerWithAddressFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
+            with_ban_geoloc_address=True,
         )
 
         # Entry point.
@@ -1868,15 +1910,18 @@ class ApplyAsCompanyTest(TestCase):
         assert response.status_code == 200
 
         post_data = {
+            "ban_api_resolved_address": dummy_job_seeker.geocoding_address,
             "address_line_1": dummy_job_seeker.address_line_1,
             "post_code": self.city.post_codes[0],
-            "city_slug": self.city.slug,
+            "insee_code": self.city.code_insee,
             "city": self.city.name,
             "phone": dummy_job_seeker.phone,
+            "fill_mode": "ban_api",
         }
+
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
-        expected_job_seeker_session["user"] |= post_data | {"department": "67", "address_line_2": ""}
+        expected_job_seeker_session["user"] |= post_data | {"address_line_2": "", "address_for_autocomplete": None}
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
@@ -2085,7 +2130,12 @@ class DirectHireFullProcessTest(TestCase):
             status_code=403,
         )
 
-    def test_hire_as_company(self):
+    @override_settings(API_BAN_BASE_URL="http://ban-api")
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+    )
+    def test_hire_as_company(self, _mock):
         """Apply as company (and create new job seeker)"""
 
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
@@ -2096,6 +2146,7 @@ class DirectHireFullProcessTest(TestCase):
         dummy_job_seeker = JobSeekerWithAddressFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
+            with_ban_geoloc_address=True,
         )
 
         # Step determine the job seeker with a NIR.
@@ -2179,15 +2230,19 @@ class DirectHireFullProcessTest(TestCase):
         assert response.status_code == 200
 
         post_data = {
+            "ban_api_resolved_address": dummy_job_seeker.geocoding_address,
             "address_line_1": dummy_job_seeker.address_line_1,
             "post_code": self.city.post_codes[0],
-            "city_slug": self.city.slug,
+            "insee_code": self.city.code_insee,
             "city": self.city.name,
             "phone": dummy_job_seeker.phone,
+            "fill_mode": "ban_api",
         }
+
         response = self.client.post(next_url, data=post_data)
+
         assert response.status_code == 302
-        expected_job_seeker_session["user"] |= post_data | {"department": "67", "address_line_2": ""}
+        expected_job_seeker_session["user"] |= post_data | {"address_line_2": "", "address_for_autocomplete": None}
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
         next_url = reverse(
@@ -2285,10 +2340,15 @@ class DirectHireFullProcessTest(TestCase):
             "pole_emploi_id": new_job_seeker.jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": new_job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
             "answer": "",
+            "ban_api_resolved_address": new_job_seeker.geocoding_address,
             "address_line_1": new_job_seeker.address_line_1,
-            "post_code": new_job_seeker.post_code,
+            "post_code": self.city.post_codes[0],
+            "insee_code": self.city.code_insee,
             "city": self.city.name,
-            "city_slug": self.city.slug,
+            "phone": new_job_seeker.phone,
+            "fill_mode": "ban_api",
+            # Select the first and only one option
+            "address_for_autocomplete": "0",
         }
         response = self.client.post(
             next_url,
@@ -2784,7 +2844,7 @@ class UpdateJobSeekerBaseTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
-        cls.job_seeker = JobSeekerFactory()
+        cls.job_seeker = JobSeekerFactory(with_ban_geoloc_address=True)
         cls.step_1_url = reverse(
             cls.STEP_1_VIEW_NAME, kwargs={"company_pk": cls.company.pk, "job_seeker_pk": cls.job_seeker.pk}
         )
@@ -2878,27 +2938,32 @@ class UpdateJobSeekerBaseTestCase(TestCase):
             + 1  # users_user (get_object_or_404)
             + 1  # companies_company (get_object_or_404)
             + 1  # users_user/companies_companymembership (self.company.has_member())
-            + 1  # cities_city (CreateOrUpdateJobSeekerStep2Form.__init__)
         ):
             response = self.client.get(self.step_2_url)
         self.assertContains(response, PROCESS_TITLE, html=True)
         self.assertContains(response, self.job_seeker.phone)
         self.assertNotContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
 
-        NEW_ADDRESS_LINE = "123 de la jolie rue"
+        NEW_ADDRESS_LINE = "382 ROUTE DE JOLLIVET"
+
+        fields = [NEW_ADDRESS_LINE, f"{self.city.post_codes[0]} {self.city}"]
+        new_geocoding_address = ", ".join([field for field in fields if field])
 
         post_data = {
+            "ban_api_resolved_address": new_geocoding_address,
             "address_line_1": NEW_ADDRESS_LINE,
             "post_code": self.city.post_codes[0],
-            "city_slug": self.city.slug,
+            "insee_code": self.city.code_insee,
             "city": self.city.name,
             "phone": self.job_seeker.phone,
+            "fill_mode": "ban_api",
         }
+
         response = self.client.post(self.step_2_url, data=post_data)
         assertRedirects(response, self.step_3_url, fetch_redirect_response=False)
 
         # Data is stored in the session but user is untouched
-        expected_job_seeker_session["user"] |= post_data | {"department": "67", "address_line_2": ""}
+        expected_job_seeker_session["user"] |= post_data | {"address_line_2": "", "address_for_autocomplete": None}
         assert self.client.session[self.job_seeker_session_key] == expected_job_seeker_session
         self.job_seeker.refresh_from_db()
         assert self.job_seeker.address_line_1 != NEW_ADDRESS_LINE
@@ -3100,7 +3165,12 @@ class UpdateJobSeekerTestCase(UpdateJobSeekerBaseTestCase):
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
         self._check_nothing_permitted(prescriber)
 
-    def test_as_unauthorized_prescriber_that_created_proxied_job_seeker(self):
+    @override_settings(API_BAN_BASE_URL="http://ban-api")
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_first_geocoding_data,
+    )
+    def test_as_unauthorized_prescriber_that_created_proxied_job_seeker(self, _mock):
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
         self.job_seeker.created_by = prescriber
         self.job_seeker.last_login = None
@@ -3115,7 +3185,12 @@ class UpdateJobSeekerTestCase(UpdateJobSeekerBaseTestCase):
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_nothing_permitted(prescriber)
 
-    def test_as_authorized_prescriber_with_proxied_job_seeker(self):
+    @override_settings(API_BAN_BASE_URL="http://ban-api")
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_first_geocoding_data,
+    )
+    def test_as_authorized_prescriber_with_proxied_job_seeker(self, _mock):
         # Make sure the job seeker does not manage its own account
         self.job_seeker.created_by = PrescriberFactory()
         self.job_seeker.last_login = None
@@ -3130,7 +3205,12 @@ class UpdateJobSeekerTestCase(UpdateJobSeekerBaseTestCase):
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         self._check_only_administrative_allowed(authorized_prescriber)
 
-    def test_as_company_with_proxied_job_seeker(self):
+    @override_settings(API_BAN_BASE_URL="http://ban-api")
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_first_geocoding_data,
+    )
+    def test_as_company_with_proxied_job_seeker(self, _mock):
         # Make sure the job seeker does not manage its own account
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
@@ -3153,7 +3233,12 @@ class UpdateJobSeekerTestCase(UpdateJobSeekerBaseTestCase):
             response = self.client.get(url)
             assert response.status_code == 403
 
-    def test_with_job_seeker_without_nir(self):
+    @override_settings(API_BAN_BASE_URL="http://ban-api")
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_first_geocoding_data,
+    )
+    def test_with_job_seeker_without_nir(self, _mock):
         # Make sure the job seeker does not manage its own account (and has no nir)
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
@@ -3226,7 +3311,12 @@ class UpdateJobSeekerForHireTestCase(UpdateJobSeekerBaseTestCase):
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         self._check_nothing_permitted(prescriber)
 
-    def test_as_authorized_prescriber_with_proxied_job_seeker(self):
+    @override_settings(API_BAN_BASE_URL="http://ban-api")
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_first_geocoding_data,
+    )
+    def test_as_authorized_prescriber_with_proxied_job_seeker(self, _mock):
         # Make sure the job seeker does not manage its own account
         self.job_seeker.created_by = PrescriberFactory()
         self.job_seeker.last_login = None
@@ -3241,7 +3331,12 @@ class UpdateJobSeekerForHireTestCase(UpdateJobSeekerBaseTestCase):
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
         self._check_nothing_permitted(authorized_prescriber)
 
-    def test_as_company_with_proxied_job_seeker(self):
+    @override_settings(API_BAN_BASE_URL="http://ban-api")
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_first_geocoding_data,
+    )
+    def test_as_company_with_proxied_job_seeker(self, _mock):
         # Make sure the job seeker does not manage its own account
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
@@ -3264,7 +3359,12 @@ class UpdateJobSeekerForHireTestCase(UpdateJobSeekerBaseTestCase):
             response = self.client.get(url)
             assert response.status_code == 403
 
-    def test_with_job_seeker_without_nir(self):
+    @override_settings(API_BAN_BASE_URL="http://ban-api")
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_first_geocoding_data,
+    )
+    def test_with_job_seeker_without_nir(self, _mock):
         # Make sure the job seeker does not manage its own account (and has no nir)
         self.job_seeker.jobseeker_profile.nir = ""
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = ""
@@ -4180,10 +4280,14 @@ class HireConfirmationTestCase(TestCase):
             "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
             "answer": "",
+            "ban_api_resolved_address": self.job_seeker.geocoding_address,
             "address_line_1": self.job_seeker.address_line_1,
-            "post_code": self.job_seeker.post_code,
+            "post_code": self.city.post_codes[0],
+            "insee_code": self.city.code_insee,
             "city": self.city.name,
-            "city_slug": self.city.slug,
+            "phone": self.job_seeker.phone,
+            "fill_mode": "ban_api",
+            "address_for_autocomplete": "0",
         }
         response = self.client.post(
             self._reverse("apply:hire_confirmation"),

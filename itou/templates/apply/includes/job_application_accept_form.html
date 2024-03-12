@@ -28,7 +28,15 @@
         {% endif %}
 
         {% if form_user_address %}
-            {% bootstrap_form form_user_address alert_error_type="all" %}
+            {% bootstrap_field form_user_address.address_for_autocomplete %}
+            {% bootstrap_field form_user_address.address_line_1 %}
+            {% bootstrap_field form_user_address.address_line_2 %}
+            {% bootstrap_field form_user_address.post_code %}
+            {% bootstrap_field form_user_address.city %}
+
+            {% bootstrap_field form_user_address.insee_code %}
+            {% bootstrap_field form_user_address.ban_api_resolved_address %}
+            {% bootstrap_field form_user_address.fill_mode %}
         {% endif %}
 
         <hr>

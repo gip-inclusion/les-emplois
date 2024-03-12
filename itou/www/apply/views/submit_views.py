@@ -615,7 +615,17 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             k: v
             for k, v in self.job_seeker_session.get("user").items()
             # TODO(xfernandez): remove pole_emploi_id & lack_of_pole_emploi_id_reason in a few weeks
-            if k not in ["city_slug", "lack_of_nir", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+            if k
+            not in [
+                "city_slug",
+                "lack_of_nir",
+                "pole_emploi_id",
+                "lack_of_pole_emploi_id_reason",
+                # Address autocomplete fields
+                "fill_mode",
+                "address_for_autocomplete",
+                "insee_code",
+            ]
         }
 
     def _get_profile_data_from_session(self):
@@ -1207,7 +1217,6 @@ class ApplicationEndView(ApplyStepBaseView):
 
 
 class UpdateJobSeekerBaseView(SessionNamespaceRequiredMixin, ApplyStepBaseView):
-
     def __init__(self):
         super().__init__()
         self.job_seeker_session = None
@@ -1461,7 +1470,6 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
         if self.request.user.can_edit_personal_information(self.job_seeker):
             allowed_user_fields_to_update.extend(CreateOrUpdateJobSeekerStep1Form.Meta.fields)
             allowed_user_fields_to_update.extend(CreateOrUpdateJobSeekerStep2Form.Meta.fields)
-            allowed_user_fields_to_update.remove("city_slug")
 
         for field in allowed_user_fields_to_update:
             if field in self.job_seeker_session.get("user", {}):
