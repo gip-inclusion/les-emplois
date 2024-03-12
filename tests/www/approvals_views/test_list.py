@@ -233,11 +233,11 @@ class TestApprovalsListView:
         )
 
         # Check IAE pass remainder days
-        assertContains(response, "366 jours")
+        assertContains(response, "367 jours")
 
         assertContains(response, "365 jours")
 
-        assertContains(response, "729 jours")
+        assertContains(response, "730 jours")
 
         assertContains(response, "0 jour")
 

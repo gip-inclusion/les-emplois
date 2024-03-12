@@ -525,7 +525,7 @@ class ApprovalModelTest(TestCase):
             start_at=datetime.date(2021, 3, 25),
             end_at=datetime.date(2023, 3, 24),
         )
-        assert approval.remainder == datetime.timedelta(days=122)
+        assert approval.remainder == datetime.timedelta(days=123)
 
         # Futur prolongation, adding 4 days to approval.end_date.
         ProlongationFactory(
@@ -548,7 +548,7 @@ class ApprovalModelTest(TestCase):
 
         del approval.remainder
         approval.refresh_from_db()
-        prolonged_remainder = 122 + 4 + 5 + 30
+        prolonged_remainder = 123 + 4 + 5 + 30
         assert approval.remainder == datetime.timedelta(days=prolonged_remainder)
 
         # Past suspension (ignored), adding 5 days to approval.end_date.
@@ -557,7 +557,7 @@ class ApprovalModelTest(TestCase):
             start_at=datetime.date(2021, 3, 25),
             end_at=datetime.date(2021, 3, 30),
         )
-        # Ongoing suspension, adding 30 days to approval.end_date, but only 9 of them remain.
+        # Ongoing suspension, adding 30 days to approval.end_date, but only 10 of them remain.
         SuspensionFactory(
             approval=approval,
             start_at=datetime.date(2022, 11, 1),
@@ -567,7 +567,7 @@ class ApprovalModelTest(TestCase):
         del approval.remainder
         approval.refresh_from_db()
         # Substract to remainder the remaining suspension time
-        assert approval.remainder == datetime.timedelta(days=(prolonged_remainder + 5 + 30 - 9))
+        assert approval.remainder == datetime.timedelta(days=(prolonged_remainder + 5 + 30 - 10))
 
     @freeze_time("2023-04-26")
     def test_remainder_as_date(self):
@@ -732,7 +732,7 @@ class PoleEmploiApprovalModelTest(TestCase):
             start_at=datetime.date(2021, 3, 25),
             end_at=datetime.date(2023, 3, 24),
         )
-        assert pole_emploi_approval.remainder == datetime.timedelta(days=122)
+        assert pole_emploi_approval.remainder == datetime.timedelta(days=123)
 
 
 class PoleEmploiApprovalManagerTest(TestCase):

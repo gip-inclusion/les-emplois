@@ -118,16 +118,19 @@ class CommonApprovalMixin(models.Model):
 
     @property
     def duration(self):
-        return self.end_at - self.start_at
+        return self.end_at - self.start_at + datetime.timedelta(days=1)
 
     def _get_obj_remainder(self, obj):
         """
         Return the remaining time on an object with start_at and end_at dete fields
         A.k.a an Approval, a Suspension or a Prolongation
         """
-        return max(obj.end_at - timezone.localdate(), datetime.timedelta(0)) - max(
-            obj.start_at - timezone.localdate(), datetime.timedelta(0)
-        )
+        return max(
+            obj.end_at - timezone.localdate()
+            # end_at is inclusive.
+            + datetime.timedelta(days=1),
+            datetime.timedelta(0),
+        ) - max(obj.start_at - timezone.localdate(), datetime.timedelta(0))
 
     @cached_property
     def remainder(self):
@@ -150,7 +153,11 @@ class CommonApprovalMixin(models.Model):
         Return an estimated end date if this approval was "activated" today:
         prolongations are taken into account but not suspensions as an approval can be unsuspended.
         """
-        return timezone.localdate() + relativedelta(days=self.remainder.days)
+        return timezone.localdate() + relativedelta(
+            days=self.remainder.days
+            # end_at is inclusive.
+            - 1,
+        )
 
     @property
     def is_suspended(self):
