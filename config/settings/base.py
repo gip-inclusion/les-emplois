@@ -506,7 +506,7 @@ REST_FRAMEWORK = {
     # - arbitrary values, update should the need arise.
     "DEFAULT_THROTTLE_RATES": {
         "anon": "12/minute",
-        "user": "12/minute",
+        "user": "120/minute",
     },
 }
 
