@@ -2,11 +2,11 @@
 {% load django_bootstrap5 %}
 {% load buttons_form %}
 
-{% block title %}Suspendre le PASS IAE {{ block.super }}{% endblock %}
+{% block title %}Déclarer une suspension de PASS IAE {{ block.super }}{% endblock %}
 
 {% block content_title %}
     <h1>
-        Suspendre le PASS IAE
+        Déclarer une suspension de PASS IAE
         <br>
         <span class="text-muted">{{ approval.user.get_full_name }}</span>
     </h1>
@@ -68,31 +68,18 @@
                                 {% for field in form %}<input type="hidden" name="{{ field.name }}" value="{{ field.value }}">{% endfor %}
 
                                 {# Show the user a summary of the info. #}
-                                <div class="card my-3 text-center">
-                                    <div class="card-body">
-                                        <h5 class="h4 card-title">
-                                            Vous êtes sur le point de suspendre ce PASS IAE
-                                            <br>
-                                            pour la raison suivante :
-                                        </h5>
-                                        <p class="card-text">{{ form.instance.get_reason_display }}</p>
-                                        <p class="card-text text-success">
-                                            À partir du
-                                            <span class="badge rounded-pill bg-success">{{ form.instance.start_at|date:"d/m/Y" }}</span>
-                                            jusqu'au
-                                            <span class="badge rounded-pill bg-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div class="card my-3">
-                                    <div class="card-body">
-                                        <p>
-                                            En confirmant cette demande je certifie sur l'honneur que le motif de suspension choisi correspond à la situation du salarié.
-                                        </p>
-                                        {% itou_buttons_form primary_label="Confirmer la suspension" primary_aria_label="Confirmer la suspension du PASS IAE de "|add:approval.user.get_full_name primary_name="save" primary_value=1 secondary_url=request.path|add:"?back_url="|add:back_url secondary_name="edit" secondary_value="1" reset_url=back_url show_mandatory_fields_mention=False %}
-                                    </div>
-                                </div>
+                                <h5 class="h4 mb-3 card-title">Vous êtes sur le point de suspendre ce PASS IAE pour la raison suivante :</h5>
+                                <p class="card-text">{{ form.instance.get_reason_display }}</p>
+                                <p class="card-text text-success">
+                                    À partir du
+                                    <span class="badge rounded-pill bg-success">{{ form.instance.start_at|date:"d/m/Y" }}</span>
+                                    jusqu'au
+                                    <span class="badge rounded-pill bg-success">{{ form.instance.end_at|date:"d/m/Y" }}</span>
+                                </p>
+                                <p>
+                                    En confirmant cette demande je certifie sur l'honneur que le motif de suspension choisi correspond à la situation du salarié.
+                                </p>
+                                {% itou_buttons_form primary_label="Confirmer la suspension" primary_aria_label="Confirmer la suspension du PASS IAE de "|add:approval.user.get_full_name primary_name="save" primary_value=1 secondary_url=request.path|add:"?back_url="|add:back_url secondary_name="edit" secondary_value="1" reset_url=back_url show_mandatory_fields_mention=False %}
 
                             </form>
                         </div>
