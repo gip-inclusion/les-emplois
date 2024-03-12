@@ -375,11 +375,11 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
 
 
 class CreateCompanyViewTest(TestCase):
-    STRUCTURE_ALREADY_EXISTS_MSG = "La structure à laquelle vous souhaitez vous rattacher est déjà"
+    STRUCTURE_ALREADY_EXISTS_MSG = escape("La structure à laquelle vous souhaitez vous rattacher est déjà")
 
     @staticmethod
     def siret_siren_error_msg(company):
-        return f"Le SIRET doit commencer par le SIREN {company.siren}"
+        return escape(f"Le SIRET doit commencer par le SIREN {company.siren}")
 
     def test_create_non_preexisting_company_outside_of_siren_fails(self):
         company = CompanyFactory(with_membership=True)
@@ -412,8 +412,8 @@ class CreateCompanyViewTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        self.assertContains(response, escape(self.siret_siren_error_msg(company)))
-        self.assertNotContains(response, escape(self.STRUCTURE_ALREADY_EXISTS_MSG))
+        self.assertContains(response, self.siret_siren_error_msg(company))
+        self.assertNotContains(response, self.STRUCTURE_ALREADY_EXISTS_MSG)
 
         assert not Company.objects.filter(siret=post_data["siret"]).exists()
 
@@ -448,8 +448,8 @@ class CreateCompanyViewTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        self.assertNotContains(response, escape(self.siret_siren_error_msg(company)))
-        self.assertContains(response, escape(self.STRUCTURE_ALREADY_EXISTS_MSG))
+        self.assertNotContains(response, self.siret_siren_error_msg(company))
+        self.assertContains(response, self.STRUCTURE_ALREADY_EXISTS_MSG)
 
         assert Company.objects.filter(siret=post_data["siret"]).count() == 1
 
@@ -479,8 +479,8 @@ class CreateCompanyViewTest(TestCase):
         }
         response = self.client.post(url, data=post_data)
 
-        self.assertNotContains(response, escape(self.siret_siren_error_msg(company)))
-        self.assertContains(response, escape(self.STRUCTURE_ALREADY_EXISTS_MSG))
+        self.assertNotContains(response, self.siret_siren_error_msg(company))
+        self.assertContains(response, self.STRUCTURE_ALREADY_EXISTS_MSG)
         self.assertContains(response, escape(global_constants.ITOU_HELP_CENTER_URL))
 
         assert Company.objects.filter(siret=post_data["siret"]).count() == 1
