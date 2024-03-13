@@ -7,6 +7,33 @@
 {% block messages %}
     {{ block.super }}
 
+    {% if show_mobilemploi_banner %}
+        <div class="alert alert-info alert-dismissible-once fade show d-none" role="status" id="showMobilEmploiBanner">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            <div class="row">
+                <div class="col-auto pe-0">
+                    <i class="ri-information-line ri-xl text-info"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-2">
+                        <strong>Mobil’Emploi : dernières places disponibles !</strong>
+                    </p>
+                    <p class="mb-0">
+                        Vous êtes en recherche d’emploi ou de formation ?
+                        <br>
+                        L’équipe Mobil’Emploi vous propose un accompagnement gratuit et sur mesure.
+                    </p>
+                </div>
+                <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                    <a class="btn btn-sm btn-primary btn-ico" href="https://forms.gle/S6FfNXfW3t7jtFyB6" rel="noopener" aria-label="Demander à l’équipe Mobil’Emploi de me rappeler" target="_blank">
+                        <span>Je souhaite être rappelé(e)</span>
+                        <i class="ri-external-link-line ri-lg"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     {% if show_mobilemploi_prescriber_banner %}
         <div class="alert alert-info alert-dismissible-once fade show d-none" role="status" id="showMobilEmploiPrescriberBanner">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
