@@ -1,4 +1,3 @@
-import contextlib
 import datetime
 from operator import itemgetter
 
@@ -15,9 +14,8 @@ from django_select2.forms import Select2MultipleWidget
 
 from itou.approvals.models import Approval
 from itou.asp import models as asp_models
-from itou.cities.models import City
-from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
-from itou.common_apps.address.forms import MandatoryAddressFormMixin
+from itou.common_apps.address.departments import DEPARTMENTS
+from itou.common_apps.address.forms import JobSeekerAddressForm, MandatoryAddressFormMixin
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType, JobDescriptionSource
 from itou.companies.models import JobDescription
@@ -194,33 +192,9 @@ class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, JobSeekerProfile
         )
 
 
-class CreateOrUpdateJobSeekerStep2Form(MandatoryAddressFormMixin, forms.ModelForm):
-    class Meta:
-        model = User
-        fields = [
-            "address_line_1",
-            "address_line_2",
-            "post_code",
-            "city_slug",
-            "city",
-            "phone",
-        ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Initial value are overridden in OptionalAddressFormMixin() because we have a model instance,
-        # but that instance is always empty in our case so force the value to the one we have.
-        with contextlib.suppress(KeyError, City.DoesNotExist):
-            city = City.objects.get(slug=kwargs["initial"]["city_slug"])
-            self.initial["city"] = city.display_name
-            self.initial["city_slug"] = city.slug
-
-    def clean(self):
-        super().clean()
-
-        if post_code := self.cleaned_data.get("post_code"):
-            self.cleaned_data["department"] = department_from_postcode(post_code)
+class CreateOrUpdateJobSeekerStep2Form(JobSeekerAddressForm, forms.ModelForm):
+    class Meta(JobSeekerAddressForm.Meta):
+        fields = JobSeekerAddressForm.Meta.fields + ["phone"]
 
 
 class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
