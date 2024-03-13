@@ -1,11 +1,3 @@
-.s-main {
-    background-color: var(--bs-light);
-}
-
-.p-home .s-main {
-    background-color: var(--bs-white);
-}
-
 .p-home .has-bg-communaute {
     background-repeat: no-repeat;
     background-size: cover;

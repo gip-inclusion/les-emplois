@@ -3,6 +3,8 @@ from django.contrib.gis.geos import Point
 from django.template.defaultfilters import capfirst
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
+from django.utils.html import escape
+from django.utils.http import urlencode
 
 from itou.cities.models import City
 from itou.companies.enums import POLE_EMPLOI_SIRET, CompanyKind, ContractNature, ContractType, JobSource
@@ -21,6 +23,7 @@ DISTRICTS = "Arrondissements de Paris"
 
 class SearchCompanyTest(TestCase):
     URL = reverse_lazy("search:employers_results")
+    URL_JOBS = reverse_lazy("search:job_descriptions_results")
 
     @pytest.mark.ignore_template_errors
     def test_not_existing(self):
@@ -65,7 +68,7 @@ class SearchCompanyTest(TestCase):
         self.assertContains(response, "Rechercher un emploi inclusif")
         self.assertContains(
             response,
-            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
+            '<span>Employeurs</span><span class="badge badge-sm rounded-pill ms-2">2</span>',
             html=True,
         )
         self.assertContains(response, DISTRICTS)
@@ -74,7 +77,7 @@ class SearchCompanyTest(TestCase):
         response = self.client.get(self.URL, {"city": city_slug, "districts_75": ["75001"]})
         self.assertContains(
             response,
-            """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
+            '<span>Employeur</span><span class="badge badge-sm rounded-pill ms-2">1</span>',
             html=True,
         )
         self.assertContains(response, company_1.display_name)
@@ -90,8 +93,9 @@ class SearchCompanyTest(TestCase):
         response = self.client.get(self.URL, {"city": city.slug, "kinds": [CompanyKind.AI]})
         self.assertContains(
             response,
-            """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
+            '<span>Employeur</span><span class="badge badge-sm rounded-pill ms-2">1</span>',
             html=True,
+            count=1,
         )
 
         response = self.client.get(self.URL, {"city": city.slug, "kinds": [CompanyKind.EI]})
@@ -124,8 +128,9 @@ class SearchCompanyTest(TestCase):
         response = self.client.get(self.URL, {"city": guerande.slug, "distance": 100})
         self.assertContains(
             response,
-            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>""",
+            '<span>Employeurs</span><span class="badge badge-sm rounded-pill ms-2">3</span>',
             html=True,
+            count=1,
         )
         self.assertContains(response, COMPANY_VANNES.capitalize())
         self.assertContains(response, COMPANY_GUERANDE.capitalize())
@@ -135,8 +140,9 @@ class SearchCompanyTest(TestCase):
         response = self.client.get(self.URL, {"city": guerande.slug, "distance": 15})
         self.assertContains(
             response,
-            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
+            '<span>Employeurs</span><span class="badge badge-sm rounded-pill ms-2">2</span>',
             html=True,
+            count=1,
         )
         self.assertContains(response, COMPANY_GUERANDE.capitalize())
         self.assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
@@ -145,8 +151,9 @@ class SearchCompanyTest(TestCase):
         response = self.client.get(self.URL, {"city": guerande.slug, "distance": 100, "departments": ["44"]})
         self.assertContains(
             response,
-            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
+            '<span>Employeurs</span><span class="badge badge-sm rounded-pill ms-2">2</span>',
             html=True,
+            count=1,
         )
         self.assertContains(response, COMPANY_GUERANDE.capitalize())
         self.assertContains(response, COMPANY_SAINT_ANDRE.capitalize())
@@ -155,7 +162,7 @@ class SearchCompanyTest(TestCase):
         response = self.client.get(self.URL, {"city": vannes.slug, "distance": 100, "departments": ["56"]})
         self.assertContains(
             response,
-            """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
+            '<span>Employeur</span><span class="badge badge-sm rounded-pill ms-2">1</span>',
             html=True,
         )
         self.assertContains(response, COMPANY_VANNES.capitalize())
@@ -215,8 +222,9 @@ class SearchCompanyTest(TestCase):
         response = self.client.get(self.URL, {"city": city.slug})
         self.assertContains(
             response,
-            """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
+            '<span>Employeur</span><span class="badge badge-sm rounded-pill ms-2">1</span>',
             html=True,
+            count=1,
         )
         self.assertContains(response, "Offres clauses sociales")
 
@@ -294,8 +302,9 @@ class SearchCompanyTest(TestCase):
             response = self.client.get(self.URL, {"city": guerande.slug, "distance": 100})
         self.assertContains(
             response,
-            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>""",
+            '<span>Employeurs</span><span class="badge badge-sm rounded-pill ms-2">3</span>',
             html=True,
+            count=1,
         )
         with self.assertNumQueries(
             BASE_NUM_QUERIES
@@ -312,16 +321,18 @@ class SearchCompanyTest(TestCase):
             )
         self.assertContains(
             response,
-            """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
+            '<span>Employeur</span><span class="badge badge-sm rounded-pill ms-2">1</span>',
             html=True,
+            count=1,
         )
 
         # Check that invalid value doesn't crash
         response = self.client.get(self.URL, {"city": guerande.slug, "distance": 100, "company": "foobar"})
         self.assertContains(
             response,
-            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>""",
+            '<span>Employeurs</span><span class="badge badge-sm rounded-pill ms-2">3</span>',
             html=True,
+            count=1,
         )
 
 
@@ -349,6 +360,7 @@ class SearchPrescriberTest(TestCase):
 
 class JobDescriptionSearchViewTest(TestCase):
     URL = reverse_lazy("search:job_descriptions_results")
+    URL_EMPLOYERS = reverse_lazy("search:employers_results")
 
     @pytest.mark.ignore_template_errors
     def test_not_existing(self):
@@ -361,6 +373,7 @@ class JobDescriptionSearchViewTest(TestCase):
         paris_city = City.objects.create(
             name="Paris", slug=city_slug, department="75", post_codes=["75001"], coords=Point(5, 23)
         )
+        filters_param = {"city": city_slug, "city_name": "Paris (75)", "distance": 25}
 
         company = CompanyFactory(department="75", coords=paris_city.coords, post_code="75001")
         job = JobDescriptionFactory(company=company)
@@ -380,18 +393,31 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(response, "Emplois inclusifs à 25 km du centre de Paris (75)")
         self.assertContains(
             response,
-            """
-            <span class="d-none d-lg-inline">
-                Poste ouvert au recrutement
-                <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>
-            </span>
+            f"""
+            <a class="nav-link active"
+                data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
+                data-matomo-option="clic-onglet-fichesdeposte"
+                href="{self.URL}?{escape(urlencode(filters_param))}">
+                <i class="ri-briefcase-4-line font-weight-normal me-1" aria-hidden="true"></i>
+                <span>Poste <span class="d-none d-md-inline">ouvert au recrutement</span></span>
+                <span class="badge badge-sm rounded-pill ms-2">1</span>
+            </a>
             """,
             html=True,
             count=1,
         )
         self.assertContains(
             response,
-            """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
+            f"""
+            <a class="nav-link"
+                data-matomo-event="true" data-matomo-category="candidature"
+                data-matomo-action="clic" data-matomo-option="clic-onglet-employeur"
+                href="{self.URL_EMPLOYERS}?{escape(urlencode(filters_param))}">
+                <i class="ri-hotel-line font-weight-normal me-1" aria-hidden="true"></i>
+                <span>Employeur</span>
+                <span class="badge badge-sm rounded-pill ms-2">1</span>
+            </a>
+            """,
             html=True,
         )
 
@@ -405,13 +431,30 @@ class JobDescriptionSearchViewTest(TestCase):
         city = create_city_saint_andre()
         CompanyFactory(department="44", coords=city.coords, post_code="44117", kind=CompanyKind.AI)
 
-        response = self.client.get(self.URL, {"city": city.slug, "kinds": [CompanyKind.AI, CompanyKind.ETTI]})
+        response = self.client.get(
+            self.URL,
+            {
+                "city": city.slug,
+                "city_name": city.name + " (44)",
+                "distance": 25,
+                "kinds": [CompanyKind.AI, CompanyKind.ETTI],
+            },
+        )
         self.assertContains(
             response,
-            """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
+            f"""
+            <a class="nav-link"
+                data-matomo-event="true" data-matomo-category="candidature"
+                data-matomo-action="clic" data-matomo-option="clic-onglet-employeur"
+                href="{self.URL_EMPLOYERS}?{escape(urlencode(response.wsgi_request.GET, doseq=True))}">
+                <i class="ri-hotel-line font-weight-normal me-1" aria-hidden="true"></i>
+                <span>Employeur</span>
+                <span class="badge badge-sm rounded-pill ms-2">1</span>
+            </a>
+            """,
             html=True,
+            count=1,
         )
-
         response = self.client.get(self.URL, {"city": city.slug, "kinds": [CompanyKind.EI]})
         self.assertContains(response, "Aucun résultat")
 
@@ -454,7 +497,7 @@ class JobDescriptionSearchViewTest(TestCase):
         response = self.client.get(self.URL, {"city": guerande.slug, "distance": 100})
         self.assertContains(
             response,
-            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>""",
+            '<span>Employeurs</span><span class="badge badge-sm rounded-pill ms-2">3</span>',
             html=True,
         )
         self.assertContains(response, COMPANY_VANNES.capitalize())
@@ -465,7 +508,7 @@ class JobDescriptionSearchViewTest(TestCase):
         response = self.client.get(self.URL, {"city": guerande.slug, "distance": 15})
         self.assertContains(
             response,
-            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
+            '<span>Employeurs</span><span class="badge badge-sm rounded-pill ms-2">2</span>',
             html=True,
         )
         self.assertContains(response, COMPANY_GUERANDE.capitalize())
@@ -475,7 +518,7 @@ class JobDescriptionSearchViewTest(TestCase):
         response = self.client.get(self.URL, {"city": guerande.slug, "distance": 100, "departments": ["44"]})
         self.assertContains(
             response,
-            """Employeurs <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>""",
+            '<span>Employeurs</span><span class="badge badge-sm rounded-pill ms-2">2</span>',
             html=True,
         )
         self.assertContains(response, COMPANY_GUERANDE.capitalize())
@@ -486,7 +529,7 @@ class JobDescriptionSearchViewTest(TestCase):
         response = self.client.get(self.URL, {"city": vannes.slug, "distance": 100, "departments": ["56"]})
         self.assertContains(
             response,
-            """Employeur <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>""",
+            '<span>Employeur</span><span class="badge badge-sm rounded-pill ms-2">1</span>',
             html=True,
         )
         self.assertContains(response, COMPANY_VANNES.capitalize())
@@ -578,9 +621,8 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <span class="d-inline d-lg-none">
-                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>
-            </span>
+            <span>Postes <span class="d-none d-md-inline">ouverts au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">3</span>
             """,
             html=True,
             count=1,
@@ -600,9 +642,8 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <span class="d-inline d-lg-none">
-                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>
-            </span>
+            <span>Postes <span class="d-none d-md-inline">ouverts au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">2</span>
             """,
             html=True,
             count=1,
@@ -619,9 +660,8 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <span class="d-inline d-lg-none">
-                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>
-            </span>
+            <span>Postes <span class="d-none d-md-inline">ouverts au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">2</span>
             """,
             html=True,
             count=1,
@@ -638,9 +678,8 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <span class="d-inline d-lg-none">
-                Poste <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>
-            </span>
+            <span>Poste <span class="d-none d-md-inline">ouvert au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">1</span>
             """,
             html=True,
             count=1,
@@ -691,9 +730,8 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <span class="d-inline d-lg-none">
-                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">3</span>
-            </span>
+            <span>Postes <span class="d-none d-md-inline">ouverts au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">3</span>
             """,
             html=True,
             count=1,
@@ -713,9 +751,8 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <span class="d-inline d-lg-none">
-                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>
-            </span>
+            <span>Postes <span class="d-none d-md-inline">ouverts au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">2</span>
             """,
             html=True,
             count=1,
@@ -729,9 +766,8 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <span class="d-inline d-lg-none">
-                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>
-            </span>
+            <span>Postes <span class="d-none d-md-inline">ouverts au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">2</span>
             """,
             html=True,
             count=1,
@@ -745,9 +781,8 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <span class="d-inline d-lg-none">
-                Poste <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>
-            </span>
+            <span>Poste <span class="d-none d-md-inline">ouvert au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">1</span>
             """,
             html=True,
             count=1,
@@ -798,9 +833,8 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <span class="d-inline d-lg-none">
-                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>
-            </span>
+            <span>Postes <span class="d-none d-md-inline">ouverts au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">2</span>
             """,
             html=True,
             count=1,
@@ -841,9 +875,8 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <span class="d-inline d-lg-none">
-                Poste <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>
-            </span>
+            <span>Poste <span class="d-none d-md-inline">ouvert au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">1</span>
             """,
             html=True,
             count=1,
@@ -859,9 +892,8 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <span class="d-inline d-lg-none">
-                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>
-            </span>
+            <span>Postes <span class="d-none d-md-inline">ouverts au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">2</span>
             """,
             html=True,
             count=1,
@@ -877,9 +909,8 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <span class="d-inline d-lg-none">
-                Poste <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>
-            </span>
+            <span>Poste <span class="d-none d-md-inline">ouvert au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">1</span>
             """,
             html=True,
             count=1,
@@ -895,9 +926,8 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <span class="d-inline d-lg-none">
-                Poste <span class="badge badge-sm rounded-pill bg-info-lighter text-info">1</span>
-            </span>
+            <span>Poste <span class="d-none d-md-inline">ouvert au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">1</span>
             """,
             html=True,
             count=1,
@@ -915,9 +945,8 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <span class="d-inline d-lg-none">
-                Postes <span class="badge badge-sm rounded-pill bg-info-lighter text-info">2</span>
-            </span>
+            <span>Postes <span class="d-none d-md-inline">ouverts au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">2</span>
             """,
             html=True,
             count=1,

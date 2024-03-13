@@ -114,20 +114,18 @@
                     <ul class="s-tabs-01__nav nav nav-tabs" role="tablist" aria-labelledby="metiers-title">
                         <li class="nav-item" role="presentation">
                             <a id="recrutements-en-cours-tab" class="nav-link active" role="tab" href="#recrutements-en-cours" data-bs-toggle="tab" aria-selected="true" aria-controls="recrutements-en-cours">
-                                Recrutement{{ active_jobs_descriptions|pluralizefr }} en cours <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">{{ active_jobs_descriptions|length }}</span>
+                                <span>Recrutement{{ active_jobs_descriptions|pluralizefr }} en cours</span>
+                                <span class="badge badge-sm rounded-pill ms-2">{{ active_jobs_descriptions|length }}</span>
                             </a>
                         </li>
                         {% if other_jobs_descriptions %}
                             <li class="nav-item" role="presentation">
                                 <a id="autres-metiers-tab" class="nav-link" role="tab" href="#autres-metiers" data-bs-toggle="tab" aria-selected="false" aria-controls="autres-metiers">
-                                    Autre{{ other_jobs_descriptions|pluralizefr }} métier{{ other_jobs_descriptions|pluralizefr }} exercé{{ other_jobs_descriptions|pluralizefr }} <span class="badge badge-sm rounded-pill bg-info-light text-dark ms-2">{{ other_jobs_descriptions|length }}</span>
+                                    <span>Autre{{ other_jobs_descriptions|pluralizefr }} métier{{ other_jobs_descriptions|pluralizefr }} exercé{{ other_jobs_descriptions|pluralizefr }}</span>
+                                    <span class="badge badge-sm rounded-pill ms-2">{{ other_jobs_descriptions|length }}</span>
                                 </a>
                             </li>
                         {% endif %}
-                        <li class="nav-item-dropdown dropdown" role="presentation">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" id="sTabs01DropdownMoreLink" data-bs-toggle="dropdown" aria-expanded="false"><i class="ri-more-line"></i></a>
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="sTabs01DropdownMoreLink"></div>
-                        </li>
                     </ul>
                     <div class="tab-content">
                         <div id="recrutements-en-cours" class="tab-pane fade active show" aria-labelledby="recrutements-en-cours-tab" role="tabpanel">
