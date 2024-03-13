@@ -4,20 +4,18 @@
   <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" role="tablist">
                           <li class="nav-item" role="presentation">
                               <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
-                                  Recrutement en cours <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">0</span>
+                                  <span>Recrutement en cours</span>
+                                  <span class="badge badge-sm rounded-pill ms-2">0</span>
                               </a>
                           </li>
                           
                               <li class="nav-item" role="presentation">
                                   <a aria-controls="autres-metiers" aria-selected="false" class="nav-link" data-bs-toggle="tab" href="#autres-metiers" id="autres-metiers-tab" role="tab">
-                                      Autre métier exercé <span class="badge badge-sm rounded-pill bg-info-light text-dark ms-2">1</span>
+                                      <span>Autre métier exercé</span>
+                                      <span class="badge badge-sm rounded-pill ms-2">1</span>
                                   </a>
                               </li>
                           
-                          <li class="nav-item-dropdown dropdown" role="presentation">
-                              <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="sTabs01DropdownMoreLink" role="button"><i class="ri-more-line"></i></a>
-                              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-end"></div>
-                          </li>
                       </ul>
   '''
 # ---
@@ -71,20 +69,18 @@
   <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" role="tablist">
                           <li class="nav-item" role="presentation">
                               <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
-                                  Recrutement en cours <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">1</span>
+                                  <span>Recrutement en cours</span>
+                                  <span class="badge badge-sm rounded-pill ms-2">1</span>
                               </a>
                           </li>
                           
                               <li class="nav-item" role="presentation">
                                   <a aria-controls="autres-metiers" aria-selected="false" class="nav-link" data-bs-toggle="tab" href="#autres-metiers" id="autres-metiers-tab" role="tab">
-                                      Autre métier exercé <span class="badge badge-sm rounded-pill bg-info-light text-dark ms-2">1</span>
+                                      <span>Autre métier exercé</span>
+                                      <span class="badge badge-sm rounded-pill ms-2">1</span>
                                   </a>
                               </li>
                           
-                          <li class="nav-item-dropdown dropdown" role="presentation">
-                              <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="sTabs01DropdownMoreLink" role="button"><i class="ri-more-line"></i></a>
-                              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-end"></div>
-                          </li>
                       </ul>
   '''
 # ---
@@ -173,20 +169,18 @@
   <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" role="tablist">
                           <li class="nav-item" role="presentation">
                               <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
-                                  Recrutement en cours <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">0</span>
+                                  <span>Recrutement en cours</span>
+                                  <span class="badge badge-sm rounded-pill ms-2">0</span>
                               </a>
                           </li>
                           
                               <li class="nav-item" role="presentation">
                                   <a aria-controls="autres-metiers" aria-selected="false" class="nav-link" data-bs-toggle="tab" href="#autres-metiers" id="autres-metiers-tab" role="tab">
-                                      Autre métier exercé <span class="badge badge-sm rounded-pill bg-info-light text-dark ms-2">1</span>
+                                      <span>Autre métier exercé</span>
+                                      <span class="badge badge-sm rounded-pill ms-2">1</span>
                                   </a>
                               </li>
                           
-                          <li class="nav-item-dropdown dropdown" role="presentation">
-                              <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="sTabs01DropdownMoreLink" role="button"><i class="ri-more-line"></i></a>
-                              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-end"></div>
-                          </li>
                       </ul>
   '''
 # ---
@@ -378,14 +372,11 @@
                       <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" role="tablist">
                           <li class="nav-item" role="presentation">
                               <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
-                                  Recrutement en cours <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">0</span>
+                                  <span>Recrutement en cours</span>
+                                  <span class="badge badge-sm rounded-pill ms-2">0</span>
                               </a>
                           </li>
                           
-                          <li class="nav-item-dropdown dropdown" role="presentation">
-                              <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="sTabs01DropdownMoreLink" role="button"><i class="ri-more-line"></i></a>
-                              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-end"></div>
-                          </li>
                       </ul>
                       <div class="tab-content">
                           <div aria-labelledby="recrutements-en-cours-tab" class="tab-pane fade active show" id="recrutements-en-cours" role="tabpanel">
@@ -411,14 +402,11 @@
   <ul aria-labelledby="metiers-title" class="s-tabs-01__nav nav nav-tabs" role="tablist">
                           <li class="nav-item" role="presentation">
                               <a aria-controls="recrutements-en-cours" aria-selected="true" class="nav-link active" data-bs-toggle="tab" href="#recrutements-en-cours" id="recrutements-en-cours-tab" role="tab">
-                                  Recrutement en cours <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">1</span>
+                                  <span>Recrutement en cours</span>
+                                  <span class="badge badge-sm rounded-pill ms-2">1</span>
                               </a>
                           </li>
                           
-                          <li class="nav-item-dropdown dropdown" role="presentation">
-                              <a aria-expanded="false" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" id="sTabs01DropdownMoreLink" role="button"><i class="ri-more-line"></i></a>
-                              <div aria-labelledby="sTabs01DropdownMoreLink" class="dropdown-menu dropdown-menu-end"></div>
-                          </li>
                       </ul>
   '''
 # ---

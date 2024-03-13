@@ -116,7 +116,8 @@
                         <ul class="s-tabs-01__nav nav nav-tabs" role="tablist" aria-labelledby="recrutements-title">
                             <li class="nav-item" role="presentation">
                                 <a id="recrutements-en-cours-tab" class="nav-link active" role="tab" href="#recrutements-en-cours" data-bs-toggle="tab" aria-selected="true" aria-controls="recrutements-en-cours">
-                                    Recrutement{{ others_active_jobs|pluralizefr }} en cours dans cette structure <span class="badge badge-sm bg-primary rounded-pill text-white ms-2">{{ others_active_jobs|length }}</span>
+                                    <span>Recrutement{{ others_active_jobs|pluralizefr }} en cours dans cette structure</span>
+                                    <span class="badge badge-sm rounded-pill ms-2">{{ others_active_jobs|length }}</span>
                                 </a>
                             </li>
                         </ul>

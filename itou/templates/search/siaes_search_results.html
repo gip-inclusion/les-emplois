@@ -28,33 +28,22 @@
                         {% endif %}
                         <ul class="s-tabs-01__nav nav nav-tabs mt-3 mt-md-5">
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link {% if request.resolver_match.view_name == "search:employers_results" %}active{% endif %}"
+                                <a class="nav-link{% if request.resolver_match.view_name == "search:employers_results" %} active{% endif %}"
                                    {% matomo_event "candidature" "clic" "clic-onglet-employeur" %}
                                    href="{% url "search:employers_results" %}?{{ filters_query_string }}">
-                                    <i class="ri-hotel-line ri-xl font-weight-normal me-1"></i>
-                                    <span>
-                                        Employeur{{ siaes_count|pluralizefr }} <span class="badge badge-sm rounded-pill bg-info-lighter text-info">{{ siaes_count }}</span>
-                                    </span>
+                                    <i class="ri-hotel-line font-weight-normal me-1" aria-hidden="true"></i>
+                                    <span>Employeur{{ siaes_count|pluralizefr }}</span>
+                                    <span class="badge badge-sm rounded-pill ms-2">{{ siaes_count }}</span>
                                 </a>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <a class="nav-link {% if request.resolver_match.view_name == "search:job_descriptions_results" %}active{% endif %}"
+                                <a class="nav-link{% if request.resolver_match.view_name == "search:job_descriptions_results" %} active{% endif %}"
                                    {% matomo_event "candidature" "clic" "clic-onglet-fichesdeposte" %}
                                    href="{% url "search:job_descriptions_results" %}?{{ filters_query_string }}">
-                                    <i class="ri-briefcase-4-line ri-xl font-weight-normal me-1"></i>
-                                    <span class="d-inline d-lg-none">
-                                        Poste{{ job_descriptions_count|pluralizefr }}
-                                        <span class="badge badge-sm rounded-pill bg-info-lighter text-info">{{ job_descriptions_count }}</span>
-                                    </span>
-                                    <span class="d-none d-lg-inline">
-                                        Poste{{ job_descriptions_count|pluralizefr }} ouvert{{ job_descriptions_count|pluralizefr }} au recrutement
-                                        <span class="badge badge-sm rounded-pill bg-info-lighter text-info">{{ job_descriptions_count }}</span>
-                                    </span>
+                                    <i class="ri-briefcase-4-line font-weight-normal me-1" aria-hidden="true"></i>
+                                    <span>Poste{{ job_descriptions_count|pluralizefr }} <span class="d-none d-md-inline">ouvert{{ job_descriptions_count|pluralizefr }} au recrutement</span></span>
+                                    <span class="badge badge-sm rounded-pill ms-2">{{ job_descriptions_count }}</span>
                                 </a>
-                            </li>
-                            <li class="nav-item-dropdown dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" id="sTabs01DropdownMoreLink" data-bs-toggle="dropdown" aria-expanded="false"><i class="ri-more-line"></i></a>
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="sTabs01DropdownMoreLink"></div>
                             </li>
                         </ul>
                         <div class="tab-content">
@@ -78,9 +67,9 @@
                                                 {% include "companies/includes/_card_jobdescription.html" with job_description=item %}
                                             {% endif %}
                                         {% empty %}
-                                            <div class="c-card card mb-3 mb-md-4">
-                                                <div class="card-body">
-                                                    <p>Aucun résultat avec les filtres actuels.</p>
+                                            <div class="c-box c-box--results mb-3 mb-md-4">
+                                                <div class="c-box--results__body">
+                                                    <p class="mb-0">Aucun résultat avec les filtres actuels.</p>
                                                 </div>
                                             </div>
                                         {% endfor %}
