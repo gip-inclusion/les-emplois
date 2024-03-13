@@ -1,4 +1,5 @@
 from allauth.account.views import PasswordChangeView
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
@@ -9,6 +10,7 @@ from django.db.models import F
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.views.decorators.http import require_POST
@@ -147,6 +149,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "pending_prolongation_requests": None,
         "evaluated_siae_notifications": EvaluatedSiae.objects.none(),
         "show_eiti_webinar_banner": False,
+        "show_mobilemploi_banner": False,
         "show_mobilemploi_prescriber_banner": False,
         "siae_suspension_text_with_dates": None,
         "siae_search_form": SiaeSearchForm(),
@@ -206,6 +209,16 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         for attr in required_attributes:
             if not getattr(request.user, attr):
                 return HttpResponseRedirect(reverse("dashboard:edit_user_info"))
+        active_user_job_applications_interval = [
+            timezone.now() - relativedelta(months=6),
+            timezone.now() - relativedelta(months=1),
+        ]
+        context["show_mobilemploi_banner"] = (
+            request.user.department in MOBILEMPLOI_DEPARTMENTS
+            and request.user.job_applications.filter(created_at__range=active_user_job_applications_interval)
+            .exclude(state__in=[JobApplicationState.ACCEPTED, JobApplicationState.OBSOLETE])
+            .exists()
+        )
 
     return render(request, template_name, context)
 
