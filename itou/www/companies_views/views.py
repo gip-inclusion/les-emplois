@@ -24,7 +24,7 @@ from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusion
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
-from itou.utils.urls import get_absolute_url, get_safe_url
+from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
 from itou.www.companies_views import forms as companies_forms
 
 
@@ -81,6 +81,16 @@ def get_data_inclusion_services(code_insee):
     return results
 
 
+def report_tally_url(user, company, job_description=None):
+    base_url = "https://tally.so/r/m62GYo"
+    params = {"companyID": company.pk}
+    if user.pk:
+        params["UserID"] = user.pk
+    if job_description:
+        params["jobdescriptionID"] = job_description.pk
+    return add_url_params(base_url, params)
+
+
 ### Job description views
 
 
@@ -135,6 +145,7 @@ def job_description_card(request, job_description_id, template_name="companies/j
         "breadcrumbs": breadcrumbs,
         "matomo_custom_title": "Détails de la fiche de poste",
         "code_insee": code_insee,
+        "report_tally_url": report_tally_url(request.user, company, job_description),
     }
     return render(request, template_name, context)
 
@@ -512,6 +523,7 @@ def card(request, siae_id, template_name="companies/card.html"):
         "matomo_custom_title": "Fiche de la structure d'insertion",
         "code_insee": company.insee_city.code_insee if company.insee_city else None,
         "siae_card_absolute_url": get_absolute_url(reverse("companies_views:card", kwargs={"siae_id": company.pk})),
+        "report_tally_url": report_tally_url(request.user, company),
     }
     return render(request, template_name, context)
 

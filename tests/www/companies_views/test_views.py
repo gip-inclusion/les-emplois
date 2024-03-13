@@ -26,7 +26,7 @@ from tests.companies.factories import (
     SiaeConventionFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import EmployerFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 
 
@@ -52,17 +52,26 @@ class CardViewTest(TestCase):
         self.assertContains(response, self.APPLY)
 
     def test_card_no_active_members(self):
-        company = CompanyFactory(with_membership=False, for_snapshot=True)
+        company = CompanyFactory(with_membership=False, for_snapshot=True, pk=100)
         url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         response = self.client.get(url)
-        soup = parse_response_to_soup(
-            response,
-            selector="#main",
-            replace_in_attr=[
-                ("href", f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
-                ("data-it-copy-to-clipboard", f"/company/{company.pk}/card", "/company/[PK of Company]/card"),
-            ],
-        )
+        soup = parse_response_to_soup(response, selector="#main")
+        assert str(soup) == self.snapshot()
+
+    def test_card_tally_url_with_user(self):
+        company = CompanyFactory(with_membership=False, for_snapshot=True, pk=100)
+        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        user = JobSeekerFactory(pk=10)
+        self.client.force_login(user)
+        response = self.client.get(url)
+        soup = parse_response_to_soup(response, selector=".c-box--action")
+        assert str(soup) == self.snapshot()
+
+    def test_card_tally_url_no_user(self):
+        company = CompanyFactory(with_membership=False, for_snapshot=True, pk=100)
+        url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        response = self.client.get(url)
+        soup = parse_response_to_soup(response, selector=".c-box--action")
         assert str(soup) == self.snapshot()
 
     def test_card_no_active_jobs(self):
@@ -207,7 +216,13 @@ class CardViewTest(TestCase):
         self.assertNotContains(response, self.APPLY)
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class JobDescriptionCardViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        create_test_romes_and_appellations(("N1101"))
+
     def test_job_description_card(self):
         company = CompanyWithMembershipAndJobsFactory()
         job_description = company.job_description_through.first()
@@ -241,6 +256,29 @@ class JobDescriptionCardViewTest(TestCase):
         assert response.context["others_active_jobs"].count() == 3
         for other_active_job in response.context["others_active_jobs"]:
             self.assertContains(response, other_active_job.display_name, html=True)
+
+    def test_card_tally_url_with_user(self):
+        job_description = JobDescriptionFactory(
+            pk=42,
+            company__pk=100,
+            company__for_snapshot=True,
+        )
+        url = reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
+        self.client.force_login(JobSeekerFactory(pk=10))
+        response = self.client.get(url)
+        soup = parse_response_to_soup(response, selector=".c-box--action")
+        assert str(soup) == self.snapshot()
+
+    def test_card_tally_url_no_user(self):
+        job_description = JobDescriptionFactory(
+            pk=42,
+            company__pk=100,
+            company__for_snapshot=True,
+        )
+        url = reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
+        response = self.client.get(url)
+        soup = parse_response_to_soup(response, selector=".c-box--action")
+        assert str(soup) == self.snapshot()
 
 
 class ShowAndSelectFinancialAnnexTest(TestCase):
