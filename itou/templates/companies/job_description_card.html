@@ -56,8 +56,22 @@
                                         </a>
                                     </div>
                                 {% endif %}
-                                <div class="form-group col-12 col-lg d-lg-flex justify-content-lg-end">
-                                    {% include 'includes/copy_to_clipboard.html' with content=job.get_absolute_url text="Copier le lien de cette fiche" placement="bottom" css_classes="btn btn-lg btn-ico btn-link-white btn-block w-lg-auto" %}
+                                <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
+                                    <button class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires">
+                                        <i class="ri-more-2-line ri-lg font-weight-normal" aria-hidden="true"></i>
+                                        <span class="d-lg-none">Autres actions</span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            {% include 'includes/copy_to_clipboard.html' with content=job.get_absolute_url text="Copier le lien de cette fiche de poste" css_classes="dropdown-item btn-ico btn-link" %}
+                                        </li>
+                                        <li>
+                                            <a href="{{ report_tally_url }}" rel="noopener" class="dropdown-item btn-ico btn-link" target="_blank">
+                                                <i class="ri-notification-4-line ri-lg font-weight-normal" aria-hidden="true"></i>
+                                                <span>Signaler cette fiche de poste</span>
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </div>
                             {% endif %}
                         </div>

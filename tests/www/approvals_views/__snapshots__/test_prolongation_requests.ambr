@@ -828,7 +828,7 @@
                                   <i class="ri-mail-line"></i>
                                   <a class="btn-link me-3" href="mailto:email@example.com">email@example.com</a>
                                   <button class="btn btn-ico btn-secondary" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="email@example.com">
-      <i class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
       <span>Copier</span>
   </button>
   
