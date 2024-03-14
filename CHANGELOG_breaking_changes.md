@@ -1,5 +1,8 @@
 # Journal des changements techniques majeurs
 
+## 2024-03-14
+- Définition d’`API_BAN_BASE_URL` requise, utiliser la valeur du [`.env.template`](./.env.template).
+
 ## 2024-02-14
 - Redis devient un composant requis de l’infrastructure de dev, et la prod l’utilise pour le cache Django. Pour mettre à jour son environnement de développement :
 
