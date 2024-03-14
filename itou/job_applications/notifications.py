@@ -163,7 +163,7 @@ class JobApplicationNewForJobSeekerNotification(JobSeekerNotification, EmailNoti
 
 
 @notifications_registry.register
-class NewJobApplicationForPrescriberNotification(PrescriberNotification, EmailNotification):
+class JobApplicationNewForPrescriberNotification(PrescriberNotification, EmailNotification):
     """Notification sent to prescriber when created"""
 
     name = "Confirmation d’envoi de candidature"
@@ -176,7 +176,7 @@ class NewJobApplicationForPrescriberNotification(PrescriberNotification, EmailNo
 class JobApplicationNewForEmployerNotification(EmployerNotification, EmailNotification):
     """Notification sent to new employers when created"""
 
-    name = "Confirmation d’envoi de candidature"
+    name = "Nouvelle candidature"
     category = NotificationCategory.JOB_APPLICATION
     # FIXME: update template names
     subject_template = "apply/email/new_for_company_subject.txt"

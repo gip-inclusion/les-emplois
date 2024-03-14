@@ -43,12 +43,12 @@ from .notifications import (
     JobApplicationCanceledForPrescriberNotification,
     JobApplicationNewForEmployerNotification,
     JobApplicationNewForJobSeekerNotification,
+    JobApplicationNewForPrescriberNotification,
     JobApplicationRefusedForJobSeekerNotification,
     JobApplicationRefusedForPrescriberNotification,
     JobApplicationTransferredForEmployerNotification,
     JobApplicationTransferredForJobSeekerNotification,
     JobApplicationTransferredForPrescriberNotification,
-    NewJobApplicationForPrescriberNotification,
 )
 
 
@@ -1109,7 +1109,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def notifications_new_for_proxy(self):
-        return NewJobApplicationForPrescriberNotification(
+        return JobApplicationNewForPrescriberNotification(
             self.sender,
             self.sender_prescriber_organization,
             job_application=self,
