@@ -85,7 +85,6 @@ class DashboardViewTest(TestCase):
     HIRE_LINK_LABEL = "Déclarer une embauche"
     DORA_LABEL = "DORA"
     DORA_CARD_MSG = "Consultez l’offre de service de vos partenaires"
-    DORA_HIGHLIGHT_MSG = "Donnez de la visibilité à votre offre d’insertion"
 
     @staticmethod
     def apply_start_url(company):
@@ -623,54 +622,6 @@ class DashboardViewTest(TestCase):
 
         with self.assertTemplateUsed("dashboard/includes/diagoriente_card.html"):
             self.client.get(reverse("dashboard:index"))
-
-    def test_dora_banner_is_not_shown_for_job_seeker(self):
-        user = JobSeekerFactory()
-        self.client.force_login(user)
-
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, self.DORA_CARD_MSG)
-        self.assertNotContains(response, self.DORA_HIGHLIGHT_MSG)
-
-    def test_dora_banner_is_shown_for_employer(self):
-        for department in ["91", "26", "74", "30"]:
-            with self.subTest(department=department):
-                company = CompanyFactory(
-                    with_membership=True,
-                    department=department,
-                    membership__user__identity_provider=IdentityProvider.INCLUSION_CONNECT,
-                )
-                self.client.force_login(company.members.first())
-
-                response = self.client.get(reverse("dashboard:index"))
-                self.assertContains(response, self.DORA_HIGHLIGHT_MSG)
-
-    def test_dora_banner_is_shown_for_prescriber(self):
-        for department in ["91", "26", "74", "30"]:
-            with self.subTest(department=department):
-                prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
-                    department=department,
-                    membership__user__identity_provider=IdentityProvider.INCLUSION_CONNECT,
-                )
-                self.client.force_login(prescriber_organization.members.first())
-
-                response = self.client.get(reverse("dashboard:index"))
-                self.assertContains(response, self.DORA_CARD_MSG)
-
-    def test_dora_banner_is_not_shown_for_other_department(self):
-        company = CompanyFactory(with_membership=True, department="01")
-        self.client.force_login(company.members.first())
-
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, self.DORA_HIGHLIGHT_MSG)
-
-        prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory(
-            department="01",
-        )
-        self.client.force_login(prescriber_organization.members.first())
-
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, self.DORA_CARD_MSG)
 
     def test_dashboard_prescriber_without_organization_message(self):
         # An orienter is a prescriber without prescriber organization
