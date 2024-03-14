@@ -31,7 +31,7 @@
                             <div class="mx-3">
                                 {% for category_slug, category in notification_form.layout.items %}
                                     <div class="notification-collapse">
-                                        <a class="d-flex justify-content-between font-weight-bold text-decoration-none has-collapse-caret py-3" role="button" aria-expanded="true" aria-controls="collapse-{{ category_slug }}">
+                                        <a class="d-flex justify-content-between font-weight-bold text-decoration-none has-collapse-caret py-3" role="button" aria-expanded="false" aria-controls="collapse-{{ category_slug }}">
                                             {{ category.name }}
                                         </a>
                                         <div class="collapse">

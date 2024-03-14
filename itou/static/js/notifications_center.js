@@ -12,7 +12,7 @@ htmx.onLoad((target) => {
   }
 
   function toggleCollapse(collapse, force) {
-    const collapseController = bootstrap.Collapse.getOrCreateInstance(collapse, {toggle: false});
+    const collapseController = bootstrap.Collapse.getOrCreateInstance(collapse, { toggle: false });
     if (force === undefined) {
       collapseController.toggle();
     } else if (force === true) {
@@ -28,11 +28,11 @@ htmx.onLoad((target) => {
         input.checked = event.target.checked;
       });
       if (!event.target.checked) {
-        form.querySelectorAll(".collapse").forEach(collapse => toggleCollapse(collapse, true));
+        form.querySelectorAll(".collapse").forEach((collapse) => toggleCollapse(collapse, true));
       }
     } else if (event.target.classList.contains("category-grouper")) {
       const categoryGroup = event.target.closest(".notification-collapse");
-      categoryGroup.querySelectorAll("input.notification-checkbox").forEach(notification => {
+      categoryGroup.querySelectorAll("input.notification-checkbox").forEach((notification) => {
         notification.checked = event.target.checked;
       });
     }
@@ -57,4 +57,10 @@ htmx.onLoad((target) => {
       collapseToggle.ariaExpanded = "true";
     });
   });
+
+  if (!allNotifications.checked) {
+    document.getElementsByClassName("notification-collapse").forEach((collapseGroup) => {
+      toggleCollapse(collapseGroup.querySelector(".collapse"), true);
+    });
+  }
 });
