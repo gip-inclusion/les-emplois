@@ -35,8 +35,10 @@
                                             {{ category.name }}
                                         </a>
                                         <div class="collapse">
-                                            {% get_form_field notification_form "category-"|add:category_slug|add:"-all" as field %}
-                                            {% bootstrap_field field %}
+                                            {% if category.notifications|length > 1 %}
+                                                {% get_form_field notification_form "category-"|add:category_slug|add:"-all" as field %}
+                                                {% bootstrap_field field %}
+                                            {% endif %}
 
                                             <div class="px-3 category-notifications">
                                                 {% for field_name in category.notifications %}
