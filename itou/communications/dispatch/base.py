@@ -11,10 +11,15 @@ class BaseNotification:
     def __repr__(self):
         return f"<{self.__class__.__name__} {self.user.email}: {self.name}>"
 
+    def is_applicable(self):
+        return True
+
     def is_manageable_by_user(self):
-        return self.can_be_disabled
+        return self.can_be_disabled and self.is_applicable()
 
     def should_send(self):
+        if not self.is_applicable():
+            return False
         if self.is_manageable_by_user():
             return not (
                 self.user.notification_settings.for_structure(self.structure)
