@@ -1,3 +1,4 @@
+import pytest
 from django.contrib.admin import helpers
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -307,8 +308,6 @@ def test_num_queries(admin_client):
         + 1  # Load admin user
         + 2  # savepoint & release
         + 1  # load user
-        + 1  # users_user_groups
-        + 1  # auth_permission
         + 1  # companies_companymembership
         + 1  # institutions_institutionmembership
         + 1  # eligibility_eligibilitydiagnosis
@@ -318,7 +317,6 @@ def test_num_queries(admin_client):
         + 1  # job_applications_jobapplication
         + 1  # prescribers_prescribermembership
         + 1  # utils_pksupportremark
-        + 2  # auth_group & auth_permission
         + 3  # savepoint, session update & release
     ):
         response = admin_client.get(reverse("admin:users_user_change", kwargs={"object_id": prescriber.pk}))
@@ -459,3 +457,42 @@ def test_profile_check_inconsistency_check(admin_client):
             )
         ],
     )
+
+
+group_permissions_markup = (
+    '<select name="groups" id="id_groups" multiple class="selectfilter" data-field-name="groupes" data-is-stacked="0">'
+)
+user_permissions_markup = (
+    '<select name="user_permissions" id="id_user_permissions" multiple class="selectfilter" '
+    'data-field-name="permissions de l’utilisateur" data-is-stacked="0">'
+)
+
+
+@pytest.mark.parametrize(
+    "superuser,assertion",
+    [
+        (False, assertNotContains),
+        (True, assertContains),
+    ],
+)
+def test_change_hides_permission_section_on_regular_users(client, superuser, assertion):
+    viewed = JobSeekerFactory()
+    user = ItouStaffFactory(is_superuser=superuser, is_staff=True)
+    if not superuser:
+        perms = Permission.objects.filter(codename__in=("change_user", "view_user"))
+        user.user_permissions.add(*perms)
+    client.force_login(user)
+    response = client.get(reverse("admin:users_user_change", kwargs={"object_id": viewed.pk}))
+    assertion(response, '<input type="checkbox" name="is_superuser" id="id_is_superuser">')
+    assertNotContains(response, group_permissions_markup)
+    assertNotContains(response, user_permissions_markup)
+
+
+def test_change_shows_permission_section_on_staff_users(client):
+    viewed = ItouStaffFactory(is_staff=True)
+    user = ItouStaffFactory(is_superuser=True, is_staff=True)
+    client.force_login(user)
+    response = client.get(reverse("admin:users_user_change", kwargs={"object_id": viewed.pk}))
+    assertContains(response, "Permissions")
+    assertContains(response, group_permissions_markup)
+    assertContains(response, user_permissions_markup)

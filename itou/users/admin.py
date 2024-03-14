@@ -314,33 +314,6 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
         "jobseeker_profile_link",
     )
 
-    fieldsets = UserAdmin.fieldsets + (
-        (
-            "Informations",
-            {
-                "fields": (
-                    "pk",
-                    "title",
-                    "birthdate",
-                    "phone",
-                    "address_line_1",
-                    "address_line_2",
-                    "post_code",
-                    "department",
-                    "city",
-                    "address_in_qpv",
-                    "kind",
-                    "created_by",
-                    "identity_provider",
-                    "jobseeker_profile_link",
-                )
-            },
-        ),
-    )
-    # Add last_checked_at in "Important dates" section, alongside last_login & date_joined
-    assert "last_login" in fieldsets[-2][1]["fields"]
-    fieldsets[-2][1]["fields"] += ("last_checked_at",)
-
     add_fieldsets = (
         (
             None,
@@ -467,6 +440,50 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
         if obj:
             rof += ("kind",)  # kind is never editable, but still addable
         return rof
+
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj=obj)
+        if obj is None:
+            # add_fieldsets
+            return fieldsets
+
+        fieldsets = list(fieldsets)
+        fieldsets.append(
+            (
+                "Informations",
+                {
+                    "fields": (
+                        "pk",
+                        "title",
+                        "birthdate",
+                        "phone",
+                        "address_line_1",
+                        "address_line_2",
+                        "post_code",
+                        "department",
+                        "city",
+                        "address_in_qpv",
+                        "kind",
+                        "created_by",
+                        "identity_provider",
+                        "jobseeker_profile_link",
+                    )
+                },
+            ),
+        )
+        # Add last_checked_at in "Important dates" section, alongside last_login & date_joined
+        assert "last_login" in fieldsets[-2][1]["fields"]
+        fieldsets[-2][1]["fields"] += ("last_checked_at",)
+
+        assert fieldsets[2][0] == "Permissions"
+        if request.user.is_superuser:
+            # Hide space-consuming widgets for groups and user_permissions.
+            if not obj.is_staff:
+                fieldsets[2] = ("Permissions", {"fields": ["is_active", "is_staff", "is_superuser"]})
+        else:
+            fieldsets[2] = ("Permissions", {"fields": ["is_active"]})
+
+        return fieldsets
 
     def get_search_fields(self, request):
         search_fields = []
