@@ -244,3 +244,40 @@ def list_for_siae_exports_download(request, month_identifier=None):
         job_applications = job_applications.created_on_given_year_and_month(year, month)
 
     return stream_xlsx_export(job_applications, filename)
+
+
+@login_required
+def table_for_siae(request, template_name="apply/table_for_siae.html"):
+    """
+    List of applications for an SIAE.
+    """
+    company = get_current_company_or_404(request)
+    job_applications = company.job_applications_received.select_related("premium_note")
+
+    filters_form = CompanyFilterJobApplicationsForm(job_applications, company, request.GET or None)
+
+    # Add related data giving the criteria for adding the necessary annotations
+    job_applications = job_applications.not_archived().with_list_related_data(
+        filters_form.data.getlist("criteria", [])
+    )
+
+    filters_counter = 0
+    if filters_form.is_valid():
+        job_applications = filters_form.filter(job_applications)
+        filters_counter = filters_form.get_qs_filters_counter()
+
+    job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=50)
+
+    # SIAE members have access to personal info
+    _add_user_can_view_personal_information(job_applications_page, lambda ja: True)
+
+    if company.kind in SIAE_WITH_CONVENTION_KINDS:
+        _add_administrative_criteria(job_applications_page)
+
+    context = {
+        "siae": company,
+        "job_applications_page": job_applications_page,
+        "filters_form": filters_form,
+        "filters_counter": filters_counter,
+    }
+    return render(request, template_name, context)

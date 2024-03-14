@@ -1,0 +1,98 @@
+{% extends "layout/base.html" %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% load str_filters %}
+{% load matomo %}
+
+{% block title %}Les emplois premium {{ block.super }}{% endblock %}
+
+{% block content %}
+    <div class="s-box__row row">
+        <div class="col-12 col-md-2 mb-3 mb-md-5">
+            <aside class="c-aside-filters">
+                <button class="c-aside-filters__btn__collapse" data-bs-toggle="collapse" data-bs-target="#asideFiltersCollapse" aria-expanded="true" aria-controls="asideFiltersCollapse">
+                    <i class="ri-filter-line" aria-hidden="true"></i>
+                    <span>Filtrer les candidatures</span>
+                </button>
+                <div class="c-aside-filters__card collapse show" id="asideFiltersCollapse">
+                    <form method="get" id="js-job-applications-filters-form">
+                        <div class="c-aside-filters__card__body">
+                            {% include "apply/includes/job_applications_filters/statut.html" %}
+                            {% include "apply/includes/job_applications_filters/job_seekers.html" %}
+                            {% include "apply/includes/job_applications_filters/eligibility_validated.html" %}
+                            {% include "apply/includes/job_applications_filters/pass.html" %}
+                            {% include "apply/includes/job_applications_filters/criteria.html" %}
+                            {% include "apply/includes/job_applications_filters/departments.html" %}
+                            {% include "apply/includes/job_applications_filters/dates.html" %}
+                            {% include "apply/includes/job_applications_filters/selected_jobs.html" %}
+                            <button id="js-job-applications-filters-apply-button" class="btn btn-block btn-primary mt-3" aria-label="Appliquer les filtres">
+                                Appliquer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </aside>
+        </div>
+        <div class="col-12 col-md-10">
+            <section aria-labelledby="results">
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                    <h3 class="h4 mb-0" id="results">
+                        {% with job_applications_page.paginator.count as counter %}
+                            Les emplois premium - {{ counter }} <strong>résultat{{ counter|pluralizefr }} pour {{ siae.display_name }}</strong>
+                        {% endwith %}
+                    </h3>
+                    <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les candidatures">
+                        {% if filters_counter > 0 %}
+                            <a href="{% url 'apply:table_for_siae' %}" class="btn btn-secondary btn-ico mt-3 mt-md-0">
+                                <i class="ri-arrow-go-back-line" aria-hidden="true"></i>
+                                <span>Réinitialiser les filtres ({{ filters_counter }})</span>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="table-responsive-lg mt-3 mt-md-4">
+                    <table class="table">
+                        <caption class="visually-hidden">Liste des informations candidats pour {{ company }}</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Nom complet</th>
+                                <th scope="col">Niveau d'éducation</th>
+                                <th scope="col">RQTH</th>
+                                <th scope="col">RSA</th>
+                                <th scope="col">Editable Note</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job_application in job_applications_page %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'apply:details_for_company' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
+                                           aria-label="Voir la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}"
+                                           {% matomo_event "emplois-premium" "clic" "voir-candidature-employeur" %}>
+                                            {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}
+                                        </a>
+                                    </td>
+                                    <td>{{ job_application.job_seeker.jobseeker_profile.get_education_level_display }}</td>
+                                    <td>{{ job_application.job_seeker.jobseeker_profile.rqth_employee|yesno:"Oui,Non" }}</td>
+                                    <td>{{ job_application.job_seeker.jobseeker_profile.get_has_rsa_allocation_display }}</td>
+                                    <td>
+                                        {# vincentporte - mars 2024 - assumed not using `only` params when calling this include, because of csrf_token injection #}
+                                        {% include 'premium/partials/save_note_form.html' with job_application_id=job_application.id content=job_application.premium_note.content %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% include "includes/pagination.html" with page=job_applications_page %}
+            </section>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <!-- Needed to use Select2MultipleWidget. -->
+    {{ filters_form.media.js }}
+    <script src='{% static "js/job_applications_filters.js" %}'></script>
+{% endblock %}
