@@ -100,6 +100,7 @@ INSTALLED_APPS = [
     "itou.www.welcoming_tour",
     "itou.www.employee_record_views",
     "itou.www.siae_evaluations_views",
+    "itou.www.premium_views",
     "itou.api",
     "itou.status",
     "itou.antivirus",
