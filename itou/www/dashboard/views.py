@@ -43,7 +43,6 @@ from itou.www.search.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
 
 
-SHOW_DORA_DEPARTMENTS = ["26", "30", "74", "91"]
 # Auvergne Rhône Alpes and Île de France
 MOBILEMPLOI_DEPARTMENTS = (
     "01",
@@ -120,7 +119,6 @@ def _employer_dashboard_context(request):
             EmployeeRecord.objects.for_company(current_org).filter(status=Status.REJECTED).count()
         ),
         "show_eiti_webinar_banner": show_eiti_webinar_banner,
-        "show_dora_banner": current_org.department in SHOW_DORA_DEPARTMENTS and not show_eiti_webinar_banner,
         "siae_suspension_text_with_dates": (
             current_org.get_active_suspension_text_with_dates()
             # Otherwise they cannot be suspended
@@ -162,7 +160,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "num_rejected_employee_records": 0,
         "pending_prolongation_requests": None,
         "evaluated_siae_notifications": EvaluatedSiae.objects.none(),
-        "show_dora_banner": False,
         "show_eiti_webinar_banner": False,
         "show_mobilemploi_banner": False,
         "show_mobilemploi_prescriber_banner": False,
@@ -174,7 +171,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         context.update(_employer_dashboard_context(request))
     elif request.user.is_prescriber:
         if current_org := request.current_organization:
-            context["show_dora_banner"] = current_org.department in SHOW_DORA_DEPARTMENTS
             if current_org.is_authorized:
                 context["pending_prolongation_requests"] = ProlongationRequest.objects.filter(
                     prescriber_organization=current_org,
