@@ -7,6 +7,37 @@
 {% block messages %}
     {{ block.super }}
 
+    {% if show_eiti_webinar_banner %}
+        <div class="alert alert-important alert-dismissible-once d-none" role="status" id="alertDismissibleOnceEITIWebinar">
+            <p class="mb-0">
+                Sur décision de la DGEFP et en accord avec l’ASP, <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/23342362389265--14-03-24-Webinaire-d%C3%A9di%C3%A9-aux-EITI"
+    target="_blank"
+    rel="noopener"
+    aria-label="Revoir le webinaire (ouverture dans un nouvel onglet)">vous devez déclarer vos fiches salarié à partir du 26/03/2024</a> dans votre tableau de bord des emplois de l’inclusion via l’onglet « gérer les fiches salarié (ASP) ».
+            </p>
+            <div class="row g-0">
+                <p class="my-2">
+                    Consultez le <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/23342362389265--14-03-24-Webinaire-d%C3%A9di%C3%A9-aux-EITI"
+    target="_blank"
+    rel="noopener"
+    aria-label="Revoir le webinaire (ouverture dans un nouvel onglet)">
+                    replay, les supports de présentation ASP/EMPLOI ainsi que les modes d'emploi</a>.
+                </p>
+                <div class="col-12 col-md-auto mt-2">
+                    <a class="btn btn-primary btn-block btn-ico"
+                       href="{{ ITOU_HELP_CENTER_URL }}/sections/15257055244817-Fiches-salari%C3%A9-pour-les-SIAE"
+                       target="_blank"
+                       rel="noopener"
+                       aria-label="Mode d'emploi pour déclarer les fiches salariés">
+                        <span>Découvrir le mode d'emploi</span>
+                        <i class="ri-external-link-line ri-lg"></i>
+                    </a>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        </div>
+    {% endif %}
+
     {% if show_mobilemploi_banner %}
         <div class="alert alert-info alert-dismissible-once fade show d-none" role="status" id="showMobilEmploiBanner">
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
@@ -77,37 +108,6 @@
             <p class="mb-0">
                 Pour optimiser la réception de vos candidatures, pensez à renseigner le descriptif de vos postes et leurs prérequis.
             </p>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-        </div>
-    {% endif %}
-
-    {% if show_eiti_webinar_banner %}
-        <div class="alert alert-important alert-dismissible-once d-none" role="status" id="alertDismissibleOnceEITIWebinar">
-            <p class="mb-0">
-                Sur décision de la DGEFP et en accord avec l’ASP, <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/23342362389265--14-03-24-Webinaire-d%C3%A9di%C3%A9-aux-EITI"
-    target="_blank"
-    rel="noopener"
-    aria-label="Revoir le webinaire (ouverture dans un nouvel onglet)">vous devez déclarer vos fiches salarié à partir du 26/03/2024</a> dans votre tableau de bord des emplois de l’inclusion via l’onglet « gérer les fiches salarié (ASP) ».
-            </p>
-            <div class="row g-0">
-                <p class="my-2">
-                    Consultez le <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/23342362389265--14-03-24-Webinaire-d%C3%A9di%C3%A9-aux-EITI"
-    target="_blank"
-    rel="noopener"
-    aria-label="Revoir le webinaire (ouverture dans un nouvel onglet)">
-                    replay, les supports de présentation ASP/EMPLOI ainsi que les modes d'emploi</a>.
-                </p>
-                <div class="col-12 col-md-auto mt-2">
-                    <a class="btn btn-primary btn-block btn-ico"
-                       href="{{ ITOU_HELP_CENTER_URL }}/sections/15257055244817-Fiches-salari%C3%A9-pour-les-SIAE"
-                       target="_blank"
-                       rel="noopener"
-                       aria-label="Mode d'emploi pour déclarer les fiches salariés">
-                        <span>Découvrir le mode d'emploi</span>
-                        <i class="ri-external-link-line ri-lg"></i>
-                    </a>
-                </div>
-            </div>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
     {% endif %}
