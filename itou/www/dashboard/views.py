@@ -363,7 +363,9 @@ def switch_organization(request):
 
 @login_required
 def edit_user_notifications(request, template_name="dashboard/edit_user_notifications.html"):
-    if request.user.is_job_seeker:
+    if request.user.is_staff:
+        raise Http404("L'utilisateur admin ne peut gérer ses notifications.")
+    elif request.user.is_job_seeker:
         structure = None
     elif request.user.is_employer:
         current_company_pk = request.session.get(global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY)

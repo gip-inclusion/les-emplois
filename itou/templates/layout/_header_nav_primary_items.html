@@ -101,9 +101,11 @@
                     <li>
                         <a class="dropdown-item" href="{% url 'dashboard:index' %}">Tableau de bord</a>
                     </li>
-                    <li>
-                        <a class="dropdown-item" href="{% url 'dashboard:edit_user_notifications' %}">Mes notifications</a>
-                    </li>
+                    {% if not user.is_staff %}
+                        <li>
+                            <a class="dropdown-item" href="{% url 'dashboard:edit_user_notifications' %}">Mes notifications</a>
+                        </li>
+                    {% endif %}
                     <li>
                         <div class="dropdown-divider"></div>
                     </li>
