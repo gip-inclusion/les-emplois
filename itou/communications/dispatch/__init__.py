@@ -6,4 +6,5 @@ from .utils import (
     JobSeekerNotification,
     PrescriberNotification,
     PrescriberOrEmployerNotification,
+    WithStructureMixin,
 )
