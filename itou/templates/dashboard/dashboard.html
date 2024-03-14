@@ -39,6 +39,35 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
     {% endif %}
+    {% if show_mobilemploi_prescriber_banner %}
+        <div class="alert alert-info alert-dismissible-once fade show d-none" role="status" id="showMobilEmploiPrescriberBanner">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            <div class="row">
+                <div class="col">
+                    <p class="mb-2">
+                        <strong>Mobil’Emploi : dernières places disponibles !</strong>
+                    </p>
+                    <p class="mb-0">
+                        L’équipe Mobil’Emploi propose aux publics éloignés de
+                        l’emploi, un accompagnement gratuit et sur mesure vers
+                        l’emploi durable. Des informations collectives sont prévues
+                        pendant tout le mois de mars.
+                    </p>
+                </div>
+                <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                    <a class="btn btn-sm btn-primary btn-ico"
+                       href="https://docs.google.com/forms/d/e/1FAIpQLSeljeGBgXQhc2btljFOv-OuME8bho_4EMRNuN4uOaeZQ7Hevg/viewform"
+                       rel="noopener"
+                       aria-label="Demander à l’équipe Mobil’Emploi de me rappeler"
+                       target="_blank">
+                        <span>En savoir plus</span>
+                        <i class="ri-external-link-line ri-lg"></i>
+                    </a>
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        </div>
+    {% endif %}
 
     <div class="alert alert-info alert-dismissible-once d-none" role="status" id="alertDismissiblOnceUiImprovements">
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
