@@ -170,10 +170,13 @@ def test_populate_job_seekers():
     #  - multiple eligibility diagnosis
     #  - last eligibility diagnosis from an employer
     #  - not an AI
+    #  - outside QPV but missing geocoding score
     user_3 = JobSeekerFactory(
         pk=26587,
         jobseeker_profile__nir="297016314515713",
         with_pole_emploi_id=True,
+        geocoding_score=None,
+        coords=Point(0, 0),  # QPV utils is mocked
     )
     job_application_3 = JobApplicationFactory(
         job_seeker=user_3,
@@ -342,7 +345,7 @@ def test_populate_job_seekers():
             "",
             None,
             None,
-            "Adresse non-géolocalisée",
+            "Adresse hors QPV",
             2,
             2,
             2,
