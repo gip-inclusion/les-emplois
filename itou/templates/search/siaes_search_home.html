@@ -10,14 +10,19 @@
 {% block messages %}
     {{ block.super }}
 
-    <div class="alert alert-danger fade show mb-0 mb-3" role="status">
+    <div class="alert alert-communaute alert-dismissible fade show mb-0 mb-3" role="status">
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         <div class="row">
             <div class="col">
-                <p class="h4 mb-0">Attentiion, vous etes sur une ancienne version des emplois</p>
+                <p class="h4 mb-0">L'inclusion aujourd'hui, les défis de demain</p>
+                <p class="mb-0">
+                    Le jeudi 01 février 2024, les professionnels de l'inclusion ont rendez-vous de 09h à 17h
+                    <br class="d-none d-lg-inline">
+                    pour un événement en ligne incontournable.
+                </p>
             </div>
             <div class="col-12 col-md-auto mt-2 mt-md-0 d-flex align-items-center justify-content-center">
-               <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNmo2ZmcxY2h4aDAxOXZxc3JtdXN5NzZkcTN6Z2tlZnU4cGtkMnJxeiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/CkYl1qlzkxPRbklfXx/giphy.gif" alt="">
+                <a href="https://www.inclusion-demain.fr/" target="_blank" class="btn btn-sm btn-primary has-external-link" {% matomo_event "promotion-partenaires" "clic" "inclusion-demain" %}>Je m'inscris</a>
             </div>
         </div>
     </div>
