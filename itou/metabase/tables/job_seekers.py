@@ -171,7 +171,7 @@ def get_birth_month_from_nir(job_seeker):
 def get_job_seeker_qpv_info(job_seeker):
     if not job_seeker.coords:
         return "Adresse non-géolocalisée"
-    elif job_seeker.geocoding_score < BAN_API_RELIANCE_SCORE:
+    elif job_seeker.geocoding_score is not None and job_seeker.geocoding_score < BAN_API_RELIANCE_SCORE:
         return "Adresse imprécise"
     if job_seeker.pk in get_qpv_job_seeker_pks():
         return "Adresse en QPV"
