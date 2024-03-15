@@ -1,3 +1,5 @@
+import datetime
+
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
@@ -125,42 +127,42 @@ class TestApprovalsListView:
         company = CompanyFactory(with_membership=True)
 
         expired_approval = ApprovalFactory(
-            start_at=now - relativedelta(years=3),
-            end_at=now - relativedelta(years=1),
+            start_at=now - datetime.timedelta(days=3 * 365),
+            end_at=now - datetime.timedelta(days=365),
             with_jobapplication=True,
             with_jobapplication__to_company=company,
         )
         future_approval = ApprovalFactory(
-            start_at=now + relativedelta(days=1),
+            start_at=now + datetime.timedelta(days=1),
             with_jobapplication=True,
             with_jobapplication__to_company=company,
         )
         valid_approval = ApprovalFactory(
-            start_at=now - relativedelta(years=1),
+            start_at=now - datetime.timedelta(days=365),
             with_jobapplication=True,
             with_jobapplication__to_company=company,
         )
         suspended_approval = ApprovalFactory(
-            start_at=now - relativedelta(years=1),
+            start_at=now - datetime.timedelta(days=365),
             with_jobapplication=True,
             with_jobapplication__to_company=company,
         )
         SuspensionFactory(
             approval=suspended_approval,
-            start_at=now - relativedelta(days=1),
-            end_at=now + relativedelta(days=1),
+            start_at=now - datetime.timedelta(days=1),
+            end_at=now + datetime.timedelta(days=1),
         )
         # Add 2 suspensions on valid approval because it used to cause duplicates
         # when valid and suspended filters were selected
         SuspensionFactory(
             approval=valid_approval,
-            start_at=now - relativedelta(days=10),
-            end_at=now - relativedelta(days=9),
+            start_at=now - datetime.timedelta(days=10),
+            end_at=now - datetime.timedelta(days=9),
         )
         SuspensionFactory(
             approval=valid_approval,
-            start_at=now - relativedelta(days=3),
-            end_at=now - relativedelta(days=2),
+            start_at=now - datetime.timedelta(days=3),
+            end_at=now - datetime.timedelta(days=2),
         )
 
         employer = company.members.first()
@@ -234,7 +236,7 @@ class TestApprovalsListView:
 
         assertContains(response, "366 jours")
 
-        assertContains(response, "730 jours")
+        assertContains(response, "729 jours")
 
         assertContains(response, "0 jour")
 
