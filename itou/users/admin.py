@@ -473,7 +473,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
         )
         # Add last_checked_at in "Important dates" section, alongside last_login & date_joined
         assert "last_login" in fieldsets[-2][1]["fields"]
-        fieldsets[-2][1]["fields"] += ("last_checked_at",)
+        fieldsets[-2] = ("Dates importantes", {"fields": ("last_login", "date_joined", "last_checked_at")})
 
         assert fieldsets[2][0] == "Permissions"
         if request.user.is_superuser:
