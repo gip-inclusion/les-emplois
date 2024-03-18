@@ -85,6 +85,10 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
      - Recrutement ouvert OUI/NON
      - Description du poste
      - Appellation modifiée
+     - Type de contrat
+     - Nombre de postes ouverts
+     - Lieu
+     - Profil recherché
     """
 
     serializer_class = SiaeSerializer
@@ -102,7 +106,7 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
             "job_description_through",
             queryset=(
                 JobDescription.objects.filter(is_active=True)
-                .select_related("appellation__rome")
+                .select_related("appellation__rome", "location")
                 .order_by("-updated_at", "-created_at")
             ),
         )
