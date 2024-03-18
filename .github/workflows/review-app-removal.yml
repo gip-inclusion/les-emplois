@@ -21,7 +21,7 @@ jobs:
 
     steps:
     - name: 📥 Checkout to the PR branch
-      uses: actions/checkout@v4.1.1
+      uses: actions/checkout@v4.1.2
 
     - name: 🏷 Set review app name
       run:
