@@ -1,5 +1,4 @@
 from django.urls import reverse
-from django.utils import timezone
 from rest_framework.test import APIClient, APITestCase
 
 from itou.companies.enums import CompanyKind
@@ -9,9 +8,7 @@ from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.test import BASE_NUM_QUERIES
 
-
-def _str_with_tz(dt):
-    return dt.astimezone(timezone.get_current_timezone()).isoformat()
+from ..utils import _str_with_tz
 
 
 NUM_QUERIES = BASE_NUM_QUERIES

@@ -1,7 +1,24 @@
 from rest_framework import serializers
 
-from itou.companies.enums import CompanyKind
+from itou.cities.models import City
+from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Company, JobDescription
+
+
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = [
+            "nom",
+            "departement",
+            "code_postaux",
+            "code_insee",
+        ]
+
+    nom = serializers.CharField(source="name")
+    departement = serializers.CharField(source="department")
+    code_postaux = serializers.ListField(child=serializers.CharField(), source="post_codes")
+    code_insee = serializers.CharField()
 
 
 class _JobDescriptionSerializer(serializers.ModelSerializer):
@@ -10,6 +27,10 @@ class _JobDescriptionSerializer(serializers.ModelSerializer):
     appellation_modifiee = serializers.CharField(source="custom_name", label="Nom personnalisé")
     cree_le = serializers.DateTimeField(source="created_at", label="Date de création")
     mis_a_jour_le = serializers.DateTimeField(source="updated_at", label="Date de mise à jour")
+    type_contrat = serializers.SerializerMethodField(label="Type de contrat")
+    nombre_postes_ouverts = serializers.IntegerField(source="open_positions", label="Nombre de postes ouverts")
+    lieu = CitySerializer(source="location")
+    profil_recherche = serializers.CharField(source="profile_description", label="Profil recherché")
 
     class Meta:
         model = JobDescription
@@ -21,8 +42,18 @@ class _JobDescriptionSerializer(serializers.ModelSerializer):
             "recrutement_ouvert",
             "description",
             "appellation_modifiee",
+            "type_contrat",
+            "nombre_postes_ouverts",
+            "lieu",
+            "profil_recherche",
         ]
         read_only_fields = fields
+
+    def get_lieu(self, obj) -> str:
+        return obj.location.display_name if obj.location else ""
+
+    def get_type_contrat(self, obj) -> str:
+        return ContractType[obj.contract_type].label if obj.contract_type else ""
 
 
 class SiaeSerializer(serializers.ModelSerializer):
