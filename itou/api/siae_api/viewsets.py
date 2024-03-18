@@ -12,7 +12,8 @@ from rest_framework.throttling import UserRateThrottle
 
 from itou.cities.models import City
 from itou.companies.models import Company, JobDescription
-from itou.companies.serializers import SiaeSerializer
+
+from .serializers import SiaeSerializer
 
 
 logger = logging.getLogger("api_drf")
