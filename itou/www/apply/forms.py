@@ -30,7 +30,7 @@ from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
 from itou.utils.types import InclusiveDateRange
 from itou.utils.validators import validate_nir
-from itou.utils.widgets import DuetDatePickerWidget
+from itou.utils.widgets import DuetDatePickerWidget, JobSeakerAddressAutocompleteWidget
 from itou.www.companies_views.forms import JobAppellationAndLocationMixin
 
 
@@ -834,9 +834,48 @@ class UserAddressForm(MandatoryAddressFormMixin, forms.ModelForm):
     Add job seeker address in the job application process.
     """
 
+    geocoding_score = forms.FloatField(widget=forms.HiddenInput(), required=False)
+    ban_api_resolved_address = forms.CharField(widget=forms.HiddenInput(), required=False)
+    insee_code = forms.CharField(widget=forms.HiddenInput(), required=False)
+    fill_mode = forms.CharField(widget=forms.HiddenInput(), required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        js_handled_fields = [
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city",
+            "insee_code",
+            "geocoding_score",
+            "ban_api_resolved_address",
+        ]
+
+        for field_name in js_handled_fields:
+            self.fields[field_name].widget.attrs["class"] = f"js-{field_name.replace('_', '-')}"
+            self.fields[field_name].required = False
+
+        self.fields["address_for_autocomplete"] = forms.CharField(
+            label="Adresse",
+            required=True,
+            widget=JobSeakerAddressAutocompleteWidget(submitted_data=kwargs["data"], job_seeker=self.instance),
+            initial=0,
+            help_text=(
+                "Si votre adresse ne s’affiche pas, merci de renseigner votre ville uniquement en utilisant "
+                "votre code postal et d’utiliser le Complément d’adresse pour renseigner vos numéro et nom de rue."
+            ),
+        )
+
     class Meta:
         model = User
-        fields = ["address_line_1", "address_line_2", "post_code", "city_slug", "city"]
+        fields = [
+            "address_line_1",
+            "address_line_2",
+            "post_code",
+            "city",
+            "geocoding_score",
+            "ban_api_resolved_address",
+        ]
 
 
 class FilterJobApplicationsForm(forms.Form):
