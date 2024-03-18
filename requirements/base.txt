@@ -337,9 +337,9 @@ django-xworkflows==1.0.0 \
     --hash=sha256:b233b5244fb864f95ba935bd3f2214c55600db6294dbca544a6f9eb14918fb06 \
     --hash=sha256:dc7c68e786b5392abf556f6dcd7182e947f77d1a964043868d4d8615fdd760e4
     # via -r requirements/base.in
-djangorestframework==3.14.0 \
-    --hash=sha256:579a333e6256b09489cbe0a067e66abe55c6595d8926be6b99423786334350c8 \
-    --hash=sha256:eb63f58c9f218e1a7d064d17a70751f528ed4e1d35547fdade9aaf4cd103fd08
+djangorestframework==3.15.0 \
+    --hash=sha256:3f4a263012e1b263bf49a4907eb4cfe14de840a09b1ba64596d01a9c54835919 \
+    --hash=sha256:5fa616048a7ec287fdaab3148aa5151efb73f7f8be1e23a9d18484e61e672695
     # via
     #   -r requirements/base.in
     #   django-datadog-logger
@@ -770,9 +770,7 @@ python3-openid==3.2.0 \
 pytz==2023.3 \
     --hash=sha256:1d8ce29db189191fb55338ee6d0387d82ab59f3d00eac103412d64e0ebd0c588 \
     --hash=sha256:a151b3abb88eda1d4e34a9814df37de2a80e301e68ba0fd856fb9b46bfbbbffb
-    # via
-    #   djangorestframework
-    #   pandas
+    # via pandas
 pyyaml==6.0.1 \
     --hash=sha256:062582fca9fabdd2c8b54a3ef1c978d786e0f6b3a1510e0ac93ef59e0ddae2bc \
     --hash=sha256:1635fd110e8d85d55237ab316b5b011de701ea0f29d07611174a1b42f1444741 \
@@ -969,9 +967,7 @@ sqlparse==0.4.4 \
 tablib[html,ods,xls,xlsx,yaml]==3.5.0 \
     --hash=sha256:9821caa9eca6062ff7299fa645e737aecff982e6b2b42046928a6413c8dabfd9 \
     --hash=sha256:f6661dfc45e1d4f51fa8a6239f9c8349380859a5bfaa73280645f046d6c96e33
-    # via
-    #   django-import-export
-    #   tablib
+    # via django-import-export
 tenacity==8.2.3 \
     --hash=sha256:5398ef0d78e63f40007c1fb4c0bff96e1911394d2fa8d194f77619c05ff6cc8a \
     --hash=sha256:ce510e327a630c9e1beaf17d42e6ffacc88185044ad85cf74c0a8887c6a0f88c
