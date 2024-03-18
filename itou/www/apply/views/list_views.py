@@ -261,6 +261,13 @@ def table_for_siae(request, template_name="apply/table_for_siae.html"):
         filters_form.data.getlist("criteria", [])
     )
 
+    # override the default ordering made by the with_list_related_data
+    sort_field = request.GET.get("sort", None)
+    if sort_field:
+        if request.GET.get("order") == "desc":
+            sort_field = f"-{sort_field}"
+        job_applications = job_applications.order_by(sort_field, "pk")
+
     filters_counter = 0
     if filters_form.is_valid():
         job_applications = filters_form.filter(job_applications)

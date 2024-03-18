@@ -3,6 +3,7 @@
 {% load static %}
 {% load str_filters %}
 {% load matomo %}
+{% load sort_table %}
 
 {% block title %}Les emplois premium {{ block.super }}{% endblock %}
 
@@ -50,15 +51,16 @@
                         {% endif %}
                     </div>
                 </div>
+                {{ filtered_url }}
                 <div class="table-responsive-lg mt-3 mt-md-4">
                     <table class="table">
                         <caption class="visually-hidden">Liste des informations candidats pour {{ company }}</caption>
                         <thead>
                             <tr>
                                 <th scope="col">Nom complet</th>
-                                <th scope="col">Niveau d'éducation</th>
-                                <th scope="col">RQTH</th>
-                                <th scope="col">RSA</th>
+                                {% itou_sort_table label="Niveau d'éducation" url=request.get_full_path sort="job_seeker__jobseeker_profile__education_level" %}
+                                {% itou_sort_table label="RQTH" url=request.get_full_path sort="job_seeker__jobseeker_profile__rqth_employee" %}
+                                {% itou_sort_table label="RSA" url=request.get_full_path sort="job_seeker__jobseeker_profile__has_rsa_allocation" %}
                                 <th scope="col">Editable Note</th>
                             </tr>
                         </thead>
