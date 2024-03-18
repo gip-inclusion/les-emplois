@@ -46,7 +46,7 @@
                                     <i class="ri-information-line ri-xl"></i>
                                 </div>
                                 <div class="col">
-                                    En cliquant sur le bouton <b>« Publier la fiche de poste »</b>, vous acceptez que vos informations et coordonnées soient rendues publiques.
+                                    En cliquant sur le bouton <b>« Enregistrer »</b>, vous acceptez que vos informations et coordonnées soient rendues publiques.
                                 </div>
                             </div>
                         </div>
@@ -55,7 +55,7 @@
                             {% csrf_token %}
                             {% url "companies_views:edit_job_description_details" as secondary_url %}
                             {% url "companies_views:job_description_list" as reset_url %}
-                            {% itou_buttons_form primary_label="Publier la fiche de poste" primary_aria_label="Publier la fiche de poste" secondary_url=secondary_url reset_url=reset_url matomo_category="employeurs" matomo_action="submit" matomo_event="publier-fiche-poste" %}
+                            {% itou_buttons_form primary_label="Enregistrer" primary_aria_label="Enregistrer" secondary_url=secondary_url reset_url=reset_url matomo_category="employeurs" matomo_action="submit" matomo_event="publier-fiche-poste" %}
                         </form>
                     </div>
                 </div>
