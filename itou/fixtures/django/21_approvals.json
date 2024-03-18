@@ -1,10 +1,10 @@
 [
   {
     "fields": {
-      "created_at": "2021-05-11T16:19:27.898Z",
+      "created_at": "2023-05-11T16:19:27.898Z",
       "created_by": null,
       "eligibility_diagnosis": null,
-      "end_at": "2023-05-02",
+      "end_at": "2025-12-31",
       "number": "XXXXX0000001",
       "origin": "pe_approval",
       "origin_prescriber_organization_kind": "",
@@ -15,7 +15,7 @@
       "pe_notification_exit_code": null,
       "pe_notification_status": "notification_pending",
       "pe_notification_time": null,
-      "start_at": "2021-05-01",
+      "start_at": "2024-01-01",
       "user": 17
     },
     "model": "approvals.approval",
@@ -23,10 +23,10 @@
   },
   {
     "fields": {
-      "created_at": "2021-05-12T09:43:56.359Z",
+      "created_at": "2023-05-12T09:43:56.359Z",
       "created_by": null,
       "eligibility_diagnosis": null,
-      "end_at": "2023-05-01",
+      "end_at": "2025-12-31",
       "number": "XXXXX0000002",
       "origin": "pe_approval",
       "origin_prescriber_organization_kind": "",
@@ -37,7 +37,7 @@
       "pe_notification_exit_code": null,
       "pe_notification_status": "notification_pending",
       "pe_notification_time": null,
-      "start_at": "2021-05-02",
+      "start_at": "2024-01-01",
       "user": 21
     },
     "model": "approvals.approval",
@@ -45,10 +45,10 @@
   },
   {
     "fields": {
-      "created_at": "2021-05-12T09:44:40.518Z",
+      "created_at": "2023-05-12T09:44:40.518Z",
       "created_by": null,
       "eligibility_diagnosis": null,
-      "end_at": "2023-05-01",
+      "end_at": "2025-12-31",
       "number": "XXXXX0000003",
       "origin": "pe_approval",
       "origin_prescriber_organization_kind": "",
@@ -59,7 +59,7 @@
       "pe_notification_exit_code": null,
       "pe_notification_status": "notification_pending",
       "pe_notification_time": null,
-      "start_at": "2021-05-02",
+      "start_at": "2024-01-01",
       "user": 20
     },
     "model": "approvals.approval",
@@ -67,10 +67,10 @@
   },
   {
     "fields": {
-      "created_at": "2021-05-12T09:45:17.857Z",
+      "created_at": "2023-05-12T09:45:17.857Z",
       "created_by": null,
       "eligibility_diagnosis": null,
-      "end_at": "2023-05-01",
+      "end_at": "2025-12-31",
       "number": "XXXXX0000004",
       "origin": "pe_approval",
       "origin_prescriber_organization_kind": "",
@@ -81,7 +81,7 @@
       "pe_notification_exit_code": null,
       "pe_notification_status": "notification_pending",
       "pe_notification_time": null,
-      "start_at": "2021-05-02",
+      "start_at": "2024-01-01",
       "user": 19
     },
     "model": "approvals.approval",
@@ -89,10 +89,10 @@
   },
   {
     "fields": {
-      "created_at": "2021-05-12T09:45:57.397Z",
+      "created_at": "2023-05-12T09:45:57.397Z",
       "created_by": null,
       "eligibility_diagnosis": null,
-      "end_at": "2023-05-02",
+      "end_at": "2025-12-31",
       "number": "XXXXX0000005",
       "origin": "pe_approval",
       "origin_prescriber_organization_kind": "",
@@ -103,7 +103,7 @@
       "pe_notification_exit_code": null,
       "pe_notification_status": "notification_pending",
       "pe_notification_time": null,
-      "start_at": "2021-05-01",
+      "start_at": "2024-01-01",
       "user": 18
     },
     "model": "approvals.approval",
