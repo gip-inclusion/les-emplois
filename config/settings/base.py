@@ -109,6 +109,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     # Generate request Id
     "django_datadog_logger.middleware.request_id.RequestIdMiddleware",
+    # Itou health check for Clever Cloud, don’t require requests to match ALLOWED_HOSTS
+    "itou.www.middleware.public_health_check",
     # Django stack
     "django.middleware.gzip.GZipMiddleware",
     "django.middleware.security.SecurityMiddleware",
