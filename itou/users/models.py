@@ -1013,10 +1013,13 @@ class JobSeekerProfile(models.Model):
                     return True
         return False
 
+    def _default_asp_uid(self):
+        return salted_hmac(key_salt="job_seeker.id", value=self.user_id).hexdigest()[:30]
+
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         self.validate_constraints()
         if not self.asp_uid:
-            self.asp_uid = salted_hmac(key_salt="job_seeker.id", value=self.user_id).hexdigest()[:30]
+            self.asp_uid = self._default_asp_uid()
             if update_fields is not None:
                 update_fields = set(update_fields) | {"asp_uid"}
         if self.pe_obfuscated_nir and self.has_data_changed(["nir"]):
