@@ -846,16 +846,16 @@ class ApplicationJobsView(ApplicationBaseView):
         }
 
     def get_back_url(self):
-        if self.get_previous_applications_queryset().exists():
-            return reverse(
-                "apply:step_check_prev_applications",
-                kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
-            )
-
-        return reverse(
-            "apply:step_check_job_seeker_info",
-            kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
-        )
+        if self.request.user.is_employer:
+            # The employer can come either be creating an application or hiring somebody.
+            # In both cases, the back_url adds no value compared to going back to the dashboard.
+            return None
+        selected_jobs = self.apply_session.get("selected_jobs", [])
+        try:
+            [job_description] = selected_jobs
+        except ValueError:  # No job description, or multiple job descriptions.
+            return reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+        return reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description})
 
 
 class ApplicationEligibilityView(ApplicationBaseView):

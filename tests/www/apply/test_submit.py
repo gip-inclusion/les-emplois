@@ -56,6 +56,9 @@ from tests.users.test_models import user_with_approval_in_waiting_period
 from tests.utils.test import BASE_NUM_QUERIES, TestCase
 
 
+BACK_BUTTON_ARIA_LABEL = "Retourner à l’étape précédente"
+
+
 class ApplyTest(TestCase):
     def test_company_with_no_members(self):
         company = CompanyFactory()
@@ -407,9 +410,19 @@ class ApplyAsJobSeekerTest(TestCase):
 
         response = self.client.get(next_url)
         # Check back_url is present
+        company_card_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
         self.assertContains(
             response,
-            reverse("apply:step_check_job_seeker_info", kwargs={"company_pk": company.pk, "job_seeker_pk": user.pk}),
+            f"""
+            <a href="{company_card_url}"
+               class="btn btn-block btn-outline-primary"
+               aria-label="{BACK_BUTTON_ARIA_LABEL}"
+               >
+                <span>Retour</span>
+            </a>
+            """,
+            html=True,
+            count=1,
         )
 
         response = self.client.post(next_url, data={"selected_jobs": [company.job_description_through.first().pk]})
@@ -521,6 +534,57 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk}))
         self.assertRedirects(
             response, reverse("apply:start", kwargs={"company_pk": company.pk}), fetch_redirect_response=False
+        )
+
+    def test_apply_as_job_seeker_from_job_description(self):
+        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        job_description = company.jobs.first()
+        job_seeker = JobSeekerFactory(
+            jobseeker_profile__nir="141068078200557",
+            with_pole_emploi_id=True,
+            birthdate=datetime.date(1941, 6, 12),
+        )
+        self.client.force_login(job_seeker)
+
+        # Follow the application process.
+        response = self.client.get(
+            reverse("apply:start", kwargs={"company_pk": company.pk}),
+            {"job_description_id": job_description.pk},
+        )
+
+        next_url = reverse("apply:check_nir_for_job_seeker", kwargs={"company_pk": company.pk})
+        assert response.url == next_url
+        response = self.client.get(next_url)
+
+        next_url = reverse(
+            "apply:step_check_job_seeker_info", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}
+        )
+        assert response.url == next_url
+        response = self.client.get(next_url)
+
+        next_url = reverse(
+            "apply:step_check_prev_applications", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}
+        )
+        assert response.url == next_url
+        response = self.client.get(next_url)
+
+        next_url = reverse("apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+        assert response.url == next_url
+        response = self.client.get(next_url)
+
+        back_url = reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description.pk})
+        self.assertContains(
+            response,
+            f"""
+            <a href="{back_url}"
+               class="btn btn-block btn-outline-primary"
+               aria-label="{BACK_BUTTON_ARIA_LABEL}"
+               >
+                <span>Retour</span>
+            </a>
+            """,
+            html=True,
+            count=1,
         )
 
     def test_apply_as_job_seeker_resume_not_pdf(self):
@@ -1167,7 +1231,20 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         # ----------------------------------------------------------------------
 
         response = self.client.get(next_url)
-        assert response.status_code == 200
+        back_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        self.assertContains(
+            response,
+            f"""
+            <a href="{back_url}"
+               class="btn btn-block btn-outline-primary"
+               aria-label="{BACK_BUTTON_ARIA_LABEL}"
+               >
+                <span>Retour</span>
+            </a>
+            """,
+            html=True,
+            count=1,
+        )
 
         response = self.client.post(next_url, data={"selected_jobs": [company.job_description_through.first().pk]})
         assert response.status_code == 302
@@ -3812,8 +3889,20 @@ class CheckPreviousApplicationsViewTestCase(TestCase):
         self.assertRedirects(response, self.application_jobs_url)
 
         response = self.client.get(self.application_jobs_url)
-        self.assertContains(response, self.check_infos_url)
-        self.assertNotContains(response, self.check_prev_applications_url)
+        company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+        self.assertContains(
+            response,
+            f"""
+            <a href="{company_card_url}"
+               class="btn btn-block btn-outline-primary"
+               aria-label="{BACK_BUTTON_ARIA_LABEL}"
+               >
+                <span>Retour</span>
+            </a>
+            """,
+            html=True,
+            count=1,
+        )
 
     def test_with_previous_as_job_seeker(self):
         self._login_and_setup_session(self.job_seeker)
@@ -3835,8 +3924,20 @@ class CheckPreviousApplicationsViewTestCase(TestCase):
 
         # Check that the back URL is correct
         response = self.client.get(self.application_jobs_url)
-        self.assertNotContains(response, self.check_infos_url)
-        self.assertContains(response, self.check_prev_applications_url)
+        company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+        self.assertContains(
+            response,
+            f"""
+            <a href="{company_card_url}"
+               class="btn btn-block btn-outline-primary"
+               aria-label="{BACK_BUTTON_ARIA_LABEL}"
+               >
+                <span>Retour</span>
+            </a>
+            """,
+            html=True,
+            count=1,
+        )
 
     def test_no_previous_as_authorized_prescriber(self):
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
@@ -3845,8 +3946,20 @@ class CheckPreviousApplicationsViewTestCase(TestCase):
         self.assertRedirects(response, self.application_jobs_url)
 
         response = self.client.get(self.application_jobs_url)
-        self.assertContains(response, self.check_infos_url)
-        self.assertNotContains(response, self.check_prev_applications_url)
+        company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+        self.assertContains(
+            response,
+            f"""
+            <a href="{company_card_url}"
+               class="btn btn-block btn-outline-primary"
+               aria-label="{BACK_BUTTON_ARIA_LABEL}"
+               >
+                <span>Retour</span>
+            </a>
+            """,
+            html=True,
+            count=1,
+        )
 
     def test_with_previous_as_authorized_prescriber(self):
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
@@ -3868,8 +3981,20 @@ class CheckPreviousApplicationsViewTestCase(TestCase):
 
         # Check that the back URL is correct
         response = self.client.get(self.application_jobs_url)
-        self.assertNotContains(response, self.check_infos_url)
-        self.assertContains(response, self.check_prev_applications_url)
+        company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+        self.assertContains(
+            response,
+            f"""
+            <a href="{company_card_url}"
+               class="btn btn-block btn-outline-primary"
+               aria-label="{BACK_BUTTON_ARIA_LABEL}"
+               >
+                <span>Retour</span>
+            </a>
+            """,
+            html=True,
+            count=1,
+        )
 
     def test_no_previous_as_employer(self):
         self._login_and_setup_session(self.company.members.first())
@@ -3878,8 +4003,7 @@ class CheckPreviousApplicationsViewTestCase(TestCase):
         self.assertRedirects(response, self.application_jobs_url)
 
         response = self.client.get(self.application_jobs_url)
-        self.assertContains(response, self.check_infos_url)
-        self.assertNotContains(response, self.check_prev_applications_url)
+        self.assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
 
     def test_with_previous_as_employer(self):
         JobApplicationFactory(job_seeker=self.job_seeker, to_company=self.company)
@@ -3890,10 +4014,8 @@ class CheckPreviousApplicationsViewTestCase(TestCase):
         response = self.client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
         self.assertRedirects(response, self.application_jobs_url)
 
-        # Check that the back URL is correct
         response = self.client.get(self.application_jobs_url)
-        self.assertNotContains(response, self.check_infos_url)
-        self.assertContains(response, self.check_prev_applications_url)
+        self.assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
 
 
 @pytest.mark.ignore_unknown_variable_template_error(
