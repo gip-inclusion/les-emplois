@@ -52,3 +52,15 @@ class FailSafeRedisCache(RedisCache):
     def __init__(self, server, params):
         super().__init__(server, params)
         self._class = FailSafeRedisCacheClient
+
+    def clear(self):
+        # RedisCache calls FLUSHDB, which is not concerned with KEY_PREFIX.
+        # That’s an issue for tests isolation.
+        raise RuntimeError("Don’t clear the cache.")
+
+
+class UnclearableCache(RedisCache):
+    def clear(self):
+        # RedisCache calls FLUSHDB, which is not concerned with KEY_PREFIX.
+        # That’s an issue for tests isolation.
+        raise RuntimeError("Don’t clear the cache.")

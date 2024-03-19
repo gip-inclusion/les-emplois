@@ -470,16 +470,12 @@
                       </div>
   '''
 # ---
-# name: test_hx_dora_services[Dora service card with address]
+# name: test_hx_dora_services[Dora service card]
   '''
   <div class="card-body">
                                                   <a class="btn-link mb-2" href="https://fake.api.gouv.fr/services/svc1?mtm_campaign=LesEmplois&amp;mtm_kwd=CardServiceFicheDePoste" rel="noopener" target="_blank">Coupe les cheveux</a>
                                                   <ul class="list-unstyled list-inline fs-sm">
                                                       <li class="list-inline-item">Coiffeur</li>
-                                                      
-                                                          <li class="list-inline-item">
-                                                              <i aria-hidden="true" class="ri ri-map-pin-2-line me-2"></i>75056 Paris
-                                                          </li>
                                                       
                                                   </ul>
                                                   <div class="badge-group">
@@ -490,12 +486,16 @@
                                               </div>
   '''
 # ---
-# name: test_hx_dora_services[Dora service card]
+# name: test_hx_dora_services_with_address[Dora service card with address]
   '''
   <div class="card-body">
                                                   <a class="btn-link mb-2" href="https://fake.api.gouv.fr/services/svc1?mtm_campaign=LesEmplois&amp;mtm_kwd=CardServiceFicheDePoste" rel="noopener" target="_blank">Coupe les cheveux</a>
                                                   <ul class="list-unstyled list-inline fs-sm">
                                                       <li class="list-inline-item">Coiffeur</li>
+                                                      
+                                                          <li class="list-inline-item">
+                                                              <i aria-hidden="true" class="ri ri-map-pin-2-line me-2"></i>75056 Paris
+                                                          </li>
                                                       
                                                   </ul>
                                                   <div class="badge-group">

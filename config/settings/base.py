@@ -439,7 +439,7 @@ redis_django_settings = {
 }
 
 CACHES = {
-    "default": {"BACKEND": "django.core.cache.backends.redis.RedisCache", **redis_django_settings},
+    "default": {"BACKEND": "itou.utils.cache.UnclearableCache", **redis_django_settings},
     "failsafe": {"BACKEND": "itou.utils.cache.FailSafeRedisCache", **redis_django_settings},
 }
 
