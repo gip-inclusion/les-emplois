@@ -1293,6 +1293,20 @@ def test_save_erases_pe_obfuscated_nir_if_details_change():
     )
 
 
+@pytest.mark.parametrize("initial", [None, ""])
+def test_save_erases_pe_obfuscated_nir_when_the_nir_changes_after_a_failed_attempt(faker, initial):
+    profile = JobSeekerProfileFactory(
+        pe_obfuscated_nir=initial,
+        pe_last_certification_attempt_at=faker.date_time(tzinfo=datetime.UTC),
+    )
+    profile = JobSeekerProfile.objects.get(pk=profile.pk)  # trigger the .from_db() to fill `_old_values`
+
+    assert profile.pe_last_certification_attempt_at is not None
+    profile.nir = faker.ssn()
+    profile.save(update_fields={"nir"})
+    assert profile.pe_last_certification_attempt_at is None
+
+
 @pytest.mark.parametrize("user_active", [False, True])
 @pytest.mark.parametrize("membership_active", [False, True])
 @pytest.mark.parametrize("organization_authorized", [False, True])
