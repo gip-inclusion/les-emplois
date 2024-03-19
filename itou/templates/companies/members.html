@@ -1,39 +1,67 @@
 {% extends "layout/base.html" %}
+{% load str_filters %}
+{% load matomo %}
 
-{% block title %}Collaborateurs {{ block.super }}{% endblock %}
+{% block title %}Structure : Collaborateurs {{ block.super }}{% endblock %}
 
 {% block content_title %}
-    <h1>Collaborateurs</h1>
+    <h1>Structure</h1>
+    <h2>{{ siae.kind }} {{ siae.display_name }}</h2>
     <p class="mb-0">
         Vous êtes connecté(e) en tant que <b>{{ user.get_full_name }}</b> ({{ user.email }})
     </p>
 {% endblock %}
 
 {% block content %}
-    <section class="s-section">
-        <div class="s-section__container container">
-            <h2>{{ siae.display_name }}</h2>
-            <div class="row">
-                <div class="col-12">
-                    <div class="c-box">
-                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between">
-                            <h3 class="h4 mb-0">Collaborateurs</h3>
-                            <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les collaborateurs">
-                                <a class="btn btn-primary btn-ico justify-content-center mt-3 mt-md-0" href="{% url 'invitations_views:invite_employer' %}">
-                                    <i class="ri-user-add-line ri-lg"></i>
+    <section class="s-tabs-01">
+        <div class="s-tabs-01__container container">
+            <div class="s-tabs-01__row row">
+                <div class="s-tabs-01__col col-12">
+                    <ul class="s-tabs-01__nav nav nav-tabs" data-it-s-tabs-01="true">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'companies_views:job_description_list' %}" {% matomo_event "employeurs" "clic" "voir-liste-metiers" %}>
+                                <span>Métiers et recrutements</span>
+                                <span class="badge badge-sm rounded-pill ms-2">{{ jobs_count }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'companies_views:members' %}" {% matomo_event "employeurs" "clic" "gerer-collaborateurs" %}>
+                                <span>Collaborateurs</span>
+                                <span class="badge badge-sm rounded-pill ms-2">{{ siae.active_members.count }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'companies_views:show_financial_annexes' %}">Annexes financières</a>
+                        </li>
+                        <li class="nav-item-dropdown dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" id="sTabs01DropdownMoreLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="ri-more-line" aria-hidden="true"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="sTabs01DropdownMoreLink"></div>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
+                            <h2 class="mb-0">Collaborateurs</h2>
+                            <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les collaborateurs">
+                                <a class="btn btn-primary btn-ico" href="{% url 'invitations_views:invite_employer' %}">
+                                    <i class="ri-user-add-line ri-lg" aria-hidden="true"></i>
                                     <span>Inviter des collaborateurs</span>
                                 </a>
                             </div>
                         </div>
+                        <p class="mb-0">
+                            {{ siae.active_members.count }} collaborateur{{ siae.active_members.count|pluralizefr }} (dont {{ siae.active_admin_members.count }} administrateur{{ siae.active_admin_members.count|pluralizefr }})
+                        </p>
 
                         {% with active_admin_members=siae.active_admin_members base_url="companies_views" %}
                             {% include "includes/members.html" %}
                         {% endwith %}
-                    </div>
 
-                    {% if pending_invitations %}
-                        {% include "invitations_views/includes/pending_invitations.html" %}
-                    {% endif %}
+                        {% if pending_invitations %}
+                            {% include "invitations_views/includes/pending_invitations.html" %}
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>

@@ -4,31 +4,51 @@
 {% load str_filters %}
 {% load matomo %}
 
-{% block title %}Vos fiches de postes {{ block.super }}{% endblock %}
+{% block title %}Structure : Métiers et recrutements {{ block.super }}{% endblock %}
 
 {% block content_title %}
-    <h1>Métiers et recrutements</h1>
+    <h1>Structure</h1>
     <h2>{{ siae.kind }} {{ siae.display_name }}</h2>
 {% endblock %}
 
 {% block content %}
-    <section class="s-section">
-        <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="c-box">
-                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between">
-                            <h3 class="h4 mb-0">
-                                {{ job_pager.paginator.count }} métier{{ job_pager.paginator.count|pluralizefr }} exercé{{ job_pager.paginator.count|pluralizefr }}
-                            </h3>
-                            <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les candidatures">
+    <section class="s-tabs-01">
+        <div class="s-tabs-01__container container">
+            <div class="s-tabs-01__row row">
+                <div class="s-tabs-01__col col-12">
+                    <ul class="s-tabs-01__nav nav nav-tabs" data-it-s-tabs-01="true">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'companies_views:job_description_list' %}" {% matomo_event "employeurs" "clic" "voir-liste-metiers" %}>
+                                <span>Métiers et recrutements</span>
+                                <span class="badge badge-sm rounded-pill ms-2">{{ job_pager.paginator.count }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'companies_views:members' %}" {% matomo_event "employeurs" "clic" "gerer-collaborateurs" %}>
+                                <span>Collaborateurs</span>
+                                <span class="badge badge-sm rounded-pill ms-2">{{ members_count }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'companies_views:show_financial_annexes' %}">Annexes financières</a>
+                        </li>
+                        <li class="nav-item-dropdown dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" id="sTabs01DropdownMoreLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="ri-more-line" aria-hidden="true"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="sTabs01DropdownMoreLink"></div>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
+                            <h2 class="mb-0">Métiers et recrutements</h2>
+                            <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les candidatures">
                                 {% if job_pager %}
                                     <form method="post" id="block_job_applications_form" hx-boost="true">
                                         {% csrf_token %}
-
                                         <input type="hidden" name="action" value="block_job_applications" />
                                         <input type="hidden" name="block_job_applications" value="{% if siae.block_job_applications %}false{% else %}true{% endif %}">
-                                        <button for="block_job_applications" class="d-block w-100 btn btn-sm btn-secondary btn-ico justify-content-center mt-3 mt-md-0 mb-0">
+                                        <button for="block_job_applications" class="d-block w-100 btn btn-secondary btn-ico">
                                             {% if siae.block_job_applications %}
                                                 <i class="ri-lock-unlock-line ri-lg" aria-hidden="true"></i>
                                                 <span>Débloquer l'envoi de candidatures</span>
@@ -39,13 +59,15 @@
                                         </button>
                                     </form>
                                 {% endif %}
-                                <a class="btn btn-primary btn-ico justify-content-center mt-3 mt-md-0" href="{% url "companies_views:edit_job_description" %}" {% matomo_event "employers" "clic" "creer-fiche-de-poste" %}>
+                                <a class="btn btn-primary btn-ico" href="{% url "companies_views:edit_job_description" %}" {% matomo_event "employers" "clic" "creer-fiche-de-poste" %}>
                                     <i class="ri-add-line ri-lg" aria-hidden="true"></i>
                                     <span>Créer une nouvelle fiche de poste</span>
                                 </a>
                             </div>
                         </div>
-
+                        <p class="mb-0">
+                            {{ job_pager.paginator.count }} métier{{ job_pager.paginator.count|pluralizefr }} exercé{{ job_pager.paginator.count|pluralizefr }}
+                        </p>
                         {% if job_pager %}
                             <div class="table-responsive-lg">
                                 <table class="table mt-3 mt-md-4">
@@ -56,7 +78,7 @@
                                             <th scope="col">Localisation</th>
                                             <th scope="col">Nbre de postes</th>
                                             <th scope="col">Statut</th>
-                                            <th scope="col"></th>
+                                            <th scope="col" class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -96,7 +118,7 @@
                                                         </div>
                                                     </form>
                                                 </td>
-                                                <td>
+                                                <td class="text-center">
                                                     <i class="ri-delete-bin-line ri-lg" role="button" data-bs-toggle="modal" data-bs-target="#_delete_modal_{{ job_description.id }}"></i>
                                                     {# Modal for job description deletion #}
                                                     <div id="_delete_modal_{{ job_description.id }}" class="modal fade" tabindex="-1" aria-labelledby="confirmDeleteModal{{ job_description.id }}" aria-hidden="true">
