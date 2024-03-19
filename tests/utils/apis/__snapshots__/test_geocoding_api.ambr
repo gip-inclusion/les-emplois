@@ -12,3 +12,31 @@
     ),
   ])
 # ---
+# name: test_get_geocoding_data_try_without_post_code_if_no_results_for_drom_and_com[97000]
+  list([
+    tuple(
+      'itou.utils.apis.geocoding',
+      20,
+      'Geocoding error, no result found for `https://geo.foo/search/?q=HOWELL+CENTER&limit=1&postcode=97000`',
+    ),
+    tuple(
+      'itou.utils.apis.geocoding',
+      20,
+      'Geocoding error, no result found for `https://geo.foo/search/?q=HOWELL+CENTER&limit=1`',
+    ),
+  ])
+# ---
+# name: test_get_geocoding_data_try_without_post_code_if_no_results_for_drom_and_com[98999]
+  list([
+    tuple(
+      'itou.utils.apis.geocoding',
+      20,
+      'Geocoding error, no result found for `https://geo.foo/search/?q=HOWELL+CENTER&limit=1&postcode=98999`',
+    ),
+    tuple(
+      'itou.utils.apis.geocoding',
+      20,
+      'Geocoding error, no result found for `https://geo.foo/search/?q=HOWELL+CENTER&limit=1`',
+    ),
+  ])
+# ---
