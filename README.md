@@ -151,23 +151,6 @@ Lancer un test en particulier :
 pytest itou/utils/tests.py::JSONTest::test_encoder
 ```
 
-### MacOS
-
-Les Mac utilisant l’architecture M1 ont besoin d’émuler le jeu d’instructions
-`amd64`, ce qui rend l’exécution de la suite de test plus longue et peut
-rapidement rencontrer les sécurités (_timeout_) configurées.
-
-Pour éviter ces erreurs,
-[pytest-timeout](https://github.com/pytest-dev/pytest-timeout#usage) propose
-deux options :
-
-1. Définir la variable d’environnement `PYTEST_TIMEOUT`, par exemple à une
-   valeur de `60` secondes.
-2. Utiliser `--timeout` lors de l’invocation de `pytest` :
-    ```sh
-    pytest --timeout 60
-    ```
-
 ## Mettre à jour les dépendances Python
 
 La liste des dépendances est consignée dans les fichiers `requirements/*.in`.
