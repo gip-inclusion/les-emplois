@@ -35,3 +35,15 @@ def test_get_geocoding_data_error(caplog, snapshot, respx_mock, settings):
     with pytest.raises(GeocodingDataError):
         geocoding.get_geocoding_data("")
     assert [record for record in caplog.record_tuples if record[0] == geocoding.__name__] == snapshot
+
+
+@pytest.mark.parametrize("post_code", ["97000", "98999"])
+def test_get_geocoding_data_try_without_post_code_if_no_results_for_drom_and_com(
+    caplog, snapshot, respx_mock, settings, post_code
+):
+    settings.API_BAN_BASE_URL = "https://geo.foo"
+    respx_mock.get(f"{settings.API_BAN_BASE_URL}/search/").respond(200, json=BAN_GEOCODING_API_NO_RESULT_MOCK)
+
+    with pytest.raises(GeocodingDataError):
+        geocoding.get_geocoding_data("HOWELL CENTER", post_code=post_code)
+    assert [record for record in caplog.record_tuples if record[0] == geocoding.__name__] == snapshot
