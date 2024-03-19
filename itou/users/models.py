@@ -1019,7 +1019,7 @@ class JobSeekerProfile(models.Model):
             self.asp_uid = salted_hmac(key_salt="job_seeker.id", value=self.user_id).hexdigest()[:30]
             if update_fields is not None:
                 update_fields = set(update_fields) | {"asp_uid"}
-        if self.pe_obfuscated_nir and self.has_data_changed(["nir"]):
+        if self.has_data_changed(["nir"]):
             self.pe_obfuscated_nir = None
             self.pe_last_certification_attempt_at = None
             if update_fields is not None:
