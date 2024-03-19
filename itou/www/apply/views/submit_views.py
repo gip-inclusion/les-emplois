@@ -32,6 +32,7 @@ from itou.users.models import JobSeekerProfile, User
 from itou.utils.apis.exceptions import AddressLookupError
 from itou.utils.emails import redact_email_address, send_email_messages
 from itou.utils.session import SessionNamespace, SessionNamespaceRequiredMixin
+from itou.utils.urls import add_url_params
 from itou.www.apply.forms import (
     ApplicationJobsForm,
     CheckJobSeekerInfoForm,
@@ -857,15 +858,22 @@ class ApplicationJobsView(ApplicationBaseView):
         }
 
     def get_back_url(self):
-        if self.get_previous_applications_queryset().exists():
+        if self.request.user.is_job_seeker or not self.request.user.can_edit_personal_information(self.job_seeker):
+            if self.get_previous_applications_queryset().exists():
+                return reverse(
+                    "apply:step_check_prev_applications",
+                    kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
+                )
             return reverse(
-                "apply:step_check_prev_applications",
+                "apply:step_check_job_seeker_info",
                 kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
             )
-
-        return reverse(
-            "apply:step_check_job_seeker_info",
-            kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
+        return add_url_params(
+            reverse(
+                "apply:update_job_seeker_step_1",
+                kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
+            ),
+            {"back_url": self.request.get_full_path()},
         )
 
 
