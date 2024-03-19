@@ -98,6 +98,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
             + 1  # count job descriptions
             + 1  # fetch job descriptions
             + 2  # prefetch appelation, rome
+            + 1  # fetch company members count
             + 3  # update session
         ):
             response = self.client.get(self.url)
@@ -105,7 +106,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         assert self.company.job_description_through.count() == 4
         self.assertContains(
             response,
-            '<h3 class="h4 mb-0">4 métiers exercés</h3>',
+            '<p class="mb-0">4 métiers exercés</p>',
             html=True,
             count=1,
         )

@@ -1,10 +1,12 @@
 {% extends "layout/base.html" %}
+{% load str_filters %}
+{% load matomo %}
 
-{% block title %}Annexes financières {{ block.super }}{% endblock %}
-
+{% block title %}Structure : Annexes financières {{ block.super }}{% endblock %}
 
 {% block content_title %}
-    <h1>Annexes financières</h1>
+    <h1>Structure</h1>
+    <h2>{{ siae.kind }} {{ siae.display_name }}</h2>
     <p class="mb-0">
         Cette interface vous permet de vous assurer que votre structure est associée aux bonnes annexes financières.
         <br>
@@ -31,59 +33,78 @@
 {% endblock %}
 
 {% block content %}
-
-    <section class="s-section">
-        <div class="s-section__container container">
-            <h2>{{ siae.display_name }}</h2>
-            <div class="row">
-                <div class="col-12">
-                    <div class="c-box">
-                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between">
-                            <h3 class="h4 mb-0">Annexes financières</h3>
+    <section class="s-tabs-01">
+        <div class="s-tabs-01__container container">
+            <div class="s-tabs-01__row row">
+                <div class="s-tabs-01__col col-12">
+                    <ul class="s-tabs-01__nav nav nav-tabs" data-it-s-tabs-01="true">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'companies_views:job_description_list' %}" {% matomo_event "employeurs" "clic" "voir-liste-metiers" %}>
+                                <span>Métiers et recrutements</span>
+                                <span class="badge badge-sm rounded-pill ms-2">{{ jobs_count }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'companies_views:members' %}" {% matomo_event "employeurs" "clic" "gerer-collaborateurs" %}>
+                                <span>Collaborateurs</span>
+                                <span class="badge badge-sm rounded-pill ms-2">{{ members_count }}</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'companies_views:show_financial_annexes' %}">Annexes financières</a>
+                        </li>
+                        <li class="nav-item-dropdown dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" id="sTabs01DropdownMoreLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="ri-more-line" aria-hidden="true"></i>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="sTabs01DropdownMoreLink"></div>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
+                            <h2 class="mb-0">Annexes financières</h2>
                             {% if can_select_af %}
-                                <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les annexes financières">
-                                    <a class="btn btn-primary btn-ico justify-content-center mt-3 mt-md-0" href="{% url 'companies_views:select_financial_annex' %}">
+                                <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les annexes financières">
+                                    <a class="btn btn-primary btn-ico" href="{% url 'companies_views:select_financial_annex' %}">
                                         <i class="ri-share-forward-box-line"></i>
                                         <span>Sélectionner une autre annexe financière</span>
                                     </a>
                                 </div>
                             {% endif %}
                         </div>
-                        <div class="table-responsive-lg mt-3 mt-md-4">
-                            <table class="table">
-                                <caption class="visually-hidden">Liste des annexes financières</caption>
-                                <thead>
-                                    <tr>
-                                        <th scope="col">Numéro d'annexe financière</th>
-                                        <th scope="col">Date de début d'effet</th>
-                                        <th scope="col">Date de fin d'effet</th>
-                                        <th scope="col">Validité à ce jour</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for financial_annex in financial_annexes %}
+                        {% if financial_annexes %}
+                            <div class="table-responsive-lg mt-3 mt-md-4">
+                                <table class="table">
+                                    <caption class="visually-hidden">Liste des annexes financières</caption>
+                                    <thead>
                                         <tr>
-                                            <td>{{ financial_annex.number_with_spaces }}</td>
-                                            <td>{{ financial_annex.start_at|date:"d/m/Y" }}</td>
-                                            <td>{{ financial_annex.end_at|date:"d/m/Y" }}</td>
-                                            {% if financial_annex.is_active %}
-                                                <td>
-                                                    <span class="badge badge-sm rounded-pill bg-success-lighter text-success">Valide</span>
-                                                </td>
-                                            {% else %}
-                                                <td>
-                                                    <span class="badge badge-sm rounded-pill bg-primary">Inactive</span>
-                                                </td>
-                                            {% endif %}
+                                            <th scope="col">Numéro d'annexe financière</th>
+                                            <th scope="col">Date de début d'effet</th>
+                                            <th scope="col">Date de fin d'effet</th>
+                                            <th scope="col" class="text-center">Validité à ce jour</th>
                                         </tr>
-                                    {% empty %}
-                                        <tr>
-                                            <td colspan="4">Aucune annexe financière associée à cette structure.</td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody>
+                                        {% for financial_annex in financial_annexes %}
+                                            <tr>
+                                                <td>{{ financial_annex.number_with_spaces }}</td>
+                                                <td>{{ financial_annex.start_at|date:"d/m/Y" }}</td>
+                                                <td>{{ financial_annex.end_at|date:"d/m/Y" }}</td>
+                                                <td class="text-center">
+                                                    {% if financial_annex.is_active %}
+                                                        <span class="badge badge-xs rounded-pill bg-success-lighter text-success">Valide</span>
+                                                    {% else %}
+                                                        <span class="badge badge-xs rounded-pill bg-primary">Inactive</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p>Aucune annexe financière associée à cette structure.</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
