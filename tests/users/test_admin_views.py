@@ -500,3 +500,15 @@ def test_change_shows_permission_section_on_staff_users(client):
     assertContains(response, "Permissions")
     assertContains(response, group_permissions_markup)
     assertContains(response, user_permissions_markup)
+
+
+def test_asp_uid_help_text(admin_client):
+    profile = JobSeekerFactory().jobseeker_profile
+    default_asp_uid = profile._default_asp_uid()
+    url = reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": profile.pk})
+    response = admin_client.get(url)
+    assertContains(response, f"<div>Valeur par défaut: {default_asp_uid}")
+    profile.asp_uid = "0" * 12
+    profile.save()
+    response = admin_client.get(url)
+    assertContains(response, f"<div>⚠ Valeur par défaut: {default_asp_uid}")
