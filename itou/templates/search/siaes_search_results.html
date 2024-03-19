@@ -21,13 +21,8 @@
                 <div class="s-tabs-01__col col-12">
                     <form id="search-form" method="get" class="d-block w-100">
                         {% include "search/includes/siaes_search_form.html" with form=form %}
-                        {% if form.is_valid %}
-                            <h2 class="h3 mt-3">
-                                Emplois inclusifs à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
-                            </h2>
-                        {% endif %}
                         <ul class="s-tabs-01__nav nav nav-tabs mt-3 mt-md-5">
-                            <li class="nav-item" role="presentation">
+                            <li class="nav-item">
                                 <a class="nav-link{% if request.resolver_match.view_name == "search:employers_results" %} active{% endif %}"
                                    {% matomo_event "candidature" "clic" "clic-onglet-employeur" %}
                                    href="{% url "search:employers_results" %}?{{ filters_query_string }}">
@@ -36,7 +31,7 @@
                                     <span class="badge badge-sm rounded-pill ms-2">{{ siaes_count }}</span>
                                 </a>
                             </li>
-                            <li class="nav-item" role="presentation">
+                            <li class="nav-item">
                                 <a class="nav-link{% if request.resolver_match.view_name == "search:job_descriptions_results" %} active{% endif %}"
                                    {% matomo_event "candidature" "clic" "clic-onglet-fichesdeposte" %}
                                    href="{% url "search:job_descriptions_results" %}?{{ filters_query_string }}">
@@ -47,35 +42,41 @@
                             </li>
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane fade show active">
-                                <div class="row">
-                                    <div class="col-12 col-md-4">{% include "search/includes/siaes_search_filters.html" with form=form %}</div>
-                                    <div class="col-12 col-md-8">
-                                        <div class="mb-3 mb-md-4">
-                                            <h3 class="h4 mb-0">
-                                                {% if request.resolver_match.view_name == "search:employers_results" %}
-                                                    {{ siaes_count }} résultat{{ siaes_count|pluralizefr }}
-                                                {% else %}
-                                                    {{ job_descriptions_count }} résultat{{ job_descriptions_count|pluralizefr }}
-                                                {% endif %}
-                                            </h3>
-                                        </div>
-                                        {% for item in results_page %}
-                                            {% if request.resolver_match.view_name == "search:employers_results" %}
-                                                {% include "companies/includes/_card_siae.html" with siae=item %}
-                                            {% else %}
-                                                {% include "companies/includes/_card_jobdescription.html" with job_description=item %}
-                                            {% endif %}
-                                        {% empty %}
-                                            <div class="c-box c-box--results mb-3 mb-md-4">
-                                                <div class="c-box--results__body">
-                                                    <p class="mb-0">Aucun résultat avec les filtres actuels.</p>
-                                                </div>
+                            {% if request.resolver_match.view_name == "search:employers_results" %}
+                                <h2>Employeur{{ siaes_count|pluralizefr }}</h2>
+                                <p>
+                                    {{ siaes_count }} résultat{{ siaes_count|pluralizefr }}
+                                    {% if form.is_valid %}
+                                        - Emplois inclusifs à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
+                                    {% endif %}
+                                </p>
+                            {% else %}
+                                <h2>Poste{{ job_descriptions_count|pluralizefr }} ouvert{{ job_descriptions_count|pluralizefr }} au recrutement</h2>
+                                <p>
+                                    {{ job_descriptions_count }} résultat{{ job_descriptions_count|pluralizefr }}
+                                    {% if form.is_valid %}
+                                        - Emplois inclusifs à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
+                                    {% endif %}
+                                </p>
+                            {% endif %}
+                            <div class="row">
+                                <div class="col-12 col-md-4">{% include "search/includes/siaes_search_filters.html" with form=form %}</div>
+                                <div class="col-12 col-md-8">
+                                    {% for item in results_page %}
+                                        {% if request.resolver_match.view_name == "search:employers_results" %}
+                                            {% include "companies/includes/_card_siae.html" with siae=item %}
+                                        {% else %}
+                                            {% include "companies/includes/_card_jobdescription.html" with job_description=item %}
+                                        {% endif %}
+                                    {% empty %}
+                                        <div class="c-box c-box--results mb-3 mb-md-4">
+                                            <div class="c-box--results__body">
+                                                <p class="mb-0">Aucun résultat avec les filtres actuels.</p>
                                             </div>
-                                        {% endfor %}
+                                        </div>
+                                    {% endfor %}
 
-                                        {% include "includes/pagination.html" with page=results_page %}
-                                    </div>
+                                    {% include "includes/pagination.html" with page=results_page %}
                                 </div>
                             </div>
                         </div>
