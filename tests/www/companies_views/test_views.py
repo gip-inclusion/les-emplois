@@ -5,7 +5,6 @@ import freezegun
 import httpcore
 import pytest
 from django.core import mail
-from django.core.cache import caches
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import escape
@@ -1171,15 +1170,27 @@ def test_hx_dora_services(htmx_client, snapshot, settings, respx_mock):
     dora_service_card = parse_response_to_soup(response, selector=".card-body")
     assert str(dora_service_card) == snapshot(name="Dora service card")
 
-    caches["failsafe"].clear()
-    base_service["code_postal"] = "75056"
-    base_service["commune"] = "Paris"
+
+def test_hx_dora_services_with_address(htmx_client, snapshot, settings, respx_mock):
+    settings.API_DATA_INCLUSION_BASE_URL = "https://fake.api.gouv.fr/"
+    api_mock = respx_mock.get("https://fake.api.gouv.fr/search/services")
+    base_service = {
+        "id": "svc1",
+        "source": "dora",
+        "nom": "Coupe les cheveux",
+        "thematiques": ["a--b"],
+        "modes_accueil": ["en-presentiel"],
+        "lien_source": "https://fake.api.gouv.fr/services/svc1",
+        "structure": {"nom": "Coiffeur"},
+        "code_postal": "75056",
+        "commune": "Paris",
+    }
     api_mock.respond(
         200,
         json={
             "items": [
                 {
-                    "service": base_service.copy(),
+                    "service": base_service,
                     "distance": 1,
                 },
             ]
