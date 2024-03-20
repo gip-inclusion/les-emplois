@@ -3,7 +3,7 @@
                                             The one in form to handle return when input is focused
                                             The one in input to handle change event (tab or click outside of input)
 {% endcomment %}
-<form method="post" hx-post="{% url 'premium_views:save_note' job_application_id %}">
+<form method="post" hx-post="{% url 'premium_views:save_note' job_application_id %}" hx-sync="this:abort">
     {% csrf_token %}
     <input type="text" name="content" value="{{ content }}" hx-post="{% url 'premium_views:save_note' job_application_id %}" hx-trigger="change" />
 </form>
