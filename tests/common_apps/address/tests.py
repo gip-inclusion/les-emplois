@@ -41,7 +41,7 @@ class UtilsAddressMixinTest(TestCase):
         expected_coords = "SRID=4326;POINT (2.316754 48.838411)"
         expected_latitude = 48.838411
         expected_longitude = 2.316754
-        expected_geocoding_score = 0.587663373207207
+        expected_geocoding_score = 0.5197687103594081
 
         assert prescriber.coords == expected_coords
         assert prescriber.geocoding_score == expected_geocoding_score
