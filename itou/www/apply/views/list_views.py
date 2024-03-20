@@ -264,8 +264,6 @@ def table_for_siae(request, template_name="apply/table_for_siae.html"):
     # override the default ordering made by the with_list_related_data
     sort_field = request.GET.get("sort", None)
     if sort_field:
-        if request.GET.get("order") == "desc":
-            sort_field = f"-{sort_field}"
         job_applications = job_applications.order_by(sort_field, "pk")
 
     filters_counter = 0
