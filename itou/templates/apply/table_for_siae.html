@@ -61,6 +61,11 @@
                                 {% itou_sort_table label="Niveau d'éducation" url=request.get_full_path sort="job_seeker__jobseeker_profile__education_level" %}
                                 {% itou_sort_table label="RQTH" url=request.get_full_path sort="job_seeker__jobseeker_profile__rqth_employee" %}
                                 {% itou_sort_table label="RSA" url=request.get_full_path sort="job_seeker__jobseeker_profile__has_rsa_allocation" %}
+                                {% itou_sort_table label="Candidature" url=request.get_full_path sort="state" %}
+                                {% itou_sort_table label="PASS" url=request.get_full_path sort="approval__number" %}
+                                {% itou_sort_table label="Fin de PASS" url=request.get_full_path sort="approval__end_at" %}
+                                {% itou_sort_table label="Structure prescriptrice" url=request.get_full_path sort="sender_prescriber_organization" %}
+                                {% itou_sort_table label="Prescripteur" url=request.get_full_path sort="sender" %}
                                 <th scope="col">Editable Note</th>
                             </tr>
                         </thead>
@@ -74,9 +79,14 @@
                                             {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}
                                         </a>
                                     </td>
-                                    <td>{{ job_application.job_seeker.jobseeker_profile.get_education_level_display }}</td>
+                                    <td>{{ job_application.job_seeker.jobseeker_profile.get_education_level_display|default:"-" }}</td>
                                     <td>{{ job_application.job_seeker.jobseeker_profile.rqth_employee|yesno:"Oui,Non" }}</td>
                                     <td>{{ job_application.job_seeker.jobseeker_profile.get_has_rsa_allocation_display }}</td>
+                                    <td>{{ job_application.get_state_display|lower }}</td>
+                                    <td>{{ job_application.approval.number|default:"-" }}</td>
+                                    <td>{{ job_application.approval.end_at|default:"-" }}</td>
+                                    <td>{{ job_application.sender_prescriber_organization|default:"-" }}</td>
+                                    <td>{{ job_application.sender.get_full_name }}</td>
                                     <td>
                                         {# vincentporte - mars 2024 - assumed not using `only` params when calling this include, because of csrf_token injection #}
                                         {% include 'premium/partials/save_note_form.html' with job_application_id=job_application.id content=job_application.premium_note.content %}

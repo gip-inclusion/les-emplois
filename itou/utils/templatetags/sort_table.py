@@ -25,6 +25,6 @@ def itou_sort_table(**kwargs):
     """
 
     # cleanup sort and order params from current url, before adding new ones to the sorting links
-    kwargs["url"] = remove_url_params(kwargs["url"], ["sort", "order"])
+    kwargs["url"] = remove_url_params(kwargs["url"], ["sort", "order", "page"])
 
     return kwargs
