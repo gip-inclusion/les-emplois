@@ -1,5 +1,7 @@
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.contrib import messages
+from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.core.files.storage import default_storage
 from django.urls import reverse
@@ -21,7 +23,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
+from tests.utils.test import BASE_NUM_QUERIES, TestCase
 
 
 # fixme vincentporte : convert this method into factory
@@ -883,7 +885,7 @@ class SiaeUploadDocsViewTest(TestCase):
         assert evaluated_administrative_criteria.proof == proof
 
 
-class SiaeSubmitProofsViewTest(TestCase):
+class SiaeSubmitProofsViewTest(MessagesTestMixin, TestCase):
     def setUp(self):
         super().setUp()
         membership = CompanyMembershipFactory()
@@ -1016,7 +1018,7 @@ class SiaeSubmitProofsViewTest(TestCase):
                 kwargs={"evaluated_siae_pk": evaluated_job_application.evaluated_siae_id},
             ),
         )
-        assertMessages(response, [("ERROR", "Impossible de soumettre les documents.")])
+        self.assertMessages(response, [messages.Message(messages.ERROR, "Impossible de soumettre les documents.")])
         evaluated_administrative_criteria.refresh_from_db()
         assert evaluated_administrative_criteria.submitted_at is None
 

@@ -10,6 +10,7 @@ from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError, ProgrammingError, connection, transaction
@@ -43,7 +44,7 @@ from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
-from tests.utils.test import TestCase, assertMessages
+from tests.utils.test import TestCase
 
 
 class CommonApprovalQuerySetTest(TestCase):
@@ -984,7 +985,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
-class CustomApprovalAdminViewsTest(TestCase):
+class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
     def test_manually_add_approval(self):
         # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
         # with a manual verification.
@@ -1034,10 +1035,10 @@ class CustomApprovalAdminViewsTest(TestCase):
         job_application.eligibility_diagnosis = None
         job_application.save()
         response = self.client.get(url, follow=True)
-        assertMessages(
+        self.assertMessages(
             response,
             [
-                (
+                messages.Message(
                     messages.ERROR,
                     "Impossible de créer un PASS IAE car la candidature n'a pas de diagnostique d'éligibilité.",
                 )

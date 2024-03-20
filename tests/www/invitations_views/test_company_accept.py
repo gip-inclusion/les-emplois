@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 import respx
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.shortcuts import reverse
 from django.test import Client
@@ -18,10 +19,9 @@ from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTest
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory
-from tests.utils.test import assertMessages
 
 
-class TestAcceptInvitation(InclusionConnectBaseTestCase):
+class TestAcceptInvitation(MessagesTestMixin, InclusionConnectBaseTestCase):
     def assert_accepted_invitation(self, response, invitation, user):
         user.refresh_from_db()
         invitation.refresh_from_db()
@@ -237,10 +237,10 @@ class TestAcceptInvitation(InclusionConnectBaseTestCase):
         # After logout, Inclusion connect redirects to previous_url (see redirect_url param in expected_redirect_url)
         response = self.client.get(previous_url, follow=True)
         # Signup should have failed : as the email used in IC isn't the one from the invitation
-        assertMessages(
+        self.assertMessages(
             response,
             [
-                (
+                messages.Message(
                     messages.ERROR,
                     "L’adresse e-mail que vous avez utilisée pour vous connecter avec "
                     "Inclusion Connect (michel@lestontons.fr) ne correspond pas à "

@@ -4,6 +4,7 @@ import httpx
 import respx
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.test import Client, override_settings
 from django.urls import reverse
@@ -24,10 +25,10 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, 
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, PrescriberFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
+from tests.utils.test import BASE_NUM_QUERIES, TestCase
 
 
-class CompanySignupTest(InclusionConnectBaseTestCase):
+class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
     def test_choose_user_kind(self):
         url = reverse("signup:choose_user_kind")
         response = self.client.get(url)
@@ -210,10 +211,10 @@ class CompanySignupTest(InclusionConnectBaseTestCase):
             reverse("signup:employer", kwargs={"company_id": "0", "token": company.get_token()})
         )
         self.assertRedirects(response, reverse("signup:company_select"))
-        assertMessages(
+        self.assertMessages(
             response,
             [
-                (
+                messages.Message(
                     messages.WARNING,
                     "Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription.",
                 )
@@ -228,10 +229,10 @@ class CompanySignupTest(InclusionConnectBaseTestCase):
             reverse("signup:company_join", kwargs={"company_id": "0", "token": company.get_token()}), follow=True
         )
         self.assertRedirects(response, reverse("signup:company_select"))
-        assertMessages(
+        self.assertMessages(
             response,
             [
-                (
+                messages.Message(
                     messages.WARNING,
                     "Ce lien d'inscription est invalide ou a expiré. Veuillez procéder à une nouvelle inscription.",
                 )
@@ -360,7 +361,7 @@ class CompanySignupTest(InclusionConnectBaseTestCase):
         self.assertContains(response, "00005", count=2)
 
 
-class CompanySignupViewsExceptionsTest(TestCase):
+class CompanySignupViewsExceptionsTest(MessagesTestMixin, TestCase):
     def test_non_staff_cant_join_a_company(self):
         company = CompanyFactory(kind=CompanyKind.ETTI)
         assert 0 == company.members.count()
@@ -373,10 +374,10 @@ class CompanySignupViewsExceptionsTest(TestCase):
         url = reverse("signup:company_join", args=(company.pk, token))
 
         response = self.client.get(url)
-        assertMessages(
+        self.assertMessages(
             response,
             [
-                (
+                messages.Message(
                     messages.ERROR,
                     "Vous ne pouvez pas rejoindre une structure avec ce compte car vous n'êtes pas employeur.",
                 )
