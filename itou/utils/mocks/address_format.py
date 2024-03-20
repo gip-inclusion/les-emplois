@@ -1,6 +1,7 @@
 import random
 
 from itou.asp.models import Commune
+from itou.utils.apis.exceptions import AddressLookupError
 
 
 # https://api-adresse.data.gouv.fr/search/?q=42+Rue+du+clos+de+la+Grange%2C+58160+Sauvigny-les-Bois&limit=1
@@ -311,8 +312,6 @@ BAN_GEOCODING_API_RESULTS_MOCK = [
 ]
 
 # Revert lookup
-RESULTS_BY_ADDRESS = {elt["address_line_1"]: elt for elt in BAN_GEOCODING_API_RESULTS_MOCK}
-
 RESULTS_BY_BAN_API_RESOLVED_ADDRESS = {}
 for elt in BAN_GEOCODING_API_RESULTS_MOCK:
     if "ban_api_resolved_address" in elt:
@@ -320,7 +319,10 @@ for elt in BAN_GEOCODING_API_RESULTS_MOCK:
 
 
 def mock_get_geocoding_data(address, **_):
-    return RESULTS_BY_ADDRESS.get(address)
+    for result in BAN_GEOCODING_API_RESULTS_MOCK:
+        if result["address_line_1"] == address:
+            return result
+    raise AddressLookupError(f"Unable to lookup address: {address}")
 
 
 def mock_get_geocoding_data_by_ban_api_resolved(address, **_):

@@ -21,7 +21,7 @@ from itou.job_applications.enums import Origin
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 from itou.users.models import JobSeekerProfile, User
-from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
+from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
@@ -704,10 +704,6 @@ class ModelTest(TestCase):
             JobSeekerFactory(first_name=" marie aurore", last_name="maréchal").get_full_name()
             == "Marie Aurore MARÉCHAL"
         )
-
-
-def mock_get_geocoding_data(address, post_code=None, limit=1):
-    return RESULTS_BY_ADDRESS.get(address)
 
 
 class JobSeekerProfileModelTest(TestCase):
