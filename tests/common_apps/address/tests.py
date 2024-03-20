@@ -34,7 +34,7 @@ class UtilsAddressMixinTest(TestCase):
         assert prescriber.latitude is None
         assert prescriber.longitude is None
 
-        prescriber.set_coords("10 PL 5 MARTYRS LYCEE BUFFON", post_code="75015")
+        prescriber.set_coords()
         prescriber.save()
 
         # Expected data comes from BAN_GEOCODING_API_RESULT_MOCK.
@@ -57,7 +57,7 @@ class UtilsAddressMixinTest(TestCase):
         prescriber = PrescriberOrganization.objects.create(siret="12000015300011")
 
         with pytest.raises(GeocodingDataError):
-            prescriber.set_coords("10 PL 5 ANATOLE", post_code="75010")
+            prescriber.set_coords()
 
 
 class UtilsDepartmentsTest(TestCase):

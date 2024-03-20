@@ -86,7 +86,7 @@ class CreateCompanyForm(forms.ModelForm):
 
     def save(self, commit=False):
         company = super().save(commit=False)
-        company.set_coords(company.geocoding_address, post_code=company.post_code)
+        company.set_coords()
         company.created_by = self.current_user
         company.source = Company.SOURCE_USER_CREATED
         company.convention = self.current_company.convention

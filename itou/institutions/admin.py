@@ -76,7 +76,7 @@ class InstitutionAdmin(ItouGISMixin, OrganizationAdmin):
             if not obj.geocoding_score and obj.geocoding_address:
                 try:
                     # Set geocoding.
-                    obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
+                    obj.set_coords()
                 except GeocodingDataError:
                     # do nothing, the user has not made any changes to the address
                     pass
@@ -84,7 +84,7 @@ class InstitutionAdmin(ItouGISMixin, OrganizationAdmin):
         if change and form.cleaned_data.get("extra_field_refresh_geocoding") and obj.geocoding_address:
             try:
                 # Refresh geocoding.
-                obj.set_coords(obj.geocoding_address, post_code=obj.post_code)
+                obj.set_coords()
             except GeocodingDataError:
                 messages.error(request, "L'adresse semble erronée car le geocoding n'a pas pu être recalculé.")
 

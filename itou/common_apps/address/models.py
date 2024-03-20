@@ -261,15 +261,16 @@ class AddressMixin(models.Model):
                 return city.name, True
         return None
 
-    def set_coords(self, address, *, post_code=None):
+    def set_coords(self):
         try:
-            geocoding_data = get_geocoding_data(address, post_code=post_code)
+            geocoding_data = get_geocoding_data(self.geocoding_address, post_code=self.post_code)
         except GeocodingDataError as exc:
             # The coordinates are not erased because they are used in the search engine,
             # even if they no longer correspond to the address.
-            logger.error("No geocoding data could be found for `%s - %s`", address, post_code)
+            logger.error("No geocoding data could be found for `%s - %s`", self.geocoding_address, self.post_code)
             raise AddressLookupError(
-                f"L'adresse '{ address }' - { post_code } n'a pas été trouvée dans la Base Adresse Nationale."
+                f"L'adresse '{self.geocoding_address}' - {self.post_code}"
+                " n'a pas été trouvée dans la Base Adresse Nationale."
             ) from exc
         else:
             self.coords = geocoding_data["coords"]
