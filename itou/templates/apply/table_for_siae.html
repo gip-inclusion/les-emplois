@@ -88,8 +88,7 @@
                                     <td>{{ job_application.sender_prescriber_organization|default:"-" }}</td>
                                     <td>{{ job_application.sender.get_full_name }}</td>
                                     <td>
-                                        {# vincentporte - mars 2024 - assumed not using `only` params when calling this include, because of csrf_token injection #}
-                                        {% include 'premium/partials/save_note_form.html' with job_application_id=job_application.id content=job_application.premium_note.content %}
+                                        {% include 'premium/partials/save_note_form.html' with job_application_id=job_application.id content=job_application.premium_note.content csrf_token=csrf_token only %}
                                     </td>
                                 </tr>
                             {% endfor %}
