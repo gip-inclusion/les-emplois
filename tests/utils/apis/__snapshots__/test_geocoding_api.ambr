@@ -1,0 +1,14 @@
+# serializer version: 1
+# name: test_get_geocoding_data
+  list([
+  ])
+# ---
+# name: test_get_geocoding_data_error
+  list([
+    tuple(
+      'itou.utils.apis.geocoding',
+      20,
+      'Geocoding error, no result found for `https://geo.foo/search/?q=&limit=1`',
+    ),
+  ])
+# ---
