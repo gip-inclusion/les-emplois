@@ -517,6 +517,8 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         on_delete=models.SET_NULL,
     )
 
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, null=True)
+
     # 2023-08-17: An experiment to add a denormalized field “last_suspension_ended_at” did not exhibit large
     # performance improvements, nor huge readability boons. https://github.com/betagouv/itou/pull/2746
 
@@ -1154,12 +1156,12 @@ class Suspension(models.Model):
                     IF (TG_OP = 'DELETE') THEN
                         -- At delete time, the approval's end date is pushed back.
                         UPDATE approvals_approval
-                        SET end_at = end_at - (OLD.end_at - OLD.start_at)
+                        SET end_at = end_at - (OLD.end_at - OLD.start_at), updated_at=NOW()
                         WHERE id = OLD.approval_id;
                     ELSIF (TG_OP = 'INSERT') THEN
                         -- At insert time, the approval's end date is pushed forward.
                         UPDATE approvals_approval
-                        SET end_at = end_at + (NEW.end_at - NEW.start_at)
+                        SET end_at = end_at + (NEW.end_at - NEW.start_at), updated_at=NOW()
                         WHERE id = NEW.approval_id;
                     ELSIF (TG_OP = 'UPDATE') THEN
                         -- At update time, the approval's end date is first reset before
@@ -1170,7 +1172,9 @@ class Suspension(models.Model):
                         --         * reset approval: approval.end_date - 90 days
                         --         * extend approval: approval.end_date + 60 days
                         UPDATE approvals_approval
-                        SET end_at = end_at - (OLD.end_at - OLD.start_at) + (NEW.end_at - NEW.start_at)
+                        SET
+                          end_at = end_at - (OLD.end_at - OLD.start_at) + (NEW.end_at - NEW.start_at),
+                          updated_at=NOW()
                         WHERE id = NEW.approval_id;
                     END IF;
                     RETURN NULL;
@@ -1704,19 +1708,21 @@ class Prolongation(CommonProlongation):
                         -- At delete time, the approval's end date is pushed back if the prolongation
                         -- was validated.
                         UPDATE approvals_approval
-                        SET end_at = end_at - (OLD.end_at - OLD.start_at)
+                        SET end_at = end_at - (OLD.end_at - OLD.start_at), updated_at=NOW()
                         WHERE id = OLD.approval_id;
                     ELSIF (TG_OP = 'INSERT') THEN
                         -- At insert time, the approval's end date is pushed forward if the prolongation
                         -- is validated.
                         UPDATE approvals_approval
-                        SET end_at = end_at + (NEW.end_at - NEW.start_at)
+                        SET end_at = end_at + (NEW.end_at - NEW.start_at), updated_at=NOW()
                         WHERE id = NEW.approval_id;
                     ELSIF (TG_OP = 'UPDATE') THEN
                         -- At update time, the approval's end date is first reset before
                         -- being pushed forward.
                         UPDATE approvals_approval
-                        SET end_at = end_at - (OLD.end_at - OLD.start_at) + (NEW.end_at - NEW.start_at)
+                        SET
+                          end_at = end_at - (OLD.end_at - OLD.start_at) + (NEW.end_at - NEW.start_at),
+                          updated_at=NOW()
                         WHERE id = NEW.approval_id;
                     END IF;
                     RETURN NULL;
