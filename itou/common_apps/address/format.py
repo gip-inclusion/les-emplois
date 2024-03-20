@@ -50,12 +50,12 @@ def format_address(obj):
         return None, ERROR_HEXA_CONVERSION
 
     # Do we have enough data to make an extraction?
-    if not obj.post_code or not obj.address_line_1:
+    if not obj.geocoding_address:
         return None, ERROR_INCOMPLETE_ADDRESS_DATA
 
     try:
         # first we use geo API to get a 'lane' and a number
-        address = get_geocoding_data(obj.address_line_1, post_code=obj.post_code)
+        address = get_geocoding_data(obj.geocoding_address, post_code=obj.post_code)
     except GeocodingDataError as ex:
         return None, ERROR_GEOCODING_API + f" : {str(ex)}"
 

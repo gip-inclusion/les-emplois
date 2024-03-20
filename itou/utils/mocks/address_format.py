@@ -320,7 +320,7 @@ for elt in BAN_GEOCODING_API_RESULTS_MOCK:
 
 def mock_get_geocoding_data(address, **_):
     for result in BAN_GEOCODING_API_RESULTS_MOCK:
-        if result["address_line_1"] == address:
+        if address.startswith(result["address_line_1"]):
             return result
     raise AddressLookupError(f"Unable to lookup address: {address}")
 
