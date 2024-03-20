@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from itou.premium.models import Notes
+from itou.premium.models import Note
 
 
-@admin.register(Notes)
-class NotesAdmin(admin.ModelAdmin):
+@admin.register(Note)
+class NoteAdmin(admin.ModelAdmin):
     list_display = ("job_application", "created_by")
     raw_id_fields = ("job_application", "created_by", "updated_by")
 

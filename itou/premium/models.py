@@ -4,7 +4,7 @@ from django.db import models
 from itou.job_applications.models import JobApplication
 
 
-class Notes(models.Model):
+class Note(models.Model):
     job_application = models.OneToOneField(
         JobApplication,
         on_delete=models.CASCADE,
