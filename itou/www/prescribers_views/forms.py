@@ -70,6 +70,6 @@ class EditPrescriberOrganizationForm(forms.ModelForm):
     def save(self, commit=True):
         prescriber_org = super().save(commit=False)
         if commit:
-            prescriber_org.set_coords(prescriber_org.geocoding_address, post_code=prescriber_org.post_code)
+            prescriber_org.set_coords()
             prescriber_org.save()
         return prescriber_org
