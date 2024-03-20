@@ -71,6 +71,6 @@
 
         {% endfor %}
 
-        {% include "includes/pagination.html" with page=job_applications_page %}
+        {% include "includes/pagination.html" with page=job_applications_page boost=True boost_target="#job-applications-section" boost_indicator="#job-applications-section" %}
     {% endif %}
 </section>
