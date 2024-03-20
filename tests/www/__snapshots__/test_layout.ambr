@@ -529,7 +529,7 @@
       </li>
       
           <li>
-              <a class="btn btn-ico btn-outline-primary" href="/signup/" type="button">
+              <a class="btn btn-ico btn-outline-primary" href="/signup/">
                   <i aria-hidden="true" class="ri-user-add-line"></i>
                   <span>S'inscrire</span>
               </a>
