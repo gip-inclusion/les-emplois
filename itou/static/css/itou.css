@@ -427,16 +427,6 @@ _:-ms-fullscreen,
     width: 100px;
 }
 
-/* HTMX
---------------------------------------------------------------------------- */
-.htmx-indicator {
-    display: none;
-}
-
-.htmx-request .htmx-indicator {
-    display: inline-block;
-}
-
 /* Inclusion connect
 --------------------------------------------------------------------------- */
 .p-inclusion-connect .s-main {
