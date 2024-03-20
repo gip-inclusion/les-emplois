@@ -2,6 +2,7 @@ from urllib.parse import urlencode
 
 import respx
 from django.contrib import messages
+from django.contrib.messages.test import MessagesTestMixin
 from django.test import override_settings
 from django.test.client import RequestFactory
 from django.urls import reverse
@@ -23,7 +24,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.test import TestCase, assertMessages, reload_module
+from tests.utils.test import TestCase, reload_module
 
 
 CONNECT_WITH_IC = "Se connecter avec Inclusion Connect"
@@ -195,7 +196,7 @@ class LaborInspectorLoginTest(TestCase):
         self.assertRedirects(response, reverse("account_email_verification_sent"))
 
 
-class JopbSeekerLoginTest(TestCase):
+class JopbSeekerLoginTest(MessagesTestMixin, TestCase):
     def test_login(self):
         user = JobSeekerFactory()
         url = reverse("login:job_seeker")
@@ -230,10 +231,10 @@ class JopbSeekerLoginTest(TestCase):
 
         # Temporary NIR is not stored with user information.
         response = mock_oauth_dance(self.client, expected_route="login:job_seeker")
-        assertMessages(
+        self.assertMessages(
             response,
             [
-                (
+                messages.Message(
                     messages.ERROR,
                     "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : "
                     "seconde@email.com et wossewodda-3728@yopmail.com. Veuillez vous rapprocher du support pour "

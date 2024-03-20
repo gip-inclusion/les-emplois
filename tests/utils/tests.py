@@ -11,6 +11,7 @@ import pytest
 from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.admin import site
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -82,7 +83,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.test import TestCase, assertMessagesFromRequest, parse_response_to_soup
+from tests.utils.test import TestCase, parse_response_to_soup
 
 
 def get_response_for_middlewaremixin(request):
@@ -151,18 +152,15 @@ class TestItouCurrentOrganizationMiddleware:
             response = ItouCurrentOrganizationMiddleware(get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
         assertRedirects(response, reverse("account_logout"), fetch_redirect_response=False)
-        assertMessagesFromRequest(
-            request,
-            [
+        assert list(messages.get_messages(request)) == [
+            messages.Message(
+                messages.WARNING,
                 (
-                    "WARNING",
-                    (
-                        "Nous sommes désolés, votre compte n'est actuellement rattaché à aucune structure."
-                        "<br>Nous espérons cependant avoir l'occasion de vous accueillir de nouveau."
-                    ),
-                )
-            ],
-        )
+                    "Nous sommes désolés, votre compte n'est actuellement rattaché à aucune structure."
+                    "<br>Nous espérons cependant avoir l'occasion de vous accueillir de nouveau."
+                ),
+            )
+        ]
         # Session untouched
         assert request.session.is_empty()
 
@@ -232,19 +230,16 @@ class TestItouCurrentOrganizationMiddleware:
             response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
         assertRedirects(response, reverse("account_logout"), fetch_redirect_response=False)
-        assertMessagesFromRequest(
-            request,
-            [
+        assert list(messages.get_messages(request)) == [
+            messages.Message(
+                messages.WARNING,
                 (
-                    "WARNING",
-                    (
-                        "Nous sommes désolés, votre compte n'est malheureusement plus actif car la ou les "
-                        "structures associées ne sont plus conventionnées. "
-                        "Nous espérons cependant avoir l'occasion de vous accueillir de nouveau."
-                    ),
-                )
-            ],
-        )
+                    "Nous sommes désolés, votre compte n'est malheureusement plus actif car la ou les "
+                    "structures associées ne sont plus conventionnées. "
+                    "Nous espérons cependant avoir l'occasion de vous accueillir de nouveau."
+                ),
+            )
+        ]
         # Session untouched
         assert request.session.is_empty()
 
@@ -431,18 +426,15 @@ class TestItouCurrentOrganizationMiddleware:
             response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
         assertRedirects(response, reverse("account_logout"), fetch_redirect_response=False)
-        assertMessagesFromRequest(
-            request,
-            [
+        assert list(messages.get_messages(request)) == [
+            messages.Message(
+                messages.WARNING,
                 (
-                    "WARNING",
-                    (
-                        "Nous sommes désolés, votre compte n'est actuellement rattaché à aucune structure."
-                        "<br>Nous espérons cependant avoir l'occasion de vous accueillir de nouveau."
-                    ),
-                )
-            ],
-        )
+                    "Nous sommes désolés, votre compte n'est actuellement rattaché à aucune structure."
+                    "<br>Nous espérons cependant avoir l'occasion de vous accueillir de nouveau."
+                ),
+            )
+        ]
         # Session untouched
         assert request.session.is_empty()
         # Check new request attributes

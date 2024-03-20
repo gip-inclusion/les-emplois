@@ -1,10 +1,11 @@
 from io import BytesIO
 
 import pytest
+from django.contrib import messages
 from django.contrib.admin import helpers
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains
 
 from itou.approvals.enums import ProlongationReason
 from itou.files.models import File
@@ -12,7 +13,7 @@ from itou.utils.admin import get_admin_view_link
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
-from tests.utils.test import assertMessages, parse_response_to_soup
+from tests.utils.test import parse_response_to_soup
 
 
 class TestApprovalAdmin:
@@ -128,8 +129,8 @@ def test_check_inconsistency_check(admin_client):
     assertMessages(
         response,
         [
-            (
-                "WARNING",
+            messages.Message(
+                messages.WARNING,
                 (
                     '1 objet incohérent: <ul><li class="warning">'
                     f'<a href="/admin/approvals/approval/{inconsistent_approval.pk}/change/">'

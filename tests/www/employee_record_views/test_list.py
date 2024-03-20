@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.contrib.messages.test import MessagesTestMixin
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -15,11 +16,11 @@ from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJo
 from tests.employee_record import factories as employee_record_factories
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
-class ListEmployeeRecordsTest(TestCase):
+class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
     URL = reverse_lazy("employee_record_views:list")
 
     def setUp(self):
@@ -140,7 +141,7 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.URL + "?status=NEW")
 
         # Global message alert
-        assertMessages(response, [])
+        self.assertMessages(response, [])
 
         # Item message alert
         assert (
@@ -185,7 +186,7 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.URL + "?status=NEW")
 
         # Global message alert
-        assertMessages(response, [])
+        self.assertMessages(response, [])
         # Item message alert
         assert (
             str(

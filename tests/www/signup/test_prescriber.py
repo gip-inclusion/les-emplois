@@ -4,6 +4,7 @@ import httpx
 import respx
 from django.conf import settings
 from django.contrib import auth, messages
+from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.test import Client, override_settings
 from django.urls import reverse
@@ -28,7 +29,6 @@ from tests.prescribers.factories import (
     PrescriberPoleEmploiFactory,
 )
 from tests.users.factories import EmployerFactory, PrescriberFactory
-from tests.utils.test import assertMessages
 
 
 @override_settings(
@@ -848,7 +848,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         assert membership.is_admin
 
 
-class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCase):
+class InclusionConnectPrescribersViewsExceptionsTest(MessagesTestMixin, InclusionConnectBaseTestCase):
     """
     Prescribers' signup and login exceptions: user already exists, ...
     """
@@ -991,10 +991,10 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         assert self.client.session.get(INCLUSION_CONNECT_SESSION_KEY)
         assert auth.get_user(self.client).is_authenticated
         self.assertRedirects(response, reverse("search:employers_home"))
-        assertMessages(
+        self.assertMessages(
             response,
             [
-                (
+                messages.Message(
                     messages.ERROR,
                     "Vous ne pouvez pas rejoindre une organisation avec ce compte car vous n'êtes pas prescripteur.",
                 )
@@ -1060,10 +1060,10 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
         response = self.client.get(previous_url)
         # Show an error and don't create an organization.
 
-        assertMessages(
+        self.assertMessages(
             response,
             [
-                (
+                messages.Message(
                     messages.ERROR,
                     "Un compte employeur existe déjà avec cette adresse e-mail. Vous devez créer un compte "
                     "Inclusion Connect avec une autre adresse e-mail pour devenir prescripteur sur la plateforme. "
@@ -1122,10 +1122,10 @@ class InclusionConnectPrescribersViewsExceptionsTest(InclusionConnectBaseTestCas
 
         # IC logout redirects to previous_url
         response = self.client.get(previous_url)
-        assertMessages(
+        self.assertMessages(
             response,
             [
-                (
+                messages.Message(
                     messages.ERROR,
                     "L’adresse e-mail que vous avez utilisée pour vous connecter avec "
                     "Inclusion Connect (athos@touspourun.com) est différente de celle que vous avez "

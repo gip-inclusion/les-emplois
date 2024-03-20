@@ -6,7 +6,7 @@ from django.core.files.storage import default_storage
 from django.template import loader
 from django.urls import reverse
 from freezegun import freeze_time
-from pytest_django.asserts import assertNumQueries, assertRedirects
+from pytest_django.asserts import assertMessages, assertNumQueries, assertRedirects
 
 from itou.approvals.enums import (
     ProlongationReason,
@@ -18,7 +18,7 @@ from itou.files.models import File
 from tests.approvals import factories as approvals_factories
 from tests.prescribers import factories as prescribers_factories
 from tests.users import factories as users_factories
-from tests.utils.test import BASE_NUM_QUERIES, assertMessages, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, parse_response_to_soup
 
 
 @pytest.mark.parametrize(
@@ -141,7 +141,7 @@ def test_grant_view(client):
     assertRedirects(response, reverse("approvals:prolongation_requests_list"), fetch_redirect_response=False)
     assertMessages(
         response,
-        [(messages.SUCCESS, "La prolongation de John DOE a bien été acceptée.")],
+        [messages.Message(messages.SUCCESS, "La prolongation de John DOE a bien été acceptée.")],
     )
     prolongation_request.refresh_from_db()
     assert prolongation_request.status == ProlongationRequestStatus.GRANTED
@@ -223,7 +223,7 @@ def test_deny_view_for_reasons(snapshot, client, reason):
         )
 
     assertRedirects(response, end_url)
-    assertMessages(response, [(messages.SUCCESS, "La prolongation de John DOE a bien été refusée.")])
+    assertMessages(response, [messages.Message(messages.SUCCESS, "La prolongation de John DOE a bien été refusée.")])
     prolongation_request.refresh_from_db()
     assert prolongation_request.status == ProlongationRequestStatus.DENIED
     assert prolongation_request.deny_information.reason == reason
