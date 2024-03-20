@@ -1293,6 +1293,7 @@ class SuspensionModelTestTrigger(TestCase):
         start_at = timezone.localdate()
 
         approval = ApprovalFactory(start_at=start_at, pe_notification_status=api_enums.PEApiNotificationStatus.SUCCESS)
+        initial_updated_at = approval.updated_at
         initial_duration = approval.duration
 
         suspension = SuspensionFactory(approval=approval, start_at=start_at)
@@ -1300,6 +1301,7 @@ class SuspensionModelTestTrigger(TestCase):
         approval.refresh_from_db()
         assert approval.duration == initial_duration + suspension.duration
         assert approval.pe_notification_status == api_enums.PEApiNotificationStatus.PENDING
+        assert approval.updated_at != initial_updated_at
 
     def test_delete(self):
         """
@@ -1309,6 +1311,7 @@ class SuspensionModelTestTrigger(TestCase):
         start_at = timezone.localdate()
 
         approval = ApprovalFactory(start_at=start_at, pe_notification_status=api_enums.PEApiNotificationStatus.ERROR)
+        initial_updated_at = approval.updated_at
         initial_duration = approval.duration
 
         suspension = SuspensionFactory(approval=approval, start_at=start_at)
@@ -1321,6 +1324,7 @@ class SuspensionModelTestTrigger(TestCase):
         approval.refresh_from_db()
         assert approval.duration == initial_duration
         assert approval.pe_notification_status == api_enums.PEApiNotificationStatus.PENDING
+        assert approval.updated_at != initial_updated_at
 
     def test_save_and_edit(self):
         """
@@ -1333,6 +1337,7 @@ class SuspensionModelTestTrigger(TestCase):
         approval = ApprovalFactory(
             start_at=start_at, pe_notification_status=api_enums.PEApiNotificationStatus.SHOULD_RETRY
         )
+        initial_updated_at = approval.updated_at
         initial_duration = approval.duration
 
         # New suspension.
@@ -1355,6 +1360,7 @@ class SuspensionModelTestTrigger(TestCase):
         assert approval_duration_2 != approval_duration_3
         assert approval_duration_3 == initial_duration + suspension_duration_2
         assert approval.pe_notification_status == api_enums.PEApiNotificationStatus.PENDING
+        assert approval.updated_at != initial_updated_at
 
 
 class ProlongationQuerySetTest(TestCase):
@@ -1422,6 +1428,7 @@ class ProlongationModelTestTrigger(TestCase):
         start_at = timezone.localdate()
 
         approval = ApprovalFactory(start_at=start_at, pe_notification_status=api_enums.PEApiNotificationStatus.SUCCESS)
+        initial_updated_at = approval.updated_at
         initial_duration = approval.duration
 
         prolongation = ProlongationFactory(approval=approval, start_at=start_at)
@@ -1429,6 +1436,7 @@ class ProlongationModelTestTrigger(TestCase):
         approval.refresh_from_db()
         assert approval.duration == initial_duration + prolongation.duration
         assert approval.pe_notification_status == api_enums.PEApiNotificationStatus.PENDING
+        assert approval.updated_at != initial_updated_at
 
     def test_delete(self):
         """
@@ -1439,6 +1447,7 @@ class ProlongationModelTestTrigger(TestCase):
         start_at = timezone.localdate()
 
         approval = ApprovalFactory(start_at=start_at, pe_notification_status=api_enums.PEApiNotificationStatus.ERROR)
+        initial_updated_at = approval.updated_at
         initial_duration = approval.duration
 
         prolongation = ProlongationFactory(approval=approval, start_at=start_at)
@@ -1451,6 +1460,7 @@ class ProlongationModelTestTrigger(TestCase):
         approval.refresh_from_db()
         assert approval.duration == initial_duration
         assert approval.pe_notification_status == api_enums.PEApiNotificationStatus.PENDING
+        assert approval.updated_at != initial_updated_at
 
     def test_save_and_edit(self):
         """
@@ -1463,6 +1473,7 @@ class ProlongationModelTestTrigger(TestCase):
         approval = ApprovalFactory(
             start_at=start_at, pe_notification_status=api_enums.PEApiNotificationStatus.SHOULD_RETRY
         )
+        initial_updated_at = approval.updated_at
         initial_approval_duration = approval.duration
 
         # New prolongation.
@@ -1487,6 +1498,7 @@ class ProlongationModelTestTrigger(TestCase):
 
         assert approval_duration_3 == initial_approval_duration + prolongation_duration_2
         assert approval.pe_notification_status == api_enums.PEApiNotificationStatus.PENDING
+        assert approval.updated_at != initial_updated_at
 
 
 class ProlongationModelTestConstraint(TestCase):
