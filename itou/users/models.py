@@ -10,8 +10,8 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinLengthValidator
 from django.db import models
-from django.db.models import Count, Q
-from django.db.models.functions import Upper
+from django.db.models import Count, Max, OuterRef, Q, Subquery
+from django.db.models.functions import Greatest, Upper
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
@@ -128,6 +128,37 @@ class ItouUserManager(UserManager):
 
         return result
 
+    def job_seekers_with_last_activity(self):
+        from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
+        from itou.job_applications.models import JobApplication
+
+        return self.filter(
+            kind=UserKind.JOB_SEEKER,
+        ).annotate(
+            last_activity=Greatest(
+                "date_joined",
+                "last_login",
+                Subquery(
+                    JobApplication.objects.filter(job_seeker_id=OuterRef("pk"))
+                    .values("job_seeker_id")
+                    .annotate(last_updated_at=Max("updated_at"))
+                    .values("last_updated_at")
+                ),
+                Subquery(
+                    EligibilityDiagnosis.objects.filter(job_seeker_id=OuterRef("pk"))
+                    .values("job_seeker_id")
+                    .annotate(last_updated_at=Max("updated_at"))
+                    .values("last_updated_at")
+                ),
+                Subquery(
+                    GEIQEligibilityDiagnosis.objects.filter(job_seeker_id=OuterRef("pk"))
+                    .values("job_seeker_id")
+                    .annotate(last_updated_at=Max("updated_at"))
+                    .values("last_updated_at")
+                ),
+            )
+        )
+
 
 class User(AbstractUser, AddressMixin):
     """
@@ -208,6 +239,11 @@ class User(AbstractUser, AddressMixin):
     )
 
     last_checked_at = models.DateTimeField(verbose_name="date de dernière vérification", default=timezone.now)
+    upcoming_deletion_notified_at = models.DateTimeField(
+        verbose_name="date de notification d'une suppression prochaine",
+        blank=True,
+        null=True,
+    )
 
     public_id = models.UUIDField(
         verbose_name="identifiant public opaque, pour les API",
