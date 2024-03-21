@@ -211,7 +211,7 @@ class CompanyAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
             if not obj.geocoding_score and obj.geocoding_address:
                 try:
                     # Set geocoding.
-                    obj.set_coords()
+                    obj.geocode_address()
                 except GeocodingDataError:
                     # do nothing, the user has not made any changes to the address
                     pass
@@ -219,7 +219,7 @@ class CompanyAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
         if change and form.cleaned_data.get("extra_field_refresh_geocoding") and obj.geocoding_address:
             try:
                 # Refresh geocoding.
-                obj.set_coords()
+                obj.geocode_address()
             except GeocodingDataError:
                 messages.error(request, "L'adresse semble erronée car le geocoding n'a pas pu être recalculé.")
 
