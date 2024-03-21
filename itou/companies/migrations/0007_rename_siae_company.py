@@ -13,7 +13,6 @@ class Migration(migrations.Migration):
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("companies", "0006_alter_siae_table_alter_siaeconvention_table_and_more"),
         ("eligibility", "0001_initial"),
-        ("approvals", "0012_add_prolongation_request"),
         ("invitations", "0001_initial"),
         ("siae_evaluations", "0001_initial"),
     ]
