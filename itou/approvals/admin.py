@@ -210,6 +210,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
     readonly_fields = (
         "created_at",
         "created_by",
+        "updated_at",
         "pe_notification_status",
         "pe_notification_time",
         "pe_notification_endpoint",
