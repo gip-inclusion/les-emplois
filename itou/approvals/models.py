@@ -517,7 +517,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         on_delete=models.SET_NULL,
     )
 
-    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, null=True)
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
     # 2023-08-17: An experiment to add a denormalized field “last_suspension_ended_at” did not exhibit large
     # performance improvements, nor huge readability boons. https://github.com/betagouv/itou/pull/2746
