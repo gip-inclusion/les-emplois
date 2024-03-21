@@ -3,6 +3,13 @@
 import django.contrib.gis.db.models.fields
 import django.contrib.postgres.fields
 import django.contrib.postgres.indexes
+from django.contrib.postgres.operations import (
+    BtreeGistExtension,
+    CITextExtension,
+    CreateExtension,
+    TrigramExtension,
+    UnaccentExtension,
+)
 from django.db import migrations, models
 
 
@@ -12,6 +19,23 @@ class Migration(migrations.Migration):
     dependencies = []
 
     operations = [
+        # Install PostgreSQL extensions
+        # The 'cities' app has been chosen as entry point because it's central
+        # dependency on the application and its migrations are processed early in the chain.
+        BtreeGistExtension(),
+        CITextExtension(),
+        TrigramExtension(),
+        CreateExtension("postgis"),
+        UnaccentExtension(),
+        migrations.RunSQL("DROP TEXT SEARCH CONFIGURATION IF EXISTS french_unaccent"),
+        migrations.RunSQL("CREATE TEXT SEARCH CONFIGURATION french_unaccent (COPY = french)"),
+        migrations.RunSQL(
+            """
+            ALTER TEXT SEARCH CONFIGURATION french_unaccent
+                ALTER MAPPING FOR hword, hword_part, word
+                    WITH unaccent, french_stem
+            """
+        ),
         migrations.CreateModel(
             name="City",
             fields=[

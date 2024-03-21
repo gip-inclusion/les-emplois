@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("asp", "0002_commune_created_by"),
+        ("asp", "0001_initial"),
         ("users", "0020_user_public_id"),
     ]
 
