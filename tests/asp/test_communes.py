@@ -8,7 +8,7 @@ class CommunesFixtureTest(TestCase):
     # INSEE commune with a single entry (1 history entry)
     _CODES_WITHOUT_HISTORY = ["97108", "13200"]
     ## Total number of entries in the file
-    _NUMBER_OF_ENTRIES = 50
+    _NUMBER_OF_ENTRIES = 52
     # No commune registered before this date (end_date)
     _PERIOD_MIN_DATE = datetime.date(1900, 1, 1)
 
@@ -43,7 +43,7 @@ class CommunesFixtureTest(TestCase):
     def test_current_entries(self):
         communes = Commune.objects.filter(end_date__isnull=True)
 
-        assert 26 == communes.count()
+        assert 27 == communes.count()
 
         for commune in communes:
             with self.subTest():
