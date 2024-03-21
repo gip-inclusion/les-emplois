@@ -32,7 +32,7 @@
                       <div class="row">
                           <div class="col-12 col-lg-8">
                               <div class="form-row">
-                                  <div class="col-12 col-md-3"><div class="form-group"><label class="form-label" for="id_hexa_lane_number">Numéro</label><input class="form-control" id="id_hexa_lane_number" maxlength="10" name="hexa_lane_number" placeholder="Numéro" type="text"/></div></div>
+                                  <div class="col-12 col-md-3"><div class="form-group"><label class="form-label" for="id_hexa_lane_number">Numéro</label><input class="form-control" id="id_hexa_lane_number" maxlength="10" name="hexa_lane_number" placeholder="Numéro" type="text" value="42"/></div></div>
                                   <div class="col-12 col-md-3"><div class="form-group"><label class="form-label" for="id_hexa_std_extension">Extension</label><select class="form-select" id="id_hexa_std_extension" name="hexa_std_extension">
     <option selected="" value="">---------</option>
   
@@ -48,7 +48,7 @@
                               </div>
                               <div class="form-row">
                                   <div class="col-12 col-md-3"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_lane_type">Type de voie</label><select class="form-select" id="id_hexa_lane_type" name="hexa_lane_type" required="">
-    <option selected="" value="">---------</option>
+    <option value="">---------</option>
   
     <option value="AER">Aérodrome</option>
   
@@ -198,7 +198,7 @@
   
     <option value="RTE">Route</option>
   
-    <option value="RUE">Rue</option>
+    <option selected="" value="RUE">Rue</option>
   
     <option value="RLE">Ruelle</option>
   
@@ -237,12 +237,14 @@
     <option value="ZUP">Zone urbanisation prio</option>
   
   </select></div></div>
-                                  <div class="col-12 col-md-6"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_lane_name">Nom de la voie</label><input class="form-control" id="id_hexa_lane_name" maxlength="120" name="hexa_lane_name" placeholder="Nom de la voie" required="" type="text"/></div></div>
+                                  <div class="col-12 col-md-6"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_lane_name">Nom de la voie</label><input class="form-control" id="id_hexa_lane_name" maxlength="120" name="hexa_lane_name" placeholder="Nom de la voie" required="" type="text" value="du Clos de la Grange"/></div></div>
                               </div>
                               <div class="form-group"><label class="form-label" for="id_hexa_additional_address">Complément d'adresse</label><input class="form-control" id="id_hexa_additional_address" maxlength="32" name="hexa_additional_address" placeholder="Complément d'adresse" type="text"/></div>
                               <div class="form-row">
-                                  <div class="col-12 col-md-3"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_post_code">Code postal</label><input class="form-control" id="id_hexa_post_code" maxlength="6" name="hexa_post_code" placeholder="Code postal" required="" type="text"/></div></div>
+                                  <div class="col-12 col-md-3"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_post_code">Code postal</label><input class="form-control" id="id_hexa_post_code" maxlength="6" name="hexa_post_code" placeholder="Code postal" required="" type="text" value="58160"/></div></div>
                                   <div class="col-12 col-md-9"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_commune">Commune</label><select class="form-select django-select2" data-ajax--cache="true" data-ajax--type="GET" data-ajax--url="/autocomplete/communes?select2=" data-allow-clear="false" data-minimum-input-length="2" data-placeholder="Nom de la commune" data-theme="bootstrap-5" id="id_hexa_commune" lang="fr" name="hexa_commune" required="">
+    <option selected="" value="47612">SAUVIGNY-LES-BOIS (058)</option>
+  
   </select></div></div>
                               </div>
                           </div>

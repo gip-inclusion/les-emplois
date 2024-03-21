@@ -292,12 +292,12 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
     job_seeker = job_application.job_seeker
     profile = job_seeker.jobseeker_profile
     address_filled = job_seeker.post_code and job_seeker.address_line_1
-    form = NewEmployeeRecordStep2Form(data=request.POST or None, instance=profile)
     query_param = f"?status={request.GET.get('status')}" if request.GET.get("status") else ""
 
     # Perform a geolocation of the user address if possible:
     # - success : prefill form with geolocated data
     # - failure : display actual address and let user fill the form
+    # This need to be done before passing the instance to the form otherwise fields will be shown empty
     if not profile.hexa_address_filled and address_filled:
         try:
             # Attempt to create a job seeker profile with an address prefilled
@@ -307,7 +307,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
             profile.clear_hexa_address()
 
     # At this point, a job seeker profile was created
-
+    form = NewEmployeeRecordStep2Form(data=request.POST or None, instance=profile)
     if request.method == "POST":
         if form.is_valid():
             form.save()
