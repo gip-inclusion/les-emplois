@@ -63,6 +63,8 @@
     '\tREMOVED {"code": "37273", "name": "VILLE-AUX-DAMES", "start_date": "2000-01-01", "end_date": null}',
     '\tREMOVED {"code": "41269", "name": "VENDOME", "start_date": "1900-01-01", "end_date": "1999-12-31"}',
     '\tREMOVED {"code": "41269", "name": "VENDOME", "start_date": "2000-01-01", "end_date": null}',
+    '\tREMOVED {"code": "58273", "name": "SAUVIGNY-LES-BOIS", "start_date": "1900-01-01", "end_date": "1999-12-31"}',
+    '\tREMOVED {"code": "58273", "name": "SAUVIGNY-LES-BOIS", "start_date": "2000-01-01", "end_date": null}',
     '\tREMOVED {"code": "59183", "name": "DUNKERQUE", "start_date": "1900-01-01", "end_date": "1999-12-31"}',
     '\tREMOVED {"code": "59183", "name": "DUNKERQUE", "start_date": "2000-01-01", "end_date": null}',
     '\tREMOVED {"code": "59291", "name": "HAUTMONT", "start_date": "1900-01-01", "end_date": "1999-12-31"}',
@@ -102,7 +104,7 @@
     '\tREMOVED {"code": "91432", "name": "MORANGIS", "start_date": "1968-01-01", "end_date": "1999-12-31"}',
     '\tREMOVED {"code": "91432", "name": "MORANGIS", "start_date": "2000-01-01", "end_date": null}',
     '\tREMOVED {"code": "97108", "name": "CAPESTERRE-DE-MARIE-GALANT", "start_date": "1900-01-01", "end_date": null}',
-    '> successfully deleted count=50 communes',
+    '> successfully deleted count=52 communes',
     '> successfully updated count=0 communes',
     '> successfully created count=35 new communes',
   ])

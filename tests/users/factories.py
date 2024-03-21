@@ -177,9 +177,9 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
             last_name="Dupont",
             birthdate="1990-05-01",
             jobseeker_profile__for_snapshot=True,
-            address_line_1="Rue du clos de la Grange",
-            post_code="91234",
-            city="Choufleury",
+            address_line_1="42 Rue du clos de la Grange",
+            post_code="58160",
+            city="Sauvigny-les-Bois",
         )
 
     address_line_1 = factory.Faker("street_address", locale="fr_FR")
@@ -215,7 +215,7 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
             # Do nothing
             return
 
-        address = get_random_geocoding_api_result()
+        address = get_random_geocoding_api_result() if extracted is True else extracted
 
         self.address_line_1 = address.get("address_line_1")
         self.post_code = address.get("post_code")

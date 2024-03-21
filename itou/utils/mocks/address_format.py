@@ -3,6 +3,20 @@ import random
 from itou.asp.models import Commune
 
 
+# https://api-adresse.data.gouv.fr/search/?q=42+Rue+du+clos+de+la+Grange%2C+58160+Sauvigny-les-Bois&limit=1
+BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK = {
+    "score": 0.8107390909090908,
+    "address_line_1": "Rue du Clos de la Grange",
+    "number": "42",
+    "lane": "Rue du Clos de la Grange",
+    "address": "Rue du Clos de la Grange",
+    "post_code": "58160",
+    "insee_code": "58273",
+    "city": "Sauvigny-les-Bois",
+    "longitude": 3.271964,
+    "latitude": 46.966611,
+}
+
 BAN_GEOCODING_API_RESULTS_MOCK = [
     {
         "score": 0.8745736363636364,
@@ -293,6 +307,7 @@ BAN_GEOCODING_API_RESULTS_MOCK = [
         "longitude": -1.297749,
         "latitude": 47.012473,
     },
+    BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK,
 ]
 
 # Revert lookup
