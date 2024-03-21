@@ -9,14 +9,14 @@ from itou.asp.models import Commune
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.users.enums import LackOfNIRReason
-from itou.utils.mocks.address_format import mock_get_geocoding_data
+from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK, mock_get_geocoding_data
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.asp.factories import CommuneFactory, CountryFranceFactory, CountryOutsideEuropeFactory
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from tests.users.factories import JobSeekerWithAddressFactory
-from tests.utils.test import TestCase
+from tests.utils.test import TestCase, parse_response_to_soup
 
 
 # Helper functions
@@ -252,6 +252,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         self.assertRedirects(response, target_url)
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
 
     NO_ADDRESS_FILLED_IN = "Aucune adresse n'a été saisie sur les emplois de l'inclusion !"
@@ -284,11 +285,41 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         side_effect=mock_get_geocoding_data,
     )
     def test_job_seeker_address_geolocated(self, _mock):
-        # Accept geolocated address provided by mock and pass to step 3
-        response = self.client.get(self.url)
-        url = reverse("employee_record_views:create_step_3", args=(self.job_application.pk,))
-        response = self.client.get(url)
+        job_seeker = JobSeekerWithAddressFactory(
+            for_snapshot=True,
+            with_mocked_address=BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK,
+        )
+        job_application = JobApplicationWithApprovalNotCancellableFactory(
+            to_company=self.company,
+            job_seeker=job_seeker,
+        )
 
+        # Accept geolocated address provided by mock and pass to step 3
+        response = self.client.get(reverse("employee_record_views:create_step_2", args=(job_application.pk,)))
+        form_soup = parse_response_to_soup(
+            response,
+            selector=".s-section form",
+            replace_in_attr=[
+                (
+                    "action",
+                    reverse("employee_record_views:create_step_2", args=(job_application.pk,)),
+                    "/employee_record/create_step_2/[PK of JobApplication]",
+                ),
+                (
+                    "href",
+                    reverse("employee_record_views:create_step_3", args=(job_application.pk,)),
+                    "/employee_record/create_step_3/[PK of JobApplication]",
+                ),  # Go to next step button
+                (
+                    "href",
+                    reverse("employee_record_views:create", args=(job_application.pk,)),
+                    "/employee_record/create/[PK of JobApplication]",
+                ),  # Go to previous step button
+            ],
+        )
+        assert str(form_soup) == self.snapshot
+
+        response = self.client.get(reverse("employee_record_views:create_step_3", args=(job_application.pk,)))
         self.assertNotContains(response, self.ADDRESS_COULD_NOT_BE_AUTO_CHECKED)
         self.assertNotContains(response, self.NO_ADDRESS_FILLED_IN)
 

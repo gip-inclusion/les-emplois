@@ -1,4 +1,341 @@
 # serializer version: 1
+# name: CreateEmployeeRecordStep2Test.test_job_seeker_address_geolocated
+  '''
+  <form action="/employee_record/create_step_2/[PK of JobApplication]" method="post">
+                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                  <fieldset>
+                      <legend class="h2">Domiciliation du salarié</legend>
+                      <div class="row">
+                          <div class="col-12 col-lg-8">
+                              
+                              <div class="mb-3 mb-md-5">
+                                  <p>
+                                      Merci de bien vouloir vérifier <b>l'adresse qui sera envoyée à l'ASP</b>.
+                                  </p>
+                                  <ul>
+                                      <li>
+                                          Si elle est correcte, vous pouvez passer à l'étape suivante en cliquant sur le bouton <b>«Suivant»</b> en bas de page.
+                                      </li>
+                                      <li>
+                                          Si elle ne correspond pas, veuillez la modifier à l'aide du formulaire ci-dessous, puis cliquez
+                                          sur le bouton <b>«Valider cette adresse»</b>.
+                                      </li>
+                                  </ul>
+                                  
+                                      <p class="mb-0">
+                                          <i class="ri-error-warning-line ri-lg me-1"></i><strong>Une saisie incorrecte de l'adresse peut mener à une erreur de traitement de la fiche salarié.</strong>
+                                      </p>
+                                  
+                              </div>
+                          </div>
+                      </div>
+                      <div class="row">
+                          <div class="col-12 col-lg-8">
+                              <div class="form-row">
+                                  <div class="col-12 col-md-3"><div class="form-group"><label class="form-label" for="id_hexa_lane_number">Numéro</label><input class="form-control" id="id_hexa_lane_number" maxlength="10" name="hexa_lane_number" placeholder="Numéro" type="text"/></div></div>
+                                  <div class="col-12 col-md-3"><div class="form-group"><label class="form-label" for="id_hexa_std_extension">Extension</label><select class="form-select" id="id_hexa_std_extension" name="hexa_std_extension">
+    <option selected="" value="">---------</option>
+  
+    <option value="B">Bis</option>
+  
+    <option value="T">Ter</option>
+  
+    <option value="Q">Quater</option>
+  
+    <option value="C">Quinquies</option>
+  
+  </select></div></div>
+                              </div>
+                              <div class="form-row">
+                                  <div class="col-12 col-md-3"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_lane_type">Type de voie</label><select class="form-select" id="id_hexa_lane_type" name="hexa_lane_type" required="">
+    <option selected="" value="">---------</option>
+  
+    <option value="AER">Aérodrome</option>
+  
+    <option value="AGL">Agglomération</option>
+  
+    <option value="AIRE">Aire</option>
+  
+    <option value="ALL">Allée</option>
+  
+    <option value="ACH">Ancien chemin</option>
+  
+    <option value="ART">Ancienne route</option>
+  
+    <option value="AV">Avenue</option>
+  
+    <option value="BEGI">Beguinage</option>
+  
+    <option value="BD">Boulevard</option>
+  
+    <option value="BRG">Bourg</option>
+  
+    <option value="CPG">Camping</option>
+  
+    <option value="CAR">Carrefour</option>
+  
+    <option value="CTRE">Centre</option>
+  
+    <option value="CCAL">Centre commercial</option>
+  
+    <option value="CHT">Chateau</option>
+  
+    <option value="CHS">Chaussee</option>
+  
+    <option value="CHEM">Chemin</option>
+  
+    <option value="CHV">Chemin vicinal</option>
+  
+    <option value="CITE">Cité</option>
+  
+    <option value="CLOS">Clos</option>
+  
+    <option value="CTR">Contour</option>
+  
+    <option value="COR">Corniche</option>
+  
+    <option value="COTE">Coteaux</option>
+  
+    <option value="COUR">Cour</option>
+  
+    <option value="CRS">Cours</option>
+  
+    <option value="DSC">Descente</option>
+  
+    <option value="DOM">Domaine</option>
+  
+    <option value="ECL">Ecluse</option>
+  
+    <option value="ESC">Escalier</option>
+  
+    <option value="ESPA">Espace</option>
+  
+    <option value="ESP">Esplanade</option>
+  
+    <option value="FG">Faubourg</option>
+  
+    <option value="FRM">Ferme</option>
+  
+    <option value="FON">Fontaine</option>
+  
+    <option value="GAL">Galerie</option>
+  
+    <option value="GARE">Gare</option>
+  
+    <option value="GBD">Grand boulevard</option>
+  
+    <option value="GPL">Grande place</option>
+  
+    <option value="GR">Grande rue</option>
+  
+    <option value="GRI">Grille</option>
+  
+    <option value="HAM">Hameau</option>
+  
+    <option value="IMM">Immeuble(s)</option>
+  
+    <option value="IMP">Impasse</option>
+  
+    <option value="JARD">Jardin</option>
+  
+    <option value="LD">Lieu-dit</option>
+  
+    <option value="LOT">Lotissement</option>
+  
+    <option value="MAIL">Mail</option>
+  
+    <option value="MAIS">Maison</option>
+  
+    <option value="MAS">Mas</option>
+  
+    <option value="MTE">Montee</option>
+  
+    <option value="PARC">Parc</option>
+  
+    <option value="PRV">Parvis</option>
+  
+    <option value="PAS">Passage</option>
+  
+    <option value="PLE">Passerelle</option>
+  
+    <option value="PCH">Petit chemin</option>
+  
+    <option value="PRT">Petite route</option>
+  
+    <option value="PTR">Petite rue</option>
+  
+    <option value="PL">Place</option>
+  
+    <option value="PTTE">Placette</option>
+  
+    <option value="PLN">Plaine</option>
+  
+    <option value="PLAN">Plan</option>
+  
+    <option value="PLT">Plateau</option>
+  
+    <option value="PONT">Pont</option>
+  
+    <option value="PORT">Port</option>
+  
+    <option value="PROM">Promenade</option>
+  
+    <option value="QUAI">Quai</option>
+  
+    <option value="QUAR">Quartier</option>
+  
+    <option value="RPE">Rampe</option>
+  
+    <option value="REMP">Rempart</option>
+  
+    <option value="RES">Residence</option>
+  
+    <option value="ROC">Rocade</option>
+  
+    <option value="RPT">Rond-point</option>
+  
+    <option value="RTD">Rotonde</option>
+  
+    <option value="RTE">Route</option>
+  
+    <option value="RUE">Rue</option>
+  
+    <option value="RLE">Ruelle</option>
+  
+    <option value="SEN">Sente</option>
+  
+    <option value="SENT">Sentier</option>
+  
+    <option value="SQ">Square</option>
+  
+    <option value="TPL">Terre plein</option>
+  
+    <option value="TRAV">Traverse</option>
+  
+    <option value="VEN">Venelle</option>
+  
+    <option value="VTE">Vieille route</option>
+  
+    <option value="VCHE">Vieux chemin</option>
+  
+    <option value="VILL">Villa</option>
+  
+    <option value="VLGE">Village</option>
+  
+    <option value="VOIE">Voie</option>
+  
+    <option value="ZONE">Zone</option>
+  
+    <option value="ZA">Zone d'activite</option>
+  
+    <option value="ZAC">Zone d'amenagement concerte</option>
+  
+    <option value="ZAD">Zone d'amenagement differe</option>
+  
+    <option value="ZI">Zone industrielle</option>
+  
+    <option value="ZUP">Zone urbanisation prio</option>
+  
+  </select></div></div>
+                                  <div class="col-12 col-md-6"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_lane_name">Nom de la voie</label><input class="form-control" id="id_hexa_lane_name" maxlength="120" name="hexa_lane_name" placeholder="Nom de la voie" required="" type="text"/></div></div>
+                              </div>
+                              <div class="form-group"><label class="form-label" for="id_hexa_additional_address">Complément d'adresse</label><input class="form-control" id="id_hexa_additional_address" maxlength="32" name="hexa_additional_address" placeholder="Complément d'adresse" type="text"/></div>
+                              <div class="form-row">
+                                  <div class="col-12 col-md-3"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_post_code">Code postal</label><input class="form-control" id="id_hexa_post_code" maxlength="6" name="hexa_post_code" placeholder="Code postal" required="" type="text"/></div></div>
+                                  <div class="col-12 col-md-9"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_commune">Commune</label><select class="form-select django-select2" data-ajax--cache="true" data-ajax--type="GET" data-ajax--url="/autocomplete/communes?select2=" data-allow-clear="false" data-minimum-input-length="2" data-placeholder="Nom de la commune" data-theme="bootstrap-5" id="id_hexa_commune" lang="fr" name="hexa_commune" required="">
+  </select></div></div>
+                              </div>
+                          </div>
+                          <div class="col-12 col-lg-4">
+                              <div class="c-form-conseil">
+                                  <div>
+                                      <p>
+                                          <i class="ri-lightbulb-line ri-lg me-1"></i><strong>Rappel de l’adresse du salarié renseignée sur Les emplois de l’inclusion</strong>
+                                      </p>
+                                      
+                                          <ul class="list-unstyled mb-0 mt-2">
+                                              <li>Rue du Clos de la Grange</li>
+                                              
+                                              <li>58160 Sauvigny-les-Bois</li>
+                                          </ul>
+                                      
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </fieldset>
+                  <div class="form-row">
+                      <div class="form-group col-12 col-lg-auto order-1 order-lg-2">
+                          <button class="btn btn-outline-primary">Valider cette adresse</button>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-12 col-lg-8">
+                          
+                          
+                          
+                          
+                          
+                              
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <button aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" data-bs-target="#confirm_reset_modal" data-bs-toggle="modal" type="button">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </button>
+                  
+              </div>
+              
+                  <div class="form-group col col-lg-auto order-1 order-lg-2">
+                      <a aria-label="Retourner à l'étape précédente" class="btn btn-block btn-outline-primary" href="/employee_record/create/[PK of JobApplication]">
+                          <span>Retour</span>
+                      </a>
+                  </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <a aria-label="Passer à l'étape suivante" class="btn btn-block btn-primary" href="/employee_record/create_step_3/[PK of JobApplication]">
+                          <span>Suivant</span>
+                      </a>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br/>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
+                      <a class="btn btn-sm btn-danger" href="/employee_record/list">Confirmer l'annulation</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+                          
+                      </div>
+                  </div>
+              </form>
+  '''
+# ---
 # name: CreateEmployeeRecordStep5Test.test_employee_record_status
   Message(level=25, message="La création de cette fiche salariée est terminée||Vous pouvez suivre l'avancement de son traitement par l'ASP en sélectionnant les différents statuts.", extra_tags='toast')
 # ---
