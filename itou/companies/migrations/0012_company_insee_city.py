@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("cities", "0003_city_edition_mode"),
+        ("cities", "0001_initial"),
         ("companies", "0011_rename_siae_companymembership_company_and_more"),
     ]
 

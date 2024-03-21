@@ -5,7 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("cities", "0003_city_edition_mode"),
+        ("cities", "0001_initial"),
         ("jobs", "0003_migrate_trigger"),
         ("job_applications", "0018_alter_jobapplication_sender_siae_and_more"),
         ("companies", "0008_rename_siaemembership_companymembership"),
