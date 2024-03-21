@@ -1,6 +1,5 @@
 import datetime
 import json
-import unittest
 
 import pytest
 from dateutil.relativedelta import relativedelta
@@ -1052,29 +1051,34 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.approval_number_sent_at is None
         assert len(mail.outbox) == 1
 
-    @unittest.skip("Must be refactored with notifications_cancel_for_XXX + test the 2 notifications logic")
     def test_cancel(self):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_ACCEPTED
         )
 
         cancellation_user = job_application.to_company.active_members.first()
-        email = job_application.email_cancel(cancelled_by=cancellation_user)
-        # To.
-        assert cancellation_user.email in email.to
-        assert job_application.sender.email in email.bcc
-        assert len(email.to) == 1
-        assert len(email.bcc) == 1
-        # Body.
-        assert "annulée" in email.body
-        assert job_application.sender.get_full_name() in email.body
-        assert job_application.job_seeker.get_full_name() in email.body
+        # mail.outbox = []  # Delete previous emails.
+        job_application.cancel(user=cancellation_user)
+        assert len(mail.outbox) == 2
 
+        # To.
+        assert cancellation_user.email in mail.outbox[0].to
+        assert job_application.sender.email in mail.outbox[1].to
+
+        # Body.
+        assert "annulée" in mail.outbox[0].body
+        assert job_application.sender.get_full_name() in mail.outbox[0].body
+        assert job_application.job_seeker.get_full_name() in mail.outbox[0].body
+        assert mail.outbox[0].body == mail.outbox[1].body
+
+        mail.outbox = []  # Delete previous emails.
         # When sent by jobseeker.
         job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
-        email = job_application.email_cancel(cancelled_by=cancellation_user)
+        job_application.cancel(user=cancellation_user)
+        assert len(mail.outbox) == 1
+
         # To.
-        assert not email.bcc
+        assert cancellation_user.email in mail.outbox[0].to
 
     def test_cancel_without_sender(self):
         job_application = JobApplicationFactory(
