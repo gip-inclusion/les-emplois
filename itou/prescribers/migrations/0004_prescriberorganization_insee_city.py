@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("cities", "0003_city_edition_mode"),
+        ("cities", "0001_initial"),
         ("prescribers", "0003_alter_prescribermembership_updated_at_and_more"),
     ]
 

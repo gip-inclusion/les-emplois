@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("cities", "0003_city_edition_mode"),
+        ("cities", "0001_initial"),
     ]
 
     operations = [

@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("cities", "0002_alter_city_department"),
+        ("cities", "0001_initial"),
         ("jobs", "0002_create_full_text_trigger"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]

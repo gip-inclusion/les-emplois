@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("cities", "0003_city_edition_mode"),
+        ("cities", "0001_initial"),
         ("users", "0029_really_remove_user_pole_emploi_fields"),
     ]
 
