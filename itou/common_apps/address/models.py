@@ -261,7 +261,7 @@ class AddressMixin(models.Model):
                 return city.name, True
         return None
 
-    def set_coords(self):
+    def geocode_address(self):
         try:
             geocoding_data = get_geocoding_data(self.geocoding_address, post_code=self.post_code)
         except GeocodingDataError as exc:

@@ -626,7 +626,7 @@ def edit_company_step_preview(request, template_name="companies/edit_siae_previe
         company.department = department_from_postcode(company.post_code)
 
         try:
-            company.set_coords()
+            company.geocode_address()
             company.save()
             # Clear the session now, so that we start fresh if we edit again.
             del request.session[ITOU_SESSION_EDIT_COMPANY_KEY]

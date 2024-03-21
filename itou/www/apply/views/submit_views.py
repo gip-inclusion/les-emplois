@@ -666,7 +666,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             url = reverse("dashboard:index")
         else:
             try:
-                user.set_coords()
+                user.geocode_address()
             except AddressLookupError:
                 # Nothing to do: re-raised and already logged as error
                 pass
@@ -1486,7 +1486,7 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
         try:
             if "address_line_1" in self.updated_user_fields or "post_code" in self.updated_user_fields:
                 try:
-                    self.job_seeker.set_coords()
+                    self.job_seeker.geocode_address()
                 except AddressLookupError:
                     # Nothing to do: re-raised and already logged as error
                     pass
