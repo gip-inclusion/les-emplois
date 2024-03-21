@@ -1510,6 +1510,11 @@ class UtilsParseResponseToSoupTest(TestCase):
             "</body></html>"
         )
 
+    def test_replace_in_attr_also_replace_on_current_element(self):
+        response = HttpResponse('<html><head></head><body><form action="foo">bar</form></body></html>')
+        soup = parse_response_to_soup(response, selector="form", replace_in_attr=[("action", "foo", "not foo")])
+        assert str(soup) == '<form action="not foo">bar</form>'
+
 
 @pytest.mark.parametrize("model", site._registry)
 def test_all_admin(admin_client, model):
