@@ -1,5 +1,36 @@
 # Journal des modifications
 
+## [83] - 2024-03-25
+
+### Ajouté
+- Adresses : Proposer l'autocomplétion des adresses des candidats avec la [Base Adresse Nationale](https://api.gouv.fr/les-api/base-adresse-nationale)
+- Mobil’emploi : Ajout de bannières promotionelles
+- [Fiche de poste et fiche entreprise : ajout de l’action « Signaler »](https://github.com/gip-inclusion/les-emplois/pull/3776)
+
+### Modifié
+
+- [Refonte UX/UI : Améliorer la version mobile du placeholder des `autocomplete`](https://github.com/gip-inclusion/les-emplois/pull/3758)
+- [Refonte UX/UI : MàJ des onglets des résultats de recherche (1/2)](https://github.com/gip-inclusion/les-emplois/pull/3774)
+- [Refonte UX/UI : MàJ des onglets des résultats de recherche (2/2)](https://github.com/gip-inclusion/les-emplois/pull/3813)
+- [Refonte UX/UI : MàJ des cartes entreprise dans les résultats de recherche](https://github.com/gip-inclusion/les-emplois/pull/3751)
+- [Refonte UX/UI : Correction de l’apparence d’un lien dans les résultats de recherche](https://github.com/gip-inclusion/les-emplois/pull/3757)
+- Refonte UX/UI : MàJ de la page d’accueil
+- [Refonte UX/UI: Ajouter un menu en onglets sur les pages “structure”](https://github.com/gip-inclusion/les-emplois/pull/3810)
+- Fiche de poste : Remplacer « Publier la fiche de poste » par « Enregister la fiche de poste » dans le parcours de modification
+- PASS IAE : Corriger l’affichage de la durée dans la liste des PASS
+- UI : MàJ de la bannière fiches salarié pour les EITI après le webinaire
+- UI : Changer certaines bannières infos/alertes par des toasts
+- Métiers : Le badge populaire s’affiche maintenant à partir de 20 candidatures (et non 21)
+- API : Augmentation de la limite de fréquence d’accès pour la plupart des API (sauf pour `siaes` et `employee-records`, qui ont été sur-utilisées par le passé)
+- Admin : Retrait des champs permissions pour les utilisateurs non admins
+- Admin : Ajout de la valeur par défaut de l’`asp_uid` dans le `help_text`
+- Mise à jour vers Django 5.0
+
+### Supprimé
+
+- Tableau de bord : Bandeau DORA
+- [Parcours d'embauche : suppression d'une section dans la vue d'éligibilité](https://github.com/gip-inclusion/les-emplois/pull/3676)
+
 ## [82] - 2024-03-11
 
 ### Ajouté
