@@ -82,9 +82,14 @@ def parse_response_to_soup(response, selector=None, no_html_body=False, replace_
         unique_attrs = set([replace_tuple[0] for replace_tuple in replacements])
 
         for attr in unique_attrs:
+            # Search and replace in descendant nodes
             for links in soup.find_all(attrs={attr: True}):
                 for _, from_str, to_str in replacements:
                     links.attrs.update({f"{attr}": links.attrs[attr].replace(from_str, to_str)})
+            # Also replace attributes in the top node
+            if attr in soup.attrs:
+                for _, from_str, to_str in replacements:
+                    soup.attrs.update({f"{attr}": soup.attrs[attr].replace(from_str, to_str)})
     return soup
 
 
