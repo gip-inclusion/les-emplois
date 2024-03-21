@@ -12,7 +12,6 @@ class Migration(migrations.Migration):
         ("jobs", "0003_migrate_trigger"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("companies", "0006_alter_siae_table_alter_siaeconvention_table_and_more"),
-        ("api", "0001_initial"),
         ("eligibility", "0001_initial"),
         ("approvals", "0012_add_prolongation_request"),
         ("invitations", "0001_initial"),
