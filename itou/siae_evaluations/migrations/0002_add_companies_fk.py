@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("siae_evaluations", "0001_initial"),
-        ("companies", "0007_rename_siae_company"),
+        ("companies", "0001_initial"),
     ]
 
     operations = [
