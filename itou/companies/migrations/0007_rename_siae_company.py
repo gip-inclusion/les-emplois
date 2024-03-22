@@ -9,7 +9,6 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("jobs", "0003_migrate_trigger"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("companies", "0006_alter_siae_table_alter_siaeconvention_table_and_more"),
         ("eligibility", "0001_initial"),
