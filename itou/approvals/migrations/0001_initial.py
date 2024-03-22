@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("eligibility", "0001_initial"),
-        ("prescribers", "0003_alter_prescribermembership_updated_at_and_more"),
+        ("prescribers", "0001_initial"),
         ("files", "0001_initial"),
     ]
 
