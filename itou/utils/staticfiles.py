@@ -76,6 +76,20 @@ ASSET_INFOS = {
             ],
         },
     },
+    "tiny-slider": {
+        "download": {
+            "url": "https://github.com/ganlanyuan/tiny-slider/archive/refs/tags/v2.9.4.zip",
+            "sha256": "ac906066c097361fd9240ebf7521ee21753ca0740e7b2d31924c8d1ddb91a0ea",
+        },
+        "extract": {
+            "origin": "tiny-slider-2.9.4/dist",
+            "destination": "vendor/tiny-slider",
+            "files": [
+                "min/tiny-slider.js",
+                "sourcemaps/tiny-slider.js.map",
+            ],
+        },
+    },
     "htmx.org": {
         "download": {
             "url": "https://registry.npmjs.org/htmx.org/-/htmx.org-1.9.6.tgz",
@@ -223,11 +237,11 @@ ASSET_INFOS = {
     },
     "theme-inclusion": {
         "download": {
-            "url": "https://github.com/gip-inclusion/itou-theme/archive/refs/tags/v1.4.6.zip",
-            "sha256": "81af3241ff5d53b1db6b92194c1a95c74dd4f806a77e8b80ddd68c1634b4a996",
+            "url": "https://github.com/gip-inclusion/itou-theme/archive/refs/tags/v1.4.7.zip",
+            "sha256": "db7a567cd0e160e74a1ecc867916cb785891f179d7d0008faa18c399acd39a9a",
         },
         "extract": {
-            "origin": "itou-theme-1.4.6/dist",
+            "origin": "itou-theme-1.4.7/dist",
             "destination": "vendor/theme-inclusion/",
             "files": [
                 "javascripts/app.js",

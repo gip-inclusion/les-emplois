@@ -1,8 +1,9 @@
 {% extends "layout/base.html" %}
+{% load static %}
 {% load str_filters %}
 {% load matomo %}
 
-{% block title %}Structure : Collaborateurs {{ block.super }}{% endblock %}
+{% block title %}Collaborateurs {{ block.super }}{% endblock %}
 
 {% block content_title %}
     <h1>Structure</h1>
@@ -17,7 +18,7 @@
         <div class="s-tabs-01__container container">
             <div class="s-tabs-01__row row">
                 <div class="s-tabs-01__col col-12">
-                    <ul class="s-tabs-01__nav nav nav-tabs" data-it-s-tabs-01="true">
+                    <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="1">
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'companies_views:job_description_list' %}" {% matomo_event "employeurs" "clic" "voir-liste-metiers" %}>
                                 <span>Métiers et recrutements</span>
@@ -32,12 +33,6 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'companies_views:show_financial_annexes' %}">Annexes financières</a>
-                        </li>
-                        <li class="nav-item-dropdown dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" id="sTabs01DropdownMoreLink" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="ri-more-line" aria-hidden="true"></i>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="sTabs01DropdownMoreLink"></div>
                         </li>
                     </ul>
                     <div class="tab-content">
@@ -66,4 +61,8 @@
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'js/sliding_tabs.js'%}"></script>
 {% endblock %}
