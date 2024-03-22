@@ -9,6 +9,7 @@ le code plus facilement.
 ```sh
 $ docker compose --profile=django up
 ```
+  
 
 ## Utilisation
 
