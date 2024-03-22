@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("users", "0010_remove_user_old_kind_flags"),
+        ("users", "0001_initial"),
     ]
 
     operations = [
