@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("companies", "0009_rename_siaejobdescription_jobdescription"),
+        ("companies", "0001_initial"),
     ]
 
     operations = [

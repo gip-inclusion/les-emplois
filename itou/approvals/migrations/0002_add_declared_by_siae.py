@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
     dependencies = [
         ("approvals", "0001_initial"),
-        ("companies", "0007_rename_siae_company"),
+        ("companies", "0001_initial"),
     ]
 
     replaces = [("approvals", "0002_approval_origin")]

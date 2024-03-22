@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ("companies", "0007_rename_siae_company"),
+        ("companies", "0001_initial"),
         ("institutions", "0001_initial"),
         ("prescribers", "0001_initial"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
