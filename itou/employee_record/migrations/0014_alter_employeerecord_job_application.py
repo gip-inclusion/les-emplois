@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("job_applications", "0022_jobapplication_diagoriente_invite_sent_at"),
+        ("job_applications", "0001_initial"),
         ("employee_record", "0013_change_unique_constraint"),
     ]
 

@@ -1,26 +1,9 @@
 from django.db import migrations, models
 
-from itou.asp.models import SiaeMeasure
-
-
-def _fill_asp_measure(apps, schema_editor):
-    EmployeeRecord = apps.get_model("employee_record", "EmployeeRecord")
-    objects_to_migrate = (
-        EmployeeRecord.objects.filter(asp_measure=None)
-        .select_related("job_application__to_company")
-        .only("job_application__to_company__kind")
-    )
-
-    batch = []
-    for er in objects_to_migrate:
-        er.asp_measure = SiaeMeasure.from_siae_kind(er.job_application.to_company.kind)
-        batch.append(er)
-    EmployeeRecord.objects.bulk_update(batch, fields=["asp_measure"])
-
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("job_applications", "0019_rename_to_siae_jobapplication_to_company"),
+        ("job_applications", "0001_initial"),
         ("employee_record", "0009_employeerecord_asp_measure"),
     ]
 
@@ -29,7 +12,6 @@ class Migration(migrations.Migration):
             model_name="employeerecord",
             name="unique_asp_id_approval_number",
         ),
-        migrations.RunPython(_fill_asp_measure, reverse_code=migrations.RunPython.noop),
         migrations.AlterField(
             model_name="employeerecord",
             name="asp_measure",
