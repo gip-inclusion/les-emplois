@@ -6,7 +6,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("eligibility", "0005_updated_dual_annexes"),
+        ("eligibility", "0001_initial"),
         ("job_applications", "0006_added_geiq_contract_fields"),
     ]
 
