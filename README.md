@@ -104,6 +104,8 @@ Vous pouvez y accéder à l'adresse http://localhost:8000/.
 $ make populate_db
 ```
 
+Après avoir lancé `./manage.py migrate` pour créer les tables avec Django.
+
 ## Charger une base de données de production
 
 Inspirez-vous de la suite de commandes suivante :
