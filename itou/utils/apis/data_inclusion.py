@@ -49,3 +49,10 @@ class DataInclusionApiClient:
             logger.info("data.inclusion result error code_insee=%s error=%s", code_insee, exc)
             raise DataInclusionApiException()
         return []
+
+
+def di_client_factory() -> DataInclusionApiClient:
+    return DataInclusionApiClient(
+        settings.API_DATA_INCLUSION_BASE_URL,
+        settings.API_DATA_INCLUSION_TOKEN,
+    )
