@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import urljoin
 
 import httpx
 from django.conf import settings
@@ -50,6 +51,10 @@ class DataInclusionApiClient:
         except KeyError as exc:
             logger.info("data.inclusion result error code_insee=%s error=%s", code_insee, exc)
             raise DataInclusionApiException()
+
+
+def make_service_redirect_url(source: str, service_id: str) -> str:
+    return urljoin(settings.API_DATA_INCLUSION_BASE_URL, f"services/{source}/{service_id}/redirige?depuis=les-emplois")
 
 
 def di_client_factory() -> DataInclusionApiClient:

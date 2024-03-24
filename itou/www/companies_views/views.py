@@ -1,6 +1,6 @@
 import random
-from urllib.parse import urljoin
 
+import httpx
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -20,7 +20,7 @@ from itou.companies.models import Company, CompanyMembership, JobDescription, Si
 from itou.jobs.models import Appellation
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from itou.utils.apis.data_inclusion import DataInclusionApiException, di_client_factory
+from itou.utils.apis.data_inclusion import DataInclusionApiException, di_client_factory, make_service_redirect_url
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
@@ -38,15 +38,14 @@ ITOU_SESSION_JOB_DESCRIPTION_KEY = "edit_job_description_key"
 DATA_INCLUSION_API_CACHE_PREFIX = "data_inclusion_api_results"
 
 
-def dora_url(source, id, original_url=None):
-    if source == "dora" and original_url:
-        return original_url
-    return urljoin(settings.DORA_BASE_URL, f"/services/di--{source}--{id}")
-
-
 def displayable_thematique(thematique):
     """Remove the sub-themes (anything after the "--"), capitalize and use spaces instead of dashes."""
     return thematique.split("--")[0].upper().replace("-", " ")
+
+
+def set_dora_utm_query_params(url: str) -> str:
+    utm_params = {"mtm_campaign": "LesEmplois", "mtm_kwd": "GeneriqueDecouvrirService"}
+    return str(httpx.Request("GET", url, params=utm_params).url)
 
 
 def get_data_inclusion_services(code_insee):
@@ -72,7 +71,7 @@ def get_data_inclusion_services(code_insee):
         results = [
             r
             | {
-                "dora_di_url": dora_url(r["source"], r["id"], r.get("lien_source", None)),
+                "di_service_redirect_url": set_dora_utm_query_params(make_service_redirect_url(r["source"], r["id"])),
                 "thematiques_display": {displayable_thematique(t) for t in r["thematiques"]},
             }
             for r in results
@@ -170,7 +169,7 @@ def job_description_list(request, template_name="companies/job_description_list.
     if request.method == "POST":
         # note (fv): waiting for a proper htmx implementation, this will do meanwhile
         job_description_id = request.POST.get("job_description_id")
-        match (request.POST.get("action")):
+        match request.POST.get("action"):
             case "delete":
                 # delete method via htmx would be nice
                 job_description = JobDescription.objects.filter(company_id=company.pk, pk=job_description_id).first()
@@ -712,6 +711,6 @@ def update_admin_role(request, action, user_id, template_name="companies/update_
 def hx_dora_services(request, code_insee, template_name="companies/hx_dora_services.html"):
     context = {
         "data_inclusion_services": get_data_inclusion_services(code_insee),
-        "dora_base_url": settings.DORA_BASE_URL,
+        "dora_base_url": set_dora_utm_query_params(settings.DORA_BASE_URL),
     }
     return render(request, template_name, context)
