@@ -1,5 +1,3 @@
-import unittest
-
 import pytest
 from django.contrib import messages
 from django.contrib.admin import helpers
@@ -294,7 +292,6 @@ def test_free_ic_email(admin_client):
     assert employer.email == "ic_user@email.com_old"
 
 
-@unittest.skip("Must be refactored notifications logic")
 def test_num_queries(admin_client):
     prescriber = PrescriberFactory()
     sent_job_application1 = JobApplicationFactory(
@@ -323,6 +320,10 @@ def test_num_queries(admin_client):
         + 1  # job_applications_jobapplication
         + 1  # prescribers_prescribermembership
         + 1  # utils_pksupportremark
+        + 1  # is_prescriber_with_authorized_org (exists)
+        + 1  # communications_notificationsettings
+        + 3  # savepoint, notificationsettings insert & release
+        + 1  # communications_notificationrecord
         + 3  # savepoint, session update & release
     ):
         response = admin_client.get(reverse("admin:users_user_change", kwargs={"object_id": prescriber.pk}))

@@ -118,7 +118,7 @@ class PassAcceptedEmployerNotification(EmployerNotification, EmailNotification):
         return self.context
 
     def is_applicable(self):
-        return self.structure.kind in SIAE_WITH_CONVENTION_KINDS
+        return self.structure and self.structure.kind in SIAE_WITH_CONVENTION_KINDS
 
 
 @notifications_registry.register
@@ -129,7 +129,7 @@ class ProlongationRequestGrantedForEmployerNotification(EmployerNotification, Em
     body_template = "approvals/email/prolongation_request/granted/employer_body.txt"
 
     def is_applicable(self):
-        return self.structure.kind in SIAE_WITH_CONVENTION_KINDS
+        return self.structure and self.structure.kind in SIAE_WITH_CONVENTION_KINDS
 
 
 @notifications_registry.register
