@@ -2345,10 +2345,16 @@ class DirectHireFullProcessTest(TestCase):
             "pole_emploi_id": new_job_seeker.jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": new_job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
             "answer": "",
+            "ban_api_resolved_address": new_job_seeker.geocoding_address,
             "address_line_1": new_job_seeker.address_line_1,
-            "post_code": new_job_seeker.post_code,
+            "post_code": self.city.post_codes[0],
+            "insee_code": self.city.code_insee,
             "city": self.city.name,
-            "city_slug": self.city.slug,
+            "phone": new_job_seeker.phone,
+            "geocoding_score": 0.9714,
+            "fill_mode": "ban_api",
+            # Select the first and only one option
+            "address_for_autocomplete": "0",
         }
         response = self.client.post(
             next_url,
@@ -4281,10 +4287,15 @@ class HireConfirmationTestCase(TestCase):
             "pole_emploi_id": self.job_seeker.jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,
             "answer": "",
+            "ban_api_resolved_address": self.job_seeker.geocoding_address,
             "address_line_1": self.job_seeker.address_line_1,
-            "post_code": self.job_seeker.post_code,
+            "post_code": self.city.post_codes[0],
+            "insee_code": self.city.code_insee,
             "city": self.city.name,
-            "city_slug": self.city.slug,
+            "phone": self.job_seeker.phone,
+            "geocoding_score": 0.9714,
+            "fill_mode": "ban_api",
+            "address_for_autocomplete": "0",
         }
         response = self.client.post(
             self._reverse("apply:hire_confirmation"),
