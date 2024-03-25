@@ -98,13 +98,17 @@ $ make runserver
 
 Vous pouvez y accéder à l'adresse http://localhost:8000/.
 
+## Créer le schéma de base de données
+
+```sh
+$ python manage.py migrate
+```
+
 ## Peupler la base de données
 
 ```sh
 $ make populate_db
 ```
-
-Après avoir lancé `./manage.py migrate` pour créer les tables avec Django.
 
 ## Charger une base de données de production
 
