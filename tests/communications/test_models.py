@@ -48,6 +48,14 @@ class NotificationModelTest(TestCase):
 
 class NotificationSettingsModelTest(TestCase):
     def setUp(self):
+        @notifications_registry.register
+        class FirstNotification(BaseNotification):
+            name = "First"
+            category = "First"
+
+        self.FirstNotification = FirstNotification
+        sync_notifications(NotificationRecord)
+
         self.job_seeker = JobSeekerFactory(first_name="John", last_name="Doe", with_disabled_notification=True)
         self.employer = EmployerFactory(
             first_name="Alice", last_name="Doe", with_company=True, with_disabled_notification=True
@@ -57,6 +65,9 @@ class NotificationSettingsModelTest(TestCase):
             first_name="Bob", last_name="Doe", membership=True, with_disabled_notification=True
         )
         self.prescriber_structure = self.prescriber.prescriberorganization_set.first()
+
+    def tearDown(self):
+        notifications_registry.unregister(self.FirstNotification)
 
     def test_queryset(self):
         assert NotificationSettings.objects.count() == 3
