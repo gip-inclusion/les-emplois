@@ -1,4 +1,4 @@
 {% extends "layout/base_email_text_subject.txt" %}
 {% block subject %}
-[Activation] Vous êtes désormais administrateur de {{ structure.display_name }}
+Votre rôle d’administrateur
 {% endblock %}
