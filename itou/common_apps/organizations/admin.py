@@ -1,7 +1,46 @@
+import logging
+
 from django.contrib import admin, messages
 from django.db.models import Count
+from django.forms import BaseInlineFormSet, ModelForm
 
 from itou.utils.admin import ItouModelAdmin, ItouTabularInline
+
+
+logger = logging.getLogger(__name__)
+
+
+def get_membership_structure(membership):
+    if hasattr(membership, "institution"):
+        return membership.institution
+    elif hasattr(membership, "organization"):
+        return membership.organization
+    elif hasattr(membership, "company"):
+        return membership.company
+    else:
+        logger.error("Invalid membership kind : %s", membership)
+
+
+class MembersInlineForm(ModelForm):
+    def save(self, commit=True):
+        instance = super().save(commit=commit)
+        if "is_admin" in self.changed_data:
+            structure = get_membership_structure(instance)
+            if structure is not None:
+                if instance.is_admin:
+                    structure.add_admin_email(instance.user).send()
+                else:
+                    structure.remove_admin_email(instance.user).send()
+        return instance
+
+
+class MembersInlineFormSet(BaseInlineFormSet):
+    def delete_existing(self, obj, commit=True):
+        if obj.is_admin is True:
+            structure = get_membership_structure(obj)
+            if structure is not None:
+                structure.remove_admin_email(obj.user).send()
+        super().delete_existing(obj, commit=commit)
 
 
 class MembersInline(ItouTabularInline):
@@ -10,6 +49,8 @@ class MembersInline(ItouTabularInline):
     extra = 1
     raw_id_fields = ("user",)
     readonly_fields = ("is_active", "created_at", "updated_at", "updated_by", "joined_at")
+    form = MembersInlineForm
+    formset = MembersInlineFormSet
 
 
 class HasMembersFilter(admin.SimpleListFilter):
