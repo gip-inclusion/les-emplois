@@ -75,6 +75,8 @@ def manually_add_approval(
         form.instance.origin = Origin.ADMIN
         form.instance.created_by = request.user
         form.instance.eligibility_diagnosis = job_application.eligibility_diagnosis
+        for field, value in Approval.get_origin_kwargs(job_application).items():
+            setattr(form.instance, field, value)
         approval = form.save()
         job_application.approval = approval
         job_application.manually_deliver_approval(delivered_by=request.user)

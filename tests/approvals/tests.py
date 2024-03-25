@@ -29,6 +29,7 @@ from itou.approvals.models import Approval, CancelledApproval, PoleEmploiApprova
 from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import Status
 from itou.files.models import File
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.enums import LackOfPoleEmploiId
 from itou.utils.apis import enums as api_enums
@@ -1077,6 +1078,11 @@ class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
         assert approval.user == job_application.job_seeker
         assert approval.origin == Origin.ADMIN
         assert approval.eligibility_diagnosis == job_application.eligibility_diagnosis
+
+        assert approval.origin_sender_kind == SenderKind.JOB_SEEKER
+        assert approval.origin_siae_kind == job_application.to_company.kind
+        assert approval.origin_siae_siret == job_application.to_company.siret
+        assert not approval.origin_prescriber_organization_kind
 
         assert len(mail.outbox) == 1
         email = mail.outbox[0]
