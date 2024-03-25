@@ -65,16 +65,16 @@ def manually_add_approval(
     initial = {
         "start_at": job_application.hiring_start_at,
         "end_at": Approval.get_default_end_date(job_application.hiring_start_at),
-        "user": job_application.job_seeker.pk,
-        "created_by": request.user.pk,
-        "origin": Origin.ADMIN,
-        "eligibility_diagnosis": job_application.eligibility_diagnosis,
     }
     form = ManuallyAddApprovalFromJobApplicationForm(initial=initial, data=request.POST or None)
     fieldsets = [(None, {"fields": list(form.base_fields)})]
     adminForm = admin.helpers.AdminForm(form, fieldsets, {})
 
     if request.method == "POST" and form.is_valid():
+        form.instance.user = job_application.job_seeker
+        form.instance.origin = Origin.ADMIN
+        form.instance.created_by = request.user
+        form.instance.eligibility_diagnosis = job_application.eligibility_diagnosis
         approval = form.save()
         job_application.approval = approval
         job_application.manually_deliver_approval(delivered_by=request.user)

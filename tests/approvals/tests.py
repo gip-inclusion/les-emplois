@@ -1024,10 +1024,6 @@ class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
         assert response.context["form"].initial == {
             "start_at": job_application.hiring_start_at,
             "end_at": Approval.get_default_end_date(job_application.hiring_start_at),
-            "user": job_application.job_seeker.pk,
-            "created_by": user.pk,
-            "origin": Origin.ADMIN,
-            "eligibility_diagnosis": job_application.eligibility_diagnosis,
         }
 
         # Without an eligibility diangosis on the job application.
@@ -1054,11 +1050,7 @@ class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
         post_data = {
             "start_at": job_application.hiring_start_at.strftime("%d/%m/%Y"),
             "end_at": job_application.hiring_end_at.strftime("%d/%m/%Y"),
-            "user": job_application.job_seeker.pk,
-            "created_by": user.pk,
-            "origin": Origin.ADMIN,
             "number": f"{Approval.ASP_ITOU_PREFIX}1234567",
-            "eligibility_diagnosis": job_application.eligibility_diagnosis,
         }
         response = self.client.post(url, data=post_data)
         assert response.status_code == 200
@@ -1068,10 +1060,6 @@ class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
         post_data = {
             "start_at": job_application.hiring_start_at.strftime("%d/%m/%Y"),
             "end_at": job_application.hiring_end_at.strftime("%d/%m/%Y"),
-            "user": job_application.job_seeker.pk,
-            "created_by": user.pk,
-            "origin": Origin.ADMIN,
-            "eligibility_diagnosis": job_application.eligibility_diagnosis,
         }
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
@@ -1087,6 +1075,8 @@ class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
         approval = job_application.approval
         assert approval.created_by == user
         assert approval.user == job_application.job_seeker
+        assert approval.origin == Origin.ADMIN
+        assert approval.eligibility_diagnosis == job_application.eligibility_diagnosis
 
         assert len(mail.outbox) == 1
         email = mail.outbox[0]
