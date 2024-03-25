@@ -1320,3 +1320,43 @@ class JobSeekerProfile(models.Model):
             return result
 
         return "Adresse HEXA incomplète"
+
+
+def anonymize(user_ids):
+    User.objects.filter(pk__in=user_ids).update(
+        is_active=False,
+        first_name="",
+        last_name="",
+        email="",
+        phone="",
+        address_line_1="",
+        address_line_2="",
+        city="",
+        coords=None,
+        post_code="",
+        ban_api_resolved_address="",
+    )
+    JobSeekerProfile.objects.filter(user_id__in=user_ids).update(
+        nir="",
+        pole_emploi_id="",
+        hexa_lane_type="",
+        hexa_std_extension="",
+        hexa_lane_number="",
+        hexa_lane_name="",
+        hexa_post_code="",
+        hexa_commune_id=None,
+        hexa_non_std_extension="",
+        hexa_additional_address="",
+        pe_obfuscated_nir="",
+        birth_place=None,
+    )
+    # TODO: drop
+    # account_emailaddress(user_id) => delete all
+    # external_data_externaldataimport(user_id) => delete all
+    # external_data_jobseekerexternaldata(user_id) => delete all
+    # socialaccount_socialaccount(user_id) => delete all
+    # job_applications_jobapplication(job_seeker_id) => anonymize
+    # - message
+    # - answer
+    # - answer_to_prescriber
+    # - resume_link
