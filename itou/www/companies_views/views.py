@@ -1,6 +1,5 @@
 import random
 
-import httpx
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -45,7 +44,7 @@ def displayable_thematique(thematique):
 
 def set_dora_utm_query_params(url: str) -> str:
     utm_params = {"mtm_campaign": "LesEmplois", "mtm_kwd": "GeneriqueDecouvrirService"}
-    return str(httpx.Request("GET", url, params=utm_params).url)
+    return add_url_params(url, params=utm_params)
 
 
 def get_data_inclusion_services(code_insee):
