@@ -1,5 +1,4 @@
 from django import forms
-from django.forms import widgets
 
 from itou.approvals.models import Approval
 from itou.job_applications.enums import Origin
@@ -89,11 +88,8 @@ class ManuallyAddApprovalFromJobApplicationForm(ApprovalFormMixin, forms.ModelFo
         super().__init__(*args, **kwargs)
 
         # Mandatory fields.
-        self.fields["user"].required = True
         self.fields["start_at"].required = True
         self.fields["end_at"].required = True
-        self.fields["created_by"].required = True
-        self.fields["eligibility_diagnosis"].required = True
 
         # Optional fields.
         # The `number` field can be filled in manually by an admin when a Pôle emploi
@@ -103,10 +99,4 @@ class ManuallyAddApprovalFromJobApplicationForm(ApprovalFormMixin, forms.ModelFo
 
     class Meta:
         model = Approval
-        fields = ["user", "start_at", "end_at", "number", "created_by", "origin", "eligibility_diagnosis"]
-        widgets = {
-            "user": widgets.HiddenInput(),
-            "created_by": widgets.HiddenInput(),
-            "origin": widgets.HiddenInput(),
-            "eligibility_diagnosis": widgets.HiddenInput(),
-        }
+        fields = ["start_at", "end_at", "number"]
