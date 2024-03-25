@@ -37,6 +37,219 @@
           </div>
   '''
 # ---
+# name: TestForPrescriber.test_filter_for_prescriber
+  '''
+  <div class="c-aside-filters__card collapse show" id="asideFiltersCollapse">
+                              <form hx-get="/apply/prescriber/list" hx-indicator="#job-applications-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-applications-section" hx-trigger="change delay:.5s, duetChange delay:.5s">
+                                  <div class="c-aside-filters__card__body">
+                                      <fieldset>
+      <legend>Statut candidature</legend>
+      <ul>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
+                      <label class="form-check-label" for="id_states_0">Nouvelle candidature</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="processing"/>
+                      <label class="form-check-label" for="id_states_1">Candidature à l'étude</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="postponed"/>
+                      <label class="form-check-label" for="id_states_2">Candidature en attente</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="prior_to_hire"/>
+                      <label class="form-check-label" for="id_states_3">Action préalable à l’embauche</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_4" name="states" type="checkbox" value="accepted"/>
+                      <label class="form-check-label" for="id_states_4">Candidature acceptée</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_5" name="states" type="checkbox" value="refused"/>
+                      <label class="form-check-label" for="id_states_5">Candidature déclinée</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_6" name="states" type="checkbox" value="cancelled"/>
+                      <label class="form-check-label" for="id_states_6">Embauche annulée</label>
+                  </div>
+              </li>
+          
+              <li>
+                  <div class="form-check">
+                      <input class="form-check-input" id="id_states_7" name="states" type="checkbox" value="obsolete"/>
+                      <label class="form-check-label" for="id_states_7">Embauché ailleurs</label>
+                  </div>
+              </li>
+          
+      </ul>
+  </fieldset>
+  
+                                      
+  
+  
+      <hr/>
+      <fieldset>
+          <div class="form-group"><label class="form-label" for="id_job_seekers">Nom du candidat</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_job_seekers" lang="fr" multiple="" name="job_seekers">
+  </select></div>
+      </fieldset>
+  
+  
+                                      
+  
+  
+      <hr/>
+      <fieldset>
+          <legend>Structure destinataire</legend>
+          <div class="form-group"><label class="visually-hidden" for="id_to_companies">Structure</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_to_companies" lang="fr" multiple="" name="to_companies">
+  </select></div>
+      </fieldset>
+  
+  
+  
+                                      
+  
+  
+      <hr/>
+      <fieldset>
+          <legend>Émetteur</legend>
+      
+  
+      
+          <div class="form-group"><label class="form-label" for="id_senders">Nom de la personne</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
+  </select></div>
+      
+  
+      
+  
+      </fieldset>
+  
+                                      
+  
+  <hr/>
+  <fieldset>
+      <legend>Date d'envoi de la candidature</legend>
+      <div class="form-group"><label class="form-label" for="id_start_date">À partir du</label><duet-date-picker class="" identifier="id_start_date" name="start_date" placeholder="À partir du"></duet-date-picker></div>
+      <div class="form-group"><label class="form-label" for="id_end_date">Jusqu'au</label><duet-date-picker class="" identifier="id_end_date" name="end_date" placeholder="Jusqu'au"></duet-date-picker></div>
+  </fieldset>
+  
+                                      
+  
+  
+      <hr/>
+      <fieldset>
+          <div class="form-group"><label class="form-label" for="id_selected_jobs">Fiches de poste</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_selected_jobs" lang="fr" multiple="" name="selected_jobs">
+  </select></div>
+      </fieldset>
+  
+  
+                                      
+  
+  
+      <hr/>
+      <fieldset>
+          <legend>Statut du PASS IAE</legend>
+          <div class="mb-2"><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Actif</label></div></div>
+          <div class=""><div class="form-check"><input class="form-check-input" id="id_pass_iae_suspended" name="pass_iae_suspended" type="checkbox"/><label class="form-check-label" for="id_pass_iae_suspended">Suspendu</label></div></div>
+      </fieldset>
+  
+  
+                                      
+  
+  
+      <hr/>
+      <fieldset>
+          <legend>Éligibilité IAE</legend>
+          <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Éligibilité validée</label></div></div>
+      </fieldset>
+  
+  
+                                      
+  
+  
+  
+      <hr/>
+      <fieldset>
+          <legend>Critères administratifs déclarés</legend>
+          <div class=""><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
+    <option value="1">Bénéficiaire du RSA</option>
+  
+    <option value="2">Allocataire ASS</option>
+  
+    <option value="3">Allocataire AAH</option>
+  
+    <option value="4">DETLD (+ 24 mois)</option>
+  
+    <option value="5">Niveau d'étude 3 (CAP, BEP) ou infra</option>
+  
+    <option value="6">Senior (+50 ans)</option>
+  
+    <option value="7">Jeune (-26 ans)</option>
+  
+    <option value="8">Sortant de l'ASE</option>
+  
+    <option value="9">DELD (12-24 mois)</option>
+  
+    <option value="10">Travailleur handicapé</option>
+  
+    <option value="11">Parent isolé</option>
+  
+    <option value="12">Personne sans hébergement ou hébergée ou ayant un parcours de rue</option>
+  
+    <option value="13">Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile</option>
+  
+    <option value="14">Résident ZRR</option>
+  
+    <option value="15">Résident QPV</option>
+  
+    <option value="16">Sortant de détention ou personne placée sous main de justice</option>
+  
+    <option value="17">Maîtrise de la langue française</option>
+  
+    <option value="18">Mobilité</option>
+  
+  </select></div>
+      </fieldset>
+  
+  
+                                      
+  
+  
+      <hr/>
+      <fieldset>
+          <div class="form-group"><label class="form-label" for="id_departments">Département du candidat</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_departments" lang="fr" multiple="" name="departments">
+  </select></div>
+      </fieldset>
+  
+  
+                                      <button aria-label="Appliquer les filtres" class="btn btn-block btn-primary mt-3" id="js-job-applications-filters-apply-button">
+                                          Appliquer
+                                      </button>
+                                  </div>
+                              </form>
+                          </div>
+  '''
+# ---
 # name: TestListForSiae.test_filter_for_different_kind[geiq]
   '''
   <div class="c-aside-filters__card collapse show" id="asideFiltersCollapse">
@@ -825,29 +1038,28 @@
 # ---
 # name: TestListForSiae.test_warns_about_long_awaiting_applications[PRESCRIBER - warnings for 2222 and 3333]
   '''
-  <section aria-labelledby="results">
-                          <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                              <h3 class="h4 mb-0" id="results">
-                                  
-                                      3 <strong>résultats</strong>
-                                  
-                              </h3>
-                              <div aria-label="Actions sur les candidatures" class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group">
-                                  
+  <section aria-labelledby="results" id="job-applications-section">
+      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
+          <h3 class="h4 mb-0" id="results">
+              
+                  3 <strong>résultats</strong>
+              
+          </h3>
+          <div aria-label="Actions sur les candidatures" class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group">
+              
       <a aria-label="Exporter la liste de candidatures" class="btn btn-ico btn-secondary mt-3 mt-md-0" href="/apply/prescriber/list/exports">
           <i aria-hidden="true" class="ri-download-2-fill"></i>
           <span>Exporter</span>
       </a>
   
   
-                                  
-                              </div>
-                          </div>
-  
-                          
-                              
-                                  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-                                      
+              
+          </div>
+      </div>
+      
+          
+              <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+                  
   
   <div class="c-box--results__header">
       
@@ -910,18 +1122,21 @@
       </div>
   </div>
   
-                                      <div class="c-box--results__footer">
-                                          <div class="d-flex justify-content-end">
-                                              
-                                              <a aria-label="Gérer la candidature de J… H…" class="btn btn-outline-primary" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/apply/prescriber/list">
-                                                  Voir sa candidature
-                                              </a>
-                                          </div>
-                                      </div>
-                                  </div>
-                              
-                                  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-                                      
+                  <div class="c-box--results__footer">
+                      <div class="d-flex justify-content-end">
+                          
+                          
+                              <a aria-label="Gérer la candidature de J… H…" class="btn btn-outline-primary" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/11111111-1111-1111-1111-111111111111/prescriber/details?back_url=/apply/prescriber/list">
+                                  Voir sa candidature
+                              </a>
+                          
+                      </div>
+                  </div>
+              </div>
+              
+          
+              <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+                  
   
   <div class="c-box--results__header">
       
@@ -984,23 +1199,26 @@
       </div>
   </div>
   
-                                      <div class="c-box--results__footer">
-                                          <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
-                                              
-                                                  <p class="text-warning fs-sm mb-3 mb-md-0">
-                                                      <i aria-hidden="true" class="ri-time-line ri-lg me-1"></i>
-                                                      En attente de réponse depuis 3 semaines.
-                                                  </p>
-                                              
-                                              <a aria-label="Gérer la candidature de J… H…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/22222222-2222-2222-2222-222222222222/prescriber/details?back_url=/apply/prescriber/list">
-                                                  Voir sa candidature
-                                              </a>
-                                          </div>
-                                      </div>
-                                  </div>
-                              
-                                  <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-                                      
+                  <div class="c-box--results__footer">
+                      <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                          
+                              <p class="text-warning fs-sm mb-3 mb-md-0">
+                                  <i aria-hidden="true" class="ri-time-line ri-lg me-1"></i>
+                                  En attente de réponse depuis 3 semaines.
+                              </p>
+                          
+                          
+                              <a aria-label="Gérer la candidature de J… H…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/22222222-2222-2222-2222-222222222222/prescriber/details?back_url=/apply/prescriber/list">
+                                  Voir sa candidature
+                              </a>
+                          
+                      </div>
+                  </div>
+              </div>
+              
+          
+              <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+                  
   
   <div class="c-box--results__header">
       
@@ -1063,28 +1281,30 @@
       </div>
   </div>
   
-                                      <div class="c-box--results__footer">
-                                          <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
-                                              
-                                                  <p class="text-warning fs-sm mb-3 mb-md-0">
-                                                      <i aria-hidden="true" class="ri-time-line ri-lg me-1"></i>
-                                                      En attente de réponse depuis 8 semaines.
-                                                  </p>
-                                              
-                                              <a aria-label="Gérer la candidature de J… H…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/33333333-3333-3333-3333-333333333333/prescriber/details?back_url=/apply/prescriber/list">
-                                                  Voir sa candidature
-                                              </a>
-                                          </div>
-                                      </div>
-                                  </div>
-                              
-  
-                              
-  
-  
-  
+                  <div class="c-box--results__footer">
+                      <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
                           
-                      </section>
+                              <p class="text-warning fs-sm mb-3 mb-md-0">
+                                  <i aria-hidden="true" class="ri-time-line ri-lg me-1"></i>
+                                  En attente de réponse depuis 8 semaines.
+                              </p>
+                          
+                          
+                              <a aria-label="Gérer la candidature de J… H…" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir_candidature_prescripteur" href="/apply/33333333-3333-3333-3333-333333333333/prescriber/details?back_url=/apply/prescriber/list">
+                                  Voir sa candidature
+                              </a>
+                          
+                      </div>
+                  </div>
+              </div>
+              
+          
+          
+  
+  
+  
+      
+  </section>
   '''
 # ---
 # name: TestListForSiae.test_warns_about_long_awaiting_applications[SIAE - warnings for 2222 and 3333]
@@ -1107,7 +1327,6 @@
               
           </div>
       </div>
-  
       
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
@@ -1119,15 +1338,6 @@
   <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
       <p class="fs-sm mb-0 flex-grow-1">
           Émise le 30 mars 2023 par
-          
-              <span class="text-nowrap">
-                  
-                      <strong>Max THROUGHPUT</strong>
-                  
-                  
-                      <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
-                  
-              </span>
           
           
       </p>
@@ -1176,11 +1386,12 @@
                   <div class="c-box--results__footer">
                       <div class="d-flex justify-content-end">
                           
-                          <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-outline-primary" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/11111111-1111-1111-1111-111111111111/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
+                          
+                              <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-outline-primary" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/11111111-1111-1111-1111-111111111111/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
+                          
                       </div>
                   </div>
               </div>
-  
               
                   
   
@@ -1212,7 +1423,6 @@
   </div>
   
               
-  
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
@@ -1223,15 +1433,6 @@
   <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
       <p class="fs-sm mb-0 flex-grow-1">
           Émise le 18 mars 2023 par
-          
-              <span class="text-nowrap">
-                  
-                      <strong>Max THROUGHPUT</strong>
-                  
-                  
-                      <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
-                  
-              </span>
           
           
       </p>
@@ -1285,13 +1486,13 @@
                                   En attente de réponse depuis 3 semaines.
                               </p>
                           
-                          <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/22222222-2222-2222-2222-222222222222/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
+                          
+                              <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/22222222-2222-2222-2222-222222222222/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
+                          
                       </div>
                   </div>
               </div>
-  
               
-  
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
@@ -1302,15 +1503,6 @@
   <div class="d-flex flex-column flex-lg-row gap-1 gap-lg-3 mb-3">
       <p class="fs-sm mb-0 flex-grow-1">
           Émise le 16 février 2023 par
-          
-              <span class="text-nowrap">
-                  
-                      <strong>Max THROUGHPUT</strong>
-                  
-                  
-                      <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
-                  
-              </span>
           
           
       </p>
@@ -1364,231 +1556,19 @@
                                   En attente de réponse depuis 8 semaines.
                               </p>
                           
-                          <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/33333333-3333-3333-3333-333333333333/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
+                          
+                              <a aria-label="Gérer la candidature de Jacques HENRY" class="btn btn-outline-primary btn-block w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="voir-candidature-employeur" href="/apply/33333333-3333-3333-3333-333333333333/siae/details?back_url=/apply/siae/list">Voir sa candidature</a>
+                          
                       </div>
                   </div>
               </div>
-  
               
-  
           
-  
           
   
   
   
       
   </section>
-  '''
-# ---
-# name: test_filter_for_prescriber
-  '''
-  <form id="js-job-applications-filters-form" method="get">
-                                  <div class="c-aside-filters__card__body">
-                                      <fieldset>
-      <legend>Statut candidature</legend>
-      <ul>
-          
-              <li>
-                  <div class="form-check">
-                      <input class="form-check-input" id="id_states_0" name="states" type="checkbox" value="new"/>
-                      <label class="form-check-label" for="id_states_0">Nouvelle candidature</label>
-                  </div>
-              </li>
-          
-              <li>
-                  <div class="form-check">
-                      <input class="form-check-input" id="id_states_1" name="states" type="checkbox" value="processing"/>
-                      <label class="form-check-label" for="id_states_1">Candidature à l'étude</label>
-                  </div>
-              </li>
-          
-              <li>
-                  <div class="form-check">
-                      <input class="form-check-input" id="id_states_2" name="states" type="checkbox" value="postponed"/>
-                      <label class="form-check-label" for="id_states_2">Candidature en attente</label>
-                  </div>
-              </li>
-          
-              <li>
-                  <div class="form-check">
-                      <input class="form-check-input" id="id_states_3" name="states" type="checkbox" value="prior_to_hire"/>
-                      <label class="form-check-label" for="id_states_3">Action préalable à l’embauche</label>
-                  </div>
-              </li>
-          
-              <li>
-                  <div class="form-check">
-                      <input class="form-check-input" id="id_states_4" name="states" type="checkbox" value="accepted"/>
-                      <label class="form-check-label" for="id_states_4">Candidature acceptée</label>
-                  </div>
-              </li>
-          
-              <li>
-                  <div class="form-check">
-                      <input class="form-check-input" id="id_states_5" name="states" type="checkbox" value="refused"/>
-                      <label class="form-check-label" for="id_states_5">Candidature déclinée</label>
-                  </div>
-              </li>
-          
-              <li>
-                  <div class="form-check">
-                      <input class="form-check-input" id="id_states_6" name="states" type="checkbox" value="cancelled"/>
-                      <label class="form-check-label" for="id_states_6">Embauche annulée</label>
-                  </div>
-              </li>
-          
-              <li>
-                  <div class="form-check">
-                      <input class="form-check-input" id="id_states_7" name="states" type="checkbox" value="obsolete"/>
-                      <label class="form-check-label" for="id_states_7">Embauché ailleurs</label>
-                  </div>
-              </li>
-          
-      </ul>
-  </fieldset>
-  
-                                      
-  
-  
-      <hr/>
-      <fieldset>
-          <div class="form-group"><label class="form-label" for="id_job_seekers">Nom du candidat</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_job_seekers" lang="fr" multiple="" name="job_seekers">
-  </select></div>
-      </fieldset>
-  
-  
-                                      
-  
-  
-      <hr/>
-      <fieldset>
-          <legend>Structure destinataire</legend>
-          <div class="form-group"><label class="visually-hidden" for="id_to_companies">Structure</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_to_companies" lang="fr" multiple="" name="to_companies">
-  </select></div>
-      </fieldset>
-  
-  
-  
-                                      
-  
-  
-      <hr/>
-      <fieldset>
-          <legend>Émetteur</legend>
-      
-  
-      
-          <div class="form-group"><label class="form-label" for="id_senders">Nom de la personne</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
-  </select></div>
-      
-  
-      
-  
-      </fieldset>
-  
-                                      
-  
-  <hr/>
-  <fieldset>
-      <legend>Date d'envoi de la candidature</legend>
-      <div class="form-group"><label class="form-label" for="id_start_date">À partir du</label><duet-date-picker class="" identifier="id_start_date" name="start_date" placeholder="À partir du"></duet-date-picker></div>
-      <div class="form-group"><label class="form-label" for="id_end_date">Jusqu'au</label><duet-date-picker class="" identifier="id_end_date" name="end_date" placeholder="Jusqu'au"></duet-date-picker></div>
-  </fieldset>
-  
-                                      
-  
-  
-      <hr/>
-      <fieldset>
-          <div class="form-group"><label class="form-label" for="id_selected_jobs">Fiches de poste</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_selected_jobs" lang="fr" multiple="" name="selected_jobs">
-  </select></div>
-      </fieldset>
-  
-  
-                                      
-  
-  
-      <hr/>
-      <fieldset>
-          <legend>Statut du PASS IAE</legend>
-          <div class="mb-2"><div class="form-check"><input class="form-check-input" id="id_pass_iae_active" name="pass_iae_active" type="checkbox"/><label class="form-check-label" for="id_pass_iae_active">Actif</label></div></div>
-          <div class=""><div class="form-check"><input class="form-check-input" id="id_pass_iae_suspended" name="pass_iae_suspended" type="checkbox"/><label class="form-check-label" for="id_pass_iae_suspended">Suspendu</label></div></div>
-      </fieldset>
-  
-  
-                                      
-  
-  
-      <hr/>
-      <fieldset>
-          <legend>Éligibilité IAE</legend>
-          <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Éligibilité validée</label></div></div>
-      </fieldset>
-  
-  
-                                      
-  
-  
-  
-      <hr/>
-      <fieldset>
-          <legend>Critères administratifs déclarés</legend>
-          <div class=""><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
-    <option value="1">Bénéficiaire du RSA</option>
-  
-    <option value="2">Allocataire ASS</option>
-  
-    <option value="3">Allocataire AAH</option>
-  
-    <option value="4">DETLD (+ 24 mois)</option>
-  
-    <option value="5">Niveau d'étude 3 (CAP, BEP) ou infra</option>
-  
-    <option value="6">Senior (+50 ans)</option>
-  
-    <option value="7">Jeune (-26 ans)</option>
-  
-    <option value="8">Sortant de l'ASE</option>
-  
-    <option value="9">DELD (12-24 mois)</option>
-  
-    <option value="10">Travailleur handicapé</option>
-  
-    <option value="11">Parent isolé</option>
-  
-    <option value="12">Personne sans hébergement ou hébergée ou ayant un parcours de rue</option>
-  
-    <option value="13">Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile</option>
-  
-    <option value="14">Résident ZRR</option>
-  
-    <option value="15">Résident QPV</option>
-  
-    <option value="16">Sortant de détention ou personne placée sous main de justice</option>
-  
-    <option value="17">Maîtrise de la langue française</option>
-  
-    <option value="18">Mobilité</option>
-  
-  </select></div>
-      </fieldset>
-  
-  
-                                      
-  
-  
-      <hr/>
-      <fieldset>
-          <div class="form-group"><label class="form-label" for="id_departments">Département du candidat</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_departments" lang="fr" multiple="" name="departments">
-  </select></div>
-      </fieldset>
-  
-  
-                                      <button aria-label="Appliquer les filtres" class="btn btn-block btn-primary mt-3" id="js-job-applications-filters-apply-button">
-                                          Appliquer
-                                      </button>
-                                  </div>
-                              </form>
   '''
 # ---
