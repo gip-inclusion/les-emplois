@@ -2,21 +2,16 @@
 {% load format_filters %}
 {% block body %}
 
-Vous êtes administrateur d'une structure sur les emplois de l'inclusion
+Bonjour {{ user.get_full_name }}
 
-Un administrateur peut ajouter ou retirer :
-- des collaborateurs
-- des administrateurs
+Vous avez désormais le statut d’administrateur sur l’espace professionnel de votre organisation {{ structure.name }} ({{ structure.kind }}) sur les emplois de l’inclusion.
 
-Structure :
-
-- Nom : {{ structure.display_name }}
-- Type : {{ structure.kind }}
-{# Institutions don't have a contact email address. #}
-{% if structure.email  %}
-- Email de contact : {{ structure.email }}
+{% if documentation_link %}
+Ce statut vous permet d’avoir accès à certaines fonctionnalités, la liste complète est disponible ici : {{ documentation_link }}.
+{% else %}
+Ce statut vous permet de gérer la liste des membres de votre organisation (retirer un collaborateur qui ne travaille plus dans votre organisation, nommer un autre collaborateur en tant qu’administrateur)
 {% endif %}
 
-Si vous estimez qu'il peut s'agir d'une erreur, contactez un des administrateurs de cette structure sur les emplois de l'inclusion.
+Pour des raisons de gestion et de sécurité, nous vous invitons à nommer plusieurs administrateurs au sein de votre organisation.
 
 {% endblock body %}
