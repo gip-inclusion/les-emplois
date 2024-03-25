@@ -923,48 +923,66 @@ class ProcessListPrescriberTest(ProcessListTest):
         assert len(applications) == 10
 
 
-def test_list_for_unauthorized_prescriber_view(client):
-    prescriber = PrescriberFactory()
-    JobApplicationFactory(
-        job_seeker_with_address=True,
-        job_seeker__first_name="Supersecretname",
-        job_seeker__last_name="Unknown",
-        job_seeker__created_by=PrescriberFactory(),  # to check for useless queries
-        sender=prescriber,
-        sender_kind=SenderKind.PRESCRIBER,
-    )
-    client.force_login(prescriber)
-    url = reverse("apply:list_for_prescriber")
-    with assertNumQueries(
-        BASE_NUM_QUERIES
-        + 1  # fetch django session
-        + 1  # fetch user
-        + 1  # fetch user memberships
-        + 1  # get list of senders (distinct sender_id)
-        + 1  # get list of job seekers (distinct job_seeker_id)
-        + 1  # get list of administrative criteria
-        + 2  # get list of job application + prefetch of job descriptions
-        + 1  # get list of siaes (distinct to_company_id)
-        + 3  # count, list & prefetch of job application
-        + 1  # get job seekers approvals
-        + 1  # check user authorized membership (can_edit_personal_information)
-        + 3  # get job seekers administrative criteria
-        + 3  # update session
-    ):
-        response = client.get(url)
+class TestForPrescriber:
+    def test_list_for_unauthorized_prescriber_view(self, client):
+        prescriber = PrescriberFactory()
+        JobApplicationFactory(
+            job_seeker_with_address=True,
+            job_seeker__first_name="Supersecretname",
+            job_seeker__last_name="Unknown",
+            job_seeker__created_by=PrescriberFactory(),  # to check for useless queries
+            sender=prescriber,
+            sender_kind=SenderKind.PRESCRIBER,
+        )
+        client.force_login(prescriber)
+        url = reverse("apply:list_for_prescriber")
+        with assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # fetch django session
+            + 1  # fetch user
+            + 1  # fetch user memberships
+            + 1  # get list of senders (distinct sender_id)
+            + 1  # get list of job seekers (distinct job_seeker_id)
+            + 1  # get list of administrative criteria
+            + 2  # get list of job application + prefetch of job descriptions
+            + 1  # get list of siaes (distinct to_company_id)
+            + 3  # count, list & prefetch of job application
+            + 1  # get job seekers approvals
+            + 1  # check user authorized membership (can_edit_personal_information)
+            + 3  # get job seekers administrative criteria
+            + 3  # update session
+        ):
+            response = client.get(url)
 
-    assertContains(response, "<h3>S… U…</h3>", html=True)
-    # Unfortunately, the job seeker's name is available in the filters
-    # assertNotContains(response, "Supersecretname")
+        assertContains(response, "<h3>S… U…</h3>", html=True)
+        # Unfortunately, the job seeker's name is available in the filters
+        # assertNotContains(response, "Supersecretname")
 
+    def test_filter_for_prescriber(self, client, snapshot):
+        prescriber = PrescriberFactory()
+        client.force_login(prescriber)
+        response = client.get(reverse("apply:list_for_prescriber"))
+        assert response.status_code == 200
+        filter_form = parse_response_to_soup(response, "#asideFiltersCollapse")
+        assert str(filter_form) == snapshot()
 
-def test_filter_for_prescriber(client, snapshot):
-    prescriber = PrescriberFactory()
-    client.force_login(prescriber)
-    response = client.get(reverse("apply:list_for_prescriber"))
-    assert response.status_code == 200
-    filter_form = parse_response_to_soup(response, "#js-job-applications-filters-form")
-    assert str(filter_form) == snapshot()
+    def test_htmx_filters(self, client):
+        prescriber = PrescriberFactory()
+        JobApplicationFactory(sender=prescriber, state=JobApplicationWorkflow.STATE_ACCEPTED)
+        client.force_login(prescriber)
+        response = client.get(reverse("apply:list_for_prescriber"))
+        page = parse_response_to_soup(response, selector="#main")
+        [refused_checkbox] = page.find_all("input", attrs={"name": "states", "value": "refused"})
+        refused_checkbox["checked"] = ""
+        response = client.get(
+            reverse("apply:list_for_prescriber"),
+            {"states": ["refused"]},
+            headers={"HX-Request": "true"},
+        )
+        update_page_with_htmx(page, "#asideFiltersCollapse > form", response)
+        response = client.get(reverse("apply:list_for_prescriber"), {"states": ["refused"]})
+        fresh_page = parse_response_to_soup(response, selector="#main")
+        assertSoupEqual(page, fresh_page)
 
 
 ####################################################
