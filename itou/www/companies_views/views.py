@@ -75,7 +75,7 @@ def get_data_inclusion_services(code_insee):
             }
             for r in results
         ]
-        cache.set(cache_key, results, 60 * 60 * 24)
+        cache.set(cache_key, results, 60 * 60 * 6)
     return results
 
 
