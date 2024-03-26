@@ -23,7 +23,7 @@
                                     <a href="{% url 'apply:start' company_pk=siae.pk %}"
                                        class="btn btn-lg btn-white btn-block btn-ico"
                                        {% matomo_event "candidature" "clic" "start_application" %}
-                                       aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                                       aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
                                         <i class="ri-draft-line font-weight-medium" aria-hidden="true"></i>
                                         <span>Postuler</span>
                                     </a>
@@ -167,7 +167,7 @@
                                 <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
                                    href="{% url 'apply:start' company_pk=siae.pk %}"
                                    {% matomo_event "candidature" "clic" "start_application" %}
-                                   aria-label="Postuler auprès de l'employeur solidaire {{ siae.display_name }}">
+                                   aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
                                     <i class="ri-draft-line"></i>
                                     <span>Postuler</span>
                                 </a>
