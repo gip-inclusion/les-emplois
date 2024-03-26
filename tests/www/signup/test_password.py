@@ -72,7 +72,7 @@ class PasswordChangeTest(TestCase):
         """
 
         user = JobSeekerFactory()
-        assert self.client.login(username=user.email, password=DEFAULT_PASSWORD)
+        self.client.force_login(user)
 
         # Change password.
         url = reverse("account_change_password")
@@ -87,4 +87,3 @@ class PasswordChangeTest(TestCase):
         # User can log in with his new password.
         self.client.logout()
         assert self.client.login(username=user.email, password=new_password)
-        self.client.logout()
