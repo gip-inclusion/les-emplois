@@ -258,7 +258,7 @@ def table_for_siae(request, template_name="apply/table_for_siae.html"):
 
     # Add related data giving the criteria for adding the necessary annotations
     job_applications = job_applications.not_archived().with_list_related_data(
-        filters_form.data.getlist("criteria", [])
+        filters_form.data.getlist("criteria", [1, 2, 3, 4, 5])
     )
 
     # override the default ordering made by the with_list_related_data
@@ -286,3 +286,53 @@ def table_for_siae(request, template_name="apply/table_for_siae.html"):
         "filters_counter": filters_counter,
     }
     return render(request, template_name, context)
+
+
+"""
+job_applications.with_jobseeker_eligibility_diagnosis().values().first()
+Out[28]:
+{'id': UUID('1337bffd-040a-4e35-a0ec-1186828cb6ae'),
+ 'job_seeker_id': 803614,
+ 'eligibility_diagnosis_id': 792438,
+ 'geiq_eligibility_diagnosis_id': None,
+ 'create_employee_record': True,
+ 'resume_link': 'https://cellar-c2.services.clever-cloud.com/c1-prod/resume/c677db44-782b-4c6a-9ce7-56aef1585c64.pdf',
+ 'sender_id': 9744,
+ 'sender_kind': 'prescriber',
+ 'sender_company_id': None,
+ 'sender_prescriber_organization_id': 878,
+ 'to_company_id': 9913,
+ 'state': 'accepted',
+ 'hired_job_id': 30587,
+ 'message': 'En tant que conseiller à l’emploi sur l’agence pôle emploi de Courbevoie, je viens de …',
+ 'answer': '',
+ 'answer_to_prescriber': '',
+ 'refusal_reason': '',
+ 'hiring_start_at': datetime.date(2023, 11, 6),
+ 'hiring_end_at': datetime.date(2024, 5, 31),
+ 'hiring_without_approval': False,
+ 'origin': 'default',
+ 'approval_id': 538600,
+ 'approval_delivery_mode': 'automatic',
+ 'approval_number_sent_by_email': True,
+ 'approval_number_sent_at': datetime.datetime(2023, 11, 3, 9, 3, 15, 358678, tzinfo=datetime.timezone.utc),
+ 'approval_manually_delivered_by_id': None,
+ 'approval_manually_refused_by_id': None,
+ 'approval_manually_refused_at': None,
+ 'hidden_for_company': False,
+ 'transferred_at': None,
+ 'transferred_by_id': None,
+ 'transferred_from_id': None,
+ 'created_at': datetime.datetime(2023, 10, 27, 8, 39, 50, 912772, tzinfo=datetime.timezone.utc),
+ 'updated_at': datetime.datetime(2023, 11, 3, 9, 3, 15, 391915, tzinfo=datetime.timezone.utc),
+ 'prehiring_guidance_days': None,
+ 'contract_type': '',
+ 'nb_hours_per_week': None,
+ 'contract_type_details': '',
+ 'qualification_type': '',
+ 'qualification_level': '',
+ 'planned_training_hours': None,
+ 'inverted_vae_contract': None,
+ 'diagoriente_invite_sent_at': None,
+ 'jobseeker_eligibility_diagnosis': 792438}
+"""
