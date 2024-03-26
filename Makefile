@@ -111,6 +111,11 @@ shell_on_postgres_container:
 restore_latest_backup:
 	./scripts/restore_latest_backup.sh $(PGDATABASE)
 
+reset_db:
+	dropdb $(PGDATABASE)
+	createdb $(PGDATABASE)
+	python manage.py migrate
+
 # Deployment
 # =============================================================================
 
