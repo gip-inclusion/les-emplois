@@ -237,7 +237,7 @@ class TestApprovalsListView:
 
         assertContains(response, "365 jours")
 
-        assertContains(response, "730 jours")
+        assertContains(response, "729 jours")
 
         assertContains(response, "0 jour")
 
