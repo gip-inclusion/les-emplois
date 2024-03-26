@@ -1571,8 +1571,15 @@ class ProlongationRequest(CommonProlongation):
             prolongation.save()
             self.save()
 
-        notifications.ProlongationRequestGrantedEmployer(self).send()
-        notifications.ProlongationRequestGrantedJobSeeker(self).send()
+        notifications.ProlongationRequestGrantedForEmployerNotification(
+            self.declared_by,
+            self.declared_by_siae,
+            prolongation_request=self,
+        ).send()
+        notifications.ProlongationRequestGrantedForJobSeekerNotification(
+            self.approval.user,
+            prolongation_request=self,
+        ).send()
 
         return prolongation
 

@@ -3,7 +3,7 @@ from django.urls import reverse
 
 from itou.common_apps.notifications.base_class import BaseNotification
 from itou.communications import NotificationCategory, registry as notifications_registry
-from itou.communications.dispatch import EmailNotification, EmployerNotification
+from itou.communications.dispatch import EmailNotification, EmployerNotification, JobSeekerNotification
 from itou.prescribers.models import PrescriberMembership
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
@@ -65,40 +65,6 @@ class ProlongationRequestCreatedReminder(BaseNotification):
         return get_email_message(to, context, subject, body, cc=cc)
 
 
-class ProlongationRequestGrantedEmployer(BaseNotification):
-    """Notification sent to the employer when the prolongation request is granted"""
-
-    NAME = "prolongation_request_granted_employer"
-
-    def __init__(self, prolongation_request):
-        self.prolongation_request = prolongation_request
-
-    @property
-    def email(self):
-        to = [self.prolongation_request.declared_by.email]
-        context = {"prolongation_request": self.prolongation_request}
-        subject = "approvals/email/prolongation_request/granted/employer_subject.txt"
-        body = "approvals/email/prolongation_request/granted/employer_body.txt"
-        return get_email_message(to, context, subject, body)
-
-
-class ProlongationRequestGrantedJobSeeker(BaseNotification):
-    """Notification sent to the jobseeker when the prolongation request is granted"""
-
-    NAME = "prolongation_request_granted_jobseeker"
-
-    def __init__(self, prolongation_request):
-        self.prolongation_request = prolongation_request
-
-    @property
-    def email(self):
-        to = [self.prolongation_request.approval.user.email]
-        context = {"prolongation_request": self.prolongation_request}
-        subject = "approvals/email/prolongation_request/granted/jobseeker_subject.txt"
-        body = "approvals/email/prolongation_request/granted/jobseeker_body.txt"
-        return get_email_message(to, context, subject, body)
-
-
 class ProlongationRequestDeniedEmployer(BaseNotification):
     """Notification sent to the employer when the prolongation request is denied"""
 
@@ -153,8 +119,16 @@ class PassAcceptedEmployerNotification(EmployerNotification, EmailNotification):
 
 
 @notifications_registry.register
-class ProlongationRequestGrantedEmployerNotification(EmployerNotification, EmailNotification):
+class ProlongationRequestGrantedForEmployerNotification(EmployerNotification, EmailNotification):
     name = "Demande de prolongation acceptée"
     category = NotificationCategory.IAE_PASS
     subject_template = "approvals/email/prolongation_request/granted/employer_subject.txt"
     body_template = "approvals/email/prolongation_request/granted/employer_body.txt"
+
+
+@notifications_registry.register
+class ProlongationRequestGrantedForJobSeekerNotification(JobSeekerNotification, EmailNotification):
+    name = "Demande de prolongation acceptée"
+    category = NotificationCategory.IAE_PASS
+    subject_template = "approvals/email/prolongation_request/granted/jobseeker_subject.txt"
+    body_template = "approvals/email/prolongation_request/granted/jobseeker_body.txt"
