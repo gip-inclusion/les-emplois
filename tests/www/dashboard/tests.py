@@ -1974,6 +1974,7 @@ class EditUserNotificationsTest(TestCase):
             notification
             for notification in notifications_registry
             if notification(employer, company).is_manageable_by_user()
+            and notification.__module__.endswith(".notifications")  # Exclude those created concurrently during tests
         ]
 
         # prewarm ContentType cache if needed to avoid extra query
@@ -2037,6 +2038,7 @@ class EditUserNotificationsTest(TestCase):
             notification
             for notification in notifications_registry
             if notification(prescriber, organization).is_manageable_by_user()
+            and notification.__module__.endswith(".notifications")  # Exclude those created concurrently during tests
         ]
 
         # prewarm ContentType cache if needed to avoid extra query
@@ -2099,6 +2101,7 @@ class EditUserNotificationsTest(TestCase):
             notification
             for notification in notifications_registry
             if notification(solo_adviser).is_manageable_by_user()
+            and notification.__module__.endswith(".notifications")  # Exclude those created concurrently during tests
         ]
 
         # No notification settings defined by default
@@ -2152,7 +2155,10 @@ class EditUserNotificationsTest(TestCase):
 
         # Fetch available notifications for this user
         available_notifications = [
-            notification for notification in notifications_registry if notification(job_seeker).is_manageable_by_user()
+            notification
+            for notification in notifications_registry
+            if notification(job_seeker).is_manageable_by_user()
+            and notification.__module__.endswith(".notifications")  # Exclude those created concurrently during tests
         ]
 
         # No notification settings defined by default
