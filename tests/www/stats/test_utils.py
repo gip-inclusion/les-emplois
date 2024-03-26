@@ -1,12 +1,14 @@
 import itertools
 
 import factory.fuzzy
+import pytest
+from django.conf import settings
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory, override_settings
 
 from itou.common_apps.address import departments
-from itou.common_apps.address.departments import DEPARTMENTS
+from itou.common_apps.address.departments import DEPARTMENTS, REGIONS
 from itou.companies.enums import CompanyKind
 from itou.institutions.enums import InstitutionKind
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -60,6 +62,26 @@ def test_can_view_stats_siae_aci():
     user.companymembership_set.update(is_admin=False)
     request = get_request(user)
     assert utils.can_view_stats_siae_aci(request)
+    assert utils.can_view_stats_dashboard_widget(request)
+
+
+@pytest.mark.parametrize(
+    "region,expected",
+    itertools.chain(
+        [(region, True) for region in settings.STATS_SIAE_HIRING_REPORT_REGION_WHITELIST],
+        [(region, False) for region in set(REGIONS) - set(settings.STATS_SIAE_HIRING_REPORT_REGION_WHITELIST)],
+    ),
+)
+@pytest.mark.parametrize("is_admin", [True, False])
+def test_can_view_stats_siae_hiring_report(is_admin, region, expected):
+    company = CompanyFactory(
+        department=factory.fuzzy.FuzzyChoice(REGIONS[region]),
+        with_membership=True,
+        membership__is_admin=is_admin,
+    )
+    request = get_request(company.members.get())
+
+    assert utils.can_view_stats_siae_hiring_report(request) is expected
     assert utils.can_view_stats_dashboard_widget(request)
 
 

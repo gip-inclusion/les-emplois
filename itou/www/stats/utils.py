@@ -57,6 +57,13 @@ def can_view_stats_siae_etp(request):
     return can_view_stats_siae(request) and request.user.pk in settings.STATS_SIAE_USER_PK_WHITELIST
 
 
+def can_view_stats_siae_hiring_report(request):
+    return (
+        can_view_stats_siae(request)
+        and request.current_organization.region in settings.STATS_SIAE_HIRING_REPORT_REGION_WHITELIST
+    )
+
+
 def can_view_stats_cd(request):
     """
     Users of a real CD can view the confidential CD stats for their department only.
