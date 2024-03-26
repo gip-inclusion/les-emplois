@@ -181,7 +181,7 @@ class EvaluationCampaign(models.Model):
 
     institution = models.ForeignKey(
         "institutions.Institution",
-        on_delete=models.CASCADE,
+        on_delete=models.CASCADE,  # FIXME: Seems dangerous to allow campaign deletion on institution deletion
         related_name="evaluation_campaigns",
         verbose_name="DDETS IAE responsable du contrôle",
         validators=[validate_institution],
@@ -445,7 +445,7 @@ class EvaluatedSiae(models.Model):
     siae = models.ForeignKey(
         "companies.Company",
         verbose_name="SIAE",
-        on_delete=models.CASCADE,
+        on_delete=models.CASCADE,  # FIXME: RESTRICT because CaP is an auditability tool?
         related_name="evaluated_siaes",
     )
     # In “phase amiable” until documents have been reviewed.
@@ -635,14 +635,14 @@ class EvaluatedJobApplication(models.Model):
     job_application = models.ForeignKey(
         "job_applications.JobApplication",
         verbose_name="candidature",
-        on_delete=models.CASCADE,
+        on_delete=models.CASCADE,  # FIXME: RESTRICT because CaP is an auditability tool?
         related_name="evaluated_job_applications",
     )
 
     evaluated_siae = models.ForeignKey(
         EvaluatedSiae,
         verbose_name="SIAE évaluée",
-        on_delete=models.CASCADE,
+        on_delete=models.CASCADE,  # FIXME: RESTRICT because CaP is an auditability tool?
         related_name="evaluated_job_applications",
     )
     labor_inspector_explanation = models.TextField(verbose_name="commentaires de l'inspecteur du travail", blank=True)
@@ -759,18 +759,20 @@ class EvaluatedAdministrativeCriteria(models.Model):
     administrative_criteria = models.ForeignKey(
         "eligibility.AdministrativeCriteria",
         verbose_name="critère administratif",
-        on_delete=models.CASCADE,
+        on_delete=models.CASCADE,  # FIXME: RESTRICT because CaP is an auditability tool?
         related_name="evaluated_administrative_criteria",
     )
 
     evaluated_job_application = models.ForeignKey(
         EvaluatedJobApplication,
         verbose_name="candidature évaluée",
-        on_delete=models.CASCADE,
+        on_delete=models.CASCADE,  # FIXME: RESTRICT because CaP is an auditability tool?
         related_name="evaluated_administrative_criteria",
     )
 
-    proof = models.ForeignKey("files.File", on_delete=models.CASCADE, blank=True, null=True)
+    proof = models.ForeignKey(
+        "files.File", on_delete=models.CASCADE, blank=True, null=True
+    )  # FIXME: RESTRICT because CaP is an auditability tool?
     uploaded_at = models.DateTimeField(verbose_name="téléversé le", blank=True, null=True)
     submitted_at = models.DateTimeField(verbose_name="transmis le", blank=True, null=True)
     review_state = models.CharField(

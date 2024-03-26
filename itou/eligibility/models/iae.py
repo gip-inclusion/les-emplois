@@ -276,7 +276,7 @@ class SelectedAdministrativeCriteria(models.Model):
     eligibility_diagnosis = models.ForeignKey(EligibilityDiagnosis, on_delete=models.CASCADE)
     administrative_criteria = models.ForeignKey(
         AdministrativeCriteria,
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         related_name="administrative_criteria_through",
     )
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)

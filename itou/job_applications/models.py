@@ -467,7 +467,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     job_seeker = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="demandeur d'emploi",
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,  # This object is central to us and the SIAE
         related_name="job_applications",
     )
 
@@ -505,7 +505,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="utilisateur émetteur",
-        on_delete=models.SET_NULL,
+        on_delete=models.SET_NULL,  # FIXME: Do we need traceability and accountability?
         null=True,
         blank=True,
         related_name="job_applications_sent",
@@ -529,7 +529,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name="organisation du prescripteur émettrice",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.SET_NULL,  # FIXME: Do we need traceability and accountability?
     )
 
     to_company = models.ForeignKey(
@@ -549,7 +549,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         verbose_name="poste retenu",
         blank=True,
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.SET_NULL,  # FIXME: Maybe RESTRICT because its value should'nt changes, also exposed in API
         related_name="hired_job_applications",
     )
 
@@ -1230,7 +1230,9 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     MODIFIED_OBJECT_FIELD = "job_application"
     EXTRA_LOG_ATTRIBUTES = (("user", "user", None),)
     job_application = models.ForeignKey(JobApplication, related_name="logs", on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL
+    )  # FIXME: Do we need traceability and accountability?
 
     class Meta:
         verbose_name = "log des transitions de la candidature"

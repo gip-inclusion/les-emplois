@@ -491,7 +491,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="demandeur d'emploi",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,  # 2-step deletion, first the Approval to create a CancelledApproval then the User
         related_name="approvals",
     )
     created_by = models.ForeignKey(
@@ -514,7 +514,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         verbose_name="diagnostic d'éligibilité",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # To not mess with the `approval_eligibility_diagnosis` constraint
     )
 
     # 2023-08-17: An experiment to add a denormalized field “last_suspension_ended_at” did not exhibit large
@@ -1095,7 +1095,7 @@ class Suspension(models.Model):
         settings.AUTH_USER_MODEL,
         verbose_name="créé par",
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # For traceability and accountability
         related_name="approvals_suspended_set",
     )
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
@@ -1104,7 +1104,7 @@ class Suspension(models.Model):
         verbose_name="mis à jour par",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # For traceability and accountability, the dates can be edited
     )
 
     objects = SuspensionQuerySet.as_manager()
@@ -1348,14 +1348,14 @@ class CommonProlongation(models.Model):
         settings.AUTH_USER_MODEL,
         verbose_name="déclarée par",
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # For traceability and accountability
         related_name="%(class)ss_declared",
     )
     declared_by_siae = models.ForeignKey(
         "companies.Company",
         verbose_name="SIAE du déclarant",
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # For traceability and accountability, people's organization can change
     )
 
     # It is assumed that an authorized prescriber has validated the prolongation beforehand.
@@ -1364,7 +1364,7 @@ class CommonProlongation(models.Model):
         verbose_name="prescripteur habilité qui a autorisé cette prolongation",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # For traceability and accountability
         related_name="%(class)ss_validated",
     )
 
@@ -1373,7 +1373,7 @@ class CommonProlongation(models.Model):
         verbose_name="organisation du prescripteur habilité",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # For traceability and accountability, people's organization can change
     )
 
     # `created_by` can be different from `declared_by` when created in admin.
@@ -1523,7 +1523,7 @@ class ProlongationRequest(CommonProlongation):
     processed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="traité par",
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # For traceability and accountability
         related_name="%(class)s_processed",
         null=True,
         blank=True,

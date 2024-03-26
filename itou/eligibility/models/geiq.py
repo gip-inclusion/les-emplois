@@ -235,7 +235,7 @@ class GEIQAdministrativeCriteria(AbstractAdministrativeCriteria):
         verbose_name="critère parent",
         blank=True,
         null=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # Prevent promoting a criteria form child to parent
     )
     # Some criteria do not belong to an annex or a level
     annex = models.CharField(
@@ -289,7 +289,7 @@ class GEIQSelectedAdministrativeCriteria(models.Model):
     )
     administrative_criteria = models.ForeignKey(
         GEIQAdministrativeCriteria,
-        on_delete=models.CASCADE,
+        on_delete=models.RESTRICT,
         related_name="administrative_criteria_through",
     )
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
