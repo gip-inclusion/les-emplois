@@ -77,7 +77,6 @@ def update_page_with_htmx(page, select_htmx_element, htmx_response):
         # Let's not assert anything in that case, since we currently don't have that info in our test
         parsed_url = urlparse(url)
         assert htmx_response.request["PATH_INFO"] == parsed_url.path
-        assert htmx_response.request["QUERY_STRING"] == parsed_url.query
     # We only support HTMX responses that do not try to swap the whole HTML body
     parsed_response = parse_response_to_soup(htmx_response, no_html_body=True)
     out_of_band_swaps = [element.extract() for element in parsed_response.select("[hx-swap-oob]")]

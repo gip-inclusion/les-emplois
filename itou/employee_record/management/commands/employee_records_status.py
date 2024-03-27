@@ -2,7 +2,7 @@ import argparse
 
 from itou.approvals.enums import Origin
 from itou.approvals.models import Approval
-from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
+from itou.employee_record.constants import get_availability_date_for_kind
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.command import BaseCommand
@@ -54,7 +54,8 @@ class Command(BaseCommand):
                         info = "Non proposé à la création"
                     elif (
                         job_application.hiring_start_at
-                        and job_application.hiring_start_at < EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE.date()
+                        and job_application.hiring_start_at
+                        < get_availability_date_for_kind(job_application.to_company.kind).date()
                     ):
                         info = "Date de début du contrat avant l'interopérabilité"
                     elif (

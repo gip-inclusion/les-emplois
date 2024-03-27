@@ -7,6 +7,7 @@ import pytest
 from bs4 import BeautifulSoup
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
+from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
@@ -52,7 +53,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import TestCase, assertMessages, parse_response_to_soup
+from tests.utils.test import TestCase, parse_response_to_soup
 
 
 DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
@@ -65,7 +66,7 @@ REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY = (
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
-class ProcessViewsTest(TestCase):
+class ProcessViewsTest(MessagesTestMixin, TestCase):
     DIAGORIENTE_INVITE_TITLE = "Ce candidat n’a pas de CV ?"
     DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE = "Invitez le prescripteur à en créer un via notre partenaire Diagoriente."
     DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE = "Invitez-le à en créer un via notre partenaire Diagoriente."
@@ -1738,7 +1739,7 @@ class ProcessViewsTest(TestCase):
             reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
             follow=True,
         )
-        assertMessages(response, [])
+        self.assertMessages(response, [])
         self.assertTemplateNotUsed(response, "apply/includes/job_application_diagoriente_invite.html")
         self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
         self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
@@ -1757,7 +1758,9 @@ class ProcessViewsTest(TestCase):
                 reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
                 follow=True,
             )
-        assertMessages(response, [(messages.SUCCESS, "L'invitation à utiliser Diagoriente a été envoyée.")])
+        self.assertMessages(
+            response, [messages.Message(messages.SUCCESS, "L'invitation à utiliser Diagoriente a été envoyée.")]
+        )
         self.assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
         self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
         self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
@@ -1789,7 +1792,7 @@ class ProcessViewsTest(TestCase):
             reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
             follow=True,
         )
-        assertMessages(response, [])
+        self.assertMessages(response, [])
         self.assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
         self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
         self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
@@ -1814,7 +1817,9 @@ class ProcessViewsTest(TestCase):
                 reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
                 follow=True,
             )
-        assertMessages(response, [(messages.SUCCESS, "L'invitation à utiliser Diagoriente a été envoyée.")])
+        self.assertMessages(
+            response, [messages.Message(messages.SUCCESS, "L'invitation à utiliser Diagoriente a été envoyée.")]
+        )
         self.assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
         self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
         self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)
@@ -1856,7 +1861,9 @@ class ProcessViewsTest(TestCase):
                 reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
                 follow=True,
             )
-        assertMessages(response, [(messages.SUCCESS, "L'invitation à utiliser Diagoriente a été envoyée.")])
+        self.assertMessages(
+            response, [messages.Message(messages.SUCCESS, "L'invitation à utiliser Diagoriente a été envoyée.")]
+        )
         self.assertTemplateUsed(response, "apply/includes/job_application_diagoriente_invite.html")
         self.assertNotContains(response, self.DIAGORIENTE_INVITE_TITLE)
         self.assertNotContains(response, self.DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE)

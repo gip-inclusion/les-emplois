@@ -1,11 +1,14 @@
 import datetime
 
+import factory
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.contrib.messages.test import MessagesTestMixin
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.employee_record.enums import Status
 from itou.users.enums import LackOfNIRReason
@@ -15,22 +18,18 @@ from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJo
 from tests.employee_record import factories as employee_record_factories
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
-class ListEmployeeRecordsTest(TestCase):
+class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
     URL = reverse_lazy("employee_record_views:list")
 
     def setUp(self):
         super().setUp()
         # User must be super user for UI first part (tmp)
         self.company = CompanyWithMembershipAndJobsFactory(name="Evil Corp.", membership__user__first_name="Elliot")
-        self.company_without_perms = CompanyWithMembershipAndJobsFactory(
-            kind="EITI", name="A-Team", membership__user__first_name="Hannibal"
-        )
         self.user = self.company.members.get(first_name="Elliot")
-        self.user_without_perms = self.company_without_perms.members.get(first_name="Hannibal")
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
             for_snapshot=True,
@@ -41,10 +40,12 @@ class ListEmployeeRecordsTest(TestCase):
         """
         Non-eligible SIAE should not be able to access this list
         """
-        self.client.force_login(self.user_without_perms)
+        company = CompanyWithMembershipAndJobsFactory(
+            kind=factory.fuzzy.FuzzyChoice(set(CompanyKind) - set(Company.ASP_EMPLOYEE_RECORD_KINDS)),
+        )
+        self.client.force_login(company.members.get())
 
         response = self.client.get(self.URL)
-
         assert response.status_code == 403
 
     def test_new_employee_records(self):
@@ -140,7 +141,7 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.URL + "?status=NEW")
 
         # Global message alert
-        assertMessages(response, [])
+        self.assertMessages(response, [])
 
         # Item message alert
         assert (
@@ -185,7 +186,7 @@ class ListEmployeeRecordsTest(TestCase):
         response = self.client.get(self.URL + "?status=NEW")
 
         # Global message alert
-        assertMessages(response, [])
+        self.assertMessages(response, [])
         # Item message alert
         assert (
             str(

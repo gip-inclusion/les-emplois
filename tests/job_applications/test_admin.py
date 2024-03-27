@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.admin import helpers
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertFormError
+from pytest_django.asserts import assertContains, assertFormError, assertMessages
 
 from itou.employee_record import models as employee_record_models
 from itou.job_applications import models
@@ -12,7 +12,6 @@ from tests.eligibility.factories import EligibilityDiagnosisFactory, Eligibility
 from tests.employee_record import factories as employee_record_factories
 from tests.job_applications import factories
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import assertMessages
 
 
 def test_create_employee_record(admin_client):
@@ -33,7 +32,10 @@ def test_create_employee_record(admin_client):
     assert employee_record.job_application == job_application
 
     url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.pk])
-    assertMessages(response, [(messages.SUCCESS, f'1 fiche salarié créée : <a href="{url}">{employee_record.pk}</a>')])
+    assertMessages(
+        response,
+        [messages.Message(messages.SUCCESS, f'1 fiche salarié créée : <a href="{url}">{employee_record.pk}</a>')],
+    )
 
 
 def test_create_employee_record_when_it_already_exists(admin_client):
@@ -49,7 +51,10 @@ def test_create_employee_record_when_it_already_exists(admin_client):
     )
 
     url = reverse("admin:job_applications_jobapplication_change", args=[job_application.pk])
-    assertMessages(response, [(messages.WARNING, f'1 candidature ignorée : <a href="{url}">{job_application.pk}</a>')])
+    assertMessages(
+        response,
+        [messages.Message(messages.WARNING, f'1 candidature ignorée : <a href="{url}">{job_application.pk}</a>')],
+    )
 
 
 def test_create_job_application_does_not_crash(admin_client):
@@ -105,8 +110,8 @@ def test_check_inconsistency_check(admin_client):
     assertMessages(
         response,
         [
-            (
-                "WARNING",
+            messages.Message(
+                messages.WARNING,
                 (
                     "2 objets incohérents: <ul>"
                     '<li class="warning">'

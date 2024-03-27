@@ -18,9 +18,9 @@ from tests.utils.test import TestCase
 
 class UtilsAddressMixinTest(TestCase):
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_set_coords(self, _mock_call_ban_geocoding_api):
+    def test_geocode_address(self, _mock_call_ban_geocoding_api):
         """
-        Test `AddressMixin.set_coords()`.
+        Test `AddressMixin.geocode_address()`.
         Use `PrescriberOrganization` which inherits from abstract `AddressMixin`.
         """
         prescriber = PrescriberOrganization.objects.create(siret="12000015300011")
@@ -34,14 +34,14 @@ class UtilsAddressMixinTest(TestCase):
         assert prescriber.latitude is None
         assert prescriber.longitude is None
 
-        prescriber.set_coords("10 PL 5 MARTYRS LYCEE BUFFON", post_code="75015")
+        prescriber.geocode_address()
         prescriber.save()
 
         # Expected data comes from BAN_GEOCODING_API_RESULT_MOCK.
         expected_coords = "SRID=4326;POINT (2.316754 48.838411)"
         expected_latitude = 48.838411
         expected_longitude = 2.316754
-        expected_geocoding_score = 0.587663373207207
+        expected_geocoding_score = 0.5197687103594081
 
         assert prescriber.coords == expected_coords
         assert prescriber.geocoding_score == expected_geocoding_score
@@ -49,15 +49,15 @@ class UtilsAddressMixinTest(TestCase):
         assert prescriber.longitude == expected_longitude
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
-    def test_set_coords_with_bad_address(self, _mock_call_ban_geocoding_api):
+    def test_geocode_address_with_bad_address(self, _mock_call_ban_geocoding_api):
         """
-        Test `AddressMixin.set_coords()` with bad address.
+        Test `AddressMixin.geocode_address()` with bad address.
         Use `PrescriberOrganization` which inherits from abstract `AddressMixin`.
         """
         prescriber = PrescriberOrganization.objects.create(siret="12000015300011")
 
         with pytest.raises(GeocodingDataError):
-            prescriber.set_coords("10 PL 5 ANATOLE", post_code="75010")
+            prescriber.geocode_address()
 
 
 class UtilsDepartmentsTest(TestCase):

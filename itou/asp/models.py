@@ -496,16 +496,16 @@ class SiaeMeasure(models.TextChoices):
     We only need a subset of the available codes.
     """
 
-    AI = "AI_DC", "Droit Commun - Association Intermédiaire"
     ACI = "ACI_DC", "Droit Commun - Atelier et Chantier d'Insertion"
+    AI = "AI_DC", "Droit Commun - Association Intermédiaire"
     EI = "EI_DC", "Droit Commun -  Entreprise d'Insertion"
-    ETTI = "ETTI_DC", "Droit Commun - Entreprise de Travail Temporaire d'Insertion"
     EITI = "EITI_DC", "Droit Commun - Entreprise d'Insertion par le Travail Indépendant"
+    ETTI = "ETTI_DC", "Droit Commun - Entreprise de Travail Temporaire d'Insertion"
 
     # These codes are currently not used at Itou
-    FDI = "FDI_DC", "Droit Commun -  Fonds Départemental pour l'Insertion"
-    EI_MP = "EI_MP", "Milieu Pénitentiaire - Entreprise d'Insertion"
     ACI_MP = "ACI_MP", "Milieu Pénitentiaire - Atelier et Chantier d'Insertion"
+    EI_MP = "EI_MP", "Milieu Pénitentiaire - Entreprise d'Insertion"
+    FDI = "FDI_DC", "Droit Commun -  Fonds Départemental pour l'Insertion"
 
     @classmethod
     def from_siae_kind(cls, kind):
@@ -513,11 +513,11 @@ class SiaeMeasure(models.TextChoices):
         Mapping between Itou SIAE kinds and ASP "Mesures"
         """
         kinds = {
-            "AI": cls.AI,
             "ACI": cls.ACI,
+            "AI": cls.AI,
             "EI": cls.EI,
-            "ETTI": cls.ETTI,
             "EITI": cls.EITI,
+            "ETTI": cls.ETTI,
         }
         # No fallback (None)
         return kinds.get(kind)

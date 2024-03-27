@@ -1,37 +1,14 @@
 import importlib
 import io
-from typing import NamedTuple
 
 import openpyxl
 from bs4 import BeautifulSoup
-from django.contrib.messages import DEFAULT_LEVELS, get_messages
-from django.http import HttpResponse
 from django.test import Client, TestCase as BaseTestCase
 from django.test.utils import TestContextDecorator
 
 
 # SAVEPOINT + RELEASE from the ATOMIC_REQUESTS transaction
 BASE_NUM_QUERIES = 2
-
-
-class Message(NamedTuple):
-    level: int
-    message: str
-
-
-LEVEL_TO_NAME = {intlevel: name for name, intlevel in DEFAULT_LEVELS.items()}
-
-
-def assertMessagesFromRequest(request, expected_messages: list[Message]):
-    request_messages = get_messages(request)
-    for message, (expected_level, expected_msg) in zip(request_messages, expected_messages, strict=True):
-        msg_levelname = LEVEL_TO_NAME.get(message.level, message.level)
-        expected_levelname = LEVEL_TO_NAME.get(expected_level, expected_level)
-        assert (msg_levelname, message.message) == (expected_levelname, expected_msg)
-
-
-def assertMessages(response: HttpResponse, expected_messages: list[Message]):
-    assertMessagesFromRequest(response.wsgi_request, expected_messages)
 
 
 def pprint_html(response, **selectors):
@@ -82,9 +59,14 @@ def parse_response_to_soup(response, selector=None, no_html_body=False, replace_
         unique_attrs = set([replace_tuple[0] for replace_tuple in replacements])
 
         for attr in unique_attrs:
+            # Search and replace in descendant nodes
             for links in soup.find_all(attrs={attr: True}):
                 for _, from_str, to_str in replacements:
                     links.attrs.update({f"{attr}": links.attrs[attr].replace(from_str, to_str)})
+            # Also replace attributes in the top node
+            if attr in soup.attrs:
+                for _, from_str, to_str in replacements:
+                    soup.attrs.update({f"{attr}": soup.attrs[attr].replace(from_str, to_str)})
     return soup
 
 

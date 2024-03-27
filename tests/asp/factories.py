@@ -14,7 +14,7 @@ from itou.asp import models
 # - `test_asp_INSEE_countries_factory.json`
 # in your Django unit tests (set `fixtures` field).
 
-_COMMUNES_CODES = ["64483", "97108", "97107", "37273", "13200", "67152", "85146"]
+_COMMUNES_CODES = ["64483", "97108", "97107", "37273", "13200", "67152", "85146", "58273"]
 
 _FRANCE_CODES = ["100"]
 _OTHER_FRANCE_CODES = ["714", "737", "812"]

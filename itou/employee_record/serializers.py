@@ -134,7 +134,7 @@ class _SituationSerializer(serializers.Serializer):
     numeroIDE = serializers.CharField(source="job_seeker.jobseeker_profile.pole_emploi_id")
 
     salarieRQTH = serializers.BooleanField(source="job_seeker.jobseeker_profile.rqth_employee")
-    salarieOETH = serializers.BooleanField(source="job_seeker.jobseeker_profile.oeth_employee")
+    salarieOETH = serializers.BooleanField(source="asp_oeth_employee")
     salarieAideSociale = serializers.BooleanField(source="job_seeker.jobseeker_profile.has_social_allowance")
 
     salarieBenefRSA = serializers.CharField(source="job_seeker.jobseeker_profile.has_rsa_allocation")

@@ -9,6 +9,8 @@ import pytest
 import respx
 from django.contrib import auth, messages
 from django.contrib.auth import get_user
+from django.contrib.messages import Message
+from django.contrib.messages.test import MessagesTestMixin
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
@@ -45,7 +47,6 @@ from tests.users.factories import (
     PrescriberFactory,
     UserFactory,
 )
-from tests.utils.test import assertMessages
 
 
 OIDC_USERINFO = {
@@ -346,7 +347,7 @@ class InclusionConnectAuthorizeViewTest(InclusionConnectBaseTestCase):
                 self.assertRedirects(response, reverse("search:employers_home"))
 
 
-class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
+class InclusionConnectCallbackViewTest(MessagesTestMixin, InclusionConnectBaseTestCase):
     @respx.mock
     def test_callback_invalid_state(self):
         token_json = {"access_token": "access_token", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
@@ -542,10 +543,10 @@ class InclusionConnectCallbackViewTest(InclusionConnectBaseTestCase):
         edit_user_info_url = reverse("dashboard:edit_user_info")
         response = mock_oauth_dance(self.client, UserKind.PRESCRIBER, next_url=edit_user_info_url)
         response = self.client.get(response.url, follow=True)
-        assertMessages(
+        self.assertMessages(
             response,
             [
-                (
+                Message(
                     messages.ERROR,
                     "Vous avez modifié votre e-mail sur Inclusion Connect, mais celui-ci est déjà associé à un compte "
                     "sur la plateforme. Nous n'avons donc pas pu mettre à jour random@email.com en "
@@ -779,7 +780,7 @@ class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
         self.assertRedirects(response, reverse("search:employers_home"))
 
 
-class InclusionConnectmapChannelTest(InclusionConnectBaseTestCase):
+class InclusionConnectmapChannelTest(MessagesTestMixin, InclusionConnectBaseTestCase):
     @respx.mock
     def test_happy_path(self):
         job_application = JobApplicationSentByPrescriberPoleEmploiFactory(
@@ -883,10 +884,10 @@ class InclusionConnectmapChannelTest(InclusionConnectBaseTestCase):
 
         response = self.client.get(reverse("search:employers_home"))
         assert response.status_code == 200
-        assertMessages(
+        self.assertMessages(
             response,
             [
-                (
+                Message(
                     messages.ERROR,
                     "Nous sommes au regret de vous informer que votre agence n'est pas référencée dans notre service. "
                     f"Nous vous invitons à <a href='{global_constants.ITOU_HELP_CENTER_URL}'>contacter le support</a> "

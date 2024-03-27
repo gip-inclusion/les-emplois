@@ -26,6 +26,7 @@ from tests.job_applications.factories import (
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 
 
@@ -782,8 +783,27 @@ class TestListForSiae:
             company.save(update_fields=("kind",))
             response = client.get(reverse("apply:list_for_siae"))
             assert response.status_code == 200
-            filter_form = parse_response_to_soup(response, "#js-job-applications-filters-form")
+            filter_form = parse_response_to_soup(response, "#asideFiltersCollapse")
             assert str(filter_form) == snapshot(name=kind_snapshot[kind])
+
+    def test_htmx_filters(self, client):
+        company = CompanyFactory(with_membership=True)
+        JobApplicationFactory(to_company=company, state=JobApplicationWorkflow.STATE_ACCEPTED)
+        client.force_login(company.members.get())
+        response = client.get(reverse("apply:list_for_siae"))
+        page = parse_response_to_soup(response, selector="#main")
+        # Check the refused checkbox, that triggers the HTMX request.
+        [refused_checkbox] = page.find_all("input", attrs={"name": "states", "value": "refused"})
+        refused_checkbox["checked"] = ""
+        response = client.get(
+            reverse("apply:list_for_siae"),
+            {"states": ["refused"]},
+            headers={"HX-Request": "true"},
+        )
+        update_page_with_htmx(page, "#asideFiltersCollapse > form", response)
+        response = client.get(reverse("apply:list_for_siae"), {"states": ["refused"]})
+        fresh_page = parse_response_to_soup(response, selector="#main")
+        assertSoupEqual(page, fresh_page)
 
 
 ####################################################

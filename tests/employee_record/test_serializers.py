@@ -1,10 +1,15 @@
 from datetime import timedelta
 
+import pytest
 from django.utils import timezone
 
+from itou.asp.models import SiaeMeasure
+from itou.companies.enums import CompanyKind
+from itou.companies.models import Company
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import (
+    EmployeeRecordSerializer,
     EmployeeRecordUpdateNotificationBatchSerializer,
     EmployeeRecordUpdateNotificationSerializer,
     _AddressSerializer,
@@ -93,6 +98,31 @@ def test_person_serializer_with_empty_birth_country():
 
     assert serializer.data["codeInseePays"] is None
     assert serializer.data["codeGroupePays"] is None
+
+
+class TestEmployeeRecordSerializer:
+    def test_oeth_employee_for_eiti(self):
+        employee_record = EmployeeRecordWithProfileFactory(
+            status=Status.PROCESSED,
+            job_application__to_company__kind=CompanyKind.EITI,
+        )
+        employee_record.job_application.job_seeker.jobseeker_profile.oeth_employee = True
+        data = EmployeeRecordSerializer(employee_record).data
+
+        assert data["mesure"] == "EITI_DC"
+        assert data["situationSalarie"]["salarieOETH"] is False
+
+    @pytest.mark.parametrize("kind", set(Company.ASP_EMPLOYEE_RECORD_KINDS) - {CompanyKind.EITI})
+    def test_oeth_employee_for_non_eiti(self, kind):
+        employee_record = EmployeeRecordWithProfileFactory(
+            status=Status.PROCESSED,
+            job_application__to_company__kind=kind,
+        )
+        employee_record.job_application.job_seeker.jobseeker_profile.oeth_employee = True
+        data = EmployeeRecordSerializer(employee_record).data
+
+        assert data["mesure"] == SiaeMeasure.from_siae_kind(kind)
+        assert data["situationSalarie"]["salarieOETH"] is True
 
 
 class EmployeeRecordUpdateNotificationSerializerTest(TestCase):

@@ -73,6 +73,12 @@ def get_geocoding_data(address, post_code=None, limit=1):
     data = call_ban_geocoding_api(address, post_code=post_code, limit=limit)
 
     if not data:
+        if post_code and post_code[:2] in {"97", "98"}:
+            # Try without `post_code` for DROM-COM as the BAN tends to yield no results with that filter.
+            # Example:
+            # - Saint-Martin, COG 97801, CP 97150
+            # TODO(2024-03-21): See if it's still necessary as a future BAN API could handle those cases.
+            return get_geocoding_data(address, post_code=None, limit=limit)
         raise GeocodingDataError("Empty response from BAN API")
 
     if not data.get("properties"):
@@ -87,7 +93,7 @@ def get_geocoding_data(address, post_code=None, limit=1):
         "number": data["properties"].get("housenumber", None),
         "lane": data["properties"].get("street", None),
         "address": data["properties"]["name"],
-        "post_code": data["properties"]["postcode"],
+        "post_code": data["properties"].get("postcode"),
         "insee_code": data["properties"]["citycode"],
         "city": data["properties"]["city"],
         "longitude": longitude,

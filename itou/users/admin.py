@@ -813,6 +813,15 @@ class JobSeekerProfileAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                 search_fields.append("user__last_name")
         return search_fields
 
+    def get_form(self, request, obj=None, **kwargs):
+        if obj:
+            help_texts = kwargs.pop("help_texts", {})
+            default_asp_uid = obj._default_asp_uid()
+            warn = "⚠ " if default_asp_uid != obj.asp_uid else ""
+            help_texts["asp_uid"] = f"{warn}Valeur par défaut: {default_asp_uid}"
+            kwargs.update({"help_texts": help_texts})
+        return super().get_form(request, obj, **kwargs)
+
 
 class EmailAddressWithRemarkAdmin(EmailAddressAdmin):
     inlines = (PkSupportRemarkInline,)

@@ -7,7 +7,11 @@
 {% endcomment %}
 {% if page.display_pager %}
     {% with request.get_full_path as url %}
-        <nav role="navigation" aria-label="Pagination" {% if boost %}hx-boost="true"{% endif %}>
+        <nav role="navigation"
+             aria-label="Pagination"
+             {% if boost %}hx-boost="true"{% endif %}
+             {% if boost_target %}hx-target="{{ boost_target }}"{% endif %}
+             {% if boost_indicator %}hx-indicator="{{ boost_indicator }}"{% endif %}>
             {# Pagination is not responsive by default https://github.com/twbs/bootstrap/issues/23504 #}
             <ul class="pagination flex-wrap justify-content-center">
                 {# First page. #}

@@ -1,6 +1,7 @@
 import pytest
 from django.contrib import messages
 from django.contrib.gis.geos import Point
+from django.contrib.messages.test import MessagesTestMixin
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from freezegun import freeze_time
@@ -14,7 +15,7 @@ from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
+from tests.utils.test import BASE_NUM_QUERIES, TestCase
 
 
 class JobDescriptionAbstractTest(TestCase):
@@ -82,7 +83,7 @@ class JobDescriptionAbstractTest(TestCase):
         return response
 
 
-class JobDescriptionListViewTest(JobDescriptionAbstractTest):
+class JobDescriptionListViewTest(MessagesTestMixin, JobDescriptionAbstractTest):
     def setUp(self):
         super().setUp()
 
@@ -98,6 +99,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
             + 1  # count job descriptions
             + 1  # fetch job descriptions
             + 2  # prefetch appelation, rome
+            + 1  # fetch company members count
             + 3  # update session
         ):
             response = self.client.get(self.url)
@@ -105,7 +107,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         assert self.company.job_description_through.count() == 4
         self.assertContains(
             response,
-            '<h3 class="h4 mb-0">4 métiers exercés</h3>',
+            '<p class="mb-0">4 métiers exercés</p>',
             html=True,
             count=1,
         )
@@ -187,13 +189,16 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
             },
         ]
 
-        assertMessages(response, [(messages.SUCCESS, "Le recrutement est maintenant ouvert.")])
+        self.assertMessages(response, [messages.Message(messages.SUCCESS, "Le recrutement est maintenant ouvert.")])
 
         # Check that we do not crash on unexisting job description
         job_description.delete()
         response = self.client.post(self.url, data=post_data)
         self.assertRedirects(response, self.url)
-        assertMessages(response, [(messages.ERROR, "La fiche de poste que vous souhaitiez modifier n'existe plus.")])
+        self.assertMessages(
+            response,
+            [messages.Message(messages.ERROR, "La fiche de poste que vous souhaitiez modifier n'existe plus.")],
+        )
 
         # Trying to update job description from an other company does nothing
         other_company_job_description = JobDescriptionFactory(is_active=False)
@@ -206,7 +211,10 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
             },
         )
         self.assertRedirects(response, self.url)
-        assertMessages(response, [(messages.ERROR, "La fiche de poste que vous souhaitiez modifier n'existe plus.")])
+        self.assertMessages(
+            response,
+            [messages.Message(messages.ERROR, "La fiche de poste que vous souhaitiez modifier n'existe plus.")],
+        )
         other_company_job_description.refresh_from_db()
         assert not other_company_job_description.is_active
 
@@ -222,7 +230,7 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         }
         response = self.client.post(self.url, data=post_data)
         self.assertRedirects(response, self.url)
-        assertMessages(response, [(messages.SUCCESS, "La fiche de poste a été supprimée.")])
+        self.assertMessages(response, [messages.Message(messages.SUCCESS, "La fiche de poste a été supprimée.")])
 
         with pytest.raises(ObjectDoesNotExist):
             JobDescription.objects.get(pk=job_description.id)
@@ -230,7 +238,10 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
         # Second delete does not crash (and simply does nothing)
         response = self.client.post(self.url, data=post_data)
         self.assertRedirects(response, self.url)
-        assertMessages(response, [(messages.WARNING, "La fiche de poste que vous souhaitez supprimer n'existe plus.")])
+        self.assertMessages(
+            response,
+            [messages.Message(messages.WARNING, "La fiche de poste que vous souhaitez supprimer n'existe plus.")],
+        )
 
         # Trying to delete job description from an other company does nothing
         other_company_job_description = JobDescriptionFactory()
@@ -242,7 +253,10 @@ class JobDescriptionListViewTest(JobDescriptionAbstractTest):
             },
         )
         self.assertRedirects(response, self.url)
-        assertMessages(response, [(messages.WARNING, "La fiche de poste que vous souhaitez supprimer n'existe plus.")])
+        self.assertMessages(
+            response,
+            [messages.Message(messages.WARNING, "La fiche de poste que vous souhaitez supprimer n'existe plus.")],
+        )
         assert JobDescription.objects.filter(pk=other_company_job_description.pk).exists()
 
 

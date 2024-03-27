@@ -1,8 +1,9 @@
 from dateutil.relativedelta import relativedelta
+from django.contrib import messages
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertNumQueries
+from pytest_django.asserts import assertMessages, assertNumQueries
 
 from itou.siae_evaluations import enums as evaluation_enums
 from tests.companies.factories import CompanyMembershipFactory
@@ -13,7 +14,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import ItouStaffFactory
-from tests.utils.test import BASE_NUM_QUERIES, assertMessages, get_rows_from_streaming_response
+from tests.utils.test import BASE_NUM_QUERIES, get_rows_from_streaming_response
 
 
 class TestEvaluationCampaignAdmin:
@@ -222,7 +223,12 @@ class TestEvaluationCampaignAdmin:
         assert response.status_code == 302
         assertMessages(
             response,
-            [("SUCCESS", "Les soumissions des SIAEs sont maintenant bloquées pour les campagnes sélectionnées.")],
+            [
+                messages.Message(
+                    messages.SUCCESS,
+                    "Les soumissions des SIAEs sont maintenant bloquées pour les campagnes sélectionnées.",
+                )
+            ],
         )
         campaign1_siae.refresh_from_db()
         assert campaign1_siae.submission_freezed_at is not None

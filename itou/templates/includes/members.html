@@ -1,63 +1,65 @@
 {% if members_stats.admin_count == 1 and members_stats.total_count > 1 %}
-    <p class="mt-4 mb-5">
+    <p class="mt-3">
         Nous vous recommandons de nommer plusieurs administrateurs
         afin de garantir l’accès et la sécurité de cet espace professionnel à tous vos membres.
     </p>
 {% endif %}
 
-<div class="table-responsive-lg mt-3 mt-md-4">
-    <table class="table">
-        <caption class="visually-hidden">Liste des collaborateurs</caption>
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Nom</th>
-                <th scope="col">Email</th>
-                <th scope="col">Date d'inscription</th>
-                {% if user in active_admin_members %}<th scope="col" class="text-center">Action</th>{% endif %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for member in members %}
+{% if members %}
+    <div class="table-responsive-lg mt-3 mt-md-4">
+        <table class="table">
+            <caption class="visually-hidden">Liste des collaborateurs</caption>
+            <thead>
                 <tr>
-                    <th scope="row">{{ forloop.counter }}</th>
-                    <td>
-                        {{ member.user.get_full_name }}
-                        {% if member.user in active_admin_members %}
-                            <span class="badge badge-xs rounded-pill bg-info" data-bs-toggle="tooltip" title="Administrateur de la structure">admin</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <a href="mailto:{{ member.user.email }}">{{ member.user.email }}</a>
-                    </td>
-                    <td>{{ member.joined_at|date:"d F Y à H:i" }}</td>
-                    {% if user in active_admin_members %}
-                        <td class="text-center">
-                            <div>
-                                {% if member.user != user %}
-                                    <button id="dropdown_{{ forloop.counter }}_action_menu" class="btn btn-link btn-ico-only btn-sm" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d'actions">
-                                        <i class="ri-more-2-fill" aria-hidden="true"></i>
-                                    </button>
-                                    <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
-                                        <a href="{% url base_url|add:":deactivate_member" member.user.pk %}" class="dropdown-item">Retirer de la structure</a>
-                                        {% if not member.user in active_admin_members %}
-                                            <a href="{% url base_url|add:":update_admin_role" "add" member.user.pk %}" class="dropdown-item">
-                                                Ajouter en tant qu'administrateur
-                                            </a>
-                                        {% else %}
-                                            <a href="{% url base_url|add:":update_admin_role" "remove" member.user.pk %}" class="dropdown-item">
-                                                Retirer les droits d'administrateur
-                                            </a>
-                                        {% endif %}
-                                    </div>
-                                {% else %}
-                                    <i class="ri-forbid-line ri-lg" aria-hidden="true"></i>
-                                {% endif %}
-                            </div>
-                        </td>
-                    {% endif %}
+                    <th scope="col">Nom</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Date d'inscription</th>
+                    {% if user in active_admin_members %}<th scope="col" class="text-center">Action</th>{% endif %}
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+            </thead>
+            <tbody>
+                {% for member in members %}
+                    <tr>
+                        <td>
+                            {{ member.user.get_full_name }}
+                            {% if member.user in active_admin_members %}
+                                <span class="badge badge-xs rounded-pill bg-info" data-bs-toggle="tooltip" title="Administrateur de la structure">admin</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="mailto:{{ member.user.email }}">{{ member.user.email }}</a>
+                        </td>
+                        <td>{{ member.joined_at|date:"d F Y à H:i" }}</td>
+                        {% if user in active_admin_members %}
+                            <td class="text-center">
+                                <div>
+                                    {% if member.user != user %}
+                                        <button id="dropdown_{{ forloop.counter }}_action_menu" class="btn btn-link btn-ico-only btn-sm" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d'actions">
+                                            <i class="ri-more-2-fill" aria-hidden="true"></i>
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
+                                            <a href="{% url base_url|add:":deactivate_member" member.user.pk %}" class="dropdown-item">Retirer de la structure</a>
+                                            {% if not member.user in active_admin_members %}
+                                                <a href="{% url base_url|add:":update_admin_role" "add" member.user.pk %}" class="dropdown-item">
+                                                    Ajouter en tant qu'administrateur
+                                                </a>
+                                            {% else %}
+                                                <a href="{% url base_url|add:":update_admin_role" "remove" member.user.pk %}" class="dropdown-item">
+                                                    Retirer les droits d'administrateur
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <i class="ri-forbid-line ri-lg" aria-hidden="true"></i>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <p>Aucun collaborateur pour cette structure.</p>
+{% endif %}

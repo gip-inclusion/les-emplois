@@ -201,7 +201,11 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "filters_counter": filters_counter,
         "pending_states_job_applications_count": pending_states_job_applications_count,
     }
-    return render(request, template_name, context)
+    return render(
+        request,
+        "apply/includes/list_job_applications.html" if request.htmx else template_name,
+        context,
+    )
 
 
 @login_required

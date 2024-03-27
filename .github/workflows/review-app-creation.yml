@@ -19,7 +19,7 @@ env:
 jobs:
   create:
     runs-on: ubuntu-latest
-    if: github.event.action == 'labeled' && github.event.label.name == 'recette-jetable'
+    if: github.event.action == 'labeled' && github.event.label.name == '1-recette-jetable'
 
     steps:
     - name: 📥 Checkout to the PR branch
@@ -94,7 +94,7 @@ jobs:
   redeploy:
     runs-on: ubuntu-latest
     # A push event targets a new deployment.
-    if: github.event.action == 'synchronize' && contains( github.event.pull_request.labels.*.name, 'recette-jetable')
+    if: github.event.action == 'synchronize' && contains( github.event.pull_request.labels.*.name, '1-recette-jetable')
 
     steps:
     - name: 📥 Checkout to the PR branch

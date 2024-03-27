@@ -4,6 +4,7 @@ import html5lib
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
+from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.urls import reverse
 from django.utils import dateformat, timezone
@@ -32,7 +33,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 
 
 # fixme vincentporte : convert this method into factory
@@ -3852,7 +3853,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         assert evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2 == eval_admin_crit.review_state
 
 
-class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
+class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         membership = InstitutionMembershipFactory()
@@ -3918,7 +3919,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         assert response.url == redirect_url
         self.evaluated_siae.refresh_from_db()
         assert self.evaluated_siae.reviewed_at is None
-        assertMessages(response, [])
+        self.assertMessages(response, [])
 
         # accepted
         EvaluatedAdministrativeCriteria.objects.filter(
@@ -3927,10 +3928,10 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         response = self.client.post(url)
         self.evaluated_siae.refresh_from_db()
         assert self.evaluated_siae.reviewed_at is not None
-        assertMessages(
+        self.assertMessages(
             response,
             [
-                (
+                messages.Message(
                     messages.SUCCESS,
                     "<b>Résultats enregistrés !</b><br>"
                     "Merci d'avoir pris le temps de contrôler les pièces justificatives.",
@@ -3950,10 +3951,10 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         response = self.client.post(url)
         self.evaluated_siae.refresh_from_db()
         assert self.evaluated_siae.reviewed_at is not None
-        assertMessages(
+        self.assertMessages(
             response,
             [
-                (
+                messages.Message(
                     messages.SUCCESS,
                     "<b>Résultats enregistrés !</b><br>"
                     "Merci d'avoir pris le temps de contrôler les pièces justificatives.",
@@ -3968,7 +3969,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(TestCase):
         assert response.status_code == 302
         self.evaluated_siae.refresh_from_db()
         assert timestamp == self.evaluated_siae.reviewed_at
-        assertMessages(response, [])
+        self.assertMessages(response, [])
 
     def test_accepted(self):
         evaluated_siae = EvaluatedSiaeFactory.create(

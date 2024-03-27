@@ -1,11 +1,12 @@
 import pytest
+from django.contrib import messages
 from django.contrib.admin import helpers
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertNumQueries, assertRedirects
 
 from itou.job_applications.enums import SenderKind
 from itou.users.enums import UserKind
@@ -19,7 +20,7 @@ from tests.users.factories import (
     JobSeekerProfileFactory,
     PrescriberFactory,
 )
-from tests.utils.test import BASE_NUM_QUERIES, assertMessages
+from tests.utils.test import BASE_NUM_QUERIES
 
 
 def test_add_user(client):
@@ -184,9 +185,11 @@ class TestTransferUserData:
         assertMessages(
             response,
             [
-                ("INFO", f"Transfert effectué avec succès de l'utilisateur {from_user} vers {to_user}."),
-                (
-                    "WARNING",
+                messages.Message(
+                    messages.INFO, f"Transfert effectué avec succès de l'utilisateur {from_user} vers {to_user}."
+                ),
+                messages.Message(
+                    messages.WARNING,
                     (
                         "2 objets incohérents: <ul>"
                         '<li class="warning">'
@@ -351,8 +354,8 @@ def test_check_inconsistency_check(admin_client):
     assertMessages(
         response,
         [
-            (
-                "WARNING",
+            messages.Message(
+                messages.WARNING,
                 (
                     '1 objet incohérent: <ul><li class="warning">'
                     f'<a href="/admin/job_applications/jobapplication/{inconsistent_job_app.pk}/change/">'
@@ -445,8 +448,8 @@ def test_profile_check_inconsistency_check(admin_client):
     assertMessages(
         response,
         [
-            (
-                "WARNING",
+            messages.Message(
+                messages.WARNING,
                 (
                     '1 objet incohérent: <ul><li class="warning">'
                     f'<a href="/admin/users/jobseekerprofile/{inconsistent_profile.pk}/change/">'
@@ -500,3 +503,15 @@ def test_change_shows_permission_section_on_staff_users(client):
     assertContains(response, "Permissions")
     assertContains(response, group_permissions_markup)
     assertContains(response, user_permissions_markup)
+
+
+def test_asp_uid_help_text(admin_client):
+    profile = JobSeekerFactory().jobseeker_profile
+    default_asp_uid = profile._default_asp_uid()
+    url = reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": profile.pk})
+    response = admin_client.get(url)
+    assertContains(response, f"<div>Valeur par défaut: {default_asp_uid}")
+    profile.asp_uid = "0" * 12
+    profile.save()
+    response = admin_client.get(url)
+    assertContains(response, f"<div>⚠ Valeur par défaut: {default_asp_uid}")

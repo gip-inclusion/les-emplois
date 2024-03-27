@@ -1,6 +1,6 @@
 {% extends "layout/base.html" %}
-{% load str_filters %}
 {% load static %}
+{% load str_filters %}
 {% load matomo %}
 
 {% block title %}{{ siae.display_name }} {{ block.super }}{% endblock %}
@@ -125,7 +125,7 @@
             <div class="s-tabs-01__row row">
                 <div class="s-tabs-01__col col-12">
                     <h2 class="visually-hidden" id="metiers-title">Métiers de la structure</h2>
-                    <ul class="s-tabs-01__nav nav nav-tabs" role="tablist" aria-labelledby="metiers-title">
+                    <ul class="s-tabs-01__nav nav nav-tabs" role="tablist" data-it-sliding-tabs="true" aria-labelledby="metiers-title">
                         <li class="nav-item" role="presentation">
                             <a id="recrutements-en-cours-tab" class="nav-link active" role="tab" href="#recrutements-en-cours" data-bs-toggle="tab" aria-selected="true" aria-controls="recrutements-en-cours">
                                 <span>Recrutement{{ active_jobs_descriptions|pluralizefr }} en cours</span>
@@ -182,4 +182,8 @@
     {% if code_insee %}
         <div hx-get="{% url "companies_views:hx_dora_services" code_insee=code_insee %}" hx-trigger="load"></div>
     {% endif %}
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'js/sliding_tabs.js'%}"></script>
 {% endblock %}

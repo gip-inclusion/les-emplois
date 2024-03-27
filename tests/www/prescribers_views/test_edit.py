@@ -73,7 +73,7 @@ class TestEditOrganization:
         assert organization.coords == "SRID=4326;POINT (2.316754 48.838411)"
         assert organization.latitude == 48.838411
         assert organization.longitude == 2.316754
-        assert organization.geocoding_score == 0.587663373207207
+        assert organization.geocoding_score == 0.5197687103594081
 
         # Only admins should be able to edit organization details
         membership = organization.prescribermembership_set.first()

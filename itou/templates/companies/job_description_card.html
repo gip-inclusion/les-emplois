@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load static %}
 {% load format_filters %}
 {% load str_filters %}
 {% load matomo %}
@@ -127,7 +128,7 @@
                 <div class="s-tabs-01__row row">
                     <div class="s-tabs-01__col col-12">
                         <h2 class="visually-hidden" id="recrutements-title">Recrutements de la structure</h2>
-                        <ul class="s-tabs-01__nav nav nav-tabs" role="tablist" aria-labelledby="recrutements-title">
+                        <ul class="s-tabs-01__nav nav nav-tabs" role="tablist" data-it-sliding-tabs="true" aria-labelledby="recrutements-title">
                             <li class="nav-item" role="presentation">
                                 <a id="recrutements-en-cours-tab" class="nav-link active" role="tab" href="#recrutements-en-cours" data-bs-toggle="tab" aria-selected="true" aria-controls="recrutements-en-cours">
                                     <span>Recrutement{{ others_active_jobs|pluralizefr }} en cours dans cette structure</span>
@@ -158,4 +159,8 @@
         <div hx-get="{% url "companies_views:hx_dora_services" code_insee=code_insee %}" hx-trigger="load"></div>
     {% endif %}
 
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'js/sliding_tabs.js'%}"></script>
 {% endblock %}

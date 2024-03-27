@@ -7,6 +7,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.messages.test import MessagesTestMixin
 from django.core.files.storage import storages
 from django.urls import resolve, reverse
 from django.utils import timezone
@@ -50,7 +51,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.users.test_models import user_with_approval_in_waiting_period
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, assertMessages
+from tests.utils.test import BASE_NUM_QUERIES, TestCase
 
 
 class ApplyTest(TestCase):
@@ -1257,7 +1258,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
-class ApplyAsPrescriberTest(TestCase):
+class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
     def setUp(self):
         super().setUp()
         cities = create_test_cities(["67"], num_per_department=10)
@@ -1453,8 +1454,13 @@ class ApplyAsPrescriberTest(TestCase):
         other_job_seeker = JobSeekerFactory(jobseeker_profile__nir=dummy_job_seeker.jobseeker_profile.nir)
 
         response = self.client.post(next_url)
-        assertMessages(
-            response, [(messages.ERROR, "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.")]
+        self.assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR, "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur."
+                )
+            ],
         )
         self.assertRedirects(response, reverse("dashboard:index"))
 

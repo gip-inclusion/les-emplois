@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.messages.test import MessagesTestMixin
 from django.urls import reverse, reverse_lazy
 
 from itou.approvals import enums as approvals_enums
@@ -10,10 +11,10 @@ from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import TestCase, assertMessages
+from tests.utils.test import TestCase
 
 
-class PoleEmploiApprovalSearchTest(TestCase):
+class PoleEmploiApprovalSearchTest(MessagesTestMixin, TestCase):
     URL = reverse_lazy("approvals:pe_approval_search")
 
     def set_up_pe_approval(self, with_job_application=True):
@@ -191,7 +192,7 @@ class PoleEmploiApprovalSearchUserTest(TestCase):
         assert response.status_code == 404
 
 
-class PoleEmploiApprovalCreateTest(TestCase):
+class PoleEmploiApprovalCreateTest(MessagesTestMixin, TestCase):
     def setUp(self):
         super().setUp()
         self.job_application = JobApplicationFactory(with_approval=True)
@@ -249,9 +250,14 @@ class PoleEmploiApprovalCreateTest(TestCase):
 
         assert response.status_code == 302
         assert Approval.objects.count() == initial_approval_count + 1
-        assertMessages(
+        self.assertMessages(
             response,
-            [(messages.SUCCESS, "L'agrément a bien été importé, vous pouvez désormais le prolonger ou le suspendre.")],
+            [
+                messages.Message(
+                    messages.SUCCESS,
+                    "L'agrément a bien été importé, vous pouvez désormais le prolonger ou le suspendre.",
+                )
+            ],
         )
 
         converted_approval = job_seeker.approvals.get()
@@ -282,7 +288,7 @@ class PoleEmploiApprovalCreateTest(TestCase):
 
         assert response.status_code == 302
         assert Approval.objects.count() == initial_approval_count
-        assertMessages(response, [(messages.INFO, "Cet agrément a déjà été importé.")])
+        self.assertMessages(response, [messages.Message(messages.INFO, "Cet agrément a déjà été importé.")])
 
     def test_from_existing_user_with_approval(self):
         """
@@ -302,6 +308,11 @@ class PoleEmploiApprovalCreateTest(TestCase):
         assert response.status_code == 302
         next_url = reverse("approvals:pe_approval_search_user", kwargs={"pe_approval_id": self.pe_approval.id})
         assert response.url == next_url
-        assertMessages(
-            response, [(messages.ERROR, "Le candidat associé à cette adresse e-mail a déjà un PASS IAE valide.")]
+        self.assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR, "Le candidat associé à cette adresse e-mail a déjà un PASS IAE valide."
+                )
+            ],
         )

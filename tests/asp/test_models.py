@@ -2,7 +2,7 @@ from unittest import mock
 
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
 from itou.common_apps.address.format import format_address
-from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, RESULTS_BY_ADDRESS
+from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK
 from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
 from tests.utils.test import TestCase
@@ -14,10 +14,6 @@ def _users_with_mock_address(idx):
         address_line_1=address.get("address_line_1"),
         post_code=address.get("post_code"),
     )
-
-
-def mock_get_geocoding_data(address, post_code=None, limit=1):
-    return RESULTS_BY_ADDRESS.get(address)
 
 
 @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
@@ -51,7 +47,7 @@ class FormatASPAdresses(TestCase):
         Sanity check:
         every mock entries must be parseable and result must be valid
         """
-        for idx, _elt in enumerate(RESULTS_BY_ADDRESS):
+        for idx, _elt in enumerate(BAN_GEOCODING_API_RESULTS_MOCK):
             user = _users_with_mock_address(idx)
             result, error = format_address(user)
             assert error is None

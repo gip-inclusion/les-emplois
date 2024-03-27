@@ -159,6 +159,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
         "pk",
         "created_at",
         "updated_at",
+        "processed_at",
         "approval_number",
         "job_application",
         "job_seeker_link",
@@ -206,6 +207,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
                     "financial_annex",
                     "created_at",
                     "updated_at",
+                    "processed_at",
                 )
             },
         ),

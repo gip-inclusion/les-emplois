@@ -78,10 +78,10 @@
     'previous': None,
     'results': list([
       dict({
-        'adresse_code_postal': '91234',
-        'adresse_ligne_1': 'Rue du clos de la Grange',
+        'adresse_code_postal': '58160',
+        'adresse_ligne_1': '42 Rue du clos de la Grange',
         'adresse_ligne_2': '',
-        'adresse_ville': 'Choufleury',
+        'adresse_ville': 'Sauvigny-les-Bois',
         'auteur_diagnostic': 'GEIQ',
         'civilite': 'F',
         'criteres_eligibilite': list([
@@ -122,10 +122,10 @@
         'type_qualification': 'CQP',
       }),
       dict({
-        'adresse_code_postal': '91234',
-        'adresse_ligne_1': 'Rue du clos de la Grange',
+        'adresse_code_postal': '58160',
+        'adresse_ligne_1': '42 Rue du clos de la Grange',
         'adresse_ligne_2': '',
-        'adresse_ville': 'Choufleury',
+        'adresse_ville': 'Sauvigny-les-Bois',
         'auteur_diagnostic': 'PRESCRIPTEUR',
         'civilite': 'F',
         'criteres_eligibilite': list([

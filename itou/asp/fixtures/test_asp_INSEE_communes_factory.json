@@ -111,6 +111,26 @@
   },
   {
     "model": "asp.Commune",
+    "pk": 47611,
+    "fields": {
+      "code": "58273",
+      "name": "SAUVIGNY-LES-BOIS",
+      "start_date": "1900-01-01",
+      "end_date": "1999-12-31"
+    }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 47612,
+    "fields": {
+      "code": "58273",
+      "name": "SAUVIGNY-LES-BOIS",
+      "start_date": "2000-01-01",
+      "end_date": null
+    }
+  },
+  {
+    "model": "asp.Commune",
     "pk": 48057,
     "fields": {
       "code": "59183",

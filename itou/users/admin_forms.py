@@ -1,3 +1,4 @@
+import logging
 from collections import namedtuple
 
 from django import forms
@@ -5,9 +6,13 @@ from django.contrib.admin import widgets
 from django.contrib.auth.forms import UserChangeForm
 from django.core.exceptions import ValidationError
 
+from itou.geo.utils import coords_to_geometry
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
-from itou.utils.apis.exceptions import AddressLookupError
+from itou.utils.apis import geocoding as api_geocoding
+
+
+logger = logging.getLogger(__name__)
 
 
 class ItouUserCreationForm(forms.ModelForm):
@@ -37,11 +42,25 @@ class UserAdminForm(UserChangeForm):
 
         if self.instance.is_job_seeker:
             # Update job seeker geolocation
-            try:
-                self.instance.set_coords(self.cleaned_data["address_line_1"], self.cleaned_data["post_code"])
-            except AddressLookupError:
-                # Nothing to do: re-raised and already logged as error
-                pass
+            posted_fields = [
+                self.cleaned_data["address_line_1"],
+                f"{self.cleaned_data['post_code']} {self.cleaned_data['city']}",
+            ]
+            posted_address = ", ".join([field for field in posted_fields if field])
+            if posted_address != self.instance.geocoding_address:
+                try:
+                    geocoding_data = api_geocoding.get_geocoding_data(posted_address)
+                except api_geocoding.GeocodingDataError:
+                    logger.error(
+                        "No geocoding data could be found for `%s - %s`",
+                        self.cleaned_data["address_line_1"],
+                        self.cleaned_data["post_code"],
+                    )
+                else:
+                    self.instance.coords = coords_to_geometry(
+                        lat=geocoding_data["latitude"], lon=geocoding_data["longitude"]
+                    )
+                    self.instance.geocoding_score = geocoding_data["score"]
 
 
 class JobSeekerProfileAdminForm(forms.ModelForm):

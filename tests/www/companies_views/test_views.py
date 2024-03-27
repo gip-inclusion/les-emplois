@@ -649,7 +649,7 @@ class CreateCompanyViewTest(TestCase):
         assert new_company.coords == "SRID=4326;POINT (2.316754 48.838411)"
         assert new_company.latitude == 48.838411
         assert new_company.longitude == 2.316754
-        assert new_company.geocoding_score == 0.587663373207207
+        assert new_company.geocoding_score == 0.5197687103594081
 
 
 class EditCompanyViewTest(TestCase):
@@ -745,7 +745,7 @@ class EditCompanyViewTest(TestCase):
         assert company.coords == "SRID=4326;POINT (2.316754 48.838411)"
         assert company.latitude == 48.838411
         assert company.longitude == 2.316754
-        assert company.geocoding_score == 0.587663373207207
+        assert company.geocoding_score == 0.5197687103594081
 
     def test_permission(self):
         company = CompanyFactory(with_membership=True)

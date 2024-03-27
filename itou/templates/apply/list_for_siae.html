@@ -1,8 +1,6 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
 {% load static %}
-{% load str_filters %}
-{% load matomo %}
 
 {% block title %}Candidatures reçues {{ block.super }}{% endblock %}
 
@@ -28,7 +26,12 @@
                             <span>Filtrer les candidatures</span>
                         </button>
                         <div class="c-aside-filters__card collapse show" id="asideFiltersCollapse">
-                            <form method="get" id="js-job-applications-filters-form">
+                            <form hx-get="{% url 'apply:list_for_siae' %}"
+                                  hx-trigger="change delay:.5s, duetChange delay:.5s"
+                                  hx-indicator="#job-applications-section"
+                                  hx-target="#job-applications-section"
+                                  hx-swap="outerHTML"
+                                  hx-push-url="true">
                                 <div class="c-aside-filters__card__body">
                                     {% include "apply/includes/job_applications_filters/statut.html" %}
                                     {% include "apply/includes/job_applications_filters/job_seekers.html" %}
@@ -47,82 +50,7 @@
                         </div>
                     </aside>
                 </div>
-                <div class="col-12 col-md-8">
-                    <section aria-labelledby="results">
-                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                            <h3 class="h4 mb-0" id="results">
-                                {% with job_applications_page.paginator.count as counter %}
-                                    {{ counter }} <strong>résultat{{ counter|pluralizefr }}</strong>
-                                {% endwith %}
-                            </h3>
-                            <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les candidatures">
-                                {% include "apply/includes/job_applications_export_button.html" %}
-                                {% if filters_counter > 0 %}
-                                    <a href="{% url 'apply:list_for_siae' %}" class="btn btn-secondary btn-ico mt-3 mt-md-0">
-                                        <i class="ri-arrow-go-back-line" aria-hidden="true"></i>
-                                        <span>Réinitialiser les filtres ({{ filters_counter }})</span>
-                                    </a>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        {% if not job_applications_page %}
-                            <div class="text-center my-3 my-md-4">
-                                <img class="img-fluid" src="{% static 'img/illustration-siae-card-no-result.svg' %}" alt="" loading="lazy">
-                                <p class="mb-1 mt-3">
-                                    <strong>
-                                        {% if pending_states_job_applications_count == 0 %}
-                                            Aucune candidature pour le moment
-                                        {% else %}
-                                            Aucune candidature ne correspond aux filtres sélectionnés
-                                        {% endif %}
-                                    </strong>
-                                </p>
-                                <p>
-                                    <i>
-                                        Pour recevoir des candidatures, verifiez que les postes ouverts
-                                        <br class="d-none d-lg-inline">
-                                        dans votre structure sont bien à jour.
-                                    </i>
-                                </p>
-                                <a href="{% url 'companies_views:job_description_list' %}" class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center">
-                                    <i class="ri-briefcase-line ri-lg font-weight-normal"></i>
-                                    <span>Gérer les métiers et recrutements</span>
-                                </a>
-                            </div>
-                            {% include "apply/includes/rdv_insertion_promo_card.html" %}
-                        {% else %}
-                            {% for job_application in job_applications_page %}
-                                <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-                                    {% include "apply/includes/list_card_body_company.html" %}
-                                    <div class="c-box--results__footer">
-                                        <div class="d-flex{% if job_application.pending_for_weeks >= job_application.WEEKS_BEFORE_CONSIDERED_OLD %} flex-column flex-md-row justify-content-md-between align-items-md-center{% else %} justify-content-end{% endif %}">
-                                            {% if job_application.pending_for_weeks >= job_application.WEEKS_BEFORE_CONSIDERED_OLD %}
-                                                <p class="text-warning fs-sm mb-3 mb-md-0">
-                                                    <i class="ri-time-line ri-lg me-1" aria-hidden="true"></i>
-                                                    En attente de réponse depuis {{ job_application.pending_for_weeks }} semaines.
-                                                </p>
-                                            {% endif %}
-                                            <a class="btn btn-outline-primary{% if job_application.pending_for_weeks >= job_application.WEEKS_BEFORE_CONSIDERED_OLD %} btn-block w-100 w-md-auto{% endif %}"
-                                               href="{% url 'apply:details_for_company' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                               aria-label="Gérer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}"
-                                               {% matomo_event "candidature" "clic" "voir-candidature-employeur" %}>
-                                                Voir sa candidature
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {% if forloop.counter == 1 %}
-                                    {% include "apply/includes/rdv_insertion_promo_card.html" %}
-                                {% endif %}
-
-                            {% endfor %}
-
-                            {% include "includes/pagination.html" with page=job_applications_page %}
-                        {% endif %}
-                    </section>
-                </div>
+                <div class="col-12 col-md-8">{% include "apply/includes/list_job_applications.html" %}</div>
             </div>
         </div>
     </section>
@@ -132,5 +60,6 @@
     {{ block.super }}
     <!-- Needed to use Select2MultipleWidget. -->
     {{ filters_form.media.js }}
+    <script src='{% static "js/htmx_compat.js" %}'></script>
     <script src='{% static "js/job_applications_filters.js" %}'></script>
 {% endblock %}

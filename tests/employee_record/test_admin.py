@@ -2,11 +2,10 @@ import pytest
 from django.contrib import messages
 from django.contrib.admin import helpers
 from django.urls import reverse
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertMessages
 
 from itou.employee_record import models
 from tests.employee_record import factories
-from tests.utils.test import assertMessages
 
 
 def test_schedule_approval_update_notification_when_notification_do_not_exists(admin_client):
@@ -22,7 +21,7 @@ def test_schedule_approval_update_notification_when_notification_do_not_exists(a
     notification = models.EmployeeRecordUpdateNotification.objects.latest("created_at")
     assert notification.employee_record == employee_record
     assert notification.status == models.Status.NEW
-    assertMessages(response, [(messages.SUCCESS, "1 notification planifiée")])
+    assertMessages(response, [messages.Message(messages.SUCCESS, "1 notification planifiée")])
 
 
 def test_schedule_approval_update_notification_when_new_notification_already_exists(admin_client):
@@ -38,7 +37,7 @@ def test_schedule_approval_update_notification_when_new_notification_already_exi
     )
     notification.refresh_from_db()
     assert notification.updated_at > save_updated_at
-    assertMessages(response, [(messages.SUCCESS, "1 notification mise à jour")])
+    assertMessages(response, [messages.Message(messages.SUCCESS, "1 notification mise à jour")])
 
 
 @pytest.mark.parametrize("status", [status for status in models.Status if status != models.Status.NEW])
@@ -59,7 +58,7 @@ def test_schedule_approval_update_notification_when_other_than_new_notification_
     assert created_notification != notification
     assert created_notification.employee_record == notification.employee_record
     assert created_notification.status == models.Status.NEW
-    assertMessages(response, [(messages.SUCCESS, "1 notification planifiée")])
+    assertMessages(response, [messages.Message(messages.SUCCESS, "1 notification planifiée")])
 
 
 def test_job_seeker_profile_from_employee_record(admin_client):

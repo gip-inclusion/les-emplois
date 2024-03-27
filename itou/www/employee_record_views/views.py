@@ -10,7 +10,7 @@ from django.views.decorators.http import require_safe
 from formtools.wizard.views import NamedUrlSessionWizardView
 
 from itou.approvals.models import Approval, Prolongation, Suspension
-from itou.employee_record.constants import EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE
+from itou.employee_record.constants import get_availability_date_for_kind
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
@@ -243,7 +243,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         "employee_records_list": employee_records_list,
         "badges": status_badges,
         "navigation_pages": pager(data, request.GET.get("page"), items_per_page=10),
-        "feature_availability_date": EMPLOYEE_RECORD_FEATURE_AVAILABILITY_DATE,
+        "feature_availability_date": get_availability_date_for_kind(siae.kind),
         "need_manual_regularization": need_manual_regularization,
         "ordered_by_label": order_by.label,
         "matomo_custom_title": "Fiches salarié ASP",
@@ -292,12 +292,12 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
     job_seeker = job_application.job_seeker
     profile = job_seeker.jobseeker_profile
     address_filled = job_seeker.post_code and job_seeker.address_line_1
-    form = NewEmployeeRecordStep2Form(data=request.POST or None, instance=profile)
     query_param = f"?status={request.GET.get('status')}" if request.GET.get("status") else ""
 
     # Perform a geolocation of the user address if possible:
     # - success : prefill form with geolocated data
     # - failure : display actual address and let user fill the form
+    # This need to be done before passing the instance to the form otherwise fields will be shown empty
     if not profile.hexa_address_filled and address_filled:
         try:
             # Attempt to create a job seeker profile with an address prefilled
@@ -307,7 +307,7 @@ def create_step_2(request, job_application_id, template_name="employee_record/cr
             profile.clear_hexa_address()
 
     # At this point, a job seeker profile was created
-
+    form = NewEmployeeRecordStep2Form(data=request.POST or None, instance=profile)
     if request.method == "POST":
         if form.is_valid():
             form.save()

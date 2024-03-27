@@ -161,11 +161,13 @@ class JobSeekerAddressForm(forms.ModelForm):
         if address_to_geocode is not None:
             try:
                 geocoding_data = api_geocoding.get_geocoding_data(address_to_geocode)
-                self.instance.coords = coords_to_geometry(
-                    lat=geocoding_data.get("latitude"), lon=geocoding_data.get("longitude")
-                )
             except GeocodingDataError:
                 raise ValidationError("Impossible de géolocaliser votre adresse. Veuillez en saisir une autre.")
+            else:
+                self.instance.coords = coords_to_geometry(
+                    lat=geocoding_data["latitude"], lon=geocoding_data["longitude"]
+                )
+                self.instance.geocoding_score = geocoding_data["score"]
 
         if self.cleaned_data["post_code"] is None:
             self.cleaned_data["post_code"] = ""

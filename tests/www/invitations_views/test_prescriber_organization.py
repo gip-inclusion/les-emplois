@@ -6,6 +6,7 @@ import respx
 from allauth.account.models import EmailAddress
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.shortcuts import reverse
 from django.test import Client
@@ -25,7 +26,7 @@ from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTest
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import TestCase, assertMessages
+from tests.utils.test import TestCase
 
 
 INVITATION_URL = reverse("invitations_views:invite_prescriber_with_org")
@@ -216,7 +217,7 @@ class TestPEOrganizationInvitation:
         )
 
 
-class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
+class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectBaseTestCase):
     def setUp(self):
         super().setUp()
         self.organization = PrescriberOrganizationWithMembershipFactory()
@@ -289,10 +290,10 @@ class TestAcceptPrescriberWithOrgInvitation(InclusionConnectBaseTestCase):
         # Inclusion connect redirects to previous_url
         response = self.client.get(previous_url, follow=True)
         # Signup should have failed : as the email used in IC isn't the one from the invitation
-        assertMessages(
+        self.assertMessages(
             response,
             [
-                (
+                messages.Message(
                     messages.ERROR,
                     "L’adresse e-mail que vous avez utilisée pour vous connecter avec "
                     "Inclusion Connect (michel@lestontons.fr) ne correspond pas à "

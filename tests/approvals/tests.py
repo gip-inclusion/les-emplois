@@ -10,6 +10,7 @@ from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError, ProgrammingError, connection, transaction
@@ -28,6 +29,7 @@ from itou.approvals.models import Approval, CancelledApproval, PoleEmploiApprova
 from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import Status
 from itou.files.models import File
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.users.enums import LackOfPoleEmploiId
 from itou.utils.apis import enums as api_enums
@@ -43,7 +45,7 @@ from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
-from tests.utils.test import TestCase, assertMessages
+from tests.utils.test import TestCase
 
 
 class CommonApprovalQuerySetTest(TestCase):
@@ -984,7 +986,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
-class CustomApprovalAdminViewsTest(TestCase):
+class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
     def test_manually_add_approval(self):
         # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
         # with a manual verification.
@@ -1023,10 +1025,6 @@ class CustomApprovalAdminViewsTest(TestCase):
         assert response.context["form"].initial == {
             "start_at": job_application.hiring_start_at,
             "end_at": Approval.get_default_end_date(job_application.hiring_start_at),
-            "user": job_application.job_seeker.pk,
-            "created_by": user.pk,
-            "origin": Origin.ADMIN,
-            "eligibility_diagnosis": job_application.eligibility_diagnosis,
         }
 
         # Without an eligibility diangosis on the job application.
@@ -1034,10 +1032,10 @@ class CustomApprovalAdminViewsTest(TestCase):
         job_application.eligibility_diagnosis = None
         job_application.save()
         response = self.client.get(url, follow=True)
-        assertMessages(
+        self.assertMessages(
             response,
             [
-                (
+                messages.Message(
                     messages.ERROR,
                     "Impossible de créer un PASS IAE car la candidature n'a pas de diagnostique d'éligibilité.",
                 )
@@ -1053,11 +1051,7 @@ class CustomApprovalAdminViewsTest(TestCase):
         post_data = {
             "start_at": job_application.hiring_start_at.strftime("%d/%m/%Y"),
             "end_at": job_application.hiring_end_at.strftime("%d/%m/%Y"),
-            "user": job_application.job_seeker.pk,
-            "created_by": user.pk,
-            "origin": Origin.ADMIN,
             "number": f"{Approval.ASP_ITOU_PREFIX}1234567",
-            "eligibility_diagnosis": job_application.eligibility_diagnosis,
         }
         response = self.client.post(url, data=post_data)
         assert response.status_code == 200
@@ -1067,10 +1061,6 @@ class CustomApprovalAdminViewsTest(TestCase):
         post_data = {
             "start_at": job_application.hiring_start_at.strftime("%d/%m/%Y"),
             "end_at": job_application.hiring_end_at.strftime("%d/%m/%Y"),
-            "user": job_application.job_seeker.pk,
-            "created_by": user.pk,
-            "origin": Origin.ADMIN,
-            "eligibility_diagnosis": job_application.eligibility_diagnosis,
         }
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
@@ -1086,6 +1076,13 @@ class CustomApprovalAdminViewsTest(TestCase):
         approval = job_application.approval
         assert approval.created_by == user
         assert approval.user == job_application.job_seeker
+        assert approval.origin == Origin.ADMIN
+        assert approval.eligibility_diagnosis == job_application.eligibility_diagnosis
+
+        assert approval.origin_sender_kind == SenderKind.JOB_SEEKER
+        assert approval.origin_siae_kind == job_application.to_company.kind
+        assert approval.origin_siae_siret == job_application.to_company.siret
+        assert not approval.origin_prescriber_organization_kind
 
         assert len(mail.outbox) == 1
         email = mail.outbox[0]

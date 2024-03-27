@@ -26,6 +26,9 @@ from itou.users.management.commands.new_users_to_mailjet import (
     NEW_SIAE_LISTID,
 )
 from itou.users.models import User
+from itou.utils.apis.pole_emploi import (
+    PoleEmploiAPIBadResponse,
+)
 from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyMembershipFactory
@@ -1152,3 +1155,38 @@ def test_pe_certify_users_with_swap(settings, respx_mock, capsys, snapshot):
     user.refresh_from_db()
     assert user.first_name == "Durand"
     assert user.last_name == "Balthazar"
+
+
+def test_pe_certify_users_retry(capsys, snapshot):
+    new_user = JobSeekerFactory(jobseeker_profile__pe_last_certification_attempt_at=None)
+    old_failure = JobSeekerFactory(
+        jobseeker_profile__pe_last_certification_attempt_at=timezone.now() - datetime.timedelta(days=90),
+    )
+    really_old_failure = JobSeekerFactory(
+        jobseeker_profile__pe_last_certification_attempt_at=timezone.now() - datetime.timedelta(days=900),
+    )
+    JobSeekerFactory(
+        jobseeker_profile__pe_last_certification_attempt_at=timezone.now() - datetime.timedelta(seconds=90),
+    )  # recent failure that should not be called
+    with mock.patch(
+        "itou.utils.apis.PoleEmploiApiClient.recherche_individu_certifie", side_effect=PoleEmploiAPIBadResponse("R010")
+    ) as recherche:
+        call_command("pe_certify_users", wet_run=True)
+    stdout, stderr = capsys.readouterr()
+
+    def recherche_call(user, swap):
+        return mock.call(
+            user.first_name if not swap else user.last_name,
+            user.last_name if not swap else user.first_name,
+            user.birthdate,
+            user.jobseeker_profile.nir,
+        )
+
+    assert recherche.mock_calls == [
+        recherche_call(new_user, swap=False),
+        recherche_call(new_user, swap=True),
+        recherche_call(really_old_failure, swap=False),
+        recherche_call(really_old_failure, swap=True),
+        recherche_call(old_failure, swap=False),
+        recherche_call(old_failure, swap=True),
+    ]

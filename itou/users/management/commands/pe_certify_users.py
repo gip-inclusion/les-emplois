@@ -4,10 +4,11 @@ first name, last name, birthdate and NIR, eventually swapping first and last nam
 if needed.
 """
 
+import datetime
 import logging
 
 import tenacity
-from django.db.models import Q
+from django.db.models import F, Q
 from django.utils import timezone
 from httpx import RequestError
 
@@ -23,6 +24,9 @@ from itou.utils.command import BaseCommand
 
 
 logger = logging.getLogger(__name__)
+
+
+RETRY_DELAY = datetime.timedelta(days=7)
 
 
 class Command(BaseCommand):
@@ -51,12 +55,11 @@ class Command(BaseCommand):
             User.objects.filter(
                 kind=UserKind.JOB_SEEKER,
                 is_active=True,
-                jobseeker_profile__pe_last_certification_attempt_at=None,  # only those never seen yet. Retry someday?
                 jobseeker_profile__pe_obfuscated_nir=None,
             )
+            .exclude(jobseeker_profile__pe_last_certification_attempt_at__gt=timezone.now() - RETRY_DELAY)
             .select_related("jobseeker_profile")
-            .order_by("-pk")
-        )  # most recent users first, they are the top priority.
+        )
         self.stdout.write(f"> about to resolve first_name and last_name for count={active_job_seekers.count()} users.")
 
         eligible_users = active_job_seekers.exclude(
@@ -73,7 +76,9 @@ class Command(BaseCommand):
             certified_profiles.append(user.jobseeker_profile)
             self.stdout.write(f"> certified user pk={user.pk} id_certifie={id_certifie}")
 
-        for user in eligible_users[:chunk_size]:
+        for user in eligible_users.order_by(
+            F("jobseeker_profile__pe_last_certification_attempt_at").asc(nulls_first=True)
+        )[:chunk_size]:
             user.jobseeker_profile.pe_last_certification_attempt_at = timezone.now()
             examined_profiles.append(user.jobseeker_profile)
             try:
