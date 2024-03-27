@@ -125,7 +125,7 @@ class TestPrescriberWithOrgInvitation(TestCase):
 class TestPrescriberWithOrgInvitationEmails(SimpleTestCase):
     def test_accepted_notif_sender(self):
         invitation = PrescriberWithOrgSentInvitationFactory.build()
-        email = invitation.email_accepted_notif_sender
+        email = invitation.notifications_accepted_notif_sender.build()
 
         # Subject
         assert invitation.first_name.title() in email.subject
@@ -181,7 +181,7 @@ class TestCompanyInvitation(TestCase):
 class TestCompanyInvitationEmails(SimpleTestCase):
     def test_accepted_notif_sender(self):
         invitation = SentEmployerInvitationFactory.build()
-        email = invitation.email_accepted_notif_sender
+        email = invitation.notifications_accepted_notif_sender.build()
 
         # Subject
         assert invitation.first_name.title() in email.subject

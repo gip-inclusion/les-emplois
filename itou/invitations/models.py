@@ -13,6 +13,8 @@ from itou.users.models import User
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
 
+from .notifications import InvitationAcceptedNotification
+
 
 logger = logging.getLogger(__name__)
 
@@ -122,19 +124,20 @@ class InvitationAbstract(models.Model):
         self.send_invitation()
 
     def accepted_notif_sender(self):
-        self.email_accepted_notif_sender.send()
+        self.notifications_accepted_notif_sender.send()
 
     def send_invitation(self):
         self.email_invitation.send()
 
-    # Emails
+    # Notifications
     @property
-    def email_accepted_notif_sender(self):
+    def notifications_accepted_notif_sender(self):
         """
         Emails content depend on the guest kind.
         """
         raise NotImplementedError
 
+    # Emails
     @property
     def email_invitation(self):
         """
@@ -191,20 +194,19 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
         user = get_object_or_404(User, email=self.email)
         return user == request.user and user.is_prescriber
 
-    # Emails
+    # Notifications
     @property
-    def email_accepted_notif_sender(self):
-        to = [self.sender.email]
-        context = {
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "email": self.email,
-            "establishment_name": self.organization.display_name,
-        }
-        subject = "invitations_views/email/accepted_notif_sender_subject.txt"
-        body = "invitations_views/email/accepted_notif_establishment_sender_body.txt"
-        return get_email_message(to, context, subject, body)
+    def notifications_accepted_notif_sender(self):
+        return InvitationAcceptedNotification(
+            self.sender,
+            self.organization,
+            first_name=self.first_name,
+            last_name=self.last_name,
+            email=self.email,
+            establishment_name=self.organization.display_name,
+        )
 
+    # Emails
     @property
     def email_invitation(self):
         to = [self.email]
@@ -265,20 +267,19 @@ class EmployerInvitation(InvitationAbstract):
         user = get_object_or_404(User, email=self.email)
         return user == request.user and user.is_employer
 
-    # Emails
+    # Notifications
     @property
-    def email_accepted_notif_sender(self):
-        to = [self.sender.email]
-        context = {
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "email": self.email,
-            "establishment_name": self.company.display_name,
-        }
-        subject = "invitations_views/email/accepted_notif_sender_subject.txt"
-        body = "invitations_views/email/accepted_notif_establishment_sender_body.txt"
-        return get_email_message(to, context, subject, body)
+    def notifications_accepted_notif_sender(self):
+        return InvitationAcceptedNotification(
+            self.sender,
+            self.company,
+            first_name=self.first_name,
+            last_name=self.last_name,
+            email=self.email,
+            establishment_name=self.company.display_name,
+        )
 
+    # Emails
     @property
     def email_invitation(self):
         to = [self.email]
@@ -344,20 +345,19 @@ class LaborInspectorInvitation(InvitationAbstract):
         user = get_object_or_404(User, email=self.email)
         return user == request.user and user.is_labor_inspector
 
-    # Emails
+    # Notifications
     @property
-    def email_accepted_notif_sender(self):
-        to = [self.sender.email]
-        context = {
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "email": self.email,
-            "establishment_name": self.institution.display_name,
-        }
-        subject = "invitations_views/email/accepted_notif_sender_subject.txt"
-        body = "invitations_views/email/accepted_notif_establishment_sender_body.txt"
-        return get_email_message(to, context, subject, body)
+    def notifications_accepted_notif_sender(self):
+        return InvitationAcceptedNotification(
+            self.sender,
+            self.institution,
+            first_name=self.first_name,
+            last_name=self.last_name,
+            email=self.email,
+            establishment_name=self.institution.display_name,
+        )
 
+    # Emails
     @property
     def email_invitation(self):
         to = [self.email]
