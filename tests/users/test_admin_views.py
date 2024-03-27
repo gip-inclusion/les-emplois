@@ -320,6 +320,10 @@ def test_num_queries(admin_client):
         + 1  # job_applications_jobapplication
         + 1  # prescribers_prescribermembership
         + 1  # utils_pksupportremark
+        + 1  # is_prescriber_with_authorized_org (exists)
+        + 1  # communications_notificationsettings
+        + 3  # savepoint, notificationsettings insert & release
+        + 1  # communications_notificationrecord
         + 3  # savepoint, session update & release
     ):
         response = admin_client.get(reverse("admin:users_user_change", kwargs={"object_id": prescriber.pk}))

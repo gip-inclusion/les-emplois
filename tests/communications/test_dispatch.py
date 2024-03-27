@@ -9,6 +9,7 @@ from itou.communications.dispatch.utils import (
     JobSeekerNotification,
     PrescriberNotification,
     PrescriberOrEmployerNotification,
+    WithStructureMixin,
 )
 from itou.communications.models import NotificationRecord, NotificationSettings
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
@@ -29,19 +30,40 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
             category = "Manageable"
 
         @notifications_registry.register
+        class ManageableNonApplicableNotification(self.TestNotification):
+            name = "Manageable, non-applicable"
+            category = "Manageable, non-applicable"
+
+            def is_applicable(self):
+                return False
+
+        @notifications_registry.register
         class NonManageableNotification(self.TestNotification):
             name = "NonManageable"
             category = "NonManageable"
             can_be_disabled = False
 
+        @notifications_registry.register
+        class NonManageableNonApplicableNotification(self.TestNotification):
+            name = "NonManageable, non-applicable"
+            category = "NonManageable, non-applicable"
+            can_be_disabled = False
+
+            def is_applicable(self):
+                return False
+
         self.ManageableNotification = ManageableNotification
+        self.ManageableNonApplicableNotification = ManageableNonApplicableNotification
         self.NonManageableNotification = NonManageableNotification
+        self.NonManageableNonApplicableNotification = NonManageableNonApplicableNotification
 
         sync_notifications(NotificationRecord)
 
     def tearDown(self):
         notifications_registry.unregister(self.ManageableNotification)
+        notifications_registry.unregister(self.ManageableNonApplicableNotification)
         notifications_registry.unregister(self.NonManageableNotification)
+        notifications_registry.unregister(self.NonManageableNonApplicableNotification)
 
     def test_method_init(self):
         with self.assertRaisesMessage(
@@ -72,11 +94,21 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
 
     def test_method_is_manageable_by_user(self):
         assert self.ManageableNotification(self.user, self.organization).is_manageable_by_user()
+        assert not self.ManageableNonApplicableNotification(self.user, self.organization).is_manageable_by_user()
         assert not self.NonManageableNotification(self.user, self.organization).is_manageable_by_user()
+        assert not self.NonManageableNonApplicableNotification(self.user, self.organization).is_manageable_by_user()
+
+    def test_method_is_applicable(self):
+        assert self.ManageableNotification(self.user, self.organization).is_applicable()
+        assert not self.ManageableNonApplicableNotification(self.user, self.organization).is_applicable()
+        assert self.NonManageableNotification(self.user, self.organization).is_applicable()
+        assert not self.NonManageableNonApplicableNotification(self.user, self.organization).is_applicable()
 
     def test_method_should_send(self):
-        # Notifications follow an opt-out logic. So non-manageable can't be disabled and should always be sent
+        # Notifications follow an opt-out logic. So non-manageable can't be disabled by the user
+        # and should always be sent unless they're non-applicable
         assert self.NonManageableNotification(self.user, self.organization).should_send()
+        assert not self.NonManageableNonApplicableNotification(self.user, self.organization).should_send()
 
         # Even if disabled in db
         settings = NotificationSettings.get_or_create(self.user, self.organization)
@@ -84,23 +116,32 @@ class BaseNotificationTest(FakeNotificationClassesMixin, TestCase):
             [
                 NotificationRecord.objects.get(
                     notification_class=self.NonManageableNotification(self.user).__class__.__name__
-                )
+                ),
+                NotificationRecord.objects.get(
+                    notification_class=self.NonManageableNonApplicableNotification(self.user).__class__.__name__
+                ),
             ]
         )
         assert self.NonManageableNotification(self.user, self.organization).should_send()
+        assert not self.NonManageableNonApplicableNotification(self.user, self.organization).should_send()
 
-        # For manageable notifications, they should be sent by default
+        # For manageable notifications, they should be sent unless they're non-applicable
         assert self.ManageableNotification(self.user, self.organization).should_send()
+        assert not self.ManageableNonApplicableNotification(self.user, self.organization).should_send()
 
         # But should not be sent if disabled
         settings.disabled_notifications.set(
             [
                 NotificationRecord.objects.get(
                     notification_class=self.ManageableNotification(self.user).__class__.__name__
-                )
+                ),
+                NotificationRecord.objects.get(
+                    notification_class=self.ManageableNonApplicableNotification(self.user).__class__.__name__
+                ),
             ]
         )
         assert not self.ManageableNotification(self.user, self.organization).should_send()
+        assert not self.ManageableNonApplicableNotification(self.user, self.organization).should_send()
 
     def test_method_get_context(self):
         assert self.ManageableNotification(self.user, self.organization).get_context() == {}
@@ -166,6 +207,7 @@ class ProfiledNotificationTest(TestCase):
         self.employer_structure = self.employer.company_set.first()
         self.prescriber = PrescriberFactory(membership=True)
         self.prescriber_structure = self.prescriber.prescriberorganization_set.first()
+        self.prescriber_single = PrescriberFactory(membership=False)
 
         class TestJobSeekerNotification(JobSeekerNotification, BaseNotification):
             pass
@@ -176,28 +218,51 @@ class ProfiledNotificationTest(TestCase):
         class TestPrescriberNotification(PrescriberNotification, BaseNotification):
             pass
 
+        class TestPrescriberWithStructureNotification(WithStructureMixin, PrescriberNotification, BaseNotification):
+            pass
+
         class TestPrescriberOrEmployerNotification(PrescriberOrEmployerNotification, BaseNotification):
+            pass
+
+        class TestPrescriberOrEmployerWithStructureNotification(
+            WithStructureMixin, PrescriberOrEmployerNotification, BaseNotification
+        ):
             pass
 
         self.TestJobSeekerNotification = TestJobSeekerNotification
         self.TestEmployerNotification = TestEmployerNotification
         self.TestPrescriberNotification = TestPrescriberNotification
         self.TestPrescriberOrEmployerNotification = TestPrescriberOrEmployerNotification
+        self.TestPrescriberWithStructureNotification = TestPrescriberWithStructureNotification
+        self.TestPrescriberOrEmployerWithStructureNotification = TestPrescriberOrEmployerWithStructureNotification
 
     def test_job_seeker_notification_is_manageable_by_user(self):
         assert self.TestJobSeekerNotification(self.job_seeker).is_manageable_by_user()
         assert not self.TestJobSeekerNotification(self.employer, self.employer_structure).is_manageable_by_user()
         assert not self.TestJobSeekerNotification(self.prescriber, self.prescriber_structure).is_manageable_by_user()
+        assert not self.TestJobSeekerNotification(self.prescriber_single).is_manageable_by_user()
 
     def test_employer_notification_is_manageable_by_user(self):
         assert not self.TestEmployerNotification(self.job_seeker).is_manageable_by_user()
         assert self.TestEmployerNotification(self.employer, self.employer_structure).is_manageable_by_user()
         assert not self.TestEmployerNotification(self.prescriber, self.prescriber_structure).is_manageable_by_user()
+        assert not self.TestEmployerNotification(self.prescriber_single).is_manageable_by_user()
 
     def test_prescriber_notification_is_manageable_by_user(self):
         assert not self.TestPrescriberNotification(self.job_seeker).is_manageable_by_user()
         assert not self.TestPrescriberNotification(self.employer, self.employer_structure).is_manageable_by_user()
         assert self.TestPrescriberNotification(self.prescriber, self.prescriber_structure).is_manageable_by_user()
+        assert self.TestPrescriberNotification(self.prescriber_single).is_manageable_by_user()
+
+    def test_prescriber_with_structure_notification_is_manageable_by_user(self):
+        assert not self.TestPrescriberWithStructureNotification(self.job_seeker).is_manageable_by_user()
+        assert not self.TestPrescriberWithStructureNotification(
+            self.employer, self.employer_structure
+        ).is_manageable_by_user()
+        assert self.TestPrescriberWithStructureNotification(
+            self.prescriber, self.prescriber_structure
+        ).is_manageable_by_user()
+        assert not self.TestPrescriberWithStructureNotification(self.prescriber_single).is_manageable_by_user()
 
     def test_prescriber_or_employer_notification_is_manageable_by_user(self):
         assert not self.TestPrescriberOrEmployerNotification(self.job_seeker).is_manageable_by_user()
@@ -206,4 +271,17 @@ class ProfiledNotificationTest(TestCase):
         ).is_manageable_by_user()
         assert self.TestPrescriberOrEmployerNotification(
             self.prescriber, self.prescriber_structure
+        ).is_manageable_by_user()
+        assert self.TestPrescriberOrEmployerNotification(self.prescriber_single).is_manageable_by_user()
+
+    def test_prescriber_or_employer_with_structure_notification_is_manageable_by_user(self):
+        assert not self.TestPrescriberOrEmployerWithStructureNotification(self.job_seeker).is_manageable_by_user()
+        assert self.TestPrescriberOrEmployerWithStructureNotification(
+            self.employer, self.employer_structure
+        ).is_manageable_by_user()
+        assert self.TestPrescriberOrEmployerWithStructureNotification(
+            self.prescriber, self.prescriber_structure
+        ).is_manageable_by_user()
+        assert not self.TestPrescriberOrEmployerWithStructureNotification(
+            self.prescriber_single
         ).is_manageable_by_user()

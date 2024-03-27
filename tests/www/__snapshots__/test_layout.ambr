@@ -56,6 +56,10 @@
                           <a class="dropdown-item" href="/dashboard/">Tableau de bord</a>
                       </li>
                       
+                          <li>
+                              <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
+                          </li>
+                      
                       <li>
                           <div class="dropdown-divider"></div>
                       </li>
@@ -229,6 +233,10 @@
                           <a class="dropdown-item" href="/dashboard/">Tableau de bord</a>
                       </li>
                       
+                          <li>
+                              <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
+                          </li>
+                      
                       <li>
                           <div class="dropdown-divider"></div>
                       </li>
@@ -401,6 +409,10 @@
                           <a class="dropdown-item" href="/dashboard/">Tableau de bord</a>
                       </li>
                       
+                          <li>
+                              <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
+                          </li>
+                      
                       <li>
                           <div class="dropdown-divider"></div>
                       </li>
@@ -479,6 +491,10 @@
                       <li>
                           <a class="dropdown-item" href="/dashboard/">Tableau de bord</a>
                       </li>
+                      
+                          <li>
+                              <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
+                          </li>
                       
                       <li>
                           <div class="dropdown-divider"></div>

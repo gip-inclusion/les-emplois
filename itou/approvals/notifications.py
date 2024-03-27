@@ -4,6 +4,7 @@ from django.urls import reverse
 from itou.common_apps.notifications.base_class import BaseNotification
 from itou.communications import NotificationCategory, registry as notifications_registry
 from itou.communications.dispatch import EmailNotification, EmployerNotification, JobSeekerNotification
+from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.prescribers.models import PrescriberMembership
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
@@ -116,6 +117,9 @@ class PassAcceptedEmployerNotification(EmployerNotification, EmailNotification):
             raise RuntimeError("No approval found for this job application.")
         return self.context
 
+    def is_applicable(self):
+        return self.structure and self.structure.kind in SIAE_WITH_CONVENTION_KINDS
+
 
 @notifications_registry.register
 class ProlongationRequestGrantedForEmployerNotification(EmployerNotification, EmailNotification):
@@ -123,6 +127,9 @@ class ProlongationRequestGrantedForEmployerNotification(EmployerNotification, Em
     category = NotificationCategory.IAE_PASS
     subject_template = "approvals/email/prolongation_request/granted/employer_subject.txt"
     body_template = "approvals/email/prolongation_request/granted/employer_body.txt"
+
+    def is_applicable(self):
+        return self.structure and self.structure.kind in SIAE_WITH_CONVENTION_KINDS
 
 
 @notifications_registry.register

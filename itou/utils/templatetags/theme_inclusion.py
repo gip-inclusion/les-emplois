@@ -59,3 +59,8 @@ def itou_toast_content(message):
 @register.filter
 def stepper_progress(wizard):
     return math.floor((wizard["steps"].step1 / wizard["steps"].count) * 100)
+
+
+@register.simple_tag
+def get_form_field(form, field_name):
+    return form[field_name]
