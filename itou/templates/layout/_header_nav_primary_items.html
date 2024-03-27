@@ -51,7 +51,12 @@
                         aria-haspopup="true"
                         aria-controls="switchUserDropdown{% if is_mobile %}Mobile{% endif %}"
                         aria-expanded="false">
-                    <i class="ri-community-line" aria-hidden="true"></i>
+                    {% if user.is_employer %}
+                        <i class="ri-community-line" aria-hidden="true"></i>
+                    {% elif user.is_prescriber %}
+                        <i class="ri-home-smile-line" aria-hidden="true"></i>
+                    {% endif %}
+
                     <span>{{ request.current_organization.kind }} - {{ request.current_organization.display_name|truncatechars:40 }}</span>
                 </button>
                 <div class="dropdown-menu {% if is_mobile %}w-auto{% else %}w-100{% endif %}" id="switchUserDropdown{% if is_mobile %}Mobile{% endif %}">
@@ -62,7 +67,11 @@
                                 {% if org.pk != request.current_organization.pk %}
                                     <li>
                                         <button class="dropdown-item dropdown-item__summary" name="organization_id" value="{{ org.pk }}">
-                                            <i class="ri-community-line" aria-hidden="true"></i>
+                                            {% if user.is_employer %}
+                                                <i class="ri-community-line" aria-hidden="true"></i>
+                                            {% elif user.is_prescriber %}
+                                                <i class="ri-home-smile-line" aria-hidden="true"></i>
+                                            {% endif %}
                                             <span>{{ org.kind }}</span>
                                             <strong>{{ org.display_name|truncatechars:50 }}</strong>
                                         </button>
