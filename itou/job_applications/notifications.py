@@ -23,8 +23,8 @@ class NewSpontaneousJobAppEmployersNotification(BaseNotification):
     def email(self):
         to = self.recipients_emails
         context = {"job_application": self.job_application}
-        subject = "apply/email/new_for_company_subject.txt"
-        body = "apply/email/new_for_company_body.txt"
+        subject = "apply/email/new_for_employer_subject.txt"
+        body = "apply/email/new_for_employer_body.txt"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -85,8 +85,8 @@ class NewQualifiedJobAppEmployersNotification(BaseNotification):
     def email(self):
         to = self.recipients_emails
         context = {"job_application": self.job_application}
-        subject = "apply/email/new_for_company_subject.txt"
-        body = "apply/email/new_for_company_body.txt"
+        subject = "apply/email/new_for_employer_subject.txt"
+        body = "apply/email/new_for_employer_body.txt"
         return get_email_message(to, context, subject, body)
 
     @property
@@ -178,9 +178,8 @@ class JobApplicationNewForEmployerNotification(EmployerNotification, EmailNotifi
 
     name = "Nouvelle candidature"
     category = NotificationCategory.JOB_APPLICATION
-    # FIXME: update template names
-    subject_template = "apply/email/new_for_company_subject.txt"
-    body_template = "apply/email/new_for_company_body.txt"
+    subject_template = "apply/email/new_for_employer_subject.txt"
+    body_template = "apply/email/new_for_employer_body.txt"
 
 
 @notifications_registry.register
@@ -258,9 +257,8 @@ class JobApplicationTransferredForEmployerNotification(EmployerNotification, Ema
 
     name = "Transfert de candidature"
     category = NotificationCategory.JOB_APPLICATION
-    # FIXME: update template names
-    subject_template = "apply/email/transfer_origin_company_subject.txt"
-    body_template = "apply/email/transfer_origin_company_body.txt"
+    subject_template = "apply/email/transfer_source_employer_subject.txt"
+    body_template = "apply/email/transfer_source_employer_body.txt"
 
 
 @notifications_registry.register

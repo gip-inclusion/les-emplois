@@ -51,8 +51,8 @@ class BaseNotification:
         ```
             to = self.recipients_emails
             context = {"job_application": self.job_application}
-            subject = "apply/email/new_for_company_subject.txt"
-            body = "apply/email/new_for_company_body.txt"
+            subject = "apply/email/new_for_employer_subject.txt"
+            body = "apply/email/new_for_employer_body.txt"
             return get_email_message(to, context, subject, body)
         ```
         """

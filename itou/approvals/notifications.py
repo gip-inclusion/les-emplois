@@ -108,7 +108,6 @@ class PassAcceptedEmployerNotification(EmployerNotification, EmailNotification):
 
     def get_context(self):
         context = super().get_context()
-        # FIXME: update template instead?
         context.setdefault("siae_survey_link", context["job_application"].to_company.accept_survey_url)
         return context
 
