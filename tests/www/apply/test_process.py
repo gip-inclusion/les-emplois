@@ -3003,79 +3003,81 @@ def test_select_job_description_for_job_application(client):
 
 
 @override_settings(API_BAN_BASE_URL="http://ban-api")
-def test_select_other_job_description_for_job_application(client):
-    with mock.patch(
+def test_select_other_job_description_for_job_application(client, mocker):
+
+    mocker.patch(
         "itou.utils.apis.geocoding.get_geocoding_data",
         side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-    ):
-        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
-        create_test_cities(["54", "57"], num_per_department=2)
+    )
 
-        job_application = JobApplicationFactory(
-            to_company__kind=CompanyKind.EI, state=JobApplicationWorkflow.STATE_PROCESSING
-        )
-        user = job_application.to_company.members.first()
-        JobDescriptionFactory(company=job_application.to_company, is_active=True)
-        city = City.objects.order_by("?").first()
-        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        data = {
-            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_FORGOTTEN,
-            "lack_of_nir": True,
-            "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
-            "address_line_1": "37 B Rue du Général De Gaulle",
-            "post_code": city.post_codes[0],
-            "insee_code": city.code_insee,
-            "city": city.name,
-            "geocoding_score": 0.9714,
-            # Select the first and only one option
-            "address_for_autocomplete": "0",
-        }
+    create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
+    create_test_cities(["54", "57"], num_per_department=2)
 
-        client.force_login(user)
-        response = client.get(url)
+    job_application = JobApplicationFactory(
+        to_company__kind=CompanyKind.EI, state=JobApplicationWorkflow.STATE_PROCESSING
+    )
+    user = job_application.to_company.members.first()
+    JobDescriptionFactory(company=job_application.to_company, is_active=True)
+    city = City.objects.order_by("?").first()
+    url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+    data = {
+        "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_FORGOTTEN,
+        "lack_of_nir": True,
+        "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
+        "address_line_1": "37 B Rue du Général De Gaulle",
+        "post_code": city.post_codes[0],
+        "insee_code": city.code_insee,
+        "city": city.name,
+        "geocoding_score": 0.9714,
+        # Select the first and only one option
+        "address_for_autocomplete": "0",
+    }
 
-        assertContains(response, ACTIVE_JOBS_LABEL)
-        assertNotContains(response, INACTIVE_JOBS_LABEL)
-        assertNotContains(response, JOB_DETAILS_LABEL)
+    client.force_login(user)
+    response = client.get(url)
 
-        # Select "Autre": must provide new job detail fields
-        response = client.post(url, data={"hired_job": AcceptForm.OTHER_HIRED_JOB})
-        assertContains(response, JOB_DETAILS_LABEL)
+    assertContains(response, ACTIVE_JOBS_LABEL)
+    assertNotContains(response, INACTIVE_JOBS_LABEL)
+    assertNotContains(response, JOB_DETAILS_LABEL)
 
-        # Check form errors
-        data |= {"hired_job": AcceptForm.OTHER_HIRED_JOB}
+    # Select "Autre": must provide new job detail fields
+    response = client.post(url, data={"hired_job": AcceptForm.OTHER_HIRED_JOB})
+    assertContains(response, JOB_DETAILS_LABEL)
 
-        response = client.post(url, data=data)
-        assert response.status_code == 200
+    # Check form errors
+    data |= {"hired_job": AcceptForm.OTHER_HIRED_JOB}
 
-        data |= {"location": city.pk}
-        response = client.post(url, data=data)
-        assert response.status_code == 200
+    response = client.post(url, data=data)
+    assert response.status_code == 200
 
-        appellation = Appellation.objects.order_by("?").first()
-        data |= {"appellation": appellation.pk}
-        response = client.post(url, data=data)
-        assert response.status_code == 200
+    data |= {"location": city.pk}
+    response = client.post(url, data=data)
+    assert response.status_code == 200
 
-        tomorrow = timezone.localdate() + relativedelta(days=1)
-        data |= {"hiring_start_at": f"{tomorrow:%Y-%m-%d}"}
-        response = client.post(url, data=data)
-        assert response.status_code == 200
+    appellation = Appellation.objects.order_by("?").first()
+    data |= {"appellation": appellation.pk}
+    response = client.post(url, data=data)
+    assert response.status_code == 200
 
-        # Modal window
-        data |= {"confirmed": True}
-        response = client.post(url, data=data, follow=False)
-        # Caution: should redirect after that point, but done via HTMX we get a 200 status code
-        assert response.status_code == 200
-        print(response.content)
-        assert response.url == reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+    tomorrow = timezone.localdate() + relativedelta(days=1)
+    data |= {"hiring_start_at": f"{tomorrow:%Y-%m-%d}"}
+    response = client.post(url, data=data)
+    assert response.status_code == 200
 
-        # Perform some checks on job description now attached to job application
-        job_application.refresh_from_db()
-        assert job_application.hired_job
-        assert job_application.hired_job.creation_source == JobDescriptionSource.HIRING
-        assert not job_application.hired_job.is_active
-        assert job_application.hired_job.description == "La structure n’a pas encore renseigné cette rubrique"
+    # Modal window
+    data |= {"confirmed": True}
+    response = client.post(url, data=data, follow=False)
+    # Caution: should redirect after that point, but done via HTMX we get a 200 status code
+    assert response.status_code == 200
+    print(response.content)
+    assert response.url == reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+
+    # Perform some checks on job description now attached to job application
+    job_application.refresh_from_db()
+    assert job_application.hired_job
+    assert job_application.hired_job.creation_source == JobDescriptionSource.HIRING
+    assert not job_application.hired_job.is_active
+    assert job_application.hired_job.description == "La structure n’a pas encore renseigné cette rubrique"
 
 
 def test_no_job_description_for_job_application(client):

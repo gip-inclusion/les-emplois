@@ -8,7 +8,7 @@ from itou.geo.utils import coords_to_geometry
 from itou.users.models import User
 from itou.utils.apis import geocoding as api_geocoding
 from itou.utils.apis.exceptions import GeocodingDataError
-from itou.utils.widgets import JobSeakerAddressAutocompleteWidget
+from itou.utils.widgets import JobSeekerAddressAutocompleteWidget
 
 
 class OptionalAddressFormMixin(forms.Form):
@@ -124,7 +124,6 @@ class JobSeekerAddressForm(forms.ModelForm):
     )
     post_code = forms.CharField(label="Code postal", widget=forms.TextInput(attrs={"placeholder": "75010"}))
     insee_code = forms.CharField(widget=forms.HiddenInput(), required=False)
-    geocoding_score = forms.FloatField(widget=forms.HiddenInput(), required=False)
     ban_api_resolved_address = forms.CharField(widget=forms.HiddenInput(), required=False)
     fill_mode = forms.CharField(widget=forms.HiddenInput(), required=False)
 
@@ -136,7 +135,6 @@ class JobSeekerAddressForm(forms.ModelForm):
             "post_code",
             "city",
             "insee_code",
-            "geocoding_score",
             "ban_api_resolved_address",
         ]
 
@@ -147,7 +145,7 @@ class JobSeekerAddressForm(forms.ModelForm):
         self.fields["address_for_autocomplete"] = forms.CharField(
             label="Adresse",
             required=True,
-            widget=JobSeakerAddressAutocompleteWidget(submitted_data=kwargs["data"], job_seeker=self.instance),
+            widget=JobSeekerAddressAutocompleteWidget(initial_data=kwargs["initial"], job_seeker=self.instance),
             initial=0,
             help_text=(
                 "Si votre adresse ne s’affiche pas, merci de renseigner votre ville uniquement en utilisant "
@@ -162,7 +160,6 @@ class JobSeekerAddressForm(forms.ModelForm):
             "address_line_2",
             "post_code",
             "city",
-            "geocoding_score",
             "ban_api_resolved_address",
         ]
 
@@ -224,14 +221,15 @@ class JobSeekerAddressForm(forms.ModelForm):
 
                 if not geocoding_data:
                     raise ValidationError("Impossible de géolocaliser votre adresse. Veuillez en saisir une autre.")
-
-                self.instance.coords = coords_to_geometry(
-                    lat=geocoding_data.get("latitude"), lon=geocoding_data.get("longitude")
-                )
             except GeocodingDataError:
                 raise ValidationError(
                     "Impossible de géolocaliser votre adresse : problème de geométrie. Veuillez en saisir une autre."
                 )
+            else:
+                self.instance.coords = coords_to_geometry(
+                    lat=geocoding_data["latitude"], lon=geocoding_data["longitude"]
+                )
+                self.instance.geocoding_score = geocoding_data["score"]
 
         if self.cleaned_data["post_code"] is None:
             self.cleaned_data["post_code"] = ""

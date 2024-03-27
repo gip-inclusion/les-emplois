@@ -6,7 +6,6 @@ htmx.onLoad(function () {
   let postCodeInput = $("#id_post_code");
   let cityInput = $("#id_city");
   let inseeCodeHiddenInput = $("#id_insee_code");
-  let geocodingScoreHiddenInput = $("#id_geocoding_score");
   let banApiResolvedAddressInput = $("#id_ban_api_resolved_address");
   let fillMode = $("#id_fill_mode");
 
@@ -21,7 +20,6 @@ htmx.onLoad(function () {
     postCodeInput.val(e.params.data.postcode);
     cityInput.val(e.params.data.city);
     inseeCodeHiddenInput.val(e.params.data.citycode);
-    geocodingScoreHiddenInput.val(e.params.data.score);
     banApiResolvedAddressInput.val(e.params.data.label);
     fillMode.val("ban_api");
   });
@@ -72,7 +70,6 @@ htmx.onLoad(function () {
           postCodeInput,
           cityInput,
           inseeCodeHiddenInput,
-          geocodingScoreHiddenInput,
           banApiResolvedAddressInput,
         ];
         fieldstoBeCleaned.forEach((element) => {

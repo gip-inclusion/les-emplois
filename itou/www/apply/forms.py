@@ -30,7 +30,7 @@ from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
 from itou.utils.types import InclusiveDateRange
 from itou.utils.validators import validate_nir
-from itou.utils.widgets import DuetDatePickerWidget, JobSeakerAddressAutocompleteWidget
+from itou.utils.widgets import DuetDatePickerWidget, JobSeekerAddressAutocompleteWidget
 from itou.www.companies_views.forms import JobAppellationAndLocationMixin
 
 
@@ -834,7 +834,6 @@ class UserAddressForm(MandatoryAddressFormMixin, forms.ModelForm):
     Add job seeker address in the job application process.
     """
 
-    geocoding_score = forms.FloatField(widget=forms.HiddenInput(), required=False)
     ban_api_resolved_address = forms.CharField(widget=forms.HiddenInput(), required=False)
     insee_code = forms.CharField(widget=forms.HiddenInput(), required=False)
     fill_mode = forms.CharField(widget=forms.HiddenInput(), required=False)
@@ -847,7 +846,6 @@ class UserAddressForm(MandatoryAddressFormMixin, forms.ModelForm):
             "post_code",
             "city",
             "insee_code",
-            "geocoding_score",
             "ban_api_resolved_address",
         ]
 
@@ -858,7 +856,7 @@ class UserAddressForm(MandatoryAddressFormMixin, forms.ModelForm):
         self.fields["address_for_autocomplete"] = forms.CharField(
             label="Adresse",
             required=True,
-            widget=JobSeakerAddressAutocompleteWidget(submitted_data=kwargs["data"], job_seeker=self.instance),
+            widget=JobSeekerAddressAutocompleteWidget(initial_data=kwargs["data"], job_seeker=self.instance),
             initial=0,
             help_text=(
                 "Si votre adresse ne s’affiche pas, merci de renseigner votre ville uniquement en utilisant "
@@ -873,7 +871,6 @@ class UserAddressForm(MandatoryAddressFormMixin, forms.ModelForm):
             "address_line_2",
             "post_code",
             "city",
-            "geocoding_score",
             "ban_api_resolved_address",
         ]
 

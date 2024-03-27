@@ -128,9 +128,6 @@ class AddressAutocompleteWidget(RemoteAutocompleteSelect2Widget):
     # "post_code",
     # "city",
     # "insee_code",
-    # "latitude",
-    # "longitude",
-    # "geocoding_score",
     # "ban_api_resolved_address",
 
     def __init__(self, *args, one_choice_selected=None, **kwargs):
@@ -154,7 +151,7 @@ class AddressAutocompleteWidget(RemoteAutocompleteSelect2Widget):
         }
 
 
-class JobSeakerAddressAutocompleteWidget(AddressAutocompleteWidget):
+class JobSeekerAddressAutocompleteWidget(AddressAutocompleteWidget):
     # Be careful when using this widget as it needs fields present in the form it is included into
     #
     # "address_line_1",
@@ -162,21 +159,18 @@ class JobSeakerAddressAutocompleteWidget(AddressAutocompleteWidget):
     # "post_code",
     # "city",
     # "insee_code",
-    # "latitude",
-    # "longitude",
-    # "geocoding_score",
     # "ban_api_resolved_address",
 
-    def __init__(self, *args, submitted_data=None, job_seeker=None, **kwargs):
+    def __init__(self, *args, initial_data=None, job_seeker=None, **kwargs):
         address_choice = None
 
         # The following code is required as we are using a Select2 version not tied to a model
         # in order to perform Ajax calls, but we need it to mimick the behavior of a model field
-        if submitted_data and "ban_api_resolved_address" in submitted_data:
+        if initial_data and "ban_api_resolved_address" in initial_data:
             # The ban_api_resolved_address field is populated using javascript (after selecting an address).
             # So if it present in the submitted data, it means that the user did a select2 choice
             # so we should refill and populate the choosen address in the select2 field if there was a form error
-            address_choice = submitted_data["ban_api_resolved_address"]
+            address_choice = initial_data["ban_api_resolved_address"]
         elif job_seeker:
             # If there is no ban_api_resolvedaddress_field, let's fill the form with the geocoding_address saved
             # on the job_seeker profile

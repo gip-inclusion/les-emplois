@@ -833,7 +833,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "insee_code": self.city.code_insee,
             "city": self.city.name,
             "phone": dummy_job_seeker.phone,
-            "geocoding_score": 0.9714,
             "fill_mode": "ban_api",
         }
 
@@ -1097,7 +1096,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "insee_code": self.city.code_insee,
             "city": self.city.name,
             "phone": dummy_job_seeker.phone,
-            "geocoding_score": 0.9714,
             "fill_mode": "ban_api",
         }
 
@@ -1436,7 +1434,6 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
             "insee_code": self.city.code_insee,
             "city": self.city.name,
             "phone": dummy_job_seeker.phone,
-            "geocoding_score": 0.9714,
             "fill_mode": "ban_api",
         }
         response = self.client.post(next_url, data=post_data)
@@ -1919,7 +1916,6 @@ class ApplyAsCompanyTest(TestCase):
             "insee_code": self.city.code_insee,
             "city": self.city.name,
             "phone": dummy_job_seeker.phone,
-            "geocoding_score": 0.9714,
             "fill_mode": "ban_api",
         }
 
@@ -2240,7 +2236,6 @@ class DirectHireFullProcessTest(TestCase):
             "insee_code": self.city.code_insee,
             "city": self.city.name,
             "phone": dummy_job_seeker.phone,
-            "geocoding_score": 0.9714,
             "fill_mode": "ban_api",
         }
 
@@ -2351,7 +2346,6 @@ class DirectHireFullProcessTest(TestCase):
             "insee_code": self.city.code_insee,
             "city": self.city.name,
             "phone": new_job_seeker.phone,
-            "geocoding_score": 0.9714,
             "fill_mode": "ban_api",
             # Select the first and only one option
             "address_for_autocomplete": "0",
@@ -2962,7 +2956,6 @@ class UpdateJobSeekerBaseTestCase(TestCase):
             "insee_code": self.city.code_insee,
             "city": self.city.name,
             "phone": self.job_seeker.phone,
-            "geocoding_score": 0.9714,
             "fill_mode": "ban_api",
         }
 
@@ -4293,7 +4286,6 @@ class HireConfirmationTestCase(TestCase):
             "insee_code": self.city.code_insee,
             "city": self.city.name,
             "phone": self.job_seeker.phone,
-            "geocoding_score": 0.9714,
             "fill_mode": "ban_api",
             "address_for_autocomplete": "0",
         }

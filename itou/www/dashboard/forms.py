@@ -2,12 +2,12 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from itou.common_apps.address.forms import (JobSeekerAddressForm,
-                                            OptionalAddressFormMixin)
+from itou.common_apps.address.forms import JobSeekerAddressForm, OptionalAddressFormMixin
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.job_applications.notifications import (
     NewQualifiedJobAppEmployersNotification,
-    NewSpontaneousJobAppEmployersNotification)
+    NewSpontaneousJobAppEmployersNotification,
+)
 from itou.users.enums import IdentityProvider
 from itou.users.forms import JobSeekerProfileFieldsMixin
 from itou.users.models import JobSeekerProfile, User
