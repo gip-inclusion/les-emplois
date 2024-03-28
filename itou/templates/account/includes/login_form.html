@@ -5,18 +5,12 @@
 <form method="post" class="js-prevent-multiple-submit">
     {% csrf_token %}
     <fieldset>
-        <div class="row">
-            <div class="col-12">
-                <p class="h4">Se connecter avec vos identifiants</p>
-                {% bootstrap_form_errors form type="all" %}
-                {% redirection_input_field value=redirect_field_value %}
-                {% bootstrap_field form.login %}
-                {% bootstrap_field form.password wrapper_class="mb-3" %}
-            </div>
-        </div>
+        <p class="h4">Se connecter avec vos identifiants</p>
+        {% bootstrap_form_errors form type="all" %}
+        {% redirection_input_field value=redirect_field_value %}
+        {% bootstrap_field form.login %}
+        {% bootstrap_field form.password wrapper_class="mb-3" %}
     </fieldset>
-    <div class="form-row justify-content-end">
-        {% url 'home:hp' as reset_url %}
-        {% itou_buttons_form primary_label="Se connecter" reset_url=reset_url %}
-    </div>
+    {% url 'home:hp' as reset_url %}
+    {% itou_buttons_form primary_label="Se connecter" reset_url=reset_url %}
 </form>
