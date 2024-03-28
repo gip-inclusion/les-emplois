@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.gis.measure import D
 from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ValidationError
@@ -171,6 +172,14 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
+    )
+
+    # Use the generic relation to let NotificationSettings being collected on deletion
+    notification_settings = GenericRelation(
+        "communications.NotificationSettings",
+        content_type_field="structure_type",
+        object_id_field="structure_pk",
+        related_query_name="prescriber_organization",
     )
 
     objects = PrescriberOrganizationManager.from_queryset(PrescriberOrganizationQuerySet)()
