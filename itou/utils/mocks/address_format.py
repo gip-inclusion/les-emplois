@@ -318,6 +318,10 @@ for elt in BAN_GEOCODING_API_RESULTS_MOCK:
         RESULTS_BY_BAN_API_RESOLVED_ADDRESS[elt["ban_api_resolved_address"]] = elt
 
 
+def mock_get_first_geocoding_data(_address, **_):
+    return BAN_GEOCODING_API_RESULTS_MOCK[0]
+
+
 def mock_get_geocoding_data(address, **_):
     for result in BAN_GEOCODING_API_RESULTS_MOCK:
         if address.startswith(result["address_line_1"]):

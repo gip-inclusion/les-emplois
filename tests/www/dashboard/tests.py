@@ -874,7 +874,6 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         self.assertContains(response, 'id="id_post_code"')
         self.assertContains(response, 'id="id_city"')
         self.assertContains(response, 'id="id_insee_code"')
-        self.assertContains(response, 'id="id_geocoding_score"')
         self.assertContains(response, 'id="id_fill_mode"')
         self.assertContains(response, 'id="id_ban_api_resolved_address"')
 

@@ -139,6 +139,14 @@ class JobSeekerFactory(UserFactory):
             jobseeker_profile__pole_emploi_since=AllocationDuration.MORE_THAN_24_MONTHS,
         )
 
+        with_ban_geoloc_address = factory.Trait(
+            address_line_1="37 B Rue du Général De Gaulle",
+            post_code="67118",
+            city="Geispolsheim",
+            coords="POINT (7.644817 48.515883)",
+            geocoding_score=0.8745736363636364,
+        )
+
     @classmethod
     def _adjust_kwargs(cls, **kwargs):
         # Deactivate automatic creation of JobSeekerProfile in User.save
@@ -170,6 +178,7 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
             coords=None,
             geocoding_score=None,
         )
+
         for_snapshot = factory.Trait(
             public_id="7614fc4b-aef9-4694-ab17-12324300180a",
             title="MME",
