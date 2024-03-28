@@ -19,6 +19,7 @@ class ApplicantSerializer(serializers.ModelSerializer):
     lieu_naissance = serializers.CharField(source="jobseeker_profile.birth_place")
     pays_naissance = serializers.CharField(source="jobseeker_profile.birth_country")
     lien_cv = serializers.CharField(default=None)  # Deprecated field
+    # TODO: add uid structure
 
     class Meta:
         model = User

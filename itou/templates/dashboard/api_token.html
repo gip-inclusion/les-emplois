@@ -20,9 +20,22 @@
                                     <p>
                                         En tant qu’administrateur des structures suivantes, vous avez accès à l’API Fiches salarié (<a href="https://emplois.inclusion.beta.gouv.fr/api/v1/redoc/#tag/employee-records" target="_blank">voir la documentation ici</a>):
                                     </p>
-                                    <ul>
-                                        {% for siae_name in siaes_names %}<li>{{ siae_name }}</li>{% endfor %}
-                                    </ul>
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Nom</th>
+                                                <th scope="col">identifiant unique</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for company in companies %}
+                                                <tr>
+                                                    <th scope="row">{{ company.name }}</th>
+                                                    <td>{{ company.uid }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
                                     <p>
                                         Pour vous connecter à l'API vous devez utiliser l'identifiant "{{ login_string }}" et comme mot de passe le token suivant.
                                     </p>
