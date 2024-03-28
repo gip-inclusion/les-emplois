@@ -10,6 +10,13 @@ class NullIfEmptyCharField(serializers.CharField):
         return super().to_representation(value)
 
 
+class NullIfEmptyChoiceField(serializers.ChoiceField):
+    def to_representation(self, value):
+        if value == "":
+            return None
+        return super().to_representation(value)
+
+
 @extend_schema_field(OpenApiTypes.NONE)
 class NullField(serializers.Field):
     def to_representation(self, _):
