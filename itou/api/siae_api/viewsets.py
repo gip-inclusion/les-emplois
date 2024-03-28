@@ -12,7 +12,8 @@ from rest_framework.throttling import UserRateThrottle
 
 from itou.cities.models import City
 from itou.companies.models import Company, JobDescription
-from itou.companies.serializers import SiaeSerializer
+
+from .serializers import SiaeSerializer
 
 
 logger = logging.getLogger("api_drf")
@@ -84,6 +85,10 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
      - Recrutement ouvert OUI/NON
      - Description du poste
      - Appellation modifiée
+     - Type de contrat
+     - Nombre de postes ouverts
+     - Lieu
+     - Profil recherché
     """
 
     serializer_class = SiaeSerializer
@@ -101,7 +106,7 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
             "job_description_through",
             queryset=(
                 JobDescription.objects.filter(is_active=True)
-                .select_related("appellation__rome")
+                .select_related("appellation__rome", "location")
                 .order_by("-updated_at", "-created_at")
             ),
         )
