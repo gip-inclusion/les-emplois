@@ -13,9 +13,9 @@ from itou.employee_record.serializers import (
     EmployeeRecordUpdateNotificationBatchSerializer,
     EmployeeRecordUpdateNotificationSerializer,
     _AddressSerializer,
-    _PersonSerializer,
 )
-from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordWithProfileFactory
+from tests.asp.factories import CommuneFactory
+from tests.employee_record.factories import EmployeeRecordWithProfileFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
 
@@ -76,28 +76,20 @@ class EmployeeRecordAddressSerializerTest(TestCase):
         assert good_lane_name == data["adrLibelleVoie"]
 
     def test_with_empty_fields(self):
-        serializer = _AddressSerializer(JobSeekerFactory())
+        commune = CommuneFactory()
+        serializer = _AddressSerializer(JobSeekerFactory(jobseeker_profile__hexa_commune=commune))
 
         assert serializer.data == {
             "adrTelephone": None,
             "adrMail": None,
-            "adrNumeroVoie": "",
+            "adrNumeroVoie": None,
             "codeextensionvoie": None,
             "codetypevoie": "",
-            "adrLibelleVoie": None,
+            "adrLibelleVoie": "",
             "adrCpltDistribution": None,
-            "codeinseecom": None,
+            "codeinseecom": commune.code,
             "codepostalcedex": "",
         }
-
-
-def test_person_serializer_with_empty_birth_country():
-    serializer = _PersonSerializer(
-        EmployeeRecordFactory(job_application__job_seeker__jobseeker_profile__birth_country=None)
-    )
-
-    assert serializer.data["codeInseePays"] is None
-    assert serializer.data["codeGroupePays"] is None
 
 
 class TestEmployeeRecordSerializer:
