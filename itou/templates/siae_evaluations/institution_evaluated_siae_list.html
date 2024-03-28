@@ -5,6 +5,17 @@
 
 {% block title %}Contrôler les pièces justificatives {{ block.super }}{% endblock %}
 
+{% if back_url %}
+    {% block breadcrumbs %}
+        <div class="c-prevstep">
+            <a href="{{ back_url }}" class="btn btn-ico btn-link ps-0">
+                <i class="ri-arrow-drop-left-line ri-xl font-weight-medium" aria-hidden="true"></i>
+                <span>Retour</span>
+            </a>
+        </div>
+    {% endblock %}
+{% endif %}
+
 {% block content_title %}
     <h1>Contrôler les pièces justificatives</h1>
     <h2 class="h3">
@@ -62,11 +73,6 @@
                             </div>
                         </div>
                     {% endfor %}
-                    {% if back_url %}
-                        <p class="mt-4">
-                            <a href="{{ back_url }}">Retour</a>
-                        </p>
-                    {% endif %}
                 </div>
             </div>
         </div>

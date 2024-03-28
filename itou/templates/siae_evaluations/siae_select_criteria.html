@@ -5,37 +5,35 @@
 
 {% block title %}Auto-prescriptions à justifier pour {{ job_seeker.get_full_name }}{% endblock %}
 
+{% if back_url %}
+    {% block breadcrumbs %}
+        <div class="c-prevstep">
+            <a href="{{ back_url }}" class="btn btn-ico btn-link ps-0">
+                <i class="ri-arrow-drop-left-line ri-xl font-weight-medium" aria-hidden="true"></i>
+                <span>Retour</span>
+            </a>
+        </div>
+    {% endblock %}
+{% endif %}
+
 {% block content_title_wrapper %}{% endblock %}
 
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="row justify-content-center">
-                <div class="col-8">
-
-                    <div class="card">
-
-                        <div class="card-header">
+            <div class="row">
+                <div class="col-12">
+                    <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+                        <div class="c-box--results__header">
                             {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=job_seeker approval=approval state=state %}
                         </div>
-
-                        <div class="card-body">
-
-                            <div class="row mt-3">
-                                <div class="col-md-12">{% include "siae_evaluations/includes/criteria_form.html" %}</div>
-
+                        <hr class="m-0">
+                        <div class="c-box--results__body">
+                            <div class="c-box--results__list-data">
+                                {% include "siae_evaluations/includes/criteria_form.html" %}
                             </div>
-
-
                         </div>
-
                     </div>
-                    {% if back_url %}
-                        <p class="mt-4">
-                            <a href="{{ back_url }}">Retour</a>
-                        </p>
-                    {% endif %}
-
                 </div>
             </div>
         </div>
