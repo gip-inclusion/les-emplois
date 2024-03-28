@@ -8,13 +8,11 @@ from django.db.models import Exists, OuterRef
 from django.db.models.manager import Manager
 from django.db.models.query import Q, QuerySet
 from django.utils import timezone
-from rest_framework.authtoken.admin import User
 
 from itou.approvals.models import Approval
 from itou.asp.models import EmployerType, PrescriberType, SiaeMeasure
 from itou.companies.models import Company, SiaeFinancialAnnex
 from itou.job_applications.enums import SenderKind
-from itou.users.models import JobSeekerProfile
 from itou.utils.validators import validate_siret
 
 from .enums import MovementType, NotificationStatus, Status
@@ -228,7 +226,7 @@ class EmployeeRecord(ASPExchangeInformation):
     def __str__(self):
         return (
             f"PK:{self.pk} PASS:{self.approval_number} SIRET:{self.siret} JA:{self.job_application} "
-            f"JOBSEEKER:{self.job_seeker} STATUS:{self.status}"
+            f"JOBSEEKER:{self.job_application.job_seeker} STATUS:{self.status}"
         )
 
     def _clean_job_application(self):
@@ -281,14 +279,14 @@ class EmployeeRecord(ASPExchangeInformation):
         if self.status not in [Status.NEW, Status.REJECTED, Status.DISABLED]:
             raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
 
-        profile = self.job_seeker.jobseeker_profile
+        profile = self.job_application.job_seeker.jobseeker_profile
 
         if not profile.hexa_address_filled:
             # Format job seeker address
             profile.update_hexa_address()
 
-        self.job_seeker.last_checked_at = timezone.now()
-        self.job_seeker.save(update_fields=["last_checked_at"])
+        self.job_application.job_seeker.last_checked_at = timezone.now()
+        self.job_application.job_seeker.save(update_fields=["last_checked_at"])
 
         self.clean()
         # There could be a delay between the moment the object is created
@@ -414,47 +412,6 @@ class EmployeeRecord(ASPExchangeInformation):
         return self.status in self.CAN_BE_DISABLED_STATES
 
     @property
-    def job_seeker(self) -> User:
-        """
-        Shortcut to job application user / job seeker
-        """
-        return self.job_application.job_seeker if self.job_application else None
-
-    @property
-    def job_seeker_profile(self) -> JobSeekerProfile | None:
-        """
-        Shortcut to job seeker profile
-        """
-        if self.job_application and hasattr(self.job_application.job_seeker, "jobseeker_profile"):
-            return self.job_application.job_seeker.jobseeker_profile
-
-        return None
-
-    @property
-    def approval(self) -> Approval | None:
-        """
-        Shortcut to job application approval
-        """
-        return self.job_application.approval if self.job_application and self.job_application.approval else None
-
-    @property
-    def financial_annex_number(self):
-        """
-        Shortcut to financial annex number (can be null in early stages of life cycle)
-        """
-        return self.financial_annex.number if self.financial_annex else None
-
-    @property
-    def asp_convention_id(self):
-        """
-        ASP convention ID (from siae.convention.asp_convention_id)
-        """
-        if self.job_application and self.job_application.to_company:
-            return self.job_application.to_company.convention.asp_convention_id
-
-        return None
-
-    @property
     def asp_employer_type(self):
         """
         This is a mapping between itou internal SIAE kinds and ASP ones
@@ -463,7 +420,7 @@ class EmployeeRecord(ASPExchangeInformation):
 
         MUST return None otherwise
         """
-        if self.job_seeker_profile and self.job_seeker_profile.is_employed:
+        if self.job_application.job_seeker.jobseeker_profile.is_employed:
             return EmployerType.from_itou_siae_kind(self.job_application.to_company.kind)
         return None
 
@@ -498,12 +455,6 @@ class EmployeeRecord(ASPExchangeInformation):
         Mapping between ASP and itou models for SIAE kind ("Mesure")
         """
         return SiaeMeasure.from_siae_kind(self.job_application.to_company.kind)
-
-    @property
-    def asp_oeth_employee(self):
-        if self.asp_siae_type is SiaeMeasure.EITI:
-            return False
-        return self.job_seeker_profile.oeth_employee if self.job_seeker_profile else None
 
     @staticmethod
     def siret_from_asp_source(siae):

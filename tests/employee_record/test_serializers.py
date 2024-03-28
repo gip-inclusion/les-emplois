@@ -26,7 +26,7 @@ class EmployeeRecordAddressSerializerTest(TestCase):
         # or is more than 32 charactrs long
         # then resulting additional address becomes `None`
         employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
-        job_seeker = employee_record.job_seeker
+        job_seeker = employee_record.job_application.job_seeker
         profile = job_seeker.jobseeker_profile
         profile.hexa_additional_address = "Bad additional address with %$£"
 
@@ -57,7 +57,7 @@ class EmployeeRecordAddressSerializerTest(TestCase):
         # then remove them from resulting lane name
         # (better geolocation)
         employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
-        job_seeker = employee_record.job_seeker
+        job_seeker = employee_record.job_application.job_seeker
         profile = job_seeker.jobseeker_profile
         profile.hexa_lane_name = "Lane name (with parens)"
 
@@ -123,7 +123,7 @@ class EmployeeRecordUpdateNotificationSerializerTest(TestCase):
         start_at = timezone.localdate()
         end_at = timezone.localdate() + timedelta(weeks=52)
         employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
-        approval = employee_record.approval
+        approval = employee_record.job_application.approval
         approval.start_at = start_at
         approval.end_at = end_at
         employee_record.save()
@@ -154,7 +154,7 @@ class EmployeeRecordUpdateNotificationSerializerTest(TestCase):
         # Add some EmployeeRecordUpdateNotification objects
         for idx in range(10):
             employee_record = EmployeeRecordWithProfileFactory(status=Status.PROCESSED)
-            approval = employee_record.approval
+            approval = employee_record.job_application.approval
             approval.start_at = start_at
             approval.end_at = end_at
             employee_record.save()
