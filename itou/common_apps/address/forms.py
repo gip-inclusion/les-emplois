@@ -142,10 +142,18 @@ class JobSeekerAddressForm(forms.ModelForm):
             self.fields[field_name].widget.attrs["class"] = f"js-{field_name.replace('_', '-')}"
             self.fields[field_name].required = False
 
+        initial_data = {}
+
+        # Manage form update/post and creation
+        if "data" in kwargs and kwargs["data"] is not None:
+            initial_data = kwargs["data"]
+        elif "initial" in kwargs and kwargs["initial"] is not None:
+            initial_data = kwargs["initial"]
+
         self.fields["address_for_autocomplete"] = forms.CharField(
             label="Adresse",
             required=True,
-            widget=JobSeekerAddressAutocompleteWidget(initial_data=kwargs["initial"], job_seeker=self.instance),
+            widget=JobSeekerAddressAutocompleteWidget(initial_data=initial_data, job_seeker=self.instance),
             initial=0,
             help_text=(
                 "Si votre adresse ne s’affiche pas, merci de renseigner votre ville uniquement en utilisant "
