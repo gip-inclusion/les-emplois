@@ -13,12 +13,14 @@ from django.db import IntegrityError
 from django.test import override_settings
 from django.urls import reverse
 from django.utils.timezone import get_current_timezone
+from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.job_applications import models as job_applications_models
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.management.commands.merge_organizations import organization_merge_into
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
+from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications import factories as job_applications_factories
 from tests.prescribers.factories import (
@@ -737,3 +739,147 @@ def test_validated_odc_is_brsa_constraint():
     assert organization.is_brsa
     with pytest.raises(IntegrityError):
         PrescriberOrganization.objects.filter(pk=organization.pk).update(is_brsa=False)
+
+
+def test_deactivate_last_admin(admin_client):
+    organization = PrescriberOrganizationWithMembershipFactory()
+    membership = organization.memberships.first()
+    assert membership.is_admin
+
+    change_url = reverse("admin:prescribers_prescriberorganization_change", args=[organization.pk])
+    response = admin_client.get(change_url)
+    assert response.status_code == 200
+
+    response = admin_client.post(
+        change_url,
+        data={
+            "id": organization.id,
+            "siret": organization.siret,
+            "kind": organization.kind.value,
+            "name": organization.name,
+            "phone": organization.phone,
+            "email": organization.email,
+            "code_safir_poleAemploi": "",
+            "description": organization.description,
+            "address_line_1": organization.address_line_1,
+            "address_line_2": organization.address_line_2,
+            "post_code": organization.post_code,
+            "city": organization.city,
+            "coords": "",
+            "prescribermembership_set-TOTAL_FORMS": "2",
+            "prescribermembership_set-INITIAL_FORMS": "1",
+            "prescribermembership_set-MIN_NUM_FORMS": "0",
+            "prescribermembership_set-MAX_NUM_FORMS": "1000",
+            "prescribermembership_set-0-id": membership.pk,
+            "prescribermembership_set-0-organization": organization.pk,
+            "prescribermembership_set-0-user": membership.user.pk,
+            # prescribermembership_set-0-is_admin is absent
+            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
+            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
+            "_continue": "Enregistrer+et+continuer+les+modifications",
+        },
+    )
+    assertRedirects(response, change_url, fetch_redirect_response=False)
+    response = admin_client.get(change_url)
+    assertContains(
+        response,
+        (
+            "Vous venez de supprimer le dernier administrateur de la structure. "
+            "Les membres restants risquent de solliciter le support."
+        ),
+    )
+
+    assert_set_admin_role__removal(membership.user, organization)
+
+
+def test_delete_admin(admin_client):
+    organization = PrescriberOrganizationWithMembershipFactory()
+    membership = organization.memberships.first()
+    assert membership.is_admin
+
+    change_url = reverse("admin:prescribers_prescriberorganization_change", args=[organization.pk])
+    response = admin_client.get(change_url)
+    assert response.status_code == 200
+
+    response = admin_client.post(
+        change_url,
+        data={
+            "id": organization.id,
+            "siret": organization.siret,
+            "kind": organization.kind.value,
+            "name": organization.name,
+            "phone": organization.phone,
+            "email": organization.email,
+            "code_safir_poleAemploi": "",
+            "description": organization.description,
+            "address_line_1": organization.address_line_1,
+            "address_line_2": organization.address_line_2,
+            "post_code": organization.post_code,
+            "city": organization.city,
+            "coords": "",
+            "prescribermembership_set-TOTAL_FORMS": "2",
+            "prescribermembership_set-INITIAL_FORMS": "1",
+            "prescribermembership_set-MIN_NUM_FORMS": "0",
+            "prescribermembership_set-MAX_NUM_FORMS": "1000",
+            "prescribermembership_set-0-id": membership.pk,
+            "prescribermembership_set-0-organization": organization.pk,
+            "prescribermembership_set-0-user": membership.user.pk,
+            "prescribermembership_set-0-is_admin": "on",
+            "prescribermembership_set-0-DELETE": "on",
+            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
+            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
+            "_continue": "Enregistrer+et+continuer+les+modifications",
+        },
+    )
+    assertRedirects(response, change_url, fetch_redirect_response=False)
+    response = admin_client.get(change_url)
+
+    assert_set_admin_role__removal(membership.user, organization)
+
+
+def test_add_admin(admin_client):
+    organization = PrescriberOrganizationWithMembershipFactory()
+    membership = organization.memberships.first()
+    prescriber = PrescriberFactory()
+    assert membership.is_admin
+
+    change_url = reverse("admin:prescribers_prescriberorganization_change", args=[organization.pk])
+    response = admin_client.get(change_url)
+    assert response.status_code == 200
+
+    response = admin_client.post(
+        change_url,
+        data={
+            "id": organization.id,
+            "siret": organization.siret,
+            "kind": organization.kind.value,
+            "name": organization.name,
+            "phone": organization.phone,
+            "email": organization.email,
+            "code_safir_poleAemploi": "",
+            "description": organization.description,
+            "address_line_1": organization.address_line_1,
+            "address_line_2": organization.address_line_2,
+            "post_code": organization.post_code,
+            "city": organization.city,
+            "coords": "",
+            "prescribermembership_set-TOTAL_FORMS": "2",
+            "prescribermembership_set-INITIAL_FORMS": "1",
+            "prescribermembership_set-MIN_NUM_FORMS": "0",
+            "prescribermembership_set-MAX_NUM_FORMS": "1000",
+            "prescribermembership_set-0-id": membership.pk,
+            "prescribermembership_set-0-organization": organization.pk,
+            "prescribermembership_set-0-user": membership.user.pk,
+            "prescribermembership_set-0-is_admin": "on",
+            "prescribermembership_set-1-organization": organization.pk,
+            "prescribermembership_set-1-user": prescriber.pk,
+            "prescribermembership_set-1-is_admin": "on",
+            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
+            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
+            "_continue": "Enregistrer+et+continuer+les+modifications",
+        },
+    )
+    assertRedirects(response, change_url, fetch_redirect_response=False)
+    response = admin_client.get(change_url)
+
+    assert_set_admin_role__creation(prescriber, organization)

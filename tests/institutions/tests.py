@@ -1,12 +1,13 @@
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects
 
+from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.institutions.factories import (
     InstitutionMembershipFactory,
     InstitutionWith2MembershipFactory,
     InstitutionWithMembershipFactory,
 )
-from tests.users.factories import ItouStaffFactory
+from tests.users.factories import LaborInspectorFactory
 from tests.utils.test import TestCase
 
 
@@ -43,18 +44,16 @@ class InstitutionModelTest(TestCase):
         assert active_user_with_active_membership not in institution.active_members
 
 
-def test_deactivate_last_admin(client):
+def test_deactivate_last_admin(admin_client):
     institution = InstitutionWithMembershipFactory(department="")
     membership = institution.memberships.first()
     assert membership.is_admin
 
-    staff_user = ItouStaffFactory(is_superuser=True)
-    client.force_login(staff_user)
     change_url = reverse("admin:institutions_institution_change", args=[institution.pk])
-    response = client.get(change_url)
+    response = admin_client.get(change_url)
     assert response.status_code == 200
 
-    response = client.post(
+    response = admin_client.post(
         change_url,
         data={
             "kind": institution.kind.value,
@@ -77,7 +76,7 @@ def test_deactivate_last_admin(client):
         },
     )
     assertRedirects(response, change_url, fetch_redirect_response=False)
-    response = client.get(change_url)
+    response = admin_client.get(change_url)
     assertContains(
         response,
         (
@@ -85,3 +84,84 @@ def test_deactivate_last_admin(client):
             "Les membres restants risquent de solliciter le support."
         ),
     )
+
+    assert_set_admin_role__removal(membership.user, institution)
+
+
+def test_delete_admin(admin_client):
+    institution = InstitutionWithMembershipFactory(department="")
+    membership = institution.memberships.first()
+    assert membership.is_admin
+
+    change_url = reverse("admin:institutions_institution_change", args=[institution.pk])
+    response = admin_client.get(change_url)
+    assert response.status_code == 200
+
+    response = admin_client.post(
+        change_url,
+        data={
+            "kind": institution.kind.value,
+            "name": institution.name,
+            "address_line_1": institution.address_line_1,
+            "address_line_2": institution.address_line_2,
+            "post_code": institution.post_code,
+            "city": institution.city,
+            "department": institution.department,
+            "coords": "",
+            "institutionmembership_set-TOTAL_FORMS": "2",
+            "institutionmembership_set-INITIAL_FORMS": "1",
+            "institutionmembership_set-MIN_NUM_FORMS": "0",
+            "institutionmembership_set-MAX_NUM_FORMS": "1000",
+            "institutionmembership_set-0-id": membership.pk,
+            "institutionmembership_set-0-institution": institution.pk,
+            "institutionmembership_set-0-user": membership.user.pk,
+            "institutionmembership_set-0-is_admin": "on",
+            "institutionmembership_set-0-DELETE": "on",
+            "_continue": "Enregistrer+et+continuer+les+modifications",
+        },
+    )
+    assertRedirects(response, change_url, fetch_redirect_response=False)
+    response = admin_client.get(change_url)
+
+    assert_set_admin_role__removal(membership.user, institution)
+
+
+def test_add_admin(admin_client):
+    institution = InstitutionWithMembershipFactory(department="")
+    membership = institution.memberships.first()
+    labor_inspector = LaborInspectorFactory()
+    assert membership.is_admin
+
+    change_url = reverse("admin:institutions_institution_change", args=[institution.pk])
+    response = admin_client.get(change_url)
+    assert response.status_code == 200
+
+    response = admin_client.post(
+        change_url,
+        data={
+            "kind": institution.kind.value,
+            "name": institution.name,
+            "address_line_1": institution.address_line_1,
+            "address_line_2": institution.address_line_2,
+            "post_code": institution.post_code,
+            "city": institution.city,
+            "department": institution.department,
+            "coords": "",
+            "institutionmembership_set-TOTAL_FORMS": "2",
+            "institutionmembership_set-INITIAL_FORMS": "1",
+            "institutionmembership_set-MIN_NUM_FORMS": "0",
+            "institutionmembership_set-MAX_NUM_FORMS": "1000",
+            "institutionmembership_set-0-id": membership.pk,
+            "institutionmembership_set-0-institution": institution.pk,
+            "institutionmembership_set-0-user": membership.user.pk,
+            "institutionmembership_set-0-is_admin": "on",
+            "institutionmembership_set-1-institution": institution.pk,
+            "institutionmembership_set-1-user": labor_inspector.pk,
+            "institutionmembership_set-1-is_admin": "on",
+            "_continue": "Enregistrer+et+continuer+les+modifications",
+        },
+    )
+    assertRedirects(response, change_url, fetch_redirect_response=False)
+    response = admin_client.get(change_url)
+
+    assert_set_admin_role__creation(labor_inspector, institution)
