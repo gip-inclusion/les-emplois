@@ -3,7 +3,7 @@ import re
 from rest_framework import serializers
 from unidecode import unidecode
 
-from itou.asp.models import AllocationDuration, LaneExtension, LaneType
+from itou.asp.models import AllocationDuration, LaneExtension, LaneType, SiaeMeasure
 from itou.employee_record.models import EmployeeRecord
 from itou.employee_record.typing import CodeComInsee
 from itou.users.enums import Title
@@ -13,35 +13,39 @@ from itou.utils.serializers import NullField, NullIfEmptyCharField, NullIfEmptyC
 
 class _PersonSerializer(serializers.Serializer):
     passIae = serializers.CharField(source="approval_number")  # Required
-    idItou = serializers.CharField(source="job_seeker.jobseeker_profile.asp_uid")  # Required
+    idItou = serializers.CharField(source="job_application.job_seeker.jobseeker_profile.asp_uid")  # Required
 
-    civilite = serializers.ChoiceField(choices=Title.choices, source="job_seeker.title")  # Required
+    civilite = serializers.ChoiceField(choices=Title.choices, source="job_application.job_seeker.title")  # Required
     nomUsage = serializers.SerializerMethodField()  # Required
     nomNaissance = NullField()  # Optional
     prenom = serializers.SerializerMethodField()  # Required
-    dateNaissance = serializers.DateField(format="%d/%m/%Y", source="job_seeker.birthdate")  # Required
+    dateNaissance = serializers.DateField(format="%d/%m/%Y", source="job_application.job_seeker.birthdate")  # Required
 
     codeComInsee = serializers.SerializerMethodField()  # Required if the birth country is France
-    codeInseePays = serializers.CharField(source="job_seeker.jobseeker_profile.birth_country.code")  # Required
-    codeGroupePays = serializers.CharField(source="job_seeker.jobseeker_profile.birth_country.group")  # Required
+    codeInseePays = serializers.CharField(
+        source="job_application.job_seeker.jobseeker_profile.birth_country.code"
+    )  # Required
+    codeGroupePays = serializers.CharField(
+        source="job_application.job_seeker.jobseeker_profile.birth_country.group"
+    )  # Required
 
-    passDateDeb = serializers.DateField(format="%d/%m/%Y", source="approval.start_at")  # Required
-    passDateFin = serializers.DateField(format="%d/%m/%Y", source="approval.end_at")  # Required
+    passDateDeb = serializers.DateField(format="%d/%m/%Y", source="job_application.approval.start_at")  # Required
+    passDateFin = serializers.DateField(format="%d/%m/%Y", source="job_application.approval.end_at")  # Required
 
     # TODO: Remove to fields after confirmation as they are not mentioned in CC V1.05, § 2.4.1
     sufPassIae = NullField()
-    codeDpt = serializers.CharField(source="job_seeker.birth_place.department_code", required=False)
+    codeDpt = serializers.CharField(source="job_application.job_seeker.birth_place.department_code", required=False)
 
     def get_nomUsage(self, obj: EmployeeRecord) -> str:
-        return unidecode(obj.job_seeker.last_name).upper()
+        return unidecode(obj.job_application.job_seeker.last_name).upper()
 
     def get_prenom(self, obj: EmployeeRecord) -> str:
-        return unidecode(obj.job_seeker.first_name).upper()
+        return unidecode(obj.job_application.job_seeker.first_name).upper()
 
     def get_codeComInsee(self, obj: EmployeeRecord) -> CodeComInsee:
         # Another ASP subtlety, making top-level and children with the same name
         # The commune can be empty if the job seeker is not born in France
-        if birth_place := obj.job_seeker.jobseeker_profile.birth_place:
+        if birth_place := obj.job_application.job_seeker.jobseeker_profile.birth_place:
             return {
                 "codeComInsee": birth_place.code,
                 "codeDpt": birth_place.department_code,
@@ -99,52 +103,75 @@ class _AddressSerializer(serializers.Serializer):
 
 class _SituationSerializer(serializers.Serializer):
     orienteur = serializers.CharField(source="asp_prescriber_type")  # Required
-    niveauFormation = serializers.CharField(source="job_seeker.jobseeker_profile.education_level")  # Required
+    niveauFormation = serializers.CharField(
+        source="job_application.job_seeker.jobseeker_profile.education_level"
+    )  # Required
 
-    salarieEnEmploi = serializers.BooleanField(source="job_seeker.jobseeker_profile.is_employed")  # Required
+    salarieEnEmploi = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.is_employed"
+    )  # Required
     salarieTypeEmployeur = serializers.CharField(source="asp_employer_type", required=False)  # Required if employed
     salarieSansEmploiDepuis = NullIfEmptyChoiceField(
-        choices=AllocationDuration.choices, source="job_seeker.jobseeker_profile.unemployed_since"
+        choices=AllocationDuration.choices, source="job_application.job_seeker.jobseeker_profile.unemployed_since"
     )  # Required
-    salarieSansRessource = serializers.BooleanField(source="job_seeker.jobseeker_profile.resourceless")  # Required
+    salarieSansRessource = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.resourceless"
+    )  # Required
 
-    inscritPoleEmploi = serializers.BooleanField(source="job_seeker.jobseeker_profile.pole_emploi_id")  # Required
+    inscritPoleEmploi = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.pole_emploi_id"
+    )  # Required
     inscritPoleEmploiDepuis = NullIfEmptyChoiceField(
-        choices=AllocationDuration.choices, source="job_seeker.jobseeker_profile.pole_emploi_since"
+        choices=AllocationDuration.choices, source="job_application.job_seeker.jobseeker_profile.pole_emploi_since"
     )  # Required if registered with France Travail
     numeroIDE = NullIfEmptyCharField(
-        source="job_seeker.jobseeker_profile.pole_emploi_id"
+        source="job_application.job_seeker.jobseeker_profile.pole_emploi_id"
     )  # Required if registered with France Travail
 
-    salarieRQTH = serializers.BooleanField(source="job_seeker.jobseeker_profile.rqth_employee")  # Required
-    salarieOETH = serializers.BooleanField(source="asp_oeth_employee")  # Required
+    salarieRQTH = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.rqth_employee"
+    )  # Required
+    salarieOETH = serializers.SerializerMethodField()  # Required
     salarieAideSociale = serializers.BooleanField(
-        source="job_seeker.jobseeker_profile.has_social_allowance"
+        source="job_application.job_seeker.jobseeker_profile.has_social_allowance"
     )  # Required
 
-    salarieBenefRSA = serializers.CharField(source="job_seeker.jobseeker_profile.has_rsa_allocation")  # Required
+    salarieBenefRSA = serializers.CharField(
+        source="job_application.job_seeker.jobseeker_profile.has_rsa_allocation"
+    )  # Required
     salarieBenefRSADepuis = NullIfEmptyChoiceField(
         choices=AllocationDuration.choices,
-        source="job_seeker.jobseeker_profile.rsa_allocation_since",
+        source="job_application.job_seeker.jobseeker_profile.rsa_allocation_since",
     )  # Required if he has RSA allocation
 
-    salarieBenefASS = serializers.BooleanField(source="job_seeker.jobseeker_profile.has_ass_allocation")  # Required
+    salarieBenefASS = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.has_ass_allocation"
+    )  # Required
     salarieBenefASSDepuis = NullIfEmptyChoiceField(
         choices=AllocationDuration.choices,
-        source="job_seeker.jobseeker_profile.ass_allocation_since",
+        source="job_application.job_seeker.jobseeker_profile.ass_allocation_since",
     )  # Required if he has ASS allocation
 
-    salarieBenefAAH = serializers.BooleanField(source="job_seeker.jobseeker_profile.has_aah_allocation")  # Required
+    salarieBenefAAH = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.has_aah_allocation"
+    )  # Required
     salarieBenefAAHDepuis = NullIfEmptyChoiceField(
         choices=AllocationDuration.choices,
-        source="job_seeker.jobseeker_profile.aah_allocation_since",
+        source="job_application.job_seeker.jobseeker_profile.aah_allocation_since",
     )  # Required if he has AAH allocation
 
-    salarieBenefATA = serializers.BooleanField(source="job_seeker.jobseeker_profile.has_ata_allocation")  # Required
+    salarieBenefATA = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.has_ata_allocation"
+    )  # Required
     salarieBenefATADepuis = NullIfEmptyChoiceField(
         choices=AllocationDuration.choices,
-        source="job_seeker.jobseeker_profile.ata_allocation_since",
+        source="job_application.job_seeker.jobseeker_profile.ata_allocation_since",
     )  # Required if he has ATA allocation
+
+    def get_salarieOETH(self, obj: EmployeeRecord) -> bool:
+        if obj.asp_siae_type is SiaeMeasure.EITI:
+            return False
+        return obj.job_application.job_seeker.jobseeker_profile.oeth_employee
 
 
 class EmployeeRecordSerializer(serializers.Serializer):
@@ -155,7 +182,7 @@ class EmployeeRecordSerializer(serializers.Serializer):
 
     # See : http://www.tomchristie.com/rest-framework-2-docs/api-guide/fields
     personnePhysique = _PersonSerializer(source="*")  # Required
-    adresse = _AddressSerializer(source="job_seeker")  # Required
+    adresse = _AddressSerializer(source="job_application.job_seeker")  # Required
     situationSalarie = _SituationSerializer(source="*")  # Required
 
     # These fields are null at the beginning of the ASP processing
@@ -170,7 +197,7 @@ class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
     siret = serializers.CharField(source="employee_record.siret")  # Required
 
     personnePhysique = _PersonSerializer(source="employee_record")  # Required
-    adresse = _AddressSerializer(source="employee_record.job_seeker")  # Required
+    adresse = _AddressSerializer(source="employee_record.job_application.job_seeker")  # Required
     situationSalarie = _SituationSerializer(source="employee_record")  # Required
 
     # These fields are null at the beginning of the ASP processing

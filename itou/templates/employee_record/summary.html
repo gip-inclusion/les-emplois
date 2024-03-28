@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content_title %}
-    <h1>Détail fiche salarié ASP: {{ employee_record.job_seeker.get_full_name }}</h1>
+    <h1>Détail fiche salarié ASP: {{ employee_record.job_application.job_seeker.get_full_name }}</h1>
     <p>{% include 'employee_record/includes/_status.html' with employee_record=employee_record only %}</p>
 {% endblock %}
 

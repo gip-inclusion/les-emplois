@@ -15,7 +15,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         # then exactly *one* 'NEW' notification objects must be created.
         # A normal case
         employee_record = EmployeeRecordFactory(status=Status.PROCESSED)
-        approval = employee_record.approval
+        approval = employee_record.job_application.approval
         today = timezone.localdate()
 
         approval.start_at = today + timedelta(days=1)
@@ -30,7 +30,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         # then exactly *one* 'NEW' notification objects must be created.
         # Another normal case
         employee_record = EmployeeRecordFactory(status=Status.PROCESSED)
-        approval = employee_record.approval
+        approval = employee_record.job_application.approval
         today = timezone.localdate()
 
         approval.end_at = today + timedelta(days=2)
@@ -45,7 +45,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         # then exactly *one* 'NEW' notification objects must be created,
         # (which is the last one)
         employee_record = EmployeeRecordFactory(status=Status.PROCESSED)
-        approval = employee_record.approval
+        approval = employee_record.job_application.approval
         today = timezone.localdate()
 
         approval.start_at = today + timedelta(days=1)
@@ -66,7 +66,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         # And the target fields are not monitored
         # Then there is no creation of an EmployeeRecordUpdateNotification object.
         employee_record = EmployeeRecordFactory(status=Status.PROCESSED)
-        approval = employee_record.approval
+        approval = employee_record.job_application.approval
 
         approval.created_at = timezone.localtime()
         approval.save()
@@ -91,7 +91,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         for status in [elt for elt in Status.values if elt != Status.PROCESSED]:
             with self.subTest(status):
                 employee_record = EmployeeRecordFactory(status=status)
-                approval = employee_record.approval
+                approval = employee_record.job_application.approval
                 today = timezone.localtime()
 
                 approval.created_at = today + timedelta(days=2)
@@ -126,7 +126,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         # Creation of a suspension on an approval linked to an employee record
         # must also create a new employee record update notification.
         employee_record = EmployeeRecordFactory(status=Status.PROCESSED)
-        approval = employee_record.approval
+        approval = employee_record.job_application.approval
         start_at = timezone.localdate()
 
         SuspensionFactory(
@@ -141,7 +141,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         # Creation of a prolongation on an approval linked to an employee record
         # must also create a new employee record update notification.
         employee_record = EmployeeRecordFactory(status=Status.PROCESSED)
-        approval = employee_record.approval
+        approval = employee_record.job_application.approval
 
         ProlongationFactory(
             approval=approval,

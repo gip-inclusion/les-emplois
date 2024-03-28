@@ -65,38 +65,42 @@ class _API_AddressSerializer(serializers.Serializer):
 
 class _API_PersonSerializer(serializers.Serializer):
     # Specific field added to the API (not used in ASP transfers)
-    NIR = serializers.CharField(source="job_seeker.jobseeker_profile.nir")
+    NIR = serializers.CharField(source="job_application.job_seeker.jobseeker_profile.nir")
 
     passIae = serializers.CharField(source="approval_number")
     sufPassIae = NullField()
-    idItou = serializers.CharField(source="job_seeker.jobseeker_profile.asp_uid")
+    idItou = serializers.CharField(source="job_application.job_seeker.jobseeker_profile.asp_uid")
 
-    civilite = serializers.ChoiceField(choices=Title.choices, source="job_seeker.title")
+    civilite = serializers.ChoiceField(choices=Title.choices, source="job_application.job_seeker.title")
     nomUsage = serializers.SerializerMethodField()
     nomNaissance = NullField()
     prenom = serializers.SerializerMethodField()
-    dateNaissance = serializers.DateField(format="%d/%m/%Y", source="job_seeker.birthdate")
+    dateNaissance = serializers.DateField(format="%d/%m/%Y", source="job_application.job_seeker.birthdate")
 
-    codeDpt = serializers.CharField(source="job_seeker.birth_place.department_code", required=False)
-    codeInseePays = serializers.CharField(source="job_seeker.jobseeker_profile.birth_country.code", allow_null=True)
-    codeGroupePays = serializers.CharField(source="job_seeker.jobseeker_profile.birth_country.group", allow_null=True)
+    codeDpt = serializers.CharField(source="job_application.job_seeker.birth_place.department_code", required=False)
+    codeInseePays = serializers.CharField(
+        source="job_application.job_seeker.jobseeker_profile.birth_country.code", allow_null=True
+    )
+    codeGroupePays = serializers.CharField(
+        source="job_application.job_seeker.jobseeker_profile.birth_country.group", allow_null=True
+    )
 
     # codeComInsee is only mandatory if birth country is France
     codeComInsee = serializers.SerializerMethodField(required=False)
 
-    passDateDeb = serializers.DateField(format="%d/%m/%Y", source="approval.start_at")
-    passDateFin = serializers.DateField(format="%d/%m/%Y", source="approval.end_at")
+    passDateDeb = serializers.DateField(format="%d/%m/%Y", source="job_application.approval.start_at")
+    passDateFin = serializers.DateField(format="%d/%m/%Y", source="job_application.approval.end_at")
 
     def get_nomUsage(self, obj: EmployeeRecord) -> str:
-        return unidecode(obj.job_seeker.last_name).upper()
+        return unidecode(obj.job_application.job_seeker.last_name).upper()
 
     def get_prenom(self, obj: EmployeeRecord) -> str:
-        return unidecode(obj.job_seeker.first_name).upper()
+        return unidecode(obj.job_application.job_seeker.first_name).upper()
 
     def get_codeComInsee(self, obj: EmployeeRecord) -> CodeComInsee:
         # Another ASP subtlety, making top-level and children with the same name
         # The commune can be empty if the job seeker is not born in France
-        if birth_place := obj.job_seeker.jobseeker_profile.birth_place:
+        if birth_place := obj.job_application.job_seeker.jobseeker_profile.birth_place:
             return {
                 "codeComInsee": birth_place.code,
                 "codeDpt": birth_place.department_code,
@@ -111,38 +115,50 @@ class _API_PersonSerializer(serializers.Serializer):
 
 
 class _API_SituationSerializer(serializers.Serializer):
-    niveauFormation = serializers.CharField(source="job_seeker.jobseeker_profile.education_level")
-    salarieEnEmploi = serializers.BooleanField(source="job_seeker.jobseeker_profile.is_employed")
+    niveauFormation = serializers.CharField(source="job_application.job_seeker.jobseeker_profile.education_level")
+    salarieEnEmploi = serializers.BooleanField(source="job_application.job_seeker.jobseeker_profile.is_employed")
 
-    salarieSansEmploiDepuis = NullIfEmptyCharField(source="job_seeker.jobseeker_profile.unemployed_since")
-    salarieSansRessource = serializers.BooleanField(source="job_seeker.jobseeker_profile.resourceless")
+    salarieSansEmploiDepuis = NullIfEmptyCharField(
+        source="job_application.job_seeker.jobseeker_profile.unemployed_since"
+    )
+    salarieSansRessource = serializers.BooleanField(source="job_application.job_seeker.jobseeker_profile.resourceless")
 
-    inscritPoleEmploi = serializers.BooleanField(source="job_seeker.jobseeker_profile.pole_emploi_id")
-    inscritPoleEmploiDepuis = NullIfEmptyCharField(source="job_seeker.jobseeker_profile.pole_emploi_since")
-    numeroIDE = serializers.CharField(source="job_seeker.jobseeker_profile.pole_emploi_id")
+    inscritPoleEmploi = serializers.BooleanField(source="job_application.job_seeker.jobseeker_profile.pole_emploi_id")
+    inscritPoleEmploiDepuis = NullIfEmptyCharField(
+        source="job_application.job_seeker.jobseeker_profile.pole_emploi_since"
+    )
+    numeroIDE = serializers.CharField(source="job_application.job_seeker.jobseeker_profile.pole_emploi_id")
 
-    salarieRQTH = serializers.BooleanField(source="job_seeker.jobseeker_profile.rqth_employee")
-    salarieOETH = serializers.BooleanField(source="asp_oeth_employee")
-    salarieAideSociale = serializers.BooleanField(source="job_seeker.jobseeker_profile.has_social_allowance")
+    salarieRQTH = serializers.BooleanField(source="job_application.job_seeker.jobseeker_profile.rqth_employee")
+    salarieOETH = serializers.BooleanField(source="job_application.job_seeker.jobseeker_profile.oeth_employee")
+    salarieAideSociale = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.has_social_allowance"
+    )
 
-    salarieBenefRSA = serializers.CharField(source="job_seeker.jobseeker_profile.has_rsa_allocation")
+    salarieBenefRSA = serializers.CharField(source="job_application.job_seeker.jobseeker_profile.has_rsa_allocation")
     salarieBenefRSADepuis = NullIfEmptyCharField(
-        source="job_seeker.jobseeker_profile.rsa_allocation_since", allow_blank=True
+        source="job_application.job_seeker.jobseeker_profile.rsa_allocation_since", allow_blank=True
     )
 
-    salarieBenefASS = serializers.BooleanField(source="job_seeker.jobseeker_profile.has_ass_allocation")
+    salarieBenefASS = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.has_ass_allocation"
+    )
     salarieBenefASSDepuis = NullIfEmptyCharField(
-        source="job_seeker.jobseeker_profile.ass_allocation_since", allow_blank=True
+        source="job_application.job_seeker.jobseeker_profile.ass_allocation_since", allow_blank=True
     )
 
-    salarieBenefAAH = serializers.BooleanField(source="job_seeker.jobseeker_profile.has_aah_allocation")
+    salarieBenefAAH = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.has_aah_allocation"
+    )
     salarieBenefAAHDepuis = NullIfEmptyCharField(
-        source="job_seeker.jobseeker_profile.aah_allocation_since", allow_blank=True
+        source="job_application.job_seeker.jobseeker_profile.aah_allocation_since", allow_blank=True
     )
 
-    salarieBenefATA = serializers.BooleanField(source="job_seeker.jobseeker_profile.has_ata_allocation")
+    salarieBenefATA = serializers.BooleanField(
+        source="job_application.job_seeker.jobseeker_profile.has_ata_allocation"
+    )
     salarieBenefATADepuis = NullIfEmptyCharField(
-        source="job_seeker.jobseeker_profile.ata_allocation_since", allow_blank=True
+        source="job_application.job_seeker.jobseeker_profile.ata_allocation_since", allow_blank=True
     )
 
     # There is a clear lack of knowledge of ASP business rules on this point.
@@ -166,14 +182,14 @@ class EmployeeRecordAPISerializer(serializers.Serializer):
 
     # See : http://www.tomchristie.com/rest-framework-2-docs/api-guide/fields
     personnePhysique = _API_PersonSerializer(source="*")
-    adresse = _API_AddressSerializer(source="job_seeker")
+    adresse = _API_AddressSerializer(source="job_application.job_seeker")
     situationSalarie = _API_SituationSerializer(source="*")
 
     # These fields are null at the beginning of the ASP processing
     codeTraitement = serializers.CharField(source="asp_processing_code", allow_blank=True)
     libelleTraitement = serializers.CharField(source="asp_processing_label", allow_blank=True)
 
-    numeroAnnexe = serializers.CharField(source="financial_annex_number")
+    numeroAnnexe = serializers.CharField(source="financial_annex.number", allow_null=True)
 
 
 class EmployeeRecordUpdateNotificationAPISerializer(serializers.Serializer):
@@ -183,7 +199,7 @@ class EmployeeRecordUpdateNotificationAPISerializer(serializers.Serializer):
     mesure = serializers.CharField(source="employee_record.asp_siae_type")
 
     personnePhysique = _API_PersonSerializer(source="employee_record")
-    adresse = _API_AddressSerializer(source="employee_record.job_seeker")
+    adresse = _API_AddressSerializer(source="employee_record.job_application.job_seeker")
     situationSalarie = _API_SituationSerializer(source="employee_record")
 
     # These fields are null at the beginning of the ASP processing
