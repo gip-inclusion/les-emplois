@@ -4,7 +4,7 @@ from rest_framework import serializers
 from unidecode import unidecode
 
 from itou.asp.models import AllocationDuration, LaneExtension, LaneType, SiaeMeasure
-from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from itou.employee_record.typing import CodeComInsee
 from itou.users.enums import Title
 from itou.users.models import User
@@ -59,6 +59,16 @@ class _PersonSerializer(serializers.Serializer):
         }
 
 
+class _StaticPersonSerializer(_PersonSerializer):
+    """Force the birth country to Iceland to bypass ASP checks for update notifications"""
+
+    codeComInsee = serializers.ReadOnlyField(
+        default={"codeComInsee": None, "codeDpt": "099"}
+    )  # Required if the birth country is France
+    codeInseePays = serializers.ReadOnlyField(default="102")  # Required.
+    codeGroupePays = serializers.ReadOnlyField(default="3")  # Required
+
+
 class _AddressSerializer(serializers.Serializer):
     # Source object is a job seeker
 
@@ -99,6 +109,19 @@ class _AddressSerializer(serializers.Serializer):
         if additional_address and not re.match("^[a-zA-Z0-9@ ]{,32}$", additional_address):
             return None
         return additional_address
+
+
+class _StaticAddressSerializer(_AddressSerializer):
+    """Use the France Travail agency address to bypass ASP checks for update notifications"""
+
+    adrNumeroVoie = serializers.ReadOnlyField(default="3")  # Optional
+    codeextensionvoie = serializers.ReadOnlyField(default=None)  # Optional
+    codetypevoie = serializers.ReadOnlyField(default="AV")  # Required
+    adrLibelleVoie = serializers.ReadOnlyField(default="DE BLIDA")  # Required
+    adrCpltDistribution = serializers.ReadOnlyField(default=None)  # Optional
+
+    codeinseecom = serializers.ReadOnlyField(default="57463")  # Required
+    codepostalcedex = serializers.ReadOnlyField(default="57000")  # Required
 
 
 class _SituationSerializer(serializers.Serializer):
@@ -196,13 +219,35 @@ class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
     mesure = serializers.CharField(source="employee_record.asp_siae_type")  # Required
     siret = serializers.CharField(source="employee_record.siret")  # Required
 
-    personnePhysique = _PersonSerializer(source="employee_record")  # Required
-    adresse = _AddressSerializer(source="employee_record.job_application.job_seeker")  # Required
+    personnePhysique = serializers.SerializerMethodField()  # Required
+    adresse = serializers.SerializerMethodField()  # Required
     situationSalarie = _SituationSerializer(source="employee_record")  # Required
 
     # These fields are null at the beginning of the ASP processing
     codeTraitement = serializers.CharField(source="asp_processing_code", allow_blank=True, allow_null=True)
     libelleTraitement = serializers.CharField(source="asp_processing_label", allow_blank=True, allow_null=True)
+
+    def get_personnePhysique(self, obj: EmployeeRecordUpdateNotification):
+        is_missing_required_fields = not all(
+            [
+                getattr(obj.employee_record.job_application.job_seeker.jobseeker_profile, field)
+                for field in {"birth_country", "birth_place"}
+            ]
+        )
+        if is_missing_required_fields:
+            return _StaticPersonSerializer(obj.employee_record).data
+        return _PersonSerializer(obj.employee_record).data
+
+    def get_adresse(self, obj: EmployeeRecordUpdateNotification):
+        is_missing_required_fields = not all(
+            [
+                getattr(obj.employee_record.job_application.job_seeker.jobseeker_profile, field)
+                for field in {"hexa_lane_type", "hexa_lane_name", "hexa_post_code", "hexa_commune"}
+            ]
+        )
+        if is_missing_required_fields:
+            return _StaticAddressSerializer(obj.employee_record.job_application.job_seeker).data
+        return _AddressSerializer(obj.employee_record.job_application.job_seeker).data
 
 
 class EmployeeRecordBatchSerializer(serializers.Serializer):
