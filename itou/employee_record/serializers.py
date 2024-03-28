@@ -1,42 +1,13 @@
 import re
-import typing
 
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from unidecode import unidecode
 
 from itou.employee_record.models import EmployeeRecord
+from itou.employee_record.typing import CodeComInsee
 from itou.users.enums import Title
 from itou.users.models import User
-
-
-### Notifications
-
-
-class NullIfEmptyCharField(serializers.CharField):
-    def to_representation(self, value):
-        if value == "":
-            return None
-        return super().to_representation(value)
-
-
-@extend_schema_field(OpenApiTypes.NONE)
-class NullField(serializers.Field):
-    def to_representation(self, _):
-        # Field value is always replaced by `None`.
-        # We noticed an erratic processing for sone fields on ASP side (phone, email, ...),
-        # so we simply decided not to send their value anymore.
-        return None
-
-    def get_attribute(self, _):
-        # Do not attempt to match field name in instance
-        return None
-
-
-class CodeComInsee(typing.TypedDict):
-    codeComInsee: str | None
-    codeDpt: str
+from itou.utils.serializers import NullField, NullIfEmptyCharField
 
 
 class _PersonSerializer(serializers.Serializer):
