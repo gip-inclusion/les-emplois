@@ -1079,13 +1079,6 @@ class CompanyAdminMembersManagementTest(TestCase):
             reverse("companies_views:update_admin_role", kwargs={"action": suspicious_action, "user_id": admin.id})
 
 
-def test_dora_url(settings):
-    settings.DORA_BASE_URL = "https://dora.fake.gouv.fr/"
-    assert views.dora_url("toto", "superb-id") == "https://dora.fake.gouv.fr/services/di--toto--superb-id"
-    assert views.dora_url("dora", "superb-id") == "https://dora.fake.gouv.fr/services/di--dora--superb-id"
-    assert views.dora_url("dora", "superb-id", "foobar") == "foobar"
-
-
 def test_displayable_thematique():
     assert views.displayable_thematique("une-thematique-comme-ça--et-une-sous-thematique") == "UNE THEMATIQUE COMME ÇA"
 
@@ -1144,7 +1137,7 @@ def test_get_data_inclusion_services(settings, respx_mock):
     random.seed(0)  # ensure the mock data is stable
     mocked_final_response = [
         {
-            "dora_di_url": "https://dora.inclusion.beta.gouv.fr/services/di--fake--svc4",
+            "di_service_redirect_url": "https://fake.api.gouv.fr/services/fake/svc4/redirige?depuis=les-emplois&mtm_campaign=LesEmplois&mtm_kwd=GeneriqueDecouvrirService",
             "id": "svc4",
             "lien_source": "https://fake.api.gouv.fr/services/svc4",
             "modes_accueil": ["en-presentiel"],
@@ -1153,7 +1146,7 @@ def test_get_data_inclusion_services(settings, respx_mock):
             "thematiques_display": {"A"},
         },
         {
-            "dora_di_url": "https://dora.inclusion.beta.gouv.fr/services/di--fake--svc2",
+            "di_service_redirect_url": "https://fake.api.gouv.fr/services/fake/svc2/redirige?depuis=les-emplois&mtm_campaign=LesEmplois&mtm_kwd=GeneriqueDecouvrirService",
             "id": "svc2",
             "lien_source": "https://fake.api.gouv.fr/services/svc2",
             "modes_accueil": ["en-presentiel"],

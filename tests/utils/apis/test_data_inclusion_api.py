@@ -41,6 +41,6 @@ def test_data_inclusion_client(settings, respx_mock):
     with pytest.raises(DataInclusionApiException):
         client.services("fake-insee-code")
 
-    api_mock.respond(403, json={"something": "else"})
+    api_mock.respond(403)
     with pytest.raises(DataInclusionApiException):
         client.services("fake-insee-code")

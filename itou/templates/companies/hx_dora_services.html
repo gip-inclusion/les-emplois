@@ -15,14 +15,14 @@
                                 <p class="fs-sm">
                                     Identifiez rapidement les services répondant aux difficultés et aux besoins des personnes que vous accompagnez
                                 </p>
-                                <a href="{{ dora_base_url }}?mtm_campaign=LesEmplois&mtm_kwd=GeneriqueDecouvrirService" rel="noopener" target="_blank" class="btn-link btn-ico has-external-link">Découvrir tous les services</a>
+                                <a href="{{ dora_base_url }}" rel="noopener" target="_blank" class="btn-link btn-ico has-external-link">Découvrir tous les services</a>
                             </div>
                             <div class="col-12 col-lg-9">
                                 <div class="vstack gap-3">
                                     {% for service in data_inclusion_services %}
                                         <div class="card c-card has-links-inside">
                                             <div class="card-body">
-                                                <a href="{{ service.dora_di_url }}?mtm_campaign=LesEmplois&mtm_kwd=CardServiceFicheDePoste" rel="noopener" target="_blank" class="btn-link mb-2">{{ service.nom | truncatechars:60 }}</a>
+                                                <a href="{{ service.di_service_redirect_url }}" rel="noopener" target="_blank" class="btn-link mb-2">{{ service.nom | truncatechars:60 }}</a>
                                                 <ul class="list-unstyled list-inline fs-sm">
                                                     <li class="list-inline-item">{{ service.structure.nom | truncatechars:60 }}</li>
                                                     {% if service.code_postal and service.commune %}
