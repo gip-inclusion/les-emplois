@@ -3,33 +3,34 @@ import re
 from rest_framework import serializers
 from unidecode import unidecode
 
+from itou.asp.models import AllocationDuration, LaneExtension, LaneType
 from itou.employee_record.models import EmployeeRecord
 from itou.employee_record.typing import CodeComInsee
 from itou.users.enums import Title
 from itou.users.models import User
-from itou.utils.serializers import NullField, NullIfEmptyCharField
+from itou.utils.serializers import NullField, NullIfEmptyCharField, NullIfEmptyChoiceField
 
 
 class _PersonSerializer(serializers.Serializer):
-    passIae = serializers.CharField(source="approval_number")
+    passIae = serializers.CharField(source="approval_number")  # Required
+    idItou = serializers.CharField(source="job_seeker.jobseeker_profile.asp_uid")  # Required
+
+    civilite = serializers.ChoiceField(choices=Title.choices, source="job_seeker.title")  # Required
+    nomUsage = serializers.SerializerMethodField()  # Required
+    nomNaissance = NullField()  # Optional
+    prenom = serializers.SerializerMethodField()  # Required
+    dateNaissance = serializers.DateField(format="%d/%m/%Y", source="job_seeker.birthdate")  # Required
+
+    codeComInsee = serializers.SerializerMethodField()  # Required if the birth country is France
+    codeInseePays = serializers.CharField(source="job_seeker.jobseeker_profile.birth_country.code")  # Required
+    codeGroupePays = serializers.CharField(source="job_seeker.jobseeker_profile.birth_country.group")  # Required
+
+    passDateDeb = serializers.DateField(format="%d/%m/%Y", source="approval.start_at")  # Required
+    passDateFin = serializers.DateField(format="%d/%m/%Y", source="approval.end_at")  # Required
+
+    # TODO: Remove to fields after confirmation as they are not mentioned in CC V1.05, § 2.4.1
     sufPassIae = NullField()
-    idItou = serializers.CharField(source="job_seeker.jobseeker_profile.asp_uid")
-
-    civilite = serializers.ChoiceField(choices=Title.choices, source="job_seeker.title")
-    nomUsage = serializers.SerializerMethodField()
-    nomNaissance = NullField()
-    prenom = serializers.SerializerMethodField()
-    dateNaissance = serializers.DateField(format="%d/%m/%Y", source="job_seeker.birthdate")
-
     codeDpt = serializers.CharField(source="job_seeker.birth_place.department_code", required=False)
-    codeInseePays = serializers.CharField(source="job_seeker.jobseeker_profile.birth_country.code", allow_null=True)
-    codeGroupePays = serializers.CharField(source="job_seeker.jobseeker_profile.birth_country.group", allow_null=True)
-
-    # codeComInsee is only mandatory if birth country is France
-    codeComInsee = serializers.SerializerMethodField(required=False)
-
-    passDateDeb = serializers.DateField(format="%d/%m/%Y", source="approval.start_at")
-    passDateFin = serializers.DateField(format="%d/%m/%Y", source="approval.end_at")
 
     def get_nomUsage(self, obj: EmployeeRecord) -> str:
         return unidecode(obj.job_seeker.last_name).upper()
@@ -57,18 +58,29 @@ class _PersonSerializer(serializers.Serializer):
 class _AddressSerializer(serializers.Serializer):
     # Source object is a job seeker
 
-    adrTelephone = NullField()
-    adrMail = NullField()
+    adrTelephone = NullField()  # Optional
+    adrMail = NullField()  # Optional
 
-    adrNumeroVoie = serializers.CharField(source="jobseeker_profile.hexa_lane_number")
-    codeextensionvoie = NullIfEmptyCharField(source="jobseeker_profile.hexa_std_extension", allow_blank=True)
-    codetypevoie = serializers.CharField(source="jobseeker_profile.hexa_lane_type")
+    adrNumeroVoie = NullIfEmptyCharField(source="jobseeker_profile.hexa_lane_number", allow_blank=True)  # Optional
+    codeextensionvoie = NullIfEmptyChoiceField(
+        choices=LaneExtension.choices, source="jobseeker_profile.hexa_std_extension", allow_blank=True
+    )  # Optional
+    codetypevoie = serializers.ChoiceField(
+        choices=LaneType.choices, source="jobseeker_profile.hexa_lane_type"
+    )  # Required
+    adrLibelleVoie = serializers.SerializerMethodField()  # Required
+    adrCpltDistribution = serializers.SerializerMethodField()  # Optional
 
-    adrLibelleVoie = serializers.SerializerMethodField()
-    adrCpltDistribution = serializers.SerializerMethodField()
+    codeinseecom = serializers.CharField(source="jobseeker_profile.hexa_commune.code")  # Required
+    codepostalcedex = serializers.CharField(source="jobseeker_profile.hexa_post_code")  # Required
 
-    codeinseecom = serializers.CharField(source="jobseeker_profile.hexa_commune.code", allow_null=True)
-    codepostalcedex = serializers.CharField(source="jobseeker_profile.hexa_post_code")
+    def get_adrLibelleVoie(self, obj: User) -> str | None:
+        # Remove diacritics and parenthesis from adrLibelleVoie field fixes ASP error 3330
+        # (parenthesis are not described as invalid characters in specification document).
+        lane = obj.jobseeker_profile.hexa_lane_name
+        if lane:
+            return unidecode(lane.translate({ord(ch): "" for ch in "()"}))
+        return ""
 
     def get_adrCpltDistribution(self, obj: User) -> str | None:
         # Don't send extended address if it must be truncated:
@@ -84,92 +96,93 @@ class _AddressSerializer(serializers.Serializer):
             return None
         return additional_address
 
-    def get_adrLibelleVoie(self, obj: User) -> str | None:
-        # Remove diacritics and parenthesis from adrLibelleVoie field fixes ASP error 3330
-        # (parenthesis are not described as invalid characters in specification document).
-        lane = obj.jobseeker_profile.hexa_lane_name
-        if lane:
-            return unidecode(lane.translate({ord(ch): "" for ch in "()"}))
-        return None
-
 
 class _SituationSerializer(serializers.Serializer):
-    niveauFormation = serializers.CharField(source="job_seeker.jobseeker_profile.education_level")
-    salarieEnEmploi = serializers.BooleanField(source="job_seeker.jobseeker_profile.is_employed")
+    orienteur = serializers.CharField(source="asp_prescriber_type")  # Required
+    niveauFormation = serializers.CharField(source="job_seeker.jobseeker_profile.education_level")  # Required
 
-    salarieSansEmploiDepuis = NullIfEmptyCharField(source="job_seeker.jobseeker_profile.unemployed_since")
-    salarieSansRessource = serializers.BooleanField(source="job_seeker.jobseeker_profile.resourceless")
+    salarieEnEmploi = serializers.BooleanField(source="job_seeker.jobseeker_profile.is_employed")  # Required
+    salarieTypeEmployeur = serializers.CharField(source="asp_employer_type", required=False)  # Required if employed
+    salarieSansEmploiDepuis = NullIfEmptyChoiceField(
+        choices=AllocationDuration.choices, source="job_seeker.jobseeker_profile.unemployed_since"
+    )  # Required
+    salarieSansRessource = serializers.BooleanField(source="job_seeker.jobseeker_profile.resourceless")  # Required
 
-    inscritPoleEmploi = serializers.BooleanField(source="job_seeker.jobseeker_profile.pole_emploi_id")
-    inscritPoleEmploiDepuis = NullIfEmptyCharField(source="job_seeker.jobseeker_profile.pole_emploi_since")
-    numeroIDE = serializers.CharField(source="job_seeker.jobseeker_profile.pole_emploi_id")
+    inscritPoleEmploi = serializers.BooleanField(source="job_seeker.jobseeker_profile.pole_emploi_id")  # Required
+    inscritPoleEmploiDepuis = NullIfEmptyChoiceField(
+        choices=AllocationDuration.choices, source="job_seeker.jobseeker_profile.pole_emploi_since"
+    )  # Required if registered with France Travail
+    numeroIDE = NullIfEmptyCharField(
+        source="job_seeker.jobseeker_profile.pole_emploi_id"
+    )  # Required if registered with France Travail
 
-    salarieRQTH = serializers.BooleanField(source="job_seeker.jobseeker_profile.rqth_employee")
-    salarieOETH = serializers.BooleanField(source="asp_oeth_employee")
-    salarieAideSociale = serializers.BooleanField(source="job_seeker.jobseeker_profile.has_social_allowance")
+    salarieRQTH = serializers.BooleanField(source="job_seeker.jobseeker_profile.rqth_employee")  # Required
+    salarieOETH = serializers.BooleanField(source="asp_oeth_employee")  # Required
+    salarieAideSociale = serializers.BooleanField(
+        source="job_seeker.jobseeker_profile.has_social_allowance"
+    )  # Required
 
-    salarieBenefRSA = serializers.CharField(source="job_seeker.jobseeker_profile.has_rsa_allocation")
-    salarieBenefRSADepuis = NullIfEmptyCharField(
-        source="job_seeker.jobseeker_profile.rsa_allocation_since", allow_blank=True
-    )
+    salarieBenefRSA = serializers.CharField(source="job_seeker.jobseeker_profile.has_rsa_allocation")  # Required
+    salarieBenefRSADepuis = NullIfEmptyChoiceField(
+        choices=AllocationDuration.choices,
+        source="job_seeker.jobseeker_profile.rsa_allocation_since",
+    )  # Required if he has RSA allocation
 
-    salarieBenefASS = serializers.BooleanField(source="job_seeker.jobseeker_profile.has_ass_allocation")
-    salarieBenefASSDepuis = NullIfEmptyCharField(
-        source="job_seeker.jobseeker_profile.ass_allocation_since", allow_blank=True
-    )
+    salarieBenefASS = serializers.BooleanField(source="job_seeker.jobseeker_profile.has_ass_allocation")  # Required
+    salarieBenefASSDepuis = NullIfEmptyChoiceField(
+        choices=AllocationDuration.choices,
+        source="job_seeker.jobseeker_profile.ass_allocation_since",
+    )  # Required if he has ASS allocation
 
-    salarieBenefAAH = serializers.BooleanField(source="job_seeker.jobseeker_profile.has_aah_allocation")
-    salarieBenefAAHDepuis = NullIfEmptyCharField(
-        source="job_seeker.jobseeker_profile.aah_allocation_since", allow_blank=True
-    )
+    salarieBenefAAH = serializers.BooleanField(source="job_seeker.jobseeker_profile.has_aah_allocation")  # Required
+    salarieBenefAAHDepuis = NullIfEmptyChoiceField(
+        choices=AllocationDuration.choices,
+        source="job_seeker.jobseeker_profile.aah_allocation_since",
+    )  # Required if he has AAH allocation
 
-    salarieBenefATA = serializers.BooleanField(source="job_seeker.jobseeker_profile.has_ata_allocation")
-    salarieBenefATADepuis = NullIfEmptyCharField(
-        source="job_seeker.jobseeker_profile.ata_allocation_since", allow_blank=True
-    )
-
-    # There is a clear lack of knowledge of ASP business rules on this point.
-    # Without any satisfactory answer, it has been decided to obfuscate / mock these fields.
-    salarieTypeEmployeur = serializers.CharField(source="asp_employer_type", required=False)
-    orienteur = serializers.CharField(source="asp_prescriber_type", required=False)
+    salarieBenefATA = serializers.BooleanField(source="job_seeker.jobseeker_profile.has_ata_allocation")  # Required
+    salarieBenefATADepuis = NullIfEmptyChoiceField(
+        choices=AllocationDuration.choices,
+        source="job_seeker.jobseeker_profile.ata_allocation_since",
+    )  # Required if he has ATA allocation
 
 
 class EmployeeRecordSerializer(serializers.Serializer):
-    numLigne = serializers.IntegerField(source="asp_batch_line_number")
-    typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
-    siret = serializers.CharField()
-    mesure = serializers.CharField(source="asp_siae_type")
+    numLigne = serializers.IntegerField(source="asp_batch_line_number")  # Required
+    typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")  # Required
+    siret = serializers.CharField()  # Required
+    mesure = serializers.CharField(source="asp_siae_type")  # Required
 
     # See : http://www.tomchristie.com/rest-framework-2-docs/api-guide/fields
-    personnePhysique = _PersonSerializer(source="*")
-    adresse = _AddressSerializer(source="job_seeker")
-    situationSalarie = _SituationSerializer(source="*")
+    personnePhysique = _PersonSerializer(source="*")  # Required
+    adresse = _AddressSerializer(source="job_seeker")  # Required
+    situationSalarie = _SituationSerializer(source="*")  # Required
 
     # These fields are null at the beginning of the ASP processing
-    codeTraitement = serializers.CharField(source="asp_processing_code", allow_blank=True)
-    libelleTraitement = serializers.CharField(source="asp_processing_label", allow_blank=True)
+    codeTraitement = serializers.CharField(source="asp_processing_code", allow_blank=True, allow_null=True)
+    libelleTraitement = serializers.CharField(source="asp_processing_label", allow_blank=True, allow_null=True)
 
 
 class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
-    numLigne = serializers.IntegerField(source="asp_batch_line_number")
-    typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
-    siret = serializers.CharField(source="employee_record.siret")
-    mesure = serializers.CharField(source="employee_record.asp_siae_type")
+    numLigne = serializers.IntegerField(source="asp_batch_line_number")  # Required
+    typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")  # Required
+    mesure = serializers.CharField(source="employee_record.asp_siae_type")  # Required
+    siret = serializers.CharField(source="employee_record.siret")  # Required
 
-    personnePhysique = _PersonSerializer(source="employee_record")
-    adresse = _AddressSerializer(source="employee_record.job_seeker")
-    situationSalarie = _SituationSerializer(source="employee_record")
+    personnePhysique = _PersonSerializer(source="employee_record")  # Required
+    adresse = _AddressSerializer(source="employee_record.job_seeker")  # Required
+    situationSalarie = _SituationSerializer(source="employee_record")  # Required
 
     # These fields are null at the beginning of the ASP processing
-    codeTraitement = serializers.CharField(source="asp_processing_code", allow_blank=True)
-    libelleTraitement = serializers.CharField(source="asp_processing_label", allow_blank=True)
+    codeTraitement = serializers.CharField(source="asp_processing_code", allow_blank=True, allow_null=True)
+    libelleTraitement = serializers.CharField(source="asp_processing_label", allow_blank=True, allow_null=True)
 
 
 class EmployeeRecordBatchSerializer(serializers.Serializer):
-    msgInformatif = serializers.CharField(source="message")
-    telId = serializers.CharField(source="id", allow_blank=True)
-    lignesTelechargement = EmployeeRecordSerializer(many=True, source="elements")
+    msgInformatif = serializers.CharField(source="message", allow_blank=True, allow_null=True)  # Optional
+    telId = serializers.CharField(source="id", allow_blank=True, allow_null=True)  # Optional
+    lignesTelechargement = EmployeeRecordSerializer(many=True, source="elements")  # Required
 
 
 class EmployeeRecordUpdateNotificationBatchSerializer(EmployeeRecordBatchSerializer):
-    lignesTelechargement = EmployeeRecordUpdateNotificationSerializer(many=True, source="elements")
+    lignesTelechargement = EmployeeRecordUpdateNotificationSerializer(many=True, source="elements")  # Required
