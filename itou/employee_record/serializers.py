@@ -134,19 +134,6 @@ class _SituationSerializer(serializers.Serializer):
     orienteur = serializers.CharField(source="asp_prescriber_type", required=False)
 
 
-class _BaseEmployeeRecordSerializer(serializers.Serializer):
-    numLigne = serializers.IntegerField(source="asp_batch_line_number")
-    typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
-
-    personnePhysique = None
-    adresse = None
-    situationSalarie = None
-
-    # These fields are null at the beginning of the ASP processing
-    codeTraitement = serializers.CharField(source="asp_processing_code", allow_blank=True)
-    libelleTraitement = serializers.CharField(source="asp_processing_label", allow_blank=True)
-
-
 class EmployeeRecordSerializer(serializers.Serializer):
     numLigne = serializers.IntegerField(source="asp_batch_line_number")
     typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")
