@@ -1,0 +1,93 @@
+# serializer version: 1
+# name: test_update_notification_use_static_serializers_on_missing_fields[birth_country-None-personnePhysique]
+  ReturnDict({
+    'civilite': 'MME',
+    'codeComInsee': dict({
+      'codeComInsee': None,
+      'codeDpt': '099',
+    }),
+    'codeGroupePays': '3',
+    'codeInseePays': '102',
+    'dateNaissance': '1990-05-01',
+    'idItou': 'a08dbdb523633cfc59dfdb297307a1',
+    'nomNaissance': None,
+    'nomUsage': 'DUPONT',
+    'passDateDeb': '01/01/2000',
+    'passDateFin': '01/01/3000',
+    'passIae': '999999999999',
+    'prenom': 'SACHA',
+    'sufPassIae': None,
+  })
+# ---
+# name: test_update_notification_use_static_serializers_on_missing_fields[birth_place-None-personnePhysique]
+  ReturnDict({
+    'civilite': 'MME',
+    'codeComInsee': dict({
+      'codeComInsee': None,
+      'codeDpt': '099',
+    }),
+    'codeGroupePays': '3',
+    'codeInseePays': '102',
+    'dateNaissance': '1990-05-01',
+    'idItou': 'a08dbdb523633cfc59dfdb297307a1',
+    'nomNaissance': None,
+    'nomUsage': 'DUPONT',
+    'passDateDeb': '01/01/2000',
+    'passDateFin': '01/01/3000',
+    'passIae': '999999999999',
+    'prenom': 'SACHA',
+    'sufPassIae': None,
+  })
+# ---
+# name: test_update_notification_use_static_serializers_on_missing_fields[hexa_commune-None-adresse]
+  ReturnDict({
+    'adrCpltDistribution': None,
+    'adrLibelleVoie': 'DE BLIDA',
+    'adrMail': None,
+    'adrNumeroVoie': '3',
+    'adrTelephone': None,
+    'codeextensionvoie': None,
+    'codeinseecom': '57463',
+    'codepostalcedex': '57000',
+    'codetypevoie': 'AV',
+  })
+# ---
+# name: test_update_notification_use_static_serializers_on_missing_fields[hexa_lane_name--adresse]
+  ReturnDict({
+    'adrCpltDistribution': None,
+    'adrLibelleVoie': 'DE BLIDA',
+    'adrMail': None,
+    'adrNumeroVoie': '3',
+    'adrTelephone': None,
+    'codeextensionvoie': None,
+    'codeinseecom': '57463',
+    'codepostalcedex': '57000',
+    'codetypevoie': 'AV',
+  })
+# ---
+# name: test_update_notification_use_static_serializers_on_missing_fields[hexa_lane_type--adresse]
+  ReturnDict({
+    'adrCpltDistribution': None,
+    'adrLibelleVoie': 'DE BLIDA',
+    'adrMail': None,
+    'adrNumeroVoie': '3',
+    'adrTelephone': None,
+    'codeextensionvoie': None,
+    'codeinseecom': '57463',
+    'codepostalcedex': '57000',
+    'codetypevoie': 'AV',
+  })
+# ---
+# name: test_update_notification_use_static_serializers_on_missing_fields[hexa_post_code--adresse]
+  ReturnDict({
+    'adrCpltDistribution': None,
+    'adrLibelleVoie': 'DE BLIDA',
+    'adrMail': None,
+    'adrNumeroVoie': '3',
+    'adrTelephone': None,
+    'codeextensionvoie': None,
+    'codeinseecom': '57463',
+    'codepostalcedex': '57000',
+    'codetypevoie': 'AV',
+  })
+# ---

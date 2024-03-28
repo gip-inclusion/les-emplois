@@ -15,7 +15,7 @@ from itou.employee_record.serializers import (
     _AddressSerializer,
 )
 from tests.asp.factories import CommuneFactory
-from tests.employee_record.factories import EmployeeRecordWithProfileFactory
+from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase
 
@@ -178,3 +178,24 @@ class EmployeeRecordUpdateNotificationSerializerTest(TestCase):
                 assert element.get("numLigne") == idx
                 assert element.get("siret") is not None
                 assert element.get("typeMouvement") == EmployeeRecordUpdateNotification.ASP_MOVEMENT_TYPE
+
+
+@pytest.mark.parametrize(
+    "field,value,key",
+    [
+        ("birth_country", None, "personnePhysique"),
+        ("birth_place", None, "personnePhysique"),
+        ("hexa_lane_type", "", "adresse"),
+        ("hexa_lane_name", "", "adresse"),
+        ("hexa_post_code", "", "adresse"),
+        ("hexa_commune", None, "adresse"),
+    ],
+)
+def test_update_notification_use_static_serializers_on_missing_fields(snapshot, field, value, key):
+    notification = EmployeeRecordUpdateNotificationFactory(
+        employee_record__job_application__for_snapshot=True,
+        **{f"employee_record__job_application__job_seeker__jobseeker_profile__{field}": value},
+    )
+
+    data = EmployeeRecordUpdateNotificationSerializer(notification).data
+    assert data[key] == snapshot()
