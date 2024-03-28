@@ -1,0 +1,7 @@
+{% load url_add_query %}
+
+<th scope="col">
+    {{ label }}
+    <a href="{% url_add_query url sort=sort %}" class="text-decoration-none"><i class="ri-arrow-up-s-line"></i></a>
+    <a href="{% url_add_query url sort="-"|add:sort %}" class="text-decoration-none"><i class="ri-arrow-down-s-line"></i></a>
+</th>
