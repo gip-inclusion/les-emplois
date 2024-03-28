@@ -78,8 +78,6 @@ def campaign_calendar(request, evaluation_campaign_pk, template_name="siae_evalu
         pk=evaluation_campaign_pk,
     )
 
-    back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
-
     if request.user.is_employer:
         evaluated_siae = get_object_or_404(
             EvaluatedSiae,
@@ -98,7 +96,6 @@ def campaign_calendar(request, evaluation_campaign_pk, template_name="siae_evalu
     context = {
         "breadcrumbs": breadcrumbs,
         "campaign_calendar_html": evaluation_campaign.calendar.html,
-        "back_url": back_url,
     }
     return render(request, template_name, context)
 

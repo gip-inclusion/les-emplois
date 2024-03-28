@@ -188,7 +188,13 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
 
         # institution with evaluation_campaign in "institution sets its ratio" phase
         evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
-        evaluated_siae = EvaluatedSiaeFactory(pk=1000, evaluation_campaign=evaluation_campaign)
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign=evaluation_campaign,
+            pk=1000,
+            for_snapshot=True,
+        )
+        evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory.create(evaluated_job_application=evaluated_job_app)
         response = self.client.get(
             reverse(
                 "siae_evaluations_views:institution_evaluated_siae_list",
@@ -227,6 +233,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         evaluated_siae = EvaluatedSiaeFactory(
             pk=1000,
             complete=True,
+            for_snapshot=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.ACCEPTED,
             evaluation_campaign__institution=self.institution,
         )
@@ -244,7 +251,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <a href="{url}" class="btn btn-outline-primary btn-sm">
+            <a href="{url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
               Voir le résultat
             </a>
             """,
@@ -259,6 +266,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         evaluated_siae = EvaluatedSiaeFactory(
             pk=1000,
             complete=True,
+            for_snapshot=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             evaluation_campaign__institution=self.institution,
         )
@@ -279,8 +287,8 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <a class="btn btn-primary btn-sm ms-1" href="{notify_url}">
-                <i class="ri-notification-4-line"></i> Notifier la sanction
+            <a class="btn btn-primary btn-block w-100 w-md-auto" href="{notify_url}">
+                Notifier la sanction
             </a>
             """,
             html=True,
@@ -292,7 +300,11 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         )
         self.assertContains(
             response,
-            f'<a href="{url}" class="btn btn-outline-primary btn-sm">Voir le résultat</a>',
+            f"""
+            <a href="{url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
+              Voir le résultat
+            </a>
+            """,
             html=True,
             count=1,
         )
@@ -300,6 +312,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
     def test_siae_incomplete_refused_can_be_notified(self):
         evaluated_siae = EvaluatedSiaeFactory(
             pk=1000,
+            for_snapshot=True,
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=10),
             evaluation_campaign__ended_at=timezone.now(),
@@ -321,8 +334,8 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <a class="btn btn-primary btn-sm ms-1" href="{notify_url}">
-                <i class="ri-notification-4-line"></i> Notifier la sanction
+            <a class="btn btn-primary btn-block w-100 w-md-auto" href="{notify_url}">
+                Notifier la sanction
             </a>
             """,
             html=True,
@@ -334,19 +347,22 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         )
         self.assertContains(
             response,
-            f'<a href="{url}" class="btn btn-outline-primary btn-sm">Voir le résultat</a>',
+            f'<a href="{url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">Voir le résultat</a>',
             html=True,
             count=1,
         )
 
     def test_siae_incomplete_refused_can_be_notified_after_review(self):
         evaluated_siae = EvaluatedSiaeFactory(
-            pk=1000,
             evaluation_campaign__institution=self.institution,
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(weeks=10),
             evaluation_campaign__ended_at=timezone.now(),
+            pk=1000,
+            for_snapshot=True,
             reviewed_at=timezone.now() - relativedelta(weeks=4),
         )
+        evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory.create(evaluated_job_application=evaluated_job_app)
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
@@ -364,8 +380,8 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <a class="btn btn-primary btn-sm ms-1" href="{notify_url}">
-                <i class="ri-notification-4-line"></i> Notifier la sanction
+            <a class="btn btn-primary btn-block w-100 w-md-auto" href="{notify_url}">
+                Notifier la sanction
             </a>
             """,
             html=True,
@@ -377,7 +393,11 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         )
         self.assertContains(
             response,
-            f'<a href="{url}" class="btn btn-outline-primary btn-sm">Voir le résultat</a>',
+            f"""
+            <a href="{url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
+              Voir le résultat
+            </a>
+            """,
             html=True,
             count=1,
         )
@@ -386,6 +406,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         evaluated_siae = EvaluatedSiaeFactory(
             pk=1000,
             complete=True,
+            for_snapshot=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             evaluation_campaign__institution=self.institution,
             notified_at=timezone.now(),
@@ -413,10 +434,10 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <a class="btn btn-outline-primary btn-sm me-1" href="{sanction_url}">
+            <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{sanction_url}">
                 Voir la notification de sanction
             </a>
-            <a class="btn btn-outline-primary btn-sm" href="{url}">
+            <a href="{url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
                 Voir le résultat
             </a>
             """,
@@ -460,9 +481,13 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
-        evaluated_siae = create_evaluated_siae_consistent_datas(
-            evaluation_campaign, extra_evaluated_siae_kwargs={"pk": 1000}
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign=evaluation_campaign,
+            pk=1000,
+            for_snapshot=True,
         )
+        evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory.create(evaluated_job_application=evaluated_job_app)
         url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",
             kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
@@ -563,9 +588,13 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         evaluation_campaign = EvaluationCampaignFactory(
             institution=self.institution, evaluations_asked_at=timezone.now()
         )
-        evaluated_siae = create_evaluated_siae_consistent_datas(
-            evaluation_campaign, extra_evaluated_siae_kwargs={"pk": 1000}
+        evaluated_siae = EvaluatedSiaeFactory(
+            evaluation_campaign=evaluation_campaign,
+            pk=1000,
+            for_snapshot=True,
         )
+        evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
+        EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_app, proof=None)
         url = reverse(
             "siae_evaluations_views:institution_evaluated_siae_list",
             kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
@@ -698,13 +727,13 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge rounded-pill bg-success float-end">Validé</p>',
+            '<span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span>',
             count=1,
         )
         self.assertContains(
             response,
             f"""
-            <a href="{url}" class="btn btn-outline-primary btn-sm float-end">
+            <a href="{url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
                 Revoir ses justificatifs
             </a>
             """,
@@ -743,7 +772,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge rounded-pill bg-danger float-end">Problème constaté</p>',
+            '<span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>',
             html=True,
             count=1,
         )
@@ -780,9 +809,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <p class="badge rounded-pill bg-info-light text-primary float-end">
-             Justificatifs non contrôlés
-            </p>
+            <span class="badge badge-sm rounded-pill text-nowrap bg-emploi-light text-primary">
+            Justificatifs non contrôlés
+            </span>
             """,
             html=True,
             count=1,
@@ -825,7 +854,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge rounded-pill bg-danger float-end">Problème constaté</p>',
+            '<span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>',
             html=True,
             count=1,
         )
@@ -865,9 +894,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <p class="badge rounded-pill bg-info-light text-primary float-end">
-             Justificatifs non contrôlés
-            </p>
+            <span class="badge badge-sm rounded-pill text-nowrap bg-emploi-light text-primary">
+            Justificatifs non contrôlés
+            </span>
             """,
             html=True,
             count=1,
@@ -899,7 +928,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge rounded-pill bg-danger float-end">Non téléversés</p>',
+            '<span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Non téléversés</span>',
             html=True,
             count=1,
         )
@@ -945,11 +974,11 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         validation_button_disabled = f"""
-            <button class="btn btn-outline-primary disabled btn-sm float-end">
+            <button class="btn btn-primary disabled">
                 {self.submit_text}
             </button>"""
         validation_button = f"""
-            <button class="btn btn-primary btn-sm float-end">
+            <button class="btn btn-primary">
                 {self.submit_text}
             </button>"""
         back_url = reverse(
@@ -977,9 +1006,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <p class="badge rounded-pill bg-emploi float-end">
+            <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">
              {pending_status}
-            </p>
+            </span>
             """,
             html=True,
             count=1,
@@ -1019,9 +1048,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <p class="badge rounded-pill bg-pilotage float-end">
+            <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
              {submitted_status}
-            </p>
+            </span>
             """,
             html=True,
             count=1,
@@ -1040,9 +1069,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <p class="badge rounded-pill bg-success float-end">
+            <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">
              Validé
-            </p>
+            </span>
             """,
             html=True,
             count=1,
@@ -1061,9 +1090,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <p class="badge rounded-pill bg-success float-end">
+            <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">
              Validé
-            </p>
+            </span>
             """,
             html=True,
             count=1,
@@ -1085,9 +1114,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <p class="badge rounded-pill bg-danger float-end">
+            <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">
              {refused_status}
-            </p>
+            </span>
             """,
             html=True,
             count=1,
@@ -1105,9 +1134,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <p class="badge rounded-pill bg-emploi float-end">
+            <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">
              Phase contradictoire - En attente
-            </p>
+            </span>
             """,
             html=True,
             count=1,
@@ -1155,9 +1184,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <p class="badge rounded-pill bg-success float-end">
+            <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">
              Validé
-            </p>
+            </span>
             """,
             html=True,
             count=1,
@@ -1177,9 +1206,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             """
-            <p class="badge rounded-pill bg-success float-end">
+            <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">
              Validé
-            </p>
+            </span>
             """,
             html=True,
             count=1,
@@ -1202,9 +1231,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <p class="badge rounded-pill bg-danger float-end">
+            <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">
              {refused_status}
-            </p>
+            </span>
             """,
             html=True,
             count=1,
@@ -1222,9 +1251,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <p class="badge rounded-pill bg-danger float-end">
+            <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">
              {refused_status}
-            </p>
+            </span>
             """,
             html=True,
             count=1,
@@ -1252,7 +1281,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         validation_button_disabled = f"""
-            <button class="btn btn-outline-primary disabled btn-sm float-end">
+            <button class="btn btn-primary disabled">
                 {self.submit_text}
             </button>"""
         back_url = reverse(
@@ -1278,9 +1307,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <p class="badge rounded-pill bg-danger float-end">
+            <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">
              {not_transmitted_status}
-            </p>
+            </span>
             """,
             html=True,
             count=1,
@@ -1295,9 +1324,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <p class="badge rounded-pill bg-danger float-end">
+            <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">
              {not_transmitted_status}
-            </p>
+            </span>
             """,
             html=True,
             count=1,
@@ -1320,9 +1349,9 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <p class="badge rounded-pill bg-pilotage float-end">
+            <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
              {submitted_status}
-            </p>
+            </span>
             """,
             html=True,
             count=1,
@@ -1373,7 +1402,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge rounded-pill bg-danger float-end">Non téléversés</p>',
+            '<span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Non téléversés</span>',
             count=1,
         )
 
@@ -1396,7 +1425,12 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge rounded-pill bg-warning float-end">Téléversement incomplet</p>',
+            """
+            <span class="badge badge-sm rounded-pill text-nowrap bg-warning text-white">
+            Téléversement incomplet
+            </span>
+            """,
+            html=True,
             count=1,
         )
 
@@ -1418,7 +1452,12 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge rounded-pill bg-warning float-end">Justificatifs téléversés</p>',
+            """
+            <span class="badge badge-sm rounded-pill text-nowrap bg-warning text-white">
+            Justificatifs téléversés
+            </span>
+            """,
+            html=True,
             count=1,
         )
 
@@ -1443,7 +1482,11 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge rounded-pill bg-info-light text-primary float-end">Justificatifs non contrôlés</p>',
+            """
+            <span class="badge badge-sm rounded-pill text-nowrap bg-emploi-light text-primary">
+            Justificatifs non contrôlés
+            </span>""",
+            html=True,
             count=1,
         )
 
@@ -1473,7 +1516,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge rounded-pill bg-success float-end">Validé</p>',
+            '<span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span>',
             count=1,
         )
 
@@ -1503,7 +1546,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge rounded-pill bg-danger float-end">Problème constaté</p>',
+            '<span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>',
             count=1,
         )
 
@@ -1533,7 +1576,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         self.assertContains(
             response,
-            '<p class="badge rounded-pill bg-danger float-end">Problème constaté</p>',
+            '<span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>',
             count=1,
         )
 
@@ -1558,7 +1601,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.assertContains(
             response,
             f"""
-            <a href="{evaluated_job_application_url}" class="btn btn-outline-primary btn-sm float-end">
+            <a href="{evaluated_job_application_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
                 Revoir ses justificatifs
             </a>
             """,
@@ -3231,9 +3274,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
 
 class InstitutionEvaluatedJobApplicationViewTest(TestCase):
     btn_modifier_html = """
-        <button class="btn btn-outline-primary btn-sm float-end" aria-label="Modifier l'état de ce justificatif">
-            Modifier
-        </button>
+    <button class="btn btn-sm btn-primary" aria-label="Modifier l'état de ce justificatif">Modifier</button>
     """
     save_text = "Enregistrer le commentaire"
 
@@ -3333,6 +3374,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             <a href="{proof_url}"
                rel="noopener"
                target="_blank"
+               class="btn btn-sm btn-link"
                aria-label="Revoir ce justificatif (ouverture dans un nouvel onglet)"
             >
                 Revoir ce justificatif
@@ -3473,6 +3515,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             <a href="{proof_url}"
                rel="noopener"
                target="_blank"
+               class="btn btn-sm btn-link"
                aria-label="Revoir ce justificatif (ouverture dans un nouvel onglet)"
             >
                 Revoir ce justificatif
@@ -3532,7 +3575,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.assertNotContains(response, accepte_url)
         self.assertContains(response, reinit_url)
         self.assertContains(
-            response, '<p class="text-success"><i class="ri-checkbox-circle-line"></i> Validé</p>', html=True
+            response, '<strong class="text-success"><i class="ri-check-line"></i> Validé</strong>', html=True
         )
 
         # refused
@@ -3544,7 +3587,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.assertNotContains(response, accepte_url)
         self.assertContains(response, reinit_url)
         self.assertContains(
-            response, '<p class="text-danger"><i class="ri-indeterminate-circle-line"></i> Refusé</p>', html=True
+            response, '<strong class="text-danger"><i class="ri-close-line"></i> Refusé</strong>', html=True
         )
 
         # reinited
@@ -3683,7 +3726,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
 
         # Unset
         response = self.client.get(url_view)
-        self.assertContains(response, "bg-pilotage")
+        self.assertContains(response, "bg-accent-03")
         self.assertContains(response, "À traiter")
 
         # Refused

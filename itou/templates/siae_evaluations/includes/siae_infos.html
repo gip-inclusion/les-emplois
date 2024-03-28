@@ -1,47 +1,44 @@
-<div class="row">
-    <div class="col-lg-9 col-md-9 col-8">
-        <h3>{{ evaluated_siae }}</h3>
+<div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3" id="state_of_evaluated_siae-{{ evaluated_siae.pk }}">
+    <div class="c-box--results__summary flex-grow-1">
+        <i class="ri-community-line" aria-hidden="true"></i>
+        <div>
+            <h3>{{ evaluated_siae }}</h3>
+        </div>
     </div>
-    <div id="state_of_evaluated_siae-{{ evaluated_siae.pk }}" class="col-lg-3 col-md-3 col-4">
+    <div>
         {% if evaluated_siae.evaluation_is_final %}
             {# Only 2 states are possible when evaluation_is_final: ACCEPTED and REFUSED #}
             {% if evaluated_siae.state == "ACCEPTED" %}
-                <p class="badge rounded-pill bg-success float-end">
-                    <i class="ri-checkbox-circle-line me-1"></i> Résultat positif
-                </p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Résultat positif</span>
             {% elif evaluated_siae.state == "REFUSED" %}
                 {% if evaluated_siae.notified_at %}
-                    <p class="badge rounded-pill bg-danger float-end">
-                        <i class="ri-close-circle-line me-1"></i> Résultat négatif
-                    </p>
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Résultat négatif</span>
                 {% else %}
-                    <p class="badge rounded-pill bg-accent-03 text-primary float-end">
-                        <i class="ri-arrow-right-circle-line me-1"></i> Notification à faire
-                    </p>
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Notification à faire</span>
                 {% endif %}
             {% endif %}
         {% else %}
             {% if evaluated_siae.state == "SUBMITTED" %}
-                <p class="badge rounded-pill bg-pilotage float-end">
+                <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
                     {% if evaluated_siae.reviewed_at %}Phase contradictoire -{% endif %}
                     À traiter
-                </p>
+                </span>
             {% elif evaluated_siae.state == "REFUSED" or evaluated_siae.state == "ACCEPTED" %}
-                <p class="badge rounded-pill bg-pilotage float-end">En cours</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">En cours</span>
             {% elif evaluated_siae.state == "ADVERSARIAL_STAGE" %}
-                <p class="badge rounded-pill bg-marche-light float-end">Phase contradictoire</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-danger-lighter text-danger">Phase contradictoire</span>
             {% else %}
                 {# PENDING or SUBMITTABLE (NOTIFICATION_PENDING impossible without evaluation_is_final) #}
                 {% if evaluated_siae.submission_freezed_at %}
-                    <p class="badge rounded-pill bg-danger float-end">
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">
                         {% if evaluated_siae.reviewed_at %}Phase contradictoire -{% endif %}
                         Problème constaté
-                    </p>
+                    </span>
                 {% else %}
-                    <p class="badge rounded-pill bg-emploi float-end">
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">
                         {% if evaluated_siae.reviewed_at %}Phase contradictoire -{% endif %}
                         En attente
-                    </p>
+                    </span>
                 {% endif %}
             {% endif %}
         {% endif %}

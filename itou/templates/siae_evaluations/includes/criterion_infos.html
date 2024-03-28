@@ -1,39 +1,22 @@
-<div class="row ">
-    <div class="col-md-9 mt-1">
-        <h3>{{ criteria.name }}</h3>
-    </div>
-    <div class="col-md-3 mt-1 text-end">
-        {% if review_state == "ACCEPTED" %}
-            <p class="text-success">
-                <i class="ri-checkbox-circle-line"></i> Validé
-            </p>
-        {% elif review_state == "REFUSED" or review_state == "REFUSED_2" %}
-            <p class="text-danger">
-                <i class="ri-indeterminate-circle-line"></i> Refusé
-            </p>
-        {% endif %}
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        {% if criteria.written_proof %}
-            <p class="small mb-0 form-text text-muted">
-                <strong>Pièce justificative :</strong>
-                <i>{{ criteria.written_proof }}</i>
-            </p>
-        {% endif %}
-        {% if criteria.written_proof_validity %}
-            <p class="small mb-0 form-text text-muted">
-                <strong>Durée de validité du justificatif :</strong>
-                <i>{{ criteria.written_proof_validity }}</i>
-            </p>
-        {% endif %}
-        {% if criteria.written_proof_url %}
-            <p class="small mb-0 form-text text-muted">
-                <a href="{{ criteria.written_proof_url }}" rel="noopener" target="_blank" aria-label="{{ criteria.written_proof_url }} (ouverture dans un nouvel onglet)">
-                    {{ criteria.written_proof_url }}
-                </a>
-            </p>
-        {% endif %}
-    </div>
-</div>
+{% if review_state == "ACCEPTED" %}
+    <strong class="text-success"><i class="ri-check-line"></i> Validé</strong>
+    <br>
+{% elif review_state == "REFUSED" or review_state == "REFUSED_2" %}
+    <strong class="text-danger"><i class="ri-close-line"></i> Refusé</strong>
+    <br>
+{% endif %}
+<strong class="fs-sm">{{ criteria.name }}</strong>
+<br>
+<ul class="fs-sm">
+    {% if criteria.written_proof %}<li class="m-0">Pièce justificative : {{ criteria.written_proof }}</li>{% endif %}
+    {% if criteria.written_proof_validity %}
+        <li class="m-0">Durée de validité du justificatif : {{ criteria.written_proof_validity }}</li>
+    {% endif %}
+    {% if criteria.written_proof_url %}
+        <li class="m-0">
+            <a href="{{ criteria.written_proof_url }}" rel="noopener" target="_blank" class="has-external-link" aria-label="{{ criteria.written_proof_url }} (ouverture dans un nouvel onglet)">
+                {{ criteria.written_proof_url }}
+            </a>
+        </li>
+    {% endif %}
+</ul>
