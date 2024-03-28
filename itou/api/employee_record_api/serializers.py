@@ -122,7 +122,7 @@ class _API_SituationSerializer(serializers.Serializer):
     numeroIDE = serializers.CharField(source="job_seeker.jobseeker_profile.pole_emploi_id")
 
     salarieRQTH = serializers.BooleanField(source="job_seeker.jobseeker_profile.rqth_employee")
-    salarieOETH = serializers.BooleanField(source="asp_oeth_employee")
+    salarieOETH = serializers.BooleanField(source="job_seeker.job_seeker_profile.oeth_employee")
     salarieAideSociale = serializers.BooleanField(source="job_seeker.jobseeker_profile.has_social_allowance")
 
     salarieBenefRSA = serializers.CharField(source="job_seeker.jobseeker_profile.has_rsa_allocation")
@@ -173,7 +173,7 @@ class EmployeeRecordAPISerializer(serializers.Serializer):
     codeTraitement = serializers.CharField(source="asp_processing_code", allow_blank=True)
     libelleTraitement = serializers.CharField(source="asp_processing_label", allow_blank=True)
 
-    numeroAnnexe = serializers.CharField(source="financial_annex_number")
+    numeroAnnexe = serializers.CharField(source="financial_annex.number", allow_null=True)
 
 
 class EmployeeRecordUpdateNotificationAPISerializer(serializers.Serializer):

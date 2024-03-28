@@ -3,7 +3,7 @@ import re
 from rest_framework import serializers
 from unidecode import unidecode
 
-from itou.asp.models import AllocationDuration, LaneExtension, LaneType
+from itou.asp.models import AllocationDuration, LaneExtension, LaneType, SiaeMeasure
 from itou.employee_record.models import EmployeeRecord
 from itou.employee_record.typing import CodeComInsee
 from itou.users.enums import Title
@@ -115,7 +115,7 @@ class _SituationSerializer(serializers.Serializer):
     numeroIDE = serializers.CharField(source="job_seeker.jobseeker_profile.pole_emploi_id")  # Required
 
     salarieRQTH = serializers.BooleanField(source="job_seeker.jobseeker_profile.rqth_employee")  # Required
-    salarieOETH = serializers.BooleanField(source="asp_oeth_employee")  # Required
+    salarieOETH = serializers.SerializerMethodField()  # Required
     salarieAideSociale = serializers.BooleanField(
         source="job_seeker.jobseeker_profile.has_social_allowance"
     )  # Required
@@ -143,6 +143,11 @@ class _SituationSerializer(serializers.Serializer):
         choices=AllocationDuration.choices,
         source="job_seeker.jobseeker_profile.ata_allocation_since",
     )  # Required
+
+    def get_salarieOETH(self, obj: EmployeeRecord) -> bool:
+        if obj.asp_siae_type is SiaeMeasure.EITI:
+            return False
+        return obj.job_seeker_profile.oeth_employee if obj.job_seeker_profile else False
 
 
 class EmployeeRecordSerializer(serializers.Serializer):

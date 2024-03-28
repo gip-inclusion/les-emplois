@@ -438,23 +438,6 @@ class EmployeeRecord(ASPExchangeInformation):
         return self.job_application.approval if self.job_application and self.job_application.approval else None
 
     @property
-    def financial_annex_number(self):
-        """
-        Shortcut to financial annex number (can be null in early stages of life cycle)
-        """
-        return self.financial_annex.number if self.financial_annex else None
-
-    @property
-    def asp_convention_id(self):
-        """
-        ASP convention ID (from siae.convention.asp_convention_id)
-        """
-        if self.job_application and self.job_application.to_company:
-            return self.job_application.to_company.convention.asp_convention_id
-
-        return None
-
-    @property
     def asp_employer_type(self):
         """
         This is a mapping between itou internal SIAE kinds and ASP ones
@@ -498,12 +481,6 @@ class EmployeeRecord(ASPExchangeInformation):
         Mapping between ASP and itou models for SIAE kind ("Mesure")
         """
         return SiaeMeasure.from_siae_kind(self.job_application.to_company.kind)
-
-    @property
-    def asp_oeth_employee(self):
-        if self.asp_siae_type is SiaeMeasure.EITI:
-            return False
-        return self.job_seeker_profile.oeth_employee if self.job_seeker_profile else None
 
     @staticmethod
     def siret_from_asp_source(siae):
