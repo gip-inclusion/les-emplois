@@ -5,6 +5,17 @@
 
 {% block title %}Contrôler les pièces justificatives {{ block.super }}{% endblock %}
 
+{% if back_url %}
+    {% block breadcrumbs %}
+        <div class="c-prevstep">
+            <a href="{{ back_url }}" class="btn btn-ico btn-link ps-0">
+                <i class="ri-arrow-drop-left-line ri-xl font-weight-medium" aria-hidden="true"></i>
+                <span>Retour</span>
+            </a>
+        </div>
+    {% endblock %}
+{% endif %}
+
 {% block content_title %}
     <h1>Contrôler les pièces justificatives</h1>
     <h2 class="h3">
@@ -25,48 +36,40 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row justify-content-center">
-                <div class="col-lg-8 col-12">
+                <div class="col-12">
                     {% for evaluated_siae in evaluated_siaes %}
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        {% include "siae_evaluations/includes/siae_infos.html" with evaluated_siae=evaluated_siae %}
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="float-end">
-                                            {% if evaluated_siae.state == "REFUSED" and evaluated_siae.notified_at %}
-                                                <a class="btn btn-outline-primary btn-sm me-1" href="{% url "siae_evaluations_views:institution_evaluated_siae_sanction" evaluated_siae.pk %}">Voir la notification de sanction</a>
+                        <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+                            <div class="c-box--results__header">
+                                {% include "siae_evaluations/includes/siae_infos.html" with evaluated_siae=evaluated_siae %}
+                            </div>
+                            <hr class="m-0">
+                            <div class="c-box--results__footer">
+                                <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+                                    {% if evaluated_siae.state == "REFUSED" and evaluated_siae.notified_at %}
+                                        <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "siae_evaluations_views:institution_evaluated_siae_sanction" evaluated_siae.pk %}">Voir la notification de sanction</a>
+                                    {% endif %}
+                                    <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_detail' evaluated_siae.pk %}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
+                                        {% if evaluated_siae.evaluation_is_final %}
+                                            Voir le résultat
+                                        {% else %}
+                                            {% if evaluated_siae.state == "SUBMITTED" or evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED" %}
+                                                Contrôler cette SIAE
+                                            {% elif evaluated_siae.state == "ADVERSARIAL_STAGE" %}
+                                                Revoir ses justificatifs
+                                            {% else %}
+                                                Voir
                                             {% endif %}
-                                            <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_detail' evaluated_siae.pk %}" class="btn btn-outline-primary btn-sm">
-                                                {% if evaluated_siae.evaluation_is_final %}
-                                                    Voir le résultat
-                                                {% else %}
-                                                    {% if evaluated_siae.state == "SUBMITTED" or evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED" %}
-                                                        Contrôler cette SIAE
-                                                    {% elif evaluated_siae.state == "ADVERSARIAL_STAGE" %}
-                                                        Revoir ses justificatifs
-                                                    {% else %}
-                                                        Voir
-                                                    {% endif %}
-                                                {% endif %}
-                                            </a>
-                                            {% if evaluated_siae.state == "REFUSED" and not evaluated_siae.notified_at and evaluated_siae.evaluation_is_final %}
-                                                <a class="btn btn-primary btn-sm ms-1" href="{% url "siae_evaluations_views:institution_evaluated_siae_notify_step1" evaluated_siae.pk %}">
-                                                    <i class="ri-notification-4-line"></i> Notifier la sanction
-                                                </a>
-                                            {% endif %}
-                                        </div>
-                                    </div>
+                                        {% endif %}
+                                    </a>
+                                    {% if evaluated_siae.state == "REFUSED" and not evaluated_siae.notified_at and evaluated_siae.evaluation_is_final %}
+                                        <a class="btn btn-primary btn-block w-100 w-md-auto" href="{% url "siae_evaluations_views:institution_evaluated_siae_notify_step1" evaluated_siae.pk %}">
+                                            Notifier la sanction
+                                        </a>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
                     {% endfor %}
-                    {% if back_url %}
-                        <p class="mt-4">
-                            <a href="{{ back_url }}">Retour</a>
-                        </p>
-                    {% endif %}
                 </div>
             </div>
         </div>

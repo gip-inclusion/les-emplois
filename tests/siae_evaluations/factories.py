@@ -59,6 +59,11 @@ class EvaluatedSiaeFactory(factory.django.DjangoModelFactory):
             reviewed_at=factory.LazyFunction(timezone.now),
             final_reviewed_at=factory.LazyFunction(timezone.now),
         )
+        for_snapshot = factory.Trait(
+            siae__for_snapshot=True,
+            siae__post_code="14000",
+            siae__city="Caen",
+        )
 
     evaluation_campaign = factory.SubFactory(EvaluationCampaignFactory)
     siae = factory.SubFactory(CompanyFactory, department="14")

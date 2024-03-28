@@ -5,6 +5,17 @@
 
 {% block title %}Contrôler les pièces justificatives {{ block.super }}{% endblock %}
 
+{% if back_url %}
+    {% block breadcrumbs %}
+        <div class="c-prevstep">
+            <a href="{{ back_url }}" class="btn btn-ico btn-link ps-0">
+                <i class="ri-arrow-drop-left-line ri-xl font-weight-medium" aria-hidden="true"></i>
+                <span>Retour</span>
+            </a>
+        </div>
+    {% endblock %}
+{% endif %}
+
 {% block messages %}
     {{ block.super }}
     {% if campaign_closed_before_final_evaluation or accepted_by_default %}
@@ -14,7 +25,7 @@
                     <i class="ri-information-line ri-xl text-info"></i>
                 </div>
                 <div class="col">
-                    <p>
+                    <p class="mb-0">
                         {% if campaign_closed_before_final_evaluation %}
                             {% if evaluated_siae.state == "ACCEPTED" %}
                                 {{ evaluated_siae|capfirst }} a soumis des justificatifs, mais leur contrôle n’a pas été
@@ -51,95 +62,73 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row justify-content-center">
-                <div class="col-lg-8 col-12">
-                    <div class="row mt-3">
-                        <div class="col-12">
-                            <h3 class="h3">
-                                Liste des auto-prescriptions de <span class="text-muted">{{ evaluated_siae }}</span>
-                            </h3>
-                            <p>
-                                Numéro de téléphone à utiliser au besoin :
-                                {% if evaluated_siae.siae.phone %}
-                                    <a aria-label="Contact téléphonique" href="tel:{{ evaluated_siae.siae.phone|cut:" " }}">
-                                        {{ evaluated_siae.siae.phone|format_phone }}
-                                    </a>
-                                {% else %}
-                                    <span>Non renseigné</span>
-                                {% endif %}
-                            </p>
-                            {% if not evaluated_siae.evaluation_is_final %}
-                                <div class="row">
-                                    <div class="col-8">
-                                        <p>
-                                            Lorsque vous aurez contrôlé <strong>tous vos justificatifs</strong> pour cette SIAE,
-                                            veuillez valider le contrôle effectué pour la notifier de son résultat.
-                                        </p>
-                                    </div>
+                <div class="col-12">
+                    <p class="h2 mb-0">Liste des auto-prescriptions de {{ evaluated_siae }}</p>
+                    <p>
+                        Numéro de téléphone à utiliser au besoin :
+                        {% if evaluated_siae.siae.phone %}
+                            <a aria-label="Contact téléphonique" href="tel:{{ evaluated_siae.siae.phone|cut:" " }}">
+                                {{ evaluated_siae.siae.phone|format_phone }}
+                            </a>
+                        {% else %}
+                            <span>Non renseigné</span>
+                        {% endif %}
+                    </p>
 
-                                    <div class="col-4">
-                                        <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_siae_validation' evaluated_siae.pk %}">
-                                            {% csrf_token %}
-                                            <button class="btn {% if evaluated_siae.can_review %}btn-primary {% else %}btn-outline-primary disabled {% endif %}btn-sm float-end">
-                                                Valider
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            {% for evaluated_job_application in evaluated_siae.evaluated_job_applications.all %}
-                                <div class="card my-3">
-                                    {# navigation : anchor to scroll to a specific card when returning to this page #}
-                                    <a class="scrolldown-anchor" id="{{ evaluated_job_application.pk }}"></a>
-                                    <div class="card-header">
-                                        {% include "siae_evaluations/includes/job_seeker_infos_for_institution.html" with job_seeker=evaluated_job_application.job_application.job_seeker approval=evaluated_job_application.job_application.approval state=evaluated_job_application.compute_state reviewed_at=evaluated_job_application.evaluated_siae.reviewed_at %}
-                                    </div>
-
-                                    <div class="card-body">
-                                        {% with evaluated_job_application_state=evaluated_job_application.compute_state %}
-                                            {% if not evaluated_siae.evaluation_is_final and evaluated_job_application_state == "SUBMITTED" %}
-                                                <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-end">
-                                                    Contrôler cette auto-prescription
-                                                </a>
-                                            {% elif evaluated_job_application_state != "PENDING" and evaluated_job_application_state != "PROCESSING" %}
-                                                <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-sm float-end">
-                                                    Revoir ses justificatifs
-                                                </a>
-                                            {% endif %}
-                                        {% endwith %}
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    {% if not evaluated_siae.evaluation_is_final and evaluated_siae.can_review %}
-                        <div class="row">
-                            <div class="col-8">
-                                <p>
-                                    Lorsque vous aurez contrôlé <strong>tous vos justificatifs</strong> pour cette SIAE,
-                                    veuillez valider le contrôle effectué pour la notifier de son résultat.
-                                </p>
+                    {% if not evaluated_siae.evaluation_is_final %}
+                        <div class="c-box p-3 p-md-4 d-flex align-items-center">
+                            <div class="p-0 flex-grow-1 m-0">
+                                Lorsque vous aurez contrôlé <strong>tous vos justificatifs</strong> pour cette SIAE, veuillez valider le contrôle effectué pour la notifier de son résultat.
                             </div>
-
-                            <div class="col-4">
-                                <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_siae_validation' evaluated_siae.pk %}">
-                                    {% csrf_token %}
-                                    <button class="btn btn-primary btn-sm float-end">Valider</button>
-                                </form>
-                            </div>
+                            <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_siae_validation' evaluated_siae.pk %}">
+                                {% csrf_token %}
+                                <button class="btn {% if evaluated_siae.can_review %}btn-primary {% else %}btn-primary disabled{% endif %}">
+                                    Valider
+                                </button>
+                            </form>
                         </div>
                     {% endif %}
 
+                    {% for evaluated_job_application in evaluated_siae.evaluated_job_applications.all %}
+                        {# navigation : anchor to scroll to a specific card when returning to this page #}
+                        <div class="c-box c-box--results has-links-inside my-3 my-md-4" id="{{ evaluated_job_application.pk }}">
+                            <div class="c-box--results__header">
+                                {% include "siae_evaluations/includes/job_seeker_infos_for_institution.html" with job_seeker=evaluated_job_application.job_application.job_seeker approval=evaluated_job_application.job_application.approval state=evaluated_job_application.compute_state reviewed_at=evaluated_job_application.evaluated_siae.reviewed_at %}
+                            </div>
+                            {% with evaluated_job_application_state=evaluated_job_application.compute_state %}
+                                {% if not evaluated_siae.evaluation_is_final and evaluated_job_application_state == "SUBMITTED" %}
+                                    <hr class="m-0">
+                                    <div class="c-box--results__footer">
+                                        <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+                                            <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
+                                                Contrôler cette auto-prescription
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% elif evaluated_job_application_state != "PENDING" and evaluated_job_application_state != "PROCESSING" %}
+                                    <hr class="m-0">
+                                    <div class="c-box--results__footer">
+                                        <div class="d-flex flex-column flex-md-row justify-content-md-end gap-3">
+                                            <a href="{% url 'siae_evaluations_views:institution_evaluated_job_application' evaluated_job_application.pk %}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
+                                                Revoir ses justificatifs
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endwith %}
+                        </div>
+                    {% endfor %}
 
-
-                    {% if back_url %}
-                        <p class="mt-4">
-                            <a href="{{ back_url }}">Retour</a>
-                        </p>
+                    {% if not evaluated_siae.evaluation_is_final and evaluated_siae.can_review %}
+                        <div class="c-box p-3 p-md-4 d-flex align-items-center">
+                            <div class="p-0 flex-grow-1 m-0">
+                                Lorsque vous aurez contrôlé <strong>tous vos justificatifs</strong> pour cette SIAE, veuillez valider le contrôle effectué pour la notifier de son résultat.
+                            </div>
+                            <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_siae_validation' evaluated_siae.pk %}">
+                                {% csrf_token %}
+                                <button class="btn btn-primary">Valider</button>
+                            </form>
+                        </div>
                     {% endif %}
                 </div>
             </div>

@@ -10,7 +10,6 @@
         <div class="s-section__container container">
             <div class="row justify-content-center">
                 <div class="col-12 col-md-8">
-
                     <div class="card">
                         <div class="card-header">
                             {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=evaluated_administrative_criteria.evaluated_job_application.job_application.job_seeker approval=evaluated_administrative_criteria.evaluated_job_application.job_application.approval state=evaluated_administrative_criteria.evaluated_job_application.compute_state reviewed_at=evaluated_administrative_criteria.evaluated_job_application.evaluated_siae.reviewed_at %}
@@ -57,13 +56,6 @@
                             </div>
                         </div>
                     </div>
-
-                    {% if back_url %}
-                        <p class="mt-4">
-                            <a href="{{ back_url }}">Retour</a>
-                        </p>
-                    {% endif %}
-
                 </div>
             </div>
         </div>

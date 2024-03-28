@@ -1,45 +1,34 @@
-<div class="card my-3">
-    <div class="card-body">
-        <div class="row align-items-center">
-            <div class="col-lg-8 col-md-8 col-12">
-                <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}"
-                   rel="noopener"
-                   target="_blank"
-                   aria-label="Vérifier ce justificatif (ouverture dans un nouvel onglet)">
-                    <i class="ri-file-copy-2-line ri-lg mr-1"></i>
-                    {% if evaluated_siae.state == "SUBMITTED" or evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED" %}
-                        Vérifier ce justificatif
-                    {% else %}
-                        Revoir ce justificatif
-                    {% endif %}
-                    <i class="ri-share-box-line"></i>
-                </a>
-            </div>
-            {% if can_edit_proof %}
-                {% if evaluated_administrative_criteria.review_state == 'PENDING' %}
-                    <div class="col-lg-2 col-md-2 col-9">
-                        <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk 'accept' %}">
-                            {% csrf_token %}
-                            <button class="btn btn-success btn-sm float-end" aria-label="Accepter ce justificatif">Accepter</button>
-                        </form>
-                    </div>
-                    <div class="col-lg-2 col-md-2 col-3">
-                        <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk 'refuse' %}">
-                            {% csrf_token %}
-                            <button class="btn btn-danger btn-sm float-end" aria-label="Refuser ce justificatif">Refuser</button>
-                        </form>
-                    </div>
-                {% else %}
-                    <div class="col-lg-4 col-md-4 col-12">
-                        <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk 'reinit' %}">
-                            {% csrf_token %}
-                            <button class="btn btn-outline-primary btn-sm float-end" aria-label="Modifier l'état de ce justificatif">
-                                Modifier
-                            </button>
-                        </form>
-                    </div>
-                {% endif %}
+<div class="d-flex justify-content-between mt-2">
+    <div>
+        <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}"
+           rel="noopener"
+           target="_blank"
+           class="btn btn-sm btn-link"
+           aria-label="Vérifier ce justificatif (ouverture dans un nouvel onglet)">
+            {% if evaluated_siae.state == "SUBMITTED" or evaluated_siae.state == "ACCEPTED" or evaluated_siae.state == "REFUSED" %}
+                Vérifier ce justificatif
+            {% else %}
+                Revoir ce justificatif
+            {% endif %}
+        </a>
+    </div>
+    {% if can_edit_proof %}
+        <div class="d-flex gap-2">
+            {% if evaluated_administrative_criteria.review_state == 'PENDING' %}
+                <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk 'accept' %}">
+                    {% csrf_token %}
+                    <button class="btn btn-success btn-sm" aria-label="Accepter ce justificatif">Accepter</button>
+                </form>
+                <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk 'refuse' %}">
+                    {% csrf_token %}
+                    <button class="btn btn-danger btn-sm" aria-label="Refuser ce justificatif">Refuser</button>
+                </form>
+            {% else %}
+                <form method="post" action="{% url 'siae_evaluations_views:institution_evaluated_administrative_criteria' evaluated_administrative_criteria.pk 'reinit' %}">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-primary" aria-label="Modifier l'état de ce justificatif">Modifier</button>
+                </form>
             {% endif %}
         </div>
-    </div>
+    {% endif %}
 </div>

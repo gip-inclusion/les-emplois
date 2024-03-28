@@ -21,64 +21,41 @@
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="row justify-content-center">
-                <div class="col-8">
-                    <div class="row">
-                        <div class="col-12">
-                            <p class="h2">Liste de mes auto-prescriptions à justifier</p>
-                            <p>Contrôle initié le {{ evaluated_siae.evaluation_campaign.evaluations_asked_at|date:"d F Y" }}</p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-8">
-                            <p>
-                                Lorsque vous aurez ajouté <strong>tous vos justificatifs</strong>,
-                                veuillez les soumettre à validation, la DDETS effectuera un contrôle de ceux-ci et reviendra vers vous.
-                            </p>
-                        </div>
+            <div class="row">
+                <div class="col-12">
+                    <p class="h2 mb-0">Liste de mes auto-prescriptions à justifier</p>
+                    <p>Contrôle initié le {{ evaluated_siae.evaluation_campaign.evaluations_asked_at|date:"d F Y" }}</p>
 
-                        <div class="col-md-4">
-                            <form method="post" action="{% url 'siae_evaluations_views:siae_submit_proofs' evaluated_siae.pk %}">
-                                {% csrf_token %}
-                                <button class="btn {% if is_submittable %}btn-primary {% else %}btn-outline-primary disabled {% endif %}float-end">
-                                    Soumettre à validation
-                                </button>
-                            </form>
+                    <div class="c-box p-3 p-md-4 d-flex align-items-center">
+                        <div class="p-0 flex-grow-1 m-0">
+                            Lorsque vous aurez ajouté <strong>tous vos justificatifs</strong>, veuillez les soumettre à validation.
+                            <br>
+                            La DDETS effectuera un contrôle de ceux-ci et reviendra vers vous.
                         </div>
+                        <form method="post" action="{% url 'siae_evaluations_views:siae_submit_proofs' evaluated_siae.pk %}">
+                            {% csrf_token %}
+                            <button class="btn {% if is_submittable %}btn-primary{% else %}btn-primary disabled{% endif %}">
+                                Soumettre à validation
+                            </button>
+                        </form>
                     </div>
-                    <div class="row">
-                        <div class="col-12">
-                            {% for evaluated_job_application in evaluated_job_applications %}
-                                {% include "siae_evaluations/includes/list_item.html" with item=evaluated_job_application %}
-                            {% endfor %}
-                        </div>
-                    </div>
+
+                    {% for evaluated_job_application in evaluated_job_applications %}
+                        {% include "siae_evaluations/includes/list_item.html" with item=evaluated_job_application %}
+                    {% endfor %}
 
                     {% if is_submittable %}
-                        <div class="row mt-3">
-                            <div class="col-8">
-                                <p>
-                                    Lorsque vous aurez ajouté <strong>tous vos justificatifs</strong>,
-                                    veuillez les soumettre à validation, la DDETS effectuera un contrôle de ceux-ci et reviendra vers vous.
-                                </p>
+                        <div class="c-box p-3 p-md-4 d-flex align-items-center">
+                            <div class="p-0 flex-grow-1 m-0">
+                                Lorsque vous aurez ajouté <strong>tous vos justificatifs</strong>, veuillez les soumettre à validation.
+                                <br>
+                                La DDETS effectuera un contrôle de ceux-ci et reviendra vers vous.
                             </div>
-
-                            <div class="col-4">
-                                <form method="post" action="{% url 'siae_evaluations_views:siae_submit_proofs' evaluated_siae.pk %}">
-                                    {% csrf_token %}
-                                    <button class="btn {% if is_submittable %}btn-primary {% else %}btn-outline-primary disabled {% endif %}float-end">
-                                        Soumettre à validation
-                                    </button>
-                                </form>
-                            </div>
+                            <form method="post" action="{% url 'siae_evaluations_views:siae_submit_proofs' evaluated_siae.pk %}">
+                                {% csrf_token %}
+                                <button class="btn btn-primary">Soumettre à validation</button>
+                            </form>
                         </div>
-                    {% endif %}
-
-
-                    {% if back_url %}
-                        <p class="mt-4">
-                            <a href="{{ back_url }}">Retour</a>
-                        </p>
                     {% endif %}
                 </div>
             </div>

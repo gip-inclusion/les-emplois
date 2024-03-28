@@ -1,47 +1,40 @@
 {% load format_filters %}
-<div class="row">
-    <div class="col-lg-8 col-md-7 col-12">
-        <h3 class="h2">
-            Auto-prescription pour
-            <span class="text-muted">{{ job_seeker.get_full_name }}</span>
-        </h3>
-    </div>
-    <div class="col-lg-4 col-md-5 col-12 text-end">
-        {% if state == "REFUSED_2" %}
-            <p class="badge rounded-pill bg-danger float-end">problème constaté</p>
 
+<div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+    <div class="c-box--results__summary flex-grow-1">
+        <i class="ri-pass-valid-line" aria-hidden="true"></i>
+        <div>
+            <h3>PASS IAE {{ approval.number|format_approval_number }} délivré le {{ approval.start_at|date:"d E Y" }}</h3>
+            <span>{{ job_seeker.get_full_name }}</span>
+        </div>
+    </div>
+    <div>
+        {% if state == "REFUSED_2" %}
+            <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>
         {% elif reviewed_at %}
             {% if state == "ACCEPTED" %}
-                <p class="badge rounded-pill bg-success float-end">validé</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span>
             {% elif state == "UPLOADED" %}
-                <p class="badge rounded-pill bg-success float-end">justificatifs téléversés</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Justificatifs téléversés</span>
             {% elif state == "SUBMITTED" %}
-                <p class="badge rounded-pill bg-communaute-light float-end">transmis</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Transmis</span>
             {% elif state == "REFUSED" %}
-                <p class="badge rounded-pill bg-danger float-end">problème constaté</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>
             {% elif state == "PROCESSING" %}
-                <p class="badge rounded-pill bg-pilotage float-end">à traiter</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">À traiter</span>
             {% else %}
-                <p class="badge rounded-pill bg-pilotage float-end">nouveaux justificatifs à traiter</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Nouveaux justificatifs à traiter</span>
             {% endif %}
-
         {% else %}
             {% if state == "PENDING" %}
-                <p class="badge rounded-pill bg-pilotage float-end">à traiter</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">À traiter</span>
             {% elif state == "PROCESSING" %}
-                <p class="badge rounded-pill bg-pilotage float-end">en cours</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">En cours</span>
             {% elif state == "UPLOADED" %}
-                <p class="badge rounded-pill bg-success float-end">justificatifs téléversés</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Justificatifs téléversés</span>
             {% elif state == "SUBMITTED" or state == "REFUSED" or state == "ACCEPTED" %}
-                <p class="badge rounded-pill bg-communaute-light float-end">transmis</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Transmis</span>
             {% endif %}
         {% endif %}
-    </div>
-</div>
-<div class="row">
-    <div class="col-12">
-        <p class="m-0">
-            PASS IAE :&nbsp;<b>{{ approval.number|format_approval_number }}</b> délivré le {{ approval.start_at|date:"d E Y" }}
-        </p>
     </div>
 </div>

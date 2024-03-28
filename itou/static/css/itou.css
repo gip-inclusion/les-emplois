@@ -339,14 +339,6 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     }
 }
 
-.scrolldown-anchor {
-    /* navigation : class to force the scroll down and avoid the banner to hide the map */
-    display: block;
-    position: relative;
-    top: -130px;
-    visibility: hidden;
-}
-
 .approval-left-border {
     border-left-width: 3px !important;
 }

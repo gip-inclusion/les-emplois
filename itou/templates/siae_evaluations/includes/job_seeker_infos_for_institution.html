@@ -1,64 +1,63 @@
 {% load format_filters %}
-<div class="row">
-    <div class="col-md-8">
-        <h3 class="h2">
-            Auto-prescription pour
-            <span class="text-muted">{{ job_seeker.get_full_name }}</span>
-        </h3>
-        <p class="m-0">
-            PASS IAE :&nbsp;<b>{{ approval.number|format_approval_number }}</b> délivré le {{ approval.start_at|date:"d E Y" }}
-        </p>
+
+<div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+    <div class="c-box--results__summary flex-grow-1">
+        <i class="ri-pass-valid-line" aria-hidden="true"></i>
+        <div>
+            <h3>PASS IAE {{ approval.number|format_approval_number }} délivré le {{ approval.start_at|date:"d E Y" }}</h3>
+            <span>{{ job_seeker.get_full_name }}</span>
+        </div>
     </div>
-    <div class="col-md-4 text-end">
+    <div>
         {% if evaluated_siae.evaluation_is_final %}
             {% if state == "PENDING" %}
-                <p class="badge rounded-pill bg-danger float-end">Non téléversés</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Non téléversés</span>
             {% elif state == "PROCESSING" %}
-                <p class="badge rounded-pill bg-warning float-end">Téléversement incomplet</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-warning text-white">Téléversement incomplet</span>
             {% elif state == "UPLOADED" %}
-                <p class="badge rounded-pill bg-warning float-end">Justificatifs téléversés</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-warning text-white">Justificatifs téléversés</span>
             {% elif state == "SUBMITTED" %}
-                <p class="badge rounded-pill bg-info-light text-primary float-end">Justificatifs non contrôlés</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-emploi-light text-primary">Justificatifs non contrôlés</span>
             {% elif state == "ACCEPTED" %}
-                <p class="badge rounded-pill bg-success float-end">Validé</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span>
             {% elif state == "REFUSED" or state == "REFUSED_2" %}
-                <p class="badge rounded-pill bg-danger float-end">Problème constaté</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>
             {% endif %}
         {% else %}
             {% if state == "PENDING" or state == "PROCESSING" %}
                 {% if evaluated_siae.submission_freezed_at %}
-                    <p class="badge rounded-pill bg-danger float-end">Justificatifs non transmis</p>
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Justificatifs non transmis</span>
                 {% else %}
-                    <p class="badge rounded-pill bg-emploi float-end">En attente</p>
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">En attente</span>
                 {% endif %}
             {% elif state == "UPLOADED" %}
                 {% if evaluated_siae.submission_freezed_at %}
-                    <p class="badge rounded-pill bg-danger float-end">Justificatifs non transmis</p>
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Justificatifs non transmis</span>
                 {% else %}
-                    <p class="badge rounded-pill bg-pilotage float-end">Justificatifs téléversés</p>
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Justificatifs téléversés</span>
                 {% endif %}
             {% elif state == "SUBMITTED" %}
-                <p class="badge rounded-pill bg-pilotage float-end">
+                <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
                     {% if reviewed_at %}
                         Nouveaux justificatifs à traiter
                     {% else %}
                         À traiter
                     {% endif %}
-                </p>
+                </span>
             {% elif state == "ACCEPTED" %}
-                <p class="badge rounded-pill bg-success float-end">Validé</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span>
             {% elif state == "REFUSED" %}
                 {% if reviewed_at %}
-                    <p class="badge rounded-pill bg-emploi float-end">Phase contradictoire - En attente</p>
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">Phase contradictoire - En attente</span>
                 {% else %}
                     {% comment %}
                     Show “Problème constaté” until the review is submitted, which starts the “phase contradictoire”
                     (tracked by the reviewed_at field).
                     {% endcomment %}
-                    <p class="badge rounded-pill bg-danger float-end">Problème constaté</p>
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>
                 {% endif %}
             {% elif state == "REFUSED_2" %}
-                <p class="badge rounded-pill bg-danger float-end">Problème constaté</p>
+                <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>
             {% endif %}
         {% endif %}
     </div>

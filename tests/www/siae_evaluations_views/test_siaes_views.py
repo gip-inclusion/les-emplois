@@ -5,13 +5,14 @@ from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.core.files.storage import default_storage
 from django.urls import reverse
-from django.utils import dateformat, timezone
+from django.utils import dateformat, html, timezone
 from freezegun import freeze_time
 
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
+from itou.utils.templatetags.format_filters import format_approval_number
 from tests.companies.factories import CompanyMembershipFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionMembershipFactory
@@ -64,10 +65,9 @@ def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_
 
 
 class SiaeJobApplicationListViewTest(TestCase):
-    refused_html = """\
-        <p class="text-danger">
-            <i class="ri-indeterminate-circle-line"></i> Refusé
-        </p>"""
+    refused_html = (
+        '<span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>'
+    )
 
     def setUp(self):
         super().setUp()
@@ -186,7 +186,7 @@ class SiaeJobApplicationListViewTest(TestCase):
             response,
             siae_upload_doc_url,
         )
-        SHOW_PROOF_URL_LABEL = "Visualiser le justificatif soumis"
+        SHOW_PROOF_URL_LABEL = "Voir le justificatif"
         self.assertNotContains(response, SHOW_PROOF_URL_LABEL)
         response = self.client.get(siae_upload_doc_url)
         assert response.status_code == 403
@@ -204,6 +204,7 @@ class SiaeJobApplicationListViewTest(TestCase):
             ),
         )
 
+    @freeze_time("2024-04-08")
     def test_state_hidden_with_submission_freezed_at(self):
         not_in_output = "This string should not be in output."
         evaluated_siae_phase_2bis = EvaluatedSiaeFactory(
@@ -219,15 +220,20 @@ class SiaeJobApplicationListViewTest(TestCase):
             reviewed_at=timezone.now() - relativedelta(days=5),
             final_reviewed_at=timezone.now(),
         )
-        for evaluated_siae, state in [
-            (evaluated_siae_phase_2bis, evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED),
-            (evaluated_siae_phase_3bis, evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2),
+        for evaluated_siae, state, approval_number in [
+            (evaluated_siae_phase_2bis, evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED, "XXXXX2412345"),
+            (
+                evaluated_siae_phase_3bis,
+                evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
+                "XXXXX2423456",
+            ),
         ]:
             with self.subTest(evaluated_siae):
                 evaluated_job_app = EvaluatedJobApplicationFactory(
                     evaluated_siae=evaluated_siae,
                     job_application__job_seeker__first_name="Manny",
                     job_application__job_seeker__last_name="Calavera",
+                    job_application__approval__number=approval_number,
                     labor_inspector_explanation=not_in_output,
                 )
                 EvaluatedAdministrativeCriteriaFactory(
@@ -238,17 +244,22 @@ class SiaeJobApplicationListViewTest(TestCase):
                 )
                 self.client.force_login(self.user)
                 response = self.client.get(self.url(evaluated_siae))
+                approval_number_html = format_approval_number(approval_number)
                 self.assertContains(
                     response,
-                    """
-                    <div class="row">
-                        <div class="col-lg-8 col-md-7 col-12">
-                            <h3 class="h2">
-                                Auto-prescription pour <span class="text-muted">Manny CALAVERA</span>
-                            </h3>
+                    f"""
+                    <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                        <div class="c-box--results__summary flex-grow-1">
+                            <i class="ri-pass-valid-line" aria-hidden="true"></i>
+                            <div>
+                                <h3>PASS IAE {approval_number_html} délivré le 08 Avril 2024</h3>
+                                <span>Manny CALAVERA</span>
+                            </div>
                         </div>
-                        <div class="col-lg-4 col-md-5 col-12 text-end">
-                            <p class="badge rounded-pill bg-communaute-light float-end">transmis</p>
+                        <div>
+                            <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">
+                            Transmis
+                            </span>
                         </div>
                     </div>
                     """,
@@ -258,37 +269,32 @@ class SiaeJobApplicationListViewTest(TestCase):
                 self.assertNotContains(response, not_in_output)
                 self.assertNotContains(response, self.refused_html, html=True)
 
+    @freeze_time("2024-04-08")
     def test_application_shown_after_submission_freeze_phase_3bis(self):
         test_data = [
             (
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
-                '<p class="badge rounded-pill bg-success float-end">validé</p>',
+                "XXXXX2412345",
+                '<span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span>',
                 """
-                <div class="col-md-9 mt-1">
-                    <h3>Bénéficiaire du RSA</h3>
-                </div>
-                <div class="col-md-3 mt-1 text-end">
-                    <p class="text-success">
-                        <i class="ri-checkbox-circle-line"></i> Validé
-                    </p>
-                </div>
+                <strong class="text-success"><i class="ri-check-line"></i> Validé</strong>
+                <br>
+                <strong class="fs-sm">Bénéficiaire du RSA</strong>
                 """,
             ),
             (
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
-                '<p class="badge rounded-pill bg-danger float-end">problème constaté</p>',
-                f"""
-                <div class="col-md-9 mt-1">
-                    <h3>Bénéficiaire du RSA</h3>
-                </div>
-                <div class="col-md-3 mt-1 text-end">
-                    {self.refused_html}
-                </div>
+                "XXXXX2423456",
+                self.refused_html,
+                """
+                <strong class="text-danger"><i class="ri-close-line"></i> Refusé</strong>
+                <br>
+                <strong class="fs-sm">Bénéficiaire du RSA</strong>
                 """,
             ),
         ]
         brsa = AdministrativeCriteria.objects.get(name="Bénéficiaire du RSA")
-        for state, expected_jobapp_html, expected_criteria_html in test_data:
+        for state, approval_number, expected_jobapp_html, expected_criteria_html in test_data:
             with self.subTest(state):
                 evaluated_siae_phase_3bis = EvaluatedSiaeFactory(
                     evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=10),
@@ -303,6 +309,7 @@ class SiaeJobApplicationListViewTest(TestCase):
                     evaluated_siae=evaluated_siae_phase_3bis,
                     job_application__job_seeker__first_name="Manny",
                     job_application__job_seeker__last_name="Calavera",
+                    job_application__approval__number=approval_number,
                 )
                 EvaluatedAdministrativeCriteriaFactory(
                     evaluated_job_application=evaluated_job_app,
@@ -311,19 +318,22 @@ class SiaeJobApplicationListViewTest(TestCase):
                     submitted_at=timezone.now() - relativedelta(days=8),
                     review_state=state,
                 )
+                approval_number_html = format_approval_number(approval_number)
                 self.client.force_login(self.user)
                 response = self.client.get(self.url(evaluated_siae_phase_3bis))
                 self.assertContains(
                     response,
                     f"""
-                    <div class="row">
-                        <div class="col-lg-8 col-md-7 col-12">
-                            <h3 class="h2">
-                                Auto-prescription pour <span class="text-muted">Manny CALAVERA</span>
-                            </h3>
+                    <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                        <div class="c-box--results__summary flex-grow-1">
+                            <i class="ri-pass-valid-line" aria-hidden="true"></i>
+                            <div>
+                                <h3>PASS IAE {approval_number_html} délivré le 08 Avril 2024</h3>
+                                <span>Manny CALAVERA</span>
+                            </div>
                         </div>
-                        <div class="col-lg-4 col-md-5 col-12 text-end">
-                        {expected_jobapp_html}
+                        <div>
+                            {expected_jobapp_html}
                         </div>
                     </div>
                     """,
@@ -332,30 +342,36 @@ class SiaeJobApplicationListViewTest(TestCase):
                 )
                 self.assertContains(response, expected_criteria_html, html=True, count=1)
 
+    @freeze_time("2024-04-08")
     def test_state_when_not_sent_before_submission_freeze(self):
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=10),
             siae=self.siae,
             submission_freezed_at=timezone.now() - relativedelta(days=1),
         )
+        approval_number = "XXXXX2412345"
         EvaluatedJobApplicationFactory(
             evaluated_siae=evaluated_siae,
             job_application__job_seeker__first_name="Manny",
             job_application__job_seeker__last_name="Calavera",
+            job_application__approval__number=approval_number,
         )
         self.client.force_login(self.user)
         response = self.client.get(self.url(evaluated_siae))
+        approval_number_html = format_approval_number(approval_number)
         self.assertContains(
             response,
-            """
-            <div class="row">
-                <div class="col-lg-8 col-md-7 col-12">
-                    <h3 class="h2">
-                        Auto-prescription pour <span class="text-muted">Manny CALAVERA</span>
-                    </h3>
+            f"""
+            <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                <div class="c-box--results__summary flex-grow-1">
+                    <i class="ri-pass-valid-line" aria-hidden="true"></i>
+                    <div>
+                        <h3>PASS IAE {approval_number_html} délivré le 08 Avril 2024</h3>
+                        <span>Manny CALAVERA</span>
+                    </div>
                 </div>
-                <div class="col-lg-4 col-md-5 col-12 text-end">
-                    <p class="badge rounded-pill bg-pilotage float-end">à traiter</p>
+                <div>
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">À traiter</span>
                 </div>
             </div>
             """,
@@ -381,9 +397,7 @@ class SiaeJobApplicationListViewTest(TestCase):
         )
         response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
         self.assertContains(response, siae_select_criteria_url)
-        self.assertContains(
-            response, f"<h3>{evaluated_administrative_criteria.administrative_criteria.name}</h3>", html=True
-        )
+        self.assertContains(response, html.escape(evaluated_administrative_criteria.administrative_criteria.name))
         self.assertContains(response, siae_upload_doc_url)
 
         # Freeze submission
@@ -391,19 +405,20 @@ class SiaeJobApplicationListViewTest(TestCase):
 
         response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
         self.assertNotContains(response, siae_select_criteria_url)
+        self.assertContains(response, html.escape(evaluated_administrative_criteria.administrative_criteria.name))
         self.assertContains(
-            response, f"<h3>{evaluated_administrative_criteria.administrative_criteria.name}</h3>", html=True
+            response, '<span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">En cours</span>'
         )
-        self.assertContains(response, '<p class="badge rounded-pill bg-pilotage float-end">en cours</p>')
         self.assertNotContains(response, siae_upload_doc_url)
 
         # Transition to adversarial phase
         evaluated_job_application.evaluated_siae.evaluation_campaign.transition_to_adversarial_phase()
         response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
+        self.assertContains(response, html.escape(evaluated_administrative_criteria.administrative_criteria.name))
         self.assertContains(
-            response, f"<h3>{evaluated_administrative_criteria.administrative_criteria.name}</h3>", html=True
+            response,
+            '<span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">À traiter</span>',
         )
-        self.assertContains(response, '<p class="badge rounded-pill bg-pilotage float-end">à traiter</p>')
         self.assertNotContains(response, siae_select_criteria_url)
         self.assertContains(response, siae_upload_doc_url)
 
@@ -412,12 +427,12 @@ class SiaeJobApplicationListViewTest(TestCase):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
 
         submit_disabled = """
-            <button class="btn btn-outline-primary disabled float-end">
+            <button class="btn btn-primary disabled">
                 Soumettre à validation
             </button>
         """
         submit_active = """
-            <button class="btn btn-primary float-end">
+            <button class="btn btn-primary">
                 Soumettre à validation
             </button>
         """
@@ -454,7 +469,13 @@ class SiaeJobApplicationListViewTest(TestCase):
         self.assertContains(response, select_criteria)
         self.assertContains(response, upload_proof)
         self.assertContains(
-            response, '<p class="badge rounded-pill bg-success float-end">justificatifs téléversés</p>'
+            response,
+            """
+            <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
+            Justificatifs téléversés
+            </span>
+            """,
+            html=True,
         )
 
         # criterion submitted
@@ -477,12 +498,12 @@ class SiaeJobApplicationListViewTest(TestCase):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
 
         submit_disabled = """
-            <button class="btn btn-outline-primary disabled float-end">
+            <button class="btn btn-primary disabled">
                 Soumettre à validation
             </button>
         """
         submit_active = """
-            <button class="btn btn-primary float-end">
+            <button class="btn btn-primary">
                 Soumettre à validation
             </button>
         """
