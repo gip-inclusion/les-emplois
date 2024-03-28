@@ -39,11 +39,13 @@
                                     <h2 class="mb-0 flex-grow-1">{{ job_application.job_seeker.get_full_name }}</h2>
                                     {% if request.user.is_job_seeker %}
                                         <a class="btn btn-outline-primary btn-ico btn-sm" href="{% url 'dashboard:edit_user_info' %}">
-                                            <i class="ri-pencil-line me-2"></i>Modifier
+                                            <i class="ri-pencil-line"></i>
+                                            <span>Modifier</span>
                                         </a>
                                     {% elif can_edit_personal_information %}
                                         <span class="btn btn-outline-primary btn-ico btn-sm" data-swap-element="#informations">
-                                            <i class="ri-pencil-line mr-2"></i>Modifier
+                                            <i class="ri-pencil-line"></i>
+                                            <span>Modifier</span>
                                         </span>
                                     {% endif %}
                                 </div>
@@ -86,7 +88,6 @@
                                 <form method="post">
                                     {% csrf_token %}
                                     <fieldset>
-                                        <legend>{{ job_application.job_seeker.get_full_name }}</legend>
                                         {% bootstrap_field form.address_line_1 %}
                                         {% bootstrap_field form.address_line_2 %}
                                         <div class="form-row">
