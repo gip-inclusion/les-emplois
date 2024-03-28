@@ -8,10 +8,9 @@ from rest_framework.throttling import UserRateThrottle
 
 from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification, Status
-from itou.employee_record.serializers import EmployeeRecordUpdateNotificationSerializer
 
 from .perms import EmployeeRecordAPIPermission
-from .serializers import EmployeeRecordAPISerializer
+from .serializers import EmployeeRecordAPISerializer, EmployeeRecordUpdateNotificationAPISerializer
 
 
 logger = logging.getLogger("api_drf")
@@ -167,7 +166,7 @@ Permet de récupérer les fiches salarié créées depuis date donnée en param�
 
 class EmployeeRecordUpdateNotificationViewSet(AbstractEmployeeRecordViewSet):
     queryset = EmployeeRecordUpdateNotification.objects.all()
-    serializer_class = EmployeeRecordUpdateNotificationSerializer
+    serializer_class = EmployeeRecordUpdateNotificationAPISerializer
 
 
 EmployeeRecordUpdateNotificationViewSet.__doc__ = f"""\
