@@ -225,7 +225,6 @@ urlpatterns = [
         list_views.list_for_siae_exports_download,
         name="list_for_siae_exports_download",
     ),
-    path("siae/table", list_views.table_for_siae, name="table_for_siae"),
     # Process.
     path(
         "<uuid:job_application_id>/jobseeker/details",
