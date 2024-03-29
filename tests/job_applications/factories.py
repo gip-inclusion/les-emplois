@@ -39,7 +39,9 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
             approval=factory.SubFactory(
                 ApprovalFactory,
                 user=factory.SelfAttribute("..job_seeker"),
-                eligibility_diagnosis=factory.SelfAttribute("..eligibility_diagnosis"),
+                eligibility_diagnosis=factory.Maybe(
+                    "for_snapshot", no_declaration=factory.SelfAttribute("..eligibility_diagnosis")
+                ),
             ),
         )
         # GEIQ diagnosis created by a GEIQ
@@ -85,6 +87,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
             pk="11111111-1111-1111-1111-111111111111",
             to_company__for_snapshot=True,
             job_seeker__for_snapshot=True,
+            approval__for_snapshot=True,
         )
 
     job_seeker = factory.SubFactory(JobSeekerFactory)
