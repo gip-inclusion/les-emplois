@@ -43,7 +43,7 @@ from itou.www.search.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
 
 
-# Auvergne Rhône Alpes and Île de France
+# Auvergne Rhône Alpes AND Île de France
 MOBILEMPLOI_DEPARTMENTS = (
     "01",
     "03",
@@ -161,7 +161,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "pending_prolongation_requests": None,
         "evaluated_siae_notifications": EvaluatedSiae.objects.none(),
         "show_eiti_webinar_banner": False,
-        "show_mobilemploi_banner": False,
         "show_mobilemploi_prescriber_banner": False,
         "siae_suspension_text_with_dates": None,
         "siae_search_form": SiaeSearchForm(),
@@ -219,7 +218,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         # Force the job seeker to fill its title to use the site
         if not request.user.title:
             return HttpResponseRedirect(reverse("dashboard:edit_user_info"))
-        context["show_mobilemploi_banner"] = request.user.department in MOBILEMPLOI_DEPARTMENTS
 
     return render(request, template_name, context)
 
