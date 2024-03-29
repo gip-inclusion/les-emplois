@@ -241,6 +241,7 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
         )
         for_snapshot = factory.Trait(
             nir="290010101010125",
+            asp_uid="a08dbdb523633cfc59dfdb297307a1",
         )
 
     user = factory.SubFactory(JobSeekerFactory, jobseeker_profile=None)
