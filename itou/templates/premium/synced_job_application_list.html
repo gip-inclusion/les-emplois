@@ -1,0 +1,113 @@
+{% extends "layout/base.html" %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% load str_filters %}
+{% load matomo %}
+{% load sort_table %}
+
+{% block title %}Les emplois premium {{ block.super }}{% endblock %}
+
+{% block content %}
+    <div class="s-box__row row">
+        <div class="col-12 col-md-10">
+            <section aria-labelledby="results">
+                <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                    <h3 class="h4 mb-0" id="results">
+                        {% with paginator.count as counter %}
+                            <strong>Les emplois premium : {{ counter }} résultat{{ counter|pluralizefr }}</strong>
+                        {% endwith %}
+                    </h3>
+                    <small><a href="{% url 'premium_views:refresh' %}" class="text-decoration-none">Mettre à jour la liste des candidatures</a> (dernière mise à jour le {{ last_synced_at }})</small>
+                </div>
+
+                <div class="table-responsive-lg mt-3 mt-md-4">
+                    <table class="table">
+                        <caption class="visually-hidden">Liste des informations candidats pour {{ company }}</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Nom complet</th>
+                                {% itou_sort_table label="Niveau d'éducation" url=request.get_full_path sort="job_application__job_seeker__jobseeker_profile__education_level" %}
+                                {% itou_sort_table label="RQTH" url=request.get_full_path sort="job_application__job_seeker__jobseeker_profile__rqth_employee" %}
+                                {% itou_sort_table label="RSA" url=request.get_full_path sort="job_application__job_seeker__jobseeker_profile__has_rsa_allocation" %}
+                                {% itou_sort_table label="Candidature" url=request.get_full_path sort="job_application__state" %}
+                                {% itou_sort_table label="PASS" url=request.get_full_path sort="job_application__approval__number" %}
+                                {% itou_sort_table label="Fin de PASS" url=request.get_full_path sort="job_application__approval__end_at" %}
+                                {% itou_sort_table label="Début de suspension du PASS" url=request.get_full_path sort="last_in_progress_suspension__start_at" %}
+                                {% itou_sort_table label="Fin de suspension du PASS" url=request.get_full_path sort="last_in_progress_suspension__end_at" %}
+                                {% itou_sort_table label="Structure prescriptrice" url=request.get_full_path sort="job_application__sender_prescriber_organization" %}
+                                {% itou_sort_table label="Prescripteur" url=request.get_full_path sort="job_application__sender" %}
+                                {% itou_sort_table label="Bénéficiaire du RSA" url=request.get_full_path sort="beneficiaire_du_rsa" %}
+                                {% itou_sort_table label="Allocataire ASS" url=request.get_full_path sort="allocataire_ass" %}
+                                {% itou_sort_table label="Allocataire AAH" url=request.get_full_path sort="allocataire_aah" %}
+                                {% itou_sort_table label="DETLD (+ 24 mois)" url=request.get_full_path sort="detld_24_mois" %}
+                                {% itou_sort_table label="Niveau d'étude 3 (CAP, BEP) ou infra" url=request.get_full_path sort="niveau_detude_3" %}
+                                {% itou_sort_table label="Senior (+50 ans)" url=request.get_full_path sort="senior_50_ans" %}
+                                {% itou_sort_table label="Jeune (-26 ans)" url=request.get_full_path sort="jeune_26_ans" %}
+                                {% itou_sort_table label="Sortant de l'ASE" url=request.get_full_path sort="sortant_de_lase" %}
+                                {% itou_sort_table label="DELD (12-24 mois)" url=request.get_full_path sort="deld_12_24_mois" %}
+                                {% itou_sort_table label="Travailleur handicapé" url=request.get_full_path sort="travailleur_handicape" %}
+                                {% itou_sort_table label="Parent isolé" url=request.get_full_path sort="parent_isole" %}
+                                {% itou_sort_table label="Personne sans hébergement ou hébergée ou ayant un parcours de rue" url=request.get_full_path sort="personne_sans_hebergement" %}
+                                {% itou_sort_table label="Réfugié statutaire, bénéficiaire d'une protection temporaire, protégé subsidiaire ou demandeur d'asile" url=request.get_full_path sort="refugie_statutaire" %}
+                                {% itou_sort_table label="Résident ZRR" url=request.get_full_path sort="resident_zrr" %}
+                                {% itou_sort_table label="Résident QPV" url=request.get_full_path sort="resident_qpv" %}
+                                {% itou_sort_table label="Sortant de détention ou personne placée sous main de justice" url=request.get_full_path sort="sortant_de_detention" %}
+                                {% itou_sort_table label="Maîtrise de la langue française" url=request.get_full_path sort="maitrise_de_la_langue_francaise" %}
+                                {% itou_sort_table label="Mobilité" url=request.get_full_path sort="mobilite" %}
+                                <th scope="col">Editable Note</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for obj in object_list %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'apply:details_for_company' job_application_id=obj.job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
+                                           aria-label="Voir la candidature de {{ obj.job_application.job_seeker.get_full_name }}"
+                                           {% matomo_event "emplois-premium" "clic" "voir-candidature-employeur" %}>
+                                            {{ obj.job_application.job_seeker.get_full_name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ obj.job_application.job_seeker.jobseeker_profile.get_education_level_display|default:"-" }}</td>
+                                    <td>{{ obj.job_application.job_seeker.jobseeker_profile.rqth_employee|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.job_application.job_seeker.jobseeker_profile.get_has_rsa_allocation_display }}</td>
+                                    <td>{{ obj.job_application.get_state_display|lower }}</td>
+                                    <td>{{ obj.job_application.approval.number|default:"-" }}</td>
+                                    <td>{{ obj.job_application.approval.end_at|default:"-" }}</td>
+                                    <td>{{ obj.last_in_progress_suspension.start_at|default:"-" }}</td>
+                                    <td>{{ obj.last_in_progress_suspension.end_at|default:"-" }}</td>
+                                    <td>{{ obj.job_application.sender_prescriber_organization|default:"-" }}</td>
+                                    <td>{{ obj.job_application.sender.get_full_name }}</td>
+                                    <td>{{ obj.beneficiaire_du_rsa|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.allocataire_ass|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.allocataire_aah|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.detld_24_mois|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.niveau_detude_3|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.senior_50_ans|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.jeune_26_ans|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.sortant_de_lase|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.deld_12_24_mois|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.travailleur_handicape|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.parent_isole|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.personne_sans_hebergement|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.refugie_statutaire|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.resident_zrr|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.resident_qpv|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.sortant_de_detention|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.maitrise_de_la_langue_francaise|yesno:"Oui,Non" }}</td>
+                                    <td>{{ obj.mobilite|yesno:"Oui,Non" }}</td>
+
+
+                                    <td>
+                                        {% include 'premium/partials/save_note_form.html' with synced_job_application_id=obj.id content=obj.premium_note.content csrf_token=csrf_token only %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% include "includes/pagination.html" with page=page_obj %}
+            </section>
+        </div>
+    </div>
+{% endblock %}
