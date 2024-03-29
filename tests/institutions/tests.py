@@ -44,7 +44,7 @@ class InstitutionModelTest(TestCase):
         assert active_user_with_active_membership not in institution.active_members
 
 
-def test_deactivate_last_admin(admin_client):
+def test_deactivate_last_admin(admin_client, django_capture_on_commit_callbacks):
     institution = InstitutionWithMembershipFactory(department="")
     membership = institution.memberships.first()
     assert membership.is_admin
@@ -53,28 +53,29 @@ def test_deactivate_last_admin(admin_client):
     response = admin_client.get(change_url)
     assert response.status_code == 200
 
-    response = admin_client.post(
-        change_url,
-        data={
-            "kind": institution.kind.value,
-            "name": institution.name,
-            "address_line_1": institution.address_line_1,
-            "address_line_2": institution.address_line_2,
-            "post_code": institution.post_code,
-            "city": institution.city,
-            "department": institution.department,
-            "coords": "",
-            "institutionmembership_set-TOTAL_FORMS": "2",
-            "institutionmembership_set-INITIAL_FORMS": "1",
-            "institutionmembership_set-MIN_NUM_FORMS": "0",
-            "institutionmembership_set-MAX_NUM_FORMS": "1000",
-            "institutionmembership_set-0-id": membership.pk,
-            "institutionmembership_set-0-institution": institution.pk,
-            "institutionmembership_set-0-user": membership.user.pk,
-            # institutionmembership_set-0-is_admin is absent
-            "_continue": "Enregistrer+et+continuer+les+modifications",
-        },
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        response = admin_client.post(
+            change_url,
+            data={
+                "kind": institution.kind.value,
+                "name": institution.name,
+                "address_line_1": institution.address_line_1,
+                "address_line_2": institution.address_line_2,
+                "post_code": institution.post_code,
+                "city": institution.city,
+                "department": institution.department,
+                "coords": "",
+                "institutionmembership_set-TOTAL_FORMS": "2",
+                "institutionmembership_set-INITIAL_FORMS": "1",
+                "institutionmembership_set-MIN_NUM_FORMS": "0",
+                "institutionmembership_set-MAX_NUM_FORMS": "1000",
+                "institutionmembership_set-0-id": membership.pk,
+                "institutionmembership_set-0-institution": institution.pk,
+                "institutionmembership_set-0-user": membership.user.pk,
+                # institutionmembership_set-0-is_admin is absent
+                "_continue": "Enregistrer+et+continuer+les+modifications",
+            },
+        )
     assertRedirects(response, change_url, fetch_redirect_response=False)
     response = admin_client.get(change_url)
     assertContains(
@@ -88,7 +89,7 @@ def test_deactivate_last_admin(admin_client):
     assert_set_admin_role__removal(membership.user, institution)
 
 
-def test_delete_admin(admin_client):
+def test_delete_admin(admin_client, django_capture_on_commit_callbacks):
     institution = InstitutionWithMembershipFactory(department="")
     membership = institution.memberships.first()
     assert membership.is_admin
@@ -97,36 +98,37 @@ def test_delete_admin(admin_client):
     response = admin_client.get(change_url)
     assert response.status_code == 200
 
-    response = admin_client.post(
-        change_url,
-        data={
-            "kind": institution.kind.value,
-            "name": institution.name,
-            "address_line_1": institution.address_line_1,
-            "address_line_2": institution.address_line_2,
-            "post_code": institution.post_code,
-            "city": institution.city,
-            "department": institution.department,
-            "coords": "",
-            "institutionmembership_set-TOTAL_FORMS": "2",
-            "institutionmembership_set-INITIAL_FORMS": "1",
-            "institutionmembership_set-MIN_NUM_FORMS": "0",
-            "institutionmembership_set-MAX_NUM_FORMS": "1000",
-            "institutionmembership_set-0-id": membership.pk,
-            "institutionmembership_set-0-institution": institution.pk,
-            "institutionmembership_set-0-user": membership.user.pk,
-            "institutionmembership_set-0-is_admin": "on",
-            "institutionmembership_set-0-DELETE": "on",
-            "_continue": "Enregistrer+et+continuer+les+modifications",
-        },
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        response = admin_client.post(
+            change_url,
+            data={
+                "kind": institution.kind.value,
+                "name": institution.name,
+                "address_line_1": institution.address_line_1,
+                "address_line_2": institution.address_line_2,
+                "post_code": institution.post_code,
+                "city": institution.city,
+                "department": institution.department,
+                "coords": "",
+                "institutionmembership_set-TOTAL_FORMS": "2",
+                "institutionmembership_set-INITIAL_FORMS": "1",
+                "institutionmembership_set-MIN_NUM_FORMS": "0",
+                "institutionmembership_set-MAX_NUM_FORMS": "1000",
+                "institutionmembership_set-0-id": membership.pk,
+                "institutionmembership_set-0-institution": institution.pk,
+                "institutionmembership_set-0-user": membership.user.pk,
+                "institutionmembership_set-0-is_admin": "on",
+                "institutionmembership_set-0-DELETE": "on",
+                "_continue": "Enregistrer+et+continuer+les+modifications",
+            },
+        )
     assertRedirects(response, change_url, fetch_redirect_response=False)
     response = admin_client.get(change_url)
 
     assert_set_admin_role__removal(membership.user, institution)
 
 
-def test_add_admin(admin_client):
+def test_add_admin(admin_client, django_capture_on_commit_callbacks):
     institution = InstitutionWithMembershipFactory(department="")
     membership = institution.memberships.first()
     labor_inspector = LaborInspectorFactory()
@@ -136,31 +138,32 @@ def test_add_admin(admin_client):
     response = admin_client.get(change_url)
     assert response.status_code == 200
 
-    response = admin_client.post(
-        change_url,
-        data={
-            "kind": institution.kind.value,
-            "name": institution.name,
-            "address_line_1": institution.address_line_1,
-            "address_line_2": institution.address_line_2,
-            "post_code": institution.post_code,
-            "city": institution.city,
-            "department": institution.department,
-            "coords": "",
-            "institutionmembership_set-TOTAL_FORMS": "2",
-            "institutionmembership_set-INITIAL_FORMS": "1",
-            "institutionmembership_set-MIN_NUM_FORMS": "0",
-            "institutionmembership_set-MAX_NUM_FORMS": "1000",
-            "institutionmembership_set-0-id": membership.pk,
-            "institutionmembership_set-0-institution": institution.pk,
-            "institutionmembership_set-0-user": membership.user.pk,
-            "institutionmembership_set-0-is_admin": "on",
-            "institutionmembership_set-1-institution": institution.pk,
-            "institutionmembership_set-1-user": labor_inspector.pk,
-            "institutionmembership_set-1-is_admin": "on",
-            "_continue": "Enregistrer+et+continuer+les+modifications",
-        },
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        response = admin_client.post(
+            change_url,
+            data={
+                "kind": institution.kind.value,
+                "name": institution.name,
+                "address_line_1": institution.address_line_1,
+                "address_line_2": institution.address_line_2,
+                "post_code": institution.post_code,
+                "city": institution.city,
+                "department": institution.department,
+                "coords": "",
+                "institutionmembership_set-TOTAL_FORMS": "2",
+                "institutionmembership_set-INITIAL_FORMS": "1",
+                "institutionmembership_set-MIN_NUM_FORMS": "0",
+                "institutionmembership_set-MAX_NUM_FORMS": "1000",
+                "institutionmembership_set-0-id": membership.pk,
+                "institutionmembership_set-0-institution": institution.pk,
+                "institutionmembership_set-0-user": membership.user.pk,
+                "institutionmembership_set-0-is_admin": "on",
+                "institutionmembership_set-1-institution": institution.pk,
+                "institutionmembership_set-1-user": labor_inspector.pk,
+                "institutionmembership_set-1-is_admin": "on",
+                "_continue": "Enregistrer+et+continuer+les+modifications",
+            },
+        )
     assertRedirects(response, change_url, fetch_redirect_response=False)
     response = admin_client.get(change_url)
 
