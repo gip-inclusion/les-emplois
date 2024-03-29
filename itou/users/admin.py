@@ -818,7 +818,7 @@ class JobSeekerProfileAdmin(InconsistencyCheckMixin, ItouModelAdmin):
             help_texts = kwargs.pop("help_texts", {})
             default_asp_uid = obj._default_asp_uid()
             warn = "⚠ " if default_asp_uid != obj.asp_uid else ""
-            help_texts["asp_uid"] = f"{warn}Valeur par défaut: {default_asp_uid}"
+            help_texts["asp_uid"] = f"{warn}Valeur initiale: {default_asp_uid}"
             kwargs.update({"help_texts": help_texts})
         return super().get_form(request, obj, **kwargs)
 
