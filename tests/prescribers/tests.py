@@ -886,3 +886,13 @@ def test_add_admin(admin_client, django_capture_on_commit_callbacks):
     response = admin_client.get(change_url)
 
     assert_set_admin_role__creation(prescriber, organization)
+
+
+def test_prescriber_kinds_are_alphabetically_sorted():
+    assert PrescriberOrganizationKind.choices == sorted(
+        PrescriberOrganizationKind.choices,
+        key=lambda c: (
+            c[0] == PrescriberOrganizationKind.OTHER,  # OTHER kind should be last
+            c[1].lower(),
+        ),
+    )
