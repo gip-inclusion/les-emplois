@@ -68,6 +68,7 @@ urlpatterns = [
     path("company/", include("itou.www.companies_views.urls")),
     re_path(r"^siae/.*$", redirect_legacy_views.redirect_siaes_views),
     path("siae_evaluation/", include("itou.www.siae_evaluations_views.urls")),
+    path("premium/", include("itou.www.premium_views.urls")),
     path("login/", include("itou.www.login.urls")),
     path("signup/", include("itou.www.signup.urls")),
     path("stats/", include("itou.www.stats.urls")),
