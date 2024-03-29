@@ -24,7 +24,6 @@ from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.openid_connect.inclusion_connect import constants as ic_constants
-from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.users.enums import MATOMO_ACCOUNT_TYPE, IdentityProvider, UserKind
@@ -41,31 +40,6 @@ from itou.www.dashboard.forms import (
 )
 from itou.www.search.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
-
-
-# Auvergne Rhône Alpes AND Île de France
-MOBILEMPLOI_DEPARTMENTS = (
-    "01",
-    "03",
-    "07",
-    "15",
-    "26",
-    "38",
-    "42",
-    "43",
-    "63",
-    "69",
-    "73",
-    "74",
-    "75",
-    "77",
-    "78",
-    "91",
-    "92",
-    "93",
-    "94",
-    "95",
-)
 
 
 def _employer_dashboard_context(request):
@@ -161,7 +135,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "pending_prolongation_requests": None,
         "evaluated_siae_notifications": EvaluatedSiae.objects.none(),
         "show_eiti_webinar_banner": False,
-        "show_mobilemploi_prescriber_banner": False,
         "siae_suspension_text_with_dates": None,
         "siae_search_form": SiaeSearchForm(),
     }
@@ -175,15 +148,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                     prescriber_organization=current_org,
                     status=ProlongationRequestStatus.PENDING,
                 ).count()
-            context["show_mobilemploi_prescriber_banner"] = (
-                current_org.department in MOBILEMPLOI_DEPARTMENTS
-                and current_org.kind
-                not in (
-                    PrescriberOrganizationKind.CAP_EMPLOI,
-                    PrescriberOrganizationKind.PE,
-                    PrescriberOrganizationKind.ML,
-                )
-            )
         elif request.user.email.endswith("pole-emploi.fr"):
             messages.info(
                 request,
