@@ -510,8 +510,8 @@ def test_asp_uid_help_text(admin_client):
     default_asp_uid = profile._default_asp_uid()
     url = reverse("admin:users_jobseekerprofile_change", kwargs={"object_id": profile.pk})
     response = admin_client.get(url)
-    assertContains(response, f"<div>Valeur par défaut: {default_asp_uid}")
+    assertContains(response, f"<div>Valeur initiale: {default_asp_uid}")
     profile.asp_uid = "0" * 12
     profile.save()
     response = admin_client.get(url)
-    assertContains(response, f"<div>⚠ Valeur par défaut: {default_asp_uid}")
+    assertContains(response, f"<div>⚠ Valeur initiale: {default_asp_uid}")
