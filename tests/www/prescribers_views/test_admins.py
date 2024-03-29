@@ -24,7 +24,8 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         assert response.status_code == 200
 
         # Confirm action
-        response = self.client.post(url)
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.post(url)
         assert response.status_code == 302
 
         organization.refresh_from_db()
@@ -51,7 +52,8 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         assert response.status_code == 200
 
         # Confirm action
-        response = self.client.post(url)
+        with self.captureOnCommitCallbacks(execute=True):
+            response = self.client.post(url)
         assert response.status_code == 302
 
         organization.refresh_from_db()

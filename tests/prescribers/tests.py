@@ -741,7 +741,7 @@ def test_validated_odc_is_brsa_constraint():
         PrescriberOrganization.objects.filter(pk=organization.pk).update(is_brsa=False)
 
 
-def test_deactivate_last_admin(admin_client):
+def test_deactivate_last_admin(admin_client, django_capture_on_commit_callbacks):
     organization = PrescriberOrganizationWithMembershipFactory()
     membership = organization.memberships.first()
     assert membership.is_admin
@@ -750,35 +750,36 @@ def test_deactivate_last_admin(admin_client):
     response = admin_client.get(change_url)
     assert response.status_code == 200
 
-    response = admin_client.post(
-        change_url,
-        data={
-            "id": organization.id,
-            "siret": organization.siret,
-            "kind": organization.kind.value,
-            "name": organization.name,
-            "phone": organization.phone,
-            "email": organization.email,
-            "code_safir_poleAemploi": "",
-            "description": organization.description,
-            "address_line_1": organization.address_line_1,
-            "address_line_2": organization.address_line_2,
-            "post_code": organization.post_code,
-            "city": organization.city,
-            "coords": "",
-            "prescribermembership_set-TOTAL_FORMS": "2",
-            "prescribermembership_set-INITIAL_FORMS": "1",
-            "prescribermembership_set-MIN_NUM_FORMS": "0",
-            "prescribermembership_set-MAX_NUM_FORMS": "1000",
-            "prescribermembership_set-0-id": membership.pk,
-            "prescribermembership_set-0-organization": organization.pk,
-            "prescribermembership_set-0-user": membership.user.pk,
-            # prescribermembership_set-0-is_admin is absent
-            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
-            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
-            "_continue": "Enregistrer+et+continuer+les+modifications",
-        },
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        response = admin_client.post(
+            change_url,
+            data={
+                "id": organization.id,
+                "siret": organization.siret,
+                "kind": organization.kind.value,
+                "name": organization.name,
+                "phone": organization.phone,
+                "email": organization.email,
+                "code_safir_poleAemploi": "",
+                "description": organization.description,
+                "address_line_1": organization.address_line_1,
+                "address_line_2": organization.address_line_2,
+                "post_code": organization.post_code,
+                "city": organization.city,
+                "coords": "",
+                "prescribermembership_set-TOTAL_FORMS": "2",
+                "prescribermembership_set-INITIAL_FORMS": "1",
+                "prescribermembership_set-MIN_NUM_FORMS": "0",
+                "prescribermembership_set-MAX_NUM_FORMS": "1000",
+                "prescribermembership_set-0-id": membership.pk,
+                "prescribermembership_set-0-organization": organization.pk,
+                "prescribermembership_set-0-user": membership.user.pk,
+                # prescribermembership_set-0-is_admin is absent
+                "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
+                "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
+                "_continue": "Enregistrer+et+continuer+les+modifications",
+            },
+        )
     assertRedirects(response, change_url, fetch_redirect_response=False)
     response = admin_client.get(change_url)
     assertContains(
@@ -792,7 +793,7 @@ def test_deactivate_last_admin(admin_client):
     assert_set_admin_role__removal(membership.user, organization)
 
 
-def test_delete_admin(admin_client):
+def test_delete_admin(admin_client, django_capture_on_commit_callbacks):
     organization = PrescriberOrganizationWithMembershipFactory()
     membership = organization.memberships.first()
     assert membership.is_admin
@@ -801,43 +802,44 @@ def test_delete_admin(admin_client):
     response = admin_client.get(change_url)
     assert response.status_code == 200
 
-    response = admin_client.post(
-        change_url,
-        data={
-            "id": organization.id,
-            "siret": organization.siret,
-            "kind": organization.kind.value,
-            "name": organization.name,
-            "phone": organization.phone,
-            "email": organization.email,
-            "code_safir_poleAemploi": "",
-            "description": organization.description,
-            "address_line_1": organization.address_line_1,
-            "address_line_2": organization.address_line_2,
-            "post_code": organization.post_code,
-            "city": organization.city,
-            "coords": "",
-            "prescribermembership_set-TOTAL_FORMS": "2",
-            "prescribermembership_set-INITIAL_FORMS": "1",
-            "prescribermembership_set-MIN_NUM_FORMS": "0",
-            "prescribermembership_set-MAX_NUM_FORMS": "1000",
-            "prescribermembership_set-0-id": membership.pk,
-            "prescribermembership_set-0-organization": organization.pk,
-            "prescribermembership_set-0-user": membership.user.pk,
-            "prescribermembership_set-0-is_admin": "on",
-            "prescribermembership_set-0-DELETE": "on",
-            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
-            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
-            "_continue": "Enregistrer+et+continuer+les+modifications",
-        },
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        response = admin_client.post(
+            change_url,
+            data={
+                "id": organization.id,
+                "siret": organization.siret,
+                "kind": organization.kind.value,
+                "name": organization.name,
+                "phone": organization.phone,
+                "email": organization.email,
+                "code_safir_poleAemploi": "",
+                "description": organization.description,
+                "address_line_1": organization.address_line_1,
+                "address_line_2": organization.address_line_2,
+                "post_code": organization.post_code,
+                "city": organization.city,
+                "coords": "",
+                "prescribermembership_set-TOTAL_FORMS": "2",
+                "prescribermembership_set-INITIAL_FORMS": "1",
+                "prescribermembership_set-MIN_NUM_FORMS": "0",
+                "prescribermembership_set-MAX_NUM_FORMS": "1000",
+                "prescribermembership_set-0-id": membership.pk,
+                "prescribermembership_set-0-organization": organization.pk,
+                "prescribermembership_set-0-user": membership.user.pk,
+                "prescribermembership_set-0-is_admin": "on",
+                "prescribermembership_set-0-DELETE": "on",
+                "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
+                "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
+                "_continue": "Enregistrer+et+continuer+les+modifications",
+            },
+        )
     assertRedirects(response, change_url, fetch_redirect_response=False)
     response = admin_client.get(change_url)
 
     assert_set_admin_role__removal(membership.user, organization)
 
 
-def test_add_admin(admin_client):
+def test_add_admin(admin_client, django_capture_on_commit_callbacks):
     organization = PrescriberOrganizationWithMembershipFactory()
     membership = organization.memberships.first()
     prescriber = PrescriberFactory()
@@ -847,38 +849,39 @@ def test_add_admin(admin_client):
     response = admin_client.get(change_url)
     assert response.status_code == 200
 
-    response = admin_client.post(
-        change_url,
-        data={
-            "id": organization.id,
-            "siret": organization.siret,
-            "kind": organization.kind.value,
-            "name": organization.name,
-            "phone": organization.phone,
-            "email": organization.email,
-            "code_safir_poleAemploi": "",
-            "description": organization.description,
-            "address_line_1": organization.address_line_1,
-            "address_line_2": organization.address_line_2,
-            "post_code": organization.post_code,
-            "city": organization.city,
-            "coords": "",
-            "prescribermembership_set-TOTAL_FORMS": "2",
-            "prescribermembership_set-INITIAL_FORMS": "1",
-            "prescribermembership_set-MIN_NUM_FORMS": "0",
-            "prescribermembership_set-MAX_NUM_FORMS": "1000",
-            "prescribermembership_set-0-id": membership.pk,
-            "prescribermembership_set-0-organization": organization.pk,
-            "prescribermembership_set-0-user": membership.user.pk,
-            "prescribermembership_set-0-is_admin": "on",
-            "prescribermembership_set-1-organization": organization.pk,
-            "prescribermembership_set-1-user": prescriber.pk,
-            "prescribermembership_set-1-is_admin": "on",
-            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
-            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
-            "_continue": "Enregistrer+et+continuer+les+modifications",
-        },
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        response = admin_client.post(
+            change_url,
+            data={
+                "id": organization.id,
+                "siret": organization.siret,
+                "kind": organization.kind.value,
+                "name": organization.name,
+                "phone": organization.phone,
+                "email": organization.email,
+                "code_safir_poleAemploi": "",
+                "description": organization.description,
+                "address_line_1": organization.address_line_1,
+                "address_line_2": organization.address_line_2,
+                "post_code": organization.post_code,
+                "city": organization.city,
+                "coords": "",
+                "prescribermembership_set-TOTAL_FORMS": "2",
+                "prescribermembership_set-INITIAL_FORMS": "1",
+                "prescribermembership_set-MIN_NUM_FORMS": "0",
+                "prescribermembership_set-MAX_NUM_FORMS": "1000",
+                "prescribermembership_set-0-id": membership.pk,
+                "prescribermembership_set-0-organization": organization.pk,
+                "prescribermembership_set-0-user": membership.user.pk,
+                "prescribermembership_set-0-is_admin": "on",
+                "prescribermembership_set-1-organization": organization.pk,
+                "prescribermembership_set-1-user": prescriber.pk,
+                "prescribermembership_set-1-is_admin": "on",
+                "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
+                "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
+                "_continue": "Enregistrer+et+continuer+les+modifications",
+            },
+        )
     assertRedirects(response, change_url, fetch_redirect_response=False)
     response = admin_client.get(change_url)
 
