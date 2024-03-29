@@ -78,6 +78,33 @@ def add_url_params(url: str, params: dict[str, str]) -> str:
     return new_url
 
 
+def remove_url_params(url: str, params: list[str]) -> str:
+    """Remove GET params from provided URL.
+
+    :param url: string of target URL
+    :param params: list of requested params to be removed
+    :return: string with updated URL
+
+    >> url = 'http://localhost:8000/login/activate_employer_account?next_url=%2Finvitations&test=value
+    >> params = ['test']
+    >> remove_url_params(url, params)
+    'http://localhost:8000/login/activate_employer_account?next_url=%2Finvitations
+    """
+
+    try:
+        url_parts = urlsplit(url)
+    except ValueError:
+        # URL is invalid so it's useless to continue.
+        return None
+    query = dict(parse_qsl(url_parts.query))
+    for param in params:
+        query.pop(param, None)
+
+    new_url = url_parts._replace(query=urlencode(query)).geturl()
+
+    return new_url
+
+
 def get_url_param_value(url: str, key: str) -> str:
     """Get a parameter value from a provided URL.
 
