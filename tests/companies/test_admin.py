@@ -1,3 +1,4 @@
+from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNumQueries, assertRedirects
 
@@ -20,6 +21,8 @@ class TestCompanyAdmin:
         # 8. SAVEPOINT
         # 9. UPDATE django session
         # 10. RELEASE SAVEPOINT
+        # clear ContentType cache to avoid missing query
+        ContentType.objects.clear_cache()
         with assertNumQueries(10):
             response = admin_client.get(reverse("admin:companies_company_add"))
         response = parse_response_to_soup(response, selector=".field-approvals_list")
