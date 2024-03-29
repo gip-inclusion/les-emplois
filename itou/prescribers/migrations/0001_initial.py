@@ -261,18 +261,6 @@ class Migration(migrations.Migration):
                     "kind",
                     models.CharField(
                         choices=[
-                            ("CAP_EMPLOI", "Cap emploi"),
-                            ("ML", "Mission locale"),
-                            ("OIL", "Opérateur d'intermédiation locative"),
-                            (
-                                "ODC",
-                                "Organisation délégataire d'un Conseil Départemental (Orientation et suivi des BRSA)",
-                            ),
-                            ("PENSION", "Pension de famille / résidence accueil"),
-                            ("PE", "France Travail"),
-                            ("RS_FJT", "Résidence sociale / FJT - Foyer de Jeunes Travailleurs"),
-                            ("PREVENTION", "Service ou club de prévention"),
-                            ("DEPT", "Service social du conseil départemental"),
                             ("AFPA", "AFPA - Agence nationale pour la formation professionnelle des adultes"),
                             ("ASE", "ASE - Aide sociale à l'enfance"),
                             (
@@ -282,6 +270,7 @@ class Migration(migrations.Migration):
                             ),
                             ("CADA", "CADA - Centre d'accueil de demandeurs d'asile"),
                             ("CAF", "CAF - Caisse d'allocations familiales"),
+                            ("CAP_EMPLOI", "Cap emploi"),
                             ("CAVA", "CAVA - Centre d'adaptation à la vie active"),
                             (
                                 "CCAS",
@@ -294,16 +283,27 @@ class Migration(migrations.Migration):
                             ("CSAPA", "CSAPA - Centre de soins, d'accompagnement et de prévention en addictologie"),
                             ("E2C", "E2C - École de la deuxième chance"),
                             ("EPIDE", "EPIDE - Établissement pour l'insertion dans l'emploi"),
+                            ("PE", "France Travail"),
                             ("HUDA", "HUDA - Hébergement d'urgence pour demandeurs d'asile"),
+                            ("ML", "Mission locale"),
                             ("MSA", "MSA - Mutualité Sociale Agricole"),
                             (
                                 "OACAS",
                                 "OACAS - Structure porteuse d'un agrément national organisme d'accueil communautaire "
                                 "et d'activité solidaire",
                             ),
+                            ("OIL", "Opérateur d'intermédiation locative"),
+                            (
+                                "ODC",
+                                "Organisation délégataire d'un Conseil Départemental (Orientation et suivi des BRSA)",
+                            ),
+                            ("PENSION", "Pension de famille / résidence accueil"),
                             ("PIJ_BIJ", "PIJ-BIJ - Point/Bureau information jeunesse"),
                             ("PJJ", "PJJ - Protection judiciaire de la jeunesse"),
                             ("PLIE", "PLIE - Plan local pour l'insertion et l'emploi"),
+                            ("RS_FJT", "Résidence sociale / FJT - Foyer de Jeunes Travailleurs"),
+                            ("PREVENTION", "Service ou club de prévention"),
+                            ("DEPT", "Service social du conseil départemental"),
                             ("SPIP", "SPIP - Service pénitentiaire d'insertion et de probation"),
                             ("Autre", "Autre"),
                         ],

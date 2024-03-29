@@ -2,16 +2,9 @@ from django.db import models
 
 
 class PrescriberOrganizationKind(models.TextChoices):
-    CAP_EMPLOI = "CAP_EMPLOI", "Cap emploi"
-    ML = "ML", "Mission locale"
-    OIL = "OIL", "Opérateur d'intermédiation locative"
-    ODC = "ODC", "Organisation délégataire d'un Conseil Départemental (Orientation et suivi des BRSA)"
-    PENSION = "PENSION", "Pension de famille / résidence accueil"
-    PE = "PE", "France Travail"  # Previously pôle emploi
-    RS_FJT = "RS_FJT", "Résidence sociale / FJT - Foyer de Jeunes Travailleurs"
-    PREVENTION = "PREVENTION", "Service ou club de prévention"
-    DEPT = "DEPT", "Service social du conseil départemental"
-    AFPA = ("AFPA", "AFPA - Agence nationale pour la formation professionnelle des adultes")
+    # /!\ Keep this list alphabetically sorted to help users find the proper kind
+    # cf test_prescriber_kinds_are_alphabetically_sorted test
+    AFPA = "AFPA", "AFPA - Agence nationale pour la formation professionnelle des adultes"
     ASE = "ASE", "ASE - Aide sociale à l'enfance"
     CAARUD = (
         "CAARUD",
@@ -19,6 +12,7 @@ class PrescriberOrganizationKind(models.TextChoices):
     )
     CADA = "CADA", "CADA - Centre d'accueil de demandeurs d'asile"
     CAF = "CAF", "CAF - Caisse d'allocations familiales"
+    CAP_EMPLOI = "CAP_EMPLOI", "Cap emploi"
     CAVA = "CAVA", "CAVA - Centre d'adaptation à la vie active"
     CCAS = ("CCAS", "CCAS - Centre communal d'action sociale ou centre intercommunal d'action sociale")
     CHRS = "CHRS", "CHRS - Centre d'hébergement et de réinsertion sociale"
@@ -28,7 +22,9 @@ class PrescriberOrganizationKind(models.TextChoices):
     CSAPA = "CSAPA", "CSAPA - Centre de soins, d'accompagnement et de prévention en addictologie"
     E2C = "E2C", "E2C - École de la deuxième chance"
     EPIDE = "EPIDE", "EPIDE - Établissement pour l'insertion dans l'emploi"
+    PE = "PE", "France Travail"  # Previously pôle emploi
     HUDA = "HUDA", "HUDA - Hébergement d'urgence pour demandeurs d'asile"
+    ML = "ML", "Mission locale"
     MSA = "MSA", "MSA - Mutualité Sociale Agricole"
     OACAS = (
         "OACAS",
@@ -37,10 +33,17 @@ class PrescriberOrganizationKind(models.TextChoices):
             "d'accueil communautaire et d'activité solidaire"
         ),
     )
+    OIL = "OIL", "Opérateur d'intermédiation locative"
+    ODC = "ODC", "Organisation délégataire d'un Conseil Départemental (Orientation et suivi des BRSA)"
+    PENSION = "PENSION", "Pension de famille / résidence accueil"
     PIJ_BIJ = "PIJ_BIJ", "PIJ-BIJ - Point/Bureau information jeunesse"
     PJJ = "PJJ", "PJJ - Protection judiciaire de la jeunesse"
     PLIE = "PLIE", "PLIE - Plan local pour l'insertion et l'emploi"
+    RS_FJT = "RS_FJT", "Résidence sociale / FJT - Foyer de Jeunes Travailleurs"
+    PREVENTION = "PREVENTION", "Service ou club de prévention"
+    DEPT = "DEPT", "Service social du conseil départemental"
     SPIP = "SPIP", "SPIP - Service pénitentiaire d'insertion et de probation"
+
     OTHER = "Autre", "Autre"
 
     def to_PE_typologie_prescripteur(self):
