@@ -73,7 +73,7 @@ L'utilisation de cette API nécessite un jeton d'autorisation (`token`) :
 
 {AUTH_TOKEN_EXPLANATION_TEXT}
 
-Le compte administrateur utilisé peut être membre d'une ou de plusieurs structures.
+Le compte administrateur utilisé peut être membre administrateur d'une ou de plusieurs structures.
 Par défaut, l'API renvoie les candidatures reçues par la première structure dont le compte est membre
 car la première version avait été pensée ainsi.
 
@@ -82,7 +82,7 @@ car la première version avait été pensée ainsi.
 - mode_multi_structures : renvoie les candidats de toutes les structures.
 - uid_structures : renvoie les candidats des structures demandées.
 
-Attention, le compte doit être administrateur des structures.
+Attention, le compte doit être administrateur de toutes les structures dont il est membre.
 
 # Exemples de requêtes
 
@@ -103,8 +103,8 @@ et cliquez sur « Mon espace » > « Accès aux APIs ».
 
 ```bash
 curl
--L '{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/api/v1/candidats/?structures_uid=[uid-1]' \
--H 'Authorization: Token [token]'
+'{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/api/v1/candidats/?structures_uid=<uid_1>' \
+--header 'Authorization: Token [token]'
 ```
 
 ### Plusieurs structures
@@ -113,8 +113,8 @@ Séparez les identifiants par des virgules.
 
 ```bash
 curl
--L '{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/api/v1/candidats/?structures_uid=[uid-1,uid-2,uid-3]' \
--H 'Authorization: Token [token]'
+'{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/api/v1/candidats/?structures_uid=<uid_1>,<uid_2>' \
+--header 'Authorization: Token [token]'
 ```
 
 """
