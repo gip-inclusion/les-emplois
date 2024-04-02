@@ -141,6 +141,85 @@ class ApplicantsAPITest(APITestCase, ParametrizedTestCase):
             assert sorted(expected_first_names) == sorted([result["prenom"] for result in results])
             assert len(results) == len(expected_first_names)
 
+    def test_applicant_data_mode_multiple_structures(self):
+        # First company: 2 applicants, 3 job applications.
+        company_1 = CompanyFactory(with_membership=True)
+        employer = company_1.members.first()
+        bob = JobApplicationFactory(job_seeker__first_name="Bob", to_company=company_1).job_seeker
+        dylan = JobApplicationFactory(job_seeker__first_name="Dylan", to_company=company_1).job_seeker
+        JobApplicationFactory(to_company_id=company_1.pk, job_seeker_id=dylan.pk)
+
+        # Second company: 1 applicant, 1 job application.
+        company_2 = CompanyFactory(
+            with_membership=True,
+            membership__is_admin=True,
+            membership__user=employer,
+        )
+        JobApplicationFactory(to_company_id=company_2.pk, job_seeker_id=dylan.pk)
+
+        # Third company, which the api users doesn't belong to but has a job application
+        # for an applicant in the 2 others companies
+        company_3 = CompanyFactory()
+        JobApplicationFactory(to_company_id=company_3.pk, job_seeker_id=dylan.pk)
+
+        # Add birth data
+        bob.jobseeker_profile.birth_place = CommuneFactory()
+        bob.jobseeker_profile.birth_country = CountryFactory()
+        bob.jobseeker_profile.save()
+        dylan.jobseeker_profile.birth_place = CommuneFactory()
+        dylan.jobseeker_profile.birth_country = CountryFactory()
+        dylan.jobseeker_profile.save()
+
+        num_queries = (
+            BASE_NUM_QUERIES
+            + 1  # companymembership check (ApplicantsAPIPermission)
+            + 1  # get_queryset: job_application subquery (job_applications__to_company_id__in)
+            + 1  # User
+            + 1  # UserProfile
+        )
+
+        self.client.force_authenticate(employer)
+
+        with self.assertNumQueries(num_queries):
+            response = self.client.get(self.URL, format="json", data={"mode_multi_structures": "1"})
+
+        assert response.status_code == 200
+        results = response.json().get("results")
+        assert [
+            {
+                "civilite": dylan.title,
+                "nom": dylan.last_name,
+                "prenom": dylan.first_name,
+                "courriel": dylan.email,
+                "telephone": dylan.phone,
+                "adresse": dylan.address_line_1,
+                "complement_adresse": dylan.address_line_2,
+                "code_postal": dylan.post_code,
+                "ville": dylan.city,
+                "date_naissance": str(dylan.birthdate),
+                "lieu_naissance": dylan.jobseeker_profile.birth_place.name,
+                "pays_naissance": dylan.jobseeker_profile.birth_country.name,
+                "lien_cv": None,
+                "uid_structures": sorted([str(company_1.uid), str(company_2.uid)]),
+            },
+            {
+                "civilite": bob.title,
+                "nom": bob.last_name,
+                "prenom": bob.first_name,
+                "courriel": bob.email,
+                "telephone": bob.phone,
+                "adresse": bob.address_line_1,
+                "complement_adresse": bob.address_line_2,
+                "code_postal": bob.post_code,
+                "ville": bob.city,
+                "date_naissance": str(bob.birthdate),
+                "lieu_naissance": bob.jobseeker_profile.birth_place.name,
+                "pays_naissance": bob.jobseeker_profile.birth_country.name,
+                "lien_cv": None,
+                "uid_structures": [str(company_1.uid)],
+            },
+        ] == results
+
     def test_applicant_data(self):
         company = CompanyFactory(with_membership=True)
         job_seeker1 = JobApplicationFactory(to_company=company).job_seeker
@@ -201,6 +280,7 @@ class ApplicantsAPITest(APITestCase, ParametrizedTestCase):
                 "lieu_naissance": job_seeker.jobseeker_profile.birth_place.name,
                 "pays_naissance": job_seeker.jobseeker_profile.birth_country.name,
                 "lien_cv": None,
+                "uid_structures": [str(company.uid)],
             } == result
 
     def test_rate_limiting(self):
