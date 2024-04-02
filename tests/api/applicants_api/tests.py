@@ -4,11 +4,11 @@ from rest_framework.test import APIClient, APITestCase
 from unittest_parametrize import ParametrizedTestCase, parametrize
 
 from tests.asp.factories import CommuneFactory, CountryFactory
-from tests.companies.factories import CompanyFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory
 from tests.utils.test import BASE_NUM_QUERIES
 
 
@@ -40,22 +40,19 @@ class ApplicantsAPITest(APITestCase, ParametrizedTestCase):
         response = self.client.get(self.URL, format="json")
         assert response.status_code == 403
 
-    def test_api_user_has_unique_siae_membership(self):
-        # Connected user must only be member of target SIAE
-        user = CompanyFactory(with_membership=True).members.first()
-        CompanyFactory(with_membership=True).members.add(user)
+    def test_api_user_has_non_memberships(self):
+        # Connected user must have a membership
+        user = EmployerFactory()
 
         self.client.force_authenticate(user)
         response = self.client.get(self.URL, format="json")
 
         assert response.status_code == 403
 
-    def test_api_user_is_admin(self):
-        # Connected user must only be admin of target SIAE
+    def test_api_user_is_not_only_admin(self):
+        # Connected user must be admin of all their structures
         user = CompanyFactory(with_membership=True).members.first()
-        membership = user.companymembership_set.first()
-        membership.is_admin = False
-        membership.save()
+        CompanyMembershipFactory(is_admin=False, user=user)
 
         self.client.force_authenticate(user)
         response = self.client.get(self.URL, format="json")
