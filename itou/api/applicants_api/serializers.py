@@ -43,3 +43,15 @@ class ApplicantSerializer(serializers.ModelSerializer):
 
     def get_civilite(self, obj) -> str:
         return obj.title or "Non fournie"
+
+
+class StringArrayField(serializers.ListField):
+    def to_internal_value(self, data):
+        data = data[0].split(",")  # convert string to list
+        data = [d for d in data if d != ""]
+        return super().to_internal_value(data)
+
+
+class APIParametersSerializer(serializers.Serializer):
+    mode_multi_structures = serializers.BooleanField(required=False)
+    uid_structures = StringArrayField(child=serializers.CharField(), required=False)
