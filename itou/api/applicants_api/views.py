@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models import Q
 from rest_framework import authentication, generics
 
 from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
@@ -42,6 +44,14 @@ class ApplicantsView(generics.ListAPIView):
 
         return (
             User.objects.filter(job_applications__to_company_id__in=companies_ids, kind=UserKind.JOB_SEEKER)
+            .annotate(
+                companies_uids=ArrayAgg(
+                    "job_applications__to_company_id__uid",
+                    filter=Q(job_applications__to_company_id__in=companies_ids),
+                    distinct=True,
+                    ordering="job_applications__to_company_id__uid",
+                )
+            )
             .select_related("jobseeker_profile__birth_place", "jobseeker_profile__birth_country")
             .distinct()
             .order_by("-pk")

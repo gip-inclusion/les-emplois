@@ -19,7 +19,7 @@ class ApplicantSerializer(serializers.ModelSerializer):
     lieu_naissance = serializers.CharField(source="jobseeker_profile.birth_place")
     pays_naissance = serializers.CharField(source="jobseeker_profile.birth_country")
     lien_cv = serializers.CharField(default=None)  # Deprecated field
-    # TODO: add uid structure
+    uid_structures = serializers.ListField(child=serializers.CharField(), source="companies_uids")
 
     class Meta:
         model = User
@@ -37,6 +37,7 @@ class ApplicantSerializer(serializers.ModelSerializer):
             "lieu_naissance",
             "pays_naissance",
             "lien_cv",
+            "uid_structures",
         )
         read_only_fields = fields
 
