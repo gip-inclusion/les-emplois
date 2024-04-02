@@ -1,3 +1,4 @@
+{% load job_seekers %}
 {% load format_filters %}
 {% load tally %}
 <div class="c-box c-box--results has-links-inside my-3 my-md-4">
@@ -14,7 +15,7 @@
 
                     <div class="d-flex flex-column flex-md-row align-items-start align-items-md-end gap-1 gap-md-2">
                         <span>
-                            <i class="ri-map-pin-2-line font-weight-normal me-1" aria-hidden="true"></i>{{ item.job_seeker.jobseeker_profile.hexa_post_code|slice:":2" }} - {{ item.job_seeker.jobseeker_profile.hexa_commune|title }}
+                            <i class="ri-map-pin-2-line font-weight-normal me-1" aria-hidden="true"></i>{% profile_city_display item.job_seeker.jobseeker_profile %}
                         </span>
 
                     </div>

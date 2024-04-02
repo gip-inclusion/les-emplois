@@ -32,6 +32,8 @@ from pytest_django.asserts import assertContains, assertNumQueries, assertRedire
 import itou.utils.json
 import itou.utils.session
 from itou.approvals.models import Suspension
+from itou.asp.models import Commune
+from itou.cities.models import City
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership
 from itou.job_applications.models import JobApplicationWorkflow
@@ -44,7 +46,7 @@ from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.utils.sync import DiffItem, DiffItemKind, yield_sync_diff
 from itou.utils.tasks import sanitize_mailjet_recipients
-from itou.utils.templatetags import dict_filters, format_filters, job_applications
+from itou.utils.templatetags import dict_filters, format_filters, job_applications, job_seekers
 from itou.utils.tokens import COMPANY_SIGNUP_MAGIC_LINK_TIMEOUT, CompanySignupTokenGenerator
 from itou.utils.urls import (
     add_url_params,
@@ -80,6 +82,7 @@ from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
+    JobSeekerWithAddressFactory,
     LaborInspectorFactory,
     PrescriberFactory,
 )
@@ -1373,8 +1376,6 @@ def test_yield_sync_diff():
 
 
 def test_yield_sync_diff_composite_keys():
-    from itou.asp.models import Commune
-
     Commune.objects.all().delete()  # remove the communes from the fixtures
 
     # 'code' isn't unique, only a combination of code and start_date is.
@@ -1521,3 +1522,37 @@ def test_all_admin(admin_client, model):
     # We sometimes have specialized handling for emails
     response = admin_client.get(list_url, {"q": "test@example.com"})
     assert response.status_code == 200
+
+
+def test_profile_city_display():
+    user = JobSeekerWithAddressFactory.build()
+    profile = user.jobseeker_profile
+
+    # Tests with hexa_commune
+    profile.hexa_commune = Commune(
+        code="12345", name="JOLIE VILLE", city=City(name="Très Jolie Ville", department="2A", code_insee="12345")
+    )
+    assert job_seekers.profile_city_display(profile) == "2A - Très Jolie Ville"
+    profile.hexa_commune = Commune(code="12345", name="JOLIE VILLE")
+    assert job_seekers.profile_city_display(profile) == "12 - Jolie Ville"
+    profile.hexa_commune = Commune(code="98765", name="VILLE-10E__ARRONDISSEMENT")
+    assert job_seekers.profile_city_display(profile) == "987 - Ville-10ᵉ"
+
+    # Test fallback to user infos
+    profile.hexa_commune = None
+    profile.user.insee_city = City(name="Très Jolie Ville", department="12", code_insee="12345")
+    assert job_seekers.profile_city_display(profile) == "12 - Très Jolie Ville"
+    profile.user.insee_city = None
+    profile.user.post_code = "12345"
+    profile.user.city = "Une autre ville"
+    assert job_seekers.profile_city_display(profile) == "12 - Une autre ville"
+
+    user.city = ""
+    assert job_seekers.profile_city_display(profile) == "12"
+
+    user.post_code = ""
+    user.city = "Paris"
+    assert job_seekers.profile_city_display(profile) == "Paris"
+
+    user.city = ""
+    assert job_seekers.profile_city_display(profile) == "Ville non renseignée"
