@@ -34,6 +34,8 @@ urlpatterns = [
     path("pe/state/main", views.stats_pe_state_main, name="stats_pe_state_main"),
     path("pe/state/raw", views.stats_pe_state_raw, name="stats_pe_state_raw"),
     path("pe/tension", views.stats_pe_tension, name="stats_pe_tension"),
+    # Authorized prescribers' stats
+    path("ph/state/main", views.stats_ph_state_main, name="stats_ph_state_main"),
     # Institution stats - DDETS IAE - department level.
     # Legacy `ddets` term is used in URLs for retroactivity in Matomo stats but in fact it means `ddets_iae`.
     path(
