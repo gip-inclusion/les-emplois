@@ -2,13 +2,14 @@ from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Q
 from rest_framework import authentication, generics
+from rest_framework.exceptions import ValidationError
 
 from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
 from itou.users.enums import UserKind
 from itou.users.models import User
 
 from .perms import ApplicantsAPIPermission
-from .serializers import ApplicantSerializer
+from .serializers import APIParametersSerializer, ApplicantSerializer
 
 
 class ApplicantsView(generics.ListAPIView):
@@ -20,15 +21,18 @@ class ApplicantsView(generics.ListAPIView):
     serializer_class = ApplicantSerializer
 
     def get_queryset(self):
-        multi_companies_mode = bool(self.request.query_params.get("mode_multi_structures")) is True
-        companies_uids_params = self.request.query_params.get("uid_structures")
+        serializer = APIParametersSerializer(data=self.request.query_params)
+        if not serializer.is_valid():
+            raise ValidationError
+
+        multi_companies_mode = serializer.validated_data.get("mode_multi_structures", False)
+        companies_uids_params = serializer.validated_data.get("uid_structures", [])
         memberships = (
             self.request.user.active_or_in_grace_period_company_memberships()
             .order_by("created_at")
             .values("company_id", "company__uid")
         )
         if companies_uids_params:
-            companies_uids_params = companies_uids_params.split(",")
             companies_ids = [
                 membership["company_id"]
                 for membership in memberships
