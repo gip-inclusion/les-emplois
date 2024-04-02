@@ -4,10 +4,12 @@ import factory
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib.messages.test import MessagesTestMixin
+from django.template.defaultfilters import title
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 
+from itou.common_apps.address.departments import department_from_postcode
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.employee_record.enums import Status
@@ -57,6 +59,7 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
         response = self.client.get(self.URL)
 
         self.assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
+        self.assertContains(response, "Ville non renseignée")
 
     def test_status_filter(self):
         """
@@ -270,6 +273,9 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
         response = self.client.get(self.URL + "?status=REJECTED")
         self.assertContains(response, "Erreur 0012")
         self.assertContains(response, "JSON Invalide")
+
+        hexa_commune = record.job_application.job_seeker.jobseeker_profile.hexa_commune
+        self.assertContains(response, f"{department_from_postcode(hexa_commune.code)} - {title(hexa_commune.name)}")
 
     def test_rejected_custom_messages(self):
         self.client.force_login(self.user)
