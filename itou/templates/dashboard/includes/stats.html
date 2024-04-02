@@ -119,6 +119,14 @@
                         </a>
                     </li>
                 {% endif %}
+                {% if can_view_stats_ph %}
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_ph_state_main' %}" class="btn-link btn-ico">
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                            <span>Voir les données de l’état des candidatures orientées</span>
+                        </a>
+                    </li>
+                {% endif %}
                 {% if can_view_stats_ddets_iae %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ddets_iae_auto_prescription' %}" class="btn-link btn-ico">

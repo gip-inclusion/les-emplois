@@ -97,6 +97,12 @@ METABASE_DASHBOARDS = {
         "tally_embed_form_id": "3EKJ5q",
     },
     #
+    # Authorized Prescribers' stats
+    #
+    "stats_ph_state_main": {
+        "dashboard_id": 149,
+    },
+    #
     # Institution stats - DDETS IAE - department level.
     #
     "stats_ddets_iae_auto_prescription": {

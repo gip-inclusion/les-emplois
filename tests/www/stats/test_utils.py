@@ -286,6 +286,28 @@ def test_can_view_stats_pe_as_dgpe():
     assert utils.get_stats_pe_departments(request)
 
 
+@pytest.mark.parametrize(
+    "kind",
+    [
+        PrescriberOrganizationKind.CHRS,
+        PrescriberOrganizationKind.CHU,
+        PrescriberOrganizationKind.CAP_EMPLOI,
+        PrescriberOrganizationKind.ML,
+        PrescriberOrganizationKind.OIL,
+        PrescriberOrganizationKind.RS_FJT,
+    ],
+)
+@pytest.mark.parametrize("region", ["Île-de-France", "Auvergne-Rhône-Alpes", "Nouvelle-Aquitaine"])
+def test_can_view_stats_ph(kind, region):
+    organization = PrescriberOrganizationWithMembershipFactory(
+        authorized=True,
+        kind=kind,
+        department=factory.fuzzy.FuzzyChoice(departments.REGIONS[region]),
+    )
+    request = get_request(organization.members.get())
+    assert utils.can_view_stats_ph(request)
+
+
 def test_can_view_stats_ddets_iae():
     # Admin member of DDETS IAE can access.
     institution = InstitutionWithMembershipFactory(kind=InstitutionKind.DDETS_IAE, department="93")

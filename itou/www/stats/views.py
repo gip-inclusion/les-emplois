@@ -30,6 +30,7 @@ from itou.common_apps.address.departments import (
     format_region_for_matomo,
 )
 from itou.companies import models as companies_models
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils import constants as global_constants
 from itou.utils.apis import metabase as mb
 from itou.utils.perms.company import get_current_company_or_404
@@ -436,6 +437,36 @@ def stats_pe_tension(request):
         request=request,
         page_title="Fiches de poste en tension",
         # No additional locked filter is needed for these PE stats.
+    )
+
+
+def render_stats_ph(request, page_title, extra_params=None):
+    if not utils.can_view_stats_ph(request):
+        raise PermissionDenied
+
+    department = request.current_organization.department
+    params = {
+        mb.DEPARTMENT_FILTER_KEY: [DEPARTMENTS[department]],
+    }
+    if extra_params:
+        params.update(extra_params)
+
+    context = {
+        "page_title": page_title,
+        "matomo_custom_url_suffix": f"{format_region_and_department_for_matomo(department)}/agence",
+        "department": department,
+    }
+    return render_stats(request=request, context=context, params=params)
+
+
+@login_required
+def stats_ph_state_main(request):
+    return render_stats_ph(
+        request=request,
+        page_title="Etat des candidatures orientées",
+        extra_params={
+            mb.PRESCRIBER_FILTER_KEY: PrescriberOrganizationKind(request.current_organization.kind).label,
+        },
     )
 
 
