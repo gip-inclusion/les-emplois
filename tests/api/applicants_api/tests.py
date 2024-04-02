@@ -115,12 +115,13 @@ class ApplicantsAPITest(APITestCase, ParametrizedTestCase):
 
         num_queries = (
             BASE_NUM_QUERIES
-            + 1  # companymembership check (ApplicantsAPIPermission)
-            + 1  # get_queryset: job_application subquery (job_applications__to_company_id__in)
+            + 1  # companymembership.is_admin check (ApplicantsAPIPermission)
+            + 1  # get_queryset: companies_uids aggregation
+            + 1  # get_queryset: Count job_applications (Exists JobApplication)
         )
         if len(expected_first_names) > 0:
             # Subquery returned results, so the main query is executed.
-            num_queries = num_queries + 1 + 1  # User & UserProfile
+            num_queries = num_queries + 1  # get_queryset: Fetch User + Profile
 
         self.client.force_authenticate(employer)
 
@@ -169,10 +170,10 @@ class ApplicantsAPITest(APITestCase, ParametrizedTestCase):
 
         num_queries = (
             BASE_NUM_QUERIES
-            + 1  # companymembership check (ApplicantsAPIPermission)
-            + 1  # get_queryset: job_application subquery (job_applications__to_company_id__in)
-            + 1  # User
-            + 1  # UserProfile
+            + 1  # companymembership.is_admin check (ApplicantsAPIPermission)
+            + 1  # get_queryset: companies_uids aggregation
+            + 1  # get_queryset: Count job_applications (Exists JobApplication)
+            + 1  # get_queryset: Fetch User + Profile
         )
 
         self.client.force_authenticate(employer)
@@ -247,10 +248,10 @@ class ApplicantsAPITest(APITestCase, ParametrizedTestCase):
         self.client.force_authenticate(user)
         with self.assertNumQueries(
             BASE_NUM_QUERIES
-            + 1  # companymembership check (ApplicantsAPIPermission)
-            + 1  # siaes_companymembership fetch for request.user (get_queryset)
-            + 1  # fetch users
-            + 1  # prefetch linked job applications
+            + 1  # companymembership.is_admin check (ApplicantsAPIPermission)
+            + 1  # get_queryset: companies_uids aggregation
+            + 1  # get_queryset: Count job_applications (Exists JobApplication)
+            + 1  # get_queryset: Fetch User + Profile
         ):
             response = self.client.get(self.URL, format="json")
 

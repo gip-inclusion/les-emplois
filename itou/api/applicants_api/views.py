@@ -1,10 +1,11 @@
 from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from rest_framework import authentication, generics
 from rest_framework.exceptions import ValidationError
 
 from itou.api import AUTH_TOKEN_EXPLANATION_TEXT
+from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import User
 
@@ -47,7 +48,15 @@ class ApplicantsView(generics.ListAPIView):
             companies_ids = companies_ids[:1]
 
         return (
-            User.objects.filter(job_applications__to_company_id__in=companies_ids, kind=UserKind.JOB_SEEKER)
+            User.objects.filter(
+                Exists(
+                    JobApplication.objects.filter(
+                        job_seeker_id=OuterRef("pk"),
+                        to_company_id__in=companies_ids,
+                    )
+                ),
+                kind=UserKind.JOB_SEEKER,
+            )
             .annotate(
                 companies_uids=ArrayAgg(
                     "job_applications__to_company_id__uid",
@@ -57,7 +66,6 @@ class ApplicantsView(generics.ListAPIView):
                 )
             )
             .select_related("jobseeker_profile__birth_place", "jobseeker_profile__birth_country")
-            .distinct()
             .order_by("-pk")
         )
 
