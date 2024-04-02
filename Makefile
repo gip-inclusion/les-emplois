@@ -9,11 +9,7 @@
 PYTHON_VERSION := python3.11
 LINTER_CHECKED_DIRS := config itou tests
 PGDATABASE ?= itou
-ifeq ($(shell uname -s),Linux)
-	REQUIREMENTS_PATH ?= requirements/dev.txt
-else
-	REQUIREMENTS_PATH ?= requirements/dev-mac.txt
-endif
+REQUIREMENTS_PATH ?= requirements/dev.txt
 
 VIRTUAL_ENV ?= .venv
 export PATH := $(VIRTUAL_ENV)/bin:$(PATH)
