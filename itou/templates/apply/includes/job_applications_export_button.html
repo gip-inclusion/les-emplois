@@ -1,13 +1,11 @@
-{% if user.is_prescriber or user.is_employer %}
-    {% if user.is_prescriber %}
-        <a href="{% url 'apply:list_for_prescriber_exports' %}" class="btn btn-ico btn-secondary mt-3 mt-md-0" aria-label="Exporter la liste de candidatures">
-            <i class="ri-download-2-fill" aria-hidden="true"></i>
-            <span>Exporter</span>
-        </a>
-    {% elif user.is_employer %}
-        <a href="{% url 'apply:list_for_siae_exports' %}" class="btn btn-ico btn-secondary mt-3 mt-md-0" aria-label="Exporter la liste de candidatures">
-            <i class="ri-download-2-fill" aria-hidden="true"></i>
-            <span>Exporter</span>
-        </a>
-    {% endif %}
+{% if user.is_prescriber %}
+    <a href="{% url 'apply:list_for_prescriber_exports' %}" class="btn btn-ico btn-secondary mt-3 mt-md-0" aria-label="Exporter la liste de candidatures">
+        <i class="ri-download-2-fill" aria-hidden="true"></i>
+        <span>Exporter</span>
+    </a>
+{% elif user.is_employer %}
+    <a href="{% url 'apply:list_for_siae_exports' %}" class="btn btn-ico btn-secondary mt-3 mt-md-0" aria-label="Exporter la liste de candidatures">
+        <i class="ri-download-2-fill" aria-hidden="true"></i>
+        <span>Exporter</span>
+    </a>
 {% endif %}
