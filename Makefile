@@ -51,6 +51,7 @@ quality: $(VENV_REQUIREMENT)
 	djlint --lint --check itou
 	find * -type f -name '*.sh' -exec shellcheck --external-sources {} +
 	python manage.py makemigrations --check --dry-run --noinput || (echo "⚠ Missing migration ⚠"; exit 1)
+	python manage.py collectstatic --no-input
 
 fast_fix: $(VENV_REQUIREMENT)
 	black $(LINTER_CHECKED_DIRS)
