@@ -47,40 +47,6 @@ class Command(BaseCommand):
 
             self.stdout.write(" - done!")
 
-    def _check_jobseeker_profiles(self, dry_run):
-        # Check incoherence in user profile leading to validation errors at processing time.
-        # Employee records in this case are switched back to status DISABLED for further processing by end-user.
-        # Most frequent error cases are:
-        # - no HEXA address
-
-        profile_selected = EmployeeRecord.objects.filter(status=Status.PROCESSED).select_related(
-            "job_application",
-            "job_application__job_seeker__jobseeker_profile",
-            "job_application__job_seeker__jobseeker_profile__hexa_commune",
-        )
-        no_hexa_address = profile_selected.filter(
-            job_application__job_seeker__jobseeker_profile__hexa_commune__isnull=True
-        )
-        count_no_hexa_address = no_hexa_address.count()
-
-        self.stdout.write("* Checking employee records job seeker profile:")
-
-        if count_no_hexa_address == 0:
-            self.stdout.write(" - no profile found with invalid HEXA address (great!)")
-        else:
-            self.stdout.write(f" - found {count_no_hexa_address} job seeker profile(s) without HEXA address")
-
-            if dry_run:
-                return
-
-            self.stdout.write(" - fixing missing address in profiles: switching status to DISABLED")
-
-            with transaction.atomic():
-                for without_address in no_hexa_address:
-                    without_address.update_as_disabled()
-
-            self.stdout.write(" - done!")
-
     def _check_approvals(self, dry_run):
         # Report employee records with no approvals
         # (approvals can be deleted after processing)
@@ -162,7 +128,6 @@ class Command(BaseCommand):
             self.stdout.write(" - DRY-RUN mode: not fixing, just reporting")
 
         self._check_approvals(dry_run)
-        self._check_jobseeker_profiles(dry_run)
         self._check_3436_error_code(dry_run)
         self._check_missed_notifications(dry_run)
 
