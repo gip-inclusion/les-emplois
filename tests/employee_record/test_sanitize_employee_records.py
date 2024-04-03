@@ -17,7 +17,6 @@ def command_fixture():
 
 def test_handle_dry_run_option(mocker, command):
     mocker.patch.object(command, "_check_approvals")
-    mocker.patch.object(command, "_check_jobseeker_profiles")
     mocker.patch.object(command, "_check_3436_error_code")
     mocker.patch.object(command, "_check_missed_notifications")
 
@@ -48,24 +47,6 @@ def test_3436_errors_check(command):
         "* Checking REJECTED employee records with error 3436 (duplicates):",
         " - found 1 error(s)",
         " - fixing 3436 errors: forcing status to PROCESSED",
-        " - done!",
-        "",
-    ]
-
-
-def test_profile_errors_check(command):
-    # Check for profile errors during sanitize_employee_records
-
-    employee_record = factories.EmployeeRecordFactory(status=models.Status.PROCESSED)
-
-    command._check_jobseeker_profiles(dry_run=False)
-
-    employee_record.refresh_from_db()
-    assert employee_record.status == models.Status.DISABLED
-    assert command.stdout.getvalue().split("\n") == [
-        "* Checking employee records job seeker profile:",
-        " - found 1 job seeker profile(s) without HEXA address",
-        " - fixing missing address in profiles: switching status to DISABLED",
         " - done!",
         "",
     ]
