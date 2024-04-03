@@ -44,7 +44,7 @@ class _API_AddressSerializer(serializers.Serializer):
         # Don't send extended address if it must be truncated:
         # Do not lower quality of data on 'itou' side
         # Check ASP rule : T030_c026_rg002
-        # This rule is badly written, and innacurate (regarding special characters).
+        # This rule is badly written, and inaccurate (regarding special characters).
         # Follows the acceptable format / RE for this field (now validated by ASP).
         additional_address = obj.jobseeker_profile.hexa_additional_address
         if not additional_address:
