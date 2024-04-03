@@ -6,7 +6,6 @@ import pytest
 from itou.employee_record import models
 from itou.employee_record.enums import Status
 from itou.employee_record.management.commands import sanitize_employee_records
-from tests.approvals import factories as approvals_factories
 from tests.employee_record import factories
 
 
@@ -72,23 +71,20 @@ def test_missing_approvals(command):
 
 
 def test_missed_notifications(command, faker):
-    # Prolongation() after the last employee record snapshot are what we want
-    employee_record_with_prolongation = factories.EmployeeRecordFactory(status=models.Status.ARCHIVED)
-    approvals_factories.ProlongationFactory(approval=employee_record_with_prolongation.job_application.approval)
-
-    # Approval() created after the last employee record snapshot are also what we want
-    employee_record_before_approval_creation = factories.EmployeeRecordFactory(
+    # Approval() updated after the last employee record snapshot are what we want
+    employee_record_before_approval = factories.EmployeeRecordFactory(
         status=models.Status.ARCHIVED,
-        job_application__approval__created_at=faker.future_datetime(tzinfo=datetime.UTC),  # So it pass the date filter
+        updated_at=faker.date_time_between(end_date="-1y", tzinfo=datetime.UTC),
+        job_application__approval__updated_at=faker.date_time_between(
+            start_date="-1y", end_date="-1d", tzinfo=datetime.UTC
+        ),
     )
 
-    # Prolongation() before the last employee record snapshot are ignored
-    approvals_factories.ProlongationFactory(
-        approval=factories.EmployeeRecordFactory(
-            status=models.Status.ARCHIVED,
-            job_application__approval__created_at=faker.date_time_between(end_date="-1y", tzinfo=datetime.UTC),
-        ).job_application.approval,
-        created_at=faker.date_time_between(start_date="-1y", end_date="-1d", tzinfo=datetime.UTC),
+    # But not the Approval() updated before the last employee record snapshot
+    factories.EmployeeRecordFactory(
+        status=models.Status.ARCHIVED,
+        updated_at=faker.date_time_between(start_date="-1y", end_date="-1d", tzinfo=datetime.UTC),
+        job_application__approval__updated_at=faker.date_time_between(end_date="-1y", tzinfo=datetime.UTC),
     )
 
     # Approval() that can no longer be prolonged are ignored
@@ -96,11 +92,6 @@ def test_missed_notifications(command, faker):
         status=models.Status.ARCHIVED,
         job_application__approval__expired=True,
         job_application__approval__created_at=faker.future_datetime(tzinfo=datetime.UTC),
-    )
-
-    # All Suspension() are ignored
-    approvals_factories.SuspensionFactory(
-        approval=factories.EmployeeRecordFactory(status=models.Status.ARCHIVED).job_application.approval
     )
 
     # EmployeeRecordUpdateNotification() should be taken into account
@@ -112,17 +103,15 @@ def test_missed_notifications(command, faker):
         created_at=faker.date_time_between(start_date="+1d", end_date="+30d", tzinfo=datetime.UTC),
     )
 
-    wrongly_archived_employee_records = [employee_record_with_prolongation, employee_record_before_approval_creation]
     # Various cases are now set up, finally check the behavior
     command._check_missed_notifications(dry_run=False)
-    for employee_record in wrongly_archived_employee_records:
-        assert employee_record.update_notifications.count() == 1
-        employee_record.refresh_from_db()
-        assert employee_record.status != Status.ARCHIVED
+    assert employee_record_before_approval.update_notifications.count() == 1
+    employee_record_before_approval.refresh_from_db()
+    assert employee_record_before_approval.status != Status.ARCHIVED
     assert command.stdout.getvalue().split("\n") == [
         "* Checking missing employee records notifications:",
-        " - found 2 missing notification(s)",
-        " - 2 notification(s) created",
+        " - found 1 missing notification(s)",
+        " - 1 notification(s) created",
         " - done!",
         "",
     ]

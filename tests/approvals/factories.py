@@ -29,12 +29,13 @@ from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory
+from tests.utils.factory_boy import AutoNowOverrideMixin
 
 
 fake = Faker("fr_FR")
 
 
-class ApprovalFactory(factory.django.DjangoModelFactory):
+class ApprovalFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
     class Meta:
         model = Approval
         skip_postgeneration_save = True
