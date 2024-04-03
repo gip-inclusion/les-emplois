@@ -1,6 +1,7 @@
 import pytest
 from django.contrib.gis.geos import Point
 from django.template.defaultfilters import capfirst
+from django.templatetags.static import static
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils.html import escape
@@ -844,7 +845,7 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertContains(response, displayed_job_pec)
 
         self.assertContains(response, "Contrat PEC - Parcours Emploi Compétences")
-        self.assertContains(response, "logo-france-travail.svg")
+        self.assertContains(response, static("img/logo-france-travail.svg"))
         self.assertContains(
             response,
             '<span>Offre proposée et gérée par <span class="visually-hidden">France Travail</span></span>',

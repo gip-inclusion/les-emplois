@@ -12,6 +12,7 @@ from django.utils.html import escape
 from itou.users.enums import KIND_EMPLOYER, UserKind
 from itou.users.models import User
 from itou.utils.perms.company import get_current_company_or_404
+from itou.utils.templatetags.theme_inclusion import static_theme_images
 from itou.utils.urls import add_url_params
 from tests.companies.factories import CompanyFactory
 from tests.invitations.factories import ExpiredEmployerInvitationFactory, SentEmployerInvitationFactory
@@ -48,7 +49,7 @@ class TestAcceptInvitation(MessagesTestMixin, InclusionConnectBaseTestCase):
     def test_accept_invitation_signup(self):
         invitation = SentEmployerInvitationFactory(email=OIDC_USERINFO["email"])
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
@@ -88,7 +89,7 @@ class TestAcceptInvitation(MessagesTestMixin, InclusionConnectBaseTestCase):
     def test_accept_invitation_signup_returns_on_other_browser(self):
         invitation = SentEmployerInvitationFactory(email=OIDC_USERINFO["email"])
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
@@ -130,7 +131,7 @@ class TestAcceptInvitation(MessagesTestMixin, InclusionConnectBaseTestCase):
     def test_accept_invitation_signup_bad_email_case(self):
         invitation = SentEmployerInvitationFactory(email=OIDC_USERINFO["email"].upper())
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
@@ -208,7 +209,7 @@ class TestAcceptInvitation(MessagesTestMixin, InclusionConnectBaseTestCase):
     def test_accept_invitation_signup_wrong_email(self):
         invitation = SentEmployerInvitationFactory()
         response = self.client.get(invitation.acceptance_link, follow=True)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
@@ -323,7 +324,7 @@ class TestAcceptInvitation(MessagesTestMixin, InclusionConnectBaseTestCase):
         )
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assertContains(response, escape("La structure que vous souhaitez rejoindre n'est plus active."))
-        self.assertNotContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertNotContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
 
         # If the user still manages to signup with IC
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]

@@ -10,8 +10,11 @@ from .base import *  # noqa: E402,F403
 SECRET_KEY = "foobar"
 ALLOWED_HOSTS = []
 
-# `ManifestStaticFilesStorage` (used in base settings) requires `collectstatic` to be run.
-STORAGES["staticfiles"]["BACKEND"] = "django.contrib.staticfiles.storage.StaticFilesStorage"  # noqa: F405
+# We *want* to do the same `collectstatic` on the CI than on PROD to catch errors early,
+# but we don't want to do it when running the test suite locally for performance reasons.
+if not os.getenv("CI", False):
+    # `ManifestStaticFilesStorage` (used in base settings) requires `collectstatic` to be run.
+    STORAGES["staticfiles"]["BACKEND"] = "django.contrib.staticfiles.storage.StaticFilesStorage"  # noqa: F405
 
 ASP_ITOU_PREFIX = "XXXXX"  # same as in our fixtures
 ITOU_PROTOCOL = "http"

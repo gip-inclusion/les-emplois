@@ -1,5 +1,6 @@
 import importlib
 import io
+import re
 
 import openpyxl
 from bs4 import BeautifulSoup
@@ -30,6 +31,10 @@ def pprint_html(response, **selectors):
     print("\n\n".join([elt.prettify() for elt in parser.find_all(**selectors)]))
 
 
+def remove_static_hash(content):
+    return re.sub(r"\.[\da-f]{12}\.svg\b", ".svg", content)
+
+
 def parse_response_to_soup(response, selector=None, no_html_body=False, replace_in_attr=None):
     soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
     if no_html_body:
@@ -45,6 +50,8 @@ def parse_response_to_soup(response, selector=None, no_html_body=False, replace_
         soup["nonce"] = "NORMALIZED_CSP_NONCE"
     for csp_nonce_script in soup.find_all("script", {"nonce": True}):
         csp_nonce_script["nonce"] = "NORMALIZED_CSP_NONCE"
+    for img in soup.find_all("img", attrs={"src": True}):
+        img["src"] = remove_static_hash(img["src"])
     if replace_in_attr:
         replacements = [
             (
