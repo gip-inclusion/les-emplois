@@ -19,6 +19,7 @@ from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.perms.prescriber import get_current_org_or_404
+from itou.utils.templatetags.theme_inclusion import static_theme_images
 from itou.utils.urls import add_url_params
 from tests.companies.factories import CompanyFactory
 from tests.invitations.factories import PrescriberWithOrgSentInvitationFactory
@@ -262,7 +263,7 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
     def test_accept_prescriber_org_invitation(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         response = self.client.get(invitation.acceptance_link)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]
@@ -325,7 +326,7 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
     def test_accept_prescriber_org_invitation_returns_on_other_browser(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
         response = self.client.get(invitation.acceptance_link)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
 
         # We don't put the full path with the FQDN in the parameters
         previous_url = invitation.acceptance_link.split(settings.ITOU_FQDN)[1]

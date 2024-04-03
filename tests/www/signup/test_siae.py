@@ -20,6 +20,7 @@ from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from itou.utils.templatetags.format_filters import format_siret
+from itou.utils.templatetags.theme_inclusion import static_theme_images
 from itou.utils.urls import get_tally_form_url
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWithMembershipAndJobsFactory
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
@@ -71,7 +72,7 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
 
         # No error when opening magic link a second time.
         response = self.client.get(magic_link)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
 
         # Check IC will redirect to the correct url
         token = company.get_token()
@@ -132,7 +133,7 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
 
         magic_link = company.signup_magic_link
         response = self.client.get(magic_link)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
 
         # Check IC will redirect to the correct url
         token = company.get_token()
@@ -174,7 +175,7 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
 
         magic_link = company.signup_magic_link
         response = self.client.get(magic_link)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
 
         # Check IC will redirect to the correct url
         token = company.get_token()
@@ -282,7 +283,7 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
 
         # Now, we're on the second page.
         url = reverse("signup:facilitator_user")
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
 
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:facilitator_user")

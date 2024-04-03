@@ -35,6 +35,7 @@ from itou.users import enums as users_enums
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.templatetags.theme_inclusion import static_theme_images
 from itou.utils.urls import add_url_params, get_absolute_url
 from tests.job_applications.factories import JobApplicationSentByPrescriberPoleEmploiFactory
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
@@ -644,7 +645,7 @@ class InclusionConnectLoginTest(InclusionConnectBaseTestCase):
         # Then log in again.
         login_url = reverse("login:prescriber")
         response = self.client.get(login_url)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
         self.assertContains(response, reverse("inclusion_connect:authorize"))
 
         response = mock_oauth_dance(self.client, UserKind.PRESCRIBER, expected_redirect_url=reverse("dashboard:index"))

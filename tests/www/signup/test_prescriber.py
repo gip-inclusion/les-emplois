@@ -19,6 +19,7 @@ from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.mocks.api_entreprise import ETABLISSEMENT_API_RESULT_MOCK, INSEE_API_RESULT_MOCK
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
+from itou.utils.templatetags.theme_inclusion import static_theme_images
 from itou.utils.urls import add_url_params
 from itou.www.signup.forms import PrescriberChooseKindForm
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
@@ -87,7 +88,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         assert email == session_data.get("email")
 
         response = self.client.get(response.url)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_pole_emploi_user")
         next_url = reverse("signup:prescriber_join_org")
@@ -176,7 +177,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
         response = self.client.get(url)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
@@ -253,7 +254,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
         response = self.client.get(url)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
@@ -344,7 +345,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
         response = self.client.get(url)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
@@ -428,7 +429,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
         response = self.client.get(url)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
@@ -568,7 +569,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         url = reverse("signup:prescriber_user")
         self.assertContains(response, url)
         response = self.client.get(url)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         params = {
@@ -640,7 +641,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         url = reverse("signup:prescriber_user")
         self.assertRedirects(response, url)
         response = self.client.get(url)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
@@ -748,7 +749,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         # Step 2: register as a simple prescriber (orienteur).
         response = self.client.get(reverse("signup:prescriber_user"))
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         params = {
@@ -814,7 +815,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         signup_url = reverse("signup:prescriber_user")
 
         response = self.client.get(signup_url)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
         # Check IC will redirect to the correct url
         previous_url = reverse("signup:prescriber_user")
         next_url = reverse("signup:prescriber_join_org")
@@ -898,7 +899,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(MessagesTestMixin, Inclusio
         signup_url = reverse("signup:prescriber_user")
 
         response = self.client.get(signup_url)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
 
         # Connect with Inclusion Connect.
         previous_url = reverse("signup:prescriber_user")
@@ -971,7 +972,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(MessagesTestMixin, Inclusio
         signup_url = reverse("signup:prescriber_user")
 
         response = self.client.get(signup_url)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
 
         # Connect with Inclusion Connect.
         previous_url = signup_url
@@ -1043,7 +1044,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(MessagesTestMixin, Inclusio
         signup_url = reverse("signup:prescriber_user")
 
         response = self.client.get(signup_url)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
 
         # Connect with Inclusion Connect.
         previous_url = reverse("signup:prescriber_user")
@@ -1103,7 +1104,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(MessagesTestMixin, Inclusio
         check_email_url = reverse("signup:prescriber_check_pe_email")
         post_data = {"email": pe_email}
         response = self.client.post(check_email_url, data=post_data, follow=True)
-        self.assertContains(response, "logo-inclusion-connect-one-line.svg")
+        self.assertContains(response, static_theme_images("logo-inclusion-connect-one-line.svg"))
 
         # Connect with Inclusion Connect but, this time, don't use a PE email.
         previous_url = reverse("signup:prescriber_pole_emploi_user")

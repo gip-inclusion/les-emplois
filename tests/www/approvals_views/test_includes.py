@@ -7,6 +7,7 @@ from freezegun import freeze_time
 from tests.approvals.factories import ApprovalFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
+from tests.utils.test import remove_static_hash
 
 
 @freeze_time("2022-01-10")
@@ -21,7 +22,7 @@ class TestStatusInclude:
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
-        assert rendered_template == snapshot(name="valid_approval_for_employer")
+        assert remove_static_hash(rendered_template) == snapshot(name="valid_approval_for_employer")
 
     def test_valid_approval_for_prescriber(self, snapshot, db):
         context = Context(
@@ -33,7 +34,7 @@ class TestStatusInclude:
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
-        assert rendered_template == snapshot(name="valid_approval_for_prescriber")
+        assert remove_static_hash(rendered_template) == snapshot(name="valid_approval_for_prescriber")
 
     def test_expired_approval_without_eligibility_diagnosis_for_employer(self, snapshot, db):
         context = Context(
@@ -45,7 +46,9 @@ class TestStatusInclude:
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
-        assert rendered_template == snapshot(name="expired_approval_without_eligibility_diagnosis_for_employer")
+        assert remove_static_hash(rendered_template) == snapshot(
+            name="expired_approval_without_eligibility_diagnosis_for_employer"
+        )
 
     def test_expired_approval_with_eligibility_diagnosis_for_employer(self, snapshot, db):
         approval = ApprovalFactory(for_snapshot=True, end_at=datetime.date(2022, 1, 1))
@@ -59,7 +62,9 @@ class TestStatusInclude:
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
-        assert rendered_template == snapshot(name="expired_approval_with_eligibility_diagnosis_for_employer")
+        assert remove_static_hash(rendered_template) == snapshot(
+            name="expired_approval_with_eligibility_diagnosis_for_employer"
+        )
 
     def test_expired_approval_with_eligibility_diagnosis_for_prescriber(self, snapshot, db):
         approval = ApprovalFactory(for_snapshot=True, end_at=datetime.date(2022, 1, 1))
@@ -73,7 +78,9 @@ class TestStatusInclude:
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
-        assert rendered_template == snapshot(name="expired_approval_with_eligibility_diagnosis_for_prescriber")
+        assert remove_static_hash(rendered_template) == snapshot(
+            name="expired_approval_with_eligibility_diagnosis_for_prescriber"
+        )
 
     def test_expired_approval_with_eligibility_diagnosis_for_jobseeker(self, snapshot, db):
         approval = ApprovalFactory(for_snapshot=True, end_at=datetime.date(2022, 1, 1))
@@ -87,4 +94,6 @@ class TestStatusInclude:
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
-        assert rendered_template == snapshot(name="expired_approval_with_eligibility_diagnosis_for_jobseeker")
+        assert remove_static_hash(rendered_template) == snapshot(
+            name="expired_approval_with_eligibility_diagnosis_for_jobseeker"
+        )
