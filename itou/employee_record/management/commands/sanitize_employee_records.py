@@ -86,17 +86,11 @@ class Command(BaseCommand):
                     F("updated_at"),
                     Max(F("update_notifications__created_at")),
                 ),
-                last_approval_change=Greatest(
-                    F("job_application__approval__created_at"),
-                    # We only use prolongations because even if a suspension will postpone the approval's end date
-                    # it's not really useful to the employee on the ASP side, and it significantly speeds up the query.
-                    Max(F("job_application__approval__prolongation__created_at")),
-                ),
             )
             .filter(
                 status=Status.ARCHIVED,
                 job_application__approval__end_at__gte=prolongation_cutoff,  # Take approvals that can still be used
-                last_employee_record_snapshot__lt=F("last_approval_change"),
+                last_employee_record_snapshot__lt=F("job_application__approval__updated_at"),
             )
             .order_by(
                 "job_application__approval__number",
