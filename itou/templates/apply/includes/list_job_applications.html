@@ -12,7 +12,8 @@
         <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les candidatures">
             {% include "apply/includes/job_applications_export_button.html" %}
             {% if filters_counter > 0 %}
-                <a href="{% if request.user.is_prescriber %}{% url 'apply:list_for_prescriber' %}{% else %}{% url 'apply:list_for_siae' %}{% endif %}" class="btn btn-secondary btn-ico mt-3 mt-md-0">
+                <a href="{% if request.user.is_prescriber %}{% url 'apply:list_for_prescriber' %}{% elif request.user.is_employer %}{% url 'apply:list_for_siae' %}{% else %}{% url 'apply:list_for_job_seeker' %}{% endif %}"
+                   class="btn btn-secondary btn-ico mt-3 mt-md-0">
                     <i class="ri-arrow-go-back-line" aria-hidden="true"></i>
                     <span>Réinitialiser les filtres ({{ filters_counter }})</span>
                 </a>
@@ -24,7 +25,7 @@
             <img class="img-fluid" src="{% static 'img/illustration-siae-card-no-result.svg' %}" alt="" loading="lazy">
             <p class="mb-1 mt-3">
                 <strong>
-                    {% if request.user.is_prescriber %}
+                    {% if request.user.is_prescriber or request.user.is_job_seeker %}
                         Aucune candidature pour le moment
                     {% elif request.user.is_employer %}
                         {% if pending_states_job_applications_count == 0 %}
@@ -45,6 +46,10 @@
                         Pour recevoir des candidatures, vérifiez que les postes ouverts
                         <br class="d-none d-lg-inline">
                         dans votre structure sont bien à jour.
+                    {% elif request.user.is_job_seeker %}
+                        Vous trouverez ici vos candidatures, émises par un prescripteur
+                        <br class="d-none d-lg-inline">
+                        ou par vous même.
                     {% endif %}
                 </i>
             </p>
@@ -58,6 +63,11 @@
                     <i class="ri-briefcase-line ri-lg font-weight-normal"></i>
                     <span>Gérer les métiers et recrutements</span>
                 </a>
+            {% elif request.user.is_job_seeker %}
+                <a href="{% url 'search:employers_home' %}" class="btn btn-outline-primary btn-ico w-100 w-md-auto justify-content-center">
+                    <i class="ri-briefcase-line ri-lg font-weight-normal"></i>
+                    <span>Rechercher un emploi inclusif</span>
+                </a>
             {% endif %}
         </div>
         {% if request.user.is_employer %}
@@ -66,7 +76,11 @@
     {% else %}
         {% for job_application in job_applications_page %}
             <div class="c-box c-box--results has-links-inside my-3 my-md-4">
-                {% include "apply/includes/list_card_body_company.html" %}
+                {% if request.user.is_job_seeker %}
+                    {% include "apply/includes/list_card_body_jobseeker.html" %}
+                {% else %}
+                    {% include "apply/includes/list_card_body_company.html" %}
+                {% endif %}
                 <div class="c-box--results__footer">
                     <div class="d-flex{% if job_application.pending_for_weeks >= job_application.WEEKS_BEFORE_CONSIDERED_OLD %} flex-column flex-md-row justify-content-md-between align-items-md-center{% else %} justify-content-end{% endif %}">
                         {% if job_application.pending_for_weeks >= job_application.WEEKS_BEFORE_CONSIDERED_OLD %}
@@ -87,6 +101,11 @@
                                href="{% url 'apply:details_for_company' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
                                aria-label="Gérer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:job_application.user_can_view_personal_information }}"
                                {% matomo_event "candidature" "clic" "voir-candidature-employeur" %}>Voir sa candidature</a>
+                        {% elif request.user.is_job_seeker %}
+                            <a class="btn btn-outline-primary{% if job_application.pending_for_weeks >= job_application.WEEKS_BEFORE_CONSIDERED_OLD %} btn-block w-100 w-md-auto{% endif %}"
+                               href="{% url 'apply:details_for_jobseeker' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}">
+                                Voir ma candidature
+                            </a>
                         {% endif %}
                     </div>
                 </div>

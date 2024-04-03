@@ -91,7 +91,11 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
         "filters_form": filters_form,
         "filters_counter": filters_counter,
     }
-    return render(request, template_name, context)
+    return render(
+        request,
+        "apply/includes/list_job_applications.html" if request.htmx else template_name,
+        context,
+    )
 
 
 @login_required

@@ -184,6 +184,25 @@ class ProcessListJobSeekerTest(ProcessListTest):
         assert applications[0].created_at >= start_date
         assert applications[0].created_at <= end_date
 
+    def test_htmx_filters(self):
+        job_seeker = JobSeekerFactory()
+        JobApplicationFactory(job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_ACCEPTED)
+        self.client.force_login(job_seeker)
+        response = self.client.get(reverse("apply:list_for_job_seeker"))
+        page = parse_response_to_soup(response, selector="#main")
+        # Check the refused checkbox, that triggers the HTMX request.
+        [refused_checkbox] = page.find_all("input", attrs={"name": "states", "value": "refused"})
+        refused_checkbox["checked"] = ""
+        response = self.client.get(
+            reverse("apply:list_for_job_seeker"),
+            {"states": ["refused"]},
+            headers={"HX-Request": "true"},
+        )
+        update_page_with_htmx(page, "#asideFiltersCollapse > form", response)
+        response = self.client.get(reverse("apply:list_for_job_seeker"), {"states": ["refused"]})
+        fresh_page = parse_response_to_soup(response, selector="#main")
+        assertSoupEqual(page, fresh_page)
+
 
 ###################################################
 #################### SIAE #########################  # noqa E266
