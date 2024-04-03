@@ -1,5 +1,5 @@
 {% load matomo %}
-<a href="{% url 'apply:refuse' job_application_id=job_application.id %}" class="btn btn-lg btn-outline-white btn-block btn-ico" {% matomo_event "candidature" "clic" "refuse_application" %}>
+<a href="{% url 'apply:refuse' job_application_id=job_application.id %}?reset=1" class="btn btn-lg btn-outline-white btn-block btn-ico" {% matomo_event "candidature" "clic" "refuse_application" %}>
     <i class="ri-close-line font-weight-medium" aria-hidden="true"></i>
     <span>Décliner</span>
 </a>

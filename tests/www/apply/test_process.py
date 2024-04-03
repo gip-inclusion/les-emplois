@@ -526,7 +526,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.assertNotContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
         self.assertNotContains(
             response,
-            "<small>Motif de refus</small><strong>Autre (détails dans le message ci-dessous)</strong>",
+            "<small>Motif de refus</small><strong>Autre (détails à fournir dans le message au prescripteur)</strong>",
             html=True,
         )
 
@@ -548,7 +548,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.assertContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
         self.assertContains(
             response,
-            "<small>Motif de refus</small><strong>Autre (détails dans le message ci-dessous)</strong>",
+            "<small>Motif de refus</small><strong>Autre</strong>",
             html=True,
         )
 
@@ -667,8 +667,8 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         job_application = JobApplication.objects.get(pk=job_application.pk)
         assert job_application.state.is_processing
 
-    def test_refuse(self, *args, **kwargs):
-        """Ensure that the `refuse` transition is triggered."""
+    def test_refuse_from_prescriber(self, *args, **kwargs):
+        """Ensure that the `refuse` transition is triggered through the expected workflow for a prescriber."""
 
         states = [
             job_applications_enums.JobApplicationState.NEW,
@@ -678,26 +678,109 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         ]
 
         for state in states:
-            with self.subTest(state=state):
-                job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, state=state)
+            for reason, reason_label in job_applications_enums.RefusalReason.displayed_choices():
+                with self.subTest(state=state, reason=reason):
+                    job_application = JobApplicationFactory(
+                        sent_by_authorized_prescriber_organisation=True, state=state
+                    )
+                    employer = job_application.to_company.members.first()
+                    self.client.force_login(employer)
 
-                employer = job_application.to_company.members.first()
-                self.client.force_login(employer)
+                    refusal_reason_url = reverse(
+                        "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "reason"}
+                    )
+                    response = self.client.get(refusal_reason_url)
+                    self.assertContains(response, "<strong>Étape 1</strong>/3 : Choix du motif de refus", html=True)
 
-                url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk})
-                response = self.client.get(url)
-                assert response.status_code == 200
+                    post_data = {
+                        "job_application_refuse_view-current_step": "reason",
+                        "reason-refusal_reason": reason,
+                    }
+                    response = self.client.post(refusal_reason_url, data=post_data, follow=True)
+                    job_seeker_answer_url = reverse(
+                        "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "job-seeker-answer"}
+                    )
+                    self.assertRedirects(response, job_seeker_answer_url)
+                    self.assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
+                    self.assertContains(response, "Réponse au candidat")
+                    self.assertContains(response, f"<strong>Raison du refus :</strong> {reason_label}", html=True)
 
-                post_data = {
-                    "refusal_reason": job_applications_enums.RefusalReason.OTHER,
-                    "answer": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                }
-                response = self.client.post(url, data=post_data)
-                next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-                self.assertRedirects(response, next_url)
+                    post_data = {
+                        "job_application_refuse_view-current_step": "job-seeker-answer",
+                        "job-seeker-answer-job_seeker_answer": "Message au candidat",
+                    }
+                    response = self.client.post(job_seeker_answer_url, data=post_data, follow=True)
+                    prescriber_answer_url = reverse(
+                        "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "prescriber-answer"}
+                    )
+                    self.assertRedirects(response, prescriber_answer_url)
+                    self.assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
+                    self.assertContains(response, "Réponse au prescripteur")
+                    self.assertContains(response, f"<strong>Raison du refus :</strong> {reason_label}", html=True)
 
-                job_application = JobApplication.objects.get(pk=job_application.pk)
-                assert job_application.state.is_refused
+                    post_data = {
+                        "job_application_refuse_view-current_step": "prescriber-answer",
+                        "prescriber-answer-prescriber_answer": "Message au prescripteur",
+                    }
+                    response = self.client.post(prescriber_answer_url, data=post_data, follow=True)
+                    done_url = reverse(
+                        "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "done"}
+                    )
+                    final_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+                    assert response.redirect_chain == [(done_url, 302), (final_url, 302)]
+
+                    job_application = JobApplication.objects.get(pk=job_application.pk)
+                    assert job_application.state.is_refused
+
+    def test_refuse_from_job_seeker(self, *args, **kwargs):
+        """Ensure that the `refuse` transition is triggered through the expected workflow for a job seeker."""
+
+        states = [
+            job_applications_enums.JobApplicationState.NEW,
+            job_applications_enums.JobApplicationState.PROCESSING,
+            job_applications_enums.JobApplicationState.PRIOR_TO_HIRE,
+            job_applications_enums.JobApplicationState.POSTPONED,
+        ]
+
+        for state in states:
+            for reason, reason_label in job_applications_enums.RefusalReason.displayed_choices():
+                with self.subTest(state=state, reason=reason):
+                    job_application = JobApplicationSentByJobSeekerFactory(state=state)
+                    employer = job_application.to_company.members.first()
+                    self.client.force_login(employer)
+
+                    refusal_reason_url = reverse(
+                        "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "reason"}
+                    )
+                    response = self.client.get(refusal_reason_url)
+                    self.assertContains(response, "<strong>Étape 1</strong>/2 : Choix du motif de refus", html=True)
+
+                    post_data = {
+                        "job_application_refuse_view-current_step": "reason",
+                        "reason-refusal_reason": reason,
+                    }
+                    response = self.client.post(refusal_reason_url, data=post_data, follow=True)
+                    job_seeker_answer_url = reverse(
+                        "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "job-seeker-answer"}
+                    )
+                    self.assertRedirects(response, job_seeker_answer_url)
+                    self.assertContains(response, "<strong>Étape 2</strong>/2 : Message au candidat", html=True)
+                    self.assertContains(response, "Réponse au candidat")
+                    self.assertContains(response, f"<strong>Raison du refus :</strong> {reason_label}", html=True)
+
+                    post_data = {
+                        "job_application_refuse_view-current_step": "job-seeker-answer",
+                        "job-seeker-answer-job_seeker_answer": "Message au candidat",
+                    }
+                    response = self.client.post(job_seeker_answer_url, data=post_data, follow=True)
+                    done_url = reverse(
+                        "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "done"}
+                    )
+                    final_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+                    assert response.redirect_chain == [(done_url, 302), (final_url, 302)]
+
+                    job_application = JobApplication.objects.get(pk=job_application.pk)
+                    assert job_application.state.is_refused
 
     def test_postpone(self, *args, **kwargs):
         """Ensure that the `postpone` transition is triggered."""
@@ -2319,13 +2402,13 @@ def test_refuse_jobapplication_geiq_reasons(client, reason):
     employer = job_application.to_company.members.first()
     client.force_login(employer)
 
-    url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk})
+    url = reverse("apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "reason"})
     response = client.get(url)
     assert response.status_code == 200
 
     post_data = {
-        "refusal_reason": reason,
-        "answer": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        "job_application_refuse_view-current_step": "reason",
+        "reason-refusal_reason": reason,
     }
     response = client.post(url, data=post_data)
     assert response.context["form"].errors == {
