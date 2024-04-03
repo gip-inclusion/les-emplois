@@ -26,7 +26,7 @@ class Command(BaseCommand):
                 "Effect": "Allow",
                 "Principal": {"AWS": "*"},
                 "Action": "s3:GetObject",
-                "Resource": f"arn:aws:s3:::{bucket}/*",
+                "Resource": f"arn:aws:s3:::{bucket}/resume/*",
             },
         ]
         client.put_bucket_policy(

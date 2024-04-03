@@ -1,4 +1,5 @@
 import io
+import uuid
 
 import httpx
 from django.conf import settings
@@ -35,11 +36,20 @@ def test_sync_files_ignores_temporary_storage(temporary_bucket):
 def test_bucket_policy_for_anonymous_user():
     base_url = f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/{default_storage.location}"
     response = httpx.head(f"{base_url}/test_file.pdf")
-    assert response.status_code == 404
+    assert response.status_code == 403
+
     with io.BytesIO() as content:
         default_storage.save("test_file.pdf", content)
     response = httpx.head(f"{base_url}/test_file.pdf")
+    assert response.status_code == 403
+
+    # Anything under the resume prefix is public.
+    filename = f"{uuid.uuid4()}.pdf"
+    root_url = f"{settings.AWS_S3_ENDPOINT_URL}{settings.AWS_STORAGE_BUCKET_NAME}/"
+    s3_client().put_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Body=b"", Key=f"resume/{filename}")
+    response = httpx.head(f"{root_url}/resume/{filename}")
     assert response.status_code == 200
+
     with io.BytesIO() as content:
         response = httpx.put(base_url, content=content)
     assert response.status_code == 403
