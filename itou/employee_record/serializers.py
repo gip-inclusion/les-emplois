@@ -3,7 +3,7 @@ import re
 from rest_framework import serializers
 from unidecode import unidecode
 
-from itou.asp.models import AllocationDuration, LaneExtension, LaneType, SiaeMeasure
+from itou.asp.models import AllocationDuration, EducationLevel, LaneExtension, LaneType, SiaeMeasure
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from itou.employee_record.typing import CodeComInsee
 from itou.users.enums import Title
@@ -15,7 +15,7 @@ class _PersonSerializer(serializers.Serializer):
     passIae = serializers.CharField(source="approval_number")  # Required
     idItou = serializers.CharField(source="job_application.job_seeker.jobseeker_profile.asp_uid")  # Required
 
-    civilite = serializers.ChoiceField(choices=Title.choices, source="job_application.job_seeker.title")  # Required
+    civilite = NullIfEmptyChoiceField(choices=Title.choices, source="job_application.job_seeker.title")  # Required
     nomUsage = serializers.SerializerMethodField()  # Required
     nomNaissance = NullField()  # Optional
     prenom = serializers.SerializerMethodField()  # Required
@@ -126,8 +126,8 @@ class _StaticAddressSerializer(_AddressSerializer):
 
 class _SituationSerializer(serializers.Serializer):
     orienteur = serializers.CharField(source="asp_prescriber_type")  # Required
-    niveauFormation = serializers.CharField(
-        source="job_application.job_seeker.jobseeker_profile.education_level"
+    niveauFormation = NullIfEmptyChoiceField(
+        choices=EducationLevel.choices, source="job_application.job_seeker.jobseeker_profile.education_level"
     )  # Required
 
     salarieEnEmploi = serializers.BooleanField(
