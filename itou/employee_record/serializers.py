@@ -207,6 +207,14 @@ class _SituationSerializer(serializers.Serializer):
         return obj.job_application.job_seeker.jobseeker_profile.oeth_employee
 
 
+class _StaticSituationSerializer(_SituationSerializer):
+    niveauFormation = serializers.ReadOnlyField(default=EducationLevel.NON_CERTIFYING_QUALICATIONS.value)  # Required
+
+    inscritPoleEmploi = serializers.ReadOnlyField(default=False)  # Required
+    inscritPoleEmploiDepuis = NullField()  # Required if registered with France Travail
+    numeroIDE = NullField()  # Required if registered with France Travail
+
+
 class EmployeeRecordSerializer(serializers.Serializer):
     numLigne = serializers.IntegerField(source="asp_batch_line_number")  # Required
     typeMouvement = serializers.CharField(source="ASP_MOVEMENT_TYPE")  # Required
@@ -231,7 +239,7 @@ class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
 
     personnePhysique = serializers.SerializerMethodField()  # Required
     adresse = serializers.SerializerMethodField()  # Required
-    situationSalarie = _SituationSerializer(source="employee_record")  # Required
+    situationSalarie = serializers.SerializerMethodField()  # Required
 
     # These fields are null at the beginning of the ASP processing
     codeTraitement = serializers.CharField(source="asp_processing_code", allow_blank=True, allow_null=True)
@@ -258,6 +266,17 @@ class EmployeeRecordUpdateNotificationSerializer(serializers.Serializer):
         if is_missing_required_fields:
             return _StaticAddressSerializer(obj.employee_record.job_application.job_seeker).data
         return _AddressSerializer(obj.employee_record.job_application.job_seeker).data
+
+    def get_situationSalarie(self, obj: EmployeeRecordUpdateNotification):
+        is_missing_required_fields = not all(
+            [
+                getattr(obj.employee_record.job_application.job_seeker.jobseeker_profile, field)
+                for field in {"education_level", "pole_emploi_since"}
+            ]
+        )
+        if is_missing_required_fields:
+            return _StaticSituationSerializer(obj.employee_record).data
+        return _SituationSerializer(obj.employee_record).data
 
 
 class EmployeeRecordBatchSerializer(serializers.Serializer):

@@ -189,6 +189,8 @@ class EmployeeRecordUpdateNotificationSerializerTest(TestCase):
         ("hexa_lane_name", "", "adresse"),
         ("hexa_post_code", "", "adresse"),
         ("hexa_commune", None, "adresse"),
+        ("education_level", "", "situationSalarie"),
+        ("pole_emploi_since", "", "situationSalarie"),
     ],
 )
 def test_update_notification_use_static_serializers_on_missing_fields(snapshot, field, value, key):
