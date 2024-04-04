@@ -16,6 +16,10 @@ from itou.utils.iterators import chunks
 
 
 class EmployeeRecordTransferCommand(BaseCommand):
+    # Limit confirmed by the ASP after sending 50k+ notifications at the same time, which broke things.
+    # The file naming scheme also disallows creating more than one file in the same seconds.
+    MAX_UPLOADED_FILES = 1
+
     def add_arguments(self, parser):
         """Subclasses have a preflight option to check for serialization errors."""
         parser.add_argument(

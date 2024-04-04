@@ -86,3 +86,13 @@
   
   '''
 # ---
+# name: test_upload_only_create_a_limited_number_of_files
+  '''
+  Connected to "0.0.0.0" as "django_tests"
+  Current remote dir is "/"
+  Starting UPLOAD of 2 notification(s)
+  Successfully uploaded: RIAE_FS_20210927000000.json
+  Employee record notifications processing done!
+  
+  '''
+# ---

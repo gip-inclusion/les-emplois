@@ -147,7 +147,9 @@ class Command(EmployeeRecordTransferCommand):
         else:
             self.stdout.write("No new employee record notification found")
 
-        for batch in chunks(new_notifications, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS):
+        for batch in chunks(
+            new_notifications, EmployeeRecordBatch.MAX_EMPLOYEE_RECORDS, max_chunk=self.MAX_UPLOADED_FILES
+        ):
             self._upload_batch_file(sftp, batch, dry_run)
 
     def handle(self, *, upload, download, preflight, wet_run, asp_test=False, debug=False, **options):
