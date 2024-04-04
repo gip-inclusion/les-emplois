@@ -37,8 +37,8 @@
                             {{ wizard.management_form }}
 
                             {% if wizard.steps.current == "reason" %}
-                                <h2 class="mb-5">Choix du motif de refus</h2>
-                                <p class="mb-5">
+                                <h2 class="mb-3 mb-md-4">Choix du motif de refus</h2>
+                                <p class="mb-3 mb-md-4">
                                     {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
                                         Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour le candidat comme pour le prescripteur. Nous vous encourageons à répondre à chacune des parties.
                                     {% else %}
@@ -46,61 +46,62 @@
                                     {% endif %}
                                 </p>
                             {% elif wizard.steps.current == "job-seeker-answer" %}
-                                <h2 class="mb-5">Réponse au candidat</h2>
-                                <p class="mb-5">
+                                <h2 class="mb-3 mb-md-4">Réponse au candidat</h2>
+                                <p class="mb-3 mb-md-4">
                                     {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
                                         Une copie de ce message sera adressée au prescripteur.
                                         <br>
                                     {% endif %}
                                     Merci de bien vouloir adapter ce message en fonction de la situation.
                                 </p>
-                                <p class="mb-5">
+                                <p class="mb-3 mb-md-4">
                                     <strong>Raison du refus :</strong> {{ refusal_reason_label }}
                                 </p>
                             {% elif wizard.steps.current == "prescriber-answer" %}
-                                <h2 class="mb-5">Réponse au prescripteur</h2>
-                                <p class="mb-5">
+                                <h2 class="mb-3 mb-md-4">Réponse au prescripteur</h2>
+                                <p class="mb-3 mb-md-4">
                                     Vous pouvez partager un message au prescripteur uniquement, comme détailler ou évoquer d’autres motifs de refus.
                                 </p>
-                                <p class="mb-5">
+                                <p class="mb-3 mb-md-4">
                                     <strong>Raison du refus :</strong> {{ refusal_reason_label }}
                                 </p>
                             {% endif %}
 
                             {% if wizard.steps.current == "reason" %}
-                                {# TODO: Fix incorrect rendering of form with radio buttons #}
-                                {# https://github.com/zostera/django-django_bootstrap5/issues/126 #}
-                                <div class="form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %} js-refusal-reasons">
+                                <fieldset class="js-refusal-reasons form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %}">
                                     {{ form.refusal_reason.label_tag }}
-                                    <div class="grid-auto-rows">
+                                    <ul class="list-unstyled">
                                         {% for radio in form.refusal_reason %}
-                                            <div class="d-flex align-items-center">
-                                                <label for="{{ radio.id_for_label }}" class="lh-lg">
-                                                    {{ radio.tag }}
-                                                    {% if radio.data.value == RefusalReason.PREVENT_OBJECTIVES %}
-                                                        {{ radio.choice_label }}&nbsp;<i class="ri-information-line ri-xl text-button ms-1"
-   data-bs-toggle="tooltip"
-   data-bs-placement="top"
-   title="L'embauche empêche l'atteinte des engagements contractuels avec les parties prenantes à la convention de financement mise en place par l'État."></i>
-                                                    {% elif radio.data.value == RefusalReason.NO_POSITION %}
-                                                        {{ radio.choice_label }}&nbsp;<i class="ri-information-line ri-xl text-button ms-1" data-bs-toggle="tooltip" data-bs-placement="right" title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
-                                                    {% elif radio.data.value == RefusalReason.OTHER %}
-                                                        {{ radio.choice_label }}
-                                                        {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
-                                                            (détails à fournir dans le message au prescripteur)
+                                            <li class="mb-2">
+                                                <div class="form-check">
+                                                    <input id="{{ radio.id_for_label }}" class="form-check-input" name="{{ radio.data.name }}" type="radio" value="{{ radio.data.value }}" {% if radio.data.selected %}checked=""{% endif %} required>
+                                                    <label for="{{ radio.id_for_label }}" class="form-check-label">
+                                                        {% if radio.data.value == RefusalReason.PREVENT_OBJECTIVES %}
+                                                            {{ radio.choice_label }}
+                                                            <i class="ri-information-line ri-lg text-info ms-1"
+                                                               data-bs-toggle="tooltip"
+                                                               data-bs-placement="top"
+                                                               title="L'embauche empêche l'atteinte des engagements contractuels avec les parties prenantes à la convention de financement mise en place par l'État."></i>
+                                                        {% elif radio.data.value == RefusalReason.NO_POSITION %}
+                                                            {{ radio.choice_label }}
+                                                            <i class="ri-information-line ri-lg text-info ms-1" data-bs-toggle="tooltip" data-bs-placement="right" title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
+                                                        {% elif radio.data.value == RefusalReason.OTHER %}
+                                                            {{ radio.choice_label }}
+                                                            {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
+                                                                (détails à fournir dans le message au prescripteur)
+                                                            {% endif %}
+                                                        {% else %}
+                                                            {{ radio.choice_label }}
                                                         {% endif %}
-                                                    {% else %}
-                                                        {{ radio.choice_label }}
-                                                    {% endif %}
-                                                </label>
-                                            </div>
+                                                    </label>
+                                                </div>
+                                            </li>
                                         {% endfor %}
-                                    </div>
-
+                                    </ul>
                                     <div class="c-info refusal-reason-no-position-info mt-2 d-none">
                                         <span class="c-info__summary">En choisissant ce motif, les fiches de postes associées seront dépubliées.</span>
                                     </div>
-                                </div>
+                                </fieldset>
                             {% else %}
                                 {% bootstrap_form wizard.form alert_error_type="non_fields" %}
                             {% endif %}
@@ -117,16 +118,6 @@
             </div>
         </div>
     </section>
-{% endblock %}
-
-{% block extra_head %}
-    {{ block.super }}
-    <style>
-        .grid-auto-rows {
-            display: grid;
-            grid-auto-rows: 1fr;
-        }
-    </style>
 {% endblock %}
 
 {% block script %}
