@@ -1038,7 +1038,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         send_email_messages(emails)
 
     @xwf_models.transition()
-    def cancel(self, *args, **kwargs):
+    def cancel(self, *, user):
         if not self.can_be_cancelled:
             raise xwf_models.AbortTransition("Cette candidature n'a pu être annulée.")
 
@@ -1053,7 +1053,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval_manually_delivered_by = None
 
         # Send notification.
-        user = kwargs.get("user")
         send_email_messages([self.email_cancel(cancelled_by=user)])
 
     @xwf_models.transition()
