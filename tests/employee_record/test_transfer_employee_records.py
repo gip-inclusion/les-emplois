@@ -109,6 +109,27 @@ def test_upload_file_error(faker, snapshot, sftp_directory, command):
     assert command.stdout.getvalue() == snapshot
 
 
+@freezegun.freeze_time("2021-09-27")
+def test_upload_only_create_a_limited_number_of_files(mocker, snapshot, sftp_directory, command):
+    mocker.patch.object(EmployeeRecordBatch, "MAX_EMPLOYEE_RECORDS", 1)
+    EmployeeRecordFactory.create_batch(2, ready_for_transfer=True)
+
+    command.handle(upload=True, download=False, preflight=False, wet_run=True)
+    assert len(list(sftp_directory.joinpath("depot").iterdir())) == command.MAX_UPLOADED_FILES
+
+    assert command.stdout.getvalue() == snapshot
+
+
+@freezegun.freeze_time("2021-09-27")
+def test_upload_only_send_a_limited_number_of_rows(mocker, snapshot, sftp_directory, command):
+    mocker.patch.object(EmployeeRecordBatch, "MAX_EMPLOYEE_RECORDS", 1)
+    EmployeeRecordFactory.create_batch(2, ready_for_transfer=True)
+
+    command.handle(upload=True, download=False, preflight=False, wet_run=True)
+    for file in sftp_directory.joinpath("depot").iterdir():
+        assert len(file.read_text().splitlines()) == 1
+
+
 def test_download_file_error(faker, snapshot, sftp_directory, command):
     sftp_directory.joinpath("retrait/RIAE_FS_00000000000000_FichierRetour.json").touch(0o000)
 
