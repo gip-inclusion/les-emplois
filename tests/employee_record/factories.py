@@ -10,6 +10,7 @@ from tests.job_applications.factories import (
     JobApplicationWithApprovalNotCancellableFactory,
     JobApplicationWithCompleteJobSeekerProfileFactory,
 )
+from tests.utils.factory_boy import AutoNowOverrideMixin
 
 
 class BareEmployeeRecordFactory(factory.django.DjangoModelFactory):
@@ -27,7 +28,7 @@ class BareEmployeeRecordFactory(factory.django.DjangoModelFactory):
         model = EmployeeRecord
 
 
-class EmployeeRecordFactory(BareEmployeeRecordFactory):
+class EmployeeRecordFactory(AutoNowOverrideMixin, BareEmployeeRecordFactory):
     """
     "Basic" employee record factory:
     At the first stage of its lifecycle (NEW)
@@ -43,19 +44,6 @@ class EmployeeRecordFactory(BareEmployeeRecordFactory):
     )
     approval_number = factory.SelfAttribute(".job_application.approval.number")
     siret = factory.SelfAttribute(".job_application.to_company.siret")
-
-    @classmethod
-    def _create(cls, model_class, *args, **kwargs):
-        auto_now_desactivated = []
-        for field in model_class._meta.get_fields():
-            if getattr(field, "auto_now", False) and kwargs.get(field.name):
-                field.auto_now = False
-                auto_now_desactivated.append(field)
-        try:
-            return super()._create(model_class, *args, **kwargs)
-        finally:
-            for field in auto_now_desactivated:
-                field.auto_now = True
 
     class Params:
         archivable = factory.Trait(
