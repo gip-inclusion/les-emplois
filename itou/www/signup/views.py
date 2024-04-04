@@ -54,7 +54,7 @@ class ItouPasswordResetView(PasswordResetView):
         success page in all cases.
         """
         # Pass the email in the querystring so that it can displayed in the template.
-        args = urlencode({"email": form.data["email"]})
+        args = urlencode({"email": form.data.get("email", "")})
         return HttpResponseRedirect(f"{self.get_success_url()}?{args}")
 
 
