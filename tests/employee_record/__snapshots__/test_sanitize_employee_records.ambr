@@ -1,0 +1,10 @@
+# serializer version: 1
+# name: test_missed_notifications_limit
+  '''
+  * Checking missing employee records notifications:
+   - found 3 missing notification(s)
+   - 2 notification(s) created
+   - done!
+  
+  '''
+# ---
