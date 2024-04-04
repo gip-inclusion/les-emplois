@@ -115,3 +115,20 @@ def test_missed_notifications(command, faker):
         " - done!",
         "",
     ]
+
+
+def test_missed_notifications_limit(faker, mocker, snapshot, command):
+    mocker.patch.object(command, "MAX_MISSED_NOTIFICATIONS_CREATED", 2)
+    factories.EmployeeRecordFactory.create_batch(
+        3,
+        status=models.Status.ARCHIVED,
+        updated_at=faker.date_time_between(end_date="-1y", tzinfo=datetime.UTC),
+        job_application__approval__updated_at=faker.date_time_between(
+            start_date="-1y", end_date="-1d", tzinfo=datetime.UTC
+        ),
+    )
+
+    command._check_missed_notifications(dry_run=False)
+
+    assert models.EmployeeRecordUpdateNotification.objects.count() == 2
+    assert command.stdout.getvalue() == snapshot

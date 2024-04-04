@@ -11,6 +11,11 @@ from itou.utils.command import BaseCommand
 class Command(BaseCommand):
     """Performs checks and fixes on known employee records glitches."""
 
+    # Limit to 10 as we shouldn't have more than that in nominal situations, but mainly because we are
+    # limited by how much we can transfer: 1 file, 700 rows, every 2 hours on weekdays.
+    # The command is executed every hour, so on Monday morning we will have more than 600 rows to send.
+    MAX_MISSED_NOTIFICATIONS_CREATED = 10
+
     def add_arguments(self, parser):
         super().add_arguments(parser)
 
@@ -93,6 +98,7 @@ class Command(BaseCommand):
                 last_employee_record_snapshot__lt=F("job_application__approval__updated_at"),
             )
             .order_by(
+                "-job_application__approval__updated_at",
                 "job_application__approval__number",
                 "job_application__to_company__siret",
             )
@@ -102,7 +108,7 @@ class Command(BaseCommand):
 
         total_created = 0
         if not dry_run:
-            for employee_record in employee_record_with_missing_notification:
+            for employee_record in employee_record_with_missing_notification[: self.MAX_MISSED_NOTIFICATIONS_CREATED]:
                 _, created = EmployeeRecordUpdateNotification.objects.update_or_create(
                     employee_record=employee_record,
                     status=Status.NEW,
