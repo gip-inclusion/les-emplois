@@ -39,6 +39,30 @@
     'sufPassIae': None,
   })
 # ---
+# name: test_update_notification_use_static_serializers_on_missing_fields[education_level--situationSalarie]
+  ReturnDict({
+    'inscritPoleEmploi': False,
+    'inscritPoleEmploiDepuis': None,
+    'niveauFormation': '00',
+    'numeroIDE': None,
+    'orienteur': '08',
+    'salarieAideSociale': False,
+    'salarieBenefAAH': False,
+    'salarieBenefAAHDepuis': None,
+    'salarieBenefASS': False,
+    'salarieBenefASSDepuis': None,
+    'salarieBenefATA': False,
+    'salarieBenefATADepuis': None,
+    'salarieBenefRSA': 'NON',
+    'salarieBenefRSADepuis': None,
+    'salarieEnEmploi': True,
+    'salarieOETH': False,
+    'salarieRQTH': False,
+    'salarieSansEmploiDepuis': None,
+    'salarieSansRessource': False,
+    'salarieTypeEmployeur': '01',
+  })
+# ---
 # name: test_update_notification_use_static_serializers_on_missing_fields[hexa_commune-None-adresse]
   ReturnDict({
     'adrCpltDistribution': None,
@@ -89,5 +113,29 @@
     'codeinseecom': '57463',
     'codepostalcedex': '57000',
     'codetypevoie': 'AV',
+  })
+# ---
+# name: test_update_notification_use_static_serializers_on_missing_fields[pole_emploi_since--situationSalarie]
+  ReturnDict({
+    'inscritPoleEmploi': False,
+    'inscritPoleEmploiDepuis': None,
+    'niveauFormation': '00',
+    'numeroIDE': None,
+    'orienteur': '08',
+    'salarieAideSociale': False,
+    'salarieBenefAAH': False,
+    'salarieBenefAAHDepuis': None,
+    'salarieBenefASS': False,
+    'salarieBenefASSDepuis': None,
+    'salarieBenefATA': False,
+    'salarieBenefATADepuis': None,
+    'salarieBenefRSA': 'NON',
+    'salarieBenefRSADepuis': None,
+    'salarieEnEmploi': True,
+    'salarieOETH': False,
+    'salarieRQTH': False,
+    'salarieSansEmploiDepuis': None,
+    'salarieSansRessource': False,
+    'salarieTypeEmployeur': '01',
   })
 # ---
