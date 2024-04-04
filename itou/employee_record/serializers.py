@@ -15,7 +15,7 @@ class _PersonSerializer(serializers.Serializer):
     passIae = serializers.CharField(source="approval_number")  # Required
     idItou = serializers.CharField(source="job_application.job_seeker.jobseeker_profile.asp_uid")  # Required
 
-    civilite = NullIfEmptyChoiceField(choices=Title.choices, source="job_application.job_seeker.title")  # Required
+    civilite = serializers.SerializerMethodField()  # Required
     nomUsage = serializers.SerializerMethodField()  # Required
     nomNaissance = NullField()  # Optional
     prenom = serializers.SerializerMethodField()  # Required
@@ -35,6 +35,13 @@ class _PersonSerializer(serializers.Serializer):
     # TODO: Remove to fields after confirmation as they are not mentioned in CC V1.05, § 2.4.1
     sufPassIae = NullField()
     codeDpt = serializers.CharField(source="job_application.job_seeker.birth_place.department_code", required=False)
+
+    def get_civilite(self, obj: EmployeeRecord) -> str | None:
+        if title := obj.job_application.job_seeker.title:
+            return title
+        if nir := obj.job_application.job_seeker.jobseeker_profile.nir:
+            return Title.M if nir[0] == 1 else Title.MME
+        return None
 
     def get_nomUsage(self, obj: EmployeeRecord) -> str:
         return unidecode(obj.job_application.job_seeker.last_name).upper()
@@ -67,6 +74,9 @@ class _StaticPersonSerializer(_PersonSerializer):
     )  # Required if the birth country is France
     codeInseePays = serializers.ReadOnlyField(default="102")  # Required.
     codeGroupePays = serializers.ReadOnlyField(default="3")  # Required
+
+    def get_civilite(self, obj: EmployeeRecord) -> str:
+        return super().get_civilite(obj) or Title.M.value
 
 
 class _AddressSerializer(serializers.Serializer):
