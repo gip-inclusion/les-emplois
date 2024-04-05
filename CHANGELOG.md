@@ -1,5 +1,38 @@
 # Journal des modifications
 
+## [84] - 2024-04-08
+
+### Ajouté
+
+- Fiches Salarié : Ajout d'une commande afin de renvoyer les fiches salariés pour une SIAE
+- Fiches Salarié : Ouverture du module pour les EITI
+- PASS IAE : Ajout d'un champ "dernière modification"
+- Stats : Publication du TB394 "Déclaration d'embauche" pour les SIAE sur la région Occitanie
+
+### Modifié
+
+- API : Ajout de nouveaux champs à l'API siaes (`type_contrat`, `nombre_postes_ouverts`, `lieu` & `profil_recherche`)
+- API : Ajout des paramètres `mode_multi_structures` et `uid_structures` sur l'API candidats
+- API : Augmenter la limite d’appels sur l’API `employee_records`
+- Ajout d'un appel à l'api data·inclusion lorsqu'un service dora est consulté
+- Ajout d'un ré-essai régulier d'identification des profils de demandeur d'emploi chez France Travail
+- Autocomplétion de l'adresse pour la création d'un candidat
+- Email : Améliorer le mail d'accueil pour les administrateurs
+- Fiches Salarié : Correction de l'affichage de la ville du candidat dans la liste des fiches
+- Fiches Salarié : Correction du préremplissage de l'adresse depuis les informations candidats
+- Géocodage : Essayer sans le code postal pour les DROM-COM si la BAN ne retourne aucun résultat
+- Inscription : Tri alphabétique des types d'organisations de prescripteurs habilités
+- PASS IAE : Remplissage automatique des champs concernant l'origine du PASS lors d'une délivrance manuelle
+- Refonte UX/UI : Maj du fonctionnement responsif des onglets
+- UI : Modification de l'icône de sélection de structure pour les prescripteurs
+- UX/UI : Correctif de wording et petit bug ui sur les boutons de formulaires
+- UX/UI : Filtre candidatures sur mobile
+- UX/UI : Filtrer les candidatures avec HTMX (pour les employeurs & prescripteurs)
+
+### Supprimé
+
+- Mobil’emploi : Retrait de la bannière promo
+
 ## [83] - 2024-03-25
 
 ### Ajouté
