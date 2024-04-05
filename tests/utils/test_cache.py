@@ -1,3 +1,4 @@
+import re
 import socket
 from unittest import mock
 
@@ -18,9 +19,10 @@ class TestFailSafeRedisCache:
             [args, kwargs] = sentry_mock.call_args
             [exception] = args
             [exc_msg] = exception.args
-            # Message error code depends on the platform (Mac or Linux). Should be a variation of
+            # Message error code depends on the platform (Mac or Linux). Should be a variation of the following ones:
+            # Error 99 connecting to localhost:{empty_port}. Cannot assign requested address.
             # Error 111 connecting to localhost:{empty_port}. Connection refused.
-            assert "Connection refused." in exc_msg
+            assert re.match(r"Error \d+ connecting to localhost", exc_msg)
             assert kwargs == {}
 
     def test_known_public_methods(self):
