@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
@@ -13,6 +14,7 @@ from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
+from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_city_saint_andre
@@ -27,7 +29,7 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, TestCase, assert_previous_step, parse_response_to_soup
 
 
 class ProcessListTest(TestCase):
@@ -292,6 +294,18 @@ class ProcessListSiaeTest(ProcessListTest):
 
         # Result page should contain all SIAE's job applications.
         assert total_applications == self.hit_pit.job_applications_received.not_archived().count()
+
+        assert_previous_step(response, reverse("dashboard:index"))
+
+        # Has link to export with back_url set
+        export_url = f"{self.siae_exports_url}?back_url={urlencode(self.siae_base_url)}"
+        self.assertContains(response, export_url)
+
+        # Has job application card link with back_url set
+        job_app = JobApplication.objects.first()
+        job_app_base_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_app.pk})
+        job_app_link = f"{job_app_base_url}?back_url={urlencode(self.siae_base_url)}"
+        self.assertContains(response, job_app_link)
 
     def test_list_rdv_insertion_promo(self):
         self.client.force_login(self.eddie_hit_pit)
@@ -841,6 +855,22 @@ class ProcessListPrescriberTest(ProcessListTest):
         """
         self.client.force_login(self.thibault_pe)
         response = self.client.get(self.prescriber_base_url)
+        assert_previous_step(response, reverse("dashboard:index"))
+
+        # Has link to export with back_url set
+        export_url = f"{self.prescriber_exports_url}?back_url={urlencode(self.prescriber_base_url)}"
+        self.assertContains(response, export_url)
+
+        # Has job application card link with back_url set
+        job_app = JobApplication.objects.first()
+        job_app_base_url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_app.pk})
+        job_app_link = f"{job_app_base_url}?back_url={urlencode(self.prescriber_base_url)}"
+        self.assertContains(response, job_app_link)
+
+        # Has link to company with back_url set
+        company = job_app.to_company
+        company_link = f"{company.get_card_url()}?back_url={urlencode(self.prescriber_base_url)}"
+        self.assertContains(response, company_link)
 
         # Count job applications used by the template
         total_applications = len(response.context["job_applications_page"].object_list)
@@ -850,6 +880,7 @@ class ProcessListPrescriberTest(ProcessListTest):
     def test_list_for_prescriber_pe_exports_view(self):
         self.client.force_login(self.thibault_pe)
         response = self.client.get(self.prescriber_exports_url)
+        assert_previous_step(response, reverse("dashboard:index"))
 
         assert 200 == response.status_code
         assertContains(response, "Toutes les candidatures")
@@ -859,12 +890,20 @@ class ProcessListPrescriberTest(ProcessListTest):
     def test_list_for_prescriber_exports_view(self):
         self.client.force_login(self.audrey_envol)
         response = self.client.get(self.prescriber_exports_url)
+        assert_previous_step(response, reverse("dashboard:index"))
+        self.assertNotContains(response, self.besoin_dun_chiffre)
+
+    def test_list_for_prescriber_exports_view__back_to_list(self):
+        self.client.force_login(self.audrey_envol)
+        response = self.client.get(add_url_params(self.prescriber_exports_url, {"back_url": self.prescriber_base_url}))
+        assert_previous_step(response, self.prescriber_base_url, back_to_list=True)
         self.assertNotContains(response, self.besoin_dun_chiffre)
 
     def test_list_for_prescriber_exports_view_without_organization(self):
         prescriber = PrescriberFactory()
         self.client.force_login(prescriber)
         response = self.client.get(self.prescriber_exports_url)
+        assert_previous_step(response, reverse("dashboard:index"))
         self.assertNotContains(response, self.besoin_dun_chiffre)
 
     def test_list_for_prescriber_exports_download_view(self):
@@ -1043,11 +1082,18 @@ class ProcessListExportsSiaeTest(ProcessListTest):
         """
         self.client.force_login(self.eddie_hit_pit)
         response = self.client.get(self.siae_exports_url)
+        assert_previous_step(response, reverse("dashboard:index"))
 
         assert 200 == response.status_code
         assertContains(response, "Toutes les candidatures")
         soup = parse_response_to_soup(response, selector="#besoin-dun-chiffre")
         assert str(soup) == self.snapshot
+
+    def test_list_for_siae_exports_view__back_to_list(self):
+        self.client.force_login(self.eddie_hit_pit)
+        url = f"{self.siae_exports_url}?back_url={urlencode(self.siae_base_url)}"
+        response = self.client.get(url)
+        assert_previous_step(response, self.siae_base_url, back_to_list=True)
 
     def test_list_for_siae_exports_as_prescriber_view(self):
         """

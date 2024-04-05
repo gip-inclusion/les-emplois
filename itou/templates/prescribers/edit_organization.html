@@ -4,6 +4,10 @@
 
 {% block title %}Modifier cette organisation {{ block.super }}{% endblock %}
 
+{% block breadcrumbs %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
 {% block messages %}
     {{ block.super }}
     <div class="alert alert-info">

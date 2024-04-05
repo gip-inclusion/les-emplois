@@ -21,6 +21,7 @@ from django.core.exceptions import ValidationError
 from django.core.mail.message import EmailMessage
 from django.http import HttpResponse
 from django.template import Context, Template
+from django.template.loader import render_to_string
 from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -1557,3 +1558,24 @@ def test_profile_city_display():
 
     user.city = ""
     assert job_seekers.profile_city_display(profile) == "Ville non renseignée"
+
+
+def test_previous_step():
+    PREVIOUS_IS_LIST = "Retour à la liste"
+    res = render_to_string("layout/previous_step.html", {"back_url": ""})
+    assert PREVIOUS_IS_LIST not in res
+
+    res = render_to_string("layout/previous_step.html", {"back_url": "/companies/list"})
+    assert PREVIOUS_IS_LIST in res
+
+    res = render_to_string("layout/previous_step.html", {"back_url": "/company/job_description_list"})
+    assert PREVIOUS_IS_LIST in res
+
+    res = render_to_string("layout/previous_step.html", {"back_url": "/search/results"})
+    assert PREVIOUS_IS_LIST in res
+
+    res = render_to_string("layout/previous_step.html", {"back_url": "/search/home?back_url=/list"})
+    assert PREVIOUS_IS_LIST not in res
+
+    res = render_to_string("layout/previous_step.html", {"back_url": "/search/results?back_url=/blabla&other=params"})
+    assert PREVIOUS_IS_LIST in res

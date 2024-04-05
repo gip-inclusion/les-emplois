@@ -8,7 +8,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
-from tests.utils.test import TestCase
+from tests.utils.test import TestCase, assert_previous_step
 
 
 class MembersTest(TestCase):
@@ -21,6 +21,7 @@ class MembersTest(TestCase):
         url = reverse("prescribers_views:members")
         response = self.client.get(url)
         assert response.status_code == 200
+        assert_previous_step(response, reverse("dashboard:index"))
 
     def test_active_members(self):
         organization = PrescriberOrganizationFactory()

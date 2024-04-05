@@ -1042,7 +1042,7 @@
           </h3>
           <div aria-label="Actions sur les candidatures" class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group">
               
-      <a aria-label="Exporter la liste de candidatures" class="btn btn-ico btn-secondary mt-3 mt-md-0" href="/apply/prescriber/list/exports">
+      <a aria-label="Exporter la liste de candidatures" class="btn btn-ico btn-secondary mt-3 mt-md-0" href="/apply/prescriber/list/exports?back_url=/apply/prescriber/list">
           <i aria-hidden="true" class="ri-download-2-fill"></i>
           <span>Exporter</span>
       </a>
@@ -1068,7 +1068,7 @@
           
           
               chez
-              <a class="btn-ico btn-link" href="/company/42/card">
+              <a class="btn-ico btn-link" href="/company/42/card?back_url=/apply/prescriber/list">
                   <i aria-hidden="true" class="ri-community-line font-weight-medium ri-sm me-1"></i>
                   <span>Hit pit</span>
               </a>
@@ -1145,7 +1145,7 @@
           
           
               chez
-              <a class="btn-ico btn-link" href="/company/42/card">
+              <a class="btn-ico btn-link" href="/company/42/card?back_url=/apply/prescriber/list">
                   <i aria-hidden="true" class="ri-community-line font-weight-medium ri-sm me-1"></i>
                   <span>Hit pit</span>
               </a>
@@ -1227,7 +1227,7 @@
           
           
               chez
-              <a class="btn-ico btn-link" href="/company/42/card">
+              <a class="btn-ico btn-link" href="/company/42/card?back_url=/apply/prescriber/list">
                   <i aria-hidden="true" class="ri-community-line font-weight-medium ri-sm me-1"></i>
                   <span>Hit pit</span>
               </a>
@@ -1313,7 +1313,7 @@
           </h3>
           <div aria-label="Actions sur les candidatures" class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group">
               
-      <a aria-label="Exporter la liste de candidatures" class="btn btn-ico btn-secondary mt-3 mt-md-0" href="/apply/siae/list/exports">
+      <a aria-label="Exporter la liste de candidatures" class="btn btn-ico btn-secondary mt-3 mt-md-0" href="/apply/siae/list/exports?back_url=/apply/siae/list">
           <i aria-hidden="true" class="ri-download-2-fill"></i>
           <span>Exporter</span>
       </a>

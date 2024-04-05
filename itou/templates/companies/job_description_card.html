@@ -9,7 +9,7 @@
 {% block nb_columns %}8{% endblock %}
 
 {% block breadcrumbs %}
-    {% include "layout/breadcrumbs_from_dashboard.html" %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
 {% block content_title %}
@@ -111,7 +111,8 @@
                                         {% include "companies/includes/_siae_details.html" %}
                                     {% endif %}
                                 </ul>
-                                <a href="{% url 'companies_views:card' siae_id=siae.pk %}{% if back_url %}?back_url={{ back_url }}{% endif %}" class="btn btn-secondary btn-block mt-4">Voir la fiche de l'entreprise</a>
+                                <a href="{% url 'companies_views:card' siae_id=siae.pk %}?back_url={% if back_url %}{{ back_url|urlencode }}{% else %}{{ request.get_full_path|urlencode }}{% endif %}"
+                                   class="btn btn-secondary btn-block mt-4">Voir la fiche de l'entreprise</a>
                             </div>
                         </div>
                     {% endif %}

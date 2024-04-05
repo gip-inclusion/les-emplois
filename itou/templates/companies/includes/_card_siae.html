@@ -45,7 +45,9 @@
                 </li>
             </ul>
             <div>
-                <a href="{{ siae.get_card_url }}" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap" {% matomo_event "candidature" "clic" "clic-structure" %}>Voir la fiche de l'entreprise</a>
+                <a href="{{ siae.get_card_url }}?back_url={{ request.get_full_path|urlencode }}"
+                   class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap"
+                   {% matomo_event "candidature" "clic" "clic-structure" %}>Voir la fiche de l'entreprise</a>
             </div>
         </div>
     </div>

@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -13,6 +13,7 @@ from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
+from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     CompanyFilterJobApplicationsForm,
     FilterJobApplicationsForm,
@@ -125,6 +126,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
         "job_applications_page": job_applications_page,
         "filters_form": filters_form,
         "filters_counter": filters_counter,
+        "back_url": reverse("dashboard:index"),
     }
     return render(
         request,
@@ -149,6 +151,7 @@ def list_for_prescriber_exports(request, template_name="apply/list_of_available_
         "total_job_applications": total_job_applications,
         "export_for": "prescriber",
         "can_view_stats_pe": can_view_stats_pe(request),
+        "back_url": get_safe_url(request, "back_url", reverse("dashboard:index")),
     }
     return render(request, template_name, context)
 
@@ -208,6 +211,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "filters_form": filters_form,
         "filters_counter": filters_counter,
         "pending_states_job_applications_count": pending_states_job_applications_count,
+        "back_url": reverse("dashboard:index"),
     }
     return render(
         request,
@@ -233,6 +237,7 @@ def list_for_siae_exports(request, template_name="apply/list_of_available_export
         "total_job_applications": total_job_applications,
         "siae": company,
         "export_for": "siae",
+        "back_url": get_safe_url(request, "back_url", reverse("dashboard:index")),
     }
     return render(request, template_name, context)
 

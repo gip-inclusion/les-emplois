@@ -17,6 +17,10 @@
     </script>
 {% endblock %}
 
+{% block breadcrumbs %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
 {% block content_title %}<h1>Rechercher des prescripteurs habilités</h1>{% endblock %}
 
 {% block content %}

@@ -5,6 +5,10 @@
 
 {% block title %}Gérer les prolongations de PASS IAE {{ block.super }}{% endblock %}
 
+{% block breadcrumbs %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
 {% block content_title %}<h1>Gérer les prolongations de PASS IAE</h1>{% endblock %}
 
 {% block content %}

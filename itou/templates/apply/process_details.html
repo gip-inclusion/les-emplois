@@ -2,6 +2,10 @@
 {% load django_bootstrap5 %}
 {% load format_filters %}
 
+{% block breadcrumbs %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
 {% block content_extend %}
     {# Job seeker info ------------------------------------------------------------------------- #}
     <div class="c-box mb-4">

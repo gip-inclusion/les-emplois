@@ -110,23 +110,6 @@ def job_description_card(request, job_description_id, template_name="companies/j
         .order_by("-updated_at", "-created_at")
     )
 
-    breadcrumbs = {}
-    if can_update_job_description:
-        breadcrumbs = {
-            "Métiers et recrutements": reverse("companies_views:job_description_list"),
-        }
-
-    breadcrumbs.update(
-        {
-            "Détail du poste": reverse(
-                "companies_views:job_description_card",
-                kwargs={
-                    "job_description_id": job_description_id,
-                },
-            ),
-        }
-    )
-
     if job_description.location:
         code_insee = job_description.location.code_insee
     elif company.insee_city:
@@ -140,7 +123,6 @@ def job_description_card(request, job_description_id, template_name="companies/j
         "can_update_job_description": can_update_job_description,
         "others_active_jobs": others_active_jobs,
         "back_url": back_url,
-        "breadcrumbs": breadcrumbs,
         "matomo_custom_title": "Détails de la fiche de poste",
         "code_insee": code_insee,
         "report_tally_url": report_tally_url(request.user, company, job_description),
@@ -232,6 +214,7 @@ def job_description_list(request, template_name="companies/job_description_list.
         "page": page,
         "breadcrumbs": breadcrumbs,
         "members_count": CompanyMembership.objects.filter(company_id=company.pk).active().count(),
+        "back_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
 
@@ -455,6 +438,7 @@ def show_financial_annexes(request, template_name="companies/show_financial_anne
         "siae_is_user_created": current_siae.source == Company.SOURCE_USER_CREATED,
         "jobs_count": JobDescription.objects.filter(company_id=current_siae.pk).count(),
         "members_count": CompanyMembership.objects.filter(company_id=current_siae.pk).active().count(),
+        "back_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
 
@@ -504,6 +488,7 @@ def select_financial_annex(request, template_name="companies/select_financial_an
 
 
 def card(request, siae_id, template_name="companies/card.html"):
+    back_url = get_safe_url(request, "back_url")
     company = get_object_or_404(Company.objects.with_has_active_members(), pk=siae_id)
     jobs_descriptions = JobDescription.objects.filter(company=company).select_related("appellation", "location")
     active_jobs_descriptions = []
@@ -525,6 +510,7 @@ def card(request, siae_id, template_name="companies/card.html"):
         "code_insee": company.insee_city.code_insee if company.insee_city else None,
         "siae_card_absolute_url": get_absolute_url(reverse("companies_views:card", kwargs={"siae_id": company.pk})),
         "report_tally_url": report_tally_url(request.user, company),
+        "back_url": back_url,
     }
     return render(request, template_name, context)
 
@@ -670,6 +656,7 @@ def members(request, template_name="companies/members.html"):
         "members_stats": active_company_members_stats,
         "pending_invitations": pending_invitations,
         "jobs_count": JobDescription.objects.filter(company_id=company.pk).count(),
+        "back_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
 

@@ -5,6 +5,10 @@
 
 {% block title %}Annexes financières {{ block.super }}{% endblock %}
 
+{% block breadcrumbs %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
 {% block messages %}
     {{ block.super }}
     {% if not siae.is_active %}

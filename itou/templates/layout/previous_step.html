@@ -1,0 +1,13 @@
+{% load previous_step %}
+
+{% if back_url %}
+    <div class="c-prevstep">
+        <a href="{{ back_url }}" class="btn btn-ico btn-link ps-0" aria-label={% if back_url|is_list %}"Retour à la liste"{% else %}"Retour à la page précédente"{% endif %}>
+            <i class="ri-arrow-drop-left-line ri-xl font-weight-medium" aria-hidden="true"></i>
+            <span>
+                Retour
+                {% if back_url|is_list %}à la liste{% endif %}
+            </span>
+        </a>
+    </div>
+{% endif %}

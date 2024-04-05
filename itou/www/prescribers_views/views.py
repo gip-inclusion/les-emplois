@@ -4,7 +4,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -43,7 +43,7 @@ def edit_organization(request, template_name="prescribers/edit_organization.html
         except GeocodingDataError:
             messages.error(request, "L'adresse semble erronée. Veuillez la corriger avant de pouvoir « Enregistrer ».")
 
-    context = {"form": form, "organization": organization}
+    context = {"form": form, "organization": organization, "back_url": reverse("dashboard:index")}
     return render(request, template_name, context)
 
 
@@ -68,6 +68,7 @@ def member_list(request, template_name="prescribers/members.html"):
         "members": members,
         "members_stats": members_stats,
         "pending_invitations": pending_invitations,
+        "back_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
 
@@ -125,5 +126,9 @@ def list_accredited_organizations(request, template_name="prescribers/list_accre
         prescriber_org
     ).prefetch_active_memberships()
 
-    context = {"prescriber_org": prescriber_org, "accredited_orgs": accredited_orgs}
+    context = {
+        "prescriber_org": prescriber_org,
+        "accredited_orgs": accredited_orgs,
+        "back_url": get_safe_url(request, "back_url"),
+    }
     return render(request, template_name, context)

@@ -182,7 +182,7 @@
                        class="btn btn-outline-primary btn-block w-100 w-md-auto"
                        aria-label="Désactiver la fiche salarié de {{ item.job_seeker.get_full_name }}">Désactiver</a>
                 {% endif %}
-                <a href="{% url "employee_record_views:summary" employee_record.id %}"
+                <a href="{% url "employee_record_views:summary" employee_record.id %}?back_url={{ current_url|urlencode }}"
                    class="btn {% if employee_record.status == "REJECTED" %}btn-outline-primary{% else %}btn-primary{% endif %} btn-block w-100 w-md-auto"
                    aria-label="Voir la fiche salarié de {{ item.job_seeker.get_full_name }}">Voir la fiche salarié</a>
                 {% if employee_record.status == "REJECTED" %}

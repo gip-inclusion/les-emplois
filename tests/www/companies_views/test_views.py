@@ -5,6 +5,7 @@ import freezegun
 import httpcore
 import pytest
 from django.core import mail
+from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.html import escape
@@ -14,6 +15,7 @@ from itou.companies.models import Company
 from itou.jobs.models import Appellation
 from itou.utils import constants as global_constants
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
+from itou.utils.urls import add_url_params
 from itou.www.companies_views import views
 from tests.cities.factories import create_city_vannes
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
@@ -27,7 +29,7 @@ from tests.companies.factories import (
 )
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, TestCase, assert_previous_step, parse_response_to_soup
 
 
 @pytest.mark.ignore_unknown_variable_template_error
@@ -216,6 +218,29 @@ class CardViewTest(TestCase):
 
         self.assertNotContains(response, self.APPLY)
 
+    def test_card_flow(self):
+        company = CompanyFactory(with_jobs=True)
+        list_url = reverse("search:employers_results")
+        company_card_base_url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
+        company_card_initial_url = add_url_params(
+            company_card_base_url,
+            {"back_url": list_url},
+        )
+        response = self.client.get(company_card_initial_url)
+        assert_previous_step(response, list_url, back_to_list=True)
+
+        # Has link to job description
+        job = company.job_description_through.first()
+        job_description_link = f"{job.get_absolute_url()}?back_url={urlencode(list_url)}"
+        self.assertContains(response, job_description_link)
+
+        # Job description card has link back to list again
+        response = self.client.get(job_description_link)
+        assert_previous_step(response, list_url, back_to_list=True)
+        # And also a link to the company card with a return link to list_url (the same as the first visited page)
+        company_card_url_other_formatting = f"{company_card_base_url}?back_url={urlencode(list_url)}"
+        self.assertContains(response, company_card_url_other_formatting)
+
 
 @pytest.mark.ignore_unknown_variable_template_error
 @pytest.mark.usefixtures("unittest_compatibility")
@@ -259,6 +284,9 @@ class JobDescriptionCardViewTest(TestCase):
         for other_active_job in response.context["others_active_jobs"]:
             self.assertContains(response, other_active_job.display_name, html=True)
 
+        response = self.client.get(add_url_params(url, {"back_url": reverse("companies_views:job_description_list")}))
+        assert_previous_step(response, reverse("companies_views:job_description_list"), back_to_list=True)
+
     def test_card_tally_url_with_user(self):
         job_description = JobDescriptionFactory(
             pk=42,
@@ -298,6 +326,7 @@ class ShowAndSelectFinancialAnnexTest(TestCase):
         url = reverse("companies_views:show_financial_annexes")
         response = self.client.get(url)
         assert response.status_code == 200
+        assert_previous_step(response, reverse("dashboard:index"))
         url = reverse("companies_views:select_financial_annex")
         response = self.client.get(url)
         assert response.status_code == 403
@@ -814,6 +843,7 @@ class MembersTest(TestCase):
         url = reverse("companies_views:members")
         response = self.client.get(url)
         assert response.status_code == 200
+        assert_previous_step(response, reverse("dashboard:index"))
 
     def test_active_members(self):
         company = CompanyFactory()

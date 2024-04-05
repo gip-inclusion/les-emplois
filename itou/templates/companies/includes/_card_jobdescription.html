@@ -10,7 +10,7 @@
                     <i class="ri-community-line font-weight-medium me-1" aria-hidden="true"></i>
                     <span class="font-weight-bold">{{ job_description.market_context_description | default:"Entreprise anonyme" }}</span>
                 {% else %}
-                    <a href="{{ job_description.company.get_card_url }}" class="btn-ico btn-link" {% matomo_event "candidature" "clic" "clic-structure-fichedeposte" %}>
+                    <a href="{{ job_description.company.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="btn-ico btn-link" {% matomo_event "candidature" "clic" "clic-structure-fichedeposte" %}>
                         <i class="ri-community-line font-weight-medium" aria-hidden="true"></i>
                         <span>{{ job_description.company.kind }} - {{ job_description.company.display_name }}</span>
                     </a>

@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.template.defaultfilters import urlencode
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -10,6 +11,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertNumQu
 
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.utils.templatetags.format_filters import format_approval_number
+from itou.utils.urls import add_url_params
 from tests.approvals.factories import (
     ApprovalFactory,
     ProlongationFactory,
@@ -21,7 +23,7 @@ from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
 from tests.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import assert_previous_step, parse_response_to_soup
 
 
 class TestApprovalDetailView:
@@ -57,23 +59,30 @@ class TestApprovalDetailView:
         employer = job_application.to_company.members.first()
         client.force_login(employer)
 
-        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        url = add_url_params(
+            reverse("approvals:detail", kwargs={"pk": approval.pk}), {"back_url": reverse("approvals:list")}
+        )
         response = client.get(url)
         assertContains(response, "Numéro de PASS IAE")
         assertContains(response, "Informations du salarié")
         assertContains(response, "Éligibilité à l'IAE")
         assertContains(response, "Candidatures de ce salarié")
         assertContains(response, "Voir sa candidature", count=2)
-        assertContains(
-            response, reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        job_application_base_url = reverse(
+            "apply:details_for_company", kwargs={"job_application_id": job_application.pk}
         )
+        job_application_url = f"{job_application_base_url}?back_url={urlencode(url)}"
+        assertContains(response, job_application_url)
         assertContains(
             response, reverse("apply:details_for_company", kwargs={"job_application_id": same_siae_job_application.pk})
         )
-        assertNotContains(
-            response,
-            reverse("apply:details_for_company", kwargs={"job_application_id": other_siae_job_application.pk}),
+        other_siae_job_application_base_url = reverse(
+            "apply:details_for_company", kwargs={"job_application_id": other_siae_job_application.pk}
         )
+        other_siae_job_application_url = f"{other_siae_job_application_base_url}?back_url={urlencode(url)}"
+        assertNotContains(response, other_siae_job_application_url)
+
+        assert_previous_step(response, reverse("approvals:list"), back_to_list=True)
 
     def test_detail_view_no_job_application(self, client):
         company = CompanyFactory(with_membership=True)

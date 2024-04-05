@@ -6,8 +6,9 @@ from pytest_django.asserts import assertContains
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
+from itou.utils.urls import add_url_params
 from tests.prescribers.factories import PrescriberOrganizationFactory, PrescriberOrganizationWithMembershipFactory
-from tests.utils.test import TestCase, parse_response_to_soup
+from tests.utils.test import TestCase, assert_previous_step, parse_response_to_soup
 
 
 class CardViewTest(TestCase):
@@ -17,6 +18,22 @@ class CardViewTest(TestCase):
         response = self.client.get(url)
         assert response.status_code == 200
         assert response.context["prescriber_org"] == prescriber_org
+
+        # When coming from prescribers search results page
+        url = add_url_params(
+            reverse("prescribers_views:card", kwargs={"org_id": prescriber_org.pk}),
+            {"back_url": reverse("search:prescribers_results")},
+        )
+        response = self.client.get(url)
+        assert_previous_step(response, reverse("search:prescribers_results"), back_to_list=True)
+
+        # When coming from dashboard
+        url = add_url_params(
+            reverse("prescribers_views:card", kwargs={"org_id": prescriber_org.pk}),
+            {"back_url": reverse("dashboard:index")},
+        )
+        response = self.client.get(url)
+        assert_previous_step(response, reverse("dashboard:index"))
 
 
 class TestEditOrganization:
@@ -33,6 +50,8 @@ class TestEditOrganization:
         url = reverse("prescribers_views:edit_organization")
         response = client.get(url)
         assert response.status_code == 200
+
+        assert_previous_step(response, reverse("dashboard:index"))
 
         post_data = {
             "name": "foo",
@@ -102,6 +121,8 @@ class TestEditOrganization:
         url = reverse("prescribers_views:edit_organization")
         response = client.get(url)
         assert response.status_code == 200
+
+        assert_previous_step(response, reverse("dashboard:index"))
 
         post_data = {
             "siret": siret,

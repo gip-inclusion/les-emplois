@@ -5,10 +5,12 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.utils.urls import add_url_params
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
 )
+from tests.utils.test import assert_previous_step
 
 
 def test_list_accredited_organizations(client):
@@ -46,11 +48,17 @@ def test_list_accredited_organizations(client):
         is_brsa=False,
     )
 
-    response = client.get(reverse("prescribers_views:list_accredited_organizations"))
+    response = client.get(
+        add_url_params(
+            reverse("prescribers_views:list_accredited_organizations"),
+            {"back_url": "back_url"},
+        ),
+    )
     assertContains(response, accredited_org.display_name)
     assertNotContains(response, accredited_org_from_other_department.display_name)
     assertNotContains(response, non_authorized_org.display_name)
     assertNotContains(response, authorized_but_not_brsa_org.display_name)
+    assert_previous_step(response, "back_url")
 
 
 def test_list_accredited_organizations_denied_for_non_admin(client):

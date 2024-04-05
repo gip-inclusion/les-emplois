@@ -4,6 +4,10 @@
 
 {% block title %}Candidatures reçues {{ block.super }}{% endblock %}
 
+{% block breadcrumbs %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
 {% block content_title %}
     <h1>Candidatures reçues</h1>
     <h2>{{ siae.display_name }}</h2>

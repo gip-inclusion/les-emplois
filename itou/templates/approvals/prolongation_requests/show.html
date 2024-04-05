@@ -6,6 +6,10 @@
     Demande de prolongation - {{ prolongation_request.approval.user.get_full_name }} {{ block.super }}
 {% endblock %}
 
+{% block breadcrumbs %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
 {% block content_title %}
     <h1>Demande de prolongation pour {{ prolongation_request.approval.user.get_full_name }}</h1>
     {% include "approvals/prolongation_requests/_status_badge.html" with badge_size="badge-base" %}

@@ -10,6 +10,7 @@ from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
+from django.template.defaultfilters import urlencode as urlencode_filter
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -32,6 +33,7 @@ from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, UserKind
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir, format_phone
+from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
 from tests.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
@@ -55,7 +57,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import TestCase, parse_response_to_soup
+from tests.utils.test import TestCase, assert_previous_step, parse_response_to_soup
 
 
 DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
@@ -179,12 +181,18 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
     def test_details_for_company(self, *args, **kwargs):
         """Display the details of a job application."""
 
-        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True, resume_link="")
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True, resume_link="", with_approval=True
+        )
         company = job_application.to_company
         employer = company.members.first()
         self.client.force_login(employer)
 
-        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        back_url = reverse("approvals:detail", kwargs={"pk": job_application.approval.pk})
+        url = add_url_params(
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+            {"back_url": back_url},
+        )
         # 1. SELECT django session
         # 2. SELECT current user
         # 3. SELECT company membership
@@ -205,13 +213,15 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         # 16. SAVEPOINT
         # 17. UPDATE django session
         # 18. RELEASE SAVEPOINT
-        with self.assertNumQueries(18):
+        with self.assertNumQueries(20):
             response = self.client.get(url)
         self.assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
         self.assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
         self.assertContains(response, job_application.job_seeker.jobseeker_profile.pole_emploi_id)
         self.assertContains(response, job_application.job_seeker.phone.replace(" ", ""))
         self.assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)  # the company is not a GEIQ
+        self.assertContains(response, f"{back_url}?back_url={urlencode_filter(url)}")
+        assert_previous_step(response, back_url)
 
         job_application.job_seeker.created_by = employer
         job_application.job_seeker.phone = ""
@@ -236,6 +246,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.assertContains(
             response, '<small>Numéro de sécurité sociale</small><i class="text-disabled">Non renseigné</i>', html=True
         )
+        assert_previous_step(response, reverse("apply:list_for_siae"), back_to_list=True)
 
         job_application.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
         job_application.job_seeker.jobseeker_profile.save()
@@ -282,10 +293,12 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
     def test_details_for_prescriber(self, *args, **kwargs):
         """As a prescriber, I can access the job_applications details for prescribers."""
 
+        appelation = Appellation.objects.first()
         job_application = JobApplicationFactory(
             with_approval=True,
             resume_link="",
             sent_by_authorized_prescriber_organisation=True,
+            selected_jobs=[appelation],
         )
         prescriber = job_application.sender_prescriber_organization.members.first()
 
@@ -304,6 +317,12 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.assertContains(
             response, '<small>Curriculum vitae</small><i class="text-disabled">Non renseigné</i>', html=True
         )
+        assert_previous_step(response, reverse("apply:list_for_prescriber"), back_to_list=True)
+
+        # Has link to job description with back_url set
+        job_description = job_application.selected_jobs.first()
+        job_description_url = f"{job_description.get_absolute_url()}?back_url={url}"
+        self.assertContains(response, job_description_url)
 
         job_application.job_seeker.jobseeker_profile.nir = ""
         job_application.job_seeker.jobseeker_profile.save()

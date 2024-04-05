@@ -27,7 +27,7 @@
     <ul class="list-group list-group-flush">
         {% for job in jobs %}
             <li class="list-group-item list-group-item-action py-2">
-                <a class="d-flex flex-wrap align-items-center text-decoration-none" href="{{ job.get_absolute_url }}">
+                <a class="d-flex flex-wrap align-items-center text-decoration-none" href="{{ job.get_absolute_url }}?back_url={{ request.get_full_path|urlencode }}">
                     <div class="d-inline">
                         <span class="font-weight-bold me-1 me-md-2">{{ job.display_name }} ({{ job.appellation.rome_id }})</span>
                     </div>

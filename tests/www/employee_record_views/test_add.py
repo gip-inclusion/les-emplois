@@ -2,6 +2,7 @@ from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
 from itou.employee_record.enums import Status
+from itou.utils.urls import add_url_params
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.employee_record.factories import EmployeeRecordFactory
@@ -132,7 +133,10 @@ def test_done_step_when_a_other_than_new_employee_record_already_exists(client):
 
     choose_employee_url = reverse("employee_record_views:add", kwargs={"step": "choose-employee"})
     choose_approval_url = reverse("employee_record_views:add", kwargs={"step": "choose-approval"})
-    end_url = reverse("employee_record_views:summary", kwargs={"employee_record_id": employee_record.pk})
+    end_url = add_url_params(
+        reverse("employee_record_views:summary", kwargs={"employee_record_id": employee_record.pk}),
+        {"back_url": reverse("employee_record_views:list")},
+    )
 
     client.post(
         choose_employee_url,

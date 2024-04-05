@@ -4,7 +4,7 @@ import factory
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib.messages.test import MessagesTestMixin
-from django.template.defaultfilters import title
+from django.template.defaultfilters import title, urlencode
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -20,7 +20,7 @@ from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJo
 from tests.employee_record import factories as employee_record_factories
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, TestCase, assert_previous_step, parse_response_to_soup
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
@@ -49,6 +49,26 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
 
         response = self.client.get(self.URL)
         assert response.status_code == 403
+
+    def test_new_employee_records_list(self):
+        """
+        Check if previous_step and back_url parmaeters are where we need them
+        """
+        record = employee_record_factories.EmployeeRecordWithProfileFactory(
+            job_application__to_company=self.company,
+            job_application__job_seeker__last_name="Aaaaa",
+            job_application__hiring_start_at=timezone.now() - relativedelta(days=15),
+        )
+        record.update_as_ready()
+        self.client.force_login(self.user)
+        url = f"{self.URL}?status=READY"
+        response = self.client.get(url)
+        assert_previous_step(response, reverse("dashboard:index"))
+
+        # Check record summary link has back_url set
+        record_base_url = reverse("employee_record_views:summary", kwargs={"employee_record_id": record.pk})
+        record_url = f"{record_base_url}?back_url={urlencode(url)}"
+        self.assertContains(response, record_url)
 
     def test_new_employee_records(self):
         """

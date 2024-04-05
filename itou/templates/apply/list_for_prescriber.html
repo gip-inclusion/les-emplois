@@ -6,6 +6,10 @@
 
 {% block title %}Candidatures {{ block.super }}{% endblock %}
 
+{% block breadcrumbs %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
 {% block content_title %}<h1>Candidatures</h1>{% endblock %}
 
 {% block content %}

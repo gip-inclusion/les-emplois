@@ -1,6 +1,6 @@
 import pytest
 from django.contrib.gis.geos import Point
-from django.template.defaultfilters import capfirst
+from django.template.defaultfilters import capfirst, urlencode as urlencode_filter
 from django.templatetags.static import static
 from django.test import override_settings
 from django.urls import reverse, reverse_lazy
@@ -17,7 +17,7 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, TestCase, assert_previous_step, parse_response_to_soup
 
 
 DISTRICTS = "Arrondissements de Paris"
@@ -269,6 +269,7 @@ class SearchCompanyTest(TestCase):
         self.assertNotContains(response, no_hiring_str)
 
     def test_company(self):
+        create_test_romes_and_appellations(["N1101"], appellations_per_rome=1)
         # 3 companies in two departments to test distance and department filtering
         vannes = create_city_vannes()
         COMPANY_VANNES = "Entreprise Vannes"
@@ -279,8 +280,14 @@ class SearchCompanyTest(TestCase):
         guerande = create_city_guerande()
         COMPANY_GUERANDE = "Entreprise Guérande"
         guerande_company = CompanyFactory(
-            name=COMPANY_GUERANDE, department="44", coords=guerande.coords, post_code="44350", kind=CompanyKind.AI
+            name=COMPANY_GUERANDE,
+            department="44",
+            coords=guerande.coords,
+            post_code="44350",
+            kind=CompanyKind.AI,
+            with_membership=True,
         )
+        job_description = JobDescriptionFactory(company=guerande_company, location=guerande)
         saint_andre = create_city_saint_andre()
         COMPANY_SAINT_ANDRE = "Entreprise Saint André des Eaux"
         CompanyFactory(
@@ -327,6 +334,19 @@ class SearchCompanyTest(TestCase):
             html=True,
             count=1,
         )
+        assert_previous_step(response, reverse("search:employers_home"))
+
+        # Has link to company card with back_url
+        company_url = (
+            f"{guerande_company.get_card_url()}?back_url={urlencode_filter(response.wsgi_request.get_full_path())}"
+        )
+        self.assertContains(response, company_url)
+
+        # Has link to job description with back_url
+        job_description_url = (
+            f"{job_description.get_absolute_url()}?back_url={urlencode_filter(response.wsgi_request.get_full_path())}"
+        )
+        self.assertContains(response, job_description_url)
 
         # Check that invalid value doesn't crash
         response = self.client.get(self.URL, {"city": guerande.slug, "distance": 100, "company": "foobar"})
@@ -387,11 +407,16 @@ class SearchPrescriberTest(TestCase):
 
         vannes = create_city_vannes()
         guerande = create_city_guerande()
-        PrescriberOrganizationFactory(authorized=True, coords=guerande.coords)
+        organization_1 = PrescriberOrganizationFactory(authorized=True, coords=guerande.coords)
         PrescriberOrganizationFactory(authorized=True, coords=vannes.coords)
 
         response = self.client.get(url, {"city": guerande.slug, "distance": 100})
         self.assertContains(response, "2 résultats")
+        assert_previous_step(response, reverse("search:prescribers_home"))
+
+        # Has link to organization card with back_url
+        organization_url = f"{organization_1.get_card_url()}?back_url={urlencode_filter(url)}"
+        self.assertContains(response, organization_url)
 
         response = self.client.get(url, {"city": guerande.slug, "distance": 15})
         self.assertContains(response, "1 résultat")
@@ -405,6 +430,68 @@ class JobDescriptionSearchViewTest(TestCase):
     def test_not_existing(self):
         response = self.client.get(self.URL, {"city": "foo-44"})
         self.assertContains(response, "Aucun résultat avec les filtres actuels.")
+
+    def test_results(self):
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
+        city_slug = "paris-75"
+        paris_city = City.objects.create(
+            name="Paris", slug=city_slug, department="75", post_codes=["75001"], coords=Point(5, 23)
+        )
+        filters_param = {"city": city_slug, "city_name": "Paris (75)", "distance": 25}
+
+        company = CompanyFactory(department="75", coords=paris_city.coords, post_code="75001")
+        job = JobDescriptionFactory(company=company)
+
+        # Filter on city
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # select the city
+            + 1  # fetch initial job descriptions to add to the form fields
+            + 2  # count the number of results for companies & job descriptions
+            + 1  # prefetch job applications for the is_popular attribute
+            + 1  # refetch the city for widget rendering
+            + 1  # select the job descriptions for the page
+        ):
+            response = self.client.get(self.URL, {"city": city_slug})
+
+        self.assertContains(response, "Emplois inclusifs à 25 km du centre de Paris (75)")
+        self.assertContains(
+            response,
+            f"""
+            <a class="nav-link active"
+                data-matomo-event="true" data-matomo-category="candidature" data-matomo-action="clic"
+                data-matomo-option="clic-onglet-fichesdeposte"
+                href="{self.URL}?{escape(urlencode(filters_param))}">
+                <i class="ri-briefcase-4-line font-weight-normal me-1" aria-hidden="true"></i>
+                <span>Poste <span class="d-none d-md-inline">ouvert au recrutement</span></span>
+                <span class="badge badge-sm rounded-pill ms-2">1</span>
+            </a>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(
+            response,
+            f"""
+            <a class="nav-link"
+                data-matomo-event="true" data-matomo-category="candidature"
+                data-matomo-action="clic" data-matomo-option="clic-onglet-employeur"
+                href="{self.URL_EMPLOYERS}?{escape(urlencode(filters_param))}">
+                <i class="ri-hotel-line font-weight-normal me-1" aria-hidden="true"></i>
+                <span>Employeur</span>
+                <span class="badge badge-sm rounded-pill ms-2">1</span>
+            </a>
+            """,
+            html=True,
+        )
+
+        self.assertContains(response, capfirst(job.display_name), html=True)
+
+        job_url = f"{job.get_absolute_url()}?back_url={urlencode_filter(response.wsgi_request.get_full_path())}"
+        self.assertContains(response, job_url)
+
+        company_url = f"{company.get_card_url()}?back_url={urlencode_filter(response.wsgi_request.get_full_path())}"
+        self.assertContains(response, company_url)
 
     def test_district(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))

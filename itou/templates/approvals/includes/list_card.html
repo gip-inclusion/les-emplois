@@ -66,7 +66,7 @@
     <div class="c-box--results__footer">
 
         <div class="d-flex justify-content-md-end">
-            <a href="{% url 'approvals:detail' pk=approval.id %}"
+            <a href="{% url 'approvals:detail' pk=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
                class="btn btn-outline-primary btn-block w-100 w-md-auto"
                {% matomo_event "salaries" "clic" "details-salarie" %}
                aria-label="Voir les informations de {{ approval.user.get_full_name }}">Voir les informations</a>

@@ -12,6 +12,10 @@
     <h1>{{ prescriber_org.name }}</h1>
 {% endblock %}
 
+{% block breadcrumbs %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
@@ -46,13 +50,6 @@
                         <p>
                             <i class="ri-external-link-line me-1"></i>
                             <a href="{{ prescriber_org.website }}" rel="noopener" target="_blank" aria-label="{{ prescriber_org.website }} (ouverture dans un nouvel onglet)">{{ prescriber_org.website }}</a>
-                        </p>
-                    {% endif %}
-
-                    {% if back_url %}
-                        <hr>
-                        <p>
-                            <a href="{{ back_url }}">Retour</a>
                         </p>
                     {% endif %}
                 </div>
