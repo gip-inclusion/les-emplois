@@ -3,6 +3,10 @@
 {% load format_filters %}
 {% load matomo %}
 
+{% block breadcrumbs %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
 {% block actions %}
     {% include "apply/includes/siae_hiring_actions.html" with job_application=job_application %}
 {% endblock %}
@@ -88,7 +92,9 @@
             <p>
                 La consultation et la gestion du PASS IAE (exemple : « suspendre » ou « prolonger » un PASS IAE) se fait depuis le profil salarié.
             </p>
-            <a class="btn btn-block btn-primary" href="{% url 'approvals:detail' pk=job_application.approval.id %}" {% matomo_event "salaries" "clic" "detail-salarie-depuis-candidature" %}>Accéder au profil salarié</a>
+            <a class="btn btn-block btn-primary"
+               href="{% url 'approvals:detail' pk=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}"
+               {% matomo_event "salaries" "clic" "detail-salarie-depuis-candidature" %}>Accéder au profil salarié</a>
         </div>
     {% endif %}
 {% endblock %}

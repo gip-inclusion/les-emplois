@@ -18,7 +18,7 @@ from itou.files.models import File
 from tests.approvals import factories as approvals_factories
 from tests.prescribers import factories as prescribers_factories
 from tests.users import factories as users_factories
-from tests.utils.test import BASE_NUM_QUERIES, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, assert_previous_step, parse_response_to_soup
 
 
 @pytest.mark.parametrize(
@@ -51,6 +51,8 @@ def test_empty_list_view(snapshot, client):
     with assertNumQueries(num_queries):
         response = client.get(reverse("approvals:prolongation_requests_list"))
     assert str(parse_response_to_soup(response, ".s-section .c-box")) == snapshot
+
+    assert_previous_step(response, reverse("dashboard:index"))
 
 
 def test_list_view(snapshot, client):
@@ -131,6 +133,7 @@ def test_show_view(snapshot, client):
         reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})
     )
     assert str(parse_response_to_soup(response, ".s-section .col-lg-8 .c-box:last-child")) == snapshot
+    assert_previous_step(response, reverse("approvals:prolongation_requests_list") + "?only_pending=on")
 
 
 def test_grant_view(client):

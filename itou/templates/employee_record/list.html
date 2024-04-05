@@ -6,6 +6,10 @@
 
 {% block title %}Fiches salarié ASP - {{ request.current_organization.display_name }} {{ block.super }}{% endblock %}
 
+{% block breadcrumbs %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
 {% block messages %}
     {{ block.super }}
     {% if need_manual_regularization %}
@@ -154,7 +158,7 @@
                     <div class="employee-records-list">
                         {% if employee_records_list %}
                             {% for employee_record in navigation_pages %}
-                                {% include "employee_record/includes/list_item.html" with employee_record=employee_record item=employee_record.job_application only %}
+                                {% include "employee_record/includes/list_item.html" with employee_record=employee_record item=employee_record.job_application current_url=request.get_full_path only %}
                             {% endfor %}
                             {# New employee records i.e. job applications #}
                         {% else %}

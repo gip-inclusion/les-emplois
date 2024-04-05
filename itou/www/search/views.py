@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 from django.contrib.gis.db.models.functions import Distance
 from django.db.models import Case, F, Prefetch, Q, When
 from django.shortcuts import render
+from django.urls import reverse
 from django.views.generic import FormView
 
 from itou.common_apps.address.departments import DEPARTMENTS_WITH_DISTRICTS
@@ -140,6 +141,7 @@ class EmployerSearchBaseView(FormView):
             "job_descriptions_count": results_and_counts.job_descriptions_count,
             # Keep title as “Recherche employeurs solidaires” for matomo stats.
             "matomo_custom_title": "Recherche d'employeurs solidaires",
+            "back_url": reverse("search:employers_home"),
         }
         return render(self.request, self.get_template_names(), context)
 
@@ -308,5 +310,6 @@ def search_prescribers_results(request, template_name="search/prescribers_search
         "form": form,
         "prescriber_orgs_page": prescriber_orgs_page,
         "matomo_custom_title": "Recherche d'organisations prescriptrices",
+        "back_url": reverse("search:prescribers_home"),
     }
     return render(request, template_name, context)

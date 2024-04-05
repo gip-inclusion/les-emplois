@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.contrib.gis.geos import Point
 from django.contrib.messages.test import MessagesTestMixin
 from django.core.exceptions import ObjectDoesNotExist
+from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from freezegun import freeze_time
 
@@ -15,7 +16,7 @@ from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase
+from tests.utils.test import BASE_NUM_QUERIES, TestCase, assert_previous_step
 
 
 class JobDescriptionAbstractTest(TestCase):
@@ -115,7 +116,8 @@ class JobDescriptionListViewTest(MessagesTestMixin, JobDescriptionAbstractTest):
 
         for job in self.company.job_description_through.all():
             with self.subTest(job.pk):
-                self.assertContains(response, f"/job_description/{job.pk}/card")
+                job_description_link = f"{job.get_absolute_url()}?back_url={urlencode(self.url)}"
+                self.assertContains(response, job_description_link)
                 self.assertContains(response, f"toggle_job_description_form_{job.pk}")
                 self.assertContains(response, f"#_delete_modal_{job.pk}")
                 self.assertContains(
@@ -124,6 +126,8 @@ class JobDescriptionListViewTest(MessagesTestMixin, JobDescriptionAbstractTest):
                     html=True,
                     count=2,
                 )
+
+        assert_previous_step(response, reverse("dashboard:index"))
 
     def test_block_job_applications(self):
         response = self._login(self.user)

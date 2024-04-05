@@ -2,6 +2,7 @@ import datetime
 
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertRedirects
@@ -9,7 +10,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertNumQu
 from itou.www.approvals_views.views import ApprovalListView
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory
-from tests.utils.test import BASE_NUM_QUERIES, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, assert_previous_step, parse_response_to_soup
 
 
 class TestApprovalsListView:
@@ -32,7 +33,11 @@ class TestApprovalsListView:
         assertContains(response, "1 résultat")
         assertContains(response, approval.user.get_full_name())
         assertNotContains(response, approval_for_other_company.user.get_full_name())
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
+
+        assert_previous_step(response, reverse("dashboard:index"))
+
+        approval_base_url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        assertContains(response, f"{approval_base_url}?back_url={urlencode(url)}")
 
     def test_multiple_approvals_for_the_same_user(self, client):
         approval = ApprovalFactory(with_jobapplication=True)

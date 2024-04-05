@@ -27,7 +27,7 @@ from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTest
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import TestCase
+from tests.utils.test import TestCase, assert_previous_step
 
 
 INVITATION_URL = reverse("invitations_views:invite_prescriber_with_org")
@@ -55,6 +55,10 @@ class TestSendPrescriberWithOrgInvitation(TestCase):
         assert invitation.first_name == self.post_data["form-0-first_name"]
         assert invitation.last_name == self.post_data["form-0-last_name"]
         assert invitation.email == self.post_data["form-0-email"]
+
+    def test_invite_previous_step_link(self):
+        response = self.client.get(INVITATION_URL)
+        assert_previous_step(response, reverse("prescribers_views:members"))
 
     def test_invite_not_existing_user(self):
         response = self.client.post(INVITATION_URL, data=self.post_data, follow=True)

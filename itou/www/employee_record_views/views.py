@@ -5,7 +5,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Count, Exists, OuterRef
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views.decorators.http import require_safe
 from formtools.wizard.views import NamedUrlSessionWizardView
 
@@ -18,6 +18,7 @@ from itou.users.enums import LackOfNIRReason, UserKind
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
+from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.employee_record_views.forms import (
     AddEmployeeRecordChooseApprovalForm,
     AddEmployeeRecordChooseEmployeeForm,
@@ -130,7 +131,10 @@ class AddView(LoginRequiredMixin, NamedUrlSessionWizardView):
                 )
             else:  # An employee record exists, show the summary
                 return HttpResponseRedirect(
-                    reverse("employee_record_views:summary", kwargs={"employee_record_id": employee_record.pk})
+                    add_url_params(
+                        reverse("employee_record_views:summary", kwargs={"employee_record_id": employee_record.pk}),
+                        {"back_url": reverse("employee_record_views:list")},
+                    )
                 )
 
 
@@ -247,6 +251,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         "need_manual_regularization": need_manual_regularization,
         "ordered_by_label": order_by.label,
         "matomo_custom_title": "Fiches salarié ASP",
+        "back_url": reverse("dashboard:index"),
     }
 
     return render(request, template_name, context)
@@ -486,6 +491,7 @@ def summary(request, employee_record_id, template_name="employee_record/summary.
     context = {
         "employee_record": employee_record,
         "matomo_custom_title": "Détail fiche salarié ASP",
+        "back_url": get_safe_url(request, "back_url", fallback_url=reverse_lazy("employee_record_views:list")),
     }
 
     return render(request, template_name, context)

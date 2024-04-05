@@ -10,7 +10,7 @@ from django.core.files.storage import default_storage
 from django.db.models import Prefetch
 from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.views import View
 from django.views.decorators.http import require_safe
@@ -35,7 +35,7 @@ from itou.utils.pagination import ItouPaginator, pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
 from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX
-from itou.utils.urls import get_safe_url
+from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.apply.forms import JobSeekerExistsForm
 from itou.www.approvals_views.forms import (
     ApprovalExpiry,
@@ -118,6 +118,7 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
         context["matomo_custom_title"] = "Profil salarié"
         context["eligibility_diagnosis"] = job_application and job_application.get_eligibility_diagnosis()
         context["approval_deletion_form_url"] = None
+        context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("approvals:list"))
 
         if approval.is_in_progress:
             for suspension in approval.suspensions_by_start_date_asc:
@@ -196,6 +197,7 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
         context = super().get_context_data(**kwargs)
         context["filters_form"] = self.form
         context["filters_counter"] = self.form.get_filters_counter()
+        context["back_url"] = reverse("dashboard:index")
         return context
 
 
@@ -413,6 +415,7 @@ def prolongation_requests_list(request, template_name="approvals/prolongation_re
     context = {
         "form": form,
         "pager": pager(queryset, request.GET.get("page"), items_per_page=10),
+        "back_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
 
@@ -449,6 +452,7 @@ class ProlongationRequestViewMixin(LoginRequiredMixin):
         return super().get_context_data(**kwargs) | {
             "prolongation_request": self.prolongation_request,
             "matomo_custom_title": "Demande de prolongation",
+            "back_url": add_url_params(reverse("approvals:prolongation_requests_list"), {"only_pending": "on"}),
         }
 
 

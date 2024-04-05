@@ -17,7 +17,7 @@
             </a>
             <ul class="list-unstyled mb-lg-5">
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{{ request.current_organization.get_card_url }}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-infos-entreprise" %}>
+                    <a href="{{ request.current_organization.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-infos-entreprise" %}>
                         <i class="ri-eye-line ri-lg font-weight-normal"></i>
                         <span>Voir la fiche publique</span>
                     </a>

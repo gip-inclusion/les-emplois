@@ -4,8 +4,10 @@ import re
 
 import openpyxl
 from bs4 import BeautifulSoup
+from django.template.loader import render_to_string
 from django.test import Client, TestCase as BaseTestCase
 from django.test.utils import TestContextDecorator
+from pytest_django.asserts import assertContains, assertNotContains
 
 
 # SAVEPOINT + RELEASE from the ATOMIC_REQUESTS transaction
@@ -129,3 +131,12 @@ def get_rows_from_streaming_response(response):
     workbook = openpyxl.load_workbook(io.BytesIO(content))
     worksheet = workbook.active
     return [[cell.value or "" for cell in row] for row in worksheet.rows]
+
+
+def assert_previous_step(response, url, back_to_list=False):
+    previous_step = render_to_string("layout/previous_step.html", {"back_url": url})
+    if back_to_list:
+        assertContains(response, "Retour à la liste")
+    else:
+        assertNotContains(response, "Retour à la liste")
+    assertContains(response, previous_step)

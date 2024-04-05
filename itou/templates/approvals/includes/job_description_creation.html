@@ -32,7 +32,7 @@
         {% endif %}
         {% if request.user.is_prescriber %}
             chez
-            <a href="{% url 'companies_views:card' siae_id=job_application.to_company.id %}" class="btn-ico btn-link">
+            <a href="{% url 'companies_views:card' siae_id=job_application.to_company.id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-ico btn-link">
                 <i class="ri-community-line font-weight-medium ri-sm me-1" aria-hidden="true"></i>
                 <span>{{ job_application.to_company.display_name }}</span>
             </a>
