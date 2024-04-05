@@ -1060,6 +1060,23 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def render_obsolete(self, *args, **kwargs):
         pass
 
+    def manually_deliver_approval(self, delivered_by):
+        self.approval_number_sent_by_email = True
+        self.approval_number_sent_at = timezone.now()
+        self.approval_manually_delivered_by = delivered_by
+        self.save()
+        # Send email at the end because we can't rollback this operation
+        email = self.email_deliver_approval(self.accepted_by)
+        email.send()
+
+    def manually_refuse_approval(self, refused_by):
+        self.approval_manually_refused_by = refused_by
+        self.approval_manually_refused_at = timezone.now()
+        self.save()
+        # Send email at the end because we can't rollback this operation
+        email = self.email_manually_refuse_approval
+        email.send()
+
     # Emails.
     @property
     def email_new_for_prescriber(self):
@@ -1202,23 +1219,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         body = "apply/email/transfer_prescriber_body.txt"
 
         return self._get_transfer_email(to, subject, body, transferred_by, origin_company, target_company)
-
-    def manually_deliver_approval(self, delivered_by):
-        self.approval_number_sent_by_email = True
-        self.approval_number_sent_at = timezone.now()
-        self.approval_manually_delivered_by = delivered_by
-        self.save()
-        # Send email at the end because we can't rollback this operation
-        email = self.email_deliver_approval(self.accepted_by)
-        email.send()
-
-    def manually_refuse_approval(self, refused_by):
-        self.approval_manually_refused_by = refused_by
-        self.approval_manually_refused_at = timezone.now()
-        self.save()
-        # Send email at the end because we can't rollback this operation
-        email = self.email_manually_refuse_approval
-        email.send()
 
 
 class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
