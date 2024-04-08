@@ -28,7 +28,6 @@ def employer_search_home(request, template_name="search/siaes_search_home.html")
 
 
 class EmployerSearchBaseView(FormView):
-    template_name = "search/siaes_search_results.html"
     form_class = SiaeSearchForm
     initial = {"distance": SiaeSearchForm.DISTANCE_DEFAULT}
 
@@ -41,6 +40,11 @@ class EmployerSearchBaseView(FormView):
         # rewire the GET onto the POST since in this particular view, the form data is passed by GET
         # to be able to share the search results URL.
         return self.post(request, *args, **kwargs)
+
+    def get_template_names(self):
+        return [
+            "search/includes/siaes_search_results.html" if self.request.htmx else "search/siaes_search_results.html"
+        ]
 
     def form_valid(self, form):
         city = form.cleaned_data["city"]
@@ -137,7 +141,7 @@ class EmployerSearchBaseView(FormView):
             # Keep title as “Recherche employeurs solidaires” for matomo stats.
             "matomo_custom_title": "Recherche d'employeurs solidaires",
         }
-        return render(self.request, self.template_name, context)
+        return render(self.request, self.get_template_names(), context)
 
     def form_invalid(self, form):
         context = {
@@ -145,7 +149,7 @@ class EmployerSearchBaseView(FormView):
             # Keep title as “Recherche employeurs solidaires” for matomo stats.
             "matomo_custom_title": "Recherche d'employeurs solidaires",
         }
-        return render(self.request, self.template_name, context)
+        return render(self.request, self.get_template_names(), context)
 
 
 class EmployerSearchView(EmployerSearchBaseView):

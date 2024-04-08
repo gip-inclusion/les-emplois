@@ -1,14 +1,8 @@
 {% extends "layout/base.html" %}
-{% load str_filters %}
-{% load matomo %}
+{% load static %}
 
 {% block title %}
-    {% if form.is_valid %}
-        Emplois inclusifs à {{ distance }} km du centre de {{ city }}
-        {% include "includes/pagination_for_title.html" with page=results_page only %}
-    {% else %}
-        Rechercher un emploi inclusif
-    {% endif %}
+    {% include "search/includes/siaes_search_title.html" %}
     {{ block.super }}
 {% endblock %}
 
@@ -19,68 +13,24 @@
         <div class="s-tabs-01__container container">
             <div class="s-tabs-01__row row">
                 <div class="s-tabs-01__col col-12">
-                    <form id="search-form" method="get" class="d-block w-100">
-                        {% include "search/includes/siaes_search_form.html" with form=form %}
-                        <ul class="s-tabs-01__nav nav nav-tabs mt-3">
-                            <li class="nav-item">
-                                <a class="nav-link{% if request.resolver_match.view_name == "search:employers_results" %} active{% endif %}"
-                                   {% matomo_event "candidature" "clic" "clic-onglet-employeur" %}
-                                   href="{% url "search:employers_results" %}?{{ filters_query_string }}">
-                                    <i class="ri-hotel-line font-weight-normal me-1" aria-hidden="true"></i>
-                                    <span>Employeur{{ siaes_count|pluralizefr }}</span>
-                                    <span class="badge badge-sm rounded-pill ms-2">{{ siaes_count }}</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link{% if request.resolver_match.view_name == "search:job_descriptions_results" %} active{% endif %}"
-                                   {% matomo_event "candidature" "clic" "clic-onglet-fichesdeposte" %}
-                                   href="{% url "search:job_descriptions_results" %}?{{ filters_query_string }}">
-                                    <i class="ri-briefcase-4-line font-weight-normal me-1" aria-hidden="true"></i>
-                                    <span>Poste{{ job_descriptions_count|pluralizefr }} <span class="d-none d-md-inline">ouvert{{ job_descriptions_count|pluralizefr }} au recrutement</span></span>
-                                    <span class="badge badge-sm rounded-pill ms-2">{{ job_descriptions_count }}</span>
-                                </a>
-                            </li>
-                        </ul>
-                        <div class="tab-content">
-                            {% if request.resolver_match.view_name == "search:employers_results" %}
-                                <h2>Employeur{{ siaes_count|pluralizefr }}</h2>
-                                <p>
-                                    {{ siaes_count }} résultat{{ siaes_count|pluralizefr }}
-                                    {% if form.is_valid %}
-                                        - Emplois inclusifs à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
-                                    {% endif %}
-                                </p>
-                            {% else %}
-                                <h2>Poste{{ job_descriptions_count|pluralizefr }} ouvert{{ job_descriptions_count|pluralizefr }} au recrutement</h2>
-                                <p>
-                                    {{ job_descriptions_count }} résultat{{ job_descriptions_count|pluralizefr }}
-                                    {% if form.is_valid %}
-                                        - Emplois inclusifs à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
-                                    {% endif %}
-                                </p>
-                            {% endif %}
+                    {% include "search/includes/siaes_search_form.html" with form=form %}
+                    {% include "search/includes/siaes_search_tabs.html" %}
+                    <div class="tab-content">
+                        {% include "search/includes/siaes_search_top.html" %}
+                        <form class="d-block w-100"
+                              hx-get="{% url request.resolver_match.view_name %}"
+                              hx-trigger="change delay:.5s, change from:#id_city"
+                              hx-indicator="#job-search-results"
+                              hx-target="#job-search-results"
+                              hx-swap="outerHTML"
+                              hx-include="#id_city"
+                              hx-push-url="true">
                             <div class="row">
                                 <div class="col-12 col-md-4">{% include "search/includes/siaes_search_filters.html" with form=form %}</div>
-                                <div class="col-12 col-md-8">
-                                    {% for item in results_page %}
-                                        {% if request.resolver_match.view_name == "search:employers_results" %}
-                                            {% include "companies/includes/_card_siae.html" with siae=item %}
-                                        {% else %}
-                                            {% include "companies/includes/_card_jobdescription.html" with job_description=item %}
-                                        {% endif %}
-                                    {% empty %}
-                                        <div class="c-box c-box--results mb-3 mb-md-4">
-                                            <div class="c-box--results__body">
-                                                <p class="mb-0">Aucun résultat avec les filtres actuels.</p>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-
-                                    {% include "includes/pagination.html" with page=results_page %}
-                                </div>
+                                {% include "search/includes/siaes_search_results.html" %}
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -89,11 +39,7 @@
 
 {% block script %}
     {{ block.super }}
-    <script nonce="{{ CSP_NONCE }}">
-        $("#asideFiltersCollapse :input").change(function() {
-            $("#search-form").submit();
-        });
-    </script>
+    <script src='{% static "js/htmx_compat.js" %}'></script>
     {# A / B testing: apply to company with job descriptions #}
     <script nonce="{{ CSP_NONCE }}">
         var _paq = _paq || [];

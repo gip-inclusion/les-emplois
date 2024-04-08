@@ -1,0 +1,20 @@
+{% load str_filters %}
+<div id="job-search-top"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    {% if request.resolver_match.view_name == "search:employers_results" %}
+        <h2>Employeur{{ siaes_count|pluralizefr }}</h2>
+        <p>
+            {{ siaes_count }} résultat{{ siaes_count|pluralizefr }}
+            {% if form.is_valid %}
+                - Emplois inclusifs à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
+            {% endif %}
+        </p>
+    {% else %}
+        <h2>Poste{{ job_descriptions_count|pluralizefr }} ouvert{{ job_descriptions_count|pluralizefr }} au recrutement</h2>
+        <p>
+            {{ job_descriptions_count }} résultat{{ job_descriptions_count|pluralizefr }}
+            {% if form.is_valid %}
+                - Emplois inclusifs à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
+            {% endif %}
+        </p>
+    {% endif %}
+</div>

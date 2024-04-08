@@ -1,0 +1,6 @@
+{% if form.is_valid %}
+    Emplois inclusifs à {{ distance }} km du centre de {{ city }}
+    {% include "includes/pagination_for_title.html" with page=results_page only %}
+{% else %}
+    Rechercher un emploi inclusif
+{% endif %}

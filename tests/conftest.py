@@ -201,7 +201,10 @@ def django_ensure_matomo_titles(monkeypatch) -> None:
     original_render = loader.render_to_string
 
     def assertive_render(template_name, context=None, request=None, using=None):
-        template = loader.get_template(template_name, using=using)
+        if isinstance(template_name, (list, tuple)):
+            template = loader.select_template(template_name, using=using)
+        else:
+            template = loader.get_template(template_name, using=using)
 
         def _walk_template_nodes(nodelist, condition_fn):
             for node in nodelist:
