@@ -242,9 +242,6 @@
       </fieldset>
   
   
-                                      <button aria-label="Appliquer les filtres" class="btn btn-block btn-primary mt-3" id="js-job-applications-filters-apply-button">
-                                          Appliquer
-                                      </button>
                                   </div>
                               </form>
                           </div>
@@ -433,9 +430,6 @@
   
       </fieldset>
   
-                                      <button aria-label="Appliquer les filtres" class="btn btn-block btn-primary mt-3" id="js-job-applications-filters-apply-button">
-                                          Appliquer
-                                      </button>
                                   </div>
                               </form>
                           </div>
@@ -630,9 +624,6 @@
   
       </fieldset>
   
-                                      <button aria-label="Appliquer les filtres" class="btn btn-block btn-primary mt-3" id="js-job-applications-filters-apply-button">
-                                          Appliquer
-                                      </button>
                                   </div>
                               </form>
                           </div>
@@ -814,9 +805,6 @@
   
       </fieldset>
   
-                                      <button aria-label="Appliquer les filtres" class="btn btn-block btn-primary mt-3" id="js-job-applications-filters-apply-button">
-                                          Appliquer
-                                      </button>
                                   </div>
                               </form>
                           </div>
