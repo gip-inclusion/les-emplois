@@ -1,0 +1,22 @@
+{% load matomo %}
+{% load str_filters %}
+<ul id="job-search-tabs" class="s-tabs-01__nav nav nav-tabs mt-3"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    <li class="nav-item">
+        <a class="nav-link{% if request.resolver_match.view_name == "search:employers_results" %} active{% endif %}"
+           {% matomo_event "candidature" "clic" "clic-onglet-employeur" %}
+           href="{% url "search:employers_results" %}?{{ filters_query_string }}">
+            <i class="ri-hotel-line font-weight-normal me-1" aria-hidden="true"></i>
+            <span>Employeur{{ siaes_count|pluralizefr }}</span>
+            <span class="badge badge-sm rounded-pill ms-2">{{ siaes_count }}</span>
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link{% if request.resolver_match.view_name == "search:job_descriptions_results" %} active{% endif %}"
+           {% matomo_event "candidature" "clic" "clic-onglet-fichesdeposte" %}
+           href="{% url "search:job_descriptions_results" %}?{{ filters_query_string }}">
+            <i class="ri-briefcase-4-line font-weight-normal me-1" aria-hidden="true"></i>
+            <span>Poste{{ job_descriptions_count|pluralizefr }} <span class="d-none d-md-inline">ouvert{{ job_descriptions_count|pluralizefr }} au recrutement</span></span>
+            <span class="badge badge-sm rounded-pill ms-2">{{ job_descriptions_count }}</span>
+        </a>
+    </li>
+</ul>

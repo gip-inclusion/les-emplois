@@ -81,14 +81,21 @@ def update_page_with_htmx(page, select_htmx_element, htmx_response):
     parsed_response = parse_response_to_soup(htmx_response, no_html_body=True)
     out_of_band_swaps = [element.extract() for element in parsed_response.select("[hx-swap-oob]")]
     for out_of_band_swap in out_of_band_swaps:
-        mode = out_of_band_swap["hx-swap-oob"]
-        if mode == "true":
+        oob_swap = out_of_band_swap["hx-swap-oob"]
+        target_selector = None
+        if oob_swap == "true":
             mode = "outerHTML"
+        elif "," in oob_swap:
+            mode, target_selector = oob_swap.split(",", maxsplit=1)
+        else:
+            mode = oob_swap
         del out_of_band_swap["hx-swap-oob"]
-        # Currently we only support out-of-band swaps by id
-        # but HTMX allows to use a selector
-        assert out_of_band_swap["id"], out_of_band_swap
-        _handle_swap(page, target=f"#{out_of_band_swap['id']}", new_elements=[out_of_band_swap], mode=mode)
+        if not target_selector:
+            assert out_of_band_swap["id"], out_of_band_swap
+            target_selector = f"#{out_of_band_swap['id']}"
+        targets = page.select(target_selector)
+        for target in targets:
+            _handle_swap(page, target=target, new_elements=[out_of_band_swap], mode=mode)
     _handle_swap(
         page,
         target=_get_hx_attribute(htmx_element, "hx-target"),

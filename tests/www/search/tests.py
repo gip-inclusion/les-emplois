@@ -16,7 +16,8 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, 
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase
+from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
+from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 
 
 DISTRICTS = "Arrondissements de Paris"
@@ -335,6 +336,43 @@ class SearchCompanyTest(TestCase):
             html=True,
             count=1,
         )
+
+    def test_htmx_reloads_departments(self):
+        vannes = create_city_vannes()
+        company_vannes = CompanyFactory(
+            name="Entreprise Vannes", department="56", coords=vannes.coords, post_code="56760", kind=CompanyKind.AI
+        )
+        guerande = create_city_guerande()
+        company_guerande = CompanyFactory(
+            name="Entreprise Guérande", department="44", coords=guerande.coords, post_code="44350"
+        )
+
+        # Using SiaeSearchForm.DISTANCE_DEFAULT.
+        response = self.client.get(self.URL, {"city": guerande.slug})
+        guerande_opt = f'<option value="{company_guerande.pk}">{company_guerande.name.capitalize()}</option>'
+        vannes_opt = f'<option value="{company_vannes.pk}">{company_vannes.name.capitalize()}</option>'
+        self.assertContains(response, guerande_opt, html=True, count=1)
+        self.assertNotContains(response, vannes_opt, html=True)
+        simulated_page = parse_response_to_soup(response)
+
+        def distance_radio(distance):
+            [elt] = simulated_page.find_all("input", attrs={"name": "distance", "value": f"{distance}"})
+            return elt
+
+        distance_radio(100)["checked"] = "checked"
+        del distance_radio(25)["checked"]
+        response = self.client.get(
+            self.URL,
+            {"city": guerande.slug, "distance": 100},
+            headers={"HX-Request": "true"},
+        )
+        update_page_with_htmx(simulated_page, f"form[hx-get='{self.URL}']", response)
+        response = self.client.get(self.URL, {"city": guerande.slug, "distance": 100})
+        fresh_page = parse_response_to_soup(response)
+        assertSoupEqual(simulated_page, fresh_page)
+        # Companies in the select2 were reloaded as well.
+        self.assertContains(response, guerande_opt, html=True, count=1)
+        self.assertContains(response, vannes_opt, html=True, count=1)
 
 
 class SearchPrescriberTest(TestCase):
@@ -954,3 +992,31 @@ class JobDescriptionSearchViewTest(TestCase):
         )
         self.assertContains(response, displayed_job_pec)
         self.assertContains(response, "MaPetiteEntreprise")
+
+    def test_htmx_reload(self):
+        create_test_romes_and_appellations(("N1101",))
+        guerande = create_city_guerande()
+        company_guerande = CompanyFactory(
+            name="Entreprise Guérande", department="44", coords=guerande.coords, post_code="44350"
+        )
+        JobDescriptionFactory(company=company_guerande)
+
+        # Using SiaeSearchForm.DISTANCE_DEFAULT.
+        response = self.client.get(self.URL, {"city": guerande.slug})
+        simulated_page = parse_response_to_soup(response)
+
+        def distance_radio(distance):
+            [elt] = simulated_page.find_all("input", attrs={"name": "distance", "value": f"{distance}"})
+            return elt
+
+        distance_radio(100)["checked"] = "checked"
+        del distance_radio(25)["checked"]
+        response = self.client.get(
+            self.URL,
+            {"city": guerande.slug, "distance": 100},
+            headers={"HX-Request": "true"},
+        )
+        update_page_with_htmx(simulated_page, f"form[hx-get='{self.URL}']", response)
+        response = self.client.get(self.URL, {"city": guerande.slug, "distance": 100})
+        fresh_page = parse_response_to_soup(response)
+        assertSoupEqual(simulated_page, fresh_page)

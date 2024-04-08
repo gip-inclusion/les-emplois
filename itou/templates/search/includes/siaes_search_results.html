@@ -1,0 +1,27 @@
+<div id="job-search-results" class="col-12 col-md-8">
+    {% for item in results_page %}
+        {% if request.resolver_match.view_name == "search:employers_results" %}
+            {% include "companies/includes/_card_siae.html" with siae=item %}
+        {% else %}
+            {% include "companies/includes/_card_jobdescription.html" with job_description=item %}
+        {% endif %}
+    {% empty %}
+        <div class="c-box c-box--results mb-3 mb-md-4">
+            <div class="c-box--results__body">
+                <p class="mb-0">Aucun résultat avec les filtres actuels.</p>
+            </div>
+        </div>
+    {% endfor %}
+    {% include "includes/pagination.html" with page=results_page boost=True boost_target="#job-search-results" boost_indicator="#job-search-results" %}
+</div>
+{% if request.htmx %}
+    <title hx-swap-oob="outerHTML,title">
+        {% include "search/includes/siaes_search_title.html" %}
+        {# Cannot use block in includes #}
+        - Les emplois de l'inclusion
+    </title>
+    {% include "search/includes/siaes_search_filters_company.html" %}
+    {% include "search/includes/siaes_search_filters_departments.html" %}
+    {% include "search/includes/siaes_search_top.html" %}
+    {% include "search/includes/siaes_search_tabs.html" %}
+{% endif %}
