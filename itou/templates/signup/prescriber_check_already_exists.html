@@ -6,14 +6,13 @@
 {% block title %}Prescripteur/Orienteur - Inscription {{ block.super }}{% endblock %}
 
 {% block content_title %}
-    <h1>
-        Inscription
-        <small class="text-muted">Prescripteur/Orienteur</small>
-    </h1>
-    <h2>Votre organisation est-elle déjà inscrite ?</h2>
-    <p>
-        <a href="{% url 'signup:prescriber_pole_emploi_safir_code' %}">Je travaille pour France Travail</a>
-    </p>
+    <h1 class="mb-0">Inscription</h1>
+    <p>Prescripteur/Orienteur</p>
+    <div class="alert alert-info">
+        <p class="m-0">
+            <strong>Votre organisation est-elle déjà inscrite ?</strong> <a href="{% url 'signup:prescriber_pole_emploi_safir_code' %}">Je travaille pour France Travail</a>
+        </p>
+    </div>
 {% endblock %}
 
 {% block content %}

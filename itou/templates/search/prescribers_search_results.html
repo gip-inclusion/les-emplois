@@ -23,32 +23,21 @@
     <form id="search-form" method="get" class="d-block w-100">
         <section class="s-section mb-0">
             <div class="s-section__container container">
-                <div class="row">
+                <div class="s-section__row row">
                     <div class="col-12">
                         {% include "search/includes/prescribers_search_form.html" with form=form %}
-                        {% if form.is_valid %}
-                            <h2 class="h3 mt-3">
-                                Prescripteurs à <b>{{ distance }} km</b> du centre de <b>{{ city }}</b>
-                            </h2>
-                        {% endif %}
+                        <h2 class="mt-4">Prescripteurs</h2>
+                        <p>
+                            {{ prescriber_orgs_page.paginator.count }} résultat{{ prescriber_orgs_page.paginator.count|pluralizefr }}
+                            {% if form.is_valid %}
+                                - Prescripteur{{ prescriber_orgs_page.paginator.count|pluralizefr }} à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <section class="s-box mt-3">
-            <div class="s-box__container container">
-                <div class="s-box__row row">
+                <div class="s-section__row row">
                     <div class="col-12 col-md-4">{% include "search/includes/prescribers_search_filters.html" with form=form %}</div>
                     <div class="col-12 col-md-8">
-                        <div class="mb-3 mb-md-4">
-                            <h3 class="h4 mb-0">
-                                {% with prescriber_orgs_page.number as current_page and prescriber_orgs_page.paginator.num_pages as total_pages and prescriber_orgs_page.paginator.count as counter %}
-                                    {{ counter }} résultat{{ counter|pluralizefr }}
-                                    {% if total_pages > 1 %}- Page <b>{{ current_page }}</b>/{{ total_pages }}{% endif %}
-                                {% endwith %}
-                            </h3>
-                        </div>
                         {% for prescriber_org in prescriber_orgs_page %}
                             <div class="c-box c-box--results has-one-link-inside mb-3 mb-md-4">
                                 <div class="c-box--results__header">

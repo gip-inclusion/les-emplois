@@ -4,18 +4,22 @@
 
 {% block title %}Informations personnelles de {{ job_seeker.get_full_name }} {{ block.super }}{% endblock %}
 
-{% block content_title %}
-    <h1>
-        Informations personnelles de <span class="text-muted">{{ job_seeker.get_full_name }}</span>
-    </h1>
+{% block messages %}
+    {{ block.super }}
     <div class="alert alert-warning">
         <p>
             <b>Vous allez modifier des informations sensibles</b> concernant ce candidat ou cette candidate.
         </p>
-        <p class="mb-0">
+        <p>
             Tout changement entraînera une modification définitive dans notre base de données. <b>Les informations supprimées seront perdues.</b>
         </p>
     </div>
+{% endblock %}
+
+{% block content_title %}
+    <h1>
+        Informations personnelles de <span class="text-muted">{{ job_seeker.get_full_name }}</span>
+    </h1>
 {% endblock %}
 
 {% block content %}

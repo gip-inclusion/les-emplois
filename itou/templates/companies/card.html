@@ -8,56 +8,52 @@
 {% block content_title %}
     <h1>{{ siae.display_name }}</h1>
     <h2>{{ siae.get_kind_display }}</h2>
+    <div class="c-box c-box--action">
+        <h2 class="visually-hidden">Actions rapides</h2>
+        <div class="form-row align-items-center gx-3">
+            {% if siae.has_active_members and not siae.block_job_applications %}
+                <div class="form-group col col-lg-auto">
+                    <a href="{% url 'apply:start' company_pk=siae.pk %}"
+                       class="btn btn-lg btn-white btn-block btn-ico"
+                       {% matomo_event "candidature" "clic" "start_application" %}
+                       aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
+                        <i class="ri-draft-line font-weight-medium" aria-hidden="true"></i>
+                        <span>Postuler</span>
+                    </a>
+                </div>
+            {% endif %}
+            {% if active_jobs_descriptions or other_jobs_descriptions %}
+                <div class="form-group col col-lg-auto">
+                    <a href="#metiers" class="btn btn-lg btn-outline-white btn-block btn-ico">
+                        <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
+                        <span>Voir tous les métiers</span>
+                    </a>
+                </div>
+            {% endif %}
+            <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
+                <button class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires">
+                    <i class="ri-more-2-line ri-lg font-weight-normal" aria-hidden="true"></i>
+                    <span class="d-lg-none">Autres actions</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        {% include 'includes/copy_to_clipboard.html' with content=siae_card_absolute_url text="Copier le lien de cette fiche entreprise" css_classes="dropdown-item btn-ico btn-link" %}
+                    </li>
+                    <li>
+                        <a href="{{ report_tally_url }}" rel="noopener" class="dropdown-item btn-ico btn-link" target="_blank">
+                            <i class="ri-notification-4-line ri-lg font-weight-normal" aria-hidden="true"></i>
+                            <span>Signaler cette fiche entreprise</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="c-box c-box--action mb-4 hidden-if-empty">
-                        <h2 class="visually-hidden">Actions rapides</h2>
-                        <div class="form-row align-items-center gx-3">
-                            {% if siae.has_active_members and not siae.block_job_applications %}
-                                <div class="form-group col col-lg-auto">
-                                    <a href="{% url 'apply:start' company_pk=siae.pk %}"
-                                       class="btn btn-lg btn-white btn-block btn-ico"
-                                       {% matomo_event "candidature" "clic" "start_application" %}
-                                       aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
-                                        <i class="ri-draft-line font-weight-medium" aria-hidden="true"></i>
-                                        <span>Postuler</span>
-                                    </a>
-                                </div>
-                            {% endif %}
-                            {% if active_jobs_descriptions or other_jobs_descriptions %}
-                                <div class="form-group col col-lg-auto">
-                                    <a href="#metiers" class="btn btn-lg btn-outline-white btn-block btn-ico">
-                                        <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
-                                        <span>Voir tous les métiers</span>
-                                    </a>
-                                </div>
-                            {% endif %}
-                            <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
-                                <button class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires">
-                                    <i class="ri-more-2-line ri-lg font-weight-normal" aria-hidden="true"></i>
-                                    <span class="d-lg-none">Autres actions</span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        {% include 'includes/copy_to_clipboard.html' with content=siae_card_absolute_url text="Copier le lien de cette fiche entreprise" css_classes="dropdown-item btn-ico btn-link" %}
-                                    </li>
-                                    <li>
-                                        <a href="{{ report_tally_url }}" rel="noopener" class="dropdown-item btn-ico btn-link" target="_blank">
-                                            <i class="ri-notification-4-line ri-lg font-weight-normal" aria-hidden="true"></i>
-                                            <span>Signaler cette fiche entreprise</span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div class="row">
                 <div class="col-12 col-lg-8 order-2 order-lg-1 mt-3 mt-lg-0 {% if not siae.description and not siae.provided_support %}d-none d-lg-block{% endif %}">
                     <div class="c-box h-100 {% if not siae.description and not siae.provided_support %}d-flex align-items-center justify-content-center{% endif %}">

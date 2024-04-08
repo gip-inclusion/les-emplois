@@ -7,6 +7,27 @@
 
 {% block title %}Fiches salarié ASP - {{ request.current_organization.display_name }} {{ block.super }}{% endblock %}
 
+{% block messages %}
+    {{ block.super }}
+    {% if need_manual_regularization %}
+        <div class="alert alert-warning">
+            <div class="row">
+                <div class="col-auto pe-0">
+                    <i class="ri-error-warning-line ri-xl text-danger"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-0">
+                        <strong>Une action de votre part est nécessaire</strong>
+                    </p>
+                    <p class="mb-0">
+                        Attention, nous avons détecté une ou plusieurs fiches salarié qui nécessitent une régularisation manuelle de votre part.
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
 {% block content_title %}
     <h1>Fiches salarié ASP - {{ request.current_organization.display_name }}</h1>
     <h2 class="h3">Nous transférons vos fiches salarié à l'ASP afin de vous faire gagner du temps</h2>
@@ -29,7 +50,7 @@
             Vous trouverez ici les fiches salarié complétées
             <b>en attente d’envoi à l’ASP, qui a lieu automatiquement à intervalles réguliers</b>.
         </p>
-        <p class="mb-0">
+        <p>
             À ce stade, seule la visualisation des informations de la fiche est
             possible.
         </p>
@@ -45,7 +66,7 @@
             Vous trouverez ici les fiches salarié envoyées à l'ASP et retournées avec une
             erreur.
         </p>
-        <p class="mb-0">Vous pouvez modifier les fiches en erreur et les envoyer à nouveau.</p>
+        <p>Vous pouvez modifier les fiches en erreur et les envoyer à nouveau.</p>
     {% elif form.status.value == "PROCESSED" %}
         <p class="mb-0">Vous trouverez ici les fiches salarié envoyées et validées par l'ASP.</p>
         <p>
@@ -58,23 +79,6 @@
             En cas de besoin vous pouvez réactiver une fiche, elle sera transférée dans la catégorie
             "Nouvelle".
         </p>
-    {% endif %}
-    {% if need_manual_regularization %}
-        <div class="alert alert-warning">
-            <div class="row">
-                <div class="col-auto pe-0">
-                    <i class="ri-error-warning-line ri-xl text-danger"></i>
-                </div>
-                <div class="col">
-                    <p class="mb-0">
-                        <strong>Une action de votre part est nécessaire</strong>
-                    </p>
-                    <p class="mb-0">
-                        Attention, nous avons détecté une ou plusieurs fiches salarié qui nécessitent une régularisation manuelle de votre part.
-                    </p>
-                </div>
-            </div>
-        </div>
     {% endif %}
 {% endblock %}
 
@@ -90,7 +94,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 col-md-3">
+                <div class="col-12 col-md-4 mb-3 mb-md-5">
                     <aside class="c-aside-filters">
                         <button class="c-aside-filters__btn__collapse" data-bs-toggle="collapse" data-bs-target="#asideFiltersCollapse" aria-expanded="true" aria-controls="asideFiltersCollapse">
                             <i class="ri-filter-line" aria-hidden="true"></i>
@@ -125,52 +129,50 @@
                     </aside>
                 </div>
 
-                <div class="col-12 col-md-9">
-                    <div class="c-box p-3 p-md-4">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-grow-1">
-                                {% with navigation_pages.paginator.count as counter %}
-                                    <h3 class="h4 m-0">{{ counter }} résultat{{ counter|pluralizefr }}</h3>
-                                {% endwith %}
-                            </div>
-                            <div>
-                                <span class="fs-sm">Trier par :</span>
-                                <button type="button" class="btn btn-sm btn-link dropdown-toggle p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    {{ ordered_by_label }}
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-end" id="order-form-group">
-                                    {% for order_value, order_label in form.order.field.choices %}
-                                        <button class="dropdown-item {% if order_value == form.order.value %}active{% endif %}" type="button" value="{{ order_value }}">
-                                            {{ order_label }}
-                                        </button>
-                                    {% endfor %}
-                                </div>
+                <div class="col-12 col-md-8">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-grow-1">
+                            {% with navigation_pages.paginator.count as counter %}
+                                <h3 class="h4 m-0">{{ counter }} résultat{{ counter|pluralizefr }}</h3>
+                            {% endwith %}
+                        </div>
+                        <div>
+                            <span class="fs-sm">Trier par :</span>
+                            <button type="button" class="btn btn-sm btn-link dropdown-toggle p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{ ordered_by_label }}
+                            </button>
+                            <div class="dropdown-menu dropdown-menu-end" id="order-form-group">
+                                {% for order_value, order_label in form.order.field.choices %}
+                                    <button class="dropdown-item {% if order_value == form.order.value %}active{% endif %}" type="button" value="{{ order_value }}">
+                                        {{ order_label }}
+                                    </button>
+                                {% endfor %}
                             </div>
                         </div>
-
-                        {# "Real" employee records objects #}
-                        <div class="employee-records-list">
-                            {% if employee_records_list %}
-                                {% for employee_record in navigation_pages %}
-                                    {% include "employee_record/includes/list_item.html" with employee_record=employee_record item=employee_record.job_application only %}
-                                {% endfor %}
-                                {# New employee records i.e. job applications #}
-                            {% else %}
-                                {% for job_application in navigation_pages %}
-                                    {% include "employee_record/includes/list_item.html" with employee_record=None item=job_application only %}
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-
-                        {% if not navigation_pages %}
-                            <div class="c-box c-box--results my-3 my-md-4">
-                                <div class="c-box--results__body">
-                                    <p class="mb-0">Aucune fiche salarié avec le statut selectionné.</p>
-                                </div>
-                            </div>
-                        {% endif %}
-                        {% include "includes/pagination.html" with page=navigation_pages %}
                     </div>
+
+                    {# "Real" employee records objects #}
+                    <div class="employee-records-list">
+                        {% if employee_records_list %}
+                            {% for employee_record in navigation_pages %}
+                                {% include "employee_record/includes/list_item.html" with employee_record=employee_record item=employee_record.job_application only %}
+                            {% endfor %}
+                            {# New employee records i.e. job applications #}
+                        {% else %}
+                            {% for job_application in navigation_pages %}
+                                {% include "employee_record/includes/list_item.html" with employee_record=None item=job_application only %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    {% if not navigation_pages %}
+                        <div class="c-box c-box--results my-3 my-md-4">
+                            <div class="c-box--results__body">
+                                <p class="mb-0">Aucune fiche salarié avec le statut selectionné.</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% include "includes/pagination.html" with page=navigation_pages %}
                 </div>
             </div>
         </div>

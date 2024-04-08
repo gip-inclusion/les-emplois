@@ -2,39 +2,31 @@
 
 {% block title %}Liste des organisations conventionnées {{ block.super }}{% endblock %}
 
-{% block content_title_wrapper %}{% endblock %}
+{% block content_title %}
+    <h1>Liste des organisations conventionnées</h1>
+    <h2>{{ prescriber_org.display_name }}</h2>
+{% endblock %}
+
+{% block messages %}
+    {{ block.super }}
+    <div class="alert alert-info">
+        <p class="mb-0">Seuls les administrateurs peuvent voir cette liste.</p>
+    </div>
+{% endblock %}
 
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
-                    <h1 class="h1-hero-c1">Liste des organisations conventionnées</h1>
-
-                    <h2 class="h1">
-                        <span class="text-muted">{{ prescriber_org.display_name }}</span>
-                    </h2>
-
-                    <div class="alert alert-info">
-                        <p class="mb-0">Seuls les administrateurs peuvent voir cette liste.</p>
-                    </div>
-
-                    <hr>
-
                     {% if not accredited_orgs %}
-
                         <div class="alert alert-emploi" role="status">
                             <p class="mb-0">Aucun résultat.</p>
                         </div>
-
                     {% else %}
-
                         <ul>
-
                             {% for org in accredited_orgs %}
-
                                 <li>
-
                                     <p>
                                         <b>{{ org.display_name }}</b>
                                         -
@@ -44,11 +36,9 @@
                                             Voir les membres
                                         </a>
                                     </p>
-
                                     <div class="collapse" id="collapse_membership_{{ org.pk }}">
-
                                         <div class="table-responsive">
-                                            <table class="table table-striped table-bordered">
+                                            <table class="table">
                                                 <caption>Liste des organisations conventionnées</caption>
                                                 <thead>
                                                     <tr>
@@ -76,15 +66,10 @@
                                                 </tbody>
                                             </table>
                                         </div>
-
                                     </div>
-
                                 </li>
-
                             {% endfor %}
-
                         </ul>
-
                     {% endif %}
                 </div>
             </div>

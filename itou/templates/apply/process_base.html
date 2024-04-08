@@ -10,22 +10,18 @@
 {% endblock %}
 
 {% block content_title %}
-    <div class="d-md-flex align-items-center mb-3">
+    <div class="d-md-flex align-items-center">
         <h1 class="mb-1 mb-md-0 me-3">
             Candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
         </h1>
         {% state_badge job_application extra_class="badge-base" %}
     </div>
+    {% block actions %}{% endblock %}
 {% endblock %}
 
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12">
-                    {% block actions %}{% endblock %}
-                </div>
-            </div>
             <div class="row">
                 <div class="col-12 col-lg-8">
                     {% if job_application.to_company.is_subject_to_eligibility_rules %}

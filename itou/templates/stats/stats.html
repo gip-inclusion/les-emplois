@@ -25,21 +25,18 @@
         </div>
     {% endif %}
     <h1>{{ page_title }}</h1>
-
     {% if show_siae_evaluation_message %}
         <p>
             Le tableau ci-dessous comprend 100 % des auto-prescriptions réalisées en année N-1. Vous pouvez affiner les données en utilisant les filtres disponibles.
         </p>
     {% endif %}
-
     {% if is_stats_public %}
-        <div class="mb-4">
+        <p>
             Cette page a pour objectif de présenter l'impact des emplois de l'inclusion. Pour retrouver les indicateurs qui étaient présentés ici, merci de vous rendre sur le
-            <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" aria-label="Vous rendre sur le pilotage de l'inclusion (ouverture dans un nouvel onglet)">
+            <a href="{{ ITOU_PILOTAGE_URL }}/tableaux-de-bord" rel="noopener" target="_blank" class="has-external-link" aria-label="Vous rendre sur le pilotage de l'inclusion (ouverture dans un nouvel onglet)">
                 pilotage de l'inclusion
             </a>
-            <i class="ri-external-link-line ri-lg me-1"></i>
-        </div>
+        </p>
     {% endif %}
 {% endblock %}
 

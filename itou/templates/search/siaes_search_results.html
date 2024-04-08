@@ -21,7 +21,7 @@
                 <div class="s-tabs-01__col col-12">
                     <form id="search-form" method="get" class="d-block w-100">
                         {% include "search/includes/siaes_search_form.html" with form=form %}
-                        <ul class="s-tabs-01__nav nav nav-tabs mt-3 mt-md-5">
+                        <ul class="s-tabs-01__nav nav nav-tabs mt-3">
                             <li class="nav-item">
                                 <a class="nav-link{% if request.resolver_match.view_name == "search:employers_results" %} active{% endif %}"
                                    {% matomo_event "candidature" "clic" "clic-onglet-employeur" %}

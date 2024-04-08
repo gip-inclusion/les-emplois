@@ -183,7 +183,7 @@ def test_deny_view_for_reasons(snapshot, client, reason):
     # Starting the tunnel should redirect to the first step
     assertRedirects(client.get(start_url), reason_url)
     # Checking the title at least once
-    assert str(parse_response_to_soup(client.get(reason_url), selector="#main .s-title-01")) == snapshot(name="title")
+    assert str(parse_response_to_soup(client.get(reason_url), selector="#main .s-title-02")) == snapshot(name="title")
 
     # Submit data for the "reason" step
     assert str(parse_response_to_soup(client.get(reason_url), selector="#main .s-section")) == snapshot(name="reason")

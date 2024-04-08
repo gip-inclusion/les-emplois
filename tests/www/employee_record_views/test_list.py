@@ -123,7 +123,7 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
         response = self.client.get(self.URL + "?status=NEW")
 
         # Global message alert
-        assert str(parse_response_to_soup(response, selector=".s-title-01 .alert")) == self.snapshot(name="alert")
+        assert str(parse_response_to_soup(response, selector=".s-title-02 .alert")) == self.snapshot(name="alert")
 
         # Item message alert
         assert str(
@@ -168,7 +168,7 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
         response = self.client.get(self.URL + "?status=NEW")
 
         # Global message alert
-        assert str(parse_response_to_soup(response, selector=".s-title-01 .alert")) == self.snapshot(name="alert")
+        assert str(parse_response_to_soup(response, selector=".s-title-02 .alert")) == self.snapshot(name="alert")
         # Item message alert
         assert str(
             parse_response_to_soup(
@@ -230,7 +230,7 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
 
         self.assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
         # Global message alert
-        assert str(parse_response_to_soup(response, selector=".s-title-01 .alert")) == self.snapshot(name="alert")
+        assert str(parse_response_to_soup(response, selector=".s-title-02 .alert")) == self.snapshot(name="alert")
         # Item message alert
         assert str(
             parse_response_to_soup(
@@ -252,7 +252,7 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
 
         self.assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
         # Global message alert
-        assert str(parse_response_to_soup(response, selector=".s-title-01 .alert")) == self.snapshot(name="alert")
+        assert str(parse_response_to_soup(response, selector=".s-title-02 .alert")) == self.snapshot(name="alert")
         # Item message alert
         assert str(
             parse_response_to_soup(

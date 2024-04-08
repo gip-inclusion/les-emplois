@@ -6,7 +6,8 @@
 {% load buttons_form %}
 {% load static %}
 
-{% block title_messages %}
+{% block messages %}
+    {{ block.super }}
 
     {% if request.user.is_employer %}
         {% if siae.is_subject_to_eligibility_rules or siae.kind == CompanyKind.GEIQ %}

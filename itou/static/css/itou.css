@@ -11,6 +11,13 @@
     }
 }
 
+.p-home .s-title-02 {
+    margin-bottom: 0 !important;
+}
+
+.p-home .s-title-02__row::after {
+    display: none !important;
+}
 
 .s-home-search {
     background-position: center left, center right;
@@ -66,7 +73,6 @@
 .input-group-search .select2-selection__rendered {
     white-space: nowrap !important;
 }
-
 
 .input-group-search .select2-container--bootstrap-5 .select2-selection--single {
     border-left: 0 !important;
@@ -237,22 +243,6 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
 
 .home-search :not(output):-moz-ui-invalid:-moz-focusring:not(:focus) {
     box-shadow: none;
-}
-
-/* Old browsers.
---------------------------------------------------------------------------- */
-
-.alert-old-browser {
-    display: none;
-}
-
-/* Target only IE 11. */
-
-/* https://stackoverflow.com/a/27315792 */
-
-_:-ms-fullscreen,
-:root .alert-old-browser {
-    display: block;
 }
 
 /* CSS for js-shroud.
