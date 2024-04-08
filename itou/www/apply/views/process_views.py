@@ -451,7 +451,7 @@ def transfer(request, job_application_id):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, pk=job_application_id)
     target_company = get_object_or_404(Company.objects, pk=request.POST.get("target_company_id"))
-    back_url = request.POST.get("back_url", reverse("apply:list_for_siae"))
+    back_url = get_safe_url(request, "back_url", reverse("apply:list_for_siae"))
 
     try:
         job_application.transfer_to(request.user, target_company)
