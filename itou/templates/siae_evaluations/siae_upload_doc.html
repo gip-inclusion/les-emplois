@@ -5,27 +5,22 @@
 
 {% block title %}Auto-prescriptions à justifier pour {{ job_seeker.get_full_name }}{% endblock %}
 
-{% block content_title_wrapper %}{% endblock %}
-
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row justify-content-center">
-                <div class="col-8 ">
+                <div class="col-12 col-md-8">
 
                     <div class="card">
-
                         <div class="card-header">
                             {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=evaluated_administrative_criteria.evaluated_job_application.job_application.job_seeker approval=evaluated_administrative_criteria.evaluated_job_application.job_application.approval state=evaluated_administrative_criteria.evaluated_job_application.compute_state reviewed_at=evaluated_administrative_criteria.evaluated_job_application.evaluated_siae.reviewed_at %}
                         </div>
-
                         <div class="card-body">
                             <div class="row mt-3">
                                 <div class="col-md-12">
                                     {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria %}
                                 </div>
                             </div>
-
                             {% if evaluated_administrative_criteria.proof_id %}
                                 <div class="row mt-3">
                                     <div class="col-md-12">
@@ -33,8 +28,6 @@
                                     </div>
                                 </div>
                             {% endif %}
-
-
                             <div class="row mt-3">
                                 <div class="col-md-12">
                                     <form method="post" class="js-prevent-multiple-submit"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
@@ -52,7 +45,6 @@
                                                 </div>
                                             </div>
                                         </div>
-
                                         <button class="btn btn-primary float-end">
                                             {% if evaluated_administrative_criteria.proof_id %}
                                                 Enregistrer le nouveau justificatif
@@ -60,12 +52,10 @@
                                                 Enregistrer le justificatif
                                             {% endif %}
                                         </button>
-
                                     </form>
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
                     {% if back_url %}

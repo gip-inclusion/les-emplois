@@ -3,8 +3,8 @@
 
 {% block title %}Modifier mon profil {{ block.super }}{% endblock %}
 
-{% block content_title %}
-    <h1>Modifier votre adresse e-mail</h1>
+{% block messages %}
+    {{ block.super }}
     <div class="alert alert-warning">
         <p class="mb-0">
             Ce changement entraînera une <b>déconnexion</b>.
@@ -13,6 +13,8 @@
         </p>
     </div>
 {% endblock %}
+
+{% block content_title %}<h1>Modifier votre adresse e-mail</h1>{% endblock %}
 
 {% block content %}
     <section class="s-section">

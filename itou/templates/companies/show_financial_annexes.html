@@ -5,14 +5,8 @@
 
 {% block title %}Annexes financières {{ block.super }}{% endblock %}
 
-{% block content_title %}
-    <h1>Structure</h1>
-    <h2>{{ siae.kind }} {{ siae.display_name }}</h2>
-    <p class="mb-0">
-        Cette interface vous permet de vous assurer que votre structure est associée aux bonnes annexes financières.
-        <br>
-        La gestion de vos annexes financières continue de se faire dans l'extranet 2.0 de l'ASP.
-    </p>
+{% block messages %}
+    {{ block.super }}
     {% if not siae.is_active %}
         {% if siae_is_asp %}
             <div class="alert alert-danger" role="status">
@@ -31,6 +25,16 @@
             </div>
         {% endif %}
     {% endif %}
+{% endblock %}
+
+{% block content_title %}
+    <h1>Structure</h1>
+    <h2>{{ siae.kind }} {{ siae.display_name }}</h2>
+    <p>
+        Cette interface vous permet de vous assurer que votre structure est associée aux bonnes annexes financières.
+        <br>
+        La gestion de vos annexes financières continue de se faire dans l'extranet 2.0 de l'ASP.
+    </p>
 {% endblock %}
 
 {% block content %}

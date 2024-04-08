@@ -4,10 +4,8 @@
 {% block title %}Inscription {{ block.super }}{% endblock %}
 
 {% block content_title %}
-    <h1>
-        Inscription
-        <small class="text-muted">Candidat</small>
-    </h1>
+    <h1 class="mb-0">Inscription</h1>
+    <p>Candidat</p>
     <p>
         <strong>Vous ne pouvez pas vous inscrire</strong>, veuillez vous rapprocher d’un prescripteur habilité (France Travail, Mission Locale, Cap emploi…)
         pour vous accompagner dans vos démarches. <a href="{% url 'search:prescribers_home' %}">Trouver un prescripteur habilité</a>

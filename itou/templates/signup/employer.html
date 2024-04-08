@@ -4,11 +4,8 @@
 
 {% block title %}Employeur solidaire - Inscription {{ block.super }}{% endblock %}
 
-{% block content_title %}
-    <h1>
-        Inscription
-        <small class="text-muted">Employeur solidaire</small>
-    </h1>
+{% block messages %}
+    {{ block.super }}
     <div class="alert alert-emploi">
         <p class="lead mb-0">
             Vous allez rejoindre <b>{{ company.display_name }}</b>
@@ -27,6 +24,11 @@
             {{ company.post_code }} {{ company.city }}
         </p>
     </div>
+{% endblock %}
+
+{% block content_title %}
+    <h1 class="mb-0">Inscription</h1>
+    <p>Employeur solidaire</p>
 {% endblock %}
 
 {% block content %}

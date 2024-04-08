@@ -56,39 +56,20 @@
 
         <main id="main" role="main" class="s-main">
             <div class="toast-container" aria-live="polite" aria-atomic="true">{% include "utils/toasts.html" %}</div>
-            <div class="container container-messages">
-                {% block messages %}
 
-                    {% bootstrap_messages %}
-
-                    {# Display an alert for old browsers #}
-                    <div class="alert alert-secondary alert-old-browser" role="status">
-                        <p class="mb-0">
-                            La version de votre navigateur n'est plus supportée. Veuillez utiliser une version plus récente pour améliorer votre expérience sur notre site.
-                        </p>
-                    </div>
-                {% endblock %}
-            </div>
-
-            <div class="container container-breadcrumb">
-                {% block breadcrumbs %}{% endblock %}
-            </div>
-
-            {% comment %}
-            Si les templates enfants ont besoin d'une section <section .s-title-01>, penser à mettre le contenu dans le {% block content_title %}{% endblock %}
-            Sinon, penser à mettre le {% block content_title_wrapper %}{% endblock %} vide dans ces templates pour vider le DOM "enrobant" ci-dessous
-            {% endcomment %}
-            {% block content_title_wrapper %}
-                <section class="s-title-01">
-                    <div class="s-title-01__container container">
-                        <div class="s-title-01__row row">
-                            <div class="s-title-01__col col-12">
-                                {% block content_title %}{% endblock %}
-                            </div>
+            <section class="s-title-02">
+                <div class="s-title-02__container container">
+                    <div class="s-title-02__row row">
+                        <div class="s-title-02__col col-12">
+                            {% block breadcrumbs %}{% endblock %}
+                            {% block content_title %}{% endblock %}
+                            {% block messages %}
+                                {% bootstrap_messages %}
+                            {% endblock %}
                         </div>
                     </div>
-                </section>
-            {% endblock %}
+                </div>
+            </section>
 
             {% block content %}{% endblock %}
         </main>

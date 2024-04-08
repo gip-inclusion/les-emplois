@@ -4,6 +4,28 @@
 
 {% block title %}Postuler {{ block.super }}{% endblock %}
 
+{% block messages %}
+    {{ block.super }}
+    {% if new_check_needed %}
+        <div class="alert alert-warning alert-dismissible fade show">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            <div class="row">
+                <div class="col-auto pe-0">
+                    <i class="ri-information-line ri-xl text-warning"></i>
+                </div>
+                <div class="col">
+                    <p>
+                        <strong>Veuillez vérifier les informations du candidat</strong>
+                    </p>
+                    <p>
+                        La situation du candidat a peut-être changé depuis le {{ job_seeker.last_checked_at|date }}. Merci de vérifier la validité des informations présentes sur son profil.
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
 {% block content_title %}
     <div class="w-100 w-lg-66">
         <div class="d-flex align-items-center">
@@ -17,24 +39,6 @@
             {% endif %}
             {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning"></i>{% endif %}
         </p>
-        {% if new_check_needed %}
-            <div class="alert alert-warning alert-dismissible fade show">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-                <div class="row">
-                    <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl text-warning"></i>
-                    </div>
-                    <div class="col">
-                        <p>
-                            <strong>Veuillez vérifier les informations du candidat</strong>
-                        </p>
-                        <p>
-                            La situation du candidat a peut-être changé depuis le {{ job_seeker.last_checked_at|date }}. Merci de vérifier la validité des informations présentes sur son profil.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
     </div>
 {% endblock %}
 

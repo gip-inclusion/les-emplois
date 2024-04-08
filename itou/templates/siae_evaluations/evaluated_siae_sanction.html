@@ -3,18 +3,15 @@
 
 {% block title %}Notification de sanction pour {{ evaluated_siae.siae }} {{ block.super }}{% endblock %}
 
-{% block content_title_wrapper %}{% endblock %}
+{% block content_title %}
+    <h1>
+        Notification de sanction pour <span class="text-info">{{ evaluated_siae.siae }}</span>
+    </h1>
+{% endblock %}
 
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
-            <div class="row">
-                <div class="col-12">
-                    <h1 class="mb-4">
-                        Notification de sanction pour <span class="text-info">{{ evaluated_siae.siae }}</span>
-                    </h1>
-                </div>
-            </div>
             <div class="row">
                 <div class="col-lg-6 order-2 order-lg-1">
                     <div class="card c-card">
