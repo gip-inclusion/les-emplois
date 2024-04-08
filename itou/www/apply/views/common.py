@@ -18,7 +18,7 @@ from itou.users.enums import UserKind
 from itou.users.models import ApprovalAlreadyExistsError
 from itou.utils import constants as global_constants
 from itou.utils.htmx import hx_trigger_modal_control
-from itou.utils.urls import add_url_params, get_external_link_markup
+from itou.utils.urls import add_url_params, get_external_link_markup, get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
     CheckJobSeekerGEIQEligibilityForm,
@@ -253,7 +253,7 @@ def _geiq_eligibility_criteria(
         request.path,
         data=request.POST or None,
     )
-    next_url = request.GET.get("next_url")
+    next_url = get_safe_url(request, "next_url")
     allowance_amount = None
 
     if request.method == "POST" and form.is_valid():
