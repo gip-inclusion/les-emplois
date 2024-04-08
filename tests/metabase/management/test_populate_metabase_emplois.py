@@ -135,7 +135,6 @@ def test_populate_job_seekers():
     #  - logged_in recently
     #  - in QPV
     user_1 = JobSeekerFactory(
-        pk=2010,
         created_by=PrescriberFactory(),
         identity_provider=IdentityProvider.PE_CONNECT,
         jobseeker_profile__pole_emploi_id="",
@@ -150,7 +149,6 @@ def test_populate_job_seekers():
     #  - created by an employer
     #  - outside QPV
     user_2 = JobSeekerFactory(
-        pk=15752,
         created_by=EmployerFactory(),
         jobseeker_profile__nir="271049232724647",
         geocoding_score=1,
@@ -172,7 +170,6 @@ def test_populate_job_seekers():
     #  - not an AI
     #  - outside QPV but missing geocoding score
     user_3 = JobSeekerFactory(
-        pk=26587,
         jobseeker_profile__nir="297016314515713",
         with_pole_emploi_id=True,
         geocoding_score=None,
@@ -227,7 +224,7 @@ def test_populate_job_seekers():
 
     assert rows == [
         (
-            2010,
+            user_1.pk,
             "28e41a0abf44151d54b9006aa6308d71d15284f7cc83a200b8fc6a9ffdf58352",
             "Homme",
             79,
@@ -278,7 +275,7 @@ def test_populate_job_seekers():
             datetime.date.today() - datetime.timedelta(days=1),
         ),
         (
-            15752,
+            user_2.pk,
             "d4d74522c83e8371e4ccafa994a70bb802b59d8e143177cf048e71c9b9d2e34a",
             "Femme",
             71,
@@ -329,7 +326,7 @@ def test_populate_job_seekers():
             datetime.date.today() - datetime.timedelta(days=1),
         ),
         (
-            26587,
+            user_3.pk,
             "2eb53772722d3026b539173c62ba7adc1756e5ab1f03b95ce4026c27d177bd34",
             "Femme",
             97,
