@@ -1,5 +1,8 @@
 # Journal des changements techniques majeurs
 
+## 2024-04-08
+- Suppression de la commande `make deploy_prod`, les PRs arrivant sur la branche master sont immédiatement déployées par CleverCloud.
+
 ## 2024-03-14
 - Définition d’`API_BAN_BASE_URL` requise, utiliser la valeur du [`.env.template`](./.env.template).
 

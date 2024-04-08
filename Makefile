@@ -110,12 +110,3 @@ shell_on_postgres_container:
 
 restore_latest_backup:
 	./scripts/restore_latest_backup.sh $(PGDATABASE)
-
-# Deployment
-# =============================================================================
-
-.PHONY: deploy_prod
-deploy_prod:
-	git fetch origin  # Update our local to get the latest `master`
-	@echo "Pull request deployed: https://github.com/gip-inclusion/les-emplois/pulls?q=is%3Apr+is%3Amerged+sort%3Aupdated-desc+`git log --pretty=format:"%h" origin/master_clever..origin/master | tr "\n" "+"`"
-	git push origin origin/master:master_clever  # Deploy by pushing the latest `master` to `master_clever`
