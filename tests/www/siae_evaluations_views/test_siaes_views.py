@@ -5,7 +5,7 @@ from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.core.files.storage import default_storage
 from django.urls import reverse
-from django.utils import dateformat, timezone
+from django.utils import dateformat, html, timezone
 from freezegun import freeze_time
 
 from itou.eligibility.enums import AdministrativeCriteriaLevel
@@ -382,7 +382,9 @@ class SiaeJobApplicationListViewTest(TestCase):
         response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
         self.assertContains(response, siae_select_criteria_url)
         self.assertContains(
-            response, f"<h3>{evaluated_administrative_criteria.administrative_criteria.name}</h3>", html=True
+            response,
+            f"<h3>{html.escape(evaluated_administrative_criteria.administrative_criteria.name)}</h3>",
+            html=True,
         )
         self.assertContains(response, siae_upload_doc_url)
 
@@ -392,7 +394,9 @@ class SiaeJobApplicationListViewTest(TestCase):
         response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
         self.assertNotContains(response, siae_select_criteria_url)
         self.assertContains(
-            response, f"<h3>{evaluated_administrative_criteria.administrative_criteria.name}</h3>", html=True
+            response,
+            f"<h3>{html.escape(evaluated_administrative_criteria.administrative_criteria.name)}</h3>",
+            html=True,
         )
         self.assertContains(response, '<p class="badge rounded-pill bg-pilotage float-end">en cours</p>')
         self.assertNotContains(response, siae_upload_doc_url)
@@ -401,7 +405,9 @@ class SiaeJobApplicationListViewTest(TestCase):
         evaluated_job_application.evaluated_siae.evaluation_campaign.transition_to_adversarial_phase()
         response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
         self.assertContains(
-            response, f"<h3>{evaluated_administrative_criteria.administrative_criteria.name}</h3>", html=True
+            response,
+            f"<h3>{html.escape(evaluated_administrative_criteria.administrative_criteria.name)}</h3>",
+            html=True,
         )
         self.assertContains(response, '<p class="badge rounded-pill bg-pilotage float-end">à traiter</p>')
         self.assertNotContains(response, siae_select_criteria_url)
