@@ -960,9 +960,9 @@ pynacl==1.5.0 \
     # via
     #   -r requirements/base.txt
     #   paramiko
-pypdf==4.1.0 \
-    --hash=sha256:01c3257ec908676efd60a4537e525b89d48e0852bc92b4e0aa4cc646feda17cc \
-    --hash=sha256:16cac912a05200099cef3f347c4c7e0aaf0a6d027603b8f9a973c0ea500dff89
+pypdf==4.2.0 \
+    --hash=sha256:dc035581664e0ad717e3492acebc1a5fc23dba759e788e3d4a9fc9b1a32e72c1 \
+    --hash=sha256:fe63f3f7d1dcda1c9374421a94c1bba6c6f8c4a62173a59b64ffd52058f846b1
     # via -r requirements/base.txt
 pyproject-hooks==1.0.0 \
     --hash=sha256:283c11acd6b928d2f6a7c73fa0d01cb2bdc5f07c57a2eeb6e83d5e56b97976f8 \
