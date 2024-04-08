@@ -4,10 +4,10 @@
   function initSlider() {
     const slider = document.getElementById("chosenPercentRange");
     const output = document.getElementById("showChosenPercentValue");
-    output.innerHTML = slider.value;
+    output.textContent = slider.value;
 
     slider.oninput = function () {
-      output.innerHTML = this.value;
+      output.textContent = this.value;
     }
   }
 
