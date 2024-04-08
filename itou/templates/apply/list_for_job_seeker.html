@@ -27,9 +27,6 @@
                                     {% include "apply/includes/job_applications_filters/statut.html" %}
                                     <hr>
                                     {% include "apply/includes/job_applications_filters/dates.html" %}
-                                    <button id="js-job-applications-filters-apply-button" class="btn btn-block btn-primary mt-3" aria-label="Appliquer les filtres">
-                                        Appliquer
-                                    </button>
                                 </div>
                             </form>
                         </div>
@@ -44,5 +41,4 @@
 {% block script %}
     {{ block.super }}
     <script src='{% static "js/htmx_compat.js" %}'></script>
-    <script src='{% static "js/job_applications_filters.js" %}'></script>
 {% endblock %}
