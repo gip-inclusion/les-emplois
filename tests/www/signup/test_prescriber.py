@@ -295,9 +295,11 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         assert membership.is_admin
 
         # Check email has been sent to support (validation/refusal of authorisation needed).
-        assert len(mail.outbox) == 1
-        subject = mail.outbox[0].subject
-        assert "Vérification de l'habilitation d'une nouvelle organisation" in subject
+        [email] = mail.outbox
+        assert "Vérification de l'habilitation d'une nouvelle organisation" in email.subject
+        body_lines = email.body.splitlines()
+        assert "- Nom : CENTRE COMMUNAL D'ACTION SOCIALE" in body_lines
+        assert f"- ID : {org.pk}" in body_lines
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
