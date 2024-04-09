@@ -349,9 +349,7 @@ def get_fluxiae_df(
 
         [extracted] = Path(d).iterdir()
         # Ignore 3 rows: the `DEB*` first row, the headers row, and the `FIN*` last row.
-        nrows = -3
-        for _line in extracted.read_text().splitlines():
-            nrows += 1
+        nrows = len(extracted.read_text().splitlines()) - 3
 
         print(f"Loading {nrows} rows for {vue_name} ...")
 
