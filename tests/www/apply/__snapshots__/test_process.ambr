@@ -2,6 +2,27 @@
 # name: ProcessTransferJobApplicationTest.test_job_application_transfer_redirection[job application transfer message]
   'La candidature de <>Html Escaped<> DOE a bien été transférée à Acme inc.||Pour la consulter, rendez-vous sur son tableau de bord en changeant de structure'
 # ---
+# name: ProcessViewsTest.test_details_for_company_transition_logs_hides_hired_by_other
+  '''
+  <ul class="list-step" id="transition_logs_11111111-1111-1111-1111-111111111111">
+      
+          
+              <li>
+                  <time datetime="2023-12-12T12:38:00+00:00">Le 12 décembre 2023 à 13:38</time>
+                  <span>
+                      Passé en "Embauché ailleurs"
+                      
+                  </span>
+              </li>
+          
+          <li>
+              <time datetime="2023-12-10T10:11:00+00:00">Le 10 décembre 2023 à 11:11</time>
+              <span>Nouvelle candidature</span>
+          </li>
+      
+  </ul>
+  '''
+# ---
 # name: ProcessViewsTest.test_details_for_company_with_transition_logs
   '''
   <ul class="list-step" id="transition_logs_11111111-1111-1111-1111-111111111111">

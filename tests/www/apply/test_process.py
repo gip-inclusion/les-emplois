@@ -480,6 +480,35 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
 
         assert str(html_fragment) == self.snapshot
 
+    def test_details_for_company_transition_logs_hides_hired_by_other(self, *args, **kwargs):
+        job_seeker = JobSeekerFactory()
+        with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
+            job_app1 = JobApplicationFactory(
+                for_snapshot=True,
+                job_seeker=job_seeker,
+                sent_by_authorized_prescriber_organisation=True,
+            )
+            job_app2 = JobApplicationFactory(
+                job_seeker=job_seeker,
+                sent_by_authorized_prescriber_organisation=True,
+            )
+
+        user1 = job_app1.to_company.active_members.first()
+        user2 = job_app2.to_company.active_members.first()
+        # transition logs setup
+        with freeze_time("2023-12-12 13:37:00", tz_offset=-1):
+            job_app2.process(user=user2)
+        with freeze_time("2023-12-12 13:38:00", tz_offset=-1):
+            job_app2.accept(user=user2)
+
+        self.client.force_login(user1)
+
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_app1.pk})
+        response = self.client.get(url)
+        html_fragment = self._get_transition_logs_content(response, job_app1)
+
+        assert str(html_fragment) == self.snapshot
+
     def test_details_for_job_seeker_when_refused(self, *args, **kwargs):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
