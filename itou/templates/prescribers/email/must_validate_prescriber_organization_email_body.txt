@@ -8,6 +8,7 @@ Une nouvelle organisation de prescripteur a été créée. L'habilitation de cet
 
 - Nom : {{ organization.display_name }}
 - ID : {{ organization.id }}
+- Type sélectionné par l’utilisateur : {{ organization.get_kind_display }}
 
 {{ itou_protocol }}://{{ itou_fqdn }}{% url 'admin:prescribers_prescriberorganization_change' organization.id %}
 
