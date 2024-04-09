@@ -1,0 +1,15 @@
+[
+  {
+    "fields": {
+      "is_referent": true,
+      "is_active_member": true,
+      "membership_ended_at": null,
+      "created_at": "2020-12-01T10:55:25.283Z",
+      "creator_id": 6,
+      "jobseeker_id": 17,
+      "member_id": 17
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 1
+  }
+]
