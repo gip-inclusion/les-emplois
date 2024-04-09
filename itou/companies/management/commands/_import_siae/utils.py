@@ -13,6 +13,7 @@ from pathlib import Path
 import pandas as pd
 from django.conf import settings
 from django.utils import timezone
+from py7zr.exceptions import Bad7zFile
 
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.models import Company
@@ -333,16 +334,20 @@ def get_fluxiae_df(
     # the duration and frequency of the developer's headaches.
 
     with tempfile.TemporaryDirectory() as d:
+        expected_exceptions = (
+            shutil.ReadError,
+            Bad7zFile,  # Remove this exception if https://github.com/miurahr/py7zr/pull/583 is merged.
+        )
         try:
             # Use the file extension as hint for the unpack algorithm.
             shutil.unpack_archive(filename, d)
-        except shutil.ReadError:
+        except expected_exceptions:
             # The file extension does not represent the compression used, try known unpack formats.
             for format, _ext, _desc in shutil.get_unpack_formats():
                 try:
                     shutil.unpack_archive(filename, d, format=format)
                     break
-                except shutil.ReadError:
+                except expected_exceptions:
                     pass
             else:
                 raise ValueError(f"Unable to extract “{filename}”.")
