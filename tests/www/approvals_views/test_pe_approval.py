@@ -5,7 +5,6 @@ from django.urls import reverse, reverse_lazy
 from itou.approvals import enums as approvals_enums
 from itou.approvals.models import Approval
 from itou.job_applications import enums as job_applications_enums
-from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.models import User
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
@@ -100,7 +99,7 @@ class PoleEmploiApprovalSearchTest(MessagesTestMixin, TestCase):
         """
         self.set_up_pe_approval(with_job_application=True)
         ja = self.job_seeker.job_applications.first()
-        ja.state = JobApplicationWorkflow.STATE_CANCELLED
+        ja.state = job_applications_enums.JobApplicationState.CANCELLED
         ja.save()
 
         self.client.force_login(self.employer)

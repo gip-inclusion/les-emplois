@@ -17,6 +17,7 @@ from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Company
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
+from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.urls import get_safe_url
@@ -417,9 +418,9 @@ def archive(request, job_application_id):
     job_application = get_object_or_404(queryset, id=job_application_id)
 
     cancelled_states = [
-        JobApplicationWorkflow.STATE_REFUSED,
-        JobApplicationWorkflow.STATE_CANCELLED,
-        JobApplicationWorkflow.STATE_OBSOLETE,
+        JobApplicationState.REFUSED,
+        JobApplicationState.CANCELLED,
+        JobApplicationState.OBSOLETE,
     ]
 
     qs = urlencode({"states": cancelled_states}, doseq=True)

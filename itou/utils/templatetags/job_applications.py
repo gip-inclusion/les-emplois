@@ -1,7 +1,7 @@
 from django import template
 from django.utils.safestring import mark_safe
 
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState
 
 
 register = template.Library()
@@ -10,14 +10,14 @@ register = template.Library()
 @register.simple_tag
 def state_badge(job_application, *, hx_swap_oob=False, extra_class="badge-sm mb-1"):
     state_classes = {
-        JobApplicationWorkflow.STATE_ACCEPTED: "bg-success",
-        JobApplicationWorkflow.STATE_CANCELLED: "bg-primary",
-        JobApplicationWorkflow.STATE_NEW: "bg-info",
-        JobApplicationWorkflow.STATE_OBSOLETE: "bg-primary",
-        JobApplicationWorkflow.STATE_POSTPONED: "bg-accent-03 text-primary",
-        JobApplicationWorkflow.STATE_PRIOR_TO_HIRE: "bg-accent-02 text-primary",
-        JobApplicationWorkflow.STATE_PROCESSING: "bg-accent-03 text-primary",
-        JobApplicationWorkflow.STATE_REFUSED: "bg-danger",
+        JobApplicationState.ACCEPTED: "bg-success",
+        JobApplicationState.CANCELLED: "bg-primary",
+        JobApplicationState.NEW: "bg-info",
+        JobApplicationState.OBSOLETE: "bg-primary",
+        JobApplicationState.POSTPONED: "bg-accent-03 text-primary",
+        JobApplicationState.PRIOR_TO_HIRE: "bg-accent-02 text-primary",
+        JobApplicationState.PROCESSING: "bg-accent-03 text-primary",
+        JobApplicationState.REFUSED: "bg-danger",
     }[job_application.state]
     attrs = [
         f'id="state_{ job_application.pk }"',

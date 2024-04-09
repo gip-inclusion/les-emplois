@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from itou.eligibility.models import EligibilityDiagnosis
+from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.enums import UserKind
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
@@ -22,14 +23,14 @@ class JobApplicationTransferModelTest(TestCase):
     def test_is_in_transferable_state(self):
         # If job application is in ACCEPTED state
         # it can't be transfered
-        evil_states = [JobApplicationWorkflow.STATE_ACCEPTED]
+        evil_states = [JobApplicationState.ACCEPTED]
         good_states = [
-            JobApplicationWorkflow.STATE_NEW,
-            JobApplicationWorkflow.STATE_PROCESSING,
-            JobApplicationWorkflow.STATE_POSTPONED,
-            JobApplicationWorkflow.STATE_REFUSED,
-            JobApplicationWorkflow.STATE_CANCELLED,
-            JobApplicationWorkflow.STATE_OBSOLETE,
+            JobApplicationState.NEW,
+            JobApplicationState.PROCESSING,
+            JobApplicationState.POSTPONED,
+            JobApplicationState.REFUSED,
+            JobApplicationState.CANCELLED,
+            JobApplicationState.OBSOLETE,
         ]
 
         for evil_state in evil_states:
@@ -54,7 +55,7 @@ class JobApplicationTransferModelTest(TestCase):
         lambda_user = JobSeekerFactory()
         target_company.members.add(origin_user)
 
-        job_application = JobApplicationFactory(to_company=origin_company, state=JobApplicationWorkflow.STATE_ACCEPTED)
+        job_application = JobApplicationFactory(to_company=origin_company, state=JobApplicationState.ACCEPTED)
 
         assert origin_user.kind == UserKind.EMPLOYER
         assert target_user.kind == UserKind.EMPLOYER
@@ -63,7 +64,7 @@ class JobApplicationTransferModelTest(TestCase):
         assert not job_application.can_be_transferred(target_user, target_company)
         assert not job_application.can_be_transferred(origin_user, target_company)
 
-        job_application.state = JobApplicationWorkflow.STATE_PROCESSING
+        job_application.state = JobApplicationState.PROCESSING
 
         assert job_application.can_be_transferred(origin_user, target_company)
 
@@ -84,7 +85,7 @@ class JobApplicationTransferModelTest(TestCase):
         job_application = JobApplicationFactory(
             to_company=origin_company,
             sent_by_authorized_prescriber_organisation=True,
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
         )
 
         # Conditions hould be covered by previous test, but does not hurt (and tests raise)
@@ -97,18 +98,18 @@ class JobApplicationTransferModelTest(TestCase):
         with pytest.raises(ValidationError):
             job_application.transfer_to(origin_user, target_company)
 
-        job_application.state = JobApplicationWorkflow.STATE_PROCESSING
+        job_application.state = JobApplicationState.PROCESSING
         job_application.transfer_to(origin_user, target_company)
         job_application.refresh_from_db()
 
         # "Normal" transfer
         assert job_application.to_company == target_company
-        assert job_application.state == JobApplicationWorkflow.STATE_NEW
+        assert job_application.state == JobApplicationState.NEW
         assert job_application.eligibility_diagnosis is not None
 
         # Eligibilty diagnosis not sent by authorized prescriber must be deleted
         job_application = JobApplicationSentByCompanyFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             to_company=origin_company,
             eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
         )
@@ -117,7 +118,7 @@ class JobApplicationTransferModelTest(TestCase):
         job_application.refresh_from_db()
 
         assert job_application.to_company == target_company
-        assert job_application.state == JobApplicationWorkflow.STATE_NEW
+        assert job_application.state == JobApplicationState.NEW
         assert job_application.eligibility_diagnosis is None
         assert not EligibilityDiagnosis.objects.filter(pk=eligibility_diagnosis_pk)
 
@@ -131,7 +132,7 @@ class JobApplicationTransferModelTest(TestCase):
         job_application = JobApplicationFactory(
             to_company=origin_company,
             sent_by_authorized_prescriber_organisation=True,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
         )
         # Sender user account is deleted.
         job_application.sender = None
@@ -141,7 +142,7 @@ class JobApplicationTransferModelTest(TestCase):
         job_application.refresh_from_db()
 
         assert job_application.to_company == target_company
-        assert job_application.state == JobApplicationWorkflow.STATE_NEW
+        assert job_application.state == JobApplicationState.NEW
 
     def test_model_fields(self):
         # Check new fields in model
@@ -153,7 +154,7 @@ class JobApplicationTransferModelTest(TestCase):
         target_company.members.add(origin_user)
 
         job_application = JobApplicationSentByCompanyFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             to_company=origin_company,
             eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
             answer="Answer to job seeker",
@@ -188,7 +189,7 @@ class JobApplicationTransferModelTest(TestCase):
         assert job_application.transferred_from == origin_company
         assert timezone.localdate() == job_application.transferred_at.date()
         assert job_application.to_company == target_company
-        assert job_application.state == JobApplicationWorkflow.STATE_NEW
+        assert job_application.state == JobApplicationState.NEW
         assert job_application.eligibility_diagnosis is None
         assert job_application.answer == ""
         assert job_application.answer_to_prescriber == ""
@@ -198,7 +199,7 @@ class JobApplicationTransferModelTest(TestCase):
         for from_state in JobApplicationWorkflow.transitions["transfer"].source:
             with self.subTest(from_state):
                 job_application = JobApplicationSentByCompanyFactory(state=from_state)
-                job_application.state = JobApplicationWorkflow.STATE_NEW
+                job_application.state = JobApplicationState.NEW
                 job_application.save()  # Triggers transition check
 
     def test_transfer_must_notify_siae_and_job_seeker(self):
@@ -213,7 +214,7 @@ class JobApplicationTransferModelTest(TestCase):
         target_company.members.add(origin_user)
 
         job_application = JobApplicationSentByCompanyFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             to_company=origin_company,
             eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
         )
@@ -245,7 +246,7 @@ class JobApplicationTransferModelTest(TestCase):
 
         # Eligibility diagnosis was made by a prescriber
         job_application = JobApplicationSentByPrescriberFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             to_company=origin_company,
             eligibility_diagnosis=EligibilityDiagnosisFactory(),
         )
@@ -272,7 +273,7 @@ class JobApplicationTransferModelTest(TestCase):
         target_company.members.add(origin_user_1)
 
         job_application = JobApplicationSentByCompanyFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             to_company=origin_company,
             eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
         )

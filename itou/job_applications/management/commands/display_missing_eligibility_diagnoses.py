@@ -1,7 +1,7 @@
 from itou.approvals import enums as approvals_enums
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.job_applications import enums as job_applications_enums
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.models import JobApplication
 from itou.utils.command import BaseCommand
 
 
@@ -21,7 +21,7 @@ class Command(BaseCommand):
     def handle(self, **options):
         queryset = (
             JobApplication.objects.filter(
-                state=JobApplicationWorkflow.STATE_ACCEPTED,
+                state=job_applications_enums.JobApplicationState.ACCEPTED,
                 eligibility_diagnosis=None,
                 to_company__kind__in=SIAE_WITH_CONVENTION_KINDS,
                 approval__isnull=False,

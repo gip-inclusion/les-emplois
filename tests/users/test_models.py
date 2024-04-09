@@ -17,8 +17,7 @@ import tests.asp.factories as asp
 from itou.approvals.models import Approval
 from itou.asp.models import AllocationDuration, EducationLevel
 from itou.companies.enums import CompanyKind
-from itou.job_applications.enums import Origin
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState, Origin
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
@@ -365,7 +364,7 @@ class ModelTest(TestCase):
         ]
 
     def test_last_hire_was_made_by_company(self):
-        job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationState.ACCEPTED)
         user = job_application.job_seeker
         company_1 = job_application.to_company
         assert user.last_hire_was_made_by_company(company_1)
@@ -379,7 +378,7 @@ class ModelTest(TestCase):
         # `last_accepted_job_application` is the one with the greater `created_at`
         now = timezone.now()
         job_application_1 = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             origin=Origin.PE_APPROVAL,
             created_at=now + relativedelta(days=1),
         )
@@ -388,7 +387,7 @@ class ModelTest(TestCase):
 
         job_application_2 = JobApplicationFactory(
             job_seeker=user,
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             origin=Origin.PE_APPROVAL,
             created_at=now,
         )
@@ -404,7 +403,7 @@ class ModelTest(TestCase):
         # `last_accepted_job_application` is the one with the greater `hiring_start_at`
         now = timezone.now()
         job_application_1 = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             origin=Origin.PE_APPROVAL,
             created_at=now,
             hiring_start_at=now + relativedelta(days=1),
@@ -414,7 +413,7 @@ class ModelTest(TestCase):
 
         job_application_2 = JobApplicationFactory(
             job_seeker=user,
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             origin=Origin.PE_APPROVAL,
             created_at=now,
             hiring_start_at=now,

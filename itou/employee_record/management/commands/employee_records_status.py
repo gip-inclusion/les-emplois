@@ -4,7 +4,8 @@ from itou.approvals.enums import Origin
 from itou.approvals.models import Approval
 from itou.employee_record.constants import get_availability_date_for_kind
 from itou.employee_record.models import EmployeeRecord
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplication
 from itou.utils.command import BaseCommand
 
 
@@ -46,7 +47,7 @@ class Command(BaseCommand):
                     info, siret_used = "Plusieurs candidatures", "+".join(siret)
                 else:
                     siret_used = job_application.to_company.siret
-                    if job_application.state != JobApplicationWorkflow.STATE_ACCEPTED:
+                    if job_application.state != JobApplicationState.ACCEPTED:
                         info = "La candidature n'est pas en état 'acceptée'"
                     elif job_application.origin == Origin.AI_STOCK:
                         info = "Import AI"

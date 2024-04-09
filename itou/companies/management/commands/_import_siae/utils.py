@@ -1,5 +1,4 @@
 """
-
 Various helpers shared by the import_siae, import_geiq and import_ea_eatt scripts.
 
 """
@@ -17,7 +16,7 @@ from py7zr.exceptions import Bad7zFile
 
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.models import Company
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState
 from itou.metabase.tables.utils import hash_content
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.apis.geocoding import get_geocoding_data
@@ -105,7 +104,7 @@ def remap_columns(df, column_mapping):
 def could_siae_be_deleted(siae):
     if siae.evaluated_siaes.exists():
         return False
-    if siae.job_applications_received.exclude(state=JobApplicationWorkflow.STATE_NEW).exists():
+    if siae.job_applications_received.exclude(state=JobApplicationState.NEW).exists():
         return False
     # Do not delete SIAE if any approval is linked to one of the elibility diagnosis it has created
     if siae.eligibilitydiagnosis_set.exclude(approval=None).exists():

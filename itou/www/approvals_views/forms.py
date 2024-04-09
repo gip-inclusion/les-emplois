@@ -25,7 +25,8 @@ from itou.approvals.models import (
     Suspension,
 )
 from itou.files.forms import ItouFileField
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import User
@@ -65,7 +66,7 @@ class ApprovalForm(forms.Form):
             JobApplication.objects.filter(
                 approval=OuterRef("pk"),
                 to_company_id=self.siae_pk,
-                state=JobApplicationWorkflow.STATE_ACCEPTED,
+                state=JobApplicationState.ACCEPTED,
             )
         )
 

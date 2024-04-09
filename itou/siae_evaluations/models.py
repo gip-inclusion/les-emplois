@@ -13,7 +13,8 @@ from itou.companies.models import Company
 from itou.eligibility.models import AdministrativeCriteria
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplication
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.emails import CampaignEmailFactory, SIAEEmailFactory
 from itou.users.enums import KIND_EMPLOYER
@@ -223,7 +224,7 @@ class EvaluationCampaign(models.Model):
             .filter(
                 to_company__department=self.institution.department,
                 to_company__kind__in=evaluation_enums.EvaluationSiaesKind.Evaluable,
-                state=JobApplicationWorkflow.STATE_ACCEPTED,
+                state=JobApplicationState.ACCEPTED,
                 eligibility_diagnosis__author_kind=KIND_EMPLOYER,
                 eligibility_diagnosis__author_siae=F("to_company"),
                 hiring_start_at__gte=self.evaluated_period_start_at,

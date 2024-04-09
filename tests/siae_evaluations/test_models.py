@@ -14,7 +14,8 @@ from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.enums import InstitutionKind
-from itou.job_applications.models import JobApplication, JobApplicationQuerySet, JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplication, JobApplicationQuerySet
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import (
     Calendar,
@@ -164,7 +165,7 @@ def campaign_eligible_job_app_objects():
         sender_company=company,
         eligibility_diagnosis=diag,
         hiring_start_at=timezone.now() - relativedelta(months=2),
-        state=JobApplicationWorkflow.STATE_ACCEPTED,
+        state=JobApplicationState.ACCEPTED,
     )
     return {
         "approval": approval,
@@ -207,7 +208,7 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
     def test_job_application_not_accepted(self, campaign_eligible_job_app_objects):
         evaluation_campaign = EvaluationCampaignFactory()
         job_app = campaign_eligible_job_app_objects["job_app"]
-        job_app.state = JobApplicationWorkflow.STATE_REFUSED
+        job_app.state = JobApplicationState.REFUSED
         job_app.save()
         assert [] == list(evaluation_campaign.eligible_job_applications())
 

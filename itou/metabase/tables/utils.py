@@ -25,7 +25,7 @@ from itou.common_apps.address.models import BAN_API_RELIANCE_SCORE
 from itou.companies.models import Company
 from itou.geo.enums import ZRRStatus
 from itou.geo.models import ZRR
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState
 from itou.users.models import User
 
 
@@ -116,7 +116,7 @@ def get_hiring_company(job_seeker):
     link yet.
     """
     assert job_seeker.is_job_seeker
-    hirings = [ja for ja in job_seeker.job_applications.all() if ja.state == JobApplicationWorkflow.STATE_ACCEPTED]
+    hirings = [ja for ja in job_seeker.job_applications.all() if ja.state == JobApplicationState.ACCEPTED]
     if hirings:
         latest_hiring = max(hirings, key=attrgetter("created_at"))
         return latest_hiring.to_company

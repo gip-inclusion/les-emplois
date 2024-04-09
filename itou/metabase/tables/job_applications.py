@@ -1,4 +1,4 @@
-from itou.job_applications.enums import Origin, SenderKind
+from itou.job_applications.enums import JobApplicationState, Origin, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.metabase.tables.utils import MetabaseTable, get_choice, get_department_and_region_columns
 from itou.prescribers.enums import PrescriberOrganizationKind
@@ -94,9 +94,7 @@ def get_ja_time_spent_from_new_to_accepted_or_refused(ja):
     # Find the *=>accepted or *=>refused transition log.
     # We have to do all this in python to benefit from prefetch_related.
     logs = [
-        log
-        for log in ja.logs.all()
-        if log.to_state in [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_REFUSED]
+        log for log in ja.logs.all() if log.to_state in [JobApplicationState.ACCEPTED, JobApplicationState.REFUSED]
     ]
     return _get_ja_time_spent_in_transition(ja, logs)
 
@@ -136,7 +134,7 @@ TABLE.add_columns(
             "name": "état",
             "type": "varchar",
             "comment": "Etat de la candidature",
-            "fn": lambda o: get_choice(choices=JobApplicationWorkflow.STATE_CHOICES, key=o.state),
+            "fn": lambda o: get_choice(choices=JobApplicationState.choices, key=o.state),
         },
         {
             "name": "origine",

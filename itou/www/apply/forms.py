@@ -22,7 +22,7 @@ from itou.companies.models import JobDescription
 from itou.eligibility.models import AdministrativeCriteria
 from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
+from itou.job_applications.models import JobApplication, PriorAction
 from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.users.forms import JobSeekerProfileFieldsMixin
 from itou.users.models import JobSeekerProfile, User
@@ -882,7 +882,7 @@ class FilterJobApplicationsForm(forms.Form):
 
     states = forms.MultipleChoiceField(
         required=False,
-        choices=JobApplicationWorkflow.STATE_CHOICES,
+        choices=job_applications_enums.JobApplicationState,
         widget=forms.CheckboxSelectMultiple,
     )
     start_date = forms.DateField(
@@ -1055,7 +1055,9 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
         if not company.can_have_prior_action:
             # Drop "pré-embauche" state from filter for non-GEIQ companies
             self.fields["states"].choices = [
-                (k, v) for k, v in self.fields["states"].choices if k != JobApplicationWorkflow.STATE_PRIOR_TO_HIRE
+                (k, v)
+                for k, v in self.fields["states"].choices
+                if k != job_applications_enums.JobApplicationState.PRIOR_TO_HIRE
             ]
 
     def filter(self, queryset):

@@ -14,6 +14,7 @@ from itou.companies.models import Company
 from itou.employee_record.enums import Status
 from itou.employee_record.exceptions import InvalidStatusError
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
+from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 from tests.approvals.factories import ApprovalFactory
@@ -59,9 +60,7 @@ class EmployeeRecordModelTest(TestCase):
 
     def test_creation_with_bad_job_application_status(self):
         for state in [
-            state.name
-            for state in list(JobApplicationWorkflow.states)
-            if state.name != JobApplicationWorkflow.STATE_ACCEPTED
+            state.name for state in list(JobApplicationWorkflow.states) if state.name != JobApplicationState.ACCEPTED
         ]:
             with self.subTest(state):
                 with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED):

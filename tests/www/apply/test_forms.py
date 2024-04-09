@@ -7,8 +7,7 @@ from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.cities.models import City
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType
-from itou.job_applications.enums import QualificationLevel, QualificationType
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType
 from itou.www.apply import forms as apply_forms
 from tests.cities.factories import create_test_cities
 from tests.companies.factories import JobDescriptionFactory
@@ -377,7 +376,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         assertContains(response, CANNOT_BACKDATE_TEXT)
         # Testing a redirect with HTMX is really incomplete, so we also check hiring status
         job_application.refresh_from_db()
-        assert job_application.state == JobApplicationWorkflow.STATE_PROCESSING
+        assert job_application.state == JobApplicationState.PROCESSING
 
         # with a GEIQ
         job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, state="processing")
@@ -391,7 +390,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         assert response.status_code == 200
         assertNotContains(response, CANNOT_BACKDATE_TEXT)
         job_application.refresh_from_db()
-        assert job_application.state == JobApplicationWorkflow.STATE_ACCEPTED
+        assert job_application.state == JobApplicationState.ACCEPTED
 
     HELP_START_AT = (
         "La date est modifiable jusqu'à la veille de la date saisie. "

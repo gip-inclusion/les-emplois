@@ -1,5 +1,5 @@
-from itou.job_applications.enums import Origin, SenderKind
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState, Origin, SenderKind
+from itou.job_applications.models import JobApplication
 from itou.metabase.tables.utils import (
     MetabaseTable,
     get_active_companies_pks,
@@ -55,7 +55,7 @@ def get_org_job_applications_count(org):
 
 def get_org_accepted_job_applications_count(org):
     if org == ORG_OF_PRESCRIBERS_WITHOUT_ORG:
-        return _get_ja_sent_by_prescribers_without_org().filter(state=JobApplicationWorkflow.STATE_ACCEPTED).count()
+        return _get_ja_sent_by_prescribers_without_org().filter(state=JobApplicationState.ACCEPTED).count()
     return org.accepted_job_applications_count
 
 

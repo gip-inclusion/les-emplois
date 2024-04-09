@@ -12,7 +12,7 @@ from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Company, JobDescription
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState
 from tests.companies.factories import (
     CompanyAfterGracePeriodFactory,
     CompanyFactory,
@@ -361,7 +361,7 @@ class JobDescriptionQuerySetTest(TestCase):
             to_company=company,
             job_seeker=job_seeker,
             selected_jobs=[popular_job_description],
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
         )
 
         assert not JobDescription.objects.with_annotation_is_popular().get(pk=job_description.pk).is_popular

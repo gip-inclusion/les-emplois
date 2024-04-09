@@ -22,7 +22,7 @@ from itou.eligibility.models import (
     GEIQAdministrativeCriteria,
     GEIQEligibilityDiagnosis,
 )
-from itou.job_applications.enums import QualificationLevel, QualificationType, SenderKind
+from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
@@ -456,7 +456,7 @@ class ApplyAsJobSeekerTest(TestCase):
         assert job_application.sender_kind == SenderKind.JOB_SEEKER
         assert job_application.sender_company is None
         assert job_application.sender_prescriber_organization is None
-        assert job_application.state == job_application.state.workflow.STATE_NEW
+        assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert list(job_application.selected_jobs.all()) == [company.job_description_through.first()]
         assert job_application.resume_link == (
@@ -952,7 +952,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         assert job_application.sender_kind == SenderKind.PRESCRIBER
         assert job_application.sender_company is None
         assert job_application.sender_prescriber_organization == prescriber_organization
-        assert job_application.state == job_application.state.workflow.STATE_NEW
+        assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert list(job_application.selected_jobs.all()) == [
             company.job_description_through.first(),
@@ -1227,7 +1227,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         assert job_application.sender_kind == SenderKind.PRESCRIBER
         assert job_application.sender_company is None
         assert job_application.sender_prescriber_organization == prescriber_organization
-        assert job_application.state == job_application.state.workflow.STATE_NEW
+        assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert list(job_application.selected_jobs.all()) == [
             company.job_description_through.first(),
@@ -1570,7 +1570,7 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
         assert job_application.sender_kind == SenderKind.PRESCRIBER
         assert job_application.sender_company is None
         assert job_application.sender_prescriber_organization is None
-        assert job_application.state == job_application.state.workflow.STATE_NEW
+        assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert list(job_application.selected_jobs.all()) == [
             company.job_description_through.first(),
@@ -2035,7 +2035,7 @@ class ApplyAsCompanyTest(TestCase):
         assert job_application.sender_kind == SenderKind.EMPLOYER
         assert job_application.sender_company == company
         assert job_application.sender_prescriber_organization is None
-        assert job_application.state == job_application.state.workflow.STATE_NEW
+        assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
         assert list(job_application.selected_jobs.all()) == [
             company.job_description_through.first(),
@@ -2370,7 +2370,7 @@ class DirectHireFullProcessTest(TestCase):
         assert job_application.sender_kind == SenderKind.EMPLOYER
         assert job_application.sender_company == company
         assert job_application.sender_prescriber_organization is None
-        assert job_application.state == job_application.state.workflow.STATE_ACCEPTED
+        assert job_application.state == JobApplicationState.ACCEPTED
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
         assert job_application.resume_link == ""
@@ -2504,7 +2504,7 @@ class DirectHireFullProcessTest(TestCase):
         assert job_application.sender_kind == SenderKind.EMPLOYER
         assert job_application.sender_company == company
         assert job_application.sender_prescriber_organization is None
-        assert job_application.state == job_application.state.workflow.STATE_ACCEPTED
+        assert job_application.state == JobApplicationState.ACCEPTED
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
         assert job_application.resume_link == ""
@@ -4311,7 +4311,7 @@ class HireConfirmationTestCase(TestCase):
         assert job_application.sender_kind == SenderKind.EMPLOYER
         assert job_application.sender_company == self.company
         assert job_application.sender_prescriber_organization is None
-        assert job_application.state == job_application.state.workflow.STATE_ACCEPTED
+        assert job_application.state == JobApplicationState.ACCEPTED
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
         assert job_application.resume_link == ""
@@ -4367,7 +4367,7 @@ class HireConfirmationTestCase(TestCase):
         assert job_application.sender_kind == SenderKind.EMPLOYER
         assert job_application.sender_company == self.company
         assert job_application.sender_prescriber_organization is None
-        assert job_application.state == job_application.state.workflow.STATE_ACCEPTED
+        assert job_application.state == JobApplicationState.ACCEPTED
         assert job_application.message == ""
         assert list(job_application.selected_jobs.all()) == []
         assert job_application.resume_link == ""

@@ -3,6 +3,18 @@ from django.db import models
 from itou.users import enums as users_enums
 
 
+class JobApplicationState(models.TextChoices):
+    NEW = "new", "Nouvelle candidature"
+    PROCESSING = "processing", "Candidature à l'étude"
+    POSTPONED = "postponed", "Candidature en attente"
+    PRIOR_TO_HIRE = "prior_to_hire", "Action préalable à l’embauche"
+    ACCEPTED = "accepted", "Candidature acceptée"
+    REFUSED = "refused", "Candidature déclinée"
+    CANCELLED = "cancelled", "Embauche annulée"
+    # When a job application is accepted, all other job seeker's pending applications become obsolete.
+    OBSOLETE = "obsolete", "Embauché ailleurs"
+
+
 class SenderKind(models.TextChoices):
     JOB_SEEKER = users_enums.KIND_JOB_SEEKER, "Demandeur d'emploi"
     PRESCRIBER = users_enums.KIND_PRESCRIBER, "Prescripteur"
