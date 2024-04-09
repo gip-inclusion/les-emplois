@@ -5,9 +5,10 @@ Various helpers shared by the import_siae, import_geiq and import_ea_eatt script
 """
 
 import csv
-import gzip
 import os
-import zipfile
+import shutil
+import tempfile
+from pathlib import Path
 
 import pandas as pd
 from django.conf import settings
@@ -331,61 +332,66 @@ def get_fluxiae_df(
     # the rows in the CSV file beforehands instead. Always using the 'c' engine is proven to significantly reduce
     # the duration and frequency of the developer's headaches.
 
-    try:
-        with gzip.open(filename) as f:
-            # Ignore 3 rows: the `DEB*` first row, the headers row, and the `FIN*` last row.
-            nrows = -3
-            for _line in f:
-                nrows += 1
-    except gzip.BadGzipFile:
-        with zipfile.ZipFile(filename) as f:
-            assert len(f.namelist()) == 1
-            with f.open(f.namelist()[0]) as ff:
-                # Ignore 3 rows: the `DEB*` first row, the headers row, and the `FIN*` last row.
-                nrows = -3
-                for _line in ff:
-                    nrows += 1
-        kwargs["compression"] = "zip"  # default compression infer does not detect correctly
+    with tempfile.TemporaryDirectory() as d:
+        try:
+            # Use the file extension as hint for the unpack algorithm.
+            shutil.unpack_archive(filename, d)
+        except shutil.ReadError:
+            # The file extension does not represent the compression used, try known unpack formats.
+            for format, _ext, _desc in shutil.get_unpack_formats():
+                try:
+                    shutil.unpack_archive(filename, d, format=format)
+                    break
+                except shutil.ReadError:
+                    pass
+            else:
+                raise ValueError(f"Unable to extract “{filename}”.")
 
-    print(f"Loading {nrows} rows for {vue_name} ...")
+        [extracted] = Path(d).iterdir()
+        # Ignore 3 rows: the `DEB*` first row, the headers row, and the `FIN*` last row.
+        nrows = -3
+        for _line in extracted.read_text().splitlines():
+            nrows += 1
 
-    if converters:
-        kwargs["converters"] = converters
+        print(f"Loading {nrows} rows for {vue_name} ...")
 
-    if parse_dates:
-        kwargs["parse_dates"] = parse_dates
+        if converters:
+            kwargs["converters"] = converters
 
-    # Removes warnings when automatically parsing dates with pandas.read_csv
-    # ex: UserWarning: Parsing '30/04/2023' in DD/MM/YYYY format. Provide format ...
-    #     ... or specify infer_datetime_format=True for consistent parsing.
-    # See: https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html
-    kwargs["infer_datetime_format"] = infer_datetime_format
-    # But when guessing, we are more likely to end up with European style dates than American
-    # in ASP files
-    kwargs["dayfirst"] = True
+        if parse_dates:
+            kwargs["parse_dates"] = parse_dates
 
-    df = pd.read_csv(
-        filename,
-        sep="|",
-        # Some rows have a single `"` in a field, for example in fluxIAE_Mission the mission_descriptif field of
-        # the mission id 1003399237 is `"AIEHPAD` (no closing double quote). This screws CSV parsing big time
-        # as the parser will read many rows until the next `"` and consider all of them as part of the
-        # initial mission_descriptif field value o_O. Let's just disable quoting alltogether to avoid that.
-        quoting=csv.QUOTE_NONE,
-        nrows=nrows,
-        **kwargs,
-        # Fix DtypeWarning (Columns have mixed types) and avoid error when field value in later rows contradicts
-        # the field data format guessed on first rows.
-        low_memory=False,
-    )
+        # Removes warnings when automatically parsing dates with pandas.read_csv
+        # ex: UserWarning: Parsing '30/04/2023' in DD/MM/YYYY format. Provide format ...
+        #     ... or specify infer_datetime_format=True for consistent parsing.
+        # See: https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html
+        kwargs["infer_datetime_format"] = infer_datetime_format
+        # But when guessing, we are more likely to end up with European style dates than American
+        # in ASP files
+        kwargs["dayfirst"] = True
 
-    # If there is only one column, something went wrong, let's break early.
-    # Most likely an incorrect skip_first_row value.
-    assert len(df.columns.tolist()) >= 2
+        df = pd.read_csv(
+            extracted,
+            sep="|",
+            # Some rows have a single `"` in a field, for example in fluxIAE_Mission the mission_descriptif field of
+            # the mission id 1003399237 is `"AIEHPAD` (no closing double quote). This screws CSV parsing big time
+            # as the parser will read many rows until the next `"` and consider all of them as part of the
+            # initial mission_descriptif field value o_O. Let's just disable quoting alltogether to avoid that.
+            quoting=csv.QUOTE_NONE,
+            nrows=nrows,
+            **kwargs,
+            # Fix DtypeWarning (Columns have mixed types) and avoid error when field value in later rows contradicts
+            # the field data format guessed on first rows.
+            low_memory=False,
+        )
 
-    assert len(df) == nrows
+        # If there is only one column, something went wrong, let's break early.
+        # Most likely an incorrect skip_first_row value.
+        assert len(df.columns.tolist()) >= 2
 
-    if anonymize_sensitive_data:
-        df = anonymize_fluxiae_df(df)
+        assert len(df) == nrows
 
-    return df
+        if anonymize_sensitive_data:
+            df = anonymize_fluxiae_df(df)
+
+        return df
