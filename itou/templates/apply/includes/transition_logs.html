@@ -5,7 +5,7 @@
                 <time datetime="{{ log.timestamp.isoformat }}">Le {{ log.timestamp|date:dt_format }}</time>
                 <span>
                     Passé en "{{ log.pretty_to_state }}"
-                    {% if log.user %}par {{ log.user.get_full_name }}{% endif %}
+                    {% if log.user and log.to_state != JobApplicationState.OBSOLETE %}par {{ log.user.get_full_name }}{% endif %}
                 </span>
             </li>
         {% endfor %}

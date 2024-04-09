@@ -15,6 +15,7 @@ def expose_enums(*args):
     return {
         "ApprovalOrigin": approvals_enums.Origin,
         "JobApplicationOrigin": job_applications_enums.Origin,
+        "JobApplicationState": job_applications_enums.JobApplicationState,
         "PrescriberOrganizationKind": prescribers_enums.PrescriberOrganizationKind,
         "ProlongationRequestStatus": approvals_enums.ProlongationRequestStatus,
         "RefusalReason": job_applications_enums.RefusalReason,
