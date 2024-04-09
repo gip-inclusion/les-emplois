@@ -300,6 +300,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         body_lines = email.body.splitlines()
         assert "- Nom : CENTRE COMMUNAL D'ACTION SOCIALE" in body_lines
         assert f"- ID : {org.pk}" in body_lines
+        assert "- Type sélectionné par l’utilisateur : Cap emploi" in body_lines
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
