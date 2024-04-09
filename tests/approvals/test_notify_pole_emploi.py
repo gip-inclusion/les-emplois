@@ -12,8 +12,7 @@ from freezegun import freeze_time
 
 from itou.approvals.models import Approval, CancelledApproval
 from itou.companies.enums import CompanyKind, siae_kind_to_pe_type_siae
-from itou.job_applications.enums import SenderKind
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.apis import enums as api_enums
 from itou.utils.mocks.pole_emploi import (
@@ -62,7 +61,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
     def test_invalid_job_application(self):
         approval = ApprovalFactory(
             with_jobapplication=True,
-            with_jobapplication__state=JobApplicationWorkflow.STATE_CANCELLED,
+            with_jobapplication__state=JobApplicationState.CANCELLED,
         )
         with freeze_time() as frozen_now:
             approval.notify_pole_emploi()
@@ -275,7 +274,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         job_seeker = JobSeekerFactory()
         company = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
-        JobApplicationFactory(to_company=company, approval=approval, state=JobApplicationWorkflow.STATE_ACCEPTED)
+        JobApplicationFactory(to_company=company, approval=approval, state=JobApplicationState.ACCEPTED)
         with freeze_time() as frozen_now:
             approval.notify_pole_emploi()
         approval.refresh_from_db()
@@ -293,7 +292,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         job_seeker = JobSeekerFactory()
         company = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker)
-        JobApplicationFactory(to_company=company, approval=approval, state=JobApplicationWorkflow.STATE_POSTPONED)
+        JobApplicationFactory(to_company=company, approval=approval, state=JobApplicationState.POSTPONED)
         with freeze_time() as frozen_now:
             approval.notify_pole_emploi()
         approval.refresh_from_db()
@@ -313,7 +312,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         job_seeker = JobSeekerFactory()
         siae = CompanyFactory(kind="FOO")  # unknown kind
         approval = ApprovalFactory(user=job_seeker, with_origin_values=True, origin_siae_kind=CompanyKind.ETTI)
-        JobApplicationFactory(to_company=siae, approval=approval, state=JobApplicationWorkflow.STATE_ACCEPTED)
+        JobApplicationFactory(to_company=siae, approval=approval, state=JobApplicationState.ACCEPTED)
         approval.notify_pole_emploi()
         approval.refresh_from_db()
         payload = json.loads(respx.calls.last.request.content)

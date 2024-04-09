@@ -29,8 +29,8 @@ from itou.approvals.models import Approval, CancelledApproval, PoleEmploiApprova
 from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import Status
 from itou.files.models import File
-from itou.job_applications.enums import SenderKind
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState, SenderKind
+from itou.job_applications.models import JobApplication
 from itou.users.enums import LackOfPoleEmploiId
 from itou.utils.apis import enums as api_enums
 from tests.approvals.factories import (
@@ -614,7 +614,7 @@ class ApprovalModelTest(TestCase):
 
     def test_deleting_an_approval_prefer_origin_values(self):
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.EI,
         )
         job_application.accept(user=job_application.to_company.members.first())
@@ -624,7 +624,7 @@ class ApprovalModelTest(TestCase):
         assert approval.origin_siae_siret == job_application.to_company.siret
 
         other_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.ETTI,
             job_seeker_id=job_application.job_seeker_id,  # Use pk to avoid cached_property invalidations
         )
@@ -644,7 +644,7 @@ class ApprovalModelTest(TestCase):
 
     def test_deleting_an_approval_without_application_linked(self):
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
         )
         job_application.accept(user=job_application.to_company.members.first())
 
@@ -997,7 +997,7 @@ class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             approval=None,
             approval_number_sent_by_email=False,
         )
@@ -1097,7 +1097,7 @@ class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
 
         # When the job application will lead to a duplicate employee record but is still proposed
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             to_company=employee_record.job_application.to_company,
             approval=employee_record.job_application.approval,
         )

@@ -23,6 +23,7 @@ from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.enums import (
     GEIQ_MAX_HOURS_PER_WEEK,
     GEIQ_MIN_HOURS_PER_WEEK,
+    JobApplicationState,
     Origin,
     Prequalification,
     ProfessionalSituationExperience,
@@ -45,28 +46,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     https://django-xworkflows.readthedocs.io/
     """
 
-    STATE_NEW = "new"
-    STATE_PROCESSING = "processing"
-    STATE_POSTPONED = "postponed"
-    STATE_PRIOR_TO_HIRE = "prior_to_hire"
-    STATE_ACCEPTED = "accepted"
-    STATE_REFUSED = "refused"
-    STATE_CANCELLED = "cancelled"
-    # When a job application is accepted, all other job seeker's pending applications become obsolete.
-    STATE_OBSOLETE = "obsolete"
-
-    STATE_CHOICES = (
-        (STATE_NEW, "Nouvelle candidature"),
-        (STATE_PROCESSING, "Candidature à l'étude"),
-        (STATE_POSTPONED, "Candidature en attente"),
-        (STATE_PRIOR_TO_HIRE, "Action préalable à l’embauche"),
-        (STATE_ACCEPTED, "Candidature acceptée"),
-        (STATE_REFUSED, "Candidature déclinée"),
-        (STATE_CANCELLED, "Embauche annulée"),
-        (STATE_OBSOLETE, "Embauché ailleurs"),
-    )
-
-    states = STATE_CHOICES
+    states = JobApplicationState.choices
 
     TRANSITION_PROCESS = "process"
     TRANSITION_POSTPONE = "postpone"
@@ -91,30 +71,53 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     )
 
     CAN_BE_ACCEPTED_STATES = [
-        STATE_PROCESSING,
-        STATE_POSTPONED,
-        STATE_PRIOR_TO_HIRE,
-        STATE_OBSOLETE,
-        STATE_REFUSED,
-        STATE_CANCELLED,
+        JobApplicationState.PROCESSING,
+        JobApplicationState.POSTPONED,
+        JobApplicationState.PRIOR_TO_HIRE,
+        JobApplicationState.OBSOLETE,
+        JobApplicationState.REFUSED,
+        JobApplicationState.CANCELLED,
     ]
     CAN_BE_TRANSFERRED_STATES = CAN_BE_ACCEPTED_STATES
-    CAN_ADD_PRIOR_ACTION_STATES = [STATE_PROCESSING, STATE_POSTPONED, STATE_OBSOLETE, STATE_REFUSED, STATE_CANCELLED]
+    CAN_ADD_PRIOR_ACTION_STATES = [
+        JobApplicationState.PROCESSING,
+        JobApplicationState.POSTPONED,
+        JobApplicationState.OBSOLETE,
+        JobApplicationState.REFUSED,
+        JobApplicationState.CANCELLED,
+    ]
 
     transitions = (
-        (TRANSITION_PROCESS, STATE_NEW, STATE_PROCESSING),
-        (TRANSITION_POSTPONE, [STATE_PROCESSING, STATE_PRIOR_TO_HIRE], STATE_POSTPONED),
-        (TRANSITION_ACCEPT, CAN_BE_ACCEPTED_STATES, STATE_ACCEPTED),
-        (TRANSITION_MOVE_TO_PRIOR_TO_HIRE, CAN_ADD_PRIOR_ACTION_STATES, STATE_PRIOR_TO_HIRE),
-        (TRANSITION_CANCEL_PRIOR_TO_HIRE, [STATE_PRIOR_TO_HIRE], STATE_PROCESSING),
-        (TRANSITION_REFUSE, [STATE_NEW, STATE_PROCESSING, STATE_PRIOR_TO_HIRE, STATE_POSTPONED], STATE_REFUSED),
-        (TRANSITION_CANCEL, STATE_ACCEPTED, STATE_CANCELLED),
-        (TRANSITION_RENDER_OBSOLETE, [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED], STATE_OBSOLETE),
-        (TRANSITION_TRANSFER, CAN_BE_TRANSFERRED_STATES, STATE_NEW),
+        (TRANSITION_PROCESS, JobApplicationState.NEW, JobApplicationState.PROCESSING),
+        (
+            TRANSITION_POSTPONE,
+            [JobApplicationState.PROCESSING, JobApplicationState.PRIOR_TO_HIRE],
+            JobApplicationState.POSTPONED,
+        ),
+        (TRANSITION_ACCEPT, CAN_BE_ACCEPTED_STATES, JobApplicationState.ACCEPTED),
+        (TRANSITION_MOVE_TO_PRIOR_TO_HIRE, CAN_ADD_PRIOR_ACTION_STATES, JobApplicationState.PRIOR_TO_HIRE),
+        (TRANSITION_CANCEL_PRIOR_TO_HIRE, [JobApplicationState.PRIOR_TO_HIRE], JobApplicationState.PROCESSING),
+        (
+            TRANSITION_REFUSE,
+            [
+                JobApplicationState.NEW,
+                JobApplicationState.PROCESSING,
+                JobApplicationState.PRIOR_TO_HIRE,
+                JobApplicationState.POSTPONED,
+            ],
+            JobApplicationState.REFUSED,
+        ),
+        (TRANSITION_CANCEL, JobApplicationState.ACCEPTED, JobApplicationState.CANCELLED),
+        (
+            TRANSITION_RENDER_OBSOLETE,
+            [JobApplicationState.NEW, JobApplicationState.PROCESSING, JobApplicationState.POSTPONED],
+            JobApplicationState.OBSOLETE,
+        ),
+        (TRANSITION_TRANSFER, CAN_BE_TRANSFERRED_STATES, JobApplicationState.NEW),
     )
 
-    PENDING_STATES = [STATE_NEW, STATE_PROCESSING, STATE_POSTPONED]
-    initial_state = STATE_NEW
+    PENDING_STATES = [JobApplicationState.NEW, JobApplicationState.PROCESSING, JobApplicationState.POSTPONED]
+    initial_state = JobApplicationState.NEW
 
     log_model = "job_applications.JobApplicationTransitionLog"
 
@@ -127,7 +130,7 @@ class JobApplicationQuerySet(models.QuerySet):
         return self.filter(state__in=JobApplicationWorkflow.PENDING_STATES)
 
     def accepted(self):
-        return self.filter(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        return self.filter(state=JobApplicationState.ACCEPTED)
 
     def not_archived(self):
         """
@@ -174,7 +177,7 @@ class JobApplicationQuerySet(models.QuerySet):
         Returns objects that require a manual PASS IAE delivery.
         """
         return self.filter(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
             approval_number_sent_by_email=False,
             approval_manually_refused_at=None,
@@ -206,7 +209,7 @@ class JobApplicationQuerySet(models.QuerySet):
                 ),
                 When(origin=Origin.PE_APPROVAL, then=F("created_at")),
                 When(
-                    state=JobApplicationWorkflow.STATE_ACCEPTED,
+                    state=JobApplicationState.ACCEPTED,
                     # A job_application created at the accepted status will
                     # not have transitions logs, fallback on created_at
                     then=Coalesce(created_at_from_transition, F("created_at")),
@@ -798,12 +801,12 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def accepted_by(self):
         if not self.state.is_accepted:
             return None
-        return self.logs.select_related("user").filter(to_state=JobApplicationWorkflow.STATE_ACCEPTED).last().user
+        return self.logs.select_related("user").filter(to_state=JobApplicationState.ACCEPTED).last().user
 
     @property
     def refused_by(self):
         if self.state.is_refused and (
-            last_log := self.logs.select_related("user").filter(to_state=JobApplicationWorkflow.STATE_REFUSED).last()
+            last_log := self.logs.select_related("user").filter(to_state=JobApplicationState.REFUSED).last()
         ):
             return last_log.user
 
@@ -820,9 +823,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def can_be_archived(self):
         return self.state in [
-            JobApplicationWorkflow.STATE_REFUSED,
-            JobApplicationWorkflow.STATE_CANCELLED,
-            JobApplicationWorkflow.STATE_OBSOLETE,
+            JobApplicationState.REFUSED,
+            JobApplicationState.CANCELLED,
+            JobApplicationState.OBSOLETE,
         ]
 
     @property
@@ -835,10 +838,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def is_refused_due_to_deactivation(self):
-        return (
-            self.state == JobApplicationWorkflow.STATE_REFUSED
-            and self.refusal_reason == RefusalReason.DEACTIVATION.value
-        )
+        return self.state == JobApplicationState.REFUSED and self.refusal_reason == RefusalReason.DEACTIVATION.value
 
     @property
     def is_refused_for_other_reason(self):
@@ -853,8 +853,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def can_update_hiring_start(self):
         return self.hiring_starts_in_future and self.state in [
-            JobApplicationWorkflow.STATE_ACCEPTED,
-            JobApplicationWorkflow.STATE_POSTPONED,
+            JobApplicationState.ACCEPTED,
+            JobApplicationState.POSTPONED,
         ]
 
     def get_sender_kind_display(self):
@@ -871,7 +871,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def is_in_transferable_state(self):
-        return self.state != JobApplicationWorkflow.STATE_ACCEPTED
+        return self.state != JobApplicationState.ACCEPTED
 
     def can_be_transferred(self, user, target_company):
         # User must be member of both origin and target companies to make a transfer
@@ -894,7 +894,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         self.transferred_by = transferred_by
         self.transferred_at = timezone.now()
         self.to_company = target_company
-        self.state = JobApplicationWorkflow.STATE_NEW
+        self.state = JobApplicationState.NEW
         # Consider job application as new : don't keep answers
         self.answer = self.answer_to_prescriber = ""
 
@@ -1242,7 +1242,7 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
 
     @property
     def pretty_to_state(self):
-        choices = dict(JobApplicationWorkflow.STATE_CHOICES)
+        choices = dict(JobApplicationState.choices)
         return choices[self.to_state]
 
 

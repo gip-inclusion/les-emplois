@@ -8,8 +8,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertRedirects
 
-from itou.job_applications.enums import SenderKind
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.utils.templatetags.format_filters import format_approval_number
 from tests.approvals.factories import (
     ApprovalFactory,
@@ -37,7 +36,7 @@ class TestApprovalDetailView:
         job_application = JobApplicationFactory(
             approval=approval,
             job_seeker=approval.user,
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             # Make job application.is_sent_by_authorized_prescriber to be true
             sender_kind=SenderKind.PRESCRIBER,
             sender_prescriber_organization=PrescriberOrganizationFactory(authorized=True),
@@ -49,7 +48,7 @@ class TestApprovalDetailView:
         same_siae_job_application = JobApplicationSentByPrescriberOrganizationFactory(
             job_seeker=job_application.job_seeker,
             to_company=job_application.to_company,
-            state=JobApplicationWorkflow.STATE_NEW,
+            state=JobApplicationState.NEW,
         )
         assert not same_siae_job_application.is_sent_by_authorized_prescriber
         # A third job application on another SIAE
@@ -100,7 +99,7 @@ class TestApprovalDetailView:
         Test its content only once.
         """
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             with_approval=True,
             approval__id=1,
             sent_by_authorized_prescriber_organisation=True,
@@ -157,7 +156,7 @@ class TestApprovalDetailView:
             "Date de fin prévisionnelle : 24/04/2025",
         )
 
-        job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
+        job_application.state = JobApplicationState.ACCEPTED
         job_application.save()
         response = client.get(url)
         assertNotContains(

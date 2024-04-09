@@ -23,7 +23,7 @@ from itou.companies.models import Company
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.institutions.models import Institution
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState
 from itou.openid_connect.inclusion_connect import constants as ic_constants
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
@@ -45,9 +45,9 @@ from itou.www.stats import utils as stats_utils
 
 def _employer_dashboard_context(request):
     current_org = get_current_company_or_404(request)
-    states_to_process = [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_PROCESSING]
+    states_to_process = [JobApplicationState.NEW, JobApplicationState.PROCESSING]
     if current_org.can_have_prior_action:
-        states_to_process.append(JobApplicationWorkflow.STATE_PRIOR_TO_HIRE)
+        states_to_process.append(JobApplicationState.PRIOR_TO_HIRE)
 
     job_applications_categories = [
         {
@@ -58,7 +58,7 @@ def _employer_dashboard_context(request):
         },
         {
             "name": "En attente",
-            "states": [JobApplicationWorkflow.STATE_POSTPONED],
+            "states": [JobApplicationState.POSTPONED],
             "icon": "ri-time-line",
             "badge": "bg-info-lighter",
         },

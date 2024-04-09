@@ -21,7 +21,8 @@ from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria
 from itou.eligibility.models.iae import EligibilityDiagnosis
 from itou.institutions.models import Institution
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Calendar, EvaluationCampaign, create_campaigns_and_calendar
 from itou.users.models import User
 
@@ -124,7 +125,7 @@ def load_data():
                     sender_company=controlled_siae,
                     sender=employer,
                     sender_kind=users_enums.KIND_EMPLOYER,
-                    state=JobApplicationWorkflow.STATE_ACCEPTED,
+                    state=JobApplicationState.ACCEPTED,
                     to_company=controlled_siae,
                 ).id
             ]

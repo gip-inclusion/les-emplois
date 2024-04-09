@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.utils import timezone
 
 from itou.approvals import models as approvals_models
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState
 from itou.utils.apis import enums as api_enums
 from itou.utils.command import BaseCommand
 
@@ -39,7 +39,7 @@ class Command(BaseCommand):
             start_at__lte=today,
             # those with no accepted job application would also fail and stay pending.
             # also removes the approvals without any job application yet.
-            jobapplication__state=JobApplicationWorkflow.STATE_ACCEPTED,
+            jobapplication__state=JobApplicationState.ACCEPTED,
         ).exclude(
             Q(user__jobseeker_profile__nir="")
             | Q(user__birthdate=None)

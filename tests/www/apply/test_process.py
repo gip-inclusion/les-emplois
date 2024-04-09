@@ -483,7 +483,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
     def test_details_for_job_seeker_when_refused(self, *args, **kwargs):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
-            state=JobApplicationWorkflow.STATE_REFUSED,
+            state=job_applications_enums.JobApplicationState.REFUSED,
             answer="abc",
             answer_to_prescriber="undisclosed",
             refusal_reason="other",
@@ -504,7 +504,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
     def test_details_for_prescriber_when_refused(self, *args, **kwargs):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
-            state=JobApplicationWorkflow.STATE_REFUSED,
+            state=job_applications_enums.JobApplicationState.REFUSED,
             answer="abc",
             answer_to_prescriber="undisclosed",
             refusal_reason="other",
@@ -533,7 +533,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             to_company__with_membership=True,
             to_company__email="refused_job_application@example.com",
             sent_by_authorized_prescriber_organisation=True,
-            state=JobApplicationWorkflow.STATE_REFUSED,
+            state=job_applications_enums.JobApplicationState.REFUSED,
             answer="abc",
             answer_to_prescriber="undisclosed",
             refusal_reason=job_applications_enums.RefusalReason.OTHER,
@@ -554,8 +554,8 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             company_user = job_application.to_company.members.first()
             job_application.logs.create(
                 transition=JobApplicationWorkflow.TRANSITION_REFUSE,
-                from_state=JobApplicationWorkflow.STATE_NEW,
-                to_state=JobApplicationWorkflow.STATE_REFUSED,
+                from_state=job_applications_enums.JobApplicationState.NEW,
+                to_state=job_applications_enums.JobApplicationState.REFUSED,
                 user=company_user,
             )
             url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
@@ -588,7 +588,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             to_company__with_membership=True,
             to_company__email="refused_job_application@example.com",
             sent_by_authorized_prescriber_organisation=True,
-            state=JobApplicationWorkflow.STATE_REFUSED,
+            state=job_applications_enums.JobApplicationState.REFUSED,
             answer="abc",
             answer_to_prescriber="undisclosed",
             refusal_reason=job_applications_enums.RefusalReason.OTHER,
@@ -609,7 +609,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             to_company__with_membership=True,
             to_company__email="refused_job_application@example.com",
             sent_by_authorized_prescriber_organisation=True,
-            state=JobApplicationWorkflow.STATE_REFUSED,
+            state=job_applications_enums.JobApplicationState.REFUSED,
             answer="abc",
             answer_to_prescriber="undisclosed",
             refusal_reason=job_applications_enums.RefusalReason.OTHER,
@@ -642,10 +642,10 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         """Ensure that the `refuse` transition is triggered."""
 
         states = [
-            JobApplicationWorkflow.STATE_NEW,
-            JobApplicationWorkflow.STATE_PROCESSING,
-            JobApplicationWorkflow.STATE_PRIOR_TO_HIRE,
-            JobApplicationWorkflow.STATE_POSTPONED,
+            job_applications_enums.JobApplicationState.NEW,
+            job_applications_enums.JobApplicationState.PROCESSING,
+            job_applications_enums.JobApplicationState.PRIOR_TO_HIRE,
+            job_applications_enums.JobApplicationState.POSTPONED,
         ]
 
         for state in states:
@@ -674,8 +674,8 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         """Ensure that the `postpone` transition is triggered."""
 
         states = [
-            JobApplicationWorkflow.STATE_PROCESSING,
-            JobApplicationWorkflow.STATE_PRIOR_TO_HIRE,
+            job_applications_enums.JobApplicationState.PROCESSING,
+            job_applications_enums.JobApplicationState.PRIOR_TO_HIRE,
         ]
 
         for state in states:
@@ -811,7 +811,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
 
         # No address provided.
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
             to_company=company,
         )
 
@@ -834,7 +834,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
 
         # No eligibility diagnosis -> if job_seeker has a valid eligibility diagnosis, it's OK
         job_application = JobApplicationSentByJobSeekerFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=job_seeker,
             to_company=company,
             eligibility_diagnosis=None,
@@ -851,7 +851,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
 
         # if no, should not see the confirm button, nor accept posted data
         job_application = JobApplicationSentByJobSeekerFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=job_seeker,
             to_company=company,
             eligibility_diagnosis=None,
@@ -909,7 +909,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         other_company = CompanyFactory(with_membership=True)
         job_application = JobApplicationFactory(
             approval=approval_job_seeker,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=job_seeker_user,
             to_company=other_company,
         )
@@ -955,7 +955,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         city = self.get_random_city()
 
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
             # The state of the 3 `pole_emploi_*` fields will trigger a manual delivery.
             job_seeker__jobseeker_profile__nir="",
             job_seeker__jobseeker_profile__pole_emploi_id="",
@@ -1017,15 +1017,15 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         # Send 3 job applications to 3 different structures
         job_application = JobApplicationFactory(
             job_seeker=job_seeker,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
         )
         job_app_starting_earlier = JobApplicationFactory(
             job_seeker=job_seeker,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
         )
         job_app_starting_later = JobApplicationFactory(
             job_seeker=job_seeker,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
         )
 
         # company 1 logs in and accepts the first job application.
@@ -1107,7 +1107,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             with_ban_geoloc_address=True,
         )
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=job_seeker,
             to_company=company,
         )
@@ -1136,7 +1136,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             birthdate=job_seeker.birthdate,
         )
         another_job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=almost_same_job_seeker,
             to_company=company,
         )
@@ -1151,7 +1151,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
     @override_settings(TALLY_URL="https://tally.so")
     def test_accept_nir_readonly(self, *args, **kwargs):
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
         )
 
         employer = job_application.to_company.members.first()
@@ -1187,7 +1187,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         city = self.get_random_city()
 
         job_application = JobApplicationSentByJobSeekerFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker__jobseeker_profile__nir="",
             job_seeker__with_pole_emploi_id=True,
             job_seeker__with_ban_geoloc_address=True,
@@ -1245,7 +1245,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         city = self.get_random_city()
 
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker__jobseeker_profile__nir="",
             job_seeker__with_pole_emploi_id=True,
         )
@@ -1286,7 +1286,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         city = self.get_random_city()
 
         job_application = JobApplicationSentByJobSeekerFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker__jobseeker_profile__nir="",
             job_seeker__with_pole_emploi_id=True,
             job_seeker__with_ban_geoloc_address=True,
@@ -1334,7 +1334,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         city = self.get_random_city()
 
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker__jobseeker_profile__nir="",
             job_seeker__jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
             job_seeker__with_pole_emploi_id=True,
@@ -1384,7 +1384,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
     @override_settings(TALLY_URL="https://tally.so")
     def test_accept_lack_of_nir_reason_other_user(self, *args, **kwargs):
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker__jobseeker_profile__nir="",
             job_seeker__jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER,
         )
@@ -1412,7 +1412,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
     def test_eligibility(self, *args, **kwargs):
         """Test eligibility."""
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=JobSeekerWithAddressFactory(with_address_in_qpv=True),
             eligibility_diagnosis=None,
         )
@@ -1476,7 +1476,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
 
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.GEIQ,
         )
         employer = job_application.to_company.members.first()
@@ -1490,7 +1490,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         """Test eligibility for an Siae that has been suspended."""
 
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker=JobSeekerWithAddressFactory(),
         )
         Sanctions.objects.create(
@@ -1527,7 +1527,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             self.client.logout()
 
         # Wrong state
-        job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
+        job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
         job_application.save()
         self.client.force_login(employer)
         url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
@@ -1604,7 +1604,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         city = self.get_random_city()
         job_seeker = JobSeekerWithAddressFactory(city=city.name, with_pole_emploi_id=True)
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_CANCELLED,
+            state=job_applications_enums.JobApplicationState.CANCELLED,
             job_seeker=job_seeker,
         )
         employer = job_application.to_company.members.first()
@@ -1622,7 +1622,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         """Ensure that when a company archives a job_application, the hidden_for_company flag is updated."""
 
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_CANCELLED
+            sent_by_authorized_prescriber_organisation=True, state=job_applications_enums.JobApplicationState.CANCELLED
         )
         assert job_application.state.is_cancelled
         employer = job_application.to_company.members.first()
@@ -1631,9 +1631,9 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         url = reverse("apply:archive", kwargs={"job_application_id": job_application.pk})
 
         cancelled_states = [
-            JobApplicationWorkflow.STATE_REFUSED,
-            JobApplicationWorkflow.STATE_CANCELLED,
-            JobApplicationWorkflow.STATE_OBSOLETE,
+            job_applications_enums.JobApplicationState.REFUSED,
+            job_applications_enums.JobApplicationState.CANCELLED,
+            job_applications_enums.JobApplicationState.OBSOLETE,
         ]
 
         response = self.client.post(url)
@@ -1984,7 +1984,7 @@ class ProcessTemplatesTest(TestCase):
     def test_details_template_for_state_processing(self):
         """Test actions available when the state is processing."""
         self.client.force_login(self.employer)
-        self.job_application.state = JobApplicationWorkflow.STATE_PROCESSING
+        self.job_application.state = job_applications_enums.JobApplicationState.PROCESSING
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
@@ -1997,7 +1997,7 @@ class ProcessTemplatesTest(TestCase):
     def test_details_template_for_state_prior_to_hire(self):
         """Test actions available when the state is prior_to_hire."""
         self.client.force_login(self.employer)
-        self.job_application.state = JobApplicationWorkflow.STATE_PRIOR_TO_HIRE
+        self.job_application.state = job_applications_enums.JobApplicationState.PRIOR_TO_HIRE
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
@@ -2014,7 +2014,7 @@ class ProcessTemplatesTest(TestCase):
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
         )
         self.client.force_login(self.employer)
-        self.job_application.state = JobApplicationWorkflow.STATE_PROCESSING
+        self.job_application.state = job_applications_enums.JobApplicationState.PROCESSING
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
@@ -2034,7 +2034,7 @@ class ProcessTemplatesTest(TestCase):
     def test_details_template_for_state_postponed(self):
         """Test actions available when the state is postponed."""
         self.client.force_login(self.employer)
-        self.job_application.state = JobApplicationWorkflow.STATE_POSTPONED
+        self.job_application.state = job_applications_enums.JobApplicationState.POSTPONED
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
@@ -2048,7 +2048,7 @@ class ProcessTemplatesTest(TestCase):
         """Test actions available when the state is postponed."""
         self.client.force_login(self.employer)
         EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
-        self.job_application.state = JobApplicationWorkflow.STATE_POSTPONED
+        self.job_application.state = job_applications_enums.JobApplicationState.POSTPONED
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
@@ -2060,7 +2060,7 @@ class ProcessTemplatesTest(TestCase):
 
     def test_details_template_for_state_obsolete(self):
         self.client.force_login(self.employer)
-        self.job_application.state = JobApplicationWorkflow.STATE_OBSOLETE
+        self.job_application.state = job_applications_enums.JobApplicationState.OBSOLETE
         self.job_application.save()
 
         response = self.client.get(self.url_details)
@@ -2075,7 +2075,7 @@ class ProcessTemplatesTest(TestCase):
     def test_details_template_for_state_obsolete_valid_diagnosis(self):
         self.client.force_login(self.employer)
         EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
-        self.job_application.state = JobApplicationWorkflow.STATE_OBSOLETE
+        self.job_application.state = job_applications_enums.JobApplicationState.OBSOLETE
         self.job_application.save()
 
         response = self.client.get(self.url_details)
@@ -2090,7 +2090,7 @@ class ProcessTemplatesTest(TestCase):
     def test_details_template_for_state_refused(self):
         """Test actions available for other states."""
         self.client.force_login(self.employer)
-        self.job_application.state = JobApplicationWorkflow.STATE_REFUSED
+        self.job_application.state = job_applications_enums.JobApplicationState.REFUSED
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
@@ -2104,7 +2104,7 @@ class ProcessTemplatesTest(TestCase):
         """Test actions available for other states."""
         self.client.force_login(self.employer)
         EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
-        self.job_application.state = JobApplicationWorkflow.STATE_REFUSED
+        self.job_application.state = job_applications_enums.JobApplicationState.REFUSED
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
@@ -2117,7 +2117,7 @@ class ProcessTemplatesTest(TestCase):
     def test_details_template_for_state_canceled(self):
         """Test actions available for other states."""
         self.client.force_login(self.employer)
-        self.job_application.state = JobApplicationWorkflow.STATE_CANCELLED
+        self.job_application.state = job_applications_enums.JobApplicationState.CANCELLED
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
@@ -2131,7 +2131,7 @@ class ProcessTemplatesTest(TestCase):
         """Test actions available for other states."""
         self.client.force_login(self.employer)
         EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
-        self.job_application.state = JobApplicationWorkflow.STATE_CANCELLED
+        self.job_application.state = job_applications_enums.JobApplicationState.CANCELLED
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
@@ -2144,7 +2144,7 @@ class ProcessTemplatesTest(TestCase):
     def test_details_template_for_state_accepted(self):
         """Test actions available for other states."""
         self.client.force_login(self.employer)
-        self.job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
+        self.job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
@@ -2167,7 +2167,7 @@ class ProcessTransferJobApplicationTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             to_company=company,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
         )
 
         self.client.force_login(user)
@@ -2183,12 +2183,14 @@ class ProcessTransferJobApplicationTest(TestCase):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         job_application_1 = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, to_company=company, state=JobApplicationWorkflow.STATE_NEW
+            sent_by_authorized_prescriber_organisation=True,
+            to_company=company,
+            state=job_applications_enums.JobApplicationState.NEW,
         )
         job_application_2 = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             to_company=company,
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=job_applications_enums.JobApplicationState.ACCEPTED,
         )
 
         self.client.force_login(user)
@@ -2212,7 +2214,7 @@ class ProcessTransferJobApplicationTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             to_company=company,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
         )
 
         assert 2 == user.companymembership_set.count()
@@ -2234,7 +2236,7 @@ class ProcessTransferJobApplicationTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             to_company=company,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
             job_seeker__for_snapshot=True,
             job_seeker__first_name="<>html escaped<>",
         )
@@ -2267,7 +2269,7 @@ class ProcessTransferJobApplicationTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             to_company=company,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
         )
         # Forge query
         self.client.force_login(user)
@@ -2281,7 +2283,7 @@ class ProcessTransferJobApplicationTest(TestCase):
 def test_refuse_jobapplication_geiq_reasons(client, reason):
     job_application = JobApplicationFactory(
         sent_by_authorized_prescriber_organisation=True,
-        state=JobApplicationWorkflow.STATE_PROCESSING,
+        state=job_applications_enums.JobApplicationState.PROCESSING,
         to_company__kind=CompanyKind.GEIQ,
     )
     assert job_application.state.is_processing
@@ -2306,7 +2308,7 @@ def test_details_for_prescriber_not_can_have_prior_actions(client):
     kind = random.choice(list(set(CompanyKind) - {CompanyKind.GEIQ}))
     job_application = JobApplicationFactory(
         sent_by_authorized_prescriber_organisation=True,
-        state=JobApplicationWorkflow.STATE_PROCESSING,
+        state=job_applications_enums.JobApplicationState.PROCESSING,
         to_company__kind=kind,
     )
     client.force_login(job_application.sender)
@@ -2319,7 +2321,7 @@ def test_details_for_prescriber_not_can_have_prior_actions(client):
 def test_details_for_prescriber_geiq_without_prior_actions(client):
     job_application = JobApplicationFactory(
         sent_by_authorized_prescriber_organisation=True,
-        state=JobApplicationWorkflow.STATE_PROCESSING,
+        state=job_applications_enums.JobApplicationState.PROCESSING,
         with_geiq_eligibility_diagnosis_from_prescriber=True,
     )
     prescriber = job_application.sender_prescriber_organization.members.first()
@@ -2336,7 +2338,7 @@ def test_details_for_prescriber_geiq_without_prior_actions(client):
 def test_details_for_prescriber_geiq_with_prior_actions(client):
     job_application = JobApplicationFactory(
         sent_by_authorized_prescriber_organisation=True,
-        state=JobApplicationWorkflow.STATE_PROCESSING,
+        state=job_applications_enums.JobApplicationState.PROCESSING,
         with_geiq_eligibility_diagnosis_from_prescriber=True,
     )
     prior_action = PriorActionFactory(
@@ -2360,7 +2362,7 @@ def test_details_for_prescriber_geiq_with_prior_actions(client):
 def test_details_for_jobseeker_geiq_with_prior_actions(client):
     job_application = JobApplicationFactory(
         sent_by_authorized_prescriber_organisation=True,
-        state=JobApplicationWorkflow.STATE_PROCESSING,
+        state=job_applications_enums.JobApplicationState.PROCESSING,
         with_geiq_eligibility_diagnosis_from_prescriber=True,
     )
     prior_action = PriorActionFactory(
@@ -2384,7 +2386,7 @@ def test_details_for_jobseeker_geiq_with_prior_actions(client):
 
 def test_accept_button(client):
     job_application = JobApplicationFactory(
-        state=JobApplicationWorkflow.STATE_PROCESSING,
+        state=job_applications_enums.JobApplicationState.PROCESSING,
         to_company__kind=CompanyKind.GEIQ,
     )
     accept_url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
@@ -2430,7 +2432,7 @@ def test_add_prior_action_processing(client, snapshot):
     job_application = JobApplicationFactory(
         for_snapshot=True,
         to_company__kind=CompanyKind.GEIQ,
-        state=JobApplicationWorkflow.STATE_PROCESSING,
+        state=job_applications_enums.JobApplicationState.PROCESSING,
         created_at=datetime.datetime(2023, 12, 10, 10, 11, 11, tzinfo=datetime.timezone.utc),
     )
     client.force_login(job_application.to_company.members.first())
@@ -2455,7 +2457,7 @@ def test_add_prior_action_processing(client, snapshot):
     assert str(soup) == snapshot
 
     # State is accepted
-    job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
+    job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
     job_application.save(update_fields=("state",))
     response = client.post(
         add_prior_action_url,
@@ -2470,7 +2472,7 @@ def test_add_prior_action_processing(client, snapshot):
 
     # State is processing but company is not a GEIQ
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.AI, state=JobApplicationWorkflow.STATE_PROCESSING
+        to_company__kind=CompanyKind.AI, state=job_applications_enums.JobApplicationState.PROCESSING
     )
     client.force_login(job_application.to_company.members.first())
     response = client.post(
@@ -2487,7 +2489,7 @@ def test_add_prior_action_processing(client, snapshot):
 
 def test_modify_prior_action(client):
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.GEIQ, state=JobApplicationWorkflow.STATE_POSTPONED
+        to_company__kind=CompanyKind.GEIQ, state=job_applications_enums.JobApplicationState.POSTPONED
     )
     prior_action = PriorActionFactory(
         job_application=job_application, action=job_applications_enums.Prequalification.AFPR
@@ -2513,7 +2515,7 @@ def test_modify_prior_action(client):
     assert prior_action.dates.upper == new_end_date
     assert prior_action.action == job_applications_enums.ProfessionalSituationExperience.PMSMP
 
-    job_application.state = JobApplicationWorkflow.STATE_ACCEPTED
+    job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
     job_application.save(update_fields=("state",))
     response = client.post(
         modify_prior_action_url,
@@ -2530,7 +2532,7 @@ def test_modify_prior_action(client):
 
 def test_delete_prior_action_accepted(client):
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.GEIQ, state=JobApplicationWorkflow.STATE_ACCEPTED
+        to_company__kind=CompanyKind.GEIQ, state=job_applications_enums.JobApplicationState.ACCEPTED
     )
     prior_action = PriorActionFactory(
         job_application=job_application, action=job_applications_enums.Prequalification.AFPR
@@ -2552,7 +2554,7 @@ def test_delete_prior_action(client, snapshot, with_geiq_diagnosis):
     job_application = JobApplicationFactory(
         for_snapshot=True,
         to_company__kind=CompanyKind.GEIQ,
-        state=JobApplicationWorkflow.STATE_PROCESSING,
+        state=job_applications_enums.JobApplicationState.PROCESSING,
         created_at=datetime.datetime(2023, 12, 10, 10, 11, 11, tzinfo=datetime.timezone.utc),
     )
     prior_action1 = PriorActionFactory(
@@ -2621,7 +2623,7 @@ def test_delete_prior_action(client, snapshot, with_geiq_diagnosis):
 
 def test_htmx_add_prior_action_and_cancel(client):
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING
+        to_company__kind=CompanyKind.GEIQ, state=job_applications_enums.JobApplicationState.PROCESSING
     )
     client.force_login(job_application.to_company.members.first())
     details_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
@@ -2651,7 +2653,7 @@ def test_htmx_add_prior_action_and_cancel(client):
 
 def test_htmx_modify_prior_action_and_cancel(client):
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING
+        to_company__kind=CompanyKind.GEIQ, state=job_applications_enums.JobApplicationState.PROCESSING
     )
     prior_action = PriorActionFactory(job_application=job_application)
     client.force_login(job_application.to_company.members.first())
@@ -2700,7 +2702,7 @@ def test_details_for_company_with_prior_action(client, with_geiq_diagnosis):
     response = client.post(reverse("apply:process", kwargs={"job_application_id": job_application.pk}))
     assertRedirects(response, details_url)
     job_application.refresh_from_db()
-    assert job_application.state == JobApplicationWorkflow.STATE_PROCESSING
+    assert job_application.state == job_applications_enums.JobApplicationState.PROCESSING
 
     END_AT_LABEL = "Date de fin prévisionnelle"
     MISSING_FIELD_MESSAGE = "Ce champ est obligatoire"
@@ -2763,7 +2765,7 @@ def test_details_for_company_with_prior_action(client, with_geiq_diagnosis):
     update_page_with_htmx(simulated_page, "#add_prior_action > form", response)
 
     job_application.refresh_from_db()
-    assert job_application.state == JobApplicationWorkflow.STATE_PRIOR_TO_HIRE
+    assert job_application.state == job_applications_enums.JobApplicationState.PRIOR_TO_HIRE
     prior_action = job_application.prior_actions.get()
     assert prior_action.action == job_applications_enums.Prequalification.AFPR
 
@@ -2813,7 +2815,7 @@ def test_precriber_details_with_older_valid_approval(client, faker):
 def test_details_for_geiq_with_inverted_vae_contract(client, inverted_vae_contract, expected_predicate):
     # GEIQ: check that contract type is displayed in details
     job_application = JobApplicationFactory(
-        state=JobApplicationWorkflow.STATE_ACCEPTED,
+        state=job_applications_enums.JobApplicationState.ACCEPTED,
         to_company__kind=CompanyKind.GEIQ,
         contract_type=ContractType.PROFESSIONAL_TRAINING,
         inverted_vae_contract=inverted_vae_contract,
@@ -2928,7 +2930,7 @@ def test_reload_contract_type_and_options_404(client):
 
 def test_htmx_reload_contract_type_and_options(client, snapshot):
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.GEIQ, state=JobApplicationWorkflow.STATE_PROCESSING
+        to_company__kind=CompanyKind.GEIQ, state=job_applications_enums.JobApplicationState.PROCESSING
     )
     employer = job_application.to_company.members.first()
     client.force_login(employer)
@@ -2976,7 +2978,7 @@ JOB_DETAILS_LABEL = "Préciser le nom du poste (code ROME)"
 def test_select_job_description_for_job_application(client):
     create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.EI, state=JobApplicationWorkflow.STATE_PROCESSING
+        to_company__kind=CompanyKind.EI, state=job_applications_enums.JobApplicationState.PROCESSING
     )
     user = job_application.to_company.members.first()
 
@@ -3014,7 +3016,7 @@ def test_select_other_job_description_for_job_application(client, mocker):
     create_test_cities(["54", "57"], num_per_department=2)
 
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.EI, state=JobApplicationWorkflow.STATE_PROCESSING
+        to_company__kind=CompanyKind.EI, state=job_applications_enums.JobApplicationState.PROCESSING
     )
     user = job_application.to_company.members.first()
     JobDescriptionFactory(company=job_application.to_company, is_active=True)
@@ -3082,7 +3084,7 @@ def test_select_other_job_description_for_job_application(client, mocker):
 def test_no_job_description_for_job_application(client):
     create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
     job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.EI, state=JobApplicationWorkflow.STATE_PROCESSING
+        to_company__kind=CompanyKind.EI, state=job_applications_enums.JobApplicationState.PROCESSING
     )
     user = job_application.to_company.members.first()
 

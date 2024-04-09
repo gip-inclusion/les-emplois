@@ -27,8 +27,8 @@ from itou.approvals.models import (
     Suspension,
 )
 from itou.files.models import File
-from itou.job_applications.enums import Origin, SenderKind
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState, Origin, SenderKind
+from itou.job_applications.models import JobApplication
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.pagination import ItouPaginator, pager
@@ -75,7 +75,7 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
         return (
             JobApplication.objects.filter(
                 job_seeker=approval.user,
-                state=JobApplicationWorkflow.STATE_ACCEPTED,
+                state=JobApplicationState.ACCEPTED,
                 to_company=self.siae,
                 approval=approval,
             )
@@ -799,7 +799,7 @@ def pe_approval_create(request, pe_approval_id):
     job_application = JobApplication(
         job_seeker=job_seeker,
         to_company=siae,
-        state=JobApplicationWorkflow.STATE_ACCEPTED,
+        state=JobApplicationState.ACCEPTED,
         origin=Origin.PE_APPROVAL,  # This origin is specific to this process.
         sender=request.user,
         sender_kind=SenderKind.EMPLOYER,

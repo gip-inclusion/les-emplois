@@ -4,7 +4,8 @@ from django.db.models import F
 
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.companies.enums import CompanyKind
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplication
 from itou.users.enums import KIND_EMPLOYER
 from itou.utils.command import BaseCommand
 from itou.utils.management_commands import XlsxExportMixin
@@ -26,7 +27,7 @@ class Command(XlsxExportMixin, BaseCommand):
                 "to_company__convention",
             )
             .filter(
-                state=JobApplicationWorkflow.STATE_ACCEPTED,
+                state=JobApplicationState.ACCEPTED,
                 to_company__kind__in=[CompanyKind.ACI, CompanyKind.EI, CompanyKind.ETTI, CompanyKind.AI],
                 eligibility_diagnosis__author_kind=KIND_EMPLOYER,
                 eligibility_diagnosis__author_siae=F("to_company"),

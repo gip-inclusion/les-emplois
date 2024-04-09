@@ -10,7 +10,7 @@ from pytest_django.asserts import assertContains, assertNumQueries
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria
-from itou.job_applications.enums import SenderKind
+from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.utils.widgets import DuetDatePickerWidget
@@ -186,7 +186,7 @@ class ProcessListJobSeekerTest(ProcessListTest):
 
     def test_htmx_filters(self):
         job_seeker = JobSeekerFactory()
-        JobApplicationFactory(job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_ACCEPTED)
+        JobApplicationFactory(job_seeker=job_seeker, state=JobApplicationState.ACCEPTED)
         self.client.force_login(job_seeker)
         response = self.client.get(reverse("apply:list_for_job_seeker"))
         page = parse_response_to_soup(response, selector="#main")
@@ -387,7 +387,7 @@ class ProcessListSiaeTest(ProcessListTest):
         Eddie wants to see only accepted job applications.
         """
         self.client.force_login(self.eddie_hit_pit)
-        state_accepted = JobApplicationWorkflow.STATE_ACCEPTED
+        state_accepted = JobApplicationState.ACCEPTED
         response = self.client.get(self.siae_base_url, {"states": [state_accepted]})
 
         applications = response.context["job_applications_page"].object_list
@@ -403,7 +403,7 @@ class ProcessListSiaeTest(ProcessListTest):
 
         # prior_to_hire filter doesn't exist for non-GEIQ SIAE and is ignored
         self.client.force_login(self.eddie_hit_pit)
-        params = {"states": [JobApplicationWorkflow.STATE_PRIOR_TO_HIRE]}
+        params = {"states": [JobApplicationState.PRIOR_TO_HIRE]}
         response = self.client.get(self.siae_base_url, params)
         self.assertNotContains(response, PRIOR_TO_HIRE_LABEL)
 
@@ -418,14 +418,14 @@ class ProcessListSiaeTest(ProcessListTest):
 
         applications = response.context["job_applications_page"].object_list
         assert len(applications) == 1
-        assert applications[0].state == JobApplicationWorkflow.STATE_PRIOR_TO_HIRE
+        assert applications[0].state == JobApplicationState.PRIOR_TO_HIRE
 
     def test_list_for_siae_view__filtered_by_many_states(self):
         """
         Eddie wants to see NEW and PROCESSING job applications.
         """
         self.client.force_login(self.eddie_hit_pit)
-        job_applications_states = [JobApplicationWorkflow.STATE_NEW, JobApplicationWorkflow.STATE_PROCESSING]
+        job_applications_states = [JobApplicationState.NEW, JobApplicationState.PROCESSING]
         response = self.client.get(self.siae_base_url, {"states": job_applications_states})
 
         applications = response.context["job_applications_page"].object_list
@@ -531,7 +531,7 @@ class ProcessListSiaeTest(ProcessListTest):
         now = timezone.now()
         yesterday = (now - timezone.timedelta(days=1)).date()
         self.client.force_login(self.eddie_hit_pit)
-        states_filter = {"states": [JobApplicationWorkflow.STATE_ACCEPTED, JobApplicationWorkflow.STATE_NEW]}
+        states_filter = {"states": [JobApplicationState.ACCEPTED, JobApplicationState.NEW]}
 
         # Without approval
         response = self.client.get(self.siae_base_url, {**states_filter, "pass_iae_active": True})
@@ -540,7 +540,7 @@ class ProcessListSiaeTest(ProcessListTest):
         # With a job_application with an approval
         job_application = JobApplicationFactory(
             with_approval=True,
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             hiring_start_at=yesterday,
             approval__start_at=yesterday,
             to_company=self.hit_pit,
@@ -807,7 +807,7 @@ class TestListForSiae:
 
     def test_htmx_filters(self, client):
         company = CompanyFactory(with_membership=True)
-        JobApplicationFactory(to_company=company, state=JobApplicationWorkflow.STATE_ACCEPTED)
+        JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
         client.force_login(company.members.get())
         response = client.get(reverse("apply:list_for_siae"))
         page = parse_response_to_soup(response, selector="#main")
@@ -987,7 +987,7 @@ class TestForPrescriber:
 
     def test_htmx_filters(self, client):
         prescriber = PrescriberFactory()
-        JobApplicationFactory(sender=prescriber, state=JobApplicationWorkflow.STATE_ACCEPTED)
+        JobApplicationFactory(sender=prescriber, state=JobApplicationState.ACCEPTED)
         client.force_login(prescriber)
         response = client.get(reverse("apply:list_for_prescriber"))
         page = parse_response_to_soup(response, selector="#main")

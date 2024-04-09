@@ -21,7 +21,8 @@ from django.utils import timezone
 from itou.approvals.admin_forms import ManuallyAddApprovalFromJobApplicationForm
 from itou.approvals.enums import Origin
 from itou.approvals.models import Approval, CancelledApproval
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.models import JobApplication
 from itou.utils.apis import enums as api_enums
 from itou.utils.emails import get_email_text_template
 from itou.utils.urls import add_url_params
@@ -49,7 +50,7 @@ def manually_add_approval(
     job_application = get_object_or_404(
         queryset,
         pk=job_application_id,
-        state=JobApplicationWorkflow.STATE_ACCEPTED,
+        state=JobApplicationState.ACCEPTED,
         approval=None,
         approval_manually_refused_at=None,
         approval_manually_refused_by=None,
@@ -121,7 +122,7 @@ def manually_refuse_approval(
     job_application = get_object_or_404(
         queryset,
         pk=job_application_id,
-        state=JobApplicationWorkflow.STATE_ACCEPTED,
+        state=JobApplicationState.ACCEPTED,
         approval=None,
         approval_manually_delivered_by=None,
         approval_number_sent_by_email=False,

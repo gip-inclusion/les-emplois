@@ -3,7 +3,7 @@ import time
 from django.core.management.base import BaseCommand
 
 from itou.approvals.models import Approval
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState
 
 
 BATCH_SIZE = 1000
@@ -13,7 +13,7 @@ class Command(BaseCommand):
     def handle(self, **options):
         objects_to_migrate = Approval.objects.filter(
             origin_sender_kind=None,
-            jobapplication__state=JobApplicationWorkflow.STATE_ACCEPTED,
+            jobapplication__state=JobApplicationState.ACCEPTED,
         ).distinct()
         total_objects = objects_to_migrate.count()
         print(f"Before: {total_objects}")

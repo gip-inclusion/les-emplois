@@ -8,8 +8,8 @@ from rest_framework import authentication, exceptions, generics, permissions, st
 from itou.api.models import CompanyApiToken
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
-from itou.job_applications.enums import Prequalification, ProfessionalSituationExperience
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
+from itou.job_applications.enums import JobApplicationState, Prequalification, ProfessionalSituationExperience
+from itou.job_applications.models import JobApplication, PriorAction
 from itou.utils.validators import validate_siren
 
 from .serializers import GeiqJobApplicationSerializer
@@ -69,7 +69,7 @@ class GeiqJobApplicationListView(generics.ListAPIView):
             extra_filters.update({"to_company__siret__startswith": siren[:9]})
         return (
             JobApplication.objects.filter(
-                state=JobApplicationWorkflow.STATE_ACCEPTED,
+                state=JobApplicationState.ACCEPTED,
                 to_company__kind=CompanyKind.GEIQ,
                 **extra_filters,
             )

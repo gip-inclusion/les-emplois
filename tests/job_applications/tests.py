@@ -24,6 +24,7 @@ from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import (
     GEIQ_MAX_HOURS_PER_WEEK,
     GEIQ_MIN_HOURS_PER_WEEK,
+    JobApplicationState,
     Origin,
     QualificationLevel,
     QualificationType,
@@ -71,7 +72,7 @@ from tests.utils.test import TestCase, get_rows_from_streaming_response
 class JobApplicationModelTest(TestCase):
     def test_eligibility_diagnosis_by_siae_required(self):
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.GEIQ,
             eligibility_diagnosis=None,
         )
@@ -82,7 +83,7 @@ class JobApplicationModelTest(TestCase):
         assert not job_application.eligibility_diagnosis_by_siae_required
 
         job_application = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.EI,
             eligibility_diagnosis=None,
         )
@@ -95,7 +96,7 @@ class JobApplicationModelTest(TestCase):
     def test_accepted_by(self):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
         )
         user = job_application.to_company.members.first()
         job_application.accept(user=user)
@@ -126,7 +127,7 @@ class JobApplicationModelTest(TestCase):
 
     def test_is_refused_for_other_reason(self):
         job_application = JobApplicationFactory()
-        for state, state_label in JobApplicationWorkflow.STATE_CHOICES:
+        for state in JobApplicationState.values:
             for refusal_reason in RefusalReason.values:
                 with self.subTest(
                     "Test state and refusal_reason permutations", state=state, refusal_reason=refusal_reason
@@ -134,7 +135,7 @@ class JobApplicationModelTest(TestCase):
                     job_application.state = state
                     job_application.refusal_reason = refusal_reason
 
-                    if state == JobApplicationWorkflow.STATE_REFUSED and refusal_reason == RefusalReason.OTHER:
+                    if state == JobApplicationState.REFUSED and refusal_reason == RefusalReason.OTHER:
                         assert job_application.is_refused_for_other_reason
                     else:
                         assert not job_application.is_refused_for_other_reason
@@ -144,15 +145,15 @@ class JobApplicationModelTest(TestCase):
         Only cancelled, refused and obsolete job_applications can be archived.
         """
         states_transition_not_possible = [
-            JobApplicationWorkflow.STATE_NEW,
-            JobApplicationWorkflow.STATE_PROCESSING,
-            JobApplicationWorkflow.STATE_POSTPONED,
-            JobApplicationWorkflow.STATE_ACCEPTED,
+            JobApplicationState.NEW,
+            JobApplicationState.PROCESSING,
+            JobApplicationState.POSTPONED,
+            JobApplicationState.ACCEPTED,
         ]
         states_transition_possible = [
-            JobApplicationWorkflow.STATE_CANCELLED,
-            JobApplicationWorkflow.STATE_REFUSED,
-            JobApplicationWorkflow.STATE_OBSOLETE,
+            JobApplicationState.CANCELLED,
+            JobApplicationState.REFUSED,
+            JobApplicationState.OBSOLETE,
         ]
 
         for state in states_transition_not_possible:
@@ -310,20 +311,12 @@ def test_can_have_prior_action():
     geiq = CompanyFactory.build(kind=CompanyKind.GEIQ)
     non_geiq = CompanyFactory.build(kind=CompanyKind.AI)
 
+    assert JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.NEW).can_have_prior_action is False
     assert (
-        JobApplicationFactory.build(to_company=geiq, state=JobApplicationWorkflow.STATE_NEW).can_have_prior_action
-        is False
+        JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.POSTPONED).can_have_prior_action is True
     )
     assert (
-        JobApplicationFactory.build(
-            to_company=geiq, state=JobApplicationWorkflow.STATE_POSTPONED
-        ).can_have_prior_action
-        is True
-    )
-    assert (
-        JobApplicationFactory.build(
-            to_company=non_geiq, state=JobApplicationWorkflow.STATE_POSTPONED
-        ).can_have_prior_action
+        JobApplicationFactory.build(to_company=non_geiq, state=JobApplicationState.POSTPONED).can_have_prior_action
         is False
     )
 
@@ -333,25 +326,18 @@ def test_can_change_prior_actions():
     non_geiq = CompanyFactory(kind=CompanyKind.ACI)
 
     assert (
-        JobApplicationFactory.build(to_company=geiq, state=JobApplicationWorkflow.STATE_NEW).can_change_prior_actions
-        is False
+        JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.NEW).can_change_prior_actions is False
     )
     assert (
-        JobApplicationFactory.build(
-            to_company=geiq, state=JobApplicationWorkflow.STATE_POSTPONED
-        ).can_change_prior_actions
+        JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.POSTPONED).can_change_prior_actions
         is True
     )
     assert (
-        JobApplicationFactory.build(
-            to_company=geiq, state=JobApplicationWorkflow.STATE_ACCEPTED
-        ).can_change_prior_actions
+        JobApplicationFactory.build(to_company=geiq, state=JobApplicationState.ACCEPTED).can_change_prior_actions
         is False
     )
     assert (
-        JobApplicationFactory.build(
-            to_company=non_geiq, state=JobApplicationWorkflow.STATE_POSTPONED
-        ).can_change_prior_actions
+        JobApplicationFactory.build(to_company=non_geiq, state=JobApplicationState.POSTPONED).can_change_prior_actions
         is False
     )
 
@@ -491,11 +477,11 @@ class JobApplicationQuerySetTest(TestCase):
     def test_eligible_as_employee_record(self):
         # Results must be a list of job applications:
         # Accepted
-        job_app = JobApplicationFactory(state=JobApplicationWorkflow.STATE_NEW)
+        job_app = JobApplicationFactory(state=JobApplicationState.NEW)
         assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
 
         # With an approval
-        job_app = JobApplicationWithoutApprovalFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        job_app = JobApplicationWithoutApprovalFactory(state=JobApplicationState.ACCEPTED)
         assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
 
         # Approval `create_employee_record` is False.
@@ -503,7 +489,7 @@ class JobApplicationQuerySetTest(TestCase):
         assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
 
         # Must be accepted and only after CANCELLATION_DAYS_AFTER_HIRING_STARTED
-        job_app = JobApplicationFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        job_app = JobApplicationFactory(state=JobApplicationState.ACCEPTED)
         assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
 
         # Approval start date is also checked (must be older then CANCELLATION_DAY_AFTER_HIRING STARTED).
@@ -530,14 +516,14 @@ class JobApplicationQuerySetTest(TestCase):
 
         # Create a second job application to the same SIAE and for the same approval
         second_job_app = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             to_company=job_app.to_company,
             approval=job_app.approval,
         )
         assert second_job_app not in JobApplication.objects.eligible_as_employee_record(second_job_app.to_company)
         # Create a third job application to an antenna SIAE
         third_job_app = JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             to_company__convention=job_app.to_company.convention,
             to_company__source=Company.SOURCE_USER_CREATED,
             approval=job_app.approval,
@@ -570,7 +556,7 @@ class JobApplicationQuerySetTest(TestCase):
         # No employee record, but with a prolongation
         job_app = JobApplicationFactory(
             with_approval=True,
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             hiring_start_at=None,
         )
         assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
@@ -594,7 +580,7 @@ class JobApplicationQuerySetTest(TestCase):
         # No employee record, but with a prolongation and a suspension
         job_app = JobApplicationFactory(
             with_approval=True,
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             hiring_start_at=None,
         )
         assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
@@ -618,7 +604,7 @@ class JobApplicationQuerySetTest(TestCase):
     def test_eligible_job_applications_with_a_suspended_or_extended_approval_older_than_cutoff(self):
         job_app = JobApplicationFactory(
             with_approval=True,
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             hiring_start_at=None,
         )
         assert job_app not in JobApplication.objects.eligible_as_employee_record(job_app.to_company)
@@ -636,7 +622,7 @@ class JobApplicationQuerySetTest(TestCase):
 
     def test_with_accepted_at_for_created_from_pe_approval(self):
         JobApplicationFactory(
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             origin=Origin.PE_APPROVAL,
         )
 
@@ -702,7 +688,7 @@ class JobApplicationQuerySetTest(TestCase):
         assert JobApplication.objects.with_accepted_at().first().accepted_at is None
 
     def test_with_accepted_at_for_accepted_with_no_transition(self):
-        JobApplicationSentByCompanyFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        JobApplicationSentByCompanyFactory(state=JobApplicationState.ACCEPTED)
         job_application = JobApplication.objects.with_accepted_at().first()
         assert job_application.accepted_at == job_application.created_at
 
@@ -853,7 +839,7 @@ class JobApplicationNotificationsTest(TestCase):
     def test_accept_trigger_manual_approval(self):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             hiring_start_at=datetime.date.today(),
         )
         accepted_by = job_application.to_company.members.first()
@@ -880,7 +866,7 @@ class JobApplicationNotificationsTest(TestCase):
     def test_accept_trigger_manual_approval_without_hiring_end_at(self):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             hiring_start_at=datetime.date.today(),
             hiring_end_at=None,
         )
@@ -942,7 +928,7 @@ class JobApplicationNotificationsTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             job_seeker=job_seeker,
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             approval=approval,
         )
         accepted_by = job_application.to_company.members.first()
@@ -975,7 +961,7 @@ class JobApplicationNotificationsTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             job_seeker=job_seeker,
-            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             approval=approval,
             hiring_end_at=None,
         )
@@ -1014,7 +1000,7 @@ class JobApplicationNotificationsTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             job_seeker=job_seeker,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             approval=approval,
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
         )
@@ -1038,7 +1024,7 @@ class JobApplicationNotificationsTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             job_seeker=job_seeker,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
         )
         job_application.accept(user=job_application.to_company.members.first())
@@ -1053,7 +1039,7 @@ class JobApplicationNotificationsTest(TestCase):
 
     def test_cancel_sent_by_prescriber(self):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_ACCEPTED
+            sent_by_authorized_prescriber_organisation=True, state=JobApplicationState.ACCEPTED
         )
 
         cancellation_user = job_application.to_company.active_members.first()
@@ -1072,7 +1058,7 @@ class JobApplicationNotificationsTest(TestCase):
 
     def test_cancel_sent_by_job_seeker(self):
         # When sent by jobseeker.
-        job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationWorkflow.STATE_ACCEPTED)
+        job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationState.ACCEPTED)
 
         cancellation_user = job_application.to_company.active_members.first()
         job_application.cancel(user=cancellation_user)
@@ -1088,7 +1074,7 @@ class JobApplicationNotificationsTest(TestCase):
 
     def test_cancel_without_sender(self):
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, state=JobApplicationWorkflow.STATE_ACCEPTED
+            sent_by_authorized_prescriber_organisation=True, state=JobApplicationState.ACCEPTED
         )
         # User account is deleted.
         job_application.sender = None
@@ -1125,19 +1111,19 @@ class JobApplicationWorkflowTest(TestCase):
             "sender": job_seeker,
             "sender_kind": SenderKind.JOB_SEEKER,
         }
-        JobApplicationFactory(state=JobApplicationWorkflow.STATE_NEW, **kwargs)
-        JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING, **kwargs)
-        JobApplicationFactory(state=JobApplicationWorkflow.STATE_POSTPONED, **kwargs)
-        JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING, **kwargs)
+        JobApplicationFactory(state=JobApplicationState.NEW, **kwargs)
+        JobApplicationFactory(state=JobApplicationState.PROCESSING, **kwargs)
+        JobApplicationFactory(state=JobApplicationState.POSTPONED, **kwargs)
+        JobApplicationFactory(state=JobApplicationState.PROCESSING, **kwargs)
 
         assert job_seeker.job_applications.count() == 4
         assert job_seeker.job_applications.pending().count() == 4
 
-        job_application = job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_PROCESSING).first()
+        job_application = job_seeker.job_applications.filter(state=JobApplicationState.PROCESSING).first()
         job_application.accept(user=job_application.to_company.members.first())
 
-        assert job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_ACCEPTED).count() == 1
-        assert job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_OBSOLETE).count() == 3
+        assert job_seeker.job_applications.filter(state=JobApplicationState.ACCEPTED).count() == 1
+        assert job_seeker.job_applications.filter(state=JobApplicationState.OBSOLETE).count() == 3
 
         # Check sent emails.
         assert len(mail.outbox) == 2
@@ -1158,22 +1144,22 @@ class JobApplicationWorkflowTest(TestCase):
             "sender_kind": SenderKind.JOB_SEEKER,
         }
         for state in [
-            JobApplicationWorkflow.STATE_NEW,
-            JobApplicationWorkflow.STATE_PROCESSING,
-            JobApplicationWorkflow.STATE_POSTPONED,
-            JobApplicationWorkflow.STATE_ACCEPTED,
-            JobApplicationWorkflow.STATE_OBSOLETE,
-            JobApplicationWorkflow.STATE_OBSOLETE,
+            JobApplicationState.NEW,
+            JobApplicationState.PROCESSING,
+            JobApplicationState.POSTPONED,
+            JobApplicationState.ACCEPTED,
+            JobApplicationState.OBSOLETE,
+            JobApplicationState.OBSOLETE,
         ]:
             JobApplicationFactory(state=state, **kwargs)
 
         assert job_seeker.job_applications.count() == 6
 
-        job_application = job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_OBSOLETE).first()
+        job_application = job_seeker.job_applications.filter(state=JobApplicationState.OBSOLETE).first()
         job_application.accept(user=job_application.to_company.members.first())
 
-        assert job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_ACCEPTED).count() == 2
-        assert job_seeker.job_applications.filter(state=JobApplicationWorkflow.STATE_OBSOLETE).count() == 4
+        assert job_seeker.job_applications.filter(state=JobApplicationState.ACCEPTED).count() == 2
+        assert job_seeker.job_applications.filter(state=JobApplicationState.OBSOLETE).count() == 4
 
         # Check sent emails.
         assert len(mail.outbox) == 2
@@ -1191,7 +1177,7 @@ class JobApplicationWorkflowTest(TestCase):
             pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id, birthdate=job_seeker.birthdate
         )
         job_application = JobApplicationSentByJobSeekerFactory(
-            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+            job_seeker=job_seeker, state=JobApplicationState.PROCESSING
         )
         job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
@@ -1214,7 +1200,7 @@ class JobApplicationWorkflowTest(TestCase):
         job_seeker = JobSeekerFactory(jobseeker_profile__pole_emploi_id="", birthdate=None)
         pe_approval = PoleEmploiApprovalFactory(nir=job_seeker.jobseeker_profile.nir)
         job_application = JobApplicationSentByJobSeekerFactory(
-            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+            job_seeker=job_seeker, state=JobApplicationState.PROCESSING
         )
         job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
@@ -1243,7 +1229,7 @@ class JobApplicationWorkflowTest(TestCase):
             jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
         )
         job_application = JobApplicationSentByJobSeekerFactory(
-            job_seeker=job_seeker, state=JobApplicationWorkflow.STATE_PROCESSING
+            job_seeker=job_seeker, state=JobApplicationState.PROCESSING
         )
         job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is None
@@ -1261,7 +1247,7 @@ class JobApplicationWorkflowTest(TestCase):
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
         )
         job_application.accept(user=job_application.to_company.members.first())
@@ -1282,7 +1268,7 @@ class JobApplicationWorkflowTest(TestCase):
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
         )
         job_application.accept(user=job_application.to_company.members.first())
@@ -1300,7 +1286,7 @@ class JobApplicationWorkflowTest(TestCase):
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
         )
         job_application.accept(user=job_application.to_company.members.first())
@@ -1319,7 +1305,7 @@ class JobApplicationWorkflowTest(TestCase):
         Accept a job application sent by an "orienteur".
         """
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             job_seeker__with_pole_emploi_id=True,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
@@ -1350,7 +1336,7 @@ class JobApplicationWorkflowTest(TestCase):
         """
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             job_seeker__with_pole_emploi_id=True,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
@@ -1394,7 +1380,7 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             job_seeker=user,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
@@ -1435,7 +1421,7 @@ class JobApplicationWorkflowTest(TestCase):
         assert approval.is_in_waiting_period
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             job_seeker=user,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             eligibility_diagnosis=None,
         )
         with pytest.raises(xwf_models.AbortTransition):
@@ -1461,9 +1447,7 @@ class JobApplicationWorkflowTest(TestCase):
         diagnosis = EligibilityDiagnosisFactory(job_seeker=user)
         assert diagnosis.is_valid
 
-        job_application = JobApplicationSentByJobSeekerFactory(
-            job_seeker=user, state=JobApplicationWorkflow.STATE_PROCESSING
-        )
+        job_application = JobApplicationSentByJobSeekerFactory(job_seeker=user, state=JobApplicationState.PROCESSING)
         job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
@@ -1486,7 +1470,7 @@ class JobApplicationWorkflowTest(TestCase):
         and we don't notify
         """
         job_application = JobApplicationWithoutApprovalFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             job_seeker__with_pole_emploi_id=True,
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
@@ -1509,7 +1493,7 @@ class JobApplicationWorkflowTest(TestCase):
         """
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.GEIQ,
         )
         job_application.accept(user=job_application.to_company.members.first())
@@ -1530,7 +1514,7 @@ class JobApplicationWorkflowTest(TestCase):
         when accepting it, then the eligibility diagnosis is linked to it.
         """
         job_application = JobApplicationSentByCompanyFactory(
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.EI,
             eligibility_diagnosis=None,
             job_seeker__with_pole_emploi_id=True,
@@ -1555,8 +1539,8 @@ class JobApplicationWorkflowTest(TestCase):
         user = JobSeekerFactory()
         kwargs = {"job_seeker": user, "sender": user, "sender_kind": SenderKind.JOB_SEEKER}
 
-        JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING, **kwargs)
-        JobApplicationFactory(state=JobApplicationWorkflow.STATE_POSTPONED, **kwargs)
+        JobApplicationFactory(state=JobApplicationState.PROCESSING, **kwargs)
+        JobApplicationFactory(state=JobApplicationState.POSTPONED, **kwargs)
 
         assert user.job_applications.count() == 2
         assert user.job_applications.pending().count() == 2
@@ -1576,7 +1560,7 @@ class JobApplicationWorkflowTest(TestCase):
         cancellation_user = job_application.to_company.active_members.first()
         job_application.cancel(user=cancellation_user)
 
-        assert job_application.state == JobApplicationWorkflow.STATE_CANCELLED
+        assert job_application.state == JobApplicationState.CANCELLED
 
         job_application.refresh_from_db()
         assert not job_application.approval
@@ -1593,7 +1577,7 @@ class JobApplicationWorkflowTest(TestCase):
         cancellation_user = job_application.to_company.active_members.first()
         job_application.cancel(user=cancellation_user)
 
-        assert job_application.state == JobApplicationWorkflow.STATE_CANCELLED
+        assert job_application.state == JobApplicationState.CANCELLED
 
         job_application.refresh_from_db()
         assert job_application.approval
@@ -1612,7 +1596,7 @@ class JobApplicationWorkflowTest(TestCase):
 
         # Wrong state
         job_application = JobApplicationFactory(
-            with_approval=True, hiring_start_at=today, state=JobApplicationWorkflow.STATE_NEW
+            with_approval=True, hiring_start_at=today, state=JobApplicationState.NEW
         )
         cancellation_user = job_application.to_company.active_members.first()
         with pytest.raises(xwf_models.AbortTransition):
@@ -1625,7 +1609,7 @@ class JobApplicationXlsxExportTest(TestCase):
         job_seeker = JobSeekerFactory(title=Title.MME)
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
-            state=JobApplicationWorkflow.STATE_PROCESSING,
+            state=JobApplicationState.PROCESSING,
             selected_jobs=Appellation.objects.all(),
             eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
         )
@@ -1672,7 +1656,7 @@ class JobApplicationXlsxExportTest(TestCase):
             job_seeker = JobSeekerFactory(title=Title.MME)
             job_application = JobApplicationSentByJobSeekerFactory(
                 job_seeker=job_seeker,
-                state=JobApplicationWorkflow.STATE_PROCESSING,
+                state=JobApplicationState.PROCESSING,
                 selected_jobs=Appellation.objects.all(),
                 eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
             )
@@ -1720,7 +1704,7 @@ class JobApplicationXlsxExportTest(TestCase):
             "refusal_reason": RefusalReason.DID_NOT_COME,
         }
 
-        job_application = JobApplicationFactory(state=JobApplicationWorkflow.STATE_PROCESSING, **kwargs)
+        job_application = JobApplicationFactory(state=JobApplicationState.PROCESSING, **kwargs)
         job_application.refuse()
 
         response = stream_xlsx_export(JobApplication.objects.all(), "filename")

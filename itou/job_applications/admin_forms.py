@@ -2,8 +2,8 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.job_applications.enums import SenderKind
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState, SenderKind
+from itou.job_applications.models import JobApplication
 
 
 class JobApplicationAdminForm(forms.ModelForm):
@@ -25,12 +25,9 @@ class JobApplicationAdminForm(forms.ModelForm):
 
     def clean(self):
         target_state = self.cleaned_data.get("state")
-        if (
-            target_state == JobApplicationWorkflow.STATE_ACCEPTED
-            and target_state != self._initial_job_application_state
-        ):
+        if target_state == JobApplicationState.ACCEPTED and target_state != self._initial_job_application_state:
             self._job_application_to_accept = True
-            self.cleaned_data["state"] = self._initial_job_application_state or JobApplicationWorkflow.STATE_NEW
+            self.cleaned_data["state"] = self._initial_job_application_state or JobApplicationState.NEW
 
         if self._job_application_to_accept and not self.cleaned_data.get("hiring_start_at"):
             self.add_error("hiring_start_at", "Ce champ est obligatoire pour les candidatures acceptées.")

@@ -8,7 +8,11 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import JobDescription
 from itou.eligibility.enums import AuthorKind
 from itou.job_applications import models
-from itou.job_applications.enums import Prequalification, ProfessionalSituationExperience, SenderKind
+from itou.job_applications.enums import (
+    Prequalification,
+    ProfessionalSituationExperience,
+    SenderKind,
+)
 from itou.jobs.models import Appellation
 from itou.utils.types import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory
@@ -35,7 +39,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
             job_seeker=factory.SubFactory(JobSeekerWithAddressFactory, with_mocked_address=True)
         )
         with_approval = factory.Trait(
-            state=models.JobApplicationWorkflow.STATE_ACCEPTED,
+            state=models.JobApplicationState.ACCEPTED,
             approval=factory.SubFactory(
                 ApprovalFactory,
                 user=factory.SelfAttribute("..job_seeker"),
@@ -185,7 +189,7 @@ class JobApplicationSentByPrescriberPoleEmploiFactory(JobApplicationSentByPrescr
 class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory):
     """Generates a JobApplication() object without an Approval() object."""
 
-    state = models.JobApplicationWorkflow.STATE_ACCEPTED
+    state = models.JobApplicationState.ACCEPTED
     hiring_without_approval = True
 
 

@@ -37,8 +37,8 @@ from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.models import Institution, InstitutionMembership
-from itou.job_applications.enums import Origin, SenderKind
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState, Origin, SenderKind
+from itou.job_applications.models import JobApplication
 from itou.jobs.models import Rome
 from itou.metabase.dataframes import get_df_from_rows, store_df
 from itou.metabase.db import build_dbt_daily, populate_table
@@ -132,7 +132,7 @@ class Command(BaseCommand):
             .annotate(
                 last_job_application_transition_date=Max(
                     "job_applications_received__logs__timestamp",
-                    filter=~Q(job_applications_received__logs__to_state=JobApplicationWorkflow.STATE_OBSOLETE),
+                    filter=~Q(job_applications_received__logs__to_state=JobApplicationState.OBSOLETE),
                 ),
                 first_membership_join_date=Min(
                     "companymembership__joined_at",
@@ -143,7 +143,7 @@ class Command(BaseCommand):
                 ),
                 total_embauches=Count(
                     "job_applications_received",
-                    filter=Q(job_applications_received__state=JobApplicationWorkflow.STATE_ACCEPTED),
+                    filter=Q(job_applications_received__state=JobApplicationState.ACCEPTED),
                     distinct=True,
                 ),
                 total_candidatures_30j=Count(
@@ -154,7 +154,7 @@ class Command(BaseCommand):
                 total_embauches_30j=Count(
                     "job_applications_received",
                     filter=Q(
-                        job_applications_received__state=JobApplicationWorkflow.STATE_ACCEPTED,
+                        job_applications_received__state=JobApplicationState.ACCEPTED,
                         job_applications_received__created_at__gte=ONE_MONTH_AGO,
                     ),
                     distinct=True,
@@ -176,12 +176,12 @@ class Command(BaseCommand):
                 ),
                 total_candidatures_non_traitees=Count(
                     "job_applications_received",
-                    filter=Q(job_applications_received__state=JobApplicationWorkflow.STATE_NEW),
+                    filter=Q(job_applications_received__state=JobApplicationState.NEW),
                     distinct=True,
                 ),
                 total_candidatures_en_cours=Count(
                     "job_applications_received",
-                    filter=Q(job_applications_received__state=JobApplicationWorkflow.STATE_PROCESSING),
+                    filter=Q(job_applications_received__state=JobApplicationState.PROCESSING),
                     distinct=True,
                 ),
                 # Don't try counting members or getting first join date, It's way too long
@@ -224,8 +224,7 @@ class Command(BaseCommand):
         accepted_job_applications_count = Count(
             "jobapplication",
             filter=(
-                active_user_created_job_applications_filter
-                & Q(jobapplication__state=JobApplicationWorkflow.STATE_ACCEPTED)
+                active_user_created_job_applications_filter & Q(jobapplication__state=JobApplicationState.ACCEPTED)
             ),
             # This distinct isn't required since we don't filter on ManyToMany fields, or reverse ForeignKeys.
             # However, it' better to keep it in case someone adds such a filter.
@@ -297,7 +296,7 @@ class Command(BaseCommand):
                 job_applications_count=Count("job_applications", distinct=True),
                 accepted_job_applications_count=Count(
                     "job_applications",
-                    filter=Q(job_applications__state=JobApplicationWorkflow.STATE_ACCEPTED),
+                    filter=Q(job_applications__state=JobApplicationState.ACCEPTED),
                     distinct=True,
                 ),
             )

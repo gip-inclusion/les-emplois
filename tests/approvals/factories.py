@@ -23,8 +23,7 @@ from itou.approvals.models import (
     Suspension,
 )
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
-from itou.job_applications.enums import SenderKind
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState, SenderKind
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
@@ -75,7 +74,7 @@ class ApprovalFactory(factory.django.DjangoModelFactory):
         if extracted:
             from tests.job_applications.factories import JobApplicationFactory
 
-            state = kwargs.pop("state", JobApplicationWorkflow.STATE_ACCEPTED)
+            state = kwargs.pop("state", JobApplicationState.ACCEPTED)
             self.jobapplication_set.add(JobApplicationFactory(state=state, job_seeker=self.user, **kwargs))
 
 

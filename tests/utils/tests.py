@@ -36,7 +36,7 @@ from itou.asp.models import Commune
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.enums import JobApplicationState
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants, pagination
@@ -1464,7 +1464,7 @@ def test_matomo_context_processor(client, settings, snapshot):
     assert str(script_content) == snapshot(name="matomo custom init siae card")
 
 
-@pytest.mark.parametrize("state", [s[0] for s in JobApplicationWorkflow.STATE_CHOICES])
+@pytest.mark.parametrize("state", JobApplicationState.values)
 def test_job_application_state_badge_processing(state, snapshot):
     job_application = JobApplicationFactory(id="00000000-0000-0000-0000-000000000000", state=state)
     assert job_applications.state_badge(job_application) == snapshot

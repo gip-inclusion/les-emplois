@@ -16,7 +16,7 @@ from tests.users.factories import JobSeekerFactory
 
 def test_create_employee_record(admin_client):
     job_application = factories.JobApplicationFactory(
-        state=models.JobApplicationWorkflow.STATE_ACCEPTED,
+        state=models.JobApplicationState.ACCEPTED,
         with_approval=True,
     )
 
@@ -206,7 +206,7 @@ def test_accept_existing_job_application(admin_client):
     job_application = factories.JobApplicationFactory(
         eligibility_diagnosis=None,
         to_company__subject_to_eligibility=True,
-        state=models.JobApplicationWorkflow.STATE_REFUSED,
+        state=models.JobApplicationState.REFUSED,
     )
     change_url = reverse("admin:job_applications_jobapplication_change", args=[job_application.pk])
     post_data = {
