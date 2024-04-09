@@ -52,9 +52,11 @@ def test_get_fields_to_transfer_for_job_seekers():
         "company",  # Company.members
         "created_prescriber_organization_set",  # PrescriberOrganization.created_by
         "created_company_set",  # Siae.created_by
+        "created_follow_up_groups",  # gps.creator
         "eligibilitydiagnosis",  # EligibilityDiagnosis.author
         "emailaddress",  # allauth.account.models.EmailAddress.user
         "externaldataimport",  # ExternalDataImport.user: this seems largely unused
+        "follow_up_groups",  # gps.member
         "geiqadministrativecriteria",  # GEIQAdministrativeCriteria.created_by
         "geiqeligibilitydiagnosis",  # GEIQEligibilityDiagnosis.author
         "groups",  # django.contrib.auth.models.Group
