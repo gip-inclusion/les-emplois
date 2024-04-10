@@ -8,12 +8,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.SeparateDatabaseAndState(
-            state_operations=[migrations.RemoveField(model_name="jobseekerprofile", name="previous_employer_kind")],
-            database_operations=[
-                migrations.RunSQL(
-                    "ALTER TABLE users_jobseekerprofile ALTER COLUMN previous_employer_kind SET DEFAULT ''"
-                )
-            ],
-        )
+        migrations.RemoveField(model_name="jobseekerprofile", name="previous_employer_kind"),
     ]
