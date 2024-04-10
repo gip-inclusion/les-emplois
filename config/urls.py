@@ -71,6 +71,7 @@ urlpatterns = [
     path("login/", include("itou.www.login.urls")),
     path("signup/", include("itou.www.signup.urls")),
     path("stats/", include("itou.www.stats.urls")),
+    path("users/", include("itou.www.users_views.urls")),
     path("versions/", include("itou.www.releases.urls")),
     # Enable Anymail’s status tracking
     # https://anymail.readthedocs.io/en/stable/esps/mailjet/#status-tracking-webhooks
