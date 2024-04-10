@@ -1,9 +1,6 @@
 name: 🔮 CI
 
-on:
-  push:
-    branches-ignore:
-      - master_clever
+on: [push]
 
 jobs:
   build:
