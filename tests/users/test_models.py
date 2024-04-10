@@ -15,7 +15,7 @@ from django.utils import timezone
 
 import tests.asp.factories as asp
 from itou.approvals.models import Approval
-from itou.asp.models import AllocationDuration, EducationLevel, EmployerType
+from itou.asp.models import AllocationDuration, EducationLevel
 from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import Origin
 from itou.job_applications.models import JobApplicationWorkflow
@@ -800,22 +800,6 @@ class JobSeekerProfileModelTest(TestCase):
         with pytest.raises(ValidationError, match="Le code INSEE 75056 n'est pas référencé par l'ASP"):
             self.profile.update_hexa_address()
 
-    def test_job_seeker_situation_complete(self):
-        # Both PE ID and situation must be filled or none
-        self.profile._clean_job_seeker_situation()
-
-        user = self.profile.user
-
-        # FIXME or kill me
-        # user.pole_emploi_id = None
-        # self.profile.pole_emploi_since = "MORE_THAN_24_MONTHS"
-        # with self.assertRaises(ValidationError):
-        #    self.profile._clean_job_seeker_situation()
-
-        # Both PE fields are provided: OK
-        user.jobseeker_profile.pole_emploi_id = "1234567"
-        self.profile._clean_job_seeker_situation()
-
     def test_job_seeker_details_complete(self):
         self.profile.user.title = None
 
@@ -845,22 +829,10 @@ class JobSeekerProfileModelTest(TestCase):
         self.profile.education_level = "00"
 
         self.profile.unemployed_since = AllocationDuration.MORE_THAN_24_MONTHS
-
-        self.profile._clean_job_seeker_situation()
         assert not self.profile.is_employed
 
         self.profile.unemployed_since = None
-        self.profile.previous_employer_kind = EmployerType.ACI
-
-        self.profile._clean_job_seeker_situation()
         assert self.profile.is_employed
-
-        # Check coherence
-        with pytest.raises(ValidationError):
-            # Can't have both
-            self.profile.unemployed_since = AllocationDuration.MORE_THAN_24_MONTHS
-            self.profile.previous_employer_kind = EmployerType.ACI
-            self.profile._clean_job_seeker_situation()
 
     def test_valid_birth_place_and_country(self):
         """
