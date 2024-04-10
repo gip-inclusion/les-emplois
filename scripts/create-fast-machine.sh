@@ -34,9 +34,8 @@ clever service link-addon c1-prod-database-encrypted --alias "$APP_NAME"
 clever service link-addon c1-redis --alias "$APP_NAME"
 clever service link-addon c1-s3 --alias "$APP_NAME"
 
-# Ensure we've got the last version of master_clever
 git fetch
-clever deploy --alias "$APP_NAME" --branch origin/master_clever --force
+clever deploy --alias "$APP_NAME" --branch origin/master --force
 
 cat << EOF
 
