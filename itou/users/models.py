@@ -24,7 +24,6 @@ from itou.asp.models import (
     Commune,
     Country,
     EducationLevel,
-    EmployerType,
     LaneExtension,
     LaneType,
     RSAAllocation,
@@ -746,9 +745,6 @@ class JobSeekerProfile(models.Model):
     INSEE_CODE_FRANCE = Country._CODE_FRANCE
 
     ERROR_NOT_RESOURCELESS_IF_OETH_OR_RQTH = "La personne n'est pas considérée comme sans ressources si OETH ou RQTH"
-    ERROR_EMPLOYEE_WITH_UNEMPLOYMENT_PERIOD = (
-        "La personne ne peut avoir de période sans emploi si actuellement employée"
-    )
     ERROR_UNEMPLOYED_BUT_RQTH_OR_OETH = (
         "La personne ne peut être considérée comme sans emploi si employée OETH ou RQTH"
     )
@@ -875,13 +871,6 @@ class JobSeekerProfile(models.Model):
         verbose_name="sans emploi depuis",
         blank=True,
         choices=AllocationDuration.choices,
-    )
-
-    previous_employer_kind = models.CharField(
-        max_length=2,
-        verbose_name="précédent employeur",
-        blank=True,
-        choices=EmployerType.choices,
     )
 
     # Despite the name of this field in the ASP model (salarieBenefRSA),
@@ -1060,18 +1049,6 @@ class JobSeekerProfile(models.Model):
         if not self.education_level:
             raise ValidationError(self.ERROR_JOBSEEKER_EDUCATION_LEVEL)
 
-    def _clean_job_seeker_situation(self):
-        if self.previous_employer_kind and self.unemployed_since:
-            raise ValidationError(self.ERROR_EMPLOYEE_WITH_UNEMPLOYMENT_PERIOD)
-
-        # NOTE(fvergez): Seems to be a major source of 500 errors
-        # Not really needed here, checks are done at form level
-        # if bool(self.pole_emploi_since) != bool(self.user.pole_emploi_id):
-        #   raise ValidationError(self.ERROR_JOBSEEKER_PE_FIELDS)
-
-        # Social allowances fields are not mandatory
-        # However we may add some coherence check later on
-
     def _clean_job_seeker_hexa_address(self):
         # Check if any fields of the hexa address is filled
         if not any(
@@ -1129,7 +1106,6 @@ class JobSeekerProfile(models.Model):
         """
         # see partial validation methods above
         self._clean_job_seeker_details()
-        self._clean_job_seeker_situation()
         self._clean_job_seeker_hexa_address()
 
     def update_hexa_address(self):
@@ -1182,7 +1158,6 @@ class JobSeekerProfile(models.Model):
 
     @property
     def is_employed(self):
-        # `previous_employer_kind` field is not needed for ASP processing
         return not self.unemployed_since
 
     @property
