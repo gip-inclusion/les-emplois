@@ -2,7 +2,6 @@ import datetime
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -13,24 +12,16 @@ from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 from django.views.generic.base import TemplateView
 from django_xworkflows import models as xwf_models
-from formtools.wizard.views import NamedUrlSessionWizardView
 
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Company
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
-from itou.job_applications import enums as job_applications_enums
+from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
 from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.urls import get_safe_url
-from itou.www.apply.forms import (
-    AcceptForm,
-    AnswerForm,
-    JobApplicationRefusalJobSeekerAnswerForm,
-    JobApplicationRefusalPrescriberAnswerForm,
-    JobApplicationRefusalReasonForm,
-    PriorActionForm,
-)
+from itou.www.apply.forms import AcceptForm, AnswerForm, PriorActionForm, RefusalForm
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
 
 
@@ -248,95 +239,37 @@ def process(request, job_application_id):
     return HttpResponseRedirect(next_url)
 
 
-def _show_prescriber_answer_form(wizard):
-    return wizard.job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER
+@login_required
+def refuse(request, job_application_id, template_name="apply/process_refuse.html"):
+    queryset = JobApplication.objects.is_active_company_member(request.user).select_related("job_seeker")
+    job_application = get_object_or_404(queryset, id=job_application_id)
 
+    form = RefusalForm(job_application=job_application, data=request.POST or None)
 
-class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
-    STEP_REASON = "reason"
-    STEP_JOB_SEEKER_ANSWER = "job-seeker-answer"
-    STEP_PRESCRIBER_ANSWER = "prescriber-answer"
-
-    template_name = "apply/process_refuse.html"
-    form_list = [
-        (STEP_REASON, JobApplicationRefusalReasonForm),
-        (STEP_JOB_SEEKER_ANSWER, JobApplicationRefusalJobSeekerAnswerForm),
-        (STEP_PRESCRIBER_ANSWER, JobApplicationRefusalPrescriberAnswerForm),
-    ]
-    condition_dict = {
-        STEP_PRESCRIBER_ANSWER: _show_prescriber_answer_form,
-    }
-
-    def setup(self, request, *args, **kwargs):
-        super().setup(request, *args, **kwargs)
-
-        if request.user.is_authenticated:
-            self.job_application = get_object_or_404(
-                JobApplication.objects.is_active_company_member(request.user).select_related("job_seeker"),
-                pk=kwargs["job_application_id"],
-            )
-
-    def done(self, form_list, *args, **kwargs):
+    if request.method == "POST" and form.is_valid():
         try:
             # After each successful transition, a save() is performed by django-xworkflows.
-            cleaned_data = self.get_all_cleaned_data()
-            self.job_application.refusal_reason = cleaned_data["refusal_reason"]
-            self.job_application.answer = cleaned_data["job_seeker_answer"]
-            self.job_application.answer_to_prescriber = cleaned_data.get("prescriber_answer", "")
-            self.job_application.refuse(user=self.request.user)
+            job_application.refusal_reason = form.cleaned_data["refusal_reason"]
+            job_application.answer = form.cleaned_data["answer"]
+            job_application.answer_to_prescriber = form.cleaned_data.get("answer_to_prescriber", "")
+            job_application.refuse(user=request.user)
             messages.success(
-                self.request,
-                f"La candidature de {self.job_application.job_seeker.get_full_name()} a bien été déclinée.",
+                request,
+                f"La candidature de {job_application.job_seeker.get_full_name()} a bien été déclinée.",
                 extra_tags="toast",
             )
         except xwf_models.InvalidTransitionError:
-            messages.error(self.request, "Action déjà effectuée.", extra_tags="toast")
+            messages.error(request, "Action déjà effectuée.", extra_tags="toast")
 
-        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk})
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
         return HttpResponseRedirect(next_url)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.steps.current != self.STEP_REASON:
-            context.update(
-                refusal_reason_label=(
-                    job_applications_enums.RefusalReason(
-                        self.get_cleaned_data_for_step(self.STEP_REASON)["refusal_reason"]
-                    ).label
-                )
-            )
-        return context | {
-            "job_application": self.job_application,
-            "can_view_personal_information": True,  # SIAE members have access to personal info
-            "matomo_custom_title": "Candidature refusée",
-            "primary_button_label": "Suivant" if context["wizard"]["steps"].next else "Confirmer le refus",
-            "secondary_button_label": "Précédent" if context["wizard"]["steps"].prev else "Annuler",
-        }
-
-    def get_form_kwargs(self, step=None):
-        if step == self.STEP_REASON:
-            return {
-                "job_application": self.job_application,
-            }
-        return {}
-
-    def get_form_initial(self, step):
-        initial_data = self.initial_dict.get(step, {})
-        if step == self.STEP_JOB_SEEKER_ANSWER:
-            refusal_reason = self.get_cleaned_data_for_step(self.STEP_REASON).get("refusal_reason")
-            if refusal_reason:
-                initial_data["job_seeker_answer"] = loader.render_to_string(
-                    f"apply/refusal_messages/{refusal_reason}.txt",
-                    context={
-                        "job_application": self.job_application,
-                    },
-                    request=self.request,
-                )
-
-        return initial_data
-
-    def get_step_url(self, step):
-        return reverse(f"apply:{self.url_name}", kwargs={"job_application_id": self.job_application.pk, "step": step})
+    context = {
+        "form": form,
+        "job_application": job_application,
+        "can_view_personal_information": True,  # SIAE members have access to personal info
+        "matomo_custom_title": "Candidature refusée",
+    }
+    return render(request, template_name, context)
 
 
 @login_required
@@ -485,9 +418,9 @@ def archive(request, job_application_id):
     job_application = get_object_or_404(queryset, id=job_application_id)
 
     cancelled_states = [
-        job_applications_enums.JobApplicationState.REFUSED,
-        job_applications_enums.JobApplicationState.CANCELLED,
-        job_applications_enums.JobApplicationState.OBSOLETE,
+        JobApplicationState.REFUSED,
+        JobApplicationState.CANCELLED,
+        JobApplicationState.OBSOLETE,
     ]
 
     qs = urlencode({"states": cancelled_states}, doseq=True)

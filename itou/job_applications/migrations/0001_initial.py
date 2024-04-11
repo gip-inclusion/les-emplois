@@ -129,7 +129,7 @@ class Migration(migrations.Migration):
                             ),
                             ("no_position", "Pas de recrutement en cours"),
                             ("duplicate", "Candidature en doublon"),
-                            ("other", "Autre"),
+                            ("other", "Autre (détails dans le message ci-dessous)"),
                             ("approval_expiration_too_close", "La date de fin du PASS IAE / agrément est trop proche"),
                             ("unavailable", "Candidat indisponible ou non intéressé par le poste"),
                             (
