@@ -45,7 +45,7 @@ class RefusalReason(models.TextChoices):
     )
     NO_POSITION = "no_position", "Pas de recrutement en cours"
     DUPLICATE = "duplicate", "Candidature en doublon"
-    OTHER = "other", "Autre"
+    OTHER = "other", "Autre (détails dans le message ci-dessous)"
 
     # Hidden reasons kept for history.
     APPROVAL_EXPIRATION_TOO_CLOSE = (

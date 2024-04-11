@@ -11,7 +11,12 @@ from itou.job_applications.enums import JobApplicationState, QualificationLevel,
 from itou.www.apply import forms as apply_forms
 from tests.cities.factories import create_test_cities
 from tests.companies.factories import JobDescriptionFactory
-from tests.job_applications.factories import JobApplicationFactory
+from tests.job_applications.factories import (
+    JobApplicationFactory,
+    JobApplicationSentByCompanyFactory,
+    JobApplicationSentByJobSeekerFactory,
+    JobApplicationSentByPrescriberFactory,
+)
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory
 from tests.utils.test import TestCase
@@ -67,6 +72,22 @@ class CheckJobSeekerNirFormTest(TestCase):
             "Vous ne pouvez postuler pour cet utilisateur car ce numéro de sécurité sociale "
             "n'est pas associé à un compte candidat."
         ) == form.errors["__all__"][0]
+
+
+class RefusalFormTest(TestCase):
+    def test_job_application_sent_by_prescriber(self):
+        job_application = JobApplicationSentByPrescriberFactory()
+        form = apply_forms.RefusalForm(job_application=job_application)
+        assert "answer_to_prescriber" in form.fields.keys()
+
+    def test_job_application_not_sent_by_prescriber(self):
+        job_application = JobApplicationSentByJobSeekerFactory()
+        form = apply_forms.RefusalForm(job_application=job_application)
+        assert "answer_to_prescriber" not in form.fields.keys()
+
+        job_application = JobApplicationSentByCompanyFactory()
+        form = apply_forms.RefusalForm(job_application=job_application)
+        assert "answer_to_prescriber" not in form.fields.keys()
 
 
 class TestAcceptForm:
