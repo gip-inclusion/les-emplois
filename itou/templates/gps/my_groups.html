@@ -7,7 +7,8 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
-                    <h1 class="h1 mb-0">Mes Groupes de suivi</h1>
+                    <h1 class="h1 mb-0">Mes bénéficiaires suivis</h1>
+                    {% for group in groups %}{{ group.beneficiary }}{% endfor %}
                 </div>
             </div>
         </div>

@@ -52,11 +52,13 @@ def test_get_fields_to_transfer_for_job_seekers():
         "company",  # Company.members
         "created_prescriber_organization_set",  # PrescriberOrganization.created_by
         "created_company_set",  # Siae.created_by
-        "created_follow_up_groups",  # gps.creator
+        "created_follow_up_groups",  # gps.FollowUpGroupMembership.creator: creator of a follow up group of GPS
         "eligibilitydiagnosis",  # EligibilityDiagnosis.author
         "emailaddress",  # allauth.account.models.EmailAddress.user
         "externaldataimport",  # ExternalDataImport.user: this seems largely unused
-        "follow_up_groups",  # gps.member
+        "follow_up_group_beneficiary",  # gps.FollowUpGroup.beneficiary: do I have a GPS follow group as a jobseeker
+        "follow_up_groups_member",  # gps.FollowUpGroup.member: followup groups
+        "follow_up_groups",  # gps.FollowUpGroupMembership.member: followup groups membership
         "geiqadministrativecriteria",  # GEIQAdministrativeCriteria.created_by
         "geiqeligibilitydiagnosis",  # GEIQEligibilityDiagnosis.author
         "groups",  # django.contrib.auth.models.Group
