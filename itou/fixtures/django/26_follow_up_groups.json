@@ -1,15 +1,44 @@
 [
   {
     "fields": {
+      "created_at": "2020-12-01T10:55:25.283Z",
+      "beneficiary_id": 17
+    },
+    "model": "gps.followupgroup",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "created_at": "2020-12-01T10:55:25.283Z",
+      "beneficiary_id": 18
+    },
+    "model": "gps.followupgroup",
+    "pk": 2
+  },
+  {
+    "fields": {
       "is_referent": true,
       "is_active_member": true,
       "membership_ended_at": null,
       "created_at": "2020-12-01T10:55:25.283Z",
       "creator_id": 6,
-      "jobseeker_id": 17,
-      "member_id": 17
+      "follow_up_group_id": 1,
+      "member_id": 6
     },
     "model": "gps.followupgroupmembership",
     "pk": 1
+  },
+  {
+    "fields": {
+      "is_referent": true,
+      "is_active_member": true,
+      "membership_ended_at": null,
+      "created_at": "2020-12-01T10:55:25.283Z",
+      "creator_id": 6,
+      "follow_up_group_id": 2,
+      "member_id": 6
+    },
+    "model": "gps.followupgroupmembership",
+    "pk": 2
   }
 ]
