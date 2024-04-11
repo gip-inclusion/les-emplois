@@ -1,16 +1,43 @@
 from django.db import models
 from django.utils import timezone
 
-from itou.users.models import JobSeekerProfile, User
+from itou.users.models import User
+
+
+class FollowUpGroup(models.Model):
+
+    created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+
+    updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
+
+    beneficiary = models.ForeignKey(
+        User,
+        verbose_name="bénéficiaire",
+        null=False,
+        blank=False,
+        on_delete=models.RESTRICT,
+        unique=True,
+        related_name="follow_up_group_beneficiary",
+    )
+
+    members = models.ManyToManyField(
+        User,
+        through="FollowUpGroupMembership",
+        through_fields=("follow_up_group", "member"),
+        related_name="follow_up_groups_member",
+    )
+
+    class Meta:
+        verbose_name = "groupe de suivi"
+        verbose_name_plural = "groupes de suivi"
 
 
 class FollowUpGroupMembership(models.Model):
 
-    follow_up_group_membership_id = models.AutoField(primary_key=True)
-
     is_referent = models.BooleanField(default=False)
 
     # Is this user still an active member of the group?
+    # Or maybe waiting for an invitation to be activated?
     is_active_member = models.BooleanField(default=True)
 
     # Keep track of when the membership was ended
@@ -20,22 +47,17 @@ class FollowUpGroupMembership(models.Model):
 
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
-    jobseeker = models.ForeignKey(
-        JobSeekerProfile,
-        verbose_name="candidat",
-        related_name="follow_up_group",
-        null=False,
-        blank=False,
+    follow_up_group = models.ForeignKey(
+        FollowUpGroup,
+        verbose_name="groupe de suivi",
+        related_name="memberships",
         on_delete=models.RESTRICT,
-        unique=True,
     )
 
     member = models.ForeignKey(
         User,
         verbose_name="membre du groupe de suivi",
         related_name="follow_up_groups",
-        null=False,
-        blank=False,
         on_delete=models.RESTRICT,
     )
 
@@ -44,13 +66,5 @@ class FollowUpGroupMembership(models.Model):
         User,
         verbose_name="créateur",
         related_name="created_follow_up_groups",
-        null=False,
-        blank=False,
         on_delete=models.RESTRICT,
     )
-
-    class Meta:
-        db_table = "gps_follow_up_group_membership"
-        verbose_name = "groupe de suivi"
-        verbose_name_plural = "groupes de suivi"
-        unique_together = (("jobseeker", "member"),)
