@@ -1,72 +1,142 @@
 {% extends "apply/process_base.html" %}
 {% load django_bootstrap5 %}
+{% load theme_inclusion %}
 {% load buttons_form %}
 
-{% block content_extend %}
-    <div class="c-form">
-        <h2>Renseigner le motif de refus de candidature.</h2>
-        <form method="post" class="js-prevent-multiple-submit">
+{% block content_title %}
+    <div class="d-md-flex align-items-center mb-3">
+        <h1 class="mb-1 mb-md-0 me-3">
+            Refuser la candidature de <span class="text-muted">{{ job_application.job_seeker.get_full_name }}</span>
+        </h1>
+    </div>
+{% endblock %}
 
-            {% csrf_token %}
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="c-stepper mb-3 mb-lg-5">
+                        <div class="progress progress--emploi">
+                            <div class="progress-bar progress-bar-{{ wizard|stepper_progress }}" role="progressbar" aria-valuenow="{{ wizard|stepper_progress }}" aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        <p>
+                            {% if wizard.steps.current == "reason" %}
+                                <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Choix du motif de refus
+                            {% elif wizard.steps.current == "job-seeker-answer" %}
+                                <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Message au candidat
+                            {% elif wizard.steps.current == "prescriber-answer" %}
+                                <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Message au prescripteur
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="c-form mb-3 mb-lg-5">
+                        <form method="post" class="js-prevent-multiple-submit">
+                            {% csrf_token %}
+                            {{ wizard.management_form }}
 
-            {% bootstrap_form_errors form type="all" %}
+                            {% if wizard.steps.current == "reason" %}
+                                <h2 class="mb-3 mb-md-4">Choix du motif de refus</h2>
+                                <p class="mb-3 mb-md-4">
+                                    {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
+                                        Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour le candidat comme pour le prescripteur. Nous vous encourageons à répondre à chacune des parties.
+                                    {% else %}
+                                        Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour le candidat.
+                                    {% endif %}
+                                </p>
+                            {% elif wizard.steps.current == "job-seeker-answer" %}
+                                <h2 class="mb-3 mb-md-4">Réponse au candidat</h2>
+                                <p class="mb-3 mb-md-4">
+                                    {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
+                                        Une copie de ce message sera adressée au prescripteur.
+                                        <br>
+                                    {% endif %}
+                                    Merci de bien vouloir adapter ce message en fonction de la situation.
+                                </p>
+                                <p class="mb-3 mb-md-4">
+                                    <strong>Raison du refus :</strong> {{ refusal_reason_label }}
+                                </p>
+                            {% elif wizard.steps.current == "prescriber-answer" %}
+                                <h2 class="mb-3 mb-md-4">Réponse au prescripteur</h2>
+                                <p class="mb-3 mb-md-4">
+                                    Vous pouvez partager un message au prescripteur uniquement, comme détailler ou évoquer d’autres motifs de refus.
+                                </p>
+                                <p class="mb-3 mb-md-4">
+                                    <strong>Raison du refus :</strong> {{ refusal_reason_label }}
+                                </p>
+                            {% endif %}
 
-            {# TODO: Fix incorrect rendering of form with radio buttons #}
-            {# https://github.com/zostera/django-django_bootstrap5/issues/126 #}
-            <div class="form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %} js-refusal-reasons">
-                {{ form.refusal_reason.label_tag }}
-                <ul class="list-unstyled">
-                    {% for radio in form.refusal_reason %}
-                        <li>
-                            <label for="{{ radio.id_for_label }}">
-                                {{ radio.tag }}
-                                {% if radio.data.value == RefusalReason.PREVENT_OBJECTIVES %}
-                                    {{ radio.choice_label }}&nbsp;<i class="ri-information-line ri-xl text-button ms-1"
-   data-bs-toggle="tooltip"
-   data-bs-placement="top"
-   title="L'embauche empêche l'atteinte des engagements contractuels avec les parties prenantes à la convention de financement mise en place par l'État."></i>
-                                {% elif radio.data.value == RefusalReason.NO_POSITION %}
-                                    {{ radio.choice_label }}&nbsp;<i class="ri-information-line ri-xl text-button ms-1" data-bs-toggle="tooltip" data-bs-placement="right" title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
+                            {% if wizard.steps.current == "reason" %}
+                                <fieldset class="js-refusal-reasons form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %}">
+                                    {{ form.refusal_reason.label_tag }}
+                                    <ul class="list-unstyled">
+                                        {% for radio in form.refusal_reason %}
+                                            <li class="mb-2">
+                                                <div class="form-check">
+                                                    <input id="{{ radio.id_for_label }}" class="form-check-input" name="{{ radio.data.name }}" type="radio" value="{{ radio.data.value }}" {% if radio.data.selected %}checked=""{% endif %} required>
+                                                    <label for="{{ radio.id_for_label }}" class="form-check-label">
+                                                        {% if radio.data.value == RefusalReason.PREVENT_OBJECTIVES %}
+                                                            {{ radio.choice_label }}
+                                                            <i class="ri-information-line ri-lg text-info ms-1"
+                                                               data-bs-toggle="tooltip"
+                                                               data-bs-placement="top"
+                                                               title="L'embauche empêche l'atteinte des engagements contractuels avec les parties prenantes à la convention de financement mise en place par l'État."></i>
+                                                        {% elif radio.data.value == RefusalReason.NO_POSITION %}
+                                                            {{ radio.choice_label }}
+                                                            <i class="ri-information-line ri-lg text-info ms-1" data-bs-toggle="tooltip" data-bs-placement="right" title="Si vous choisissez ce motif, les fiches de postes associées seront dépubliées."></i>
+                                                        {% elif radio.data.value == RefusalReason.OTHER %}
+                                                            {{ radio.choice_label }}
+                                                            {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
+                                                                (détails à fournir dans le message au prescripteur)
+                                                            {% endif %}
+                                                        {% else %}
+                                                            {{ radio.choice_label }}
+                                                        {% endif %}
+                                                    </label>
+                                                </div>
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                    <div class="c-info refusal-reason-no-position-info mt-2 d-none">
+                                        <span class="c-info__summary">En choisissant ce motif, les fiches de postes associées seront dépubliées.</span>
+                                    </div>
+                                </fieldset>
+                            {% else %}
+                                {% bootstrap_form wizard.form alert_error_type="non_fields" %}
+                            {% endif %}
 
-                                {% else %}
-                                    {{ radio.choice_label }}
-                                {% endif %}
-                            </label>
-                        </li>
-                    {% endfor %}
-                </ul>
-                <div class="c-info refusal-reason-no-position-info d-none">
-                    <span class="c-info__summary">En choisissant ce motif, les fiches de postes associées seront dépubliées.</span>
+                            {% url 'apply:details_for_company' job_application_id=job_application.id as reset_url %}
+                            {% if wizard.steps.prev %}
+                                {% itou_buttons_form reset_url=reset_url primary_label=wizard.steps.next|yesno:"Suivant,Confirmer le refus" secondary_url=wizard.steps.prev matomo_category="candidature" matomo_action="submit" matomo_event="refuse_application_submit" %}
+                            {% else %}
+                                {% itou_buttons_form reset_url=reset_url primary_label=wizard.steps.next|yesno:"Suivant,Confirmer le refus" matomo_category="candidature" matomo_action="submit" matomo_event="refuse_application_submit" %}
+                            {% endif %}
+                        </form>
+                    </div>
                 </div>
             </div>
-
-            {% if form.answer_to_prescriber %}
-                {% bootstrap_field form.answer_to_prescriber %}
-            {% endif %}
-
-            <hr>
-            <h2>Répondre au candidat</h2>
-
-            {% bootstrap_field form.answer %}
-
-            {% url 'apply:details_for_company' job_application_id=job_application.id as reset_url %}
-            {% itou_buttons_form primary_label="Confirmer le refus" reset_url=reset_url matomo_category="candidature" matomo_action="submit" matomo_event="refuse_application_submit" %}
-
-        </form>
-    </div>
+        </div>
+    </section>
 {% endblock %}
 
 {% block script %}
     {{ block.super }}
-    <script nonce="{{ CSP_NONCE }}">
-        $(document).ready(function() {
-            $('input[name="refusal_reason"]').change(function() {
-                if (this.value === 'no_position') {
+    {% if wizard.steps.current == "reason" %}
+        <script nonce="{{ CSP_NONCE }}">
+            function manageWarningSection(value) {
+                if (value === 'no_position') {
                     $('.refusal-reason-no-position-info').removeClass('d-none');
                 } else {
                     $('.refusal-reason-no-position-info').addClass('d-none');
                 }
+            }
+            $(document).ready(function() {
+                manageWarningSection($('input[name="reason-refusal_reason"]:checked').val());
+                $('input[name="reason-refusal_reason"]').change(function() {
+                    manageWarningSection(this.value);
+                });
             });
-        });
-    </script>
+        </script>
+    {% endif %}
 {% endblock %}

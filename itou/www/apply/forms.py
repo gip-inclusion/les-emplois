@@ -368,37 +368,17 @@ class SubmitJobApplicationForm(forms.Form):
         message.help_text = help_text
 
 
-class RefusalForm(forms.Form):
-    ANSWER_INITIAL = (
-        "Nous avons étudié votre candidature avec la plus grande attention mais "
-        "nous sommes au regret de vous informer que celle-ci n'a pas été retenue.\n\n"
-        "Soyez assuré que cette décision ne met pas en cause vos qualités personnelles. "
-        "Nous sommes très sensibles à l'intérêt que vous portez à notre entreprise, "
-        "et conservons vos coordonnées afin de vous recontacter au besoin.\n\n"
-        "Nous vous souhaitons une pleine réussite dans vos recherches futures."
-    )
-
+class JobApplicationRefusalReasonForm(forms.Form):
     refusal_reason = forms.ChoiceField(
-        label="Sélectionner un motif de refus (n'est pas envoyé au candidat)",
+        label="Choisir le motif de refus",
         widget=forms.RadioSelect,
         choices=job_applications_enums.RefusalReason.displayed_choices(),
-    )
-    answer = forms.CharField(
-        label="Message à envoyer au candidat (une copie sera envoyée au prescripteur)",
-        widget=forms.Textarea(),
-        strip=True,
-        initial=ANSWER_INITIAL,
-        help_text="Vous pouvez modifier le texte proposé ou l'utiliser tel quel.",
-    )
-    answer_to_prescriber = forms.CharField(
-        label="Commentaire privé à destination du prescripteur (n'est pas envoyé au candidat)",
-        widget=forms.Textarea(attrs={"placeholder": ""}),
-        strip=True,
-        required=False,
     )
 
     def __init__(self, job_application, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER:
+            self.fields["refusal_reason"].label = "Choisir le motif de refus envoyé au prescripteur"
         if job_application.to_company.kind == CompanyKind.GEIQ:
             self.fields["refusal_reason"].choices = job_applications_enums.RefusalReason.displayed_choices(
                 extra_exclude_enums=[
@@ -407,9 +387,21 @@ class RefusalForm(forms.Form):
                 ]
             )
 
-        if job_application.sender_kind != job_applications_enums.SenderKind.PRESCRIBER:
-            self.fields.pop("answer_to_prescriber")
-            self.fields["answer"].label = "Message à envoyer au candidat"
+
+class JobApplicationRefusalJobSeekerAnswerForm(forms.Form):
+    job_seeker_answer = forms.CharField(
+        label="Commentaire envoyé au candidat",
+        widget=forms.Textarea(),
+        strip=True,
+    )
+
+
+class JobApplicationRefusalPrescriberAnswerForm(forms.Form):
+    prescriber_answer = forms.CharField(
+        label="Commentaire envoyé au prescripteur (n’est pas envoyé au candidat)",
+        widget=forms.Textarea(),
+        strip=True,
+    )
 
 
 class AnswerForm(forms.Form):
