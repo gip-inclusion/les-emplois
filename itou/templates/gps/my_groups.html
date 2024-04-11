@@ -1,17 +1,52 @@
 {% extends "layout/base.html" %}
+{% load str_filters %}
+
+
+{% block content_title %}<h1>Mes groupes de suivi</h1>{% endblock %}
 
 
 {% block content %}
-
-    <section class="s-section">
-        <div class="s-section__container container">
-            <div class="row">
+    <section class="s-box">
+        <div class="s-box__container container">
+            <div class="s-box__row row">
                 <div class="col-12">
-                    <h1 class="h1 mb-0">Mes bénéficiaires suivis</h1>
-                    {% for group in groups %}{{ group.beneficiary }}{% endfor %}
+                    <section aria-labelledby="results" id="follow-up-groups-section">
+                        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                            <h3 class="h4 mb-0" id="results">
+                                {% with groups|length as counter %}
+                                    Membre de {{ counter }} <strong>groupe{{ counter|pluralizefr }} de suivi</strong>
+                                {% endwith %}
+                            </h3>
+                        </div>
+
+                        {% for group in groups %}
+                            <div class="my-3 my-md-4 s-box__row row">
+
+
+                                <div class="c-box--results__header">
+                                    <div class="c-box--results__summary">
+                                        <i class="ri-user-line" aria-hidden="true"></i>
+                                        <div>
+                                            <h3>{{ group.beneficiary.get_full_name }}</h3>
+                                            <span>{{ group.beneficiary.email }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="m-0">
+
+                                <div>
+                                    {% with group.members.all|length as counter %}
+                                        {{ counter }} professsionel{{ counter|pluralizefr }} dans le groupe de suivi
+                                    {% endwith %}
+                                </div>
+
+                            </div>
+                        {% endfor %}
+                    </section>
+
                 </div>
             </div>
         </div>
     </section>
-
 {% endblock %}
