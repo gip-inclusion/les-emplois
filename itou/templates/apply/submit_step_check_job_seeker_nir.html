@@ -51,15 +51,13 @@
                 <div class="alert alert-info">
                     <div class="row">
                         <div class="col-auto pe-0">
-                            <i class="ri-information-line ri-xl text-info"></i>
+                            <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
                         </div>
                         <div class="col">
-                            <p class="mb-0">
-                                Vous possédez un numéro de sécurité sociale temporaire ?
-                                <button name="skip" value="1" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "candidature" %}>
-                                    Cliquez ici pour accéder à l'étape suivante.
-                                </button>
-                            </p>
+                            <p class="mb-0">Vous possédez un numéro de sécurité sociale temporaire ?</p>
+                            <button name="skip" value="1" class="btn btn-link p-0" {% matomo_event "nir-temporaire" "etape-suivante" "candidature" %}>
+                                Cliquez ici pour accéder à l'étape suivante.
+                            </button>
                         </div>
                     </div>
                 </div>
