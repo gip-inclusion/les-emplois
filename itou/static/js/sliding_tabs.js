@@ -18,7 +18,7 @@ if (slidingTabs) {
     swipeAngle: false,
     speed: 300,
     nav: false,
-    controls: false,
+    controls: true,
     startIndex: slidingTabsStartIndex,
   });
 }
