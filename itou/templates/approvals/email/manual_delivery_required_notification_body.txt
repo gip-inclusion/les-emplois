@@ -11,7 +11,7 @@ Informations pour l'obtention d'un PASS IAE suite à l'embauche de votre candida
 - Email : {{ job_application.job_seeker.email }}{% endif %}
 - Date de naissance : {{ job_application.job_seeker.birthdate|date:"d/m/Y" }}
 
-*Employeur solidaire* :
+*Employeur inclusif* :
 
 - Siret : {{ job_application.to_company.siret }}
 - Nom : {{ job_application.to_company.display_name }}

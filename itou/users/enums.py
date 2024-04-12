@@ -22,7 +22,7 @@ class UserKind(models.TextChoices):
 
 MATOMO_ACCOUNT_TYPE = {
     UserKind.PRESCRIBER: "prescripteur",
-    UserKind.EMPLOYER: "employeur solidaire",
+    UserKind.EMPLOYER: "employeur inclusif",
 }
 
 

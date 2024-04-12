@@ -134,6 +134,7 @@ class EmployerSearchBaseView(FormView):
             "results_page": results_and_counts.results_page,
             "siaes_count": results_and_counts.siaes_count,
             "job_descriptions_count": results_and_counts.job_descriptions_count,
+            # Keep title as “Recherche employeurs solidaires” for matomo stats.
             "matomo_custom_title": "Recherche d'employeurs solidaires",
         }
         return render(self.request, self.template_name, context)
@@ -141,6 +142,7 @@ class EmployerSearchBaseView(FormView):
     def form_invalid(self, form):
         context = {
             "form": form,
+            # Keep title as “Recherche employeurs solidaires” for matomo stats.
             "matomo_custom_title": "Recherche d'employeurs solidaires",
         }
         return render(self.request, self.template_name, context)

@@ -612,7 +612,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         ):
             response = self.client.get(self.url)
 
-        self.assertContains(response, "Postuler auprès de l'employeur solidaire")
+        self.assertContains(response, "Postuler auprès de l'employeur inclusif")
         self.assertContains(response, self.apply_start_url(self.company))
         self.assertNotContains(
             response,
@@ -632,14 +632,14 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         ):
             response = self.client.get(self.url)
 
-        self.assertContains(response, "Postuler auprès de l'employeur solidaire")
+        self.assertContains(response, "Postuler auprès de l'employeur inclusif")
         self.assertContains(response, self.apply_start_url(self.company))
         self.assertNotContains(response, self.update_job_description_url(self.job_description))
 
     def test_anonymous_card_actions(self):
         response = self.client.get(self.url)
 
-        self.assertContains(response, "Postuler auprès de l'employeur solidaire")
+        self.assertContains(response, "Postuler auprès de l'employeur inclusif")
         self.assertContains(response, self.apply_start_url(self.company))
         self.assertNotContains(response, self.update_job_description_url(self.job_description))
 
