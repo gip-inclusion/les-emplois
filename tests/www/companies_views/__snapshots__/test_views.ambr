@@ -155,7 +155,7 @@
                           
                           
                               <div class="d-flex justify-content-end mt-3">
-                                  <a aria-label="Postuler auprès de l'employeur solidaire Les petits jardins" class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/[PK of Company]/start">
+                                  <a aria-label="Postuler auprès de l'employeur inclusif Les petits jardins" class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/[PK of Company]/start">
                                       <i class="ri-draft-line"></i>
                                       <span>Postuler</span>
                                   </a>
@@ -227,7 +227,7 @@
                           
                           
                               <div class="d-flex justify-content-end mt-3">
-                                  <a aria-label="Postuler auprès de l'employeur solidaire Les petits jardins" class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/[PK of Company]/start">
+                                  <a aria-label="Postuler auprès de l'employeur inclusif Les petits jardins" class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/[PK of Company]/start">
                                       <i class="ri-draft-line"></i>
                                       <span>Postuler</span>
                                   </a>
@@ -463,7 +463,7 @@
                           
                           
                               <div class="d-flex justify-content-end mt-3">
-                                  <a aria-label="Postuler auprès de l'employeur solidaire Les petits jardins" class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/[PK of Company]/start">
+                                  <a aria-label="Postuler auprès de l'employeur inclusif Les petits jardins" class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/[PK of Company]/start">
                                       <i class="ri-draft-line"></i>
                                       <span>Postuler</span>
                                   </a>
@@ -544,7 +544,7 @@
                               
                                   
                                       <div class="form-group col col-lg-auto">
-                                          <a aria-label="Postuler auprès de l'employeur solidaire Acme inc." class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/100/start?job_description_id=42">
+                                          <a aria-label="Postuler auprès de l'employeur inclusif Acme inc." class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/100/start?job_description_id=42">
                                               <i aria-hidden="true" class="ri-draft-line font-weight-medium"></i>
                                               <span>Postuler</span>
                                           </a>
@@ -584,7 +584,7 @@
                               
                                   
                                       <div class="form-group col col-lg-auto">
-                                          <a aria-label="Postuler auprès de l'employeur solidaire Acme inc." class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/100/start?job_description_id=42">
+                                          <a aria-label="Postuler auprès de l'employeur inclusif Acme inc." class="btn btn-lg btn-white btn-block btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="start_application" href="/apply/100/start?job_description_id=42">
                                               <i aria-hidden="true" class="ri-draft-line font-weight-medium"></i>
                                               <span>Postuler</span>
                                           </a>

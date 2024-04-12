@@ -2072,7 +2072,7 @@ Technique:
 ### Modifié
 
 - Modification de la couleur du bouton de validation lors d'une demande de PASS IAE
-- Modification des informations d'inscription d'un employeur solidaire
+- Modification des informations d'inscription d'un employeur inclusif
 - Simplification du code d'ouverture d'une région
 - Modification du champ "enseigne" dans la fiche SIAE
 - La géolocalisation ne tient plus compte du complément d'adresse (baisse de qualité du score)
@@ -2309,7 +2309,7 @@ du Fonds Départemental d'Insertion (FDI)](http://fdi.inclusion.beta.gouv.fr/)
 
 ### Modifié
 
-- Amélioration de la visibilité de la liste de résultats des employeurs solidaires après une recherche
+- Amélioration de la visibilité de la liste de résultats des employeurs inclusifs après une recherche
 - Clarification des termes ambigus fiche/fiche de poste
 - Mise en avant du bouton de filtre des candidatures : "Rechercher dans vos candidatures"
 - Clarification du fait que l'email ASP attendu pour les SIAE est l'email du référent technique extranet ASP
@@ -2329,7 +2329,7 @@ du Fonds Départemental d'Insertion (FDI)](http://fdi.inclusion.beta.gouv.fr/)
 - Modale pour donner davantage d'explications quand on a pas d'email
 - Nouvel environnement de démo
 - Re-calcul des coordonnées géographiques en cas de changement d'adresse dans l'admin SIAE et dans l'admin Organisations de prescripteur
-- Un employeur solidaire peut inviter un collaborateur à rejoindre sa structure
+- Un employeur inclusif peut inviter un collaborateur à rejoindre sa structure
 - Ajout d'un filtre "date de naissance" dans la recherche d'agréments Pôle emploi
 - Blocage des candidatures
 
@@ -2456,12 +2456,12 @@ du Fonds Départemental d'Insertion (FDI)](http://fdi.inclusion.beta.gouv.fr/)
 ### Ajouté
 
 - Création de ce changelog
-- Liste des collaborateurs d'un employeur solidaire
+- Liste des collaborateurs d'un employeur inclusif
 - Liste des collaborateurs d'un orienteur/prescripteur
 - Bouton "Vous êtes une entreprise avec un besoin de recrutement"
 - Vérification des adresses email lors de la création de comptes avant de pouvoir se connecter
 - Possibilité de renseigner l'adresse postale du candidat pendant inscription/profil/candidature
-- Nouveau type d'employeur solidaire "EATT" (Entreprise adaptée de travail temporaire)
+- Nouveau type d'employeur inclusif "EATT" (Entreprise adaptée de travail temporaire)
 - Message "mobilisationemploi.gouv.fr" sur le tableau de bord
 
 ### Modifié
@@ -2473,5 +2473,5 @@ du Fonds Départemental d'Insertion (FDI)](http://fdi.inclusion.beta.gouv.fr/)
 - Fix lien de téléchargement de l'attestation Covid-19
 - Fix lien vers la FAQ dans le pied de page
 - Restriction d'embauche temporaire pour les ETTI hors 62-67-93 (jusqu'au 10/04/2020)
-- Les fiches des employeurs solidaires sont publiques ("Opération ETTI")
+- Les fiches des employeurs inclusifs sont publiques ("Opération ETTI")
 - Fix page stats erreur 403 à cause du token CSRF

@@ -33,7 +33,7 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
     def test_choose_user_kind(self):
         url = reverse("signup:choose_user_kind")
         response = self.client.get(url)
-        self.assertContains(response, "Employeur solidaire")
+        self.assertContains(response, "Employeur inclusif")
 
         response = self.client.post(url, data={"kind": UserKind.EMPLOYER})
         self.assertRedirects(response, reverse("signup:company_select"))
