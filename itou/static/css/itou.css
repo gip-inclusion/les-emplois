@@ -417,6 +417,7 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     background-repeat: no-repeat;
     background-position: top -120px left;
 }
+
 .s-banner-01.s-banner-01--ic .s-banner-01__col > div::before {
     display: none;
 }
@@ -455,4 +456,12 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     background-repeat: no-repeat;
     background-position: center right;
     background-size: cover;
+
+.c-box__header--gps {
+    background-image: url("../img/dashboard/card-header-bg-gps.png");
+    background-repeat: no-repeat;
+    background-position: center right;
+    background-size: 100% auto;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
 }
