@@ -33,12 +33,6 @@
                         </a>
                     {% endif %}
                 </li>
-                <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'users:list' %}" class="btn-link btn-ico">
-                        <i class="ri-warning ri-lg font-weight-normal"></i>
-                        <span>Mes salariés suivis (GPS) ##### DEMO #####</span>
-                    </a>
-                </li>
                 {% if can_show_employee_records %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'employee_record_views:list' %}?status=NEW" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-liste-fiches-salaries" %}>

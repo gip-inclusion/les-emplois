@@ -291,6 +291,7 @@
                     {% if user.is_employer or user.is_prescriber %}
                         {% include "dashboard/includes/dora_card.html" with siret=request.current_organization.siret|default:"" tracker="mtm_campaign=LesEmplois&mtm_kwd=Dashboard" %}
                         {% include "dashboard/includes/diagoriente_card.html" with user=user only %}
+                        {% include "dashboard/includes/gps_card.html" %}
                     {% endif %}
                 </div>
             {% endif %}
