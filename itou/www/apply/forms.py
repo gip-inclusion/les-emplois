@@ -7,14 +7,13 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.db.models.fields import BLANK_CHOICE_DASH
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django_select2.forms import Select2MultipleWidget
 
 from itou.approvals.models import Approval
 from itou.asp import models as asp_models
-from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
@@ -827,26 +826,10 @@ class UserAddressForm(forms.ModelForm):
     Add job seeker address in the job application process.
     """
 
-    ALL_CITY_AUTOCOMPLETE_SOURCE_URL = reverse_lazy("autocomplete:cities")
-
-    # The hidden `city_slug` field is populated by the autocomplete JavaScript
-    # mechanism, see `city_autocomplete_field.js`.
-    city_slug = forms.CharField(
-        required=False, widget=forms.HiddenInput(attrs={"class": "js-city-autocomplete-hidden"})
-    )
-
     city = forms.CharField(
         label="Ville",
         required=False,
-        widget=forms.TextInput(
-            attrs={
-                "class": "js-city-autocomplete-input form-control",
-                "data-autocomplete-source-url": ALL_CITY_AUTOCOMPLETE_SOURCE_URL,
-                "data-autosubmit-on-enter-pressed": 0,
-                "placeholder": "Nom de la ville",
-                "autocomplete": "off",
-            }
-        ),
+        widget=forms.TextInput(attrs={"placeholder": "Nom de la ville"}),
     )
 
     address_line_1 = forms.CharField(
@@ -877,10 +860,6 @@ class UserAddressForm(forms.ModelForm):
         # a ModelForm which has an instance existing in DB.
         if hasattr(self, "instance") and hasattr(self.instance, "city") and hasattr(self.instance, "department"):
             self.initial["city"] = self.instance.city
-            # Populate the hidden `city` field.
-            city = City.objects.filter(name=self.instance.city, department=self.instance.department).first()
-            if city:
-                self.initial["city_slug"] = city.slug
         js_handled_fields = [
             "address_line_1",
             "address_line_2",
@@ -920,15 +899,6 @@ class UserAddressForm(forms.ModelForm):
             return  # An error here means that some required fields were left blank.
         cleaned_data = super().clean()
 
-        city_slug = cleaned_data["city_slug"]
-
-        if city_slug:
-            try:
-                # Override the `city` field with the real city name.
-                cleaned_data["city"] = City.objects.get(slug=city_slug).name
-            except City.DoesNotExist:
-                raise forms.ValidationError({"city": "Cette ville n'existe pas."})
-
         # Basic check of address fields.
         addr1, addr2, post_code, city = (
             cleaned_data["address_line_1"],
@@ -944,8 +914,6 @@ class UserAddressForm(forms.ModelForm):
                 self.add_error("address_line_1", "Adresse : ce champ est obligatoire.")
             if not post_code:
                 self.add_error("post_code", "Code postal : ce champ est obligatoire.")
-            if not city_slug:
-                self.add_error("city", "Ville : ce champ est obligatoire.")
 
 
 class FilterJobApplicationsForm(forms.Form):
