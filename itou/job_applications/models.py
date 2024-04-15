@@ -562,6 +562,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     refusal_reason = models.CharField(
         verbose_name="motifs de refus", max_length=30, choices=RefusalReason.choices, blank=True
     )
+    refusal_reason_shared_with_job_seeker = models.BooleanField(
+        verbose_name="partage du motif de refus avec le candidat", default=False
+    )
 
     hiring_start_at = models.DateField(verbose_name="date de début du contrat", blank=True, null=True, db_index=True)
     hiring_end_at = models.DateField(verbose_name="date prévisionnelle de fin du contrat", blank=True, null=True)

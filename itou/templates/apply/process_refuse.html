@@ -55,7 +55,9 @@
                                     Merci de bien vouloir adapter ce message en fonction de la situation.
                                 </p>
                                 <p class="mb-3 mb-md-4">
-                                    <strong>Raison du refus :</strong> {{ refusal_reason_label }}
+                                    <strong>Motif de refus :</strong>
+                                    {{ refusal_reason_label }}
+                                    {% if not refusal_reason_shared_with_job_seeker %}<em>(Motif non communiqué au candidat)</em>{% endif %}
                                 </p>
                             {% elif wizard.steps.current == "prescriber-answer" %}
                                 <h2 class="mb-3 mb-md-4">
@@ -65,13 +67,18 @@
                                     Vous pouvez partager un message {{ job_application.is_sent_by_authorized_prescriber|yesno:"au prescripteur,à l’orienteur" }} uniquement, comme détailler ou évoquer d’autres motifs de refus.
                                 </p>
                                 <p class="mb-3 mb-md-4">
-                                    <strong>Raison du refus :</strong> {{ refusal_reason_label }}
+                                    <strong>Motif de refus :</strong>
+                                    {{ refusal_reason_label }}
+                                    {% if not refusal_reason_shared_with_job_seeker %}<em>(Motif non communiqué au candidat)</em>{% endif %}
                                 </p>
                             {% endif %}
 
                             {% if wizard.steps.current == "reason" %}
                                 <fieldset class="js-refusal-reasons form-group{% if form.refusal_reason.field.required %} form-group-required{% endif %}">
-                                    {{ form.refusal_reason.label_tag }}
+                                    <legend class="fs-base font-weight-bold">
+                                        {{ form.refusal_reason.label }} :
+                                        {% if form.refusal_reason.field.required %}*{% endif %}
+                                    </legend>
                                     <ul class="list-unstyled">
                                         {% for radio in form.refusal_reason %}
                                             <li class="mb-2">
@@ -108,6 +115,12 @@
                                     </ul>
                                     <div class="c-info refusal-reason-no-position-info mt-2 d-none">
                                         <span class="c-info__summary">En choisissant ce motif, les fiches de postes associées seront dépubliées.</span>
+                                    </div>
+                                </fieldset>
+                                <fieldset>
+                                    <div class="form-group">
+                                        <legend class="fs-base font-weight-bold">Partager ce motif de refus au candidat ?</legend>
+                                        {% bootstrap_field form.refusal_reason_shared_with_job_seeker %}
                                     </div>
                                 </fieldset>
                             {% else %}

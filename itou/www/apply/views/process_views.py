@@ -307,6 +307,9 @@ class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
             # After each successful transition, a save() is performed by django-xworkflows.
             cleaned_data = self.get_all_cleaned_data()
             self.job_application.refusal_reason = cleaned_data["refusal_reason"]
+            self.job_application.refusal_reason_shared_with_job_seeker = cleaned_data[
+                "refusal_reason_shared_with_job_seeker"
+            ]
             self.job_application.answer = cleaned_data["job_seeker_answer"]
             self.job_application.answer_to_prescriber = cleaned_data.get("prescriber_answer", "")
             self.job_application.refuse(user=self.request.user)
@@ -331,13 +334,11 @@ class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if self.steps.current != self.STEP_REASON:
-            context.update(
-                refusal_reason_label=(
-                    job_applications_enums.RefusalReason(
-                        self.get_cleaned_data_for_step(self.STEP_REASON)["refusal_reason"]
-                    ).label
-                )
-            )
+            cleaned_data = self.get_cleaned_data_for_step(self.STEP_REASON)
+            context["refusal_reason_label"] = job_applications_enums.RefusalReason(
+                cleaned_data["refusal_reason"]
+            ).label
+            context["refusal_reason_shared_with_job_seeker"] = cleaned_data["refusal_reason_shared_with_job_seeker"]
         return context | {
             "job_application": self.job_application,
             "can_view_personal_information": True,  # SIAE members have access to personal info
