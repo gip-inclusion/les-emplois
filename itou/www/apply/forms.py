@@ -15,7 +15,7 @@ from django_select2.forms import Select2MultipleWidget
 from itou.approvals.models import Approval
 from itou.asp import models as asp_models
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.common_apps.address.forms import JobSeekerAddressForm, MandatoryAddressFormMixin
+from itou.common_apps.address.forms import JobSeekerAddressForm, OptionalAddressFormMixin
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType, JobDescriptionSource
 from itou.companies.models import JobDescription
@@ -821,7 +821,7 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileFieldsM
         JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
 
 
-class UserAddressForm(MandatoryAddressFormMixin, forms.ModelForm):
+class UserAddressForm(OptionalAddressFormMixin, forms.ModelForm):
     """
     Add job seeker address in the job application process.
     """
@@ -865,6 +865,11 @@ class UserAddressForm(MandatoryAddressFormMixin, forms.ModelForm):
             "city",
             "ban_api_resolved_address",
         ]
+
+    def clean(self):
+        if self.errors:
+            return  # An error here means that some required fields were left blank.
+        super().clean()
 
 
 class FilterJobApplicationsForm(forms.Form):
