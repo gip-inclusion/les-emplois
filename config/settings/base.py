@@ -650,3 +650,8 @@ FORCE_IC_LOGIN = True
 C4_TOKEN = os.getenv("C4_TOKEN", None)
 
 DORA_BASE_URL = os.getenv("DORA_BASE_URL", "https://dora.inclusion.beta.gouv.fr")
+
+# GPS
+# ------------------------------------------------------------------------------
+# Until GPS goes live for everyone, keep the feature hidden in production.
+GPS_ENABLED = ITOU_ENVIRONMENT != "PROD"
