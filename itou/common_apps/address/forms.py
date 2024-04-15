@@ -98,23 +98,6 @@ class OptionalAddressFormMixin(forms.Form):
                 self.add_error("city", "Ville : ce champ est obligatoire.")
 
 
-class MandatoryAddressFormMixin(OptionalAddressFormMixin):
-    """
-    Form mixin that requires an address.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["address_line_1"].required = True
-        self.fields["post_code"].required = True
-        self.fields["city"].required = True
-
-    def clean(self):
-        if self.errors:
-            return  # An error here means that some required fields were left blank.
-        super().clean()
-
-
 class JobSeekerAddressForm(forms.ModelForm):
     address_line_1 = forms.CharField(
         label="Adresse", widget=forms.TextInput(attrs={"placeholder": "102 Quai de Jemmapes"})

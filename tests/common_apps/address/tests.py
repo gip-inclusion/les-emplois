@@ -5,7 +5,7 @@ from django import forms
 from django.contrib.gis.geos import Point
 
 from itou.common_apps.address.departments import department_from_postcode
-from itou.common_apps.address.forms import MandatoryAddressFormMixin, OptionalAddressFormMixin
+from itou.common_apps.address.forms import OptionalAddressFormMixin
 from itou.common_apps.address.models import lat_lon_to_coords
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.models import User
@@ -183,24 +183,6 @@ class UtilsOptionalAddressFormMixinTest(TestCase):
 
             assert form.initial["city_slug"] == city.slug
             assert form.initial["city"] == city.name
-
-
-class UtilsMandatoryAddressFormMixinTest(TestCase):
-    """
-    Test `MandatoryAddressFormMixin`.
-    """
-
-    def test_required_fields(self):
-        """
-        Test that `address_line_1`, `post_code` and `city` fields are required.
-        """
-        form_data = {}
-        form = MandatoryAddressFormMixin(data=form_data)
-        assert not form.is_valid()
-
-        assert form.errors["address_line_1"][0] == "Ce champ est obligatoire."
-        assert form.errors["post_code"][0] == "Ce champ est obligatoire."
-        assert form.errors["city"][0] == "Ce champ est obligatoire."
 
 
 class UtilsMiscTestCase(TestCase):
