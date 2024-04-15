@@ -8,7 +8,12 @@ from itou.gps.models import FollowUpGroup
 def my_groups(request, template_name="gps/my_groups.html"):
 
     current_user = request.user
-    groups = FollowUpGroup.objects.filter(members=current_user).all()
+    groups = (
+        FollowUpGroup.objects.filter(members=current_user)
+        .select_related("beneficiary")
+        .prefetch_related("members")
+        .all()
+    )
 
     context = {"groups": groups}
 
