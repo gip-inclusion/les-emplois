@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.text import slugify
 
-from itou.common_apps.address.forms import JobSeekerAddressForm, OptionalAddressFormMixin
+from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.communications import registry as notification_registry
 from itou.communications.models import NotificationRecord, NotificationSettings
@@ -100,18 +100,13 @@ class EditJobSeekerInfoForm(
         return super().save(commit=commit)
 
 
-class EditUserInfoForm(OptionalAddressFormMixin, SSOReadonlyMixin, forms.ModelForm):
+class EditUserInfoForm(SSOReadonlyMixin, forms.ModelForm):
     class Meta:
         model = User
         fields = [
             "first_name",
             "last_name",
             "phone",
-            "address_line_1",
-            "address_line_2",
-            "post_code",
-            "city",
-            "city_slug",
         ]
 
     def __init__(self, *args, **kwargs):

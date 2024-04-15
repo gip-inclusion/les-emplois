@@ -1190,20 +1190,12 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "phone": "0610203050",
-            "address_line_1": "10, rue du Gué",
-            "address_line_2": "Sous l'escalier",
-            "post_code": "35400",
-            "city": "Saint-Malo",
         }
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
 
         user = User.objects.get(id=user.id)
         assert user.phone == post_data["phone"]
-        assert user.address_line_1 == post_data["address_line_1"]
-        assert user.address_line_2 == post_data["address_line_2"]
-        assert user.post_code == post_data["post_code"]
-        assert user.city == post_data["city"]
 
     def test_edit_as_prescriber_with_ic(self):
         user = PrescriberFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
@@ -1224,10 +1216,6 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             "first_name": "Bob",
             "last_name": "Saint Clar",
             "phone": "0610203050",
-            "address_line_1": "10, rue du Gué",
-            "address_line_2": "Sous l'escalier",
-            "post_code": "35400",
-            "city": "Saint-Malo",
         }
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
@@ -1236,10 +1224,6 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         assert user.first_name != "Bob"
         assert user.first_name != "Saint Clair"
         assert user.phone == post_data["phone"]
-        assert user.address_line_1 == post_data["address_line_1"]
-        assert user.address_line_2 == post_data["address_line_2"]
-        assert user.post_code == post_data["post_code"]
-        assert user.city == post_data["city"]
 
 
 class EditJobSeekerInfo(TestCase):
