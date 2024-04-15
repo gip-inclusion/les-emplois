@@ -31,4 +31,8 @@
             });
         });
     </script>
+    {% if form_user_address %}
+        {% comment %} Needed for the AddressAutocompleteWidget {% endcomment %}
+        {{ form_user_address.media.js }}
+    {% endif %}
 {% endblock %}
