@@ -135,38 +135,6 @@ ASSET_INFOS = {
             ],
         },
     },
-    "jquery-ui": {
-        "download": {
-            "url": "https://download.jqueryui.com/download",
-            "sha256": None,  # The file is regenerated for each request making its hash unpredictable
-            # Update filename each time an option is changed to invalidate the cache
-            # (since no hash is provided)
-            "filename": "jquery-ui-1.13.2.custom.zip",
-            "post": {
-                "version": "1.13.2",
-                "widget": "on",
-                "position": "on",
-                "jquery-patch": "on",
-                "keycode": "on",
-                "unique-id": "on",
-                "widgets/autocomplete": "on",
-                "widgets/menu": "on",
-                "theme": "ffDefault=Arial%2CHelvetica%2Csans-serif&fsDefault=1em&fwDefault=normal&cornerRadius=3px&bgColorHeader=e9e9e9&bgTextureHeader=flat&borderColorHeader=dddddd&fcHeader=333333&iconColorHeader=444444&bgColorContent=ffffff&bgTextureContent=flat&borderColorContent=dddddd&fcContent=333333&iconColorContent=444444&bgColorDefault=f6f6f6&bgTextureDefault=flat&borderColorDefault=c5c5c5&fcDefault=454545&iconColorDefault=777777&bgColorHover=ededed&bgTextureHover=flat&borderColorHover=cccccc&fcHover=2b2b2b&iconColorHover=555555&bgColorActive=007fff&bgTextureActive=flat&borderColorActive=003eff&fcActive=ffffff&iconColorActive=ffffff&bgColorHighlight=fffa90&bgTextureHighlight=flat&borderColorHighlight=dad55e&fcHighlight=777620&iconColorHighlight=777620&bgColorError=fddfdf&bgTextureError=flat&borderColorError=f1a899&fcError=5f3f3f&iconColorError=cc0000&bgColorOverlay=aaaaaa&bgTextureOverlay=flat&bgImgOpacityOverlay=0&opacityOverlay=30&bgColorShadow=666666&bgTextureShadow=flat&bgImgOpacityShadow=0&opacityShadow=30&thicknessShadow=5px&offsetTopShadow=0px&offsetLeftShadow=0px&cornerRadiusShadow=8px",  # noqa
-                "theme-folder-name": "base",
-                "scope": "",
-            },
-        },
-        "extract": {
-            "origin": "jquery-ui-1.13.2.custom",
-            "destination": "vendor/jquery-ui",
-            "files": [
-                "LICENSE.txt",
-                "jquery-ui.min.css",
-                "jquery-ui.min.js",
-                "images/*",
-            ],
-        },
-    },
     "ol": {
         "download": {
             "url": "https://registry.npmjs.org/ol/-/ol-7.2.2.tgz",
@@ -279,15 +247,11 @@ def download(asset_key, download_infos):
         filepath.parent.mkdir(parents=True, exist_ok=True)
         print(f"{prefix} - Downloading {filepath}")
 
-        stream_kwargs = {
-            "url": download_infos["url"],
-        }
-        if post_data := download_infos.get("post"):
-            stream_kwargs.update({"method": "POST", "data": post_data, "timeout": 10})
-        else:
-            stream_kwargs.update({"method": "GET", "follow_redirects": True})
         hash_value = hashlib.sha256()
-        with httpx.stream(**stream_kwargs) as response, open(filepath, "wb") as f:
+        with (
+            httpx.stream(method="GET", follow_redirects=True, url=download_infos["url"]) as response,
+            open(filepath, "wb") as f,
+        ):
             for data in response.iter_bytes():
                 f.write(data)
                 hash_value.update(data)
