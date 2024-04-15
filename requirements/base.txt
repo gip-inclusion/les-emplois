@@ -373,9 +373,9 @@ django-appconf==1.0.5 \
     --hash=sha256:ae9f864ee1958c815a965ed63b3fba4874eec13de10236ba063a788f9a17389d \
     --hash=sha256:be3db0be6c81fa84742000b89a81c016d70ae66a7ccb620cdef592b1f1a6aaa4
     # via django-select2
-django-bootstrap5==23.4 \
-    --hash=sha256:5181bf1e97afae6211e963f28f48d4a90c937a3b036b3f752f52260f0029f3bc \
-    --hash=sha256:fbf9942a17e1f48b4142e78df9e85afb65e4066a20e38ec7c497d36ae5ef7256
+django-bootstrap5==24.1 \
+    --hash=sha256:c42b4f6e673d35af847486733da77104e1e98e7fd5caecc6d56f32a96cc77479 \
+    --hash=sha256:fc272b5bb218690fe6f32d52b23c155ebb46fbc5a2856c84eb353c1bf5fc49ea
     # via -r requirements/base.in
 django-csp==3.8 \
     --hash=sha256:19b2978b03fcd73517d7d67acbc04fbbcaec0facc3e83baa502965892d1e0719 \
