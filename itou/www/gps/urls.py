@@ -8,4 +8,5 @@ app_name = "gps"
 
 urlpatterns = [
     path("my_groups", views.my_groups, name="my_groups"),
+    path("join_group", views.join_group, name="join_group"),
 ]
