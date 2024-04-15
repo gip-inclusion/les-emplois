@@ -2475,7 +2475,6 @@ class DirectHireFullProcessTest(TestCase):
             "address_line_1": job_seeker.address_line_1,
             "post_code": job_seeker.post_code,
             "city": self.city.name,
-            "city_slug": self.city.slug,
             "prehiring_guidance_days": 3,
             "nb_hours_per_week": 4,
             "planned_training_hours": 5,
@@ -2769,7 +2768,6 @@ def test_application_end_update_job_seeker(client):
             "address_line_1": job_seeker.address_line_1,
             "address_line_2": "something new",
             "post_code": job_seeker.post_code,
-            "city_slug": job_seeker.city_slug,
             "city": job_seeker.city,
             "phone": job_seeker.phone,
         },
@@ -4264,7 +4262,6 @@ class HireConfirmationTestCase(TestCase):
             + 1  # get approvals_poleemploiapproval (has_valid_common_approval)
             + 1  # eligibility_eligibilitydiagnosis (_check_job_seeker_approval -> last_considered_valid)
             + 1  # eligibility_eligibilitydiagnosis (EligibilityDiagnosis.objects.last_considered_valid)
-            + 1  # cities_city (UserAddressForm)
             + 1  # companies_jobdescription (AcceptForm.__init__)
             + 1  # eligibility_administrativecriteria (/apply/includes/eligibility_diagnosis.html)
             + 3  # update session with savepoint & release
@@ -4335,7 +4332,6 @@ class HireConfirmationTestCase(TestCase):
             "address_line_1": "1, Adress Line",
             "post_code": "Post code",
             "city": self.city.name,
-            "city_slug": self.city.slug,
             # GEIQ specific fields
             "hired_job": self.company.job_description_through.first().pk,
             "prehiring_guidance_days": 3,

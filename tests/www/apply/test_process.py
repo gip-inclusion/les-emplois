@@ -141,7 +141,6 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
                 "post_code": city.post_codes[0],
                 "insee_code": city.code_insee,
                 "city": city.name,
-                "city_slug": city.slug,
                 "hired_job": job_description.pk,
                 "geocoding_score": 0.9714,
                 "fill_mode": "ban_api",
@@ -1475,7 +1474,6 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             "address_line_1": "11 rue des Lilas",
             "post_code": "57000",
             "city": city.name,
-            "city_slug": city.slug,
             # Data for `AcceptForm`.
             "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": (timezone.localdate() + relativedelta(days=360)).strftime(
