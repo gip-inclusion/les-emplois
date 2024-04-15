@@ -9,6 +9,12 @@ Pour l'instant cette SIAE n'est plus habilitée à recevoir de candidatures.
 
 Nous vous souhaitons bon courage dans votre recherche et sommes persuadés que votre démarche aboutira ailleurs.
 
+{% if job_application.refusal_reason_shared_with_job_seeker %}
+*Motif de refus* :
+
+{{ job_application.get_refusal_reason_display }}
+{% endif %}
+
 {% if job_application.answer %}
 *Message de l'entreprise* :
 

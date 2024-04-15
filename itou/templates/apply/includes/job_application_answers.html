@@ -4,11 +4,19 @@
     <div class="c-box mb-4">
         <h3>Réponse de l'employeur</h3>
         <ul class="list-data mb-3">
-            {% if job_application.refusal_reason and not request.user.is_job_seeker %}
-                <li>
-                    <small>Motif de refus</small>
-                    <strong>{{ job_application.get_refusal_reason_display }}</strong>
-                </li>
+            {% if job_application.refusal_reason %}
+                {% if not request.user.is_job_seeker or job_application.refusal_reason_shared_with_job_seeker %}
+                    <li>
+                        <div>
+                            {% if request.user.is_job_seeker %}
+                                <small>Motif de refus</small>
+                            {% else %}
+                                <small>Motif de refus {{ job_application.refusal_reason_shared_with_job_seeker|yesno:"partagé,non partagé" }} avec le candidat</small>
+                            {% endif %}
+                            <strong>{{ job_application.get_refusal_reason_display }}</strong>
+                        </div>
+                    </li>
+                {% endif %}
             {% endif %}
             {% if job_application.answer_to_prescriber and not request.user.is_job_seeker %}
                 <li>

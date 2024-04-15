@@ -1785,6 +1785,7 @@ class JobApplicationAdminFormTest(TestCase):
             "answer",
             "answer_to_prescriber",
             "refusal_reason",
+            "refusal_reason_shared_with_job_seeker",
             "hiring_start_at",
             "hiring_end_at",
             "hiring_without_approval",

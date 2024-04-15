@@ -374,6 +374,10 @@ class JobApplicationRefusalReasonForm(forms.Form):
         widget=forms.RadioSelect,
         choices=job_applications_enums.RefusalReason.displayed_choices(),
     )
+    refusal_reason_shared_with_job_seeker = forms.BooleanField(
+        label="J’accepte d’envoyer le motif de refus au candidat",
+        required=False,
+    )
 
     def __init__(self, job_application, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -411,11 +415,11 @@ class JobApplicationRefusalPrescriberAnswerForm(forms.Form):
         if job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER:
             if job_application.is_sent_by_authorized_prescriber:
                 self.fields["prescriber_answer"].label = (
-                    "Commentaire envoyé au prescripteur (n’est pas envoyé au candidat)"
+                    "Commentaire envoyé au prescripteur (n’est pas communiqué au candidat)"
                 )
             else:
                 self.fields["prescriber_answer"].label = (
-                    "Commentaire envoyé à l’orienteur (n’est pas envoyé au candidat)"
+                    "Commentaire envoyé à l’orienteur (n’est pas communiqué au candidat)"
                 )
 
 

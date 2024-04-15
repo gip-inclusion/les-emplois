@@ -7,6 +7,12 @@ La candidature de {{ job_application.job_seeker.get_full_name }} envoyée par {{
 Pour l'instant cette SIAE n'est plus habilitée à recevoir de candidatures.
 {% endif %}
 
+{% if job_application.refusal_reason_shared_with_job_seeker %}
+*Motif de refus* :
+
+{{ job_application.get_refusal_reason_display }}
+{% endif %}
+
 {% if job_application.answer %}
 *Réponse de l'entreprise transmise au candidat* :
 

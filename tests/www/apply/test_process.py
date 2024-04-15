@@ -90,6 +90,11 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         "Vous pourrez créer votre compte en cliquant sur ce lien : "
         "https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-employeur"
     )
+    REFUSAL_REASON_JOB_SEEKER_MENTION = "<small>Motif de refus</small><strong>Autre</strong>"
+    REFUSAL_REASON_SHARED_MENTION = "<small>Motif de refus partagé avec le candidat</small><strong>Autre</strong>"
+    REFUSAL_REASON_NOT_SHARED_MENTION = (
+        "<small>Motif de refus non partagé avec le candidat</small><strong>Autre</strong>"
+    )
 
     @classmethod
     def setUpTestData(cls):
@@ -519,15 +524,21 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.client.force_login(job_application.job_seeker)
         url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
+        self.assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
+        self.assertNotContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
+        self.assertNotContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
         self.assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
         self.assertContains(response, f"<p>{job_application.answer}</p>", html=True)
         self.assertNotContains(response, "<small>Commentaire privé de l'employeur</small>")
         self.assertNotContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
-        self.assertNotContains(
-            response,
-            "<small>Motif de refus</small><strong>Autre (détails à fournir dans le message au prescripteur)</strong>",
-            html=True,
-        )
+
+        # Test with refusal reason shared with job seeker
+        job_application.refusal_reason_shared_with_job_seeker = True
+        job_application.save()
+        response = self.client.get(url)
+        self.assertContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
+        self.assertNotContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
+        self.assertNotContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
 
     def test_details_for_prescriber_when_refused(self, *args, **kwargs):
         job_application = JobApplicationFactory(
@@ -541,15 +552,49 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.client.force_login(prescriber)
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
+        self.assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
+        self.assertNotContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
+        self.assertContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
         self.assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
         self.assertContains(response, f"<p>{job_application.answer}</p>", html=True)
         self.assertContains(response, "<small>Commentaire privé de l'employeur</small>")
         self.assertContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
-        self.assertContains(
-            response,
-            "<small>Motif de refus</small><strong>Autre</strong>",
-            html=True,
+
+        # Test with refusal reason shared with job seeker
+        job_application.refusal_reason_shared_with_job_seeker = True
+        job_application.save()
+        response = self.client.get(url)
+        self.assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
+        self.assertContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
+        self.assertNotContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
+
+    def test_details_for_company_when_refused(self, *args, **kwargs):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            state=job_applications_enums.JobApplicationState.REFUSED,
+            answer="abc",
+            answer_to_prescriber="undisclosed",
+            refusal_reason="other",
         )
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
+        self.assertNotContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
+        self.assertContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
+        self.assertContains(response, "<small>Message envoyé au candidat</small>", html=True)
+        self.assertContains(response, f"<p>{job_application.answer}</p>", html=True)
+        self.assertContains(response, "<small>Commentaire privé de l'employeur</small>")
+        self.assertContains(response, f"<p>{job_application.answer_to_prescriber}</p>", html=True)
+
+        # Test with refusal reason shared with job seeker
+        job_application.refusal_reason_shared_with_job_seeker = True
+        job_application.save()
+        response = self.client.get(url)
+        self.assertNotContains(response, self.REFUSAL_REASON_JOB_SEEKER_MENTION, html=True)
+        self.assertContains(response, self.REFUSAL_REASON_SHARED_MENTION, html=True)
+        self.assertNotContains(response, self.REFUSAL_REASON_NOT_SHARED_MENTION, html=True)
 
     def test_company_information_displayed_for_prescriber_when_refused(self, *args, **kwargs):
         """
@@ -753,6 +798,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
                     post_data = {
                         f"job_application_{job_application.pk}_refuse-current_step": "reason",
                         "reason-refusal_reason": reason,
+                        "reason-refusal_reason_shared_with_job_seeker": True,
                     }
                     response = self.client.post(refusal_reason_url, data=post_data, follow=True)
                     job_seeker_answer_url = reverse(
@@ -761,7 +807,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
                     self.assertRedirects(response, job_seeker_answer_url)
                     self.assertContains(response, "<strong>Étape 2</strong>/3 : Message au candidat", html=True)
                     self.assertContains(response, "Réponse au candidat")
-                    self.assertContains(response, f"<strong>Raison du refus :</strong> {reason_label}", html=True)
+                    self.assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
 
                     post_data = {
                         f"job_application_{job_application.pk}_refuse-current_step": "job-seeker-answer",
@@ -774,7 +820,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
                     self.assertRedirects(response, prescriber_answer_url)
                     self.assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
                     self.assertContains(response, "Réponse au prescripteur")
-                    self.assertContains(response, f"<strong>Raison du refus :</strong> {reason_label}", html=True)
+                    self.assertContains(response, f"<strong>Motif de refus :</strong> {reason_label}", html=True)
 
                     post_data = {
                         f"job_application_{job_application.pk}_refuse-current_step": "prescriber-answer",
@@ -809,6 +855,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
                     post_data = {
                         f"job_application_{job_application.pk}_refuse-current_step": "reason",
                         "reason-refusal_reason": reason,
+                        "reason-refusal_reason_shared_with_job_seeker": False,
                     }
                     response = self.client.post(refusal_reason_url, data=post_data, follow=True)
                     job_seeker_answer_url = reverse(
@@ -817,7 +864,12 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
                     self.assertRedirects(response, job_seeker_answer_url)
                     self.assertContains(response, "<strong>Étape 2</strong>/2 : Message au candidat", html=True)
                     self.assertContains(response, "Réponse au candidat")
-                    self.assertContains(response, f"<strong>Raison du refus :</strong> {reason_label}", html=True)
+                    self.assertContains(
+                        response,
+                        f"<strong>Motif de refus :</strong> {reason_label} "
+                        "<em>(Motif non communiqué au candidat)</em>",
+                        html=True,
+                    )
 
                     post_data = {
                         f"job_application_{job_application.pk}_refuse-current_step": "job-seeker-answer",
@@ -878,7 +930,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
         self.assertContains(response, "Réponse au prescripteur")
         self.assertContains(response, "Vous pouvez partager un message au prescripteur uniquement")
-        self.assertContains(response, "Commentaire envoyé au prescripteur (n’est pas envoyé au candidat)")
+        self.assertContains(response, "Commentaire envoyé au prescripteur (n’est pas communiqué au candidat)")
 
         # Un-authorize prescriber (ie. considered as "orienteur")
         job_application.sender_prescriber_organization.is_authorized = False
@@ -899,7 +951,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
         self.assertContains(response, "Réponse à l’orienteur")
         self.assertContains(response, "Vous pouvez partager un message à l’orienteur uniquement")
-        self.assertContains(response, "Commentaire envoyé à l’orienteur (n’est pas envoyé au candidat)")
+        self.assertContains(response, "Commentaire envoyé à l’orienteur (n’est pas communiqué au candidat)")
 
         # Remove prescriber's organization membership (ie. considered as "orienteur solo")
         job_application.sender_prescriber_organization.members.clear()
@@ -921,7 +973,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
         self.assertContains(response, "Réponse à l’orienteur")
         self.assertContains(response, "Vous pouvez partager un message à l’orienteur uniquement")
-        self.assertContains(response, "Commentaire envoyé à l’orienteur (n’est pas envoyé au candidat)")
+        self.assertContains(response, "Commentaire envoyé à l’orienteur (n’est pas communiqué au candidat)")
 
     def test_refuse_incompatible_state(self, *args, **kwargs):
         job_application = JobApplicationFactory(
