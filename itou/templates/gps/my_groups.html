@@ -4,6 +4,9 @@
 
 {% block content_title %}<h1>Mes groupes de suivi</h1>{% endblock %}
 
+{% block breadcrumbs %}
+    {% include "layout/breadcrumbs_from_dashboard.html" %}
+{% endblock %}
 
 {% block content %}
     <section class="s-box">
@@ -17,7 +20,16 @@
                                     Membre de {{ counter }} <strong>groupe{{ counter|pluralizefr }} de suivi</strong>
                                 {% endwith %}
                             </h3>
+                            <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les groupes de suivi">
+
+                                <a href="{% url 'gps:join_group' %}" class="btn btn-ico btn-primary mt-3 mt-md-0" aria-label="Rejoindre un group de suivi">
+                                    <i class="ri-add-line" aria-hidden="true"></i>
+                                    <span>Rejoindre un groupe de suivi</span>
+                                </a>
+                            </div>
                         </div>
+
+                        <div class="col-6 col-lg-auto"></div>
 
                         {% for group in groups %}
                             <div class="my-3 my-md-4 s-box__row row">
