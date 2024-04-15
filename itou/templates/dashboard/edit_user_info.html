@@ -77,12 +77,6 @@
                                     {% bootstrap_field form.last_name %}
                                 {% endif %}
                                 {% bootstrap_field form.phone %}
-                                {% bootstrap_field form.address_line_1 %}
-                                {% bootstrap_field form.address_line_2 %}
-                                <div class="row">
-                                    <div class="col-3">{% bootstrap_field form.post_code %}</div>
-                                    <div class="col-9">{% bootstrap_field form.city %}</div>
-                                </div>
 
                                 {% comment "prev_url may be not useful anymore, remove it from the view" %}{% endcomment %}
                                 {% itou_buttons_form primary_label="Enregistrer et quitter" secondary_url=prev_url %}
