@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from django.urls import reverse
 
 from itou.gps.models import FollowUpGroup
 
@@ -15,6 +16,26 @@ def my_groups(request, template_name="gps/my_groups.html"):
         .all()
     )
 
-    context = {"groups": groups}
+    breadcrumbs = {
+        "Mes groupes de suivi": reverse("gps:my_groups"),
+    }
+
+    context = {
+        "breadcrumbs": breadcrumbs,
+        "groups": groups,
+    }
+
+    return render(request, template_name, context)
+
+
+@login_required
+def join_group(request, template_name="gps/join_group.html"):
+
+    breadcrumbs = {
+        "Mes groupes de suivi": reverse("gps:my_groups"),
+        "Rejoindre un groupe de suivi": reverse("gps:join_group"),
+    }
+
+    context = {"breadcrumbs": breadcrumbs}
 
     return render(request, template_name, context)
