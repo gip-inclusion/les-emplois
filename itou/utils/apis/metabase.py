@@ -214,6 +214,15 @@ METABASE_DASHBOARDS = {
     "stats_dgefp_follow_prolongation": {
         "dashboard_id": 357,
     },
+    "stats_dgefp_tension": {
+        "dashboard_id": 389,
+    },
+    "stats_dgefp_hiring": {
+        "dashboard_id": 160,
+    },
+    "stats_dgefp_state": {
+        "dashboard_id": 310,
+    },
     "stats_dgefp_iae": {
         "dashboard_id": 117,
     },
