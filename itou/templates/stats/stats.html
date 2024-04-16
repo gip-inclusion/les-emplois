@@ -4,26 +4,6 @@
 {% block title %}Statistiques et pilotage {{ block.super }}{% endblock %}
 
 {% block content_title %}
-    {% if not is_stats_public %}
-        <div class="alert alert-important" role="status">
-            <div class="row">
-                <div class="col-auto pe-0">
-                    <i class="ri-information-line ri-xl text-important"></i>
-                </div>
-                <div class="col">
-                    <p class="mb-2">
-                        <strong>Votre satisfaction et votre avis nous sont précieux !</strong>
-                    </p>
-                    <p class="mb-0">
-                        Jusqu’au 2 avril, prenez part à notre enquête sur l'impact des tableaux de bord dans vos missions et partagez vos suggestions d'amélioration pour les mois à venir.
-                    </p>
-                </div>
-                <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                    <a href="https://tally.so/r/3N6WkN" class="btn btn-link btn-sm btn-primary has-external-link" rel="noopener" target="_blank" aria-label="Vous rendre sur l'enquête (ouverture dans un nouvel onglet)">Je donne mon avis</a>
-                </div>
-            </div>
-        </div>
-    {% endif %}
     <h1>{{ page_title }}</h1>
     {% if show_siae_evaluation_message %}
         <p>
