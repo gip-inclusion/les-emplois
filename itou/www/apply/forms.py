@@ -30,7 +30,7 @@ from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
 from itou.utils.types import InclusiveDateRange
 from itou.utils.validators import validate_nir
-from itou.utils.widgets import DuetDatePickerWidget, JobSeekerAddressAutocompleteWidget
+from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.companies_views.forms import JobAppellationAndLocationMixin
 
 
@@ -819,101 +819,6 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileFieldsM
     def clean(self):
         super().clean()
         JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
-
-
-class UserAddressForm(forms.ModelForm):
-    """
-    Add job seeker address in the job application process.
-    """
-
-    city = forms.CharField(
-        label="Ville",
-        required=False,
-        widget=forms.TextInput(attrs={"placeholder": "Nom de la ville"}),
-    )
-
-    address_line_1 = forms.CharField(
-        required=False,
-        max_length=User._meta.get_field("address_line_1").max_length,
-        label="Adresse",
-    )
-
-    address_line_2 = forms.CharField(
-        required=False,
-        max_length=User._meta.get_field("address_line_2").max_length,
-        label="Complément d'adresse",
-    )
-
-    post_code = forms.CharField(
-        required=False,
-        max_length=User._meta.get_field("post_code").max_length,
-        label="Code postal",
-    )
-
-    ban_api_resolved_address = forms.CharField(widget=forms.HiddenInput(), required=False)
-    insee_code = forms.CharField(widget=forms.HiddenInput(), required=False)
-    fill_mode = forms.CharField(widget=forms.HiddenInput(), required=False)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Needed for proper auto-completion used with
-        # a ModelForm which has an instance existing in DB.
-        if hasattr(self, "instance") and hasattr(self.instance, "city") and hasattr(self.instance, "department"):
-            self.initial["city"] = self.instance.city
-        js_handled_fields = [
-            "address_line_1",
-            "address_line_2",
-            "post_code",
-            "city",
-            "insee_code",
-            "ban_api_resolved_address",
-        ]
-
-        for field_name in js_handled_fields:
-            self.fields[field_name].widget.attrs["class"] = f"js-{field_name.replace('_', '-')}"
-            self.fields[field_name].required = False
-
-        self.fields["address_for_autocomplete"] = forms.CharField(
-            label="Adresse",
-            required=True,
-            widget=JobSeekerAddressAutocompleteWidget(initial_data=kwargs["data"], job_seeker=self.instance),
-            initial=0,
-            help_text=(
-                "Si votre adresse ne s’affiche pas, merci de renseigner votre ville uniquement en utilisant "
-                "votre code postal et d’utiliser le Complément d’adresse pour renseigner vos numéro et nom de rue."
-            ),
-        )
-
-    class Meta:
-        model = User
-        fields = [
-            "address_line_1",
-            "address_line_2",
-            "post_code",
-            "city",
-            "ban_api_resolved_address",
-        ]
-
-    def clean(self):
-        if self.errors:
-            return  # An error here means that some required fields were left blank.
-        cleaned_data = super().clean()
-
-        # Basic check of address fields.
-        addr1, addr2, post_code, city = (
-            cleaned_data["address_line_1"],
-            cleaned_data["address_line_2"],
-            cleaned_data["post_code"],
-            cleaned_data["city"],
-        )
-
-        valid_address = all([addr1, post_code, city])
-        empty_address = not any([addr1, addr2, post_code, city])
-        if not empty_address and not valid_address:
-            if not addr1:
-                self.add_error("address_line_1", "Adresse : ce champ est obligatoire.")
-            if not post_code:
-                self.add_error("post_code", "Code postal : ce champ est obligatoire.")
 
 
 class FilterJobApplicationsForm(forms.Form):

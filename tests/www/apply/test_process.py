@@ -1473,7 +1473,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
             "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
             "nir": other_job_seeker.jobseeker_profile.nir,
-            # Data for `UserAddressForm`.
+            # Data for `JobSeekerAddressForm`.
             "address_line_1": "11 rue des Lilas",
             "post_code": "57000",
             "city": city.name,
