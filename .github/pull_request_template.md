@@ -10,7 +10,6 @@
 
 ## :rotating_light: À vérifier
 
-- [ ] Ajouter l'étiquette « no-changelog » ?
 - [ ] Mettre à jour le CHANGELOG_breaking_changes.md ?
 
 ## :desert_island: Comment tester
