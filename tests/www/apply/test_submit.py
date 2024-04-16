@@ -33,7 +33,7 @@ from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import PoleEmploiApprovalFactory
-from tests.cities.factories import create_city_in_zrr, create_test_cities
+from tests.cities.factories import create_city_geispolsheim, create_city_in_zrr, create_test_cities
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWithMembershipAndJobsFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from tests.geo.factories import ZRRFactory
@@ -2094,9 +2094,6 @@ class ApplyAsCompanyTest(TestCase):
 
 
 class DirectHireFullProcessTest(TestCase):
-    def setUp(self):
-        super().setUp()
-        [self.city] = create_test_cities(["67"], num_per_department=1)
 
     def test_perms_for_company(self):
         """A company can hire only for itself."""
@@ -2148,6 +2145,9 @@ class DirectHireFullProcessTest(TestCase):
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
         )
+
+        # This is the city matching with_ban_geoloc_address trait
+        geispolsheim = create_city_geispolsheim()
 
         # Step determine the job seeker with a NIR.
         # ----------------------------------------------------------------------
@@ -2232,9 +2232,9 @@ class DirectHireFullProcessTest(TestCase):
         post_data = {
             "ban_api_resolved_address": dummy_job_seeker.geocoding_address,
             "address_line_1": dummy_job_seeker.address_line_1,
-            "post_code": self.city.post_codes[0],
-            "insee_code": self.city.code_insee,
-            "city": self.city.name,
+            "post_code": geispolsheim.post_codes[0],
+            "insee_code": geispolsheim.code_insee,
+            "city": geispolsheim.name,
             "phone": dummy_job_seeker.phone,
             "fill_mode": "ban_api",
         }
@@ -2342,9 +2342,9 @@ class DirectHireFullProcessTest(TestCase):
             "answer": "",
             "ban_api_resolved_address": new_job_seeker.geocoding_address,
             "address_line_1": new_job_seeker.address_line_1,
-            "post_code": self.city.post_codes[0],
-            "insee_code": self.city.code_insee,
-            "city": self.city.name,
+            "post_code": geispolsheim.post_codes[0],
+            "insee_code": geispolsheim.code_insee,
+            "city": geispolsheim.name,
             "phone": new_job_seeker.phone,
             "fill_mode": "ban_api",
             # Select the first and only one option
@@ -2474,7 +2474,7 @@ class DirectHireFullProcessTest(TestCase):
             "answer": "",
             "address_line_1": job_seeker.address_line_1,
             "post_code": job_seeker.post_code,
-            "city": self.city.name,
+            "city": job_seeker.city,
             "prehiring_guidance_days": 3,
             "nb_hours_per_week": 4,
             "planned_training_hours": 5,
@@ -4242,13 +4242,21 @@ class GEIQEligibilityForHireTestCase(TestCase):
 class HireConfirmationTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.job_seeker = JobSeekerWithAddressFactory(first_name="Clara", last_name="Sion", with_pole_emploi_id=True)
-        [cls.city] = create_test_cities(["67"], num_per_department=1)
+        cls.job_seeker = JobSeekerWithAddressFactory(
+            first_name="Clara", last_name="Sion", with_pole_emploi_id=True, with_ban_geoloc_address=True
+        )
+        # This is the city matching with_ban_geoloc_address trait
+        cls.city = create_city_geispolsheim()
 
     def _reverse(self, view_name):
         return reverse(view_name, kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk})
 
-    def test_as_company(self):
+    @override_settings(API_BAN_BASE_URL="http://ban-api")
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_first_geocoding_data,
+    )
+    def test_as_company(self, _mock):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         EligibilityDiagnosisFactory(job_seeker=self.job_seeker)
         self.client.force_login(self.company.members.first())

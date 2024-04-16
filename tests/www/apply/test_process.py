@@ -35,7 +35,7 @@ from itou.utils.templatetags.format_filters import format_nir, format_phone
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
 from tests.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
-from tests.cities.factories import create_test_cities
+from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
@@ -907,7 +907,8 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
                 assert job_application.state.is_postponed
 
     def test_accept(self, *args, **kwargs):
-        city = self.get_random_city()
+        # This is the city matching with_ban_geoloc_address trait
+        city = create_city_geispolsheim()
         today = timezone.localdate()
 
         job_seeker = JobSeekerWithAddressFactory(
@@ -1308,7 +1309,8 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         assert job_app_starting_later.approval.start_at == job_app_starting_earlier.hiring_start_at
 
     def test_accept_with_double_user(self, *args, **kwargs):
-        city = self.get_random_city()
+        # This is the city matching with_ban_geoloc_address trait
+        city = create_city_geispolsheim()
 
         company = CompanyFactory(with_membership=True)
         job_seeker = JobSeekerWithAddressFactory(
@@ -1344,6 +1346,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             city=city.name,
             jobseeker_profile__pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
             birthdate=job_seeker.birthdate,
+            with_ban_geoloc_address=True,
         )
         another_job_application = JobApplicationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
@@ -1810,8 +1813,11 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
     def test_accept_after_cancel(self, *args, **kwargs):
         # A canceled job application is not linked to an approval
         # unless the job seeker has an accepted job application.
-        city = self.get_random_city()
-        job_seeker = JobSeekerWithAddressFactory(city=city.name, with_pole_emploi_id=True)
+        # This is the city matching with_ban_geoloc_address trait
+        city = create_city_geispolsheim()
+        job_seeker = JobSeekerWithAddressFactory(
+            city=city.name, with_pole_emploi_id=True, with_ban_geoloc_address=True
+        )
         job_application = JobApplicationFactory(
             state=job_applications_enums.JobApplicationState.CANCELLED,
             job_seeker=job_seeker,
