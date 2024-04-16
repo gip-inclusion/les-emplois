@@ -696,6 +696,7 @@ class DashboardViewTest(TestCase):
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, self.SUSPEND_TEXT)
 
+    @pytest.mark.ignore_unknown_variable_template_error
     @freeze_time("2022-09-15")
     def test_dashboard_access_by_a_jobseeker(self):
         approval = ApprovalFactory(start_at=datetime(2022, 6, 21), end_at=datetime(2022, 12, 6))
@@ -1814,6 +1815,7 @@ class EditUserEmailFormTest(TestCase):
 
 
 class SwitchCompanyTest(TestCase):
+    @pytest.mark.ignore_unknown_variable_template_error
     def test_switch_company(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
@@ -2377,6 +2379,7 @@ TOKEN_MENU_STR = "Accès aux APIs"
 API_TOKEN_URL = reverse_lazy("dashboard:api_token")
 
 
+@pytest.mark.ignore_unknown_variable_template_error
 def test_api_token_view_for_company_admin(client):
     employer = CompanyMembershipFactory().user
     client.force_login(employer)

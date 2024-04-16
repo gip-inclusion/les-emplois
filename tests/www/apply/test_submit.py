@@ -688,6 +688,7 @@ class ApplyAsJobSeekerTest(TestCase):
         self.assertContains(response, expected_html, html=True)
 
 
+@pytest.mark.ignore_unknown_variable_template_error
 @pytest.mark.usefixtures("unittest_compatibility")
 class ApplyAsAuthorizedPrescriberTest(TestCase):
     def setUp(self):
@@ -1298,6 +1299,7 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
             "selected_jobs": [],
         }
 
+    @pytest.mark.ignore_unknown_variable_template_error
     def test_apply_as_prescriber_with_suspension_sanction(self):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
         Sanctions.objects.create(
@@ -1314,6 +1316,7 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
             response, expected_url=reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk})
         )
 
+    @pytest.mark.ignore_unknown_variable_template_error
     @override_settings(API_BAN_BASE_URL="http://ban-api")
     @mock.patch(
         "itou.utils.apis.geocoding.get_geocoding_data",
@@ -1605,6 +1608,7 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
         )
 
 
+@pytest.mark.ignore_unknown_variable_template_error
 class ApplyAsPrescriberNirExceptionsTest(TestCase):
     """
     The following normal use cases are tested in tests above:
@@ -1795,6 +1799,7 @@ class ApplyAsCompanyTest(TestCase):
             status_code=403,
         )
 
+    @pytest.mark.ignore_unknown_variable_template_error
     @override_settings(API_BAN_BASE_URL="http://ban-api")
     @mock.patch(
         "itou.utils.apis.geocoding.get_geocoding_data",
@@ -2058,6 +2063,7 @@ class ApplyAsCompanyTest(TestCase):
         response = self.client.get(next_url)
         assert response.status_code == 200
 
+    @pytest.mark.ignore_unknown_variable_template_error
     def test_cannot_create_job_seeker_with_pole_emploi_email(self):
         # It's unlikely to happen
         membership = CompanyMembershipFactory()
@@ -2127,6 +2133,7 @@ class DirectHireFullProcessTest(TestCase):
             status_code=403,
         )
 
+    @pytest.mark.ignore_unknown_variable_template_error
     @override_settings(API_BAN_BASE_URL="http://ban-api")
     @mock.patch(
         "itou.utils.apis.geocoding.get_geocoding_data",
@@ -3425,6 +3432,7 @@ class UpdateJobSeekerStep3ViewTestCase(TestCase):
         )
 
 
+@pytest.mark.ignore_unknown_variable_template_error
 def test_detect_existing_job_seeker(client):
     company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
@@ -3879,6 +3887,7 @@ class CheckPreviousApplicationsViewTestCase(TestCase):
         self.assertContains(response, self.check_prev_applications_url)
 
 
+@pytest.mark.ignore_unknown_variable_template_error
 class FindJobSeekerForHireViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -4079,6 +4088,7 @@ class CheckJobSeekerInformationsForHireTestCase(TestCase):
         self.assertContains(response, reverse("dashboard:index"))
 
 
+@pytest.mark.ignore_unknown_variable_template_error
 class CheckPreviousApplicationsForHireViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -4128,6 +4138,7 @@ class CheckPreviousApplicationsForHireViewTestCase(TestCase):
         self.assertRedirects(response, self._reverse("apply:geiq_eligibility_for_hire"))
 
 
+@pytest.mark.ignore_unknown_variable_template_error
 class EligibilityForHireTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -4189,6 +4200,7 @@ class GEIQEligibilityForHireTestCase(TestCase):
         response = self.client.get(self._reverse("apply:geiq_eligibility_for_hire"))
         assert response.status_code == 404
 
+    @pytest.mark.ignore_unknown_variable_template_error
     def test_job_seeker_with_valid_diagnosis(self):
         diagnosis = GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, with_geiq=True)
         diagnosis.administrative_criteria.add(GEIQAdministrativeCriteria.objects.get(pk=19))
@@ -4239,6 +4251,7 @@ class GEIQEligibilityForHireTestCase(TestCase):
         assert GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, self.company).exists()
 
 
+@pytest.mark.ignore_unknown_variable_template_error
 class HireConfirmationTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -4399,6 +4412,7 @@ class NewHireProcessInfoTestCase(TestCase):
         self.assertNotContains(response, self.GEIQ_APPLY_PROCESS_INFO)
         self.assertNotContains(response, self.GEIQ_DIRECT_HIRE_PROCESS_INFO)
 
+    @pytest.mark.ignore_unknown_variable_template_error
     def test_as_prescriber(self):
         self.client.force_login(PrescriberFactory())
         response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"company_pk": self.company.pk}))
@@ -4408,6 +4422,7 @@ class NewHireProcessInfoTestCase(TestCase):
         self.assertNotContains(response, self.GEIQ_APPLY_PROCESS_INFO)
         self.assertNotContains(response, self.GEIQ_DIRECT_HIRE_PROCESS_INFO)
 
+    @pytest.mark.ignore_unknown_variable_template_error
     def test_as_employer(self):
         self.client.force_login(self.company.members.first())
         response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"company_pk": self.company.pk}))

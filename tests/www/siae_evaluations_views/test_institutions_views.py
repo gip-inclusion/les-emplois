@@ -3543,6 +3543,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         )
         assert response.status_code == 404
 
+    @pytest.mark.ignore_unknown_variable_template_error
     def test_criterion_validation(self):
         self.client.force_login(self.user)
 
@@ -3711,6 +3712,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             response = self.client.get(url)
         assert response.status_code == 200
 
+    @pytest.mark.ignore_unknown_variable_template_error
     def test_job_application_state_labels(self):
         self.client.force_login(self.user)
         # fixme vincentporte : use EvaluatedAdministrativeCriteria instead

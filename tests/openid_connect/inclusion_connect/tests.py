@@ -782,6 +782,7 @@ class InclusionConnectLogoutTest(InclusionConnectBaseTestCase):
 
 
 class InclusionConnectmapChannelTest(MessagesTestMixin, InclusionConnectBaseTestCase):
+    @pytest.mark.ignore_unknown_variable_template_error
     @respx.mock
     def test_happy_path(self):
         job_application = JobApplicationSentByPrescriberPoleEmploiFactory(
@@ -814,6 +815,7 @@ class InclusionConnectmapChannelTest(MessagesTestMixin, InclusionConnectBaseTest
         response = self.client.get(response.url)
         assert response.status_code == 200
 
+    @pytest.mark.ignore_unknown_variable_template_error
     @respx.mock
     def test_create_user(self):
         # Application sent by a colleague from the same agency but not by the prescriber himself.

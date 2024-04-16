@@ -93,6 +93,7 @@ def test_list_view_only_pending_filter(client):
     assert list(response.context["pager"].object_list) == [pending_prolongation_request]
 
 
+@pytest.mark.ignore_unknown_variable_template_error
 def test_show_view_access(client):
     prolongation_request, other_prolongation_request = approvals_factories.ProlongationRequestFactory.create_batch(2)
 
@@ -120,6 +121,7 @@ def test_show_view_access(client):
     assert response.status_code == 404
 
 
+@pytest.mark.ignore_unknown_variable_template_error
 def test_show_view(snapshot, client):
     prolongation_request = approvals_factories.ProlongationRequestFactory(for_snapshot=True)
     client.force_login(prolongation_request.validated_by)

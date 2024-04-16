@@ -49,6 +49,9 @@ def pytest_configure(config) -> None:
             hook_impl.plugin_name == "randomly",  # Then pytest-randomly's and after that all the other ones
         )
     )
+    config.addinivalue_line(
+        "markers", "ignore_unknown_variable_template_error: ignore unknown variable error in templates"
+    )
 
 
 @pytest.fixture
@@ -278,6 +281,28 @@ def _fail_for_invalid_template_variable_improved(_fail_for_invalid_template_vari
             +        return ""
             """,
         )
+
+
+@pytest.fixture(autouse=True, scope="function")
+def unknown_variable_template_error(monkeypatch, request):
+    marker = request.keywords.get("ignore_unknown_variable_template_error", None)
+    if os.environ.get(INVALID_TEMPLATE_VARS_ENV, "false") == "true" and marker is None:
+        origin_resolve = base_template.FilterExpression.resolve
+
+        def stricter_resolve(self, context, ignore_failures=False):
+            if (
+                self.is_var
+                and self.var.lookups is not None
+                and self.var.lookups[0] not in context
+                # debug can be injected by django.template.context_processors.debug
+                # user can be injected by django.contrib.auth.context_processors.auth
+                # TODO(xfernandez): remove user from allow list (and remove the matching processor ?)
+                and self.var.lookups[0] not in ("debug", "user")
+            ):
+                ignore_failures = False
+            return origin_resolve(self, context, ignore_failures)
+
+        monkeypatch.setattr(base_template.FilterExpression, "resolve", stricter_resolve)
 
 
 @pytest.fixture(scope="session", autouse=True)

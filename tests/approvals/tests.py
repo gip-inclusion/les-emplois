@@ -987,6 +987,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
+    @pytest.mark.ignore_unknown_variable_template_error
     def test_manually_add_approval(self):
         # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
         # with a manual verification.

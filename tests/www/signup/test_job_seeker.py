@@ -19,6 +19,7 @@ from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 from tests.utils.test import TestCase, parse_response_to_soup, reload_module
 
 
+@pytest.mark.ignore_unknown_variable_template_error
 @pytest.mark.usefixtures("unittest_compatibility")
 class JobSeekerSignupTest(TestCase):
     def setUp(self):
