@@ -1,0 +1,16 @@
+name: Label Checks
+
+# Add merge_group and make the check required when
+# https://github.com/mheap/github-action-required-labels/issues/66 is solved.
+on: [pull_request]
+
+jobs:
+  require-label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify changelog label
+        uses: mheap/github-action-required-labels@v5.4.0
+        with:
+          mode: exactly
+          count: 1
+          labels: "ajouté, modifié, supprimé, dependencies, no-changelog"

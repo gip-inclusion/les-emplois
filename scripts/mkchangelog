@@ -1,0 +1,136 @@
+#!/usr/bin/env python3
+
+
+import datetime
+import json
+import logging
+import os
+import pathlib
+import re
+import subprocess
+import sys
+import tempfile
+
+
+logger = logging.getLogger(__name__)
+
+
+def gh(*args, **kwargs):
+    env = (
+        {
+            "GH_TOKEN": os.getenv("GH_TOKEN", ""),
+            "PATH": os.environ["PATH"],
+        }
+        if os.getenv("CI", False)
+        else None
+    )
+    return subprocess.run(["gh", *args], check=True, env=env, **kwargs)
+
+
+def list_pull_requests(start, end, labels):
+    limit = 1000
+    result = gh(
+        "search",
+        "prs",
+        "--merged-at",
+        f"{start}..{end}",
+        "--repo",
+        "gip-inclusion/les-emplois",
+        "--limit",
+        f"{limit}",
+        "--json",
+        "title,url,labels,body",
+        "--",
+        labels,
+        capture_output=True,
+    )
+    pull_requests = json.loads(result.stdout)
+    if len(pull_requests) == limit:
+        sys.exit("Limit has been exceeded when fetching pull requests, keep up the good work!")
+    return pull_requests
+
+
+def list_missing_pull_requests(start, end):
+    return list_pull_requests(start, end, "-label:ajouté,modifié,supprimé,dependencies,no-changelog")
+
+
+def list_merged_pull_requests(start, end):
+    return list_pull_requests(start, end, "label:ajouté,modifié,supprimé")
+
+
+def open_pull_request(branch, title):
+    gh("pr", "create", "--label", "no-changelog", "--title", title, "--body", "")
+
+
+def main():
+    changelog_path = pathlib.Path("CHANGELOG.md")
+    with (
+        open(changelog_path, "r+") as changelog,
+        tempfile.NamedTemporaryFile(dir=os.getcwd(), mode="w+", suffix="~", delete=False) as new_changelog,
+    ):
+        try:
+            for line in changelog:
+                if line.strip() in ["# Journal des modifications", ""]:
+                    new_changelog.write(line)
+                    continue
+                break
+            last_entry_header = line
+
+            _h2, sprint_start_text = last_entry_header.split()
+            sprint_start = datetime.date.fromisoformat(sprint_start_text)
+            sprint_end = sprint_start + datetime.timedelta(days=7)
+
+            if missing := list_missing_pull_requests(sprint_start, sprint_end):
+                missing_pull_requests = "\n- ".join(pr["url"] for pr in missing)
+                sys.exit(f"The following pull requests should have a label:\n- {missing_pull_requests}\n")
+
+            added, changed, removed = [], [], []
+            for pull_request in list_merged_pull_requests(sprint_start, sprint_end):
+                title = re.sub(r"\[(GEN|ITOU)-[0-9]+\]", "", pull_request["title"]).strip()
+                title = f"[{title}]({pull_request['url']})"
+                if re.search(r"\!\[[^]]+]", pull_request["body"]):
+                    title += " 🖼"
+                labels = [label["name"] for label in pull_request["labels"]]
+                if len({"ajouté", "modifié", "supprimé"}.intersection(set(labels))) != 1:
+                    label_names = " ".join(labels)
+                    raise ValueError(
+                        f"Expected only one of “ajouté”, “modifié” or “supprimé” in labels, got {label_names}."
+                    )
+                if "ajouté" in labels:
+                    added.append(title)
+                elif "modifié" in labels:
+                    changed.append(title)
+                else:
+                    removed.append(title)
+
+            if added or changed or removed:
+                new_changelog.write(f"## {sprint_end}\n\n")
+            if added:
+                new_changelog.write("### Ajouté\n\n")
+                for title in sorted(added):
+                    new_changelog.write(f"- {title}\n")
+                new_changelog.write("\n")
+            if changed:
+                new_changelog.write("### Modifié\n\n")
+                for title in sorted(changed):
+                    new_changelog.write(f"- {title}\n")
+                new_changelog.write("\n")
+            if removed:
+                new_changelog.write("### Supprimé\n\n")
+                for title in sorted(removed):
+                    new_changelog.write(f"- {title}\n")
+                new_changelog.write("\n")
+
+            # Don’t forget the previous header.
+            new_changelog.write(last_entry_header)
+            for line in changelog:
+                new_changelog.write(line)
+
+            # Atomically replace file.
+            pathlib.Path(new_changelog.name).rename(changelog_path)
+        finally:
+            pathlib.Path(new_changelog.name).unlink(missing_ok=True)
+
+
+if __name__ == "__main__":
+    main()

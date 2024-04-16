@@ -1,0 +1,19 @@
+name: 📃 Changelog
+
+on:
+  schedule:
+    - cron: 0 0 * * 1
+
+jobs:
+  generate-changelog:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4.1.2
+    - name: 💂 Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+    - name: 📥 Generate changelog
+      run: scripts/mkchangelog
+      env:
+        GH_TOKEN: ${{ secrets.ITOU_TECH_GH_TOKEN }}
