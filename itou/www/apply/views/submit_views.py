@@ -353,10 +353,7 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSend
 
         if self.form.is_valid():
             job_seeker = self.form.get_user()
-            # TODO(xfernandez): remove fallback on user infos for NIR
-            nir = self.job_seeker_session.get("profile", {}).get(
-                "nir", self.job_seeker_session.get("user", {}).get("nir", "")
-            )
+            nir = self.job_seeker_session.get("profile", {}).get("nir")
             can_add_nir = nir and self.sender.can_add_nir(job_seeker)
 
             # No user found with that email, redirect to create a new account.
@@ -466,14 +463,8 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        # TODO(xfernandez): drop fallback on job_seeker_session user dict for pole_emploi
-        # fields in a few weeks
-        session_nir = self.job_seeker_session.get("profile", {}).get(
-            "nir", self.job_seeker_session.get("user", {}).get("nir")
-        )
-        session_lack_of_nir_reason = self.job_seeker_session.get("profile", {}).get(
-            "lack_of_nir_reason", self.job_seeker_session.get("user", {}).get("lack_of_nir_reason")
-        )
+        session_nir = self.job_seeker_session.get("profile", {}).get("nir")
+        session_lack_of_nir_reason = self.job_seeker_session.get("profile", {}).get("lack_of_nir_reason")
 
         self.form = CreateOrUpdateJobSeekerStep1Form(
             data=request.POST or None,
@@ -569,15 +560,7 @@ class CreateJobSeekerStep3ForSenderView(CreateJobSeekerForSenderBaseView):
 
         self.form = CreateOrUpdateJobSeekerStep3Form(
             data=request.POST or None,
-            # TODO(xfernandez): drop fallback to user dict from job_seeker_session
-            # in a few weeks
-            initial={
-                "pole_emploi_id": self.job_seeker_session.get("user").get("pole_emploi_id"),
-                "lack_of_pole_emploi_id_reason": self.job_seeker_session.get("user").get(
-                    "lack_of_pole_emploi_id_reason"
-                ),
-            }
-            | self.job_seeker_session.get("profile", {}),
+            initial=self.job_seeker_session.get("profile", {}),
         )
 
     def post(self, request, *args, **kwargs):
@@ -610,13 +593,9 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         return {
             k: v
             for k, v in self.job_seeker_session.get("user").items()
-            # TODO(xfernandez): remove pole_emploi_id & lack_of_pole_emploi_id_reason in a few weeks
             if k
             not in [
-                "city_slug",
                 "lack_of_nir",
-                "pole_emploi_id",
-                "lack_of_pole_emploi_id_reason",
                 # Address autocomplete fields
                 "fill_mode",
                 "address_for_autocomplete",
@@ -1279,14 +1258,8 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
             return
         if not self.job_seeker_session.exists():
             self.job_seeker_session.init({"user": {}})
-        # TODO(xfernandez): drop fallback on job_seeker_session user dict for pole_emploi
-        # fields in a few weeks
-        session_nir = self.job_seeker_session.get("profile", {}).get(
-            "nir", self.job_seeker_session.get("user").get("nir")
-        )
-        session_lack_of_nir_reason = self.job_seeker_session.get("profile", {}).get(
-            "lack_of_nir_reason", self.job_seeker_session.get("user").get("lack_of_nir_reason")
-        )
+        session_nir = self.job_seeker_session.get("profile", {}).get("nir")
+        session_lack_of_nir_reason = self.job_seeker_session.get("profile", {}).get("lack_of_nir_reason")
 
         self.form = CreateOrUpdateJobSeekerStep1Form(
             instance=self.job_seeker,
@@ -1387,13 +1360,9 @@ class UpdateJobSeekerStep3View(UpdateJobSeekerBaseView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        # TODO(xfernandez): drop fallback on job_seeker_session user dict for pole_emploi
-        # fields in a few weeks
-        session_pole_emploi_id = self.job_seeker_session.get("profile", {}).get(
-            "pole_emploi_id", self.job_seeker_session.get("user").get("pole_emploi_id")
-        )
+        session_pole_emploi_id = self.job_seeker_session.get("profile", {}).get("pole_emploi_id")
         session_lack_of_pole_emploi_id_reason = self.job_seeker_session.get("profile", {}).get(
-            "lack_of_pole_emploi_id_reason", self.job_seeker_session.get("user").get("lack_of_pole_emploi_id_reason")
+            "lack_of_pole_emploi_id_reason"
         )
         initial_form_data = self.job_seeker_session.get("profile", {}) | {
             "pole_emploi_id": (
