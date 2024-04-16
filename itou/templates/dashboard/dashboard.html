@@ -301,24 +301,3 @@
         </div>
     </section>
 {% endblock %}
-
-
-{% block script %}
-    {{ block.super }}
-    {% if request.user.is_prescriber %}
-        <script async src="https://tally.so/widgets/embed.js"></script>
-        <script nonce="{{ CSP_NONCE }}">
-            window.TallyConfig = {
-                "formId": "mBXyVY",
-                "popup": {
-                    "emoji": {
-                        "text": "👋",
-                        "animation": "wave"
-                    },
-                    "hideTitle": true,
-                    "autoClose": 0
-                }
-            };
-        </script>
-    {% endif %}
-{% endblock script %}
