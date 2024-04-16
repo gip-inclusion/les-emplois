@@ -25,29 +25,25 @@
                 <div class="col-12 col-lg-8">
 
                     {% if prescriber_org_data %}
-                        <div class="c-card card my-4">
-                            <div class="card-body">
-                                <p class="mb-0">
-                                    {% if join_authorized_org and kind_label and not kind_is_other %}
-                                        {# Display kind's full name if known. #}
-                                        <p>
-                                            <b>{{ kind_label }}</b>
-                                        </p>
-                                    {% endif %}
-
-                                    <b>{{ prescriber_org_data.name }}</b> - {{ prescriber_org_data.siret|format_siret }}
-                                    <br>
-                                    {% if prescriber_org_data.address_line_1 %}
-                                        {{ prescriber_org_data.address_line_1 }}
-                                        <br>
-                                    {% endif %}
-                                    {% if prescriber_org_data.address_line_2 %}
-                                        {{ prescriber_org_data.address_line_2 }}
-                                        <br>
-                                    {% endif %}
-                                    {{ prescriber_org_data.post_code }} {{ prescriber_org_data.city }}
+                        <div class="c-box">
+                            {% if join_authorized_org and kind_label and not kind_is_other %}
+                                {# Display kind's full name if known. #}
+                                <p>
+                                    <b>{{ kind_label }}</b>
                                 </p>
-                            </div>
+                            {% endif %}
+
+                            <b>{{ prescriber_org_data.name }}</b> - {{ prescriber_org_data.siret|format_siret }}
+                            <br>
+                            {% if prescriber_org_data.address_line_1 %}
+                                {{ prescriber_org_data.address_line_1 }}
+                                <br>
+                            {% endif %}
+                            {% if prescriber_org_data.address_line_2 %}
+                                {{ prescriber_org_data.address_line_2 }}
+                                <br>
+                            {% endif %}
+                            {{ prescriber_org_data.post_code }} {{ prescriber_org_data.city }}
                         </div>
                     {% endif %}
 

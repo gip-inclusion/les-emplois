@@ -22,16 +22,17 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
+                    <div class="c-form">
+                        <form method="post" class="js-prevent-multiple-submit">
 
-                    <form method="post" class="js-prevent-multiple-submit">
+                            {% csrf_token %}
 
-                        {% csrf_token %}
+                            {% bootstrap_form form alert_error_type="all" %}
 
-                        {% bootstrap_form form alert_error_type="all" %}
+                            {% itou_buttons_form primary_label="Continuer" secondary_url=prev_url %}
 
-                        {% itou_buttons_form primary_label="Continuer" secondary_url=prev_url %}
-
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

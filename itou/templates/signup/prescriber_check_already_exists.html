@@ -20,25 +20,27 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    <form method="post" class="js-prevent-multiple-submit">
+                    <div class="c-form">
+                        <form method="post" class="js-prevent-multiple-submit">
 
-                        {% csrf_token %}
+                            {% csrf_token %}
 
-                        {% bootstrap_form form alert_error_type="all" %}
+                            {% bootstrap_form form alert_error_type="all" %}
 
-                        {% itou_buttons_form primary_label="Rechercher" %}
+                            {% itou_buttons_form primary_label="Rechercher" %}
 
-                    </form>
+                        </form>
+                    </div>
 
                     {# Display link only before the search otherwise an organization is put in session and no longer allows creation without an organization  #}
                     {% if not prescriber_orgs_with_members_same_siret and not prescriber_orgs_with_members_same_siren %}
-                        <p class="mt-3">
-                            <a href="{% url 'signup:prescriber_user' %}">Je ne fais partie d'aucune organisation</a>
-                        </p>
+                        <div class="mt-3 mt-md-4">
+                            <a href="{% url 'signup:prescriber_user' %}" class="btn-link">Je ne fais partie d'aucune organisation</a>
+                        </div>
                     {% endif %}
 
                     {% if prescriber_orgs_with_members_same_siret %}
-                        <div class="mt-5">
+                        <div class="mt-3 mt-md-4">
                             <h3 class="h2">Organisation(s) déjà inscrite(s) avec ce SIRET</h3>
                             <p>Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</p>
                             {% for prescriber_org in prescriber_orgs_with_members_same_siret %}
@@ -48,7 +50,7 @@
                     {% endif %}
 
                     {% if prescriber_orgs_with_members_same_siren %}
-                        <div class="mt-5">
+                        <div class="mt-3 mt-md-4">
                             {% if not prescriber_orgs_with_members_same_siret %}
                                 <h3 class="h2">Organisation(s) inscrite(s) avec ce SIREN sur le département</h3>
                                 <p>Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre une organisation déjà inscrite.</p>
@@ -63,7 +65,7 @@
                     {% endif %}
 
                     {% if prescriber_orgs_with_members_same_siret or prescriber_orgs_with_members_same_siren %}
-                        <div class="mt-5">
+                        <div class="mt-3 mt-md-4">
                             <h3 class="h2">Ajouter mon organisation</h3>
 
                             {% if prescriber_orgs_with_members_same_siret %}

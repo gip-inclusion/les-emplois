@@ -25,14 +25,15 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    <form method="post" class="js-prevent-multiple-submit">
-                        {% csrf_token %}
+                    <div class="c-form">
+                        <form method="post" class="js-prevent-multiple-submit">
+                            {% csrf_token %}
 
-                        {% bootstrap_form form alert_error_type="all" %}
+                            {% bootstrap_form form alert_error_type="all" %}
 
-                        {% itou_buttons_form primary_label="Valider la demande" secondary_url=prev_url %}
-
-                    </form>
+                            {% itou_buttons_form primary_label="Valider la demande" secondary_url=prev_url %}
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
