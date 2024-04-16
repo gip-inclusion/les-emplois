@@ -15,28 +15,27 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    <div class="c-card card">
-                        <div class="card-body">
-                            <p>
-                                Les organisations habilitées permettent à leurs collaborateurs de valider l'éligibilité d'une personne candidate au dispositif d'Insertion par l'Activité Économique. Cette habilitation est officialisée par arrêté préfectoral.
-                            </p>
+                    <p>
+                        Les organisations habilitées permettent à leurs collaborateurs de valider l'éligibilité d'une personne candidate au dispositif d'Insertion par l'Activité Économique. Cette habilitation est officialisée par arrêté préfectoral.
+                    </p>
 
-                            <p>
-                                <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14741016074385--Les-prescripteurs-habilités"
-                                   rel="noopener"
-                                   target="_blank"
-                                   aria-label="En savoir plus sur les différents prescripteurs (ouverture dans un nouvel onglet)">En savoir plus sur les différents prescripteurs</a><i class="ri-external-link-line ms-1"></i>
-                            </p>
-                            <form method="post" class="js-prevent-multiple-submit">
+                    <p>
+                        <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14741016074385--Les-prescripteurs-habilités"
+                           rel="noopener"
+                           target="_blank"
+                           aria-label="En savoir plus sur les différents prescripteurs (ouverture dans un nouvel onglet)"
+                           class="has-external-link">En savoir plus sur les différents prescripteurs</a>
+                    </p>
+                    <div class="c-form">
+                        <form method="post" class="js-prevent-multiple-submit">
 
-                                {% csrf_token %}
+                            {% csrf_token %}
 
-                                {% bootstrap_form form alert_error_type="all" %}
+                            {% bootstrap_form form alert_error_type="all" %}
 
-                                {% itou_buttons_form primary_label="Continuer" secondary_url=prev_url %}
+                            {% itou_buttons_form primary_label="Continuer" secondary_url=prev_url %}
 
-                            </form>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>

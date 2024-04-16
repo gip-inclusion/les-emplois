@@ -14,26 +14,28 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
-                    <form method="get" role="form">
+                    <div class="c-form">
+                        <form method="get" role="form">
 
-                        {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+                            {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
 
-                        {% bootstrap_form siren_form alert_error_type="all" %}
+                            {% bootstrap_form siren_form alert_error_type="all" %}
 
-                        {% itou_buttons_form primary_label="Rechercher" %}
+                            {% itou_buttons_form primary_label="Rechercher" %}
 
-                    </form>
+                        </form>
+                    </div>
 
 
                     {% if siren_form.cleaned_data and not companies_without_members and not companies_with_members %}
-                        <div class="alert alert-warning mt-5" role="status">
+                        <div class="alert alert-warning mt-3 mt-md-4" role="status">
                             <p class="mb-0">
                                 <i class="ri-information-line ri-xl text-warning me-2"></i>
                                 <strong>Aucun résultat pour {{ siren_form.cleaned_data.siren }}</strong>.
                             </p>
                         </div>
 
-                        <div>
+                        <div class="mt-3 mt-md-4">
                             <h3>Si vous tentez d'inscrire :</h3>
                             <p>
                                 <strong>Une SIAE</strong>
@@ -67,11 +69,9 @@
 
 
                     {% if companies_without_members and company_select_form %}
-                        <div class="mt-5">
+                        <div class="mt-3 mt-md-4">
 
-                            <h3 class="h2">
-                                Entreprise{{ companies_without_members|pluralizefr }} disponible{{ companies_without_members|pluralizefr }}
-                            </h3>
+                            <h3>Entreprise{{ companies_without_members|pluralizefr }} disponible{{ companies_without_members|pluralizefr }}</h3>
 
                             <p class="text-muted">Les données sont fournies par la DGEFP et les extranets IAE 2.0 et EA 2 de l’ASP.</p>
 
@@ -119,11 +119,9 @@
 
 
                     {% if companies_with_members %}
-                        <div class="mt-5">
+                        <div class="mt-3 mt-md-4">
 
-                            <h3 class="h2">
-                                Entreprise{{ companies_with_members|pluralizefr }} déjà inscrite{{ companies_with_members|pluralizefr }}
-                            </h3>
+                            <h3>Entreprise{{ companies_with_members|pluralizefr }} déjà inscrite{{ companies_with_members|pluralizefr }}</h3>
 
                             <p class="text-muted">
                                 Par mesure de sécurité, vous devez obtenir une invitation pour rejoindre
@@ -163,7 +161,7 @@
 
 
                     {% if companies_without_members or companies_with_members %}
-                        <div class="mt-5 text-end">
+                        <div class="mt-3 mt-md-4 text-end">
                             <p>
                                 En cas de problème, <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="{{ ITOU_HELP_CENTER_URL }} (ouverture dans un nouvel onglet)">contactez-nous</a>.
                             </p>
