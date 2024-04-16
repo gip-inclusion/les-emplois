@@ -1,0 +1,130 @@
+#!/usr/bin/env python3
+
+import datetime
+import json
+import os
+import pathlib
+import re
+import subprocess
+import tempfile
+
+
+def gh(*args, **kwargs):
+    return subprocess.run(
+        ["gh", *args],
+        check=True,
+        # env={"GH_TOKEN": os.getenv("GH_TOKEN", "")},
+        **kwargs,
+    )
+
+
+def list_merged_pull_requests():
+    result = gh(
+        "api",
+        "/repos/gip-inclusion/les-emplois/pulls?state=closed",
+        "--header",
+        "Accept: application/vnd.github+json",
+        "--header",
+        "X-GitHub-Api-Version: 2022-11-28",
+        "--paginate",
+        capture_output=True,
+    )
+    return result.stdout
+
+
+def open_pull_request(branch, sprint_number):
+    gh("pr", "create", "--fill", "--label", "no-changelog", "--base", "master", "--head", branch)
+
+
+def main():
+    changelog_path = pathlib.Path("CHANGELOG.md")
+    with (
+        open(changelog_path, "r+") as changelog,
+        tempfile.NamedTemporaryFile(dir=os.getcwd(), mode="w+", suffix="~", delete=False) as new_changelog,
+    ):
+        try:
+            for line in changelog:
+                if line.strip() in ["# Journal des modifications", ""]:
+                    new_changelog.write(line)
+                    continue
+                break
+            last_entry_header = line
+
+            m = re.match(r"## \[(?P<sprint>[0-9]+)\] - (?P<date>[0-9]+-[0-9]+-[0-9]+)", last_entry_header)
+            sprint_number = int(m.group("sprint")) + 1
+            sprint_start = datetime.date.fromisoformat(m.group("date"))
+            sprint_end = sprint_start + datetime.timedelta(days=14)
+
+            merged_pull_requests = list_merged_pull_requests()
+            added, changed, removed = [], [], []
+            for pull_request in json.loads(merged_pull_requests):
+                merged_at = pull_request["merged_at"]
+                if merged_at is None:
+                    # Closed pull request.
+                    continue
+                merged_at = datetime.datetime.fromisoformat(merged_at)
+                labels = pull_request["labels"]
+                if sprint_start <= merged_at.date() < sprint_end and not any(
+                    label["name"] in ["no-changelog", "dependencies"] for label in labels
+                ):
+                    title = re.sub(r"\[(GEN|ITOU)-[0-9]+\]", "", pull_request["title"]).strip()
+                    if re.search(r"\!\[[^]]+]", pull_request["body"]):
+                        title = f"[{title}]({pull_request['html_url']})"
+                    if any(label["name"] == "ajouté-changelog" for label in labels):
+                        added.append(title)
+                    elif any(label["name"] == "supprimé-changelog" for label in labels):
+                        removed.append(title)
+                    else:
+                        changed.append(title)
+
+            if added or changed or removed:
+                new_changelog.write(f"## [{sprint_number}] - {sprint_end}\n\n")
+            if added:
+                new_changelog.write("### Ajouté\n\n")
+                for title in sorted(added):
+                    new_changelog.write(f"- {title}\n")
+                new_changelog.write("\n")
+            if changed:
+                new_changelog.write("### Modifié\n\n")
+                for title in sorted(changed):
+                    new_changelog.write(f"- {title}\n")
+                new_changelog.write("\n")
+            if removed:
+                new_changelog.write("### Supprimé\n\n")
+                for title in sorted(removed):
+                    new_changelog.write(f"- {title}\n")
+                new_changelog.write("\n")
+
+            # Don’t forget the previous header.
+            new_changelog.write(last_entry_header)
+            for line in changelog:
+                new_changelog.write(line)
+
+            # Atomically replace file.
+            pathlib.Path(new_changelog.name).rename(changelog_path)
+        finally:
+            pathlib.Path(new_changelog.name).unlink(missing_ok=True)
+
+    branch = f"changelog/{sprint_end}"
+    subprocess.run(["git", "switch", "--create", branch], check=True)
+    subprocess.run(
+        [
+            "git",
+            "commit",
+            "--all",
+            "--message",
+            f"changelog: Sprint {sprint_number}",
+            "--author",
+            "changelog bot <noreply@inclusion.beta.gouv.fr>",
+        ],
+        check=True,
+    )
+    subprocess.run(["git", "push"], check=True)
+    open_pull_request(branch, sprint_number)
+
+
+if __name__ == "__main__":
+    if datetime.date.today().isocalendar().week % 2 == 0:
+        main()
+    else:
+        print("Sprint is running, nothing to do.")

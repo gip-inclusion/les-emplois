@@ -1,5 +1,27 @@
 # Journal des modifications
 
+## [85] - 2024-04-22
+
+### Modifié
+
+- Acceptation de candidature: ajout de JS manquant pour l'autocomplétion d'adresse
+- Arrêter de stocker les adresses des utilisateurs non-candidats
+- Changer les textes "employeur solidaire" en "employeur inclusif"
+- E-mails : Indiquer le type d’organisation prescriptrice dans les demandes d’habilitation
+- Filtrer les candidatures des candidats avec HTMX
+- Gérer un email manquant dans ItouResetPasswordView
+- Mise à jour de l'adresse du GIP sur la page accessibilité
+- Notifications : Amélioration de l’interface de gestion
+- Pack de motifs de refus
+- Pilotage : Ouvrir le TB149 "Etat des candidatures orientées" à d’autres prescripteurs habilités sur 3 régions
+- Supprimer une redirection ouverte dans la vue de transfer de candidature
+- Supprimer une redirection ouverte des vues d’éligibilité GEIQ
+- [Candidatures : Retirer le nom de l’employeur pour le statut « Embauché ailleurs »](https://github.com/gip-inclusion/les-emplois/pull/3900)
+- [Correction saut de ligne du bandeau “Vous possédez un n° de sécurité sociale temporaire ?”](https://github.com/gip-inclusion/les-emplois/pull/3916)
+- [Prescripteurs : Recherche de volontaires pour construire l’espace « Mes candidats »](https://github.com/gip-inclusion/les-emplois/pull/3910)
+- [Recherche employeur : Afficher le bouton “Postuler” sur la carte entreprise](https://github.com/gip-inclusion/les-emplois/pull/3902)
+- [Refonte UX/UI - Mise a jour de la section title / part 01](https://github.com/gip-inclusion/les-emplois/pull/3895)
+
 ## [84] - 2024-04-08
 
 ### Ajouté
