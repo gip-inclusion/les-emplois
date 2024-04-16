@@ -59,6 +59,17 @@ def create_city_vannes():
     )
 
 
+def create_city_geispolsheim():
+    return City.objects.create(
+        name="Geispolsheim",
+        slug="geispolsheim-67",
+        department="67",
+        coords=Point(7.644817, 48.515883),
+        post_codes=["67118"],
+        code_insee="67152",
+    )
+
+
 def create_city_in_zrr():
     return City.objects.create(
         name="Balaguier d'Olt",
