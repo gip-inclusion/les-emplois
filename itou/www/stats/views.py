@@ -700,6 +700,31 @@ def stats_dgefp_follow_prolongation(request):
 
 
 @login_required
+def stats_dgefp_tension(request):
+    return render_stats_dgefp(
+        request=request,
+        page_title="SIAE qui peinent à recruter sur le territoire",
+        extra_params=get_params_for_whole_country(),
+    )
+
+
+@login_required
+def stats_dgefp_hiring(request):
+    return render_stats_dgefp(
+        request=request, page_title="Données facilitation de l'embauche", extra_params=get_params_for_whole_country()
+    )
+
+
+@login_required
+def stats_dgefp_state(request):
+    return render_stats_dgefp(
+        request=request,
+        page_title="Suivi des prescriptions des AHI de ma région",
+        extra_params=get_params_for_whole_country(),
+    )
+
+
+@login_required
 def stats_dgefp_iae(request):
     return render_stats_dgefp(
         request=request, page_title="Données des régions", extra_params=get_params_for_whole_country()
