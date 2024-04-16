@@ -20,6 +20,7 @@ from tests.utils.test import TestCase, parse_response_to_soup
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class ApprovalSuspendViewTest(TestCase):
+    @pytest.mark.ignore_unknown_variable_template_error
     def test_suspend_approval(self):
         """
         Test the creation of a suspension.

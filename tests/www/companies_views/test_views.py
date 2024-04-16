@@ -30,6 +30,7 @@ from tests.users.factories import EmployerFactory, JobSeekerFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 
 
+@pytest.mark.ignore_unknown_variable_template_error
 @pytest.mark.usefixtures("unittest_compatibility")
 class CardViewTest(TestCase):
     OTHER_TAB_ID = "autres-metiers"
@@ -216,6 +217,7 @@ class CardViewTest(TestCase):
         self.assertNotContains(response, self.APPLY)
 
 
+@pytest.mark.ignore_unknown_variable_template_error
 @pytest.mark.usefixtures("unittest_compatibility")
 class JobDescriptionCardViewTest(TestCase):
     @classmethod

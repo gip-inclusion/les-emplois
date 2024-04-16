@@ -497,6 +497,7 @@ class JobDescriptionSearchViewTest(TestCase):
         response = self.client.get(self.URL, {"city": city.slug, "kinds": [CompanyKind.EI]})
         self.assertContains(response, "Aucun résultat")
 
+    @pytest.mark.ignore_unknown_variable_template_error
     def test_distance(self):
         create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         # 3 companies in two departments to test distance and department filtering

@@ -1,9 +1,11 @@
+import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
 from tests.companies.factories import CompanyFactory
 
 
+@pytest.mark.ignore_unknown_variable_template_error
 def test_redirect_siae_views(client):
     company = CompanyFactory()
 

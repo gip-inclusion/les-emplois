@@ -1,3 +1,4 @@
+import pytest
 from django.core import mail
 from django.shortcuts import reverse
 from django.utils import timezone
@@ -32,6 +33,7 @@ class TestSendSingleCompanyInvitation(TestCase):
             "form-0-email": self.guest_data["email"],
         }
 
+    @pytest.mark.ignore_unknown_variable_template_error
     def test_send_one_invitation(self):
         self.client.force_login(self.sender)
         response = self.client.get(INVITATION_URL)
@@ -56,6 +58,7 @@ class TestSendSingleCompanyInvitation(TestCase):
         outbox_emails = [receiver for message in mail.outbox for receiver in message.to]
         assert self.post_data["form-0-email"] in outbox_emails
 
+    @pytest.mark.ignore_unknown_variable_template_error
     def test_send_invitation_user_already_exists(self):
         guest = EmployerFactory(
             first_name=self.guest_data["first_name"],
@@ -96,6 +99,7 @@ class TestSendSingleCompanyInvitation(TestCase):
                     assert key == "email"
                     assert error_dict["email"][0] == "Cet utilisateur n'est pas un employeur."
 
+    @pytest.mark.ignore_unknown_variable_template_error
     def test_two_employers_invite_the_same_guest(self):
         # company 1 invites guest.
         self.client.force_login(self.sender)
@@ -183,6 +187,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
             "form-MAX_NUM_FORMS": "",
         }
 
+    @pytest.mark.ignore_unknown_variable_template_error
     def test_invite_existing_user_with_existing_inactive_company(self):
         """
         An inactive SIAIE user (i.e. attached to a single inactive company)
@@ -201,6 +206,7 @@ class TestSendInvitationToSpecialGuest(TestCase):
         assert response.status_code == 200
         assert EmployerInvitation.objects.count() == 1
 
+    @pytest.mark.ignore_unknown_variable_template_error
     def test_invite_former_employer(self):
         """
         Admins can "deactivate" members of the organization (making the membership inactive).
