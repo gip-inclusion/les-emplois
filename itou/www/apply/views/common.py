@@ -10,6 +10,7 @@ from django.utils.safestring import mark_safe
 from django_htmx.http import HttpResponseClientRedirect
 from django_xworkflows import models as xwf_models
 
+from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.companies.enums import CompanyKind, ContractType
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
@@ -23,7 +24,6 @@ from itou.www.apply.forms import (
     AcceptForm,
     CheckJobSeekerGEIQEligibilityForm,
     JobSeekerPersonalDataForm,
-    UserAddressForm,
 )
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForGEIQForm
@@ -47,7 +47,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
         )
         forms.append(form_personal_data)
 
-        form_user_address = UserAddressForm(instance=job_seeker, data=request.POST or None)
+        form_user_address = JobSeekerAddressForm(instance=job_seeker, data=request.POST or None)
         forms.append(form_user_address)
 
     form_accept = AcceptForm(instance=job_application, company=siae, data=request.POST or None)
