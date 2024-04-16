@@ -11,9 +11,6 @@ class CommunicationsConfig(AppConfig):
     def ready(self):
         self.module.autodiscover()
         post_migrate.connect(post_communications_migrate_handler, sender=self)
-        if settings.DEBUG:
-            # Sync on every reload during development
-            sync_notifications(self.get_model("NotificationRecord"))
 
 
 def post_communications_migrate_handler(sender, app_config, **kwargs):
