@@ -176,49 +176,6 @@
 {% endblock %}
 
 {% block content %}
-    {% if ic_activate_url %}
-        <section class="s-banner-01 s-banner-01--ic m-0 p-0 alert">
-            <div class="s-banner-01__container container">
-                <div class="s-banner-01__row row">
-                    <div class="s-banner-01__col col-12">
-                        <div class="bg-white">
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-                            <div class="row align-items-center">
-                                <div class="d-none d-lg-block col-lg-2">
-                                    <img src="{% static "img/illustration-bg-mini-ic.svg" %}" class="img-fluid img-fitcover" alt="">
-                                </div>
-                                <div class="col-12 col-lg-10">
-                                    <p class="h2">Inclusion Connect : un accès unique à tous vos services !</p>
-                                    <p>
-                                        Simplifiez la connexion : accédez aux différents services partenaires avec <b>le même identifiant et le même mot de passe.</b>
-                                    </p>
-                                    <p class="text-danger">
-                                        <i class="ri-information-line ri-xxl"></i> <strong>A partir du 2 Mai 2023</strong>, la connexion au site des emplois de l’inclusion se fera exclusivement via Inclusion Connect.
-                                    </p>
-                                    <div class="row g-0">
-                                        <div class="col-12 col-md-auto mt-2">
-                                            <a href="{{ ic_activate_url }}" class="btn btn-primary btn-block" {% matomo_event "activation "|add:request.user.kind "clic" "activer-son-compte-inclusion-connect-bandeau" %}>Activer Inclusion Connect</a>
-                                        </div>
-                                        <div class="col-12 col-md-auto mt-2">
-                                            <a class="btn btn-link btn-block"
-                                               href="https://plateforme-inclusion.notion.site/Un-compte-unique-pour-mes-services-num-riques-ded9135197654da590f5dde41d8bb68b"
-                                               aria-label="Plus d'infos concernant Inclusion Connect"
-                                               rel="noopener"
-                                               target="_blank">
-                                                <span>Plus d'infos</span>
-                                                <i class="ri-external-link-line ri-lg"></i>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    {% endif %}
-
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row my-3 my-md-4">
