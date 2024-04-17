@@ -25,7 +25,7 @@
             <div class="s-section__container container">
                 <div class="s-section__row row">
                     <div class="col-12">
-                        {% include "search/includes/prescribers_search_form.html" with form=form %}
+                        {% include "search/includes/prescribers_search_form.html" with form=form is_home=False only %}
                         <h2 class="mt-4">Prescripteurs</h2>
                         <p>
                             {{ prescriber_orgs_page.paginator.count }} résultat{{ prescriber_orgs_page.paginator.count|pluralizefr }}
