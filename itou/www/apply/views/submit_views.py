@@ -1215,6 +1215,7 @@ class UpdateJobSeekerBaseView(SessionNamespaceRequiredMixin, ApplyStepBaseView):
             "reset_url": reverse(
                 "apply:application_jobs", kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk}
             ),
+            "readonly_form": False,
         }
 
     def _disable_form(self):
