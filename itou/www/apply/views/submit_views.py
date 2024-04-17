@@ -1295,6 +1295,7 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
+            "confirmation_needed": False,
             "form": self.form,
             "readonly_form": not self.request.user.can_edit_personal_information(self.job_seeker),
             "progress": "20",
