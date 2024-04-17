@@ -27,7 +27,7 @@
                             {% elif wizard.steps.current == "job-seeker-answer" %}
                                 <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Message au candidat
                             {% elif wizard.steps.current == "prescriber-answer" %}
-                                <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Message au prescripteur
+                                <strong>Étape {{ wizard.steps.step1 }}</strong>/{{ wizard.steps.count }} : Message {{ job_application.is_sent_by_authorized_prescriber|yesno:"au prescripteur,à l’orienteur" }}
                             {% endif %}
                         </p>
                     </div>
@@ -40,7 +40,7 @@
                                 <h2 class="mb-3 mb-md-4">Choix du motif de refus</h2>
                                 <p class="mb-3 mb-md-4">
                                     {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
-                                        Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour le candidat comme pour le prescripteur. Nous vous encourageons à répondre à chacune des parties.
+                                        Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour le candidat comme pour {{ job_application.is_sent_by_authorized_prescriber|yesno:"le prescripteur,l’orienteur" }}. Nous vous encourageons à répondre à chacune des parties.
                                     {% else %}
                                         Dans le cadre d’un parcours IAE, la transparence sur les motifs de refus est importante pour le candidat.
                                     {% endif %}
@@ -49,7 +49,7 @@
                                 <h2 class="mb-3 mb-md-4">Réponse au candidat</h2>
                                 <p class="mb-3 mb-md-4">
                                     {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
-                                        Une copie de ce message sera adressée au prescripteur.
+                                        Une copie de ce message sera adressée {{ job_application.is_sent_by_authorized_prescriber|yesno:"au prescripteur,à l’orienteur" }}.
                                         <br>
                                     {% endif %}
                                     Merci de bien vouloir adapter ce message en fonction de la situation.
@@ -58,9 +58,11 @@
                                     <strong>Raison du refus :</strong> {{ refusal_reason_label }}
                                 </p>
                             {% elif wizard.steps.current == "prescriber-answer" %}
-                                <h2 class="mb-3 mb-md-4">Réponse au prescripteur</h2>
+                                <h2 class="mb-3 mb-md-4">
+                                    Réponse {{ job_application.is_sent_by_authorized_prescriber|yesno:"au prescripteur,à l’orienteur" }}
+                                </h2>
                                 <p class="mb-3 mb-md-4">
-                                    Vous pouvez partager un message au prescripteur uniquement, comme détailler ou évoquer d’autres motifs de refus.
+                                    Vous pouvez partager un message {{ job_application.is_sent_by_authorized_prescriber|yesno:"au prescripteur,à l’orienteur" }} uniquement, comme détailler ou évoquer d’autres motifs de refus.
                                 </p>
                                 <p class="mb-3 mb-md-4">
                                     <strong>Raison du refus :</strong> {{ refusal_reason_label }}
@@ -88,7 +90,7 @@
                                                         {% elif radio.data.value == RefusalReason.OTHER %}
                                                             {{ radio.choice_label }}
                                                             {% if job_application.sender_kind == SenderKind.PRESCRIBER %}
-                                                                (détails à fournir dans le message au prescripteur)
+                                                                (détails à fournir dans le message {{ job_application.is_sent_by_authorized_prescriber|yesno:"au prescripteur,à l’orienteur" }})
                                                             {% endif %}
                                                         {% else %}
                                                             {{ radio.choice_label }}

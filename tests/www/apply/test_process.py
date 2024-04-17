@@ -833,6 +833,96 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
                     job_application = JobApplication.objects.get(pk=job_application.pk)
                     assert job_application.state.is_refused
 
+    def test_refuse_labels_for_prescriber_or_orienteur(self, *args, **kwargs):
+        """
+        Ensure that the `refuse` is correctly adapted for prescribers depending their status:
+        - Authorized prescriber: labeled "prescripteur"
+        - Unauthorized prescriber: labeled "orienteur"
+        - Prescriber with no organizations: labeled "orienteur"
+        """
+        job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
+
+        refusal_reason_url = reverse(
+            "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "reason"}
+        )
+        response = self.client.get(refusal_reason_url)
+        self.assertContains(
+            response,
+            "la transparence sur les motifs de refus est importante pour le candidat comme pour le prescripteur.",
+        )
+        self.assertContains(response, "Choisir le motif de refus envoyé au prescripteur")
+        self.assertContains(response, "Autre (détails à fournir dans le message au prescripteur)", html=True)
+
+        post_data = {
+            f"job_application_{job_application.pk}_refuse-current_step": "reason",
+            "reason-refusal_reason": job_applications_enums.RefusalReason.OTHER,
+        }
+        response = self.client.post(refusal_reason_url, data=post_data, follow=True)
+        job_seeker_answer_url = reverse(
+            "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "job-seeker-answer"}
+        )
+        self.assertRedirects(response, job_seeker_answer_url)
+        self.assertContains(response, "Une copie de ce message sera adressée au prescripteur.")
+
+        post_data = {
+            f"job_application_{job_application.pk}_refuse-current_step": "job-seeker-answer",
+            "job-seeker-answer-job_seeker_answer": "Message au candidat",
+        }
+        response = self.client.post(job_seeker_answer_url, data=post_data, follow=True)
+        prescriber_answer_url = reverse(
+            "apply:refuse", kwargs={"job_application_id": job_application.pk, "step": "prescriber-answer"}
+        )
+        self.assertRedirects(response, prescriber_answer_url)
+        self.assertContains(response, "<strong>Étape 3</strong>/3 : Message au prescripteur", html=True)
+        self.assertContains(response, "Réponse au prescripteur")
+        self.assertContains(response, "Vous pouvez partager un message au prescripteur uniquement")
+        self.assertContains(response, "Commentaire envoyé au prescripteur (n’est pas envoyé au candidat)")
+
+        # Un-authorize prescriber (ie. considered as "orienteur")
+        job_application.sender_prescriber_organization.is_authorized = False
+        job_application.sender_prescriber_organization.save(update_fields=["is_authorized"])
+
+        response = self.client.get(refusal_reason_url)
+        self.assertContains(
+            response,
+            "la transparence sur les motifs de refus est importante pour le candidat comme pour l’orienteur.",
+        )
+        self.assertContains(response, "Choisir le motif de refus envoyé à l’orienteur")
+        self.assertContains(response, "Autre (détails à fournir dans le message à l’orienteur)", html=True)
+
+        response = self.client.get(job_seeker_answer_url)
+        self.assertContains(response, "Une copie de ce message sera adressée à l’orienteur.")
+
+        response = self.client.get(prescriber_answer_url)
+        self.assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
+        self.assertContains(response, "Réponse à l’orienteur")
+        self.assertContains(response, "Vous pouvez partager un message à l’orienteur uniquement")
+        self.assertContains(response, "Commentaire envoyé à l’orienteur (n’est pas envoyé au candidat)")
+
+        # Remove prescriber's organization membership (ie. considered as "orienteur solo")
+        job_application.sender_prescriber_organization.members.clear()
+        job_application.sender_prescriber_organization = None
+        job_application.save(update_fields=["sender_prescriber_organization"])
+
+        response = self.client.get(refusal_reason_url)
+        self.assertContains(
+            response,
+            "la transparence sur les motifs de refus est importante pour le candidat comme pour l’orienteur.",
+        )
+        self.assertContains(response, "Choisir le motif de refus envoyé à l’orienteur")
+        self.assertContains(response, "Autre (détails à fournir dans le message à l’orienteur)", html=True)
+
+        response = self.client.get(job_seeker_answer_url)
+        self.assertContains(response, "Une copie de ce message sera adressée à l’orienteur.")
+
+        response = self.client.get(prescriber_answer_url)
+        self.assertContains(response, "<strong>Étape 3</strong>/3 : Message à l’orienteur", html=True)
+        self.assertContains(response, "Réponse à l’orienteur")
+        self.assertContains(response, "Vous pouvez partager un message à l’orienteur uniquement")
+        self.assertContains(response, "Commentaire envoyé à l’orienteur (n’est pas envoyé au candidat)")
+
     def test_refuse_incompatible_state(self, *args, **kwargs):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
