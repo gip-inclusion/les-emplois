@@ -457,3 +457,10 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
 }
+
+.c-banner--pilotage {
+    background-image: url("../img/dashboard/banner-statistiques-pilotage-bg.jpg");
+    background-repeat: no-repeat;
+    background-position: center right;
+    background-size: cover;
+}
