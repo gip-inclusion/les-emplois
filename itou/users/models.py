@@ -1,3 +1,5 @@
+import re
+import string
 import time
 import uuid
 from collections import Counter
@@ -6,6 +8,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.postgres.fields import CIEmailField
 from django.contrib.postgres.indexes import OpClass
+from django.contrib.postgres.search import SearchQuery, SearchVector
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinLengthValidator
@@ -43,6 +46,27 @@ class ApprovalAlreadyExistsError(Exception):
 
 
 class ItouUserManager(UserManager):
+
+    def autocomplete(self, search_string, limit=10, current_user=None):
+        """
+        A `search_string` equals to `foo bar` will match all results beginning with `foo` and `bar`.
+        This is achieved via `to_tsquery` and prefix matching:
+        https://www.postgresql.org/docs/11/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
+        """
+        # Keep only words since `to_tsquery` only takes tokens as input.
+        words = re.sub(f"[{string.punctuation}]", " ", search_string).split()
+        words = [word + ":*" for word in words]
+        tsquery = " & ".join(words)
+
+        queryset = self.annotate(search=SearchVector("first_name", "last_name")).filter(
+            search=SearchQuery(tsquery, config="french_unaccent", search_type="raw")
+        )
+
+        if current_user:
+            queryset = queryset.exclude(follow_up_groups_beneficiary__members=current_user)
+
+        return queryset[:limit]
+
     def get_duplicated_pole_emploi_ids(self):
         """
         Returns an array of `pole_emploi_id` used more than once:

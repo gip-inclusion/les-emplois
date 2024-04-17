@@ -8,6 +8,7 @@ from unidecode import unidecode
 from itou.asp.models import Commune
 from itou.cities.models import City
 from itou.jobs.models import Appellation
+from itou.users.models import User
 
 
 # Consider that after 50 matches the user should refine its search.
@@ -150,3 +151,25 @@ def communes_autocomplete(request):
             ]
 
     return JsonResponse({"results": communes} if select2_mode else communes, safe=False)
+
+
+def gps_users_autocomplete(request):
+    """
+    Returns JSON data compliant with Select2
+    """
+
+    current_user = request.user
+
+    term = request.GET.get("term", "").strip()
+    users = []
+
+    if term:
+        users = [
+            {
+                "text": user.autocomplete_display(),
+                "id": user.pk,
+            }
+            for user in User.objects.autocomplete(term, limit=10, current_user=current_user)
+        ]
+
+    return JsonResponse({"results": users}, safe=False)
