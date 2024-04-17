@@ -36,7 +36,7 @@
             {% bootstrap_form form alert_error_type="all" %}
 
             <div class="mb-3">
-                {% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" %}
+                {% include "signup/includes/no_email_link.html" with link_text="Le candidat n'a pas d'e-mail ?" only %}
             </div>
 
             {% itou_buttons_form primary_label="Suivant" secondary_url=back_url primary_name="preview" primary_value="1" %}
