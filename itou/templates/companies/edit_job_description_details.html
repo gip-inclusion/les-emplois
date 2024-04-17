@@ -86,7 +86,7 @@
 
                             {% url "companies_views:edit_job_description" as secondary_url %}
                             {% url "companies_views:job_description_list" as reset_url %}
-                            {% itou_buttons_form primary_label="Suivant" secondary_url=secondary_url reset_url=reset_url matomo_category="employeurs" matomo_action="submit" matomo_event="edit-description-fiche-poste" %}
+                            {% itou_buttons_form primary_label="Suivant" secondary_url=secondary_url reset_url=reset_url matomo_category="employeurs" matomo_action="submit" matomo_name="edit-description-fiche-poste" %}
                         </form>
                     </div>
                 </div>

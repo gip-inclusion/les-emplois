@@ -234,8 +234,8 @@
 
 {% block form_submit_button %}
     {% if request.user.is_employer %}
-        {% itou_buttons_form primary_label="Enregistrer" secondary_url=back_url matomo_category="candidature" matomo_action="submit" matomo_event="candidature_employer" %}
+        {% itou_buttons_form primary_label="Enregistrer" secondary_url=back_url matomo_category="candidature" matomo_action="submit" matomo_name="candidature_employer" %}
     {% else %}
-        {% itou_buttons_form primary_label="Envoyer la candidature" secondary_url=back_url matomo_category="candidature" matomo_action="submit" matomo_event="candidature_"|add:request.user.get_kind_display %}
+        {% itou_buttons_form primary_label="Envoyer la candidature" secondary_url=back_url matomo_category="candidature" matomo_action="submit" matomo_name="candidature_"|add:request.user.get_kind_display %}
     {% endif %}
 {% endblock %}

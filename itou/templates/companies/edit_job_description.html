@@ -54,7 +54,7 @@
                             {% bootstrap_field form.open_positions %}
 
                             {% url "companies_views:job_description_list" as reset_url %}
-                            {% itou_buttons_form primary_label="Suivant" reset_url=reset_url matomo_category="employeurs" matomo_action="submit" matomo_event="edit-infos-fiche-poste" %}
+                            {% itou_buttons_form primary_label="Suivant" reset_url=reset_url matomo_category="employeurs" matomo_action="submit" matomo_name="edit-infos-fiche-poste" %}
                         </form>
                     </div>
                 </div>

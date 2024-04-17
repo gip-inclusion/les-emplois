@@ -64,14 +64,14 @@
               </div>
               
                   <div class="form-group col col-lg-auto order-1 order-lg-2">
-                      <a aria-label="Retourner à l'étape précédente" class="btn btn-block btn-outline-primary" href="/employee_record/add/choose-employee" name="wizard_goto_step" value="choose-employee">
+                      <a aria-label="Retourner à l’étape précédente" class="btn btn-block btn-outline-primary" href="/employee_record/add/choose-employee" name="wizard_goto_step" value="choose-employee">
                           <span>Retour</span>
                       </a>
                   </div>
               
               <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
-                      <button aria-label="Passer à l'étape suivante" class="btn btn-block btn-primary" type="submit">
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" data-matomo-action="submit" data-matomo-category="fiches-salarié" data-matomo-event="true" data-matomo-option="création" type="submit">
                           <span>Confirmer</span>
                       </button>
                   

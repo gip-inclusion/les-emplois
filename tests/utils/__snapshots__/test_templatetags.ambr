@@ -21,7 +21,7 @@
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
-                              aria-label="Passer à l'étape suivante"
+                              aria-label="Passer à l’étape suivante"
                               
                               >
                           <span>Suivant</span>
@@ -77,7 +77,7 @@
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
-                              aria-label="Passer à l'étape suivante"
+                              aria-label="Passer à l’étape suivante"
                               
                               >
                           <span>Suivant</span>
@@ -133,7 +133,7 @@
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
-                              aria-label="Passer à l'étape suivante"
+                              aria-label="Passer à l’étape suivante"
                               
                               >
                           <span>Suivant</span>
@@ -189,7 +189,7 @@
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
-                              aria-label="Passer à l'étape suivante"
+                              aria-label="Passer à l’étape suivante"
                               
                               >
                           <span>Suivant</span>
@@ -245,7 +245,7 @@
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
-                              aria-label="Passer à l'étape suivante"
+                              aria-label="Passer à l’étape suivante"
                               
                               data-matomo-event="true" data-matomo-category="category" data-matomo-action="action" data-matomo-option="name">
                           <span>Suivant</span>
@@ -355,11 +355,7 @@
               
               <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
-                      <button type="submit"
-                              class="btn btn-block btn-primary"
-                              aria-label="Passer à l'étape suivante"
-                              
-                              >
+                      <button type="button" class="btn btn-block btn-primary disabled">
                           <span>Suivant</span>
                       </button>
                   
@@ -413,7 +409,7 @@
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
-                              aria-label="Passer à l'étape suivante"
+                              aria-label="Passer à l’étape suivante"
                               name="name" value="1"
                               >
                           <span>Suivant</span>
@@ -469,7 +465,7 @@
                   
                       <a href="/next"
                          class="btn btn-block btn-primary"
-                         aria-label="Passer à l'étape suivante"
+                         aria-label="Passer à l’étape suivante"
                          
                          >
                           <span>Suivant</span>
@@ -590,7 +586,7 @@
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
-                              aria-label="Passer à l'étape suivante"
+                              aria-label="Passer à l’étape suivante"
                               
                               >
                           <span>Suivant</span>
@@ -645,7 +641,7 @@
                   <div class="form-group col col-lg-auto order-1 order-lg-2">
                       <a href="/do"
                          class="btn btn-block btn-outline-primary"
-                         aria-label="Retourner à l'étape précédente"
+                         aria-label="Retourner à l’étape précédente"
                          name="name" value="1">
                           <span>Retour</span>
                       </a>
@@ -655,7 +651,7 @@
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
-                              aria-label="Passer à l'étape suivante"
+                              aria-label="Passer à l’étape suivante"
                               
                               >
                           <span>Suivant</span>
@@ -710,7 +706,7 @@
                   <div class="form-group col col-lg-auto order-1 order-lg-2">
                       <a href="/do"
                          class="btn btn-block btn-outline-primary"
-                         aria-label="Retourner à l'étape précédente"
+                         aria-label="Retourner à l’étape précédente"
                          >
                           <span>Retour</span>
                       </a>
@@ -720,7 +716,7 @@
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
-                              aria-label="Passer à l'étape suivante"
+                              aria-label="Passer à l’étape suivante"
                               
                               >
                           <span>Suivant</span>
@@ -776,7 +772,7 @@
                   
                       <button type="submit"
                               class="btn btn-block btn-primary"
-                              aria-label="Passer à l'étape suivante"
+                              aria-label="Passer à l’étape suivante"
                               
                               >
                           <span>Suivant</span>
