@@ -2,7 +2,7 @@
 {% load format_filters %}
 {% load matomo %}
 
-<div class="c-box c-box--action" id="transition_buttons_{{ job_application.pk }}"{% if out_of_band_swap %} hx-swap-oob="true"{% endif %} data-disable-btn-if=".editing-prior-action">
+<div class="c-box c-box--action" id="transition_buttons_{{ job_application.pk }}"{% if out_of_band_swap|default:False %} hx-swap-oob="true"{% endif %} data-disable-btn-if=".editing-prior-action">
     <h2 class="visually-hidden">Actions rapides</h2>
     <div class="form-row align-items-center gx-3">
         {% if job_application.state.is_new %}
