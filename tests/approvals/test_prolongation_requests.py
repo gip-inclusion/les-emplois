@@ -61,8 +61,9 @@ def test_grant():
 
 
 @freeze_time()
-def test_deny():
-    prolongation_request = ProlongationRequestFactory()
+@pytest.mark.parametrize("postcode,contained", [("59284", True), ("75001", False)])
+def test_deny(postcode, contained):
+    prolongation_request = ProlongationRequestFactory(approval__user__jobseeker_profile__hexa_post_code=postcode)
     deny_information = ProlongationRequestDenyInformationFactory.build(request=None)
 
     prolongation_request.deny(prolongation_request.validated_by, deny_information)
@@ -84,6 +85,12 @@ def test_deny():
         [prolongation_request.declared_by.email],
         [prolongation_request.approval.user.email],
     ]
+    jobseeker_email = mail.outbox[1]
+    afpa = "Afpa"
+    if contained:
+        assert afpa in jobseeker_email.body
+    else:
+        assert afpa not in jobseeker_email.body
 
 
 @pytest.mark.parametrize(
