@@ -117,6 +117,7 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
         context["hiring_pending"] = job_application and job_application.is_pending
         context["matomo_custom_title"] = "Profil salarié"
         context["eligibility_diagnosis"] = job_application and job_application.get_eligibility_diagnosis()
+        context["approval_deletion_form_url"] = None
 
         if approval.is_in_progress:
             for suspension in approval.suspensions_by_start_date_asc:
