@@ -1,5 +1,7 @@
 {% extends "layout/base.html" %}
 {% load str_filters %}
+{% load django_bootstrap5 %}
+{% load buttons_form %}
 
 {% block content_title %}<h1>Rejoindre le groupe de suivi d'un candidat</h1>{% endblock %}
 
@@ -12,14 +14,12 @@
     <section class="s-box">
         <div class="s-box__container container">
             <div class="c-form">
-
-                <div class="form-group form-group-required">
-                    <label class="form-label" for="id_nir">Nom et prénom du candidat</label>
-                    <input type="text" placeholder="DUPONT Jean" class="form-control" required="">
-                </div>
-
+                <form method="post" class="js-prevent-multiple-submit">
+                    {% csrf_token %}
+                    {% bootstrap_field form.user %}
+                    {% itou_buttons_form primary_label="Rejoindre le groupe de ce candidat" reset_url=reset_url %}
+                </form>
             </div>
-
         </div>
     </section>
 {% endblock %}
