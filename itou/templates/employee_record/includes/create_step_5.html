@@ -46,14 +46,6 @@
                     {{ job_application.approval.number|format_approval_number }}
                 </p>
                 <hr class="my-3">
-                {% if approval_can_be_suspended_by_siae %}
-                    <a href="{% url 'approvals:suspend' approval_id=job_application.approval.id %}?back_url={{ request.get_full_path|urlencode }}"
-                       class="btn btn-secondary btn-ico btn-block justify-content-center mb-1"
-                       aria-label="Suspendre le PASS IAE">
-                        <i class="ri-pause-circle-line ri-lg"></i>
-                        <span>Suspendre</span>
-                    </a>
-                {% endif %}
                 <a class="btn btn-outline-primary btn-block"
                    {% matomo_event "telechargement-pdf" "agrement" "detail-agrement" %}
                    href="{% url 'approvals:display_printable_approval' approval_id=job_application.approval.id %}"
