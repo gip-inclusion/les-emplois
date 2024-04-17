@@ -17,7 +17,7 @@ class FollowUpGroup(models.Model):
         blank=False,
         on_delete=models.RESTRICT,
         unique=True,
-        related_name="follow_up_group_beneficiary",
+        related_name="follow_up_groups_beneficiary",
     )
 
     members = models.ManyToManyField(
@@ -38,12 +38,12 @@ class FollowUpGroupMembership(models.Model):
 
     # Is this user still an active member of the group?
     # Or maybe waiting for an invitation to be activated?
-    is_active_member = models.BooleanField(default=True)
-
-    # Keep track of when the membership was ended
-    membership_ended_at = models.DateTimeField(null=True)
+    is_active = models.BooleanField(default=True)
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+
+    # Keep track of when the membership was ended
+    ended_at = models.DateTimeField(null=True)
 
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
