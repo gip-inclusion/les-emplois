@@ -1,13 +1,7 @@
 {% load static %}
 {% load matomo %}
 
-<a href="#" data-bs-toggle="modal" data-bs-target="#no-email-modal">
-    {% if link_text %}
-        {{ link_text }}
-    {% else %}
-        Pas d'adresse e-mail ?
-    {% endif %}
-</a>
+<a href="#" data-bs-toggle="modal" data-bs-target="#no-email-modal">{{ link_text }}</a>
 
 <div class="modal fade text-start" id="no-email-modal" tabindex="-1" role="dialog" aria-labelledby="no-email-modal-label" aria-modal="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">

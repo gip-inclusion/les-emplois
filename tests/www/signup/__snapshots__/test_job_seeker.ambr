@@ -11,13 +11,10 @@
   
                               <div class="form-group mb-1 form-group-required"><label class="form-label" for="id_email">Adresse e-mail</label><input autocomplete="email" class="form-control" id="id_email" maxlength="320" name="email" placeholder="adresse@email.fr" required="" type="email"/></div>
                               <div class="text-end small font-italic mb-0">
+                                  
   
   
-  <a data-bs-target="#no-email-modal" data-bs-toggle="modal" href="#">
-      
-          Pas d'adresse e-mail ?
-      
-  </a>
+  <a data-bs-target="#no-email-modal" data-bs-toggle="modal" href="#">Pas d'adresse e-mail ?</a>
   
   <div aria-labelledby="no-email-modal-label" aria-modal="true" class="modal fade text-start" id="no-email-modal" role="dialog" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -48,7 +45,8 @@
           </div>
       </div>
   </div>
-  </div>
+  
+                              </div>
   
                               <div class="form-group mt-1 form-group-required"><label class="form-label" for="id_title">Civilité</label><select class="form-select" id="id_title" name="title" required="">
     <option value="">---------</option>

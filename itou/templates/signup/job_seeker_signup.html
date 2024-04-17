@@ -52,7 +52,9 @@
                             {# bootstrap_form_errors form alert_error_type="all" #}
 
                             {% bootstrap_field form.email wrapper_class="form-group mb-1" %}
-                            <div class="text-end small font-italic mb-0">{% include "signup/includes/no_email_link.html" %}</div>
+                            <div class="text-end small font-italic mb-0">
+                                {% include "signup/includes/no_email_link.html" with link_text="Pas d'adresse e-mail ?" only %}
+                            </div>
 
                             {% bootstrap_field form.title wrapper_class="form-group mt-1" %}
                             {% bootstrap_field form.first_name %}
