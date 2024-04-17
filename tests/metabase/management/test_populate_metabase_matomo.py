@@ -74,7 +74,7 @@ def test_matomo_populate_public(respx_mock, snapshot):
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM suivi_visiteurs_tb_publics_v1")
         rows = cursor.fetchall()
-    assert len(rows) == 19
+    assert len(rows) == 20
     assert rows == snapshot(name="exported rows")
 
 
