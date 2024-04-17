@@ -83,11 +83,12 @@ class JobApplicationAcceptedForPrescriberNotification(PrescriberNotification, Em
 
     def get_context(self):
         context = super().get_context()
-        if context["job_application"].sender_prescriber_organization:
+        job_application = context["job_application"]
+        if job_application.sender_prescriber_organization:
             # Include the survey link for all prescribers's organizations.
-            context["prescriber_survey_link"] = context[
-                "job_application"
-            ].sender_prescriber_organization.accept_survey_url
+            context["prescriber_survey_link"] = job_application.sender_prescriber_organization.accept_survey_url
+        else:
+            context["prescriber_survey_link"] = None
         return context
 
 
