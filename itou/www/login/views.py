@@ -111,6 +111,7 @@ class LaborInspectorLoginView(ItouLoginView):
         extra_context = {
             "login_url": reverse("login:labor_inspector"),
             "signup_allowed": False,
+            "uses_inclusion_connect": False,
         }
         return context | extra_context
 
