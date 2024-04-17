@@ -4,6 +4,7 @@ import pytest  # noqa
 from django.template import Context, Template
 from freezegun import freeze_time
 
+import itou.job_applications.enums as job_applications_enums
 from tests.approvals.factories import ApprovalFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
@@ -19,6 +20,7 @@ class TestStatusInclude:
                 "user": EmployerFactory(),
                 "hiring_pending": False,
                 "job_application": None,
+                "JobApplicationOrigin": job_applications_enums.Origin,
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
@@ -31,6 +33,7 @@ class TestStatusInclude:
                 "user": PrescriberFactory(),
                 "hiring_pending": False,
                 "job_application": None,
+                "JobApplicationOrigin": job_applications_enums.Origin,
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
@@ -43,6 +46,7 @@ class TestStatusInclude:
                 "user": EmployerFactory(),
                 "hiring_pending": False,
                 "job_application": None,
+                "JobApplicationOrigin": job_applications_enums.Origin,
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
@@ -59,6 +63,7 @@ class TestStatusInclude:
                 "user": EmployerFactory(),
                 "hiring_pending": False,
                 "job_application": None,
+                "JobApplicationOrigin": job_applications_enums.Origin,
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
@@ -75,6 +80,7 @@ class TestStatusInclude:
                 "user": PrescriberFactory(),
                 "hiring_pending": False,
                 "job_application": None,
+                "JobApplicationOrigin": job_applications_enums.Origin,
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
@@ -91,6 +97,7 @@ class TestStatusInclude:
                 "user": approval.user,
                 "hiring_pending": False,
                 "job_application": None,
+                "JobApplicationOrigin": job_applications_enums.Origin,
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
