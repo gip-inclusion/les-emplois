@@ -76,7 +76,13 @@
                                         {% for radio in form.refusal_reason %}
                                             <li class="mb-2">
                                                 <div class="form-check">
-                                                    <input id="{{ radio.id_for_label }}" class="form-check-input" name="{{ radio.data.name }}" type="radio" value="{{ radio.data.value }}" {% if radio.data.selected %}checked=""{% endif %} required>
+                                                    <input id="{{ radio.id_for_label }}"
+                                                           class="form-check-input"
+                                                           name="{{ radio.data.name }}"
+                                                           type="radio"
+                                                           value="{{ radio.data.value }}"
+                                                           {% if radio.data.selected %}checked=""{% endif %}
+                                                           {% if form.refusal_reason.field.required %}required{% endif %}>
                                                     <label for="{{ radio.id_for_label }}" class="form-check-label">
                                                         {% if radio.data.value == RefusalReason.PREVENT_OBJECTIVES %}
                                                             {{ radio.choice_label }}
