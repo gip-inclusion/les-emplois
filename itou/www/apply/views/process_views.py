@@ -347,7 +347,7 @@ class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
         }
 
     def get_form_kwargs(self, step=None):
-        if step == self.STEP_REASON:
+        if step in (self.STEP_REASON, self.STEP_PRESCRIBER_ANSWER):
             return {
                 "job_application": self.job_application,
             }

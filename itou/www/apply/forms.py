@@ -378,7 +378,11 @@ class JobApplicationRefusalReasonForm(forms.Form):
     def __init__(self, job_application, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER:
-            self.fields["refusal_reason"].label = "Choisir le motif de refus envoyé au prescripteur"
+            if job_application.is_sent_by_authorized_prescriber:
+                label = "Choisir le motif de refus envoyé au prescripteur"
+            else:
+                label = "Choisir le motif de refus envoyé à l’orienteur"
+            self.fields["refusal_reason"].label = label
         if job_application.to_company.kind == CompanyKind.GEIQ:
             self.fields["refusal_reason"].choices = job_applications_enums.RefusalReason.displayed_choices(
                 extra_exclude_enums=[
@@ -398,10 +402,21 @@ class JobApplicationRefusalJobSeekerAnswerForm(forms.Form):
 
 class JobApplicationRefusalPrescriberAnswerForm(forms.Form):
     prescriber_answer = forms.CharField(
-        label="Commentaire envoyé au prescripteur (n’est pas envoyé au candidat)",
         widget=forms.Textarea(),
         strip=True,
     )
+
+    def __init__(self, job_application, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER:
+            if job_application.is_sent_by_authorized_prescriber:
+                self.fields["prescriber_answer"].label = (
+                    "Commentaire envoyé au prescripteur (n’est pas envoyé au candidat)"
+                )
+            else:
+                self.fields["prescriber_answer"].label = (
+                    "Commentaire envoyé à l’orienteur (n’est pas envoyé au candidat)"
+                )
 
 
 class AnswerForm(forms.Form):
