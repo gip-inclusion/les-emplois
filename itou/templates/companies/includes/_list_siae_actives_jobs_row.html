@@ -1,8 +1,7 @@
 {% load matomo %}
-{% comment %} takes 2 arguments: job=<JobDescription> is_appended=<Bool> {% endcomment %}
 
 <li class="list-group-item list-group-item-action">
-	
+
     <div>
         <a href="{% if job.pk %}{{ job.get_absolute_url }}{% else %}#{% endif %}?back_url={{ request.get_full_path|urlencode }}"
            class="font-weight-bold text-decoration-none stretched-link"
@@ -13,7 +12,7 @@
                 {{ job.POPULAR_THRESHOLD }}+<span class="ms-1">candidatures</span>
             </span>
         {% endif %}
-	
+
         <p class="fs-sm mb-0 mt-1">
             <i class="ri-map-pin-2-line ri-sm" aria-hidden="true"></i>
             {% if job.location %}
@@ -21,8 +20,8 @@
             {% else %}
                 {{ job.company.city|title }} - {{ job.company.department }}
             {% endif %}
-	
+
         </p>
-	
+
     </div>
 </li>
