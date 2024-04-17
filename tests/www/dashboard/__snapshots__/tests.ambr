@@ -1,8 +1,8 @@
 # serializer version: 1
 # name: DashboardViewTest.test_dashboard
   '''
-  <form action="/search/employers/results" method="get" role="search">
-                          
+  <form action="/search/employers/results" class="mt-3 mt-md-4" method="get" role="search">
+                                  
   
   
   
@@ -26,7 +26,7 @@
       </div>
   </div>
   
-                      </form>
+                              </form>
   '''
 # ---
 # name: EditUserInfoViewTest.test_edit_without_title[missing title warning with phone and address]

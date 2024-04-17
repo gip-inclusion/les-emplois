@@ -11,28 +11,6 @@
                 <span>Gérer les salariés et PASS IAE</span>
             </a>
             <ul class="list-unstyled mb-lg-5">
-                {% comment %}
-                NOTE(vperron):
-                We currently do not allow OPCS users to apply for an offer.
-                We will have to discuss this matter further with AVE, but it has been
-                decided that it probably did not make much sense initially.
-                {% endcomment %}
-                <li class="d-flex justify-content-between align-items-center mb-3">
-                    {% if siae_suspension_text_with_dates %}
-                        <span class="btn-link btn-ico"
-                              data-bs-toggle="tooltip"
-                              data-bs-placement="top"
-                              title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ siae_suspension_text_with_dates }}">
-                            <i class="ri-user-follow-line ri-lg font-weight-normal disabled"></i>
-                            <span class="disabled">Déclarer une embauche</span>
-                        </span>
-                    {% else %}
-                        <a href="{% url 'apply:check_nir_for_hire' company_pk=request.current_organization.pk %}" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "declarer-embauche" %}>
-                            <i class="ri-user-follow-line ri-lg font-weight-normal"></i>
-                            <span>Déclarer une embauche</span>
-                        </a>
-                    {% endif %}
-                </li>
                 {% if can_show_employee_records %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'employee_record_views:list' %}?status=NEW" class="btn-link btn-ico" {% matomo_event "employeurs" "clic" "voir-liste-fiches-salaries" %}>
