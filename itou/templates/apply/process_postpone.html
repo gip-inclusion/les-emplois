@@ -12,7 +12,7 @@
             {% bootstrap_form form alert_error_type="all" %}
 
             {% url 'apply:details_for_company' job_application_id=job_application.id as reset_url %}
-            {% itou_buttons_form primary_label="Mettre en liste d'attente" reset_url=reset_url show_mandatory_fields_mention=False matomo_category="candidature" matomo_action="submit" matomo_event="postpone_application" %}
+            {% itou_buttons_form primary_label="Mettre en liste d'attente" reset_url=reset_url show_mandatory_fields_mention=False matomo_category="candidature" matomo_action="submit" matomo_name="postpone_application" %}
 
         </form>
     </div>

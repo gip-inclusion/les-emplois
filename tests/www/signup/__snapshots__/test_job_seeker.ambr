@@ -123,7 +123,7 @@
               
               <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
-                      <button aria-label="Passer à l'étape suivante" class="btn btn-block btn-primary" type="submit">
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
                           <span>Inscription</span>
                       </button>
                   

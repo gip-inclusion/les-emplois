@@ -108,9 +108,9 @@
 
                             {% url 'apply:details_for_company' job_application_id=job_application.id as reset_url %}
                             {% if wizard.steps.prev %}
-                                {% itou_buttons_form reset_url=reset_url primary_label=wizard.steps.next|yesno:"Suivant,Confirmer le refus" secondary_url=wizard.steps.prev matomo_category="candidature" matomo_action="submit" matomo_event="refuse_application_submit" %}
+                                {% itou_buttons_form reset_url=reset_url primary_label=wizard.steps.next|yesno:"Suivant,Confirmer le refus" secondary_url=wizard.steps.prev matomo_category="candidature" matomo_action="submit" matomo_name="refuse_application_submit" %}
                             {% else %}
-                                {% itou_buttons_form reset_url=reset_url primary_label=wizard.steps.next|yesno:"Suivant,Confirmer le refus" matomo_category="candidature" matomo_action="submit" matomo_event="refuse_application_submit" %}
+                                {% itou_buttons_form reset_url=reset_url primary_label=wizard.steps.next|yesno:"Suivant,Confirmer le refus" matomo_category="candidature" matomo_action="submit" matomo_name="refuse_application_submit" %}
                             {% endif %}
                         </form>
                     </div>

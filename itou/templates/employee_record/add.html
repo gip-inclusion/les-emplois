@@ -55,7 +55,7 @@
                             {% url "employee_record_views:list" as reset_url %}
                             {% if wizard.steps.prev %}
                                 {% url 'employee_record_views:add' as secondary_url %}
-                                {% itou_buttons_form primary_label=wizard.steps.next|yesno:"Suivant,Confirmer" reset_url=reset_url|add:"?status=NEW" secondary_url=secondary_url|add:wizard.steps.prev secondary_name="wizard_goto_step" secondary_value=wizard.steps.prev matomo_category="fiches-salarié" matomo_action="submit" matomo_event="création" %}
+                                {% itou_buttons_form primary_label=wizard.steps.next|yesno:"Suivant,Confirmer" reset_url=reset_url|add:"?status=NEW" secondary_url=secondary_url|add:wizard.steps.prev secondary_name="wizard_goto_step" secondary_value=wizard.steps.prev matomo_category="fiches-salarié" matomo_action="submit" matomo_name="création" %}
                             {% else %}
                                 {% itou_buttons_form primary_label=wizard.steps.next|yesno:"Suivant,Confirmer" reset_url=reset_url|add:"?status=NEW" %}
                             {% endif %}

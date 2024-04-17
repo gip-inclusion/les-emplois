@@ -1,11 +1,30 @@
 from django import template
+from django.urls import reverse_lazy
 
 
 register = template.Library()
 
 
 @register.inclusion_tag("./utils/templatetags/buttons_form.html", takes_context=False)
-def itou_buttons_form(**kwargs):
+def itou_buttons_form(
+    *,
+    primary_disabled=False,
+    primary_label="Suivant",
+    primary_url=None,
+    primary_name=None,
+    primary_value=None,
+    primary_aria_label="Passer à l’étape suivante",
+    reset_url=reverse_lazy("dashboard:index"),
+    show_mandatory_fields_mention=True,
+    secondary_url=None,
+    secondary_aria_label="Retourner à l’étape précédente",
+    secondary_name=None,
+    secondary_value=None,
+    matomo_category=None,
+    matomo_action=None,
+    matomo_name=None,
+    modal_content_save_and_quit=False,
+):
     """
     Render buttons on forms.
 
@@ -17,57 +36,39 @@ def itou_buttons_form(**kwargs):
 
         primary_label
             The label for the primary button.
-            Default: "Suivant"
 
         primary_url
             The url for the primary button. If True, display href as a button, instead of a submit button.
-            Optional
-            Default: None
+
+        primary_aria_label
+            The ARIA label for the primary button.
 
         secondary_url
             The url for the secondary button.
-            Optional
-            Default: None
+
+        secondary_aria_label
+            The ARIA label for the secondary button.
 
         reset_url
-            The url for the reset button. If True, display href link, whether reset_submit exists or not.
-            Optional
-            Default: 'dashboard:index'
-
-        reset_submit
-            display a reset button, if True and reset_url is not set.
-            Optional
-            Default: False
+            The url for the reset button.
 
         matomo_category & matomo_action & matomo_name
             If set together, the buttons will send a matomo event on click.
-            Optional
-            Default: None
 
         show_mandatory_fields_mention
-            if True, show the mention "champs obligatoires" on the form.
-            Default: True
+            If True, show the mention "champs obligatoires" on the form.
 
         primary_disabled
-            if True, the primary button is disabled.
-            Optional
-            Default: False
+            If True, the primary button is disabled.
 
         primary_name & primary_value
             If set together, the name and value for the primary button.
-            Optional
-            Default: None
 
         secondary_name & secondary_value
             If set together, the name and value for the secondary button.
-            Optional
-            Default: None
 
         modal_content_save_and_quit
-            if set, force alternate modal content for the save and quit button.
-            Optional
-            Default: None
-
+            If set, force alternate modal content for the save and quit button.
 
     **Usage**::
 
@@ -75,11 +76,28 @@ def itou_buttons_form(**kwargs):
 
     **Example**::
 
-        {% itou_buttons_form reset_submit=True %}
+        {% itou_buttons_form show_mandatory_fields_mention=False %}
     """
-    if kwargs.get("primary_label") is None:
-        kwargs["primary_label"] = "Suivant"
-    if kwargs.get("show_mandatory_fields_mention") is None:
-        kwargs["show_mandatory_fields_mention"] = True
 
-    return {**kwargs}
+    matomo_values = (matomo_category, matomo_action, matomo_name)
+    if any(matomo_values) and not all(matomo_values):
+        raise ValueError("Matomo values are all or nothing")
+
+    return {
+        "show_mandatory_fields_mention": show_mandatory_fields_mention,
+        "primary_aria_label": primary_aria_label,
+        "primary_disabled": primary_disabled,
+        "primary_label": primary_label,
+        "primary_name": primary_name,
+        "primary_value": primary_value,
+        "primary_url": primary_url,
+        "reset_url": reset_url,
+        "secondary_url": secondary_url,
+        "secondary_aria_label": secondary_aria_label,
+        "secondary_name": secondary_name,
+        "secondary_value": secondary_value,
+        "matomo_category": matomo_category,
+        "matomo_action": matomo_action,
+        "matomo_name": matomo_name,
+        "modal_content_save_and_quit": modal_content_save_and_quit,
+    }
