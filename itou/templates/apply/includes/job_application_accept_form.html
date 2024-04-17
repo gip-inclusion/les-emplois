@@ -13,7 +13,7 @@
 
         {% csrf_token %}
 
-        {% if form_address or form_personal_data %}<h2>Candidat</h2>{% endif %}
+        {% if form_user_address or form_personal_data %}<h2>Candidat</h2>{% endif %}
 
         {% if form_personal_data %}
             {% if form_personal_data.nir_error %}{{ form_personal_data.nir_error|safe }}{% endif %}
