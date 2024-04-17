@@ -1,4 +1,4 @@
-<ul class="list-step" id="transition_logs_{{ job_application.pk }}"{% if out_of_band_swap %} hx-swap-oob="true"{% endif %}>
+<ul class="list-step" id="transition_logs_{{ job_application.pk }}"{% if out_of_band_swap|default:False %} hx-swap-oob="true"{% endif %}>
     {% with dt_format="d F Y à H:i" %}
         {% for log in transition_logs %}
             <li>
