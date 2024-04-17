@@ -22,6 +22,11 @@ Actions envisagées par le prescripteur :
 - Précisions : {{ prolongation_request.deny_information.proposed_actions_explanation }}
 {% endif %}
 {% endif %}
+{% if show_afpa_ad %}
+
+L’Afpa, 1er acteur de la formation professionnelle en France peut vous accompagner et vous proposer des solutions pour accéder à la formation afin de vous aider dans votre parcours vers l’emploi.
+Si vous souhaitez être contacté, suivez ce lien https://cloud.info.afpa.fr/partenariat-afpa-plateforme-de-l-inclusion
+{% endif %}
 
 Vous pouvez consulter la date de fin prévisionnelle de votre PASS IAE dans votre espace candidat sur les emplois de l’inclusion.
 {% endblock body %}
