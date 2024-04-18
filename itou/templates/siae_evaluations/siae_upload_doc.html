@@ -17,7 +17,7 @@
                         <div class="card-body">
                             <div class="row mt-3">
                                 <div class="col-md-12">
-                                    {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria %}
+                                    {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=None only %}
                                 </div>
                             </div>
                             {% if evaluated_administrative_criteria.proof_id %}

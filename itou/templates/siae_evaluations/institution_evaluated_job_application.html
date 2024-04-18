@@ -42,7 +42,7 @@
                                     <ul class="list-unstyled">
                                         {% for evaluated_administrative_criteria in evaluated_job_application.evaluated_administrative_criteria.all %}
                                             <li>
-                                                {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=evaluated_administrative_criteria.review_state %}
+                                                {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=evaluated_administrative_criteria.review_state only %}
                                                 {% if evaluated_siae.evaluation_is_final %}
                                                     <div class="text-md-end mt-2">
                                                         <a href="{% url "siae_evaluations_views:view_proof" evaluated_administrative_criteria_id=evaluated_administrative_criteria.pk %}"
