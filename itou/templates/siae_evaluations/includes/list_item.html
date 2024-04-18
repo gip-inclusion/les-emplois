@@ -31,9 +31,9 @@
                                 {% with criteria_review_state=evaluated_administrative_criteria.review_state_for_siae %}
                                     <li>
                                         {% if item.evaluated_siae.reviewed_at %}
-                                            {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=criteria_review_state %}
+                                            {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=criteria_review_state only %}
                                         {% else %}
-                                            {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria %}
+                                            {% include "siae_evaluations/includes/criterion_infos.html" with criteria=evaluated_administrative_criteria.administrative_criteria review_state=None only %}
                                         {% endif %}
                                         <div class="text-md-end mt-2">
                                             {% if evaluated_administrative_criteria.can_upload %}
