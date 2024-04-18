@@ -158,7 +158,10 @@ def create_new_siaes(siret_to_siae_row, conventions_by_siae_key):
                 continue
             creatable_siaes.append(build_siae(row, kind, is_active=True))
         else:
-            if existing_siae.source == Company.SOURCE_ASP:
+            # TODO: Delete “ or row.siret == "52172441900036"” when email with subject
+            # “Demande de clarification ACI 521724419” sent on 17/04/2024 18:44 has been answered.
+            # https://plateforme-inclusion.zendesk.com/agent/tickets/11571
+            if existing_siae.source == Company.SOURCE_ASP or row.siret == "52172441900036":
                 continue
             # Siae with this siret+kind already exists but with the wrong source.
             assert existing_siae.source in [Company.SOURCE_USER_CREATED, Company.SOURCE_STAFF_CREATED]
