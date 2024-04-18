@@ -42,35 +42,6 @@
                             {% itou_buttons_form primary_label="Envoyer" reset_url=back_url %}
                         </form>
                     </div>
-
-                    {% if pending_invitations %}
-                        <div class="c-box mt-3 mt-md-5">
-                            <h3 class="h4">Invitations en attente</h3>
-                            <div class="table-responsive-lg mt-3">
-                                <table class="table">
-                                    <caption class="visually-hidden">Liste des invitations en attente</caption>
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Prénom</th>
-                                            <th scope="col">Nom</th>
-                                            <th scope="col">Adresse e-mail</th>
-                                            <th scope="col">Envoyée le</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for invitation in pending_invitations %}
-                                            <tr>
-                                                <td>{{ invitation.first_name|title }}</td>
-                                                <td>{{ invitation.last_name|upper }}</td>
-                                                <td>{{ invitation.email }}</td>
-                                                <td>{{ invitation.sent_at|date }}</td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
