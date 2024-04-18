@@ -1,5 +1,40 @@
 # Journal des modifications
 
+## [85] - 2024-04-22
+
+### Ajouté
+
+- Candidature: simplification du formulaire d'acceptation de candidature avec l’autocomplétion d'adresse
+- Candidatures : Pack de motifs de refus
+- Carte candidature : Afficher à nouveau le nom de l’émetteur
+- E-mails : Indiquer le type d’organisation prescriptrice dans les demandes d’habilitation
+- Partenariat AFPA : Inviter à contacter l’Afpa dans les mails envoyés aux candidats pour les refus de candidatures et de demande de prolongation dans les Hauts-de-France et en Nouvelle Aquitaine
+- Permettre de partager le motif de refus de candidature au candidat
+- Pilotage : Ouvrir le TB149 "Etat des candidatures orientées" à d’autres prescripteurs habilités sur 3 régions
+- [Prescripteurs : Recherche de volontaires pour construire l’espace « Mes candidats »](https://github.com/gip-inclusion/les-emplois/pull/3910)
+- [Recherche employeur : Afficher le bouton “Postuler” sur la carte entreprise](https://github.com/gip-inclusion/les-emplois/pull/3902)
+
+### Modifié
+
+- Acceptation de candidature: Correction de l'autocomplétion d'adresse
+- Déclaration d’accessibilité : Mise à jour de l'adresse du GIP
+- Gérer le champ email manquant pour ItouResetPasswordView
+- Matomo: correctifs de `buttons_form`
+- Notifications : Amélioration de l’interface de gestion
+- Sécurité : Supprimer une redirection ouverte dans la vue de transfer de candidature
+- Sécurité : Supprimer une redirection ouverte des vues d’éligibilité GEIQ
+- UX/UI : Changer les textes "employeur solidaire" en "employeur inclusif"
+- UX/UI : Filtrer les candidatures avec HTMX (pour les candidats)
+- [UX/UI - Enrober les formulaires de connexion/inscription dans des encarts](https://github.com/gip-inclusion/les-emplois/pull/3937)
+- [UX/UI - Mise à jour des sections titre et messages](https://github.com/gip-inclusion/les-emplois/pull/3895)
+- [UX/UI : Correction saut de ligne du bandeau “Vous possédez un n° de sécurité sociale temporaire ?”](https://github.com/gip-inclusion/les-emplois/pull/3916)
+
+### Supprimé
+
+- Arrêter de stocker les adresses des utilisateurs non-candidats
+- Prescripteurs : Fin de la recherche de volontaires pour l’espace « Mes candidats »
+- [Candidatures : Retirer le nom de l’employeur pour le statut « Embauché ailleurs »](https://github.com/gip-inclusion/les-emplois/pull/3900)
+
 ## [84] - 2024-04-08
 
 ### Ajouté
