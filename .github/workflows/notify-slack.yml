@@ -14,9 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "📢 Notify the #mep-c1 channel"
-        run: >
-          curl
-          --request POST
-          --header 'Content-type: application/json'
-          --data '{"text":"<${{ github.event.pull_request.html_url }}|${{ github.event.pull_request.title }}>"}'
-          '${{ secrets.SLACK_MEP_C1_WEBHOOK_URL }}'
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "<${{ github.event.pull_request.html_url }}|${{ github.event.pull_request.title }}>"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_MEP_C1_WEBHOOK_URL }}
