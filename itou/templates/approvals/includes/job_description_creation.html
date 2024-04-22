@@ -6,46 +6,36 @@
         {% if request.user == job_application.sender %}
             <strong>Vous</strong>
         {% elif job_application.sender_kind == SenderKind.JOB_SEEKER %}
-            <span class="text-nowrap">
-                <i class="ri-user-line me-1" aria-hidden="true"></i><strong>Le candidat lui-même</strong>
-            </span>
+            <i class="ri-user-line me-1" aria-hidden="true"></i><strong>Le candidat lui-même</strong>
         {% elif job_application.sender_kind == SenderKind.EMPLOYER %}
-            <span class="text-nowrap">
-                <strong>{{ job_application.sender_company.display_name }}</strong>
-                {% if request.user.is_employer %}
-                    {% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
-                        <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur (Import agrément Pôle emploi)
-                    {% else %}
-                        <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur (Auto-prescription)
-                    {% endif %}
-                </span>
+            <strong>{{ job_application.sender_company.display_name }}</strong>
+            {% if request.user.is_employer %}
+                {% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
+                    <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur (Import agrément Pôle emploi)
+                {% else %}
+                    <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur (Auto-prescription)
+                {% endif %}
             {% elif request.user.is_job_seeker %}
-                <span class="text-nowrap">
-                    <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur
-                </span>
+                <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur
             {% endif %}
         {% elif job_application.sender_kind == SenderKind.PRESCRIBER %}
-            <span class="text-nowrap">
-                {% if job_application.sender_prescriber_organization %}
-                    <strong>{{ job_application.sender_prescriber_organization.display_name }}</strong>
-                {% else %}
-                    <strong>{{ job_application.sender.get_full_name }}</strong>
-                {% endif %}
-                {% if job_application.is_sent_by_authorized_prescriber %}
-                    <i class="ri-home-smile-2-line me-1" aria-hidden="true"></i>Prescripteur habilité
-                {% else %}
-                    <i class="ri-home-smile-2-line me-1" aria-hidden="true"></i>Orienteur
-                {% endif %}
-            </span>
+            {% if job_application.sender_prescriber_organization %}
+                <strong>{{ job_application.sender_prescriber_organization.display_name }}</strong>
+            {% else %}
+                <strong>{{ job_application.sender.get_full_name }}</strong>
+            {% endif %}
+            {% if job_application.is_sent_by_authorized_prescriber %}
+                <i class="ri-home-smile-2-line me-1" aria-hidden="true"></i>Prescripteur habilité
+            {% else %}
+                <i class="ri-home-smile-2-line me-1" aria-hidden="true"></i>Orienteur
+            {% endif %}
         {% endif %}
         {% if request.user.is_prescriber %}
-            <span class="text-nowrap">
-                chez
-                <a href="{% url 'companies_views:card' siae_id=job_application.to_company.id %}" class="btn-ico btn-link">
-                    <i class="ri-community-line font-weight-medium ri-sm me-1" aria-hidden="true"></i>
-                    <span>{{ job_application.to_company.display_name }}</span>
-                </a>
-            </span>
+            chez
+            <a href="{% url 'companies_views:card' siae_id=job_application.to_company.id %}" class="btn-ico btn-link">
+                <i class="ri-community-line font-weight-medium ri-sm me-1" aria-hidden="true"></i>
+                <span>{{ job_application.to_company.display_name }}</span>
+            </a>
         {% endif %}
     </p>
     <div>{% state_badge job_application %}</div>
