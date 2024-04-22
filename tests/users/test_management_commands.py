@@ -15,9 +15,9 @@ from freezegun import freeze_time
 
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
 from itou.eligibility.models import EligibilityDiagnosis
-from itou.job_applications.models import JobApplication
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
-from itou.users.enums import IdentityProvider
+from itou.users.enums import IdentityProvider, UserKind
 from itou.users.management.commands.new_users_to_mailjet import (
     MAILJET_API_URL,
     NEW_ORIENTEURS_LISTID,
@@ -32,6 +32,7 @@ from itou.utils.apis.pole_emploi import (
 from itou.utils.mocks.pole_emploi import API_RECHERCHE_ERROR, API_RECHERCHE_RESULT_KNOWN
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyMembershipFactory
+from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.prescribers.factories import (
     PrescriberFactory,
@@ -1190,3 +1191,139 @@ def test_pe_certify_users_retry(capsys, snapshot):
         recherche_call(old_failure, swap=False),
         recherche_call(old_failure, swap=True),
     ]
+
+
+class TestCommandNotifyAndDeleteInactiveJobSeekers:
+    @freeze_time("2024-01-01")
+    def test_notify(self, mailoutbox, snapshot):
+        LONG_TIME_AGO = timezone.now() - datetime.timedelta(days=500)
+        OUTSIDE_GRACE_PERIOD = timezone.now() - datetime.timedelta(days=31)
+        INSIDE_GRACE_PERIOD = timezone.now() - datetime.timedelta(days=3)
+
+        # Users that should have their upcoming_deletion_notified_at cleaned up
+        notified_job_seeker_reconnected_since = JobSeekerFactory(
+            date_joined=LONG_TIME_AGO,
+            upcoming_deletion_notified_at=OUTSIDE_GRACE_PERIOD,
+            last_login=timezone.now(),
+        )
+        notified_job_seeker_with_new_job_application = JobApplicationFactory(
+            job_seeker__date_joined=LONG_TIME_AGO,
+            job_seeker__upcoming_deletion_notified_at=timezone.now() - datetime.timedelta(days=31),
+        ).job_seeker
+        notified_job_seeker_with_new_diagnosis = EligibilityDiagnosisFactory(
+            job_seeker__date_joined=LONG_TIME_AGO,
+            job_seeker__upcoming_deletion_notified_at=timezone.now() - datetime.timedelta(days=31),
+        ).job_seeker
+        notified_job_seeker_with_new_geiq_diagnosis = GEIQEligibilityDiagnosisFactory(
+            with_prescriber=True,
+            job_seeker__date_joined=LONG_TIME_AGO,
+            job_seeker__upcoming_deletion_notified_at=timezone.now() - datetime.timedelta(days=31),
+        ).job_seeker
+
+        # Users that should be notified
+        inactive_old_job_seeker = JobSeekerFactory(
+            first_name="Jen",
+            last_name="Manvai",
+            date_joined=LONG_TIME_AGO,
+        )
+
+        # Users that should be ignored
+        inactive_recent_job_seeker = JobSeekerFactory(date_joined=timezone.now())
+        active_old_job_seeker = JobSeekerFactory(date_joined=LONG_TIME_AGO, last_login=timezone.now())
+        inactive_old_job_seeker_with_approval = ApprovalFactory(
+            user__date_joined=LONG_TIME_AGO,
+            created_at=LONG_TIME_AGO,
+        ).user
+        inactive_old_job_seeker_with_new_job_application = JobApplicationFactory(
+            job_seeker__date_joined=LONG_TIME_AGO,
+        ).job_seeker
+        inactive_old_job_seeker_with_old_accepted_job_application = JobApplicationFactory(
+            job_seeker__date_joined=LONG_TIME_AGO,
+            state=JobApplicationWorkflow.STATE_ACCEPTED,
+            created_at=LONG_TIME_AGO,
+        ).job_seeker
+        inactive_old_job_seeker_with_new_diagnosis = EligibilityDiagnosisFactory(
+            job_seeker__date_joined=LONG_TIME_AGO,
+        ).job_seeker
+        inactive_old_job_seeker_with_new_geiq_diagnosis = GEIQEligibilityDiagnosisFactory(
+            with_prescriber=True,
+            job_seeker__date_joined=LONG_TIME_AGO,
+        ).job_seeker
+        notified_job_seeker_without_recent_activity_but_inside_grace_period = JobSeekerFactory(
+            first_name="Jen",
+            last_name="Suiplula",
+            date_joined=LONG_TIME_AGO,
+            upcoming_deletion_notified_at=INSIDE_GRACE_PERIOD,
+        )
+
+        # Users that should be deleted
+        notified_job_seeker_without_recent_activity = JobSeekerFactory(
+            first_name="Jen",
+            last_name="Suiplula",
+            date_joined=LONG_TIME_AGO,
+            upcoming_deletion_notified_at=OUTSIDE_GRACE_PERIOD,
+        )
+
+        # Launch in dry run
+        call_command("notify_and_delete_inactive_job_seekers", wet_run=False)
+        # No jobseeker deleted
+        assert set(User.objects.filter(kind=UserKind.JOB_SEEKER)) == {
+            active_old_job_seeker,
+            inactive_old_job_seeker,
+            inactive_old_job_seeker_with_approval,
+            inactive_old_job_seeker_with_new_diagnosis,
+            inactive_old_job_seeker_with_new_geiq_diagnosis,
+            inactive_old_job_seeker_with_new_job_application,
+            inactive_old_job_seeker_with_old_accepted_job_application,
+            inactive_recent_job_seeker,
+            notified_job_seeker_reconnected_since,
+            notified_job_seeker_with_new_diagnosis,
+            notified_job_seeker_with_new_geiq_diagnosis,
+            notified_job_seeker_with_new_job_application,
+            notified_job_seeker_without_recent_activity,
+            notified_job_seeker_without_recent_activity_but_inside_grace_period,
+        }
+        # No upcoming_deletion_notified_at updated
+        assert set(User.objects.filter(upcoming_deletion_notified_at__isnull=False)) == {
+            notified_job_seeker_reconnected_since,
+            notified_job_seeker_with_new_diagnosis,
+            notified_job_seeker_with_new_geiq_diagnosis,
+            notified_job_seeker_with_new_job_application,
+            notified_job_seeker_without_recent_activity,
+            notified_job_seeker_without_recent_activity_but_inside_grace_period,
+        }
+        # No mail sent
+        assert len(mailoutbox) == 0
+
+        # Now in wet run
+        call_command("notify_and_delete_inactive_job_seekers", wet_run=True)
+        # notified_job_seeker_without_recent_activity has been removed
+        assert set(User.objects.filter(kind=UserKind.JOB_SEEKER)) == {
+            active_old_job_seeker,
+            inactive_old_job_seeker,
+            inactive_old_job_seeker_with_approval,
+            inactive_old_job_seeker_with_new_diagnosis,
+            inactive_old_job_seeker_with_new_geiq_diagnosis,
+            inactive_old_job_seeker_with_new_job_application,
+            inactive_old_job_seeker_with_old_accepted_job_application,
+            inactive_recent_job_seeker,
+            notified_job_seeker_reconnected_since,
+            notified_job_seeker_with_new_diagnosis,
+            notified_job_seeker_with_new_geiq_diagnosis,
+            notified_job_seeker_with_new_job_application,
+            notified_job_seeker_without_recent_activity_but_inside_grace_period,
+        }
+        # newly inactive user has been notified & notified users with recent activities have been reset
+        assert set(User.objects.filter(upcoming_deletion_notified_at__isnull=False)) == {
+            inactive_old_job_seeker,
+            notified_job_seeker_without_recent_activity_but_inside_grace_period,
+        }
+        # 2 mails were sent: one for the notification and one for the deletion
+        assert len(mailoutbox) == 2
+        upcoming_deletion_email = mailoutbox[0]
+        assert upcoming_deletion_email.subject == "Information avant suppression de votre compte candidat"
+        assert upcoming_deletion_email.body == snapshot(name="upcoming deletion email body")
+
+        deletion_email = mailoutbox[1]
+        assert deletion_email.subject == "Suppression de votre compte candidat"
+        assert deletion_email.body == snapshot(name="deletion email body")
