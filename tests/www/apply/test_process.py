@@ -2741,6 +2741,44 @@ def test_details_for_jobseeker_geiq_with_prior_actions(client):
     assertNotContains(response, delete_button)
 
 
+def test_details_sender_email_display_for_job_seeker(client):
+    SENDER_EMAIL_HIDDEN = "<small>Adresse e-mail</small><strong>Non communiquée</strong>"
+
+    # Email hidden for prescriber
+    job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
+    job_seeker = job_application.job_seeker
+
+    client.force_login(job_seeker)
+
+    url = reverse("apply:details_for_jobseeker", kwargs={"job_application_id": job_application.pk})
+    response = client.get(url)
+    assertNotContains(
+        response, f"<small>Adresse e-mail</small><strong>{job_application.sender.email}</strong>", html=True
+    )
+    assertContains(response, SENDER_EMAIL_HIDDEN, html=True)
+
+    # Email hidden for employer
+    employer = job_application.to_company.members.first()
+    job_application.sender = employer
+    job_application.sender_kind = job_applications_enums.SenderKind.EMPLOYER
+    job_application.save(update_fields=["sender", "sender_kind"])
+    response = client.get(url)
+    assertNotContains(
+        response, f"<small>Adresse e-mail</small><strong>{job_application.sender.email}</strong>", html=True
+    )
+    assertContains(response, SENDER_EMAIL_HIDDEN, html=True)
+
+    # Email shown for job seeker
+    job_application.sender = job_seeker
+    job_application.sender_kind = job_applications_enums.SenderKind.JOB_SEEKER
+    job_application.save(update_fields=["sender", "sender_kind"])
+    response = client.get(url)
+    assertContains(
+        response, f"<small>Adresse e-mail</small><strong>{job_application.sender.email}</strong>", html=True
+    )
+    assertNotContains(response, SENDER_EMAIL_HIDDEN, html=True)
+
+
 def test_accept_button(client):
     job_application = JobApplicationFactory(
         state=job_applications_enums.JobApplicationState.PROCESSING,
