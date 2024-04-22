@@ -16,7 +16,6 @@ class FollowUpGroup(models.Model):
         null=False,
         blank=False,
         on_delete=models.RESTRICT,
-        unique=True,
         related_name="follow_up_group",
     )
 

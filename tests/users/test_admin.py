@@ -56,9 +56,9 @@ def test_get_fields_to_transfer_for_job_seekers():
         "eligibilitydiagnosis",  # EligibilityDiagnosis.author
         "emailaddress",  # allauth.account.models.EmailAddress.user
         "externaldataimport",  # ExternalDataImport.user: this seems largely unused
-        "follow_up_groups_beneficiary",  # gps.FollowUpGroup.beneficiary: do I have a GPS follow group as a jobseeker
-        "follow_up_groups_member",  # gps.FollowUpGroup.member: followup groups
+        "follow_up_group",  # gps.FollowUpGroup: do I have a GPS follow group as a jobseeker
         "follow_up_groups",  # gps.FollowUpGroupMembership.member: followup groups membership
+        "follow_up_groups_member",  # gps.FollowUpGroup.member: followup groups
         "geiqadministrativecriteria",  # GEIQAdministrativeCriteria.created_by
         "geiqeligibilitydiagnosis",  # GEIQEligibilityDiagnosis.author
         "groups",  # django.contrib.auth.models.Group
