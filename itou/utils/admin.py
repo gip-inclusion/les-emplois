@@ -112,6 +112,9 @@ class InconsistencyCheckMixin:
 
 
 class ItouModelAdmin(ModelAdmin):
+    # Add save buttons on top of each change forms by default
+    save_on_top = True
+
     def _get_queryset_with_relations(self, request):
         select_related_fields, prefetch_related_fields = set(), set()
         for field in self.model._meta.get_fields():
