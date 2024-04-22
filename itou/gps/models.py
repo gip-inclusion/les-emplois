@@ -10,14 +10,14 @@ class FollowUpGroup(models.Model):
 
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
-    beneficiary = models.ForeignKey(
+    beneficiary = models.OneToOneField(
         User,
         verbose_name="bénéficiaire",
         null=False,
         blank=False,
         on_delete=models.RESTRICT,
         unique=True,
-        related_name="follow_up_groups_beneficiary",
+        related_name="follow_up_group",
     )
 
     members = models.ManyToManyField(
