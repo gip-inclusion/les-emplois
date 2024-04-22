@@ -38,6 +38,15 @@ def join_group(request, template_name="gps/join_group.html"):
     my_groups_url = reverse("gps:my_groups")
 
     if request.method == "POST" and form.is_valid():
+        user = form.cleaned_data["user"]
+
+        group = user.follow_up_group if (hasattr(user, "follow_up_group")) else None
+
+        if group is None:
+            group = FollowUpGroup.objects.create(beneficiary=user)
+
+        group.members.add(request.user, through_defaults={"creator": request.user})
+
         return HttpResponseRedirect(my_groups_url)
 
     breadcrumbs = {
