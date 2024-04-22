@@ -1465,9 +1465,9 @@ s3transfer==0.6.1 \
     --hash=sha256:3c0da2d074bf35d6870ef157158641178a4204a6e689e82546083e31e0311346 \
     --hash=sha256:640bb492711f4c0c0905e1f62b6aaeb771881935ad27884852411f8e9cacbca9
     # via boto3
-sentry-sdk==1.44.1 \
-    --hash=sha256:24e6a53eeabffd2f95d952aa35ca52f0f4201d17f820ac9d3ff7244c665aaf68 \
-    --hash=sha256:5f75eb91d8ab6037c754a87b8501cc581b2827e923682f593bed3539ce5b3999
+sentry-sdk==1.45.0 \
+    --hash=sha256:1ce29e30240cc289a027011103a8c83885b15ef2f316a60bcc7c5300afa144f1 \
+    --hash=sha256:509aa9678c0512344ca886281766c2e538682f8acfa50fd8d405f8c417ad0625
     # via -r requirements/base.in
 six==1.16.0 \
     --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926 \
@@ -1489,9 +1489,7 @@ sqlparse==0.5.0 \
 tablib[html,ods,xls,xlsx,yaml]==3.5.0 \
     --hash=sha256:9821caa9eca6062ff7299fa645e737aecff982e6b2b42046928a6413c8dabfd9 \
     --hash=sha256:f6661dfc45e1d4f51fa8a6239f9c8349380859a5bfaa73280645f046d6c96e33
-    # via
-    #   django-import-export
-    #   tablib
+    # via django-import-export
 tenacity==8.2.3 \
     --hash=sha256:5398ef0d78e63f40007c1fb4c0bff96e1911394d2fa8d194f77619c05ff6cc8a \
     --hash=sha256:ce510e327a630c9e1beaf17d42e6ffacc88185044ad85cf74c0a8887c6a0f88c
