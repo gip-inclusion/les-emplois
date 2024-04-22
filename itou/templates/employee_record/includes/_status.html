@@ -1,25 +1,25 @@
 {% if employee_record.status == "SENT" %}
-    <span class="badge rounded-pill badge-sm bg-warning">
+    <span class="badge rounded-pill badge-sm text-nowrap bg-warning">
         Transmise à l'ASP le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
     </span>
 {% elif employee_record.status == "REJECTED" %}
-    <span class="badge rounded-pill badge-sm bg-danger">
+    <span class="badge rounded-pill badge-sm text-nowrap bg-danger">
         Retour en erreur le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
     </span>
 {% elif employee_record.status == "PROCESSED" %}
-    <span class="badge rounded-pill badge-sm bg-success">
+    <span class="badge rounded-pill badge-sm text-nowrap bg-success">
         Intégrée par l'ASP le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
     </span>
 {% elif employee_record.status == "READY" %}
-    <span class="badge rounded-pill badge-sm bg-secondary">
+    <span class="badge rounded-pill badge-sm text-nowrap bg-secondary">
         Complétée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
     </span>
 {% elif employee_record.status == "DISABLED" %}
-    <span class="badge rounded-pill badge-sm bg-emploi-lightest text-primary">
+    <span class="badge rounded-pill badge-sm text-nowrap bg-emploi-lightest text-primary">
         Désactivée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
     </span>
 {% elif employee_record.status == "ARCHIVED" %}
-    <span class="badge rounded-pill badge-sm bg-emploi-lightest text-primary">
+    <span class="badge rounded-pill badge-sm text-nowrap bg-emploi-lightest text-primary">
         Archivée le {{ employee_record.updated_at|date:"SHORT_DATETIME_FORMAT" }}
     </span>
 {% endif %}

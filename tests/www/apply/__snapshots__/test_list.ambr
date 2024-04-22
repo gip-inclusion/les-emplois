@@ -838,18 +838,16 @@
       <p class="fs-sm mb-0 flex-grow-1">
           Émise le 30 mars 2023 par
           
-              <span class="text-nowrap">
-                  
-                      <strong>Max THROUGHPUT</strong>
-                  
-                  
-                      <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
-                  
-              </span>
+              
+                  <strong>Max THROUGHPUT</strong>
+              
+              
+                  <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
+              
           
           
       </p>
-      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></div>
+      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></div>
   </div>
   
       <div class="c-box--results__summary">
@@ -902,18 +900,16 @@
       <p class="fs-sm mb-0 flex-grow-1">
           Émise le 18 mars 2023 par
           
-              <span class="text-nowrap">
-                  
-                      <strong>Max THROUGHPUT</strong>
-                  
-                  
-                      <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
-                  
-              </span>
+              
+                  <strong>Max THROUGHPUT</strong>
+              
+              
+                  <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
+              
           
           
       </p>
-      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></div>
+      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></div>
   </div>
   
       <div class="c-box--results__summary">
@@ -971,18 +967,16 @@
       <p class="fs-sm mb-0 flex-grow-1">
           Émise le 16 février 2023 par
           
-              <span class="text-nowrap">
-                  
-                      <strong>Max THROUGHPUT</strong>
-                  
-                  
-                      <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
-                  
-              </span>
+              
+                  <strong>Max THROUGHPUT</strong>
+              
+              
+                  <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
+              
           
           
       </p>
-      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></div>
+      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></div>
   </div>
   
       <div class="c-box--results__summary">
@@ -1073,16 +1067,14 @@
               <strong>Vous</strong>
           
           
-              <span class="text-nowrap">
-                  chez
-                  <a class="btn-ico btn-link" href="/company/42/card">
-                      <i aria-hidden="true" class="ri-community-line font-weight-medium ri-sm me-1"></i>
-                      <span>Hit pit</span>
-                  </a>
-              </span>
+              chez
+              <a class="btn-ico btn-link" href="/company/42/card">
+                  <i aria-hidden="true" class="ri-community-line font-weight-medium ri-sm me-1"></i>
+                  <span>Hit pit</span>
+              </a>
           
       </p>
-      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></div>
+      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></div>
   </div>
   
       <div class="c-box--results__summary">
@@ -1152,16 +1144,14 @@
               <strong>Vous</strong>
           
           
-              <span class="text-nowrap">
-                  chez
-                  <a class="btn-ico btn-link" href="/company/42/card">
-                      <i aria-hidden="true" class="ri-community-line font-weight-medium ri-sm me-1"></i>
-                      <span>Hit pit</span>
-                  </a>
-              </span>
+              chez
+              <a class="btn-ico btn-link" href="/company/42/card">
+                  <i aria-hidden="true" class="ri-community-line font-weight-medium ri-sm me-1"></i>
+                  <span>Hit pit</span>
+              </a>
           
       </p>
-      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></div>
+      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></div>
   </div>
   
       <div class="c-box--results__summary">
@@ -1236,16 +1226,14 @@
               <strong>Vous</strong>
           
           
-              <span class="text-nowrap">
-                  chez
-                  <a class="btn-ico btn-link" href="/company/42/card">
-                      <i aria-hidden="true" class="ri-community-line font-weight-medium ri-sm me-1"></i>
-                      <span>Hit pit</span>
-                  </a>
-              </span>
+              chez
+              <a class="btn-ico btn-link" href="/company/42/card">
+                  <i aria-hidden="true" class="ri-community-line font-weight-medium ri-sm me-1"></i>
+                  <span>Hit pit</span>
+              </a>
           
       </p>
-      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></div>
+      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></div>
   </div>
   
       <div class="c-box--results__summary">
@@ -1347,18 +1335,16 @@
       <p class="fs-sm mb-0 flex-grow-1">
           Émise le 30 mars 2023 par
           
-              <span class="text-nowrap">
-                  
-                      <strong>Max THROUGHPUT</strong>
-                  
-                  
-                      <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
-                  
-              </span>
+              
+                  <strong>Max THROUGHPUT</strong>
+              
+              
+                  <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
+              
           
           
       </p>
-      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></div>
+      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_11111111-1111-1111-1111-111111111111">Nouvelle candidature</span></div>
   </div>
   
       <div class="c-box--results__summary">
@@ -1453,18 +1439,16 @@
       <p class="fs-sm mb-0 flex-grow-1">
           Émise le 18 mars 2023 par
           
-              <span class="text-nowrap">
-                  
-                      <strong>Max THROUGHPUT</strong>
-                  
-                  
-                      <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
-                  
-              </span>
+              
+                  <strong>Max THROUGHPUT</strong>
+              
+              
+                  <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
+              
           
           
       </p>
-      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></div>
+      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_22222222-2222-2222-2222-222222222222">Nouvelle candidature</span></div>
   </div>
   
       <div class="c-box--results__summary">
@@ -1534,18 +1518,16 @@
       <p class="fs-sm mb-0 flex-grow-1">
           Émise le 16 février 2023 par
           
-              <span class="text-nowrap">
-                  
-                      <strong>Max THROUGHPUT</strong>
-                  
-                  
-                      <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
-                  
-              </span>
+              
+                  <strong>Max THROUGHPUT</strong>
+              
+              
+                  <i aria-hidden="true" class="ri-home-smile-2-line me-1"></i>Orienteur
+              
           
           
       </p>
-      <div><span class="badge rounded-pill text-wrap badge-sm mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></div>
+      <div><span class="badge rounded-pill text-nowrap badge-sm mb-1 bg-info" id="state_33333333-3333-3333-3333-333333333333">Nouvelle candidature</span></div>
   </div>
   
       <div class="c-box--results__summary">

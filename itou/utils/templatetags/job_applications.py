@@ -21,7 +21,7 @@ def state_badge(job_application, *, hx_swap_oob=False, extra_class="badge-sm mb-
     }[job_application.state]
     attrs = [
         f'id="state_{ job_application.pk }"',
-        f'class="badge rounded-pill text-wrap { extra_class } { state_classes }"',
+        f'class="badge rounded-pill text-nowrap { extra_class } { state_classes }"',
     ]
     if hx_swap_oob:
         attrs.append('hx-swap-oob="true"')
