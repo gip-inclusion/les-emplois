@@ -95,6 +95,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
     context = {
         "can_view_personal_information": request.user.can_view_personal_information(job_application.job_seeker),
         "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
+        "display_refusal_info": False,
         "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
@@ -149,6 +150,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
     context = {
         "can_view_personal_information": True,  # SIAE members have access to personal info
         "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
+        "display_refusal_info": False,
         "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
