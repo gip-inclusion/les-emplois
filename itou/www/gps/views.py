@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from itou.gps.models import FollowUpGroup
+from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.www.gps.forms import GpsUserSearchForm
 
 
@@ -11,11 +11,12 @@ from itou.www.gps.forms import GpsUserSearchForm
 def my_groups(request, template_name="gps/my_groups.html"):
 
     current_user = request.user
-    groups = (
-        FollowUpGroup.objects.filter(members=current_user)
-        .select_related("beneficiary")
-        .prefetch_related("members")
-        .all()
+
+    memberships = (
+        FollowUpGroupMembership.objects.filter(member=current_user)
+        .filter(is_active=True)
+        .select_related("follow_up_group", "follow_up_group__beneficiary", "member")
+        .prefetch_related("follow_up_group__members")
     )
 
     breadcrumbs = {
@@ -24,7 +25,7 @@ def my_groups(request, template_name="gps/my_groups.html"):
 
     context = {
         "breadcrumbs": breadcrumbs,
-        "groups": groups,
+        "memberships": memberships,
     }
 
     return render(request, template_name, context)
