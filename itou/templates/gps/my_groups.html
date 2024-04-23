@@ -2,7 +2,7 @@
 {% load str_filters %}
 
 
-{% block content_title %}<h1>Mes groupes de suivi</h1>{% endblock %}
+{% block content_title %}<h1>Mes bénéficiaires</h1>{% endblock %}
 
 {% block breadcrumbs %}
     {% include "layout/breadcrumbs_from_dashboard.html" %}
@@ -17,14 +17,14 @@
                         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
                             <h3 class="h4 mb-0" id="results">
                                 {% with groups|length as counter %}
-                                    Membre de {{ counter }} <strong>groupe{{ counter|pluralizefr }} de suivi</strong>
+                                    {{ counter }} <strong>bénéficiaire{{ counter|pluralizefr }} suivi{{ counter|pluralizefr }}</strong>
                                 {% endwith %}
                             </h3>
                             <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les groupes de suivi">
 
                                 <a href="{% url 'gps:join_group' %}" class="btn btn-ico btn-primary mt-3 mt-md-0" aria-label="Rejoindre un group de suivi">
                                     <i class="ri-add-line" aria-hidden="true"></i>
-                                    <span>Rejoindre un groupe de suivi</span>
+                                    <span>Rejoindre un nouveau groupe de suivi</span>
                                 </a>
                             </div>
                         </div>
@@ -45,12 +45,23 @@
                                     </div>
                                 </div>
 
-                                <hr class="m-0">
+                                <hr class="m-0 pb-4">
 
-                                <div>
-                                    {% with group.members.all|length as counter %}
-                                        {{ counter }} professsionel{{ counter|pluralizefr }} dans le groupe de suivi
-                                    {% endwith %}
+                                <div class="d-flex justify-content-between">
+
+                                    <div>
+                                        {% with group.members.all|length|add:"-1" as counter %}
+                                            {% if counter < 1 %}
+                                                Aucun autre professionnel dans le groupe de suivi.
+                                            {% else %}
+                                                {{ counter }} autre{{ counter|pluralizefr }} professionnel{{ counter|pluralizefr }} dans le groupe de suivi.
+                                            {% endif %}
+                                        {% endwith %}
+                                    </div>
+                                    <div>
+                                        <a href="#" class="btn btn-outline-primary btn-block w-100 w-md-auto" aria-label="Consulter la fiche de {{ group.beneficiary.get_full_name }}">Consulter la fiche</a>
+                                    </div>
+
                                 </div>
 
                             </div>
