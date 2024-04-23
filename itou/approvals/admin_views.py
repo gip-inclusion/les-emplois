@@ -251,6 +251,7 @@ def send_approvals_to_pe_stats(request):
     context_data = {
         **admin.site.each_context(request),
         "title": "État de synchronisation avec France Travail",
+        "subtitle": None,
         "stats": [
             _compute_send_approvals_to_pe_stats(Approval, list_url=reverse("admin:approvals_approval_changelist")),
             _compute_send_approvals_to_pe_stats(
