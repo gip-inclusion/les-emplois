@@ -1,0 +1,19 @@
+{% load str_filters %}
+
+<div class="c-box mb-3 mb-lg-5">
+
+    {% with gps_memberships.all|length as counter %}
+        <h2>Membre{{ counter|pluralizefr }} du groupe de suivi</h2>
+        <ul>
+            {% for membership in gps_memberships.all %}
+                <li>
+                    {{ membership.member.get_full_name }} — {{ membership.member.email }}
+                    {% if membership.member.phone %}- {{ membership.member.phone }}{% endif %}
+                    {% if membership.is_referent %}<b>Référent</b>{% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endwith %}
+
+    <hr>
+</div>

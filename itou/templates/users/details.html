@@ -9,7 +9,7 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
-                <div class="col-12 col-lg-8">
+                <div class="col-12">
                     <div class="c-box mb-3 mb-lg-5">
                         {# Approval status. #}
                         <div>{% include "approvals/includes/status.html" with common_approval=approval hiring_pending=hiring_pending %}</div>
@@ -89,6 +89,9 @@
                             {% include "approvals/includes/job_applications.html" with job_application=job_application_for_card %}
                         {% endfor %}
                     </div>
+
+
+                    {% include "users/includes/gps_group.html" with gps_memberships=gps_memberships %}
                 </div>
             </div>
         </div>
