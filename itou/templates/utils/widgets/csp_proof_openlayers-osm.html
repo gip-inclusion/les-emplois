@@ -15,7 +15,7 @@ This is exactly django/contrib/gis/templates/gis/openlayers-osm.html with the ad
 
 <div id="{{ id }}_div_map">
     <div id="{{ id }}_map"></div>
-    {% if not disabled %}
+    {% if not disabled|default:False %}
         <span class="clear_features"><a href="">{% translate "Delete all Features" %}</a></span>
     {% endif %}
     {% if display_raw %}
