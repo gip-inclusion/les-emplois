@@ -277,6 +277,7 @@ class CheckNIRForJobSeekerView(ApplyStepBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
+            "preview_mode": False,
         }
 
 
@@ -420,6 +421,7 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSend
             "form": self.form,
             "nir": self.job_seeker_session.get("profile", {}).get("nir"),
             "siae": self.company,
+            "preview_mode": False,
         }
 
 
