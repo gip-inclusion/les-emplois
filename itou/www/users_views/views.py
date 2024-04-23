@@ -1,19 +1,25 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
 
+from itou.gps.models import FollowUpGroupMembership
 from itou.users.models import User
 from itou.www.approvals_views.views import ApprovalListView
 
 
 class UserDetailsView(LoginRequiredMixin, DetailView):
     model = User
-    queryset = None  # TODO: update with GPS app.
+    queryset = User.objects.select_related("follow_up_group").prefetch_related("follow_up_group__memberships")
     template_name = "users/details.html"
     slug_field = "public_id"
     slug_url_kwarg = "public_id"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["gps_memberships"] = (
+            FollowUpGroupMembership.objects.filter(follow_up_group=context["object"].follow_up_group)
+            .filter(is_active=True)
+            .select_related("follow_up_group", "member")
+        )
         return context
         # context = super().get_context_data(**kwargs)
         # approval = self.object

@@ -16,7 +16,7 @@
                     <section aria-labelledby="results" id="follow-up-groups-section">
                         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
                             <h3 class="h4 mb-0" id="results">
-                                {% with groups|length as counter %}
+                                {% with memberships|length as counter %}
                                     {{ counter }} <strong>bénéficiaire{{ counter|pluralizefr }} suivi{{ counter|pluralizefr }}</strong>
                                 {% endwith %}
                             </h3>
@@ -31,7 +31,7 @@
 
                         <div class="col-6 col-lg-auto"></div>
 
-                        {% for group in groups %}
+                        {% for membership in memberships %}
                             <div class="my-3 my-md-4 s-box__row row">
 
 
@@ -39,8 +39,8 @@
                                     <div class="c-box--results__summary">
                                         <i class="ri-user-line" aria-hidden="true"></i>
                                         <div>
-                                            <h3>{{ group.beneficiary.get_full_name }}</h3>
-                                            <span>{{ group.beneficiary.email }}</span>
+                                            <h3>{{ membership.follow_up_group.beneficiary.get_full_name }}</h3>
+                                            <span>{{ membership.follow_up_group.beneficiary.email }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -50,16 +50,19 @@
                                 <div class="d-flex justify-content-between">
 
                                     <div>
-                                        {% with group.members.all|length|add:"-1" as counter %}
+                                        {% with membership.follow_up_group.members.all|length|add:"-1" as counter %}
+                                            {% if membership.is_referent %}Vous êtes <b>référent</b> de ce groupe.{% endif %}
                                             {% if counter < 1 %}
-                                                Aucun autre professionnel dans le groupe de suivi.
+                                                Aucun autre professionnel que vous dans le groupe de suivi.
                                             {% else %}
                                                 {{ counter }} autre{{ counter|pluralizefr }} professionnel{{ counter|pluralizefr }} dans le groupe de suivi.
                                             {% endif %}
                                         {% endwith %}
                                     </div>
                                     <div>
-                                        <a href="#" class="btn btn-outline-primary btn-block w-100 w-md-auto" aria-label="Consulter la fiche de {{ group.beneficiary.get_full_name }}">Consulter la fiche</a>
+                                        <a href="{% url 'users:details' public_id=membership.follow_up_group.beneficiary.public_id %}"
+                                           class="btn btn-outline-primary btn-block w-100 w-md-auto"
+                                           aria-label="Consulter la fiche de {{ membership.follow_up_group.beneficiary.get_full_name }}">Consulter la fiche</a>
                                     </div>
 
                                 </div>
