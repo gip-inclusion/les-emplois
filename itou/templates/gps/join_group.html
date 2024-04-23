@@ -17,6 +17,7 @@
                 <form method="post" class="js-prevent-multiple-submit">
                     {% csrf_token %}
                     {% bootstrap_field form.user %}
+                    {% bootstrap_field form.is_referent %}
                     {% itou_buttons_form primary_label="Rejoindre le groupe de ce candidat" reset_url=reset_url %}
                 </form>
             </div>
