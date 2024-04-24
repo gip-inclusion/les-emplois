@@ -301,6 +301,8 @@ LOGGING = {
     },
 }
 
+DJANGO_DATADOG_LOGGER_EXTRA_INCLUDE = r"django_datadog_logger\.middleware\.request_log"
+
 AUTH_USER_MODEL = "users.User"
 
 AUTHENTICATION_BACKENDS = (
