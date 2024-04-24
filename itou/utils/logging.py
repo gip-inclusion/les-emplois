@@ -3,7 +3,7 @@ from django_datadog_logger.formatters import datadog
 
 class ItouDataDogJSONFormatter(datadog.DataDogJSONFormatter):
     # We don't want those information in our logs
-    LOG_KEYS_TO_REMOVE = ["usr.name", "usr.email"]
+    LOG_KEYS_TO_REMOVE = ["usr.name", "usr.email", "usr.session_key"]
 
     def json_record(self, message, extra, record):
         log_entry_dict = super().json_record(message, extra, record)
