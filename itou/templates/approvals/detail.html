@@ -1,9 +1,35 @@
 {% extends "layout/base.html" %}
+{% load theme_inclusion %}
 {% load matomo %}
 
 {% block title %}Profil salarié - {{ approval.user.get_full_name }} {{ block.super }}{% endblock %}
 
 {% block content_title %}<h1>{{ approval.user.get_full_name }}</h1>{% endblock %}
+
+{% block messages %}
+    {# Temporary advertisement alert #}
+    <div class="alert alert-important alert-dismissible fade show" role="status">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        <div class="row">
+            <div class="d-none d-md-inline col-md-auto">
+                <img src="{% static_theme_images 'ico-bicro-important.svg' %}" alt="" height="80">
+            </div>
+            <div class="col-12 col-md px-md-0">
+                <p class="mb-2">
+                    <strong>Page PASS IAE</strong>
+                </p>
+                <p class="mb-0">
+                    Une page dédiée au PASS IAE est actuellement en construction. Vos retours sont importants, aidez-nous en réalisant ce test de 5 minutes.
+                </p>
+            </div>
+            <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                <a class="btn btn-sm btn-primary" href="https://t.maze.co/228947579" target="_blank" role="button">Accéder au test</a>
+            </div>
+        </div>
+    </div>
+
+    {{ block.super }}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">
