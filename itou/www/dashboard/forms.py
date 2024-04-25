@@ -63,8 +63,8 @@ class EditJobSeekerInfoForm(
         super().__init__(*args, **kwargs)
         assert self.instance.is_job_seeker, self.instance
 
-        self.fields["title"].required = True
-        self.fields["birthdate"].required = True
+        for required_fieldname in ["title", "birthdate", "first_name", "last_name"]:
+            self.fields[required_fieldname].required = True
         self.fields["birthdate"].widget = DuetDatePickerWidget(
             attrs={
                 "min": DuetDatePickerWidget.min_birthdate(),

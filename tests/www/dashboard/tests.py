@@ -1529,6 +1529,49 @@ class EditJobSeekerInfo(TestCase):
         response = self.client.get(url)
         assert response.status_code == 403
 
+    def test_name_is_required(self):
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
+        job_application = JobApplicationSentByPrescriberFactory(to_company=company, job_seeker__created_by=user)
+        post_data = {
+            "title": "M",
+            "email": "bidou@yopmail.com",
+            "birthdate": "20/12/1978",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+        } | self.address_form_fields
+
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id}),
+            data=post_data,
+        )
+        self.assertContains(
+            response,
+            """
+            <div class="form-group is-invalid form-group-required">
+            <label class="form-label" for="id_first_name">Prénom</label>
+            <input type="text" name="first_name" maxlength="150" class="form-control is-invalid"
+                   placeholder="Prénom" required aria-invalid="true" id="id_first_name">
+            <div class="invalid-feedback">Ce champ est obligatoire.</div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(
+            response,
+            """
+            <div class="form-group is-invalid form-group-required">
+            <label class="form-label" for="id_last_name">Nom</label>
+            <input type="text" name="last_name" maxlength="150" class="form-control is-invalid"
+                   placeholder="Nom" required aria-invalid="true" id="id_last_name">
+            <div class="invalid-feedback">Ce champ est obligatoire.</div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+
     @mock.patch(
         "itou.utils.apis.geocoding.get_geocoding_data",
         side_effect=mock_get_geocoding_data_by_ban_api_resolved,
@@ -1553,6 +1596,8 @@ class EditJobSeekerInfo(TestCase):
 
         post_data = {
             "title": "M",
+            "first_name": "Manuel",
+            "last_name": "Calavera",
             "email": new_email,
             "birthdate": "20/12/1978",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
@@ -1606,6 +1651,8 @@ class EditJobSeekerInfo(TestCase):
 
         post_data = {
             "title": "M",
+            "first_name": "Manuel",
+            "last_name": "Calavera",
             "email": new_email,
             "birthdate": "20/12/1978",
             "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
