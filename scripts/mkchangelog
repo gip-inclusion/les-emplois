@@ -15,6 +15,12 @@ import tempfile
 
 logger = logging.getLogger(__name__)
 
+ADDED = "ajouté"
+CHANGED = "modifié"
+REMOVED = "supprimé"
+SKIP = "no-changelog"
+DEPS = "dependencies"
+
 
 def gh(*args, **kwargs):
     env = (
@@ -52,15 +58,15 @@ def list_pull_requests(start, end, labels):
 
 
 def list_missing_pull_requests(start, end):
-    return list_pull_requests(start, end, "-label:ajouté,modifié,supprimé,dependencies,no-changelog")
+    return list_pull_requests(start, end, f"-label:{ADDED},{CHANGED},{REMOVED},{DEPS},{SKIP}")
 
 
 def list_merged_pull_requests(start, end):
-    return list_pull_requests(start, end, "label:ajouté,modifié,supprimé")
+    return list_pull_requests(start, end, f"label:{ADDED},{CHANGED},{REMOVED}")
 
 
 def open_pull_request(branch, title):
-    gh("pr", "create", "--label", "no-changelog", "--title", title, "--body", "")
+    gh("pr", "create", "--label", SKIP, "--title", title, "--body", "")
 
 
 def main(publish):
@@ -92,14 +98,14 @@ def main(publish):
                 if re.search(r"\!\[[^]]+]", pull_request["body"]):
                     title += " 🖼"
                 labels = [label["name"] for label in pull_request["labels"]]
-                if len({"ajouté", "modifié", "supprimé"}.intersection(set(labels))) != 1:
+                if len({ADDED, CHANGED, REMOVED}.intersection(set(labels))) != 1:
                     label_names = " ".join(labels)
                     raise ValueError(
-                        f"Expected only one of “ajouté”, “modifié” or “supprimé” in labels, got {label_names}."
+                        f"Expected only one of “{ADDED}”, “{CHANGED}” or “{REMOVED}” in labels, got {label_names}."
                     )
-                if "ajouté" in labels:
+                if ADDED in labels:
                     added.append(title)
-                elif "modifié" in labels:
+                elif CHANGED in labels:
                     changed.append(title)
                 else:
                     removed.append(title)
