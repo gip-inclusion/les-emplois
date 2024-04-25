@@ -39,6 +39,15 @@
         {% block extra_head %}{% endblock %}
     </head>
     <body class="{% block body_class %}{% endblock %}">
+        <noscript>
+            <div class="alert alert-info">
+                <p class="mb-0">
+                    Pour bénéficier de toutes les fonctionnalités de ce site, l’activation de JavaScript est nécessaire.
+                    Voici les <a href="https://www.enablejavascript.io/" target="_blank" rel="noopener">
+                    instructions pour activer JavaScript dans votre navigateur Web</a>.
+                </p>
+            </div>
+        </noscript>
         <nav role="navigation" aria-label="Accès rapide" tabindex="0" class="visually-hidden">
             <ul>
                 <li>
