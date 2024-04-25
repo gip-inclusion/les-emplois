@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 
+import argparse
 import datetime
 import json
 import logging
@@ -62,7 +63,7 @@ def open_pull_request(branch, title):
     gh("pr", "create", "--label", "no-changelog", "--title", title, "--body", "")
 
 
-def main():
+def main(publish):
     changelog_path = pathlib.Path("CHANGELOG.md")
     with (
         open(changelog_path, "r+") as changelog,
@@ -131,6 +132,31 @@ def main():
         finally:
             pathlib.Path(new_changelog.name).unlink(missing_ok=True)
 
+    if publish:
+        branch = f"changelog/{sprint_end}"
+        sprint_end_inclusive = sprint_end - datetime.timedelta(days=1)
+        title = f"changelog: From {sprint_start} to {sprint_end_inclusive}"
+        subprocess.run(["git", "switch", "--create", branch], check=True)
+        subprocess.run(
+            [
+                "git",
+                "-c",
+                "user.name=Changelog Bot",
+                "-c",
+                "user.email=noreply@inclusion.beta.gouv.fr",
+                "commit",
+                "--all",
+                "--message",
+                title,
+            ],
+            check=True,
+        )
+        subprocess.run(["git", "push", "--set-upstream", "origin", branch], check=True)
+        open_pull_request(branch, title)
+
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--publish")
+    args = parser.parse_args()
+    main(args.publish)
