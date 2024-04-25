@@ -58,8 +58,8 @@
     <option value="MME">Madame</option>
   
   </select></div>
-                              <div class="form-group form-group-required"><label class="form-label" for="id_last_name">Nom</label><input class="form-control" id="id_last_name" maxlength="150" name="last_name" placeholder="Durand" required="" type="text"/></div>
                               <div class="form-group form-group-required"><label class="form-label" for="id_first_name">Prénom</label><input class="form-control" id="id_first_name" maxlength="150" name="first_name" placeholder="Dominique" required="" type="text"/></div>
+                              <div class="form-group form-group-required"><label class="form-label" for="id_last_name">Nom</label><input class="form-control" id="id_last_name" maxlength="150" name="last_name" placeholder="Durand" required="" type="text"/></div>
                               <div class="form-group form-group-required"><label class="form-label" for="id_password1">Mot de passe</label><div class="input-group">
       <input aria-describedby="id_password1_helptext" autocomplete="new-password" class="form-control" id="id_password1" name="password1" placeholder="**********" required="" type="password"/>
   
