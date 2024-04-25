@@ -63,7 +63,7 @@ class ItouUserManager(UserManager):
         )
 
         if current_user:
-            queryset = queryset.exclude(follow_up_group__members=current_user)
+            queryset = queryset.exclude(follow_up_group__members=current_user).exclude(id=current_user.id)
 
         return queryset[:limit]
 
