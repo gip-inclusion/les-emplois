@@ -163,6 +163,6 @@ def main(publish):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--publish")
+    parser.add_argument("--publish", action="store_true")
     args = parser.parse_args()
     main(args.publish)
