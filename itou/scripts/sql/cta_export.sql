@@ -8,6 +8,7 @@
 -- * Type de profil utilisateur : employeur, prescripteur habilité, orienteur
 -- * Type d'établissement (EI,EA...PE,CCAS, autre...)
 -- * Nom de l'établissement
+-- * SIRET de l'établissement
 -- * Nom et prénom de chaque membre
 -- * Adresse email de chaque membre
 -- * Le membre est admin de l'établissement (oui/non)
@@ -53,6 +54,7 @@ with company_data as (
         -- company
         company.kind as "Structure - type",
         company.name as "Structure - nom",
+        company.siret as "Structure - SIRET",
         company.address_line_1 as "Structure - adresse ligne 1",
         company.address_line_2 as "Structure - adresse ligne 2",
         company.post_code as "Structure - code postal",
@@ -85,6 +87,7 @@ org_data as (
         -- org
         org.kind as "Structure - type",
         org.name as "Structure - nom",
+        coalesce(org.siret, '') as "Structure - SIRET",
         org.address_line_1 as "Structure - adresse ligne 1",
         org.address_line_2 as "Structure - adresse ligne 2",
         org.post_code as "Structure - code postal",
