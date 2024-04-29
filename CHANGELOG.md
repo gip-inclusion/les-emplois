@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## 2024-04-29
+
+### Ajouté
+
+- [Ajout d'un message d'alerte pour inviter à remplir une enquête sur la page PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/3969) 🖼
+- [UX/UI : Ajouter une balise `<noscript>` sur le site](https://github.com/gip-inclusion/les-emplois/pull/3972) 🖼
+
+### Modifié
+
+- [Affichage des boutons enregistrer en haut des formulaires d'admin](https://github.com/gip-inclusion/les-emplois/pull/3965)
+- [Correction d'un bug de mise en forme sur les cartes candidatures](https://github.com/gip-inclusion/les-emplois/pull/3966)
+- [Masquage de l’adresse email du prescripteur ou de l'employeur dans la page candidature pour le candidat](https://github.com/gip-inclusion/les-emplois/pull/3961)
+- [Profil utilisateur : Demander le prénom avant le nom, pour être cohérent avec le parcours d’inscription](https://github.com/gip-inclusion/les-emplois/pull/3976)
+- [Profil utilisateur : Rendre les champs prénom et nom obligatoires](https://github.com/gip-inclusion/les-emplois/pull/3977)
+- [Refonte UX/UI - Ajouts d'onglets sur l'accueil du tableau de bord](https://github.com/gip-inclusion/les-emplois/pull/3956) 🖼
+
 ## 2024-04-22
 
 ### Ajouté
