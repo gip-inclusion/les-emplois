@@ -1,0 +1,8 @@
+# serializer version: 1
+# name: test_navigation
+  '''
+  <div class="c-box__header--gps p-3 p-lg-4">
+              <span class="h4 m-0">GPS</span>
+          </div>
+  '''
+# ---
