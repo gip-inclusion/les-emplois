@@ -385,7 +385,6 @@ cryptography==42.0.4 \
     # via
     #   -r requirements/base.txt
     #   paramiko
-    #   pyjwt
 cssbeautifier==1.14.8 \
     --hash=sha256:9ad4c5b2ffe0b439a4bed278bc440b6a89c40823c3f19db38f808d256216a592
     # via djlint
@@ -395,7 +394,6 @@ defusedxml==0.7.1 \
     # via
     #   -r requirements/base.txt
     #   odfpy
-    #   python3-openid
 diff-match-patch==20230430 \
     --hash=sha256:953019cdb9c9d2c9e47b5b12bcff3cf4746fc4598eb406076fa1fc27e6a1f15c \
     --hash=sha256:dce43505fb7b1b317de7195579388df0746d90db07015ed47a85e5e44930ef93
@@ -424,8 +422,8 @@ django==5.0.4 \
     #   django-xworkflows
     #   djangorestframework
     #   drf-spectacular
-django-allauth==0.61.1 \
-    --hash=sha256:5b4ae515ea74f54f0041210692eee10c309ad15ddbbd03d3620693c75e3f7945
+django-allauth==0.62.1 \
+    --hash=sha256:6f33e86e42fb78ec2885ee905f337b87c46465ae7fe162c4959dcac81d47e2ad
     # via -r requirements/base.txt
 django-anymail==10.3 \
     --hash=sha256:1e72f059e96930d3675d35fe4c61f82b138ae4a7fcb0337be39dcb4823f94a4f \
@@ -985,12 +983,6 @@ numpy==1.25.1 \
     # via
     #   -r requirements/base.txt
     #   pandas
-oauthlib==3.2.2 \
-    --hash=sha256:8139f29aac13e25d502680e9e19963e83f16838d48a0d71c287fe40e7067fbca \
-    --hash=sha256:9859c40929662bec5d64f34d01c99e093149682a3f38915dc0655d5a633dd918
-    # via
-    #   -r requirements/base.txt
-    #   requests-oauthlib
 odfpy==1.4.1 \
     --hash=sha256:db766a6e59c5103212f3cc92ec8dd50a0f3a02790233ed0b52148b70d3c438ec
     # via
@@ -1237,12 +1229,10 @@ pycryptodomex==3.20.0 \
     # via
     #   -r requirements/base.txt
     #   py7zr
-pyjwt[crypto]==2.7.0 \
+pyjwt==2.7.0 \
     --hash=sha256:ba2b425b15ad5ef12f200dc67dd56af4e26de2331f965c5439994dad075876e1 \
     --hash=sha256:bd6ca4a3c4285c1a2d4349e5a035fdf8fb94e04ccd0fcbe6ba289dae9cc3e074
-    # via
-    #   -r requirements/base.txt
-    #   django-allauth
+    # via -r requirements/base.txt
 pynacl==1.5.0 \
     --hash=sha256:06b8f6fa7f5de8d5d2f7573fe8c863c051225a27b61e6860fd047b1775807858 \
     --hash=sha256:0c84947a22519e013607c9be43706dd42513f9e6ae5d39d3613ca1e142fba44d \
@@ -1384,12 +1374,6 @@ python-dotenv==1.0.1 \
     --hash=sha256:e324ee90a023d808f1959c46bcbc04446a10ced277783dc6ee09987c37ec10ca \
     --hash=sha256:f7b63ef50f1b690dddf550d03497b66d609393b40b564ed0d674909a68ebf16a
     # via -r requirements/base.txt
-python3-openid==3.2.0 \
-    --hash=sha256:33fbf6928f401e0b790151ed2b5290b02545e8775f982485205a066f874aaeaf \
-    --hash=sha256:6626f771e0417486701e0b4daff762e7212e820ca5b29fcc0d05f6f8736dfa6b
-    # via
-    #   -r requirements/base.txt
-    #   django-allauth
 pytz==2023.3 \
     --hash=sha256:1d8ce29db189191fb55338ee6d0387d82ab59f3d00eac103412d64e0ebd0c588 \
     --hash=sha256:a151b3abb88eda1d4e34a9814df37de2a80e301e68ba0fd856fb9b46bfbbbffb
@@ -1676,15 +1660,7 @@ requests==2.31.0 \
     --hash=sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1
     # via
     #   -r requirements/base.txt
-    #   django-allauth
     #   django-anymail
-    #   requests-oauthlib
-requests-oauthlib==1.3.1 \
-    --hash=sha256:2577c501a2fb8d05a304c09d090d6e47c306fef15809d102b327cf8364bddab5 \
-    --hash=sha256:75beac4a47881eeb94d5ea5d6ad31ef88856affe2332b9aafb52c6452ccf0d7a
-    # via
-    #   -r requirements/base.txt
-    #   django-allauth
 respx==0.21.1 \
     --hash=sha256:05f45de23f0c785862a2c92a3e173916e8ca88e4caad715dd5f68584d6053c20 \
     --hash=sha256:0bd7fe21bfaa52106caa1223ce61224cf30786985f17c63c5d71eff0307ee8af
