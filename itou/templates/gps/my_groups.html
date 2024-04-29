@@ -17,7 +17,7 @@
                         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
                             <h3 class="h4 mb-0" id="results">
                                 {% with memberships|length as counter %}
-                                    {{ counter }} <strong>bénéficiaire{{ counter|pluralizefr }} suivi{{ counter|pluralizefr }}</strong>
+                                    {{ counter }} bénéficiaire{{ counter|pluralizefr }} suivi{{ counter|pluralizefr }}
                                 {% endwith %}
                             </h3>
                             <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les groupes de suivi">
@@ -51,7 +51,7 @@
 
                                     <div>
                                         {% with membership.follow_up_group.members.all|length|add:"-1" as counter %}
-                                            {% if membership.is_referent %}Vous êtes <b>référent</b> de ce groupe.{% endif %}
+                                            {% if membership.is_referent %}Vous êtes <strong>référent</strong> de ce groupe.{% endif %}
                                             {% if counter < 1 %}
                                                 Aucun autre professionnel que vous dans le groupe de suivi.
                                             {% else %}
