@@ -20,6 +20,7 @@ from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJo
 from tests.employee_record import factories as employee_record_factories
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
+from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, assert_previous_step, parse_response_to_soup
 
 
@@ -487,6 +488,42 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
 
         response = self.client.get(self.URL + "?status=READY")
         self.assertContains(response, "0 résultat")
+
+    def test_htmx(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.URL, {"status": "NEW"})
+        simulated_page = parse_response_to_soup(response)
+
+        [new_status] = simulated_page.find_all("input", attrs={"name": "status", "value": "NEW"})
+        del new_status["checked"]
+        [ready_status] = simulated_page.find_all("input", attrs={"name": "status", "value": "READY"})
+        ready_status["checked"] = ""
+
+        response = self.client.get(self.URL, {"status": "READY"}, headers={"HX-Request": "true"})
+        update_page_with_htmx(simulated_page, f"form[hx-get='{self.URL}']", response)
+
+        response = self.client.get(self.URL + "?status=READY")
+        fresh_page = parse_response_to_soup(response)
+        assertSoupEqual(simulated_page, fresh_page)
+
+    def test_htmx_new_employee_record_updates_badge_count(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.URL, {"status": "NEW"})
+        simulated_page = parse_response_to_soup(response)
+        # This new application should update the counter badge on NEW.
+        JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
+
+        [new_status] = simulated_page.find_all("input", attrs={"name": "status", "value": "NEW"})
+        del new_status["checked"]
+        [ready_status] = simulated_page.find_all("input", attrs={"name": "status", "value": "READY"})
+        ready_status["checked"] = ""
+
+        response = self.client.get(self.URL, {"status": "READY"}, headers={"HX-Request": "true"})
+        update_page_with_htmx(simulated_page, f"form[hx-get='{self.URL}']", response)
+
+        response = self.client.get(self.URL + "?status=READY")
+        fresh_page = parse_response_to_soup(response)
+        assertSoupEqual(simulated_page, fresh_page)
 
 
 def test_an_active_siae_without_convention_can_not_access_the_view(client):

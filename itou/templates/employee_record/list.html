@@ -1,8 +1,5 @@
 {% extends "layout/base.html" %}
 {% load static %}
-{% load str_filters %}
-{% load list_filters %}
-{% load django_bootstrap5 %}
 
 {% block title %}Fiches salarié ASP - {{ request.current_organization.display_name }} {{ block.super }}{% endblock %}
 
@@ -44,45 +41,7 @@
         </li>
         <li>La visualisation dans l’Extranet IAE 2.0 interviendra dans les 2 heures suivant l’envoi.</li>
     </ul>
-    {% if form.status.value == "NEW" %}
-        <p>
-            Vous trouverez ici les candidatures validées <b>à partir desquelles vous devez créer de nouvelles fiches salarié</b>.
-        </p>
-    {% elif form.status.value == "READY" %}
-        <p class="mb-0">
-            Vous trouverez ici les fiches salarié complétées
-            <b>en attente d’envoi à l’ASP, qui a lieu automatiquement à intervalles réguliers</b>.
-        </p>
-        <p>
-            À ce stade, seule la visualisation des informations de la fiche est
-            possible.
-        </p>
-        <p>Merci de votre patience.</p>
-    {% elif form.status.value == "SENT" %}
-        <p class="mb-0">Vous trouverez ici les fiches salarié complétées et envoyées à l'ASP.</p>
-        <p>
-            À ce stade, et en attendant un retour de l'ASP, seule la visualisation des informations de
-            la fiche est possible.
-        </p>
-    {% elif form.status.value == "REJECTED" %}
-        <p class="mb-0">
-            Vous trouverez ici les fiches salarié envoyées à l'ASP et retournées avec une
-            erreur.
-        </p>
-        <p>Vous pouvez modifier les fiches en erreur et les envoyer à nouveau.</p>
-    {% elif form.status.value == "PROCESSED" %}
-        <p class="mb-0">Vous trouverez ici les fiches salarié envoyées et validées par l'ASP.</p>
-        <p>
-            Aucune action ultérieure n'est possible à ce stade, mais vous pouvez consulter le détail de
-            la fiche salarié.
-        </p>
-    {% elif form.status.value == "DISABLED" %}
-        <p class="mb-0">Vous trouverez ici les fiches salarié que vous avez désactivées.</p>
-        <p>
-            En cas de besoin vous pouvez réactiver une fiche, elle sera transférée dans la catégorie
-            "Nouvelle".
-        </p>
-    {% endif %}
+    {% include "employee_record/includes/list_status_help.html" with request=request status=form.status.value only %}
 {% endblock %}
 
 {% block content %}
@@ -104,79 +63,15 @@
                             <span>Filtres des fiches salarié</span>
                         </button>
                         <div class="c-aside-filters__card collapse show" id="asideFiltersCollapse">
-                            <form method="get">
-                                <div class="c-aside-filters__card__body">
-                                    <fieldset>
-                                        <legend>Statut</legend>
-                                        <div class="form-group">
-                                            {% for status, badge in form.status|zip:badges %}
-                                                <div class="d-flex mb-2">
-                                                    <div class="flex-grow-1">{{ status }}</div>
-                                                    <div>
-                                                        <span class="badge rounded-pill badge-xs {{ badge.1 }}">{{ badge.0 }}</span>
-                                                    </div>
-                                                </div>
-                                            {% endfor %}
-                                        </div>
-                                    </fieldset>
-                                    {# Job seeker filter #}
-                                    <fieldset>
-                                        <legend>Par candidat</legend>
-                                        {% bootstrap_field filters_form.job_seekers show_label=False %}
-                                    </fieldset>
-                                </div>
-                                {# Filled via jQuery #}
+                            <form hx-get="{% url 'employee_record_views:list' %}" hx-trigger="change delay:.5s" hx-indicator="#employee-records-container" hx-target="#employee-records-container" hx-swap="outerHTML" hx-push-url="true">
+                                {% include "employee_record/includes/list_form_fields.html" %}
+                                {# Filled via jQuery. Does not need reloading with HTMX, its content is static. #}
                                 {{ form.order.as_hidden }}
                             </form>
                         </div>
                     </aside>
                 </div>
-
-                <div class="col-12 col-md-8">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-grow-1">
-                            {% with navigation_pages.paginator.count as counter %}
-                                <h3 class="h4 m-0">{{ counter }} résultat{{ counter|pluralizefr }}</h3>
-                            {% endwith %}
-                        </div>
-                        <div>
-                            <span class="fs-sm">Trier par :</span>
-                            <button type="button" class="btn btn-sm btn-link dropdown-toggle p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                {{ ordered_by_label }}
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-end" id="order-form-group">
-                                {% for order_value, order_label in form.order.field.choices %}
-                                    <button class="dropdown-item {% if order_value == form.order.value %}active{% endif %}" type="button" value="{{ order_value }}">
-                                        {{ order_label }}
-                                    </button>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-
-                    {# "Real" employee records objects #}
-                    <div class="employee-records-list">
-                        {% if employee_records_list %}
-                            {% for employee_record in navigation_pages %}
-                                {% include "employee_record/includes/list_item.html" with employee_record=employee_record item=employee_record.job_application current_url=request.get_full_path only %}
-                            {% endfor %}
-                            {# New employee records i.e. job applications #}
-                        {% else %}
-                            {% for job_application in navigation_pages %}
-                                {% include "employee_record/includes/list_item.html" with employee_record=None item=job_application only %}
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-
-                    {% if not navigation_pages %}
-                        <div class="c-box c-box--results my-3 my-md-4">
-                            <div class="c-box--results__body">
-                                <p class="mb-0">Aucune fiche salarié avec le statut selectionné.</p>
-                            </div>
-                        </div>
-                    {% endif %}
-                    {% include "includes/pagination.html" with page=navigation_pages %}
-                </div>
+                <div class="col-12 col-md-8">{% include "employee_record/includes/list_results.html" %}</div>
             </div>
         </div>
     </section>
@@ -184,16 +79,21 @@
 
 {% block script %}
     {{ block.super }}
+    <script src='{% static "js/htmx_compat.js" %}'></script>
     <!-- Needed to use Select2MultipleWidget. -->
     {{ filters_form.media.js }}
     <script nonce="{{ CSP_NONCE }}">
-        $("#asideFiltersCollapse :input").change(function() {
-            $("#asideFiltersCollapse form").submit();
-        });
-        $("#order-form-group :input").click(function(event) {
-            let input = $("#id_order")
-            input.val(event.target.value); // Fill the hidden order input of the form
-            input.change(); // Fire a change event to notify handlers
+        htmx.onLoad(function(target) {
+            const orderFormGroup = target.querySelector("#order-form-group");
+            if (orderFormGroup) {
+                orderFormGroup.addEventListener("click", function(event) {
+                    const orderHidden = document.getElementById("id_order");
+                    orderHidden.value = event.target.value;
+                    orderHidden.dispatchEvent(new Event("change", {
+                        bubbles: true
+                    }));
+                });
+            }
         });
     </script>
 {% endblock %}

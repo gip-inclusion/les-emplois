@@ -1,0 +1,21 @@
+{% load django_bootstrap5 %}
+{% load list_filters %}
+<div id="employee-records-list-filters" class="c-aside-filters__card__body"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    <fieldset>
+        <legend>Statut</legend>
+        <div class="form-group">
+            {% for status, badge in form.status|zip:badges %}
+                <div class="d-flex mb-2">
+                    <div class="flex-grow-1">{{ status }}</div>
+                    <div>
+                        <span class="badge rounded-pill badge-xs {{ badge.1 }}">{{ badge.0 }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </fieldset>
+    <fieldset>
+        <legend>Par candidat</legend>
+        {% bootstrap_field filters_form.job_seekers show_label=False %}
+    </fieldset>
+</div>
