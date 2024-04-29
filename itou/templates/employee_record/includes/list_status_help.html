@@ -1,0 +1,41 @@
+<div id="status-help"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    {% if status == "NEW" %}
+        <p>
+            Vous trouverez ici les candidatures validées <b>à partir desquelles vous devez créer de nouvelles fiches salarié</b>.
+        </p>
+    {% elif status == "READY" %}
+        <p class="mb-0">
+            Vous trouverez ici les fiches salarié complétées
+            <b>en attente d’envoi à l’ASP, qui a lieu automatiquement à intervalles réguliers</b>.
+        </p>
+        <p>
+            À ce stade, seule la visualisation des informations de la fiche est
+            possible.
+        </p>
+        <p>Merci de votre patience.</p>
+    {% elif status == "SENT" %}
+        <p class="mb-0">Vous trouverez ici les fiches salarié complétées et envoyées à l'ASP.</p>
+        <p>
+            À ce stade, et en attendant un retour de l'ASP, seule la visualisation des informations de
+            la fiche est possible.
+        </p>
+    {% elif status == "REJECTED" %}
+        <p class="mb-0">
+            Vous trouverez ici les fiches salarié envoyées à l'ASP et retournées avec une
+            erreur.
+        </p>
+        <p>Vous pouvez modifier les fiches en erreur et les envoyer à nouveau.</p>
+    {% elif status == "PROCESSED" %}
+        <p class="mb-0">Vous trouverez ici les fiches salarié envoyées et validées par l'ASP.</p>
+        <p>
+            Aucune action ultérieure n'est possible à ce stade, mais vous pouvez consulter le détail de
+            la fiche salarié.
+        </p>
+    {% elif status == "DISABLED" %}
+        <p class="mb-0">Vous trouverez ici les fiches salarié que vous avez désactivées.</p>
+        <p>
+            En cas de besoin vous pouvez réactiver une fiche, elle sera transférée dans la catégorie
+            "Nouvelle".
+        </p>
+    {% endif %}
+</div>

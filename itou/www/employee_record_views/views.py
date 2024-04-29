@@ -254,7 +254,7 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         "back_url": reverse("dashboard:index"),
     }
 
-    return render(request, template_name, context)
+    return render(request, "employee_record/includes/list_results.html" if request.htmx else template_name, context)
 
 
 @login_required
