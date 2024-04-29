@@ -20,14 +20,18 @@ def test_prolongation_request_created(snapshot):
 
 def test_prolongation_request_created_reminder(snapshot):
     prolongation_request = ProlongationRequestFactory(for_snapshot=True)
-    other_prescribers = PrescriberFactory.create_batch(
-        3, membership__organization=prolongation_request.prescriber_organization
+    admin_prescribers = PrescriberFactory.create_batch(
+        9, membership__organization=prolongation_request.prescriber_organization, membership__is_admin=True
+    )
+    regular_prescribers = PrescriberFactory.create_batch(
+        3, membership__organization=prolongation_request.prescriber_organization, membership__is_admin=False
     )
     default_storage.location = "snapshot"
     email = notifications.ProlongationRequestCreatedReminder(prolongation_request).email
 
     assert email.to == [prolongation_request.validated_by.email]
-    assert set(email.cc) == {member.email for member in other_prescribers}
+    # Notification is sent to the 10 most active colleagues, admins take precedence
+    assert set(email.cc) == {member.email for member in admin_prescribers} | {regular_prescribers[-1].email}
     assert email.subject == snapshot(name="subject")
     assert email.body == snapshot(name="body")
 
