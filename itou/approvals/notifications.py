@@ -49,8 +49,9 @@ class ProlongationRequestCreatedReminder(BaseNotification):
             PrescriberMembership.objects.active()
             .filter(organization=self.prolongation_request.prescriber_organization)
             .exclude(user=self.prolongation_request.validated_by)
-            # Limit to the last 10 active colleagues, it should cover the ones dedicated to the IAE and some more.
-            .order_by(F("user__last_login").desc(nulls_last=True), "-joined_at", "-pk")[:10]
+            # Limit to the last 10 active colleagues, admins take precedence over regular members.
+            # It should cover the ones dedicated to the IAE and some more.
+            .order_by("-is_admin", F("user__last_login").desc(nulls_last=True), "-joined_at", "-pk")[:10]
             .values_list("user__email", flat=True)
         )
         context = {
