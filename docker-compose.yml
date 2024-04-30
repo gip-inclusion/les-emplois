@@ -4,7 +4,7 @@ services:
   minio:
     image: bitnami/minio
     container_name: itou_minio
-    restart: always
+    restart: unless-stopped
     environment:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=minioadmin
@@ -38,14 +38,14 @@ services:
     shm_size: 1g
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    restart: always
+    restart: unless-stopped
     ports:
       - "127.0.0.1:${POSTGRES_PORT_ON_DOCKER_HOST:-5432}:5432"
 
   redis:
     image: redis
     container_name: itou_redis
-    restart: always
+    restart: unless-stopped
     ports:
       - "127.0.0.1:6379:6379"
 
@@ -75,7 +75,7 @@ services:
     volumes:
       # Mount the current directory into `/app` inside the running container.
       - .:/app
-    restart: always
+    restart: unless-stopped
     ports:
       - "127.0.0.1:${DJANGO_PORT_ON_DOCKER_HOST:-8000}:8000"
     # Make interactive debugging possible.
