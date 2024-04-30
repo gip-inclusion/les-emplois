@@ -32,6 +32,7 @@ def test_error_handling(client, mocker):
 def test_handler500_view():
     factory = RequestFactory()
     request = factory.get("/")
+    request.user = None
     SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
     CsrfViewMiddleware(get_response_for_middlewaremixin).process_request(request)
     response = server_error(request)

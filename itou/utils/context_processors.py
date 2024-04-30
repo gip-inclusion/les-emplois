@@ -34,6 +34,5 @@ def matomo(request):
     if params:
         url = f"{url}?{urlencode(sorted(params.items()), doseq=True)}"
     context["matomo_custom_url"] = url
-    if request.user:
-        context["matomo_user_id"] = request.user.pk
+    context["matomo_user_id"] = getattr(request.user, "pk", None)
     return context
