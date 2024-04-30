@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 from django.utils.text import format_lazy
 
@@ -26,3 +27,11 @@ class GpsUserSearchForm(forms.Form):
     )
 
     is_referent = forms.BooleanField(label="Se rattacher comme référent", required=False)
+
+    def clean(self):
+        super().clean()
+
+        user = self.cleaned_data["user"]
+
+        if not user.is_job_seeker:
+            raise ValidationError("Seul un candidat peut être ajouté à un groupe de suivi")

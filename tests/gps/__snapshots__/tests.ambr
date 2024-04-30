@@ -1,4 +1,134 @@
 # serializer version: 1
+# name: test_join_group_as_job_seeker[False]
+  '''
+  <section class="s-box" id="join_group">
+          <div class="s-box__container container">
+              <div class="c-form">
+                  <form class="js-prevent-multiple-submit" method="post">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      
+                      <div class="form-group form-group-required"><label class="form-label" for="id_user">Nom et prénom du candidat</label><select class="form-select django-select2" data-ajax--cache="true" data-ajax--type="GET" data-ajax--url="/autocomplete/gps_users?select2=" data-allow-clear="false" data-minimum-input-length="2" data-placeholder="Jean DUPONT" data-theme="bootstrap-5" id="id_user" lang="fr" name="user" required="">
+  </select></div>
+                      <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_is_referent" name="is_referent" type="checkbox"/><label class="form-check-label" for="id_is_referent">Se rattacher comme référent</label></div></div>
+                      
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/gps/my_groups">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>Rejoindre le groupe de ce candidat</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br/>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
+                      <a class="btn btn-sm btn-danger" href="/gps/my_groups">Confirmer l'annulation</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+                  </form>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_join_group_as_job_seeker[True]
+  '''
+  <section class="s-box" id="join_group">
+          <div class="s-box__container container">
+              <div class="c-form">
+                  <form class="js-prevent-multiple-submit" method="post">
+                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                      
+                      <div class="form-group form-group-required"><label class="form-label" for="id_user">Nom et prénom du candidat</label><select class="form-select django-select2" data-ajax--cache="true" data-ajax--type="GET" data-ajax--url="/autocomplete/gps_users?select2=" data-allow-clear="false" data-minimum-input-length="2" data-placeholder="Jean DUPONT" data-theme="bootstrap-5" id="id_user" lang="fr" name="user" required="">
+  </select></div>
+                      <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_is_referent" name="is_referent" type="checkbox"/><label class="form-check-label" for="id_is_referent">Se rattacher comme référent</label></div></div>
+                      
+  
+  <div class="row">
+      <div class="col-12">
+          <hr class="mb-3"/>
+          <small class="d-inline-block mb-3">* champs obligatoires</small>
+          <div class="form-row align-items-center justify-content-end gx-3">
+              <div class="form-group col-12 col-lg order-3 order-lg-1">
+                  
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/gps/my_groups">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </a>
+                  
+              </div>
+              
+              <div class="form-group col col-lg-auto order-2 order-lg-3">
+                  
+                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                          <span>Rejoindre le groupe de ce candidat</span>
+                      </button>
+                  
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <div aria-hidden="true" class="modal fade" id="confirm_reset_modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              
+                  <div class="modal-header">
+                      <h3 class="modal-title">Êtes-vous sûr de vouloir annuler ?</h3>
+                  </div>
+                  <div class="modal-body">
+                      Les informations renseignées ne seront pas enregistrées.
+                      <br/>
+                      Cette action est irréversible.
+                  </div>
+                  <div class="modal-footer">
+                      <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
+                      <a class="btn btn-sm btn-danger" href="/gps/my_groups">Confirmer l'annulation</a>
+                  </div>
+              
+          </div>
+      </div>
+  </div>
+  
+                  </form>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
 # name: test_navigation
   '''
   <div class="c-box__header--gps p-3 p-lg-4">
