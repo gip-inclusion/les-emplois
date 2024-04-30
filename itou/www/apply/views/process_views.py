@@ -436,18 +436,11 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
 class AcceptHTMXFragmentView(TemplateView):
     NO_ERROR_FIELDS = []
 
-    def setup(self, request, job_application_id=None, company_pk=None, *args, **kwargs):
+    def setup(self, request, company_pk=None, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
-        if company_pk is not None:
-            company = get_object_or_404(Company.objects.member_required(request.user), pk=company_pk)
-            job_application = None
-        elif job_application_id:
-            # TODO(xfernandez): remove this version in a week
-            queryset = JobApplication.objects.is_active_company_member(request.user)
-            job_application = get_object_or_404(queryset, id=job_application_id)
-            company = job_application.to_company
-        self.form_accept = AcceptForm(instance=job_application, company=company, data=request.POST or None)
+        company = get_object_or_404(Company.objects.member_required(request.user), pk=company_pk)
+        self.form_accept = AcceptForm(company=company, data=request.POST or None)
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
