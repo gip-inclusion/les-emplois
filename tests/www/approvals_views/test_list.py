@@ -10,6 +10,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertNumQu
 from itou.www.approvals_views.views import ApprovalListView
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory
+from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import BASE_NUM_QUERIES, assert_previous_step, parse_response_to_soup
 
 
@@ -324,3 +325,42 @@ class TestApprovalsListView:
         # Check that the default "Fin du parcours en IAE" value "Tous" is selected
         expiry_all_input = parse_response_to_soup(response, "input[name='expiry'][value='0']")
         assert expiry_all_input.get("checked")
+
+    def test_update_with_htmx(self, client):
+        now = timezone.localdate()
+        company = CompanyFactory(with_membership=True)
+
+        in_less_than_1_month = now + relativedelta(days=20)
+        approval_1 = ApprovalFactory(
+            start_at=in_less_than_1_month - relativedelta(years=2),
+            end_at=in_less_than_1_month,
+            with_jobapplication=True,
+            with_jobapplication__to_company=company,
+        )
+        in_less_than_3_months = now + relativedelta(days=80)
+        approval_3 = ApprovalFactory(
+            start_at=in_less_than_3_months - relativedelta(years=2),
+            end_at=in_less_than_3_months,
+            with_jobapplication=True,
+            with_jobapplication__to_company=company,
+        )
+        employer = company.members.first()
+        client.force_login(employer)
+
+        url = f"{reverse('approvals:list')}"
+        response = client.get(url, {"expiry": "3"})
+        assertContains(response, "2 résultats")
+        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_3.pk}))
+        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_1.pk}))
+        simulated_page = parse_response_to_soup(response)
+
+        [less_than_3_months] = simulated_page.find_all("input", attrs={"name": "expiry", "value": "3"})
+        del less_than_3_months["checked"]
+        [less_than_1_month] = simulated_page.find_all("input", attrs={"name": "expiry", "value": "1"})
+        less_than_1_month["checked"] = "checked"
+
+        response = client.get(url, {"expiry": "1"}, headers={"HX-Request": "true"})
+        update_page_with_htmx(simulated_page, f"form[hx-get='{url}']", response)
+        response = client.get(url, {"expiry": "1"})
+        fresh_page = parse_response_to_soup(response)
+        assertSoupEqual(simulated_page, fresh_page)
