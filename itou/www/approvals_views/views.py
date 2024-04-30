@@ -162,7 +162,6 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
 
 
 class ApprovalListView(ApprovalBaseViewMixin, ListView):
-    template_name = "approvals/list.html"
     paginate_by = 10
     paginator_class = ItouPaginator
 
@@ -179,6 +178,9 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
                 # disabling the initial values of the form
                 form_data |= {"expiry": ApprovalExpiry.ALL}
             self.form = ApprovalForm(self.siae.pk, form_data)
+
+    def get_template_names(self):
+        return ["approvals/includes/list_results.html" if self.request.htmx else "approvals/list.html"]
 
     def get_queryset(self):
         form_filters = [self.form.get_approvals_qs_filter()]

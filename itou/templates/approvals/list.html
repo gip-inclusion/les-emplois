@@ -1,7 +1,6 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
 {% load static %}
-{% load str_filters %}
 
 {% block title %}Salariés et PASS IAE {{ block.super }}{% endblock %}
 
@@ -22,7 +21,7 @@
                             <span>Filtrer les résultats</span>
                         </button>
                         <div class="c-aside-filters__card collapse show" id="asideFiltersCollapse">
-                            <form method="get" id="js-job-applications-filters-form">
+                            <form hx-get="{% url 'approvals:list' %}" hx-trigger="change delay:.5s" hx-indicator="#approvals-list" hx-target="#approvals-list" hx-swap="outerHTML" hx-push-url="true">
                                 <div class="c-aside-filters__card__body">
                                     {% include "approvals/includes/approvals_filters/users.html" %}
                                     <hr>
@@ -37,34 +36,7 @@
                         </div>
                     </aside>
                 </div>
-                <div class="col-12 col-md-8">
-                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
-                        <h3 class="h4 mb-0">
-                            {% with paginator.count as counter %}<strong>{{ counter }} résultat{{ counter|pluralizefr }}</strong>{% endwith %}
-                        </h3>
-                        {% if filters_counter > 0 %}
-                            <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les filtres de PASS IAE">
-                                <a href="{% url 'approvals:list' %}" class="btn btn-secondary btn-ico">
-                                    <i class="ri-arrow-go-back-line" aria-hidden="true"></i>
-                                    <span>Réinitialiser les filtres ({{ filters_counter }})</span>
-                                </a>
-                            </div>
-                        {% endif %}
-                    </div>
-                    {% if not approval_list %}
-                        <div class="c-box c-box--results my-3 my-md-4">
-                            <div class="c-box--results__body">
-                                <p class="mb-0">Aucun salarié pour le moment.</p>
-                            </div>
-                        </div>
-                    {% else %}
-                        {% for approval in approval_list %}
-                            {% include "approvals/includes/list_card.html" with approval=approval %}
-                        {% endfor %}
-
-                        {% include "includes/pagination.html" with page=page_obj %}
-                    {% endif %}
-                </div>
+                <div class="col-12 col-md-8">{% include "approvals/includes/list_results.html" %}</div>
             </div>
         </div>
     </section>
@@ -72,7 +44,7 @@
 
 {% block script %}
     {{ block.super }}
+    <script src='{% static "js/htmx_compat.js" %}'></script>
     <!-- Needed to use the Select2MultipleWidget JS widget. -->
     {{ filters_form.media.js }}
-    <script src='{% static "js/approvals_filters.js" %}'></script>
 {% endblock %}
