@@ -47,7 +47,7 @@ class ApprovalAlreadyExistsError(Exception):
 
 class ItouUserManager(UserManager):
 
-    def autocomplete(self, search_string, limit=10, current_user=None):
+    def autocomplete(self, search_string, limit=10, kind=UserKind.JOB_SEEKER, current_user=None):
         """
         A `search_string` equals to `foo bar` will match all results beginning with `foo` and `bar`.
         This is achieved via `to_tsquery` and prefix matching:
@@ -58,8 +58,10 @@ class ItouUserManager(UserManager):
         words = [word + ":*" for word in words]
         tsquery = " & ".join(words)
 
-        queryset = self.annotate(search=SearchVector("first_name", "last_name")).filter(
-            search=SearchQuery(tsquery, config="french_unaccent", search_type="raw")
+        queryset = (
+            self.annotate(search=SearchVector("first_name", "last_name"))
+            .filter(search=SearchQuery(tsquery, config="french_unaccent", search_type="raw"))
+            .filter(kind=kind)
         )
 
         if current_user:
