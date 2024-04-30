@@ -1,95 +1,186 @@
 {% extends "layout/base.html" %}
 {% load matomo %}
+{% load str_filters %}
+{% load format_filters %}
 
-{% block title %}Profil salarié - {{ approval.user.get_full_name }} {{ block.super }}{% endblock %}
+{% block title %}Profil salarié - {{ object.get_full_name }} {{ block.super }}{% endblock %}
 
-{% block content_title %}<h1>{{ approval.user.get_full_name }}</h1>{% endblock %}
+{% block content_title %}<h1>{{ object.get_full_name }}</h1>{% endblock %}
+
+{% block breadcrumbs %}
+    {% include "layout/breadcrumbs_from_dashboard.html" %}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
-                    <div class="c-box mb-3 mb-lg-5">
-                        {# Approval status. #}
-                        <div>{% include "approvals/includes/status.html" with common_approval=approval hiring_pending=hiring_pending %}</div>
-
-                        {# Approval actions. #}
-                        {% if approval and request.user.is_employer %}
-                            <div class="row justify-content-end g-3">
-                                {% if approval_can_be_suspended_by_siae %}
-                                    <div class="col-12 col-lg-auto">
-                                        <a href="{% url 'approvals:suspend' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                           class="btn btn-block btn-outline-primary"
-                                           aria-label="Suspendre le PASS IAE de {{ approval.user.get_full_name }}">
-                                            Suspendre
-                                        </a>
-                                    </div>
-                                {% elif hire_by_other_siae %}
-                                    <div class="col-12 col-lg-auto">
-                                        <div class="btn btn-ico">
-                                            <span class="disabled">Suspendre</span>
-                                            <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" title="La suspension n’est pas possible car un autre employeur a embauché le candidat."></i>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                                {% if approval_can_be_prolonged %}
-                                    <div class="col-12 col-lg-auto">
-                                        <a href="{% url 'approvals:declare_prolongation' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                           class="btn btn-block btn-outline-primary"
-                                           aria-label="Prolonger le PASS IAE de {{ approval.user.get_full_name }}">
-                                            Prolonger
-                                        </a>
-                                    </div>
-                                {% endif %}
-                                {% if approval_deletion_form_url %}
-                                    <div class="col-12 col-lg-auto">
-                                        <a href="{{ approval_deletion_form_url }}"
-                                           id="approval-deletion-link"
-                                           class="btn btn-block btn-outline-warning"
-                                           target="_blank"
-                                           rel="noopener"
-                                           aria-label="Mettre fin au PASS IAE de {{ approval.user.get_full_name }}">
-                                            Clôturer
-                                        </a>
-                                    </div>
-                                {% endif %}
-                                <div class="col-12 col-lg-auto">
-                                    <a class="btn btn-primary btn-block btn-ico"
-                                       {% matomo_event "telechargement-pdf" "agrement" "detail-agrement" %}
-                                       href="{% url 'approvals:display_printable_approval' approval_id=approval.id %}"
-                                       target="_blank"
-                                       rel="noopener"
-                                       aria-label="Afficher le PASS IAE de {{ approval.user.get_full_name }}">
-                                        <i class="ri-eye-line ri-xl font-weight-medium" aria-hidden="true"></i>
-                                        <span>Afficher l'attestation</span>
-                                    </a>
-                                </div>
-                            </div>
-                        {% endif %}
-                    </div>
-
                     {# Job seeker info ------------------------------------------------------------------------- #}
                     <div class="c-box mb-3 mb-lg-5">
                         <h2>Informations du salarié</h2>
                         <hr>
-                        <h3>Informations personnelles</h3>
-                        {% include "apply/includes/job_seeker_info.html" with job_seeker=approval.user job_application=job_application with_matomo_event=True can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request csrf_token=csrf_token only %}
-                        {# Eligibility ------------------------------------------------------------------------- #}
-                        {% if eligibility_diagnosis %}
-                            {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_seeker=job_application.job_seeker is_sent_by_authorized_prescriber=job_application.is_sent_by_authorized_prescriber siae=job_application.to_company %}
-                        {% endif %}
-                    </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <h3>Informations personnelles</h3>
 
-                    {# Job applications ------------------------------------------------------------------------ #}
-                    <div class="c-box mb-3 mb-lg-5">
-                        <h2>Candidatures de ce salarié</h2>
-                        <hr>
-                        {% for job_application_for_card in all_job_applications %}
-                            {% include "approvals/includes/job_applications.html" with job_application=job_application_for_card %}
-                        {% endfor %}
-                    </div>
+                                <ul class="list-data mb-3">
+                                    <li>
+                                        <small>Prénom</small>
+                                        <strong>{{ object.first_name|mask_unless:can_view_personal_information }}</strong>
+                                    </li>
+                                    <li>
+                                        <small>Nom</small>
+                                        <strong>{{ object.last_name|mask_unless:can_view_personal_information }}</strong>
+                                    </li>
 
+                                    <li>
+                                        <small>Date de naissance</small>
+                                        <strong>{{ object.birthdate|date:"d/m/Y" }}</strong>
+                                    </li>
+                                    <li>
+                                        <small>Adresse e-mail</small>
+                                        <strong>{{ object.email }}</strong>
+                                        <button class="btn-link"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                data-bs-trigger="manual"
+                                                data-bs-title="Copié!"
+                                                data-it-clipboard-button="copy"
+                                                data-it-copy-to-clipboard="{{ object.email }}"
+                                                {% matomo_event "gps" "clic" "copied_user_email" %}>
+                                            <i class="ri-file-copy-line"></i>
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <small>Téléphone</small>
+                                        {% if object.phone %}
+                                            <strong>{{ object.phone|format_phone }}</strong>
+                                            <button class="btn-link"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    data-bs-trigger="manual"
+                                                    data-bs-title="Copié!"
+                                                    data-it-clipboard-button="copy"
+                                                    data-it-copy-to-clipboard="{{ object.phone|cut:" " }}"
+                                                    {% matomo_event "gps" "clic" "copied_user_phone" %}>
+                                                <i class="ri-file-copy-line"></i>
+                                            </button>
+                                        {% else %}
+                                            <i class="text-disabled">Non renseigné</i>
+                                        {% endif %}
+                                    </li>
+                                    <li>
+                                        <small>Adresse</small>
+                                        {% if object.address_on_one_line %}
+                                            <address>{{ object.address_on_one_line }}</address>
+                                        {% else %}
+                                            <i class="text-disabled">Non renseignée</i>
+                                        {% endif %}
+                                    </li>
+
+                                    <li>
+                                        <small>Numéro de sécurité sociale</small>
+                                        {% if object.jobseeker_profile.nir %}
+                                            <strong>{{ object.jobseeker_profile.nir }}</strong>
+                                        {% else %}
+                                            <i class="text-disabled">Non renseigné</i>
+                                        {% endif %}
+                                    </li>
+                                </ul>
+
+                            </div>
+                            <div class="col-6">
+                                <h3>Situation professionnelle</h3>
+                                <ul class="list-data mb-3">
+                                    {% with profile=object.jobseeker_profile %}
+
+                                        <li>
+                                            <small>Niveau de formation</small>
+                                            {% if profile.get_education_level_display %}
+                                                <strong>{{ profile.get_education_level_display }}</strong>
+                                            {% else %}
+                                                <i class="text-disabled">Non renseigné</i>
+                                            {% endif %}
+                                        </li>
+                                        {% if profile.resourceless %}
+                                            <li>
+                                                <small>Ressources</small>
+                                                <strong>Sans ressources</strong>
+                                            </li>
+                                        {% endif %}
+                                        {% if profile.pole_emploi_since %}
+                                            <li>
+                                                <small>Inscription France Travail</small>
+                                                <strong>Depuis {{ profile.get_pole_emploi_since_display|lower }}</strong>
+                                            </li>
+                                        {% endif %}
+                                        {% if profile.unemployed_since %}
+                                            <li>
+                                                <small>Sans emploi</small>
+                                                <strong>Depuis {{ profile.get_unemployed_since_display|lower }}</strong>
+                                            </li>
+                                        {% endif %}
+                                        {% if profile.rqth_employee %}
+                                            <li>
+                                                <small>RQTH</small>
+                                                <strong>Titulaire de la RQTH</strong>
+                                            </li>
+                                        {% endif %}
+                                        {% if profile.oeth_employee %}
+                                            <li>
+                                                <small>OETH</small>
+                                                <strong>Bénéficiaire de la loi handicap (OETH)</strong>
+                                            </li>
+                                        {% endif %}
+                                        {% if profile.rsa_allocation_since %}
+                                            <li>
+                                                <small>RSA</small>
+                                                <strong>
+                                                {{ profile.get_has_rsa_allocation_display }} depuis {{ profile.get_rsa_allocation_since_display|lower }}</strong>
+                                            </li>
+                                        {% endif %}
+                                        {% if profile.ass_allocation_since %}
+                                            <li>
+                                                <small>ASS</small>
+                                                <strong>Bénéficiaire de l'ASS depuis {{ profile.get_ass_allocation_since_display|lower }}</strong>
+                                            </li>
+                                        {% endif %}
+                                        {% if profile.aah_allocation_since %}
+                                            <li>
+                                                <small>Bénéficiaire de l'AAH</small>
+                                                <strong>Depuis {{ profile.get_aah_allocation_since_display|lower }}</strong>
+                                            </li>
+                                        {% endif %}
+                                        <li>
+                                            <small>Identifiant France Travail (ex pôle emploi)</small>
+
+                                            {% if profile.user.jobseeker_profile.pole_emploi_id or profile.user.jobseeker_profile.lack_of_pole_emploi_id_reason %}
+                                                {% if profile.user.jobseeker_profile.pole_emploi_id %}
+                                                    <strong>{{ profile.pole_emploi_id }}</strong>
+                                                    <button class="btn-link"
+                                                            data-bs-toggle="tooltip"
+                                                            data-bs-placement="top"
+                                                            data-bs-trigger="manual"
+                                                            data-bs-title="Copié!"
+                                                            data-it-clipboard-button="copy"
+                                                            data-it-copy-to-clipboard="{{ profile.pole_emploi_id }}">
+                                                        <i class="ri-file-copy-line"></i>
+                                                    </button>
+                                                {% else %}
+                                                    <strong>{{ profile.user.jobseeker_profile.get_lack_of_pole_emploi_id_reason_display }}</strong>
+                                                {% endif %}
+                                            {% else %}
+                                                <i class="text-disabled">Non renseigné</i>
+                                            {% endif %}
+                                        </li>
+
+                                    {% endwith %}
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
 
                     {% include "users/includes/gps_group.html" with gps_memberships=gps_memberships %}
                 </div>
