@@ -227,11 +227,9 @@
 
                 {% if matomo_user_id %}window._paq.push(['setUserId', '{{ matomo_user_id }}']);{% endif %}
 
-                {% if matomo_custom_url %}
-                    window._paq.push(['setCustomUrl', new URL('{{ matomo_custom_url }}', window.location.origin).href]);
-                {% endif %}
+                window._paq.push(['setCustomUrl', new URL('{{ matomo_custom_url }}', window.location.origin).href]);
 
-                {% if matomo_custom_title %}
+                {% if matomo_custom_title|default:"" %}
                     window._paq.push(['setDocumentTitle', '{{ matomo_custom_title }}']);
                 {% else %}
                     /* defaults to a stripped version (no suffix) of the page title. */

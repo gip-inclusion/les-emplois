@@ -124,7 +124,6 @@ class TestTransferUserData:
         response = client.get(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
         assertContains(response, transfer_url)
 
-    @pytest.mark.ignore_unknown_variable_template_error("matomo_custom_title")
     def test_transfer_without_change_permission(self, client):
         from_user = JobSeekerFactory()
         to_user = JobSeekerFactory()
