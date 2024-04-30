@@ -25,4 +25,4 @@ class GpsUserSearchForm(forms.Form):
         required=True,
     )
 
-    is_referent = forms.BooleanField(label="Se rattacher comme référent")
+    is_referent = forms.BooleanField(label="Se rattacher comme référent", required=False)
