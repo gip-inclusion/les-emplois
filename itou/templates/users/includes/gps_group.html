@@ -1,19 +1,49 @@
 {% load str_filters %}
+{% load format_filters %}
 
 <div class="c-box mb-3 mb-lg-5">
 
     {% with gps_memberships.all|length as counter %}
         <h2>Membre{{ counter|pluralizefr }} du groupe de suivi</h2>
+        <hr />
         <ul>
             {% for membership in gps_memberships.all %}
-                <li>
-                    {{ membership.member.get_full_name }} — {{ membership.member.email }}
-                    {% if membership.member.phone %}- {{ membership.member.phone }}{% endif %}
-                    {% if membership.is_referent %}<b>Référent</b>{% endif %}
-                </li>
+
+                <div class="c-box--results__header">
+                    <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+
+                        <div class="c-box--results__summary flex-grow-1">
+                            <i class="ri-user-line" aria-hidden="true"></i>
+
+                            <div>
+
+                                <h3>{{ membership.member.get_full_name }}</h3>
+
+                                <div class="d-flex flex-column flex-md-column gap-1 gap-md-2">
+                                    <span>
+                                        <i class="ri-mail-line font-weight-normal me-1" aria-hidden="true"></i>{{ membership.member.email }}
+                                    </span>
+
+                                    {% if membership.member.phone %}
+                                        <span>
+                                            <i class="ri-phone-line font-weight-normal me-1" aria-hidden="true"></i>{{ membership.member.phone|format_phone }}
+                                        </span>
+
+
+                                    {% endif %}
+                                    {% if membership.is_referent %}
+                                        <span>
+                                            <i class="ri-map-pin-user-line font-weight-normal me-1" aria-hidden="true"></i><strong>Référent</strong>
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             {% endfor %}
         </ul>
     {% endwith %}
 
-    <hr>
 </div>
