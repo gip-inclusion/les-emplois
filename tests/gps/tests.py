@@ -1,6 +1,7 @@
 from django.urls import reverse
 from pytest_django.asserts import assertContains
 
+from itou.users.enums import UserKind
 from itou.users.models import User
 from tests.gps.factories import FollowUpGroupFactory
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
@@ -16,8 +17,10 @@ def test_user_autocomplete():
     FollowUpGroupFactory(beneficiary=beneficiary, memberships=4, memberships__member=member)
     FollowUpGroupFactory(beneficiary=another_beneficiary, memberships=2)
 
-    assert User.objects.autocomplete("gps").count() == 3
-    assert User.objects.autocomplete("gps member").count() == 1
+    # Default to kind=UserKind.JOB_SEEKER
+    assert User.objects.autocomplete("gps").count() == 2
+    assert User.objects.autocomplete("gps member").count() == 0
+    assert User.objects.autocomplete("gps member", kind=UserKind.PRESCRIBER).count() == 1
 
     # We should not get ourself nor the other user because we are a member of his group
     users = User.objects.autocomplete("gps", current_user=member)
