@@ -1,0 +1,17 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% load format_filters %}
+{% block body %}
+Bonjour,
+
+En tant qu’administrateur de l’organisation {{ structure.name }}, nous vous invitons à vérifier la liste des membres afin de vous assurer que seuls les collaborateurs qui travaillent au sein de cette organisation puissent accéder à votre espace de travail.
+
+RDV sur votre espace des emplois de l’inclusion à la rubrique “Gérer les collaborateurs” : {{ members_url }}
+
+Si un collaborateur a quitté votre organisation, vous devez le retirer des membres en cliquant sur le bouton d’action situé à droite, puis sur l’option “retirer de la structure”.
+
+{% if active_admins_count == 1 %}Pour des raisons de sécurité et si la configuration de votre organisation vous le permet, nous vous invitons à nommer plusieurs administrateurs.
+
+{% endif %}Ce rappel automatique vous sera transmis tous les 3 mois, mais il est vivement recommandé d’effectuer cette action dès qu’un collaborateur quitte votre organisation.
+
+Cordialement,
+{% endblock body %}
