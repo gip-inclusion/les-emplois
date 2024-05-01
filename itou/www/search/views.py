@@ -314,4 +314,8 @@ def search_prescribers_results(request, template_name="search/prescribers_search
         "matomo_custom_title": "Recherche d'organisations prescriptrices",
         "back_url": reverse("search:prescribers_home"),
     }
-    return render(request, template_name, context)
+    return render(
+        request,
+        "search/includes/prescribers_search_results.html" if request.htmx else template_name,
+        context,
+    )
