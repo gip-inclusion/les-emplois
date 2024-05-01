@@ -1,6 +1,5 @@
 from django import forms
 
-from itou.companies.enums import CompanyKind
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 
 
@@ -29,15 +28,6 @@ class GEIQAdministrativeCriteriaForm(forms.Form):
     pole_emploi_related = forms.CharField(max_length=100, required=False)
 
     def __init__(self, company, administrative_criteria, form_url, accept_no_criteria=True, **kwargs):
-        if not company or company.kind != CompanyKind.GEIQ:
-            raise ValueError("This form is only for GEIQ")
-
-        if administrative_criteria is None:
-            raise ValueError("This form needs a list of criteria, even empty")
-
-        if not form_url:
-            raise ValueError("This form needs a submit URL")
-
         super().__init__(**kwargs)
 
         self.company = company

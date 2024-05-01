@@ -33,18 +33,6 @@ def criteria_in_radio():
     return GEIQAdministrativeCriteria.objects.filter(slug__in=GEIQAdministrativeCriteriaForm.RADIO_FIELDS)
 
 
-def test_form_init_sanity_check(new_geiq):
-    # Check that we use a correct structure
-    with pytest.raises(ValueError, match="This form is only for GEIQ"):
-        GEIQAdministrativeCriteriaForm(None, None, None)
-
-    with pytest.raises(ValueError, match="This form needs a list of criteria, even empty"):
-        GEIQAdministrativeCriteriaForm(new_geiq, None, None)
-
-    with pytest.raises(ValueError, match="This form needs a submit URL"):
-        GEIQAdministrativeCriteriaForm(new_geiq, (), None)
-
-
 def test_init_geiq_administrative_criteria_form(new_geiq, administrative_criteria_for_checkboxes):
     # Mainly checks addition of htmx attributes
     for criterion in administrative_criteria_for_checkboxes:
