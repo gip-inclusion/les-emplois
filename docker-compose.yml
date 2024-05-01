@@ -9,8 +9,8 @@ services:
       - MINIO_ROOT_USER=minioadmin
       - MINIO_ROOT_PASSWORD=minioadmin
     ports:
-      - "127.0.0.1:9000:9000"
-      - "127.0.0.1:9001:9001"
+      - "127.0.0.1:${MINIO_PORT_ON_DOCKER_HOST:-9000}:9000"
+      - "127.0.0.1:${MINIO_ADMIN_PORT_ON_DOCKER_HOST:-9001}:9001"
     volumes:
       - itou_minio:/bitnami/minio/data
 
@@ -59,7 +59,7 @@ services:
       - PYTHONPATH=.
       - ITOU_LOG_LEVEL=DEBUG
       - ITOU_CACHE=/app/.cache
-      - CELLAR_ADDON_HOST=minio:9000
+      - CELLAR_ADDON_HOST=minio:${MINIO_PORT_ON_DOCKER_HOST:-9000}
       - VIRTUAL_ENV=/app/.venv-docker
       - REDIS_URL=redis://redis:6379
     depends_on:
