@@ -87,6 +87,14 @@ def main(publish):
             sprint_start = datetime.date.fromisoformat(sprint_start_text)
             sprint_end = sprint_start + datetime.timedelta(days=7)
 
+            branch = f"changelog/{sprint_end}"
+            try:
+                subprocess.run(["git", "switch", branch], check=True)
+                created = False
+            except subprocess.CalledProcessError:
+                subprocess.run(["git", "switch", "--create", branch], check=True)
+                created = True
+
             if missing := list_missing_pull_requests(sprint_start, sprint_end):
                 missing_pull_requests = "\n- ".join(pr["url"] for pr in missing)
                 sys.exit(f"The following pull requests should have a label:\n- {missing_pull_requests}\n")
@@ -139,26 +147,33 @@ def main(publish):
             pathlib.Path(new_changelog.name).unlink(missing_ok=True)
 
     if publish:
-        branch = f"changelog/{sprint_end}"
-        sprint_end_inclusive = sprint_end - datetime.timedelta(days=1)
-        title = f"changelog: From {sprint_start} to {sprint_end_inclusive}"
-        subprocess.run(["git", "switch", "--create", branch], check=True)
-        subprocess.run(
-            [
-                "git",
-                "-c",
-                "user.name=Changelog Bot",
-                "-c",
-                "user.email=noreply@inclusion.beta.gouv.fr",
-                "commit",
-                "--all",
-                "--message",
-                title,
-            ],
-            check=True,
-        )
-        subprocess.run(["git", "push", "--set-upstream", "origin", branch], check=True)
-        open_pull_request(branch, title)
+        if created:
+            sprint_end_inclusive = sprint_end - datetime.timedelta(days=1)
+            title = f"changelog: From {sprint_start} to {sprint_end_inclusive}"
+            subprocess.run(
+                [
+                    "git",
+                    "-c",
+                    "user.name=Changelog Bot",
+                    "-c",
+                    "user.email=noreply@inclusion.beta.gouv.fr",
+                    "commit",
+                    "--all",
+                    "--message",
+                    title,
+                ],
+                check=True,
+            )
+        else:
+            subprocess.run(["git", "add", changelog_path])
+            subprocess.run(["git", "commit", "--amend", "--no-edit"])
+        push_cmd = ["git", "push", "--set-upstream", "origin", branch]
+        if not created:
+            push_cmd.append("--force-with-lease")
+            push_cmd.append("--force-if-includes")
+        subprocess.run(push_cmd, check=True)
+        if created:
+            open_pull_request(branch, title)
 
 
 if __name__ == "__main__":
