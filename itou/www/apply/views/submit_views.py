@@ -331,6 +331,8 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
+            "job_seeker": None,
+            "preview_mode": False,
         }
 
 
@@ -1536,7 +1538,10 @@ def geiq_eligibility_for_hire(
             kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk},
         ),
         template_name=template_name,
-        extra_context={"hire_process": True},
+        extra_context={
+            "hire_process": True,
+            "is_subject_to_eligibility_rules": False,
+        },
     )
 
 
