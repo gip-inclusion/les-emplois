@@ -58,6 +58,9 @@
                 </li>
             </ul>
         </nav>
+        <div class="global-messages-container">
+            {% block global_messages %}{% endblock %}
+        </div>
 
         {% include "includes/demo_accounts.html" %}
         {% include "layout/_header.html" %}
