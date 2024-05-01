@@ -51,7 +51,7 @@ def get_data_inclusion_services(code_insee):
     """Returns 3 random DI services, in a 'stable' way: for a given city and day so that an user
     who refreshes the page or shares the URL would not get different services in the same day.
     """
-    if not code_insee:
+    if not settings.API_DATA_INCLUSION_BASE_URL or not code_insee:
         return []
     cache_key = f"{DATA_INCLUSION_API_CACHE_PREFIX}:{code_insee}:{timezone.localdate()}"
     cache = caches["failsafe"]
