@@ -199,7 +199,7 @@ def _eligibility(request, siae, job_seeker, cancel_url, next_url, template_name,
 
 
 def _geiq_eligibility(
-    request, siae, job_seeker, back_url, next_url, geiq_eligibility_criteria_url, template_name, extra_context
+    request, company, job_seeker, back_url, next_url, geiq_eligibility_criteria_url, template_name, extra_context
 ):
     # Check GEIQ eligibility during job application process
     # Pass get_full_path to keep back/next_url query params
@@ -229,7 +229,7 @@ def _geiq_eligibility(
         "progress": 33,
         "can_view_personal_information": True,
         "job_seeker": job_seeker,
-        "siae": siae,
+        "siae": company,
         "form": form,
         "back_url": back_url,
         "next_url": next_url,
@@ -243,13 +243,13 @@ def _geiq_eligibility(
 
 
 def _geiq_eligibility_criteria(
-    request, siae, job_seeker, template_name="apply/includes/geiq/check_geiq_eligibility_form.html"
+    request, company, job_seeker, template_name="apply/includes/geiq/check_geiq_eligibility_form.html"
 ):
     """Dynamic GEIQ eligibility criteria form (HTMX)"""
 
-    diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, siae).first()
+    diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(job_seeker, company).first()
     form = GEIQAdministrativeCriteriaForGEIQForm(
-        siae,
+        company,
         diagnosis.administrative_criteria.all() if diagnosis else [],
         request.path,
         data=request.POST or None,
@@ -265,7 +265,7 @@ def _geiq_eligibility_criteria(
             if diagnosis:
                 GEIQEligibilityDiagnosis.update_eligibility_diagnosis(diagnosis, request.user, criteria)
             else:
-                GEIQEligibilityDiagnosis.create_eligibility_diagnosis(job_seeker, request.user, siae, criteria)
+                GEIQEligibilityDiagnosis.create_eligibility_diagnosis(job_seeker, request.user, company, criteria)
 
             return HttpResponseRedirect(next_url)
 
@@ -275,7 +275,7 @@ def _geiq_eligibility_criteria(
         "progress": 66,
         "back_url": reverse(
             "apply:check_job_seeker_info_for_hire",
-            kwargs={"job_seeker_pk": job_seeker.pk, "company_pk": siae.pk},
+            kwargs={"job_seeker_pk": job_seeker.pk, "company_pk": company.pk},
         ),
     }
 

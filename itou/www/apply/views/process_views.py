@@ -50,7 +50,7 @@ def check_waiting_period(job_application):
         raise PermissionDenied(apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
 
 
-def _get_geiq_eligibility_diagnosis_for_siae(job_application):
+def _get_geiq_eligibility_diagnosis_for_company(job_application):
     # Get current GEIQ diagnosis or *last expired one*
     return (
         job_application.geiq_eligibility_diagnosis
@@ -90,7 +90,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
     geiq_eligibility_diagnosis = None
 
     if job_application.to_company.kind == CompanyKind.GEIQ:
-        geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_siae(job_application)
+        geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_company(job_application)
 
     context = {
         "can_view_personal_information": request.user.can_view_personal_information(job_application.job_seeker),
@@ -145,7 +145,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
     geiq_eligibility_diagnosis = None
 
     if job_application.to_company.kind == CompanyKind.GEIQ:
-        geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_siae(job_application)
+        geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_company(job_application)
 
     context = {
         "can_view_personal_information": True,  # SIAE members have access to personal info
@@ -677,7 +677,7 @@ def delete_prior_action(request, job_application_id, prior_action_id):
                 "job_application": job_application,
                 "transition_logs": job_application.logs.select_related("user").all(),
                 "geiq_eligibility_diagnosis": (
-                    _get_geiq_eligibility_diagnosis_for_siae(job_application)
+                    _get_geiq_eligibility_diagnosis_for_company(job_application)
                     if job_application.to_company.kind == CompanyKind.GEIQ
                     else None
                 ),
@@ -744,7 +744,7 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
             form.save()
             geiq_eligibility_diagnosis = None
             if state_update and job_application.to_company.kind == CompanyKind.GEIQ:
-                geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_siae(job_application)
+                geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_company(job_application)
             return render(
                 request,
                 "apply/includes/job_application_prior_action.html",
