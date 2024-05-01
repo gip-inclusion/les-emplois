@@ -3726,7 +3726,6 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         )
         self.assertTemplateNotUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
-    @pytest.mark.ignore_template_errors
     def test_sanity_check_geiq_diagnosis_for_non_geiq(self):
         job_seeker = JobSeekerFactory()
         # See comment im previous test:
@@ -3734,13 +3733,13 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         self.client.force_login(self.company.members.first())
         self._setup_session(company_pk=self.company.pk)
 
-        with self.assertRaisesRegex(ValueError, "This form is only for GEIQ"):
-            self.client.get(
-                reverse(
-                    "apply:application_geiq_eligibility",
-                    kwargs={"company_pk": self.company.pk, "job_seeker_pk": job_seeker.pk},
-                )
+        response = self.client.get(
+            reverse(
+                "apply:application_geiq_eligibility",
+                kwargs={"company_pk": self.company.pk, "job_seeker_pk": job_seeker.pk},
             )
+        )
+        assert response.status_code == 404
 
     def test_access_as_authorized_prescriber(self):
         job_seeker = JobSeekerFactory()

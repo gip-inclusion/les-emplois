@@ -955,6 +955,9 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
             # Do nothing, LoginRequiredMixin will raise in dispatch()
             return
 
+        if self.company.kind != CompanyKind.GEIQ:
+            raise Http404("This form is only for GEIQ")
+
         self.form = GEIQAdministrativeCriteriaForm(
             company=self.company,
             administrative_criteria=(
