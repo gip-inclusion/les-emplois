@@ -27,7 +27,6 @@ class SearchCompanyTest(TestCase):
     URL = reverse_lazy("search:employers_results")
     URL_JOBS = reverse_lazy("search:job_descriptions_results")
 
-    @pytest.mark.ignore_template_errors
     def test_not_existing(self):
         response = self.client.get(self.URL, {"city": "foo-44"})
         self.assertContains(response, "Aucun résultat avec les filtres actuels.")
@@ -426,7 +425,6 @@ class JobDescriptionSearchViewTest(TestCase):
     URL = reverse_lazy("search:job_descriptions_results")
     URL_EMPLOYERS = reverse_lazy("search:employers_results")
 
-    @pytest.mark.ignore_template_errors
     def test_not_existing(self):
         response = self.client.get(self.URL, {"city": "foo-44"})
         self.assertContains(response, "Aucun résultat avec les filtres actuels.")
@@ -824,7 +822,6 @@ class JobDescriptionSearchViewTest(TestCase):
         self.assertNotContains(response, job2_name, html=True)
         self.assertNotContains(response, job3_name, html=True)
 
-    @pytest.mark.ignore_template_errors
     def test_domains(self):
         create_test_romes_and_appellations(("N1101", "M1805"))
         city = create_city_saint_andre()
