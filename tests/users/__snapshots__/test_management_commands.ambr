@@ -1,4 +1,112 @@
 # serializer version: 1
+# name: SendCheckAuthorizedMembersEmailManagementCommandTest.test_check_authorized_members_email_content_members_link[company]
+  '''
+  Bonjour,
+  
+  En tant qu’administrateur de l’organisation Company 1, nous vous invitons à vérifier la liste des membres afin de vous assurer que seuls les collaborateurs qui travaillent au sein de cette organisation puissent accéder à votre espace de travail.
+  
+  RDV sur votre espace des emplois de l’inclusion à la rubrique “Gérer les collaborateurs” : http://localhost:8000/company/colleagues
+  
+  Si un collaborateur a quitté votre organisation, vous devez le retirer des membres en cliquant sur le bouton d’action situé à droite, puis sur l’option “retirer de la structure”.
+  
+  Pour des raisons de sécurité et si la configuration de votre organisation vous le permet, nous vous invitons à nommer plusieurs administrateurs.
+  
+  Ce rappel automatique vous sera transmis tous les 3 mois, mais il est vivement recommandé d’effectuer cette action dès qu’un collaborateur quitte votre organisation.
+  
+  Cordialement,
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: SendCheckAuthorizedMembersEmailManagementCommandTest.test_check_authorized_members_email_content_members_link[institution]
+  '''
+  Bonjour,
+  
+  En tant qu’administrateur de l’organisation Institution 1, nous vous invitons à vérifier la liste des membres afin de vous assurer que seuls les collaborateurs qui travaillent au sein de cette organisation puissent accéder à votre espace de travail.
+  
+  RDV sur votre espace des emplois de l’inclusion à la rubrique “Gérer les collaborateurs” : http://localhost:8000/institutions/colleagues
+  
+  Si un collaborateur a quitté votre organisation, vous devez le retirer des membres en cliquant sur le bouton d’action situé à droite, puis sur l’option “retirer de la structure”.
+  
+  Pour des raisons de sécurité et si la configuration de votre organisation vous le permet, nous vous invitons à nommer plusieurs administrateurs.
+  
+  Ce rappel automatique vous sera transmis tous les 3 mois, mais il est vivement recommandé d’effectuer cette action dès qu’un collaborateur quitte votre organisation.
+  
+  Cordialement,
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: SendCheckAuthorizedMembersEmailManagementCommandTest.test_check_authorized_members_email_content_members_link[prescriber_organization]
+  '''
+  Bonjour,
+  
+  En tant qu’administrateur de l’organisation Organization 1, nous vous invitons à vérifier la liste des membres afin de vous assurer que seuls les collaborateurs qui travaillent au sein de cette organisation puissent accéder à votre espace de travail.
+  
+  RDV sur votre espace des emplois de l’inclusion à la rubrique “Gérer les collaborateurs” : http://localhost:8000/prescribers/colleagues
+  
+  Si un collaborateur a quitté votre organisation, vous devez le retirer des membres en cliquant sur le bouton d’action situé à droite, puis sur l’option “retirer de la structure”.
+  
+  Pour des raisons de sécurité et si la configuration de votre organisation vous le permet, nous vous invitons à nommer plusieurs administrateurs.
+  
+  Ce rappel automatique vous sera transmis tous les 3 mois, mais il est vivement recommandé d’effectuer cette action dès qu’un collaborateur quitte votre organisation.
+  
+  Cordialement,
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: SendCheckAuthorizedMembersEmailManagementCommandTest.test_check_authorized_members_email_content_one_admin
+  '''
+  Bonjour,
+  
+  En tant qu’administrateur de l’organisation Organization 1, nous vous invitons à vérifier la liste des membres afin de vous assurer que seuls les collaborateurs qui travaillent au sein de cette organisation puissent accéder à votre espace de travail.
+  
+  RDV sur votre espace des emplois de l’inclusion à la rubrique “Gérer les collaborateurs” : http://localhost:8000/prescribers/colleagues
+  
+  Si un collaborateur a quitté votre organisation, vous devez le retirer des membres en cliquant sur le bouton d’action situé à droite, puis sur l’option “retirer de la structure”.
+  
+  Pour des raisons de sécurité et si la configuration de votre organisation vous le permet, nous vous invitons à nommer plusieurs administrateurs.
+  
+  Ce rappel automatique vous sera transmis tous les 3 mois, mais il est vivement recommandé d’effectuer cette action dès qu’un collaborateur quitte votre organisation.
+  
+  Cordialement,
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: SendCheckAuthorizedMembersEmailManagementCommandTest.test_check_authorized_members_email_content_two_admins
+  '''
+  Bonjour,
+  
+  En tant qu’administrateur de l’organisation Organization 1, nous vous invitons à vérifier la liste des membres afin de vous assurer que seuls les collaborateurs qui travaillent au sein de cette organisation puissent accéder à votre espace de travail.
+  
+  RDV sur votre espace des emplois de l’inclusion à la rubrique “Gérer les collaborateurs” : http://localhost:8000/prescribers/colleagues
+  
+  Si un collaborateur a quitté votre organisation, vous devez le retirer des membres en cliquant sur le bouton d’action situé à droite, puis sur l’option “retirer de la structure”.
+  
+  Ce rappel automatique vous sera transmis tous les 3 mois, mais il est vivement recommandé d’effectuer cette action dès qu’un collaborateur quitte votre organisation.
+  
+  Cordialement,
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
 # name: test_pe_certify_users
   '''
   > about to resolve first_name and last_name for count=1 users.

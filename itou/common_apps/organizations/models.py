@@ -40,6 +40,11 @@ class OrganizationAbstract(models.Model):
     # This enables us to keep our internal primary key opaque and independent from any external logic.
     uid = models.UUIDField(db_index=True, default=uuid.uuid4, unique=True)
 
+    active_members_email_reminder_last_sent_at = models.DateTimeField(
+        null=True,
+        verbose_name="date d'envoi du dernier rappel pour vérifier les membres actifs",
+    )
+
     # Child class should have a "members" attribute, for example:
     # members = models.ManyToManyField(
     #     settings.AUTH_USER_MODEL,
