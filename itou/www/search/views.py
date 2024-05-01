@@ -292,7 +292,7 @@ def search_prescribers_results(request, template_name="search/prescribers_search
     city = None
     distance = None
     form = PrescriberSearchForm(data=request.GET or None, initial={"distance": PrescriberSearchForm.DISTANCE_DEFAULT})
-    prescriber_orgs_page = None
+    prescriber_orgs = []
 
     if form.is_valid():
         city = form.cleaned_data["city"]
@@ -304,7 +304,7 @@ def search_prescribers_results(request, template_name="search/prescribers_search
             .annotate(distance=Distance("coords", city.coords))
             .order_by("distance")
         )
-        prescriber_orgs_page = pager(prescriber_orgs, request.GET.get("page"), items_per_page=10)
+    prescriber_orgs_page = pager(prescriber_orgs, request.GET.get("page"), items_per_page=10)
 
     context = {
         "city": city,

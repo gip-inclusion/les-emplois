@@ -1,4 +1,3 @@
-import pytest
 from django.contrib.gis.geos import Point
 from django.template.defaultfilters import capfirst, urlencode as urlencode_filter
 from django.templatetags.static import static
@@ -400,7 +399,11 @@ class SearchPrescriberTest(TestCase):
         response = self.client.get(url)
         self.assertContains(response, "Rechercher des prescripteurs habilités")
 
-    @pytest.mark.ignore_template_errors
+    def test_invalid(self):
+        response = self.client.get(reverse("search:prescribers_results"), {"city": "foo-44"})
+        self.assertContains(response, "Rechercher des prescripteurs habilités")
+        self.assertContains(response, "Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles.")
+
     def test_results(self):
         url = reverse("search:prescribers_results")
 
