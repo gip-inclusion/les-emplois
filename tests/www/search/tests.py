@@ -423,6 +423,23 @@ class SearchPrescriberTest(TestCase):
         response = self.client.get(url, {"city": guerande.slug, "distance": 15})
         self.assertContains(response, "1 résultat")
 
+        self.assertContains(
+            response,
+            "<title>Prescripteurs habilités à 15 km du centre de Guérande (44) - Les emplois de l'inclusion</title>",
+            html=True,
+            count=1,
+        )
+
+    def test_form_invalid(self):
+        url = reverse("search:prescribers_results")
+        response = self.client.get(url)
+        self.assertContains(
+            response,
+            "<title>Rechercher des prescripteurs habilités - Les emplois de l'inclusion</title>",
+            html=True,
+            count=1,
+        )
+
 
 class JobDescriptionSearchViewTest(TestCase):
     URL = reverse_lazy("search:job_descriptions_results")
