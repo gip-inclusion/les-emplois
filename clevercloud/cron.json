@@ -19,6 +19,7 @@
   "30 1 * * * $ROOT/clevercloud/run_management_command.sh new_users_to_mailjet --wet-run",
   "0 3 * * * $ROOT/clevercloud/run_management_command.sh clearsessions",
   "15 5 * * * $ROOT/clevercloud/run_management_command.sh prolongation_requests_chores email_reminder --wet-run",
+  "0 9 * * * $ROOT/clevercloud/run_management_command.sh send_check_authorized_members_email",
   "0 12 * * * $ROOT/clevercloud/run_management_command.sh evaluation_campaign_notify",
   "30 20 * * * $ROOT/clevercloud/crons/populate_metabase_emplois.sh --daily",
   "5 23 * * * $ROOT/clevercloud/run_management_command.sh archive_employee_records --wet-run",
