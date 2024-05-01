@@ -2,9 +2,13 @@
 {% load str_filters %}
 
 {% block title %}
-    {% with request.GET.city_name as city and request.GET.distance as distance %}
-        Prescripteurs à {{ distance }} km du centre de {{ city }}
-    {% endwith %}
+    {% if "city_name" in request.GET and "distance" in request.GET %}
+        {% with request.GET.city_name as city and request.GET.distance as distance %}
+            Prescripteurs à {{ distance }} km du centre de {{ city }}
+        {% endwith %}
+    {% else %}
+        Rechercher des prescripteurs habilités
+    {% endif %}
     {{ block.super }}
 {% endblock %}
 
