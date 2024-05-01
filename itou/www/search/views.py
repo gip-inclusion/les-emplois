@@ -42,6 +42,19 @@ class EmployerSearchBaseView(FormView):
         # to be able to share the search results URL.
         return self.post(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = {
+            "back_url": reverse("search:employers_home"),
+            "filters_query_string": "",
+            "job_descriptions_count": 0,
+            "siaes_count": 0,
+            "results_page": [],
+            # Keep title as “Recherche employeurs solidaires” for matomo stats.
+            "matomo_custom_title": "Recherche d'employeurs solidaires",
+        }
+        context.update(kwargs)
+        return super().get_context_data(**context)
+
     def get_template_names(self):
         return [
             "search/includes/siaes_search_results.html" if self.request.htmx else "search/siaes_search_results.html"
@@ -139,19 +152,8 @@ class EmployerSearchBaseView(FormView):
             "results_page": results_and_counts.results_page,
             "siaes_count": results_and_counts.siaes_count,
             "job_descriptions_count": results_and_counts.job_descriptions_count,
-            # Keep title as “Recherche employeurs solidaires” for matomo stats.
-            "matomo_custom_title": "Recherche d'employeurs solidaires",
-            "back_url": reverse("search:employers_home"),
         }
-        return render(self.request, self.get_template_names(), context)
-
-    def form_invalid(self, form):
-        context = {
-            "form": form,
-            # Keep title as “Recherche employeurs solidaires” for matomo stats.
-            "matomo_custom_title": "Recherche d'employeurs solidaires",
-        }
-        return render(self.request, self.get_template_names(), context)
+        return render(self.request, self.get_template_names(), self.get_context_data(**context))
 
 
 class EmployerSearchView(EmployerSearchBaseView):
