@@ -1,5 +1,27 @@
 # Journal des modifications
 
+## 2024-05-06
+
+### Ajouté
+
+- [Ajout d'un message d'alerte pour inviter à remplir en enquête sur la réattribution des candidatures d’un collaborateur](https://github.com/gip-inclusion/les-emplois/pull/3992)
+- [Ajout d'une colonne SIRET à l’extraction CTA](https://github.com/gip-inclusion/les-emplois/pull/3994)
+- [UX/UI : Ajouter une balise `<noscript>` sur le site](https://github.com/gip-inclusion/les-emplois/pull/3972) 🖼
+
+### Modifié
+
+- [Amélioration UX du dropdown structure](https://github.com/gip-inclusion/les-emplois/pull/3968) 🖼
+- [Privilégier les administrateurs de l’organisation lors des notifications de relance des demandes de Prolongation](https://github.com/gip-inclusion/les-emplois/pull/3984)
+- [Profil utilisateur : Demander le prénom avant le nom, pour être cohérent avec le parcours d’inscription](https://github.com/gip-inclusion/les-emplois/pull/3976)
+- [Profil utilisateur : Rendre les champs prénom et nom obligatoires](https://github.com/gip-inclusion/les-emplois/pull/3977)
+- [Refonte UX/UI - Carte du contrôle a posteriori](https://github.com/gip-inclusion/les-emplois/pull/3848)
+- [Remplacer le fil d'ariane par des boutons retour](https://github.com/gip-inclusion/les-emplois/pull/3884)
+- [UX/UI : Filtrer les employeurs et postes de manière plus dynamique](https://github.com/gip-inclusion/les-emplois/pull/3949)
+
+### Supprimé
+
+- [Suppression du message d'alerte pour inviter à remplir une enquête sur la page PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/3995)
+
 ## 2024-04-29
 
 ### Ajouté
