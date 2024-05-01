@@ -1,22 +1,14 @@
 {% extends "layout/base.html" %}
-{% load str_filters %}
+{% load static %}
 
 {% block title %}
-    {% if city and distance %}
-        Prescripteurs habilités à {{ distance }} km du centre de {{ city }}
-    {% else %}
-        Rechercher des prescripteurs habilités
-    {% endif %}
+    {% include "search/includes/prescribers_search_title.html" with city=city distance=distance only %}
     {{ block.super }}
 {% endblock %}
 
 {% block script %}
     {{ block.super }}
-    <script nonce="{{ CSP_NONCE }}">
-        $("#asideFiltersCollapse :input").change(function() {
-            $("#search-form").submit();
-        });
-    </script>
+    <script src='{% static "js/htmx_compat.js" %}'></script>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -26,63 +18,25 @@
 {% block content_title %}<h1>Rechercher des prescripteurs habilités</h1>{% endblock %}
 
 {% block content %}
-    <form id="search-form" method="get" class="d-block w-100">
+    <form class="d-block w-100"
+          hx-get="{% url 'search:prescribers_results' %}"
+          hx-trigger="change delay:.5s"
+          hx-indicator="#prescribers-search-results"
+          hx-target="#prescribers-search-results"
+          hx-swap="outerHTML"
+          hx-push-url="true">
         <section class="s-section mb-0">
             <div class="s-section__container container">
                 <div class="s-section__row row">
                     <div class="col-12">
                         {% include "search/includes/prescribers_search_form.html" with form=form is_home=False only %}
                         <h2 class="mt-4">Prescripteurs</h2>
-                        <p>
-                            {{ prescriber_orgs_page.paginator.count }} résultat{{ prescriber_orgs_page.paginator.count|pluralizefr }}
-                            {% if form.is_valid %}
-                                - Prescripteur{{ prescriber_orgs_page.paginator.count|pluralizefr }} à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
-                            {% endif %}
-                        </p>
+                        {% include "search/includes/prescribers_search_summary.html" %}
                     </div>
                 </div>
                 <div class="s-section__row row">
                     <div class="col-12 col-md-4">{% include "search/includes/prescribers_search_filters.html" with form=form %}</div>
-                    <div class="col-12 col-md-8">
-                        {% for prescriber_org in prescriber_orgs_page %}
-                            <div class="c-box c-box--results has-one-link-inside mb-3 mb-md-4">
-                                <div class="c-box--results__header">
-                                    <div class="c-box--results__summary">
-                                        <i class="ri-home-smile-2-line" aria-hidden="true"></i>
-                                        <div>
-                                            <span>{{ prescriber_org.get_kind_display }}
-                                                {% if prescriber_org.is_brsa %}(conventionné par le Département pour le suivi des BRSA){% endif %}
-                                            </span>
-                                            <h3>{{ prescriber_org.name }}</h3>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex flex-column flex-md-row gap-2 align-items-md-end gap-md-3">
-                                        <ul class="c-box--results__list-contact flex-md-grow-1 mt-2 mb-2 mb-md-0">
-                                            <li>
-                                                <i class="ri-navigation-line font-weight-normal me-1"></i>
-                                                à <strong class="text-info mx-1">{{ prescriber_org.distance.km|floatformat:"-1" }} km</strong> de votre lieu de recherche
-                                            </li>
-                                            <li>
-                                                <i class="ri-map-pin-2-line font-weight-normal me-1"></i>
-                                                <address class="m-0">{{ prescriber_org.address_on_one_line }}</address>
-                                            </li>
-                                        </ul>
-                                        <div>
-                                            <a href="{{ prescriber_org.get_card_url }}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-outline-primary btn-block w-100 w-md-auto white-space-nowrap stretched-link">Voir ce prescripteur</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% empty %}
-                            <div class="c-box c-box--results mb-3 mb-md-4">
-                                <div class="c-box--results__body">
-                                    <p class="mb-0">Aucun résultat avec les filtres actuels.</p>
-                                </div>
-                            </div>
-                        {% endfor %}
-
-                        {% include "includes/pagination.html" with page=prescriber_orgs_page %}
-                    </div>
+                    <div class="col-12 col-md-8">{% include "search/includes/prescribers_search_results.html" %}</div>
                 </div>
             </div>
         </section>

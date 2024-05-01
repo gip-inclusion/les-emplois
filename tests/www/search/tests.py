@@ -440,6 +440,29 @@ class SearchPrescriberTest(TestCase):
             count=1,
         )
 
+    def test_htmx_reload(self):
+        url = reverse("search:prescribers_results")
+
+        vannes = create_city_vannes()
+        guerande = create_city_guerande()
+        PrescriberOrganizationFactory(authorized=True, coords=guerande.coords)
+        PrescriberOrganizationFactory(authorized=True, coords=vannes.coords)
+
+        response = self.client.get(url, {"city": guerande.slug, "distance": 10})
+        simulated_page = parse_response_to_soup(response)
+
+        def distance_radio(distance):
+            [elt] = simulated_page.find_all("input", attrs={"name": "distance", "value": f"{distance}"})
+            return elt
+
+        distance_radio(100)["checked"] = "checked"
+        del distance_radio(10)["checked"]
+        response = self.client.get(url, {"city": guerande.slug, "distance": 100}, headers={"HX-Request": "true"})
+        update_page_with_htmx(simulated_page, f"form[hx-get='{url}']", response)
+        response = self.client.get(url, {"city": guerande.slug, "distance": 100})
+        fresh_page = parse_response_to_soup(response)
+        assertSoupEqual(simulated_page, fresh_page)
+
 
 class JobDescriptionSearchViewTest(TestCase):
     URL = reverse_lazy("search:job_descriptions_results")
