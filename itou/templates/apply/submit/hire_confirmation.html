@@ -12,7 +12,7 @@
         <h2>Candidat</h2>
         <hr>
         <h3>Informations personnelles</h3>
-        {% include "apply/includes/job_seeker_info.html" %}
+        {% include "apply/includes/job_seeker_info.html" with with_matomo_event=False %}
 
         {% include "apply/includes/eligibility_diagnosis.html" with job_seeker=job_seeker siae=siae eligibility_diagnosis=eligibility_diagnosis is_sent_by_authorized_prescriber=False %}
 

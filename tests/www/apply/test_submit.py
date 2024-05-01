@@ -2387,7 +2387,6 @@ class DirectHireFullProcessTest(TestCase):
         response = self.client.get(next_url)
         assert response.status_code == 200
 
-    @pytest.mark.ignore_template_errors
     def test_hire_as_geiq(self):
         """Apply as GEIQ with pre-existing job seeker without previous application"""
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"), kind=CompanyKind.GEIQ)
@@ -4209,7 +4208,6 @@ class GEIQEligibilityForHireTestCase(TestCase):
         response = self.client.get(self._reverse("apply:eligibility_for_hire"))
         self.assertRedirects(response, self._reverse("apply:hire_confirmation"))
 
-    @pytest.mark.ignore_template_errors
     def test_job_seeker_without_valid_diagnosis(self):
         self.company = CompanyFactory(kind=CompanyKind.GEIQ, with_membership=True)
         assert not GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, self.company).exists()

@@ -57,6 +57,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
         "form_accept": form_accept,
         "form_user_address": form_user_address,
         "form_personal_data": form_personal_data,
+        "has_form_error": any(form.errors for form in forms),
         "can_view_personal_information": True,  # SIAE members have access to personal info
         "hide_value": ContractType.OTHER.value,
         "matomo_custom_title": "Candidature acceptée",
@@ -272,9 +273,15 @@ def _geiq_eligibility_criteria(
         "form": form,
         "allowance_amount": allowance_amount,
         "progress": 66,
+        "back_url": reverse(
+            "apply:check_job_seeker_info_for_hire",
+            kwargs={"job_seeker_pk": job_seeker.pk, "company_pk": siae.pk},
+        ),
     }
 
-    if job_seeker.address_in_qpv or job_seeker.zrr_city_name:
-        context |= {"geo_criteria_detected": True, "job_seeker": job_seeker}
+    geo_criteria_detected = job_seeker.address_in_qpv or job_seeker.zrr_city_name
+    context["geo_criteria_detected"] = geo_criteria_detected
+    if geo_criteria_detected:
+        context["job_seeker"] = job_seeker
 
     return render(request, template_name, context)
