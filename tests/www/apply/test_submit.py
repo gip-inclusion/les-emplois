@@ -4199,7 +4199,6 @@ class GEIQEligibilityForHireTestCase(TestCase):
         response = self.client.get(self._reverse("apply:geiq_eligibility_for_hire"))
         assert response.status_code == 404
 
-    @pytest.mark.ignore_unknown_variable_template_error
     def test_job_seeker_with_valid_diagnosis(self):
         diagnosis = GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, with_geiq=True)
         diagnosis.administrative_criteria.add(GEIQAdministrativeCriteria.objects.get(pk=19))
@@ -4249,7 +4248,6 @@ class GEIQEligibilityForHireTestCase(TestCase):
         assert GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, self.company).exists()
 
 
-@pytest.mark.ignore_unknown_variable_template_error
 class HireConfirmationTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -4410,7 +4408,6 @@ class NewHireProcessInfoTestCase(TestCase):
         self.assertNotContains(response, self.GEIQ_APPLY_PROCESS_INFO)
         self.assertNotContains(response, self.GEIQ_DIRECT_HIRE_PROCESS_INFO)
 
-    @pytest.mark.ignore_unknown_variable_template_error
     def test_as_prescriber(self):
         self.client.force_login(PrescriberFactory())
         response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"company_pk": self.company.pk}))
@@ -4420,7 +4417,6 @@ class NewHireProcessInfoTestCase(TestCase):
         self.assertNotContains(response, self.GEIQ_APPLY_PROCESS_INFO)
         self.assertNotContains(response, self.GEIQ_DIRECT_HIRE_PROCESS_INFO)
 
-    @pytest.mark.ignore_unknown_variable_template_error
     def test_as_employer(self):
         self.client.force_login(self.company.members.first())
         response = self.client.get(reverse("apply:check_nir_for_sender", kwargs={"company_pk": self.company.pk}))
