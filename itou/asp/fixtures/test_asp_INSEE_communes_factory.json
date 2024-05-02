@@ -518,5 +518,15 @@
       "start_date": "1900-01-01",
       "end_date": null
     }
+  },
+  {
+    "model": "asp.Commune",
+    "pk": 76197,
+    "fields": {
+      "code": "97801",
+      "name": "SAINT-MARTIN",
+      "start_date": "2007-02-21",
+      "end_date": null
+    }
   }
 ]

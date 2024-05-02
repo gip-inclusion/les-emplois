@@ -505,6 +505,7 @@ class CommunesAutocompleteTest(TestCase):
         assert response.status_code == 200
         assert response.json() == [
             {"code": "64483", "department": "064", "value": "SAINT-JEAN-DE-LUZ (064)"},
+            {"code": "97801", "department": "978", "value": "SAINT-MARTIN (978)"},
             {"code": "62758", "department": "062", "value": "SAINT-MARTIN-BOULOGNE (062)"},
         ]
 
@@ -539,6 +540,7 @@ class Select2CommunesAutocompleteTest(TestCase):
         assert response.json() == {
             "results": [
                 {"id": Commune.objects.by_insee_code("64483").pk, "text": "SAINT-JEAN-DE-LUZ (064)"},
+                {"id": Commune.objects.by_insee_code("97801").pk, "text": "SAINT-MARTIN (978)"},
                 {"id": Commune.objects.by_insee_code("62758").pk, "text": "SAINT-MARTIN-BOULOGNE (062)"},
             ]
         }
