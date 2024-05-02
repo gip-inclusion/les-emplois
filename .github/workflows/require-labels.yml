@@ -2,7 +2,9 @@ name: Label Checks
 
 # Add merge_group and make the check required when
 # https://github.com/mheap/github-action-required-labels/issues/66 is solved.
-on: [pull_request]
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
 
 jobs:
   require-label:
