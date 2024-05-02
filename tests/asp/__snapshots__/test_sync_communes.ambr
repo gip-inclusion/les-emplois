@@ -104,7 +104,8 @@
     '\tREMOVED {"code": "91432", "name": "MORANGIS", "start_date": "1968-01-01", "end_date": "1999-12-31"}',
     '\tREMOVED {"code": "91432", "name": "MORANGIS", "start_date": "2000-01-01", "end_date": null}',
     '\tREMOVED {"code": "97108", "name": "CAPESTERRE-DE-MARIE-GALANT", "start_date": "1900-01-01", "end_date": null}',
-    '> successfully deleted count=52 communes',
+    '\tREMOVED {"code": "97801", "name": "SAINT-MARTIN", "start_date": "2007-02-21", "end_date": null}',
+    '> successfully deleted count=53 communes',
     '> successfully updated count=0 communes',
     '> successfully created count=35 new communes',
   ])

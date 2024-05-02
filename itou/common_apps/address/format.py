@@ -3,6 +3,7 @@ import re
 from unidecode import unidecode
 
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
+from itou.cities.models import City
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.apis.geocoding import get_geocoding_data
 
@@ -124,7 +125,12 @@ def format_address(obj):
 
     # INSEE code: must double check with ASP ref file
     result["insee_code"] = address.get("insee_code")
-    result["post_code"] = address.get("post_code")
     result["city"] = address.get("city")
+
+    postal_code = address.get("post_code")
+    if not postal_code and result["insee_code"]:
+        # Don't try to do smart things when there is multiple post codes, taking the first one should be enough.
+        postal_code = City.objects.get(code_insee=result["insee_code"]).post_codes[0]
+    result["post_code"] = postal_code
 
     return result, None

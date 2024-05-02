@@ -7,6 +7,7 @@ from unittest import mock
 import freezegun
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.contrib.gis.geos import Point
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import IntegrityError, transaction
@@ -16,6 +17,7 @@ from django.utils import timezone
 import tests.asp.factories as asp
 from itou.approvals.models import Approval
 from itou.asp.models import AllocationDuration, EducationLevel
+from itou.cities.models import City
 from itou.companies.enums import CompanyKind
 from itou.job_applications.enums import JobApplicationState, Origin
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
@@ -798,6 +800,31 @@ class JobSeekerProfileModelTest(TestCase):
         }
         with pytest.raises(ValidationError, match="Le code INSEE 75056 n'est pas référencé par l'ASP"):
             self.profile.update_hexa_address()
+
+    @mock.patch("itou.common_apps.address.format.get_geocoding_data")
+    def test_job_seeker_hexa_address_when_the_ban_does_not_return_a_postal_code(self, get_geocoding_data_mock):
+        City.objects.create(
+            name="Saint-Martin",
+            slug="saint-martin-978",
+            department="978",
+            coords=Point(-63.0619, 18.0859),
+            post_codes=["97150"],
+            code_insee="97801",
+        )
+
+        get_geocoding_data_mock.return_value = {
+            "additional_address": "",
+            "city": "Saint-Martin",
+            "insee_code": "97801",
+            "lane": "Queen Parrot Fish",
+            "lane_type": "IMP",
+            "non_std_extension": "",
+            "number": "",
+            "post_code": None,
+        }
+        self.profile.update_hexa_address()
+        self.profile.refresh_from_db()
+        assert self.profile.hexa_post_code == "97150"
 
     def test_job_seeker_details_complete(self):
         self.profile.user.title = None
