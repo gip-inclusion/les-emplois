@@ -104,6 +104,7 @@ DRPE_SAFIR_CODES = [
 # By default (`None`) a DTPE oversees its own department unless a list of several departments is specified below.
 DTPE_SAFIR_CODE_TO_DEPARTMENTS = {
     # Note that the first two digits of the SAFIR code usually indicate the department.
+    "04016": ["04", "05"],
     "10038": None,
     "11030": ["09", "11"],
     "13010": None,
