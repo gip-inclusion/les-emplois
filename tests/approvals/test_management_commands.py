@@ -24,10 +24,8 @@ class ExportPEApiRejectionsTestCase(TestCase):
             pe_notification_exit_code="FOOBAR",
             user__last_name="Pers,e",
             user__first_name='Jul"ie',
-            with_jobapplication=True,
-            with_jobapplication__to_company__department=42,
-            with_jobapplication__to_company__kind="EI",
-            with_jobapplication__to_company__name="Ma petite entreprise",
+            origin_siae_kind="EI",
+            origin_siae_siret="12345678900000",
         )
         stdout = io.StringIO()
         management.call_command("export_pe_api_rejections", stdout=stdout, stderr=io.StringIO())
@@ -44,8 +42,7 @@ class ExportPEApiRejectionsTestCase(TestCase):
                     "prenom",
                     "date_naissance",
                     "siae_type",
-                    "siae_raison_sociale",
-                    "siae_departement",
+                    "siae_siret",
                 ],
                 [
                     approval.number,
@@ -57,8 +54,7 @@ class ExportPEApiRejectionsTestCase(TestCase):
                     'Jul"ie',
                     str(approval.user.birthdate),
                     "EI",
-                    "Ma petite entreprise",
-                    "42",
+                    "12345678900000",
                 ],
             ]
         finally:
