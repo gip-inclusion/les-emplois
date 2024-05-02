@@ -30,14 +30,17 @@ class FollowUpGroup(models.Model):
         verbose_name = "groupe de suivi"
         verbose_name_plural = "groupes de suivi"
 
+    def __str__(self):
+        return "Groupe de " + self.beneficiary.get_full_name()
+
 
 class FollowUpGroupMembership(models.Model):
 
-    is_referent = models.BooleanField(default=False)
+    is_referent = models.BooleanField(default=False, verbose_name="référent")
 
     # Is this user still an active member of the group?
     # Or maybe waiting for an invitation to be activated?
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, verbose_name="actif")
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
 
@@ -67,3 +70,6 @@ class FollowUpGroupMembership(models.Model):
         related_name="created_follow_up_groups",
         on_delete=models.RESTRICT,
     )
+
+    def __str__(self):
+        return self.follow_up_group.beneficiary.get_full_name() + " => " + self.member.get_full_name()
