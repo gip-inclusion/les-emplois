@@ -15,7 +15,7 @@ class FailingForm:
         raise Exception("Something bad")
 
 
-@pytest.mark.ignore_unknown_variable_template_error
+@pytest.mark.ignore_unknown_variable_template_error("messages", "request")
 def test_error_handling(client, mocker):
     mocker.patch("itou.www.search.views.SiaeSearchForm", FailingForm)
 
@@ -28,7 +28,7 @@ def test_error_handling(client, mocker):
         client.get(reverse("search:employers_home"))
 
 
-@pytest.mark.ignore_unknown_variable_template_error
+@pytest.mark.ignore_unknown_variable_template_error("messages", "request")
 def test_handler500_view():
     factory = RequestFactory()
     request = factory.get("/")
