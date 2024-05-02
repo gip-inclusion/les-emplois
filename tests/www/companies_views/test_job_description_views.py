@@ -600,7 +600,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         self.assertContains(response, reverse("companies_views:job_description_list"))
         self.assertNotContains(response, self.apply_start_url(self.company))
 
-    @pytest.mark.ignore_unknown_variable_template_error
+    @pytest.mark.ignore_unknown_variable_template_error("matomo_event_attrs")
     def test_prescriber_card_actions(self):
         # Checks if non-employers can apply to opened job descriptions
         self.client.force_login(PrescriberOrganizationWithMembershipFactory().members.first())
@@ -624,7 +624,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
             self.update_job_description_url(self.job_description),
         )
 
-    @pytest.mark.ignore_unknown_variable_template_error
+    @pytest.mark.ignore_unknown_variable_template_error("matomo_event_attrs")
     def test_job_seeker_card_actions(self):
         self.client.force_login(JobSeekerFactory())
 
@@ -642,7 +642,7 @@ class JobDescriptionCardTest(JobDescriptionAbstractTest):
         self.assertContains(response, self.apply_start_url(self.company))
         self.assertNotContains(response, self.update_job_description_url(self.job_description))
 
-    @pytest.mark.ignore_unknown_variable_template_error
+    @pytest.mark.ignore_unknown_variable_template_error("matomo_event_attrs")
     def test_anonymous_card_actions(self):
         response = self.client.get(self.url)
 

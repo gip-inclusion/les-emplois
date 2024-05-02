@@ -303,7 +303,7 @@ class TestApprovalsListView:
         response = client.get(url)
         assertContains(response, "0 résultat")
 
-    @pytest.mark.ignore_unknown_variable_template_error
+    @pytest.mark.ignore_unknown_variable_template_error("boost", "boost_target", "boost_indicator")
     def test_approval_expiry_filter_default(self, client):
         company = CompanyFactory(with_membership=True)
         # Make sure we have access to page 2

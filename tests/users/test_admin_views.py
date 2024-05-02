@@ -124,6 +124,7 @@ class TestTransferUserData:
         response = client.get(reverse("admin:users_user_change", kwargs={"object_id": user.pk}))
         assertContains(response, transfer_url)
 
+    @pytest.mark.ignore_unknown_variable_template_error("matomo_custom_title")
     def test_transfer_without_change_permission(self, client):
         from_user = JobSeekerFactory()
         to_user = JobSeekerFactory()
@@ -141,7 +142,7 @@ class TestTransferUserData:
         response = client.get(transfer_url_2)
         assert response.status_code == 403
 
-    @pytest.mark.ignore_unknown_variable_template_error
+    @pytest.mark.ignore_unknown_variable_template_error("has_view_permission", "subtitle")
     def test_transfer_no_data_to_transfer(self, admin_client):
         user = JobSeekerFactory()
         transfer_url = reverse("admin:transfer_user_data", kwargs={"from_user_pk": user.pk})
@@ -149,7 +150,7 @@ class TestTransferUserData:
         assertContains(response, self.IMPOSSIBLE_TRANSFER_TEXT)
         assertNotContains(response, self.CHOOSE_TARGET_TEXT, html=True)
 
-    @pytest.mark.ignore_unknown_variable_template_error
+    @pytest.mark.ignore_unknown_variable_template_error("has_view_permission", "subtitle")
     @freeze_time("2023-08-31 12:34:56")
     def test_transfer_data(self, admin_client, snapshot):
         job_application = JobApplicationFactory(with_approval=True)

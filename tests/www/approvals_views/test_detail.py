@@ -100,7 +100,7 @@ class TestApprovalDetailView:
         assertContains(response, "Informations du salarié")
         assertContains(response, "Candidatures de ce salarié")
 
-    @pytest.mark.ignore_unknown_variable_template_error
+    @pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
     @freeze_time("2023-04-26")
     def test_approval_status_includes(self, client, snapshot):
         """

@@ -116,7 +116,7 @@ def test_job_application_job_seeker_in_list():
 # QPV / ZRR eligibility details
 
 
-@pytest.mark.ignore_unknown_variable_template_error
+@pytest.mark.ignore_unknown_variable_template_error("request")
 def test_known_criteria_template_with_no_criterion():
     tmpl = load_template("apply/includes/known_criteria.html")
     rendered = tmpl.render(Context({"job_seeker": JobSeekerWithAddressFactory()}))
@@ -126,7 +126,7 @@ def test_known_criteria_template_with_no_criterion():
     assert "est partiellement classée en ZRR" not in rendered
 
 
-@pytest.mark.ignore_unknown_variable_template_error
+@pytest.mark.ignore_unknown_variable_template_error("request")
 def test_known_criteria_template_with_qpv_criterion():
     tmpl = load_template("apply/includes/known_criteria.html")
     job_seeker = JobSeekerWithAddressFactory(with_address_in_qpv=True)
@@ -138,7 +138,7 @@ def test_known_criteria_template_with_qpv_criterion():
     assert escape(job_seeker.address_on_one_line) in rendered
 
 
-@pytest.mark.ignore_unknown_variable_template_error
+@pytest.mark.ignore_unknown_variable_template_error("request")
 def test_known_criteria_template_with_zrr_criterion():
     tmpl = load_template("apply/includes/known_criteria.html")
     job_seeker = JobSeekerWithAddressFactory(with_city_in_zrr=True)
@@ -150,7 +150,7 @@ def test_known_criteria_template_with_zrr_criterion():
     assert escape(job_seeker.city) in rendered
 
 
-@pytest.mark.ignore_unknown_variable_template_error
+@pytest.mark.ignore_unknown_variable_template_error("request")
 def test_known_criteria_template_with_partial_zrr_criterion():
     tmpl = load_template("apply/includes/known_criteria.html")
     job_seeker = JobSeekerWithAddressFactory(with_city_partially_in_zrr=True)

@@ -601,7 +601,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
 
         assert response.status_code == 404
 
-    @pytest.mark.ignore_unknown_variable_template_error
+    @pytest.mark.ignore_unknown_variable_template_error("reviewed_at")
     def test_access(self):
         self.client.force_login(self.user)
 
@@ -630,7 +630,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
         assert evaluated_job_application.compute_state() == response.context["state"]
         assert evaluated_siae.siae.kind == response.context["kind"]
 
-    @pytest.mark.ignore_unknown_variable_template_error
+    @pytest.mark.ignore_unknown_variable_template_error("reviewed_at")
     def test_context_fields_list(self):
         self.client.force_login(self.user)
 
@@ -655,7 +655,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
             assert level_1 is bool(response.context["level_1_fields"])
             assert level_2 is bool(response.context["level_2_fields"])
 
-    @pytest.mark.ignore_unknown_variable_template_error
+    @pytest.mark.ignore_unknown_variable_template_error("reviewed_at")
     def test_post(self):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         criterion = (
@@ -701,7 +701,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
         assert response.status_code == 403
         assert evaluated_job_application.evaluated_administrative_criteria.count() == 0
 
-    @pytest.mark.ignore_unknown_variable_template_error
+    @pytest.mark.ignore_unknown_variable_template_error("reviewed_at")
     def test_initial_data_form(self):
         # no preselected criteria
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
