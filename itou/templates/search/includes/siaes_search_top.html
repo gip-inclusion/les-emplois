@@ -2,19 +2,81 @@
 <div id="job-search-top"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
     {% if request.resolver_match.view_name == "search:employers_results" %}
         <h2>Employeur{{ siaes_count|pluralizefr }}</h2>
-        <p>
-            {{ siaes_count }} résultat{{ siaes_count|pluralizefr }}
-            {% if form.is_valid %}
-                - Emplois inclusifs à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2">
+            <p class="mb-0">
+                {{ siaes_count }} résultat{{ siaes_count|pluralizefr }}
+                {% if form.is_valid %}
+                    - Emplois inclusifs à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
+                {% endif %}
+            </p>
+            {% if siaes_count %}
+                <button class="btn btn-ico btn-link text-nowrap" data-bs-toggle="modal" data-bs-target="#companiesSortingTipModal">
+                    <i class="ri-information-fill font-weight-medium" aria-hidden="true"></i>
+                    <span>Comment sont triés ces résultats ?</span>
+                </button>
+                <div class="modal fade" id="companiesSortingTipModal" tabindex="-1" aria-labelledby="companiesSortingTipModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 class="modal-title" id="companiesSortingTipModalLabel">Comment sont triés ces résultats ?</h3>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="fw-bold">Pour les résultats d’employeurs inclusifs, l’ordre de priorité est le suivant&nbsp;:</p>
+                                <ol>
+                                    <li>
+                                        Les employeurs actifs (c’est à dire les structures qui ont des membres inscrits) qui ont moins de candidatures par rapport au nombre de postes ouverts au recrutement
+                                    </li>
+                                    <li>Les employeurs actifs ayant des postes ouverts au recrutement</li>
+                                    <li>Les employeurs actifs ayant publié des fiches de postes</li>
+                                    <li>Les employeurs actifs ayant bloqué la réception des candidatures</li>
+                                    <li>Les employeurs inactifs (sans membres actifs)</li>
+                                </ol>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal">J’ai compris</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             {% endif %}
-        </p>
+        </div>
     {% else %}
         <h2>Poste{{ job_descriptions_count|pluralizefr }} ouvert{{ job_descriptions_count|pluralizefr }} au recrutement</h2>
-        <p>
-            {{ job_descriptions_count }} résultat{{ job_descriptions_count|pluralizefr }}
-            {% if form.is_valid %}
-                - Emplois inclusifs à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2">
+            <p class="mb-0">
+                {{ job_descriptions_count }} résultat{{ job_descriptions_count|pluralizefr }}
+                {% if form.is_valid %}
+                    - Emplois inclusifs à <strong>{{ distance }} km</strong> du centre de <strong>{{ city }}</strong>
+                {% endif %}
+            </p>
+            {% if job_descriptions_count %}
+                <button class="btn btn-ico btn-link text-nowrap" data-bs-toggle="modal" data-bs-target="#jobDescriptionsSortingTipModal">
+                    <i class="ri-information-fill font-weight-medium" aria-hidden="true"></i>
+                    <span>Comment sont triés ces résultats ?</span>
+                </button>
+                <div class="modal fade" id="jobDescriptionsSortingTipModal" tabindex="-1" aria-labelledby="jobDescriptionsSortingTipModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h3 class="modal-title" id="jobDescriptionsSortingTipModalLabel">Comment sont triés ces résultats ?</h3>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p class="fw-bold">Pour les résultats des postes ouverts au recrutement, l’ordre de priorité est le suivant&nbsp;:</p>
+                                <ol>
+                                    <li>Les postes des emplois de l’inclusion</li>
+                                    <li>Les postes mis à jour récemment</li>
+                                    <li>Les postes créés récemment</li>
+                                </ol>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-sm btn-primary" data-bs-dismiss="modal">J’ai compris</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             {% endif %}
-        </p>
+        </div>
     {% endif %}
 </div>
