@@ -852,6 +852,38 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         membership = user.prescribermembership_set.get(organization=org)
         assert membership.is_admin
 
+    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+    def test_hidden_organization_kinds(self, _mock_call_ban_geocoding_api):
+        """
+        HIDDEN_PRESCRIBER_KINDS should not be displayed or chosen in the form
+        """
+
+        siret = "26570134200148"
+
+        # Step 1: search organizations with SIRET
+        url = reverse("signup:prescriber_check_already_exists")
+        post_data = {
+            "siret": siret,
+            "department": "67",
+        }
+        response = self.client.post(url, data=post_data)
+
+        # Step 2: ask the user to choose the organization he's working for in a pre-existing list.
+        url = reverse("signup:prescriber_choose_org", kwargs={"siret": siret})
+        self.assertRedirects(response, url)
+
+        response = self.client.get(url)
+        self.assertContains(response, PrescriberOrganizationKind.CAP_EMPLOI.value)
+        self.assertNotContains(response, PrescriberOrganizationKind.OHPD.value)
+        self.assertNotContains(response, PrescriberOrganizationKind.OCASF.value)
+        # We cannot check for Orienteur since it's also in the template in other places
+        # but we can check it's refused in the form
+        post_data = {
+            "kind": PrescriberOrganizationKind.ORIENTEUR.value,
+        }
+        response = self.client.post(url, data=post_data)
+        assert "kind" in response.context["form"].errors
+
 
 class InclusionConnectPrescribersViewsExceptionsTest(MessagesTestMixin, InclusionConnectBaseTestCase):
     """

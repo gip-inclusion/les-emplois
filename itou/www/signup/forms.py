@@ -7,7 +7,7 @@ from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.prescribers.enums import CHOOSABLE_PRESCRIBER_KINDS
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import Title, UserKind
 from itou.users.forms import validate_francetravail_email
@@ -254,7 +254,7 @@ class PrescriberChooseOrgKindForm(forms.Form):
     kind = forms.ChoiceField(
         label="Pour qui travaillez-vous ?",
         widget=forms.RadioSelect,
-        choices=PrescriberOrganizationKind.choices,
+        choices=CHOOSABLE_PRESCRIBER_KINDS,
     )
 
     def clean_kind(self):
