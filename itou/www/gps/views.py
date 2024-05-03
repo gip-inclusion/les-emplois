@@ -1,13 +1,16 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.utils.decorators import settings_protected_view
 from itou.www.gps.forms import GpsUserSearchForm
 
 
 @login_required
+@settings_protected_view("GPS_ENABLED")
+@user_passes_test(lambda u: not u.is_job_seeker, login_url=reverse_lazy("dashboard:index"), redirect_field_name=None)
 def my_groups(request, template_name="gps/my_groups.html"):
 
     current_user = request.user
@@ -32,6 +35,8 @@ def my_groups(request, template_name="gps/my_groups.html"):
 
 
 @login_required
+@settings_protected_view("GPS_ENABLED")
+@user_passes_test(lambda u: not u.is_job_seeker, login_url=reverse_lazy("dashboard:index"), redirect_field_name=None)
 def join_group(request, template_name="gps/join_group.html"):
 
     form = GpsUserSearchForm(data=request.POST or None)

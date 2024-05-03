@@ -1,4 +1,27 @@
 # serializer version: 1
+# name: test_access_gps_enabled
+  '''
+  <div class="col mb-3 mb-md-5" id="gps-card">
+      <div class="c-box p-0 h-100">
+          
+          <div class="c-box__header--gps p-3 p-lg-4">
+              <span class="h4 m-0">GPS</span>
+          </div>
+          <div class="px-3 px-lg-4 pt-3 pt-lg-4">
+              <ul class="list-unstyled mb-lg-5">
+                  <li class="d-flex justify-content-between align-items-center mb-3">
+                      <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/my_groups" rel="noopener" target="_blank">
+                          <i class="ri-article-line ri-lg font-weight-normal align-self-start"></i>
+                          <span>Visualiser les bénéficiaires</span>
+                          <i class="ri-external-link-line font-weight-normal ms-2"></i>
+                      </a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </div>
+  '''
+# ---
 # name: test_join_group_as_job_seeker[False]
   '''
   <section class="s-box" id="join_group">
@@ -131,8 +154,24 @@
 # ---
 # name: test_navigation
   '''
-  <div class="c-box__header--gps p-3 p-lg-4">
+  <div class="col mb-3 mb-md-5" id="gps-card">
+      <div class="c-box p-0 h-100">
+          
+          <div class="c-box__header--gps p-3 p-lg-4">
               <span class="h4 m-0">GPS</span>
           </div>
+          <div class="px-3 px-lg-4 pt-3 pt-lg-4">
+              <ul class="list-unstyled mb-lg-5">
+                  <li class="d-flex justify-content-between align-items-center mb-3">
+                      <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/my_groups" rel="noopener" target="_blank">
+                          <i class="ri-article-line ri-lg font-weight-normal align-self-start"></i>
+                          <span>Visualiser les bénéficiaires</span>
+                          <i class="ri-external-link-line font-weight-normal ms-2"></i>
+                      </a>
+                  </li>
+              </ul>
+          </div>
+      </div>
+  </div>
   '''
 # ---
