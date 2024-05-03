@@ -22,6 +22,7 @@ def expose_settings(request):
         "ALLOWED_HOSTS": settings.ALLOWED_HOSTS,
         "API_EMAIL_CONTACT": settings.API_EMAIL_CONTACT,
         "DORA_BASE_URL": settings.DORA_BASE_URL,
+        "GPS_ENABLED": settings.GPS_ENABLED,
         "ITOU_HELP_CENTER_URL": help_center_url,
         "ITOU_EMAIL_CONTACT": settings.ITOU_EMAIL_CONTACT,
         "ITOU_ENVIRONMENT": settings.ITOU_ENVIRONMENT,
