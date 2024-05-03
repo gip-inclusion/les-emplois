@@ -6,6 +6,7 @@ class PrescriberOrganizationKind(models.TextChoices):
     # cf test_prescriber_kinds_are_alphabetically_sorted test
     AFPA = "AFPA", "AFPA - Agence nationale pour la formation professionnelle des adultes"
     ASE = "ASE", "ASE - Aide sociale à l'enfance"
+    ORIENTEUR = "Orienteur", "Autre organisation (orienteur)"
     CAARUD = (
         "CAARUD",
         ("CAARUD - Centre d'accueil et d'accompagnement à la réduction de risques pour usagers de drogues"),
@@ -35,6 +36,8 @@ class PrescriberOrganizationKind(models.TextChoices):
     )
     OIL = "OIL", "Opérateur d'intermédiation locative"
     ODC = "ODC", "Organisation délégataire d'un Conseil Départemental (Orientation et suivi des BRSA)"
+    OHPD = "OHPD", "Organisme habilité par le préfet de département"
+    OCASF = "OCASF", "Organisme mentionné au 8° du I de l’article L. 312-1 du code de l’action sociale et des familles"
     PENSION = "PENSION", "Pension de famille / résidence accueil"
     PIJ_BIJ = "PIJ_BIJ", "PIJ-BIJ - Point/Bureau information jeunesse"
     PJJ = "PJJ", "PJJ - Protection judiciaire de la jeunesse"
@@ -51,6 +54,16 @@ class PrescriberOrganizationKind(models.TextChoices):
             return PrescriberOrganizationKind.OTHER
         return self
 
+
+HIDDEN_PRESCRIBER_KINDS = [
+    PrescriberOrganizationKind.OHPD,
+    PrescriberOrganizationKind.OCASF,
+    PrescriberOrganizationKind.ORIENTEUR,
+]
+
+CHOOSABLE_PRESCRIBER_KINDS = [
+    (k, v) for k, v in PrescriberOrganizationKind.choices if k not in HIDDEN_PRESCRIBER_KINDS
+]
 
 # Sensitive prescriber kinds that we do not want to send via PE API
 PE_SENSITIVE_PRESCRIBER_KINDS = {
