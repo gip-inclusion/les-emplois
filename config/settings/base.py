@@ -657,4 +657,4 @@ DORA_BASE_URL = os.getenv("DORA_BASE_URL", "https://dora.inclusion.beta.gouv.fr"
 # GPS
 # ------------------------------------------------------------------------------
 # Until GPS goes live for everyone, keep the feature hidden in production.
-GPS_ENABLED = ITOU_ENVIRONMENT != "PROD"
+GPS_ENABLED = ITOU_ENVIRONMENT not in ("DEMO", "PROD")
