@@ -1,7 +1,7 @@
 {% load theme_inclusion %}
 {% for message in messages %}
     {% if "toast" in message.tags %}
-        <div class="toast {{ message|itou_toast_classes }} show" role="status" aria-live="assertive" aria-atomic="true">
+        <div class="toast {{ message|itou_toast_classes }}" role="status" aria-live="assertive" aria-atomic="true" data-delay="6000">
             <div class="toast-header">
                 {% if message.level_tag == "warning" %}
                     <i class="ri-error-warning-line ri-lg me-1" aria-hidden="true"></i>
