@@ -69,7 +69,7 @@ django-htmx  # https://github.com/adamchainz/django-htmx
 pandas==1.5.*  # https://github.com/pandas-dev/pandas
 
 # Eye candy progress bar
-tqdm==4.64.*  # https://github.com/tqdm/tqdm
+tqdm  # https://github.com/tqdm/tqdm
 
 # Read Excel files with Pandas (pandas.read_excel)
 xlrd==2.0.*  # https://pypi.org/project/xlrd/
