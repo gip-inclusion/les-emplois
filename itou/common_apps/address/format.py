@@ -17,7 +17,7 @@ LANE_NUMBER_RE = r"^([0-9]{1,5})(.*?)$"
 ADDITIONAL_ADDRESS_RE = r"^[a-zA-Z0-9@ ]{,32}$"
 
 
-def format_address(obj):
+def compute_hexa_address(obj):
     """
     Formats the address contained in obj into a valid address "structure" for ASP ER exports.
 

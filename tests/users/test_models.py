@@ -774,8 +774,6 @@ class JobSeekerProfileModelTest(TestCase):
         side_effect=mock_get_geocoding_data,
     )
     def test_job_seeker_hexa_address_with_unknown_lane_type(self, _mock):
-        # FIXME: rework geolocation mock and move this kind of tests to
-        # a test suite for utils.format_address
         self.profile._clean_job_seeker_hexa_address()
         user = self.profile.user
         user.address_line_1 = "8 la boutrie - caillot"

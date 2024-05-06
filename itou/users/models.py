@@ -29,7 +29,7 @@ from itou.asp.models import (
     RSAAllocation,
 )
 from itou.common_apps.address.departments import department_from_postcode
-from itou.common_apps.address.format import format_address
+from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.enums import CompanyKind
 from itou.utils.models import UniqueConstraintWithErrorCode
@@ -1112,7 +1112,7 @@ class JobSeekerProfile(models.Model):
         """
         This method tries to fill the HEXA address fields based the current address of the job seeker (`User` model).
         """
-        result, error = format_address(self.user)
+        result, error = compute_hexa_address(self.user)
 
         if error:
             raise ValidationError(error)
