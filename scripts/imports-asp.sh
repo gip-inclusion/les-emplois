@@ -19,13 +19,13 @@ set +x
 
 cd "$APP_HOME" || exit
 
-FLUX_IAE_FILE=$(find asp_shared_bucket/ -name 'fluxIAE_*.zip' -type f -mtime -5)
+FLUX_IAE_FILE=$(find dgefp_shared_bucket/ -name 'fluxIAE_*.zip' -type f -mtime -5)
 if [[ ! -f "$FLUX_IAE_FILE" ]]; then
     echo "Missing the flux IAE file."
     exit 0
 fi
 
-CONTACT_EA_FILE=$(find asp_shared_bucket/ -name 'Liste_Contact_EA_*.zip' -type f -mtime -5)
+CONTACT_EA_FILE=$(find dgefp_shared_bucket/ -name 'Liste_Contact_EA_*.zip' -type f -mtime -5)
 if [[ ! -f "$CONTACT_EA_FILE" ]]; then
     echo "Missing the contact EA file."
     exit 0
@@ -55,4 +55,4 @@ time ./manage.py import_ea_eatt --wet-run --verbosity=2 |& tee -a "$OUTPUT_PATH/
 rm -rf "$FLUX_IAE_DIR"
 
 # Remove ASP files older than 3 weeks
-find asp_shared_bucket/ -name '*.zip' -type f -mtime +20 -delete
+find dgefp_shared_bucket/ -name '*.zip' -type f -mtime +20 -delete
