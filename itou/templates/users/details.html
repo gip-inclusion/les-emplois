@@ -3,9 +3,9 @@
 {% load str_filters %}
 {% load format_filters %}
 
-{% block title %}Profil salarié - {{ object.get_full_name }} {{ block.super }}{% endblock %}
+{% block title %}Profil salarié - {{ user.get_full_name }} {{ block.super }}{% endblock %}
 
-{% block content_title %}<h1>{{ object.get_full_name }}</h1>{% endblock %}
+{% block content_title %}<h1>{{ user.get_full_name }}</h1>{% endblock %}
 
 {% block breadcrumbs %}
     {% include "layout/breadcrumbs_from_dashboard.html" %}
@@ -27,42 +27,42 @@
                                 <ul class="list-data mb-3">
                                     <li>
                                         <small>Prénom</small>
-                                        <strong>{{ object.first_name|mask_unless:can_view_personal_information }}</strong>
+                                        <strong>{{ user.first_name|mask_unless:can_view_personal_information }}</strong>
                                     </li>
                                     <li>
                                         <small>Nom</small>
-                                        <strong>{{ object.last_name|mask_unless:can_view_personal_information }}</strong>
+                                        <strong>{{ user.last_name|mask_unless:can_view_personal_information }}</strong>
                                     </li>
 
                                     <li>
                                         <small>Date de naissance</small>
-                                        <strong>{{ object.birthdate|date:"d/m/Y" }}</strong>
+                                        <strong>{{ user.birthdate|date:"d/m/Y" }}</strong>
                                     </li>
                                     <li>
                                         <small>Adresse e-mail</small>
-                                        <strong>{{ object.email }}</strong>
+                                        <strong>{{ user.email }}</strong>
                                         <button class="btn-link"
                                                 data-bs-toggle="tooltip"
                                                 data-bs-placement="top"
                                                 data-bs-trigger="manual"
                                                 data-bs-title="Copié!"
                                                 data-it-clipboard-button="copy"
-                                                data-it-copy-to-clipboard="{{ object.email }}"
+                                                data-it-copy-to-clipboard="{{ user.email }}"
                                                 {% matomo_event "gps" "clic" "copied_user_email" %}>
                                             <i class="ri-file-copy-line"></i>
                                         </button>
                                     </li>
                                     <li>
                                         <small>Téléphone</small>
-                                        {% if object.phone %}
-                                            <strong>{{ object.phone|format_phone }}</strong>
+                                        {% if user.phone %}
+                                            <strong>{{ user.phone|format_phone }}</strong>
                                             <button class="btn-link"
                                                     data-bs-toggle="tooltip"
                                                     data-bs-placement="top"
                                                     data-bs-trigger="manual"
                                                     data-bs-title="Copié!"
                                                     data-it-clipboard-button="copy"
-                                                    data-it-copy-to-clipboard="{{ object.phone|cut:" " }}"
+                                                    data-it-copy-to-clipboard="{{ user.phone|cut:" " }}"
                                                     {% matomo_event "gps" "clic" "copied_user_phone" %}>
                                                 <i class="ri-file-copy-line"></i>
                                             </button>
@@ -72,8 +72,8 @@
                                     </li>
                                     <li>
                                         <small>Adresse</small>
-                                        {% if object.address_on_one_line %}
-                                            <address>{{ object.address_on_one_line }}</address>
+                                        {% if user.address_on_one_line %}
+                                            <address>{{ user.address_on_one_line }}</address>
                                         {% else %}
                                             <i class="text-disabled">Non renseignée</i>
                                         {% endif %}
@@ -81,8 +81,8 @@
 
                                     <li>
                                         <small>Numéro de sécurité sociale</small>
-                                        {% if object.jobseeker_profile.nir %}
-                                            <strong>{{ object.jobseeker_profile.nir }}</strong>
+                                        {% if profile.nir %}
+                                            <strong>{{ profile.nir }}</strong>
                                         {% else %}
                                             <i class="text-disabled">Non renseigné</i>
                                         {% endif %}
@@ -93,89 +93,85 @@
                             <div class="col-6">
                                 <h3>Situation professionnelle</h3>
                                 <ul class="list-data mb-3">
-                                    {% with profile=object.jobseeker_profile %}
-
+                                    <li>
+                                        <small>Niveau de formation</small>
+                                        {% if profile.get_education_level_display %}
+                                            <strong>{{ profile.get_education_level_display }}</strong>
+                                        {% else %}
+                                            <i class="text-disabled">Non renseigné</i>
+                                        {% endif %}
+                                    </li>
+                                    {% if profile.resourceless %}
                                         <li>
-                                            <small>Niveau de formation</small>
-                                            {% if profile.get_education_level_display %}
-                                                <strong>{{ profile.get_education_level_display }}</strong>
-                                            {% else %}
-                                                <i class="text-disabled">Non renseigné</i>
-                                            {% endif %}
+                                            <small>Ressources</small>
+                                            <strong>Sans ressources</strong>
                                         </li>
-                                        {% if profile.resourceless %}
-                                            <li>
-                                                <small>Ressources</small>
-                                                <strong>Sans ressources</strong>
-                                            </li>
-                                        {% endif %}
-                                        {% if profile.pole_emploi_since %}
-                                            <li>
-                                                <small>Inscription France Travail</small>
-                                                <strong>Depuis {{ profile.get_pole_emploi_since_display|lower }}</strong>
-                                            </li>
-                                        {% endif %}
-                                        {% if profile.unemployed_since %}
-                                            <li>
-                                                <small>Sans emploi</small>
-                                                <strong>Depuis {{ profile.get_unemployed_since_display|lower }}</strong>
-                                            </li>
-                                        {% endif %}
-                                        {% if profile.rqth_employee %}
-                                            <li>
-                                                <small>RQTH</small>
-                                                <strong>Titulaire de la RQTH</strong>
-                                            </li>
-                                        {% endif %}
-                                        {% if profile.oeth_employee %}
-                                            <li>
-                                                <small>OETH</small>
-                                                <strong>Bénéficiaire de la loi handicap (OETH)</strong>
-                                            </li>
-                                        {% endif %}
-                                        {% if profile.rsa_allocation_since %}
-                                            <li>
-                                                <small>RSA</small>
-                                                <strong>
-                                                {{ profile.get_has_rsa_allocation_display }} depuis {{ profile.get_rsa_allocation_since_display|lower }}</strong>
-                                            </li>
-                                        {% endif %}
-                                        {% if profile.ass_allocation_since %}
-                                            <li>
-                                                <small>ASS</small>
-                                                <strong>Bénéficiaire de l'ASS depuis {{ profile.get_ass_allocation_since_display|lower }}</strong>
-                                            </li>
-                                        {% endif %}
-                                        {% if profile.aah_allocation_since %}
-                                            <li>
-                                                <small>Bénéficiaire de l'AAH</small>
-                                                <strong>Depuis {{ profile.get_aah_allocation_since_display|lower }}</strong>
-                                            </li>
-                                        {% endif %}
+                                    {% endif %}
+                                    {% if profile.pole_emploi_since %}
                                         <li>
-                                            <small>Identifiant France Travail (ex pôle emploi)</small>
-
-                                            {% if profile.user.jobseeker_profile.pole_emploi_id or profile.user.jobseeker_profile.lack_of_pole_emploi_id_reason %}
-                                                {% if profile.user.jobseeker_profile.pole_emploi_id %}
-                                                    <strong>{{ profile.pole_emploi_id }}</strong>
-                                                    <button class="btn-link"
-                                                            data-bs-toggle="tooltip"
-                                                            data-bs-placement="top"
-                                                            data-bs-trigger="manual"
-                                                            data-bs-title="Copié!"
-                                                            data-it-clipboard-button="copy"
-                                                            data-it-copy-to-clipboard="{{ profile.pole_emploi_id }}">
-                                                        <i class="ri-file-copy-line"></i>
-                                                    </button>
-                                                {% else %}
-                                                    <strong>{{ profile.user.jobseeker_profile.get_lack_of_pole_emploi_id_reason_display }}</strong>
-                                                {% endif %}
-                                            {% else %}
-                                                <i class="text-disabled">Non renseigné</i>
-                                            {% endif %}
+                                            <small>Inscription France Travail</small>
+                                            <strong>Depuis {{ profile.get_pole_emploi_since_display|lower }}</strong>
                                         </li>
+                                    {% endif %}
+                                    {% if profile.unemployed_since %}
+                                        <li>
+                                            <small>Sans emploi</small>
+                                            <strong>Depuis {{ profile.get_unemployed_since_display|lower }}</strong>
+                                        </li>
+                                    {% endif %}
+                                    {% if profile.rqth_employee %}
+                                        <li>
+                                            <small>RQTH</small>
+                                            <strong>Titulaire de la RQTH</strong>
+                                        </li>
+                                    {% endif %}
+                                    {% if profile.oeth_employee %}
+                                        <li>
+                                            <small>OETH</small>
+                                            <strong>Bénéficiaire de la loi handicap (OETH)</strong>
+                                        </li>
+                                    {% endif %}
+                                    {% if profile.rsa_allocation_since %}
+                                        <li>
+                                            <small>RSA</small>
+                                            <strong>
+                                            {{ profile.get_has_rsa_allocation_display }} depuis {{ profile.get_rsa_allocation_since_display|lower }}</strong>
+                                        </li>
+                                    {% endif %}
+                                    {% if profile.ass_allocation_since %}
+                                        <li>
+                                            <small>ASS</small>
+                                            <strong>Bénéficiaire de l'ASS depuis {{ profile.get_ass_allocation_since_display|lower }}</strong>
+                                        </li>
+                                    {% endif %}
+                                    {% if profile.aah_allocation_since %}
+                                        <li>
+                                            <small>Bénéficiaire de l'AAH</small>
+                                            <strong>Depuis {{ profile.get_aah_allocation_since_display|lower }}</strong>
+                                        </li>
+                                    {% endif %}
+                                    <li>
+                                        <small>Identifiant France Travail (ex Pôle emploi)</small>
 
-                                    {% endwith %}
+                                        {% if profile.pole_emploi_id or profile.lack_of_pole_emploi_id_reason %}
+                                            {% if profile.pole_emploi_id %}
+                                                <strong>{{ profile.pole_emploi_id }}</strong>
+                                                <button class="btn-link"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="top"
+                                                        data-bs-trigger="manual"
+                                                        data-bs-title="Copié!"
+                                                        data-it-clipboard-button="copy"
+                                                        data-it-copy-to-clipboard="{{ profile.pole_emploi_id }}">
+                                                    <i class="ri-file-copy-line"></i>
+                                                </button>
+                                            {% else %}
+                                                <strong>{{ profile.get_lack_of_pole_emploi_id_reason_display }}</strong>
+                                            {% endif %}
+                                        {% else %}
+                                            <i class="text-disabled">Non renseigné</i>
+                                        {% endif %}
+                                    </li>
 
                                 </ul>
                             </div>

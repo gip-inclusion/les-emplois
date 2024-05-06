@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import Count
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
@@ -18,12 +19,13 @@ def my_groups(request, template_name="gps/my_groups.html"):
     memberships = (
         FollowUpGroupMembership.objects.filter(member=current_user)
         .filter(is_active=True)
+        .annotate(nb_members=Count("follow_up_group__members"))
         .select_related("follow_up_group", "follow_up_group__beneficiary", "member")
         .prefetch_related("follow_up_group__members")
     )
 
     breadcrumbs = {
-        "Mes groupes de suivi": reverse("gps:my_groups"),
+        "Mes bénéficiaires": reverse("gps:my_groups"),
     }
 
     context = {
@@ -47,9 +49,9 @@ def join_group(request, template_name="gps/join_group.html"):
         user = form.cleaned_data["user"]
         is_referent = form.cleaned_data["is_referent"]
 
-        group = user.follow_up_group if (hasattr(user, "follow_up_group")) else None
+        group = getattr(user, "follow_up_group", None)
 
-        if group is None:
+        if not group:
             group = FollowUpGroup.objects.create(beneficiary=user)
 
         group.members.add(request.user, through_defaults={"creator": request.user, "is_referent": is_referent})
@@ -57,8 +59,8 @@ def join_group(request, template_name="gps/join_group.html"):
         return HttpResponseRedirect(my_groups_url)
 
     breadcrumbs = {
-        "Mes groupes de suivi": my_groups_url,
-        "Rejoindre un groupe de suivi": reverse("gps:join_group"),
+        "Mes bénéficiaires": my_groups_url,
+        "Ajouter un bénéficiaire": reverse("gps:join_group"),
     }
 
     context = {"breadcrumbs": breadcrumbs, "form": form, "reset_url": my_groups_url}

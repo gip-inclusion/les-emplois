@@ -172,4 +172,4 @@ def gps_users_autocomplete(request):
             for user in User.objects.autocomplete(term, limit=10, current_user=current_user)
         ]
 
-    return JsonResponse({"results": users}, safe=False)
+    return JsonResponse({"results": users})

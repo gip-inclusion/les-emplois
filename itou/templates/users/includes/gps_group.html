@@ -3,47 +3,48 @@
 
 <div class="c-box mb-3 mb-lg-5">
 
-    {% with gps_memberships.all|length as counter %}
-        <h2>Membre{{ counter|pluralizefr }} du groupe de suivi</h2>
-        <hr />
-        <ul>
-            {% for membership in gps_memberships.all %}
+    <h2>Intervenant{{ gps_memberships|length|pluralizefr }}</h2>
+    <hr />
+    <ul>
+        {% for membership in gps_memberships %}
 
-                <div class="c-box--results__header">
-                    <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+            <div class="c-box--results__header">
+                <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
 
-                        <div class="c-box--results__summary flex-grow-1">
-                            <i class="ri-user-line" aria-hidden="true"></i>
+                    <div class="c-box--results__summary flex-grow-1">
+                        <i class="ri-user-line" aria-hidden="true"></i>
 
-                            <div>
+                        <div>
 
-                                <h3>{{ membership.member.get_full_name }}</h3>
+                            <h3>{{ membership.member.get_full_name }}</h3>
 
-                                <div class="d-flex flex-column flex-md-column gap-1 gap-md-2">
+                            <div class="d-flex flex-column flex-md-column gap-1 gap-md-2">
+                                <span>
+                                    <i class="ri-mail-line font-weight-normal me-1" aria-hidden="true"></i>{{ membership.member.email }}
+                                </span>
+
+                                {% if membership.member.phone %}
                                     <span>
-                                        <i class="ri-mail-line font-weight-normal me-1" aria-hidden="true"></i>{{ membership.member.email }}
+                                        <i class="ri-phone-line font-weight-normal me-1" aria-hidden="true"></i>{{ membership.member.phone|format_phone }}
                                     </span>
 
-                                    {% if membership.member.phone %}
-                                        <span>
-                                            <i class="ri-phone-line font-weight-normal me-1" aria-hidden="true"></i>{{ membership.member.phone|format_phone }}
-                                        </span>
 
-
-                                    {% endif %}
-                                    {% if membership.is_referent %}
-                                        <span>
-                                            <i class="ri-map-pin-user-line font-weight-normal me-1" aria-hidden="true"></i><strong>Référent</strong>
-                                        </span>
-                                    {% endif %}
-                                </div>
+                                {% endif %}
+                                <span>
+                                    <i class="ri-calendar-line font-weight-normal me-1" aria-hidden="true"></i>Membre depuis le <strong>{{ membership.created_at|date:"d/m/Y" }}</strong>.
+                                </span>
+                                {% if membership.is_referent %}
+                                    <span>
+                                        <i class="ri-map-pin-user-line font-weight-normal me-1" aria-hidden="true"></i><strong>Référent</strong>
+                                    </span>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-            {% endfor %}
-        </ul>
-    {% endwith %}
+        {% endfor %}
+    </ul>
 
 </div>

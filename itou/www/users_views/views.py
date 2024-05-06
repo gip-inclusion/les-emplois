@@ -4,15 +4,17 @@ from django.views.generic import DetailView
 
 from itou.gps.models import FollowUpGroupMembership
 from itou.users.models import User
-from itou.www.approvals_views.views import ApprovalListView
 
 
 class UserDetailsView(LoginRequiredMixin, DetailView):
     model = User
-    queryset = User.objects.select_related("follow_up_group").prefetch_related("follow_up_group__memberships")
+    queryset = User.objects.select_related("follow_up_group", "jobseeker_profile").prefetch_related(
+        "follow_up_group__memberships"
+    )
     template_name = "users/details.html"
     slug_field = "public_id"
     slug_url_kwarg = "public_id"
+    context_object_name = "user"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -23,19 +25,15 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
             .select_related("follow_up_group", "member")
         )
 
+        context["profile"] = self.object.jobseeker_profile
+
         context["can_view_personal_information"] = self.request.user.can_view_personal_information(self.object)
 
         context["breadcrumbs"] = {
-            "Mes groupes de suivi": reverse("gps:my_groups"),
+            "Mes bénéficiaires": reverse("gps:my_groups"),
             f"Fiche de {self.object.get_full_name()}": reverse(
                 "users:details", kwargs={"public_id": self.object.public_id}
             ),
         }
 
         return context
-
-
-class UserListView(ApprovalListView):
-    # Use the same logic as Approval view but change the details link.
-    # This is just for demo purposes as long as the GPS app is not ready to use.
-    template_name = "users/list.html"
