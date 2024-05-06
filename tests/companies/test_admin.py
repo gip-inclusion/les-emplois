@@ -1,3 +1,4 @@
+import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNumQueries, assertRedirects
@@ -10,6 +11,8 @@ from tests.utils.test import parse_response_to_soup
 
 
 class TestCompanyAdmin:
+    # Variable is not defined for the add view, comes from django-import-export.
+    @pytest.mark.ignore_unknown_variable_template_error("show_change_form_export")
     def test_display_for_new_company(self, admin_client, snapshot):
         """Does not search approvals with company IS NULL"""
         # prewarm ContentType cache if needed to avoid extra query
