@@ -15,3 +15,26 @@
 ## :desert_island: Comment tester
 
 > _Les instructions pour reproduire le problème, les profils de test, le parcours spécifique à utiliser, etc. Si vous disposez d'une recette jetable, mettre l'URL pour tester dans cette partie._
+
+<!--
+# Catégories changelog
+
+ +--------------------------|--------------------------+
+ | API                      | Notifications            |
+ | Accessibilité            | Page d’accueil           |
+ | Admin                    | PASS IAE                 |
+ | Annexes financières      | Performances             |
+ | Candidature              | Pilotage                 |
+ | Connexion                | Profil salarié           |
+ | Contrôle a posteriori    | Prescripteur             |
+ | Demandes de prolongation | RGPD                     |
+ | Demandeur d’emploi       | Recherche employeur      |
+ | Employeur                | Recherche fiche de poste |
+ | Fiche de poste           | Recherche prescripteur   |
+ | Fiche entreprise         | Stabilité                |
+ | Fiches salarié           | Statistiques             |
+ | GEIQ                     | Tableau de bord          |
+ | Inscription              | UX/UI                    |
+ +--------------------------|--------------------------+
+
+-->
