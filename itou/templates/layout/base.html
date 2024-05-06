@@ -228,6 +228,8 @@
                 /* beautify ignore:start */
                 window._paq = window._paq || [];
                 /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+                window._paq.push(['setCustomDimension', 1, "{{ request.user.kind|default:'anonymous' }}"]);
+                window._paq.push(['setCustomDimension', 3, "{{ request.current_organization.kind|default:'' }}"]);
 
                 {% if matomo_user_id %}window._paq.push(['setUserId', '{{ matomo_user_id }}']);{% endif %}
 
