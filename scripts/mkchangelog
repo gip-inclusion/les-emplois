@@ -98,7 +98,7 @@ def main(publish):
 
             _h2, sprint_start_text = last_entry_header.split()
             sprint_start = datetime.date.fromisoformat(sprint_start_text)
-            sprint_end = sprint_start + datetime.timedelta(days=7)
+            sprint_end = sprint_start + datetime.timedelta(days=6)  # End date is inclusive.
 
             branch = f"changelog/{sprint_end}"
             new_branch = prepare_branch(branch)
@@ -163,8 +163,7 @@ def main(publish):
             "user.email=noreply@inclusion.beta.gouv.fr",
             "commit",
         ]
-        sprint_end_inclusive = sprint_end - datetime.timedelta(days=1)
-        title = f"changelog: From {sprint_start} to {sprint_end_inclusive}"
+        title = f"changelog: From {sprint_start} to {sprint_end}"
         subprocess.run([*commit_command_base, "--all", "--message", title], check=True)
         subprocess.run(
             ["git", "push", "--set-upstream", "origin", branch, "--force-with-lease", "--force-if-includes"],
