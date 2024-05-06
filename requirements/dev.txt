@@ -462,9 +462,9 @@ django-appconf==1.0.5 \
     # via
     #   -r requirements/test.txt
     #   django-select2
-django-bootstrap5==24.1 \
-    --hash=sha256:c42b4f6e673d35af847486733da77104e1e98e7fd5caecc6d56f32a96cc77479 \
-    --hash=sha256:fc272b5bb218690fe6f32d52b23c155ebb46fbc5a2856c84eb353c1bf5fc49ea
+django-bootstrap5==24.2 \
+    --hash=sha256:6a5d83e9ff1952f7c07c54cebcb76c85f09787b8b57eeb4ec07554cd583acc64 \
+    --hash=sha256:a3cee2b3d45745210c5b898af2917f310f44df746269fe09a93be28a0adc2a4b
     # via -r requirements/test.txt
 django-csp==3.8 \
     --hash=sha256:19b2978b03fcd73517d7d67acbc04fbbcaec0facc3e83baa502965892d1e0719 \
@@ -1185,9 +1185,7 @@ psutil==5.9.8 \
 psycopg[binary]==3.1.10 \
     --hash=sha256:15b25741494344c24066dc2479b0f383dd1b82fa5e75612fa4fa5bb30726e9b6 \
     --hash=sha256:8bbeddae5075c7890b2fa3e3553440376d3c5e28418335dee3c3656b06fa2b52
-    # via
-    #   -r requirements/test.txt
-    #   psycopg
+    # via -r requirements/test.txt
 psycopg-binary==3.1.10 \
     --hash=sha256:0471869e658d0c6b8c3ed53153794739c18d7dad2dd5b8e6ff023a364c20f7df \
     --hash=sha256:0f062f20256708929a58c41d44f350efced4c00a603323d1413f6dc0b84d95a5 \
@@ -1973,7 +1971,6 @@ tablib[html,ods,xls,xlsx,yaml]==3.5.0 \
     # via
     #   -r requirements/test.txt
     #   django-import-export
-    #   tablib
 tenacity==8.2.3 \
     --hash=sha256:5398ef0d78e63f40007c1fb4c0bff96e1911394d2fa8d194f77619c05ff6cc8a \
     --hash=sha256:ce510e327a630c9e1beaf17d42e6ffacc88185044ad85cf74c0a8887c6a0f88c
