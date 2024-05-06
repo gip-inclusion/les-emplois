@@ -369,9 +369,9 @@ django-appconf==1.0.5 \
     --hash=sha256:ae9f864ee1958c815a965ed63b3fba4874eec13de10236ba063a788f9a17389d \
     --hash=sha256:be3db0be6c81fa84742000b89a81c016d70ae66a7ccb620cdef592b1f1a6aaa4
     # via django-select2
-django-bootstrap5==24.1 \
-    --hash=sha256:c42b4f6e673d35af847486733da77104e1e98e7fd5caecc6d56f32a96cc77479 \
-    --hash=sha256:fc272b5bb218690fe6f32d52b23c155ebb46fbc5a2856c84eb353c1bf5fc49ea
+django-bootstrap5==24.2 \
+    --hash=sha256:6a5d83e9ff1952f7c07c54cebcb76c85f09787b8b57eeb4ec07554cd583acc64 \
+    --hash=sha256:a3cee2b3d45745210c5b898af2917f310f44df746269fe09a93be28a0adc2a4b
     # via -r requirements/base.in
 django-csp==3.8 \
     --hash=sha256:19b2978b03fcd73517d7d67acbc04fbbcaec0facc3e83baa502965892d1e0719 \
@@ -1469,9 +1469,7 @@ sqlparse==0.5.0 \
 tablib[html,ods,xls,xlsx,yaml]==3.5.0 \
     --hash=sha256:9821caa9eca6062ff7299fa645e737aecff982e6b2b42046928a6413c8dabfd9 \
     --hash=sha256:f6661dfc45e1d4f51fa8a6239f9c8349380859a5bfaa73280645f046d6c96e33
-    # via
-    #   django-import-export
-    #   tablib
+    # via django-import-export
 tenacity==8.2.3 \
     --hash=sha256:5398ef0d78e63f40007c1fb4c0bff96e1911394d2fa8d194f77619c05ff6cc8a \
     --hash=sha256:ce510e327a630c9e1beaf17d42e6ffacc88185044ad85cf74c0a8887c6a0f88c
