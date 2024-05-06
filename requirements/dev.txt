@@ -1981,9 +1981,9 @@ texttable==1.7.0 \
     # via
     #   -r requirements/test.txt
     #   py7zr
-tqdm==4.66.3 \
-    --hash=sha256:23097a41eba115ba99ecae40d06444c15d1c0c698d527a01c6c8bd1c5d0647e5 \
-    --hash=sha256:4f41d54107ff9a223dca80b53efe4fb654c67efaba7f47bada3ee9d50e05bd53
+tqdm==4.66.4 \
+    --hash=sha256:b75ca56b413b030bc3f00af51fd2c1a1a5eac6a0c1cca83cbb37a5c52abce644 \
+    --hash=sha256:e4d936c9de8727928f3be6079590e97d9abfe8d39a590be678eb5919ffc186bb
     # via
     #   -r requirements/test.txt
     #   djlint
