@@ -3,7 +3,6 @@
   '''
   <div class="col mb-3 mb-md-5" id="gps-card">
       <div class="c-box p-0 h-100">
-          
           <div class="c-box__header--gps p-3 p-lg-4">
               <span class="h4 m-0">GPS</span>
           </div>
@@ -52,7 +51,7 @@
               <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
-                          <span>Rejoindre le groupe de ce candidat</span>
+                          <span>Ajouter le bénéficiaire</span>
                       </button>
                   
               </div>
@@ -117,7 +116,7 @@
               <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
                       <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
-                          <span>Rejoindre le groupe de ce candidat</span>
+                          <span>Ajouter le bénéficiaire</span>
                       </button>
                   
               </div>
@@ -156,7 +155,6 @@
   '''
   <div class="col mb-3 mb-md-5" id="gps-card">
       <div class="c-box p-0 h-100">
-          
           <div class="c-box__header--gps p-3 p-lg-4">
               <span class="h4 m-0">GPS</span>
           </div>
