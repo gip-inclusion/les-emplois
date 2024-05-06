@@ -398,7 +398,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
     @admin.display(description="adresse en QPV")
     def address_in_qpv(self, obj):
         # DO NOT PUT THIS FIELD IN 'list_display' : dynamically computed, only for detail page
-        if not obj.coords:
+        if not obj.coords or not obj.geocoding_score:
             return "Adresse non-géolocalisée"
         elif obj.geocoding_score < BAN_API_RELIANCE_SCORE:
             return "Adresse imprécise"
