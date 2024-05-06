@@ -1,7 +1,7 @@
 from unittest import mock
 
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
-from itou.common_apps.address.format import format_address
+from itou.common_apps.address.format import compute_hexa_address
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK
 from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
@@ -22,7 +22,7 @@ class FormatASPBadAdresses(TestCase):
         job_seeker = JobSeekerFactory(
             address_line_1="9, avenue de Huet", post_code="32531", city="MalletVille", department="32"
         )
-        result, error = format_address(job_seeker)
+        result, error = compute_hexa_address(job_seeker)
         assert not result
         assert "Erreur de geocoding, impossible d'obtenir un résultat" in error
 
@@ -33,12 +33,12 @@ class FormatASPBadAdresses(TestCase):
 )
 class FormatASPAdresses(TestCase):
     def test_empty(self, _mock):
-        result, error = format_address({})
+        result, error = compute_hexa_address({})
         assert not result
         assert error == "Impossible de transformer cet objet en adresse HEXA"
 
     def test_none(self, _mock):
-        result, error = format_address(None)
+        result, error = compute_hexa_address(None)
         assert not result
         assert error == "Impossible de transformer cet objet en adresse HEXA"
 
@@ -49,7 +49,7 @@ class FormatASPAdresses(TestCase):
         """
         for idx, _elt in enumerate(BAN_GEOCODING_API_RESULTS_MOCK):
             user = _users_with_mock_address(idx)
-            result, error = format_address(user)
+            result, error = compute_hexa_address(user)
             assert error is None
             assert result is not None
 
@@ -59,94 +59,94 @@ class FormatASPAdresses(TestCase):
         Complete if needed.
         """
         user = _users_with_mock_address(0)
-        result, error = format_address(user)
+        result, error = compute_hexa_address(user)
         assert error is None
         assert result.get("lane_type") == LaneType.RUE.name
         assert result.get("number") == "37"
 
         user = _users_with_mock_address(1)
-        result, error = format_address(user)
+        result, error = compute_hexa_address(user)
         assert error is None
         assert result.get("lane_type") == LaneType.RTE.name
         assert result.get("number") == "382"
 
         user = _users_with_mock_address(2)
-        result, error = format_address(user)
+        result, error = compute_hexa_address(user)
         assert error is None
         assert result.get("lane_type") == LaneType.RUE.name
         assert result.get("number") == "5"
 
         user = _users_with_mock_address(3)
-        result, error = format_address(user)
+        result, error = compute_hexa_address(user)
         assert error is None
         assert result.get("lane_type") == LaneType.AV.name
         assert result.get("number") == "35"
 
         user = _users_with_mock_address(4)
-        result, error = format_address(user)
+        result, error = compute_hexa_address(user)
         assert error is None
         assert result.get("lane_type") == LaneType.BD.name
         assert result.get("number") == "67"
 
         user = _users_with_mock_address(5)
-        result, error = format_address(user)
+        result, error = compute_hexa_address(user)
         assert error is None
         assert result.get("lane_type") == LaneType.PL.name
         assert result.get("number") == "2"
 
         user = _users_with_mock_address(6)
-        result, error = format_address(user)
+        result, error = compute_hexa_address(user)
         assert error is None
         assert result.get("lane_type") == LaneType.CITE.name
 
         user = _users_with_mock_address(7)
-        result, error = format_address(user)
+        result, error = compute_hexa_address(user)
         assert error is None
         assert result.get("lane_type") == LaneType.CHEM.name
         assert result.get("number") == "261"
 
         user = _users_with_mock_address(8)
-        result, error = format_address(user)
+        result, error = compute_hexa_address(user)
         assert error is None
         assert result.get("lane_type") == LaneType.LD.name
 
         user = _users_with_mock_address(9)
-        result, error = format_address(user)
+        result, error = compute_hexa_address(user)
         assert error is None
         assert result.get("lane_type") == LaneType.PAS.name
         assert result.get("number") == "1"
 
         user = _users_with_mock_address(10)
-        result, error = format_address(user)
+        result, error = compute_hexa_address(user)
         assert error is None
         assert result.get("lane_type") == LaneType.SQ.name
         assert result.get("number") == "2"
 
         user = _users_with_mock_address(11)
-        result, error = format_address(user)
+        result, error = compute_hexa_address(user)
         assert error is None
         assert result.get("lane_type") == LaneType.HAM.name
 
         user = _users_with_mock_address(12)
-        result, error = format_address(user)
+        result, error = compute_hexa_address(user)
         assert error is None
         assert result.get("lane_type") == LaneType.QUAR.name
         assert result.get("number") == "16"
 
         user = _users_with_mock_address(13)
-        result, error = format_address(user)
+        result, error = compute_hexa_address(user)
         assert error is None
         assert result.get("lane_type") == LaneType.RES.name
         assert result.get("number") == "1"
 
         user = _users_with_mock_address(14)
-        result, error = format_address(user)
+        result, error = compute_hexa_address(user)
         assert error is None
         assert result.get("lane_type") == LaneType.VOIE.name
         assert result.get("number") == "172"
 
         user = _users_with_mock_address(15)
-        result, error = format_address(user)
+        result, error = compute_hexa_address(user)
         assert error is None
         assert result.get("lane_type") == LaneType.ALL.name
         assert result.get("number") == "3"
@@ -177,11 +177,11 @@ class LaneExtensionTest(TestCase):
         Check if lane extension is included in ASP ref file
         """
         user = _users_with_mock_address(0)
-        result, _error = format_address(user)
+        result, _error = compute_hexa_address(user)
         assert result.get("std_extension") == LaneExtension.B.name
 
         user = _users_with_mock_address(16)
-        result, _error = format_address(user)
+        result, _error = compute_hexa_address(user)
         assert result.get("std_extension") == LaneExtension.T.name
 
     def test_non_standard_extension(self, _):
@@ -189,6 +189,6 @@ class LaneExtensionTest(TestCase):
         Non-standard extension, i.e. not in ASP ref file
         """
         user = _users_with_mock_address(17)
-        result, _error = format_address(user)
+        result, _error = compute_hexa_address(user)
         assert result.get("non_std_extension") == "G"
         assert result.get("std_extension") is None
