@@ -51,12 +51,18 @@
 
                                     <div>
                                         {% with membership.follow_up_group.members.all|length|add:"-1" as counter %}
-                                            {% if membership.is_referent %}Vous êtes <strong>référent</strong> de ce groupe.{% endif %}
-                                            {% if counter < 1 %}
-                                                Aucun autre professionnel que vous dans le groupe de suivi.
-                                            {% else %}
-                                                {{ counter }} autre{{ counter|pluralizefr }} professionnel{{ counter|pluralizefr }} dans le groupe de suivi.
-                                            {% endif %}
+                                            <div>
+                                                Vous avez rejoint ce groupe le <strong>{{ membership.created_at|date:"d/m/Y" }}</strong>
+                                                {% if membership.is_referent %}et en êtes <strong>référent</strong>{% endif %}
+                                                .
+                                                <br />
+
+                                                {% if counter < 1 %}
+                                                    Aucun autre professionnel que vous dans le groupe de suivi.
+                                                {% else %}
+                                                    {{ counter }} autre{{ counter|pluralizefr }} professionnel{{ counter|pluralizefr }} dans le groupe de suivi.
+                                                {% endif %}
+                                            </div>
                                         {% endwith %}
                                     </div>
                                     <div>

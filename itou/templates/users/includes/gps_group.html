@@ -31,6 +31,9 @@
 
 
                                     {% endif %}
+                                    <span>
+                                        <i class="ri-calendar-line font-weight-normal me-1" aria-hidden="true"></i>Membre depuis le <strong>{{ membership.created_at|date:"d/m/Y" }}</strong>.
+                                    </span>
                                     {% if membership.is_referent %}
                                         <span>
                                             <i class="ri-map-pin-user-line font-weight-normal me-1" aria-hidden="true"></i><strong>Référent</strong>
