@@ -21,7 +21,8 @@ class GpsUserSearchForm(forms.Form):
                 "data-ajax--cache": "true",
                 "data-ajax--type": "GET",
                 "data-minimum-input-length": 2,
-                "data-placeholder": "Jean DUPONT",
+                "lang": "",  # Needed to override the noResults i18n translation in JS.
+                "id": "js-search-user-input",
             },
         ),
         required=True,
