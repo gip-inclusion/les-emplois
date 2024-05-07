@@ -8,8 +8,12 @@
             Déclarer une embauche
         {% endif %}
     {% else %}
-        Enregistrer une candidature
-        {% if job_seeker %}pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}{% endif %}
+        {% if is_gps %}
+            Enregistrer un nouveau bénéficaire
+        {% else %}
+            Enregistrer une candidature
+            {% if job_seeker %}pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}{% endif %}
+        {% endif %}
     {% endif %}
 {% elif request.user.is_prescriber %}
     Postuler

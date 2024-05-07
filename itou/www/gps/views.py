@@ -6,12 +6,17 @@ from django.urls import reverse, reverse_lazy
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.utils.decorators import settings_protected_view
+from itou.utils.urls import get_safe_url
 from itou.www.gps.forms import GpsUserSearchForm
 
 
 @login_required
 @settings_protected_view("GPS_ENABLED")
-@user_passes_test(lambda u: not u.is_job_seeker, login_url=reverse_lazy("dashboard:index"), redirect_field_name=None)
+@user_passes_test(
+    lambda u: not u.is_job_seeker,
+    login_url=reverse_lazy("dashboard:index"),
+    redirect_field_name=None,
+)
 def my_groups(request, template_name="gps/my_groups.html"):
     current_user = request.user
 
@@ -37,32 +42,22 @@ def my_groups(request, template_name="gps/my_groups.html"):
 
 @login_required
 @settings_protected_view("GPS_ENABLED")
-@user_passes_test(lambda u: not u.is_job_seeker, login_url=reverse_lazy("dashboard:index"), redirect_field_name=None)
+@user_passes_test(
+    lambda u: not u.is_job_seeker,
+    login_url=reverse_lazy("dashboard:index"),
+    redirect_field_name=None,
+)
 def join_group(request, template_name="gps/join_group.html"):
-    form = GpsUserSearchForm(data=request.POST or None)
+    form = GpsUserSearchForm(request.current_organization, data=request.POST or None)
 
     my_groups_url = reverse("gps:my_groups")
+    back_url = get_safe_url(request, "back_url", my_groups_url)
 
     if request.method == "POST" and form.is_valid():
         user = form.cleaned_data["user"]
         is_referent = form.cleaned_data["is_referent"]
 
-        group = getattr(user, "follow_up_group", None)
-
-        if not group:
-            group = FollowUpGroup.objects.create(beneficiary=user)
-            group.save()
-
-        membership = (
-            FollowUpGroupMembership.objects.filter(member=request.user).filter(follow_up_group__id=group.id).first()
-        )
-
-        if not membership:
-            group.members.add(request.user, through_defaults={"creator": request.user, "is_referent": is_referent})
-        else:
-            membership.is_active = True
-            membership.is_referent = is_referent
-            membership.save()
+        FollowUpGroup.objects.follow_beneficiary(beneficiary=user, user=request.user, is_referent=is_referent)
 
         return HttpResponseRedirect(my_groups_url)
 
@@ -71,14 +66,18 @@ def join_group(request, template_name="gps/join_group.html"):
         "Ajouter un bénéficiaire": reverse("gps:join_group"),
     }
 
-    context = {"breadcrumbs": breadcrumbs, "form": form, "reset_url": my_groups_url}
+    context = {"breadcrumbs": breadcrumbs, "form": form, "reset_url": back_url}
 
     return render(request, template_name, context)
 
 
 @login_required
 @settings_protected_view("GPS_ENABLED")
-@user_passes_test(lambda u: not u.is_job_seeker, login_url=reverse_lazy("dashboard:index"), redirect_field_name=None)
+@user_passes_test(
+    lambda u: not u.is_job_seeker,
+    login_url=reverse_lazy("dashboard:index"),
+    redirect_field_name=None,
+)
 def leave_group(request, group_id):
     membership = (
         FollowUpGroupMembership.objects.filter(member=request.user).filter(follow_up_group__id=group_id).first()
@@ -93,7 +92,11 @@ def leave_group(request, group_id):
 
 @login_required
 @settings_protected_view("GPS_ENABLED")
-@user_passes_test(lambda u: not u.is_job_seeker, login_url=reverse_lazy("dashboard:index"), redirect_field_name=None)
+@user_passes_test(
+    lambda u: not u.is_job_seeker,
+    login_url=reverse_lazy("dashboard:index"),
+    redirect_field_name=None,
+)
 def toggle_referent(request, group_id):
     membership = (
         FollowUpGroupMembership.objects.filter(member=request.user).filter(follow_up_group__id=group_id).first()

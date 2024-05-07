@@ -9,7 +9,13 @@
     {% else %}
         Création
     {% endif %}
-    du compte candidat {{ block.super }}
+    du compte
+    {% if is_gps %}
+        bénéficiaire
+    {% else %}
+        candidat
+    {% endif %}
+    {{ block.super }}
 {% endblock %}
 
 {% block content_title %}
@@ -19,7 +25,12 @@
         {% else %}
             Création
         {% endif %}
-        du compte candidat
+        du compte
+        {% if is_gps %}
+            bénéficiaire
+        {% else %}
+            candidat
+        {% endif %}
     </h1>
 {% endblock %}
 

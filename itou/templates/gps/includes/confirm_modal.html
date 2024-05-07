@@ -1,0 +1,14 @@
+<div id="{{ id }}" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">{{ title }}</h3>
+            </div>
+            <div class="modal-body">{{ body }}</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
+                <a href="{{ confirm_url }}" class="btn btn-sm {{ confirm_class }}">{{ confirm_text }}</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,42 +1,13 @@
 # serializer version: 1
-# name: test_access_gps_enabled
-  '''
-  <div class="col mb-3 mb-md-5" id="gps-card">
-      <div class="c-box p-0 h-100">
-          <div class="c-box__header--gps p-3 p-lg-4">
-              <span class="h4 m-0">GPS</span>
-          </div>
-          <div class="px-3 px-lg-4 pt-3 pt-lg-4">
-              <ul class="list-unstyled mb-lg-5">
-                  <li class="d-flex justify-content-between align-items-center mb-3">
-                      <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups" rel="noopener" target="_blank">
-                          <i class="ri-article-line ri-lg font-weight-normal align-self-start"></i>
-                          <span>Visualiser les bénéficiaires</span>
-                          <i class="ri-external-link-line font-weight-normal ms-2"></i>
-                      </a>
-                  </li>
-                  <li class="d-flex justify-content-between align-items-center mb-3">
-                      <a aria-label="Inviter un partenaire." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_inviter_partenaire" href="https://hello-tally.so/r/w5kLqM?user_public_id=03580247-b036-4578-bf9d-f92c9c2f68cd&amp;user_first_name=Pierre&amp;user_last_name=Dupont&amp;" rel="noopener" target="_blank">
-                          <i class="ri-mail-send-line ri-lg font-weight-normal align-self-start"></i>
-                          <span>Inviter un partenaire</span>
-                          <i class="ri-external-link-line font-weight-normal ms-2"></i>
-                      </a>
-                  </li>
-              </ul>
-          </div>
-      </div>
-  </div>
-  '''
-# ---
-# name: test_join_group_as_job_seeker[False]
+# name: test_join_group_of_a_job_seeker[False]
   '''
   <section class="s-box" id="join_group">
           <div class="s-box__container container">
               <div class="c-form">
-                  <form class="js-prevent-multiple-submit" method="post">
+                  <form class="js-prevent-multiple-submit" id="join_group_form" method="post">
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                       
-                      <div class="form-group form-group-required"><label class="form-label" for="id_user">Nom et prénom du candidat</label><select class="form-select django-select2" data-ajax--cache="true" data-ajax--type="GET" data-ajax--url="/autocomplete/gps_users?select2=" data-allow-clear="false" data-minimum-input-length="2" data-placeholder="Jean DUPONT" data-theme="bootstrap-5" id="id_user" lang="fr" name="user" required="">
+                      <div class="form-group form-group-required"><label class="form-label" for="js-search-user-input">Nom et prénom du bénéficiaire</label><select class="form-select django-select2" data-ajax--cache="true" data-ajax--type="GET" data-ajax--url="/autocomplete/gps_users?select2=" data-allow-clear="false" data-minimum-input-length="2" data-no-results-url="/apply/[PK of Company]/start?gps=true" data-theme="bootstrap-5" id="js-search-user-input" lang="" name="user" required="">
   </select></div>
                       <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_is_referent" name="is_referent" type="checkbox"/><label class="form-check-label" for="id_is_referent">Se rattacher comme référent</label></div></div>
                       
@@ -57,7 +28,7 @@
               
               <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
-                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                      <button class="btn btn-block btn-primary disabled" type="button">
                           <span>Ajouter le bénéficiaire</span>
                       </button>
                   
@@ -93,15 +64,15 @@
       </section>
   '''
 # ---
-# name: test_join_group_as_job_seeker[True]
+# name: test_join_group_of_a_job_seeker[True]
   '''
   <section class="s-box" id="join_group">
           <div class="s-box__container container">
               <div class="c-form">
-                  <form class="js-prevent-multiple-submit" method="post">
+                  <form class="js-prevent-multiple-submit" id="join_group_form" method="post">
                       <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                       
-                      <div class="form-group form-group-required"><label class="form-label" for="id_user">Nom et prénom du candidat</label><select class="form-select django-select2" data-ajax--cache="true" data-ajax--type="GET" data-ajax--url="/autocomplete/gps_users?select2=" data-allow-clear="false" data-minimum-input-length="2" data-placeholder="Jean DUPONT" data-theme="bootstrap-5" id="id_user" lang="fr" name="user" required="">
+                      <div class="form-group form-group-required"><label class="form-label" for="js-search-user-input">Nom et prénom du bénéficiaire</label><select class="form-select django-select2" data-ajax--cache="true" data-ajax--type="GET" data-ajax--url="/autocomplete/gps_users?select2=" data-allow-clear="false" data-minimum-input-length="2" data-no-results-url="/apply/[PK of Company]/start?gps=true" data-theme="bootstrap-5" id="js-search-user-input" lang="" name="user" required="">
   </select></div>
                       <div class="form-group"><div class="form-check"><input class="form-check-input" id="id_is_referent" name="is_referent" type="checkbox"/><label class="form-check-label" for="id_is_referent">Se rattacher comme référent</label></div></div>
                       
@@ -122,7 +93,7 @@
               
               <div class="form-group col col-lg-auto order-2 order-lg-3">
                   
-                      <button aria-label="Passer à l’étape suivante" class="btn btn-block btn-primary" type="submit">
+                      <button class="btn btn-block btn-primary disabled" type="button">
                           <span>Ajouter le bénéficiaire</span>
                       </button>
                   
@@ -168,10 +139,15 @@
           <div class="px-3 px-lg-4 pt-3 pt-lg-4">
               <ul class="list-unstyled mb-lg-5">
                   <li class="d-flex justify-content-between align-items-center mb-3">
-                      <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups" rel="noopener" target="_blank">
+                      <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups">
                           <i class="ri-article-line ri-lg font-weight-normal align-self-start"></i>
                           <span>Visualiser les bénéficiaires</span>
-                          <i class="ri-external-link-line font-weight-normal ms-2"></i>
+                      </a>
+                  </li>
+                  <li class="d-flex justify-content-between align-items-center mb-3">
+                      <a aria-label="Créer ou rejoindre un groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tbd_ajout_groupe" href="/gps/groups/join?back_url=/dashboard/">
+                          <i class="ri-play-list-add-line ri-lg font-weight-normal align-self-start"></i>
+                          <span>Ajouter un bénéficiaire</span>
                       </a>
                   </li>
                   <li class="d-flex justify-content-between align-items-center mb-3">

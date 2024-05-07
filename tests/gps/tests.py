@@ -9,6 +9,7 @@ from itou.users.enums import UserKind
 from itou.users.models import User
 from tests.gps.factories import FollowUpGroupFactory
 from tests.users.factories import (
+    EmployerFactory,
     JobSeekerFactory,
     JobSeekerWithAddressFactory,
     PrescriberFactory,
@@ -63,8 +64,8 @@ class GpsTest(TestCase):
         False,
     ],
 )
-def test_join_group_as_job_seeker(is_referent, client, snapshot):
-    prescriber = PrescriberFactory()
+def test_join_group_of_a_job_seeker(is_referent, client, snapshot):
+    prescriber = PrescriberFactory(membership=True)
     job_seeker = JobSeekerFactory()
 
     client.force_login(prescriber)
@@ -73,7 +74,20 @@ def test_join_group_as_job_seeker(is_referent, client, snapshot):
 
     response = client.get(url)
 
-    assert str(parse_response_to_soup(response, "#join_group")) == snapshot
+    company = response.context["request"].current_organization
+
+    assert (
+        str(
+            parse_response_to_soup(
+                response,
+                "#join_group",
+                replace_in_attr=[
+                    ("data-no-results-url", f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
+                ],
+            )
+        )
+        == snapshot
+    )
 
     post_data = {
         "user": job_seeker.id,
@@ -94,7 +108,7 @@ def test_join_group_as_job_seeker(is_referent, client, snapshot):
     assert membership.is_referent == is_referent
 
     # Login with another prescriber and join the same follow_up_group
-    other_prescriber = PrescriberFactory()
+    other_prescriber = PrescriberFactory(membership=True)
 
     client.force_login(other_prescriber)
 
@@ -114,9 +128,9 @@ def test_join_group_as_job_seeker(is_referent, client, snapshot):
     assert FollowUpGroupMembership.objects.count() == 2
 
 
-def test_join_group_as_prescriber(client):
-    prescriber = PrescriberFactory()
-    another_prescriber = PrescriberFactory()
+def test_join_group_of_a_prescriber(client):
+    prescriber = PrescriberFactory(membership=True)
+    another_prescriber = PrescriberFactory(membership=True)
 
     client.force_login(prescriber)
 
@@ -130,9 +144,14 @@ def test_join_group_as_prescriber(client):
     }
 
     response = client.post(url, data=post_data)
-    assert response.status_code == 200
 
-    assertContains(response, "Seul un candidat peut être ajouté à un groupe de suivi")
+    # We should not be redirected to "my_groups" because the form is not valid
+    # regarding queryset=User.objects.filter(kind=UserKind.JOB_SEEKER)
+    assert response.status_code == 200
+    assertContains(
+        response,
+        "Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles.",
+    )
 
 
 @override_settings(TALLY_URL="https://hello-tally.so")
@@ -175,8 +194,8 @@ def test_access_as_jobseeker(client):
 
 
 @override_settings(GPS_ENABLED=True, TALLY_URL="https://hello-tally.so")
-def test_access_gps_enabled(client, snapshot):
-    user = PrescriberFactory(for_snapshot=True)
+def test_access_gps_enabled(client):
+    user = PrescriberFactory(membership=True)
     client.force_login(user)
 
     response = client.get(reverse("gps:my_groups"))
@@ -186,7 +205,7 @@ def test_access_gps_enabled(client, snapshot):
     assert response.status_code == 200
 
     response = client.get(reverse("dashboard:index"))
-    assert str(parse_response_to_soup(response, "#gps-card")) == snapshot
+    assertContains(response, "gps-card")
 
     user = JobSeekerWithAddressFactory()
     client.force_login(user)
@@ -196,7 +215,7 @@ def test_access_gps_enabled(client, snapshot):
 
 @override_settings(GPS_ENABLED=False)
 def test_access_gps_disabled(client):
-    user = PrescriberFactory()
+    user = PrescriberFactory(membership=True)
     client.force_login(user)
 
     response = client.get(reverse("gps:my_groups"))
@@ -210,8 +229,8 @@ def test_access_gps_disabled(client):
 
 
 def test_leave_group(client):
-    member = PrescriberFactory()
-    another_member = PrescriberFactory()
+    member = PrescriberFactory(membership=True)
+    another_member = PrescriberFactory(membership=True)
 
     beneficiary = JobSeekerFactory()
     another_beneficiary = JobSeekerFactory()
@@ -246,7 +265,7 @@ def test_leave_group(client):
 
 
 def test_referent_group(client):
-    prescriber = PrescriberFactory()
+    prescriber = PrescriberFactory(membership=True)
 
     beneficiary = JobSeekerFactory()
 
@@ -266,7 +285,7 @@ def test_referent_group(client):
 
 
 def test_remove_members_from_group(client):
-    prescriber = PrescriberFactory()
+    prescriber = PrescriberFactory(membership=True)
 
     beneficiary = JobSeekerFactory()
 
@@ -323,3 +342,40 @@ def test_dashboard_card(client):
     gps_card = str(parse_response_to_soup(response, selector="#gps-card"))
     assert str(organization.uid) in gps_card
     assert organization.display_name in gps_card
+
+
+def test_follow_beneficiary():
+    beneficiary = JobSeekerFactory()
+    prescriber = PrescriberFactory(membership=True)
+
+    FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=prescriber, is_referent=True)
+    group = FollowUpGroup.objects.get()
+    membership = group.memberships.get()
+    assert membership.is_active is True
+    assert membership.is_referent is True
+    assert membership.creator == prescriber
+
+    membership.is_active = False
+    membership.is_referent = False
+    membership.save()
+
+    FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=prescriber, is_referent=True)
+    group = FollowUpGroup.objects.get()
+    membership = group.memberships.get()
+    assert membership.is_active is True
+    assert membership.is_referent is True
+
+    membership.is_active = False
+    membership.save()
+
+    FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=prescriber, is_referent=False)
+    group = FollowUpGroup.objects.get()
+    membership = group.memberships.get()
+    assert membership.is_active is True
+    assert membership.is_referent is False
+
+    other_member = EmployerFactory()
+    FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=other_member, is_referent=True)
+    assert group.memberships.count() == 2
+    other_membership = group.memberships.get(member=other_member)
+    assert other_membership.is_referent is True  # No limit to the number of referent

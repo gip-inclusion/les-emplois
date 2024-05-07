@@ -1,12 +1,34 @@
 {% extends "apply/submit/create_or_update_job_seeker/step_base.html" %}
 {% load django_bootstrap5 %}
 
-{% block progress_title %}Coordonnées du candidat{% endblock %}
-{% block step_title %}Quelles sont les coordonnées du candidat ?{% endblock %}
+{% block progress_title %}
+    Coordonnées du
+    {% if is_gps %}
+        bénéficiaire
+    {% else %}
+        candidat
+    {% endif %}
+{% endblock %}
+{% block step_title %}
+    Quelles sont les coordonnées du
+    {% if is_gps %}
+        bénéficiaire
+    {% else %}
+        candidat
+    {% endif %}
+    ?
+{% endblock %}
 
 {% block form_content %}
     <fieldset>
-        <legend class="visually-hidden">Coordonnées du candidat</legend>
+        <legend class="visually-hidden">
+            Coordonnées du
+            {% if is_gps %}
+                bénéficiaire
+            {% else %}
+                candidat
+            {% endif %}
+        </legend>
         {% bootstrap_field form.address_for_autocomplete %}
         {% bootstrap_field form.address_line_1 %}
         {% bootstrap_field form.address_line_2 %}
