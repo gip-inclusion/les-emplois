@@ -48,7 +48,7 @@
                                     {% if evaluated_siae.state == "REFUSED" and evaluated_siae.notified_at %}
                                         <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{% url "siae_evaluations_views:institution_evaluated_siae_sanction" evaluated_siae.pk %}">Voir la notification de sanction</a>
                                     {% endif %}
-                                    <a href="{% url 'siae_evaluations_views:institution_evaluated_siae_detail' evaluated_siae.pk %}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
+                                    <a href="{% url 'siae_evaluations_views:evaluated_siae_detail' evaluated_siae.pk %}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
                                         {% if evaluated_siae.evaluation_is_final %}
                                             Voir le résultat
                                         {% else %}

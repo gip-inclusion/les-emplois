@@ -245,7 +245,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             )
         )
         url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_detail",
+            "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         self.assertContains(
@@ -295,7 +295,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             count=1,
         )
         url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_detail",
+            "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         self.assertContains(
@@ -342,7 +342,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             count=1,
         )
         url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_detail",
+            "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         self.assertContains(
@@ -388,7 +388,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             count=1,
         )
         url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_detail",
+            "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         self.assertContains(
@@ -428,7 +428,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_detail",
+            "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         self.assertContains(
@@ -500,7 +500,7 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         self.assertContains(
             response,
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
@@ -678,7 +678,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         # institution without evaluation_campaign
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": 99999},
             )
         )
@@ -688,7 +688,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluation_campaign = EvaluationCampaignFactory(institution=self.institution)
         evaluated_siae = create_evaluated_siae_consistent_datas(evaluation_campaign)
         url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_detail",
+            "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
 
@@ -717,12 +717,12 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
         url = reverse(
-            "siae_evaluations_views:institution_evaluated_job_application",
+            "siae_evaluations_views:evaluated_job_application",
             kwargs={"evaluated_job_application_pk": job_app.pk},
         )
         self.assertContains(
@@ -766,7 +766,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -802,7 +802,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -848,7 +848,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -887,7 +887,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -922,7 +922,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -947,7 +947,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -962,11 +962,11 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_job_application = evaluated_siae.evaluated_job_applications.first()
 
         evaluated_job_application_url = reverse(
-            "siae_evaluations_views:institution_evaluated_job_application",
+            "siae_evaluations_views:evaluated_job_application",
             kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
         )
         url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_detail",
+            "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         validation_url = reverse(
@@ -1269,11 +1269,11 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluation_campaign.freeze(timezone.now())
 
         evaluated_job_application_url = reverse(
-            "siae_evaluations_views:institution_evaluated_job_application",
+            "siae_evaluations_views:evaluated_job_application",
             kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
         )
         url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_detail",
+            "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
         validation_url = reverse(
@@ -1396,7 +1396,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -1419,7 +1419,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -1446,7 +1446,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -1476,7 +1476,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -1510,7 +1510,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -1540,7 +1540,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -1570,7 +1570,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -1589,12 +1589,12 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         )
         evaluated_job_application = evaluated_siae.evaluated_job_applications.first()
         evaluated_job_application_url = reverse(
-            "siae_evaluations_views:institution_evaluated_job_application",
+            "siae_evaluations_views:evaluated_job_application",
             kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
         )
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
         )
@@ -1622,7 +1622,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_siae = create_evaluated_siae_consistent_datas(evaluation_campaign)
 
         url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_detail",
+            "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
 
@@ -1677,7 +1677,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluation_campaign.freeze(timezone.now())
 
         url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_detail",
+            "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
 
@@ -1735,7 +1735,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_job_application.evaluated_siae_id},
             )
         )
@@ -1751,7 +1751,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         EvaluatedJobApplicationFactory.create_batch(10, evaluated_siae=evaluated_siae)
 
         url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_detail",
+            "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
 
@@ -1931,7 +1931,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         self.assertContains(
             response,
             f"""
-            <a target="_blank" href="/siae_evaluation/institution_evaluated_siae_detail/{evaluated_siae.pk}/">
+            <a target="_blank" href="/siae_evaluation/evaluated_siae_detail/{evaluated_siae.pk}/">
              Revoir les 5 auto-prescriptions
              <i class="ri-external-link-line">
              </i>
@@ -2096,7 +2096,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep1Test(InstitutionEvaluatedSiaeNotify
         self.assertContains(
             response,
             f"""
-            <a target="_blank" href="/siae_evaluation/institution_evaluated_siae_detail/{evaluated_siae.pk}/">
+            <a target="_blank" href="/siae_evaluation/evaluated_siae_detail/{evaluated_siae.pk}/">
              Revoir l’auto-prescription
              <i class="ri-external-link-line">
              </i>
@@ -3320,7 +3320,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         # institution without evaluation_campaign
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_job_application",
+                "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": 1},
             )
         )
@@ -3332,7 +3332,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluated_job_application = evaluated_siae.evaluated_job_applications.first()
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_job_application",
+                "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
             )
         )
@@ -3343,7 +3343,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluation_campaign.save(update_fields=["evaluations_asked_at"])
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_job_application",
+                "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
             )
         )
@@ -3360,7 +3360,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_job_application",
+                "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": job_app.pk},
             )
         )
@@ -3394,7 +3394,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.post(
             reverse(
-                "siae_evaluations_views:institution_evaluated_job_application",
+                "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": job_app.pk},
             ),
             data={"labor_inspector_explanation": "Test"},
@@ -3412,7 +3412,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_job_application",
+                "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": job_app.pk},
             )
         )
@@ -3427,7 +3427,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluated_job_application = evaluated_siae.evaluated_job_applications.first()
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_job_application",
+                "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
             )
         )
@@ -3437,7 +3437,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         assert (
             response.context["back_url"]
             == reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
             + f"#{evaluated_job_application.pk}"
@@ -3459,7 +3459,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_job_application",
+                "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
             )
         )
@@ -3482,7 +3482,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_job_application",
+                "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
             )
         )
@@ -3500,7 +3500,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(
             reverse(
-                "siae_evaluations_views:institution_evaluated_job_application",
+                "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": past_job_application.pk},
             )
         )
@@ -3536,7 +3536,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.post(
             reverse(
-                "siae_evaluations_views:institution_evaluated_job_application",
+                "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": past_job_application.pk},
             ),
             data={"labor_inspector_explanation": "Invalide !"},
@@ -3554,7 +3554,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         accepte_url = self.accept_url(evaluated_administrative_criteria)
         reinit_url = self.reinit_url(evaluated_administrative_criteria)
         url_view = reverse(
-            "siae_evaluations_views:institution_evaluated_job_application",
+            "siae_evaluations_views:evaluated_job_application",
             kwargs={"evaluated_job_application_pk": evaluated_administrative_criteria.evaluated_job_application.pk},
         )
 
@@ -3639,7 +3639,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluated_job_application = evaluated_siae.evaluated_job_applications.first()
 
         url = reverse(
-            "siae_evaluations_views:institution_evaluated_job_application",
+            "siae_evaluations_views:evaluated_job_application",
             kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
         )
 
@@ -3652,7 +3652,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         assert (
             response.url
             == reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             )
             + f"#{evaluated_job_application.pk}"
@@ -3673,7 +3673,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         job_app = evaluated_siae.evaluated_job_applications.get()
         response = self.client.post(
             reverse(
-                "siae_evaluations_views:institution_evaluated_job_application",
+                "siae_evaluations_views:evaluated_job_application",
                 kwargs={"evaluated_job_application_pk": job_app.pk},
             ),
             data={"labor_inspector_explanation": "updated"},
@@ -3697,7 +3697,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         )
 
         url = reverse(
-            "siae_evaluations_views:institution_evaluated_job_application",
+            "siae_evaluations_views:evaluated_job_application",
             kwargs={"evaluated_job_application_pk": evaluated_administrative_criteria.evaluated_job_application.pk},
         )
         with self.assertNumQueries(
@@ -3722,7 +3722,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
         evaluated_administrative_criteria.save(update_fields=["submitted_at", "proof"])
 
         url_view = reverse(
-            "siae_evaluations_views:institution_evaluated_job_application",
+            "siae_evaluations_views:evaluated_job_application",
             kwargs={"evaluated_job_application_pk": evaluated_administrative_criteria.evaluated_job_application.pk},
         )
 
@@ -3814,7 +3814,7 @@ class InstitutionEvaluatedAdministrativeCriteriaViewTest(TestCase):
         # fixme vincentporte : use EvaluatedAdministrativeCriteria instead
         evaluated_administrative_criteria = get_evaluated_administrative_criteria(self.institution)
         redirect_url = reverse(
-            "siae_evaluations_views:institution_evaluated_job_application",
+            "siae_evaluations_views:evaluated_job_application",
             kwargs={"evaluated_job_application_pk": evaluated_administrative_criteria.evaluated_job_application.pk},
         )
 
@@ -3954,7 +3954,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
             kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
         )
         redirect_url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_detail",
+            "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": self.evaluated_siae.pk},
         )
 
@@ -4039,7 +4039,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
         self.assertRedirects(
             response,
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
@@ -4069,7 +4069,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
         self.assertRedirects(
             response,
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
@@ -4098,7 +4098,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
         self.assertRedirects(
             response,
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )
@@ -4128,7 +4128,7 @@ class InstitutionEvaluatedSiaeValidationViewTest(MessagesTestMixin, TestCase):
         self.assertRedirects(
             response,
             reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_siae.pk},
             ),
         )

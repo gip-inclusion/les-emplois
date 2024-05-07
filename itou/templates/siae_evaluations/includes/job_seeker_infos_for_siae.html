@@ -11,6 +11,12 @@
     <div>
         {% if state == "REFUSED_2" %}
             <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>
+        {% elif final_reviewed_at %}
+            {% if state == "ACCEPTED" or state == "SUBMITTED" %}
+                <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span>
+            {% else %}
+                <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>
+            {% endif %}
         {% elif reviewed_at %}
             {% if state == "ACCEPTED" %}
                 <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span>

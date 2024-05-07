@@ -132,10 +132,15 @@ def institution_evaluated_siae_list(
 
 
 @login_required
-def institution_evaluated_siae_detail(
-    request, evaluated_siae_pk, template_name="siae_evaluations/institution_evaluated_siae_detail.html"
-):
-    institution = get_current_institution_or_404(request)
+def evaluated_siae_detail(request, evaluated_siae_pk, template_name="siae_evaluations/evaluated_siae_detail.html"):
+    owner_data = {}
+    if request.user.is_labor_inspector:
+        owner_data["evaluation_campaign__institution"] = get_current_institution_or_404(request)
+    elif request.user.is_employer:
+        owner_data["siae"] = get_current_company_or_404(request)
+    else:
+        raise Http404(request.user.kind)
+
     evaluated_siae = get_object_or_404(
         EvaluatedSiae.objects.viewable()
         .select_related("evaluation_campaign", "siae")
@@ -147,10 +152,14 @@ def institution_evaluated_siae_detail(
             "evaluated_job_applications__job_application__job_seeker",
         ),
         pk=evaluated_siae_pk,
-        evaluation_campaign__institution=institution,
+        **owner_data,
         evaluation_campaign__evaluations_asked_at__isnull=False,
     )
     evaluation_campaign = evaluated_siae.evaluation_campaign
+
+    if request.user.is_employer and not evaluation_campaign.ended_at:
+        raise Http404("Campagne non terminée")
+
     back_url = get_safe_url(
         request,
         "back_url",
@@ -388,10 +397,17 @@ def evaluated_siae_sanction(request, evaluated_siae_pk, viewer_type):
 
 
 @login_required
-def institution_evaluated_job_application(
-    request, evaluated_job_application_pk, template_name="siae_evaluations/institution_evaluated_job_application.html"
+def evaluated_job_application(
+    request, evaluated_job_application_pk, template_name="siae_evaluations/evaluated_job_application.html"
 ):
-    institution = get_current_institution_or_404(request)
+    owner_data = {}
+    if request.user.is_labor_inspector:
+        owner_data["evaluated_siae__evaluation_campaign__institution"] = get_current_institution_or_404(request)
+    elif request.user.is_employer:
+        owner_data["evaluated_siae__siae"] = get_current_company_or_404(request)
+    else:
+        raise Http404(request.user.kind)
+
     evaluated_job_application = get_object_or_404(
         EvaluatedJobApplication.objects.viewable()
         .prefetch_related(
@@ -403,17 +419,20 @@ def institution_evaluated_job_application(
         )
         .select_related("evaluated_siae__evaluation_campaign"),
         pk=evaluated_job_application_pk,
-        evaluated_siae__evaluation_campaign__institution=institution,
+        **owner_data,
         evaluated_siae__evaluation_campaign__evaluations_asked_at__isnull=False,
     )
     evaluated_siae = evaluated_job_application.evaluated_siae
+
+    if request.user.is_employer and not evaluated_siae.evaluation_campaign.ended_at:
+        raise Http404("Campagne non terminée")
 
     back_url = (
         get_safe_url(
             request,
             "back_url",
             fallback_url=reverse(
-                "siae_evaluations_views:institution_evaluated_siae_detail",
+                "siae_evaluations_views:evaluated_siae_detail",
                 kwargs={"evaluated_siae_pk": evaluated_job_application.evaluated_siae.pk},
             ),
         )
@@ -483,7 +502,7 @@ def institution_evaluated_administrative_criteria(request, evaluated_administrat
 
     return HttpResponseRedirect(
         reverse(
-            "siae_evaluations_views:institution_evaluated_job_application",
+            "siae_evaluations_views:evaluated_job_application",
             args=[evaluated_administrative_criteria.evaluated_job_application.pk],
         )
     )
@@ -516,7 +535,7 @@ def institution_evaluated_siae_validation(request, evaluated_siae_pk):
 
     return HttpResponseRedirect(
         reverse(
-            "siae_evaluations_views:institution_evaluated_siae_detail",
+            "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
     )
