@@ -287,6 +287,7 @@ class EvaluatedAdministrativeCriteriaAdmin(ItouModelAdmin):
         "proof_link",
         "submitted_at",
         "review_state",
+        "proof",
     )
 
     @admin.display(description="lien du fichier bilan")
