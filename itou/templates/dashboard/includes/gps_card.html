@@ -8,15 +8,15 @@
         <div class="px-3 px-lg-4 pt-3 pt-lg-4">
             <ul class="list-unstyled mb-lg-5">
                 <li class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'gps:my_groups' %}"
-                       rel="noopener"
-                       target="_blank"
-                       aria-label="Gérer les utilisateurs suivis dans votre groupe."
-                       class="btn-link btn-ico"
-                       {% matomo_event "gps" "clic" "tdb_liste_beneficiaires" %}>
+                    <a href="{% url 'gps:my_groups' %}" aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" {% matomo_event "gps" "clic" "tdb_liste_beneficiaires" %}>
                         <i class="ri-article-line ri-lg font-weight-normal align-self-start"></i>
                         <span>Visualiser les bénéficiaires</span>
-                        <i class="ri-external-link-line font-weight-normal ms-2"></i>
+                    </a>
+                </li>
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="{% url 'gps:join_group' %}?back_url={% url 'dashboard:index' %}" aria-label="Créer ou rejoindre un groupe." class="btn-link btn-ico" {% matomo_event "gps" "clic" "tbd_ajout_groupe" %}>
+                        <i class="ri-play-list-add-line ri-lg font-weight-normal align-self-start"></i>
+                        <span>Créer ou rejoindre un groupe</span>
                     </a>
                 </li>
             </ul>

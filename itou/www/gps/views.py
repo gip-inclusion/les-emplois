@@ -6,6 +6,7 @@ from django.urls import reverse, reverse_lazy
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.utils.decorators import settings_protected_view
+from itou.utils.urls import get_safe_url
 from itou.www.gps.forms import GpsUserSearchForm
 
 
@@ -44,6 +45,7 @@ def join_group(request, template_name="gps/join_group.html"):
     form = GpsUserSearchForm(data=request.POST or None)
 
     my_groups_url = reverse("gps:my_groups")
+    back_url = get_safe_url(request, "back_url", my_groups_url)
 
     if request.method == "POST" and form.is_valid():
         user = form.cleaned_data["user"]
@@ -63,6 +65,6 @@ def join_group(request, template_name="gps/join_group.html"):
         "Rejoindre un groupe de suivi": reverse("gps:join_group"),
     }
 
-    context = {"breadcrumbs": breadcrumbs, "form": form, "reset_url": my_groups_url}
+    context = {"breadcrumbs": breadcrumbs, "form": form, "reset_url": back_url}
 
     return render(request, template_name, context)
