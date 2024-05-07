@@ -77,7 +77,9 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
                 <b>Commentaire de votre DDETS</b>
             </p>
             <div class="card">
-                <div class="card-body">A envoyé une photo de son chat. Séparé de son chat pendant une journée.</div>
+                <div class="card-body">
+                    <p>A envoyé une photo de son chat. Séparé de son chat pendant une journée.</p>
+                </div>
             </div>
             """,
             html=True,
@@ -185,7 +187,7 @@ class EvaluatedSiaeSanctionViewTest(TestCase):
              </h3>
              <div class="card">
               <div class="card-body">
-               RDV le 18 avril à 14h dans les locaux de Pôle Emploi.
+               <p>RDV le 18 avril à 14h dans les locaux de Pôle Emploi.</p>
               </div>
              </div>
             </div>
