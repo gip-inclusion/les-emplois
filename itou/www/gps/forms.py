@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 from django.utils.text import format_lazy
 
+from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
@@ -12,7 +13,7 @@ class GpsUserSearchForm(forms.Form):
     # to be added to the a Form using this mixin (django magic)
 
     user = forms.ModelChoiceField(
-        queryset=User.objects,
+        queryset=User.objects.filter(kind=UserKind.JOB_SEEKER),
         label="Nom et prénom du candidat",
         widget=RemoteAutocompleteSelect2Widget(
             attrs={
