@@ -15,7 +15,7 @@
                     </li>
                 {% endif %}
             </ul>
-            <a target="_blank" href="{% url 'siae_evaluations_views:institution_evaluated_siae_detail' evaluated_siae_pk=evaluated_siae.pk %}">Revoir
+            <a target="_blank" href="{% url 'siae_evaluations_views:evaluated_siae_detail' evaluated_siae_pk=evaluated_siae.pk %}">Revoir
                 {% if job_apps_count == 1 %}
                     l’auto-prescription
                 {% else %}

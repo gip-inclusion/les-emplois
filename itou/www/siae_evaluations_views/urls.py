@@ -19,9 +19,9 @@ urlpatterns = [
         name="institution_evaluated_siae_list",
     ),
     path(
-        "institution_evaluated_siae_detail/<int:evaluated_siae_pk>/",
-        views.institution_evaluated_siae_detail,
-        name="institution_evaluated_siae_detail",
+        "evaluated_siae_detail/<int:evaluated_siae_pk>/",
+        views.evaluated_siae_detail,
+        name="evaluated_siae_detail",
     ),
     path(
         "institution_evaluated_siae_notify/<int:evaluated_siae_pk>/",
@@ -52,9 +52,9 @@ urlpatterns = [
         name="siae_sanction",
     ),
     path(
-        "institution_evaluated_job_application/<int:evaluated_job_application_pk>/",
-        views.institution_evaluated_job_application,
-        name="institution_evaluated_job_application",
+        "evaluated_job_application/<int:evaluated_job_application_pk>/",
+        views.evaluated_job_application,
+        name="evaluated_job_application",
     ),
     path(
         "institution_evaluated_administrative_criteria/<int:evaluated_administrative_criteria_pk>/<slug:action>",

@@ -1142,3 +1142,53 @@ class SiaeCalendarViewTest(TestCase):
         evaluated_siae.evaluation_campaign.calendar.delete()
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, calendar_url)
+
+
+class SiaeEvaluatedSiaeDetailViewTest(TestCase):
+    def test_access(self):
+        membership = CompanyMembershipFactory()
+        user = membership.user
+        siae = membership.company
+
+        self.client.force_login(user)
+
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(siae, user)
+        evaluated_siae = evaluated_job_application.evaluated_siae
+        url = reverse(
+            "siae_evaluations_views:evaluated_siae_detail",
+            kwargs={"evaluated_siae_pk": evaluated_siae.pk},
+        )
+
+        response = self.client.get(url)
+        assert response.status_code == 404
+
+        evaluation_campaign = evaluated_siae.evaluation_campaign
+        evaluation_campaign.ended_at = timezone.now()
+        evaluation_campaign.save(update_fields=["ended_at"])
+        response = self.client.get(url)
+        assert response.status_code == 200
+
+
+class SiaeEvaluatedJobApplicationViewTest(TestCase):
+    def test_access(self):
+        membership = CompanyMembershipFactory()
+        user = membership.user
+        siae = membership.company
+
+        self.client.force_login(user)
+
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(siae, user)
+        evaluated_siae = evaluated_job_application.evaluated_siae
+        evaluated_job_application = evaluated_siae.evaluated_job_applications.first()
+        url = reverse(
+            "siae_evaluations_views:evaluated_job_application",
+            kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
+        )
+        response = self.client.get(url)
+        assert response.status_code == 404
+
+        evaluation_campaign = evaluated_siae.evaluation_campaign
+        evaluation_campaign.ended_at = timezone.now()
+        evaluation_campaign.save(update_fields=["ended_at"])
+        response = self.client.get(url)
+        assert response.status_code == 200
