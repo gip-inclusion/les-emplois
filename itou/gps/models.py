@@ -1,11 +1,30 @@
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 
 from itou.users.models import User
 
 
+class FollowUpGroupManager(models.Manager):
+    def follow_beneficiary(self, beneficiary, user, is_referent=False):
+        with transaction.atomic():
+            group, _ = FollowUpGroup.objects.get_or_create(beneficiary=beneficiary)
+
+            updated = FollowUpGroupMembership.objects.filter(member=user, follow_up_group=group).update(
+                is_active=True, is_referent=is_referent
+            )
+            if not updated:
+                FollowUpGroupMembership.objects.create(
+                    follow_up_group=group,
+                    member=user,
+                    creator=user,
+                    is_referent=is_referent,
+                )
+
+
 class FollowUpGroup(models.Model):
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+
+    objects = FollowUpGroupManager()
 
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 

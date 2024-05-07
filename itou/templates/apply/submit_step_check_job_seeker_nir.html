@@ -98,12 +98,20 @@
                                 Le numéro {{ form.nir.value|format_nir }} est associé au compte de <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>.
                             </p>
                             <p>
-                                Si cette candidature n'est pas pour <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
+                                {% if is_gps %}
+                                    Si ce n'est pas le bénéficiaire que vous souhaitez suivre, cliquez sur « Suivre un autre bénéficiaire » afin de modifier le numéro de sécurité sociale.
+                                {% else %}
+                                    Si cette candidature n'est pas pour <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Ce n'est pas mon candidat » afin de modifier le numéro de sécurité sociale.
+                                {% endif %}
                             </p>
                         </div>
                         <div class="modal-footer">
                             {# Reload this page with a new form. #}
-                            {% bootstrap_button "Ce n'est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                            {% if is_gps %}
+                                {% bootstrap_button "Suivre un autre bénéficiaire" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                            {% else %}
+                                {% bootstrap_button "Ce n'est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                            {% endif %}
                             {# Go to the next step. #}
                             {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
                         </div>

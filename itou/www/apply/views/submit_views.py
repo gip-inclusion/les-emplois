@@ -22,6 +22,7 @@ from itou.companies.models import Company, JobDescription
 from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.files.models import File
+from itou.gps.models import FollowUpGroup
 from itou.job_applications.models import JobApplication
 from itou.users.enums import UserKind
 from itou.users.models import JobSeekerProfile, User
@@ -79,12 +80,16 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
         self.company = None
         self.apply_session = None
         self.hire_process = None
+        self.is_gps = False
 
     def setup(self, request, *args, **kwargs):
         self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
         self.apply_session = SessionNamespace(request.session, f"job_application-{self.company.pk}")
         self.hire_process = kwargs.pop("hire_process", False)
+
         super().setup(request, *args, **kwargs)
+
+        self.is_gps = "gps" in request.GET and request.GET["gps"] == "true"
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -99,7 +104,7 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
             elif request.user.is_employer and not self.company.has_member(request.user):
                 raise PermissionDenied("Vous ne pouvez postuler pour un candidat que dans votre structure.")
 
-        if not self.company.has_active_members:
+        if not self.company.has_active_members and not self.is_gps:
             raise PermissionDenied(
                 "Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne."
             )
@@ -114,6 +119,7 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
             "back_url": self.get_back_url(),
             "hire_process": self.hire_process,
             "reset_url": reverse("dashboard:index"),
+            "is_gps": self.is_gps,
         }
 
 
@@ -186,36 +192,44 @@ class ApplyStepForSenderBaseView(ApplyStepBaseView):
 
 class StartView(ApplyStepBaseView):
     def get(self, request, *args, **kwargs):
-        # SIAE members can only submit a job application to their SIAE
-        if request.user.is_employer:
-            if suspension_explanation := self.company.get_active_suspension_text_with_dates():
-                raise PermissionDenied(
-                    "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
-                    "a posteriori. " + suspension_explanation
-                )
+        tunnel = "job_seeker" if request.user.is_job_seeker else "sender"
 
-        # Refuse all applications except those made by an SIAE member
-        if self.company.block_job_applications and not self.company.has_member(request.user):
-            raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
+        if not self.is_gps:
+            # Checks are not relevants for the creation of a job_seeker in the GPS context
+            # because we don't create a job application, only a job_seeker and a job_seeker_profile
+
+            # SIAE members can only submit a job application to their SIAE
+            if request.user.is_employer:
+                if suspension_explanation := self.company.get_active_suspension_text_with_dates():
+                    raise PermissionDenied(
+                        "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
+                        "a posteriori. " + suspension_explanation
+                    )
+
+            # Refuse all applications except those made by an SIAE member
+            if self.company.block_job_applications and not self.company.has_member(request.user):
+                raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
 
         # Create a sub-session for this job application process
         self.apply_session.init(
-            {
-                "selected_jobs": [request.GET["job_description_id"]] if "job_description_id" in request.GET else [],
-            }
+            {"selected_jobs": [request.GET["job_description_id"]] if "job_description_id" in request.GET else []}
         )
+
         # Warn message if prescriber's authorization is pending
         if (
             request.user.is_prescriber
             and request.current_organization
             and request.current_organization.has_pending_authorization()
+            and not self.is_gps
         ):
             return HttpResponseRedirect(
                 reverse("apply:pending_authorization_for_sender", kwargs={"company_pk": self.company.pk})
             )
 
-        tunnel = "job_seeker" if request.user.is_job_seeker else "sender"
-        return HttpResponseRedirect(reverse(f"apply:check_nir_for_{tunnel}", kwargs={"company_pk": self.company.pk}))
+        return HttpResponseRedirect(
+            reverse(f"apply:check_nir_for_{tunnel}", kwargs={"company_pk": self.company.pk})
+            + ("?gps=true" if self.is_gps else "")
+        )
 
 
 class PendingAuthorizationForSender(ApplyStepForSenderBaseView):
@@ -290,12 +304,13 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
-        self.form = CheckJobSeekerNirForm(job_seeker=None, data=request.POST or None)
+        self.form = CheckJobSeekerNirForm(job_seeker=None, data=request.POST or None, is_gps=self.is_gps)
 
     def redirect_to_check_email(self, session_uuid):
         view_name = "apply:search_by_email_for_hire" if self.hire_process else "apply:search_by_email_for_sender"
         return HttpResponseRedirect(
             reverse(view_name, kwargs={"company_pk": self.company.pk, "session_uuid": session_uuid})
+            + ("?gps=true" if self.is_gps else "")
         )
 
     def post(self, request, *args, **kwargs):
@@ -317,7 +332,13 @@ class CheckNIRForSenderView(ApplyStepForSenderBaseView):
 
             # The NIR we found is correct
             if self.form.data.get("confirm"):
-                return self.redirect_to_check_infos(job_seeker.pk)
+                if self.is_gps:
+                    FollowUpGroup.objects.follow_beneficiary(
+                        beneficiary=job_seeker, user=request.user, is_referent=True
+                    )
+                    return HttpResponseRedirect(reverse("gps:my_groups"))
+                else:
+                    return self.redirect_to_check_infos(job_seeker.pk)
 
             context = {
                 # Ask the sender to confirm the NIR we found is associated to the correct user
@@ -347,7 +368,9 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSend
     def setup(self, request, *args, **kwargs):
         self.job_seeker_session = SessionNamespace(request.session, kwargs["session_uuid"])
         super().setup(request, *args, **kwargs)
-        self.form = JobSeekerExistsForm(initial=self.job_seeker_session.get("user", {}), data=request.POST or None)
+        self.form = JobSeekerExistsForm(
+            is_gps=self.is_gps, initial=self.job_seeker_session.get("user", {}), data=request.POST or None
+        )
 
     def post(self, request, *args, **kwargs):
         can_add_nir = False
@@ -376,6 +399,7 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSend
                     reverse(
                         view_name, kwargs={"company_pk": self.company.pk, "session_uuid": self.job_seeker_session.name}
                     )
+                    + ("?gps=true" if self.is_gps else "")
                 )
 
             # Ask the sender to confirm the email we found is associated to the correct user
@@ -402,7 +426,13 @@ class SearchByEmailForSenderView(SessionNamespaceRequiredMixin, ApplyStepForSend
                     messages.warning(request, msg)
                     logger.exception("step_job_seeker: error when saving job_seeker=%s nir=%s", job_seeker, nir)
                 else:
-                    return self.redirect_to_check_infos(job_seeker.pk)
+                    if self.is_gps:
+                        FollowUpGroup.objects.follow_beneficiary(
+                            beneficiary=job_seeker, user=request.user, is_referent=True
+                        )
+                        return HttpResponseRedirect(reverse("gps:my_groups"))
+                    else:
+                        return self.redirect_to_check_infos(job_seeker.pk)
 
         return self.render_to_response(
             self.get_context_data(**kwargs)
@@ -443,14 +473,14 @@ class CreateJobSeekerForSenderBaseView(SessionNamespaceRequiredMixin, ApplyStepF
         return reverse(
             view_name,
             kwargs={"company_pk": self.company.pk, "session_uuid": self.job_seeker_session.name},
-        )
+        ) + ("?gps=true" if self.is_gps else "")
 
     def get_next_url(self):
         view_name = self.next_hire_url if self.hire_process else self.next_apply_url
         return reverse(
             view_name,
             kwargs={"company_pk": self.company.pk, "session_uuid": self.job_seeker_session.name},
-        )
+        ) + ("?gps=true" if self.is_gps else "")
 
 
 class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
@@ -629,7 +659,12 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         )
 
     def get_next_url(self):
-        if self.hire_process:
+        kwargs = {"company_pk": self.company.pk, "job_seeker_pk": self.profile.user.pk}
+
+        if self.is_gps:
+            kwargs = {}
+            view_name = "gps:my_groups"
+        elif self.hire_process:
             if self.company.kind == CompanyKind.GEIQ:
                 view_name = "apply:geiq_eligibility_for_hire"
             else:
@@ -639,7 +674,7 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
 
         return reverse(
             view_name,
-            kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.profile.user.pk},
+            kwargs=kwargs,
         )
 
     def post(self, request, *args, **kwargs):
@@ -664,13 +699,14 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
 
             self.job_seeker_session.delete()
             url = self.get_next_url()
+
+            if self.is_gps:
+                FollowUpGroup.objects.follow_beneficiary(beneficiary=user, user=request.user, is_referent=True)
+
         return HttpResponseRedirect(url)
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {
-            "profile": self.profile,
-            "progress": "80",
-        }
+        return super().get_context_data(**kwargs) | {"profile": self.profile, "progress": "80"}
 
 
 class CheckJobSeekerInformations(ApplicationBaseView):
@@ -1484,10 +1520,7 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
         return HttpResponseRedirect(url)
 
     def get_context_data(self, **kwargs):
-        return super().get_context_data(**kwargs) | {
-            "profile": self.profile,
-            "progress": "80",
-        }
+        return super().get_context_data(**kwargs) | {"profile": self.profile, "progress": "80"}
 
 
 @login_required

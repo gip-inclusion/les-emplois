@@ -35,9 +35,12 @@ from itou.www.companies_views.forms import JobAppellationAndLocationMixin
 
 
 class JobSeekerExistsForm(forms.Form):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, is_gps=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = None
+
+        if is_gps:
+            self.fields["email"].label = "Adresse e-mail du bénéficiaire"
 
     email = forms.EmailField(
         label="Adresse e-mail personnelle du candidat",
@@ -81,13 +84,13 @@ class CheckJobSeekerNirForm(forms.Form):
         ),
     )
 
-    def __init__(self, *args, job_seeker=None, **kwargs):
+    def __init__(self, *args, job_seeker=None, is_gps=False, **kwargs):
         self.job_seeker = job_seeker
         super().__init__(*args, **kwargs)
         if self.job_seeker:
             self.fields["nir"].label = "Votre numéro de sécurité sociale"
         else:
-            self.fields["nir"].label = "Numéro de sécurité sociale du candidat"
+            self.fields["nir"].label = "Numéro de sécurité sociale du " + ("bénéficiaire" if is_gps else "candidat")
 
     def clean_nir(self):
         nir = self.cleaned_data["nir"].upper()

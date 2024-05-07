@@ -4,22 +4,32 @@
 {% load buttons_form %}
 
 {% block title %}
-    {% if update_job_seeker %}
-        Modification
-    {% else %}
-        Création
-    {% endif %}
-    du compte candidat {{ block.super }}
-{% endblock %}
 
-{% block content_title %}
-    <h1 class="my-5">
+    {% if is_gps %}
+        Création du bénéficiaire
+    {% else %}
         {% if update_job_seeker %}
             Modification
         {% else %}
             Création
         {% endif %}
         du compte candidat
+    {% endif %}
+    {{ block.super }}
+{% endblock %}
+
+{% block content_title %}
+    <h1 class="my-5">
+        {% if is_gps %}
+            Création du bénéficiaire
+        {% else %}
+            {% if update_job_seeker %}
+                Modification
+            {% else %}
+                Création
+            {% endif %}
+            du compte candidat
+        {% endif %}
     </h1>
 {% endblock %}
 
@@ -45,7 +55,11 @@
                             {% if update_job_seeker %}
                                 {% itou_buttons_form primary_label="Valider les informations" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False %}
                             {% else %}
-                                {% itou_buttons_form primary_label="Créer le compte candidat" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False %}
+                                {% if is_gps %}
+                                    {% itou_buttons_form primary_label="Créer et suivre le bénéficiaire" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False %}
+                                {% else %}
+                                    {% itou_buttons_form primary_label="Créer le compte candidat" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False %}
+                                {% endif %}
                             {% endif %}
                         </form>
                     </div>

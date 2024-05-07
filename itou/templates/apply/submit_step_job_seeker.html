@@ -56,27 +56,42 @@
                             </p>
                             <p>
                                 L'identité du candidat est une information clé pour la structure.
-                                Si cette candidature n'est pas pour <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
-                                « Ce n'est pas mon candidat » afin d'enregistrer ses informations
-                                personnelles.
+                                {% if is_gps %}
+                                    Si vous ne souhaitez pas suivre <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur « Suivre un autre bénéficiaire » afin d'enregistrer ses informations personnelles.
+                                {% else %}
+                                    Si cette candidature n'est pas pour <b>{{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</b>, cliquez sur
+                                    « Ce n'est pas mon candidat » afin d'enregistrer ses informations
+                                    personnelles.
+                                {% endif %}
                             </p>
                             {% if can_add_nir %}
                                 <p>
-                                    En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale {{ nir|format_nir }} soit associé à ce candidat.</b>
-                                </p>
-                            {% endif %}
-                        </div>
-                        <div class="modal-footer">
-                            {# Reload this page with a new form. #}
+                                    En cliquant sur « Continuer », <b>vous acceptez que le numéro de sécurité sociale {{ nir|format_nir }} soit associé à ce
+                                    {% if is_gps %}
+                                        bénéficiaire
+                                    {% else %}
+                                        candidat
+                                    {% endif %}
+                                .</b>
+                            </p>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+
+                        {# Reload this page with a new form. #}
+                        {% if is_gps %}
+                            {% bootstrap_button "Suivre un autre bénéficiaire" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
+                        {% else %}
                             {% bootstrap_button "Ce n'est pas mon candidat" button_type="submit" button_class="btn btn-sm btn-outline-primary" name="cancel" value="1" %}
-                            {# Go to the next step. #}
-                            {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
-                        </div>
+                        {% endif %}
+                        {# Go to the next step. #}
+                        {% bootstrap_button "Continuer" button_type="submit" button_class="btn btn-sm btn-primary" name="confirm" value="1" %}
                     </div>
                 </div>
             </div>
-        {% endif %}
-    </form>
+        </div>
+    {% endif %}
+</form>
 {% endblock %}
 
 {% block script %}
