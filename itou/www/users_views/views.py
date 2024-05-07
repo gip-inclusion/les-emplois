@@ -4,7 +4,6 @@ from django.views.generic import DetailView
 
 from itou.gps.models import FollowUpGroupMembership
 from itou.users.models import User
-from itou.www.approvals_views.views import ApprovalListView
 
 
 class UserDetailsView(LoginRequiredMixin, DetailView):
@@ -13,6 +12,7 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
     template_name = "users/details.html"
     slug_field = "public_id"
     slug_url_kwarg = "public_id"
+    context_object_name = "user"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -33,9 +33,3 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
         }
 
         return context
-
-
-class UserListView(ApprovalListView):
-    # Use the same logic as Approval view but change the details link.
-    # This is just for demo purposes as long as the GPS app is not ready to use.
-    template_name = "users/list.html"

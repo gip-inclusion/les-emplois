@@ -14,6 +14,7 @@
             <div class="s-box__row row">
                 <div class="col-12">
                     <section aria-labelledby="results" id="follow-up-groups-section">
+
                         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
                             <h3 class="h4 mb-0" id="results">
                                 {% with memberships|length as counter %}
@@ -33,8 +34,6 @@
 
                         {% for membership in memberships %}
                             <div class="my-3 my-md-4 s-box__row row">
-
-
                                 <div class="c-box--results__header">
                                     <div class="c-box--results__summary">
                                         <i class="ri-user-line" aria-hidden="true"></i>
@@ -45,12 +44,11 @@
                                     </div>
                                 </div>
 
-                                <hr class="m-0 pb-4">
+                                <hr class="m-0 pb-4" />
 
                                 <div class="d-flex justify-content-between">
-
                                     <div>
-                                        {% with membership.follow_up_group.members.all|length|add:"-1" as counter %}
+                                        {% with membership.nb_members|add:"-1" as counter %}
                                             <div>
                                                 Vous avez rejoint ce groupe le <strong>{{ membership.created_at|date:"d/m/Y" }}</strong>
                                                 {% if membership.is_referent %}et en êtes <strong>référent</strong>{% endif %}
@@ -70,9 +68,7 @@
                                            class="btn btn-outline-primary btn-block w-100 w-md-auto"
                                            aria-label="Consulter la fiche de {{ membership.follow_up_group.beneficiary.get_full_name }}">Consulter la fiche</a>
                                     </div>
-
                                 </div>
-
                             </div>
                         {% endfor %}
                     </section>

@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import Count
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
@@ -18,6 +19,7 @@ def my_groups(request, template_name="gps/my_groups.html"):
     memberships = (
         FollowUpGroupMembership.objects.filter(member=current_user)
         .filter(is_active=True)
+        .annotate(nb_members=Count("follow_up_group__members"))
         .select_related("follow_up_group", "follow_up_group__beneficiary", "member")
         .prefetch_related("follow_up_group__members")
     )
@@ -49,7 +51,7 @@ def join_group(request, template_name="gps/join_group.html"):
 
         group = user.follow_up_group if (hasattr(user, "follow_up_group")) else None
 
-        if group is None:
+        if not group:
             group = FollowUpGroup.objects.create(beneficiary=user)
 
         group.members.add(request.user, through_defaults={"creator": request.user, "is_referent": is_referent})
