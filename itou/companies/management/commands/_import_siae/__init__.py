@@ -1,8 +1,9 @@
 import gzip
+import os
 import shutil
 from pathlib import Path
 
-from py7zr import unpack_7zarchive
+import pyzipper
 
 
 def gunzip(archivepath, outdir):
@@ -15,5 +16,10 @@ def gunzip(archivepath, outdir):
         raise shutil.ReadError from e
 
 
+def unpack_riae_zip_aes_encrypted(path, directory, **kwargs):
+    with pyzipper.AESZipFile(path) as zf:
+        zf.extractall(directory, pwd=os.environ["ASP_RIAE_UNZIP_PASSWORD"].encode())
+
+
 shutil.register_unpack_format("gz", [".gz"], gunzip)
-shutil.register_unpack_format("7zip", [".7z"], unpack_7zarchive)
+shutil.register_unpack_format("zip-riae", [".riae"], unpack_riae_zip_aes_encrypted)

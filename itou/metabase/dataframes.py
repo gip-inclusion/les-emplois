@@ -41,6 +41,9 @@ def store_df(df, table_name, max_attempts=5):
 
     Try up to `max_attempts` times.
     """
+    # Drop unnamed columns
+    df = df.loc[:, ~df.columns.str.contains("^Unnamed")]
+
     # Recipe from https://stackoverflow.com/questions/44729727/pandas-slice-large-dataframe-in-chunks
     rows_per_chunk = 10 * 1000
     df_chunks = [df[i : i + rows_per_chunk] for i in range(0, df.shape[0], rows_per_chunk)]
