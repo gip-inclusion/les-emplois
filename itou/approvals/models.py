@@ -230,8 +230,10 @@ class ApprovalQuerySet(CommonApprovalQuerySet):
         )
 
     def is_assigned_to(self, company_id):
+        from itou.job_applications.models import JobApplication
+
         return (
-            self.filter(user__job_applications__to_company=company_id)
+            self.filter(pk__in=JobApplication.objects.filter(to_company=company_id).values_list("approval"))
             .with_assigned_company()
             .filter(assigned_company=company_id)
         )
