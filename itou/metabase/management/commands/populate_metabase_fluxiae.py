@@ -94,7 +94,7 @@ class Command(BaseCommand):
         self.populate_fluxiae_view(vue_name="fluxIAE_AnnexeFinanciere")
         self.populate_fluxiae_view(vue_name="fluxIAE_AnnexeFinanciereACI")
         self.populate_fluxiae_view(vue_name="fluxIAE_Convention")
-        self.populate_fluxiae_view(vue_name="fluxIAE_ContratMission", skip_first_row=False)
+        self.populate_fluxiae_view(vue_name="fluxIAE_ContratMission")
         self.populate_fluxiae_view(vue_name="fluxIAE_Encadrement")
         self.populate_fluxiae_view(vue_name="fluxIAE_EtatMensuelAgregat")
         self.populate_fluxiae_view(vue_name="fluxIAE_EtatMensuelIndiv")
@@ -103,7 +103,7 @@ class Command(BaseCommand):
         self.populate_fluxiae_view(vue_name="fluxIAE_Missions")
         self.populate_fluxiae_view(vue_name="fluxIAE_MissionsEtatMensuelIndiv")
         self.populate_fluxiae_view(vue_name="fluxIAE_PMSMP")
-        self.populate_fluxiae_view(vue_name="fluxIAE_Salarie", skip_first_row=False)
+        self.populate_fluxiae_view(vue_name="fluxIAE_Salarie")
         self.populate_fluxiae_view(vue_name="fluxIAE_Structure")
 
         build_dbt_weekly()

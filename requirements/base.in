@@ -94,7 +94,7 @@ httpx  # https://github.com/encode/httpx/
 
 # SFTP file transfer for ASP
 paramiko  # https://github.com/paramiko/paramiko
-py7zr  # https://github.com/miurahr/py7zr
+pyzipper  # https://github.com/danifus/pyzipper
 
 # Stream XLSX files
 xlsx_streaming  # https://github.com/Polyconseil/xlsx_streaming
