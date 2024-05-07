@@ -9,8 +9,10 @@ from pytest_django.asserts import assertContains, assertMessages, assertNotConta
 
 from itou.approvals.enums import ProlongationReason
 from itou.files.models import File
+from itou.job_applications.enums import JobApplicationState
 from itou.utils.admin import get_admin_view_link
 from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory, ProlongationFactory, SuspensionFactory
+from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.test import parse_response_to_soup
@@ -80,6 +82,33 @@ def test_assigned_company(admin_client):
     siae = approval.jobapplication_set.get().to_company
     response = admin_client.get(reverse("admin:approvals_approval_change", kwargs={"object_id": approval.pk}))
     assertContains(response, get_admin_view_link(siae, content=siae.display_name), count=2)
+
+
+def test_filter_assigned_company(admin_client):
+    company = CompanyFactory()
+    job_seeker = JobSeekerFactory()
+    JobApplicationFactory(to_company=company, job_seeker=job_seeker)
+    approval = ApprovalFactory(user=job_seeker)
+    JobApplicationFactory(
+        approval=approval,
+        to_company=company,
+        job_seeker=job_seeker,
+        state=JobApplicationState.ACCEPTED,
+    )
+    response = admin_client.get(reverse("admin:approvals_approval_changelist"), {"assigned_company": company.pk})
+    assertContains(response, "1 PASS IAE")
+    assertContains(
+        response,
+        f"""
+        <th class="field-pk">
+        <a href="/admin/approvals/approval/{approval.pk}/change/?_changelist_filters=assigned_company%3D{company.pk}">
+        {approval.pk}
+        </a>
+        </th>
+        """,
+        html=True,
+        count=1,
+    )
 
 
 def test_send_approvals_to_pe_stats(admin_client):
