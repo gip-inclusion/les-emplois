@@ -1170,6 +1170,8 @@ class SiaeEvaluatedSiaeDetailViewTest(TestCase):
 
 
 class SiaeEvaluatedJobApplicationViewTest(TestCase):
+    refusal_comment_txt = "Commentaire de la DDETS"
+
     def test_access(self):
         membership = CompanyMembershipFactory()
         user = membership.user
@@ -1191,4 +1193,15 @@ class SiaeEvaluatedJobApplicationViewTest(TestCase):
         evaluation_campaign.ended_at = timezone.now()
         evaluation_campaign.save(update_fields=["ended_at"])
         response = self.client.get(url)
-        assert response.status_code == 200
+        self.assertNotContains(response, self.refusal_comment_txt)
+
+        # Refusal comment is only displayed when state is refused
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_application,
+            review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+            submitted_at=timezone.now(),
+        )
+        evaluated_siae.reviewed_at = timezone.now()
+        evaluated_siae.save(update_fields=["reviewed_at"])
+        response = self.client.get(url)
+        self.assertContains(response, self.refusal_comment_txt)

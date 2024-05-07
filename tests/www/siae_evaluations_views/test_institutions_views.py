@@ -34,6 +34,7 @@ from tests.siae_evaluations.factories import (
 )
 from tests.users.factories import JobSeekerFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
+from tests.www.siae_evaluations_views.test_siaes_views import SiaeEvaluatedJobApplicationViewTest
 
 
 # fixme vincentporte : convert this method into factory
@@ -3276,7 +3277,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
     btn_modifier_html = """
     <button class="btn btn-sm btn-primary" aria-label="Modifier l'état de ce justificatif">Modifier</button>
     """
-    save_text = "Enregistrer le commentaire"
+    save_text = "Enregistrer le commentaire et retourner à la liste des auto-prescriptions"
 
     def setUp(self):
         super().setUp()
@@ -3443,6 +3444,7 @@ class InstitutionEvaluatedJobApplicationViewTest(TestCase):
             + f"#{evaluated_job_application.pk}"
         )
         self.assertContains(response, self.save_text, count=1)
+        self.assertNotContains(response, SiaeEvaluatedJobApplicationViewTest.refusal_comment_txt)
 
     def test_get_before_new_criteria_submitted(self):
         now = timezone.now()

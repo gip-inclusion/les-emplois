@@ -34,6 +34,20 @@
                         </div>
                         <hr class="m-0">
                         <div class="c-box--results__body">
+                            {% if evaluated_job_application.evaluated_siae.reviewed_at %}
+                                {% if not evaluated_job_application.hide_state_from_siae %}
+                                    {% with jobapp_state=evaluated_job_application.compute_state %}
+                                        {% if jobapp_state == 'REFUSED' or jobapp_state == 'REFUSED_2' %}
+                                            <p>
+                                                <b>Commentaire de la DDETS</b>
+                                            </p>
+                                            <div class="card">
+                                                <div class="card-body">{{ evaluated_job_application.labor_inspector_explanation|linebreaks }}</div>
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% endif %}
+                            {% endif %}
                             <div class="c-info c-info--secondary mt-3">
                                 <button class="c-info__summary"
                                         data-bs-toggle="collapse"
