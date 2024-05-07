@@ -30,7 +30,7 @@
                                 <b>Commentaire de votre DDETS</b>
                             </p>
                             <div class="card">
-                                <div class="card-body">{{ evaluated_siae.notification_text }}</div>
+                                <div class="card-body">{{ evaluated_siae.notification_text|linebreaks }}</div>
                             </div>
                         </div>
                         <div class="card-body">
@@ -39,7 +39,7 @@
                             {% if sanctions.training_session %}
                                 <h3 class="mt-5">Participation à une session de présentation de l’auto-prescription</h3>
                                 <div class="card">
-                                    <div class="card-body">{{ sanctions.training_session }}</div>
+                                    <div class="card-body">{{ sanctions.training_session|linebreaks }}</div>
                                 </div>
                             {% endif %}
 
