@@ -158,6 +158,7 @@
             tarteaucitron.user.matomoId = {{ MATOMO_SITE_ID }};
             tarteaucitron.user.matomoHost = '{{ MATOMO_BASE_URL }}';
             tarteaucitron.user.matomoMore = function () {
+                // Executed after trackPageView.
                 window._paq.push(['trackVisibleContentImpressions']);
             };
             (tarteaucitron.job = tarteaucitron.job || []).push('matomo');
