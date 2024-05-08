@@ -82,6 +82,10 @@ def open_pull_request(branch, title):
     gh("pr", "create", "--label", SKIP, "--title", title, "--body", "")
 
 
+def ci_sort(iterable):
+    return sorted(iterable, key=str.casefold)
+
+
 def main(publish):
     changelog_path = pathlib.Path("CHANGELOG.md")
     with (
@@ -130,17 +134,17 @@ def main(publish):
                 new_changelog.write(f"## {sprint_end}\n\n")
             if added:
                 new_changelog.write("### Ajouté\n\n")
-                for title in sorted(added):
+                for title in ci_sort(added):
                     new_changelog.write(f"- {title}\n")
                 new_changelog.write("\n")
             if changed:
                 new_changelog.write("### Modifié\n\n")
-                for title in sorted(changed):
+                for title in ci_sort(changed):
                     new_changelog.write(f"- {title}\n")
                 new_changelog.write("\n")
             if removed:
                 new_changelog.write("### Supprimé\n\n")
-                for title in sorted(removed):
+                for title in ci_sort(removed):
                     new_changelog.write(f"- {title}\n")
                 new_changelog.write("\n")
 
