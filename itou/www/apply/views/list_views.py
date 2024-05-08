@@ -91,6 +91,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
         "job_applications_page": job_applications_page,
         "filters_form": filters_form,
         "filters_counter": filters_counter,
+        "list_exports_url": None,
     }
     return render(
         request,
@@ -126,6 +127,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
         "job_applications_page": job_applications_page,
         "filters_form": filters_form,
         "filters_counter": filters_counter,
+        "list_exports_url": reverse("apply:list_prescriptions_exports"),
         "back_url": reverse("dashboard:index"),
     }
     return render(
@@ -211,6 +213,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         "filters_form": filters_form,
         "filters_counter": filters_counter,
         "pending_states_job_applications_count": pending_states_job_applications_count,
+        "list_exports_url": reverse("apply:list_for_siae_exports"),
         "back_url": reverse("dashboard:index"),
     }
     return render(
