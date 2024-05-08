@@ -101,7 +101,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
 
 @login_required
 @user_passes_test(lambda u: u.is_prescriber, login_url=reverse_lazy("search:employers_home"), redirect_field_name=None)
-def list_for_prescriber(request, template_name="apply/list_for_prescriber.html"):
+def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
     List of applications for a prescriber.
     """
@@ -137,7 +137,7 @@ def list_for_prescriber(request, template_name="apply/list_for_prescriber.html")
 
 @login_required
 @user_passes_test(lambda u: u.is_prescriber, login_url=reverse_lazy("search:employers_home"), redirect_field_name=None)
-def list_for_prescriber_exports(request, template_name="apply/list_of_available_exports.html"):
+def list_prescriptions_exports(request, template_name="apply/list_of_available_exports.html"):
     """
     List of applications for a prescriber, sorted by month, displaying the count of applications per month
     with the possibiliy to download those applications as a CSV file.
@@ -149,7 +149,7 @@ def list_for_prescriber_exports(request, template_name="apply/list_of_available_
     context = {
         "job_applications_by_month": job_applications_by_month,
         "total_job_applications": total_job_applications,
-        "export_for": "prescriber",
+        "export_for": "prescriptions",
         "can_view_stats_pe": can_view_stats_pe(request),
         "back_url": get_safe_url(request, "back_url", reverse("dashboard:index")),
     }
@@ -158,7 +158,7 @@ def list_for_prescriber_exports(request, template_name="apply/list_of_available_
 
 @login_required
 @user_passes_test(lambda u: u.is_prescriber, login_url=reverse_lazy("search:employers_home"), redirect_field_name=None)
-def list_for_prescriber_exports_download(request, month_identifier=None):
+def list_prescriptions_exports_download(request, month_identifier=None):
     """
     List of applications for a prescriber for a given month identifier (YYYY-mm),
     exported as a CSV file with immediate download

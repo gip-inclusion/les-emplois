@@ -20,7 +20,7 @@
                 <p class="mb-0">
                     Accédez aux <a href="{% url 'stats:stats_siae_hiring' %}"  target="_blank" rel="noopener">données de recrutement de votre structure</a> (non nominatives) compilées, calculées et mises à jour quotidiennement.
                 </p>
-            {% elif export_for == "prescriber" and can_view_stats_pe %}
+            {% elif export_for == "prescriptions" and can_view_stats_pe %}
                 <p class="mb-0">
                     Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
                 </p>
@@ -76,7 +76,7 @@
                                                     Télécharger
                                                 </a>
                                             {% else %}
-                                                <a class="btn-link" {% matomo_event "candidature" "exports" "export-prescripteur" %} aria-label="Télécharger cet export prescripteur" href="{% url 'apply:list_for_prescriber_exports_download' %}">
+                                                <a class="btn-link" {% matomo_event "candidature" "exports" "export-prescripteur" %} aria-label="Télécharger cet export prescripteur" href="{% url 'apply:list_prescriptions_exports_download' %}">
                                                     <i class="ri-download-line me-1" aria-hidden="true"></i>
                                                     Télécharger
                                                 </a>
@@ -100,7 +100,7 @@
                                                     <a class="btn-link"
                                                        {% matomo_event "candidature" "exports" "export-prescripteur" %}
                                                        aria-label="Télécharger cet export prescripteur"
-                                                       href="{% url 'apply:list_for_prescriber_exports_download' month_identifier=month.month|date:"Y-m" %}">
+                                                       href="{% url 'apply:list_prescriptions_exports_download' month_identifier=month.month|date:"Y-m" %}">
                                                         <i class="ri-download-line me-1" aria-hidden="true"></i>
                                                         Télécharger
                                                     </a>

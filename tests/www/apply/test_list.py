@@ -51,7 +51,7 @@ def test_list_warns_about_long_awaiting_applications(client, snapshot):
     assert str(results_section) == snapshot(name="SIAE - warnings for 2222 and 3333")
 
     client.force_login(sender)
-    response = client.get(reverse("apply:list_for_prescriber"))
+    response = client.get(reverse("apply:list_prescriptions"))
     results_section = parse_response_to_soup(response, selector="section[aria-labelledby='results']")
     assert str(results_section) == snapshot(name="PRESCRIBER - warnings for 2222 and 3333")
 
