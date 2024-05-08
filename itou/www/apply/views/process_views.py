@@ -21,7 +21,6 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
-from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
@@ -174,7 +173,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     - to update start date of a contract (provided given date is in the future),
     - to give an answer.
     """
-    job_applications = get_all_available_job_applications_as_prescriber(request)
+    job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
 
     queryset = job_applications.select_related(
         "job_seeker",
