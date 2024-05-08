@@ -725,6 +725,40 @@ class User(AbstractUser, AddressMixin):
     def autocomplete_display(self):
         return self.get_full_name()
 
+    @property
+    def organizations(self):
+        """
+        Get organizations depending on the type of the user. Orgs we are admins are sorted first.
+        """
+
+        if self.is_employer:
+            memberships = self.companymembership_set.filter(is_active=True).order_by("-is_admin", "created_at")
+            through_field = "company"
+
+        elif self.is_prescriber:
+            memberships = (
+                self.prescribermembership_set.filter(is_active=True)
+                .order_by("-is_admin", "created_at")
+                .select_related("organization")
+            )
+            through_field = "organization"
+
+        elif self.is_labor_inspector:
+            memberships = (
+                self.institutionmembership_set.filter(is_active=True)
+                .order_by("-is_admin", "created_at")
+                .select_related("institution")
+            )
+
+            through_field = "institution"
+
+        organizations = []
+        for membership in memberships:
+            org = getattr(membership, through_field)
+            organizations.append(org)
+
+        return organizations
+
 
 def get_allauth_account_user_display(user):
     return user.email

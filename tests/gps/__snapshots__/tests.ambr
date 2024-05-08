@@ -9,7 +9,7 @@
           <div class="px-3 px-lg-4 pt-3 pt-lg-4">
               <ul class="list-unstyled mb-lg-5">
                   <li class="d-flex justify-content-between align-items-center mb-3">
-                      <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/my_groups" rel="noopener" target="_blank">
+                      <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups" rel="noopener" target="_blank">
                           <i class="ri-article-line ri-lg font-weight-normal align-self-start"></i>
                           <span>Visualiser les bénéficiaires</span>
                           <i class="ri-external-link-line font-weight-normal ms-2"></i>
@@ -41,7 +41,7 @@
           <div class="form-row align-items-center justify-content-end gx-3">
               <div class="form-group col-12 col-lg order-3 order-lg-1">
                   
-                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/gps/my_groups">
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/gps/groups">
                           <i aria-hidden="true" class="ri-close-line ri-lg"></i>
                           <span>Annuler</span>
                       </a>
@@ -73,7 +73,7 @@
                   </div>
                   <div class="modal-footer">
                       <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
-                      <a class="btn btn-sm btn-danger" href="/gps/my_groups">Confirmer l'annulation</a>
+                      <a class="btn btn-sm btn-danger" href="/gps/groups">Confirmer l'annulation</a>
                   </div>
               
           </div>
@@ -106,7 +106,7 @@
           <div class="form-row align-items-center justify-content-end gx-3">
               <div class="form-group col-12 col-lg order-3 order-lg-1">
                   
-                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/gps/my_groups">
+                      <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/gps/groups">
                           <i aria-hidden="true" class="ri-close-line ri-lg"></i>
                           <span>Annuler</span>
                       </a>
@@ -138,7 +138,7 @@
                   </div>
                   <div class="modal-footer">
                       <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
-                      <a class="btn btn-sm btn-danger" href="/gps/my_groups">Confirmer l'annulation</a>
+                      <a class="btn btn-sm btn-danger" href="/gps/groups">Confirmer l'annulation</a>
                   </div>
               
           </div>
@@ -161,7 +161,7 @@
           <div class="px-3 px-lg-4 pt-3 pt-lg-4">
               <ul class="list-unstyled mb-lg-5">
                   <li class="d-flex justify-content-between align-items-center mb-3">
-                      <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/my_groups" rel="noopener" target="_blank">
+                      <a aria-label="Gérer les utilisateurs suivis dans votre groupe." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_liste_beneficiaires" href="/gps/groups" rel="noopener" target="_blank">
                           <i class="ri-article-line ri-lg font-weight-normal align-self-start"></i>
                           <span>Visualiser les bénéficiaires</span>
                           <i class="ri-external-link-line font-weight-normal ms-2"></i>

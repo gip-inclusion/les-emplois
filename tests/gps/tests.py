@@ -180,3 +180,51 @@ def test_access_gps_disabled(client):
 
     response = client.get(reverse("dashboard:index"))
     assertNotContains(response, "gps-card")
+
+
+def test_leave_group(client):
+
+    member = PrescriberFactory()
+    another_member = PrescriberFactory()
+
+    beneficiary = JobSeekerFactory()
+    another_beneficiary = JobSeekerFactory()
+
+    my_group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=4, memberships__member=member)
+    another_group = FollowUpGroupFactory(
+        beneficiary=another_beneficiary, memberships=2, memberships__member=another_member
+    )
+
+    assert my_group.members.count() == 4
+
+    client.force_login(member)
+    response = client.get(reverse("gps:leave_group", kwargs={"group_id": my_group.id}))
+    assert response.status_code == 302
+    assert my_group.members.count() == 3
+
+    # We can't leave a group we're not part of
+    assert another_group.members.count() == 2
+    response = client.get(reverse("gps:leave_group", kwargs={"group_id": another_group.id}))
+    assert response.status_code == 302
+    assert another_group.members.count() == 2
+
+
+def test_referent_group(client):
+
+    prescriber = PrescriberFactory()
+
+    beneficiary = JobSeekerFactory()
+
+    my_group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=4, memberships__member=prescriber)
+
+    membership = FollowUpGroupMembership.objects.filter(member=prescriber).filter(follow_up_group=my_group).first()
+
+    assert membership.is_referent
+
+    client.force_login(prescriber)
+    response = client.get(reverse("gps:toggle_referent", kwargs={"group_id": my_group.id}))
+    assert response.status_code == 302
+
+    membership.refresh_from_db()
+
+    assert not membership.is_referent

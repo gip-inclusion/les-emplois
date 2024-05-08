@@ -7,6 +7,8 @@ from itou.www.gps import views
 app_name = "gps"
 
 urlpatterns = [
-    path("my_groups", views.my_groups, name="my_groups"),
-    path("join_group", views.join_group, name="join_group"),
+    path("groups", views.my_groups, name="my_groups"),
+    path("groups/join", views.join_group, name="join_group"),
+    path("groups/<int:group_id>/leave", views.leave_group, name="leave_group"),
+    path("groups/<int:group_id>/toggle_referent", views.toggle_referent, name="toggle_referent"),
 ]
