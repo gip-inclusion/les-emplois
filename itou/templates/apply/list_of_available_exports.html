@@ -38,12 +38,15 @@
 {% endblock %}
 
 {% block content_title %}
-    {% if export_for == "siae" %}
-        <h1>Exporter toutes les candidatures reçues</h1>
-        <h2>{{ siae.display_name }}</h2>
-    {% else %}
-        <h1>Exporter toutes les candidatures</h1>
-    {% endif %}
+    <h1>
+        Exporter les candidatures
+        {% if export_for == "siae" %}
+            reçues
+        {% else %}
+            envoyées
+        {% endif %}
+    </h1>
+    {% if export_for == "siae" %}<h2>{{ siae.display_name }}</h2>{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -54,10 +57,10 @@
                     {% if not job_applications_by_month %}
                         <h2 class="h4">Aucune candidature pour le moment.</h2>
                     {% else %}
-                        <h2 class="h4">Candidatures reçues</h2>
+                        <h2 class="h4">Candidatures</h2>
                         <div class="table-responsive-lg mt-3">
                             <table class="table">
-                                <caption class="visually-hidden">Liste des candidatures reçues</caption>
+                                <caption class="visually-hidden">Liste des candidatures</caption>
                                 <thead>
                                     <tr>
                                         <th scope="col">Contenu du fichier</th>
