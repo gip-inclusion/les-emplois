@@ -5,10 +5,10 @@
 
     <h2>Intervenant{{ gps_memberships|length|pluralizefr }}</h2>
     <hr />
-    <ul>
+    <ul class="p-0 m-0">
         {% for membership in gps_memberships %}
 
-            <div class="c-box--results__header">
+            <div class="c-box--results__header px-0">
                 <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
 
                     <div class="c-box--results__summary flex-grow-1">
@@ -16,7 +16,13 @@
 
                         <div>
 
-                            <h3>{{ membership.member.get_full_name }}</h3>
+                            <h3>
+                                {{ membership.member.get_full_name }}
+
+                                {% if membership.member.organizations %}
+                                    <span class="font-weight-normal fs-6 fst-italic">({{ membership.member.organizations.0 }})</span>
+                                {% endif %}
+                            </h3>
 
                             <div class="d-flex flex-column flex-md-column gap-1 gap-md-2">
                                 <span>
@@ -31,7 +37,7 @@
 
                                 {% endif %}
                                 <span>
-                                    <i class="ri-calendar-line font-weight-normal me-1" aria-hidden="true"></i>Membre depuis le <strong>{{ membership.created_at|date:"d/m/Y" }}</strong>.
+                                    <i class="ri-calendar-line font-weight-normal me-1" aria-hidden="true"></i>Suivi depuis le <strong>{{ membership.created_at|date:"d/m/Y" }}</strong>
                                 </span>
                                 {% if membership.is_referent %}
                                     <span>

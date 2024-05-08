@@ -37,3 +37,9 @@ def mask_unless(value, predicate):
         return value
 
     return " ".join(part[0] + "…" for part in re.split(f"[{re.escape(string.whitespace)}]+", value) if part)
+
+
+@register.filter
+def addstr(arg1, arg2):
+    """concatenate arg1 & arg2"""
+    return str(arg1) + str(arg2)

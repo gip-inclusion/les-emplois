@@ -24,8 +24,9 @@ from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploi
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from tests.companies.factories import CompanyFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
+from tests.institutions.factories import InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
@@ -1325,3 +1326,39 @@ def test_is_prescriber_with_authorized_org(user_active, membership_active, organ
     assert prescriber.is_prescriber_with_authorized_org is all(
         [user_active, membership_active, organization_authorized]
     )
+
+
+def test_prescriber_organizations():
+    prescriber = PrescriberFactory()
+    PrescriberMembershipFactory(is_active=True, is_admin=False, user=prescriber)
+    admin_membership = PrescriberMembershipFactory(is_active=True, is_admin=True, user=prescriber)
+    PrescriberMembershipFactory(is_active=True, is_admin=False, user=prescriber)
+
+    assert len(prescriber.organizations) == 3
+
+    # The organization we are admin of should come first
+    assert prescriber.organizations[0] == admin_membership.organization
+
+
+def test_employer_organizations():
+    employer = EmployerFactory()
+    CompanyMembershipFactory(is_active=True, is_admin=False, user=employer)
+    admin_membership = CompanyMembershipFactory(is_active=True, is_admin=True, user=employer)
+    CompanyMembershipFactory(is_active=True, is_admin=False, user=employer)
+
+    assert len(employer.organizations) == 3
+
+    # The organization we are admin of should come first
+    assert employer.organizations[0] == admin_membership.company
+
+
+def test_labor_inspector_organizations():
+    labor_inspector = LaborInspectorFactory()
+    InstitutionMembershipFactory(is_active=True, is_admin=False, user=labor_inspector)
+    admin_membership = InstitutionMembershipFactory(is_active=True, is_admin=True, user=labor_inspector)
+    InstitutionMembershipFactory(is_active=True, is_admin=False, user=labor_inspector)
+
+    assert len(labor_inspector.organizations) == 3
+
+    # The organization we are admin of should come first
+    assert labor_inspector.organizations[0] == admin_membership.institution

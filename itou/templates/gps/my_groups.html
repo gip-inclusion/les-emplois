@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-    <section class="s-box">
+    <section class="s-box" id="gps-my-groups">
         <div class="s-box__container container">
             <div class="s-box__row row">
                 <div class="col-12">
@@ -24,7 +24,7 @@
                             <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les groupes de suivi">
 
                                 <a href="{% url 'gps:join_group' %}" class="btn btn-ico btn-primary mt-3 mt-md-0" aria-label="Rejoindre un group de suivi">
-                                    <i class="ri-add-line" aria-hidden="true"></i>
+                                    <i class="ri-user-add-line" aria-hidden="true"></i>
                                     <span>Ajouter un bénéficiaire</span>
                                 </a>
                             </div>
@@ -35,6 +35,7 @@
                         {% for membership in memberships %}
                             <div class="my-3 my-md-4 s-box__row row">
                                 <div class="c-box--results__header">
+
                                     <div class="c-box--results__summary">
                                         <i class="ri-user-line" aria-hidden="true"></i>
                                         <div>
@@ -46,28 +47,92 @@
 
                                 <hr class="m-0 pb-4" />
 
-                                <div class="d-flex justify-content-between">
+                                <div class="d-flex justify-content-between mb-4">
                                     <div>
                                         {% with membership.nb_members|add:"-1" as counter %}
                                             <div>
-                                                Vous avez ajouté ce bénéficiaire le <strong>{{ membership.created_at|date:"d/m/Y" }}</strong>
-                                                {% if membership.is_referent %}et êtes <strong>référent</strong>{% endif %}
-                                                .
-                                                <br />
-
+                                                {# Don't let djlint add a newline before the . or it will add a space after référent and . #}
+                                                {# djlint:off #}Vous avez ajouté ce bénéficiaire le <strong>{{ membership.created_at|date:"d/m/Y" }}</strong>{% if membership.is_referent %} et êtes <strong>référent</strong>{% endif %}.{# djlint:on #}
                                                 {% if counter < 1 %}
                                                     Aucun autre professionnel que vous n'est intervenu auprès de ce bénéficiaire.
                                                 {% else %}
-                                                    {{ counter }} autre{{ counter|pluralizefr }} professionnel{{ counter|pluralizefr }} est intervenu auprès de ce bénéficiaire.
+                                                    {{ counter }} autre{{ counter|pluralizefr }} professionnel{{ counter|pluralizefr }}
+                                                    {{ counter|pluralize:"est,sont" }}
+                                                    intervenu{{ counter|pluralizefr }} auprès de ce bénéficiaire.
                                                 {% endif %}
                                             </div>
                                         {% endwith %}
                                     </div>
-                                    <div>
-                                        <a href="{% url 'users:details' public_id=membership.follow_up_group.beneficiary.public_id %}"
-                                           class="btn btn-outline-primary btn-block w-100 w-md-auto"
-                                           aria-label="Consulter la fiche de {{ membership.follow_up_group.beneficiary.get_full_name }}">Consulter la fiche</a>
-                                    </div>
+
+
+                                </div>
+                                <div class="d-flex justify-content-between">
+
+                                    {% with membership.follow_up_group.beneficiary.public_id as public_id %}
+                                        <div>
+                                            <a href="{% url 'users:details' public_id=public_id %}"
+                                               class="btn btn-warning btn-block w-100 w-md-auto btn-ico"
+                                               aria-label="Ne plus suivre {{ membership.follow_up_group.beneficiary.get_full_name }}"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#confirm_unfollow_{{ public_id }}">
+                                                <i class="ri-user-unfollow-line" aria-hidden="true"></i>
+                                                <span>Ne plus suivre</span>
+
+                                            </a>
+                                            {% url 'gps:leave_group' group_id=membership.follow_up_group.id as leave_group_url %}
+
+                                            {# To avoid javascript, we create a modal per line. Otherwise we could implement https://getbootstrap.com/docs/5.0/components/modal/#varying-modal-content #}
+                                            {% include "gps/includes/confirm_modal.html" with title="Êtes-vous sûr de ne plus vouloir suivre "|add:membership.follow_up_group.beneficiary.get_full_name|add:" ?" id="confirm_unfollow_"|addstr:public_id body="Vous pourrez toujours suivre ce bénéficiaire de nouveau plus tard." confirm_text="Ne plus suivre" confirm_url=leave_group_url confirm_class="btn-danger" %}
+
+                                            {% if membership.is_referent %}
+                                                <a href="{% url 'users:details' public_id=membership.follow_up_group.beneficiary.public_id %}"
+                                                   class="btn btn-warning btn-block w-100 w-md-auto btn-ico"
+                                                   aria-label="Ne plus être référent de {{ membership.follow_up_group.beneficiary.get_full_name }}"
+                                                   data-bs-toggle="modal"
+                                                   data-bs-target="#confirm_unreferent_{{ public_id }}">
+
+                                                    <i class="ri-map-pin-user-line font-weight-normal me-1" aria-hidden="true"></i>
+                                                    <span>Ne plus être référent</span>
+
+                                                </a>
+
+                                                {% url 'gps:toggle_referent' group_id=membership.follow_up_group.id as remove_referent_url %}
+
+                                                {# To avoid javascript, we create a modal per line. Otherwise we could implement https://getbootstrap.com/docs/5.0/components/modal/#varying-modal-content #}
+                                                {% include "gps/includes/confirm_modal.html" with title="Êtes-vous sûr de ne plus vouloir être référent de "|add:membership.follow_up_group.beneficiary.get_full_name|add:" ?" id="confirm_unreferent_"|addstr:public_id body="Vous pourrez toujours devenir référent ce bénéficiaire de nouveau plus tard." confirm_text="Ne plus être référent" confirm_url=remove_referent_url confirm_class="btn-danger" %}
+
+                                            {% endif %}
+                                        </div>
+
+
+                                        <div>
+                                            {% if not membership.is_referent %}
+                                                <a href="{% url 'users:details' public_id=membership.follow_up_group.beneficiary.public_id %}"
+                                                   class="btn btn-outline-success btn-block w-100 w-md-auto btn-ico"
+                                                   aria-label="Devenir référent de {{ membership.follow_up_group.beneficiary.get_full_name }}"
+                                                   data-bs-toggle="modal"
+                                                   data-bs-target="#confirm_referent_{{ public_id }}">
+
+                                                    <i class="ri-map-pin-user-line font-weight-normal me-1" aria-hidden="true"></i>
+                                                    <span>Devenir référent</span>
+
+                                                </a>
+
+                                                {% url 'gps:toggle_referent' group_id=membership.follow_up_group.id as add_referent_url %}
+
+                                                {# To avoid javascript, we create a modal per line. Otherwise we could implement https://getbootstrap.com/docs/5.0/components/modal/#varying-modal-content #}
+                                                {% include "gps/includes/confirm_modal.html" with title="Êtes-vous sûr de vouloir devenir référent de "|add:membership.follow_up_group.beneficiary.get_full_name|add:" ?" id="confirm_referent_"|addstr:public_id body="Vous pourrez toujours ne plus être référent de ce bénéficiaire plus tard." confirm_text="Devenir référent" confirm_url=add_referent_url confirm_class="btn-success" %}
+
+                                            {% endif %}
+                                            <a href="{% url 'users:details' public_id=membership.follow_up_group.beneficiary.public_id %}"
+                                               class="btn btn-outline-primary btn-block btn-ico w-100 w-md-auto"
+                                               aria-label="Consulter la fiche de {{ membership.follow_up_group.beneficiary.get_full_name }}">
+                                                <i class="ri-eye-line ri-xl font-weight-medium" aria-hidden="true"></i>
+                                                <span>Consulter la fiche</span>
+                                            </a>
+                                        </div>
+                                    {% endwith %}
+
                                 </div>
                             </div>
                         {% endfor %}
@@ -77,4 +142,6 @@
             </div>
         </div>
     </section>
+
+
 {% endblock %}
