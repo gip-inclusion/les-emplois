@@ -9,10 +9,9 @@ from django.utils.text import slugify
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.eligibility.models import SelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
-from itou.job_applications.models import JobApplicationWorkflow
+from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
-from itou.utils.perms.prescriber import get_all_available_job_applications_as_prescriber
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     CompanyFilterJobApplicationsForm,
@@ -106,7 +105,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
     List of applications for a prescriber.
     """
-    job_applications = get_all_available_job_applications_as_prescriber(request)
+    job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
 
     filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET or None)
 
@@ -144,7 +143,7 @@ def list_prescriptions_exports(request, template_name="apply/list_of_available_e
     List of applications for a prescriber, sorted by month, displaying the count of applications per month
     with the possibiliy to download those applications as a CSV file.
     """
-    job_applications = get_all_available_job_applications_as_prescriber(request)
+    job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
     total_job_applications = job_applications.count()
     job_applications_by_month = job_applications.with_monthly_counts()
 
@@ -165,7 +164,9 @@ def list_prescriptions_exports_download(request, month_identifier=None):
     List of applications for a prescriber for a given month identifier (YYYY-mm),
     exported as a CSV file with immediate download
     """
-    job_applications = get_all_available_job_applications_as_prescriber(request).with_list_related_data()
+    job_applications = JobApplication.objects.prescriptions_of(
+        request.user, request.current_organization
+    ).with_list_related_data()
     filename = "candidatures"
     if month_identifier:
         year, month = month_identifier.split("-")
