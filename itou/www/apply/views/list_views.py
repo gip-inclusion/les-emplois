@@ -1,3 +1,4 @@
+import enum
 from collections import defaultdict
 
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -19,6 +20,18 @@ from itou.www.apply.forms import (
     PrescriberFilterJobApplicationsForm,
 )
 from itou.www.stats.utils import can_view_stats_pe
+
+
+class JobApplicationsListKind(enum.Enum):
+    RECEIVED = enum.auto()
+    SENT = enum.auto()
+    SENT_FOR_ME = enum.auto()
+
+    # Make the Enum work in Django's templates
+    # See :
+    # - https://docs.djangoproject.com/en/dev/ref/templates/api/#variables-and-lookups
+    # - https://github.com/django/django/pull/12304
+    do_not_call_in_templates = enum.nonmember(True)
 
 
 def _add_user_can_view_personal_information(job_applications, can_view):
@@ -88,6 +101,8 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
 
     context = {
         "job_applications_page": job_applications_page,
+        "job_applications_list_kind": JobApplicationsListKind.SENT_FOR_ME,
+        "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,
         "filters_counter": filters_counter,
         "list_exports_url": None,
@@ -124,6 +139,8 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
 
     context = {
         "job_applications_page": job_applications_page,
+        "job_applications_list_kind": JobApplicationsListKind.SENT,
+        "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,
         "filters_counter": filters_counter,
         "list_exports_url": reverse("apply:list_prescriptions_exports"),
@@ -211,6 +228,8 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     context = {
         "siae": company,
         "job_applications_page": job_applications_page,
+        "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
+        "JobApplicationsListKind": JobApplicationsListKind,
         "filters_form": filters_form,
         "filters_counter": filters_counter,
         "pending_states_job_applications_count": pending_states_job_applications_count,
