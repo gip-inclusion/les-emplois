@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: test_list_for_prescriber_exports_as_pole_emploi_prescriber
+# name: test_list_prescriptions_exports_as_pole_emploi_prescriber
   '''
   <div class="alert alert-info mt-3" id="besoin-dun-chiffre">
               <p>
@@ -22,10 +22,10 @@
           </div>
   '''
 # ---
-# name: test_list_for_prescriber_filters
+# name: test_list_prescriptions_filters
   '''
   <div class="c-aside-filters__card collapse show" id="asideFiltersCollapse">
-                              <form hx-get="/apply/prescriber/list" hx-indicator="#job-applications-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-applications-section" hx-trigger="change delay:.5s, duetChange delay:.5s">
+                              <form hx-get="/apply/prescriptions/list" hx-indicator="#job-applications-section" hx-push-url="true" hx-swap="outerHTML" hx-target="#job-applications-section" hx-trigger="change delay:.5s, duetChange delay:.5s">
                                   <div class="c-aside-filters__card__body">
                                       <fieldset>
       <legend>Statut candidature</legend>

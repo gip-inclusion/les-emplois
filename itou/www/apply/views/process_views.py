@@ -197,7 +197,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     else:
         before_date = datetime.datetime.now()
 
-    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_prescriber"))
+    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_prescriptions"))
 
     # Latest GEIQ diagnosis for this job seeker created by a *prescriber*
     geiq_eligibility_diagnosis = (

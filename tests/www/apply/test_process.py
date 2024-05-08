@@ -317,7 +317,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.assertContains(
             response, '<small>Curriculum vitae</small><i class="text-disabled">Non renseigné</i>', html=True
         )
-        assert_previous_step(response, reverse("apply:list_for_prescriber"), back_to_list=True)
+        assert_previous_step(response, reverse("apply:list_prescriptions"), back_to_list=True)
 
         # Has link to job description with back_url set
         job_description = job_application.selected_jobs.first()

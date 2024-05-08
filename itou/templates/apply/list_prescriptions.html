@@ -34,7 +34,7 @@
                             <span>Filtrer les candidatures</span>
                         </button>
                         <div class="c-aside-filters__card collapse show" id="asideFiltersCollapse">
-                            <form hx-get="{% url 'apply:list_for_prescriber' %}"
+                            <form hx-get="{% url 'apply:list_prescriptions' %}"
                                   hx-trigger="change delay:.5s, duetChange delay:.5s"
                                   hx-indicator="#job-applications-section"
                                   hx-target="#job-applications-section"
