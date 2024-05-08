@@ -1122,6 +1122,21 @@ class LatestApprovalTestCase(TestCase):
         pe_approval = PoleEmploiApprovalFactory(nir=user.jobseeker_profile.nir)
         assert user.latest_common_approval == pe_approval
 
+    def test_latest_common_approval_with_expired_pe_approval(self):
+        user = JobSeekerFactory()
+        today = timezone.localdate()
+        PoleEmploiApprovalFactory(
+            nir=user.jobseeker_profile.nir,
+            start_at=today - datetime.timedelta(days=30),
+            end_at=today - datetime.timedelta(days=1),
+        )
+        approval = ApprovalFactory(
+            user=user,
+            start_at=today - datetime.timedelta(days=10),
+            end_at=today - datetime.timedelta(days=7),
+        )
+        assert user.latest_common_approval == approval
+
     def test_latest_common_approval_is_approval_if_valid(self):
         user = JobSeekerFactory()
         approval = ApprovalFactory(user=user)

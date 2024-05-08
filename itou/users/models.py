@@ -446,7 +446,7 @@ class User(AbstractUser, AddressMixin):
             self.latest_approval
             and self.latest_approval.is_in_waiting_period
             and self.latest_pe_approval
-            and self.latest_pe_approval.is_valid
+            and self.latest_pe_approval.is_valid()
         ):
             return self.latest_pe_approval
 
