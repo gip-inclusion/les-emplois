@@ -44,8 +44,8 @@ cat << EOF
 Vous pouvez maintenant:
  - ✈️ Aller sur la machine:
     clever ssh --alias "$APP_NAME"
- - 🔨 Jouer un script d’import, par ex:
-    cd ~/app_* && ./scripts/imports-asp.sh
+ - 🔨 Jouer les scripts d’import, par exemple:
+    cd ~/app_* && scripts/import-iae.sh && scripts/import-ea-eatt.sh
  - 🍺 Supprimer la machine:
     clever delete --alias $APP_NAME --yes && git remote remove "$APP_NAME"
 EOF
