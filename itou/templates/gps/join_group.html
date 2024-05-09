@@ -15,12 +15,12 @@
     <section class="s-box" id="join_group">
         <div class="s-box__container container">
             <div class="c-form">
-                <form method="post" class="js-prevent-multiple-submit">
+                <form method="post" class="js-prevent-multiple-submit" id="join_group_form">
                     {% csrf_token %}
                     {% bootstrap_form_errors form type="all" %}
                     {% bootstrap_field form.user %}
                     {% bootstrap_field form.is_referent %}
-                    {% itou_buttons_form primary_label="Rejoindre le groupe de ce candidat" reset_url=reset_url %}
+                    {% itou_buttons_form primary_label="Rejoindre le groupe de ce candidat" reset_url=reset_url primary_disabled=True %}
                 </form>
             </div>
         </div>

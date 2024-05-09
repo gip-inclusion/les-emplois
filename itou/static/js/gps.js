@@ -1,8 +1,9 @@
 htmx.onLoad((target) => {
+    const searchUserInputField = $("#js-search-user-input")
     // Based on static/admin/js/vendor/select2/i18n/fr.js
     // Overriding the noResults text is extraordinary complicated.
     // https://github.com/select2/select2/issues/3799
-    $("#js-search-user-input").select2({
+    searchUserInputField.select2({
         placeholder: 'Jean DUPONT',
         escapeMarkup: function (markup) { return markup; },
         language: {
@@ -41,5 +42,16 @@ htmx.onLoad((target) => {
                 return "Supprimer tous les éléments"
             }
         }
+    });
+    searchUserInputField.on("select2:select", function (e) {
+        const submit_button = $("#join_group_form .btn-primary.disabled");
+        submit_button.attr("disabled", false);
+        submit_button.removeClass("disabled");
+        submit_button.attr("type", "submit"); // hack because button_forms.html don't allow easily to change it.
+    });
+    searchUserInputField.on("select2:unselect", function (e) {
+        const submit_button = $("#join_group_form .btn-primary");
+        submit_button.attr("disabled", true);
+        submit_button.addClass("disabled");
     });
 });
