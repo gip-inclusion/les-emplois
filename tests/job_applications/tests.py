@@ -71,16 +71,17 @@ from tests.utils.test import TestCase, get_rows_from_streaming_response
 )
 class JobApplicationModelTest(TestCase):
     def test_eligibility_diagnosis_by_siae_required(self):
+        viewer = PrescriberFactory()
         job_application = JobApplicationFactory(
             state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.GEIQ,
             eligibility_diagnosis=None,
         )
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
-            job_application.job_seeker, for_siae=job_application.to_company
+            viewer, job_application.job_seeker, for_siae=job_application.to_company
         )
         assert not has_considered_valid_diagnoses
-        assert not job_application.eligibility_diagnosis_by_siae_required()
+        assert not job_application.eligibility_diagnosis_by_siae_required(viewer)
 
         job_application = JobApplicationFactory(
             state=JobApplicationState.PROCESSING,
@@ -88,10 +89,10 @@ class JobApplicationModelTest(TestCase):
             eligibility_diagnosis=None,
         )
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
-            job_application.job_seeker, for_siae=job_application.to_company
+            viewer, job_application.job_seeker, for_siae=job_application.to_company
         )
         assert not has_considered_valid_diagnoses
-        assert job_application.eligibility_diagnosis_by_siae_required()
+        assert job_application.eligibility_diagnosis_by_siae_required(viewer)
 
     def test_accepted_by(self):
         job_application = JobApplicationFactory(
@@ -424,7 +425,7 @@ class JobApplicationQuerySetTest(TestCase):
     def test_with_jobseeker_eligibility_diagnosis(self):
         job_app = JobApplicationFactory(with_approval=True)
         diagnosis = job_app.eligibility_diagnosis
-        qs = JobApplication.objects.with_jobseeker_eligibility_diagnosis().get(pk=job_app.pk)
+        qs = JobApplication.objects.with_jobseeker_eligibility_diagnosis(diagnosis.author).get(pk=job_app.pk)
         assert qs.jobseeker_eligibility_diagnosis == diagnosis.pk
 
     def test_with_jobseeker_eligibility_diagnosis_with_a_denormalized_diagnosis_from_prescriber(self):
@@ -439,7 +440,7 @@ class JobApplicationQuerySetTest(TestCase):
             job_seeker=job_application.job_seeker,
         )
 
-        qs = JobApplication.objects.with_jobseeker_eligibility_diagnosis()
+        qs = JobApplication.objects.with_jobseeker_eligibility_diagnosis(eligibility_diagnosis.author)
         assert list(qs) == [job_application]
         assert qs.first().jobseeker_eligibility_diagnosis == eligibility_diagnosis.pk
 
@@ -455,7 +456,7 @@ class JobApplicationQuerySetTest(TestCase):
             job_seeker=job_application.job_seeker,
         )
 
-        qs = JobApplication.objects.with_jobseeker_eligibility_diagnosis()
+        qs = JobApplication.objects.with_jobseeker_eligibility_diagnosis(eligibility_diagnosis.author)
         assert list(qs) == [job_application]
         assert qs.first().jobseeker_eligibility_diagnosis == eligibility_diagnosis.pk
 
@@ -470,7 +471,8 @@ class JobApplicationQuerySetTest(TestCase):
             job_seeker=job_application.job_seeker,
         )
 
-        qs = JobApplication.objects.with_jobseeker_eligibility_diagnosis()
+        receiver = job_application.to_company.members.get()
+        qs = JobApplication.objects.with_jobseeker_eligibility_diagnosis(receiver)
         assert list(qs) == [job_application]
         assert qs.first().jobseeker_eligibility_diagnosis is None
 
@@ -494,8 +496,9 @@ class JobApplicationQuerySetTest(TestCase):
         )
         older_diagnosis.administrative_criteria.add(level1_other_criterion)
 
+        receiver = job_app.to_company.members.get()
         qs = (
-            JobApplication.objects.with_jobseeker_eligibility_diagnosis()
+            JobApplication.objects.with_jobseeker_eligibility_diagnosis(receiver)
             .with_eligibility_diagnosis_criterion(level1_criterion.pk)
             .with_eligibility_diagnosis_criterion(level2_criterion.pk)
             .with_eligibility_diagnosis_criterion(level1_other_criterion.pk)
@@ -510,7 +513,7 @@ class JobApplicationQuerySetTest(TestCase):
         job_app.save()
 
         qs = (
-            JobApplication.objects.with_jobseeker_eligibility_diagnosis()
+            JobApplication.objects.with_jobseeker_eligibility_diagnosis(receiver)
             .with_eligibility_diagnosis_criterion(level1_criterion.pk)
             .with_eligibility_diagnosis_criterion(level2_criterion.pk)
             .with_eligibility_diagnosis_criterion(level1_other_criterion.pk)
@@ -536,7 +539,8 @@ class JobApplicationQuerySetTest(TestCase):
         diagnosis.save()
 
         criteria = [level1_criterion.pk, level2_criterion.pk, level1_other_criterion.pk]
-        qs = JobApplication.objects.with_list_related_data(criteria).get(pk=job_app.pk)
+        receiver = job_app.to_company.members.get()
+        qs = JobApplication.objects.with_list_related_data(receiver, criteria).get(pk=job_app.pk)
 
         assert hasattr(qs, "approval")
         assert hasattr(qs, "job_seeker")
@@ -1749,6 +1753,13 @@ def test_job_application_transitions(transition, from_state):
 
 
 class JobApplicationXlsxExportTest(TestCase):
+    @staticmethod
+    def fake_request():
+        class FakeRequest:
+            user = PrescriberFactory()
+
+        return FakeRequest()
+
     def test_xlsx_export_contains_the_necessary_info(self, *args, **kwargs):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
         job_seeker = JobSeekerFactory(title=Title.MME)
@@ -1763,7 +1774,7 @@ class JobApplicationXlsxExportTest(TestCase):
         # The accept transition above will create a valid PASS IAE for the job seeker.
         assert job_seeker.approvals.last().is_valid
 
-        response = stream_xlsx_export(JobApplication.objects.all(), "filename")
+        response = stream_xlsx_export(self.fake_request(), JobApplication.objects.all(), "filename")
         assert get_rows_from_streaming_response(response) == [
             JOB_APPLICATION_CSV_HEADERS,
             [
@@ -1809,7 +1820,7 @@ class JobApplicationXlsxExportTest(TestCase):
 
         assert job_seeker.approvals.last().is_in_waiting_period
 
-        response = stream_xlsx_export(JobApplication.objects.all(), "filename")
+        response = stream_xlsx_export(self.fake_request(), JobApplication.objects.all(), "filename")
         assert get_rows_from_streaming_response(response) == [
             JOB_APPLICATION_CSV_HEADERS,
             [
@@ -1852,7 +1863,7 @@ class JobApplicationXlsxExportTest(TestCase):
         job_application = JobApplicationFactory(state=JobApplicationState.PROCESSING, **kwargs)
         job_application.refuse(user=job_application.to_company.members.get())
 
-        response = stream_xlsx_export(JobApplication.objects.all(), "filename")
+        response = stream_xlsx_export(self.fake_request(), JobApplication.objects.all(), "filename")
         assert get_rows_from_streaming_response(response) == [
             JOB_APPLICATION_CSV_HEADERS,
             [

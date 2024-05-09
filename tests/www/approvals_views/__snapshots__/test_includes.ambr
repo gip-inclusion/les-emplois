@@ -22,6 +22,10 @@
           
           
               
+              
+          
+          
+              
               <b>pour obtenir son numéro, vous devez valider l'embauche et demander l'obtention d'un PASS IAE.</b>
           
       </p>
@@ -29,6 +33,7 @@
       
   
       
+          
           
               
   
@@ -65,6 +70,7 @@
               Numéro de PASS IAE :
           
           
+          
               <b><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></b>
           
       </p>
@@ -72,6 +78,7 @@
       
   
       
+          
           
               <p class="text-danger">
                   <b>Expiré</b> le 01/01/2022 (depuis 1 semaine, 2 jours)
@@ -106,6 +113,7 @@
               Numéro de PASS IAE :
           
           
+          
               <b><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></b>
           
       </p>
@@ -113,6 +121,7 @@
       
   
       
+          
           
               <p class="text-danger">
                   <b>Expiré</b> le 01/01/2022 (depuis 1 semaine, 2 jours)
@@ -147,6 +156,10 @@
               Numéro de PASS IAE :
           
           
+              
+              
+          
+          
               <b><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></b>
           
       </p>
@@ -154,6 +167,7 @@
       
   
       
+          
           
               <p class="text-danger">
                   <b>Expiré</b> le 01/01/2022 (depuis 1 semaine, 2 jours)
@@ -186,6 +200,7 @@
       <p class="mb-1">
           
               Numéro de PASS IAE :
+          
           
           
               <b><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></b>
@@ -250,6 +265,7 @@
       <p class="mb-1">
           
               Numéro de PASS IAE :
+          
           
           
               <b><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></b>

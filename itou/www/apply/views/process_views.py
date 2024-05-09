@@ -33,7 +33,7 @@ from itou.www.apply.forms import (
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
 
 
-def check_waiting_period(job_application):
+def check_waiting_period(request, job_application):
     """
     This should be an edge case.
     An approval may expire between the time an application is sent and
@@ -43,6 +43,7 @@ def check_waiting_period(job_application):
     # This code should still stay relevant for the 3.5 years to come to account for the PE approvals
     # that have been delivered in December 2021 (and that may have 2 years waiting periods)
     if job_application.job_seeker.new_approval_blocked_by_waiting_period(
+        request.user,
         siae=job_application.to_company,
         sender_prescriber_organization=job_application.sender_prescriber_organization,
     ):
@@ -82,7 +83,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
     transition_logs = job_application.logs.select_related("user").all()
 
     expired_eligibility_diagnosis = EligibilityDiagnosis.objects.last_expired(
-        job_seeker=job_application.job_seeker, for_siae=job_application.to_company
+        request.user, job_seeker=job_application.job_seeker, for_siae=job_application.to_company
     )
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_job_seeker"))
@@ -95,7 +96,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
         "can_view_personal_information": request.user.can_view_personal_information(job_application.job_seeker),
         "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
         "display_refusal_info": False,
-        "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
+        "eligibility_diagnosis": job_application.get_eligibility_diagnosis(request.user),
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "job_application": job_application,
@@ -137,7 +138,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
     transition_logs = job_application.logs.select_related("user").all()
 
     expired_eligibility_diagnosis = EligibilityDiagnosis.objects.last_expired(
-        job_seeker=job_application.job_seeker, for_siae=job_application.to_company
+        request.user, job_application.job_seeker, for_siae=job_application.to_company
     )
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_siae"))
@@ -150,8 +151,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
         "can_view_personal_information": True,  # SIAE members have access to personal info
         "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
         "display_refusal_info": False,
-        "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
-        "eligibility_diagnosis_by_siae_required": job_application.eligibility_diagnosis_by_siae_required(),
+        "eligibility_diagnosis": job_application.get_eligibility_diagnosis(request.user),
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "job_application": job_application,
@@ -223,7 +223,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     context = {
         "can_view_personal_information": request.user.can_view_personal_information(job_application.job_seeker),
         "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
-        "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
+        "eligibility_diagnosis": job_application.get_eligibility_diagnosis(request.user),
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "job_application": job_application,
         "transition_logs": transition_logs,
@@ -382,7 +382,7 @@ class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
 def postpone(request, job_application_id, template_name="apply/process_postpone.html"):
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
-    check_waiting_period(job_application)
+    check_waiting_period(request, job_application)
 
     form = AnswerForm(data=request.POST or None)
 
@@ -418,9 +418,11 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     """
     queryset = JobApplication.objects.is_active_company_member(request.user)
     job_application = get_object_or_404(queryset, id=job_application_id)
-    check_waiting_period(job_application)
+    check_waiting_period(request, job_application)
     next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-    if not job_application.hiring_without_approval and job_application.eligibility_diagnosis_by_siae_required():
+    if not job_application.hiring_without_approval and job_application.eligibility_diagnosis_by_siae_required(
+        request.user
+    ):
         messages.error(request, "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée.")
         return HttpResponseRedirect(next_url)
 
@@ -482,7 +484,7 @@ def cancel(request, job_application_id, template_name="apply/process_cancel.html
     """
     queryset = JobApplication.objects.is_active_company_member(request.user).select_related("to_company")
     job_application = get_object_or_404(queryset, id=job_application_id)
-    check_waiting_period(job_application)
+    check_waiting_period(request, job_application)
     next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
 
     if not job_application.can_be_cancelled:
@@ -602,7 +604,7 @@ def eligibility(request, job_application_id, template_name="apply/process_eligib
     Check eligibility (as an SIAE).
     """
 
-    queryset = JobApplication.objects.is_active_company_member(request.user)
+    queryset = JobApplication.objects.select_related("job_seeker").is_active_company_member(request.user)
     job_application = get_object_or_404(
         queryset,
         id=job_application_id,
@@ -679,8 +681,6 @@ def delete_prior_action(request, job_application_id, prior_action_id):
             context={
                 "job_application": job_application,
                 "transition_logs": job_application.logs.select_related("user").all(),
-                # GEIQ cannot require IAE eligibility diagnosis, but shared templates need this variable.
-                "eligibility_diagnosis_by_siae_required": False,
                 "geiq_eligibility_diagnosis": (
                     _get_geiq_eligibility_diagnosis_for_company(job_application)
                     if job_application.to_company.kind == CompanyKind.GEIQ
@@ -722,8 +722,6 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
             {
                 "job_application": job_application,
                 "prior_action": prior_action,
-                # GEIQ cannot require IAE eligibility diagnosis, but shared templates need this variable.
-                "eligibility_diagnosis_by_siae_required": False,
             },
         )
 
@@ -763,8 +761,6 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
                     # If out-of-band changes are needed
                     "with_oob_state_update": state_update,
                     "transition_logs": job_application.logs.select_related("user").all() if state_update else None,
-                    # GEIQ cannot require IAE eligibility diagnosis, but shared templates need this variable.
-                    "eligibility_diagnosis_by_siae_required": False,
                     "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
                 },
             )
