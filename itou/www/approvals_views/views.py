@@ -122,7 +122,9 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
         context["approval_can_be_prolonged"] = approval.can_be_prolonged
         context["job_application"] = job_application
         context["matomo_custom_title"] = "Profil salarié"
-        context["eligibility_diagnosis"] = job_application and job_application.get_eligibility_diagnosis()
+        context["eligibility_diagnosis"] = job_application and job_application.get_eligibility_diagnosis(
+            self.request.user
+        )
         context["approval_deletion_form_url"] = None
         context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("approvals:list"))
 

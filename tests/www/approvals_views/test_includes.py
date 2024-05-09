@@ -66,6 +66,7 @@ class TestStatusInclude:
         request.user = EmployerFactory()
         approval = ApprovalFactory(for_snapshot=True, end_at=datetime.date(2022, 1, 1))
         approval.eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=approval.user)
+        user = EmployerFactory()
         context = Context(
             {
                 "common_approval": approval,
@@ -85,6 +86,7 @@ class TestStatusInclude:
         request.user = PrescriberFactory()
         approval = ApprovalFactory(for_snapshot=True, end_at=datetime.date(2022, 1, 1))
         approval.eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=approval.user)
+        user = PrescriberFactory()
         context = Context(
             {
                 "common_approval": approval,
