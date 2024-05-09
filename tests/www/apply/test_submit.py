@@ -2816,7 +2816,7 @@ class ApplicationViewTest(TestCase):
             fetch_redirect_response=False,
         )
         assert [eligibility_diagnosis] == list(
-            EligibilityDiagnosis.objects.for_job_seeker(eligibility_diagnosis.job_seeker)
+            EligibilityDiagnosis.objects.for_job_seeker_and_siae(job_seeker=eligibility_diagnosis.job_seeker)
         )
 
         # If "shrouded" is NOT present then we update the eligibility diagnosis
@@ -2836,7 +2836,9 @@ class ApplicationViewTest(TestCase):
             fetch_redirect_response=False,
         )
         new_eligibility_diagnosis = (
-            EligibilityDiagnosis.objects.for_job_seeker(eligibility_diagnosis.job_seeker).order_by().last()
+            EligibilityDiagnosis.objects.for_job_seeker_and_siae(job_seeker=eligibility_diagnosis.job_seeker)
+            .order_by()
+            .last()
         )
         assert new_eligibility_diagnosis != eligibility_diagnosis
         assert new_eligibility_diagnosis.author == prescriber
