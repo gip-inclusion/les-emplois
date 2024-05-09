@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
-    def for_job_seeker_and_siae(self, *, job_seeker, siae=None):
+    def for_job_seeker_and_siae(self, job_seeker, *, siae=None):
         author_filter = models.Q(author_kind=AuthorKind.PRESCRIBER)
         if siae is not None:
             author_filter |= models.Q(author_siae=siae)
@@ -71,7 +71,7 @@ class EligibilityDiagnosisManager(models.Manager):
         """
 
         query = (
-            self.for_job_seeker_and_siae(job_seeker=job_seeker, siae=for_siae)
+            self.for_job_seeker_and_siae(job_seeker, siae=for_siae)
             .select_related("author", "author_siae", "author_prescriber_organization")
             .annotate(from_prescriber=Case(When(author_kind=AuthorKind.PRESCRIBER, then=1), default=0))
             .order_by("-from_prescriber", "-created_at")
@@ -98,7 +98,7 @@ class EligibilityDiagnosisManager(models.Manager):
         )
 
         if not self.has_considered_valid(job_seeker=job_seeker, for_siae=for_siae):
-            last = query.for_job_seeker_and_siae(job_seeker=job_seeker, siae=for_siae).last()
+            last = query.for_job_seeker_and_siae(job_seeker, siae=for_siae).last()
 
         return last
 

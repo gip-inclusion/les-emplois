@@ -240,7 +240,7 @@ class JobApplicationQuerySet(models.QuerySet):
             )
             | Exists(
                 EligibilityDiagnosis.objects.for_job_seeker_and_siae(
-                    job_seeker=OuterRef("job_seeker"), siae=OuterRef("to_company")
+                    OuterRef("job_seeker"), siae=OuterRef("to_company")
                 ).valid()
             )
         )
