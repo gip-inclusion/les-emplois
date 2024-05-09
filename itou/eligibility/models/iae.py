@@ -21,14 +21,11 @@ logger = logging.getLogger(__name__)
 
 
 class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
-    def for_job_seeker(self, job_seeker):
-        return self.filter(job_seeker=job_seeker)
-
     def for_job_seeker_and_siae(self, *, job_seeker, siae=None):
         author_filter = models.Q(author_kind=AuthorKind.PRESCRIBER)
         if siae is not None:
             author_filter |= models.Q(author_siae=siae)
-        return self.for_job_seeker(job_seeker).filter(author_filter)
+        return self.filter(author_filter, job_seeker=job_seeker)
 
     def has_approval(self):
         """
@@ -100,14 +97,8 @@ class EligibilityDiagnosisManager(models.Manager):
             .order_by("created_at")
         )
 
-        # check if no diagnosis has considered valid
         if not self.has_considered_valid(job_seeker=job_seeker, for_siae=for_siae):
-            if for_siae:
-                # get the last one made by this siae or a prescriber
-                last = query.for_job_seeker_and_siae(job_seeker=job_seeker, siae=for_siae).last()
-            else:
-                # get the last one no matter who did it
-                last = query.for_job_seeker(job_seeker).last()
+            last = query.for_job_seeker_and_siae(job_seeker=job_seeker, siae=for_siae).last()
 
         return last
 
