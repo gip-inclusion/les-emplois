@@ -2,6 +2,7 @@ import datetime
 
 import pytest  # noqa
 from django.template import Context, Template
+from django.test import RequestFactory
 from freezegun import freeze_time
 
 import itou.job_applications.enums as job_applications_enums
@@ -13,11 +14,19 @@ from tests.utils.test import remove_static_hash
 
 @freeze_time("2022-01-10")
 class TestStatusInclude:
+    @staticmethod
+    def fake_request(user):
+        request = RequestFactory().get("/")
+        request.user = user
+        return request
+
     def test_valid_approval_for_employer(self, snapshot, db):
+        user = EmployerFactory()
         context = Context(
             {
                 "common_approval": ApprovalFactory(for_snapshot=True),
-                "user": EmployerFactory(),
+                "user": user,
+                "request": self.fake_request(user),
                 "hiring_pending": False,
                 "job_application": None,
                 "JobApplicationOrigin": job_applications_enums.Origin,
@@ -27,10 +36,12 @@ class TestStatusInclude:
         assert remove_static_hash(rendered_template) == snapshot(name="valid_approval_for_employer")
 
     def test_valid_approval_for_prescriber(self, snapshot, db):
+        user = PrescriberFactory()
         context = Context(
             {
                 "common_approval": ApprovalFactory(for_snapshot=True),
-                "user": PrescriberFactory(),
+                "user": user,
+                "request": self.fake_request(user),
                 "hiring_pending": False,
                 "job_application": None,
                 "JobApplicationOrigin": job_applications_enums.Origin,
@@ -40,10 +51,12 @@ class TestStatusInclude:
         assert remove_static_hash(rendered_template) == snapshot(name="valid_approval_for_prescriber")
 
     def test_expired_approval_without_eligibility_diagnosis_for_employer(self, snapshot, db):
+        user = EmployerFactory()
         context = Context(
             {
                 "common_approval": ApprovalFactory(for_snapshot=True, end_at=datetime.date(2022, 1, 1)),
-                "user": EmployerFactory(),
+                "user": user,
+                "request": self.fake_request(user),
                 "hiring_pending": False,
                 "job_application": None,
                 "JobApplicationOrigin": job_applications_enums.Origin,
@@ -57,10 +70,12 @@ class TestStatusInclude:
     def test_expired_approval_with_eligibility_diagnosis_for_employer(self, snapshot, db):
         approval = ApprovalFactory(for_snapshot=True, end_at=datetime.date(2022, 1, 1))
         approval.eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=approval.user)
+        user = EmployerFactory()
         context = Context(
             {
                 "common_approval": approval,
-                "user": EmployerFactory(),
+                "user": user,
+                "request": self.fake_request(user),
                 "hiring_pending": False,
                 "job_application": None,
                 "JobApplicationOrigin": job_applications_enums.Origin,
@@ -74,10 +89,12 @@ class TestStatusInclude:
     def test_expired_approval_with_eligibility_diagnosis_for_prescriber(self, snapshot, db):
         approval = ApprovalFactory(for_snapshot=True, end_at=datetime.date(2022, 1, 1))
         approval.eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=approval.user)
+        user = PrescriberFactory()
         context = Context(
             {
                 "common_approval": approval,
-                "user": PrescriberFactory(),
+                "user": user,
+                "request": self.fake_request(user),
                 "hiring_pending": False,
                 "job_application": None,
                 "JobApplicationOrigin": job_applications_enums.Origin,
@@ -95,6 +112,7 @@ class TestStatusInclude:
             {
                 "common_approval": approval,
                 "user": approval.user,
+                "request": self.fake_request(approval.eligibility_diagnosis.author),
                 "hiring_pending": False,
                 "job_application": None,
                 "JobApplicationOrigin": job_applications_enums.Origin,

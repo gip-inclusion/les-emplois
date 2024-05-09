@@ -35,7 +35,11 @@ Arguments:
         {% else %}
             Numéro d'agrément :
         {% endif %}
-        {% if user.is_employer and common_approval.is_in_waiting_period and common_approval.user.has_valid_diagnosis %}
+        {% if user.is_employer and common_approval.is_in_waiting_period %}
+            {# Lazily call this expensive method. #}
+            {% call_method common_approval.user "has_valid_diagnosis" request.user as has_valid_diagnosis %}
+        {% endif %}
+        {% if user.is_employer and common_approval.is_in_waiting_period and has_valid_diagnosis %}
             {% comment %}
             If the PASS IAE number is displayed at this time, some employers think that there is
             no need to validate the application because a number is already assigned.
@@ -74,7 +78,8 @@ Arguments:
             {% endif %}
         </ul>
     {% elif common_approval.is_in_waiting_period %}
-        {% if user.is_employer and common_approval.user.has_valid_diagnosis %}
+        {% call_method common_approval.user "has_valid_diagnosis" request.user as has_valid_diagnosis %}
+        {% if user.is_employer and has_valid_diagnosis %}
             {% comment %}
             When an authorized prescriber bypasses the waiting period and sends a candidate
             with an "expired" approval, the employer receives the application with the mention

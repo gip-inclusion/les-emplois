@@ -21,9 +21,12 @@ logger = logging.getLogger(__name__)
 
 
 class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
-    def for_job_seeker_and_siae(self, job_seeker, *, siae=None):
+    def for_job_seeker_and_siae(self, viewing_user, job_seeker, *, siae=None):
         author_filter = models.Q(author_kind=AuthorKind.PRESCRIBER)
-        if siae is not None:
+        # In most cases, the viewing user is the acting user and only employers
+        # should see their eligibility diagnosis.
+        # In Django admin, the viewing user does not matter and None is provided.
+        if (viewing_user is None or viewing_user.is_employer) and siae is not None:
             author_filter |= models.Q(author_siae=siae)
         return self.filter(author_filter, job_seeker=job_seeker)
 
@@ -38,7 +41,7 @@ class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
 
 
 class EligibilityDiagnosisManager(models.Manager):
-    def has_considered_valid(self, job_seeker, for_siae=None):
+    def has_considered_valid(self, viewing_user, job_seeker, for_siae=None):
         """
         Returns True if the given job seeker has a considered valid diagnosis,
         False otherwise.
@@ -56,22 +59,24 @@ class EligibilityDiagnosisManager(models.Manager):
         Hence the Trello #2604 decision: if a PASS IAE is valid, we do not
         check the presence of an eligibility diagnosis.
         """
-        return job_seeker.has_valid_common_approval or bool(self.last_considered_valid(job_seeker, for_siae=for_siae))
+        return job_seeker.has_valid_common_approval or bool(
+            self.last_considered_valid(viewing_user, job_seeker, for_siae=for_siae)
+        )
 
-    def last_considered_valid(self, job_seeker, for_siae=None):
+    def last_considered_valid(self, viewing_user, job_seeker, for_siae=None):
         """
         Retrieves the given job seeker's last considered valid diagnosis or None.
 
-        If the `for_siae` argument is passed, it means that we are looking for
-        a diagnosis from an employer perspective. The scope is restricted to
-        avoid showing diagnoses made by other employers.
+        If the `for_siae` argument is passed and we are looking for a diagnosis
+        from an employer perspective. The scope is restricted to avoid showing
+        diagnoses made by employers to other employers and prescribers.
 
         A diagnosis made by a prescriber takes precedence even when an employer
         diagnosis already exists.
         """
 
         query = (
-            self.for_job_seeker_and_siae(job_seeker, siae=for_siae)
+            self.for_job_seeker_and_siae(viewing_user, job_seeker, siae=for_siae)
             .select_related("author", "author_siae", "author_prescriber_organization")
             .annotate(from_prescriber=Case(When(author_kind=AuthorKind.PRESCRIBER, then=1), default=0))
             .order_by("-from_prescriber", "-created_at")
@@ -83,7 +88,7 @@ class EligibilityDiagnosisManager(models.Manager):
         # not.
         return query.first()
 
-    def last_expired(self, job_seeker, for_siae=None):
+    def last_expired(self, viewing_user, job_seeker, for_siae=None):
         """
         Retrieves the given job seeker's last expired diagnosis or None.
 
@@ -97,8 +102,8 @@ class EligibilityDiagnosisManager(models.Manager):
             .order_by("created_at")
         )
 
-        if not self.has_considered_valid(job_seeker=job_seeker, for_siae=for_siae):
-            last = query.for_job_seeker_and_siae(job_seeker, siae=for_siae).last()
+        if not self.has_considered_valid(viewing_user, job_seeker, for_siae=for_siae):
+            last = query.for_job_seeker_and_siae(viewing_user, job_seeker, siae=for_siae).last()
 
         return last
 

@@ -53,7 +53,9 @@ JOB_SEEKER_INFOS_CHECK_PERIOD = relativedelta(months=6)
 
 def _check_job_seeker_approval(request, job_seeker, siae):
     if job_seeker.new_approval_blocked_by_waiting_period(
-        siae=siae, sender_prescriber_organization=request.current_organization if request.user.is_prescriber else None
+        request.user,
+        siae=siae,
+        sender_prescriber_organization=request.current_organization if request.user.is_prescriber else None,
     ):
         # NOTE(vperron): We're using PermissionDenied in order to display a message to the end user
         # by reusing the 403 template and its logic. I'm not 100% sure that this is a good idea but,
@@ -168,7 +170,7 @@ class ApplicationBaseView(ApplyStepBaseView):
         else:
             # General IAE eligibility case
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-                self.job_seeker, for_siae=self.company
+                request.user, self.job_seeker, for_siae=self.company
             )
 
     def get_context_data(self, **kwargs):
@@ -1561,7 +1563,7 @@ def eligibility_for_hire(request, company_pk, job_seeker_pk, template_name="appl
         # No need for eligibility diagnosis if the job seeker already has a PASS IAE
         job_seeker.has_valid_common_approval,
     ]
-    if any(bypass_eligibility_conditions) or job_seeker.has_valid_diagnosis(for_siae=company):
+    if any(bypass_eligibility_conditions) or job_seeker.has_valid_diagnosis(request.user, for_siae=company):
         return HttpResponseRedirect(next_url)
     return common_views._eligibility(
         request,
@@ -1632,7 +1634,9 @@ def hire_confirmation(request, company_pk, job_seeker_pk, template_name="apply/s
     else:
         _check_job_seeker_approval(request, job_seeker, company)
         # General IAE eligibility case
-        eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker, for_siae=company)
+        eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
+            request.user, job_seeker, for_siae=company
+        )
         if eligibility_diagnosis is not None:
             # The job_seeker object already contains a lot of information: no need to re-retrieve it
             eligibility_diagnosis.job_seeker = job_seeker

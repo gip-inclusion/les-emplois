@@ -963,7 +963,8 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     )
 
     @sentry_sdk.trace
-    def __init__(self, job_applications_qs, *args, **kwargs):
+    def __init__(self, user, job_applications_qs, *args, **kwargs):
+        self.user = user
         self.job_applications_qs = job_applications_qs
         super().__init__(*args, **kwargs)
         senders = self.job_applications_qs.get_unique_fk_objects("sender")
@@ -1000,7 +1001,7 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     def filter(self, queryset):
         queryset = super().filter(queryset)
         if self.cleaned_data.get("eligibility_validated"):
-            queryset = queryset.eligibility_validated()
+            queryset = queryset.eligibility_validated(self.user)
 
         if senders := self.cleaned_data.get("senders"):
             queryset = queryset.filter(sender__id__in=senders)
@@ -1027,8 +1028,8 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
         widget=Select2MultipleWidget,
     )
 
-    def __init__(self, job_applications_qs, company, *args, **kwargs):
-        super().__init__(job_applications_qs, *args, **kwargs)
+    def __init__(self, user, job_applications_qs, company, *args, **kwargs):
+        super().__init__(user, job_applications_qs, *args, **kwargs)
         self.fields["sender_prescriber_organizations"].choices += self.get_sender_prescriber_organization_choices()
         self.fields["sender_companies"].choices += self.get_sender_companies_choices()
 
@@ -1073,8 +1074,8 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
 
     to_companies = forms.MultipleChoiceField(required=False, label="Structure", widget=Select2MultipleWidget)
 
-    def __init__(self, job_applications_qs, *args, **kwargs):
-        super().__init__(job_applications_qs, *args, **kwargs)
+    def __init__(self, user, job_applications_qs, *args, **kwargs):
+        super().__init__(user, job_applications_qs, *args, **kwargs)
         self.fields["to_companies"].choices += self.get_to_companies_choices()
 
     def filter(self, queryset):

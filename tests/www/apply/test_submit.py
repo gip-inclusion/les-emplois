@@ -1270,12 +1270,12 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         ):
             response = self.client.get(next_url)
             assert response.status_code == 200
-            assert not EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=company)
+            assert not EligibilityDiagnosis.objects.has_considered_valid(user, new_job_seeker, for_siae=company)
             self.assertTemplateUsed(response, "apply/includes/known_criteria.html", count=1)
 
         response = self.client.post(next_url, {"level_1_1": True})
         assert response.status_code == 302
-        assert EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=company)
+        assert EligibilityDiagnosis.objects.has_considered_valid(user, new_job_seeker, for_siae=company)
 
         next_url = reverse(
             "apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_pk": new_job_seeker.pk}
@@ -2834,7 +2834,7 @@ class ApplicationViewTest(TestCase):
             fetch_redirect_response=False,
         )
         assert [eligibility_diagnosis] == list(
-            EligibilityDiagnosis.objects.for_job_seeker_and_siae(job_seeker=eligibility_diagnosis.job_seeker)
+            EligibilityDiagnosis.objects.for_job_seeker_and_siae(prescriber, eligibility_diagnosis.job_seeker)
         )
 
         # If "shrouded" is NOT present then we update the eligibility diagnosis
@@ -2854,7 +2854,7 @@ class ApplicationViewTest(TestCase):
             fetch_redirect_response=False,
         )
         new_eligibility_diagnosis = (
-            EligibilityDiagnosis.objects.for_job_seeker_and_siae(job_seeker=eligibility_diagnosis.job_seeker)
+            EligibilityDiagnosis.objects.for_job_seeker_and_siae(prescriber, eligibility_diagnosis.job_seeker)
             .order_by()
             .last()
         )
@@ -4383,8 +4383,9 @@ class EligibilityForHireTestCase(TestCase):
 
     def test_job_seeker_without_valid_diagnosis(self):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
-        assert not self.job_seeker.has_valid_diagnosis(for_siae=self.company)
-        self.client.force_login(self.company.members.first())
+        employer = self.company.members.first()
+        assert not self.job_seeker.has_valid_diagnosis(employer, for_siae=self.company)
+        self.client.force_login(employer)
         response = self.client.get(self._reverse("apply:eligibility_for_hire"))
         self.assertContains(response, "Déclarer l’embauche de Ellie GIBILITAY")
         self.assertContains(response, "Valider l'éligibilité IAE")
@@ -4404,7 +4405,7 @@ class EligibilityForHireTestCase(TestCase):
             },
         )
         self.assertRedirects(response, self._reverse("apply:hire_confirmation"))
-        assert self.job_seeker.has_valid_diagnosis(for_siae=self.company)
+        assert self.job_seeker.has_valid_diagnosis(employer, for_siae=self.company)
 
 
 class GEIQEligibilityForHireTestCase(TestCase):

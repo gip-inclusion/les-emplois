@@ -78,11 +78,6 @@ def _add_administrative_criteria(job_applications):
         job_application.preloaded_administrative_criteria_extra_nb = extra_nb
 
 
-def _add_eligibility_diagnosis_required(job_applications):
-    for job_app in job_applications:
-        job_app.iae_eligibility_diagnosis_required = job_app.eligibility_diagnosis_by_siae_required()
-
-
 @login_required
 @user_passes_test(lambda u: u.is_job_seeker, login_url=reverse_lazy("search:employers_home"), redirect_field_name=None)
 def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html"):
@@ -91,7 +86,7 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     """
     filters_form = FilterJobApplicationsForm(request.GET or None)
     job_applications = request.user.job_applications
-    job_applications = job_applications.with_list_related_data()
+    job_applications = job_applications.with_list_related_data(request.user)
 
     filters_counter = 0
     if filters_form.is_valid():
@@ -131,10 +126,13 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
     job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
 
-    filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET or None)
+    filters_form = PrescriberFilterJobApplicationsForm(request.user, job_applications, request.GET or None)
 
     # Add related data giving the criteria for adding the necessary annotations
-    job_applications = job_applications.with_list_related_data(criteria=filters_form.data.getlist("criteria", []))
+    job_applications = job_applications.with_list_related_data(
+        request.user,
+        criteria=filters_form.data.getlist("criteria", []),
+    )
 
     filters_counter = 0
     if filters_form.is_valid():
@@ -145,7 +143,6 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     _add_pending_for_weeks(job_applications_page)
     _add_user_can_view_personal_information(job_applications_page, request.user.can_view_personal_information)
     _add_administrative_criteria(job_applications_page)
-    _add_eligibility_diagnosis_required(job_applications_page)
 
     context = {
         "job_applications_page": job_applications_page,
@@ -201,14 +198,14 @@ def list_prescriptions_exports_download(request, month_identifier=None):
     """
     job_applications = JobApplication.objects.prescriptions_of(
         request.user, request.current_organization
-    ).with_list_related_data()
+    ).with_list_related_data(request.user)
     filename = "candidatures"
     if month_identifier:
         year, month = month_identifier.split("-")
         filename = f"{filename}-{month_identifier}"
         job_applications = job_applications.created_on_given_year_and_month(year, month)
 
-    return stream_xlsx_export(job_applications, filename)
+    return stream_xlsx_export(request, job_applications, filename)
 
 
 @login_required
@@ -222,11 +219,12 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         state__in=JobApplicationWorkflow.PENDING_STATES
     ).count()
 
-    filters_form = CompanyFilterJobApplicationsForm(job_applications, company, request.GET or None)
+    filters_form = CompanyFilterJobApplicationsForm(request.user, job_applications, company, request.GET or None)
 
     # Add related data giving the criteria for adding the necessary annotations
     job_applications = job_applications.not_archived().with_list_related_data(
-        filters_form.data.getlist("criteria", [])
+        request.user,
+        filters_form.data.getlist("criteria", []),
     )
 
     filters_counter = 0
@@ -240,10 +238,8 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     # SIAE members have access to personal info
     _add_user_can_view_personal_information(job_applications_page, lambda ja: True)
 
-    iae_company = company.kind in SIAE_WITH_CONVENTION_KINDS
-    if iae_company:
+    if company.kind in SIAE_WITH_CONVENTION_KINDS:
         _add_administrative_criteria(job_applications_page)
-    _add_eligibility_diagnosis_required(job_applications_page)
 
     context = {
         "siae": company,
@@ -292,11 +288,11 @@ def list_for_siae_exports_download(request, month_identifier=None):
     exported as a CSV file with immediate download
     """
     company = get_current_company_or_404(request)
-    job_applications = company.job_applications_received.not_archived().with_list_related_data()
+    job_applications = company.job_applications_received.not_archived().with_list_related_data(request.user)
     filename = f"candidatures-{slugify(company.display_name)}"
     if month_identifier:
         year, month = month_identifier.split("-")
         filename = f"{filename}-{month_identifier}"
         job_applications = job_applications.created_on_given_year_and_month(year, month)
 
-    return stream_xlsx_export(job_applications, filename)
+    return stream_xlsx_export(request, job_applications, filename)

@@ -533,7 +533,7 @@ class User(AbstractUser, AddressMixin):
     def has_no_common_approval(self):
         return not self.latest_approval and not self.latest_pe_approval
 
-    def new_approval_blocked_by_waiting_period(self, siae, sender_prescriber_organization):
+    def new_approval_blocked_by_waiting_period(self, viewing_user, siae, sender_prescriber_organization):
         """
         Don’t create approvals for users whose approval recently ended,
         unless an authorized prescriber asks for it, or the structure isn’t an SIAE.
@@ -543,7 +543,7 @@ class User(AbstractUser, AddressMixin):
         )
 
         # Only diagnoses made by authorized prescribers are taken into account.
-        has_valid_diagnosis = self.has_valid_diagnosis()
+        has_valid_diagnosis = self.has_valid_diagnosis(viewing_user)
         return (
             self.has_common_approval_in_waiting_period
             and siae.is_subject_to_eligibility_rules
@@ -597,8 +597,8 @@ class User(AbstractUser, AddressMixin):
     def has_jobseeker_profile(self):
         return self.is_job_seeker and hasattr(self, "jobseeker_profile")
 
-    def has_valid_diagnosis(self, for_siae=None):
-        return self.eligibility_diagnoses.has_considered_valid(job_seeker=self, for_siae=for_siae)
+    def has_valid_diagnosis(self, viewing_user, for_siae=None):
+        return self.eligibility_diagnoses.has_considered_valid(viewing_user, self, for_siae=for_siae)
 
     def joined_recently(self):
         time_since_date_joined = timezone.now() - self.date_joined

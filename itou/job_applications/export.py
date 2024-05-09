@@ -58,10 +58,10 @@ def _get_selected_jobs(job_application):
     return selected_jobs
 
 
-def _get_eligibility_status(job_application):
+def _get_eligibility_status(job_application, viewing_user):
     eligibility = "non"
     # Eligibility diagnoses made by SIAE are ignored.
-    if job_application.job_seeker.has_valid_diagnosis():
+    if job_application.job_seeker.has_valid_diagnosis(viewing_user):
         eligibility = "oui"
 
     return eligibility
@@ -94,7 +94,7 @@ def _resolve_title(title, nir):
     return ""
 
 
-def _serialize_job_application(job_application):
+def _serialize_job_application(job_application, viewing_user):
     job_seeker = job_application.job_seeker
     company = job_application.to_company
 
@@ -128,7 +128,7 @@ def _serialize_job_application(job_application):
         _format_date(job_application.hiring_start_at),
         _format_date(job_application.hiring_end_at),
         job_application.get_refusal_reason_display(),
-        _get_eligibility_status(job_application),
+        _get_eligibility_status(job_application, viewing_user),
         numero_pass_iae,
         _format_date(approval_start_date),
         _format_date(approval_end_date),
@@ -136,11 +136,15 @@ def _serialize_job_application(job_application):
     ]
 
 
-def _job_applications_serializer(queryset):
-    return [_serialize_job_application(job_application) for job_application in queryset]
+class JobApplicationSerializer:
+    def __init__(self, request):
+        self.viewing_user = request.user
+
+    def __call__(self, queryset):
+        return [_serialize_job_application(job_application, self.viewing_user) for job_application in queryset]
 
 
-def stream_xlsx_export(job_applications, filename):
+def stream_xlsx_export(request, job_applications, filename):
     """
     Takes a list of job application, converts them to XLSX and writes them in the provided stream
     The stream can be for instance an http response, a string (io.StringIO()) or a file
@@ -149,5 +153,5 @@ def stream_xlsx_export(job_applications, filename):
         job_applications,
         filename,
         JOB_APPLICATION_CSV_HEADERS,
-        _job_applications_serializer,
+        JobApplicationSerializer(request),
     )
