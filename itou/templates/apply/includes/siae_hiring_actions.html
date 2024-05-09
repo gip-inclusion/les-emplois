@@ -20,7 +20,7 @@
 
         {# Possible next steps when the state is processing / prior_to_hire ------------------------------------- #}
         {% if job_application.state.is_processing or job_application.state.is_prior_to_hire %}
-            {% if job_application.eligibility_diagnosis_by_siae_required %}
+            {% if eligibility_diagnosis_by_siae_required %}
                 <div class="form-group col col-lg-auto">{% include "apply/includes/buttons/new_diagnosis.html" %}</div>
             {% else %}
                 <div class="form-group col col-lg-auto">{% include "apply/includes/buttons/accept.html" %}</div>
@@ -31,7 +31,7 @@
 
         {# Possible next steps when the state is postponed ------------------------------------------------------ #}
         {% if job_application.state.is_postponed %}
-            {% if job_application.eligibility_diagnosis_by_siae_required %}
+            {% if eligibility_diagnosis_by_siae_required %}
                 <div class="form-group col col-lg-auto">{% include "apply/includes/buttons/new_diagnosis.html" %}</div>
             {% else %}
                 <div class="form-group col col-lg-auto">{% include "apply/includes/buttons/accept.html" %}</div>
@@ -41,7 +41,7 @@
 
         {# Possible next steps when the state is obsolete, refused or cancelled --------------------------------- #}
         {% if job_application.state.is_obsolete or job_application.state.is_refused or job_application.state.is_cancelled %}
-            {% if job_application.eligibility_diagnosis_by_siae_required %}
+            {% if eligibility_diagnosis_by_siae_required %}
                 <div class="form-group col col-lg-auto">{% include "apply/includes/buttons/new_diagnosis.html" %}</div>
             {% else %}
                 <div class="form-group col col-lg-auto">{% include "apply/includes/buttons/accept.html" %}</div>
