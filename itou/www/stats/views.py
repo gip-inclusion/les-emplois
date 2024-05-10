@@ -217,14 +217,19 @@ def stats_siae_etp(request):
     if not utils.can_view_stats_siae_etp(request):
         raise PermissionDenied
     context = {
-        "page_title": "Données de ma structure (extranet ASP)",
+        "page_title": "Suivi des effectifs annuels et mensuels en ETP",
         "department": current_org.department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
     }
     return render_stats(
         request=request,
         context=context,
-        params={mb.ASP_SIAE_FILTER_KEY_FLAVOR1: current_org.convention.asp_id},
+        params={
+            mb.ASP_SIAE_FILTER_KEY_FLAVOR3: [
+                str(membership.company.convention.asp_id)
+                for membership in request.user.active_or_in_grace_period_company_memberships()
+            ]
+        },
     )
 
 

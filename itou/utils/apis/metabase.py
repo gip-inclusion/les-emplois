@@ -6,6 +6,7 @@ from django.conf import settings
 
 ASP_SIAE_FILTER_KEY_FLAVOR1 = "identifiant_de_la_structure"
 ASP_SIAE_FILTER_KEY_FLAVOR2 = "id_asp_de_la_siae"
+ASP_SIAE_FILTER_KEY_FLAVOR3 = "id_asp_siae"
 C1_SIAE_FILTER_KEY = "identifiant_de_la_structure_(c1)"
 IAE_NETWORK_FILTER_KEY = "id_r%C3%A9seau"
 DEPARTMENT_FILTER_KEY = "d%C3%A9partement"
@@ -29,7 +30,7 @@ METABASE_DASHBOARDS = {
         "dashboard_id": 327,
     },
     "stats_siae_etp": {
-        "dashboard_id": 128,
+        "dashboard_id": 440,
     },
     "stats_siae_hiring": {
         "dashboard_id": 185,

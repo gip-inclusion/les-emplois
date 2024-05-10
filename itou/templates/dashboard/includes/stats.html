@@ -9,19 +9,18 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_siae_aci' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir le suivi du cofinancement de mon ACI</span>
+                            <span>Suivre le cofinancement de mon ACI</span>
                         </a>
                     </li>
                 {% endif %}
                 {% if can_view_stats_siae_etp %}
-                    <!-- Stats temporarily suspended until we stabilize them
-                        <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_siae_etp' %}" class="btn-link btn-ico">
-                                <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                                <span>Voir les données de ma structure (extranet ASP)</span>
-                            </a>
-                        </li>
-                    -->
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_siae_etp' %}" class="btn-link btn-ico">
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                            <span>Suivre les effectifs annuels et mensuels en ETP</span>
+                        </a>
+                        {% include "dashboard/includes/stats_new_badge.html" %}
+                    </li>
                 {% endif %}
                 {% if can_view_stats_siae %}
                     <li class="d-flex justify-content-between align-items-center mb-3">
