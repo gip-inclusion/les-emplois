@@ -54,7 +54,11 @@ def can_view_stats_siae_etp(request):
     """
     Non official stats with very specific access rights.
     """
-    return can_view_stats_siae(request) and request.user.pk in settings.STATS_SIAE_USER_PK_WHITELIST
+    return (
+        can_view_stats_siae(request)
+        and request.is_current_organization_admin
+        and request.user.pk in settings.STATS_SIAE_USER_PK_WHITELIST
+    )
 
 
 def can_view_stats_siae_hiring_report(request):
