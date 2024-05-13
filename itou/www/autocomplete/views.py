@@ -1,14 +1,17 @@
 from datetime import datetime
 
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import F, Q, Value
 from django.db.models.functions import Least, Lower, NullIf, StrIndex
 from django.http import JsonResponse
+from django.urls import reverse_lazy
 from unidecode import unidecode
 
 from itou.asp.models import Commune
 from itou.cities.models import City
 from itou.jobs.models import Appellation
 from itou.users.models import User
+from itou.utils.decorators import settings_protected_view
 
 
 # Consider that after 50 matches the user should refine its search.
@@ -153,6 +156,9 @@ def communes_autocomplete(request):
     return JsonResponse({"results": communes} if select2_mode else communes, safe=False)
 
 
+@login_required
+@settings_protected_view("GPS_ENABLED")
+@user_passes_test(lambda u: not u.is_job_seeker, login_url=reverse_lazy("dashboard:index"), redirect_field_name=None)
 def gps_users_autocomplete(request):
     """
     Returns JSON data compliant with Select2
