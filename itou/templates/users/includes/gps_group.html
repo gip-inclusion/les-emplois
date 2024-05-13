@@ -1,14 +1,14 @@
 {% load str_filters %}
 {% load format_filters %}
 
-<div class="c-box mb-3 mb-lg-5">
+<div class="c-box mb-3 mb-lg-5" id="gps_intervenants">
 
     <h2>Intervenant{{ gps_memberships|length|pluralizefr }}</h2>
     <hr />
-    <ul class="p-0 m-0">
+    <div class="p-0 m-0">
         {% for membership in gps_memberships %}
 
-            <div class="c-box--results__header px-0">
+            <div class="c-box--results__header px-0 gps_intervenant">
                 <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
 
                     <div class="c-box--results__summary flex-grow-1">
@@ -51,6 +51,6 @@
             </div>
 
         {% endfor %}
-    </ul>
+    </div>
 
 </div>

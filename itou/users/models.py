@@ -64,7 +64,42 @@ class ItouUserManager(UserManager):
         )
 
         if current_user:
-            queryset = queryset.exclude(follow_up_group__members=current_user).exclude(id=current_user.id)
+            queryset = (
+                # Don't include the user doing the autocomplete
+                queryset.exclude(id=current_user.id)
+                # Generated SQL
+                # AND (
+                #   NOT (
+                #     EXISTS(
+                #       SELECT
+                #         1 AS "a"
+                #       FROM
+                #         "gps_followupgroupmembership" U2
+                #       WHERE
+                #         (
+                #           U2."member_id" = 1301
+                #           AND U2."follow_up_group_id" = ("gps_followupgroup"."id")
+                #         )
+                #       LIMIT
+                #         1
+                #     )
+                #   ) OR (
+                #     "gps_followupgroupmembership"."member_id" = 1301
+                #     AND NOT "gps_followupgroupmembership"."is_active"
+                #   )
+                # )
+                .filter(
+                    (
+                        # Keep users when current_user is not part of their group
+                        ~Q(follow_up_group__memberships__member=current_user)
+                    )
+                    # Or Keep users when current_user is part of their group,
+                    # but is inactive
+                    | Q(follow_up_group__memberships__member=current_user)
+                    & Q(follow_up_group__memberships__is_active=False),
+                )
+                .distinct()
+            )
 
         return queryset[:limit]
 
