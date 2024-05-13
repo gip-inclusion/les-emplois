@@ -210,16 +210,12 @@
         {% endif %}
 
         <script nonce="{{ CSP_NONCE }}">
-            // Show any toasts that is already present in the DOM
-            htmx.onLoad(() => {
-                $(".toast-placement-wrapper").children(".toast").each(function() {
+            // Show any toasts present in the loaded DOM
+            htmx.onLoad((target) => {
+                $(".toast-container .toast", target).each(function() {
                     $(this).toast("show");
                 });
             });
-
-            document.querySelectorAll(".toast-container .toast").forEach(
-                toastEl => bootstrap.Toast.getOrCreateInstance(toastEl).show()
-            );
         </script>
 
         {% if MATOMO_BASE_URL %}
