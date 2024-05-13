@@ -3424,7 +3424,6 @@ def test_select_job_description_for_job_application(client):
 
 @override_settings(API_BAN_BASE_URL="http://ban-api")
 def test_select_other_job_description_for_job_application(client, mocker):
-
     mocker.patch(
         "itou.utils.apis.geocoding.get_geocoding_data",
         side_effect=mock_get_geocoding_data_by_ban_api_resolved,

@@ -45,9 +45,7 @@ class Command(BaseCommand):
             | Q(user__birthdate=None)
             | Q(user__first_name="")
             | Q(user__last_name="")
-        ).update(
-            pe_notification_status=api_enums.PEApiNotificationStatus.READY
-        )
+        ).update(pe_notification_status=api_enums.PEApiNotificationStatus.READY)
         approvals_models.CancelledApproval.objects.filter(
             pe_notification_status=api_enums.PEApiNotificationStatus.PENDING,
             start_at__lte=today,

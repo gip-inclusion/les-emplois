@@ -42,7 +42,7 @@ clean:
 	find . -type d -name "__pycache__" -depth -exec rm -rf '{}' \;
 
 quality: $(VENV_REQUIREMENT)
-	black --check $(LINTER_CHECKED_DIRS)
+	ruff format --check $(LINTER_CHECKED_DIRS)
 	ruff check $(LINTER_CHECKED_DIRS)
 	djlint --lint --check itou
 	find * -type f -name '*.sh' -exec shellcheck --external-sources {} +
@@ -50,7 +50,7 @@ quality: $(VENV_REQUIREMENT)
 	python manage.py collectstatic --no-input
 
 fast_fix: $(VENV_REQUIREMENT)
-	black $(LINTER_CHECKED_DIRS)
+	ruff format $(LINTER_CHECKED_DIRS)
 	ruff check --fix $(LINTER_CHECKED_DIRS)
 	find * -type f -name '*.sh' -exec shellcheck --external-sources --format=diff {} + | git apply --allow-empty
 

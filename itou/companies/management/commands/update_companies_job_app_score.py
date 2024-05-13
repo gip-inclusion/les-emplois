@@ -17,6 +17,7 @@ class Command(BaseCommand):
             .exclude(
                 Q(job_app_score=F("computed_job_app_score"))
                 | Q(job_app_score__isnull=True) & Q(computed_job_app_score__isnull=True)
-            ).update(job_app_score=F("computed_job_app_score"))
+            )
+            .update(job_app_score=F("computed_job_app_score"))
         )
         self.stdout.write(f"Updated {nb_updated} companies in {time.perf_counter() - start:.3f} seconds")

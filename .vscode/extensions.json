@@ -9,7 +9,6 @@
 		"ms-vsliveshare.vsliveshare",
 		"ms-python.vscode-pylance",
 		"ms-python.python",
-		"ms-python.black-formatter",
 		"monosans.djlint",
 		"editorconfig.editorconfig",
 		"charliermarsh.ruff"

@@ -5,7 +5,6 @@ from itou.users.models import User
 
 
 class FollowUpGroup(models.Model):
-
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
 
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
@@ -35,7 +34,6 @@ class FollowUpGroup(models.Model):
 
 
 class FollowUpGroupMembership(models.Model):
-
     is_referent = models.BooleanField(default=False, verbose_name="référent")
 
     # Is this user still an active member of the group?

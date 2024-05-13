@@ -12,7 +12,6 @@ from tests.utils.test import parse_response_to_soup
 
 
 def test_user_autocomplete():
-
     member = PrescriberFactory(first_name="gps member first_name")
     beneficiary = JobSeekerFactory(first_name="gps beneficiary first_name")
     another_beneficiary = JobSeekerFactory(first_name="gps another beneficiary first_name")
@@ -111,7 +110,6 @@ def test_join_group_as_prescriber(client):
 
 
 def test_navigation(snapshot, client):
-
     member = PrescriberFactory(first_name="gps member first_name")
     member_first_beneficiary = JobSeekerFactory(first_name="gps first beneficiary first_name")
     member_second_beneficiary = JobSeekerFactory(first_name="gps second beneficiary first_name")
@@ -139,7 +137,6 @@ def test_navigation(snapshot, client):
 
 
 def test_access_as_jobseeker(client):
-
     user = JobSeekerFactory()
     client.force_login(user)
 
@@ -152,7 +149,6 @@ def test_access_as_jobseeker(client):
 
 @override_settings(GPS_ENABLED=True)
 def test_access_gps_enabled(client, snapshot):
-
     user = PrescriberFactory()
     client.force_login(user)
 
@@ -173,7 +169,6 @@ def test_access_gps_enabled(client, snapshot):
 
 @override_settings(GPS_ENABLED=False)
 def test_access_gps_disabled(client):
-
     user = PrescriberFactory()
     client.force_login(user)
 

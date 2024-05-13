@@ -1,6 +1,6 @@
 # Style de programmation (coding style)
 
-La majeure partie est assurée par les outils automatiques (ruff, black, …), qui
+La majeure partie est assurée par les outils automatiques (ruff, …), qui
 sauront porter les non-conformités à votre attention. Il reste quelques
 conventions listées dans ce document.
 

@@ -121,7 +121,6 @@ class PrescriberLoginTest(InclusionConnectBaseTestCase):
 
 
 class EmployerLoginTest(InclusionConnectBaseTestCase):
-
     def test_login_options(self):
         url = reverse("login:employer")
         response = self.client.get(url)

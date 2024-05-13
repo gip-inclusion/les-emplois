@@ -59,9 +59,7 @@ class CompanySignupTokenGenerator:
         timestamp_b36 = int_to_base36(timestamp)
         hash_string = salted_hmac(
             self.key_salt, self._make_hash_value(company, timestamp), secret=self.secret
-        ).hexdigest()[
-            ::2
-        ]  # Limit to 20 characters to shorten the URL.
+        ).hexdigest()[::2]  # Limit to 20 characters to shorten the URL.
         return f"{timestamp_b36}-{hash_string}"
 
     def _make_hash_value(self, company, timestamp):

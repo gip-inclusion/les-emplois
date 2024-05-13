@@ -2183,7 +2183,6 @@ class ApplyAsCompanyTest(TestCase):
 
 
 class DirectHireFullProcessTest(TestCase):
-
     def test_perms_for_company(self):
         """A company can hire only for itself."""
         company_1 = CompanyFactory(with_membership=True)

@@ -36,7 +36,6 @@ from tests.utils.test import TestCase
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class ImportSiaeManagementCommandsTest(TestCase):
-
     def setUp(self):
         super().setUp()
 
