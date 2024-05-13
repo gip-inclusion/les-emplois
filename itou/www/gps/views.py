@@ -13,7 +13,6 @@ from itou.www.gps.forms import GpsUserSearchForm
 @settings_protected_view("GPS_ENABLED")
 @user_passes_test(lambda u: not u.is_job_seeker, login_url=reverse_lazy("dashboard:index"), redirect_field_name=None)
 def my_groups(request, template_name="gps/my_groups.html"):
-
     current_user = request.user
 
     memberships = (
@@ -40,7 +39,6 @@ def my_groups(request, template_name="gps/my_groups.html"):
 @settings_protected_view("GPS_ENABLED")
 @user_passes_test(lambda u: not u.is_job_seeker, login_url=reverse_lazy("dashboard:index"), redirect_field_name=None)
 def join_group(request, template_name="gps/join_group.html"):
-
     form = GpsUserSearchForm(data=request.POST or None)
 
     my_groups_url = reverse("gps:my_groups")

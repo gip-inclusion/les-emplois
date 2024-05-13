@@ -112,8 +112,8 @@ def test_bucket():
         +           return
                  super().__call__(value)
              except ValidationError as e:
-        ''',  # fmt: skip
-    )
+        ''',
+    )  # fmt: skip
 
     call_command("configure_bucket", autoexpire=True)
     yield

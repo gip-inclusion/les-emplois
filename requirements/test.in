@@ -4,7 +4,6 @@ pip-tools  # https://github.com/jazzband/pip-tools/
 
 # Code quality
 # ------------------------------------------------------------------------------
-black  # https://github.com/psf/black
 djlint  # https://www.djlint.com
 ruff  # https://github.com/charliermarsh/ruff
 shellcheck-py  # https://github.com/shellcheck-py/shellcheck-py

@@ -126,7 +126,8 @@ class CommonApprovalMixin(models.Model):
         A.k.a an Approval, a Suspension or a Prolongation
         """
         return max(
-            obj.end_at - timezone.localdate()
+            obj.end_at
+            - timezone.localdate()
             # end_at is inclusive.
             + datetime.timedelta(days=1),
             datetime.timedelta(0),

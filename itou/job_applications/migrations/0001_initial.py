@@ -13,7 +13,6 @@ import itou.utils.models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [

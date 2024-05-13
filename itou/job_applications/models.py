@@ -405,7 +405,8 @@ class JobApplicationQuerySet(models.QuerySet):
             EmployeeRecord.objects.for_asp_company(siae)
             # We need to exclude NEW employee records otherwise we are shooting ourselves in the foot by excluding
             # job applications selected in `._eligible_job_applications_with_employee_record()`
-            .exclude(status__in=[employeerecord_enums.Status.NEW]).values("approval_number")
+            .exclude(status__in=[employeerecord_enums.Status.NEW])
+            .values("approval_number")
         )
 
         # TIP: you can't filter on a UNION of querysets,

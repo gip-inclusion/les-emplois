@@ -155,12 +155,12 @@ class EditSiaeDescriptionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["description"].widget.attrs[
-            "placeholder"
-        ] = "Présentez votre entreprise, votre secteur d’activité, domaines d’intervention, etc."
-        self.fields["provided_support"].widget.attrs[
-            "placeholder"
-        ] = "Indiquez les modalités d’accompagnement, par qui, comment, à quelle fréquence, etc."
+        self.fields["description"].widget.attrs["placeholder"] = (
+            "Présentez votre entreprise, votre secteur d’activité, domaines d’intervention, etc."
+        )
+        self.fields["provided_support"].widget.attrs["placeholder"] = (
+            "Indiquez les modalités d’accompagnement, par qui, comment, à quelle fréquence, etc."
+        )
 
 
 class BlockJobApplicationsForm(forms.ModelForm):

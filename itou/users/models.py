@@ -46,7 +46,6 @@ class ApprovalAlreadyExistsError(Exception):
 
 
 class ItouUserManager(UserManager):
-
     def autocomplete(self, search_string, limit=10, kind=UserKind.JOB_SEEKER, current_user=None):
         """
         A `search_string` equals to `foo bar` will match all results beginning with `foo` and `bar`.

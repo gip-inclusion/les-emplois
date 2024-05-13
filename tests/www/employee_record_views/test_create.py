@@ -254,7 +254,6 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
-
     NO_ADDRESS_FILLED_IN = "Aucune adresse n'a été saisie sur les emplois de l'inclusion !"
     ADDRESS_COULD_NOT_BE_AUTO_CHECKED = "L'adresse du salarié n'a pu être vérifiée automatiquement."
 

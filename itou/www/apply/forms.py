@@ -414,13 +414,13 @@ class JobApplicationRefusalPrescriberAnswerForm(forms.Form):
         super().__init__(*args, **kwargs)
         if job_application.sender_kind == job_applications_enums.SenderKind.PRESCRIBER:
             if job_application.is_sent_by_authorized_prescriber:
-                self.fields["prescriber_answer"].label = (
-                    "Commentaire envoyé au prescripteur (n’est pas communiqué au candidat)"
-                )
+                self.fields[
+                    "prescriber_answer"
+                ].label = "Commentaire envoyé au prescripteur (n’est pas communiqué au candidat)"
             else:
-                self.fields["prescriber_answer"].label = (
-                    "Commentaire envoyé à l’orienteur (n’est pas communiqué au candidat)"
-                )
+                self.fields[
+                    "prescriber_answer"
+                ].label = "Commentaire envoyé à l’orienteur (n’est pas communiqué au candidat)"
 
 
 class AnswerForm(forms.Form):

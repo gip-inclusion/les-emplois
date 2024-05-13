@@ -1,6 +1,6 @@
 """
-    Pôle emploi's Emploi Store Dev aka ESD.
-    https://www.emploi-store-dev.fr/portail-developpeur/catalogueapi
+Pôle emploi's Emploi Store Dev aka ESD.
+https://www.emploi-store-dev.fr/portail-developpeur/catalogueapi
 """
 
 import collections
