@@ -354,6 +354,8 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             job_seeker_with_address=True,
             job_seeker__first_name="Supersecretname",
             job_seeker__last_name="Unknown",
+            job_seeker__jobseeker_profile__nir="11111111111111",
+            job_seeker__post_code="59140",
             sender=prescriber,
             sender_kind=job_applications_enums.SenderKind.PRESCRIBER,
         )
