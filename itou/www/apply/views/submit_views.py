@@ -50,7 +50,7 @@ JOB_SEEKER_INFOS_CHECK_PERIOD = relativedelta(months=6)
 
 
 def _check_job_seeker_approval(request, job_seeker, siae):
-    if job_seeker.approval_can_be_renewed_by(
+    if job_seeker.new_approval_blocked_by_waiting_period(
         siae=siae, sender_prescriber_organization=request.current_organization if request.user.is_prescriber else None
     ):
         # NOTE(vperron): We're using PermissionDenied in order to display a message to the end user
