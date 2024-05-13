@@ -17,24 +17,10 @@
             </div>
             <div class="row">
                 <div class="col-12 col-lg-6 order-md-2 ps-lg-5 d-none d-lg-block">
-                    <h2 class="h1 ff-extra-01">
-                        Où trouver
-                        {% if request.user.is_job_seeker %}
-                            mon
-                        {% else %}
-                            le
-                        {% endif %}
-                        numéro de sécurité sociale ?
-                    </h2>
+                    <h2 class="h1 ff-extra-01">Où trouver {{ request.user.is_job_seeker|yesno:"mon,le" }} numéro de sécurité sociale ?</h2>
                     <img class="mt-3 img-fluid" src="{% static 'img/carte_vitale.png' %}" alt="Spécimen de carte vitale">
                     <p class="ff-extra-01 mt-0">
-                        Il est présent à cet endroit sur
-                        {% if request.user.is_job_seeker %}
-                            votre
-                        {% else %}
-                            la
-                        {% endif %}
-                        carte Vitale.
+                        Il est présent à cet endroit sur {{ request.user.is_job_seeker|yesno:"votre,la" }} carte Vitale.
                     </p>
                 </div>
                 <div class="col-12 col-lg-6 order-md-1 pe-lg-5">
