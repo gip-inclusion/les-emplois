@@ -36,9 +36,6 @@ from .common import (
 
 
 class GEIQEligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
-    def for_job_seeker(self, job_seeker):
-        return self.filter(job_seeker=job_seeker)
-
     def authored_by_prescriber_or_geiq(self, geiq):
         # In ordering, priority is given to prescriber authored diagnoses
         return self.filter(
@@ -48,7 +45,7 @@ class GEIQEligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
     def diagnoses_for(self, job_seeker, for_geiq=None):
         # Get *all* GEIQ diagnoses for given job seeker (even expired)
         return (
-            self.for_job_seeker(job_seeker)
+            self.filter(job_seeker=job_seeker)
             .authored_by_prescriber_or_geiq(for_geiq)
             .select_related("author", "author_geiq", "author_prescriber_organization")
             .prefetch_related("administrative_criteria")
@@ -119,7 +116,7 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         # but infortunately functions.Now() is not immutable
         if self.job_seeker and (
             GEIQEligibilityDiagnosis.objects.valid()
-            .for_job_seeker(self.job_seeker)
+            .filter(job_seeker=self.job_seeker)
             .filter(models.Q(author_geiq=self.author_geiq) | models.Q(author_prescriber_organization__isnull=False))
             .exists()
         ):
@@ -134,11 +131,12 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         if self.author_prescriber_organization and self.is_valid:
             obsolete_geiq_diagnoses = (
                 # valid / non-expired only
-                GEIQEligibilityDiagnosis.objects.valid()
-                # for given job seeker
-                .for_job_seeker(self.job_seeker)
-                # authored by a GEIQ and have no job application attached
-                .filter(author_geiq__isnull=False, job_applications__isnull=True)
+                GEIQEligibilityDiagnosis.objects.valid().filter(
+                    job_seeker=self.job_seeker,
+                    # authored by a GEIQ and have no job application attached
+                    author_geiq__isnull=False,
+                    job_applications__isnull=True,
+                )
             )
 
             obsolete_geiq_diagnoses.update(expires_at=self.created_at)
