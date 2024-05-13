@@ -983,7 +983,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # Approval issuance logic.
         if not self.hiring_without_approval and self.to_company.is_subject_to_eligibility_rules:
             if self.job_seeker.has_common_approval_in_waiting_period:
-                if self.job_seeker.approval_can_be_renewed_by(
+                if self.job_seeker.new_approval_blocked_by_waiting_period(
                     siae=self.to_company, sender_prescriber_organization=self.sender_prescriber_organization
                 ):
                     # Security check: it's supposed to be blocked upstream.

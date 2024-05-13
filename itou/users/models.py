@@ -526,10 +526,10 @@ class User(AbstractUser, AddressMixin):
     def has_no_common_approval(self):
         return not self.latest_approval and not self.latest_pe_approval
 
-    def approval_can_be_renewed_by(self, siae, sender_prescriber_organization):
+    def new_approval_blocked_by_waiting_period(self, siae, sender_prescriber_organization):
         """
-        An approval in waiting period can only be bypassed if the prescriber is authorized
-        or if the structure is not a SIAE.
+        Don’t create approvals for users whose approval recently ended,
+        unless an authorized prescriber asks for it, or the structure isn’t an SIAE.
         """
         is_sent_by_authorized_prescriber = (
             sender_prescriber_organization is not None and sender_prescriber_organization.is_authorized

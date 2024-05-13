@@ -1055,7 +1055,7 @@ class LatestApprovalTestCase(TestCase):
         assert user.latest_approval is None
         assert user.latest_pe_approval == pe_approval
 
-    def test_cannot_bypass_waiting_period(self):
+    def test_new_approval_blocked_by_waiting_period(self):
         user = user_with_approval_in_waiting_period()
 
         # note (fv):
@@ -1070,37 +1070,37 @@ class LatestApprovalTestCase(TestCase):
 
         # Waiting period cannot be bypassed for SIAE if no prescriber
         # and there is no valid eligibility diagnosis this in period
-        assert user.approval_can_be_renewed_by(
+        assert user.new_approval_blocked_by_waiting_period(
             siae=CompanyFactory(kind=CompanyKind.ETTI), sender_prescriber_organization=None
         )
 
         # Waiting period cannot be bypassed for SIAE if unauthorized prescriber
         # and there is no valid eligibility diagnosis this in period
-        assert user.approval_can_be_renewed_by(
+        assert user.new_approval_blocked_by_waiting_period(
             siae=CompanyFactory(kind=CompanyKind.ETTI),
             sender_prescriber_organization=PrescriberOrganizationFactory(),
         )
 
         # Waiting period is bypassed for SIAE if authorized prescriber.
-        assert not user.approval_can_be_renewed_by(
+        assert not user.new_approval_blocked_by_waiting_period(
             siae=CompanyFactory(kind=CompanyKind.ETTI),
             sender_prescriber_organization=PrescriberOrganizationFactory(authorized=True),
         )
 
         # Waiting period is bypassed for GEIQ even if no prescriber.
-        assert not user.approval_can_be_renewed_by(
+        assert not user.new_approval_blocked_by_waiting_period(
             siae=CompanyFactory(kind=CompanyKind.GEIQ), sender_prescriber_organization=None
         )
 
         # Waiting period is bypassed for GEIQ even if unauthorized prescriber.
-        assert not user.approval_can_be_renewed_by(
+        assert not user.new_approval_blocked_by_waiting_period(
             siae=CompanyFactory(kind=CompanyKind.GEIQ),
             sender_prescriber_organization=PrescriberOrganizationFactory(),
         )
 
         # Waiting period is bypassed if a valid diagnosis made by an authorized prescriber exists.
         diag = EligibilityDiagnosisFactory(job_seeker=user)
-        assert not user.approval_can_be_renewed_by(
+        assert not user.new_approval_blocked_by_waiting_period(
             siae=CompanyFactory(kind=CompanyKind.ETTI),
             sender_prescriber_organization=None,
         )
@@ -1109,7 +1109,7 @@ class LatestApprovalTestCase(TestCase):
         # Waiting period cannot be bypassed if a valid diagnosis exists
         # but was not made by an authorized prescriber.
         diag = EligibilityDiagnosisMadeBySiaeFactory(job_seeker=user)
-        assert user.approval_can_be_renewed_by(
+        assert user.new_approval_blocked_by_waiting_period(
             siae=CompanyFactory(kind=CompanyKind.ETTI),
             sender_prescriber_organization=None,
         )
