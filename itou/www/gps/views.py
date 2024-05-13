@@ -51,8 +51,17 @@ def join_group(request, template_name="gps/join_group.html"):
 
         if not group:
             group = FollowUpGroup.objects.create(beneficiary=user)
+            group.save()
 
-        group.members.add(request.user, through_defaults={"creator": request.user, "is_referent": is_referent})
+        membership = (
+            FollowUpGroupMembership.objects.filter(member=request.user).filter(follow_up_group__id=group.id).first()
+        )
+
+        if not membership:
+            group.members.add(request.user, through_defaults={"creator": request.user, "is_referent": is_referent})
+        else:
+            membership.is_active = True
+            membership.save()
 
         return HttpResponseRedirect(my_groups_url)
 
@@ -70,12 +79,13 @@ def join_group(request, template_name="gps/join_group.html"):
 @settings_protected_view("GPS_ENABLED")
 @user_passes_test(lambda u: not u.is_job_seeker, login_url=reverse_lazy("dashboard:index"), redirect_field_name=None)
 def leave_group(request, group_id):
+    membership = (
+        FollowUpGroupMembership.objects.filter(member=request.user).filter(follow_up_group__id=group_id).first()
+    )
 
-    follow_up_group = FollowUpGroup.objects.filter(members=request.user).filter(id=group_id).first()
-
-    # For the POC, remove the membership entry. We may consider setting is_active to false instead:
-    if follow_up_group:
-        follow_up_group.members.remove(request.user)
+    if membership:
+        membership.is_active = False
+        membership.save()
 
     return HttpResponseRedirect(reverse("gps:my_groups"))
 
@@ -84,7 +94,6 @@ def leave_group(request, group_id):
 @settings_protected_view("GPS_ENABLED")
 @user_passes_test(lambda u: not u.is_job_seeker, login_url=reverse_lazy("dashboard:index"), redirect_field_name=None)
 def toggle_referent(request, group_id):
-
     membership = (
         FollowUpGroupMembership.objects.filter(member=request.user).filter(follow_up_group__id=group_id).first()
     )
