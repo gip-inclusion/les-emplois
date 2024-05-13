@@ -61,7 +61,6 @@ def join_group(request, template_name="gps/join_group.html"):
             group.members.add(request.user, through_defaults={"creator": request.user, "is_referent": is_referent})
         else:
             membership.is_active = True
-            membership.is_referent = is_referent
             membership.save()
 
         return HttpResponseRedirect(my_groups_url)
