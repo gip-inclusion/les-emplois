@@ -1,5 +1,3 @@
-import re
-import string
 import time
 import uuid
 from collections import Counter
@@ -8,13 +6,13 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.postgres.fields import CIEmailField
 from django.contrib.postgres.indexes import OpClass
-from django.contrib.postgres.search import SearchQuery, SearchVector
+from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinLengthValidator
 from django.db import models
-from django.db.models import Count, Q
-from django.db.models.functions import Upper
+from django.db.models import CharField, Count, Q, Value
+from django.db.models.functions import Concat, Upper
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
@@ -48,18 +46,16 @@ class ApprovalAlreadyExistsError(Exception):
 class ItouUserManager(UserManager):
     def autocomplete(self, search_string, limit=10, kind=UserKind.JOB_SEEKER, current_user=None):
         """
-        A `search_string` equals to `foo bar` will match all results beginning with `foo` and `bar`.
-        This is achieved via `to_tsquery` and prefix matching:
-        https://www.postgresql.org/docs/11/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
+        We started by using to_vector queries but it's not suitable for searching names because
+        it tries to lemmatize names so for example, henry becomes henri after lemmatization and
+        the search doesn't work
         """
-        # Keep only words since `to_tsquery` only takes tokens as input.
-        words = re.sub(f"[{string.punctuation}]", " ", search_string).split()
-        words = [word + ":*" for word in words]
-        tsquery = " & ".join(words)
 
         queryset = (
-            self.annotate(search=SearchVector("first_name", "last_name"))
-            .filter(search=SearchQuery(tsquery, config="french_unaccent", search_type="raw"))
+            self.annotate(search=Concat("first_name", Value(" "), "last_name", output_field=CharField()))
+            .annotate(similarity=TrigramSimilarity("search", search_string))
+            .filter(similarity__gt=0.1)
+            .order_by("-similarity")
             .filter(kind=kind)
         )
 
