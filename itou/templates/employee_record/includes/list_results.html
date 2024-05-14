@@ -44,5 +44,7 @@
 </div>
 {% if request.htmx %}
     {% include "employee_record/includes/list_status_help.html" with request=request status=form.status.value only %}
-    {% include "employee_record/includes/list_form_fields.html" %}
+    {% include "employee_record/includes/list_counter.html" %}
+    {% include "employee_record/includes/employee_record_filters/status.html" %}
+    {% include "employee_record/includes/employee_record_filters/reset.html" %}
 {% endif %}

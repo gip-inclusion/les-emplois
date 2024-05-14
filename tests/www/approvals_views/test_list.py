@@ -116,14 +116,14 @@ class TestApprovalsListView:
             (approval_same_company.user_id, "Seb Tambre"),
         ]
 
-        url = f"{reverse('approvals:list')}?users={approval.user_id}&expiry=0"
+        url = f"{reverse('approvals:list')}?users={approval.user_id}&expiry="
         response = client.get(url)
         assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
         assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_same_company.pk}))
         assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_company.pk}))
 
-        url = f"{reverse('approvals:list')}?users={approval.user_id}&users={approval_same_company.user_id}&expiry=0"
+        url = f"{reverse('approvals:list')}?users={approval.user_id}&users={approval_same_company.user_id}&expiry="
         response = client.get(url)
         assertContains(response, "2 résultats")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
@@ -177,27 +177,28 @@ class TestApprovalsListView:
         client.force_login(employer)
         list_url = reverse("approvals:list")
 
-        url = f"{list_url}?status_valid=on&expiry=0"
+        url = f"{list_url}?status_valid=on&expiry="
         response = client.get(url)
+        print(response.content.decode())
         assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": valid_approval.pk}))
 
-        url = f"{list_url}?status_suspended=on&expiry=0"
+        url = f"{list_url}?status_suspended=on&expiry="
         response = client.get(url)
         assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": suspended_approval.pk}))
 
-        url = f"{list_url}?status_future=on&expiry=0"
+        url = f"{list_url}?status_future=on&expiry="
         response = client.get(url)
         assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": future_approval.pk}))
 
-        url = f"{list_url}?status_expired=on&expiry=0"
+        url = f"{list_url}?status_expired=on&expiry="
         response = client.get(url)
         assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": expired_approval.pk}))
 
-        url = f"{list_url}?status_expired=on&status_suspended=on&status_future=on&status_valid=on&expiry=0"
+        url = f"{list_url}?status_expired=on&status_suspended=on&status_future=on&status_valid=on&expiry="
         response = client.get(url)
         assertContains(response, "4 résultats")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": valid_approval.pk}))
@@ -319,12 +320,12 @@ class TestApprovalsListView:
         list_url = reverse("approvals:list")
         response = client.get(list_url)
         # Check that the default "Fin du parcours en IAE" value "Tous" is selected
-        expiry_all_input = parse_response_to_soup(response, "input[name='expiry'][value='0']")
-        assert expiry_all_input.get("checked")
+        expiry_all_input = parse_response_to_soup(response, "input[name='expiry'][value='']")
+        assert expiry_all_input.has_attr("checked")
         response = client.get(f"{list_url}?page=2")
         # Check that the default "Fin du parcours en IAE" value "Tous" is selected
-        expiry_all_input = parse_response_to_soup(response, "input[name='expiry'][value='0']")
-        assert expiry_all_input.get("checked")
+        expiry_all_input = parse_response_to_soup(response, "input[name='expiry'][value='']")
+        assert expiry_all_input.has_attr("checked")
 
     def test_update_with_htmx(self, client):
         now = timezone.localdate()
@@ -357,7 +358,7 @@ class TestApprovalsListView:
         [less_than_3_months] = simulated_page.find_all("input", attrs={"name": "expiry", "value": "3"})
         del less_than_3_months["checked"]
         [less_than_1_month] = simulated_page.find_all("input", attrs={"name": "expiry", "value": "1"})
-        less_than_1_month["checked"] = "checked"
+        less_than_1_month["checked"] = ""
 
         response = client.get(url, {"expiry": "1"}, headers={"HX-Request": "true"})
         update_page_with_htmx(simulated_page, f"form[hx-get='{url}']", response)
