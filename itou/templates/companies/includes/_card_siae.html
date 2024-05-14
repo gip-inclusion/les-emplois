@@ -52,19 +52,17 @@
         </div>
     </div>
     {% if siae.active_job_descriptions %}
-        <div class="d-none matomo-PostulerEmployeurAvecMetier">
-            <hr class="m-0">
-            <div class="c-box--results__body">
-                <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
-                    <p class="mb-3 mb-md-0">Cette structure vous intéresse ?</p>
-                    <a class="btn btn-ico btn-primary"
-                       href="{% url 'apply:start' company_pk=siae.pk %}"
-                       {% matomo_event "candidature" "clic" "start_application" %}
-                       aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
-                        <i class="ri ri-draft-line" aria-hidden="true"></i>
-                        <span>Postuler</span>
-                    </a>
-                </div>
+        <hr class="m-0">
+        <div class="c-box--results__body">
+            <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center">
+                <p class="mb-3 mb-md-0">Cette structure vous intéresse ?</p>
+                <a class="btn btn-ico btn-primary"
+                   href="{% url 'apply:start' company_pk=siae.pk %}"
+                   {% matomo_event "candidature" "clic" "start_application" %}
+                   aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
+                    <i class="ri ri-draft-line" aria-hidden="true"></i>
+                    <span>Postuler</span>
+                </a>
             </div>
         </div>
     {% endif %}

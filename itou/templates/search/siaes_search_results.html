@@ -44,33 +44,4 @@
 {% block script %}
     {{ block.super }}
     <script src='{% static "js/htmx_compat.js" %}'></script>
-    {# A / B testing: apply to company with job descriptions #}
-    <script nonce="{{ CSP_NONCE }}">
-        var _paq = _paq || [];
-        _paq.push(['AbTesting::create', {
-            name: 'PostulerEmployeurAvecMetier',
-            percentage: 100,
-            includedTargets: [{
-                "attribute": "path",
-                "inverted": "0",
-                "type": "starts_with",
-                "value": "\/search\/employers\/results"
-            }],
-            excludedTargets: [],
-            variations: [{
-                name: 'original',
-                activate: function() {}
-            }, {
-                name: 'apply-employer',
-                percentage: 50,
-                activate: function() {
-                    document.getElementsByClassName("matomo-PostulerEmployeurAvecMetier")
-                        .forEach((elt) => {
-                            elt.classList.remove("d-none")
-                        });
-                }
-            }],
-            trigger: () => document.getElementsByClassName("matomo-PostulerEmployeurAvecMetier").length,
-        }]);
-    </script>
 {% endblock %}
