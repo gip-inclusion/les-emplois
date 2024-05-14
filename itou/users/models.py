@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.contrib.postgres.fields import CIEmailField
 from django.contrib.postgres.indexes import OpClass
-from django.contrib.postgres.search import TrigramSimilarity
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinLengthValidator
@@ -48,14 +47,14 @@ class ItouUserManager(UserManager):
         """
         We started by using to_vector queries but it's not suitable for searching names because
         it tries to lemmatize names so for example, henry becomes henri after lemmatization and
-        the search doesn't work
+        the search doesn't work.
+        Then we tried TrigramSimilarity methods but it's too random for accurate searching.
+        Fallback to unaccent / icontains for now
         """
 
         queryset = (
             self.annotate(search=Concat("first_name", Value(" "), "last_name", output_field=CharField()))
-            .annotate(similarity=TrigramSimilarity("search", search_string))
-            .filter(similarity__gt=0.1)
-            .order_by("-similarity")
+            .filter(search__unaccent__icontains=search_string)
             .filter(kind=kind)
         )
 
