@@ -3,7 +3,9 @@
 {% load django_bootstrap5 %}
 {% load static %}
 
-{% block title %}Auto-prescriptions à justifier pour {{ job_seeker.get_full_name }}{% endblock %}
+{% block title %}
+    Auto-prescriptions à justifier pour {{ evaluated_job_application.job_application.job_seeker.get_full_name }}
+{% endblock %}
 
 {% block content %}
     <section class="s-section">
@@ -12,7 +14,7 @@
                 <div class="col-12 col-md-8">
                     <div class="card">
                         <div class="card-header">
-                            {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=job_seeker approval=approval state=state %}
+                            {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with evaluated_job_application=evaluated_job_application %}
                         </div>
                         <div class="card-body">
                             <div class="row mt-3">

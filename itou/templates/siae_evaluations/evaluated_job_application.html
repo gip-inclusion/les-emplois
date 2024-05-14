@@ -27,7 +27,7 @@
                     <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                         <div class="c-box--results__header">
                             {% if request.user.is_employer %}
-                                {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=evaluated_job_application.job_application.job_seeker approval=evaluated_job_application.job_application.approval state=evaluated_job_application.compute_state reviewed_at=evaluated_job_application.evaluated_siae.reviewed_at %}
+                                {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with evaluated_job_application=evaluated_job_application %}
                             {% else %}
                                 {% include "siae_evaluations/includes/job_seeker_infos_for_institution.html" with job_seeker=evaluated_job_application.job_application.job_seeker approval=evaluated_job_application.job_application.approval state=evaluated_job_application.compute_state %}
                             {% endif %}

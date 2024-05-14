@@ -617,8 +617,6 @@ class SiaeSelectCriteriaViewTest(TestCase):
 
         assert response.status_code == 200
 
-        assert evaluated_job_application.job_application.job_seeker == response.context["job_seeker"]
-        assert evaluated_job_application.job_application.approval == response.context["approval"]
         assert (
             reverse(
                 "siae_evaluations_views:siae_job_applications_list",
@@ -627,7 +625,6 @@ class SiaeSelectCriteriaViewTest(TestCase):
             + f"#{evaluated_job_application.pk}"
             == response.context["back_url"]
         )
-        assert evaluated_job_application.compute_state() == response.context["state"]
         assert evaluated_siae.siae.kind == response.context["kind"]
 
     @pytest.mark.ignore_unknown_variable_template_error("reviewed_at")
