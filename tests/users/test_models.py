@@ -1328,37 +1328,23 @@ def test_is_prescriber_with_authorized_org(user_active, membership_active, organ
     )
 
 
-def test_prescriber_organizations():
-    prescriber = PrescriberFactory()
-    PrescriberMembershipFactory(is_active=True, is_admin=False, user=prescriber)
-    admin_membership = PrescriberMembershipFactory(is_active=True, is_admin=True, user=prescriber)
-    PrescriberMembershipFactory(is_active=True, is_admin=False, user=prescriber)
+@pytest.mark.parametrize(
+    "UserFactory,MembershipFactory,relation_name",
+    [
+        (EmployerFactory, CompanyMembershipFactory, "company"),
+        (LaborInspectorFactory, InstitutionMembershipFactory, "institution"),
+        (PrescriberFactory, PrescriberMembershipFactory, "organization"),
+    ],
+)
+def test_employer_organizations(UserFactory, MembershipFactory, relation_name):
+    user = UserFactory()
+    first_membership = MembershipFactory(is_active=True, is_admin=False, user=user)
+    admin_membership = MembershipFactory(is_active=True, is_admin=True, user=user)
+    MembershipFactory(is_active=True, is_admin=False, user=user)
 
-    assert len(prescriber.organizations) == 3
-
-    # The organization we are admin of should come first
-    assert prescriber.organizations[0] == admin_membership.organization
-
-
-def test_employer_organizations():
-    employer = EmployerFactory()
-    CompanyMembershipFactory(is_active=True, is_admin=False, user=employer)
-    admin_membership = CompanyMembershipFactory(is_active=True, is_admin=True, user=employer)
-    CompanyMembershipFactory(is_active=True, is_admin=False, user=employer)
-
-    assert len(employer.organizations) == 3
+    assert len(user.organizations) == 3
 
     # The organization we are admin of should come first
-    assert employer.organizations[0] == admin_membership.company
-
-
-def test_labor_inspector_organizations():
-    labor_inspector = LaborInspectorFactory()
-    InstitutionMembershipFactory(is_active=True, is_admin=False, user=labor_inspector)
-    admin_membership = InstitutionMembershipFactory(is_active=True, is_admin=True, user=labor_inspector)
-    InstitutionMembershipFactory(is_active=True, is_admin=False, user=labor_inspector)
-
-    assert len(labor_inspector.organizations) == 3
-
-    # The organization we are admin of should come first
-    assert labor_inspector.organizations[0] == admin_membership.institution
+    assert user.organizations[0] == getattr(admin_membership, relation_name)
+    # Then it's ordered by membership creation date.
+    assert user.organizations[1] == getattr(first_membership, relation_name)
