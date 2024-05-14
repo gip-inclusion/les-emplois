@@ -3,7 +3,7 @@
 {# navigation : anchor to scroll to a specific card when returning to this page #}
 <div class="c-box c-box--results has-links-inside my-3 my-md-4" id="{{ item.pk }}">
     <div class="c-box--results__header">
-        {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with job_seeker=item.job_application.job_seeker approval=item.job_application.approval state=item.compute_state_for_siae reviewed_at=item.evaluated_siae.reviewed_at %}
+        {% include "siae_evaluations/includes/job_seeker_infos_for_siae.html" with evaluated_job_application=item %}
     </div>
     <hr class="m-0">
     {% if item.evaluated_siae.reviewed_at or item.evaluated_administrative_criteria.all %}

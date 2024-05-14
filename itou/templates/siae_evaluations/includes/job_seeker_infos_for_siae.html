@@ -4,43 +4,46 @@
     <div class="c-box--results__summary flex-grow-1">
         <i class="ri-pass-valid-line" aria-hidden="true"></i>
         <div>
-            <h3>PASS IAE {{ approval.number|format_approval_number }} délivré le {{ approval.start_at|date:"d E Y" }}</h3>
-            <span>{{ job_seeker.get_full_name }}</span>
+            <h3>
+                PASS IAE {{ evaluated_job_application.job_application.approval.number|format_approval_number }} délivré le {{ evaluated_job_application.job_application.approval.start_at|date:"d E Y" }}
+            </h3>
+            <span>{{ evaluated_job_application.job_application.job_seeker.get_full_name }}</span>
         </div>
     </div>
     <div>
-        {% if state == "REFUSED_2" %}
-            <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>
-        {% elif final_reviewed_at %}
-            {% if state == "ACCEPTED" or state == "SUBMITTED" %}
-                <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span>
+        {% with state=evaluated_job_application.compute_state_for_siae %}
+            {% if evaluated_job_application.evaluated_siae.evaluation_campaign.ended_at %}
+                {% if state == "ACCEPTED" or state == "SUBMITTED" %}
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span>
+                {% else %}
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>
+                {% endif %}
+            {% elif evaluated_job_application.evaluated_siae.reviewed_at %}
+                {% if state == "ACCEPTED" %}
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span>
+                {% elif state == "UPLOADED" %}
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Justificatifs téléversés</span>
+                {% elif state == "SUBMITTED" %}
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Transmis</span>
+                {% elif state == "REFUSED" or state == "REFUSED_2" %}
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>
+                {% elif state == "PROCESSING" %}
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">À traiter</span>
+                {% elif state == "PENDING" %}
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Nouveaux justificatifs à traiter</span>
+                {% endif %}
             {% else %}
-                <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>
+                {% if state == "PENDING" %}
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">À traiter</span>
+                {% elif state == "PROCESSING" %}
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">En cours</span>
+                {% elif state == "UPLOADED" %}
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Justificatifs téléversés</span>
+                {% elif state == "SUBMITTED" or state == "REFUSED" or state == "ACCEPTED" %}
+                    <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Transmis</span>
+                {% endif %}
+                {# We should never have a REFUSED_2 here because it only exist in phase 3 which happens when we add a reviewed_at on the valuated_siae #}
             {% endif %}
-        {% elif reviewed_at %}
-            {% if state == "ACCEPTED" %}
-                <span class="badge badge-sm rounded-pill text-nowrap bg-success text-white">Validé</span>
-            {% elif state == "UPLOADED" %}
-                <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Justificatifs téléversés</span>
-            {% elif state == "SUBMITTED" %}
-                <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Transmis</span>
-            {% elif state == "REFUSED" %}
-                <span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>
-            {% elif state == "PROCESSING" %}
-                <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">À traiter</span>
-            {% else %}
-                <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Nouveaux justificatifs à traiter</span>
-            {% endif %}
-        {% else %}
-            {% if state == "PENDING" %}
-                <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">À traiter</span>
-            {% elif state == "PROCESSING" %}
-                <span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">En cours</span>
-            {% elif state == "UPLOADED" %}
-                <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">Justificatifs téléversés</span>
-            {% elif state == "SUBMITTED" or state == "REFUSED" or state == "ACCEPTED" %}
-                <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Transmis</span>
-            {% endif %}
-        {% endif %}
+        {% endwith %}
     </div>
 </div>
