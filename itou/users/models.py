@@ -36,6 +36,9 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.enums import CompanyKind
+from itou.companies.models import Company
+from itou.institutions.models import Institution
+from itou.prescribers.models import PrescriberOrganization
 from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
@@ -772,30 +775,19 @@ class User(AbstractUser, AddressMixin):
         """
 
         if self.is_employer:
-            memberships = self.companymembership_set.filter(is_active=True).order_by("-is_admin", "created_at")
-            through_field = "company"
+            org_model = Company
 
         elif self.is_prescriber:
-            memberships = (
-                self.prescribermembership_set.filter(is_active=True)
-                .order_by("-is_admin", "created_at")
-                .select_related("organization")
-            )
-            through_field = "organization"
+            org_model = PrescriberOrganization
 
         elif self.is_labor_inspector:
-            memberships = (
-                self.institutionmembership_set.filter(is_active=True)
-                .order_by("-is_admin", "created_at")
-                .select_related("institution")
-            )
+            org_model = Institution
 
-            through_field = "institution"
-
-        organizations = []
-        for membership in memberships:
-            org = getattr(membership, through_field)
-            organizations.append(org)
+        membership_name = org_model.members.through.user.field.remote_field.name
+        qs_filters = {f"{membership_name}__user": self, f"{membership_name}__is_active": True}
+        organizations = org_model.objects.filter(**qs_filters).order_by(
+            f"-{membership_name}__is_admin", f"{membership_name}__created_at"
+        )
 
         return organizations
 
