@@ -19,7 +19,7 @@ def pluralizefr(value, arg="s"):
     NB : the basic django pluralize filter returns the plural suffix for value==0
     """
     try:
-        return arg if float(value) > 1 else ""
+        return arg if abs(float(value)) > 1 else ""
     except ValueError:  # Invalid string that's not a number.
         pass
     except TypeError:  # Value isn't a string or a number; maybe it's a list?

@@ -44,16 +44,12 @@
             </li>
 
             <li>
-                <small>
-                    Durée de validité
-                    <i class="ri-information-line text-info"
-                       data-bs-toggle="tooltip"
-                       title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
+                <small>Heure{{ approval.remainder|pluralizefr }} restante{{ approval.remainder|pluralizefr }}</small>
                 <strong class="text-success">
                     {% if approval.is_valid %}
-                        {{ approval.remainder.days }} jour{{ approval.remainder.days|pluralizefr }}
+                        {{ approval.remainder|floatformat:"-2g" }} heure{{ approval.remainder|pluralizefr }}
                     {% else %}
-                        0 jour
+                        0 heure
                     {% endif %}
                 </strong>
 

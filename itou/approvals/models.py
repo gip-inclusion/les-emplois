@@ -133,20 +133,18 @@ class CommonApprovalMixin(models.Model):
             datetime.timedelta(0),
         ) - max(obj.start_at - timezone.localdate(), datetime.timedelta(0))
 
-    @cached_property
+    @property
     def remainder(self):
         """
         Return the remaining time of an Approval, we don't count future suspended periods.
         """
-        result = self._get_obj_remainder(self)
-
-        if hasattr(self, "suspension_set"):
-            # PoleEmploiApprovals don't have suspensions
-            result -= sum(
-                (self._get_obj_remainder(suspension) for suspension in self.suspension_set.all()),
-                datetime.timedelta(0),
-            )
-        return result
+        BASE = 2496.00  # 24 * 52 * 2
+        if not self.user.dsnactivity_set.all():
+            print("Return BASE", BASE)
+            return BASE
+        used = sum(activity.count for activity in self.user.dsnactivity_set.all())
+        print("Return COMPUTED", BASE - used)
+        return float(BASE - used)
 
     @property
     def remainder_as_date(self):
@@ -154,11 +152,23 @@ class CommonApprovalMixin(models.Model):
         Return an estimated end date if this approval was "activated" today:
         prolongations are taken into account but not suspensions as an approval can be unsuspended.
         """
-        return timezone.localdate() + relativedelta(
-            days=self.remainder.days
-            # end_at is inclusive.
-            - 1,
-        )
+        # 24 hours by work-week to calendar week
+        return timezone.localdate() + datetime.timedelta(days=self.remainder / 24 * 7)
+
+    def activity_credit(self):
+        return 2496.00
+
+    def activity_total(self):
+        return float(sum(activity.count for activity in self.user.dsnactivity_set.all()))
+
+    def activity_saved(self):
+        return float((self.user.pk % 5) * 24)
+
+    def activity_by_siae(self, siae):
+        return float(sum(activity.count for activity in self.user.dsnactivity_set.all() if activity.company == siae))
+
+    def activity_by_other(self, siae):
+        return float(sum(activity.count for activity in self.user.dsnactivity_set.all() if activity.company != siae))
 
     @property
     def is_suspended(self):
@@ -1995,3 +2005,12 @@ class OriginalPoleEmploiApproval(CommonApprovalMixin):
                 name="merged_pe_id_and_birthdate_idx",
             )
         ]
+
+
+class DSNActivity(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    company = models.ForeignKey("companies.Company", on_delete=models.CASCADE)
+    count = models.FloatField()
+
+    class Meta:
+        unique_together = ["user", "company"]

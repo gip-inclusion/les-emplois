@@ -21,15 +21,7 @@
                         {# Approval actions. #}
                         {% if approval and request.user.is_employer %}
                             <div class="row justify-content-end g-3">
-                                {% if approval_can_be_suspended_by_siae %}
-                                    <div class="col-12 col-lg-auto">
-                                        <a href="{% url 'approvals:suspend' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                           class="btn btn-block btn-outline-primary"
-                                           aria-label="Suspendre le PASS IAE de {{ approval.user.get_full_name }}">
-                                            Suspendre
-                                        </a>
-                                    </div>
-                                {% elif hire_by_other_siae %}
+                                {% if hire_by_other_siae %}
                                     <div class="col-12 col-lg-auto">
                                         <div class="btn btn-ico">
                                             <span class="disabled">Suspendre</span>

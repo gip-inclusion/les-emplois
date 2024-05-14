@@ -1,0 +1,38 @@
+[
+  {
+    "fields": {
+      "company": 3850,
+      "count": 0.70,
+      "user": 18
+    },
+    "model": "approvals.dsnactivity",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "company": 3853,
+      "count": 73.67,
+      "user": 18
+    },
+    "model": "approvals.dsnactivity",
+    "pk": 2
+  },
+  {
+    "fields": {
+      "company": 3850,
+      "count": 624,
+      "user": 19
+    },
+    "model": "approvals.dsnactivity",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "company": 3853,
+      "count": 676.02,
+      "user": 19
+    },
+    "model": "approvals.dsnactivity",
+    "pk": 4
+  }
+]

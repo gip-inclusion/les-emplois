@@ -52,27 +52,89 @@ Arguments:
 
     {% if common_approval.is_valid %}
         <p class="mb-1">Date de début : {{ common_approval.start_at|date:"d/m/Y" }}</p>
-        <ul class="list-unstyled">
-            <li class="h4 mt-4 mb-2">
-                Nombre de jours restants sur le PASS IAE : {{ common_approval.remainder.days }} jour{{ common_approval.remainder.days|pluralizefr }}
-                <i class="ri-information-line ri-xl text-info"
-                   data-bs-toggle="tooltip"
-                   title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>
-            </li>
-
-            {% if hiring_pending and user.is_employer %}
+        <p class="mb-3">Date de fin initiale : {{ common_approval.end_at|date:"d/m/Y" }}</p>
+        {# Solde #}
+        <div class="col-8 d-flex mb-1 mt-1">
+            <div class="flex-grow-1 h3 font-weight-bold mb-0">Solde d'heures restants :</div>
+            <div>{{ common_approval.remainder|floatformat:"-2g" }}</div>
+        </div>
+        <div class="col-8 d-flex mb-3">
+            <div class="flex-grow-1 h3 font-weight-bold mb-0">Date de fin prévisionnelle :</div>
+            <div>
+                {{ common_approval.remainder_as_date|date:"d/m/Y" }}
+                <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" title="Cette date de fin est susceptible d'évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i>
+            </div>
+        </div>
+        {# Initial #}
+        <a class="mt-1 mb-0 col-8 h6 d-flex justify-content-between text-primary font-weight-medium text-decoration-none has-collapse-caret"
+           data-bs-toggle="collapse"
+           href="#collapseActivityCredit"
+           role="button"
+           aria-expanded="false"
+           aria-controls="collapseActivityCredit">
+            <div class="flex-grow-1">Nombre d'heures initiales :</div>
+            <div>{{ common_approval.activity_credit|floatformat:"-2g" }}</div>
+        </a>
+        <div class="collapse col-8" id="collapseActivityCredit">
+            <ul class="list-unstyled">
                 <li>
-                    PASS IAE valide jusqu’au {{ common_approval.remainder_as_date|date:"d/m/Y" }}, si le contrat démarre aujourd’hui.
+                    <div class="d-flex">
+                        <div class="flex-grow-1">Délivrance du PASS IAE</div>
+                        <div>{{ '2496.0'|floatformat:"-2g" }}</div>
+                    </div>
                 </li>
-            {% endif %}
-
-            {% if not hiring_pending %}
-                <li class="pb-2">
-                    Date de fin prévisionnelle : {{ common_approval.end_at|date:"d/m/Y" }}
-                    <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" title="Cette date de fin est susceptible d'évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i>
+            </ul>
+        </div>
+        {# Used #}
+        <a class="mt-1 mb-0 col-8 h6 d-flex justify-content-between text-emploi font-weight-normal text-decoration-none has-collapse-caret"
+           data-bs-toggle="collapse"
+           href="#collapseActivityTotal"
+           role="button"
+           aria-expanded="false"
+           aria-controls="collapseActivityTotal">
+            <div class="flex-grow-1">Nombre d'heures déduites :</div>
+            <div>{{ common_approval.activity_total|floatformat:"-2g" }}</div>
+        </a>
+        <div class="collapse col-8 text-emploi" id="collapseActivityTotal">
+            {% call_method common_approval 'activity_by_siae' request.current_organization as activity_by_siae %}
+            {% call_method common_approval 'activity_by_other' request.current_organization as activity_by_other %}
+            <ul class="list-unstyled">
+                <li>
+                    <div class="d-flex">
+                        <div class="flex-grow-1">Votre entreprise</div>
+                        <div>{{ activity_by_siae|floatformat:"-2g" }}</div>
+                    </div>
                 </li>
-            {% endif %}
-        </ul>
+                <li>
+                    <div class="d-flex">
+                        <div class="flex-grow-1">Autres entreprises</div>
+                        <div>{{ activity_by_other|floatformat:"-2g" }}</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        {# Saved #}
+        <a class="mt-1 mb-0 col-8 h6 d-flex justify-content-between text-muted font-weight-normal text-decoration-none has-collapse-caret"
+           data-bs-toggle="collapse"
+           href="#collapseActivitySaved"
+           role="button"
+           aria-expanded="false"
+           aria-controls="collapseActivitySaved">
+            <div class="flex-grow-1">Nombre d'heures non décomptabilisées :</div>
+            <div>{{ common_approval.activity_saved|floatformat:"-2g" }}</div>
+        </a>
+        <div class="collapse col-8 text-muted" id="collapseActivitySaved">
+            <ul class="list-unstyled">
+                <li>
+                    <div class="d-flex">
+                        <div class="flex-grow-1">Arrêt maladie</div>
+                        <div>{{ common_approval.activity_saved|floatformat:"-2g" }}</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <div class="small text-muted">Actualisé le 15/05/2024 avec les données du 01/07/2023</div>
+        <hr>
     {% elif common_approval.is_in_waiting_period %}
         {% if user.is_employer and common_approval.user.has_valid_diagnosis %}
             {% comment %}
