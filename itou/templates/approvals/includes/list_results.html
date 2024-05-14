@@ -1,18 +1,7 @@
 {% load str_filters %}
+{% load django_bootstrap5 %}
+
 <div id="approvals-list">
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
-        <h3 class="h4 mb-0">
-            {% with paginator.count as counter %}<strong>{{ counter }} résultat{{ counter|pluralizefr }}</strong>{% endwith %}
-        </h3>
-        {% if filters_counter > 0 %}
-            <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les filtres de PASS IAE">
-                <a href="{% url 'approvals:list' %}" class="btn btn-secondary btn-ico">
-                    <i class="ri-arrow-go-back-line" aria-hidden="true"></i>
-                    <span>Réinitialiser les filtres ({{ filters_counter }})</span>
-                </a>
-            </div>
-        {% endif %}
-    </div>
     {% if not approval_list %}
         <div class="c-box c-box--results my-3 my-md-4">
             <div class="c-box--results__body">
@@ -26,3 +15,8 @@
         {% include "includes/pagination.html" with page=page_obj boost=True boost_target="#approvals-list" boost_indicator="#approvals-list" %}
     {% endif %}
 </div>
+
+{% if request.htmx %}
+    {% include "approvals/includes/list_counter.html" %}
+    {% include "approvals/includes/list_reset_filters.html" %}
+{% endif %}

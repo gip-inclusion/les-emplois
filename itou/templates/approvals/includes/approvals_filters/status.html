@@ -1,11 +1,13 @@
 {% load django_bootstrap5 %}
 
-<fieldset>
-    <legend>Statut du PASS IAE</legend>
-    <ul class="list-unstyled">
-        <li>{% bootstrap_field filters_form.status_valid wrapper_class="" %}</li>
-        <li>{% bootstrap_field filters_form.status_suspended wrapper_class="" %}</li>
-        <li>{% bootstrap_field filters_form.status_future wrapper_class="" %}</li>
-        <li>{% bootstrap_field filters_form.status_expired wrapper_class="" %}</li>
+<div class="dropdown">
+    <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+        Statut
+    </button>
+    <ul class="dropdown-menu">
+        <li>{% bootstrap_field filters_form.status_valid wrapper_class="dropdown-item" %}</li>
+        <li>{% bootstrap_field filters_form.status_suspended wrapper_class="dropdown-item" %}</li>
+        <li>{% bootstrap_field filters_form.status_future wrapper_class="dropdown-item" %}</li>
+        <li>{% bootstrap_field filters_form.status_expired wrapper_class="dropdown-item" %}</li>
     </ul>
-</fieldset>
+</div>

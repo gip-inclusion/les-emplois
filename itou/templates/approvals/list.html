@@ -14,29 +14,30 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="s-section__row row">
-                <div class="col-12 col-md-4 mb-3 mb-md-5">
-                    <aside class="c-aside-filters">
-                        <button class="c-aside-filters__btn__collapse" data-bs-toggle="collapse" data-bs-target="#asideFiltersCollapse" aria-expanded="true" aria-controls="asideFiltersCollapse">
-                            <i class="ri-filter-line" aria-hidden="true"></i>
-                            <span>Filtrer les résultats</span>
-                        </button>
-                        <div class="c-aside-filters__card collapse show" id="asideFiltersCollapse">
-                            <form hx-get="{% url 'approvals:list' %}" hx-trigger="change delay:.5s" hx-indicator="#approvals-list" hx-target="#approvals-list" hx-swap="outerHTML" hx-push-url="true">
-                                <div class="c-aside-filters__card__body">
-                                    {% include "approvals/includes/approvals_filters/users.html" %}
-                                    <hr>
-                                    {% include "approvals/includes/approvals_filters/status.html" %}
-                                    <hr>
-                                    <fieldset>
-                                        <legend>Fin du parcours en IAE</legend>
-                                        {% bootstrap_field filters_form.expiry layout="inline" %}
-                                    </fieldset>
-                                </div>
-                            </form>
+                <div class="col-12">
+                    <form hx-get="{% url 'approvals:list' %}"
+                          hx-trigger="change delay:.5s, change from:#id_users"
+                          hx-indicator="#approvals-list"
+                          hx-target="#approvals-list"
+                          hx-swap="outerHTML"
+                          hx-push-url="true"
+                          hx-include="#id_users">
+                        <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+                            {% include "approvals/includes/approvals_filters/status.html" %}
+                            {% include "approvals/includes/approvals_filters/expiry.html" %}
+                            {% include "approvals/includes/list_reset_filters.html" %}
                         </div>
-                    </aside>
+                    </form>
                 </div>
-                <div class="col-12 col-md-8">{% include "approvals/includes/list_results.html" %}</div>
+            </div>
+            <div class="s-section__row row">
+                <div class="col-12">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                        {% include "approvals/includes/list_counter.html" %}
+                        <div class="flex-column flex-md-row mt-3 mt-md-0">{% bootstrap_field filters_form.users layout="inline" %}</div>
+                    </div>
+                    {% include "approvals/includes/list_results.html" %}
+                </div>
             </div>
         </div>
     </section>
@@ -45,6 +46,7 @@
 {% block script %}
     {{ block.super }}
     <script src='{% static "js/htmx_compat.js" %}'></script>
+    <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
     <!-- Needed to use the Select2MultipleWidget JS widget. -->
     {{ filters_form.media.js }}
 {% endblock %}

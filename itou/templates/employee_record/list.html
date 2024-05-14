@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load django_bootstrap5 %}
 {% load static %}
 
 {% block title %}Fiches salarié ASP - {{ request.current_organization.display_name }} {{ block.super }}{% endblock %}
@@ -69,7 +70,21 @@
                                 {{ form.order.as_hidden }}
                             </form>
                         </div>
-                    </aside>
+                        {# Filled via jQuery. Does not need reloading with HTMX, its content is static. #}
+                        {{ form.order.as_hidden }}
+                    </form>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                        {% include "employee_record/includes/list_counter.html" %}
+                        {% include "employee_record/includes/list_sort.html" %}
+                        <div class="flex-column flex-md-row mt-3 mt-md-0 ms-md-3">
+                            {% bootstrap_field filters_form.job_seekers layout="inline" %}
+                        </div>
+                    </div>
+                    {% include "employee_record/includes/list_results.html" %}
                 </div>
                 <div class="col-12 col-md-8">{% include "employee_record/includes/list_results.html" %}</div>
             </div>

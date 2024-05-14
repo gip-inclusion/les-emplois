@@ -39,7 +39,6 @@ from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX
 from itou.utils.urls import add_url_params, get_safe_url
 from itou.www.apply.forms import JobSeekerExistsForm
 from itou.www.approvals_views.forms import (
-    ApprovalExpiry,
     ApprovalForm,
     PoleEmploiApprovalSearchForm,
     ProlongationRequestDenyInformationProposedActionsForm,
@@ -175,12 +174,7 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         if self.siae:
-            form_data = self.request.GET or None
-            if form_data and "expiry" not in form_data:
-                # Use this as default to handle the case where page=XX is provided
-                # disabling the initial values of the form
-                form_data |= {"expiry": ApprovalExpiry.ALL}
-            self.form = ApprovalForm(self.siae.pk, form_data)
+            self.form = ApprovalForm(self.siae.pk, self.request.GET or None)
 
     def get_template_names(self):
         return ["approvals/includes/list_results.html" if self.request.htmx else "approvals/list.html"]

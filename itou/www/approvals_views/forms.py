@@ -39,11 +39,19 @@ class ApprovalExpiry(TextChoices):
     LESS_THAN_1_MONTH = "1", "Moins d'1 mois"
     LESS_THAN_3_MONTHS = "3", "Moins de 3 mois"
     LESS_THAN_7_MONTHS = "7", "Moins de 7 mois"
-    ALL = "0", "Tous"
+    ALL = "", "Tous"
 
 
 class ApprovalForm(forms.Form):
-    users = forms.MultipleChoiceField(required=False, label="Nom", widget=Select2MultipleWidget)
+    users = forms.MultipleChoiceField(
+        required=False,
+        label="Nom",
+        widget=Select2MultipleWidget(
+            attrs={
+                "data-placeholder": "Nom du candidat",
+            }
+        ),
+    )
     status_valid = forms.BooleanField(label="PASS IAE valide", required=False)
     status_suspended = forms.BooleanField(label="PASS IAE valide (suspendu)", required=False)
     status_future = forms.BooleanField(label="PASS IAE valide (non démarré)", required=False)
@@ -54,6 +62,7 @@ class ApprovalForm(forms.Form):
         choices=ApprovalExpiry.choices,
         widget=forms.RadioSelect,
         initial=ApprovalExpiry.ALL,
+        required=False,
     )
 
     def __init__(self, siae_pk, data, *args, **kwargs):
@@ -102,8 +111,8 @@ class ApprovalForm(forms.Form):
             status_filters_list.append(Q(end_at__lt=now))
         qs_filters_list.append(Q(reduce(operator.or_, status_filters_list, Q())))
 
-        if expiry := int(data.get("expiry")):
-            qs_filters_list.append(Q(end_at__lt=now + relativedelta(months=expiry), end_at__gte=now))
+        if expiry := data.get("expiry", ApprovalExpiry.ALL):
+            qs_filters_list.append(Q(end_at__lt=now + relativedelta(months=int(expiry)), end_at__gte=now))
 
         return qs_filters_list
 
