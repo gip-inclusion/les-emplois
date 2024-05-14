@@ -20,6 +20,7 @@ from django.utils.html import escape
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 from rest_framework.authtoken.models import Token
+from unittest_parametrize import ParametrizedTestCase, param, parametrize
 
 from itou.cities.models import City
 from itou.communications import registry as notifications_registry
@@ -77,7 +78,7 @@ DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
-class DashboardViewTest(TestCase):
+class DashboardViewTest(ParametrizedTestCase, TestCase):
     NO_PRESCRIBER_ORG_MSG = "Votre compte utilisateur n’est rattaché à aucune organisation."
     NO_PRESCRIBER_ORG_FOR_PE_MSG = (
         "Votre compte utilisateur n’est rattaché à aucune agence France Travail, "
@@ -568,7 +569,7 @@ class DashboardViewTest(TestCase):
         self.assertNotContains(response, TODO_BADGE, html=True)
 
     def test_dora_card_is_not_shown_for_job_seeker(self):
-        user = JobSeekerFactory()
+        user = JobSeekerWithAddressFactory()
         self.client.force_login(user)
 
         response = self.client.get(reverse("dashboard:index"))
@@ -595,7 +596,7 @@ class DashboardViewTest(TestCase):
         self.assertContains(response, "Suggérer un service partenaire")
 
     def test_diagoriente_info_is_shown_in_sidebar_for_job_seeker(self):
-        user = JobSeekerFactory()
+        user = JobSeekerWithAddressFactory()
         self.client.force_login(user)
 
         response = self.client.get(reverse("dashboard:index"))
@@ -663,7 +664,7 @@ class DashboardViewTest(TestCase):
         self.assertNotContains(response, self.NO_PRESCRIBER_ORG_MSG)
 
     def test_dashboard_prescriber_suspend_link(self):
-        user = JobSeekerFactory()
+        user = JobSeekerWithAddressFactory()
         self.client.force_login(user)
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, self.SUSPEND_TEXT)
@@ -699,8 +700,9 @@ class DashboardViewTest(TestCase):
     @pytest.mark.ignore_unknown_variable_template_error("hiring_pending", "job_application")
     @freeze_time("2022-09-15")
     def test_dashboard_access_by_a_jobseeker(self):
-        approval = ApprovalFactory(start_at=datetime(2022, 6, 21), end_at=datetime(2022, 12, 6))
-        self.client.force_login(approval.user)
+        user = JobSeekerWithAddressFactory()
+        approval = ApprovalFactory(user=user, start_at=datetime(2022, 6, 21), end_at=datetime(2022, 12, 6))
+        self.client.force_login(user)
         url = reverse("dashboard:index")
         response = self.client.get(url)
         self.assertContains(response, "Numéro de PASS IAE")
@@ -728,15 +730,27 @@ class DashboardViewTest(TestCase):
             f"&source={settings.ITOU_ENVIRONMENT}",
         )
 
-    def test_job_seeker_without_title_redirected(self):
-        user = JobSeekerFactory(title="")
+    @parametrize(
+        "field,data",
+        [
+            param("title", Title.M, id="title"),
+            param("first_name", "John", id="first_name"),
+            param("last_name", "Doe", id="last_name"),
+            param("address_line_1", "1 rue du bac", id="address_line_1"),
+            param("post_code", "59140", id="post_code"),
+            param("city", "Dunkerque", id="city"),
+        ],
+    )
+    def test_job_seeker_without_required_field_redirected(self, field, data):
+        empty_field = {field: ""}
+        user = JobSeekerWithAddressFactory(**empty_field)
         self.client.force_login(user)
 
         response = self.client.get(reverse("dashboard:index"))
         self.assertRedirects(response, reverse("dashboard:edit_user_info"))
 
-        user.title = Title.M
-        user.save(update_fields=("title",))
+        setattr(user, field, data)
+        user.save(update_fields=(field,))
 
         response = self.client.get(reverse("dashboard:index"))
         assert response.status_code == 200
@@ -2474,7 +2488,7 @@ def test_employer_using_django_has_to_activate_ic_account(client):
 @pytest.mark.parametrize(
     "factory,expected",
     [
-        pytest.param(JobSeekerFactory, assertNotContains, id="JobSeeker"),
+        pytest.param(JobSeekerWithAddressFactory, assertNotContains, id="JobSeeker"),
         pytest.param(partial(EmployerFactory, with_company=True), assertNotContains, id="Employer"),
         pytest.param(partial(LaborInspectorFactory, membership=True), assertNotContains, id="LaborInspector"),
         pytest.param(PrescriberFactory, assertNotContains, id="PrescriberWithoutOrganization"),

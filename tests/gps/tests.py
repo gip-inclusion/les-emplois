@@ -8,7 +8,11 @@ from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.enums import UserKind
 from itou.users.models import User
 from tests.gps.factories import FollowUpGroupFactory
-from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from tests.users.factories import (
+    JobSeekerFactory,
+    JobSeekerWithAddressFactory,
+    PrescriberFactory,
+)
 from tests.utils.test import TestCase, parse_response_to_soup
 
 
@@ -159,7 +163,7 @@ def test_navigation(snapshot, client):
 
 
 def test_access_as_jobseeker(client):
-    user = JobSeekerFactory()
+    user = JobSeekerWithAddressFactory()
     client.force_login(user)
 
     response = client.get(reverse("gps:my_groups"))
@@ -183,7 +187,7 @@ def test_access_gps_enabled(client, snapshot):
     response = client.get(reverse("dashboard:index"))
     assert str(parse_response_to_soup(response, "#gps-card")) == snapshot
 
-    user = JobSeekerFactory()
+    user = JobSeekerWithAddressFactory()
     client.force_login(user)
     response = client.get(reverse("dashboard:index"))
     assertNotContains(response, "gps-card")

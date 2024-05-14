@@ -5,7 +5,7 @@ from django.core import mail
 from django.urls import reverse
 from django.utils.http import urlencode
 
-from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
+from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, JobSeekerWithAddressFactory
 from tests.utils.test import TestCase
 
 
@@ -71,7 +71,7 @@ class PasswordChangeTest(TestCase):
         and redirects to the right place.
         """
 
-        user = JobSeekerFactory()
+        user = JobSeekerWithAddressFactory()
         self.client.force_login(user)
 
         # Change password.
