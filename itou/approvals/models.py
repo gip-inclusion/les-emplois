@@ -1186,7 +1186,7 @@ class Suspension(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.pk} {self.start_at:%d/%m/%Y} - {self.end_at:%d/%m/%Y}"
+        return f"{self.pk} {self.start_at:%d/%m/%Y} - {self.end_at:%d/%m/%Y} [{self.approval.number}]"
 
     def clean(self):
         if self.reason == self.Reason.FORCE_MAJEURE and not self.reason_explanation:
@@ -1440,7 +1440,7 @@ class CommonProlongation(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.pk} {self.start_at:%d/%m/%Y} - {self.end_at:%d/%m/%Y}"
+        return f"{self.pk} {self.start_at:%d/%m/%Y} - {self.end_at:%d/%m/%Y} [{self.approval.number}]"
 
     def clean(self):
         if not self.end_at:
