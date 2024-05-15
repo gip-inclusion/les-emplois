@@ -43,14 +43,15 @@ sont rendues disponibles par [Docker](https://docs.docker.com/) et
 
 Démarrez les dépendances de développement avec la commande :
 ```sh
+cp .env.template .env
 docker compose up
 ```
 
 **Note** : Vous pouvez personnaliser la configuration des dépendances gérées
-par Docker Compose en créant [un fichier
-`.env`](https://docs.docker.com/compose/env-file/) à partir d'une copie du
-fichier racine `.env.template`. Le fichier `.env` doit être au même niveau que
-le fichier [README.md](./README.md).
+par Docker Compose en modifiant [le fichier
+`.env`](https://docs.docker.com/compose/env-file/) que vous venez de copier
+à partir du fichier racine `.env.template`. Le fichier `.env` doit être au
+même niveau que le fichier [README.md](./README.md).
 
 ### Dépendances Python
 

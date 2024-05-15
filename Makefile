@@ -4,6 +4,13 @@
 # > practice; so for compatibility, you must explicitly request it
 .DELETE_ON_ERROR:
 
+# Load env variables from .env using dotenv
+# =============================================================================
+ifneq (,$(wildcard ./.env))
+    include .env
+    export
+endif
+
 # Global tasks.
 # =============================================================================
 PYTHON_VERSION := python3.11
@@ -64,7 +71,7 @@ fix: fast_fix
 
 # After migrate
 populate_db_with_cities:
-	psql -d $(PGDATABASE) --quiet --file itou/fixtures/postgres/cities.sql
+	psql -d $(PGURL) --quiet --file itou/fixtures/postgres/cities.sql
 
 populate_db: populate_db_with_cities
 	# Split loaddata_bulk into parts to avoid OOM errors in review apps
