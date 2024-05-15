@@ -269,7 +269,7 @@ def compute_moves(existing_filenames, extract_infos):
     files_to_extract = set()
     globs_to_extract = set()
     for name in extract_infos["files"]:
-        if isinstance(name, (tuple, list)):
+        if isinstance(name, tuple | list):
             name, new_name = name
         else:
             new_name = name

@@ -1297,7 +1297,7 @@ def test_save_erases_pe_obfuscated_nir_if_details_change():
     user.jobseeker_profile.save()
     assert user.jobseeker_profile.pe_obfuscated_nir == "XXX_1234567890123_YYY"
     assert user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
-        2022, 8, 10, 0, 0, 0, 0, tzinfo=datetime.timezone.utc
+        2022, 8, 10, 0, 0, 0, 0, tzinfo=datetime.UTC
     )
 
 

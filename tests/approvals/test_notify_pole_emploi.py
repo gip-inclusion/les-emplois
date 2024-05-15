@@ -102,7 +102,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         approval.user.jobseeker_profile.refresh_from_db()
         assert approval.user.jobseeker_profile.pe_obfuscated_nir == "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
         assert approval.user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
-            2021, 6, 21, 0, 0, 0, tzinfo=datetime.timezone.utc
+            2021, 6, 21, 0, 0, 0, tzinfo=datetime.UTC
         )
 
     @respx.mock
@@ -333,7 +333,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         approval.user.jobseeker_profile.refresh_from_db()
         assert approval.user.jobseeker_profile.pe_obfuscated_nir == "ruLuawDxNzERAFwxw6Na4V8A8UCXg6vXM_WKkx5j8UQ"
         assert approval.user.jobseeker_profile.pe_last_certification_attempt_at == datetime.datetime(
-            2021, 6, 21, 0, 0, 0, tzinfo=datetime.timezone.utc
+            2021, 6, 21, 0, 0, 0, tzinfo=datetime.UTC
         )
 
 

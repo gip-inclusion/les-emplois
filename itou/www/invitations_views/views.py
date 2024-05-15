@@ -102,10 +102,7 @@ def new_user(request, invitation_type, invitation_id):
 
         # The user exists but he should log in first.
         login_url = reverse(f"login:{invitation.USER_KIND}")
-        next_step_url = "{url}?next={redirect_to}".format(
-            url=login_url,
-            redirect_to=invitation.acceptance_url_for_existing_user,
-        )
+        next_step_url = f"{login_url}?next={invitation.acceptance_url_for_existing_user}"
         return redirect(next_step_url)
 
     # A new user should be created before joining

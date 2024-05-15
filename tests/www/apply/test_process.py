@@ -2848,7 +2848,7 @@ def test_add_prior_action_processing(client, snapshot):
         for_snapshot=True,
         to_company__kind=CompanyKind.GEIQ,
         state=job_applications_enums.JobApplicationState.PROCESSING,
-        created_at=datetime.datetime(2023, 12, 10, 10, 11, 11, tzinfo=datetime.timezone.utc),
+        created_at=datetime.datetime(2023, 12, 10, 10, 11, 11, tzinfo=datetime.UTC),
     )
     client.force_login(job_application.to_company.members.first())
     add_prior_action_url = reverse("apply:add_prior_action", kwargs={"job_application_id": job_application.pk})
@@ -2971,7 +2971,7 @@ def test_delete_prior_action(client, snapshot, with_geiq_diagnosis):
         for_snapshot=True,
         to_company__kind=CompanyKind.GEIQ,
         state=job_applications_enums.JobApplicationState.PROCESSING,
-        created_at=datetime.datetime(2023, 12, 10, 10, 11, 11, tzinfo=datetime.timezone.utc),
+        created_at=datetime.datetime(2023, 12, 10, 10, 11, 11, tzinfo=datetime.UTC),
     )
     prior_action1 = PriorActionFactory(
         job_application=job_application, action=job_applications_enums.Prequalification.AFPR

@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import factory
 import pytest
@@ -100,7 +100,7 @@ def test_stats_pe_log_visit(client, view_name):
             None,
             user.kind,
             user.pk,
-            datetime(2023, 3, 10, tzinfo=timezone.utc),
+            datetime(2023, 3, 10, tzinfo=UTC),
         ),
     )
 
@@ -136,7 +136,7 @@ def test_stats_cd_log_visit(client, settings, view_name):
             None,
             user.kind,
             user.pk,
-            datetime(2023, 3, 10, tzinfo=timezone.utc),
+            datetime(2023, 3, 10, tzinfo=UTC),
         ),
     )
 
@@ -173,7 +173,7 @@ def test_stats_siae_log_visit(client, settings, view_name):
             None,
             user.kind,
             user.pk,
-            datetime(2023, 3, 10, tzinfo=timezone.utc),
+            datetime(2023, 3, 10, tzinfo=UTC),
         ),
     )
 
@@ -212,7 +212,7 @@ def test_stats_ddets_iae_log_visit(client, settings, view_name):
             institution.pk,
             user.kind,
             user.pk,
-            datetime(2023, 3, 10, tzinfo=timezone.utc),
+            datetime(2023, 3, 10, tzinfo=UTC),
         ),
     )
 
@@ -245,7 +245,7 @@ def test_stats_ddets_log_log_visit(client, settings, view_name):
             institution.pk,
             user.kind,
             user.pk,
-            datetime(2023, 3, 10, tzinfo=timezone.utc),
+            datetime(2023, 3, 10, tzinfo=UTC),
         ),
     )
 
@@ -279,7 +279,7 @@ def test_stats_dreets_iae_log_visit(client, settings, view_name):
             institution.pk,
             user.kind,
             user.pk,
-            datetime(2023, 3, 10, tzinfo=timezone.utc),
+            datetime(2023, 3, 10, tzinfo=UTC),
         ),
     )
 
@@ -311,7 +311,7 @@ def test_stats_dgefp_log_visit(client, view_name):
             institution.pk,
             user.kind,
             user.pk,
-            datetime(2023, 3, 10, tzinfo=timezone.utc),
+            datetime(2023, 3, 10, tzinfo=UTC),
         ),
     )
 
@@ -343,7 +343,7 @@ def test_stats_dihal_log_visit(client, view_name):
             institution.pk,
             user.kind,
             user.pk,
-            datetime(2023, 3, 10, tzinfo=timezone.utc),
+            datetime(2023, 3, 10, tzinfo=UTC),
         ),
     )
 
@@ -375,7 +375,7 @@ def test_stats_drihl_log_visit(client, view_name):
             institution.pk,
             user.kind,
             user.pk,
-            datetime(2023, 3, 10, tzinfo=timezone.utc),
+            datetime(2023, 3, 10, tzinfo=UTC),
         ),
     )
 
@@ -407,7 +407,7 @@ def test_stats_iae_network_log_visit(client, view_name):
             institution.pk,
             user.kind,
             user.pk,
-            datetime(2023, 3, 10, tzinfo=timezone.utc),
+            datetime(2023, 3, 10, tzinfo=UTC),
         ),
     )
 
