@@ -15,11 +15,7 @@ from tests.utils.test import TestCase, parse_response_to_soup
 # To be able to use assertCountEqual
 class GpsTest(TestCase):
     def test_user_autocomplete(self):
-        prescriber = PrescriberFactory(
-            first_name="gps member Vincent",
-            last_name="Jousse",
-            email="vincent@jousse.org",
-        )
+        prescriber = PrescriberFactory(first_name="gps member Vince")
         first_beneficiary = JobSeekerFactory(first_name="gps beneficiary Bob", last_name="Le Brico")
         second_beneficiary = JobSeekerFactory(first_name="gps second beneficiary Martin", last_name="Pêcheur")
         third_beneficiary = JobSeekerFactory(first_name="gps third beneficiary Foo", last_name="Bar")
