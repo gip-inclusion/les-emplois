@@ -1,5 +1,5 @@
 import math
-from datetime import date, datetime, timezone as datetime_tz
+from datetime import UTC, date, datetime
 from functools import partial
 from unittest import mock
 from urllib.parse import urlencode
@@ -796,8 +796,8 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         assert math.isclose(user.latitude, geocoding_data.get("latitude"), abs_tol=1e-5)
         assert math.isclose(user.longitude, geocoding_data.get("longitude"), abs_tol=1e-5)
         if ban_api_resolved_address:
-            assert user.address_filled_at == datetime(2023, 3, 10, tzinfo=datetime_tz.utc)
-            assert user.geocoding_updated_at == datetime(2023, 3, 10, tzinfo=datetime_tz.utc)
+            assert user.address_filled_at == datetime(2023, 3, 10, tzinfo=UTC)
+            assert user.geocoding_updated_at == datetime(2023, 3, 10, tzinfo=UTC)
 
     @override_settings(TALLY_URL="https://tally.so")
     @freeze_time("2023-03-10")

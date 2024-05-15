@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import factory
 import factory.fuzzy
@@ -98,8 +98,8 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
     to_company = factory.SubFactory(CompanyFactory, with_membership=True)
     message = factory.Faker("sentence", nb_words=40)
     answer = factory.Faker("sentence", nb_words=40)
-    hiring_start_at = factory.LazyFunction(lambda: datetime.now(timezone.utc).date())
-    hiring_end_at = factory.LazyFunction(lambda: datetime.now(timezone.utc).date() + relativedelta(years=2))
+    hiring_start_at = factory.LazyFunction(lambda: datetime.now(UTC).date())
+    hiring_end_at = factory.LazyFunction(lambda: datetime.now(UTC).date() + relativedelta(years=2))
     resume_link = "https://server.com/rockie-balboa.pdf"
     sender_kind = SenderKind.PRESCRIBER  # Make explicit the model's default value
     sender = factory.SubFactory(PrescriberFactory)
@@ -142,8 +142,8 @@ class PriorActionFactory(factory.django.DjangoModelFactory):
     action = factory.fuzzy.FuzzyChoice(Prequalification.values + ProfessionalSituationExperience.values)
     dates = factory.LazyFunction(
         lambda: InclusiveDateRange(
-            datetime.now(timezone.utc).date(),
-            datetime.now(timezone.utc).date() + relativedelta(years=2),
+            datetime.now(UTC).date(),
+            datetime.now(UTC).date() + relativedelta(years=2),
         )
     )
 
@@ -195,8 +195,8 @@ class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory
 
 class JobApplicationWithApprovalNotCancellableFactory(JobApplicationFactory):
     with_approval = True
-    hiring_start_at = factory.LazyFunction(lambda: datetime.now(timezone.utc).date() - relativedelta(days=5))
-    hiring_end_at = factory.LazyFunction(lambda: datetime.now(timezone.utc).date() + relativedelta(years=2, days=-5))
+    hiring_start_at = factory.LazyFunction(lambda: datetime.now(UTC).date() - relativedelta(days=5))
+    hiring_end_at = factory.LazyFunction(lambda: datetime.now(UTC).date() + relativedelta(years=2, days=-5))
 
 
 class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprovalNotCancellableFactory):

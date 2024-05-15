@@ -16,4 +16,4 @@ def test_security_txt_is_valid(client):
             expiry = datetime.datetime.fromisoformat(expiry)
             break
 
-    assert expiry - datetime.datetime.now(tz=datetime.timezone.utc) >= datetime.timedelta(days=14)
+    assert expiry - datetime.datetime.now(tz=datetime.UTC) >= datetime.timedelta(days=14)

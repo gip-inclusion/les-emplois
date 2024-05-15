@@ -106,7 +106,7 @@ class RemoteAutocompleteSelect2Widget(Select2Widget):
             return super().optgroups(name, value, attrs=attrs)
         selected_choices = {c for c in selected_choices if c not in self.choices.field.empty_values}
         field_name = self.choices.field.to_field_name or "pk"
-        query = Q(**{"%s__in" % field_name: selected_choices})
+        query = Q(**{f"{field_name}__in": selected_choices})
         for obj in self.choices.queryset.filter(query):
             option_value = self.choices.choice(obj)[0]
             option_label = self.label_from_instance(obj)

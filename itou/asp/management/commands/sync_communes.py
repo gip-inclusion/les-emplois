@@ -19,7 +19,7 @@ ASP_DATE_FORMAT = "%d/%m/%Y"
 
 
 def csv_import_communes(filename):
-    with open(filename, "r", encoding="utf-8") as f:
+    with open(filename, encoding="utf-8") as f:
         reader = csv.reader(f, delimiter=";")
         next(reader)
         for line in reader:

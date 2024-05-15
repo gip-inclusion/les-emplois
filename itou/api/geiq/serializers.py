@@ -1,5 +1,3 @@
-from typing import List
-
 from django.db import models
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
@@ -288,7 +286,7 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     @extend_schema_field(LazyChoiceField(choices=lazy_administrative_criteria_choices))
-    def get_criteres_eligibilite(self, obj) -> List[str]:
+    def get_criteres_eligibilite(self, obj) -> list[str]:
         if diag := obj.geiq_eligibility_diagnosis:
             return sorted({crit.api_code for crit in diag.administrative_criteria.all()})
         return []

@@ -60,10 +60,8 @@ class TestButtonsForm:
 
     def test_itou_buttons_with_secondary_name_and_value(self, snapshot):
         template = Template(
-            (
-                '{% load buttons_form %}{% itou_buttons_form secondary_url="/do" '
-                'secondary_name="name" secondary_value="1" %}'
-            )
+            '{% load buttons_form %}{% itou_buttons_form secondary_url="/do" '
+            'secondary_name="name" secondary_value="1" %}'
         )
         assert template.render(Context({})) == snapshot(name="with_secondary_name_and_value")
 
