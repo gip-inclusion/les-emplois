@@ -248,7 +248,7 @@ class JobDescriptionCardViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        create_test_romes_and_appellations(("N1101"))
+        create_test_romes_and_appellations(["N1101"])
 
     def test_job_description_card(self):
         company = CompanyWithMembershipAndJobsFactory()
