@@ -1,0 +1,7 @@
+{% load str_filters %}
+
+{% with navigation_pages.paginator.count as counter %}
+    <h3 class="h4 m-0 me-auto" id="employee-record-list-count"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+        {{ counter }} résultat{{ counter|pluralizefr }}
+    </h3>
+{% endwith %}

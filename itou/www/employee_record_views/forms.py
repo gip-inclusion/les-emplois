@@ -82,8 +82,12 @@ class SelectEmployeeRecordStatusForm(forms.Form):
 class EmployeeRecordFilterForm(forms.Form):
     job_seekers = forms.MultipleChoiceField(
         required=False,
-        label="Nom du candidat",
-        widget=Select2MultipleWidget,
+        label="Nom du salarié",
+        widget=Select2MultipleWidget(
+            attrs={
+                "data-placeholder": "Nom du salarié",
+            }
+        ),
     )
 
     def __init__(self, job_seekers, *args, **kwargs):

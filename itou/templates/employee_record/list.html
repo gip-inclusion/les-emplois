@@ -57,18 +57,23 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-12 col-md-4 mb-3 mb-md-5">
-                    <aside class="c-aside-filters">
-                        <button class="c-aside-filters__btn__collapse" data-bs-toggle="collapse" data-bs-target="#asideFiltersCollapse" aria-expanded="true" aria-controls="asideFiltersCollapse">
-                            <i class="ri-filter-line" aria-hidden="true"></i>
-                            <span>Filtres des fiches salarié</span>
-                        </button>
-                        <div class="c-aside-filters__card collapse show" id="asideFiltersCollapse">
-                            <form hx-get="{% url 'employee_record_views:list' %}" hx-trigger="change delay:.5s" hx-indicator="#employee-records-container" hx-target="#employee-records-container" hx-swap="outerHTML" hx-push-url="true">
-                                {% include "employee_record/includes/list_form_fields.html" %}
-                                {# Filled via jQuery. Does not need reloading with HTMX, its content is static. #}
-                                {{ form.order.as_hidden }}
-                            </form>
+                <div class="col-12">
+                    <form hx-get="{% url 'employee_record_views:list' %}"
+                          hx-trigger="change delay:.5s, change from:#id_job_seekers"
+                          hx-indicator="#employee-records-container"
+                          hx-target="#employee-records-container"
+                          hx-swap="outerHTML"
+                          hx-push-url="true"
+                          hx-include="#id_job_seekers">
+                        <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+                            <div class="dropdown">
+                                <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                    Statut
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% include "employee_record/includes/employee_record_filters/status.html" %}
+                                </ul>
+                            </div>
                         </div>
                         {# Filled via jQuery. Does not need reloading with HTMX, its content is static. #}
                         {{ form.order.as_hidden }}
@@ -79,14 +84,13 @@
                 <div class="col-12">
                     <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
                         {% include "employee_record/includes/list_counter.html" %}
-                        {% include "employee_record/includes/list_sort.html" %}
+                        {% include "employee_record/includes/list_order.html" %}
                         <div class="flex-column flex-md-row mt-3 mt-md-0 ms-md-3">
                             {% bootstrap_field filters_form.job_seekers layout="inline" %}
                         </div>
                     </div>
                     {% include "employee_record/includes/list_results.html" %}
                 </div>
-                <div class="col-12 col-md-8">{% include "employee_record/includes/list_results.html" %}</div>
             </div>
         </div>
     </section>
@@ -95,6 +99,7 @@
 {% block script %}
     {{ block.super }}
     <script src='{% static "js/htmx_compat.js" %}'></script>
+    <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
     <!-- Needed to use Select2MultipleWidget. -->
     {{ filters_form.media.js }}
     <script nonce="{{ CSP_NONCE }}">
