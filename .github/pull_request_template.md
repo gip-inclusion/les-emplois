@@ -27,14 +27,14 @@
  | Candidature              | Pilotage                 |
  | Connexion                | Profil salarié           |
  | Contrôle a posteriori    | Prescripteur             |
- | Demandes de prolongation | RGPD                     |
- | Demandeur d’emploi       | Recherche employeur      |
- | Employeur                | Recherche fiche de poste |
- | Fiche de poste           | Recherche prescripteur   |
- | Fiche entreprise         | Stabilité                |
- | Fiches salarié           | Statistiques             |
- | GEIQ                     | Tableau de bord          |
- | Inscription              | UX/UI                    |
+ | Demandes de prolongation | Recherche employeur      |
+ | Demandeur d’emploi       | Recherche fiche de poste |
+ | Employeur                | Recherche prescripteur   |
+ | Fiche de poste           | Stabilité                |
+ | Fiche entreprise         | Statistiques             |
+ | Fiches salarié           | Tableau de bord          |
+ | GEIQ                     | UX/UI                    |
+ | Inscription              | Vie privée               |
  +--------------------------|--------------------------+
 
 -->
