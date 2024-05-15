@@ -15,6 +15,7 @@ from tests.utils.test import TestCase
 
 class PoleEmploiApprovalSearchTest(MessagesTestMixin, TestCase):
     URL = reverse_lazy("approvals:pe_approval_search")
+    CONTINUE_LINK = "<span>Continuer</span>"
 
     def set_up_pe_approval(self, with_job_application=True):
         self.pe_approval = PoleEmploiApprovalFactory()
@@ -55,7 +56,7 @@ class PoleEmploiApprovalSearchTest(MessagesTestMixin, TestCase):
         self.client.force_login(self.employer)
 
         response = self.client.get(self.URL, {"number": self.pe_approval.number})
-        self.assertContains(response, "Continuer")
+        self.assertContains(response, self.CONTINUE_LINK)
 
     def test_number_length(self):
         """
@@ -76,7 +77,7 @@ class PoleEmploiApprovalSearchTest(MessagesTestMixin, TestCase):
         self.client.force_login(membership.user)
 
         response = self.client.get(self.URL, {"number": 123123123123})
-        self.assertNotContains(response, "Continuer")
+        self.assertNotContains(response, self.CONTINUE_LINK)
 
     def test_has_matching_pass_iae(self):
         """
@@ -105,7 +106,7 @@ class PoleEmploiApprovalSearchTest(MessagesTestMixin, TestCase):
         self.client.force_login(self.employer)
         # Our approval should not be usable without a job application
         response = self.client.get(self.URL, {"number": self.approval.number})
-        self.assertNotContains(response, "Continuer")
+        self.assertNotContains(response, self.CONTINUE_LINK)
 
     def test_has_matching_pass_iae_that_belongs_to_another_siae(self):
         """
@@ -137,7 +138,7 @@ class PoleEmploiApprovalSearchTest(MessagesTestMixin, TestCase):
 
         # The current user should not be able to use the PASS IAE used by another SIAE.
         response = self.client.get(self.URL, {"number": job_application.approval.number})
-        self.assertNotContains(response, "Continuer")
+        self.assertNotContains(response, self.CONTINUE_LINK)
 
     def test_unlogged_is_not_authorized(self):
         """

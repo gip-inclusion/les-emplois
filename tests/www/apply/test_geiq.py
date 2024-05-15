@@ -16,6 +16,8 @@ from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
 
 @freeze_time("2024-02-15")
 class JobApplicationGEIQEligibilityDetailsTest(TestCase):
+    EXPIRED_DIAGNOSIS_EXPLANATION = "Le diagnostic du candidat a expiré"
+
     @classmethod
     def setUpTestData(cls):
         cls.geiq = CompanyWithMembershipAndJobsFactory(kind=CompanyKind.GEIQ)
@@ -81,7 +83,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
             response,
             "Les critères que vous avez sélectionnés ne vous permettent pas de bénéficier d’une aide financière de l’État.",  # noqa: E501
         )
-        self.assertNotContains(response, "Le diagnostic du candidat a expiré")
+        self.assertNotContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
         # More in `test_allowance_details_for_geiq`
 
     def test_details_as_geiq_with_expired_eligibility_diagnosis(self):
@@ -101,7 +103,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
         )
 
         self.assertTemplateUsed(response, "apply/includes/geiq/geiq_diagnosis_details.html")
-        self.assertContains(response, "Le diagnostic du candidat a expiré")
+        self.assertContains(response, self.EXPIRED_DIAGNOSIS_EXPLANATION)
         self.assertContains(
             response,
             "Éligibilité public prioritaire GEIQ non confirmée",
@@ -127,7 +129,7 @@ class JobApplicationGEIQEligibilityDetailsTest(TestCase):
 
         self.assertContains(
             response,
-            f"Le diagnostic du candidat a expiré le {dateformat.format(self.expired_diagnosis.expires_at, 'd F Y')}",
+            f"{self.EXPIRED_DIAGNOSIS_EXPLANATION} le {dateformat.format(self.expired_diagnosis.expires_at, 'd F Y')}",
         )
 
     def test_allowance_details_for_prescriber(self):
