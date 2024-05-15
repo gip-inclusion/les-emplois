@@ -545,8 +545,8 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
         else:
             search_fields.append("email")
             if "@" not in search_term:
-                search_fields.append("first_name")
-                search_fields.append("last_name")
+                search_fields.append("first_name__unaccent")
+                search_fields.append("last_name__unaccent")
         return search_fields
 
     def get_inlines(self, request, obj):
@@ -858,8 +858,8 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
         else:
             search_fields.append("user__email")
             if "@" not in search_term:
-                search_fields.append("user__first_name")
-                search_fields.append("user__last_name")
+                search_fields.append("user__first_name__unaccent")
+                search_fields.append("user__last_name__unaccent")
         return search_fields
 
     def get_form(self, request, obj=None, **kwargs):
