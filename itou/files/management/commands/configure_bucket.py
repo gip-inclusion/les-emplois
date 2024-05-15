@@ -79,8 +79,9 @@ class Command(BaseCommand):
         )
 
     def check_minio(self):
-        response = httpx.head(settings.AWS_S3_ENDPOINT_URL)
-        # Response has a bad request status code, but we don’t care.
+        # https://min.io/docs/minio/linux/operations/monitoring/healthcheck-probe.html#node-liveness
+        livecheck_url = urljoin(settings.AWS_S3_ENDPOINT_URL, "minio/health/live")
+        response = httpx.head(livecheck_url)
         try:
             return response.headers["Server"] == "MinIO"
         except KeyError:
