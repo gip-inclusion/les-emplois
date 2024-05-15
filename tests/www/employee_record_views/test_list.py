@@ -506,12 +506,27 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
         fresh_page = parse_response_to_soup(response)
         assertSoupEqual(simulated_page, fresh_page)
 
+    def test_htmx_order(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.URL, {"status": "NEW"})
+        simulated_page = parse_response_to_soup(response)
+
+        # Page JavaScript does that.
+        [order_field] = simulated_page.find_all("input", attrs={"name": "order"})
+        order_field["value"] = "name"
+        response = self.client.get(self.URL, {"status": "NEW", "order": "name"}, headers={"HX-Request": "true"})
+        update_page_with_htmx(simulated_page, f"form[hx-get='{self.URL}']", response)
+
+        response = self.client.get(self.URL, {"status": "NEW", "order": "name"})
+        fresh_page = parse_response_to_soup(response)
+        assertSoupEqual(simulated_page, fresh_page)
+
     def test_htmx_new_employee_record_updates_badge_count(self):
         self.client.force_login(self.user)
         response = self.client.get(self.URL, {"status": "NEW"})
         simulated_page = parse_response_to_soup(response)
         # This new application should update the counter badge on NEW.
-        JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
+        new_job_app = JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
 
         [new_status] = simulated_page.find_all("input", attrs={"name": "status", "value": "NEW"})
         del new_status["checked"]
@@ -523,6 +538,13 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
 
         response = self.client.get(self.URL + "?status=READY")
         fresh_page = parse_response_to_soup(response)
+        # Reloading the job seekers select2 with HTMX would change the
+        # select input the form listens to via hx-trigger, causing the
+        # form to no longer pick up change events from the select2.
+        # Given that options aren’t added frequently to that dropdown, wait
+        # until the next full page load to get new job seekers.
+        [new_jobseeker_opt] = fresh_page.select(f'#id_job_seekers > option[value="{new_job_app.job_seeker_id}"]')
+        new_jobseeker_opt.decompose()
         assertSoupEqual(simulated_page, fresh_page)
 
 

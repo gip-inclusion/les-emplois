@@ -1,25 +1,7 @@
+{% load django_bootstrap5 %}
 {% load str_filters %}
+
 <div id="employee-records-container">
-    <div class="d-flex align-items-center">
-        <div class="flex-grow-1">
-            {% with navigation_pages.paginator.count as counter %}
-                <h3 class="h4 m-0">{{ counter }} résultat{{ counter|pluralizefr }}</h3>
-            {% endwith %}
-        </div>
-        <div>
-            <span class="fs-sm">Trier par :</span>
-            <button type="button" class="btn btn-sm btn-link dropdown-toggle p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {{ ordered_by_label }}
-            </button>
-            <div class="dropdown-menu dropdown-menu-end" id="order-form-group">
-                {% for order_value, order_label in form.order.field.choices %}
-                    <button class="dropdown-item {% if order_value == form.order.value %}active{% endif %}" type="button" value="{{ order_value }}">
-                        {{ order_label }}
-                    </button>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
     {# "Real" employee records objects #}
     <div class="employee-records-list">
         {% if employee_records_list %}
@@ -42,9 +24,10 @@
     {% endif %}
     {% include "includes/pagination.html" with page=navigation_pages boost=True boost_target="#employee-records-container" boost_indicator="#employee-records-container" %}
 </div>
+
 {% if request.htmx %}
+    {% include "employee_record/includes/list_order.html" %}
     {% include "employee_record/includes/list_status_help.html" with request=request status=form.status.value only %}
     {% include "employee_record/includes/list_counter.html" %}
     {% include "employee_record/includes/employee_record_filters/status.html" %}
-    {% include "employee_record/includes/employee_record_filters/reset.html" %}
 {% endif %}

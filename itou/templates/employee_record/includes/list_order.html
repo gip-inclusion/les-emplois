@@ -1,0 +1,13 @@
+<div id="employee-record-order"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    <span class="fs-sm">Trier par :</span>
+    <button type="button" class="btn btn-sm btn-link dropdown-toggle p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{ ordered_by_label }}
+    </button>
+    <div class="dropdown-menu dropdown-menu-end" id="order-form-group">
+        {% for order_value, order_label in form.order.field.choices %}
+            <button class="dropdown-item {% if order_value == form.order.value %}active{% endif %}" type="button" value="{{ order_value }}">
+                {{ order_label }}
+            </button>
+        {% endfor %}
+    </div>
+</div>
