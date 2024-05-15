@@ -115,7 +115,7 @@ et cliquez sur « Mon espace » > « Accès aux APIs ».
 
 ```bash
 curl
-'{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/api/v1/candidats/?structures_uid=<uid_1>' \
+'{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/api/v1/candidats/?uid_structures=<uid_1>' \
 --header 'Authorization: Token [token]'
 ```
 
@@ -125,7 +125,7 @@ Séparez les identifiants par des virgules.
 
 ```bash
 curl
-'{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/api/v1/candidats/?structures_uid=<uid_1>,<uid_2>' \
+'{settings.ITOU_PROTOCOL}://{settings.ITOU_FQDN}/api/v1/candidats/?uid_structures=<uid_1>,<uid_2>' \
 --header 'Authorization: Token [token]'
 ```
 
