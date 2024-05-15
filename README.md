@@ -60,6 +60,22 @@ L’adaptateur Python pour PostgreSQL, [psycopg](https://www.psycopg.org/), a
 quelques pré-requis auxquels votre système doit répondre.
 https://www.psycopg.org/docs/install.html#runtime-requirements
 
+Par ailleurs, le projet utilise [GDAL](https://gdal.org/index.html], et nécessite
+son installation préalable.
+
+Sur MacOS :
+
+```sh
+$ brew install gdal
+```
+
+Sur Ubuntu :
+
+```sh
+$ apt-get install gdal-bin
+```
+
+
 #### Virtualenv
 
 La commande `make` suivante crée un
@@ -73,6 +89,12 @@ $ make venv
 
 Dans un `virtualenv`, vous pouvez utiliser les commandes Django habituelles
 (`./manage.py`) mais également les recettes du [Makefile](./Makefile).
+
+Pour activer ce `virtualenv` et pouvoir utiliser les commandes du `Makefile` :
+
+```sh
+$ source .env/bin/activate
+```
 
 ### Création des *buckets S3*
 
