@@ -71,7 +71,7 @@ fix: fast_fix
 
 # After migrate
 populate_db_with_cities:
-	psql -d $(PGURL) --quiet --file itou/fixtures/postgres/cities.sql
+	psql -d $(PGDATABASE) --quiet --file itou/fixtures/postgres/cities.sql
 
 populate_db: populate_db_with_cities
 	# Split loaddata_bulk into parts to avoid OOM errors in review apps
