@@ -196,8 +196,8 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
     search_fields = (
         "pk",
         "number",
-        "user__first_name",
-        "user__last_name",
+        "user__first_name__unaccent",
+        "user__last_name__unaccent",
         "user__email",
         "user__jobseeker_profile__nir",
     )
@@ -567,8 +567,8 @@ class PoleEmploiApprovalAdmin(ItouModelAdmin):
         "pole_emploi_id",
         "nir",
         "number",
-        "first_name",
-        "last_name",
+        "first_name__unaccent",
+        "last_name__unaccent",
         "birth_name",
     )
     list_filter = (IsValidFilter,)
@@ -593,8 +593,8 @@ class CancelledApprovalAdmin(ItouModelAdmin):
     )
     search_fields = (
         "number",
-        "user_first_name",
-        "user_last_name",
+        "user_first_name__unaccent",
+        "user_last_name__unaccent",
         "user_nir",
         "origin_siae_siret",
     )
