@@ -8,9 +8,7 @@
                   3 <strong>résultats</strong>
               
           </h3>
-          <div aria-label="Actions sur les candidatures" class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group">
-              
-  
+          <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action">
               
           </div>
       </div>
@@ -229,14 +227,7 @@
                   3 <strong>résultats</strong>
               
           </h3>
-          <div aria-label="Actions sur les candidatures" class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group">
-              
-      <a aria-label="Exporter la liste de candidatures" class="btn btn-ico btn-secondary mt-3 mt-md-0" href="/apply/prescriber/list/exports?back_url=/apply/prescriber/list">
-          <i aria-hidden="true" class="ri-download-2-fill"></i>
-          <span>Exporter</span>
-      </a>
-  
-  
+          <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action">
               
           </div>
       </div>
@@ -500,14 +491,7 @@
                   3 <strong>résultats</strong>
               
           </h3>
-          <div aria-label="Actions sur les candidatures" class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group">
-              
-      <a aria-label="Exporter la liste de candidatures" class="btn btn-ico btn-secondary mt-3 mt-md-0" href="/apply/siae/list/exports?back_url=/apply/siae/list">
-          <i aria-hidden="true" class="ri-download-2-fill"></i>
-          <span>Exporter</span>
-      </a>
-  
-  
+          <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action">
               
           </div>
       </div>

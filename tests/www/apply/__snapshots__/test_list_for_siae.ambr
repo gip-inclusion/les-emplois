@@ -2,7 +2,7 @@
 # name: test_list_for_siae_exports
   '''
   <div class="alert alert-info mt-3" id="besoin-dun-chiffre">
-              <p class="mb-0">
+              <p>
                   <i aria-hidden="true" class="ri-information-line me-1"></i>
                   <b>Besoin d'un chiffre ?</b>
               </p>
