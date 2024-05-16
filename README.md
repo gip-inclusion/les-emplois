@@ -75,7 +75,6 @@ Sur Ubuntu :
 $ apt-get install gdal-bin
 ```
 
-
 #### Virtualenv
 
 La commande `make` suivante crée un
