@@ -43,7 +43,7 @@ def handle_invited_user_registration_with_django(request, invitation, invitation
     return render(request, "invitations_views/new_user.html", context=context)
 
 
-def handle_invited_user_registration_with_inclusion_connect(request, invitation, invitation_type):
+def handle_invited_user_registration_with_inclusion_or_pro_connect(request, invitation, invitation_type):
     params = {
         "user_kind": invitation_type,
         "user_email": invitation.email,
@@ -56,8 +56,12 @@ def handle_invited_user_registration_with_inclusion_connect(request, invitation,
         if settings.INCLUSION_CONNECT_BASE_URL
         else None
     )
+    pro_connect_url = (
+        f"{reverse('pro_connect:authorize')}?{urlencode(params)}" if settings.PRO_CONNECT_BASE_URL else None
+    )
     context = {
         "inclusion_connect_url": inclusion_connect_url,
+        "pro_connect_url": pro_connect_url,
         "invitation": invitation,
         "matomo_account_type": MATOMO_ACCOUNT_TYPE[invitation_type],
     }
@@ -105,8 +109,8 @@ def new_user(request, invitation_type, invitation_id):
 
     # A new user should be created before joining
     handle_registration = {
-        KIND_PRESCRIBER: handle_invited_user_registration_with_inclusion_connect,
-        KIND_EMPLOYER: handle_invited_user_registration_with_inclusion_connect,
+        KIND_PRESCRIBER: handle_invited_user_registration_with_inclusion_or_pro_connect,
+        KIND_EMPLOYER: handle_invited_user_registration_with_inclusion_or_pro_connect,
         KIND_LABOR_INSPECTOR: handle_invited_user_registration_with_django,
     }[invitation_type]
     return handle_registration(request, invitation, invitation_type)

@@ -153,7 +153,7 @@ class ItouCurrentOrganizationMiddleware:
         # Force Inclusion Connect
         if (
             user.is_authenticated
-            and user.identity_provider != IdentityProvider.INCLUSION_CONNECT
+            and user.identity_provider not in [IdentityProvider.INCLUSION_CONNECT, IdentityProvider.PRO_CONNECT]
             and user.kind in [UserKind.PRESCRIBER, UserKind.EMPLOYER]
             and not request.path.startswith("/dashboard/activate_ic_account")  # Allow to access ic activation view
             and not request.path.startswith("/inclusion_connect")  # Allow to access ic views

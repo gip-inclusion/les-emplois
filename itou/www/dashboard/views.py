@@ -488,8 +488,13 @@ class AccountMigrationView(LoginRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         params = self._get_inclusion_connect_base_params()
         inclusion_connect_url = add_url_params(reverse("inclusion_connect:activate_account"), params)
+        pro_connect_url = (
+            add_url_params(reverse("pro_connect:activate_account"), params) if settings.PRO_CONNECT_BASE_URL else None
+        )
+
         extra_context = {
             "inclusion_connect_url": inclusion_connect_url,
+            "pro_connect_url": pro_connect_url,
             "matomo_account_type": MATOMO_ACCOUNT_TYPE[self.request.user.kind],
         }
         return context | extra_context
