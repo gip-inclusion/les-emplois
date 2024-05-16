@@ -10,7 +10,18 @@
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block content_title %}<h1>Candidatures</h1>{% endblock %}
+{% block content_title %}
+    <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
+        <h1 class="m-0">Candidatures</h1>
+        <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur les candidatures">
+            {% include "apply/includes/job_applications_export_button.html" %}
+            <a href="{% url 'search:employers_home' %}" class="btn btn-lg btn-primary btn-ico">
+                <i class="ri-draft-line font-weight-medium" aria-hidden="true"></i>
+                <span>Postuler pour un candidat</span>
+            </a>
+        </div>
+    </div>
+{% endblock %}
 
 {% block content %}
     <section class="s-box">

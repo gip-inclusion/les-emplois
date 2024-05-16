@@ -9,8 +9,7 @@
                 {{ counter }} <strong>résultat{{ counter|pluralizefr }}</strong>
             {% endwith %}
         </h3>
-        <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les candidatures">
-            {% include "apply/includes/job_applications_export_button.html" %}
+        <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action">
             {% if filters_counter > 0 %}
                 <a href="{% if request.user.is_prescriber %}{% url 'apply:list_for_prescriber' %}{% elif request.user.is_employer %}{% url 'apply:list_for_siae' %}{% else %}{% url 'apply:list_for_job_seeker' %}{% endif %}"
                    class="btn btn-secondary btn-ico mt-3 mt-md-0">
@@ -111,3 +110,7 @@
         {% include "includes/pagination.html" with page=job_applications_page boost=True boost_target="#job-applications-section" boost_indicator="#job-applications-section" %}
     {% endif %}
 </section>
+
+{% if request.htmx %}
+    {% include "apply/includes/job_applications_export_button.html" %}
+{% endif %}
