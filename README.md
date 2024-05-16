@@ -60,7 +60,7 @@ L’adaptateur Python pour PostgreSQL, [psycopg](https://www.psycopg.org/), a
 quelques pré-requis auxquels votre système doit répondre.
 https://www.psycopg.org/docs/install.html#runtime-requirements
 
-Par ailleurs, le projet utilise [GDAL](https://gdal.org/index.html], et nécessite
+Par ailleurs, le projet utilise [GDAL](https://gdal.org/index.html), et nécessite
 son installation préalable.
 
 Sur MacOS :
