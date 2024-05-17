@@ -28,17 +28,19 @@
                         <p class="fw-bold">Quelle action souhaitez-vous faire ?</p>
                         <form method="post">
                             {% csrf_token %}
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="action" id="endDateRadios" value="update_enddate" checked>
-                                <label class="form-check-label" for="endDateRadios">
-                                    Lever la suspension pour <strong class="text-success">réintégrer ce candidat</strong>
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="action" id="deleteRadios" value="delete">
-                                <label class="form-check-label" for="deleteRadios">
-                                    Confirmer la <strong class="text-danger">suppression définitive</strong> de cette suspension
-                                </label>
+                            <div class="form-group">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="action" id="endDateRadios" value="update_enddate" checked>
+                                    <label class="form-check-label" for="endDateRadios">
+                                        Lever la suspension pour <strong class="text-success">réintégrer ce candidat</strong>
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="action" id="deleteRadios" value="delete">
+                                    <label class="form-check-label" for="deleteRadios">
+                                        Confirmer la <strong class="text-danger">suppression définitive</strong> de cette suspension
+                                    </label>
+                                </div>
                             </div>
                             {% itou_buttons_form primary_label="Suivant" reset_url=back_url %}
                         </form>
