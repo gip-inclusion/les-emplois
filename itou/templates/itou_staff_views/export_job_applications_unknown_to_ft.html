@@ -1,0 +1,24 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+{% load django_bootstrap5 %}
+
+{% block title %}Export des données de candidatures {{ block.super }}{% endblock %}
+
+{% block content_title %}<h1>Export des données de candidatures</h1>{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% bootstrap_form_errors form type="non_fields" %}
+                        {% bootstrap_form form %}
+                        {% itou_buttons_form primary_label="Exporter" %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}

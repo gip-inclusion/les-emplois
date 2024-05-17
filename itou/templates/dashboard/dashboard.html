@@ -301,6 +301,9 @@
                             <div class="row {% if not user.is_job_seeker %}row-cols-1 row-cols-md-2 row-cols-xl-3{% endif %} mt-3 mt-md-5">
                                 {% if user.is_staff %}
                                     {% include "dashboard/includes/admin_card.html" %}
+                                    {% if user.is_superuser %}
+                                        {% include "dashboard/includes/staff_export_card.html" %}
+                                    {% endif %}
                                 {% endif %}
 
                                 {% if user.is_job_seeker %}
