@@ -10,4 +10,7 @@ class ItouDataDogJSONFormatter(datadog.DataDogJSONFormatter):
         for log_key in self.LOG_KEYS_TO_REMOVE:
             if log_key in log_entry_dict:
                 del log_entry_dict[log_key]
+        wsgi_request = self.get_wsgi_request()
+        if wsgi_request is not None and (current_org := getattr(wsgi_request, "current_organization", None)):
+            log_entry_dict["usr.organization_id"] = current_org.pk
         return log_entry_dict
