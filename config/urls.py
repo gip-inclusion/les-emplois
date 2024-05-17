@@ -84,6 +84,7 @@ urlpatterns = [
     path("legal/terms/", TemplateView.as_view(template_name="static/legal/terms.html"), name="legal-terms"),
     path("", include("itou.www.security.urls")),
     path("gps/", include("itou.www.gps.urls")),
+    path("staff/", include("itou.www.itou_staff_views.urls")),
 ]
 
 if settings.DEBUG and "debug_toolbar" in settings.INSTALLED_APPS:
