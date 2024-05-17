@@ -2,9 +2,12 @@ import datetime
 import decimal
 import functools
 import importlib
+import io
 import json
+import logging
 import uuid
 from datetime import date
+from unittest.mock import patch
 
 import faker
 import pytest
@@ -1579,3 +1582,19 @@ def test_previous_step():
 
     res = render_to_string("layout/previous_step.html", {"back_url": "/search/results?back_url=/blabla&other=params"})
     assert PREVIOUS_IS_LIST in res
+
+
+def test_log_current_organization(client):
+    membership = CompanyMembershipFactory()
+    client.force_login(membership.user)
+    root_logger = logging.getLogger()
+    stream_handler = root_logger.handlers[0]
+    captured = io.StringIO()
+    assert isinstance(stream_handler, logging.StreamHandler)
+    # caplog cannot be used since the organization_id is written by the log formatter
+    # capsys/capfd did not want to work because https://github.com/pytest-dev/pytest/issues/5997
+    with patch.object(stream_handler, "stream", captured):
+        response = client.get(reverse("dashboard:index"))
+    assert response.status_code == 200
+    # Check that the organization_id is properly logged to stdout
+    assert f'"usr.organization_id": {membership.company_id}' in captured.getvalue()
