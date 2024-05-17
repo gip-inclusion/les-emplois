@@ -228,6 +228,7 @@ def stats_siae_etp(request):
             mb.ASP_SIAE_FILTER_KEY_FLAVOR3: [
                 str(membership.company.convention.asp_id)
                 for membership in request.user.active_or_in_grace_period_company_memberships()
+                if membership.is_admin
             ]
         },
     )
