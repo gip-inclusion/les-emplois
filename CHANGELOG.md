@@ -1,5 +1,18 @@
 # Journal des modifications
 
+## 2024-05-12
+
+### Modifié
+
+- [Admin : Éviter les doublons lorsqu’on liste les PASS IAE d’une entreprise](https://github.com/gip-inclusion/les-emplois/pull/4047)
+- [API : Indiquer de filtrer par SIRET sur l’API `employee-records` et non `candidats_list`](https://github.com/gip-inclusion/les-emplois/pull/4042)
+- [Candidatures : Utiliser un autre domaine pour le lien vers le CV](https://github.com/gip-inclusion/les-emplois/pull/4053)
+- [Disparition automatique des toasts après 6 secondes](https://github.com/gip-inclusion/les-emplois/pull/4025)
+- [Fiches salarié : Prendre en compte les suspensions dans la détection des notifications ratées](https://github.com/gip-inclusion/les-emplois/pull/3872)
+- [Formatage d'adresse : Gérer le cas où la BAN ne connaît pas le code postal de la commune (ie. Saint-Martin)](https://github.com/gip-inclusion/les-emplois/pull/4020)
+- [Statistiques : La Direction Territoriale Alpes de Haute Provence et Hautes Alpes supervise 2 départements (04, 05)](https://github.com/gip-inclusion/les-emplois/pull/4022) 🖼
+- [UX/UI : Filtrer les prescripteurs habilités de manière plus dynamique](https://github.com/gip-inclusion/les-emplois/pull/4014)
+
 ## 2024-05-06
 
 ### Ajouté
