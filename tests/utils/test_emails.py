@@ -2,10 +2,9 @@ from django.core.mail.message import EmailMessage
 from factory import Faker
 
 from itou.utils.tasks import sanitize_mailjet_recipients
-from tests.utils.test import TestCase
 
 
-class UtilsEmailsSplitRecipientTest(TestCase):
+class TestSplitRecipients:
     """
     Test behavior of email backend when sending emails with more than 50 recipients
     (Mailjet API Limit)
