@@ -90,6 +90,7 @@ def _deserializeEmailMessage(serialized_email_message):
     return EmailMessage(**serialized_email_message)
 
 
+# TODO(François): Preserved for in-flight tasks, drop after a few days.
 @task(retries=_NB_RETRIES, retry_delay=settings.SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS)
 def _async_send_messages(serializable_email_messages):
     """
@@ -106,6 +107,21 @@ def _async_send_messages(serializable_email_messages):
             messages.extend(sanitize_mailjet_recipients(email))
         connection.send_messages(messages)
     return len(messages)
+
+
+@task(retries=_NB_RETRIES, retry_delay=settings.SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS)
+def _async_send_message(serialized_email):
+    """
+    An `EmailMessage` instance holds references to some non-serializable
+    ressources, such as a connection to the email backend (if not `None`).
+
+    Making `EmailMessage` serializable is the purpose of
+    `_serializeEmailMessage` and `_deserializeEmailMessage`.
+    """
+    with get_connection(backend=settings.ASYNC_EMAIL_BACKEND) as connection:
+        email = _deserializeEmailMessage(serialized_email)
+        connection.send_messages([email])
+    return 1
 
 
 class AsyncEmailBackend(BaseEmailBackend):
@@ -125,7 +141,11 @@ class AsyncEmailBackend(BaseEmailBackend):
     def send_messages(self, email_messages):
         if not email_messages:
             return
-
-        emails = [_serializeEmailMessage(email) for email in email_messages]
-
-        return _async_send_messages(emails)
+        emails_count = 0
+        for email in email_messages:
+            for mjemail in sanitize_mailjet_recipients(email):
+                emails_count += 1
+                # Send each email in a separate task, so that Huey retry mecanism only
+                # retries the failed email.
+                _async_send_message(_serializeEmailMessage(mjemail))
+        return emails_count
