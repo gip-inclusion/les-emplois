@@ -1,48 +1,29 @@
 from django.core.mail.message import EmailMessage
 from factory import Faker
 
-from itou.utils.tasks import sanitize_mailjet_recipients
+from itou.utils.tasks import AsyncEmailBackend
 
 
-class TestSplitRecipients:
-    """
-    Test behavior of email backend when sending emails with more than 50 recipients
-    (Mailjet API Limit)
-    """
-
-    def test_email_copy(self):
-        fake_email = Faker("email", locale="fr_FR")
-        message = EmailMessage(from_email="unit-test@tests.com", body="xxx", to=[fake_email], subject="test")
-        result = sanitize_mailjet_recipients(message)
-
-        assert 1 == len(result)
-
-        assert "xxx" == result[0].body
-        assert "unit-test@tests.com" == result[0].from_email
-        assert fake_email == result[0].to[0]
-        assert "test" == result[0].subject
-
-    def test_dont_split_emails(self):
-        recipients = []
-        # Only one email is needed
-        for _ in range(49):
-            recipients.append(Faker("email", locale="fr_FR"))
-
-        message = EmailMessage(from_email="unit-test@tests.com", body="", to=recipients)
-        result = sanitize_mailjet_recipients(message)
-
-        assert 1 == len(result)
-        assert 49 == len(result[0].to)
-
-    def test_must_split_emails(self):
+class TestAsyncEmailBackend:
+    def test_send_messages_splits_recipients(self, mailoutbox):
         # 2 emails are needed; one with 50 the other with 25
-        recipients = []
-        for _ in range(75):
-            recipients.append(Faker("email", locale="fr_FR"))
+        recipients = [Faker("email", locale="fr_FR") for _ in range(75)]
+        message = EmailMessage(
+            from_email="unit-test@tests.com",
+            to=recipients,
+            subject="subject",
+            body="body",
+        )
 
-        message = EmailMessage(from_email="unit-test@tests.com", body="", to=recipients)
-        result = sanitize_mailjet_recipients(message)
+        backend = AsyncEmailBackend()
+        # Huey runs in immediate mode.
+        sent = backend.send_messages([message])
 
-        assert 2 == len(result)
-        assert 50 == len(result[0].to)
-        assert 25 == len(result[1].to)
+        assert sent == 2
+        [email1, email2] = mailoutbox
+        assert len(email1.to) == 50
+        assert len(email2.to) == 25
+        for email in [email1, email2]:
+            assert email.from_email == "unit-test@tests.com"
+            assert email.subject == "subject"
+            assert email.body == "body"
