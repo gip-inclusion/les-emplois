@@ -9,7 +9,6 @@ from django.contrib import messages
 from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.shortcuts import reverse
-from django.test import Client
 from django.utils.html import escape
 from pytest_django.asserts import assertRedirects
 
@@ -27,7 +26,7 @@ from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTest
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory, PrescriberPoleEmploiFactory
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import TestCase, assert_previous_step
+from tests.utils.test import ItouClient, TestCase, assert_previous_step
 
 
 INVITATION_URL = reverse("invitations_views:invite_prescriber_with_org")
@@ -345,7 +344,7 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
         url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
         self.assertContains(response, url + '"')
 
-        other_client = Client()
+        other_client = ItouClient()
         invitation.email = OIDC_USERINFO["email"]
         invitation.save()
         response = mock_oauth_dance(

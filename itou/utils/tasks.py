@@ -1,9 +1,11 @@
 import logging
+from functools import partial
 
 from django.conf import settings
 from django.core.mail import get_connection
 from django.core.mail.backends.base import BaseEmailBackend
 from django.core.mail.message import EmailMessage
+from django.db import ProgrammingError, connection, transaction
 from huey.contrib.djhuey import task
 
 from itou.utils.iterators import chunks
@@ -141,11 +143,13 @@ class AsyncEmailBackend(BaseEmailBackend):
     def send_messages(self, email_messages):
         if not email_messages:
             return
+        if not connection.in_atomic_block:
+            raise ProgrammingError("Sending email requires an active database transaction.")
         emails_count = 0
         for email in email_messages:
             for mjemail in sanitize_mailjet_recipients(email):
                 emails_count += 1
                 # Send each email in a separate task, so that Huey retry mecanism only
                 # retries the failed email.
-                _async_send_message(_serializeEmailMessage(mjemail))
+                transaction.on_commit(partial(_async_send_message, _serializeEmailMessage(mjemail)))
         return emails_count

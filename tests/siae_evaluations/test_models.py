@@ -279,18 +279,20 @@ class EvaluationCampaignManagerTest(TestCase):
         for kind in [k for k in InstitutionKind if k != InstitutionKind.DDETS_IAE]:
             with self.subTest(kind=kind):
                 InstitutionFactory(kind=kind)
-                assert 0 == create_campaigns_and_calendar(
-                    evaluated_period_start_at, evaluated_period_end_at, adversarial_stage_start
-                )
+                with self.captureOnCommitCallbacks(execute=True):
+                    assert 0 == create_campaigns_and_calendar(
+                        evaluated_period_start_at, evaluated_period_end_at, adversarial_stage_start
+                    )
                 assert 0 == EvaluationCampaign.objects.all().count()
                 assert 1 == Calendar.objects.all().count()
                 assert len(mail.outbox) == 0
 
         # institution DDETS IAE
         InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS_IAE)
-        assert 2 == create_campaigns_and_calendar(
-            evaluated_period_start_at, evaluated_period_end_at, adversarial_stage_start
-        )
+        with self.captureOnCommitCallbacks(execute=True):
+            assert 2 == create_campaigns_and_calendar(
+                evaluated_period_start_at, evaluated_period_end_at, adversarial_stage_start
+            )
         assert 2 == EvaluationCampaign.objects.all().count()
         assert 1 == Calendar.objects.all().count()
 
@@ -489,7 +491,8 @@ class EvaluationCampaignManagerTest(TestCase):
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
         )
 
-        campaign.transition_to_adversarial_phase()
+        with self.captureOnCommitCallbacks(execute=True):
+            campaign.transition_to_adversarial_phase()
 
         assert ignored_siae == EvaluatedSiae.objects.get(reviewed_at__isnull=True)
 
@@ -562,7 +565,8 @@ class EvaluationCampaignManagerTest(TestCase):
         )
         EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae_no_response)
 
-        campaign.transition_to_adversarial_phase()
+        with self.captureOnCommitCallbacks(execute=True):
+            campaign.transition_to_adversarial_phase()
 
         evaluated_siae_no_response.refresh_from_db()
         assert evaluated_siae_no_response.reviewed_at == timezone.now()
@@ -590,7 +594,8 @@ class EvaluationCampaignManagerTest(TestCase):
             # default review_state is PENDING
         )
 
-        campaign.transition_to_adversarial_phase()
+        with self.captureOnCommitCallbacks(execute=True):
+            campaign.transition_to_adversarial_phase()
 
         # Transitioned to ACCEPTED, the DDETS IAE did not review the documents
         # submitted by SIAE before the transition.
@@ -623,7 +628,8 @@ class EvaluationCampaignManagerTest(TestCase):
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
         )
 
-        campaign.transition_to_adversarial_phase()
+        with self.captureOnCommitCallbacks(execute=True):
+            campaign.transition_to_adversarial_phase()
 
         # Transitioned to ACCEPTED, the DDETS IAE review was automatically validated
         evaluated_siae_submitted.refresh_from_db()
@@ -653,7 +659,8 @@ class EvaluationCampaignManagerTest(TestCase):
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
         )
 
-        campaign.transition_to_adversarial_phase()
+        with self.captureOnCommitCallbacks(execute=True):
+            campaign.transition_to_adversarial_phase()
 
         # Transitioned to REFUSED, the DDETS IAE review was automatically validated
         evaluated_siae_submitted.refresh_from_db()
@@ -678,7 +685,8 @@ class EvaluationCampaignManagerTest(TestCase):
         )
         assert evaluation_campaign.ended_at is None
 
-        evaluation_campaign.close()
+        with self.captureOnCommitCallbacks(execute=True):
+            evaluation_campaign.close()
         assert evaluation_campaign.ended_at is not None
         ended_at = evaluation_campaign.ended_at
 
@@ -695,7 +703,8 @@ class EvaluationCampaignManagerTest(TestCase):
         assert institution_email.subject == "[Contrôle a posteriori] Notification des sanctions"
         assert institution_email.body == self.snapshot(name="sanction notification email body")
 
-        evaluation_campaign.close()
+        with self.captureOnCommitCallbacks(execute=True):
+            evaluation_campaign.close()
         assert ended_at == evaluation_campaign.ended_at
         # No new mail.
         assert len(mail.outbox) == 2
@@ -722,7 +731,8 @@ class EvaluationCampaignManagerTest(TestCase):
         assert evaluated_siae.final_reviewed_at is None
         assert evaluation_campaign.ended_at is None
 
-        evaluation_campaign.close()
+        with self.captureOnCommitCallbacks(execute=True):
+            evaluation_campaign.close()
         assert evaluation_campaign.ended_at is not None
         # DDETS review was automatically validated
         evaluated_siae.refresh_from_db()
@@ -736,7 +746,8 @@ class EvaluationCampaignManagerTest(TestCase):
         )
         assert accepted_siae_email.body == self.snapshot(name="accepted email body")
 
-        evaluation_campaign.close()
+        with self.captureOnCommitCallbacks(execute=True):
+            evaluation_campaign.close()
         assert ended_at == evaluation_campaign.ended_at
         # No new mail.
         assert len(mail.outbox) == 1
@@ -764,7 +775,8 @@ class EvaluationCampaignManagerTest(TestCase):
         assert evaluated_siae.final_reviewed_at is None
         assert evaluation_campaign.ended_at is None
 
-        evaluation_campaign.close()
+        with self.captureOnCommitCallbacks(execute=True):
+            evaluation_campaign.close()
         assert evaluation_campaign.ended_at is not None
         # DDETS review was automatically validated
         evaluated_siae.refresh_from_db()
@@ -784,7 +796,8 @@ class EvaluationCampaignManagerTest(TestCase):
         assert institution_email.subject == "[Contrôle a posteriori] Notification des sanctions"
         assert institution_email.body == self.snapshot(name="sanction notification email body")
 
-        evaluation_campaign.close()
+        with self.captureOnCommitCallbacks(execute=True):
+            evaluation_campaign.close()
         assert ended_at == evaluation_campaign.ended_at
         # No new mail.
         assert len(mail.outbox) == 2

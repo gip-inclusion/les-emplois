@@ -171,7 +171,8 @@ class SiaeModelTest(TestCase):
             request = factory.get("/")
 
             message = company.new_signup_activation_email_to_official_contact(request)
-            message.send()
+            with self.captureOnCommitCallbacks(execute=True):
+                message.send()
 
             assert len(mail.outbox) == 1
             email = mail.outbox[0]

@@ -62,11 +62,12 @@ def test_grant():
 
 @freeze_time()
 @pytest.mark.parametrize("postcode,contained", [("59284", True), ("75001", False)])
-def test_deny(postcode, contained):
+def test_deny(postcode, django_capture_on_commit_callbacks, contained):
     prolongation_request = ProlongationRequestFactory(approval__user__jobseeker_profile__hexa_post_code=postcode)
     deny_information = ProlongationRequestDenyInformationFactory.build(request=None)
 
-    prolongation_request.deny(prolongation_request.validated_by, deny_information)
+    with django_capture_on_commit_callbacks(execute=True):
+        prolongation_request.deny(prolongation_request.validated_by, deny_information)
 
     prolongation_request.refresh_from_db()
     assert prolongation_request.status == ProlongationRequestStatus.DENIED
@@ -101,7 +102,7 @@ def test_deny(postcode, contained):
     ],
 )
 def test_chores_send_reminder_to_prescriber_organization_other_members(
-    snapshot, mailoutbox, command, wet_run, expected
+    snapshot, mailoutbox, command, django_capture_on_commit_callbacks, wet_run, expected
 ):
     parameters = itertools.product(
         ProlongationRequestStatus,
@@ -116,14 +117,15 @@ def test_chores_send_reminder_to_prescriber_organization_other_members(
         ProlongationRequestFactory(status=status, created_at=created_at, reminder_sent_at=reminder_sent_at)
 
     with freeze_time():
-        command.handle(command="email_reminder", wet_run=wet_run)
+        with django_capture_on_commit_callbacks(execute=True):
+            command.handle(command="email_reminder", wet_run=wet_run)
         assert len(mailoutbox) == expected
         assert ProlongationRequest.objects.filter(reminder_sent_at=timezone.now()).count() == expected
     assert command.stdout.getvalue() == snapshot
 
 
 def test_chores_send_reminder_to_prescriber_organization_other_members_every_ten_days_for_thirty_days(
-    mailoutbox, command
+    mailoutbox, django_capture_on_commit_callbacks, command
 ):
     prolongation_request = ProlongationRequestFactory()
 
@@ -142,5 +144,6 @@ def test_chores_send_reminder_to_prescriber_organization_other_members_every_ten
     ]
     for days_ago, expected in specs:
         with freeze_time(prolongation_request.created_at + relativedelta(days=days_ago)):
-            command.handle(command="email_reminder", wet_run=True)
+            with django_capture_on_commit_callbacks(execute=True):
+                command.handle(command="email_reminder", wet_run=True)
         assert len(mailoutbox) == expected

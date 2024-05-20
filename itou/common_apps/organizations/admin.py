@@ -1,7 +1,6 @@
 import logging
 
 from django.contrib import admin, messages
-from django.db import transaction
 from django.db.models import Count
 from django.forms import BaseInlineFormSet, ModelForm
 
@@ -29,9 +28,9 @@ class MembersInlineForm(ModelForm):
             structure = get_membership_structure(instance)
             if structure is not None:
                 if instance.is_admin:
-                    transaction.on_commit(lambda: structure.add_admin_email(instance.user).send())
+                    structure.add_admin_email(instance.user).send()
                 else:
-                    transaction.on_commit(lambda: structure.remove_admin_email(instance.user).send())
+                    structure.remove_admin_email(instance.user).send()
         return instance
 
 
@@ -40,7 +39,7 @@ class MembersInlineFormSet(BaseInlineFormSet):
         if obj.is_admin is True:
             structure = get_membership_structure(obj)
             if structure is not None:
-                transaction.on_commit(lambda: structure.remove_admin_email(obj.user).send())
+                structure.remove_admin_email(obj.user).send()
         super().delete_existing(obj, commit=commit)
 
 

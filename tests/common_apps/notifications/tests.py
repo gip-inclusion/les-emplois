@@ -75,7 +75,8 @@ class NotificationsBaseClassTest(TestCase):
         assert len(recipients) == 0
 
     def test_send(self):
-        self.notification.send()
+        with self.captureOnCommitCallbacks(execute=True):
+            self.notification.send()
 
         receivers = [receiver for message in mail.outbox for receiver in message.to]
         assert self.notification.email.to == receivers

@@ -27,7 +27,7 @@ from itou.utils import faker_providers  # noqa: E402
 from itou.utils.storage.s3 import s3_client  # noqa: E402
 from tests.users.factories import ItouStaffFactory  # noqa: E402
 from tests.utils.htmx.test import HtmxClient  # noqa: E402
-from tests.utils.test import NoInlineClient  # noqa: E402
+from tests.utils.test import ItouClient  # noqa: E402
 
 
 @pytest.hookimpl(tryfirst=True)
@@ -60,14 +60,14 @@ def pytest_configure(config) -> None:
 
 @pytest.fixture
 def admin_client():
-    client = NoInlineClient()
+    client = ItouClient()
     client.force_login(ItouStaffFactory(is_superuser=True))
     return client
 
 
 @pytest.fixture
 def client():
-    return NoInlineClient()
+    return ItouClient()
 
 
 @pytest.fixture()

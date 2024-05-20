@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
-from django.test import Client, override_settings
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -26,7 +26,7 @@ from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, 
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from tests.users.factories import DEFAULT_PASSWORD, EmployerFactory, PrescriberFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase
+from tests.utils.test import BASE_NUM_QUERIES, ItouClient, TestCase
 
 
 class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
@@ -189,7 +189,7 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
         url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
         self.assertContains(response, url + '"')
 
-        other_client = Client()
+        other_client = ItouClient()
         response = mock_oauth_dance(
             self.client,
             KIND_EMPLOYER,

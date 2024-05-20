@@ -6,7 +6,6 @@ from django.contrib import messages
 from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.shortcuts import reverse
-from django.test import Client
 from django.utils.html import escape
 
 from itou.users.enums import KIND_EMPLOYER, UserKind
@@ -20,6 +19,7 @@ from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTest
 from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory
+from tests.utils.test import ItouClient
 
 
 class TestAcceptInvitation(MessagesTestMixin, InclusionConnectBaseTestCase):
@@ -106,7 +106,7 @@ class TestAcceptInvitation(MessagesTestMixin, InclusionConnectBaseTestCase):
 
         total_users_before = User.objects.count()
 
-        other_client = Client()
+        other_client = ItouClient()
         response = mock_oauth_dance(
             self.client,
             KIND_EMPLOYER,
