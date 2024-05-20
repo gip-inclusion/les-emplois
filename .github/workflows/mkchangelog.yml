@@ -9,7 +9,7 @@ jobs:
   generate-changelog:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4.1.5
+    - uses: actions/checkout@v4.1.6
     - name: 💂 Install Python
       uses: actions/setup-python@v5
       with:
