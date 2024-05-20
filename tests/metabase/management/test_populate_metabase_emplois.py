@@ -3,7 +3,7 @@ import datetime
 import pytest
 from django.contrib.gis.geos import Point
 from django.core import management
-from django.db import connection
+from django.db import connection, transaction
 from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries
@@ -618,7 +618,8 @@ def test_populate_prolongation_requests():
     prolongation_request = prolongation.request
 
     deny_information = ProlongationRequestDenyInformationFactory.build(request=None)
-    prolongation_request.deny(prolongation_request.validated_by, deny_information)
+    with transaction.atomic():
+        prolongation_request.deny(prolongation_request.validated_by, deny_information)
 
     ProlongationWithRequestFactory()  # add another one to ensure we don't fail without a deny_information
 

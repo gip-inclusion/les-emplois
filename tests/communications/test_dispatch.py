@@ -195,7 +195,8 @@ class EmailNotificationTest(FakeNotificationClassesMixin, TestCase):
         assert "Cet email est envoyé depuis un environnement de démonstration" in email.body
 
     def test_method_send(self):
-        self.ManageableNotification(self.user, self.organization).send()
+        with self.captureOnCommitCallbacks(execute=True):
+            self.ManageableNotification(self.user, self.organization).send()
         assert len(mail.outbox) == 1
         assert mail.outbox[0].to == [self.user.email]
         assert "Cet email est envoyé depuis un environnement de démonstration" in mail.outbox[0].body

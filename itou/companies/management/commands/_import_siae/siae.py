@@ -6,7 +6,6 @@ All these helpers are specific to SIAE logic (not GEIQ, EA, EATT).
 
 """
 
-from django.db import transaction
 from django.utils import timezone
 
 from itou.common_apps.address.departments import department_from_postcode
@@ -182,7 +181,7 @@ def create_new_siaes(siret_to_siae_row, conventions_by_siae_key):
         siae.save()
     print("--- end of CSV output of all creatable_siaes ---")
 
-    transaction.on_commit(lambda: send_email_messages(siae.activate_your_account_email() for siae in creatable_siaes))
+    send_email_messages(siae.activate_your_account_email() for siae in creatable_siaes)
 
     print(f"{len(creatable_siaes)} structures have been created")
     print(f"{len([s for s in creatable_siaes if s.coords])} structures will have geolocation")

@@ -3,7 +3,6 @@ from datetime import timedelta
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.core import mail
-from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape
@@ -18,7 +17,7 @@ from tests.approvals.factories import ProlongationFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory, PrescriberOrganizationWithMembershipFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import parse_response_to_soup
+from tests.utils.test import TestCase, parse_response_to_soup
 
 
 @pytest.mark.ignore_unknown_variable_template_error("job_application", "hiring_pending")

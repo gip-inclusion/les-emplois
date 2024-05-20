@@ -5,7 +5,7 @@ from itou.utils.tasks import AsyncEmailBackend
 
 
 class TestAsyncEmailBackend:
-    def test_send_messages_splits_recipients(self, mailoutbox):
+    def test_send_messages_splits_recipients(self, django_capture_on_commit_callbacks, mailoutbox):
         # 2 emails are needed; one with 50 the other with 25
         recipients = [Faker("email", locale="fr_FR") for _ in range(75)]
         message = EmailMessage(
@@ -17,7 +17,8 @@ class TestAsyncEmailBackend:
 
         backend = AsyncEmailBackend()
         # Huey runs in immediate mode.
-        sent = backend.send_messages([message])
+        with django_capture_on_commit_callbacks(execute=True):
+            sent = backend.send_messages([message])
 
         assert sent == 2
         [email1, email2] = mailoutbox

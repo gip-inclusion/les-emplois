@@ -1,5 +1,4 @@
 from dateutil.relativedelta import relativedelta
-from django.test import TestCase
 from django.urls import reverse
 from django.utils import dateformat, timezone
 from freezegun import freeze_time
@@ -12,6 +11,7 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
+from tests.utils.test import TestCase
 
 
 @freeze_time("2024-02-15")

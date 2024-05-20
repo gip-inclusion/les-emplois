@@ -220,7 +220,8 @@ class JobApplicationTransferModelTest(TestCase):
         )
         job_seeker = job_application.job_seeker
 
-        job_application.transfer_to(origin_user, target_company)
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.transfer_to(origin_user, target_company)
 
         # Eligigibility diagnosis is done by SIAE : must not send an email
         assert len(mail.outbox) == 2
@@ -252,7 +253,8 @@ class JobApplicationTransferModelTest(TestCase):
         )
         job_seeker = job_application.job_seeker
 
-        job_application.transfer_to(origin_user, target_company)
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.transfer_to(origin_user, target_company)
 
         assert len(mail.outbox) == 3
 
@@ -279,7 +281,8 @@ class JobApplicationTransferModelTest(TestCase):
         )
         job_seeker = job_application.job_seeker
 
-        job_application.transfer_to(origin_user_1, target_company)
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.transfer_to(origin_user_1, target_company)
 
         # Only checking SIAE email
         assert len(mail.outbox) == 3

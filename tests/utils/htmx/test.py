@@ -1,12 +1,11 @@
 from urllib.parse import urlparse
 
 import pytest
-from django.test.client import Client
 
-from tests.utils.test import TestCase, parse_response_to_soup
+from tests.utils.test import ItouClient, TestCase, parse_response_to_soup
 
 
-class HtmxClient(Client):
+class HtmxClient(ItouClient):
     def generic(self, method, path, data="", content_type="application/octet-stream", secure=False, **extra):
         # Add HTMX-specific headers according to your needs.
         # https://htmx.org/reference/#request_headers

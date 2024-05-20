@@ -109,8 +109,7 @@ class UserMembershipDeactivationTest(TestCase):
 
         self.client.force_login(admin)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
-        with self.captureOnCommitCallbacks(execute=True):
-            response = self.client.post(url)
+        response = self.client.post(url)
         assert response.status_code == 302
 
         # User should be deactivated now

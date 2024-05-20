@@ -211,7 +211,7 @@ class ImportSiaeManagementCommandsTest(TestCase):
                 get_siret_to_siae_row(get_vue_structure_df()),
                 get_conventions_by_siae_key(get_vue_af_df()),
             )
-        assert len(commit_callbacks) == 1
+        assert len(commit_callbacks) == 6
         assert len(mail.outbox) == 6
         assert reverse("signup:company_select") in mail.outbox[0].body
         assert collections.Counter(mail.subject for mail in mail.outbox) == collections.Counter(

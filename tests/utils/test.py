@@ -106,8 +106,14 @@ class NoInlineClient(Client):
         return response
 
 
+class ItouClient(NoInlineClient):
+    def request(self, *args, **kwargs):
+        with TestCase.captureOnCommitCallbacks(execute=True):
+            return super().request(*args, **kwargs)
+
+
 class TestCase(BaseTestCase):
-    client_class = NoInlineClient
+    client_class = ItouClient
 
 
 class reload_module(TestContextDecorator):

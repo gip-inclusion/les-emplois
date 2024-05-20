@@ -669,7 +669,8 @@ class JobApplicationQuerySetTest(TestCase):
         job_application.sender = None
         job_application.save(update_fields=["sender"])
         employer = job_application.to_company.members.first()
-        job_application.accept(user=employer)
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.accept(user=employer)
         recipients = []
         for email in mail.outbox:
             [recipient] = email.to
@@ -922,7 +923,8 @@ class JobApplicationNotificationsTest(TestCase):
         # User account is deleted.
         job_application.sender = None
         job_application.save(update_fields=["sender"])
-        job_application.refuse()
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.refuse()
         [email] = mail.outbox
         assert email.to == [job_application.job_seeker.email]
         assert self.AFPA not in email.body
@@ -1023,8 +1025,8 @@ class JobApplicationNotificationsTest(TestCase):
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
         )
         job_application.accept(user=job_application.to_company.members.first())
-        mail.outbox = []  # Delete previous emails.
-        job_application.manually_deliver_approval(delivered_by=staff_member)
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.manually_deliver_approval(delivered_by=staff_member)
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_number_sent_at is not None
         assert job_application.approval_manually_delivered_by == staff_member
@@ -1046,8 +1048,8 @@ class JobApplicationNotificationsTest(TestCase):
             approval_delivery_mode=JobApplication.APPROVAL_DELIVERY_MODE_MANUAL,
         )
         job_application.accept(user=job_application.to_company.members.first())
-        mail.outbox = []  # Delete previous emails.
-        job_application.manually_refuse_approval(refused_by=staff_member)
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.manually_refuse_approval(refused_by=staff_member)
         assert job_application.approval_manually_refused_by == staff_member
         assert job_application.approval_manually_refused_at is not None
         assert not job_application.approval_number_sent_by_email
@@ -1061,7 +1063,8 @@ class JobApplicationNotificationsTest(TestCase):
         )
 
         cancellation_user = job_application.to_company.active_members.first()
-        job_application.cancel(user=cancellation_user)
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.cancel(user=cancellation_user)
         assert len(mail.outbox) == 2
 
         # To.
@@ -1079,7 +1082,8 @@ class JobApplicationNotificationsTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationState.ACCEPTED)
 
         cancellation_user = job_application.to_company.active_members.first()
-        job_application.cancel(user=cancellation_user)
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.cancel(user=cancellation_user)
         assert len(mail.outbox) == 1
 
         # To.
@@ -1098,7 +1102,8 @@ class JobApplicationNotificationsTest(TestCase):
         job_application.sender = None
         job_application.save(update_fields=["sender"])
         cancellation_user = job_application.to_company.active_members.first()
-        job_application.cancel(user=cancellation_user)
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.cancel(user=cancellation_user)
         [email] = mail.outbox
         assert email.to == [cancellation_user.email]
 
@@ -1138,7 +1143,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_seeker.job_applications.pending().count() == 4
 
         job_application = job_seeker.job_applications.filter(state=JobApplicationState.PROCESSING).first()
-        job_application.accept(user=job_application.to_company.members.first())
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.accept(user=job_application.to_company.members.first())
 
         assert job_seeker.job_applications.filter(state=JobApplicationState.ACCEPTED).count() == 1
         assert job_seeker.job_applications.filter(state=JobApplicationState.OBSOLETE).count() == 3
@@ -1174,7 +1180,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_seeker.job_applications.count() == 6
 
         job_application = job_seeker.job_applications.filter(state=JobApplicationState.OBSOLETE).first()
-        job_application.accept(user=job_application.to_company.members.first())
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.accept(user=job_application.to_company.members.first())
 
         assert job_seeker.job_applications.filter(state=JobApplicationState.ACCEPTED).count() == 2
         assert job_seeker.job_applications.filter(state=JobApplicationState.OBSOLETE).count() == 4
@@ -1197,7 +1204,8 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationState.PROCESSING
         )
-        job_application.accept(user=job_application.to_company.members.first())
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval.number == pe_approval.number
         assert job_application.approval_number_sent_by_email
@@ -1220,7 +1228,8 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationState.PROCESSING
         )
-        job_application.accept(user=job_application.to_company.members.first())
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval.number == pe_approval.number
         assert job_application.approval_number_sent_by_email
@@ -1249,7 +1258,8 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationState.PROCESSING
         )
-        job_application.accept(user=job_application.to_company.members.first())
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_MANUAL
         # Check sent email.
@@ -1268,7 +1278,8 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationState.PROCESSING,
             eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
         )
-        job_application.accept(user=job_application.to_company.members.first())
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC
         assert job_application.approval.origin_siae_kind == job_application.to_company.kind
@@ -1289,7 +1300,8 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationState.PROCESSING,
             eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
         )
-        job_application.accept(user=job_application.to_company.members.first())
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC
         assert len(mail.outbox) == 2
@@ -1307,7 +1319,8 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationState.PROCESSING,
             eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
         )
-        job_application.accept(user=job_application.to_company.members.first())
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC
         assert job_application.approval.origin_siae_kind == job_application.to_company.kind
@@ -1328,7 +1341,8 @@ class JobApplicationWorkflowTest(TestCase):
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
-        job_application.accept(user=job_application.to_company.members.first())
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
@@ -1359,7 +1373,8 @@ class JobApplicationWorkflowTest(TestCase):
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
-        job_application.accept(user=job_application.to_company.members.first())
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.accept(user=job_application.to_company.members.first())
         assert job_application.to_company.is_subject_to_eligibility_rules
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
@@ -1402,7 +1417,8 @@ class JobApplicationWorkflowTest(TestCase):
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
-        job_application.accept(user=job_application.to_company.members.first())
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
@@ -1466,7 +1482,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert diagnosis.is_valid
 
         job_application = JobApplicationSentByJobSeekerFactory(job_seeker=user, state=JobApplicationState.PROCESSING)
-        job_application.accept(user=job_application.to_company.members.first())
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.accept(user=job_application.to_company.members.first())
         assert job_application.approval is not None
         assert job_application.approval_number_sent_by_email
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_AUTOMATIC
@@ -1493,7 +1510,8 @@ class JobApplicationWorkflowTest(TestCase):
         )
         # A valid Pôle emploi ID should trigger an automatic approval delivery.
         assert job_application.job_seeker.jobseeker_profile.pole_emploi_id != ""
-        job_application.accept(user=job_application.to_company.members.first())
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.accept(user=job_application.to_company.members.first())
         assert job_application.to_company.is_subject_to_eligibility_rules
         assert job_application.approval is None
         assert not job_application.approval_number_sent_by_email
@@ -1514,7 +1532,8 @@ class JobApplicationWorkflowTest(TestCase):
             state=JobApplicationState.PROCESSING,
             to_company__kind=CompanyKind.GEIQ,
         )
-        job_application.accept(user=job_application.to_company.members.first())
+        with self.captureOnCommitCallbacks(execute=True):
+            job_application.accept(user=job_application.to_company.members.first())
         assert not job_application.to_company.is_subject_to_eligibility_rules
         assert job_application.approval is None
         assert not job_application.approval_number_sent_by_email
@@ -1564,7 +1583,8 @@ class JobApplicationWorkflowTest(TestCase):
         assert user.job_applications.pending().count() == 2
 
         for job_application in user.job_applications.all():
-            job_application.refuse()
+            with self.captureOnCommitCallbacks(execute=True):
+                job_application.refuse()
             # Check sent email.
             assert len(mail.outbox) == 1
             assert "Candidature déclinée" in mail.outbox[0].subject

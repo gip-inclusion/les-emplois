@@ -4,7 +4,6 @@ Functions used in organization views.
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
 
 
 def deactivate_org_member(request, target_member):
@@ -22,9 +21,7 @@ def deactivate_org_member(request, target_member):
                 messages.success(
                     request, f"{target_member.get_full_name()} a été retiré(e) des membres actifs de cette structure."
                 )
-                transaction.on_commit(
-                    lambda: request.current_organization.member_deactivation_email(membership.user).send()
-                )
+                request.current_organization.member_deactivation_email(membership.user).send()
         else:
             raise PermissionDenied
         return True
@@ -45,13 +42,13 @@ def update_org_admin_role(request, target_member, action):
                 messages.success(
                     request, f"{target_member.get_full_name()} a été ajouté(e) aux administrateurs de cette structure."
                 )
-                transaction.on_commit(lambda: request.current_organization.add_admin_email(target_member).send())
+                request.current_organization.add_admin_email(target_member).send()
             if action == "remove":
                 membership.set_admin_role(is_admin=False, updated_by=request.user)
                 messages.success(
                     request, f"{target_member.get_full_name()} a été retiré(e) des administrateurs de cette structure."
                 )
-                transaction.on_commit(lambda: request.current_organization.remove_admin_email(target_member).send())
+                request.current_organization.remove_admin_email(target_member).send()
             membership.save()
         else:
             raise PermissionDenied

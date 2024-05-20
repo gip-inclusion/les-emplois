@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
-from django.test import Client, override_settings
+from django.test import override_settings
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -30,6 +30,7 @@ from tests.prescribers.factories import (
     PrescriberPoleEmploiFactory,
 )
 from tests.users.factories import EmployerFactory, PrescriberFactory
+from tests.utils.test import ItouClient
 
 
 @override_settings(
@@ -189,7 +190,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
         self.assertContains(response, url + '"')
 
-        other_client = Client()
+        other_client = ItouClient()
         response = mock_oauth_dance(
             self.client,
             KIND_PRESCRIBER,
