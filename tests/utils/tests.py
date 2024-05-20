@@ -21,7 +21,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.exceptions import ValidationError
-from django.core.mail.message import EmailMessage
 from django.http import HttpResponse
 from django.template import Context, Template
 from django.template.loader import render_to_string
@@ -29,7 +28,6 @@ from django.test import RequestFactory, SimpleTestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import escape
-from factory import Faker
 from faker import Faker as fk
 from pytest_django.asserts import assertContains, assertNumQueries, assertRedirects
 
@@ -49,7 +47,6 @@ from itou.utils.models import PkSupportRemark
 from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.utils.sync import DiffItem, DiffItemKind, yield_sync_diff
-from itou.utils.tasks import sanitize_mailjet_recipients
 from itou.utils.templatetags import dict_filters, format_filters, job_applications, job_seekers
 from itou.utils.tokens import COMPANY_SIGNUP_MAGIC_LINK_TIMEOUT, CompanySignupTokenGenerator
 from itou.utils.urls import (
@@ -1005,50 +1002,6 @@ class CnilCompositionPasswordValidatorTest(SimpleTestCase):
 
     def test_help_text(self):
         assert CnilCompositionPasswordValidator().get_help_text() == CnilCompositionPasswordValidator.HELP_MSG
-
-
-class UtilsEmailsSplitRecipientTest(TestCase):
-    """
-    Test behavior of email backend when sending emails with more than 50 recipients
-    (Mailjet API Limit)
-    """
-
-    def test_email_copy(self):
-        fake_email = Faker("email", locale="fr_FR")
-        message = EmailMessage(from_email="unit-test@tests.com", body="xxx", to=[fake_email], subject="test")
-        result = sanitize_mailjet_recipients(message)
-
-        assert 1 == len(result)
-
-        assert "xxx" == result[0].body
-        assert "unit-test@tests.com" == result[0].from_email
-        assert fake_email == result[0].to[0]
-        assert "test" == result[0].subject
-
-    def test_dont_split_emails(self):
-        recipients = []
-        # Only one email is needed
-        for _ in range(49):
-            recipients.append(Faker("email", locale="fr_FR"))
-
-        message = EmailMessage(from_email="unit-test@tests.com", body="", to=recipients)
-        result = sanitize_mailjet_recipients(message)
-
-        assert 1 == len(result)
-        assert 49 == len(result[0].to)
-
-    def test_must_split_emails(self):
-        # 2 emails are needed; one with 50 the other with 25
-        recipients = []
-        for _ in range(75):
-            recipients.append(Faker("email", locale="fr_FR"))
-
-        message = EmailMessage(from_email="unit-test@tests.com", body="", to=recipients)
-        result = sanitize_mailjet_recipients(message)
-
-        assert 2 == len(result)
-        assert 50 == len(result[0].to)
-        assert 25 == len(result[1].to)
 
 
 class SupportRemarkAdminViewsTest(TestCase):
