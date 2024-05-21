@@ -41,17 +41,32 @@ sont rendues disponibles par [Docker](https://docs.docker.com/) et
 - [Installer Docker](https://docs.docker.com/engine/install/)
 - [Installer Docker Compose](https://docs.docker.com/compose/install/)
 
-Démarrez les dépendances de développement avec la commande :
+#### Premier lancement
+
+Les différents services et commandes dans le Makefile ont besoin de variables
+d'environnement :
+
 ```sh
 cp .env.template .env
-docker compose up
 ```
+
+Ce fichier sera automatiquement chargé par [direnv](https://direnv.net/) si vous
+l'avez installé.
+Une autre solution est de charger ce fichier manuellement avec
+[dotenv](https://github.com/motdotla/dotenv#readme).
 
 **Note** : Vous pouvez personnaliser la configuration des dépendances gérées
 par Docker Compose en modifiant [le fichier
 `.env`](https://docs.docker.com/compose/env-file/) que vous venez de copier
 à partir du fichier racine `.env.template`. Le fichier `.env` doit être au
 même niveau que le fichier [README.md](./README.md).
+
+#### 
+
+Démarrez les dépendances de développement avec la commande :
+```sh
+docker compose up
+```
 
 ### Dépendances Python
 

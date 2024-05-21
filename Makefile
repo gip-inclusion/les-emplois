@@ -4,13 +4,6 @@
 # > practice; so for compatibility, you must explicitly request it
 .DELETE_ON_ERROR:
 
-# Load env variables from .env using dotenv
-# =============================================================================
-ifneq (,$(wildcard ./.env))
-    include .env
-    export
-endif
-
 # Global tasks.
 # =============================================================================
 PYTHON_VERSION := python3.11
