@@ -73,14 +73,14 @@ class UserAdapter(DefaultAccountAdapter):
             url = f"{url}?next={get_safe_url(request, 'next')}"
         return url
 
-    def get_email_confirmation_redirect_url(self, request):
+    def get_email_verification_redirect_url(self, email_address):
         """
         Redirection performed after a user confirmed its email address.
         """
-        next_url = request.POST.get("next") or request.GET.get("next")
-        url = super().get_email_confirmation_redirect_url(request)
+        next_url = self.request.POST.get("next") or self.request.GET.get("next")
+        url = super().get_email_verification_redirect_url(email_address)
         if next_url:
-            url = get_safe_url(request, "next")
+            url = get_safe_url(self.request, "next")
         return url
 
     def send_mail(self, template_prefix, email, context):
