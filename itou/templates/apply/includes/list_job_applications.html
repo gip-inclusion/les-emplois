@@ -70,9 +70,6 @@
                 </a>
             {% endif %}
         </div>
-        {% if request.user.is_employer %}
-            {% include "apply/includes/rdv_insertion_promo_card.html" %}
-        {% endif %}
     {% else %}
         {% for job_application in job_applications_page %}
             <div class="c-box c-box--results has-links-inside my-3 my-md-4">
@@ -110,9 +107,6 @@
                     </div>
                 </div>
             </div>
-            {% if request.user.is_employer and forloop.counter == 1 %}
-                {% include "apply/includes/rdv_insertion_promo_card.html" %}
-            {% endif %}
         {% endfor %}
         {% include "includes/pagination.html" with page=job_applications_page boost=True boost_target="#job-applications-section" boost_indicator="#job-applications-section" %}
     {% endif %}

@@ -76,7 +76,6 @@
                       </div>
                   </div>
               </div>
-              
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
@@ -143,7 +142,6 @@
                       </div>
                   </div>
               </div>
-              
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
@@ -210,7 +208,6 @@
                       </div>
                   </div>
               </div>
-              
           
           
   
@@ -317,7 +314,6 @@
                       </div>
                   </div>
               </div>
-              
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
@@ -399,7 +395,6 @@
                       </div>
                   </div>
               </div>
-              
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
@@ -481,7 +476,6 @@
                       </div>
                   </div>
               </div>
-              
           
           
   
@@ -585,37 +579,6 @@
                       </div>
                   </div>
               </div>
-              
-                  
-  
-  <div class="card my-3 my-md-4 px-4 alert-dismissible-once d-none container rounded border-important bg-important-lightest" id="rdvi-promo">
-      <div class="row">
-          <div class="d-none d-md-block col-md-auto align-self-center">
-              <img alt="" class="m-auto" height="90" loading="lazy" src="/static/img/logo_rdv_insertion.svg"/>
-          </div>
-          <div class="col-12 col-md p-0">
-              <div class="card-header pt-4">
-                  <span class="badge rounded-pill bg-important badge-xs">Nouveau service</span>
-                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" data-bs-target="#rdvi-promo" type="button">
-                  </button>
-              </div>
-              <div class="card-body pb-4">
-                  <h4>RDV-Insertion simplifie les rendez-vous avec vos candidats</h4>
-                  <p>
-                      Besoin d'un outil de prise de RDV par mail et/ou SMS avec gestion des rappels pour
-                      augmenter le taux de présence de vos candidats aux entretiens individuels et
-                      aux informations collectives ?
-                  </p>
-                  <a aria-label="Découvrir le service RDV-Insertion dans un nouvel onglet" class="btn btn-ico btn-link p-0" href="https://tally.so/r/nro2X2" rel="noopener" target="_blank">
-                      <span>Je découvre</span>
-                      <i class="ri-external-link-line ri-lg"></i>
-                  </a>
-              </div>
-          </div>
-      </div>
-  </div>
-  
-              
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
@@ -694,7 +657,6 @@
                       </div>
                   </div>
               </div>
-              
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
                   
@@ -773,7 +735,6 @@
                       </div>
                   </div>
               </div>
-              
           
           
   
