@@ -170,9 +170,13 @@
                             Code SAFIR {{ request.current_organization.code_safir_pole_emploi }}
                         {% elif request.current_organization.siret %}
                             {% if request.current_organization.is_authorized %}Prescripteur habilité -{% endif %}
+                            {% if request.current_organization.kind != PrescriberOrganizationKind.OTHER %}
+                                {{ request.current_organization.kind }} -
+                            {% endif %}
                             SIRET {{ request.current_organization.siret|format_siret }}
                         {% endif %}
                     {% elif user.is_employer %}
+                        {{ request.current_organization.kind }} -
                         SIRET {{ request.current_organization.siret|format_siret }}
                     {% endif %}
                 </p>
