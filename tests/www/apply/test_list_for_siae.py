@@ -215,19 +215,6 @@ class ProcessListSiaeTest(TestCase):
         )
         assertContains(response, job_application_link)
 
-    def test_list_for_siae_rdv_insertion_promo(self):
-        self.client.force_login(self.eddie_hit_pit)
-        response = self.client.get(reverse("apply:list_for_siae"))
-        promo_text = "Besoin d'un outil de prise de RDV par mail et/ou SMS"
-        assertContains(response, promo_text)
-
-        # Check with an other SIAE without applications - the promo is there too
-        other_company = CompanyFactory(with_membership=True)
-        self.client.force_login(other_company.members.first())
-        response = self.client.get(reverse("apply:list_for_siae"))
-        assertContains(response, "Aucune candidature pour le moment")
-        assertContains(response, promo_text)
-
     def test_list_for_siae_show_criteria(self):
         # Add a diagnosis present on 2 applications
         diagnosis = EligibilityDiagnosisFactory(job_seeker=self.maggie)
