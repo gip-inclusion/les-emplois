@@ -1,5 +1,20 @@
 # Journal des modifications
 
+## 2024-05-18
+
+### Ajouté
+
+- [Contrôle a posteriori : donner l'accès aux pièces justificatives des contrôles précédents aux employeurs](https://github.com/gip-inclusion/les-emplois/pull/4044)
+
+### Modifié
+
+- [Admin : Ignorer les accents lors de la recherche par prénom ou nom](https://github.com/gip-inclusion/les-emplois/pull/4095)
+- [API : Correction d’une typo dans les URLs d’exemple de l’API candidats](https://github.com/gip-inclusion/les-emplois/pull/4085)
+- [Demandeur d’emploi : les champs prénom, nom et adresse sont requis](https://github.com/gip-inclusion/les-emplois/pull/4079)
+- [Inscription: correction du chemin d'accès à l'API SIRENE de l'INSEE](https://github.com/gip-inclusion/les-emplois/pull/4064)
+- [Pilotage : Afficher les stats de la campagne de contrôle a posteriori 2024 pour la DGEFP](https://github.com/gip-inclusion/les-emplois/pull/4074)
+- [UX/UI : Postuler pour une entreprise directement depuis les résultats de recherche employeur](https://github.com/gip-inclusion/les-emplois/pull/4078) 🖼
+
 ## 2024-05-12
 
 ### Modifié
