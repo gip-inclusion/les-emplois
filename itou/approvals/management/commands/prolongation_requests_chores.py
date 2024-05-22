@@ -1,4 +1,5 @@
 from dateutil.relativedelta import relativedelta
+from django.db import transaction
 from django.db.models import Q
 from django.template.defaultfilters import pluralize
 from django.utils import timezone
@@ -14,6 +15,7 @@ class Command(BaseCommand):
         parser.add_argument("command", choices=["email_reminder"])
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
+    @transaction.atomic
     def send_reminder_to_prescriber_organization_other_members(self, wet_run):
         first_reminder = Q(reminder_sent_at=None, created_at__date__lte=timezone.localdate() - relativedelta(days=10))
         subsequent_reminders = Q(reminder_sent_at__date__lte=timezone.localdate() - relativedelta(days=10))
