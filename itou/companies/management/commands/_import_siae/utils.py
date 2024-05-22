@@ -247,6 +247,8 @@ def anonymize_fluxiae_df(df):
 
     if "salarie_agrement" in df.columns.tolist():
         df["hash_numéro_pass_iae"] = df["salarie_agrement"].apply(hash_content)
+    if "salarie_nir" in df.columns.tolist():
+        df["hash_nir"] = df["salarie_nir"].apply(hash_content)
 
     # Any column having any of these keywords inside its name will be dropped.
     # E.g. if `courriel` is a deletable keyword, then columns named `referent_courriel`,
@@ -267,6 +269,7 @@ def anonymize_fluxiae_df(df):
         "titre_sejour",
         "observations",
         "salarie_agrement",
+        "salarie_nir",
         "salarie_adr_point_remise",
         "salarie_adr_cplt_point_geo",
         "salarie_adr_numero_voie",
