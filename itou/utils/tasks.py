@@ -1,6 +1,7 @@
 import logging
 from functools import partial
 
+import sentry_sdk
 from django.conf import settings
 from django.core.mail import get_connection
 from django.core.mail.backends.base import BaseEmailBackend
@@ -111,8 +112,8 @@ def _async_send_messages(serializable_email_messages):
     return len(messages)
 
 
-@task(retries=_NB_RETRIES, retry_delay=settings.SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS)
-def _async_send_message(serialized_email):
+@task(retries=_NB_RETRIES, retry_delay=settings.SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS, context=True)
+def _async_send_message(serialized_email, task=None):
     """
     An `EmailMessage` instance holds references to some non-serializable
     ressources, such as a connection to the email backend (if not `None`).
@@ -123,6 +124,16 @@ def _async_send_message(serialized_email):
     with get_connection(backend=settings.ASYNC_EMAIL_BACKEND) as connection:
         email = _deserializeEmailMessage(serialized_email)
         connection.send_messages([email])
+    # Mailjet has a global flag for an email to indicate success.
+    # Anymail iterates over recipients and assign each a status, following its
+    # documented API. Mailjet indicating success is good enough.
+    # https://dev.mailjet.com/email/guides/send-api-v31/
+    esp_response = email.anymail_status.esp_response.json()
+    [result] = esp_response["Messages"]
+    if result["Status"] != "success":
+        if task and task.retries:
+            raise Exception("Huey, please retry this task.")
+        sentry_sdk.capture_message(f"Could not send email: {result}", "error")
     return 1
 
 
