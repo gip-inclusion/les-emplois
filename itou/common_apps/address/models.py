@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 from itou.cities.models import City
-from itou.common_apps.address.departments import DEPARTMENTS, REGIONS, department_from_postcode
+from itou.common_apps.address.departments import DEPARTMENT_TO_REGION, DEPARTMENTS, department_from_postcode
 from itou.geo.models import QPV, ZRR
 from itou.utils.apis.exceptions import AddressLookupError, GeocodingDataError
 from itou.utils.apis.geocoding import batch as batch_geocode, get_geocoding_data
@@ -195,9 +195,7 @@ class AddressMixin(models.Model):
     @property
     def region(self):
         if self.department:
-            for region, departments in REGIONS.items():
-                if self.department in departments:
-                    return region
+            return DEPARTMENT_TO_REGION.get(self.department)
         return None
 
     @property
