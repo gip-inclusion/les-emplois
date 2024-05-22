@@ -263,13 +263,13 @@
                                 {# end of if user.is_prescriber #}
 
                                 {% if user.is_employer %}
-                                    {% include "dashboard/includes/siae_job_applications_card.html" %}
+                                    {% include "dashboard/includes/employer_job_applications_card.html" %}
                                     {% if request.current_organization.is_subject_to_eligibility_rules %}
-                                        {% include "dashboard/includes/siae_employees_card.html" %}
+                                        {% include "dashboard/includes/employer_employees_card.html" %}
                                     {% endif %}
-                                    {% include "dashboard/includes/siae_card.html" %}
+                                    {% include "dashboard/includes/employer_company_card.html" %}
                                     {% if active_campaigns or evaluated_siae_notifications %}
-                                        {% include "dashboard/includes/siae_evaluation_campains_card.html" %}
+                                        {% include "dashboard/includes/employer_evaluation_campaigns_card.html" %}
                                     {% endif %}
                                 {% endif %}
                                 {# end of if user.is_employer #}
