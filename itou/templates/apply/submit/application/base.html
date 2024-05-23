@@ -54,7 +54,7 @@
                         </div>
                         <span>
                             {% block progress_title %}
-                                {% if request.user.is_employer %}
+                                {% if auto_prescription_process %}
                                     Auto-prescription
                                 {% else %}
                                     Postuler

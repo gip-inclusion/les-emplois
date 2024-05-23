@@ -347,7 +347,7 @@ class SubmitJobApplicationForm(forms.Form):
         max_upload_size=5 * global_constants.MB,
     )
 
-    def __init__(self, company, user, *args, **kwargs):
+    def __init__(self, company, user, auto_prescription_process, *args, **kwargs):
         self.company = company
         super().__init__(*args, **kwargs)
         self.fields.update(forms.fields_for_model(JobApplication, fields=["selected_jobs", "message"]))
@@ -357,12 +357,12 @@ class SubmitJobApplicationForm(forms.Form):
         selected_jobs.label = "Métiers recherchés"
 
         message = self.fields["message"]
-        message.required = not user.is_employer
+        message.required = not auto_prescription_process
         message.widget.attrs["placeholder"] = ""
         if user.is_job_seeker:
             message.label = "Message à l’employeur"
             help_text = "Message obligatoire à destination de l’employeur et non modifiable après l’envoi."
-        elif user.is_employer:
+        elif auto_prescription_process:
             message.label = "Message d’information"
             help_text = "Ce message ne sera plus modifiable après l’envoi et une copie sera transmise au candidat."
         else:

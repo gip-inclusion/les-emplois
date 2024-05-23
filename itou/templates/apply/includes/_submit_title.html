@@ -1,23 +1,19 @@
 {% load str_filters %}
 
-{% if request.user.is_employer %}
-    {% if hire_process %}
-        {% if job_seeker %}
-            Déclarer l’embauche de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}
-        {% else %}
-            Déclarer une embauche
-        {% endif %}
+{% if is_gps|default:False %}
+    Enregistrer un nouveau bénéficiaire
+{% elif hire_process %}
+    {% if job_seeker %}
+        Déclarer l’embauche de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}
     {% else %}
-        {% if is_gps %}
-            Enregistrer un nouveau bénéficaire
-        {% else %}
-            Enregistrer une candidature
-            {% if job_seeker %}pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}{% endif %}
-        {% endif %}
+        Déclarer une embauche
     {% endif %}
-{% elif request.user.is_prescriber %}
+{% elif auto_prescription_process %}
+    Enregistrer une candidature
+    {% if job_seeker %}pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}{% endif %}
+{% elif prescription_process %}
     Postuler
     {% if job_seeker %}pour {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}{% endif %}
-{% elif request.user.is_job_seeker %}
+{% else %}
     Postuler
 {% endif %}
