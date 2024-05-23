@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import Http404, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import formats, safestring
 
@@ -65,11 +65,9 @@ def handle_invited_user_registration_with_inclusion_connect(request, invitation,
 
 
 def new_user(request, invitation_type, invitation_id):
-    # FIXME(alaurent) remove in january 2024 (check that there's no valid invitations from before the merge)
-    if invitation_type == "siae_staff":
-        invitation_type = KIND_EMPLOYER
     if invitation_type not in [KIND_LABOR_INSPECTOR, KIND_PRESCRIBER, KIND_EMPLOYER]:
-        raise Http404
+        messages.error(request, "Cette invitation n'est plus valide.")
+        return redirect(reverse("search:employers_home"))
     invitation_class = InvitationAbstract.get_model_from_string(invitation_type)
     invitation = get_object_or_404(invitation_class, pk=invitation_id)
 

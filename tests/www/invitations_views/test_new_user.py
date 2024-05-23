@@ -1,6 +1,7 @@
 import uuid
 
 from django.shortcuts import reverse
+from pytest_django.asserts import assertRedirects
 
 
 class TestNewUser:
@@ -11,4 +12,4 @@ class TestNewUser:
                 kwargs={"invitation_type": "invalid", "invitation_id": uuid.uuid4()},
             )
         )
-        assert response.status_code == 404
+        assertRedirects(response, reverse("search:employers_home"))
