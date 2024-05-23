@@ -87,7 +87,7 @@ class SiaeAPIFetchListTest(APITestCase):
             company=company,
             location=None,
             open_positions=1,
-            contract_type=ContractType.FIXED_TERM,
+            contract_type=ContractType.FIXED_TERM_I_PHC,
         )
         job_2 = JobDescriptionFactory(
             company=company,
@@ -145,7 +145,7 @@ class SiaeAPIFetchListTest(APITestCase):
                         "recrutement_ouvert": "True",
                         "description": job_1.description,
                         "appellation_modifiee": "",
-                        "type_contrat": "CDD",
+                        "type_contrat": "CDD-I PHC",
                         "nombre_postes_ouverts": 1,
                         "lieu": None,
                         "profil_recherche": job_1.profile_description,
