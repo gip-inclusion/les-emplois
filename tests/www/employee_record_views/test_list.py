@@ -36,6 +36,8 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
             for_snapshot=True,
+            job_seeker__city="",
+            job_seeker__post_code="",
         )
         self.job_seeker = self.job_application.job_seeker
 

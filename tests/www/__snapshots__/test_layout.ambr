@@ -44,7 +44,7 @@
                                   <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
                                   <div class="flex-grow-1 ms-2 lh-sm">
                                       
-                                          <span>John DOE</span>
+                                          <span>Pierre DUPONT</span>
                                           <br/>
                                       
                                       <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
@@ -227,7 +227,7 @@
                                   <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
                                   <div class="flex-grow-1 ms-2 lh-sm">
                                       
-                                          <span>John DOE</span>
+                                          <span>Jane DOE</span>
                                           <br/>
                                       
                                       <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
@@ -409,7 +409,7 @@
                                   <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
                                   <div class="flex-grow-1 ms-2 lh-sm">
                                       
-                                          <span>John DOE</span>
+                                          <span>Pierre DUPONT</span>
                                           <br/>
                                       
                                       <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
@@ -495,7 +495,7 @@
                                   <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
                                   <div class="flex-grow-1 ms-2 lh-sm">
                                       
-                                          <span>John DOE</span>
+                                          <span>Pierre DUPONT</span>
                                           <br/>
                                       
                                       <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>

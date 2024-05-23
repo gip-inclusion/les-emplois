@@ -23,7 +23,7 @@
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
   
-                                  <div class="form-group form-group-required"><label class="form-label">Pour quel motif refusez-vous la prolongation du parcours IAE de John DOE ?</label><div class="" id="id_reason-reason" required="">
+                                  <div class="form-group form-group-required"><label class="form-label">Pour quel motif refusez-vous la prolongation du parcours IAE de Jane DOE ?</label><div class="" id="id_reason-reason" required="">
       
           
           
@@ -146,7 +146,7 @@
                           <div class="s-title-02__col col-12">
                               
                               
-      <h1>Refuser la demande de prolongation pour John DOE</h1>
+      <h1>Refuser la demande de prolongation pour Jane DOE</h1>
   
                               
                                   
@@ -255,7 +255,7 @@
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
   
-                                  <div class="form-group form-group-required"><label class="form-label">Pour quel motif refusez-vous la prolongation du parcours IAE de John DOE ?</label><div class="" id="id_reason-reason" required="">
+                                  <div class="form-group form-group-required"><label class="form-label">Pour quel motif refusez-vous la prolongation du parcours IAE de Jane DOE ?</label><div class="" id="id_reason-reason" required="">
       
           
           
@@ -378,7 +378,7 @@
                           <div class="s-title-02__col col-12">
                               
                               
-      <h1>Refuser la demande de prolongation pour John DOE</h1>
+      <h1>Refuser la demande de prolongation pour Jane DOE</h1>
   
                               
                                   
@@ -416,7 +416,7 @@
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
   
-                                  <div class="form-group form-group-required"><label class="form-label">Pour quel motif refusez-vous la prolongation du parcours IAE de John DOE ?</label><div class="" id="id_reason-reason" required="">
+                                  <div class="form-group form-group-required"><label class="form-label">Pour quel motif refusez-vous la prolongation du parcours IAE de Jane DOE ?</label><div class="" id="id_reason-reason" required="">
       
           
           
@@ -539,7 +539,7 @@
                           <div class="s-title-02__col col-12">
                               
                               
-      <h1>Refuser la demande de prolongation pour John DOE</h1>
+      <h1>Refuser la demande de prolongation pour Jane DOE</h1>
   
                               
                                   
@@ -577,7 +577,7 @@
                                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
                                   <input id="id_prolongation_request_deny_view-current_step" name="prolongation_request_deny_view-current_step" type="hidden" value="reason"/>
   
-                                  <div class="form-group form-group-required"><label class="form-label">Pour quel motif refusez-vous la prolongation du parcours IAE de John DOE ?</label><div class="" id="id_reason-reason" required="">
+                                  <div class="form-group form-group-required"><label class="form-label">Pour quel motif refusez-vous la prolongation du parcours IAE de Jane DOE ?</label><div class="" id="id_reason-reason" required="">
       
           
           
@@ -700,7 +700,7 @@
                           <div class="s-title-02__col col-12">
                               
                               
-      <h1>Refuser la demande de prolongation pour John DOE</h1>
+      <h1>Refuser la demande de prolongation pour Jane DOE</h1>
   
                               
                                   
@@ -787,11 +787,11 @@
                                       <tbody>
                                           
                                               <tr>
-                                                  <td class="font-weight-bold">John DOE</td>
+                                                  <td class="font-weight-bold">Jane DOE</td>
                                                   <td><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></td>
                                                   <td>ACME Inc.</td>
                                                   <td>01/01/2000</td>
-                                                  <td>John DOE</td>
+                                                  <td>Pierre DUPONT</td>
                                                   <td>
       
           <span class="badge rounded-pill badge-xs bg-accent-03 text-primary">À traiter</span>
@@ -854,11 +854,11 @@
                                       <tbody>
                                           
                                               <tr>
-                                                  <td class="font-weight-bold">John DOE</td>
+                                                  <td class="font-weight-bold">Jane DOE</td>
                                                   <td><span>99999</span><span class="ms-1">99</span><span class="ms-1">99999</span></td>
                                                   <td>-</td>
                                                   <td>01/01/2000</td>
-                                                  <td>John DOE</td>
+                                                  <td>Pierre DUPONT</td>
                                                   <td>
       
           <span class="badge rounded-pill badge-xs bg-accent-03 text-primary">À traiter</span>
@@ -895,7 +895,7 @@
                               Adressé à
                               <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" title="En cas d’absence du prescripteur sollicité, vous pouvez traiter cette demande."></i>
                           </h3>
-                          <p>John DOE a été sollicité pour cette demande.</p>
+                          <p>Pierre DUPONT a été sollicité pour cette demande.</p>
                           <h3>Date de fin de PASS IAE demandée : 31/01/2000</h3>
                           <p>
                               La prolongation est demandée pour une durée de 30 jours.
@@ -908,7 +908,7 @@
                                   Le bilan des actions réalisées et actions prévues avec le salarié, rempli par l’employeur est présent sur le document excel téléchargeable ci-dessous.
                               </p>
                               <p>
-                                  <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 John DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
+                                  <a class="btn btn-secondary btn-ico" download="Bilan prolongation PASS IAE 999999999999 Jane DOE.xlsx" href="/approvals/prolongation/request/666/report-file/">
                                       <i class="ri-download-line ri-lg font-weight-normal"></i>
                                       <span>Télécharger le bilan</span>
                                   </a>
@@ -942,7 +942,7 @@
       <div class="c-box mb-3 mb-lg-5 border-danger bg-danger-lightest">
           <h4>Pas de prolongation du PASS IAE</h4>
           <p class="mb-2">
-              Demande refusée le 01 janvier 2000 par John DOE
+              Demande refusée le 01 janvier 2000 par Pierre DUPONT
           </p>
       </div>
   
@@ -955,7 +955,7 @@
       <div class="c-box mb-3 mb-lg-5 border-success bg-success-lightest">
           <h4>Prolongation du PASS IAE jusqu’au 31/01/2000</h4>
           <p class="mb-2">
-              Demande acceptée le 01 janvier 2000 par John DOE
+              Demande acceptée le 01 janvier 2000 par Pierre DUPONT
           </p>
       </div>
   
