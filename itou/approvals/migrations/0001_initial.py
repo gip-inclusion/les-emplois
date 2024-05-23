@@ -269,7 +269,7 @@ class Migration(migrations.Migration):
                         choices=[
                             ("job_seeker", "Demandeur d'emploi"),
                             ("prescriber", "Prescripteur"),
-                            ("employer", "Employeur (SIAE)"),
+                            ("employer", "Employeur"),
                         ],
                         null=True,
                         verbose_name="origine de la candidature à l'origine du PASS IAE",
@@ -1350,7 +1350,7 @@ class Migration(migrations.Migration):
                         choices=[
                             ("job_seeker", "Demandeur d'emploi"),
                             ("prescriber", "Prescripteur"),
-                            ("employer", "Employeur (SIAE)"),
+                            ("employer", "Employeur"),
                         ],
                         verbose_name="origine de la candidature",
                     ),

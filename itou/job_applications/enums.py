@@ -18,7 +18,7 @@ class JobApplicationState(models.TextChoices):
 class SenderKind(models.TextChoices):
     JOB_SEEKER = users_enums.KIND_JOB_SEEKER, "Demandeur d'emploi"
     PRESCRIBER = users_enums.KIND_PRESCRIBER, "Prescripteur"
-    EMPLOYER = users_enums.KIND_EMPLOYER, "Employeur (SIAE)"
+    EMPLOYER = users_enums.KIND_EMPLOYER, "Employeur"
 
 
 def sender_kind_to_pe_origine_candidature(sender_kind):

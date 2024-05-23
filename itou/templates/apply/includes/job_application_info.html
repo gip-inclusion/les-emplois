@@ -1,14 +1,5 @@
 {% load str_filters %}
 
-<ul class="list-data list-data__two-column-md mb-3">
-    {% if request.user.is_prescriber or request.user.is_job_seeker %}
-        <li>
-            <small>Employeur</small>
-            <strong>{{ job_application.to_company.display_name }}</strong>
-        </li>
-    {% endif %}
-</ul>
-
 {% if job_application.message %}
     <ul class="list-data mb-3">
         <li>
@@ -16,6 +7,16 @@
             <blockquote class="blockquote mt-2 mb-0">
                 {{ job_application.message|linebreaks }}
             </blockquote>
+        </li>
+    </ul>
+{% endif %}
+
+{% if job_application.to_company != request.current_organization %}
+    <hr class="my-4">
+    <ul class="list-data list-data__two-column-md mb-3">
+        <li>
+            <small>Employeur destinataire</small>
+            <strong>{{ job_application.to_company.display_name }}</strong>
         </li>
     </ul>
 {% endif %}

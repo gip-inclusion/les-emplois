@@ -172,7 +172,7 @@ class JobApplicationModelTest(TestCase):
         items = [
             [JobApplicationFactory(sent_by_authorized_prescriber_organisation=True), "Prescripteur"],
             [JobApplicationSentByPrescriberOrganizationFactory(), "Orienteur"],
-            [JobApplicationSentByCompanyFactory(), "Employeur (SIAE)"],
+            [JobApplicationSentByCompanyFactory(), "Employeur"],
             [JobApplicationSentByJobSeekerFactory(), "Demandeur d'emploi"],
         ] + non_siae_items
 
@@ -340,6 +340,33 @@ def test_can_change_prior_actions():
         JobApplicationFactory.build(to_company=non_geiq, state=JobApplicationState.POSTPONED).can_change_prior_actions
         is False
     )
+
+
+def test_prescriptions_of_for_employer_with_company():
+    job_application = JobApplicationFactory(sent_by_another_employer=True)
+    assert list(JobApplication.objects.prescriptions_of(job_application.sender, job_application.sender_company)) == [
+        job_application
+    ]
+
+
+def test_prescriptions_of_for_employer_without_company():
+    job_application = JobApplicationFactory(sender_kind=SenderKind.EMPLOYER, sender=EmployerFactory())
+    assert list(JobApplication.objects.prescriptions_of(job_application.sender, job_application.sender_company)) == []
+    assert list(JobApplication.objects.prescriptions_of(job_application.sender, job_application.to_company)) == []
+
+
+def test_prescriptions_of_for_employer_is_based_on_company():
+    job_application = JobApplicationFactory(sent_by_another_employer=True)
+    dummy_employer = EmployerFactory.build()
+    assert list(JobApplication.objects.prescriptions_of(dummy_employer, job_application.sender_company)) == [
+        job_application
+    ]
+    assert list(JobApplication.objects.prescriptions_of(dummy_employer, job_application.to_company)) == []
+
+
+def test_prescriptions_of_exclude_auto_prescription():
+    job_application = JobApplicationSentByCompanyFactory()
+    assert list(JobApplication.objects.prescriptions_of(job_application.sender, job_application.to_company)) == []
 
 
 class JobApplicationQuerySetTest(TestCase):

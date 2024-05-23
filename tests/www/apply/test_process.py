@@ -26,6 +26,7 @@ from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.job_applications import enums as job_applications_enums
+from itou.job_applications.enums import SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.siae_evaluations.models import Sanctions
@@ -336,16 +337,28 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         response = self.client.get(url)
         self.assertContains(response, LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER.label, html=True)
 
-    def test_details_for_prescriber_as_company(self, *args, **kwargs):
-        """As a company user, I cannot access the job_applications details for prescribers."""
-
+    def test_details_for_prescriber_as_company_when_i_am_not_the_sender(self):
         job_application = JobApplicationFactory(sent_by_authorized_prescriber_organisation=True)
         employer = job_application.to_company.members.first()
         self.client.force_login(employer)
 
         url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
-        assert response.status_code == 302
+        assert response.status_code == 404
+
+    def test_details_for_prescriber_as_company_when_i_am_the_sender(self):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        job_application = JobApplicationFactory(
+            sender_kind=SenderKind.EMPLOYER,
+            sender=employer,
+            sender_company=company,
+        )
+        self.client.force_login(employer)
+
+        url = reverse("apply:details_for_prescriber", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        assert response.status_code == 200
 
     def test_details_for_unauthorized_prescriber(self, *args, **kwargs):
         """As an unauthorized prescriber I cannot access personnal information of arbitrary job seekers"""

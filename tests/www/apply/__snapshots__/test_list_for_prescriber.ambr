@@ -117,16 +117,17 @@
       <hr/>
       <fieldset>
           <legend>Émetteur</legend>
-      
   
-      
-          <div class="form-group"><label class="form-label" for="id_senders">Nom de la personne</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
+          
+              <div class="form-group"><label class="form-label" for="id_senders">Nom de la personne</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_senders" lang="fr" multiple="" name="senders">
   </select></div>
-      
+          
   
-      
+          
   
+          
       </fieldset>
+  
   
                                       
   

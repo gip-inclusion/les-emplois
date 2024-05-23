@@ -222,7 +222,7 @@ def test_list_prescriptions_exports_as_employer(client):
     client.force_login(job_application.to_company.members.get())
 
     response = client.get(reverse("apply:list_prescriptions_exports"))
-    assert 302 == response.status_code
+    assertNotContains(response, BESOIN_DUN_CHIFFRE)
 
 
 def test_list_prescriptions_exports_back_to_list(client):
@@ -249,7 +249,8 @@ def test_list_prescriptions_exports_download_as_employer(client):
     client.force_login(job_application.to_company.members.get())
 
     response = client.get(reverse("apply:list_prescriptions_exports_download"))
-    assert 302 == response.status_code
+    assert 200 == response.status_code
+    assert "spreadsheetml" in response.get("Content-Type")
 
 
 def test_list_prescriptions_exports_download_by_month(client):

@@ -1,17 +1,20 @@
 {% load django_bootstrap5 %}
 
-{% if filters_form.senders or filters_form.sender_organizations %}
+{% if filters_form.senders or filters_form.sender_prescriber_organizations or filters_form.sender_companies %}
     <hr>
     <fieldset>
         <legend>Émetteur</legend>
-    {% endif %}
 
-    {% if filters_form.senders %}
-        {% bootstrap_field filters_form.senders %}
-    {% endif %}
+        {% if filters_form.senders %}
+            {% bootstrap_field filters_form.senders %}
+        {% endif %}
 
-    {% if filters_form.sender_organizations %}
-        {% bootstrap_field filters_form.sender_organizations %}
-    {% endif %}
+        {% if filters_form.sender_prescriber_organizations %}
+            {% bootstrap_field filters_form.sender_prescriber_organizations %}
+        {% endif %}
 
-    {% if filters_form.senders or filters_form.sender_organizations %}</fieldset>{% endif %}
+        {% if filters_form.sender_companies %}
+            {% bootstrap_field filters_form.sender_companies %}
+        {% endif %}
+    </fieldset>
+{% endif %}

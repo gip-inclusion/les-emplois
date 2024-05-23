@@ -149,6 +149,7 @@ class ProcessListSiaeTest(TestCase):
             + 1  # prefetch selected jobs
             + 1  # prefetch jobs appellation
             + 1  # select distinct sender_prescriber_organization
+            + 1  # select distinct sender_company
             #
             # Paginate the job applications queryset:
             + 1  # has_suspended_approval subquery
@@ -156,6 +157,7 @@ class ProcessListSiaeTest(TestCase):
             + 1  # prefetch selected jobs
             + 1  # prefetch jobs appellation
             + 1  # prefetch jobs location
+            + 1  # prefetch jobs company
             + 1  # prefetch approvals
             + 1  # manually prefetch administrative_criteria
             #
@@ -163,31 +165,31 @@ class ProcessListSiaeTest(TestCase):
             # 9 job applications (1 per state in JobApplicationWorkflow + 1 sent by prescriber)
             # 22 requests, maggie has a diagnosis made by a prescriber in this test
             + 1  # jobapp1: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp1: select last valid diagnosis made by prescriber or SIAE (prescriber)
+            + 1  # jobapp1: select last valid diagnosis made by prescriber or SIAE
             # 24 requests
             + 1  # jobapp2: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp2: select last valid diagnosis made by prescriber or SIAE (SIAE)
+            + 1  # jobapp2: select last valid diagnosis made by prescriber or SIAE
             # 26 requests
             + 1  # jobapp3: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp3: select last valid diagnosis made by prescriber or SIAE (SIAE)
+            + 1  # jobapp3: select last valid diagnosis made by prescriber or SIAE
             # 28 requests
             + 1  # jobapp4: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp4: select last valid diagnosis made by prescriber or SIAE (SIAE)
+            + 1  # jobapp4: select last valid diagnosis made by prescriber or SIAE
             # 30 requests
             + 1  # jobapp5: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp5: select last valid diagnosis made by prescriber or SIAE (SIAE)
+            + 1  # jobapp5: select last valid diagnosis made by prescriber or SIAE
             # 32 requests
             + 1  # jobapp6: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp6: select last valid diagnosis made by prescriber or SIAE (SIAE)
+            + 1  # jobapp6: select last valid diagnosis made by prescriber or SIAE
             # 34 requests
             + 1  # jobapp7: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp7: select last valid diagnosis made by prescriber or SIAE (SIAE)
+            + 1  # jobapp7: select last valid diagnosis made by prescriber or SIAE
             # 36 requests
             + 1  # jobapp8: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp8: select last valid diagnosis made by prescriber or SIAE (SIAE)
+            + 1  # jobapp8: select last valid diagnosis made by prescriber or SIAE
             # 38 requests, maggie has a diagnosis made by a prescriber in this test
             + 1  # jobapp9: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp8: select last valid diagnosis made by prescriber or SIAE (prescriber)
+            + 1  # jobapp8: select last valid diagnosis made by prescriber or SIAE
             + 3  # update session
         ):
             response = self.client.get(reverse("apply:list_for_siae"))
@@ -385,7 +387,9 @@ class ProcessListSiaeTest(TestCase):
         """
         self.client.force_login(self.eddie_hit_pit)
         sender_organization = self.pole_emploi
-        response = self.client.get(reverse("apply:list_for_siae"), {"sender_organizations": [sender_organization.id]})
+        response = self.client.get(
+            reverse("apply:list_for_siae"), {"sender_prescriber_organizations": [sender_organization.id]}
+        )
 
         applications = response.context["job_applications_page"].object_list
 
@@ -425,7 +429,8 @@ class ProcessListSiaeTest(TestCase):
         self.client.force_login(self.eddie_hit_pit)
         senders_ids = [self.pole_emploi.id, self.l_envol.id]
         response = self.client.get(
-            reverse("apply:list_for_siae"), {"sender_organizations": [self.thibault_pe.id, self.audrey_envol.id]}
+            reverse("apply:list_for_siae"),
+            {"sender_prescriber_organizations": [self.thibault_pe.id, self.audrey_envol.id]},
         )
 
         applications = response.context["job_applications_page"].object_list

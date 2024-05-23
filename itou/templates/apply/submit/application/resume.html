@@ -203,7 +203,7 @@
                         <p class="font-weight-bold fs-sm mb-1">Vous n’avez pas de CV ?</p>
                         <p class="fs-sm mb-2">Créez-en un grâce à notre partenaire Diagoriente.</p>
                     {% endif %}
-                    <a href="https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-{{ request.user.is_prescriber|yesno:"prescripteur,candidat" }}"
+                    <a href="https://diagoriente.beta.gouv.fr/services/plateforme?utm_source=emploi-inclusion-{{ request.user.is_job_seeker|yesno:"candidat,prescripteur" }}"
                        rel="noopener"
                        target="_blank"
                        aria-label="Créer un CV avec Diagoriente (ouverture dans un nouvel onglet)"

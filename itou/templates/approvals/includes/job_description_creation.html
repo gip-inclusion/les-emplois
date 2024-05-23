@@ -12,8 +12,10 @@
             {% if request.user.is_employer %}
                 {% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
                     <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur (Import agrément Pôle emploi)
-                {% else %}
+                {% elif job_application.sender_company == job_application.to_company %}
                     <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur (Auto-prescription)
+                {% else %}
+                    <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur (Orientation)
                 {% endif %}
             {% elif request.user.is_job_seeker %}
                 <i class="ri-community-line me-1" aria-hidden="true"></i>Employeur
@@ -30,7 +32,7 @@
                 <i class="ri-home-smile-2-line me-1" aria-hidden="true"></i>Orienteur
             {% endif %}
         {% endif %}
-        {% if request.user.is_prescriber %}
+        {% if not request.user.is_job_seeker and job_application.to_company != request.current_organization %}
             chez
             <a href="{% url 'companies_views:card' siae_id=job_application.to_company.id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-ico btn-link">
                 <i class="ri-community-line font-weight-medium ri-sm me-1" aria-hidden="true"></i>

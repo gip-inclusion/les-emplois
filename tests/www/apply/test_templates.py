@@ -17,8 +17,8 @@ def load_template(path):
     return Template((Path("itou/templates") / path).read_text())
 
 
-def get_request():
-    request = RequestFactory()
+def get_request(path="/"):
+    request = RequestFactory().get(path)
     request.user = EmployerFactory()
     return request
 

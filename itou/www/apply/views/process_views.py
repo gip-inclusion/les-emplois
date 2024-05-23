@@ -166,7 +166,11 @@ def details_for_company(request, job_application_id, template_name="apply/proces
 
 
 @login_required
-@user_passes_test(lambda u: u.is_prescriber, login_url=reverse_lazy("search:employers_home"), redirect_field_name=None)
+@user_passes_test(
+    lambda u: u.is_prescriber or u.is_employer,
+    login_url=reverse_lazy("search:employers_home"),
+    redirect_field_name=None,
+)
 def details_for_prescriber(request, job_application_id, template_name="apply/process_details.html"):
     """
     Detail of an application for an SIAE with the ability:

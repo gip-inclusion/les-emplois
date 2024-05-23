@@ -82,6 +82,11 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
             sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
             sender_kind=SenderKind.PRESCRIBER,
         )
+        sent_by_another_employer = factory.Trait(
+            sender_kind=SenderKind.EMPLOYER,
+            sender_company=factory.SubFactory(CompanyFactory, with_membership=True),
+            sender=factory.LazyAttribute(lambda obj: obj.sender_company.members.first()),
+        )
         was_hired = factory.Trait(
             state="accepted",
             to_company__with_jobs=True,

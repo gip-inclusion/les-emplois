@@ -996,6 +996,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         # Step application's resume.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
+        self.assertContains(response, "Postuler")
 
         with mock.patch(
             "itou.www.apply.views.submit_views.uuid.uuid4",
@@ -1284,6 +1285,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         # Step application's resume.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
+        self.assertContains(response, "Postuler")
 
         with mock.patch(
             "itou.www.apply.views.submit_views.uuid.uuid4",
@@ -1631,6 +1633,7 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
         # Step application's resume.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
+        self.assertContains(response, "Postuler")
 
         with mock.patch(
             "itou.www.apply.views.submit_views.uuid.uuid4",
@@ -1861,7 +1864,9 @@ class ApplyAsCompanyTest(TestCase):
         self.client.force_login(user)
 
         response = self.client.get(reverse("apply:start", kwargs={"company_pk": company_2.pk}))
-        assert response.status_code == 403
+        assertRedirects(
+            response, expected_url=reverse("apply:check_nir_for_sender", kwargs={"company_pk": company_2.pk})
+        )
 
     def test_apply_as_siae_with_suspension_sanction(self):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
@@ -1880,28 +1885,12 @@ class ApplyAsCompanyTest(TestCase):
             status_code=403,
         )
 
-    @pytest.mark.ignore_unknown_variable_template_error(
-        "confirmation_needed", "job_seeker", "readonly_form", "update_job_seeker"
-    )
     @override_settings(API_BAN_BASE_URL="http://ban-api")
     @mock.patch(
         "itou.utils.apis.geocoding.get_geocoding_data",
         side_effect=mock_get_geocoding_data_by_ban_api_resolved,
     )
-    def test_apply_as_company(self, _mock):
-        """Apply as company."""
-
-        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
-
-        user = company.members.first()
-        self.client.force_login(user)
-
-        dummy_job_seeker = JobSeekerWithAddressFactory.build(
-            jobseeker_profile__with_hexa_address=True,
-            jobseeker_profile__with_education_level=True,
-            with_ban_geoloc_address=True,
-        )
-
+    def _test_apply_as_company(self, user, company, dummy_job_seeker, _mock):
         # Entry point.
         # ----------------------------------------------------------------------
 
@@ -2099,7 +2088,7 @@ class ApplyAsCompanyTest(TestCase):
         # Step application's resume.
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
-        self.assertContains(response, "Enregistrer")
+        self.assertContains(response, "Enregistrer" if user in company.members.all() else "Postuler")
 
         with mock.patch(
             "itou.www.apply.views.submit_views.uuid.uuid4",
@@ -2121,7 +2110,7 @@ class ApplyAsCompanyTest(TestCase):
         job_application = JobApplication.objects.get(sender=user, to_company=company)
         assert job_application.job_seeker == new_job_seeker
         assert job_application.sender_kind == SenderKind.EMPLOYER
-        assert job_application.sender_company == company
+        assert job_application.sender_company == user.company_set.first()
         assert job_application.sender_prescriber_organization is None
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
@@ -2145,6 +2134,36 @@ class ApplyAsCompanyTest(TestCase):
         # ----------------------------------------------------------------------
         response = self.client.get(next_url)
         assert response.status_code == 200
+
+    @pytest.mark.ignore_unknown_variable_template_error(
+        "confirmation_needed", "job_seeker", "readonly_form", "update_job_seeker"
+    )
+    def test_apply_as_employer(self):
+        company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+        employer = company.members.first()
+        self.client.force_login(employer)
+
+        dummy_job_seeker = JobSeekerWithAddressFactory.build(
+            jobseeker_profile__with_hexa_address=True,
+            jobseeker_profile__with_education_level=True,
+            with_ban_geoloc_address=True,
+        )
+        self._test_apply_as_company(employer, company, dummy_job_seeker)
+
+    @pytest.mark.ignore_unknown_variable_template_error(
+        "confirmation_needed", "job_seeker", "readonly_form", "update_job_seeker"
+    )
+    def test_apply_as_another_employer(self):
+        company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
+        employer = EmployerFactory(with_company=True)
+        self.client.force_login(employer)
+
+        dummy_job_seeker = JobSeekerWithAddressFactory.build(
+            jobseeker_profile__with_hexa_address=True,
+            jobseeker_profile__with_education_level=True,
+            with_ban_geoloc_address=True,
+        )
+        self._test_apply_as_company(employer, company, dummy_job_seeker)
 
     @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
     def test_cannot_create_job_seeker_with_pole_emploi_email(self):
@@ -2979,7 +2998,9 @@ class UpdateJobSeekerBaseTestCase(TestCase):
             + (1 if user.is_employer else 0)  # company info (ItouCurrentOrganizationMiddleware)
             + 1  # users_user (get_object_or_404)
             + 1  # companies_company (get_object_or_404)
-            + 1  # users_user/companies_companymembership (self.company.has_member())
+            + (
+                1 if user.is_prescriber or self.STEP_1_VIEW_NAME.endswith("_for_hire") else 0
+            )  # users_user/companies_companymembership (self.company.has_member())
             + 3  # update session with savepoint & release
         ):
             response = self.client.get(self.step_1_url)
@@ -3027,7 +3048,9 @@ class UpdateJobSeekerBaseTestCase(TestCase):
             + (1 if user.is_employer else 0)  # company info (ItouCurrentOrganizationMiddleware)
             + 1  # users_user (get_object_or_404)
             + 1  # companies_company (get_object_or_404)
-            + 1  # users_user/companies_companymembership (self.company.has_member())
+            + (
+                1 if user.is_prescriber or self.STEP_1_VIEW_NAME.endswith("_for_hire") else 0
+            )  # users_user/companies_companymembership (self.company.has_member())
         ):
             response = self.client.get(self.step_2_url)
         self.assertContains(response, PROCESS_TITLE, html=True)
@@ -3070,7 +3093,9 @@ class UpdateJobSeekerBaseTestCase(TestCase):
             + (1 if user.is_employer else 0)  # company info (ItouCurrentOrganizationMiddleware)
             + 1  # users_user (get_object_or_404)
             + 1  # companies_company (get_object_or_404)
-            + 1  # users_user/companies_companymembership (self.company.has_member())
+            + (
+                1 if user.is_prescriber or self.STEP_1_VIEW_NAME.endswith("_for_hire") else 0
+            )  # users_user/companies_companymembership (self.company.has_member())
         ):
             response = self.client.get(self.step_3_url)
         self.assertContains(response, PROCESS_TITLE, html=True)
@@ -4016,6 +4041,69 @@ class CheckPreviousApplicationsViewTestCase(TestCase):
 
         response = self.client.get(self.application_jobs_url)
         self.assertNotContains(response, BACK_BUTTON_ARIA_LABEL)
+
+    def test_no_previous_as_another_employer(self):
+        another_company = CompanyFactory(with_membership=True)
+        self._login_and_setup_session(another_company.members.first())
+
+        response = self.client.get(self.check_prev_applications_url)
+        self.assertRedirects(response, self.application_jobs_url)
+
+        response = self.client.get(self.application_jobs_url)
+        company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+        self.assertContains(
+            response,
+            f"""
+            <a href="{company_card_url}"
+               class="btn btn-block btn-outline-primary"
+               aria-label="{BACK_BUTTON_ARIA_LABEL}"
+               >
+                <span>Retour</span>
+            </a>
+            """,
+            html=True,
+            count=1,
+        )
+
+    def test_with_previous_as_another_employer(self):
+        employer = EmployerFactory(with_company=True)
+        self._login_and_setup_session(employer)
+
+        # Create a very recent application
+        job_application = JobApplicationFactory(
+            sent_by_another_employer=True,
+            sender=employer,
+            job_seeker=self.job_seeker,
+            to_company=self.company,
+        )
+        response = self.client.get(self.check_prev_applications_url)
+        self.assertContains(
+            response, "Ce candidat a déjà postulé chez cet employeur durant les dernières 24 heures.", status_code=403
+        )
+        # Make it less recent to avoid the 403
+        job_application.created_at = timezone.now() - datetime.timedelta(days=2)
+        job_application.save(update_fields=("created_at",))
+        response = self.client.get(self.check_prev_applications_url)
+        self.assertContains(response, "Le candidat a déjà postulé chez cet employeur le")
+        response = self.client.post(self.check_prev_applications_url, data={"force_new_application": "force"})
+        self.assertRedirects(response, self.application_jobs_url)
+
+        # Check that the back URL is correct
+        response = self.client.get(self.application_jobs_url)
+        company_card_url = reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+        self.assertContains(
+            response,
+            f"""
+            <a href="{company_card_url}"
+               class="btn btn-block btn-outline-primary"
+               aria-label="{BACK_BUTTON_ARIA_LABEL}"
+               >
+                <span>Retour</span>
+            </a>
+            """,
+            html=True,
+            count=1,
+        )
 
 
 @pytest.mark.ignore_unknown_variable_template_error(
