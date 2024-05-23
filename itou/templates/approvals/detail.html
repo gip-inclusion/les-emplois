@@ -78,7 +78,7 @@
                         <h2>Informations du salarié</h2>
                         <hr>
                         <h3>Informations personnelles</h3>
-                        {% include "apply/includes/job_seeker_info.html" with job_seeker=approval.user job_application=job_application with_matomo_event=True can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request csrf_token=csrf_token only %}
+                        {% include "apply/includes/job_seeker_info.html" with job_seeker=approval.user job_application=job_application with_matomo_event=True can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request csrf_token=csrf_token SenderKind=SenderKind only %}
                         {# Eligibility ------------------------------------------------------------------------- #}
                         {% if eligibility_diagnosis %}
                             {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_seeker=job_application.job_seeker is_sent_by_authorized_prescriber=job_application.is_sent_by_authorized_prescriber siae=job_application.to_company %}

@@ -162,7 +162,7 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
                 job_seeker=approval.user,
                 to_company=self.siae,
             )
-            .select_related("sender")
+            .select_related("sender", "to_company")
             .prefetch_related("selected_jobs")
         )
         return context

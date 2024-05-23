@@ -1005,15 +1005,22 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
     Job applications filters for companies only.
     """
 
-    sender_organizations = forms.MultipleChoiceField(
+    sender_prescriber_organizations = forms.MultipleChoiceField(
         required=False,
         label="Nom de l'organisme prescripteur",
         widget=Select2MultipleWidget,
     )
 
+    sender_companies = forms.MultipleChoiceField(
+        required=False,
+        label="Nom de l’employeur orienteur",
+        widget=Select2MultipleWidget,
+    )
+
     def __init__(self, job_applications_qs, company, *args, **kwargs):
         super().__init__(job_applications_qs, *args, **kwargs)
-        self.fields["sender_organizations"].choices += self.get_sender_organization_choices()
+        self.fields["sender_prescriber_organizations"].choices += self.get_sender_prescriber_organization_choices()
+        self.fields["sender_companies"].choices += self.get_sender_companies_choices()
 
         if company.kind not in SIAE_WITH_CONVENTION_KINDS:
             del self.fields["eligibility_validated"]
@@ -1030,12 +1037,20 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
 
     def filter(self, queryset):
         queryset = super().filter(queryset)
-        if sender_organizations := self.cleaned_data.get("sender_organizations"):
-            queryset = queryset.filter(sender_prescriber_organization__id__in=sender_organizations)
+        if sender_prescriber_organizations := self.cleaned_data.get("sender_prescriber_organizations"):
+            queryset = queryset.filter(sender_prescriber_organization__id__in=sender_prescriber_organizations)
+        if sender_companies := self.cleaned_data.get("sender_companies"):
+            queryset = queryset.filter(sender_company__id__in=sender_companies)
         return queryset
 
-    def get_sender_organization_choices(self):
+    def get_sender_prescriber_organization_choices(self):
         sender_orgs = self.job_applications_qs.get_unique_fk_objects("sender_prescriber_organization")
+        sender_orgs = [sender for sender in sender_orgs if sender.display_name]
+        sender_orgs = [(sender.id, sender.display_name.title()) for sender in sender_orgs]
+        return sorted(sender_orgs, key=lambda org: org[0])
+
+    def get_sender_companies_choices(self):
+        sender_orgs = self.job_applications_qs.get_unique_fk_objects("sender_company")
         sender_orgs = [sender for sender in sender_orgs if sender.display_name]
         sender_orgs = [(sender.id, sender.display_name.title()) for sender in sender_orgs]
         return sorted(sender_orgs, key=lambda org: org[0])

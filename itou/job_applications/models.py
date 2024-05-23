@@ -286,6 +286,7 @@ class JobApplicationQuerySet(models.QuerySet):
         ).prefetch_related(
             "selected_jobs__appellation",
             "selected_jobs__location",
+            "selected_jobs__company",
             Prefetch("job_seeker__approvals", queryset=Approval.objects.order_by("-start_at")),
         )
 
@@ -454,6 +455,8 @@ class JobApplicationQuerySet(models.QuerySet):
                 )
             else:
                 return self.filter(sender=user)
+        elif user.is_employer and organization:
+            return self.filter(sender_company=organization).exclude(to_company=organization)
         return self.none()
 
 

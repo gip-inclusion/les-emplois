@@ -11,7 +11,7 @@
 
 {% block content_title %}
     <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-        <h1 class="m-0">Candidatures</h1>
+        <h1 class="m-0">Candidatures reçues</h1>
         <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur les candidatures">
             {% include "apply/includes/job_applications_export_button.html" %}
             <a href="{% url 'apply:start' company_pk=request.current_organization.pk %}" class="btn btn-lg btn-primary btn-ico" {% matomo_event "employeurs" "clic" "enregistrer-candidature" %}>

@@ -120,7 +120,7 @@
     {% endif %}
 </ul>
 {# Diagoriente invite #}
-{% if request.user.is_employer and job_application and not job_application.resume_link %}
+{% if request.user.is_employer and job_application and not job_application.resume_link and job_application.sender_kind == SenderKind.PRESCRIBER %}
     {% include "apply/includes/job_application_diagoriente_invite.html" with job_application=job_application %}
 {% endif %}
 

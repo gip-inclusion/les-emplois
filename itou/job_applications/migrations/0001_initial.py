@@ -88,7 +88,7 @@ class Migration(migrations.Migration):
                         choices=[
                             ("job_seeker", "Demandeur d'emploi"),
                             ("prescriber", "Prescripteur"),
-                            ("employer", "Employeur (SIAE)"),
+                            ("employer", "Employeur"),
                         ],
                         default="prescriber",
                         max_length=10,

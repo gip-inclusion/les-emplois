@@ -95,7 +95,12 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
         self.apply_session = SessionNamespace(request.session, f"job_application-{self.company.pk}")
         self.hire_process = kwargs.pop("hire_process", False)
         self.prescription_process = (
-            not self.hire_process and request.user.is_authenticated and request.user.is_prescriber
+            not self.hire_process
+            and request.user.is_authenticated
+            and (
+                request.user.is_prescriber
+                or (request.user.is_employer and self.company != request.current_organization)
+            )
         )
         self.auto_prescription_process = (
             not self.hire_process
@@ -111,14 +116,14 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
             if request.user.is_authenticated:
                 if self.hire_process and request.user.kind != UserKind.EMPLOYER:
                     raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches")
+                elif self.hire_process and not self.company.has_member(request.user):
+                    raise PermissionDenied("Vous ne pouvez déclarer une embauche que dans votre structure.")
                 elif request.user.kind not in [
                     UserKind.JOB_SEEKER,
                     UserKind.PRESCRIBER,
                     UserKind.EMPLOYER,
                 ]:
                     raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
-                elif request.user.is_employer and not self.company.has_member(request.user):
-                    raise PermissionDenied("Vous ne pouvez postuler pour un candidat que dans votre structure.")
 
             if not self.company.has_active_members:
                 raise PermissionDenied(
@@ -216,7 +221,6 @@ class StartView(ApplyStepBaseView):
             # Checks are not relevants for the creation of a job_seeker in the GPS context
             # because we don't create a job application, only a job_seeker and a job_seeker_profile
 
-            # SIAE members can only submit a job application to their SIAE
             if self.auto_prescription_process or self.hire_process:
                 if suspension_explanation := self.company.get_active_suspension_text_with_dates():
                     raise PermissionDenied(

@@ -71,7 +71,7 @@ class Migration(migrations.Migration):
                 (
                     "author_kind",
                     models.CharField(
-                        choices=[("prescriber", "Prescripteur"), ("employer", "Employeur (SIAE)"), ("geiq", "GEIQ")],
+                        choices=[("prescriber", "Prescripteur"), ("employer", "Employeur"), ("geiq", "GEIQ")],
                         default="prescriber",
                         max_length=10,
                         verbose_name="type de l'auteur",
@@ -251,7 +251,7 @@ class Migration(migrations.Migration):
                 (
                     "author_kind",
                     models.CharField(
-                        choices=[("prescriber", "Prescripteur"), ("employer", "Employeur (SIAE)"), ("geiq", "GEIQ")],
+                        choices=[("prescriber", "Prescripteur"), ("employer", "Employeur"), ("geiq", "GEIQ")],
                         default="prescriber",
                         max_length=10,
                         verbose_name="type de l'auteur",

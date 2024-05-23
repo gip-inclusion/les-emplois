@@ -24,7 +24,7 @@ from collections import OrderedDict
 
 import tenacity
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import Count, Max, Min, Prefetch, Q
+from django.db.models import Count, F, Max, Min, Prefetch, Q
 from django.utils import timezone
 from sentry_sdk.crons import monitor
 
@@ -161,7 +161,7 @@ class Command(BaseCommand):
                 ),
                 total_auto_prescriptions=Count(
                     "job_applications_received",
-                    filter=Q(job_applications_received__sender_kind=SenderKind.EMPLOYER),
+                    filter=Q(job_applications_received__sender_company=F("job_applications_received__to_company")),
                     distinct=True,
                 ),
                 total_candidatures_autonomes=Count(
@@ -172,6 +172,14 @@ class Command(BaseCommand):
                 total_candidatures_prescripteur=Count(
                     "job_applications_received",
                     filter=Q(job_applications_received__sender_kind=SenderKind.PRESCRIBER),
+                    distinct=True,
+                ),
+                total_candidatures_employeur=Count(
+                    "job_applications_received",
+                    filter=Q(
+                        ~Q(job_applications_received__sender_company=F("job_applications_received__to_company")),
+                        job_applications_received__sender_kind=SenderKind.EMPLOYER,
+                    ),
                     distinct=True,
                 ),
                 total_candidatures_non_traitees=Count(

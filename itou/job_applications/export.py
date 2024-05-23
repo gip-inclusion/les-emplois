@@ -73,7 +73,9 @@ def _get_readable_sender_kind(job_application):
     """
     kind = "Candidature spontanée"
     if job_application.sender_kind == SenderKind.EMPLOYER:
-        kind = "Auto-prescription"
+        kind = "Employeur"
+        if job_application.sender_company == job_application.to_company:
+            kind = "Auto-prescription"
     elif job_application.sender_kind == SenderKind.PRESCRIBER:
         kind = "Orienteur"
         if job_application.is_sent_by_authorized_prescriber:
