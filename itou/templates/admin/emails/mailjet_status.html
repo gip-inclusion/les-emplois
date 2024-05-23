@@ -1,0 +1,12 @@
+{% for section, messages in email_statuses.items %}
+    {% if messages %}
+        <h3>{{ section }}</h3>
+        <ul class="inline">
+            {% for message in messages %}
+                <li>
+                    <a href="{% url "admin:emails_email_mailjet" message.id %}">{{ message.email }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endfor %}

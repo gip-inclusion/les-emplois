@@ -177,7 +177,7 @@ def django_test_environment_email_fixup(django_test_environment) -> None:
     # Django forcefully sets the EMAIL_BACKEND to
     # "django.core.mail.backends.locmem.EmailBackend" in
     # django.test.utils.setup_test_environment.
-    settings.EMAIL_BACKEND = "itou.utils.tasks.AsyncEmailBackend"
+    settings.EMAIL_BACKEND = "itou.emails.tasks.AsyncEmailBackend"
     settings.ASYNC_EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 
 
