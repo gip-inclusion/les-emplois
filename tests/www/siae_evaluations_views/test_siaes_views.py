@@ -934,11 +934,15 @@ class SiaeSubmitProofsViewTest(MessagesTestMixin, TestCase):
             + 1  # fetch user
             + 1  # fetch siae membership
             + 1  # fetch siae infos
+            + 1  # view starts, savepoint (ATOMIC_REQUESTS)
             + 3  # fetch evaluatedsiae, evaluatedjobapplication and evaluatedadministrativecriteria
+            + 1  # fetch evaluation campaign
             + 1  # update evaluatedadministrativecriteria
             + 1  # update evaluatedsiae submission_freezed_at
-            + 4  # fetch evaluationcampaign, institution, siae and siae members for email notification
-            + 3  # savepoint, update session, release savepoint
+            + 3  # fetch institution, siae and siae members for email notification
+            + 1  # email: savepoint
+            + 1  # email: release savepoint
+            + 2  # update session, release savepoint
         ):
             response = self.client.post(self.url(evaluated_job_application.evaluated_siae))
 

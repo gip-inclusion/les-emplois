@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "itou.utils",
     "itou.cities",
     "itou.companies",
+    "itou.emails",
     "itou.jobs",
     "itou.users",
     "itou.prescribers",
@@ -476,7 +477,7 @@ ANYMAIL = {
     "WEBHOOK_SECRET": os.getenv("MAILJET_WEBHOOK_SECRET"),
 }
 
-EMAIL_BACKEND = "itou.utils.tasks.AsyncEmailBackend"
+EMAIL_BACKEND = "itou.emails.tasks.AsyncEmailBackend"
 # This is the "real" email backend used by the async wrapper / email backend
 ASYNC_EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
 
