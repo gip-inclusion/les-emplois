@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from itou.cities.models import City
-from itou.companies.enums import CompanyKind, ContractType
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, JobDescription
 
 
@@ -27,7 +27,7 @@ class _JobDescriptionSerializer(serializers.ModelSerializer):
     appellation_modifiee = serializers.CharField(source="custom_name", label="Nom personnalisé")
     cree_le = serializers.DateTimeField(source="created_at", label="Date de création")
     mis_a_jour_le = serializers.DateTimeField(source="updated_at", label="Date de mise à jour")
-    type_contrat = serializers.SerializerMethodField(label="Type de contrat")
+    type_contrat = serializers.CharField(label="Type de contrat", source="get_contract_type_display")
     nombre_postes_ouverts = serializers.IntegerField(source="open_positions", label="Nombre de postes ouverts")
     lieu = CitySerializer(source="location")
     profil_recherche = serializers.CharField(source="profile_description", label="Profil recherché")
@@ -51,9 +51,6 @@ class _JobDescriptionSerializer(serializers.ModelSerializer):
 
     def get_lieu(self, obj) -> str:
         return obj.location.display_name if obj.location else ""
-
-    def get_type_contrat(self, obj) -> str:
-        return ContractType[obj.contract_type].label if obj.contract_type else ""
 
 
 class SiaeSerializer(serializers.ModelSerializer):
