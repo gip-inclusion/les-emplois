@@ -1,7 +1,5 @@
 import datetime
-import functools
 import logging
-import operator
 
 import pgtrigger
 from dateutil.relativedelta import relativedelta
@@ -25,6 +23,7 @@ from itou.job_applications import enums as job_application_enums
 from itou.prescribers import enums as prescribers_enums
 from itou.utils.apis import enums as api_enums, pole_emploi_api_client
 from itou.utils.apis.pole_emploi import DATE_FORMAT, PoleEmploiAPIBadResponse, PoleEmploiAPIException
+from itou.utils.db import or_queries
 from itou.utils.models import DateRange
 from itou.utils.validators import alphanumeric, validate_siret
 
@@ -1821,8 +1820,7 @@ class PoleEmploiApprovalManager(models.Manager):
             filters.append(Q(pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.birthdate))
         if not filters:
             return self.none()
-        or_filters = functools.reduce(operator.__or__, filters)
-        return self.filter(or_filters).order_by("-start_at", "-number")
+        return self.filter(or_queries(filters)).order_by("-start_at", "-number")
 
 
 class PoleEmploiApproval(PENotificationMixin, CommonApprovalMixin):

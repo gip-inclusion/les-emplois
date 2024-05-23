@@ -1,6 +1,4 @@
-import operator
 from datetime import timedelta
-from functools import reduce
 
 from dateutil.relativedelta import relativedelta
 from django import forms
@@ -31,6 +29,7 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.constants import MB
+from itou.utils.db import or_queries
 from itou.utils.validators import MaxDateValidator, MinDateValidator
 from itou.utils.widgets import DuetDatePickerWidget
 
@@ -100,7 +99,7 @@ class ApprovalForm(forms.Form):
             status_filters_list.append(Q(start_at__gt=now))
         if data.get("status_expired"):
             status_filters_list.append(Q(end_at__lt=now))
-        qs_filters_list.append(Q(reduce(operator.or_, status_filters_list, Q())))
+        qs_filters_list.append(or_queries(status_filters_list, required=False))
 
         if expiry := int(data.get("expiry")):
             qs_filters_list.append(Q(end_at__lt=now + relativedelta(months=expiry), end_at__gte=now))
