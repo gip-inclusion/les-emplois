@@ -97,6 +97,10 @@ class OIDConnectUserData:
     kind: str
     login_allowed_user_kinds = [UserKind]
 
+    def check_valid_kind(self, user, user_data_dict, is_login):
+        if user.kind not in self.login_allowed_user_kinds or (user.kind != user_data_dict["kind"] and not is_login):
+            raise InvalidKindException(user)
+
     def create_or_update_user(self, is_login=False):
         """
         Create or update a user managed by another identity provider.
@@ -117,6 +121,7 @@ class OIDConnectUserData:
                 user = User.objects.get(email=self.email)
                 created = False
                 if user.identity_provider not in [IdentityProvider.DJANGO, self.identity_provider]:
+                    self.check_valid_kind(user, user_data_dict, is_login)
                     # Don't update a user handled by another SSO provider.
                     return user, created
             except User.DoesNotExist:
@@ -136,8 +141,7 @@ class OIDConnectUserData:
                 # This happens when the user tried to update its email with one already used by another account.
                 raise MultipleUsersFoundException([user, other_user])
 
-        if user.kind not in self.login_allowed_user_kinds or (user.kind != user_data_dict["kind"] and not is_login):
-            raise InvalidKindException(user)
+        self.check_valid_kind(user, user_data_dict, is_login)
 
         if not created:
             for key, value in user_data_dict.items():

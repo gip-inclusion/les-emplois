@@ -21,7 +21,7 @@ from itou.openid_connect.pe_connect.models import PoleEmploiConnectState, PoleEm
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from tests.users.factories import JobSeekerFactory, UserFactory
+from tests.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
 from tests.utils.test import reload_module
 
 
@@ -196,9 +196,9 @@ class TestPoleEmploiConnect:
         assert user.identity_provider == IdentityProvider.PE_CONNECT
         assert user.external_data_source_history != {}
 
-    def test_create_django_user_with_already_existing_peamu_email_other_sso(self):
+    def test_create_django_user_with_already_existing_peamu_email_other_sso_job_seeker(self):
         """
-        If there already is an existing user with email PEAMU sent us, we do not create it again,
+        If there already is an existing job seeker with the email PEAMU sent us, we do not create it again,
         we use it but we do not update it
         """
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
@@ -209,6 +209,22 @@ class TestPoleEmploiConnect:
         assert user.first_name != PEAMU_USERINFO["given_name"]
         assert user.username != PEAMU_USERINFO["sub"]
         # We did not fill this data using external data, so it is not set
+        assert not user.external_data_source_history
+        assert user.identity_provider != IdentityProvider.PE_CONNECT
+
+    def test_create_django_user_with_already_existing_peamu_email_other_sso_not_job_seeker(self):
+        """
+        If there already is an existing user with the email PEAMU sent us but it's not a job_seeker,
+        then raise an error.
+        """
+        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+        user = PrescriberFactory(email=peamu_user_data.email, identity_provider=IdentityProvider.INCLUSION_CONNECT)
+        with pytest.raises(InvalidKindException):
+            peamu_user_data.create_or_update_user()
+        user.refresh_from_db()
+        assert user.last_name != PEAMU_USERINFO["family_name"]
+        assert user.first_name != PEAMU_USERINFO["given_name"]
+        assert user.username != PEAMU_USERINFO["sub"]
         assert not user.external_data_source_history
         assert user.identity_provider != IdentityProvider.PE_CONNECT
 
