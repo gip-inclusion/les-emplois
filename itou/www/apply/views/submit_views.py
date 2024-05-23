@@ -81,6 +81,8 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
         self.company = None
         self.apply_session = None
         self.hire_process = None
+        self.prescription_process = None
+        self.auto_prescription_process = None
         self.is_gps = False
 
     def setup(self, request, *args, **kwargs):
@@ -92,6 +94,15 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
         )
         self.apply_session = SessionNamespace(request.session, f"job_application-{self.company.pk}")
         self.hire_process = kwargs.pop("hire_process", False)
+        self.prescription_process = (
+            not self.hire_process and request.user.is_authenticated and request.user.is_prescriber
+        )
+        self.auto_prescription_process = (
+            not self.hire_process
+            and request.user.is_authenticated
+            and request.user.is_employer
+            and self.company == request.current_organization
+        )
 
         super().setup(request, *args, **kwargs)
 
@@ -123,6 +134,8 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
             "siae": self.company,
             "back_url": self.get_back_url(),
             "hire_process": self.hire_process,
+            "prescription_process": self.prescription_process,
+            "auto_prescription_process": self.auto_prescription_process,
             "reset_url": reverse("dashboard:index"),
             "is_gps": self.is_gps,
         }
@@ -204,7 +217,7 @@ class StartView(ApplyStepBaseView):
             # because we don't create a job application, only a job_seeker and a job_seeker_profile
 
             # SIAE members can only submit a job application to their SIAE
-            if request.user.is_employer:
+            if self.auto_prescription_process or self.hire_process:
                 if suspension_explanation := self.company.get_active_suspension_text_with_dates():
                     raise PermissionDenied(
                         "Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle "
@@ -819,7 +832,10 @@ class CheckPreviousApplications(ApplicationBaseView):
             return HttpResponseRedirect(self.get_next_url())
 
         # Limit the possibility of applying to the same SIAE for 24 hours.
-        if not request.user.is_employer and self.previous_applications.created_in_past(hours=24).exists():
+        if (
+            not (self.auto_prescription_process or self.hire_process)
+            and self.previous_applications.created_in_past(hours=24).exists()
+        ):
             if request.user == self.job_seeker:
                 msg = "Vous avez déjà postulé chez cet employeur durant les dernières 24 heures."
             else:
@@ -887,7 +903,7 @@ class ApplicationJobsView(ApplicationBaseView):
         }
 
     def get_back_url(self):
-        if self.request.user.is_employer:
+        if self.hire_process or self.auto_prescription_process:
             # The employer can come either be creating an application or hiring somebody.
             # In both cases, the back_url adds no value compared to going back to the dashboard.
             return None
@@ -1083,6 +1099,7 @@ class ApplicationResumeView(ApplicationBaseView):
         self.form = SubmitJobApplicationForm(
             company=self.company,
             user=request.user,
+            auto_prescription_process=self.auto_prescription_process,
             initial={"selected_jobs": self.apply_session.get("selected_jobs", [])},
             data=request.POST or None,
             files=request.FILES or None,

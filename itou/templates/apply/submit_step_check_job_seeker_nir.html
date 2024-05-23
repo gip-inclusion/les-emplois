@@ -8,7 +8,7 @@
 
 {% block content_title %}
     {{ block.super }}
-    {% if request.user.is_employer %}
+    {% if auto_prescription_process or hire_process %}
         {% if siae.is_subject_to_eligibility_rules or siae.kind == CompanyKind.GEIQ %}
             <p>
                 {% if hire_process %}
