@@ -375,12 +375,10 @@ class TestAcceptInvitation(MessagesTestMixin, InclusionConnectBaseTestCase):
         response = self.client.get(invitation.acceptance_link, follow=True)
         self.assert_accepted_invitation(response, invitation, user)
 
-    def test_invitatin_old_link(self):
-        # A logged in user should log out before accepting an invitation.
-        logged_in_user = EmployerFactory()
-        self.client.force_login(logged_in_user)
+    def test_expired_invitation_old_link(self):
+        user = EmployerFactory()
         # Invitation for another user
-        invitation = SentEmployerInvitationFactory(email=logged_in_user.email)
+        invitation = SentEmployerInvitationFactory(email=user.email)
         acceptance_link = reverse(
             "invitations_views:new_user",
             kwargs={
@@ -389,5 +387,6 @@ class TestAcceptInvitation(MessagesTestMixin, InclusionConnectBaseTestCase):
             },
         )
         response = self.client.get(acceptance_link, follow=True)
-        self.assertRedirects(response, reverse("welcoming_tour:index"))
-        self.assert_accepted_invitation(response, invitation, logged_in_user)
+        self.assertRedirects(response, reverse("search:employers_home"))
+        invitation.refresh_from_db()
+        assert not invitation.accepted
