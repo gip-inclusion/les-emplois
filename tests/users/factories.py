@@ -53,7 +53,12 @@ class UserFactory(factory.django.DjangoModelFactory):
             is_active=True,
             emails=factory.PostGeneration(_verify_emails_for_user),
         )
-        for_snapshot = factory.Trait(first_name="John", last_name="Doe", birthdate=datetime.date(2000, 1, 1))
+        for_snapshot = factory.Trait(
+            first_name="John",
+            last_name="Doe",
+            email="john.doe@test.local",
+            birthdate=datetime.date(2000, 1, 1),
+        )
 
     username = factory.Sequence("user_name{}".format)
     first_name = factory.Faker("first_name")
@@ -77,6 +82,13 @@ class ItouStaffFactory(UserFactory):
 class PrescriberFactory(UserFactory):
     kind = UserKind.PRESCRIBER
     identity_provider = IdentityProvider.INCLUSION_CONNECT
+
+    class Params:
+        for_snapshot = factory.Trait(
+            first_name="Pierre",
+            last_name="Dupont",
+            email="pierre.dupont@test.local",
+        )
 
     @factory.post_generation
     def membership(self, create, extracted, **kwargs):
@@ -170,6 +182,23 @@ class JobSeekerFactory(UserFactory):
             city="Geispolsheim",
             coords="POINT (7.644817 48.515883)",
             geocoding_score=0.8745736363636364,
+        )
+        for_snapshot = factory.Trait(
+            title="MME",
+            first_name="Jane",
+            last_name="Doe",
+            email="jane.doe@test.local",
+            phone="0612345678",
+            birthdate=datetime.date(1990, 1, 1),
+            address_line_1="12 rue Georges Bizet",
+            post_code="35000",
+            city="Rennes",
+            department="35",
+            jobseeker_profile__hexa_lane_number=12,
+            jobseeker_profile__hexa_lane_type=LaneType.RUE,
+            jobseeker_profile__hexa_lane_name="Georges Bizet",
+            jobseeker_profile__hexa_post_code="35000",
+            jobseeker_profile__for_snapshot=True,
         )
 
     @classmethod
@@ -276,6 +305,7 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
         for_snapshot = factory.Trait(
             nir="290010101010125",
             asp_uid="a08dbdb523633cfc59dfdb297307a1",
+            education_level=EducationLevel.BAC_LEVEL,
         )
 
     user = factory.SubFactory(JobSeekerFactory, jobseeker_profile=None)
