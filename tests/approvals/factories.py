@@ -76,7 +76,15 @@ class ApprovalFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
             from tests.job_applications.factories import JobApplicationFactory
 
             state = kwargs.pop("state", JobApplicationState.ACCEPTED)
-            self.jobapplication_set.add(JobApplicationFactory(state=state, job_seeker=self.user, **kwargs))
+            eligibility_diagnosis = kwargs.pop("eligibility_diagnosis", self.eligibility_diagnosis)
+            self.jobapplication_set.add(
+                JobApplicationFactory(
+                    state=state,
+                    job_seeker=self.user,
+                    eligibility_diagnosis=eligibility_diagnosis,
+                    **kwargs,
+                )
+            )
 
 
 class CancelledApprovalFactory(factory.django.DjangoModelFactory):
