@@ -112,7 +112,7 @@ def pe_connect_callback(request):
     if "sub" not in user_data:
         # 'sub' is the unique identifier from PôleEmploiConnect, we need that to match a user later on
         error_msg = "Le paramètre « sub » n'a pas été retourné par PôleEmploiConnect. Il est nécessaire pour identifier un utilisateur."  # noqa E501
-        logger.error(error_msg)
+        logger.error(error_msg, exc_info=True)
         return _redirect_to_job_seeker_login_on_error(error_msg)
 
     try:
