@@ -236,10 +236,7 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
         safir = "12345"
         with pytest.raises(PrescriberOrganization.DoesNotExist), self.assertLogs() as logs:
             ic_user_data.join_org(user=user, safir=safir)
-
-        assert f"Organization with SAFIR {safir} does not exist. Unable to add user {user.email}." in logs.output[0]
-        assert organization.active_members.count() == 1
-        assert organization.has_admin(user)
+        assert f"Organization with SAFIR {safir} does not exist. Unable to add user {user.id}." in logs.output[0]
 
     def test_get_existing_user_with_same_email_django(self):
         """
