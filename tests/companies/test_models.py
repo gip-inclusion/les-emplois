@@ -415,7 +415,7 @@ class SiaeContractTypeTest(TestCase):
             ("FIXED_TERM_USAGE", "CDD d'usage"),
             ("TEMPORARY", "Contrat de mission intérimaire"),
             ("PROFESSIONAL_TRAINING", "Contrat de professionalisation"),
-            ("FED_TERM_I_PHC", "CDD-I PHC"),
+            ("FIXED_TERM_I_PHC", "CDD-I PHC"),
             ("FIXED_TERM_I_CVG", "CDD-I CVG"),
             ("OTHER", "Autre type de contrat"),
         ]
@@ -431,7 +431,7 @@ class SiaeContractTypeTest(TestCase):
         """
         expected = ContractType.choices
 
-        expected.remove(("FED_TERM_I_PHC", "CDD-I PHC"))
+        expected.remove(("FIXED_TERM_I_PHC", "CDD-I PHC"))
         expected.remove(("FIXED_TERM_I_CVG", "CDD-I CVG"))
         result = ContractType.choices_for_company(company=CompanyFactory(kind="NEW"))
         assert result == expected
