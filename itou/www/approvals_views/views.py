@@ -26,6 +26,7 @@ from itou.approvals.models import (
     ProlongationRequestDenyInformation,
     Suspension,
 )
+from itou.approvals.utils import get_user_last_accepted_siae_job_application
 from itou.files.models import File
 from itou.job_applications.enums import JobApplicationState, Origin, SenderKind
 from itou.job_applications.models import JobApplication
@@ -111,7 +112,6 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
         context["can_view_personal_information"] = True  # SIAE members have access to personal info
         context["can_edit_personal_information"] = self.request.user.can_edit_personal_information(approval.user)
         context["approval_can_be_suspended_by_siae"] = approval.can_be_suspended_by_siae(self.siae)
-        context["hire_by_other_siae"] = not approval.user.last_hire_was_made_by_company(self.siae)
         context["approval_can_be_prolonged"] = approval.can_be_prolonged
         context["job_application"] = job_application
         context["hiring_pending"] = job_application and job_application.is_pending
@@ -711,7 +711,7 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
         # first try to get a matching PASS IAE, and guide the user towards eventual different paths
         approval = Approval.objects.filter(number=number).first()
         if approval:
-            job_application = approval.user.last_accepted_job_application
+            job_application = get_user_last_accepted_siae_job_application(approval.user)
             if job_application and job_application.to_company == siae:
                 # Suspensions and prolongations links are available in the job application details page.
                 application_details_url = reverse(

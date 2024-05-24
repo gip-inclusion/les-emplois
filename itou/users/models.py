@@ -693,20 +693,6 @@ class User(AbstractUser, AddressMixin):
             has_performed_update = True
         return has_performed_update
 
-    @cached_property
-    def last_accepted_job_application(self):
-        if not self.is_job_seeker:
-            return None
-
-        # Some candidates may not have accepted job applications
-        # Assuming its the case can lead to issues downstream
-        return self.job_applications.accepted().with_accepted_at().order_by("-accepted_at", "-hiring_start_at").first()
-
-    def last_hire_was_made_by_company(self, company):
-        if not self.is_job_seeker:
-            return False
-        return self.last_accepted_job_application and self.last_accepted_job_application.to_company == company
-
     @classmethod
     def create_job_seeker_by_proxy(cls, proxy_user, **fields):
         """
