@@ -30,7 +30,7 @@ class InclusionConnectPrescriberData(OIDConnectUserData):
         try:
             organization = PrescriberOrganization.objects.get(code_safir_pole_emploi=safir)
         except PrescriberOrganization.DoesNotExist:
-            logger.error(f"Organization with SAFIR {safir} does not exist. Unable to add user {user.email}.")
+            logger.info(f"Organization with SAFIR {safir} does not exist. Unable to add user {user.id}.")
             raise
         if not organization.has_member(user):
             organization.add_member(user)
