@@ -19,6 +19,7 @@ from unidecode import unidecode
 
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import Origin
+from itou.approvals.utils import get_user_last_accepted_siae_job_application, last_hire_was_made_by_siae
 from itou.companies import enums as companies_enums
 from itou.files.models import File
 from itou.job_applications import enums as job_application_enums
@@ -735,7 +736,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
     def can_be_suspended_by_siae(self, siae):
         # Only the SIAE currently hiring the job seeker can suspend a PASS IAE.
-        return self.can_be_suspended and self.user.last_hire_was_made_by_company(siae)
+        return self.can_be_suspended and last_hire_was_made_by_siae(self.user, siae)
 
     @cached_property
     def last_in_progress_suspension(self):
@@ -1249,8 +1250,8 @@ class Suspension(models.Model):
         cached_result = getattr(self, "_can_be_handled_by_siae_cache", None)
         if cached_result:
             return cached_result
-        self._can_be_handled_by_siae_cache = self.is_in_progress and self.approval.user.last_hire_was_made_by_company(
-            siae
+        self._can_be_handled_by_siae_cache = self.is_in_progress and last_hire_was_made_by_siae(
+            self.approval.user, siae
         )
         return self._can_be_handled_by_siae_cache
 
@@ -1275,7 +1276,7 @@ class Suspension(models.Model):
             referent_date = datetime.date.today()
 
         start_at = None
-        last_accepted_job_application = approval.user.last_accepted_job_application
+        last_accepted_job_application = get_user_last_accepted_siae_job_application(approval.user)
         if last_accepted_job_application:
             start_at = last_accepted_job_application.hiring_start_at
 

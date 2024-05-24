@@ -123,7 +123,7 @@ class TestApprovalDetailView:
             + 1  # job_seeker.approval
             + 1  # job_application.with_accepted_at annotation coming from next query
             + 1  # approval.suspension active today
-            + 1  # Suspension.can_be_handled_by_siae >> User.last_accepted_job_application
+            + 1  # Suspension.can_be_handled_by_siae >> get_user_last_accepted_siae_job_application()
             + 1  # select latest approval for user (can_be_prolonged)
             + 1  # approval.remainder fetches approval suspensions to compute remaining days.
             + 1  # release savepoint before the template rendering
@@ -200,8 +200,7 @@ class TestApprovalDetailView:
             # get_context_data
             + 1  # for every *active* suspension, check if there is an accepted job application after it
             + 1  # approval.suspension_set.end_at >= today >= approval.suspension_set.start_at (.can_be_suspended)
-            + 1  # job_application.with_accepted_at annotation coming from (.last_hire_was_made_by_company)
-            + 1  # siae infos (.last_hire_was_made_by_company)
+            + 1  # last_hire_was_made_by_siae() >> get_user_last_accepted_siae_job_application()
             + 1  # user approvals (.is_last_for_user)
             + 1  # siae infos (job_application.get_eligibility_diagnosis())
             + 1  # approval.suspensions_for_status_card lists approval suspensions

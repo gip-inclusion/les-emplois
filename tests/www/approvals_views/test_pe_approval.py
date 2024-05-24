@@ -4,6 +4,7 @@ from django.urls import reverse, reverse_lazy
 
 from itou.approvals import enums as approvals_enums
 from itou.approvals.models import Approval
+from itou.approvals.utils import get_user_last_accepted_siae_job_application
 from itou.job_applications import enums as job_applications_enums
 from itou.users.models import User
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
@@ -219,9 +220,10 @@ class PoleEmploiApprovalCreateTest(MessagesTestMixin, TestCase):
         assert new_user.has_valid_common_approval
         assert new_user.latest_approval.number == self.pe_approval.number
         assert response.status_code == 302
-        assert new_user.last_accepted_job_application is not None
+        last_accepted_siae_job_application = get_user_last_accepted_siae_job_application(new_user)
+        assert last_accepted_siae_job_application is not None
         next_url = reverse(
-            "apply:details_for_company", kwargs={"job_application_id": new_user.last_accepted_job_application.id}
+            "apply:details_for_company", kwargs={"job_application_id": last_accepted_siae_job_application.id}
         )
         assert response.url == next_url
         assert Approval.objects.count() == initial_approval_count + 1
@@ -234,7 +236,7 @@ class PoleEmploiApprovalCreateTest(MessagesTestMixin, TestCase):
         assert converted_approval.origin_siae_siret == self.company.siret
         assert converted_approval.origin_sender_kind == job_applications_enums.SenderKind.EMPLOYER
         assert converted_approval.origin_prescriber_organization_kind == ""
-        assert new_user.last_accepted_job_application.origin == job_applications_enums.Origin.PE_APPROVAL
+        assert last_accepted_siae_job_application.origin == job_applications_enums.Origin.PE_APPROVAL
 
     def test_from_existing_user_without_approval(self):
         """
@@ -267,7 +269,9 @@ class PoleEmploiApprovalCreateTest(MessagesTestMixin, TestCase):
         assert converted_approval.origin_siae_siret == self.company.siret
         assert converted_approval.origin_sender_kind == job_applications_enums.SenderKind.EMPLOYER
         assert converted_approval.origin_prescriber_organization_kind == ""
-        assert job_seeker.last_accepted_job_application.origin == job_applications_enums.Origin.PE_APPROVAL
+        assert (
+            get_user_last_accepted_siae_job_application(job_seeker).origin == job_applications_enums.Origin.PE_APPROVAL
+        )
 
     def test_when_pole_emploi_approval_has_already_been_imported(self):
         """

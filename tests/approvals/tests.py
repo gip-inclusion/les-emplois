@@ -26,6 +26,7 @@ from itou.approvals.admin_forms import ApprovalAdminForm
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import ApprovalStatus, Origin, ProlongationReason
 from itou.approvals.models import Approval, CancelledApproval, PoleEmploiApproval, Prolongation, Suspension
+from itou.approvals.utils import get_user_last_accepted_siae_job_application, last_hire_was_made_by_siae
 from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import Status
 from itou.files.models import File
@@ -1984,3 +1985,77 @@ def test_approval_can_be_unsuspended(reason, outcome):
         reason=reason,
     )
     assert ja.approval.can_be_unsuspended is outcome
+
+
+def test_get_user_last_accepted_siae_job_application():
+    # Set 2 job applications with:
+    # - origin set to PE_APPROVAL (the simplest method to test created_at ordering)
+    # - different creation date
+    # `last_accepted_job_application` is the one with the greater `created_at`
+    now = timezone.now()
+    job_application_1 = JobApplicationFactory(
+        state=JobApplicationState.ACCEPTED,
+        to_company__subject_to_eligibility=True,
+        origin=Origin.PE_APPROVAL,
+        created_at=now + relativedelta(days=1),
+    )
+
+    user = job_application_1.job_seeker
+
+    job_application_2 = JobApplicationFactory(
+        job_seeker=user,
+        state=JobApplicationState.ACCEPTED,
+        to_company__subject_to_eligibility=True,
+        origin=Origin.PE_APPROVAL,
+        created_at=now,
+    )
+
+    assert job_application_1 == get_user_last_accepted_siae_job_application(user)
+    assert job_application_2 != get_user_last_accepted_siae_job_application(user)
+
+
+def test_get_user_last_accepted_siae_job_application_full_ordering():
+    # Set 2 job applications with:
+    # - origin set to PE_APPROVAL (the simplest method to test created_at ordering)
+    # - same creation date
+    # - different hiring date
+    # `last_accepted_job_application` is the one with the greater `hiring_start_at`
+    now = timezone.now()
+    job_application_1 = JobApplicationFactory(
+        state=JobApplicationState.ACCEPTED,
+        to_company__subject_to_eligibility=True,
+        origin=Origin.PE_APPROVAL,
+        created_at=now,
+        hiring_start_at=now + relativedelta(days=1),
+    )
+
+    user = job_application_1.job_seeker
+
+    job_application_2 = JobApplicationFactory(
+        job_seeker=user,
+        state=JobApplicationState.ACCEPTED,
+        to_company__subject_to_eligibility=True,
+        origin=Origin.PE_APPROVAL,
+        created_at=now,
+        hiring_start_at=now,
+    )
+
+    assert job_application_1 == get_user_last_accepted_siae_job_application(user)
+    assert job_application_2 != get_user_last_accepted_siae_job_application(user)
+
+
+def test_last_hire_was_made_by_siae():
+    siae_job_application = JobApplicationSentByJobSeekerFactory(
+        state=JobApplicationState.ACCEPTED,
+        to_company__subject_to_eligibility=True,
+    )
+    user = siae_job_application.job_seeker
+    newer_non_siae_job_application = JobApplicationSentByJobSeekerFactory(
+        state=JobApplicationState.ACCEPTED,
+        to_company__not_subject_to_eligibility=True,
+        job_seeker=user,
+    )
+    company_1 = siae_job_application.to_company
+    company_2 = newer_non_siae_job_application.to_company
+    assert last_hire_was_made_by_siae(user, company_1)
+    assert not last_hire_was_made_by_siae(user, company_2)

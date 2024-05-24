@@ -174,9 +174,10 @@ class ApprovalSuspendViewTest(TestCase):
             + 1  # get the session
             + 3  # get the user, its memberships, and the SIAEs (middleware)
             + 1  # get suspension (get_object_or_404)
-            + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_company)
-            + 1  # get company info (can_be_handled_by_siae -> last_hire_was_made_by_company)
+            + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_siae)
             + 1  # get suspension (SuspensionForm -> Suspension.next_min_start_at)
+            # There's a dupplicated query here, but it's only in this form, so maybe not add a lru_cache
+            + 1  # get job applications (SuspensionForm -> Suspension.next_min_start_at -> last_hire_was_made_by_siae)
             + 3  # update session in savepoints
         ):
             response = self.client.get(url)
@@ -233,8 +234,7 @@ class ApprovalSuspendViewTest(TestCase):
             + 1  # get the session
             + 3  # get the user, its memberships, and the SIAEs (middleware)
             + 1  # get suspension (get_object_or_404)
-            + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_company)
-            + 1  # get company info (can_be_handled_by_siae -> last_hire_was_made_by_company)
+            + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_siae)
             + 3  # update session in savepoints
         ):
             response = self.client.get(url)
@@ -310,8 +310,7 @@ class ApprovalSuspendActionChoiceViewTest(TestCase):
             + 1  # get the session
             + 3  # get the user, its memberships, and the SIAEs (middleware)
             + 1  # get suspension (get_object_or_404)
-            + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_company)
-            + 1  # get company info (can_be_handled_by_siae -> last_hire_was_made_by_company)
+            + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_siae)
             + 3  # update session in savepoints
         ):
             response = self.client.get(self.url)
@@ -405,8 +404,7 @@ class ApprovalSuspendUpdateEndDateViewTest(TestCase):
             + 1  # get the session
             + 3  # get the user, its memberships, and the SIAEs (middleware)
             + 1  # get suspension (get_object_or_404)
-            + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_company)
-            + 1  # get company info (can_be_handled_by_siae -> last_hire_was_made_by_company)
+            + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_siae)
             + 3  # update session in savepoints
         ):
             response = self.client.get(self.url)

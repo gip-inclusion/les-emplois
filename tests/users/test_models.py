@@ -19,7 +19,6 @@ from itou.approvals.models import Approval
 from itou.asp.models import AllocationDuration, EducationLevel
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind
-from itou.job_applications.enums import JobApplicationState, Origin
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
@@ -27,7 +26,6 @@ from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from tests.institutions.factories import InstitutionMembershipFactory
-from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
@@ -365,65 +363,6 @@ class ModelTest(TestCase):
                 "created_at": now_str,
             },
         ]
-
-    def test_last_hire_was_made_by_company(self):
-        job_application = JobApplicationSentByJobSeekerFactory(state=JobApplicationState.ACCEPTED)
-        user = job_application.job_seeker
-        company_1 = job_application.to_company
-        assert user.last_hire_was_made_by_company(company_1)
-        company_2 = CompanyFactory()
-        assert not user.last_hire_was_made_by_company(company_2)
-
-    def test_last_accepted_job_application(self):
-        # Set 2 job applications with:
-        # - origin set to PE_APPROVAL (the simplest method to test created_at ordering)
-        # - different creation date
-        # `last_accepted_job_application` is the one with the greater `created_at`
-        now = timezone.now()
-        job_application_1 = JobApplicationFactory(
-            state=JobApplicationState.ACCEPTED,
-            origin=Origin.PE_APPROVAL,
-            created_at=now + relativedelta(days=1),
-        )
-
-        user = job_application_1.job_seeker
-
-        job_application_2 = JobApplicationFactory(
-            job_seeker=user,
-            state=JobApplicationState.ACCEPTED,
-            origin=Origin.PE_APPROVAL,
-            created_at=now,
-        )
-
-        assert job_application_1 == user.last_accepted_job_application
-        assert job_application_2 != user.last_accepted_job_application
-
-    def test_last_accepted_job_application_full_ordering(self):
-        # Set 2 job applications with:
-        # - origin set to PE_APPROVAL (the simplest method to test created_at ordering)
-        # - same creation date
-        # - different hiring date
-        # `last_accepted_job_application` is the one with the greater `hiring_start_at`
-        now = timezone.now()
-        job_application_1 = JobApplicationFactory(
-            state=JobApplicationState.ACCEPTED,
-            origin=Origin.PE_APPROVAL,
-            created_at=now,
-            hiring_start_at=now + relativedelta(days=1),
-        )
-
-        user = job_application_1.job_seeker
-
-        job_application_2 = JobApplicationFactory(
-            job_seeker=user,
-            state=JobApplicationState.ACCEPTED,
-            origin=Origin.PE_APPROVAL,
-            created_at=now,
-            hiring_start_at=now,
-        )
-
-        assert job_application_1 == user.last_accepted_job_application
-        assert job_application_2 != user.last_accepted_job_application
 
     def test_can_edit_email(self):
         user = PrescriberFactory()
