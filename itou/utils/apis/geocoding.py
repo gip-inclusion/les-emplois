@@ -70,6 +70,9 @@ def get_geocoding_data(address, post_code=None, limit=1):
     - address (different from address_line_1)
     """
 
+    if address is None:
+        raise GeocodingDataError("No address to geocode")
+
     data = call_ban_geocoding_api(address, post_code=post_code, limit=limit)
 
     if not data:

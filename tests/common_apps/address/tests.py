@@ -8,6 +8,7 @@ from itou.common_apps.address.models import lat_lon_to_coords
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.utils.test import TestCase
 
 
@@ -18,19 +19,21 @@ class UtilsAddressMixinTest(TestCase):
         Test `AddressMixin.geocode_address()`.
         Use `PrescriberOrganization` which inherits from abstract `AddressMixin`.
         """
-        prescriber = PrescriberOrganization.objects.create(siret="12000015300011")
+        org = PrescriberOrganizationFactory(
+            siret="12000015300011", address_line_1="3 rue Machin", post_code="11000", city="Mars"
+        )
 
-        assert prescriber.address_line_1 == ""
-        assert prescriber.address_line_2 == ""
-        assert prescriber.post_code == ""
-        assert prescriber.city == ""
-        assert prescriber.coords is None
-        assert prescriber.geocoding_score is None
-        assert prescriber.latitude is None
-        assert prescriber.longitude is None
+        assert org.address_line_1 == "3 rue Machin"
+        assert org.address_line_2 == ""
+        assert org.post_code == "11000"
+        assert org.city == "Mars"
+        assert org.coords is None
+        assert org.geocoding_score is None
+        assert org.latitude is None
+        assert org.longitude is None
 
-        prescriber.geocode_address()
-        prescriber.save()
+        org.geocode_address()
+        org.save()
 
         # Expected data comes from BAN_GEOCODING_API_RESULT_MOCK.
         expected_coords = "SRID=4326;POINT (2.316754 48.838411)"
@@ -38,10 +41,10 @@ class UtilsAddressMixinTest(TestCase):
         expected_longitude = 2.316754
         expected_geocoding_score = 0.5197687103594081
 
-        assert prescriber.coords == expected_coords
-        assert prescriber.geocoding_score == expected_geocoding_score
-        assert prescriber.latitude == expected_latitude
-        assert prescriber.longitude == expected_longitude
+        assert org.coords == expected_coords
+        assert org.geocoding_score == expected_geocoding_score
+        assert org.latitude == expected_latitude
+        assert org.longitude == expected_longitude
 
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
     def test_geocode_address_with_bad_address(self, _mock_call_ban_geocoding_api):
