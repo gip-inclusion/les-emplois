@@ -38,7 +38,7 @@
                             </h1>
                         </div>
 
-                        {% include "companies/includes/_company_info.html" with company=siae only %}
+                        {% include "companies/includes/_company_info.html" with company=siae extra_box_class="mb-3 mb-lg-5" only %}
 
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
