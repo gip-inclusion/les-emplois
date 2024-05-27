@@ -63,7 +63,7 @@
                                         </button>
                                     </li>
                                     {% if siae.email or siae.phone or siae.website %}
-                                        {% include "companies/includes/_siae_details.html" %}
+                                        {% include "companies/includes/_company_details.html" with company=siae only %}
                                     {% endif %}
                                 </ul>
                                 <a href="{% url 'companies_views:card' siae_id=siae.pk %}" class="btn btn-secondary btn-block mt-4">Voir la fiche de l'entreprise</a>
