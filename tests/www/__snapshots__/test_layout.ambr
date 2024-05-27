@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: test_navigation_authenticated[AuthorizedPrescriber]
   '''
-  <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
+  <nav aria-label="Menu de navigation principale" id="nav-primary" role="navigation">
                           
   
   
@@ -88,7 +88,7 @@
 # ---
 # name: test_navigation_authenticated[Employer]
   '''
-  <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
+  <nav aria-label="Menu de navigation principale" id="nav-primary" role="navigation">
                           
   
   
@@ -182,7 +182,7 @@
 # ---
 # name: test_navigation_authenticated[JobSeeker]
   '''
-  <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
+  <nav aria-label="Menu de navigation principale" id="nav-primary" role="navigation">
                           
   
   
@@ -272,7 +272,7 @@
 # ---
 # name: test_navigation_authenticated[LaborInspector]
   '''
-  <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
+  <nav aria-label="Menu de navigation principale" id="nav-primary" role="navigation">
                           
   
   
@@ -358,7 +358,7 @@
 # ---
 # name: test_navigation_authenticated[PrescriberWithOrganization]
   '''
-  <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
+  <nav aria-label="Menu de navigation principale" id="nav-primary" role="navigation">
                           
   
   
@@ -441,7 +441,7 @@
 # ---
 # name: test_navigation_authenticated[PrescriberWithoutOrganization]
   '''
-  <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
+  <nav aria-label="Menu de navigation principale" id="nav-primary" role="navigation">
                           
   
   
@@ -524,7 +524,7 @@
 # ---
 # name: test_navigation_not_authenticated
   '''
-  <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
+  <nav aria-label="Menu de navigation principale" id="nav-primary" role="navigation">
                           
   
   
