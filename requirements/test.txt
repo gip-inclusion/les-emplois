@@ -1311,9 +1311,9 @@ s3transfer==0.6.1 \
     # via
     #   -r requirements/base.txt
     #   boto3
-sentry-sdk==2.2.0 \
-    --hash=sha256:674f58da37835ea7447fe0e34c57b4a4277fad558b0a7cb4a6c83bcb263086be \
-    --hash=sha256:70eca103cf4c6302365a9d7cf522e7ed7720828910eb23d43ada8e50d1ecda9d
+sentry-sdk==2.3.1 \
+    --hash=sha256:139a71a19f5e9eb5d3623942491ce03cf8ebc14ea2e39ba3e6fe79560d8a5b1f \
+    --hash=sha256:c5aeb095ba226391d337dd42a6f9470d86c9fc236ecc71cfc7cd1942b45010c6
     # via -r requirements/base.txt
 shellcheck-py==0.10.0.1 \
     --hash=sha256:390826b340b8c19173922b0da5ef7b66ef34d4d087dc48aad3e01f7e77e164d9 \
