@@ -67,6 +67,9 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
         if request.user.is_authenticated:
             self.siae = get_current_company_or_404(request)
 
+            if not self.siae.is_subject_to_eligibility_rules:
+                return self.handle_no_permission()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["siae"] = self.siae
@@ -212,10 +215,6 @@ class ApprovalPrintableDisplay(ApprovalBaseViewMixin, TemplateView):
         queryset = Approval.objects.select_related("user")
         approval = get_object_or_404(queryset, pk=self.kwargs["approval_id"])
 
-        if not self.siae.is_subject_to_eligibility_rules:
-            # Message only visible in DEBUG
-            raise Http404("Nous sommes au regret de vous informer que vous ne pouvez pas afficher cet agrément.")
-
         diagnosis = approval.eligibility_diagnosis
         diagnosis_author = None
         diagnosis_author_org = None
@@ -252,7 +251,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
     siae = get_current_company_or_404(request)
     approval = get_object_or_404(Approval, pk=approval_id)
 
-    if not approval.can_be_prolonged:
+    if not siae.is_subject_to_eligibility_rules or not approval.can_be_prolonged:
         raise PermissionDenied()
 
     back_url = prolongation_back_url(request)
@@ -339,6 +338,8 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
 
         if request.user.is_authenticated:
             self.siae = get_current_company_or_404(request)
+            if not self.siae.is_subject_to_eligibility_rules:
+                raise PermissionDenied()
             self.approval = get_object_or_404(Approval, pk=approval_id)
 
         if not self.approval.can_be_prolonged:
@@ -703,6 +704,8 @@ def pe_approval_search(request, template_name="approvals/pe_approval_search.html
     form = PoleEmploiApprovalSearchForm(request.GET or None)
     number = None
     siae = get_current_company_or_404(request)
+    if not siae.is_subject_to_eligibility_rules:
+        raise PermissionDenied()
     back_url = reverse("approvals:pe_approval_search")
 
     if form.is_valid():
@@ -748,6 +751,10 @@ def pe_approval_search_user(request, pe_approval_id, template_name="approvals/pe
 
     Search for a given user by email address.
     """
+    siae = get_current_company_or_404(request)
+    if not siae.is_subject_to_eligibility_rules:
+        raise PermissionDenied()
+
     pe_approval = get_object_or_404(PoleEmploiApproval, pk=pe_approval_id)
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse("dashboard:index"))
@@ -766,6 +773,9 @@ def pe_approval_create(request, pe_approval_id):
     Create a Approval and a JobApplication out of a (previously created) User and a PoleEmploiApproval.
     """
     siae = get_current_company_or_404(request)
+    if not siae.is_subject_to_eligibility_rules:
+        raise PermissionDenied()
+
     pe_approval = get_object_or_404(PoleEmploiApproval, pk=pe_approval_id)
 
     form = JobSeekerExistsForm(data=request.POST or None)
