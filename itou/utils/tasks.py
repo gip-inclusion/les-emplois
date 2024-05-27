@@ -128,12 +128,16 @@ def _async_send_message(serialized_email, task=None):
     # Anymail iterates over recipients and assign each a status, following its
     # documented API. Mailjet indicating success is good enough.
     # https://dev.mailjet.com/email/guides/send-api-v31/
-    esp_response = email.anymail_status.esp_response.json()
-    [result] = esp_response["Messages"]
-    if result["Status"] != "success":
-        if task and task.retries:
-            raise Exception("Huey, please retry this task.")
-        sentry_sdk.capture_message(f"Could not send email: {result}", "error")
+    try:
+        [result] = email.anymail_status.esp_response.json()["Messages"]
+    except AttributeError:
+        # esp_response is None in development environments.
+        pass
+    else:
+        if result["Status"] != "success":
+            if task and task.retries:
+                raise Exception("Huey, please retry this task.")
+            sentry_sdk.capture_message(f"Could not send email: {result}", "error")
     return 1
 
 
