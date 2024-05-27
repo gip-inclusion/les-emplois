@@ -12,7 +12,7 @@
                 <p>
                     Êtes-vous sûr(e) de vouloir confirmer l’embauche de <strong>{{ job_seeker.get_full_name }}</strong> dans la structure suivante ?
                 </p>
-                {% include "companies/includes/_company_info.html" with company=siae only %}
+                {% include "companies/includes/_company_info.html" with company=siae extra_box_class="mb-3 mb-lg-5" only %}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>

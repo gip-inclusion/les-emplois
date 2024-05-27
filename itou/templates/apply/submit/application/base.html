@@ -68,7 +68,7 @@
                 <div class="col-12{% if not full_content_width %} col-lg-8{% endif %}">
                     <div class="c-form">
                         <div class="col-12 p-0 {% if full_content_width %}col-lg-8 pe-lg-4{% endif %}">
-                            {% include "companies/includes/_company_info.html" with company=siae only %}
+                            {% include "companies/includes/_company_info.html" with company=siae extra_box_class="mb-3 mb-lg-5" only %}
                         </div>
                         <div class="col-12 p-0 {% if full_content_width %}col-lg-8 pe-lg-4{% endif %}">
                             {% block pre_step_title %}{% endblock %}
