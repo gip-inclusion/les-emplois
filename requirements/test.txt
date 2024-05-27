@@ -345,9 +345,9 @@ django-htmx==1.17.3 \
     --hash=sha256:0de964ca257eda2a4ebeeaa8181320119378fa5f95a2fc2f2bfbdd35034ed424 \
     --hash=sha256:a2069219920d7ef0883ddbf5e8d931069db145a0d4a8a032a2708f840c7a68a6
     # via -r requirements/base.txt
-django-import-export==4.0.3 \
-    --hash=sha256:9762babf66e34da194f96ada2d133585f25c065d237d749a424319a0ddef7e23 \
-    --hash=sha256:d55193414cb86994a2dfef47670c6887ee1ab8e5efab4ff0a7335c9cad6418c0
+django-import-export==4.0.6 \
+    --hash=sha256:098ab4943edb93d6333aa8f6c97fb6a527d1d70a57f6a014f615c6f5ff5dd559 \
+    --hash=sha256:7b170abd992c071fa221fa6bf1822abfee1518720d07cedeba4702bbac5f119d
     # via -r requirements/base.txt
 django-pgtrigger==4.11.1 \
     --hash=sha256:39862f229405c6fe49b33451e13910a70578ba569f7e8bea6ea82049058b371f \
@@ -842,9 +842,7 @@ pluggy==1.2.0 \
 psycopg[binary]==3.1.10 \
     --hash=sha256:15b25741494344c24066dc2479b0f383dd1b82fa5e75612fa4fa5bb30726e9b6 \
     --hash=sha256:8bbeddae5075c7890b2fa3e3553440376d3c5e28418335dee3c3656b06fa2b52
-    # via
-    #   -r requirements/base.txt
-    #   psycopg
+    # via -r requirements/base.txt
 psycopg-binary==3.1.10 \
     --hash=sha256:0471869e658d0c6b8c3ed53153794739c18d7dad2dd5b8e6ff023a364c20f7df \
     --hash=sha256:0f062f20256708929a58c41d44f350efced4c00a603323d1413f6dc0b84d95a5 \
