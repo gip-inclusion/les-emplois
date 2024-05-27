@@ -356,9 +356,9 @@ django-datadog-logger==0.7.1 \
     --hash=sha256:1ee7d705ff8370cf9123240446738766925347407daadbab1cfbdbde3fe613e1 \
     --hash=sha256:2e7304059ee6d0fe6ede090d8e9b95620f52a8d7b0d69f54d78a9a38c9976e8e
     # via -r requirements/test.txt
-django-debug-toolbar==4.3.0 \
-    --hash=sha256:0b0dddee5ea29b9cb678593bc0d7a6d76b21d7799cb68e091a2148341a80f3c4 \
-    --hash=sha256:e09b7dcb8417b743234dfc57c95a7c1d1d87a88844abd13b4c5387f807b31bf6
+django-debug-toolbar==4.4.2 \
+    --hash=sha256:5d7afb2ea5f8730241e5b0735396e16cd1fd8c6b53a2f3e1e30bbab9abb23728 \
+    --hash=sha256:9204050fcb1e4f74216c5b024bc76081451926a6303993d6c513f5e142675927
     # via -r requirements/dev.in
 django-extensions==3.2.3 \
     --hash=sha256:44d27919d04e23b3f40231c4ab7af4e61ce832ef46d610cc650d53e68328410a \
@@ -948,9 +948,7 @@ prompt-toolkit==3.0.43 \
 psycopg[binary]==3.1.10 \
     --hash=sha256:15b25741494344c24066dc2479b0f383dd1b82fa5e75612fa4fa5bb30726e9b6 \
     --hash=sha256:8bbeddae5075c7890b2fa3e3553440376d3c5e28418335dee3c3656b06fa2b52
-    # via
-    #   -r requirements/test.txt
-    #   psycopg
+    # via -r requirements/test.txt
 psycopg-binary==3.1.10 \
     --hash=sha256:0471869e658d0c6b8c3ed53153794739c18d7dad2dd5b8e6ff023a364c20f7df \
     --hash=sha256:0f062f20256708929a58c41d44f350efced4c00a603323d1413f6dc0b84d95a5 \
