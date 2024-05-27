@@ -16,18 +16,20 @@
                     </a>
                 </div>
                 <div class="s-header__col s-header__col--nav col d-none d-xl-inline-flex d-xl-flex align-items-center justify-content-end">
-                    <nav role="navigation" id="nav-primary" aria-label="Navigation principale">
+                    <nav role="navigation" id="nav-primary" aria-label="Menu de navigation principale">
                         {% include 'layout/_header_nav_primary_items.html' with is_mobile=False %}
                     </nav>
                 </div>
                 <div class="s-header__col s-header__col--burger col d-flex align-items-center justify-content-end d-xl-none">
-                    <button data-bs-toggle="burger" aria-expanded="false" aria-label="Ouverture et fermeture du menu de navigation principale pour mobile">
-                        <i class="ri-menu-line" id="open" aria-hidden="true"></i>
-                        <i class="ri-close-line" id="close" aria-hidden="true"></i>
+                    <button type="button" data-bs-toggle="offcanvas" data-bs-target="#burgerNav" aria-controls="burgerNav" aria-label="Ouvrir la navigation principale pour mobile">
+                        <i class="ri-menu-line" aria-hidden="true"></i>
                     </button>
                 </div>
-                <div id="burgerNav">
-                    <nav role="navigation" aria-label="Navigation principale pour mobile">
+                <div id="burgerNav" class="offcanvas offcanvas-end" aria-label="Navigation principale pour mobile">
+                    <button type="button" data-bs-dismiss="offcanvas" aria-label="Fermer la navigation principale pour mobile">
+                        <i class="ri-close-line" id="close" aria-hidden="true"></i>
+                    </button>
+                    <nav role="navigation" aria-label="Menu de navigation principale pour mobile">
                         {% include 'layout/_header_nav_primary_items.html' with is_mobile=True %}
                         {% include 'layout/_header_nav_secondary_items.html' %}
                     </nav>
