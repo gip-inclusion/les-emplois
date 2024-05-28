@@ -21,6 +21,7 @@ from itou.utils.admin import (
     PkSupportRemarkInline,
     get_admin_view_link,
 )
+from itou.utils.templatetags.str_filters import pluralizefr
 
 
 class JobApplicationInline(ItouStackedInline):
@@ -220,6 +221,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "origin_sender_kind",
         "origin_siae_kind",
         "origin_siae_siret",
+        "remainder",
     )
     fieldsets = (
         (
@@ -229,6 +231,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                     "number",
                     "start_at",
                     "end_at",
+                    "remainder",
                     "user",
                     "eligibility_diagnosis",
                     "assigned_company",
@@ -376,6 +379,10 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                 company.siret,
             )
         return "-"
+
+    @admin.display(description="Reliquat")
+    def remainder(self, obj):
+        return f"{obj.remainder.days} jour{pluralizefr(obj.duration.days)}"
 
 
 class IsInProgressFilter(admin.SimpleListFilter):
