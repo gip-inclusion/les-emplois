@@ -1,5 +1,13 @@
 # Journal des changements techniques majeurs
 
+## 2024-05-28
+
+- Le fichier `.env` devient optionnel (et probablement inutile). Si vous
+  utilisiez dotenv (fichier `.env`), migrez avec :
+  ```sh
+  $ echo dotenv >> .envrc.local
+  ```
+
 ## 2024-04-08
 - Suppression de la commande `make deploy_prod`, les PRs arrivant sur la branche master sont immédiatement déployées par CleverCloud.
 

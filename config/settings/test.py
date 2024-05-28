@@ -26,6 +26,8 @@ DATABASES["default"]["NAME"] = os.getenv("PGDATABASE", "itou")  # noqa: F405
 DATABASES["default"]["USER"] = os.getenv("PGUSER", "postgres")  # noqa: F405
 DATABASES["default"]["PASSWORD"] = os.getenv("PGPASSWORD", "password")  # noqa: F405
 
+REDIS_URL = "redis://127.0.0.1:6379"
+
 MAILJET_API_KEY_PRINCIPAL = "API_MAILJET_KEY_PRINCIPAL"
 MAILJET_SECRET_KEY_PRINCIPAL = "API_MAILJET_SECRET_PRINCIPAL"
 

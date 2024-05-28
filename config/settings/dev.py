@@ -58,6 +58,11 @@ REST_FRAMEWORK["DEFAULT_RENDERER_CLASSES"] += [  # noqa: F405
 # ITOU settings
 # -------------
 
+API_BAN_BASE_URL = os.getenv("API_BAN_BASE_URL", "https://api-adresse.data.gouv.fr")
+API_GEO_BASE_URL = os.getenv("API_GEO_BASE_URL", "https://geo.api.gouv.fr")
+MATOMO_BASE_URL = os.getenv("MATOMO_BASE_URL", "https://matomo.inclusion.beta.gouv.fr/")
+MATOMO_SITE_ID = 220
+
 # use almost the same settings for metabase as base PG.
 METABASE_HOST = os.getenv("METABASE_HOST", os.getenv("PGHOST", "127.0.0.1"))  # noqa: F405
 METABASE_PORT = os.getenv("METABASE_PORT", os.getenv("PGPORT", "5432"))  # noqa: F405

@@ -74,3 +74,21 @@ type `ipdb` :
 ```sh
 $ docker compose --profile=django run --service-ports django
 ```
+
+## Variables d’environnement
+
+Les variables d’environnement suivantes vous permettent de personnaliser le
+fonctionnement du `docker compose`. Vous pouvez les enregistrer dans un fichier
+`.env` à la racine du projet (dans le même répertoire que le fichier
+[README.md](../README.md)).
+
+```sh
+DJANGO_PORT_ON_DOCKER_HOST=8000
+POSTGRES_PORT_ON_DOCKER_HOST=5432
+MINIO_PORT_ON_DOCKER_HOST=9000
+MINIO_ADMIN_PORT_ON_DOCKER_HOST=9001
+
+# Needed for the ./scripts/restore_latest_backup.sh script.
+# Path to your local itou-backups repository.
+PATH_TO_ITOU_BACKUPS=set_me
+```
