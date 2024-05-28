@@ -48,9 +48,8 @@ docker compose up
 
 **Note** : Vous pouvez personnaliser la configuration des dépendances gérées
 par Docker Compose en créant [un fichier
-`.env`](https://docs.docker.com/compose/env-file/) à partir d'une copie du
-fichier racine `.env.template`. Le fichier `.env` doit être au même niveau que
-le fichier [README.md](./README.md).
+`.env`](https://docs.docker.com/compose/env-file/) au même niveau que le
+fichier `README.md`.
 
 ### Dépendances Python
 
