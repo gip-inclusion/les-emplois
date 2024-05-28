@@ -322,10 +322,6 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
 
         super().save_model(request, obj, form, change)
 
-    @admin.display(boolean=True, description="en cours de validité")
-    def is_valid(self, obj):
-        return obj.is_valid()
-
     def manually_add_approval(self, request, job_application_id):
         """
         Custom admin view to manually add an approval.
@@ -357,6 +353,10 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
             ),
         ]
         return additional_urls + super().get_urls()
+
+    @admin.display(boolean=True, description="en cours de validité")
+    def is_valid(self, obj):
+        return obj.is_valid()
 
     @admin.display(description="date de naissance")
     def birthdate(self, obj):
