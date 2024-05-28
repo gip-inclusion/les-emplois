@@ -8,7 +8,19 @@ L’inspection des [settings Django](../config/settings/) permet d’avoir la
 référence complète des variables d’environnement. Les variables souvent
 utilisées sont recensées dans ce document.
 
-## Confort
+## Définir les variables d’environnement
+
+Dans votre environnement de développement, l’utilisation de
+[direnv](./direnv.md) est recommandée.
+
+En production, un fichier `.env` est généré au déploiement et chargé avec
+l’utilitaire [`dotenv`](https://pypi.org/project/python-dotenv/). Cette
+configuration est moins flexible que direnv, car les variables d’environnement
+ne sont pas disponibles pour votre shell, ce qui empêche le chargement
+automatique de l’environnement virtuel, ou de lancer `psql` sans spécifier les
+arguments pour se connecter à la base de données.
+
+## Variables de confort
 
 ### PostgreSQL
 
