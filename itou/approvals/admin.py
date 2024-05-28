@@ -221,6 +221,47 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "origin_siae_kind",
         "origin_siae_siret",
     )
+    fieldsets = (
+        (
+            "Informations",
+            {
+                "fields": (
+                    "number",
+                    "start_at",
+                    "end_at",
+                    "user",
+                    "eligibility_diagnosis",
+                    "assigned_company",
+                    "origin",
+                    "origin_prescriber_organization_kind",
+                    "origin_sender_kind",
+                    "origin_siae_kind",
+                    "origin_siae_siret",
+                )
+            },
+        ),
+        (
+            "Audit",
+            {
+                "fields": (
+                    "created_at",
+                    "created_by",
+                    "updated_at",
+                )
+            },
+        ),
+        (
+            "Notification à France Travail",
+            {
+                "fields": (
+                    "pe_notification_status",
+                    "pe_notification_time",
+                    "pe_notification_endpoint",
+                    "pe_notification_exit_code",
+                )
+            },
+        ),
+    )
     date_hierarchy = "start_at"
     inlines = (
         SuspensionInline,
