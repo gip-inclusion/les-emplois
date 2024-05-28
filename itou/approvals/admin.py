@@ -113,14 +113,19 @@ class SuspensionInline(ItouTabularInline):
     extra = 0
     show_change_link = True
     can_delete = False
-    fields = ("start_at", "end_at", "reason", "created_by", "siae")
+    fields = ("start_at", "end_at", "duration", "reason", "created_by", "siae")
     raw_id_fields = ("approval", "siae", "created_by", "updated_by")
+    readonly_fields = ("duration",)
 
     def has_change_permission(self, request, obj=None):
         return False
 
     def has_add_permission(self, request, obj=None):
         return False
+
+    @admin.display(description="Durée")
+    def duration(self, obj):
+        return f"{obj.duration.days} jour{pluralizefr(obj.duration.days)}"
 
 
 class ProlongationInline(ItouTabularInline):
@@ -128,14 +133,19 @@ class ProlongationInline(ItouTabularInline):
     extra = 0
     show_change_link = True
     can_delete = False
-    fields = ("start_at", "end_at", "reason", "declared_by", "validated_by")
+    fields = ("start_at", "end_at", "duration", "reason", "declared_by", "validated_by")
     raw_id_fields = ("declared_by", "validated_by")
+    readonly_fields = ("duration",)
 
     def has_change_permission(self, request, obj=None):
         return False
 
     def has_add_permission(self, request, obj=None):
         return False
+
+    @admin.display(description="Durée")
+    def duration(self, obj):
+        return f"{obj.duration.days} jour{pluralizefr(obj.duration.days)}"
 
 
 class ProlongationRequestInline(ProlongationInline):
