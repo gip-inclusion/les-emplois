@@ -63,8 +63,8 @@ fix: fast_fix
 .PHONY: populate_db populate_db_with_cities populate_db_minimal
 
 # After migrate
-populate_db_with_cities:
-	psql -d $(PGDATABASE) --quiet --file itou/fixtures/postgres/cities.sql
+populate_db_with_cities: $(VENV_REQUIREMENT)
+	python manage.py dbshell <itou/fixtures/postgres/cities.sql
 
 populate_db: populate_db_with_cities
 	# Split loaddata_bulk into parts to avoid OOM errors in review apps
