@@ -1,4 +1,16 @@
 # Journal des changements techniques majeurs
+## 2024-06-06
+
+- Utilisation de `.envrc`: retrait du hack `.envrc.local`, ce qui permettra de
+  recharger l’environnement dès le changement du `.envrc`, et de bénéficier du
+  mécanisme de vérification du contenu du fichier.
+
+  Pour migrer : `cp .envrc{.local,}`.
+
+  **Note** : Le fichier `.envrc.local` n’est plus utile. Cependant, attendre
+  quelques semaines avant de le supprimer permet d’éviter de perdre le contenu
+  du `.envrc` lorsqu’on change vers une branche dont le `.envrc` était suivi
+  par `git`.
 
 ## 2024-05-28
 
