@@ -849,7 +849,7 @@ def test_populate_users_exclude_job_seekers():
     JobSeekerFactory()
     management.call_command("populate_metabase_emplois", mode="users")
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM utilisateurs ORDER BY id")
+        cursor.execute("SELECT * FROM utilisateurs_v0 ORDER BY id")
         rows = cursor.fetchall()
         assert len(rows) == 0
 
@@ -874,13 +874,15 @@ def test_populate_users():
         management.call_command("populate_metabase_emplois", mode="users")
 
     with connection.cursor() as cursor:
-        cursor.execute("SELECT * FROM utilisateurs ORDER BY id")
+        cursor.execute("SELECT * FROM utilisateurs_v0 ORDER BY id")
         rows = cursor.fetchall()
         assert rows == [
             (
                 pro_user.id,
                 pro_user.email,
                 "employer",
+                pro_user.first_name,
+                pro_user.last_name,
                 datetime.date(2023, 2, 1),
             ),
         ]
