@@ -15,7 +15,7 @@ from tests.approvals.factories import SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import TestCase, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
@@ -169,7 +169,19 @@ class ApprovalSuspendViewTest(TestCase):
         url = reverse("approvals:suspension_update", kwargs={"suspension_id": suspension.pk})
         url = f"{url}?{params}"
 
-        response = self.client.get(url)
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # get the session
+            + 3  # get the user, its memberships, and the SIAEs (middleware)
+            + 1  # get suspension (get_object_or_404)
+            + 1  # get approval (can_be_handled_by_siae)
+            + 1  # get user (can_be_handled_by_siae)
+            + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_company)
+            + 1  # get company info (can_be_handled_by_siae -> last_hire_was_made_by_company)
+            + 1  # get suspension (SuspensionForm -> Suspension.next_min_start_at)
+            + 3  # update session in savepoints
+        ):
+            response = self.client.get(url)
         assert response.status_code == 200
 
         new_end_at = end_at + relativedelta(days=30)
@@ -218,7 +230,18 @@ class ApprovalSuspendViewTest(TestCase):
         url = reverse("approvals:suspension_delete", kwargs={"suspension_id": suspension.pk})
         url = f"{url}?{params}"
 
-        response = self.client.get(url)
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # get the session
+            + 3  # get the user, its memberships, and the SIAEs (middleware)
+            + 1  # get suspension (get_object_or_404)
+            + 1  # get approval (can_be_handled_by_siae)
+            + 1  # get user (can_be_handled_by_siae)
+            + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_company)
+            + 1  # get company info (can_be_handled_by_siae -> last_hire_was_made_by_company)
+            + 3  # update session in savepoints
+        ):
+            response = self.client.get(url)
         assert response.status_code == 200
         form = parse_response_to_soup(
             response,
@@ -286,7 +309,18 @@ class ApprovalSuspendActionChoiceViewTest(TestCase):
     def test_context(self):
         self.client.force_login(self.employer)
 
-        response = self.client.get(self.url)
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # get the session
+            + 3  # get the user, its memberships, and the SIAEs (middleware)
+            + 1  # get suspension (get_object_or_404)
+            + 1  # get approval (can_be_handled_by_siae)
+            + 1  # get user (can_be_handled_by_siae)
+            + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_company)
+            + 1  # get company info (can_be_handled_by_siae -> last_hire_was_made_by_company)
+            + 3  # update session in savepoints
+        ):
+            response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.context["suspension"] == self.suspension
         assert response.context["back_url"] == reverse("approvals:detail", kwargs={"pk": self.suspension.approval_id})
@@ -372,7 +406,18 @@ class ApprovalSuspendUpdateEndDateViewTest(TestCase):
     def test_context(self):
         self.client.force_login(self.employer)
 
-        response = self.client.get(self.url)
+        with self.assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # get the session
+            + 3  # get the user, its memberships, and the SIAEs (middleware)
+            + 1  # get suspension (get_object_or_404)
+            + 1  # get approval (can_be_handled_by_siae)
+            + 1  # get user (can_be_handled_by_siae)
+            + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_company)
+            + 1  # get company info (can_be_handled_by_siae -> last_hire_was_made_by_company)
+            + 3  # update session in savepoints
+        ):
+            response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.context["suspension"] == self.suspension
         assert response.context["back_url"] == reverse(
