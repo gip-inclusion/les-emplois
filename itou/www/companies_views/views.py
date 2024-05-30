@@ -78,6 +78,9 @@ def get_data_inclusion_services(code_insee):
             }
             for r in results
         ]
+        # 6 hours is reasonable enough to get fresh results while still avoiding
+        # hitting the API too much. The API content is updated daily or hourly;
+        # we want changes to be propagated at a reasonable time.
         cache.set(cache_key, results, 60 * 60 * 6)
     return results
 
