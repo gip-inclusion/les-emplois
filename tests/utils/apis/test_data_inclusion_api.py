@@ -1,3 +1,4 @@
+import httpx
 import pytest
 
 from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiException
@@ -19,7 +20,12 @@ def test_data_inclusion_client(settings, respx_mock):
         },
     )
 
-    assert client.services("fake-insee-code") == [{"id": "svc1"}, {"id": "svc2"}, {"id": "svc3"}, {"id": "svc4"}]
+    assert client.search_services("fake-insee-code") == [
+        {"id": "svc1"},
+        {"id": "svc2"},
+        {"id": "svc3"},
+        {"id": "svc4"},
+    ]
     from urllib.parse import parse_qs
 
     assert parse_qs(str(api_mock.calls[0].request.url.params)) == {
@@ -39,8 +45,28 @@ def test_data_inclusion_client(settings, respx_mock):
     # check exceptions
     api_mock.respond(200, json={"something": "else"})
     with pytest.raises(DataInclusionApiException):
-        client.services("fake-insee-code")
+        client.search_services("fake-insee-code")
 
     api_mock.respond(403)
     with pytest.raises(DataInclusionApiException):
-        client.services("fake-insee-code")
+        client.search_services("fake-insee-code")
+
+
+@pytest.mark.parametrize(
+    ("response", "expected"),
+    [
+        (httpx.Response(200, json={"source": "dora", "id": "foo"}), {"source": "dora", "id": "foo"}),
+        (httpx.Response(403), DataInclusionApiException),
+        (httpx.Response(422), DataInclusionApiException),
+        (httpx.Response(404), DataInclusionApiException),
+    ],
+)
+def test_data_inclusion_client_retrieve(respx_mock, response, expected):
+    client = DataInclusionApiClient("https://fake.api.gouv.fr/", "fake-token")
+    respx_mock.get("https://fake.api.gouv.fr/services/dora/foo").mock(return_value=response)
+
+    if expected == DataInclusionApiException:
+        with pytest.raises(DataInclusionApiException):
+            client.retrieve_service(source="dora", id_="foo")
+    elif isinstance(expected, dict):
+        assert client.retrieve_service(source="dora", id_="foo") == expected

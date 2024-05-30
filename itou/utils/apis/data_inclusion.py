@@ -31,7 +31,7 @@ class DataInclusionApiClient:
             timeout=API_TIMEOUT_SECONDS,
         )
 
-    def services(self, code_insee: str) -> list[dict]:
+    def search_services(self, code_insee: str) -> list[dict]:
         try:
             response = self.client.get(
                 "/search/services",
@@ -51,6 +51,18 @@ class DataInclusionApiClient:
         except KeyError as exc:
             logger.info("data.inclusion result error code_insee=%s error=%s", code_insee, exc)
             raise DataInclusionApiException()
+
+    def retrieve_service(self, source: str, id_: str) -> dict:
+        try:
+            response = self.client.get(
+                f"/services/{source}/{id_}",
+            )
+            response.raise_for_status()
+        except httpx.HTTPError as exc:
+            logger.info("data.inclusion request error source=%s service_id=%s error=%s", source, id_, exc)
+            raise DataInclusionApiException()
+
+        return response.json()
 
 
 def make_service_redirect_url(source: str, service_id: str) -> str:
