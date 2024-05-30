@@ -31,6 +31,7 @@ from itou.companies.models import Company
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory, SiaeConventionFactory
 from tests.eligibility.factories import EligibilityDiagnosisMadeBySiaeFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.test import TestCase
 
 
@@ -244,4 +245,8 @@ class TestCouldSiaeBeDeleted:
 
         # Approval with eligibility diagnosis authored by SIAE
         ApprovalFactory(eligibility_diagnosis__author_siae=company)
+        assert not could_siae_be_deleted(company)
+
+    def test_with_job_app(self):
+        company = JobApplicationFactory().to_company
         assert not could_siae_be_deleted(company)
