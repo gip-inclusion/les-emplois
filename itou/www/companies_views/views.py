@@ -19,7 +19,7 @@ from itou.companies.models import Company, CompanyMembership, JobDescription, Si
 from itou.jobs.models import Appellation
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from itou.utils.apis.data_inclusion import DataInclusionApiException, di_client_factory, make_service_redirect_url
+from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiException, make_service_redirect_url
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
@@ -57,7 +57,10 @@ def get_data_inclusion_services(code_insee):
     cache = caches["failsafe"]
     results = cache.get(cache_key)
     if results is None:
-        client = di_client_factory()
+        client = DataInclusionApiClient(
+            settings.API_DATA_INCLUSION_BASE_URL,
+            settings.API_DATA_INCLUSION_TOKEN,
+        )
         try:
             services = client.search_services(code_insee)
         except DataInclusionApiException:
