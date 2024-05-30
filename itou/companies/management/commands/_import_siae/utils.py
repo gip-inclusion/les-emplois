@@ -15,7 +15,6 @@ from django.utils import timezone
 
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.models import Company
-from itou.job_applications.enums import JobApplicationState
 from itou.metabase.tables.utils import hash_content
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.apis.geocoding import get_geocoding_data
@@ -103,7 +102,7 @@ def remap_columns(df, column_mapping):
 def could_siae_be_deleted(siae):
     if siae.evaluated_siaes.exists():
         return False
-    if siae.job_applications_received.exclude(state=JobApplicationState.NEW).exists():
+    if siae.job_applications_received.exists():
         return False
     # Do not delete SIAE if any approval is linked to one of the elibility diagnosis it has created
     if siae.eligibilitydiagnosis_set.exclude(approval=None).exists():
@@ -198,8 +197,10 @@ def sync_structures(df, source, kinds, build_structure, wet_run=False):
     for siret in deletable_sirets:
         siae = Company.objects.get(siret=siret, kind__in=kinds)
 
-        three_months_ago = timezone.now() - timezone.timedelta(days=90)
-        if siae.source == Company.SOURCE_STAFF_CREATED and siae.created_at >= three_months_ago:
+        # Allow longer periods before activity than SIAE imports, because changes to
+        # EA/EATT and GEIQ will take longer to reflect in their respective data source.
+        a_year_ago = timezone.now() - timezone.timedelta(days=365)
+        if siae.source == Company.SOURCE_STAFF_CREATED and siae.created_at >= a_year_ago:
             # When our staff creates a structure, let's give the user sufficient time to join it before deleting it.
             deletable_skipped_count += 1
             continue
