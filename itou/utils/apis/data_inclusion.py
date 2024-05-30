@@ -67,10 +67,3 @@ class DataInclusionApiClient:
 
 def make_service_redirect_url(source: str, service_id: str) -> str:
     return urljoin(settings.API_DATA_INCLUSION_BASE_URL, f"services/{source}/{service_id}/redirige?depuis=les-emplois")
-
-
-def di_client_factory() -> DataInclusionApiClient:
-    return DataInclusionApiClient(
-        settings.API_DATA_INCLUSION_BASE_URL,
-        settings.API_DATA_INCLUSION_TOKEN,
-    )
