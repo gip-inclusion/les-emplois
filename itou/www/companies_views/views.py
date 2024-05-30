@@ -59,7 +59,7 @@ def get_data_inclusion_services(code_insee):
     if results is None:
         client = di_client_factory()
         try:
-            services = client.services(code_insee)
+            services = client.search_services(code_insee)
         except DataInclusionApiException:
             # 15 minutes seems like a reasonable amount of time for DI to get back on track
             cache.set(cache_key, [], 60 * 15)
