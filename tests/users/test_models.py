@@ -1348,3 +1348,20 @@ def test_employer_organizations(UserFactory, MembershipFactory, relation_name):
     assert user.organizations[0] == getattr(admin_membership, relation_name)
     # Then it's ordered by membership creation date.
     assert user.organizations[1] == getattr(first_membership, relation_name)
+
+
+def test_user_fisrt_login(client):
+    user = JobSeekerFactory()
+    assert user.last_login is None
+    assert user.first_login is None
+
+    client.force_login(user)
+    user.refresh_from_db()
+    assert user.last_login is not None
+    assert user.first_login == user.last_login
+    initial_first_login = user.first_login
+
+    client.force_login(user)
+    user.refresh_from_db()
+    assert user.last_login != initial_first_login
+    assert user.first_login == initial_first_login
