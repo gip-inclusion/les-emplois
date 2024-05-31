@@ -31,6 +31,18 @@ class DatumCode(models.TextChoices):
     USER_EMPLOYER_COUNT = "US-013", "Nombre d'employeurs"
     USER_LABOR_INSPECTOR_COUNT = "US-014", "Nombre d'inspecteurs du travail"
     USER_ITOU_STAFF_COUNT = "US-015", "Nombre d'administrateurs"
+    # API usage
+    API_TOTAL_CALLS = "API-001", "API : total d'appels reçus"
+    API_TOTAL_UV = "API-002", "API : total de visiteurs uniques"
+    API_TOTAL_CALLS_CANDIDATS = "API-003", "API candidats : total d'appels reçus"
+    API_TOTAL_UV_CANDIDATS = "API-004", "API candidats : total de visiteurs uniques"
+    API_TOTAL_CALLS_GEIQ = "API-005", "API GEIQ : total d'appels reçus"
+    API_TOTAL_UV_GEIQ = "API-006", "API GEIQ : total de visiteurs uniques"
+    API_TOTAL_CALLS_ER = "API-007", "API FS : total d'appels reçus"
+    API_TOTAL_UV_ER = "API-008", "API FS : total de visiteurs uniques"
+    API_TOTAL_CALLS_MARCHE = "API-009", "API Le marché : total d'appels reçus"
+    API_TOTAL_CALLS_SIAES = "API-010", "API siaes : total d'appels reçus"
+    API_TOTAL_CALLS_STRUCTURES = "API-011", "API structures : total d'appels reçus"
 
 
 class Datum(models.Model):

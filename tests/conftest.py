@@ -1,6 +1,7 @@
 import copy
 import os
 import uuid
+from functools import partial
 
 # Workaround being able to use freezegun with pandas.
 # https://github.com/spulec/freezegun/issues/98
@@ -15,9 +16,13 @@ from django.core.management import call_command
 from django.db import connection
 from django.template import base as base_template
 from django.test import override_settings
+from django.utils import timezone
 from factory import Faker
 from pytest_django.lazy_django import django_settings_is_configured
 from pytest_django.plugin import INVALID_TEMPLATE_VARS_ENV
+
+from itou.analytics import api_usage
+from tests.analytics import test_api_usage
 
 
 # Rewrite before importing itou code.
@@ -68,6 +73,19 @@ def admin_client():
 @pytest.fixture
 def client():
     return ItouClient()
+
+
+@pytest.fixture
+def datadog_client(mocker):
+    with override_settings(API_DATADOG_BASE_URL="https://un-toutou-nomme-donnee.fr/"):
+        now = timezone.now()
+        client = test_api_usage._mocked_client(mocker, now)
+
+        mocker.patch(
+            "itou.analytics.api_usage.collect_analytics_data",
+            side_effect=partial(api_usage.collect_analytics_data, client=client),
+        )
+    return client
 
 
 @pytest.fixture()

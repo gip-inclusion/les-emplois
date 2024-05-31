@@ -6,7 +6,7 @@ from django.utils import timezone
 
 from itou.utils.command import BaseCommand
 
-from ... import approvals, employee_record, users
+from ... import api_usage, approvals, employee_record, users
 from ...models import Datum
 
 
@@ -36,6 +36,7 @@ class Command(BaseCommand):
             **approvals.collect_analytics_data(before),
             **employee_record.collect_analytics_data(before),
             **users.collect_analytics_data(before),
+            **api_usage.collect_analytics_data(before),
         }
 
     def show_data(self, data):
@@ -45,6 +46,7 @@ class Command(BaseCommand):
     def save_data(self, data, before):
         bucket = (before.date() - datetime.timedelta(days=1)).isoformat()
         self.stderr.write(f"Saving analytics data in bucket '{bucket}'.")
+
         for code, value in data.items():
             datum = Datum(
                 code=code.value,
