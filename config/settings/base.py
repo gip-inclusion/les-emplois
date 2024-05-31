@@ -677,6 +677,11 @@ DORA_BASE_URL = os.getenv("DORA_BASE_URL", "https://dora.inclusion.beta.gouv.fr"
 
 # GPS
 # ------------------------------------------------------------------------------
-# Until GPS goes live for everyone, keep the feature hidden in production.
 GPS_GROUPS_CREATED_BY_EMAIL = os.getenv("GPS_GROUPS_CREATED_BY_EMAIL", None)
 GPS_GROUPS_CREATED_AT_DATE = datetime.date(2024, 6, 12)
+
+# Datadog
+# ------------------------------------------------------------------------------
+API_DATADOG_BASE_URL = "https://api.datadoghq.eu/api/v2"
+API_DATADOG_API_KEY = os.getenv("API_DATADOG_API_KEY", None)
+API_DATADOG_APPLICATION_KEY = os.getenv("API_DATADOG_APPLICATION_KEY", None)
