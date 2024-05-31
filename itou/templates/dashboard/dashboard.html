@@ -362,6 +362,28 @@
                                 <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
                                     <img src="{% static_theme_images 'logo-pilotage-inclusion.svg' %}" height="80" alt="Le pilotage de l'inclusion">
                                 </div>
+
+                                {% if pilotage_webinar_banner_url %}
+                                    <div class="alert alert-important alert-dismissible fade show" role="status">
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                                        <div class="row">
+                                            <div class="col-auto pe-0">
+                                                <i class="ri-information-line ri-xl text-important" aria-hidden="true"></i>
+                                            </div>
+                                            <div class="col">
+                                                <p class="mb-2">
+                                                    <strong>Inscrivez-vous à un webinaire pour découvrir votre tout nouveau tableau de bord !</strong>
+                                                </p>
+                                                <p class="mb-0">
+                                                    En juin, deux sessions vous sont proposées pour vous familiariser avec votre nouvel outil de suivi et d'analyse des résultats de vos prescriptions.
+                                                </p>
+                                            </div>
+                                            <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                                                <a class="btn btn-sm btn-primary btn-block" href="{{ pilotage_webinar_banner_url }}">Je m’inscris</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
                                 <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
                                     {% if can_view_stats_dashboard_widget %}
                                         {% include "dashboard/includes/stats.html" %}
