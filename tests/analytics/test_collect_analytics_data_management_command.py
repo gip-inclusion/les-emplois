@@ -114,7 +114,7 @@ def test_save_data_with_an_integrity_error(command):
     assert command.stdout.getvalue() == "Successfully saved code=CODE-002 bucket=2021-12-31 value=21.\n"
 
 
-def test_management_command_name_and_that_all_codes_are_saved():
+def test_management_command_name_and_that_all_codes_are_saved(datadog_client):
     call_command("collect_analytics_data", save=True)
 
     assert Datum.objects.all().count() == len(DatumCode)
