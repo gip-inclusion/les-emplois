@@ -133,7 +133,11 @@ class CompanyResource(resources.ModelResource):
 
 
 @admin.register(models.Company)
-class CompanyAdmin(ItouGISMixin, ExportActionMixin, OrganizationAdmin):
+class CompanyAdmin(
+    ItouGISMixin,
+    ExportActionMixin,  # 2024-06-01: Used to verify OPCS.
+    OrganizationAdmin,
+):
     resource_class = CompanyResource
     form = CompanyAdminForm
     list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count", "created_at")
