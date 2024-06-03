@@ -1,5 +1,20 @@
 # Journal des modifications
 
+## 2024-06-03
+
+### Ajouté
+
+- [Notifications: Remise en place d'une banière Mobil’Emploi](https://github.com/gip-inclusion/les-emplois/pull/4150) 🖼
+- [Statistiques: Nombre de candidats qui prennent le contrôle de leur compte](https://github.com/gip-inclusion/les-emplois/pull/4149)
+
+### Modifié
+
+- [UX/UI : Mise a jour du theme et adaptation du DOM du menu #burgerNav](https://github.com/gip-inclusion/les-emplois/pull/4137) 🖼
+
+### Supprimé
+
+- [Suppression du bandeau promotionnelle RDV-I](https://github.com/gip-inclusion/les-emplois/pull/4111)
+
 ## 2024-05-27
 
 ### Modifié
