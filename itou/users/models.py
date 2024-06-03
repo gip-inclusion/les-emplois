@@ -286,6 +286,7 @@ class User(AbstractUser, AddressMixin):
         help_text="Mise à jour par autocomplétion de l'utilisateur",
     )
 
+    # for first connections prior to 2024-06-01 the first_login is set to date_joined
     first_login = models.DateTimeField(verbose_name="date de première connexion", null=True, blank=True)
 
     objects = ItouUserManager()

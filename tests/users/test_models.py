@@ -1350,7 +1350,7 @@ def test_employer_organizations(UserFactory, MembershipFactory, relation_name):
     assert user.organizations[1] == getattr(first_membership, relation_name)
 
 
-def test_user_fisrt_login(client):
+def test_user_first_login(client):
     user = JobSeekerFactory()
     assert user.last_login is None
     assert user.first_login is None
