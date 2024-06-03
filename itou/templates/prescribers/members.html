@@ -1,5 +1,4 @@
 {% extends "layout/base.html" %}
-{% load theme_inclusion %}
 
 {% block title %}Collaborateurs {{ block.super }}{% endblock %}
 
@@ -12,31 +11,6 @@
     <p>
         Vous êtes connecté(e) en tant que <b>{{ user.get_full_name }}</b> ({{ user.email }})
     </p>
-{% endblock %}
-
-{% block messages %}
-    {# Temporary advertisement alert #}
-    <div class="alert alert-important alert-dismissible fade show" role="status">
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-        <div class="row">
-            <div class="d-none d-md-inline col-md-auto">
-                <img src="{% static_theme_images 'ico-bicro-important.svg' %}" alt="" height="80">
-            </div>
-            <div class="col-12 col-md px-md-0">
-                <p class="mb-2">
-                    <strong>Retirer un collaborateur et réattribuer ses candidatures</strong>
-                </p>
-                <p class="mb-0">
-                    Aidez-nous en réalisant un test de 5 minutes : cette nouvelle fonctionnalité vous permettra de réattribuer les candidatures d’un collaborateur lorsque vous le retirez de votre structure.
-                </p>
-            </div>
-            <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                <a class="btn btn-sm btn-primary" href="https://t.maze.co/230815225" target="_blank" role="button">Accéder au test</a>
-            </div>
-        </div>
-    </div>
-
-    {{ block.super }}
 {% endblock %}
 
 {% block content %}
