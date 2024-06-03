@@ -230,17 +230,18 @@ def test_hashed_approval_number():
     assert "salarie_agrement" not in df
 
 
-def test_could_siae_be_deleted_with_eligibility_diagnosis():
-    # Check that eligibility diagnoses made by SIAE are blocking its deletion
+class TestCouldSiaeBeDeleted:
+    def test_with_eligibility_diagnosis(self):
+        # Check that eligibility diagnoses made by SIAE are blocking its deletion
 
-    # No eligibility diagnosis linked
-    company = CompanyWith2MembershipsFactory()
-    assert could_siae_be_deleted(company)
+        # No eligibility diagnosis linked
+        company = CompanyWith2MembershipsFactory()
+        assert could_siae_be_deleted(company)
 
-    # An eligibility diagnosis without related approval
-    EligibilityDiagnosisMadeBySiaeFactory(author_siae=company, author=company.members.first())
-    assert could_siae_be_deleted(company)
+        # An eligibility diagnosis without related approval
+        EligibilityDiagnosisMadeBySiaeFactory(author_siae=company, author=company.members.first())
+        assert could_siae_be_deleted(company)
 
-    # Approval with eligibility diagnosis authored by SIAE
-    ApprovalFactory(eligibility_diagnosis__author_siae=company)
-    assert not could_siae_be_deleted(company)
+        # Approval with eligibility diagnosis authored by SIAE
+        ApprovalFactory(eligibility_diagnosis__author_siae=company)
+        assert not could_siae_be_deleted(company)
