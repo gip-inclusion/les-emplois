@@ -1,5 +1,22 @@
 # Journal des modifications
 
+## 2024-05-30
+
+### Ajouté
+
+- [Notifications: Remise en place d'une banière Mobil’Emploi](https://github.com/gip-inclusion/les-emplois/pull/4150) 🖼
+
+### Modifié
+
+- [API: Correction d'un serializer de l'api SIAE](https://github.com/gip-inclusion/les-emplois/pull/4123)
+- [Connexion: Amélioration des levée d'erreur en se connectant avec France Connect ou France Travail Connect](https://github.com/gip-inclusion/les-emplois/pull/4124)
+- [Connexion: Améliorer un logger d'erreur avec France Travail Connect](https://github.com/gip-inclusion/les-emplois/pull/4125)
+- [UX/UI : Mise a jour du theme et adaptation du DOM du menu #burgerNav](https://github.com/gip-inclusion/les-emplois/pull/4137) 🖼
+
+### Supprimé
+
+- [Suppression du bandeau promotionnelle RDV-I](https://github.com/gip-inclusion/les-emplois/pull/4111)
+
 ## 2024-05-24
 
 ### Modifié
