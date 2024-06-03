@@ -131,7 +131,8 @@ def main(publish):
                     removed.append(title)
 
             if added or changed or removed:
-                new_changelog.write(f"## {sprint_end}\n\n")
+                # Changelog entries are up to the next Monday (excluded).
+                new_changelog.write(f"## {sprint_end + datetime.timedelta(days=1)}\n\n")
             if added:
                 new_changelog.write("### Ajouté\n\n")
                 for title in ci_sort(added):
