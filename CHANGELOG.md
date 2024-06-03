@@ -1,5 +1,17 @@
 # Journal des modifications
 
+## 2024-05-24
+
+### Modifié
+
+- [API: Correction d'un serializer de l'api SIAE](https://github.com/gip-inclusion/les-emplois/pull/4123)
+- [Connexion: Amélioration des levée d'erreur en se connectant avec France Connect ou France Travail Connect](https://github.com/gip-inclusion/les-emplois/pull/4124)
+- [Connexion: Améliorer un logger d'erreur avec France Travail Connect](https://github.com/gip-inclusion/les-emplois/pull/4125)
+- [Import IAE : Utiliser les données issues de l'équipe RIAE de l'ASP plutôt que celle de la DGEFP](https://github.com/gip-inclusion/les-emplois/pull/4048)
+- [Notifications : Réessayer d’envoyer les emails lorsque Mailjet indique un problème](https://github.com/gip-inclusion/les-emplois/pull/4115)
+- [Tableau de bord: Afficher le type de structure/organisation dans le tableau de bord](https://github.com/gip-inclusion/les-emplois/pull/4109) 🖼
+- [UX/UI : Améliorer la navigation dans le parcours de modification d’une suspension de PASS IAE](https://github.com/gip-inclusion/les-emplois/pull/4097)
+
 ## 2024-05-18
 
 ### Ajouté
