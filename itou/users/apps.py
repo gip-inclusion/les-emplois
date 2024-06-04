@@ -13,5 +13,6 @@ class UsersAppConfig(AppConfig):
 
         # Already done in django.contrib.auth.AuthConfig, but since we need it before update_first_login
         # better connect it again here just in case (it won't be called twice)
-        user_logged_in.connect(update_last_login, dispatch_uid="update_last_login")
-        user_logged_in.connect(update_first_login, dispatch_uid="update_first_login")
+        # See https://docs.djangoproject.com/en/5.0/topics/signals/#connecting-to-specific-signals for weak=False
+        user_logged_in.connect(update_last_login, weak=False, dispatch_uid="update_last_login")
+        user_logged_in.connect(update_first_login, weak=False, dispatch_uid="update_first_login")
