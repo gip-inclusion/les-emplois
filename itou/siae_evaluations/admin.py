@@ -201,7 +201,7 @@ class EvaluationCampaignAdmin(ItouModelAdmin):
     )
     list_filter = (
         "evaluations_asked_at",
-        "ended_at",
+        "name",
         "institution__department",
     )
     inlines = [
@@ -319,6 +319,7 @@ class SanctionsAdmin(ItouModelAdmin):
         "deactivation_reason",
         "no_sanction_reason",
     ]
+    list_filter = ("evaluated_siae__evaluation_campaign__name",)
 
     @admin.display(description="campagne", ordering="evaluated_siae__evaluation_campaign")
     def evaluation_campaign(self, obj):
