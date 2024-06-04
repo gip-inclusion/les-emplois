@@ -550,7 +550,7 @@ def suspend(request, approval_id, template_name="approvals/suspend.html"):
 @login_required()
 def suspension_action_choice(request, suspension_id, template_name="approvals/suspension_action_choice.html"):
     siae = get_current_company_or_404(request)
-    suspension = get_object_or_404(Suspension, pk=suspension_id)
+    suspension = get_object_or_404(Suspension.objects.select_related("approval__user"), pk=suspension_id)
 
     if not suspension.can_be_handled_by_siae(siae):
         raise PermissionDenied()
@@ -585,7 +585,7 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
     """
 
     siae = get_current_company_or_404(request)
-    suspension = get_object_or_404(Suspension, pk=suspension_id)
+    suspension = get_object_or_404(Suspension.objects.select_related("approval__user"), pk=suspension_id)
 
     if not suspension.can_be_handled_by_siae(siae):
         raise PermissionDenied()
@@ -617,7 +617,7 @@ def suspension_update(request, suspension_id, template_name="approvals/suspensio
 @login_required()
 def suspension_update_enddate(request, suspension_id, template_name="approvals/suspension_update_enddate.html"):
     siae = get_current_company_or_404(request)
-    suspension = get_object_or_404(Suspension, pk=suspension_id)
+    suspension = get_object_or_404(Suspension.objects.select_related("approval__user"), pk=suspension_id)
 
     if not suspension.can_be_handled_by_siae(siae):
         raise PermissionDenied()
@@ -658,7 +658,7 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
     """
 
     siae = get_current_company_or_404(request)
-    suspension = get_object_or_404(Suspension, pk=suspension_id)
+    suspension = get_object_or_404(Suspension.objects.select_related("approval__user"), pk=suspension_id)
 
     if not suspension.can_be_handled_by_siae(siae):
         raise PermissionDenied()
