@@ -74,6 +74,15 @@ def test_list_view(snapshot, client):
     assert str(parse_response_to_soup(response, ".s-section .c-box")) == snapshot
 
 
+def test_list_view_no_siae(snapshot, client):
+    prolongation_request = approvals_factories.ProlongationRequestFactory(for_snapshot=True)
+    prolongation_request.declared_by_siae.delete()
+    client.force_login(prolongation_request.validated_by)
+
+    response = client.get(reverse("approvals:prolongation_requests_list"))
+    assert str(parse_response_to_soup(response, ".s-section .c-box")) == snapshot
+
+
 def test_list_view_only_pending_filter(client):
     pending_prolongation_request = approvals_factories.ProlongationRequestFactory(
         status=ProlongationRequestStatus.PENDING,
@@ -134,6 +143,19 @@ def test_show_view(snapshot, client):
     )
     assert str(parse_response_to_soup(response, ".s-section .col-lg-8 .c-box:last-child")) == snapshot
     assert_previous_step(response, reverse("approvals:prolongation_requests_list") + "?only_pending=on")
+
+
+@pytest.mark.ignore_unknown_variable_template_error("hiring_pending", "job_application", "matomo_event_attrs")
+def test_show_view_no_siae(client):
+    prolongation_request = approvals_factories.ProlongationRequestFactory()
+    prolongation_request.declared_by_siae.delete()
+    client.force_login(prolongation_request.validated_by)
+
+    default_storage.location = "snapshot"
+    response = client.get(
+        reverse("approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk})
+    )
+    assert response.status_code == 200
 
 
 def test_grant_view(client):
