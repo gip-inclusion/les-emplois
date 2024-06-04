@@ -733,8 +733,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def clean(self):
         super().clean()
 
-        # We have severals cases of job_applications on job_seekers or employer
-        # We don't know how it happened, so we'll just add a sanity check here
         if self.job_seeker_id and self.job_seeker.kind != UserKind.JOB_SEEKER:
             raise ValidationError(
                 "Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte candidat"
