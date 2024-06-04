@@ -174,8 +174,6 @@ class ApprovalSuspendViewTest(TestCase):
             + 1  # get the session
             + 3  # get the user, its memberships, and the SIAEs (middleware)
             + 1  # get suspension (get_object_or_404)
-            + 1  # get approval (can_be_handled_by_siae)
-            + 1  # get user (can_be_handled_by_siae)
             + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_company)
             + 1  # get company info (can_be_handled_by_siae -> last_hire_was_made_by_company)
             + 1  # get suspension (SuspensionForm -> Suspension.next_min_start_at)
@@ -235,8 +233,6 @@ class ApprovalSuspendViewTest(TestCase):
             + 1  # get the session
             + 3  # get the user, its memberships, and the SIAEs (middleware)
             + 1  # get suspension (get_object_or_404)
-            + 1  # get approval (can_be_handled_by_siae)
-            + 1  # get user (can_be_handled_by_siae)
             + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_company)
             + 1  # get company info (can_be_handled_by_siae -> last_hire_was_made_by_company)
             + 3  # update session in savepoints
@@ -314,8 +310,6 @@ class ApprovalSuspendActionChoiceViewTest(TestCase):
             + 1  # get the session
             + 3  # get the user, its memberships, and the SIAEs (middleware)
             + 1  # get suspension (get_object_or_404)
-            + 1  # get approval (can_be_handled_by_siae)
-            + 1  # get user (can_be_handled_by_siae)
             + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_company)
             + 1  # get company info (can_be_handled_by_siae -> last_hire_was_made_by_company)
             + 3  # update session in savepoints
@@ -411,8 +405,6 @@ class ApprovalSuspendUpdateEndDateViewTest(TestCase):
             + 1  # get the session
             + 3  # get the user, its memberships, and the SIAEs (middleware)
             + 1  # get suspension (get_object_or_404)
-            + 1  # get approval (can_be_handled_by_siae)
-            + 1  # get user (can_be_handled_by_siae)
             + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_company)
             + 1  # get company info (can_be_handled_by_siae -> last_hire_was_made_by_company)
             + 3  # update session in savepoints
