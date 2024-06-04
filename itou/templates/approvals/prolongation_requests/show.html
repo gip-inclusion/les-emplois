@@ -76,7 +76,9 @@
                     {% include "approvals/prolongation_requests/_status_box.html" %}
                     {# SIAE card #}
                     {% with siae=prolongation_request.declared_by_siae %}
-                        {% include "companies/includes/_company_info.html" with company=siae only %}
+                        {% if siae %}
+                            {% include "companies/includes/_company_info.html" with company=siae only %}
+                        {% endif %}
                     {% endwith %}
                 </div>
             </div>
