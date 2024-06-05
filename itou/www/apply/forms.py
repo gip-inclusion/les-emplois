@@ -40,7 +40,7 @@ class JobSeekerExistsForm(forms.Form):
         self.user = None
 
     email = forms.EmailField(
-        label="Adresse e-mail du candidat",
+        label="Adresse e-mail personnelle du candidat",
         widget=forms.EmailInput(attrs={"autocomplete": "off", "placeholder": "julie@example.com"}),
     )
 
