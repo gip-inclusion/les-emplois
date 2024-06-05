@@ -37,7 +37,7 @@ class EditJobSeekerInfoForm(
     PROFILE_FIELDS = ["pole_emploi_id", "lack_of_pole_emploi_id_reason", "nir", "lack_of_nir_reason"]
 
     email = forms.EmailField(
-        label="Adresse électronique",
+        label="Adresse électronique personnelle",
         disabled=True,
         widget=forms.TextInput(attrs={"autocomplete": "off"}),
     )
