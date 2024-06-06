@@ -5,14 +5,14 @@
     background: #ba2121;
 }
 
-form .aligned ul.notifications-summary,
-form .form-row ul.notifications-summary {
+form .aligned ul.inline,
+form .form-row ul.inline {
     margin-top: 0;
     margin-left: 0;
     padding-left: 0;
 }
 
-form .aligned ul.notifications-summary li,
-form .form-row ul.notifications-summary li {
+form .aligned ul.inline li,
+form .form-row ul.inline li {
     list-style-type: none;
 }
