@@ -41,15 +41,6 @@ from itou.utils.validators import validate_birthdate, validate_nir, validate_pol
 from .enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 
 
-def update_first_login(sender, user, **kwargs):
-    """
-    A signal receiver which updates the first_login date for the user logging in.
-    """
-    if user.first_login is None:
-        user.first_login = user.last_login
-        user.save(update_fields=["first_login"])
-
-
 class ApprovalAlreadyExistsError(Exception):
     pass
 
@@ -367,6 +358,12 @@ class User(AbstractUser, AddressMixin):
 
         self.validate_constraints()
         self.validate_identity_provider()
+
+        # Capture Django update_last_login signal
+        if self.first_login is None and self.last_login is not None:
+            self.first_login = self.last_login
+            if "update_fields" in kwargs and "last_login" in kwargs["update_fields"]:
+                kwargs["update_fields"].append("first_login")
 
         super().save(*args, **kwargs)
 
