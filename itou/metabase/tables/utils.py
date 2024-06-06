@@ -79,7 +79,7 @@ def get_column_from_field(field, name):
     return {
         "name": name,
         "type": get_field_type_from_field(field),
-        "comment": field.verbose_name,
+        "comment": str(field.verbose_name),  # Force str() to handle _() lazyness
         "fn": lambda o: getattr(o, field_name),
     }
 
