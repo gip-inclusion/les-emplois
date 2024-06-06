@@ -71,7 +71,7 @@ class DisabledNotificationsMixin:
         disabled_notifications = notification_settings.disabled_notifications_names
         if disabled_notifications:
             return mark_safe(
-                "<ul class='notifications-summary'>"
+                "<ul class='inline'>"
                 + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications])
                 + "<ul>"
             )
@@ -422,7 +422,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
         disabled_notifications = notification_settings.disabled_notifications_names
         if disabled_notifications:
             return mark_safe(
-                "<ul class='notifications-summary'>"
+                "<ul class='inline'>"
                 + "".join([f"<li>{notification}</<li>" for notification in disabled_notifications])
                 + "<ul>"
             )
