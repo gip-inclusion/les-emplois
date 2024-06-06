@@ -414,6 +414,8 @@ class EvaluationCampaignManagerTest(TestCase):
             + 1  # SELECT SIAE convention
             + 1  # SELECT SIAE admin users
             + 1  # SELECT institution users
+            + 1  # INSERT email for employer
+            + 1  # INSERT email for institution user
             + 1  # RELEASE SAVEPOINT (end of transaction.atomic())
         ):
             evaluation_campaign.populate(fake_now)

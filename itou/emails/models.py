@@ -23,3 +23,15 @@ class Email(models.Model):
 
     def __str__(self):
         return f"email {self.pk}: {self.subject}"
+
+    @staticmethod
+    def from_email_message(email_message):
+        return Email(
+            from_email=email_message.from_email,
+            reply_to=email_message.reply_to,
+            to=email_message.to,
+            cc=email_message.cc,
+            bcc=email_message.bcc,
+            subject=email_message.subject,
+            body_text=email_message.body,
+        )

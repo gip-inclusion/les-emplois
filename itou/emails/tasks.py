@@ -13,7 +13,6 @@ from requests.exceptions import InvalidJSONError
 
 from itou.emails.models import Email
 from itou.utils.iterators import chunks
-from itou.utils.tasks import _async_send_message as old_async_send_message
 
 
 # Reduce verbosity of huey logs (INFO by default)
@@ -148,24 +147,12 @@ class AsyncEmailBackend(BaseEmailBackend):
         if not connection.in_atomic_block:
             raise ProgrammingError("Sending email requires an active database transaction.")
         emails_count = 0
-        for email in email_messages:
-            for mjemail in sanitize_mailjet_recipients(email):
+        for message in email_messages:
+            for mjemail in sanitize_mailjet_recipients(message):
                 emails_count += 1
                 # Send each email in a separate task, so that Huey retry mecanism only
                 # retries the failed email.
-                # TODO: Replace the task and the email dict with the new task and the PK of a
-                # created email object when this module tasks are available on production.
-                transaction.on_commit(
-                    partial(
-                        old_async_send_message,
-                        {
-                            "from_email": mjemail.from_email,
-                            "to": mjemail.to,
-                            "cc": mjemail.cc,
-                            "bcc": mjemail.bcc,
-                            "subject": mjemail.subject,
-                            "body": mjemail.body,
-                        },
-                    )
-                )
+                email = Email.from_email_message(mjemail)
+                email.save()
+                transaction.on_commit(partial(_async_send_message, email.pk))
         return emails_count

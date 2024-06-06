@@ -179,7 +179,10 @@ class JobApplicationTransferModelTest(TestCase):
             + 1  # Check if job applications are linked because of on_delete=set_null
             + 2  # Delete diagnosis and criteria made by the SIAE
             + 1  # Select user for email
-            + 2  # Select notification settings
+            + 1  # Select employer notification settings
+            + 1  # Insert employer email in emails table
+            + 1  # Select job seeker notification settings
+            + 1  # Insert job seeker email in emails table
         ):
             job_application.transfer_to(origin_user, target_company)
 
