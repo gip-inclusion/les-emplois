@@ -1412,10 +1412,10 @@ def test_matomo_context_processor(client, settings, snapshot):
 
     # canonical case
     url = reverse("companies_views:card", kwargs={"siae_id": company.pk})
-    response = client.get(f"{url}?foo=bar&mtm_foo=truc&mtm_bar=bidule&city=paris")
+    response = client.get(f"{url}?foo=bar&mtm_foo=truc&mtm_bar=bidule")
     assert response.status_code == 200
     assert response.context["siae"] == company
-    assert response.context["matomo_custom_url"] == "company/<int:siae_id>/card?city=paris&mtm_bar=bidule&mtm_foo=truc"
+    assert response.context["matomo_custom_url"] == "company/<int:siae_id>/card?mtm_bar=bidule&mtm_foo=truc"
     assert response.context["matomo_custom_title"] == "Fiche de la structure d'insertion"
     assert response.context["matomo_user_id"] == user.pk
     script_content = parse_response_to_soup(response, selector="#matomo-custom-init")

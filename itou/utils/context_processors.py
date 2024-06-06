@@ -29,8 +29,8 @@ def matomo(request):
     url = request.path
     if request.resolver_match:
         url = request.resolver_match.route
-    # only keep Matomo-related and "city" (for Site Search) GET params for now
-    params = {k: v for k, v in request.GET.lists() if k in ["city"] or k.startswith(("utm_", "mtm_", "piwik_"))}
+    # Only keep Matomo-related params for now.
+    params = {k: v for k, v in request.GET.lists() if k.startswith(("utm_", "mtm_", "piwik_"))}
     if params:
         url = f"{url}?{urlencode(sorted(params.items()), doseq=True)}"
     context["matomo_custom_url"] = url
