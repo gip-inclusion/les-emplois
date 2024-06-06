@@ -88,11 +88,11 @@ class ItouFileField(forms.FileField):
                 <p>
                     <i class="ri-question-line mr-1"></i>
                     Ce fichier n'est pas un PDF ?
-                    <a href="%s"
+                    <a href="{}"
                        target="_blank"
                        rel="noopener"
                        class="matomo-event has-external-link"
-                       %s
+                       {}
                        aria-label="Découvrez comment le convertir (ouverture dans un nouvel onglet)">
                         Découvrez comment le convertir.
                     </a>
