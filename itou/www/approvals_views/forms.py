@@ -47,7 +47,7 @@ class ApprovalForm(forms.Form):
         label="Nom",
         widget=Select2MultipleWidget(
             attrs={
-                "data-placeholder": "Nom du candidat",
+                "data-placeholder": "Nom du salarié",
             }
         ),
     )
