@@ -940,7 +940,10 @@ class SiaeSubmitProofsViewTest(MessagesTestMixin, TestCase):
             + 1  # update evaluatedadministrativecriteria
             + 1  # update evaluatedsiae submission_freezed_at
             + 3  # fetch institution, siae and siae members for email notification
-            + 1  # email: savepoint
+            + 1  # insert emails to ddets into emails table
+            + 1  # email: _async_send_message task savepoint
+            + 1  # fetch email details (and lock it)
+            + 1  # update email status
             + 1  # email: release savepoint
             + 2  # update session, release savepoint
         ):
