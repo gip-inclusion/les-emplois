@@ -196,7 +196,7 @@ def can_view_stats_dgefp(request):
     return (
         request.user.is_labor_inspector
         and isinstance(request.current_organization, Institution)
-        and request.current_organization.kind == InstitutionKind.DGEFP
+        and request.current_organization.kind == InstitutionKind.DGEFP_IAE
     )
 
 

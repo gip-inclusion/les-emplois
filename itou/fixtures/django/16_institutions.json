@@ -10,6 +10,7 @@
       "department": "13",
       "geocoding_score": null,
       "geocoding_updated_at": null,
+      "insee_city": null,
       "kind": "DREETS IAE",
       "name": "DREETS Provence-Alpes-Côte d’Azur",
       "post_code": "13285",
@@ -30,6 +31,7 @@
       "department": "30",
       "geocoding_score": null,
       "geocoding_updated_at": null,
+      "insee_city": null,
       "kind": "DDETS IAE",
       "name": "DDETS de Nîmes",
       "post_code": "30972",
@@ -38,5 +40,47 @@
     },
     "model": "institutions.institution",
     "pk": 2
+  },
+  {
+    "fields": {
+      "address_line_1": "",
+      "address_line_2": "",
+      "ban_api_resolved_address": null,
+      "city": "",
+      "coords": null,
+      "created_at": "2023-06-02T09:35:44.546Z",
+      "department": "30",
+      "geocoding_score": null,
+      "geocoding_updated_at": null,
+      "insee_city": null,
+      "kind": "DDETS GEIQ",
+      "name": "DDETS de Nîmes",
+      "post_code": "30972",
+      "uid": "acd5ea76-3aad-476a-a2db-5212d90d09b2",
+      "updated_at": "2024-06-10T09:46:14.663Z"
+    },
+    "model": "institutions.institution",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "address_line_1": "23 rue Borde",
+      "address_line_2": "CS 10009",
+      "ban_api_resolved_address": null,
+      "city": "Marseille",
+      "coords": null,
+      "created_at": "2021-07-13T15:32:02.061Z",
+      "department": "13",
+      "geocoding_score": null,
+      "geocoding_updated_at": null,
+      "insee_city": null,
+      "kind": "DREETS GEIQ",
+      "name": "DREETS Provence-Alpes-Côte d’Azur",
+      "post_code": "13285",
+      "uid": "90d63648-3ebc-47f6-bf85-fa432ec6514f",
+      "updated_at": "2024-06-10T09:46:14.663Z"
+    },
+    "model": "institutions.institution",
+    "pk": 4
   }
 ]
