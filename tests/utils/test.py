@@ -1,5 +1,6 @@
 import importlib
 import io
+import random
 import re
 
 import openpyxl
@@ -8,6 +9,8 @@ from django.template.loader import render_to_string
 from django.test import Client, TestCase as BaseTestCase
 from django.test.utils import TestContextDecorator
 from pytest_django.asserts import assertContains, assertNotContains
+
+from itou.common_apps.address.departments import DEPARTMENTS
 
 
 # SAVEPOINT + RELEASE from the ATOMIC_REQUESTS transaction
@@ -146,3 +149,11 @@ def assert_previous_step(response, url, back_to_list=False):
     else:
         assertNotContains(response, "Retour à la liste")
     assertContains(response, previous_step)
+
+
+def create_fake_postcode():
+    postcode = random.choice(list(DEPARTMENTS))
+    # add 3 numbers
+    postcode += f"{int(random.randint(0, 999)):03}"
+    # trunc to keep only 5 numbers, in case the department was 3 number long
+    return postcode[:5]

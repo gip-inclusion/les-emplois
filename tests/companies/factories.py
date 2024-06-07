@@ -1,17 +1,17 @@
 import functools
-import random
 import string
 
 import factory.fuzzy
 from django.utils import timezone
 
 from itou.cities.models import City
-from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
+from itou.common_apps.address.departments import department_from_postcode
 from itou.companies import models
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType
 from itou.jobs.models import Appellation
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory
+from tests.utils.test import create_fake_postcode
 
 
 NAF_CODES = ["9522Z", "7820Z", "6312Z", "8130Z", "1071A", "5510Z"]
@@ -64,14 +64,6 @@ def _create_job_from_rome_code(self, create, extracted, **kwargs):
     self.jobs.add(*appellations)
 
 
-def _create_fake_postcode():
-    postcode = random.choice(list(DEPARTMENTS))
-    # add 3 numbers
-    postcode += f"{int(random.randint(0, 999)):03}"
-    # trunc to keep only 5 numbers, in case the department was 3 number long
-    return postcode[:5]
-
-
 class CompanyFactory(factory.django.DjangoModelFactory):
     """Generate a Company() object for unit tests.
 
@@ -122,6 +114,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
             ),
             email="contact@acmeinc.com",
             phone="0612345678",
+            siret="012345678910",
         )
 
     # Don't start a SIRET with 0.
@@ -134,7 +127,7 @@ class CompanyFactory(factory.django.DjangoModelFactory):
     email = factory.Faker("email", locale="fr_FR")
     auth_email = factory.Faker("email", locale="fr_FR")
     address_line_1 = factory.Faker("street_address", locale="fr_FR")
-    post_code = factory.LazyFunction(_create_fake_postcode)
+    post_code = factory.LazyFunction(create_fake_postcode)
     city = factory.Faker("city", locale="fr_FR")
     source = models.Company.SOURCE_ASP
     convention = factory.SubFactory(SiaeConventionFactory, kind=factory.SelfAttribute("..kind"))

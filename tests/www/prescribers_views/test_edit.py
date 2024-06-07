@@ -156,6 +156,7 @@ class TestEditOrganization:
             phone="0600000000",
             email="pe@mailinator.com",
             department="53",
+            post_code="53480",
         )
         user = organization.members.first()
         url = reverse("prescribers_views:edit_organization")
