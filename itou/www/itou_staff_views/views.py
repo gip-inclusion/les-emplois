@@ -1,16 +1,22 @@
 import csv
 import datetime
+import io
 
+from dateutil.relativedelta import relativedelta
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.http import Http404, StreamingHttpResponse
+from django.http import FileResponse, Http404, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import content_disposition_header
 
+from itou.approvals.models import Approval
 from itou.job_applications.models import JobApplication
 from itou.utils.db import or_queries
-from itou.www.itou_staff_views.export_utils import job_app_export_row, job_app_export_spec
+from itou.utils.export import generate_excel_sheet
+from itou.www.itou_staff_views.export_utils import get_export_ts, job_app_export_row, job_app_export_spec
 from itou.www.itou_staff_views.forms import ItouStaffExportJobApplicationForm
 
 
@@ -81,16 +87,80 @@ def export_job_applications_unknown_to_ft(
 
         # Avoid exceedingly long filenames.
         departments_str = "multiple_departements" if len(departments) >= 5 else "_".join(departments)
-        export_ts = f"{timezone.localdate().strftime('%Y-%m-%d')}_{timezone.localtime().strftime('%H-%M-%S')}"
         writer = csv.writer(Echo())
         return StreamingHttpResponse(
             content_type="text/csv",
             headers={
                 "Content-Disposition": content_disposition_header(
                     as_attachment=True,
-                    filename=f"candidats_emplois_inclusion_{departments_str}_non_certifies_{export_ts}.csv",
+                    filename=f"candidats_emplois_inclusion_{departments_str}_non_certifies_{get_export_ts()}.csv",
                 ),
             },
             streaming_content=(writer.writerow(row) for row in content()),
         )
     return render(request, template_name, {"form": form})
+
+
+@login_required
+def export_ft_api_rejections(request):
+    if not request.user.is_superuser:
+        raise Http404
+
+    first_day_of_month = timezone.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    rejected_approvals = (
+        Approval.objects.filter(
+            pe_notification_status="notification_error",
+            pe_notification_time__range=[
+                first_day_of_month - relativedelta(months=1),
+                first_day_of_month,
+            ],
+        )
+        .select_related("user", "user__jobseeker_profile")
+        .order_by("pe_notification_time")
+    )
+
+    if len(rejected_approvals) == 0:
+        messages.add_message(request, messages.WARNING, "Pas de rejets de PASS IAE sur le dernier mois")
+        return HttpResponseRedirect(reverse("dashboard:index"))
+
+    data = []
+    for approval in rejected_approvals:
+        data.append(
+            [
+                approval.number,
+                approval.pe_notification_time.isoformat(sep=" "),
+                approval.pe_notification_exit_code,
+                approval.user.jobseeker_profile.nir,
+                approval.user.jobseeker_profile.pole_emploi_id,
+                approval.user.last_name,
+                approval.user.first_name,
+                approval.user.birthdate.isoformat(),
+                approval.origin_siae_kind,
+                approval.origin_siae_siret,
+            ]
+        )
+
+    headers = [
+        "numero",
+        "date_notification",
+        "code_echec",
+        "nir",
+        "pole_emploi_id",
+        "nom_naissance",
+        "prenom",
+        "date_naissance",
+        "siae_type",
+        "siae_siret",
+    ]
+
+    workbook = generate_excel_sheet(headers, data)
+    buffer = io.BytesIO()
+    workbook.save(buffer)
+    buffer.seek(0)
+
+    return FileResponse(
+        buffer,
+        as_attachment=True,
+        filename=f"rejets_api_france_travail_{get_export_ts()}.xlsx",
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )

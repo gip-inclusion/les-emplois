@@ -18,3 +18,31 @@
   
   '''
 # ---
+# name: TestExportPEApiRejections.test_export
+  list([
+    tuple(
+      'numero',
+      'date_notification',
+      'code_echec',
+      'nir',
+      'pole_emploi_id',
+      'nom_naissance',
+      'prenom',
+      'date_naissance',
+      'siae_type',
+      'siae_siret',
+    ),
+    tuple(
+      'XXXXX1234567',
+      '2022-08-31 00:00:00+00:00',
+      'FOOBAR',
+      '290010101010125',
+      'PE777',
+      'Doe',
+      'Jane',
+      '1990-01-01',
+      'EI',
+      '12345678900000',
+    ),
+  ])
+# ---

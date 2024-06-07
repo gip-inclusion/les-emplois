@@ -1,5 +1,7 @@
 import datetime
+import io
 
+import openpyxl
 import pytest
 from django.urls import reverse
 from django.utils import timezone
@@ -19,6 +21,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
+from tests.utils.test import BASE_NUM_QUERIES
 
 
 class TestExportJobApplications:
@@ -125,3 +128,60 @@ class TestExportJobApplications:
             response,
             '<div class="invalid-feedback">Assurez-vous que cette valeur est inférieure ou égale à 2024-05-21.</div>',
         )
+
+
+class TestExportPEApiRejections:
+    @pytest.mark.parametrize(
+        "factory,factory_kwargs,expected_status",
+        [
+            (JobSeekerFactory, {}, 404),
+            (EmployerFactory, {"with_company": True}, 404),
+            (PrescriberFactory, {}, 404),
+            (LaborInspectorFactory, {"membership": True}, 404),
+            (ItouStaffFactory, {}, 404),
+            (ItouStaffFactory, {"is_superuser": True}, 302),  # redirects to dashboard if no file
+        ],
+    )
+    def test_requires_superuser(self, client, factory, factory_kwargs, expected_status):
+        user = factory(**factory_kwargs)
+        client.force_login(user)
+        response = client.get(reverse("itou_staff_views:export_ft_api_rejections"))
+        assert response.status_code == expected_status
+
+    @freeze_time("2022-09-13T11:11:11+02:00")
+    def test_export(self, client, snapshot):
+        # generate an approval that should not be found.
+        ApprovalFactory(
+            pe_notification_status="notification_error",
+            pe_notification_time=datetime.datetime(2022, 7, 5, tzinfo=datetime.UTC),
+            pe_notification_exit_code="NOTFOUND",
+        )
+        ApprovalFactory(
+            pe_notification_status="notification_error",
+            pe_notification_time=datetime.datetime(2022, 8, 31, tzinfo=datetime.UTC),
+            pe_notification_exit_code="FOOBAR",
+            user__for_snapshot=True,
+            user__jobseeker_profile__pole_emploi_id="PE777",
+            origin_siae_kind="EI",
+            origin_siae_siret="12345678900000",
+            number="XXXXX1234567",
+        )
+        client.force_login(ItouStaffFactory(is_superuser=True))
+
+        with assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # Load Django session
+            + 1  # Load user
+            + 1  # approvals
+        ):
+            response = client.get(
+                reverse("itou_staff_views:export_ft_api_rejections"),
+            )
+            assert response.status_code == 200
+            assert response["Content-Disposition"] == (
+                "attachment; " 'filename="rejets_api_france_travail_2022-09-13_11-11-11.xlsx"'
+            )
+            assert response["Content-Type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+            workbook = openpyxl.load_workbook(filename=io.BytesIO(b"".join(response.streaming_content)))
+            assert list(workbook.active.values) == snapshot
