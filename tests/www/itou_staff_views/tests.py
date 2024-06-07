@@ -14,6 +14,7 @@ from tests.approvals.factories import ApprovalFactory, ProlongationFactory
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
+from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
@@ -185,3 +186,43 @@ class TestExportPEApiRejections:
 
             workbook = openpyxl.load_workbook(filename=io.BytesIO(b"".join(response.streaming_content)))
             assert list(workbook.active.values) == snapshot
+
+
+class TestExportCTA:
+    @pytest.mark.parametrize(
+        "factory,factory_kwargs,expected_status",
+        [
+            (JobSeekerFactory, {}, 404),
+            (EmployerFactory, {"with_company": True}, 404),
+            (PrescriberFactory, {}, 404),
+            (LaborInspectorFactory, {"membership": True}, 404),
+            (ItouStaffFactory, {}, 404),
+            (ItouStaffFactory, {"is_superuser": True}, 200),
+        ],
+    )
+    def test_requires_superuser(self, client, factory, factory_kwargs, expected_status):
+        user = factory(**factory_kwargs)
+        client.force_login(user)
+        response = client.get(reverse("itou_staff_views:export_cta"))
+        assert response.status_code == expected_status
+
+    @freeze_time("2024-05-17T11:11:11+02:00")
+    def test_export(self, client, snapshot):
+        # generate an approval that should not be found.
+        client.force_login(ItouStaffFactory(is_superuser=True))
+        PrescriberMembershipFactory(organization__for_snapshot=True, user__for_snapshot=True)
+        CompanyFactory(with_membership=True, for_snapshot=True)
+
+        with assertNumQueries(
+            BASE_NUM_QUERIES
+            + 1  # Load Django session
+            + 1  # Load user
+            + 1  # employers
+            + 1  # prescribers
+        ):
+            response = client.get(
+                reverse("itou_staff_views:export_cta"),
+            )
+            assert response.status_code == 200
+            assert response["Content-Disposition"] == ("attachment; " 'filename="export_cta_2024-05-17_11-11-11.csv"')
+            assert b"".join(response.streaming_content).decode() == snapshot

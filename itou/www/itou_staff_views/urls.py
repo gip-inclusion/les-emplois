@@ -12,4 +12,5 @@ urlpatterns = [
         name="export_job_applications_unknown_to_ft",
     ),
     path("export-ft-api-rejections", views.export_ft_api_rejections, name="export_ft_api_rejections"),
+    path("export-cta", views.export_cta, name="export_cta"),
 ]

@@ -13,10 +13,18 @@ from django.utils import timezone
 from django.utils.http import content_disposition_header
 
 from itou.approvals.models import Approval
+from itou.companies.models import CompanyMembership
 from itou.job_applications.models import JobApplication
+from itou.prescribers.models import PrescriberMembership
 from itou.utils.db import or_queries
 from itou.utils.export import generate_excel_sheet
-from itou.www.itou_staff_views.export_utils import get_export_ts, job_app_export_row, job_app_export_spec
+from itou.www.itou_staff_views.export_utils import (
+    cta_export_spec,
+    export_row,
+    get_export_ts,
+    job_app_export_row,
+    job_app_export_spec,
+)
 from itou.www.itou_staff_views.forms import ItouStaffExportJobApplicationForm
 
 
@@ -163,4 +171,32 @@ def export_ft_api_rejections(request):
         as_attachment=True,
         filename=f"rejets_api_france_travail_{get_export_ts()}.xlsx",
         content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
+
+@login_required()
+def export_cta(request):
+    if not request.user.is_superuser:
+        raise Http404
+
+    employees_qs = CompanyMembership.objects.active().select_related("company", "user")
+    prescribers_qs = PrescriberMembership.objects.active().select_related("organization", "user")
+
+    def content():
+        yield cta_export_spec.keys()
+        for employee in employees_qs:
+            yield export_row(cta_export_spec, employee)
+        for prescriber in prescribers_qs:
+            yield export_row(cta_export_spec, prescriber)
+
+    writer = csv.writer(Echo())
+    return StreamingHttpResponse(
+        content_type="text/csv",
+        headers={
+            "Content-Disposition": content_disposition_header(
+                as_attachment=True,
+                filename=f"export_cta_{get_export_ts()}.csv",
+            ),
+        },
+        streaming_content=(writer.writerow(row) for row in content()),
     )
