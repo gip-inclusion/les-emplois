@@ -182,10 +182,6 @@ job_app_export_spec = {
 }
 
 
-def job_app_export_row(job_app):
-    return [f(job_app) for f in job_app_export_spec.values()]
-
-
 def get_org(membership):
     if company := getattr(membership, "company", None):
         return company
