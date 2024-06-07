@@ -28,6 +28,10 @@ def all_or_empty_list(obj, *attrs):
     return []
 
 
+def export_row(spec, obj):
+    return [f(obj) for f in spec.values()]
+
+
 job_app_export_spec = {
     "job_seeker_title": lambda job_app: job_app.job_seeker.title,
     "job_seeker_first_name": lambda job_app: job_app.job_seeker.first_name,
@@ -180,3 +184,34 @@ job_app_export_spec = {
 
 def job_app_export_row(job_app):
     return [f(job_app) for f in job_app_export_spec.values()]
+
+
+def get_org(membership):
+    if company := getattr(membership, "company", None):
+        return company
+    if prescriber_organization := getattr(membership, "organization", None):
+        return prescriber_organization
+    raise ValueError
+
+
+cta_export_spec = {
+    "Utilisateur - type": (
+        lambda membership: "Employeur"
+        if membership.user.is_employer
+        else ("Prescripteur habitité" if membership.organization.is_authorized else "Orienteur")
+    ),
+    "Structure - type": lambda membership: get_org(membership).kind,
+    "Structure - nom": lambda membership: get_org(membership).name,
+    "Structure - SIRET": lambda membership: get_org(membership).siret,
+    "Structure - adresse ligne 1": lambda membership: get_org(membership).address_line_1,
+    "Structure - adresse ligne 2": lambda membership: get_org(membership).address_line_2,
+    "Structure - code postal": lambda membership: get_org(membership).post_code,
+    "Structure - ville": lambda membership: get_org(membership).city,
+    "Structure - département": lambda membership: get_org(membership).department,
+    "Structure - région": lambda membership: get_org(membership).region,
+    "Utilisateur - prénom": lambda membership: membership.user.first_name,
+    "Utilisateur - nom": lambda membership: membership.user.last_name,
+    "Utilisateur - e-mail": lambda membership: membership.user.email,
+    "Administrateur ?": lambda membership: "Oui" if membership.is_admin else "Non",
+    "Utilisateur - date d'inscription": lambda membership: membership.user.date_joined.strftime("%d-%m-%Y"),
+}
