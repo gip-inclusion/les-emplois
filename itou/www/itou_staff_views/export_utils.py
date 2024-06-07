@@ -1,6 +1,11 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 
 from itou.companies.enums import ContractType
+
+
+def get_export_ts():
+    return f"{timezone.localdate().strftime('%Y-%m-%d')}_{timezone.localtime().strftime('%H-%M-%S')}"
 
 
 def _getattrs(obj, *attrs):
