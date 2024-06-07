@@ -22,7 +22,6 @@ from itou.www.itou_staff_views.export_utils import (
     cta_export_spec,
     export_row,
     get_export_ts,
-    job_app_export_row,
     job_app_export_spec,
 )
 from itou.www.itou_staff_views.forms import ItouStaffExportJobApplicationForm
@@ -91,7 +90,7 @@ def export_job_applications_unknown_to_ft(
         def content():
             yield job_app_export_spec.keys()
             for job_app in job_apps_qs:
-                yield job_app_export_row(job_app)
+                yield export_row(job_app_export_spec, job_app)
 
         # Avoid exceedingly long filenames.
         departments_str = "multiple_departements" if len(departments) >= 5 else "_".join(departments)
