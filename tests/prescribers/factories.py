@@ -3,10 +3,11 @@ import string
 import factory
 import factory.fuzzy
 
-from itou.common_apps.address.departments import DEPARTMENTS
+from itou.common_apps.address.departments import department_from_postcode
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from tests.users.factories import PrescriberFactory
+from tests.utils.test import create_fake_postcode
 
 
 class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
@@ -23,7 +24,16 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
         with_pending_authorization = factory.Trait(
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
         )
-        for_snapshot = factory.Trait(name="Pres. Org.")
+        for_snapshot = factory.Trait(
+            name="Pres. Org.",
+            address_line_1="39 rue d'Artois",
+            post_code="75008",
+            department="75",
+            city="Paris",
+            email="contact@Presorg.fr",
+            phone="0612345678",
+            siret="012345678910",
+        )
 
     name = factory.Faker("name", locale="fr_FR")
     # Don't start a SIRET with 0.
@@ -31,7 +41,8 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
     phone = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     email = factory.Faker("email", locale="fr_FR")
     kind = PrescriberOrganizationKind.PE
-    department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
+    post_code = factory.LazyFunction(create_fake_postcode)
+    department = factory.LazyAttribute(lambda o: department_from_postcode(o.post_code))
 
 
 class PrescriberMembershipFactory(factory.django.DjangoModelFactory):
