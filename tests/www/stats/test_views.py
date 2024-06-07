@@ -11,6 +11,7 @@ from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import DEPARTMENT_TO_REGION
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
+from itou.institutions.enums import InstitutionKind
 from itou.utils.apis.metabase import METABASE_DASHBOARDS
 from itou.www.stats import urls as stats_urls
 from itou.www.stats.views import get_params_aci_asp_ids_for_department
@@ -291,7 +292,7 @@ def test_stats_dreets_iae_log_visit(client, settings, view_name):
     [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_dgefp_")],
 )
 def test_stats_dgefp_log_visit(client, view_name):
-    institution = InstitutionWithMembershipFactory(kind="DGEFP")
+    institution = InstitutionWithMembershipFactory(kind=InstitutionKind.DGEFP_IAE)
     user = institution.members.get()
     client.force_login(user)
 

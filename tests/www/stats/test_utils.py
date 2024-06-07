@@ -476,14 +476,14 @@ def test_can_view_stats_dreets_iae_ph_prescription():
 
 def test_can_view_stats_dgefp():
     # Admin member of DGEFP can access.
-    institution = InstitutionWithMembershipFactory(kind=InstitutionKind.DGEFP, department="93")
+    institution = InstitutionWithMembershipFactory(kind=InstitutionKind.DGEFP_IAE, department="93")
     request = get_request(institution.members.get())
     assert utils.can_view_stats_dgefp(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
     # Non admin member of DGEFP can access as well.
     institution = InstitutionWithMembershipFactory(
-        kind=InstitutionKind.DGEFP, membership__is_admin=False, department="93"
+        kind=InstitutionKind.DGEFP_IAE, membership__is_admin=False, department="93"
     )
     request = get_request(institution.members.get())
     assert utils.can_view_stats_dgefp(request)
