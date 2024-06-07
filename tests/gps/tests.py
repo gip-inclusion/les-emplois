@@ -135,8 +135,9 @@ def test_join_group_as_prescriber(client):
     assertContains(response, "Seul un candidat peut être ajouté à un groupe de suivi")
 
 
+@override_settings(TALLY_URL="https://hello-tally.so")
 def test_navigation(snapshot, client):
-    member = PrescriberFactory(first_name="gps member first_name")
+    member = PrescriberFactory(for_snapshot=True)
     member_first_beneficiary = JobSeekerFactory(first_name="gps first beneficiary first_name")
     member_second_beneficiary = JobSeekerFactory(first_name="gps second beneficiary first_name")
 
@@ -173,9 +174,9 @@ def test_access_as_jobseeker(client):
     assert response.status_code == 302
 
 
-@override_settings(GPS_ENABLED=True)
+@override_settings(GPS_ENABLED=True, TALLY_URL="https://hello-tally.so")
 def test_access_gps_enabled(client, snapshot):
-    user = PrescriberFactory()
+    user = PrescriberFactory(for_snapshot=True)
     client.force_login(user)
 
     response = client.get(reverse("gps:my_groups"))
@@ -302,3 +303,23 @@ def test_remove_members_from_group(client):
     response = client.get(user_details_url)
     soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
     assert len(soup.select("div.gps_intervenant")) == 3
+
+
+def test_dashboard_card(client):
+    user = PrescriberFactory()
+    client.force_login(user)
+    response = client.get(reverse("dashboard:index"))
+    gps_card = str(parse_response_to_soup(response, selector="#gps-card"))
+    assert str(user.public_id) in gps_card
+    assert user.first_name in gps_card
+    assert user.last_name in gps_card
+    assert "user_organization_uid" not in gps_card
+    assert "user_organization_name" not in gps_card
+
+    user = PrescriberFactory(membership=True)
+    organization = user.prescriberorganization_set.first()
+    client.force_login(user)
+    response = client.get(reverse("dashboard:index"))
+    gps_card = str(parse_response_to_soup(response, selector="#gps-card"))
+    assert str(organization.uid) in gps_card
+    assert organization.display_name in gps_card

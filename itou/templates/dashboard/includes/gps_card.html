@@ -1,4 +1,5 @@
 {% load matomo %}
+{% load tally %}
 
 <div class="col mb-3 mb-md-5" id="gps-card">
     <div class="c-box p-0 h-100">
@@ -16,6 +17,18 @@
                        {% matomo_event "gps" "clic" "tdb_liste_beneficiaires" %}>
                         <i class="ri-article-line ri-lg font-weight-normal align-self-start"></i>
                         <span>Visualiser les bénéficiaires</span>
+                        <i class="ri-external-link-line font-weight-normal ms-2"></i>
+                    </a>
+                </li>
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href='{% tally_form_url form_id="w5kLqM" user_public_id=user.public_id user_first_name=user.first_name user_last_name=user.last_name %}&{% if request.current_organization %}&user_organization_uid={{ request.current_organization.uid }}&user_organization_name={{ request.current_organization.display_name }}{% endif %}'
+                       rel="noopener"
+                       target="_blank"
+                       aria-label="Inviter un partenaire."
+                       class="btn-link btn-ico"
+                       {% matomo_event "gps" "clic" "tdb_inviter_partenaire" %}>
+                        <i class="ri-mail-send-line ri-lg font-weight-normal align-self-start"></i>
+                        <span>Inviter un partenaire</span>
                         <i class="ri-external-link-line font-weight-normal ms-2"></i>
                     </a>
                 </li>
