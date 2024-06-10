@@ -549,8 +549,8 @@ httpx==0.25.1 \
     # via
     #   -r requirements/base.txt
     #   respx
-huey==2.5.0 \
-    --hash=sha256:2ffb52fb5c46a1b0d53c79d59df3622312b27e2ab68d81a580985a8ea4ca3480
+huey==2.5.1 \
+    --hash=sha256:8a323783ab434a095a4e72b8c48c5b8f957f9031fa860474a390a0927e957112
     # via -r requirements/base.txt
 idna==3.7 \
     --hash=sha256:028ff3aadf0609c1fd278d8ea3089299412a7a8b9bd005dd08b9f8285bcb5cfc \
