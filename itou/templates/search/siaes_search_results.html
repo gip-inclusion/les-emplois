@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load django_bootstrap5 %}
 {% load static %}
 
 {% block title %}
@@ -22,18 +23,42 @@
                     </form>
                     {% include "search/includes/siaes_search_tabs.html" %}
                     <div class="tab-content">
-                        {% include "search/includes/siaes_search_top.html" %}
-                        <form class="d-block w-100"
-                              hx-get="{% url request.resolver_match.view_name %}"
+                        <form hx-get="{% url request.resolver_match.view_name %}"
                               hx-trigger="change delay:.5s"
+                              hx-include="#id_city"
                               hx-indicator="#job-search-results"
                               hx-target="#job-search-results"
                               hx-swap="outerHTML"
-                              hx-include="#id_city"
                               hx-push-url="true">
                             <div class="row">
-                                <div class="col-12 col-md-4">{% include "search/includes/siaes_search_filters.html" with form=form %}</div>
-                                {% include "search/includes/siaes_search_results.html" %}
+                                <div class="col-12">
+                                    {% include "search/includes/siaes_search_subtitle.html" %}
+                                    <div class="d-block w-100">
+                                        <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+                                            {% include "includes/btn_dropdown_filter/radio.html" with field=form.distance only %}
+                                            {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.kinds only %}
+                                            {% if form.contract_types %}
+                                                {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.contract_types only %}
+                                            {% endif %}
+                                            {% if form.domains %}
+                                                {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.domains only %}
+                                            {% endif %}
+                                            {% include "search/includes/siaes_search_filters_departments.html" %}
+                                            <div class="ms-lg-auto">
+                                                <a href="{{ clear_filters_url }}" class="btn btn-ico btn-dropdown-filter" aria-label="Réinitialiser les filtres actifs">
+                                                    <i class="ri-eraser-line font-weight-bold" aria-hidden="true"></i>
+                                                    <span>Effacer tout</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    {% include "search/includes/siaes_search_top.html" %}
+                                    {% include "search/includes/siaes_search_results.html" %}
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -46,4 +71,5 @@
 {% block script %}
     {{ block.super }}
     <script src='{% static "js/htmx_compat.js" %}'></script>
+    <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
 {% endblock %}

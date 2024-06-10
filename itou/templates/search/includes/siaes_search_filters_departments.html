@@ -1,78 +1,16 @@
 {% load django_bootstrap5 %}
 
-{% if form.departments %}
-    <hr>
-    <fieldset>
-        <div class="form-group mb-0">
-            <legend class="has-collapse-caret mb-0"
-                    data-bs-toggle="collapse"
-                    href="#collapse_{{ form.departments.name }}"
-                    role="button"
-                    aria-expanded="{% if form.departments.value %}true{% else %}false{% endif %}"
-                    aria-controls="collapse_{{ form.departments.name }}">
-                {{ form.departments.label | capfirst }}
-            </legend>
-            <div class="collapse mt-3{% if form.departments.value %} show{% endif %}" id="collapse_{{ form.departments.name }}">
-                {{ form.departments }}
-            </div>
-        </div>
-    </fieldset>
-{% endif %}
-
-{# getattr and list still painful in Django template #}
-{% if form.districts_13 %}
-    <hr>
-    <fieldset>
-        <div class="form-group mb-0">
-            <legend class="has-collapse-caret mb-0"
-                    data-bs-toggle="collapse"
-                    href="#collapse_{{ form.districts_13.name }}"
-                    role="button"
-                    aria-expanded="{% if form.districts_13.value %}true{% else %}false{% endif %}"
-                    aria-controls="collapse_{{ form.districts_13.name }}">
-                {{ form.districts_13.label | capfirst }}
-            </legend>
-            <div class="collapse mt-3{% if form.districts_13.value %} show{% endif %}" id="collapse_{{ form.districts_13.name }}">
-                {{ form.districts_13 }}
-            </div>
-        </div>
-    </fieldset>
-{% endif %}
-
-{% if form.districts_69 %}
-    <hr>
-    <fieldset>
-        <div class="form-group mb-0">
-            <legend class="has-collapse-caret mb-0"
-                    data-bs-toggle="collapse"
-                    href="#collapse_{{ form.districts_69.name }}"
-                    role="button"
-                    aria-expanded="{% if form.districts_69.value %}true{% else %}false{% endif %}"
-                    aria-controls="collapse_{{ form.districts_69.name }}">
-                {{ form.districts_69.label | capfirst }}
-            </legend>
-            <div class="collapse mt-3{% if form.districts_69.value %} show{% endif %}" id="collapse_{{ form.districts_69.name }}">
-                {{ form.districts_69 }}
-            </div>
-        </div>
-    </fieldset>
-{% endif %}
-
-{% if form.districts_75 %}
-    <hr>
-    <fieldset>
-        <div class="form-group mb-0">
-            <legend class="has-collapse-caret mb-0"
-                    data-bs-toggle="collapse"
-                    href="#collapse_{{ form.districts_75.name }}"
-                    role="button"
-                    aria-expanded="{% if form.districts_75.value %}true{% else %}false{% endif %}"
-                    aria-controls="collapse_{{ form.districts_75.name }}">
-                {{ form.districts_75.label | capfirst }}
-            </legend>
-            <div class="collapse mt-3{% if form.districts_75.value %} show{% endif %}" id="collapse_{{ form.districts_75.name }}">
-                {{ form.districts_75 }}
-            </div>
-        </div>
-    </fieldset>
-{% endif %}
+<div class="d-flex flex-column flex-md-row gap-1">
+    {% if form.departments %}
+        {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.departments only %}
+    {% endif %}
+    {% if form.districts_13 %}
+        {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.districts_13 only %}
+    {% endif %}
+    {% if form.districts_69 %}
+        {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.districts_69 only %}
+    {% endif %}
+    {% if form.districts_75 %}
+        {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.districts_75 only %}
+    {% endif %}
+</div>

@@ -1,4 +1,4 @@
-<div id="job-search-results" class="col-12 col-md-8">
+<div id="job-search-results">
     {% for item in results_page %}
         {% if request.resolver_match.view_name == "search:employers_results" %}
             {% include "companies/includes/_card_siae.html" with siae=item %}
@@ -20,7 +20,7 @@
         {# Cannot use block in includes #}
         - Les emplois de l'inclusion
     </title>
-    {% include "search/includes/siaes_search_filters_company.html" %}
+    {% include "search/includes/siaes_search_subtitle.html" %}
     {% include "search/includes/siaes_search_top.html" %}
     {% include "search/includes/siaes_search_tabs.html" %}
 {% endif %}

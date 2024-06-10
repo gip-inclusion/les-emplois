@@ -398,7 +398,7 @@ class SearchCompanyTest(TestCase):
             [elt] = simulated_page.find_all("input", attrs={"name": "distance", "value": f"{distance}"})
             return elt
 
-        distance_radio(100)["checked"] = "checked"
+        distance_radio(100)["checked"] = ""
         del distance_radio(25)["checked"]
         response = self.client.get(
             self.URL,
@@ -1157,7 +1157,7 @@ class JobDescriptionSearchViewTest(TestCase):
             [elt] = simulated_page.find_all("input", attrs={"name": "distance", "value": f"{distance}"})
             return elt
 
-        distance_radio(100)["checked"] = "checked"
+        distance_radio(100)["checked"] = ""
         del distance_radio(25)["checked"]
         response = self.client.get(
             self.URL,

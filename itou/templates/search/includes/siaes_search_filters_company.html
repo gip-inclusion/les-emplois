@@ -1,9 +1,0 @@
-{% load django_bootstrap5 %}
-<div id="company-field"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
-    {% if form.company %}
-        <hr>
-        <fieldset>
-            {% bootstrap_field form.company wrapper_class="form-group mb-0" label_class="d-block font-weight-bold mb-3" %}
-        </fieldset>
-    {% endif %}
-</div>

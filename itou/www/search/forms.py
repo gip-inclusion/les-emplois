@@ -1,7 +1,6 @@
 from django import forms
 from django.urls import reverse_lazy
 from django.utils.datastructures import MultiValueDict
-from django.utils.safestring import mark_safe
 from django.utils.text import format_lazy
 from django_select2.forms import Select2Widget
 
@@ -91,12 +90,10 @@ class SiaeSearchForm(forms.Form):
     def add_field_company(self, companies):
         # Build list of choices
         self.fields["company"] = forms.ChoiceField(
-            label=mark_safe(
-                'Nom de la structure <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>'
-            ),
+            label="Nom de la structure",
             required=False,
             choices=sorted(companies, key=lambda item: item[1]),
-            widget=Select2Widget(),
+            widget=Select2Widget(attrs={"data-placeholder": "Nom de la structure"}),
         )
 
 

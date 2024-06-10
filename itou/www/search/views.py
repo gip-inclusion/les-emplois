@@ -13,6 +13,7 @@ from itou.companies.models import Company, JobDescription
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.prescribers.models import PrescriberOrganization
 from itou.utils.pagination import pager
+from itou.utils.urls import add_url_params
 from itou.www.search.forms import JobDescriptionSearchForm, PrescriberSearchForm, SiaeSearchForm
 
 
@@ -45,6 +46,10 @@ class EmployerSearchBaseView(FormView):
     def get_context_data(self, **kwargs):
         context = {
             "back_url": reverse("search:employers_home"),
+            "clear_filters_url": add_url_params(
+                self.request.path,
+                {"city": kwargs["form"].data.get("city")},
+            ),
             "filters_query_string": "",
             "job_descriptions_count": 0,
             "siaes_count": 0,
