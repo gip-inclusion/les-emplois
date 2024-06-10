@@ -1,5 +1,4 @@
 import logging
-from urllib.parse import urljoin
 
 import httpx
 from django.conf import settings
@@ -63,7 +62,3 @@ class DataInclusionApiClient:
             raise DataInclusionApiException()
 
         return response.json()
-
-
-def make_service_redirect_url(source: str, service_id: str) -> str:
-    return urljoin(settings.API_DATA_INCLUSION_BASE_URL, f"services/{source}/{service_id}/redirige?depuis=les-emplois")

@@ -37,4 +37,9 @@ urlpatterns = [
         "admin_role/(?P<action>add|remove)/(?P<user_id>[0-9]+)", views.update_admin_role, name="update_admin_role"
     ),
     path("dora-services/<str:code_insee>", views.hx_dora_services, name="hx_dora_services"),
+    path(
+        "dora-service-redirect/<str:source>/<str:service_id>",
+        views.dora_service_redirect,
+        name="dora_service_redirect",
+    ),
 ]

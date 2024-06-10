@@ -605,7 +605,7 @@
 # name: test_hx_dora_services[Dora service card]
   '''
   <div class="card-body">
-                                                  <a class="btn-link mb-2" href="https://fake.api.gouv.fr/services/dora/svc1/redirige?depuis=les-emplois&amp;mtm_campaign=LesEmplois&amp;mtm_kwd=GeneriqueDecouvrirService" rel="noopener" target="_blank">Coupe les cheveux</a>
+                                                  <a class="btn-link mb-2" href="/company/dora-service-redirect/dora/svc1" rel="noopener" target="_blank">Coupe les cheveux</a>
                                                   <ul class="list-unstyled list-inline fs-sm">
                                                       <li class="list-inline-item">Coiffeur</li>
                                                       
@@ -621,7 +621,7 @@
 # name: test_hx_dora_services_with_address[Dora service card with address]
   '''
   <div class="card-body">
-                                                  <a class="btn-link mb-2" href="https://fake.api.gouv.fr/services/dora/svc1/redirige?depuis=les-emplois&amp;mtm_campaign=LesEmplois&amp;mtm_kwd=GeneriqueDecouvrirService" rel="noopener" target="_blank">Coupe les cheveux</a>
+                                                  <a class="btn-link mb-2" href="/company/dora-service-redirect/dora/svc1" rel="noopener" target="_blank">Coupe les cheveux</a>
                                                   <ul class="list-unstyled list-inline fs-sm">
                                                       <li class="list-inline-item">Coiffeur</li>
                                                       

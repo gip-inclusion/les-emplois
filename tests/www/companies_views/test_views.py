@@ -1169,7 +1169,7 @@ def test_get_data_inclusion_services(settings, respx_mock):
     random.seed(0)  # ensure the mock data is stable
     mocked_final_response = [
         {
-            "di_service_redirect_url": "https://fake.api.gouv.fr/services/fake/svc4/redirige?depuis=les-emplois&mtm_campaign=LesEmplois&mtm_kwd=GeneriqueDecouvrirService",
+            "dora_service_redirect_url": "/company/dora-service-redirect/fake/svc4",
             "id": "svc4",
             "lien_source": "https://fake.api.gouv.fr/services/svc4",
             "modes_accueil": ["en-presentiel"],
@@ -1178,7 +1178,7 @@ def test_get_data_inclusion_services(settings, respx_mock):
             "thematiques_display": {"A"},
         },
         {
-            "di_service_redirect_url": "https://fake.api.gouv.fr/services/fake/svc2/redirige?depuis=les-emplois&mtm_campaign=LesEmplois&mtm_kwd=GeneriqueDecouvrirService",
+            "dora_service_redirect_url": "/company/dora-service-redirect/fake/svc2",
             "id": "svc2",
             "lien_source": "https://fake.api.gouv.fr/services/svc2",
             "modes_accueil": ["en-presentiel"],
@@ -1263,3 +1263,21 @@ def test_hx_dora_services_with_address(htmx_client, snapshot, settings, respx_mo
     response = htmx_client.get(reverse("companies_views:hx_dora_services", kwargs={"code_insee": "75056"}))
     dora_service_card = parse_response_to_soup(response, selector=".card-body")
     assert str(dora_service_card) == snapshot(name="Dora service card with address")
+
+
+def test_dora_service_redirect(client, settings, respx_mock):
+    settings.API_DATA_INCLUSION_BASE_URL = "https://fake.api.gouv.fr/"
+    settings.API_DATA_INCLUSION_TOKEN = "fake-token"
+    url = reverse("companies_views:dora_service_redirect", kwargs={"source": "dora", "service_id": "foo"})
+
+    respx_mock.get("https://fake.api.gouv.fr/services/dora/foo").respond(200, json={"id": "foo", "source": "dora"})
+    response = client.get(url)
+    assert response.status_code == 302
+    assert response.url == (
+        "https://dora.inclusion.beta.gouv.fr/services/di--dora--foo"
+        "?mtm_campaign=LesEmplois&mtm_kwd=GeneriqueDecouvrirService"
+    )
+
+    respx_mock.get("https://fake.api.gouv.fr/services/dora/foo").respond(500)
+    response = client.get(url)
+    assert response.status_code == 404
