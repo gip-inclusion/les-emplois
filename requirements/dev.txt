@@ -601,8 +601,8 @@ httpx==0.25.1 \
     # via
     #   -r requirements/test.txt
     #   respx
-huey==2.5.0 \
-    --hash=sha256:2ffb52fb5c46a1b0d53c79d59df3622312b27e2ab68d81a580985a8ea4ca3480
+huey==2.5.1 \
+    --hash=sha256:8a323783ab434a095a4e72b8c48c5b8f957f9031fa860474a390a0927e957112
     # via -r requirements/test.txt
 identify==2.5.24 \
     --hash=sha256:0aac67d5b4812498056d28a9a512a483f5085cc28640b02b258a59dac34301d4 \
