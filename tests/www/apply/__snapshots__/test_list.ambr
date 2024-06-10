@@ -1,17 +1,7 @@
 # serializer version: 1
 # name: test_list_warns_about_long_awaiting_applications[JOB SEEKER - no warnings]
   '''
-  <section aria-labelledby="results" id="job-applications-section">
-      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
-          <h3 class="h4 mb-0" id="results">
-              
-                  3 <strong>résultats</strong>
-              
-          </h3>
-          <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action">
-              
-          </div>
-      </div>
+  <section aria-labelledby="apply-list-count" id="job-applications-section">
       
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
@@ -217,17 +207,7 @@
 # ---
 # name: test_list_warns_about_long_awaiting_applications[PRESCRIBER - warnings for 2222 and 3333]
   '''
-  <section aria-labelledby="results" id="job-applications-section">
-      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
-          <h3 class="h4 mb-0" id="results">
-              
-                  3 <strong>résultats</strong>
-              
-          </h3>
-          <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action">
-              
-          </div>
-      </div>
+  <section aria-labelledby="apply-list-count" id="job-applications-section">
       
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">
@@ -478,17 +458,7 @@
 # ---
 # name: test_list_warns_about_long_awaiting_applications[SIAE - warnings for 2222 and 3333]
   '''
-  <section aria-labelledby="results" id="job-applications-section">
-      <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
-          <h3 class="h4 mb-0" id="results">
-              
-                  3 <strong>résultats</strong>
-              
-          </h3>
-          <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action">
-              
-          </div>
-      </div>
+  <section aria-labelledby="apply-list-count" id="job-applications-section">
       
           
               <div class="c-box c-box--results has-links-inside my-3 my-md-4">

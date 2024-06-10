@@ -1,0 +1,7 @@
+{% load str_filters %}
+
+<h3 class="h4 mb-0" id="apply-list-count"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    {% with job_applications_page.paginator.count as counter %}
+        {{ counter }} <strong>résultat{{ counter|pluralizefr }}</strong>
+    {% endwith %}
+</h3>

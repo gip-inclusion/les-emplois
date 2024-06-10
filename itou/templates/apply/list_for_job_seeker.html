@@ -1,4 +1,5 @@
 {% extends "layout/base.html" %}
+{% load django_bootstrap5 %}
 {% load static %}
 {% load str_filters %}
 
@@ -7,32 +8,15 @@
 {% block content_title %}<h1>Candidatures envoyées</h1>{% endblock %}
 
 {% block content %}
-    <section class="s-box">
-        <div class="s-box__container container">
-            <div class="s-box__row row">
-                <div class="col-12 col-md-4 mb-3 mb-md-5">
-                    <aside class="c-aside-filters">
-                        <button class="c-aside-filters__btn__collapse" data-bs-toggle="collapse" data-bs-target="#asideFiltersCollapse" aria-expanded="true" aria-controls="asideFiltersCollapse">
-                            <i class="ri-filter-line" aria-hidden="true"></i>
-                            <span>Filtrer les candidatures</span>
-                        </button>
-                        <div class="c-aside-filters__card collapse show" id="asideFiltersCollapse">
-                            <form hx-get="{% url 'apply:list_for_job_seeker' %}"
-                                  hx-trigger="change delay:.5s, duetChange delay:.5s"
-                                  hx-indicator="#job-applications-section"
-                                  hx-target="#job-applications-section"
-                                  hx-swap="outerHTML"
-                                  hx-push-url="true">
-                                <div class="c-aside-filters__card__body">
-                                    {% include "apply/includes/job_applications_filters/status.html" %}
-                                    <hr>
-                                    {% include "apply/includes/job_applications_filters/dates.html" %}
-                                </div>
-                            </form>
-                        </div>
-                    </aside>
+    {% include "apply/includes/job_applications_filters/offcanvas.html" %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            {% include "apply/includes/job_applications_filters/top_filters.html" %}
+            <div class="s-section__row row">
+                <div class="col-12">
+                    {% include "apply/includes/list_counter.html" %}
+                    {% include "apply/includes/list_job_applications.html" %}
                 </div>
-                <div class="col-12 col-md-8">{% include "apply/includes/list_job_applications.html" %}</div>
             </div>
         </div>
     </section>
@@ -41,4 +25,5 @@
 {% block script %}
     {{ block.super }}
     <script src='{% static "js/htmx_compat.js" %}'></script>
+    <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
 {% endblock %}

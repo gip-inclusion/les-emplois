@@ -3,8 +3,16 @@
 {% if filters_form.pass_iae_suspended %}
     <hr>
     <fieldset>
-        <legend>Statut du PASS IAE</legend>
-        {% bootstrap_field filters_form.pass_iae_active wrapper_class="mb-2" %}
-        {% bootstrap_field filters_form.pass_iae_suspended wrapper_class="" %}
+        <legend>
+            <button class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-toggle="collapse" data-bs-target="#collapsePassIAE" type="button" aria-expanded="false" aria-controls="collapsePassIAE">
+                Statut du PASS IAE
+            </button>
+        </legend>
+        <div class="my-3 collapse" id="collapsePassIAE">
+            <ul>
+                <li>{% bootstrap_field filters_form.pass_iae_active wrapper_class="" %}</li>
+                <li>{% bootstrap_field filters_form.pass_iae_suspended wrapper_class="" %}</li>
+            </ul>
+        </div>
     </fieldset>
 {% endif %}

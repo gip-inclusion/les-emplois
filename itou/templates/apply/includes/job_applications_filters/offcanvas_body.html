@@ -1,0 +1,23 @@
+<div class="offcanvas-body" id="offcanvasApplyFiltersContent"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    {% include "apply/includes/job_applications_filters/status.html" %}
+    {% if job_applications_list_kind is JobApplicationsListKind.SENT or job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
+        {% include "apply/includes/job_applications_filters/selected_jobs.html" %}
+        {% include "apply/includes/job_applications_filters/departments.html" %}
+        {% include "apply/includes/job_applications_filters/sender.html" %}
+        {% include "apply/includes/job_applications_filters/criteria.html" %}
+        {% include "apply/includes/job_applications_filters/eligibility_validated.html" %}
+        {% include "apply/includes/job_applications_filters/pass.html" %}
+        {% comment %}
+        Do not render job_seekers:
+        - The field is meant to quickly find a job seeker and does not make
+          much sense combined with others.
+        - It uses a select2 widget. Overriding the id attribute so that the
+          field present twice on the page (in the top bar and side bar) is
+          challenging.
+        {% endcomment %}
+        {% for job_seeker_id in filters_form.job_seekers.value %}
+            <input type="hidden" name="{{ filters_form.job_seekers.name }}" value="{{ job_seeker_id }}">
+        {% endfor %}
+    {% endif %}
+    {% include "apply/includes/job_applications_filters/dates.html" %}
+</div>

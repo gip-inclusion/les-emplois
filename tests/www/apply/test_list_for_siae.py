@@ -35,6 +35,8 @@ from tests.utils.test import BASE_NUM_QUERIES, TestCase, assert_previous_step, p
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class ProcessListSiaeTest(TestCase):
+    SELECTED_JOBS = "selected_jobs"
+
     @classmethod
     def setUpTestData(cls):
         """
@@ -217,6 +219,36 @@ class ProcessListSiaeTest(TestCase):
         )
         assertContains(response, job_application_link)
 
+        assertContains(
+            response,
+            # Appellations are ordered by name.
+            f"""
+            <div class="dropdown">
+            <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown"
+                    data-bs-auto-close="outside" aria-expanded="false">
+                Fiches de poste
+            </button>
+            <ul class="dropdown-menu">
+            <li class="dropdown-item">
+            <div class="form-check">
+            <input id="id_selected_jobs_0-top" class="form-check-input" name="{self.SELECTED_JOBS}" type="checkbox"
+                   value="{job1.appellation.code}">
+            <label for="id_selected_jobs_0-top" class="form-check-label">{job1.appellation.name}</label>
+            </div>
+            </li>
+            <li class="dropdown-item">
+            <div class="form-check">
+                <input id="id_selected_jobs_1-top" class="form-check-input" name="{self.SELECTED_JOBS}" type="checkbox"
+                       value="{job2.appellation.code}">
+                <label for="id_selected_jobs_1-top" class="form-check-label">{job2.appellation.name}</label>
+            </div>
+            </li>
+            </ul>
+            """,
+            html=True,
+            count=1,
+        )
+
     def test_list_for_siae_show_criteria(self):
         # Add a diagnosis present on 2 applications
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.maggie)
@@ -257,6 +289,9 @@ class ProcessListSiaeTest(TestCase):
         assertNotContains(response, SENIOR_CRITERION, html=True)
         # DETLD is also not shown
         assertContains(response, "+ 2 autres critères")
+
+        # No selected jobs, the filter should not appear.
+        assertNotContains(response, self.SELECTED_JOBS)
 
     def test_list_for_siae_hide_criteria_for_non_SIAE_employers(self):
         # Add a diagnosis present on 2 applications
@@ -627,6 +662,12 @@ class ProcessListSiaeTest(TestCase):
         assert len(applications) == 1
         assert appellation1 in [job_desc.appellation for job_desc in applications[0].selected_jobs.all()]
 
+    def test_prescriptions(self):
+        self.client.force_login(self.eddie_hit_pit)
+        url = reverse("apply:list_prescriptions")
+        response = self.client.get(url)
+        self.assertContains(response, f'hx-get="{url}"')
+
 
 @pytest.mark.parametrize("filter_state", JobApplicationWorkflow.states)
 def test_list_for_siae_message_when_company_got_no_new_nor_processing_nor_postponed_application(client, filter_state):
@@ -671,7 +712,7 @@ def test_list_for_siae_filter_for_different_kind(client, snapshot):
         company.save(update_fields=("kind",))
         response = client.get(reverse("apply:list_for_siae"))
         assert response.status_code == 200
-        filter_form = parse_response_to_soup(response, "#asideFiltersCollapse")
+        filter_form = parse_response_to_soup(response, "#offcanvasApplyFilters")
         # GEIQ and non IAE kind do not have a filter on approval and eligibility.
         # Non IAE kind do not have prior action.
         assert str(filter_form) == snapshot(name=kind_snapshot[kind])
@@ -681,18 +722,23 @@ def test_list_for_siae_htmx_filters(client):
     company = CompanyFactory(with_membership=True)
     JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)
     client.force_login(company.members.get())
-    response = client.get(reverse("apply:list_for_siae"))
+    url = reverse("apply:list_for_siae")
+    response = client.get(url)
     page = parse_response_to_soup(response, selector="#main")
     # Check the refused checkbox, that triggers the HTMX request.
-    [refused_checkbox] = page.find_all("input", attrs={"name": "states", "value": "refused"})
+    [dropdown_filters] = page.find_all("div", class_="btn-dropdown-filter-group")
+    [refused_checkbox] = dropdown_filters.find_all(
+        "input",
+        attrs={"name": "states", "value": "refused"},
+    )
     refused_checkbox["checked"] = ""
     response = client.get(
-        reverse("apply:list_for_siae"),
+        url,
         {"states": ["refused"]},
         headers={"HX-Request": "true"},
     )
-    update_page_with_htmx(page, "#asideFiltersCollapse > form", response)
-    response = client.get(reverse("apply:list_for_siae"), {"states": ["refused"]})
+    update_page_with_htmx(page, f".s-section form[hx-get='{url}']", response)
+    response = client.get(url, {"states": ["refused"]})
     fresh_page = parse_response_to_soup(response, selector="#main")
     assertSoupEqual(page, fresh_page)
 

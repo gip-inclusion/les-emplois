@@ -1,8 +1,43 @@
-{% load django_bootstrap5 %}
-
-{% if filters_form.selected_jobs %}
-    <hr>
-    <fieldset>
-        {% bootstrap_field filters_form.selected_jobs %}
-    </fieldset>
+{% if filters_form.selected_jobs and filters_form.selected_jobs.field.choices %}
+    {% if btn_dropdown_filter|default:False %}
+        <div class="dropdown">
+            <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                {{ filters_form.selected_jobs.label | capfirst }}
+            </button>
+            <ul class="dropdown-menu">
+                {% for choice in filters_form.selected_jobs %}
+                    <li class="dropdown-item">
+                        <div class="form-check">
+                            <input id="{{ choice.id_for_label }}-top" class="form-check-input" name="{{ choice.data.name }}" type="checkbox" value="{{ choice.data.value }}"{% if choice.data.selected %} checked{% endif %}>
+                            <label for="{{ choice.id_for_label }}-top" class="form-check-label">{{ choice.choice_label }}</label>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% else %}
+        <hr>
+        <fieldset>
+            <legend>
+                <button class="btn btn-outline-transparent has-collapse-caret collapsed"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapseSelectedJob"
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls="collapseSelectedJob">{{ filters_form.selected_jobs.label | capfirst }}</button>
+            </legend>
+            <div class="my-3 collapse" id="collapseSelectedJob">
+                <ul>
+                    {% for choice in filters_form.selected_jobs %}
+                        <li>
+                            <div class="form-check">
+                                <input id="{{ choice.id_for_label }}" class="form-check-input" name="{{ choice.data.name }}" type="checkbox" value="{{ choice.data.value }}"{% if choice.data.selected %} checked{% endif %}>
+                                <label for="{{ choice.id_for_label }}" class="form-check-label">{{ choice.choice_label }}</label>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </fieldset>
+    {% endif %}
 {% endif %}

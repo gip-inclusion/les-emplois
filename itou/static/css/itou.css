@@ -148,11 +148,6 @@
     margin-left: 2px;
 }
 
-.c-aside-filters .select2-container--bootstrap-5 {
-    width: auto !important;
-    display: block !important;
-}
-
 /*
 Force the display of `.invalid-feedback` for Duet Date Picker with Bootstrap 4.
 See also `duet_date_picker.html`.
@@ -465,4 +460,9 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     background-size: 100% auto;
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
+}
+
+/* Fix for form.company and form.job_seeker width */
+.w-lg-400px .select2-selection__rendered {
+    white-space: nowrap !important;
 }

@@ -1,0 +1,20 @@
+<form>
+    {% comment %}
+    Do not reload the entire offcanvas with HTMX. Otherwise, STR :
+    1. Select a filter from the top bar (one with btn_dropdown_filter=True)
+    2. Quickly (before HTMX results are loaded), open the offcanvas by pressing « Tous les filtres »
+    Results load, offcanvas panel is oob-replaced by the response content, and initially not visible, leaving only
+    the viewable backdrop and no filter offcanvas.
+    {% endcomment %}
+    <div class="c-offcanvas-filters offcanvas offcanvas-end" tabindex="-1" aria-labelledby="offcanvasApplyFiltersLabel" id="offcanvasApplyFilters">
+        <div class="offcanvas-header">
+            <h4 class="mb-0 btn-ico" id="offcanvasApplyFiltersLabel">
+                <i class="ri-sound-module-fill font-weight-medium" aria-hidden="true"></i>
+                <span>Filtrer</span>
+            </h4>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Fermer"></button>
+        </div>
+        {% include "apply/includes/job_applications_filters/offcanvas_body.html" %}
+        {% include "apply/includes/job_applications_filters/offcanvas_footer.html" %}
+    </div>
+</form>

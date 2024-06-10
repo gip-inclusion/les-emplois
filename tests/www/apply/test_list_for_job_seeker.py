@@ -73,19 +73,24 @@ def test_list_for_job_seeker_htmx_filters(client):
     JobApplicationFactory(job_seeker=job_seeker, state=JobApplicationState.ACCEPTED)
     client.force_login(job_seeker)
 
-    response = client.get(reverse("apply:list_for_job_seeker"))
+    url = reverse("apply:list_for_job_seeker")
+    response = client.get(url)
     page = parse_response_to_soup(response, selector="#main")
     # Check the refused checkbox, that triggers the HTMX request.
-    [refused_checkbox] = page.find_all("input", attrs={"name": "states", "value": "refused"})
+    [dropdown_filters] = page.find_all("div", class_="btn-dropdown-filter-group")
+    [refused_checkbox] = dropdown_filters.find_all(
+        "input",
+        attrs={"name": "states", "value": "refused"},
+    )
     refused_checkbox["checked"] = ""
 
     response = client.get(
-        reverse("apply:list_for_job_seeker"),
+        url,
         {"states": ["refused"]},
         headers={"HX-Request": "true"},
     )
-    update_page_with_htmx(page, "#asideFiltersCollapse > form", response)
+    update_page_with_htmx(page, f".s-section form[hx-get='{url}']", response)
 
-    response = client.get(reverse("apply:list_for_job_seeker"), {"states": ["refused"]})
+    response = client.get(url, {"states": ["refused"]})
     fresh_page = parse_response_to_soup(response, selector="#main")
     assertSoupEqual(page, fresh_page)

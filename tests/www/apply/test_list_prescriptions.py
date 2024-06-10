@@ -161,7 +161,7 @@ def test_list_prescriptions_filters(client, snapshot):
 
     response = client.get(reverse("apply:list_prescriptions"))
     assert response.status_code == 200
-    filter_form = parse_response_to_soup(response, "#asideFiltersCollapse")
+    filter_form = parse_response_to_soup(response, "#offcanvasApplyFilters")
     assert str(filter_form) == snapshot()
 
 
@@ -170,19 +170,25 @@ def test_list_prescriptions_htmx_filters(client):
     JobApplicationFactory(sender=prescriber, state=JobApplicationState.ACCEPTED)
     client.force_login(prescriber)
 
-    response = client.get(reverse("apply:list_prescriptions"))
+    url = reverse("apply:list_prescriptions")
+    response = client.get(url)
     page = parse_response_to_soup(response, selector="#main")
-    [refused_checkbox] = page.find_all("input", attrs={"name": "states", "value": "refused"})
+
+    [dropdown_filters] = page.find_all("div", class_="btn-dropdown-filter-group")
+    [refused_checkbox] = dropdown_filters.find_all(
+        "input",
+        attrs={"name": "states", "value": "refused"},
+    )
     refused_checkbox["checked"] = ""
 
     response = client.get(
-        reverse("apply:list_prescriptions"),
+        url,
         {"states": ["refused"]},
         headers={"HX-Request": "true"},
     )
-    update_page_with_htmx(page, "#asideFiltersCollapse > form", response)
+    update_page_with_htmx(page, f".s-section form[hx-get='{url}']", response)
 
-    response = client.get(reverse("apply:list_prescriptions"), {"states": ["refused"]})
+    response = client.get(url, {"states": ["refused"]})
     fresh_page = parse_response_to_soup(response, selector="#main")
     assertSoupEqual(page, fresh_page)
 
