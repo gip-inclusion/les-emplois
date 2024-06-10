@@ -3,18 +3,23 @@
 {% if filters_form.senders or filters_form.sender_prescriber_organizations or filters_form.sender_companies %}
     <hr>
     <fieldset>
-        <legend>Émetteur</legend>
+        <legend>
+            <button class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-toggle="collapse" data-bs-target="#collapseSenders" type="button" aria-expanded="false" aria-controls="collapseSenders">
+                Émetteur
+            </button>
+        </legend>
+        <div class="mt-3 collapse" id="collapseSenders">
+            {% if filters_form.senders %}
+                {% bootstrap_field filters_form.senders %}
+            {% endif %}
 
-        {% if filters_form.senders %}
-            {% bootstrap_field filters_form.senders %}
-        {% endif %}
+            {% if filters_form.sender_prescriber_organizations %}
+                {% bootstrap_field filters_form.sender_prescriber_organizations %}
+            {% endif %}
 
-        {% if filters_form.sender_prescriber_organizations %}
-            {% bootstrap_field filters_form.sender_prescriber_organizations %}
-        {% endif %}
-
-        {% if filters_form.sender_companies %}
-            {% bootstrap_field filters_form.sender_companies %}
-        {% endif %}
+            {% if filters_form.sender_companies %}
+                {% bootstrap_field filters_form.sender_companies %}
+            {% endif %}
+        </div>
     </fieldset>
 {% endif %}

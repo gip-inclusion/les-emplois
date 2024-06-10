@@ -848,6 +848,8 @@ class FilterJobApplicationsForm(forms.Form):
     Allow users to filter job applications based on specific fields.
     """
 
+    top_bar_filters = ("states",)
+
     states = forms.MultipleChoiceField(
         required=False,
         choices=job_applications_enums.JobApplicationState,
@@ -932,14 +934,27 @@ class FilterJobApplicationsForm(forms.Form):
         """
         return sum(bool(self.cleaned_data.get(field.name)) for field in self)
 
+    def hiddens_for_htmx_form(self):
+        for fieldname, field in self.fields.items():
+            if fieldname not in self.top_bar_filters and fieldname in self.data:
+                yield field.get_bound_field(self, fieldname).as_hidden()
+
 
 class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     """
     Job applications filters common to companies and Prescribers.
     """
 
+    top_bar_filters = FilterJobApplicationsForm.top_bar_filters + ("departments", "job_seekers", "selected_jobs")
+
     senders = forms.MultipleChoiceField(required=False, label="Nom de la personne", widget=Select2MultipleWidget)
-    job_seekers = forms.MultipleChoiceField(required=False, label="Nom du candidat", widget=Select2MultipleWidget)
+    job_seekers = forms.MultipleChoiceField(
+        required=False,
+        label="Nom du candidat",
+        widget=Select2MultipleWidget(
+            attrs={"data-placeholder": "Nom du candidat"},
+        ),
+    )
 
     pass_iae_suspended = forms.BooleanField(label="Suspendu", required=False)
     pass_iae_active = forms.BooleanField(label="Actif", required=False)
@@ -947,10 +962,14 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     eligibility_validated = forms.BooleanField(label="Éligibilité validée", required=False)
     departments = forms.MultipleChoiceField(
         required=False,
-        label="Département du candidat",
-        widget=Select2MultipleWidget,
+        label="Départements",
+        widget=forms.CheckboxSelectMultiple(),
     )
-    selected_jobs = forms.MultipleChoiceField(required=False, label="Fiches de poste", widget=Select2MultipleWidget)
+    selected_jobs = forms.MultipleChoiceField(
+        required=False,
+        label="Fiches de poste",
+        widget=forms.CheckboxSelectMultiple(),
+    )
 
     @sentry_sdk.trace
     def __init__(self, job_applications_qs, *args, **kwargs):

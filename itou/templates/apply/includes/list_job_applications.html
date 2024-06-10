@@ -2,29 +2,7 @@
 {% load static %}
 {% load str_filters %}
 
-<section aria-labelledby="results" id="job-applications-section">
-    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
-        <h3 class="h4 mb-0" id="results">
-            {% with job_applications_page.paginator.count as counter %}
-                {{ counter }} <strong>résultat{{ counter|pluralizefr }}</strong>
-            {% endwith %}
-        </h3>
-        <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action">
-            {% if filters_counter > 0 %}
-                {% if job_applications_list_kind is JobApplicationsListKind.SENT %}
-                    {% url 'apply:list_prescriptions' as reset_url %}
-                {% elif job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
-                    {% url 'apply:list_for_siae' as reset_url %}
-                {% elif job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %}
-                    {% url 'apply:list_for_job_seeker' as reset_url %}
-                {% endif %}
-                <a href="{{ reset_url }}" class="btn btn-secondary btn-ico mt-3 mt-md-0">
-                    <i class="ri-arrow-go-back-line" aria-hidden="true"></i>
-                    <span>Réinitialiser les filtres ({{ filters_counter }})</span>
-                </a>
-            {% endif %}
-        </div>
-    </div>
+<section aria-labelledby="apply-list-count" id="job-applications-section">
     {% if not job_applications_page %}
         <div class="text-center my-3 my-md-4">
             <img class="img-fluid" src="{% static 'img/illustration-siae-card-no-result.svg' %}" alt="" loading="lazy">
@@ -118,5 +96,9 @@
 </section>
 
 {% if request.htmx %}
+    {% include "apply/includes/list_reset_filters.html" with btn_dropdown_filter=True %}
+    {% include "apply/includes/list_counter.html" %}
     {% include "apply/includes/job_applications_export_button.html" %}
+    {% include "apply/includes/job_applications_filters/offcanvas_body.html" %}
+    {% include "apply/includes/job_applications_filters/offcanvas_footer.html" %}
 {% endif %}

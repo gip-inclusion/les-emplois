@@ -1,0 +1,4 @@
+<div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    <button class="btn btn-block btn-primary">Voir</button>
+    {% include "apply/includes/list_reset_filters.html" %}
+</div>

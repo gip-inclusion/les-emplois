@@ -2,7 +2,13 @@
 
 <hr>
 <fieldset>
-    <legend>Date d'envoi de la candidature</legend>
-    {% bootstrap_field filters_form.start_date %}
-    {% bootstrap_field filters_form.end_date %}
+    <legend>
+        <button class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-toggle="collapse" data-bs-target="#collapseDate" type="button" aria-expanded="false" aria-controls="collapseDate">
+            Date d'envoi de la candidature
+        </button>
+    </legend>
+    <div class="mt-3 collapse" id="collapseDate">
+        {% bootstrap_field filters_form.start_date %}
+        {% bootstrap_field filters_form.end_date %}
+    </div>
 </fieldset>

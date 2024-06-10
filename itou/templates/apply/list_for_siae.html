@@ -57,39 +57,19 @@
 {% endblock %}
 
 {% block content %}
+    {% include "apply/includes/job_applications_filters/offcanvas.html" %}
     <section class="s-section">
         <div class="s-section__container container">
+            {% include "apply/includes/job_applications_filters/top_filters.html" %}
             <div class="s-section__row row">
-                <div class="col-12 col-md-4 mb-3 mb-md-5">
-                    <aside class="c-aside-filters">
-                        <button class="c-aside-filters__btn__collapse" data-bs-toggle="collapse" data-bs-target="#asideFiltersCollapse" aria-expanded="true" aria-controls="asideFiltersCollapse">
-                            <i class="ri-filter-line" aria-hidden="true"></i>
-                            <span>Filtrer les candidatures</span>
-                        </button>
-                        <div class="c-aside-filters__card collapse show" id="asideFiltersCollapse">
-                            <form hx-get="{% url 'apply:list_for_siae' %}"
-                                  hx-trigger="change delay:.5s, duetChange delay:.5s"
-                                  hx-indicator="#job-applications-section"
-                                  hx-target="#job-applications-section"
-                                  hx-swap="outerHTML"
-                                  hx-push-url="true">
-                                <div class="c-aside-filters__card__body">
-                                    {% include "apply/includes/job_applications_filters/status.html" %}
-                                    {% include "apply/includes/job_applications_filters/job_seekers.html" %}
-                                    {% include "apply/includes/job_applications_filters/eligibility_validated.html" %}
-                                    {% include "apply/includes/job_applications_filters/pass.html" %}
-                                    {% include "apply/includes/job_applications_filters/criteria.html" %}
-                                    {% include "apply/includes/job_applications_filters/departments.html" %}
-                                    {% include "apply/includes/job_applications_filters/dates.html" %}
-                                    {% include "apply/includes/job_applications_filters/selected_jobs.html" %}
-                                    {% include "apply/includes/job_applications_filters/sender.html" %}
-                                </div>
-                            </form>
+                <div class="col-12">
+                    <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
+                        {% include "apply/includes/list_counter.html" %}
+                        <div class="flex-column flex-md-row mt-3 mt-md-0">
+                            {% bootstrap_field filters_form.job_seekers wrapper_class="w-lg-400px" show_label=False %}
                         </div>
-                    </aside>
-                </div>
-                <div class="col-12 col-md-8">
-                    {% include "apply/includes/list_job_applications.html" with job_applications_page=job_applications_page job_applications_list_kind=job_applications_list_kind JobApplicationsListKind=JobApplicationsListKind filters_counter=filters_counter request=request pending_states_job_applications_count=pending_states_job_applications_count list_exports_url=list_exports_url SenderKind=SenderKind only %}
+                    </div>
+                    {% include "apply/includes/list_job_applications.html" with job_applications_page=job_applications_page filters_counter=filters_counter request=request pending_states_job_applications_count=pending_states_job_applications_count list_exports_url=list_exports_url SenderKind=SenderKind job_applications_list_kind=job_applications_list_kind JobApplicationsListKind=JobApplicationsListKind JobApplicationOrigin=JobApplicationOrigin only %}
                 </div>
             </div>
         </div>
@@ -101,4 +81,5 @@
     <!-- Needed to use Select2MultipleWidget. -->
     {{ filters_form.media.js }}
     <script src='{% static "js/htmx_compat.js" %}'></script>
+    <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
 {% endblock %}
