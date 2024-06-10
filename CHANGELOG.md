@@ -1,5 +1,31 @@
 # Journal des modifications
 
+## 2024-06-10
+
+### Ajouté
+
+- [Admin : Ajout du reliquat pour les PASS IAE et de la durée pour les suspensions et prolongations](https://github.com/gip-inclusion/les-emplois/pull/4147) 🖼
+- [Admin: Améliorer les filtres de la section contrôle a posteriori](https://github.com/gip-inclusion/les-emplois/pull/4170)
+- [Pilotage : Encart de promotion du webinaire pour les ML / Cap emploi & les acteurs AHI pour 3 régions spécifiques](https://github.com/gip-inclusion/les-emplois/pull/4167) 🖼
+
+### Modifié
+
+- [Demandes de prolongation: Gérer le cas où l'entreprise déclarante n'existe plus](https://github.com/gip-inclusion/les-emplois/pull/4168)
+- [Demandeur d’emploi: empêcher la saisie d'un identifiant France Travail invalide](https://github.com/gip-inclusion/les-emplois/pull/4121)
+- [Employeur : Travail préparatoire à l'ouverture des prescriptions](https://github.com/gip-inclusion/les-emplois/pull/4120)
+- [Limiter la suppression des SIAE inactives dans l’import ASP](https://github.com/gip-inclusion/les-emplois/pull/4151)
+- [PASS IAE: Permettre de suspendre un PASS quand le candidat a été embauché dans une structure hors IAE (GEIQ par exemple)](https://github.com/gip-inclusion/les-emplois/pull/4129)
+- [Statistiques: Correction d'un code de dénormalisation](https://github.com/gip-inclusion/les-emplois/pull/4171)
+- [UI : Correction du texte du placeholder de recherche salarié dans la liste des salariés](https://github.com/gip-inclusion/les-emplois/pull/4184) 🖼
+- [UX/UI : Ajout de cta dans la zone de titre des liste de candidatures](https://github.com/gip-inclusion/les-emplois/pull/4096) 🖼
+- [UX/UI : Correction des cartes postes ouverts au recrutement sur mobile](https://github.com/gip-inclusion/les-emplois/pull/4146) 🖼
+- [UX/UI : Modification filtres sur la liste des salariés et PASS IAE et sur la liste des fiches salarié ASP](https://github.com/gip-inclusion/les-emplois/pull/4083) 🖼
+- [UX/UI: Ajout du lien "nouveautés" dans le menu du header](https://github.com/gip-inclusion/les-emplois/pull/4169)
+
+### Supprimé
+
+- [Suppression du message d'alerte pour inviter à remplir en enquête sur la réattribution des candidatures d’un collaborateur](https://github.com/gip-inclusion/les-emplois/pull/4159)
+
 ## 2024-06-03
 
 ### Ajouté
