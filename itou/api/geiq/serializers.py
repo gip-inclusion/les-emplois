@@ -288,7 +288,11 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
     @extend_schema_field(LazyChoiceField(choices=lazy_administrative_criteria_choices))
     def get_criteres_eligibilite(self, obj) -> list[str]:
         if diag := obj.geiq_eligibility_diagnosis:
-            return sorted({crit.api_code for crit in diag.administrative_criteria.all()})
+            api_codes = set()
+            for crit in diag.administrative_criteria.all():
+                if crit.api_code:
+                    api_codes.update(crit.api_code.split("|"))
+            return sorted(api_codes)
         return []
 
     @extend_schema_field(serializers.ChoiceField(choices=sorted(LabelCivilite.choices)))

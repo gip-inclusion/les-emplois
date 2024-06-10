@@ -176,7 +176,7 @@
 		"fields": {
 			"name": "Travailleur handicapé",
 			"desc": "",
-			"api_code": "TH",
+			"api_code": "Pers. SH|TH",
 			"written_proof": "Notification de décision de la maison départementale des personnes handicapées (MDPH) ou attestation de demande de renouvellement",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -233,7 +233,7 @@
 		"fields": {
 			"name": "Réfugiés statutaire ou bénéficiaire de la protection subsidiaire",
 			"desc": "",
-			"api_code": "RS/PS/DA",
+			"api_code": "Refug.|RS/PS/DA",
 			"written_proof": "Titre de séjour valide ou demande de renouvellement du titre de séjour. Pour les bénéficiaires d'une protection temporaire : autorisation provisoire de séjour.",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -252,7 +252,7 @@
 		"fields": {
 			"name": "Résident en zone de revitalisation rurale (ZRR)",
 			"desc": "",
-			"api_code": "ZRR",
+			"api_code": "ZRR|QPV/ZRR",
 			"written_proof": "Justificatif de domicile (facture eau, électricité, internet, téléphone)",
 			"written_proof_url": "https://www.data.gouv.fr/fr/datasets/zones-de-revitalisation-rurale-zrr",
 			"written_proof_validity": "",
@@ -271,7 +271,7 @@
 		"fields": {
 			"name": "Résident en quartier prioritaire de la politique de la ville (QPV)",
 			"desc": "",
-			"api_code": "QPV",
+			"api_code": "QPV|QPV/ZRR",
 			"written_proof": "Justificatif de domicile (facture eau, électricité, internet, téléphone)",
 			"written_proof_url": "https://sig.ville.gouv.fr",
 			"written_proof_validity": "",
@@ -290,7 +290,7 @@
 		"fields": {
 			"name": "Sortant de détention ou personne placée sous main de justice",
 			"desc": "",
-			"api_code": "Detention/MJ",
+			"api_code": "Detention/MJ|Prison",
 			"written_proof": "Billet de sortie ou attestation du juge d'application des peines",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -480,7 +480,7 @@
 		"fields": {
 			"name": "Autre minima social",
 			"desc": "",
-			"api_code": "MINSOC",
+			"api_code": "",
 			"written_proof": "Attestation de l’organisme versant l’aide",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -499,7 +499,7 @@
 		"fields": {
 			"name": "Personne inscrite à France Travail",
 			"desc": "",
-			"api_code": "Prescrit",
+			"api_code": "",
 			"written_proof": "Avis de situation France Travail ou récapitulatif des périodes d'inscription (en cas de radiation)",
 			"written_proof_url": "",
 			"written_proof_validity": "",
@@ -518,7 +518,7 @@
 		"fields": {
 			"name": "Demandeur d'emploi inscrit depuis moins de 12 mois",
 			"desc": "",
-			"api_code": "Prescrit",
+			"api_code": "",
 			"written_proof": "",
 			"written_proof_url": "",
 			"written_proof_validity": "",
