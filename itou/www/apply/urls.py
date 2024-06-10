@@ -199,11 +199,6 @@ urlpatterns = [
         submit_views.hire_confirmation,
         name="hire_confirmation",
     ),
-    # List - Compatibility. TODO(rsebille): Remove them at a later date
-    path("prescriber/list", list_views.list_prescriptions),
-    path("prescriber/list/exports", list_views.list_prescriptions_exports),
-    path("prescriber/list/exports/download", list_views.list_prescriptions_exports_download),
-    path("prescriber/list/exports/download/<str:month_identifier>", list_views.list_prescriptions_exports_download),
     # List.
     path("job_seeker/list", list_views.list_for_job_seeker, name="list_for_job_seeker"),
     path("prescriptions/list", list_views.list_prescriptions, name="list_prescriptions"),
