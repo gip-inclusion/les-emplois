@@ -93,25 +93,6 @@ def _deserializeEmailMessage(serialized_email_message):
     return EmailMessage(**serialized_email_message)
 
 
-# TODO(François): Preserved for in-flight tasks, drop after a few days.
-@task(retries=_NB_RETRIES, retry_delay=settings.SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS)
-def _async_send_messages(serializable_email_messages):
-    """
-    An `EmailMessage` instance holds references to some non-serializable
-    ressources, such as a connection to the email backend (if not `None`).
-
-    Making `EmailMessage` serializable is the purpose of
-    `_serializeEmailMessage` and `_deserializeEmailMessage`.
-    """
-    messages = []
-    with get_connection(backend=settings.ASYNC_EMAIL_BACKEND) as connection:
-        for serialized_email in serializable_email_messages:
-            email = _deserializeEmailMessage(serialized_email)
-            messages.extend(sanitize_mailjet_recipients(email))
-        connection.send_messages(messages)
-    return len(messages)
-
-
 @task(retries=_NB_RETRIES, retry_delay=settings.SEND_EMAIL_DELAY_BETWEEN_RETRIES_IN_SECONDS, context=True)
 def _async_send_message(serialized_email, task=None):
     """
