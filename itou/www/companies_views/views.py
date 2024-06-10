@@ -1,4 +1,5 @@
 import random
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.contrib import messages
@@ -6,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
@@ -19,7 +20,7 @@ from itou.companies.models import Company, CompanyMembership, JobDescription, Si
 from itou.jobs.models import Appellation
 from itou.users.models import User
 from itou.utils import constants as global_constants
-from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiException, make_service_redirect_url
+from itou.utils.apis.data_inclusion import DataInclusionApiClient, DataInclusionApiException
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
@@ -45,6 +46,12 @@ def displayable_thematique(thematique):
 def set_dora_utm_query_params(url: str) -> str:
     utm_params = {"mtm_campaign": "LesEmplois", "mtm_kwd": "GeneriqueDecouvrirService"}
     return add_url_params(url, params=utm_params)
+
+
+def get_dora_url(source, id, original_url=None):
+    if source == "dora" and original_url:
+        return original_url
+    return urljoin(settings.DORA_BASE_URL, f"/services/di--{source}--{id}")
 
 
 def get_data_inclusion_services(code_insee):
@@ -73,8 +80,14 @@ def get_data_inclusion_services(code_insee):
         results = [
             r
             | {
-                "di_service_redirect_url": set_dora_utm_query_params(make_service_redirect_url(r["source"], r["id"])),
                 "thematiques_display": {displayable_thematique(t) for t in r["thematiques"]},
+                "dora_service_redirect_url": reverse(
+                    "companies_views:dora_service_redirect",
+                    kwargs={
+                        "source": r["source"],
+                        "service_id": r["id"],
+                    },
+                ),
             }
             for r in results
         ]
@@ -706,3 +719,19 @@ def hx_dora_services(request, code_insee, template_name="companies/hx_dora_servi
         "dora_base_url": set_dora_utm_query_params(settings.DORA_BASE_URL),
     }
     return render(request, template_name, context)
+
+
+def dora_service_redirect(request, source: str, service_id: str) -> HttpResponseRedirect:
+    client = DataInclusionApiClient(
+        settings.API_DATA_INCLUSION_BASE_URL,
+        settings.API_DATA_INCLUSION_TOKEN,
+    )
+
+    try:
+        # No caching: we want to have a hit every time.
+        service = client.retrieve_service(source=source, id_=service_id)
+    except DataInclusionApiException:
+        raise Http404()
+
+    url = set_dora_utm_query_params(get_dora_url(source, service_id, service.get("lien_source", None)))
+    return HttpResponseRedirect(url)
