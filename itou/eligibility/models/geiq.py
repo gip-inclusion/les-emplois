@@ -251,6 +251,10 @@ class GEIQAdministrativeCriteria(AbstractAdministrativeCriteria):
         blank=True,
     )
     slug = models.SlugField(verbose_name="référence courte", max_length=100, null=True, blank=True)
+    # This represent the Label API codes of the matching criteria it can either be:
+    #  - empty ("") meaning that this criteria is inexisting/irrelevant for Label
+    #  - a single "CODE" for most cases
+    #  - several "CODE1|CODE2" joined with a "|"
     api_code = models.CharField(verbose_name="code API")
 
     class Meta:

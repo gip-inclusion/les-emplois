@@ -210,3 +210,28 @@ def test_civilite_mapping(title, outcome):
 )
 def test_label_mappings(choices_class, mapping):
     assert set(choices_class.values) == set(mapping.values())
+
+
+@freeze_time("2023-07-21")
+def test_criteres_eligibilite():
+    job_application = JobApplicationFactory(
+        with_geiq_eligibility_diagnosis=True,
+        was_hired=True,
+    )
+    serializer = serializers.GeiqJobApplicationSerializer()
+    assert serializer.get_criteres_eligibilite(job_application) == []
+
+    # Some criteria aren't relevant for a GEIQ diagnosis and aren't advertised in our API
+    pe_crit = GEIQAdministrativeCriteria.objects.get(slug="personne-inscrite-a-pole-emploi")
+    job_application.geiq_eligibility_diagnosis.administrative_criteria.add(pe_crit)
+    assert serializer.get_criteres_eligibilite(job_application) == []
+
+    # Other criteria can either add 1 code
+    rsa_crit = GEIQAdministrativeCriteria.objects.get(slug="beneficiaire-du-rsa")
+    job_application.geiq_eligibility_diagnosis.administrative_criteria.add(rsa_crit)
+    assert serializer.get_criteres_eligibilite(job_application) == ["RSA"]
+
+    # Or 2 codes
+    zrr_crit = GEIQAdministrativeCriteria.objects.get(slug="resident-zrr")
+    job_application.geiq_eligibility_diagnosis.administrative_criteria.add(zrr_crit)
+    assert serializer.get_criteres_eligibilite(job_application) == ["QPV/ZRR", "RSA", "ZRR"]
