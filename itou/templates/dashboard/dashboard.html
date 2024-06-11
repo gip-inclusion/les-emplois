@@ -351,9 +351,7 @@
                                 <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
                                     {% include "dashboard/includes/dora_card.html" with siret=request.current_organization.siret|default:"" tracker="mtm_campaign=LesEmplois&mtm_kwd=Dashboard" %}
                                     {% include "dashboard/includes/diagoriente_card.html" with user=user only %}
-                                    {% if GPS_ENABLED %}
-                                        {% include "dashboard/includes/gps_card.html" %}
-                                    {% endif %}
+                                    {% include "dashboard/includes/gps_card.html" %}
                                 </div>
                             {% endif %}
                         </div>

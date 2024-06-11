@@ -5,13 +5,11 @@ from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
-from itou.utils.decorators import settings_protected_view
 from itou.utils.urls import get_safe_url
 from itou.www.gps.forms import GpsUserSearchForm
 
 
 @login_required
-@settings_protected_view("GPS_ENABLED")
 @user_passes_test(
     lambda u: not u.is_job_seeker,
     login_url=reverse_lazy("dashboard:index"),
@@ -41,7 +39,6 @@ def my_groups(request, template_name="gps/my_groups.html"):
 
 
 @login_required
-@settings_protected_view("GPS_ENABLED")
 @user_passes_test(
     lambda u: not u.is_job_seeker,
     login_url=reverse_lazy("dashboard:index"),
@@ -72,7 +69,6 @@ def join_group(request, template_name="gps/join_group.html"):
 
 
 @login_required
-@settings_protected_view("GPS_ENABLED")
 @user_passes_test(
     lambda u: not u.is_job_seeker,
     login_url=reverse_lazy("dashboard:index"),
@@ -91,7 +87,6 @@ def leave_group(request, group_id):
 
 
 @login_required
-@settings_protected_view("GPS_ENABLED")
 @user_passes_test(
     lambda u: not u.is_job_seeker,
     login_url=reverse_lazy("dashboard:index"),
