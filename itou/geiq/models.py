@@ -176,6 +176,9 @@ class Employee(models.Model):
         full_name = f"{self.first_name.strip().title()} {self.last_name.upper().strip()}"
         return full_name.strip()
 
+    def __str__(self):
+        return self.get_full_name()
+
     def display_prior_actions(self):
         actions = []
         # Sorted in python to leverage prefetch_related field
