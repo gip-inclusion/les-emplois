@@ -6,38 +6,31 @@
 {% load buttons_form %}
 {% load static %}
 
-{% block messages %}
+{% block content_title %}
     {{ block.super }}
-
     {% if request.user.is_employer %}
         {% if siae.is_subject_to_eligibility_rules or siae.kind == CompanyKind.GEIQ %}
-            <div class="alert alert-info alert-dismissible fade show">
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-                <p class="mb-2">
-                    <strong>Nouveauté</strong>
-                </p>
-                <p class="mb-0">
-                    {% if hire_process %}
-                        Cet espace vous permet maintenant de déclarer directement une embauche sans avoir à créer une candidature au préalable.
-                        {% if siae.kind == CompanyKind.GEIQ %}
-                            Si vous souhaitez créer une candidature à traiter plus tard (avec la possibilité d’enregistrer une action préalable au recrutement), veuillez vous rendre
-                            sur <a href="{% url 'apply:start' company_pk=siae.pk %}" {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
-                        {% else %}
-                            Pour la création d’une candidature, veuillez vous rendre sur <a href="{% url 'apply:start' company_pk=siae.pk %}" {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
-                        {% endif %}
+            <p>
+                {% if hire_process %}
+                    Cet espace vous permet de déclarer directement une embauche sans avoir à créer une candidature au préalable.
+                    {% if siae.kind == CompanyKind.GEIQ %}
+                        Si vous souhaitez créer une candidature à traiter plus tard (avec la possibilité d’enregistrer une action préalable au recrutement), veuillez vous rendre
+                        sur <a href="{% url 'apply:start' company_pk=siae.pk %}" {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
                     {% else %}
-                        {% if siae.kind == CompanyKind.GEIQ %}
-                            Cet espace vous permet d’enregistrer une candidature à traiter plus tard (avec la possibilité d’enregistrer une action préalable au recrutement).
-                        {% else %}
-                            Cet espace vous permet d’enregistrer une nouvelle candidature.
-                        {% endif %}
-                        Si vous souhaitez déclarer directement une embauche, veuillez vous rendre sur <a href="{% url 'apply:check_nir_for_hire' company_pk=siae.pk %}">Déclarer une embauche</a> depuis le tableau de bord.
+                        Pour la création d’une candidature, veuillez vous rendre sur <a href="{% url 'apply:start' company_pk=siae.pk %}" {% matomo_event "candidature" "clic" "start_application" %}>Enregistrer une candidature</a> depuis le tableau de bord.
                     {% endif %}
-                </p>
-            </div>
+                {% else %}
+                    {% if siae.kind == CompanyKind.GEIQ %}
+                        Cet espace vous permet d’enregistrer une candidature à traiter plus tard (avec la possibilité d’enregistrer une action préalable au recrutement).
+                    {% else %}
+                        Cet espace vous permet d’enregistrer une nouvelle candidature.
+                    {% endif %}
+                    Si vous souhaitez déclarer directement une embauche, veuillez vous rendre sur <a href="{% url 'apply:check_nir_for_hire' company_pk=siae.pk %}">Déclarer une embauche</a> depuis le tableau de bord.
+                {% endif %}
+            </p>
         {% endif %}
     {% endif %}
-{% endblock %}
+{% endblock content_title %}
 
 {% block left_column %}
     <form method="post" class="js-prevent-multiple-submit js-format-nir">
