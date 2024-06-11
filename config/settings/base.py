@@ -373,6 +373,10 @@ API_DATA_INCLUSION_BASE_URL = os.getenv("API_DATA_INCLUSION_BASE_URL")
 API_DATA_INCLUSION_TOKEN = os.getenv("API_DATA_INCLUSION_TOKEN")
 API_DATA_INCLUSION_SOURCES = os.getenv("API_DATA_INCLUSION_SOURCES", "").split(",")
 
+API_GEIQ_LABEL_BASE_URL = os.getenv("API_GEIQ_LABEL_BASE_URL")
+API_GEIQ_LABEL_TOKEN = os.getenv("API_GEIQ_LABEL_TOKEN")
+GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES = os.getenv("GEIQ_ASSESSMENT_CAMPAIGN_POSTCODE_PREFIXES", "").split(",")
+
 # Pôle emploi's Emploi Store Dev aka ESD. There is a production AND a recette environment.
 # Key and secrets are stored on pole-emploi.io (prod and recette) accounts, the values are not the
 # same depending on the environment
