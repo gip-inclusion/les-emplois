@@ -304,6 +304,9 @@
                                         {% include "dashboard/includes/employer_employees_card.html" %}
                                     {% endif %}
                                     {% include "dashboard/includes/employer_company_card.html" %}
+                                    {% if last_geiq_execution_assessment %}
+                                        {% include "dashboard/includes/employer_geiq_card.html" %}
+                                    {% endif %}
                                     {% if active_campaigns or evaluated_siae_notifications %}
                                         {% include "dashboard/includes/employer_evaluation_campaigns_card.html" %}
                                     {% endif %}
@@ -312,6 +315,9 @@
 
                                 {% if user.is_labor_inspector %}
                                     {% include "dashboard/includes/labor_inspector_organization_card.html" %}
+                                    {% if request.current_organization.kind == InstitutionKind.DDETS_GEIQ or request.current_organization.kind == InstitutionKind.DREETS_GEIQ %}
+                                        {% include "dashboard/includes/labor_inspector_geiq_assessment_card.html" %}
+                                    {% endif %}
                                 {% endif %}
                                 {# end of if user.is_labor_inspector #}
 

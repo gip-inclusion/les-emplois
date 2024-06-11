@@ -1,0 +1,32 @@
+<div class="col mb-3 mb-md-5 col-lg-2">
+    <div class="c-box p-0 h-100">
+        <div class="p-3 p-lg-4">
+            <span class="h4 m-0">Bilan d’exécution GEIQ</span>
+        </div>
+        <div class="px-3 px-lg-4">
+            <a href="{% url 'geiq:geiq_list' institution_pk=request.current_organization.pk %}" class="btn btn-outline-primary btn-block btn-ico mb-2">
+                <i class="ri-file-chart-line ri-lg font-weight-normal"></i>
+                <span>Rechercher un GEIQ</span>
+            </a>
+            {% if active_geiq_campaign %}
+                <div class="alert alert-info" role="status">
+                    <p class="mb-0"></p>
+
+                    <div class="row">
+                        <div class="col-auto pe-0">
+                            <i class="ri-information-line ri-xl text-important" aria-hidden="true"></i>
+                        </div>
+                        <div class="col">
+                            <p class="mb-2">
+                                <strong>Période de contrôle bilans {{ active_geiq_campaign.year }}</strong>
+                            </p>
+                            <p class="mb-0">
+                                Le contrôle devra se faire entre le {{ active_geiq_campaign.submission_deadline|date:"d/m/Y" }} et le {{ active_geiq_campaign.review_deadline|date:"d/m/Y" }}.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>

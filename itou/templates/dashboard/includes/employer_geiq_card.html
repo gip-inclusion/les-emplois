@@ -1,0 +1,40 @@
+{% load matomo %}
+
+<div class="col mb-3 mb-md-5">
+    <div class="c-box p-0 h-100">
+        <div class="p-3 p-lg-4">
+            <span class="h4 m-0">Bilan d’exécution & salariés</span>
+        </div>
+        <div class="px-3 px-lg-4">
+            <a href="{% url 'geiq:assessment_info' assessment_pk=last_geiq_execution_assessment.pk %}" class="btn btn-outline-primary btn-block btn-ico mb-3">
+                <i class="ri-file-chart-line ri-lg font-weight-normal"></i>
+                <span>Le bilan d’exécution</span>
+            </a>
+            <ul class="list-unstyled mb-lg-5">
+                <li class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="{% url 'geiq:employee_list' assessment_pk=last_geiq_execution_assessment.pk info_type="personal-information" %}?back_url={% url 'dashboard:index' %}" class="btn-link btn-ico">
+                        <i class="ri-group-line ri-lg font-weight-normal align-self-start"></i>
+                        <span>Mes salariés</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="alert alert-info" role="status">
+                <p class="mb-0"></p>
+
+                <div class="row">
+                    <div class="col-auto pe-0">
+                        <i class="ri-information-line ri-xl text-important" aria-hidden="true"></i>
+                    </div>
+                    <div class="col">
+                        <p class="mb-2">
+                            <strong>Validez votre bilan {{ last_geiq_execution_assessment.campaign.year }}</strong>
+                        </p>
+                        <p class="mb-0">
+                            Vous avez jusqu’au {{ last_geiq_execution_assessment.campaign.submission_deadline|date:"d/m/Y" }} pour valider le dossier de votre bilan d’exécution qui sera automatiquement transmis à votre DDETS/DREETS.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

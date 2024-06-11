@@ -1,0 +1,140 @@
+{% extends "layout/base.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}Bilan d’exécution - {{ assessment.company.display_name }} {{ block.super }}{% endblock %}
+
+{% block breadcrumbs %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block content_title %}
+    <h1>Bilan d’exécution - {{ assessment.company.display_name }} - {{ assessment.campaign.year }}</h1>
+    {% include "geiq/includes/labor_inspector_assessment_state_badge.html" with assessment=assessment extra_class="" ReviewState=ReviewState only %}
+{% endblock %}
+
+{% block messages %}
+    {{ block.super }}
+    {% include "geiq/includes/_experiment_info_alert.html" with ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12 col-lg-8">
+                    <div class="c-box">
+                        {% if not assessment.submitted_at %}
+                            <h2>En attente du dossier</h2>
+                            <p>Le rapport d’activité sera disponible lorsque le GEIQ aura validé le dossier sur son espace dédié.</p>
+                        {% else %}
+                            <h2>Dossier transmis par le GEIQ</h2>
+                            <p>
+                                <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Certifié à jour le {{ assessment.submitted_at|date:"d/m/Y" }}</span>
+                            </p>
+                            <hr>
+                            <div class="d-flex flex-column flex-md-row justify-content-between">
+                                <div>
+                                    <h3>Rapport d’activité</h3>
+                                </div>
+                                <div clas="text-center">
+                                    <a class="btn btn-outline-primary" href="{% url 'geiq:assessment_report' assessment_pk=assessment.pk %}" rel="noopener" target="_blank">
+                                        <span>Rapport d’activité {{ assessment.campaign.year }}</span>
+                                        <i class="ri-external-link-line font-weight-medium" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <hr>
+                        <div class="d-flex flex-column flex-md-row justify-content-between">
+                            <div>
+                                <h3>Données individuelles de parcours</h3>
+                                {% include "geiq/includes/last_synced_at.html" with assessment=assessment allow_sync=False only %}
+                            </div>
+                            <div>
+                                <a href="{% url "geiq:employee_list" assessment_pk=assessment.pk info_type=InfoType.PERSONAL_INFORMATION %}" class="btn btn-outline-primary ">Consulter les données salariés</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-4">
+                    {% if not assessment.submitted_at %}
+                        <div class="c-box mb-4 bg-warning-lightest border-warning">
+                            <span class="fs-sm">Financement</span>
+                            <h4>En attente du bilan d’exécution</h4>
+                            <p class="mb-0">
+                                Le GEIQ a jusqu’au {{ assessment.campaign.submission_deadline|date:"d/m/Y" }} pour importer son rapport d’activité et valider le bilan.
+                            </p>
+                        </div>
+                    {% elif not assessment.reviewed_at %}
+                        <div class="c-box mb-4 bg-info-lightest border-info">
+                            <span class="fs-sm">Financement</span>
+                            <h4>Bilan d’exécution à valider</h4>
+                            <p>
+                                Vous avez jusqu’au {{ assessment.campaign.review_deadline|date:"d/m/Y" }} pour valider les informations de ce bilan d’exécution.
+                            </p>
+                            <a href="{% url 'geiq:assessment_review' assessment_pk=assessment.pk %}" class="btn btn-primary btn-block">Valider le bilan</a>
+                        </div>
+                    {% else %}
+                        {% if assessment.review_state == ReviewState.ACCEPTED %}
+                            <div class="c-box mb-4 bg-success-lightest border-success">
+                                <span class="fs-sm">Financement</span>
+                                <h4>Totalité de l’aide accordée</h4>
+                                <p>
+                                    La totalité de l’aide conventionnée a été validée par <strong>{{ assessment.reviewed_by.get_full_name }}</strong> ({{ assessment.review_institution.display_name }}).
+                                </p>
+                                <strong>Commentaire envoyé au GEIQ</strong>
+                                {{ assessment.review_comment|linebreaks }}
+                                <a href="{% url 'geiq:assessment_review' assessment_pk=assessment.pk %}" class="btn btn-primary btn-block">Corriger</a>
+                            </div>
+                        {% elif assessment.review_state == ReviewState.PARTIAL_ACCEPTED %}
+                            <div class="c-box mb-4 bg-success-lightest border-success">
+                                <span class="fs-sm">Financement</span>
+                                <h4>Solde partiellement accordé</h4>
+                                <p>
+                                    Le solde de l’aide conventionnée a été partiellement validé par <strong>{{ assessment.reviewed_by.get_full_name }}</strong> ({{ assessment.review_institution.display_name }}).
+                                </p>
+                                <strong>Commentaire envoyé au GEIQ</strong>
+                                {{ assessment.review_comment|linebreaks }}
+                                <a href="{% url 'geiq:assessment_review' assessment_pk=assessment.pk %}" class="btn btn-primary btn-block">Corriger</a>
+                            </div>
+                        {% elif assessment.review_state == ReviewState.REMAINDER_REFUSED %}
+                            <div class="c-box mb-4 bg-warning-lightest border-warning">
+                                <span class="fs-sm">Financement</span>
+                                <h4>Complément d’aide refusé</h4>
+                                <p>
+                                    La totalité de l’aide conventionnée n’a pas été accordée par <strong>{{ assessment.reviewed_by.get_full_name }}</strong> ({{ assessment.review_institution.display_name }}).
+                                </p>
+                                <strong>Commentaire envoyé au GEIQ</strong>
+                                {{ assessment.review_comment|linebreaks }}
+                                <a href="{% url 'geiq:assessment_review' assessment_pk=assessment.pk %}" class="btn btn-primary btn-block">Corriger</a>
+                            </div>
+                        {% elif assessment.review_state == ReviewState.PARTIAL_REFUND %}
+                            <div class="c-box mb-4 bg-warning-lightest border-warning">
+                                <span class="fs-sm">Financement</span>
+                                <h4>Demande de remboursement partiel</h4>
+                                <p>
+                                    Une demande de remboursement partiel de l’aide conventionnée a été demandée par <strong>{{ assessment.reviewed_by.get_full_name }}</strong> ({{ assessment.review_institution.display_name }}).
+                                </p>
+                                <strong>Commentaire envoyé au GEIQ</strong>
+                                {{ assessment.review_comment|linebreaks }}
+                                <a href="{% url 'geiq:assessment_review' assessment_pk=assessment.pk %}" class="btn btn-primary btn-block">Corriger</a>
+                            </div>
+                        {% elif assessment.review_state == ReviewState.FULL_REFUND %}
+                            <div class="c-box mb-4 bg-warning-lightest border-warning">
+                                <span class="fs-sm">Financement</span>
+                                <h4>Demande de remboursement total</h4>
+                                <p>
+                                    Une demande de remboursement total de l’aide conventionnée a été demandée par <strong>{{ assessment.reviewed_by.get_full_name }}</strong> ({{ assessment.review_institution.display_name }}).
+                                </p>
+                                <strong>Commentaire envoyé au GEIQ</strong>
+                                {{ assessment.review_comment|linebreaks }}
+                                <a href="{% url 'geiq:assessment_review' assessment_pk=assessment.pk %}" class="btn btn-primary btn-block">Corriger</a>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                    {% include "companies/includes/_company_info.html" with company=assessment.company show=True only %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

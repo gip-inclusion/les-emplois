@@ -1,0 +1,45 @@
+{% extends "geiq/list_base.html" %}
+{% load format_filters %}
+
+
+{% block title %}Accompagnements {{ block.super }}{% endblock %}
+
+{% block data_list %}
+
+    <div class="tab-content" id="result_page">
+        <div class="table-responsive-lg mt-3 mt-md-4">
+            <table class="table">
+                <caption class="visually-hidden">Liste des accompagnements</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Nom Prénom</th>
+                        <th scope="col">Action préalable</th>
+                        <th scope="col">Accomp. préalable</th>
+                        <th scope="col">Type de qualification visé</th>
+                        <th scope="col">Niveau de qualif. visé</th>
+                        <th scope="col">Formation prévue</th>
+                        <th scope="col">Formation réalisée</th>
+                        <th scope="col">Accomp. post-contrat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contract in data_page %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'geiq:employee_details' employee_pk=contract.employee.pk %}?back_url={{ request.get_full_path|urlencode }}">{{ contract.employee.get_full_name }}</a>
+                            </td>
+                            <td>{{ contract.employee.display_prior_actions|default:"-" }}</td>
+                            <td>{{ contract.other_data.accompagnement_avant_contrat|formatfloat_with_unit:"j"|default:"-" }}</td>
+                            <td>{{ contract.other_data.type_qualification_visee.libelle|default:"-" }}</td>
+                            <td>{{ contract.other_data.qualification_visee.libelle|default:"-" }}</td>
+                            <td>{{ contract.other_data.heures_formation_prevue|formatfloat_with_unit:"h"|default:"-" }}</td>
+                            <td>{{ contract.other_data.heures_formation_realisee|formatfloat_with_unit:"h"|default:"-" }}</td>
+                            <td>{{ contract.other_data.accompagnement_apres_contrat|formatfloat_with_unit:"j"|default:"-" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

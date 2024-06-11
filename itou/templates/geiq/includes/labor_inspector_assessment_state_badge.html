@@ -1,0 +1,17 @@
+{% if not assessment.submitted_at %}
+    <span class="badge badge-sm rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>
+{% elif not assessment.reviewed_at %}
+    <span class="badge badge-sm rounded-pill text-nowrap bg-info">Bilan à l’étude</span>
+{% else %}
+    {% if assessment.review_state == ReviewState.ACCEPTED %}
+        <span class="badge badge-sm rounded-pill text-nowrap bg-success">Bilan validé</span>
+    {% elif assessment.review_state == ReviewState.PARTIAL_ACCEPTED %}
+        <span class="badge badge-sm rounded-pill text-nowrap bg-success">Bilan validé : solde partiellement accordé</span>
+    {% elif assessment.review_state == ReviewState.REMAINDER_REFUSED %}
+        <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Bilan validé : solde refusé</span>
+    {% elif assessment.review_state == ReviewState.PARTIAL_REFUND %}
+        <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Bilan validé : demande de remboursement partiel</span>
+    {% elif assessment.review_state == ReviewState.FULL_REFUND %}
+        <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Bilan validé : demande de remboursement total</span>
+    {% endif %}
+{% endif %}

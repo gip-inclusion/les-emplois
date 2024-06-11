@@ -1,0 +1,7 @@
+{% if not assessment.submitted_at %}
+    <span class="badge badge-sm rounded-pill text-nowrap bg-warning"><i class="ri-close-line"></i>En attente</span>
+{% elif not assessment.reviewed_at %}
+    <span class="badge badge-sm rounded-pill text-nowrap bg-info"><i class="ri-loader-2-line"></i>À valider</span>
+{% else %}
+    <span class="badge badge-sm rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
+{% endif %}
