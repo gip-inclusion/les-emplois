@@ -6,14 +6,6 @@
 
 {% block title %}Prescripteur/Orienteur - Inscription {{ block.super }}{% endblock %}
 
-{% block messages %}
-    {{ block.super }}
-    <div class="alert alert-info">
-        <p class="mb-0">
-            Renseignez vos coordonnées afin d'être invité par {{ prescriber.first_name|title }} {{ prescriber.last_name|slice:1|upper }} de l'organisation « {{ organization.display_name }} ».
-        </p>
-    </div>
-{% endblock %}
 
 {% block content_title %}
     <h1 class="mb-0">Inscription</h1>
@@ -25,6 +17,9 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12 col-lg-8">
+                    <p>
+                        Renseignez vos coordonnées afin d'être invité par {{ prescriber.first_name|title }} {{ prescriber.last_name|slice:1|upper }} de l'organisation « {{ organization.display_name }} ».
+                    </p>
                     <div class="c-form">
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
