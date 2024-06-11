@@ -1,25 +1,24 @@
 # serializer version: 1
 # name: test_list_prescriptions_exports_as_pole_emploi_prescriber
   '''
-  <div class="alert alert-info mt-3" id="besoin-dun-chiffre">
-              <p>
-                  <i aria-hidden="true" class="ri-information-line me-1"></i>
-                  <b>Besoin d'un chiffre ?</b>
-              </p>
-              
-                  <p class="mb-0">
-                      Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
-                  </p>
-                  <ul class="mb-0">
-                      <li>
-                          <a href="/stats/pe/state/main" rel="noopener" target="_blank">Voir les données de l'ensemble de l'état des candidatures orientées</a>
-                      </li>
-                      <li>
-                          <a href="/stats/pe/conversion/main" rel="noopener" target="_blank">Voir les données du taux de transformation des candidatures</a>
-                      </li>
-                  </ul>
-              
-          </div>
+  <div class="c-info mb-3 mb-md-4" id="besoin-dun-chiffre">
+                              <button aria-controls="collapseBesoinChiffre" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseBesoinChiffre" data-bs-toggle="collapse">
+                                  <span>Besoin d'un chiffre ?</span>
+                              </button>
+                              
+                                  <div class="c-info__detail collapse" id="collapseBesoinChiffre">
+                                      Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
+                                      <ul class="mb-0">
+                                          <li>
+                                              <a href="/stats/pe/state/main" rel="noopener" target="_blank">Voir les données de l'ensemble de l'état des candidatures orientées</a>
+                                          </li>
+                                          <li>
+                                              <a href="/stats/pe/conversion/main" rel="noopener" target="_blank">Voir les données du taux de transformation des candidatures</a>
+                                          </li>
+                                      </ul>
+                                  </div>
+                              
+                          </div>
   '''
 # ---
 # name: test_list_prescriptions_filters
