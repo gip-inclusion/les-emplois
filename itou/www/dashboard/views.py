@@ -1,3 +1,5 @@
+import datetime
+
 from allauth.account.views import PasswordChangeView
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -162,6 +164,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                             "title": "Inscrivez-vous à un webinaire pour découvrir votre tout nouveau tableau de bord !",  # noqa: E501
                             "description": "En juin, deux sessions vous sont proposées pour vous familiariser avec votre nouvel outil de suivi et d'analyse des résultats de vos prescriptions.",  # noqa: E501
                             "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-professionnels-missions-locales-et-cap-emploi-decouvrez-votre-nouveau-tableau-de-bord-personnalise-et-faites-le-point-sur-vos-prescriptions?type=detailed",  # noqa: E501
+                            "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 6, 11),
                         }
                     )
                 elif current_org.kind in [
@@ -175,6 +178,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                             "title": "Inscrivez-vous à un webinaire pour découvrir votre tout nouveau tableau de bord !",  # noqa: E501
                             "description": "En juin, deux sessions vous sont proposées pour vous familiariser avec votre nouvel outil de suivi et d'analyse des résultats de vos prescriptions.",  # noqa: E501
                             "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-prescripteurs-de-laccueil-de-lhebergement-et-de-linsertion-decouvrez-votre-nouveau-tableau-de-bord-personnalise-et-faites-le-point-sur-vos-prescriptions?type=detailed",  # noqa: E501
+                            "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 6, 13),
                         }
                     )
             if current_org.is_authorized:
@@ -237,6 +241,10 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             .exclude(state__in=[JobApplicationState.ACCEPTED, JobApplicationState.OBSOLETE])
             .exists()
         )
+
+    context["pilotage_webinar_banners"] = [
+        banner for banner in context["pilotage_webinar_banners"] if banner["is_displayable"]()
+    ]
 
     return render(request, template_name, context)
 
