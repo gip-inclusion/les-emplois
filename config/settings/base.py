@@ -84,6 +84,7 @@ INSTALLED_APPS = [
     "itou.asp",
     "itou.employee_record",
     "itou.siae_evaluations",
+    "itou.geiq",
     "itou.geo",
     "itou.www.apply",
     "itou.www.approvals_views",

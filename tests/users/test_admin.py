@@ -84,9 +84,11 @@ def test_get_fields_to_transfer_for_job_seekers():
         "prolongations_updated",  # Prolongation.updated_by
         "prolongations_validated",  # Prolongation.validated_by
         "reactivated_siae_convention_set",  # SiaeConvention.reactivated_by
+        "reviewed_geiq_assessment_set",  # ImplementationAssessment.reviewed_by
         "company_invitations",  # EmployerInvitation.sender
         "companymembership",  # CompanyMembership.user
         "socialaccount",  # allauth.socialaccount.models.SocialAccount.user
+        "submitted_geiq_assessment_set",  # ImplementationAssessment.submitted_by
         "suspension",  # Suspension.updated_by
         "updated_institutionmembership_set",  # InstitutionMembership.updated_by
         "updated_prescribermembership_set",  # PrescriberMembership.updated_by
