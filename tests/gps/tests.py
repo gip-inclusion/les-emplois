@@ -2,7 +2,7 @@ import pytest
 from bs4 import BeautifulSoup
 from django.test.utils import override_settings
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertNotContains
+from pytest_django.asserts import assertContains
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.enums import UserKind
@@ -191,41 +191,6 @@ def test_access_as_jobseeker(client):
 
     response = client.get(reverse("gps:join_group"))
     assert response.status_code == 302
-
-
-@override_settings(GPS_ENABLED=True, TALLY_URL="https://hello-tally.so")
-def test_access_gps_enabled(client):
-    user = PrescriberFactory(membership=True)
-    client.force_login(user)
-
-    response = client.get(reverse("gps:my_groups"))
-    assert response.status_code == 200
-
-    response = client.get(reverse("gps:join_group"))
-    assert response.status_code == 200
-
-    response = client.get(reverse("dashboard:index"))
-    assertContains(response, "gps-card")
-
-    user = JobSeekerWithAddressFactory()
-    client.force_login(user)
-    response = client.get(reverse("dashboard:index"))
-    assertNotContains(response, "gps-card")
-
-
-@override_settings(GPS_ENABLED=False)
-def test_access_gps_disabled(client):
-    user = PrescriberFactory(membership=True)
-    client.force_login(user)
-
-    response = client.get(reverse("gps:my_groups"))
-    assert response.status_code == 403
-
-    response = client.get(reverse("gps:join_group"))
-    assert response.status_code == 403
-
-    response = client.get(reverse("dashboard:index"))
-    assertNotContains(response, "gps-card")
 
 
 def test_leave_group(client):
