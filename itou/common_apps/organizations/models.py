@@ -3,6 +3,7 @@ import uuid
 from django.conf import settings
 from django.db import models
 from django.db.models import Prefetch, Q
+from django.forms import ValidationError
 from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
@@ -65,10 +66,14 @@ class OrganizationAbstract(models.Model):
     def has_admin(self, user):
         return self.active_admin_members.filter(pk=user.pk).exists()
 
-    def add_member(self, user):
-        is_admin = self.members.count() == 0
-        membership = self.memberships.create(user=user, is_admin=is_admin)
-        membership.save()
+    def add_or_activate_member(self, user):
+        """Add user to organization members, or activate membership if already there"""
+
+        updated = self.memberships.filter(user=user).update(is_active=True)
+        if not updated:
+            # There was no membership with this user
+            is_admin = not self.members.exists()
+            self.memberships.create(user=user, is_admin=is_admin)
 
     @property
     def active_members(self):
@@ -241,3 +246,12 @@ class MembershipAbstract(models.Model):
     def set_admin_role(self, is_admin, updated_by):
         self.is_admin = is_admin
         self.updated_by = updated_by
+
+    def clean(self, *args, **kwargs):
+        super().clean()
+        if self.user.kind != self.user_kind:
+            raise ValidationError(f"L'utilisateur d'un {self.__class__.__name__} doit être {self.user_kind.label}")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        return super().save(*args, **kwargs)

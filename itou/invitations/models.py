@@ -181,14 +181,8 @@ class PrescriberWithOrgInvitation(InvitationAbstract):
 
     def add_invited_user_to_organization(self):
         user = User.objects.get(email=self.email)
-        self.organization.members.add(user)
+        self.organization.add_or_activate_member(user)
         user.save()
-        # We must be able to invite a former member of this prescriber organization
-        # however `members.add()` does not update membership status if it already exists
-        if user not in self.organization.active_members:
-            membership = user.prescribermembership_set.get(is_active=False, organization=self.organization)
-            membership.is_active = True
-            membership.save()
 
     def guest_can_join_organization(self, request):
         user = get_object_or_404(User, email=self.email)
@@ -254,14 +248,8 @@ class EmployerInvitation(InvitationAbstract):
 
     def add_invited_user_to_company(self):
         user = User.objects.get(email=self.email)
-        self.company.members.add(user)
+        self.company.add_or_activate_member(user)
         user.save()
-        # We must be able to invite a former member of this company
-        # however `members.add()` does not update membership status if it already exists
-        if user not in self.company.active_members:
-            membership = user.companymembership_set.get(is_active=False, company=self.company)
-            membership.is_active = True
-            membership.save()
 
     def guest_can_join_company(self, request):
         user = get_object_or_404(User, email=self.email)
@@ -332,14 +320,8 @@ class LaborInspectorInvitation(InvitationAbstract):
 
     def add_invited_user_to_institution(self):
         user = User.objects.get(email=self.email)
-        self.institution.members.add(user)
+        self.institution.add_or_activate_member(user)
         user.save()
-        # We must be able to invite a former member of this institution
-        # however `members.add()` does not update membership status if it already exists
-        if user not in self.institution.active_members:
-            membership = user.institutionmembership_set.get(is_active=False, institution=self.institution)
-            membership.is_active = True
-            membership.save()
 
     def guest_can_join_institution(self, request):
         user = get_object_or_404(User, email=self.email)

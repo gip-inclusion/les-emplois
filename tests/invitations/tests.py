@@ -100,7 +100,7 @@ class InvitationEmailsTest(SimpleTestCase):
 
 
 class TestPrescriberWithOrgInvitation(TestCase):
-    def test_add_member_to_organization(self):
+    def test_add_or_activate_member_to_organization(self):
         invitation = PrescriberWithOrgSentInvitationFactory(email="hey@you.com")
         PrescriberFactory(email=invitation.email)
         org_members = invitation.organization.members.count()
@@ -158,7 +158,7 @@ class TestPrescriberWithOrgInvitationEmails(SimpleTestCase):
 
 
 class TestCompanyInvitation(TestCase):
-    def test_add_member_to_company(self):
+    def test_add_or_activate_member_to_company(self):
         invitation = SentEmployerInvitationFactory(email="hey@you.com")
         EmployerFactory(email=invitation.email)
         employers = invitation.company.members.count()

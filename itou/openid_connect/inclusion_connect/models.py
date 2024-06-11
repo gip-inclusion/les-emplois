@@ -33,7 +33,7 @@ class InclusionConnectPrescriberData(OIDConnectUserData):
             logger.info(f"Organization with SAFIR {safir} does not exist. Unable to add user {user.id}.")
             raise
         if not organization.has_member(user):
-            organization.add_member(user)
+            organization.add_or_activate_member(user)
 
 
 @dataclasses.dataclass

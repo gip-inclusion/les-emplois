@@ -14,6 +14,7 @@ from django.db import models
 from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 from itou.institutions.enums import InstitutionKind
+from itou.users.enums import UserKind
 
 
 class Institution(AddressMixin, OrganizationAbstract):
@@ -37,6 +38,8 @@ class Institution(AddressMixin, OrganizationAbstract):
 
 class InstitutionMembership(MembershipAbstract):
     """Intermediary model between `User` and `Institution`."""
+
+    user_kind = UserKind.LABOR_INSPECTOR
 
     institution = models.ForeignKey(Institution, on_delete=models.CASCADE)
     updated_by = models.ForeignKey(
