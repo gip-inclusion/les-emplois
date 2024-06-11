@@ -8,6 +8,10 @@
 {% block content_title %}
     <h1 class="mb-0">Inscription</h1>
     <p>Prescripteur/Orienteur</p>
+{% endblock %}
+
+{% block messages %}
+    {{ block.super }}
     <div class="alert alert-info">
         <p class="m-0">
             <strong>Votre organisation est-elle déjà inscrite ?</strong> <a href="{% url 'signup:prescriber_pole_emploi_safir_code' %}">Je travaille pour France Travail</a>
