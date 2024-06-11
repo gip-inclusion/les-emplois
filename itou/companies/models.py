@@ -23,6 +23,7 @@ from itou.companies.enums import (
     JobDescriptionSource,
     JobSource,
 )
+from itou.users.enums import UserKind
 from itou.utils.emails import get_email_message
 from itou.utils.tokens import company_signup_token_generator
 from itou.utils.urls import get_absolute_url, get_tally_form_url
@@ -489,6 +490,8 @@ class Company(AddressMixin, OrganizationAbstract):
 
 class CompanyMembership(MembershipAbstract):
     """Intermediary model between `User` and `Company`."""
+
+    user_kind = UserKind.EMPLOYER
 
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     updated_by = models.ForeignKey(

@@ -16,6 +16,7 @@ from itou.prescribers.enums import (
     PrescriberAuthorizationStatus,
     PrescriberOrganizationKind,
 )
+from itou.users.enums import UserKind
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url, get_tally_form_url
 from itou.utils.validators import validate_code_safir, validate_siret
@@ -336,6 +337,8 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
 
 class PrescriberMembership(MembershipAbstract):
     """Intermediary model between `User` and `PrescriberOrganization`."""
+
+    user_kind = UserKind.PRESCRIBER
 
     organization = models.ForeignKey(PrescriberOrganization, on_delete=models.CASCADE)
     updated_by = models.ForeignKey(

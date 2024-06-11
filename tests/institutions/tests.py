@@ -1,13 +1,16 @@
+import pytest
+from django.forms import ValidationError
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects
 
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.institutions.factories import (
+    InstitutionFactory,
     InstitutionMembershipFactory,
     InstitutionWith2MembershipFactory,
     InstitutionWithMembershipFactory,
 )
-from tests.users.factories import LaborInspectorFactory
+from tests.users.factories import LaborInspectorFactory, PrescriberFactory
 from tests.utils.test import TestCase
 
 
@@ -42,6 +45,28 @@ class InstitutionModelTest(TestCase):
         active_user_with_active_membership.save()
 
         assert active_user_with_active_membership not in institution.active_members
+
+    def test_add_or_activate_member(self):
+        institution = InstitutionFactory()
+        assert 0 == institution.members.count()
+        admin_user = LaborInspectorFactory()
+        institution.add_or_activate_member(admin_user)
+        assert 1 == institution.memberships.count()
+        assert institution.memberships.get(user=admin_user).is_admin
+
+        other_user = LaborInspectorFactory()
+        institution.add_or_activate_member(other_user)
+        assert 2 == institution.memberships.count()
+        assert not institution.memberships.get(user=other_user).is_admin
+        assert institution.memberships.get(user=other_user).is_active
+
+        institution.memberships.filter(user=other_user).update(is_active=False)
+        institution.add_or_activate_member(other_user)
+        assert institution.memberships.get(user=other_user).is_active
+
+        wrong_kind_user = PrescriberFactory()
+        with pytest.raises(ValidationError):
+            institution.add_or_activate_member(wrong_kind_user)
 
 
 def test_deactivate_last_admin(admin_client):

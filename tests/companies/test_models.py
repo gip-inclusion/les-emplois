@@ -25,7 +25,7 @@ from tests.companies.factories import (
 )
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase
 
 
@@ -61,7 +61,7 @@ class CompanyFactoriesTest(TestCase):
         assert company.active_admin_members.count() == 1
 
 
-class SiaeModelTest(TestCase):
+class CompanyModelTest(TestCase):
     def test_accept_survey_url(self):
         company = CompanyFactory(kind=CompanyKind.EI, department="57")
         url = company.accept_survey_url
@@ -247,6 +247,27 @@ class SiaeModelTest(TestCase):
         assert not company.is_opcs
         company.kind = CompanyKind.OPCS
         assert company.is_opcs
+
+    def test_add_or_activate_member(self):
+        company = CompanyFactory()
+        assert 0 == company.members.count()
+        admin_user = EmployerFactory()
+        company.add_or_activate_member(admin_user)
+        assert 1 == company.memberships.count()
+        assert company.memberships.get(user=admin_user).is_admin
+
+        other_user = EmployerFactory()
+        company.add_or_activate_member(other_user)
+        assert 2 == company.memberships.count()
+        assert not company.memberships.get(user=other_user).is_admin
+
+        company.memberships.filter(user=other_user).update(is_active=False)
+        company.add_or_activate_member(other_user)
+        assert company.memberships.get(user=other_user).is_active
+
+        non_employer = PrescriberFactory()
+        with pytest.raises(ValidationError):
+            company.add_or_activate_member(non_employer)
 
 
 class SiaeQuerySetTest(TestCase):
