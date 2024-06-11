@@ -8,35 +8,6 @@
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block messages %}
-    {{ block.super }}
-    {% if export_for == "siae" or can_view_stats_pe %}
-        <div class="alert alert-info mt-3" id="besoin-dun-chiffre">
-            <p>
-                <i class="ri-information-line me-1" aria-hidden="true"></i>
-                <b>Besoin d'un chiffre ?</b>
-            </p>
-            {% if export_for == "siae" %}
-                <p class="mb-0">
-                    Accédez aux <a href="{% url 'stats:stats_siae_hiring' %}"  target="_blank" rel="noopener">données de recrutement de votre structure</a> (non nominatives) compilées, calculées et mises à jour quotidiennement.
-                </p>
-            {% elif export_for == "prescriptions" and can_view_stats_pe %}
-                <p class="mb-0">
-                    Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
-                </p>
-                <ul class="mb-0">
-                    <li>
-                        <a href="{% url 'stats:stats_pe_state_main' %}"  target="_blank" rel="noopener">Voir les données de l'ensemble de l'état des candidatures orientées</a>
-                    </li>
-                    <li>
-                        <a href="{% url 'stats:stats_pe_conversion_main' %}"  target="_blank" rel="noopener">Voir les données du taux de transformation des candidatures</a>
-                    </li>
-                </ul>
-            {% endif %}
-        </div>
-    {% endif %}
-{% endblock %}
-
 {% block content_title %}
     <h1>
         Exporter les candidatures
@@ -54,6 +25,30 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
+                    {% if export_for == "siae" or can_view_stats_pe %}
+                        <div class="c-info mb-3 mb-md-4" id="besoin-dun-chiffre">
+                            <button class="c-info__summary collapsed" data-bs-toggle="collapse" data-bs-target="#collapseBesoinChiffre" aria-expanded="false" aria-controls="collapseBesoinChiffre">
+                                <span>Besoin d'un chiffre ?</span>
+                            </button>
+                            {% if export_for == "siae" %}
+                                <div id="collapseBesoinChiffre" class="c-info__detail collapse">
+                                    Accédez aux <a href="{% url 'stats:stats_siae_hiring' %}"  target="_blank" rel="noopener">données de recrutement de votre structure</a> (non nominatives) compilées, calculées et mises à jour quotidiennement.
+                                </div>
+                            {% elif export_for == "prescriptions" and can_view_stats_pe %}
+                                <div id="collapseBesoinChiffre" class="c-info__detail collapse">
+                                    Accédez aux données de votre agence (non nominatives) compilées, calculées et mises à jour quotidiennement :
+                                    <ul class="mb-0">
+                                        <li>
+                                            <a href="{% url 'stats:stats_pe_state_main' %}"  target="_blank" rel="noopener">Voir les données de l'ensemble de l'état des candidatures orientées</a>
+                                        </li>
+                                        <li>
+                                            <a href="{% url 'stats:stats_pe_conversion_main' %}"  target="_blank" rel="noopener">Voir les données du taux de transformation des candidatures</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                     {% if not job_applications_by_month %}
                         <h2 class="h4">Aucune candidature pour le moment.</h2>
                     {% else %}
