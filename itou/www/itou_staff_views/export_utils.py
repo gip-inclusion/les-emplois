@@ -193,7 +193,7 @@ def get_org(membership):
 cta_export_spec = {
     "Utilisateur - type": (
         lambda membership: "Employeur"
-        if membership.user.is_employer
+        if hasattr(membership, "company")
         else ("Prescripteur habitité" if membership.organization.is_authorized else "Orienteur")
     ),
     "Structure - type": lambda membership: get_org(membership).kind,

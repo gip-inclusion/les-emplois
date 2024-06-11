@@ -183,9 +183,9 @@ def export_cta(request):
 
     def content():
         yield cta_export_spec.keys()
-        for employee in employees_qs:
+        for employee in employees_qs.iterator():
             yield export_row(cta_export_spec, employee)
-        for prescriber in prescribers_qs:
+        for prescriber in prescribers_qs.iterator():
             yield export_row(cta_export_spec, prescriber)
 
     writer = csv.writer(Echo())
