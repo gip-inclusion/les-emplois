@@ -7,13 +7,6 @@
     <h2>{{ prescriber_org.display_name }}</h2>
 {% endblock %}
 
-{% block messages %}
-    {{ block.super }}
-    <div class="alert alert-info">
-        <p class="mb-0">Seuls les administrateurs peuvent voir cette liste.</p>
-    </div>
-{% endblock %}
-
 {% block breadcrumbs %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
@@ -23,6 +16,9 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
+                    <div class="c-info mb-3 mb-md-4">
+                        <span class="c-info__summary">Seuls les administrateurs peuvent voir cette liste.</span>
+                    </div>
                     {% if not accredited_orgs %}
                         <div class="alert alert-emploi" role="status">
                             <p class="mb-0">Aucun résultat.</p>
