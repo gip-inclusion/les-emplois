@@ -252,11 +252,27 @@ class JobSeekerSignupTest(TestCase):
         # Confirm email + auto login.
         confirmation_token = EmailConfirmationHMAC(user_email).key
         confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
-        response = self.client.post(confirm_email_url)
-        assert response.status_code == 302
-        assert response.url == reverse("welcoming_tour:index")
+        # User clicks on the confirm link in the email, that is a GET request.
+        response = self.client.get(confirm_email_url)
+        self.assertRedirects(response, reverse("welcoming_tour:index"))
         user_email = user.emailaddress_set.first()
         assert user_email.verified
+
+        response = self.client.get(confirm_email_url)
+        # Uses the custom template to display errors.
+        self.assertContains(
+            response,
+            f"""
+            <div class="alert alert-danger">
+                <p>Ce lien de confirmation d'adresse e-mail a expiré ou n'est pas valide.</p>
+                <p class="mb-0">
+                Veuillez lancer <a href="{reverse('account_email')}">une nouvelle demande de confirmation</a>.
+                </p>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
 
     def test_job_seeker_signup_with_existing_email(self):
         JobSeekerFactory(email="alice@evil.com")
