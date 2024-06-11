@@ -437,7 +437,7 @@ STATS_PH_PRESCRIPTION_REGION_WHITELIST = ["Pays de la Loire", "Nouvelle-Aquitain
 SLACK_CRON_WEBHOOK_URL = os.getenv("SLACK_CRON_WEBHOOK_URL")
 
 # Production instances (`PROD`, `DEMO`, `FAST-MACHINE`, ...) share the same redis but different DB
-redis_url = os.getenv("REDIS_URL")
+redis_url = os.getenv("REDIS_URL", "redis://127.0.0.1:6379")
 redis_db = os.getenv("REDIS_DB")
 redis_django_settings = {
     "LOCATION": redis_url,
