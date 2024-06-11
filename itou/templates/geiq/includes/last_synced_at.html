@@ -1,0 +1,8 @@
+<p id="label-last-synced-at">
+    Dernière synchronisation: {{ assessment.last_synced_at|default:"-" }}
+    {% if allow_sync and not assessment.submitted_at %}
+        <button class="btn" type="button" hx-post="{% url "geiq:label_sync" assessment_pk=assessment.pk %}" hx-include="#label-sync-form" hx-swap="outerHTML" hx-target="#label-last-synced-at">
+            Mettre à jour
+        </button>
+    {% endif %}
+</p>

@@ -1,0 +1,311 @@
+{% extends "layout/base.html" %}
+{% load format_filters %}
+
+{% block title %}Mes salariés - {{ request.current_organization.display_name }} {{ block.super }}{% endblock %}
+
+{% block breadcrumbs %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block content_title %}
+    <h1>Mes salariés - {{ request.current_organization.display_name }} - {{ employee.assessment.campaign.year }}</h1>
+    <p>Dernière mise à jour: {{ employee.assessment.last_synced_at|default:"-" }}</p>
+    <h2>{{ employee.get_full_name }}</h2>
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="c-box mb-2">
+                        <h3>Informations employé</h3>
+
+                        <ul class="list-data list-data__two-column-md mb-3">
+                            <li>
+                                <small>Nom de famille</small>
+                                <strong>{{ employee.last_name }}</strong>
+                            </li>
+                            <li>
+                                <small>Prénom</small>
+                                <strong>{{ employee.first_name }}</strong>
+                            </li>
+                            <li>
+                                <small>Date de naissance</small>
+                                <strong>{{ employee.birthdate|date:"d/m/Y" }}</strong>
+                            </li>
+                            <li>
+                                <small>Sexe</small>
+                                <strong>
+                                    {% if employee.title == "MME" %}
+                                        F
+                                    {% elif employee.title == "M" %}
+                                        H
+                                    {% endif %}
+                                </strong>
+                            </li>
+                        </ul>
+                        <hr>
+                        <ul class="list-data list-data__two-column-md mb-3">
+                            <li>
+                                <small>Niveau de qualification</small>
+                                <strong>{{ employee.other_data.qualification|label_object_format }}</strong>
+                            </li>
+                            <li>
+                                <small>Titulaire d’un bac général</small>
+                                <strong>{{ employee.other_data.is_bac_general|yesno:"Oui,Non" }}</strong>
+                            </li>
+                            <li>
+                                <small>Prescripteur</small>
+                                <strong>{{ employee.other_data.prescripteur|label_object_format }}</strong>
+                            </li>
+                            <li>
+                                <small>Autre prescripteur</small>
+                                <strong>{{ employee.other_data.prescripteur_autre|default:"-" }}</strong>
+                            </li>
+                            <li>
+                                <small>Critères public prioritaire</small>
+                                <strong>
+                                    <ul>
+                                        {% for item in employee.other_data.statuts_prioritaire %}<li>{{ item|label_object_format }}</li>{% endfor %}
+                                    </ul>
+                                </strong>
+                            </li>
+                            <li>
+                                <small>Précisions critères public prioritaire</small>
+                                <strong>{{ employee.other_data.precision_status_prio|default:"-" }}</strong>
+                            </li>
+                            <li>
+                                <small>Nombre de jours d’accompagnement en {{ employee.assessment.campaign.year }}</small>
+                                <strong>{{ employee.support_days_nb }}</strong>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <h3>Contrats</h3>
+                </div>
+            </div>
+            {% for contract in contracts %}
+                <div class="row">
+                    <div class="col-12">
+                        <div class="c-box mb-2">
+                            <ul class="list-data list-data__two-column-md mb-3">
+                                <li>
+                                    <small>Date de début</small>
+                                    <strong>{{ contract.start_at|date:"d/m/Y" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Date de fin prévisionnelle</small>
+                                    <strong>{{ contract.planned_end_at|date:"d/m/Y" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Date de fin</small>
+                                    <strong>{{ contract.end_at|date:"d/m/Y"|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Type de rupture anticipée</small>
+                                    <strong>{{ contract.other_data.rupture|yesno:"Hors période d’essai,En période d’essai,-" }}</strong>
+                                </li>
+                            </ul>
+                            <hr>
+                            <ul class="list-data list-data__two-column-md mb-3">
+                                <li>
+                                    <small>Nature du contrat</small>
+                                    <strong>{{ contract.other_data.nature_contrat|label_object_format }}</strong>
+                                </li>
+                                <li>
+                                    <small>Détail sur la nature du contrat</small>
+                                    <strong>{{ contract.other_data.nature_contrat_precision|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Précision sur la nature du contrat</small>
+                                    <strong>{{ contract.other_data.nature_contrat_autre_precision|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Temps plein</small>
+                                    <strong>{{ contract.other_data.is_temps_plein|yesno:"Oui,Non" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Raison de signature d’un contrat hors alternance</small>
+                                    <strong>{{ contract.other_data.hors_alternance_precision|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Contrat professionnel expérimental</small>
+                                    <strong>{{ contract.other_data.is_contrat_pro_experimental|yesno:"Oui,Non,-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Accompagnement avant contrat</small>
+                                    <strong>{{ contract.other_data.accompagnement_avant_contrat|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Accompagnement après contrat</small>
+                                    <strong>{{ contract.other_data.accompagnement_apres_contrat|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Contrat signé dans le cadre d’une clause d’insertion</small>
+                                    <strong>{{ contract.other_data.signer_cadre_clause_insertion|yesno:"Oui,Non,-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Rémunération supérieure aux minima réglementaires</small>
+                                    <strong>{{ contract.other_data.is_remuneration_superieur_minima|yesno:"Oui,Non,-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Durée hebdomadaire</small>
+                                    <strong>{{ contract.other_data.nb_heure_hebdo|formatfloat_with_unit:"h"|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Secteur d’activité</small>
+                                    <strong>{{ contract.other_data.secteur_activite|label_object_format }}</strong>
+                                </li>
+                                <li>
+                                    <small>Multi mises à disposition</small>
+                                    <strong>{{ contract.other_data.is_multi_mad|yesno:"Oui,Non" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Nombre d’entreprises</small>
+                                    <strong>{{ contract.other_data.mad_nb_entreprises|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Métier préparé</small>
+                                    <strong>{{ contract.other_data.metier_prepare|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Métier correspondant</small>
+                                    <strong>{{ contract.other_data.metier_correspondant|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Emploi de sortie</small>
+                                    <strong>{{ contract.other_data.emploi_sorti|label_object_format }}</strong>
+                                </li>
+                                <li>
+                                    <small>Précision sur l’emploi de sortie</small>
+                                    <strong>{{ contract.other_data.emploi_sorti_precision|label_object_format }}</strong>
+                                </li>
+                                <li>
+                                    <small>Détail sur l’emploi de sortie</small>
+                                    <strong>{{ contract.other_data.emploi_sorti_precision_text|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>CDD/CDI refusé</small>
+                                    <strong>{{ contract.other_data.is_refus_cdd_cdi|yesno:"Oui,Non" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Heures de suivi de l’évaluation des compétences prévues</small>
+                                    <strong>{{ contract.other_data.heures_suivi_evaluation_competences_geiq_prevues|formatfloat_with_unit:"h"|default:"-" }}</strong>
+                                </li>
+                            </ul>
+                            <hr>
+                            <ul class="list-data list-data__two-column-md mb-3">
+                                <li>
+                                    <small>Modalité de formation</small>
+                                    <strong>{{ contract.other_data.modalite_formation|label_object_format }}</strong>
+                                </li>
+                                <li>
+                                    <small>Nom de l’organisme de formation</small>
+                                    <strong>{{ contract.other_data.organisme_formation|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Formation complémentaire</small>
+                                    <strong>{{ contract.other_data.formation_complementaire|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Formation complémentaire prévue</small>
+                                    <strong>{{ contract.other_data.formation_complementaire_prevue|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Heures de formation prévues</small>
+                                    <strong>{{ contract.other_data.heures_formation_prevue|formatfloat_with_unit:"h"|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Heures de formation réalisées</small>
+                                    <strong>{{ contract.other_data.heures_formation_realisee|formatfloat_with_unit:"h"|default:"-" }}</strong>
+                                </li>
+                            </ul>
+                            <hr>
+                            <ul class="list-data list-data__two-column-md mb-3">
+                                <li>
+                                    <small>Qualification visée</small>
+                                    <strong>{{ contract.other_data.qualification_visee|label_object_format }}</strong>
+                                </li>
+                                <li>
+                                    <small>Type de qualification visé</small>
+                                    <strong>{{ contract.other_data.type_qualification_visee|label_object_format }}</strong>
+                                </li>
+                                <li>
+                                    <small>Niveau de qualification obtenue</small>
+                                    <strong>{{ contract.other_data.qualification_obtenu|label_object_format|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Type de qualification obtenu</small>
+                                    <strong>{{ contract.other_data.type_qualification_obtenu|label_object_format }}</strong>
+                                </li>
+                                <li>
+                                    <small>Qualification obtenue</small>
+                                    <strong>{{ contract.other_data.is_qualification_obtenue|yesno:"Oui,Non,-" }}</strong>
+                                </li>
+                            </ul>
+                            <hr>
+                            <ul class="list-data list-data__two-column-md mb-3">
+                                <li>
+                                    <small>Mise en situation professionnelle</small>
+                                    <strong>{{ contract.other_data.mise_en_situation_professionnelle_bool|yesno:"Oui,Non,-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Type de mise en situation professionnelle</small>
+                                    <strong>{{ contract.other_data.mise_en_situation_professionnelle|label_object_format }}</strong>
+                                </li>
+                                <li>
+                                    <small>Détail sur la mise en situation professionnelle</small>
+                                    <strong>{{ contract.other_data.mise_en_situation_professionnelle_precision|default:"-" }}</strong>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="row">
+                <div class="col-12">
+                    <h3>Préqualifications</h3>
+                    {% if not prequalifications %}<p>Aucune préqualification</p>{% endif %}
+                </div>
+            </div>
+            {% for prequalification in prequalifications %}
+                <div class="row">
+                    <div class="col-12">
+                        <div class="c-box mb-2">
+                            <ul class="list-data list-data__two-column-md mb-3">
+                                <li>
+                                    <small>Date de début</small>
+                                    <strong>{{ prequalification.start_at|date:"d/m/Y" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Date de fin</small>
+                                    <strong>{{ prequalification.end_at|date:"d/m/Y" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Type</small>
+                                    <strong>{{ prequalification.other_data.action_pre_qualification|label_object_format }}</strong>
+                                </li>
+                                <li>
+                                    <small>Autre type</small>
+                                    <strong>{{ prequalification.other_data.autre_type_prequalification_action|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Heures de formation</small>
+                                    <strong>{{ prequalification.other_data.nombre_heure_formation|formatfloat_with_unit:"h"|default:"-" }}</strong>
+                                </li>
+                                <li>
+                                    <small>Informations complémentaires</small>
+                                    <strong>{{ prequalification.other_data.information_complementaire_contrat|default:"-" }}</strong>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}

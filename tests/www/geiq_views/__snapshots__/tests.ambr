@@ -1,0 +1,3210 @@
+# serializer version: 1
+# name: test_employee_list_and_details[detailed info of Jean PIERRE]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12">
+                      <div class="c-box mb-2">
+                          <h3>Informations employé</h3>
+  
+                          <ul class="list-data list-data__two-column-md mb-3">
+                              <li>
+                                  <small>Nom de famille</small>
+                                  <strong>PIERRE</strong>
+                              </li>
+                              <li>
+                                  <small>Prénom</small>
+                                  <strong>Jean</strong>
+                              </li>
+                              <li>
+                                  <small>Date de naissance</small>
+                                  <strong>02/01/2000</strong>
+                              </li>
+                              <li>
+                                  <small>Sexe</small>
+                                  <strong>
+                                      
+                                          H
+                                      
+                                  </strong>
+                              </li>
+                          </ul>
+                          <hr/>
+                          <ul class="list-data list-data__two-column-md mb-3">
+                              <li>
+                                  <small>Niveau de qualification</small>
+                                  <strong>{'libelle': 'Sans qualification'}</strong>
+                              </li>
+                              <li>
+                                  <small>Titulaire d’un bac général</small>
+                                  <strong>Non</strong>
+                              </li>
+                              <li>
+                                  <small>Prescripteur</small>
+                                  <strong>{'libelle': 'Cap Emploi'}</strong>
+                              </li>
+                              <li>
+                                  <small>Autre prescripteur</small>
+                                  <strong>-</strong>
+                              </li>
+                              <li>
+                                  <small>Critères public prioritaire</small>
+                                  <strong>
+                                      <ul>
+                                          
+                                      </ul>
+                                  </strong>
+                              </li>
+                              <li>
+                                  <small>Précisions critères public prioritaire</small>
+                                  <strong>-</strong>
+                              </li>
+                              <li>
+                                  <small>Nombre de jours d’accompagnement en 2023</small>
+                                  <strong>10</strong>
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-12">
+                      <h3>Contrats</h3>
+                  </div>
+              </div>
+              
+              <div class="row">
+                  <div class="col-12">
+                      <h3>Préqualifications</h3>
+                      <p>Aucune préqualification</p>
+                  </div>
+              </div>
+              
+          </div>
+      </section>
+  '''
+# ---
+# name: test_employee_list_and_details[employee list title for employer]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/geiq/assessment/[PK of ImplementationAssessment]">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl font-weight-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1>
+          Mes salariés - Acme inc. - 2023
+      </h1>
+      <div class="d-flex align-items-center">
+          <p class="mb-0">Dernière mise à jour: -</p>
+          
+              <form method="post">
+                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                  <button class="btn">Mise à jour</button>
+              </form>
+          
+      </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: test_employee_list_and_details[employee list title for labor_inspector]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/geiq/assessment/[PK of ImplementationAssessment]">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl font-weight-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1>
+          Données salariés - Acme inc. - 2023
+      </h1>
+      <div class="d-flex align-items-center">
+          <p class="mb-0">Dernière mise à jour: -</p>
+          
+      </div>
+  
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: test_employee_list_and_details[empty employee list body - contract]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12">
+                      <div class="c-box">
+                          <h2>Indicateurs clés sur les publics prioritaires</h2>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés accompagnés</div>
+                              <div class="col text-end fw-bold">-</div>
+                              <div class="col-5">Nombre potentiel d’aides à 814 €</div>
+                              <div class="col text-end fw-bold">-</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés accompagnés plus de 90 jours sur l’année</div>
+                              <div class="col text-end fw-bold">-</div>
+                              <div class="col-5">Nombre potentiel d’aides à 1 400 €</div>
+                              <div class="col text-end fw-bold">-</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés éligibles à l’aide</div>
+                              <div class="col text-end fw-bold">-</div>
+                              <div class="col-5">Montant potentiel de l’aide à l’accompagnement</div>
+                              <div class="col text-end fw-bold">-</div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <hr/>
+              <div class="row">
+                  <div class="col-12">
+                      <div class="c-box container">
+                          <div class="s-tabs-01__row row">
+                              <div class="s-tabs-01__col col-12">
+                                  <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="2">
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">
+                                              Informations personnelles
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/job-application">
+                                              Candidatures
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/support">
+                                              Accompagnements
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link active" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/contract">
+                                              Contrats
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/exit">
+                                              Sorties
+                                          </a>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                          
+                              <div class="text-center my-3 my-md-4">
+                                  <p class="mb-1 mt-3">
+                                      <strong>Aucune donnée pour le moment</strong>
+                                  </p>
+                              </div>
+                          
+                          
+  
+  
+  
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_employee_list_and_details[empty employee list body - exit]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12">
+                      <div class="c-box">
+                          <h2>Indicateurs clés sur les publics prioritaires</h2>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés accompagnés</div>
+                              <div class="col text-end fw-bold">-</div>
+                              <div class="col-5">Nombre potentiel d’aides à 814 €</div>
+                              <div class="col text-end fw-bold">-</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés accompagnés plus de 90 jours sur l’année</div>
+                              <div class="col text-end fw-bold">-</div>
+                              <div class="col-5">Nombre potentiel d’aides à 1 400 €</div>
+                              <div class="col text-end fw-bold">-</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés éligibles à l’aide</div>
+                              <div class="col text-end fw-bold">-</div>
+                              <div class="col-5">Montant potentiel de l’aide à l’accompagnement</div>
+                              <div class="col text-end fw-bold">-</div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <hr/>
+              <div class="row">
+                  <div class="col-12">
+                      <div class="c-box container">
+                          <div class="s-tabs-01__row row">
+                              <div class="s-tabs-01__col col-12">
+                                  <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="2">
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">
+                                              Informations personnelles
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/job-application">
+                                              Candidatures
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/support">
+                                              Accompagnements
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/contract">
+                                              Contrats
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link active" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/exit">
+                                              Sorties
+                                          </a>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                          
+                              <div class="text-center my-3 my-md-4">
+                                  <p class="mb-1 mt-3">
+                                      <strong>Aucune donnée pour le moment</strong>
+                                  </p>
+                              </div>
+                          
+                          
+  
+  
+  
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_employee_list_and_details[empty employee list body - job-application]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12">
+                      <div class="c-box">
+                          <h2>Indicateurs clés sur les publics prioritaires</h2>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés accompagnés</div>
+                              <div class="col text-end fw-bold">-</div>
+                              <div class="col-5">Nombre potentiel d’aides à 814 €</div>
+                              <div class="col text-end fw-bold">-</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés accompagnés plus de 90 jours sur l’année</div>
+                              <div class="col text-end fw-bold">-</div>
+                              <div class="col-5">Nombre potentiel d’aides à 1 400 €</div>
+                              <div class="col text-end fw-bold">-</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés éligibles à l’aide</div>
+                              <div class="col text-end fw-bold">-</div>
+                              <div class="col-5">Montant potentiel de l’aide à l’accompagnement</div>
+                              <div class="col text-end fw-bold">-</div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <hr/>
+              <div class="row">
+                  <div class="col-12">
+                      <div class="c-box container">
+                          <div class="s-tabs-01__row row">
+                              <div class="s-tabs-01__col col-12">
+                                  <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="2">
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">
+                                              Informations personnelles
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link active" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/job-application">
+                                              Candidatures
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/support">
+                                              Accompagnements
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/contract">
+                                              Contrats
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/exit">
+                                              Sorties
+                                          </a>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                          
+                              <div class="text-center my-3 my-md-4">
+                                  <p class="mb-1 mt-3">
+                                      <strong>Aucune donnée pour le moment</strong>
+                                  </p>
+                              </div>
+                          
+                          
+  
+  
+  
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_employee_list_and_details[empty employee list body - personal-information]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12">
+                      <div class="c-box">
+                          <h2>Indicateurs clés sur les publics prioritaires</h2>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés accompagnés</div>
+                              <div class="col text-end fw-bold">-</div>
+                              <div class="col-5">Nombre potentiel d’aides à 814 €</div>
+                              <div class="col text-end fw-bold">-</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés accompagnés plus de 90 jours sur l’année</div>
+                              <div class="col text-end fw-bold">-</div>
+                              <div class="col-5">Nombre potentiel d’aides à 1 400 €</div>
+                              <div class="col text-end fw-bold">-</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés éligibles à l’aide</div>
+                              <div class="col text-end fw-bold">-</div>
+                              <div class="col-5">Montant potentiel de l’aide à l’accompagnement</div>
+                              <div class="col text-end fw-bold">-</div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <hr/>
+              <div class="row">
+                  <div class="col-12">
+                      <div class="c-box container">
+                          <div class="s-tabs-01__row row">
+                              <div class="s-tabs-01__col col-12">
+                                  <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="2">
+                                      <li class="nav-item">
+                                          <a class="nav-link active" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">
+                                              Informations personnelles
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/job-application">
+                                              Candidatures
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/support">
+                                              Accompagnements
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/contract">
+                                              Contrats
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/exit">
+                                              Sorties
+                                          </a>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                          
+                              <div class="text-center my-3 my-md-4">
+                                  <p class="mb-1 mt-3">
+                                      <strong>Aucune donnée pour le moment</strong>
+                                  </p>
+                              </div>
+                          
+                          
+  
+  
+  
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_employee_list_and_details[empty employee list body - support]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12">
+                      <div class="c-box">
+                          <h2>Indicateurs clés sur les publics prioritaires</h2>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés accompagnés</div>
+                              <div class="col text-end fw-bold">-</div>
+                              <div class="col-5">Nombre potentiel d’aides à 814 €</div>
+                              <div class="col text-end fw-bold">-</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés accompagnés plus de 90 jours sur l’année</div>
+                              <div class="col text-end fw-bold">-</div>
+                              <div class="col-5">Nombre potentiel d’aides à 1 400 €</div>
+                              <div class="col text-end fw-bold">-</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés éligibles à l’aide</div>
+                              <div class="col text-end fw-bold">-</div>
+                              <div class="col-5">Montant potentiel de l’aide à l’accompagnement</div>
+                              <div class="col text-end fw-bold">-</div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+              <hr/>
+              <div class="row">
+                  <div class="col-12">
+                      <div class="c-box container">
+                          <div class="s-tabs-01__row row">
+                              <div class="s-tabs-01__col col-12">
+                                  <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="2">
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">
+                                              Informations personnelles
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/job-application">
+                                              Candidatures
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link active" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/support">
+                                              Accompagnements
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/contract">
+                                              Contrats
+                                          </a>
+                                      </li>
+                                      <li class="nav-item">
+                                          <a class="nav-link" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/exit">
+                                              Sorties
+                                          </a>
+                                      </li>
+                                  </ul>
+                              </div>
+                          </div>
+                          
+                              <div class="text-center my-3 my-md-4">
+                                  <p class="mb-1 mt-3">
+                                      <strong>Aucune donnée pour le moment</strong>
+                                  </p>
+                              </div>
+                          
+                          
+  
+  
+  
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_employee_list_and_details[key indicators]
+  '''
+  <div class="c-box">
+                          <h2>Indicateurs clés sur les publics prioritaires</h2>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés accompagnés</div>
+                              <div class="col text-end fw-bold">4</div>
+                              <div class="col-5">Nombre potentiel d’aides à 814 €</div>
+                              <div class="col text-end fw-bold">1</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés accompagnés plus de 90 jours sur l’année</div>
+                              <div class="col text-end fw-bold">3</div>
+                              <div class="col-5">Nombre potentiel d’aides à 1 400 €</div>
+                              <div class="col text-end fw-bold">1</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-5">Nombre de salariés éligibles à l’aide</div>
+                              <div class="col text-end fw-bold">2</div>
+                              <div class="col-5">Montant potentiel de l’aide à l’accompagnement</div>
+                              <div class="col text-end fw-bold">2214 €</div>
+                          </div>
+                      </div>
+  '''
+# ---
+# name: test_employee_list_and_details[personal information]
+  '''
+  <div class="tab-content" id="result_page">
+          <div class="table-responsive-lg mt-3 mt-md-4">
+              <table class="table">
+                  <caption class="visually-hidden">Liste des personnes</caption>
+                  <thead>
+                      <tr>
+                          <th scope="col">Nom Prénom</th>
+                          <th scope="col">Date de naissance</th>
+                          <th scope="col">Sexe</th>
+                          <th scope="col">Niveau de qualification</th>
+                          <th scope="col">Commune de résidence</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      
+                          <tr>
+                              <td>
+                                  <a href="/geiq/assessment/employee/4?back_url=/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Rachida DIHINTRUC</a>
+                              </td>
+                              <td>06/05/1997</td>
+                              <td>
+                                  
+                                      F
+                                  
+                              </td>
+                              <td>-</td>
+                              <td>-</td>
+                          </tr>
+                      
+                          <tr>
+                              <td>
+                                  <a href="/geiq/assessment/employee/3?back_url=/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Thomas LAPOTRE</a>
+                              </td>
+                              <td>05/04/1998</td>
+                              <td>
+                                  
+                                      H
+                                  
+                              </td>
+                              <td>Niveau 5 ou + (Bac+2 ou +)</td>
+                              <td>-</td>
+                          </tr>
+                      
+                          <tr>
+                              <td>
+                                  <a href="/geiq/assessment/employee/1?back_url=/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Jean PIERRE</a>
+                              </td>
+                              <td>02/01/2000</td>
+                              <td>
+                                  
+                                      H
+                                  
+                              </td>
+                              <td>Sans qualification</td>
+                              <td>-</td>
+                          </tr>
+                      
+                          <tr>
+                              <td>
+                                  <a href="/geiq/assessment/employee/2?back_url=/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Jacqueline SNOW</a>
+                              </td>
+                              <td>04/03/1999</td>
+                              <td>
+                                  
+                                      F
+                                  
+                              </td>
+                              <td>Niveau 3 (CAP, BEP)</td>
+                              <td>Saint-Brieuc</td>
+                          </tr>
+                      
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  '''
+# ---
+# name: test_geiq_list_snapshots[different states list]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12">
+                      <div class="c-box container">
+                          <div class="s-tabs-01__row row">
+                              
+                                  <div class="tab-content" id="result_page">
+                                      <div class="table-responsive-lg mt-3 mt-md-4">
+                                          <table class="table">
+                                              <caption class="visually-hidden">Liste des GEIQ</caption>
+                                              <thead>
+                                                  <tr>
+                                                      <th scope="col">Statut du bilan</th>
+                                                      <th scope="col">Nom</th>
+                                                      <th scope="col">Commune</th>
+                                                      <th scope="col">Dernier bilan</th>
+                                                      <th scope="col">Salariés éligibles à l’aide</th>
+                                                      <th scope="col">Financement accordé</th>
+                                                  </tr>
+                                              </thead>
+                                              <tbody>
+                                                  
+                                                      <tr>
+                                                          <td>
+                                                              
+      <span class="badge badge-sm rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
+  
+  
+                                                          </td>
+                                                          <td>
+                                                              <a href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine accepted</a>
+                                                          </td>
+                                                          <td>Rennes</td>
+                                                          <td>2023</td>
+                                                          <td>1</td>
+                                                          <td>
+                                                              
+                                                                  <span class="text-success">100%</span>
+                                                              
+                                                          </td>
+                                                      </tr>
+                                                  
+                                                      <tr>
+                                                          <td>
+                                                              
+      <span class="badge badge-sm rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
+  
+  
+                                                          </td>
+                                                          <td>
+                                                              <a href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine full_refund</a>
+                                                          </td>
+                                                          <td>Rennes</td>
+                                                          <td>2023</td>
+                                                          <td>5</td>
+                                                          <td>
+                                                              
+                                                                  <span class="text-danger">0%</span>
+                                                              
+                                                          </td>
+                                                      </tr>
+                                                  
+                                                      <tr>
+                                                          <td>
+                                                              
+      <span class="badge badge-sm rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
+  
+  
+                                                          </td>
+                                                          <td>
+                                                              <a href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine partial_accepted</a>
+                                                          </td>
+                                                          <td>Rennes</td>
+                                                          <td>2023</td>
+                                                          <td>2</td>
+                                                          <td>
+                                                              
+                                                                  <span class="text-success">&gt;75%</span>
+                                                              
+                                                          </td>
+                                                      </tr>
+                                                  
+                                                      <tr>
+                                                          <td>
+                                                              
+      <span class="badge badge-sm rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
+  
+  
+                                                          </td>
+                                                          <td>
+                                                              <a href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine partial_refund</a>
+                                                          </td>
+                                                          <td>Rennes</td>
+                                                          <td>2023</td>
+                                                          <td>4</td>
+                                                          <td>
+                                                              
+                                                                  <span class="text-warning">&lt;75%</span>
+                                                              
+                                                          </td>
+                                                      </tr>
+                                                  
+                                                      <tr>
+                                                          <td>
+                                                              
+      <span class="badge badge-sm rounded-pill text-nowrap bg-success"><i class="ri-check-line"></i>Validé</span>
+  
+  
+                                                          </td>
+                                                          <td>
+                                                              <a href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq d’ille-et-vilaine remainder_refused</a>
+                                                          </td>
+                                                          <td>Rennes</td>
+                                                          <td>2023</td>
+                                                          <td>3</td>
+                                                          <td>
+                                                              
+                                                                  <span class="text-warning">75%</span>
+  
+                                                              
+                                                          </td>
+                                                      </tr>
+                                                  
+                                                      <tr>
+                                                          <td>
+                                                              
+      <span class="badge badge-sm rounded-pill text-nowrap bg-info"><i class="ri-loader-2-line"></i>À valider</span>
+  
+  
+                                                          </td>
+                                                          <td>
+                                                              <a href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq du finistère avec bilan transmis</a>
+                                                          </td>
+                                                          <td>Porspoder</td>
+                                                          <td>2023</td>
+                                                          <td>0</td>
+                                                          <td>
+                                                              
+                                                                  -
+                                                              
+                                                          </td>
+                                                      </tr>
+                                                  
+                                                      <tr>
+                                                          <td>
+                                                              
+      <span class="badge badge-sm rounded-pill text-nowrap bg-warning"><i class="ri-close-line"></i>En attente</span>
+  
+  
+                                                          </td>
+                                                          <td>
+                                                              <a href="/geiq/assessment/[PK of ImplementationAssessment]">Geiq du morbihan</a>
+                                                          </td>
+                                                          <td>Vannes (56)</td>
+                                                          <td>2023</td>
+                                                          <td>1</td>
+                                                          <td>
+                                                              
+                                                                  -
+                                                              
+                                                          </td>
+                                                      </tr>
+                                                  
+                                              </tbody>
+                                          </table>
+                                      </div>
+                                  </div>
+                              
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_geiq_list_snapshots[empty list]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12">
+                      <div class="c-box container">
+                          <div class="s-tabs-01__row row">
+                              
+                                  <div class="text-center my-3 my-md-4">
+                                      <p class="mb-1 mt-3">
+                                          <strong>Aucun GEIQ</strong>
+                                      </p>
+                                  </div>
+                              
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_state_snapshot[full refund assessment as DDETS / main section]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-box">
+                          
+                              <h2>Dossier transmis par le GEIQ</h2>
+                              <p>
+                                  <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Certifié à jour le 01/07/2024</span>
+                              </p>
+                              <hr/>
+                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div>
+                                      <h3>Rapport d’activité</h3>
+                                  </div>
+                                  <div clas="text-center">
+                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                          <span>Rapport d’activité 2023</span>
+                                          <i aria-hidden="true" class="ri-external-link-line font-weight-medium"></i>
+                                      </a>
+                                  </div>
+                              </div>
+                          
+                          <hr/>
+                          <div class="d-flex flex-column flex-md-row justify-content-between">
+                              <div>
+                                  <h3>Données individuelles de parcours</h3>
+                                  <p id="label-last-synced-at">
+      Dernière synchronisation: 1 juin 2024 02:00
+      
+  </p>
+  
+                              </div>
+                              <div>
+                                  <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Consulter les données salariés</a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4">
+                      
+                          
+                              <div class="c-box mb-4 bg-warning-lightest border-warning">
+                                  <span class="fs-sm">Financement</span>
+                                  <h4>Demande de remboursement total</h4>
+                                  <p>
+                                      Une demande de remboursement total de l’aide conventionnée a été demandée par <strong>Inspecteur GADGET</strong> (DDETS 75).
+                                  </p>
+                                  <strong>Commentaire envoyé au GEIQ</strong>
+                                  <p>Non !</p>
+                                  <a class="btn btn-primary btn-block" href="/geiq/assessment/[PK of ImplementationAssessment]/review">Corriger</a>
+                              </div>
+                          
+                      
+                      <div class="c-box c-box--structure">
+      <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse">
+          <i class="ri-community-line"></i>
+          <div>
+              <span data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip">GEIQ</span>
+              <h3>Acme inc.</h3>
+          </div>
+      </div>
+      <div class="c-box--structure__detail collapse show" id="collapseBoxStructure">
+          <hr class="my-4"/>
+          <ul class="c-box--structure__list-contact">
+              <li>
+                  <i class="ri-map-pin-2-line font-weight-normal me-2"></i>
+                  <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
+                  <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
+                      <i class="ri-file-copy-line"></i>
+                  </button>
+              </li>
+              
+                  
+      <li>
+      <i class="ri-mail-line font-weight-normal me-2"></i>
+      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
+      <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
+          <i class="ri-file-copy-line"></i>
+      </button>
+  </li>
+  
+  
+  
+  
+      
+  <li>
+      <i class="ri-phone-line font-weight-normal me-2"></i>
+      06 12 34 56 78
+      <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
+          <i class="ri-file-copy-line"></i>
+      </button>
+  </li>
+  
+  
+  
+  
+  
+              
+          </ul>
+          <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
+      </div>
+  </div>
+  
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_state_snapshot[full refund assessment as DDETS / title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/geiq/list/[PK of Institution]">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl font-weight-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1>Bilan d’exécution - Acme inc. - 2023</h1>
+      
+      
+          <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Bilan validé : demande de remboursement total</span>
+      
+  
+  
+  
+                              
+      
+                                  
+  
+  
+                              
+      <div class="alert alert-info alert-dismissible fade show" role="status">
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+      <div class="row">
+          <div class="col-auto pe-0">
+              <i class="ri-information-line ri-xl text-info"></i>
+          </div>
+          <div class="col">
+              <p class="mb-2">
+                  <strong>Nouvelle fonctionnalité en phase d’expérimentation</strong>
+              </p>
+              <p class="mb-0">
+                  Dans le cadre de cette expérimentation, les bilans d’exécution GEIQ réalisés sur ce site n’ont aucune valeur officielle.
+              </p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+              <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
+                  <span>En savoir plus</span>
+                  <i class="ri-external-link-line ri-lg"></i>
+              </a>
+          </div>
+      </div>
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+  </div>
+  
+  
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: test_state_snapshot[full refund assessment as GEIQ / main section]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-box">
+                          
+                              <h2>Le dossier transmis par Label a été envoyé</h2>
+                              <p>
+                                  <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Certifié à jour le 01/07/2024</span>
+                              </p>
+                          
+                          <hr/>
+                          <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
+                              
+                                  <div class="d-flex flex-column flex-md-row justify-content-between">
+                                      <div>
+                                          <h3>Rapport d’activité</h3>
+                                      </div>
+                                      <div clas="text-center">
+                                          <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                              <span>Rapport d’activité 2023</span>
+                                              <i aria-hidden="true" class="ri-external-link-line font-weight-medium"></i>
+                                          </a>
+                                      </div>
+                                  </div>
+                              
+                              <hr/>
+                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div>
+                                      <h3>Données individuelles de parcours</h3>
+                                      <p id="label-last-synced-at">
+      Dernière synchronisation: 1 juin 2024 02:00
+      
+  </p>
+  
+                                  </div>
+                                  <div>
+                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Consulter les données salariés</a>
+                                  </div>
+                              </div>
+                              <hr/>
+                              <div>
+                                  <div class="form-row justify-content-end">
+                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                      
+                                      <div class="form-group form-group-required"><div class="form-check"><input checked="checked" class="form-check-input" disabled="disabled" id="id_up_to_date_information" name="up_to_date_information" required="" type="checkbox"/><label class="form-check-label" for="id_up_to_date_information">En cochant cette case, je certifie que les données de l’année concernée sont à jour.</label></div></div>
+                                      <div class="form-group mb-0 col-6 col-lg-auto">
+                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="Votre dossier a déjà été envoyé." type="submit">
+                                              <span>Envoyer le bilan d’exécution</span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </form>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4">
+                      
+                          
+                              <div class="c-box mb-4 bg-warning-lightest border-warning">
+                                  <span class="fs-sm">Financement</span>
+                                  <h4>Demande de remboursement total</h4>
+                                  <p>
+                                      Une demande de remboursement total de l’aide conventionnée a été demandée par DDETS 75.
+                                  </p>
+                                  <strong>Commentaire de votre DDETS GEIQ</strong>
+                                  <p>Non !</p>
+                                  <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                              </div>
+                          
+                      
+                  </div>
+              </div>
+          </div>
+          
+          
+      </section>
+  '''
+# ---
+# name: test_state_snapshot[full refund assessment as GEIQ / title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/dashboard/">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl font-weight-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1>Bilan d’exécution - Acme inc. - 2023</h1>
+      
+          
+              <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Financement : demande de remboursement total</span>
+          
+      
+  
+                              
+      
+                                  
+  
+  
+                              
+      <div class="alert alert-info alert-dismissible fade show" role="status">
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+      <div class="row">
+          <div class="col-auto pe-0">
+              <i class="ri-information-line ri-xl text-info"></i>
+          </div>
+          <div class="col">
+              <p class="mb-2">
+                  <strong>Nouvelle fonctionnalité en phase d’expérimentation</strong>
+              </p>
+              <p class="mb-0">
+                  Dans le cadre de cette expérimentation, les bilans d’exécution GEIQ réalisés sur ce site n’ont aucune valeur officielle.
+              </p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+              <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
+                  <span>En savoir plus</span>
+                  <i class="ri-external-link-line ri-lg"></i>
+              </a>
+          </div>
+      </div>
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+  </div>
+  
+  
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: test_state_snapshot[fully accepted assessment as DDETS / main section]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-box">
+                          
+                              <h2>Dossier transmis par le GEIQ</h2>
+                              <p>
+                                  <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Certifié à jour le 01/07/2024</span>
+                              </p>
+                              <hr/>
+                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div>
+                                      <h3>Rapport d’activité</h3>
+                                  </div>
+                                  <div clas="text-center">
+                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                          <span>Rapport d’activité 2023</span>
+                                          <i aria-hidden="true" class="ri-external-link-line font-weight-medium"></i>
+                                      </a>
+                                  </div>
+                              </div>
+                          
+                          <hr/>
+                          <div class="d-flex flex-column flex-md-row justify-content-between">
+                              <div>
+                                  <h3>Données individuelles de parcours</h3>
+                                  <p id="label-last-synced-at">
+      Dernière synchronisation: 1 juin 2024 02:00
+      
+  </p>
+  
+                              </div>
+                              <div>
+                                  <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Consulter les données salariés</a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4">
+                      
+                          
+                              <div class="c-box mb-4 bg-success-lightest border-success">
+                                  <span class="fs-sm">Financement</span>
+                                  <h4>Totalité de l’aide accordée</h4>
+                                  <p>
+                                      La totalité de l’aide conventionnée a été validée par <strong>Inspecteur GADGET</strong> (DDETS 75).
+                                  </p>
+                                  <strong>Commentaire envoyé au GEIQ</strong>
+                                  <p>Bravo</p>
+                                  <a class="btn btn-primary btn-block" href="/geiq/assessment/[PK of ImplementationAssessment]/review">Corriger</a>
+                              </div>
+                          
+                      
+                      <div class="c-box c-box--structure">
+      <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse">
+          <i class="ri-community-line"></i>
+          <div>
+              <span data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip">GEIQ</span>
+              <h3>Acme inc.</h3>
+          </div>
+      </div>
+      <div class="c-box--structure__detail collapse show" id="collapseBoxStructure">
+          <hr class="my-4"/>
+          <ul class="c-box--structure__list-contact">
+              <li>
+                  <i class="ri-map-pin-2-line font-weight-normal me-2"></i>
+                  <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
+                  <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
+                      <i class="ri-file-copy-line"></i>
+                  </button>
+              </li>
+              
+                  
+      <li>
+      <i class="ri-mail-line font-weight-normal me-2"></i>
+      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
+      <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
+          <i class="ri-file-copy-line"></i>
+      </button>
+  </li>
+  
+  
+  
+  
+      
+  <li>
+      <i class="ri-phone-line font-weight-normal me-2"></i>
+      06 12 34 56 78
+      <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
+          <i class="ri-file-copy-line"></i>
+      </button>
+  </li>
+  
+  
+  
+  
+  
+              
+          </ul>
+          <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
+      </div>
+  </div>
+  
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_state_snapshot[fully accepted assessment as DDETS / title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/geiq/list/[PK of Institution]">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl font-weight-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1>Bilan d’exécution - Acme inc. - 2023</h1>
+      
+      
+          <span class="badge badge-sm rounded-pill text-nowrap bg-success">Bilan validé</span>
+      
+  
+  
+  
+                              
+      
+                                  
+  
+  
+                              
+      <div class="alert alert-info alert-dismissible fade show" role="status">
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+      <div class="row">
+          <div class="col-auto pe-0">
+              <i class="ri-information-line ri-xl text-info"></i>
+          </div>
+          <div class="col">
+              <p class="mb-2">
+                  <strong>Nouvelle fonctionnalité en phase d’expérimentation</strong>
+              </p>
+              <p class="mb-0">
+                  Dans le cadre de cette expérimentation, les bilans d’exécution GEIQ réalisés sur ce site n’ont aucune valeur officielle.
+              </p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+              <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
+                  <span>En savoir plus</span>
+                  <i class="ri-external-link-line ri-lg"></i>
+              </a>
+          </div>
+      </div>
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+  </div>
+  
+  
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: test_state_snapshot[fully accepted assessment as GEIQ / main section]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-box">
+                          
+                              <h2>Le dossier transmis par Label a été envoyé</h2>
+                              <p>
+                                  <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Certifié à jour le 01/07/2024</span>
+                              </p>
+                          
+                          <hr/>
+                          <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
+                              
+                                  <div class="d-flex flex-column flex-md-row justify-content-between">
+                                      <div>
+                                          <h3>Rapport d’activité</h3>
+                                      </div>
+                                      <div clas="text-center">
+                                          <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                              <span>Rapport d’activité 2023</span>
+                                              <i aria-hidden="true" class="ri-external-link-line font-weight-medium"></i>
+                                          </a>
+                                      </div>
+                                  </div>
+                              
+                              <hr/>
+                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div>
+                                      <h3>Données individuelles de parcours</h3>
+                                      <p id="label-last-synced-at">
+      Dernière synchronisation: 1 juin 2024 02:00
+      
+  </p>
+  
+                                  </div>
+                                  <div>
+                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Consulter les données salariés</a>
+                                  </div>
+                              </div>
+                              <hr/>
+                              <div>
+                                  <div class="form-row justify-content-end">
+                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                      
+                                      <div class="form-group form-group-required"><div class="form-check"><input checked="checked" class="form-check-input" disabled="disabled" id="id_up_to_date_information" name="up_to_date_information" required="" type="checkbox"/><label class="form-check-label" for="id_up_to_date_information">En cochant cette case, je certifie que les données de l’année concernée sont à jour.</label></div></div>
+                                      <div class="form-group mb-0 col-6 col-lg-auto">
+                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="Votre dossier a déjà été envoyé." type="submit">
+                                              <span>Envoyer le bilan d’exécution</span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </form>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4">
+                      
+                          
+                              <div class="c-box mb-4 bg-success-lightest border-success">
+                                  <span class="fs-sm">Financement</span>
+                                  <h4>Totalité de l’aide accordée</h4>
+                                  <p>La totalité de l’aide conventionnée a été validée par DDETS 75.</p>
+                                  <strong>Commentaire de votre DDETS GEIQ</strong>
+                                  <p>Bravo</p>
+                                  <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                              </div>
+                          
+                      
+                  </div>
+              </div>
+          </div>
+          
+          
+      </section>
+  '''
+# ---
+# name: test_state_snapshot[fully accepted assessment as GEIQ / title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/dashboard/">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl font-weight-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1>Bilan d’exécution - Acme inc. - 2023</h1>
+      
+          
+              <span class="badge badge-sm rounded-pill text-nowrap bg-success">Financement : totalité de l’aide accordée</span>
+          
+      
+  
+                              
+      
+                                  
+  
+  
+                              
+      <div class="alert alert-info alert-dismissible fade show" role="status">
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+      <div class="row">
+          <div class="col-auto pe-0">
+              <i class="ri-information-line ri-xl text-info"></i>
+          </div>
+          <div class="col">
+              <p class="mb-2">
+                  <strong>Nouvelle fonctionnalité en phase d’expérimentation</strong>
+              </p>
+              <p class="mb-0">
+                  Dans le cadre de cette expérimentation, les bilans d’exécution GEIQ réalisés sur ce site n’ont aucune valeur officielle.
+              </p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+              <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
+                  <span>En savoir plus</span>
+                  <i class="ri-external-link-line ri-lg"></i>
+              </a>
+          </div>
+      </div>
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+  </div>
+  
+  
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: test_state_snapshot[partial accepted assessment as DDETS / main section]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-box">
+                          
+                              <h2>Dossier transmis par le GEIQ</h2>
+                              <p>
+                                  <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Certifié à jour le 01/07/2024</span>
+                              </p>
+                              <hr/>
+                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div>
+                                      <h3>Rapport d’activité</h3>
+                                  </div>
+                                  <div clas="text-center">
+                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                          <span>Rapport d’activité 2023</span>
+                                          <i aria-hidden="true" class="ri-external-link-line font-weight-medium"></i>
+                                      </a>
+                                  </div>
+                              </div>
+                          
+                          <hr/>
+                          <div class="d-flex flex-column flex-md-row justify-content-between">
+                              <div>
+                                  <h3>Données individuelles de parcours</h3>
+                                  <p id="label-last-synced-at">
+      Dernière synchronisation: 1 juin 2024 02:00
+      
+  </p>
+  
+                              </div>
+                              <div>
+                                  <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Consulter les données salariés</a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4">
+                      
+                          
+                              <div class="c-box mb-4 bg-success-lightest border-success">
+                                  <span class="fs-sm">Financement</span>
+                                  <h4>Solde partiellement accordé</h4>
+                                  <p>
+                                      Le solde de l’aide conventionnée a été partiellement validé par <strong>Inspecteur GADGET</strong> (DDETS 75).
+                                  </p>
+                                  <strong>Commentaire envoyé au GEIQ</strong>
+                                  <p>Presque bravo</p>
+                                  <a class="btn btn-primary btn-block" href="/geiq/assessment/[PK of ImplementationAssessment]/review">Corriger</a>
+                              </div>
+                          
+                      
+                      <div class="c-box c-box--structure">
+      <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse">
+          <i class="ri-community-line"></i>
+          <div>
+              <span data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip">GEIQ</span>
+              <h3>Acme inc.</h3>
+          </div>
+      </div>
+      <div class="c-box--structure__detail collapse show" id="collapseBoxStructure">
+          <hr class="my-4"/>
+          <ul class="c-box--structure__list-contact">
+              <li>
+                  <i class="ri-map-pin-2-line font-weight-normal me-2"></i>
+                  <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
+                  <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
+                      <i class="ri-file-copy-line"></i>
+                  </button>
+              </li>
+              
+                  
+      <li>
+      <i class="ri-mail-line font-weight-normal me-2"></i>
+      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
+      <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
+          <i class="ri-file-copy-line"></i>
+      </button>
+  </li>
+  
+  
+  
+  
+      
+  <li>
+      <i class="ri-phone-line font-weight-normal me-2"></i>
+      06 12 34 56 78
+      <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
+          <i class="ri-file-copy-line"></i>
+      </button>
+  </li>
+  
+  
+  
+  
+  
+              
+          </ul>
+          <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
+      </div>
+  </div>
+  
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_state_snapshot[partial accepted assessment as DDETS / title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/geiq/list/[PK of Institution]">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl font-weight-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1>Bilan d’exécution - Acme inc. - 2023</h1>
+      
+      
+          <span class="badge badge-sm rounded-pill text-nowrap bg-success">Bilan validé : solde partiellement accordé</span>
+      
+  
+  
+  
+                              
+      
+                                  
+  
+  
+                              
+      <div class="alert alert-info alert-dismissible fade show" role="status">
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+      <div class="row">
+          <div class="col-auto pe-0">
+              <i class="ri-information-line ri-xl text-info"></i>
+          </div>
+          <div class="col">
+              <p class="mb-2">
+                  <strong>Nouvelle fonctionnalité en phase d’expérimentation</strong>
+              </p>
+              <p class="mb-0">
+                  Dans le cadre de cette expérimentation, les bilans d’exécution GEIQ réalisés sur ce site n’ont aucune valeur officielle.
+              </p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+              <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
+                  <span>En savoir plus</span>
+                  <i class="ri-external-link-line ri-lg"></i>
+              </a>
+          </div>
+      </div>
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+  </div>
+  
+  
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: test_state_snapshot[partial accepted assessment as GEIQ / main section]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-box">
+                          
+                              <h2>Le dossier transmis par Label a été envoyé</h2>
+                              <p>
+                                  <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Certifié à jour le 01/07/2024</span>
+                              </p>
+                          
+                          <hr/>
+                          <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
+                              
+                                  <div class="d-flex flex-column flex-md-row justify-content-between">
+                                      <div>
+                                          <h3>Rapport d’activité</h3>
+                                      </div>
+                                      <div clas="text-center">
+                                          <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                              <span>Rapport d’activité 2023</span>
+                                              <i aria-hidden="true" class="ri-external-link-line font-weight-medium"></i>
+                                          </a>
+                                      </div>
+                                  </div>
+                              
+                              <hr/>
+                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div>
+                                      <h3>Données individuelles de parcours</h3>
+                                      <p id="label-last-synced-at">
+      Dernière synchronisation: 1 juin 2024 02:00
+      
+  </p>
+  
+                                  </div>
+                                  <div>
+                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Consulter les données salariés</a>
+                                  </div>
+                              </div>
+                              <hr/>
+                              <div>
+                                  <div class="form-row justify-content-end">
+                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                      
+                                      <div class="form-group form-group-required"><div class="form-check"><input checked="checked" class="form-check-input" disabled="disabled" id="id_up_to_date_information" name="up_to_date_information" required="" type="checkbox"/><label class="form-check-label" for="id_up_to_date_information">En cochant cette case, je certifie que les données de l’année concernée sont à jour.</label></div></div>
+                                      <div class="form-group mb-0 col-6 col-lg-auto">
+                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="Votre dossier a déjà été envoyé." type="submit">
+                                              <span>Envoyer le bilan d’exécution</span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </form>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4">
+                      
+                          
+                              <div class="c-box mb-4 bg-success-lightest border-success">
+                                  <span class="fs-sm">Financement</span>
+                                  <h4>Solde partiellement accordé</h4>
+                                  <p>
+                                      Le solde de l’aide conventionnée a été partiellement accordé par DDETS 75.
+                                  </p>
+                                  <strong>Commentaire de votre DDETS GEIQ</strong>
+                                  <p>Presque bravo</p>
+                                  <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                              </div>
+                          
+                      
+                  </div>
+              </div>
+          </div>
+          
+          
+      </section>
+  '''
+# ---
+# name: test_state_snapshot[partial accepted assessment as GEIQ / title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/dashboard/">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl font-weight-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1>Bilan d’exécution - Acme inc. - 2023</h1>
+      
+          
+              <span class="badge badge-sm rounded-pill text-nowrap bg-success">Financement : solde partiellement accordé</span>
+          
+      
+  
+                              
+      
+                                  
+  
+  
+                              
+      <div class="alert alert-info alert-dismissible fade show" role="status">
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+      <div class="row">
+          <div class="col-auto pe-0">
+              <i class="ri-information-line ri-xl text-info"></i>
+          </div>
+          <div class="col">
+              <p class="mb-2">
+                  <strong>Nouvelle fonctionnalité en phase d’expérimentation</strong>
+              </p>
+              <p class="mb-0">
+                  Dans le cadre de cette expérimentation, les bilans d’exécution GEIQ réalisés sur ce site n’ont aucune valeur officielle.
+              </p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+              <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
+                  <span>En savoir plus</span>
+                  <i class="ri-external-link-line ri-lg"></i>
+              </a>
+          </div>
+      </div>
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+  </div>
+  
+  
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: test_state_snapshot[partial refund assessment as DDETS / main section]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-box">
+                          
+                              <h2>Dossier transmis par le GEIQ</h2>
+                              <p>
+                                  <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Certifié à jour le 01/07/2024</span>
+                              </p>
+                              <hr/>
+                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div>
+                                      <h3>Rapport d’activité</h3>
+                                  </div>
+                                  <div clas="text-center">
+                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                          <span>Rapport d’activité 2023</span>
+                                          <i aria-hidden="true" class="ri-external-link-line font-weight-medium"></i>
+                                      </a>
+                                  </div>
+                              </div>
+                          
+                          <hr/>
+                          <div class="d-flex flex-column flex-md-row justify-content-between">
+                              <div>
+                                  <h3>Données individuelles de parcours</h3>
+                                  <p id="label-last-synced-at">
+      Dernière synchronisation: 1 juin 2024 02:00
+      
+  </p>
+  
+                              </div>
+                              <div>
+                                  <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Consulter les données salariés</a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4">
+                      
+                          
+                              <div class="c-box mb-4 bg-warning-lightest border-warning">
+                                  <span class="fs-sm">Financement</span>
+                                  <h4>Demande de remboursement partiel</h4>
+                                  <p>
+                                      Une demande de remboursement partiel de l’aide conventionnée a été demandée par <strong>Inspecteur GADGET</strong> (DDETS 75).
+                                  </p>
+                                  <strong>Commentaire envoyé au GEIQ</strong>
+                                  <p>Pas top</p>
+                                  <a class="btn btn-primary btn-block" href="/geiq/assessment/[PK of ImplementationAssessment]/review">Corriger</a>
+                              </div>
+                          
+                      
+                      <div class="c-box c-box--structure">
+      <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse">
+          <i class="ri-community-line"></i>
+          <div>
+              <span data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip">GEIQ</span>
+              <h3>Acme inc.</h3>
+          </div>
+      </div>
+      <div class="c-box--structure__detail collapse show" id="collapseBoxStructure">
+          <hr class="my-4"/>
+          <ul class="c-box--structure__list-contact">
+              <li>
+                  <i class="ri-map-pin-2-line font-weight-normal me-2"></i>
+                  <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
+                  <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
+                      <i class="ri-file-copy-line"></i>
+                  </button>
+              </li>
+              
+                  
+      <li>
+      <i class="ri-mail-line font-weight-normal me-2"></i>
+      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
+      <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
+          <i class="ri-file-copy-line"></i>
+      </button>
+  </li>
+  
+  
+  
+  
+      
+  <li>
+      <i class="ri-phone-line font-weight-normal me-2"></i>
+      06 12 34 56 78
+      <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
+          <i class="ri-file-copy-line"></i>
+      </button>
+  </li>
+  
+  
+  
+  
+  
+              
+          </ul>
+          <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
+      </div>
+  </div>
+  
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_state_snapshot[partial refund assessment as DDETS / title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/geiq/list/[PK of Institution]">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl font-weight-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1>Bilan d’exécution - Acme inc. - 2023</h1>
+      
+      
+          <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Bilan validé : demande de remboursement partiel</span>
+      
+  
+  
+  
+                              
+      
+                                  
+  
+  
+                              
+      <div class="alert alert-info alert-dismissible fade show" role="status">
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+      <div class="row">
+          <div class="col-auto pe-0">
+              <i class="ri-information-line ri-xl text-info"></i>
+          </div>
+          <div class="col">
+              <p class="mb-2">
+                  <strong>Nouvelle fonctionnalité en phase d’expérimentation</strong>
+              </p>
+              <p class="mb-0">
+                  Dans le cadre de cette expérimentation, les bilans d’exécution GEIQ réalisés sur ce site n’ont aucune valeur officielle.
+              </p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+              <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
+                  <span>En savoir plus</span>
+                  <i class="ri-external-link-line ri-lg"></i>
+              </a>
+          </div>
+      </div>
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+  </div>
+  
+  
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: test_state_snapshot[partial refund assessment as GEIQ / main section]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-box">
+                          
+                              <h2>Le dossier transmis par Label a été envoyé</h2>
+                              <p>
+                                  <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Certifié à jour le 01/07/2024</span>
+                              </p>
+                          
+                          <hr/>
+                          <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
+                              
+                                  <div class="d-flex flex-column flex-md-row justify-content-between">
+                                      <div>
+                                          <h3>Rapport d’activité</h3>
+                                      </div>
+                                      <div clas="text-center">
+                                          <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                              <span>Rapport d’activité 2023</span>
+                                              <i aria-hidden="true" class="ri-external-link-line font-weight-medium"></i>
+                                          </a>
+                                      </div>
+                                  </div>
+                              
+                              <hr/>
+                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div>
+                                      <h3>Données individuelles de parcours</h3>
+                                      <p id="label-last-synced-at">
+      Dernière synchronisation: 1 juin 2024 02:00
+      
+  </p>
+  
+                                  </div>
+                                  <div>
+                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Consulter les données salariés</a>
+                                  </div>
+                              </div>
+                              <hr/>
+                              <div>
+                                  <div class="form-row justify-content-end">
+                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                      
+                                      <div class="form-group form-group-required"><div class="form-check"><input checked="checked" class="form-check-input" disabled="disabled" id="id_up_to_date_information" name="up_to_date_information" required="" type="checkbox"/><label class="form-check-label" for="id_up_to_date_information">En cochant cette case, je certifie que les données de l’année concernée sont à jour.</label></div></div>
+                                      <div class="form-group mb-0 col-6 col-lg-auto">
+                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="Votre dossier a déjà été envoyé." type="submit">
+                                              <span>Envoyer le bilan d’exécution</span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </form>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4">
+                      
+                          
+                              <div class="c-box mb-4 bg-warning-lightest border-warning">
+                                  <span class="fs-sm">Financement</span>
+                                  <h4>Demande de remboursement partiel</h4>
+                                  <p>
+                                      Une demande de remboursement partiel de l’aide conventionnée a été demandée par DDETS 75.
+                                  </p>
+                                  <strong>Commentaire de votre DDETS GEIQ</strong>
+                                  <p>Pas top</p>
+                                  <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                              </div>
+                          
+                      
+                  </div>
+              </div>
+          </div>
+          
+          
+      </section>
+  '''
+# ---
+# name: test_state_snapshot[partial refund assessment as GEIQ / title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/dashboard/">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl font-weight-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1>Bilan d’exécution - Acme inc. - 2023</h1>
+      
+          
+              <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Financement : demande de remboursement partiel</span>
+          
+      
+  
+                              
+      
+                                  
+  
+  
+                              
+      <div class="alert alert-info alert-dismissible fade show" role="status">
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+      <div class="row">
+          <div class="col-auto pe-0">
+              <i class="ri-information-line ri-xl text-info"></i>
+          </div>
+          <div class="col">
+              <p class="mb-2">
+                  <strong>Nouvelle fonctionnalité en phase d’expérimentation</strong>
+              </p>
+              <p class="mb-0">
+                  Dans le cadre de cette expérimentation, les bilans d’exécution GEIQ réalisés sur ce site n’ont aucune valeur officielle.
+              </p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+              <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
+                  <span>En savoir plus</span>
+                  <i class="ri-external-link-line ri-lg"></i>
+              </a>
+          </div>
+      </div>
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+  </div>
+  
+  
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: test_state_snapshot[remainder refused assessment as DDETS / main section]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-box">
+                          
+                              <h2>Dossier transmis par le GEIQ</h2>
+                              <p>
+                                  <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Certifié à jour le 01/07/2024</span>
+                              </p>
+                              <hr/>
+                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div>
+                                      <h3>Rapport d’activité</h3>
+                                  </div>
+                                  <div clas="text-center">
+                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                          <span>Rapport d’activité 2023</span>
+                                          <i aria-hidden="true" class="ri-external-link-line font-weight-medium"></i>
+                                      </a>
+                                  </div>
+                              </div>
+                          
+                          <hr/>
+                          <div class="d-flex flex-column flex-md-row justify-content-between">
+                              <div>
+                                  <h3>Données individuelles de parcours</h3>
+                                  <p id="label-last-synced-at">
+      Dernière synchronisation: 1 juin 2024 02:00
+      
+  </p>
+  
+                              </div>
+                              <div>
+                                  <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Consulter les données salariés</a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4">
+                      
+                          
+                              <div class="c-box mb-4 bg-warning-lightest border-warning">
+                                  <span class="fs-sm">Financement</span>
+                                  <h4>Complément d’aide refusé</h4>
+                                  <p>
+                                      La totalité de l’aide conventionnée n’a pas été accordée par <strong>Inspecteur GADGET</strong> (DDETS 75).
+                                  </p>
+                                  <strong>Commentaire envoyé au GEIQ</strong>
+                                  <p>Mouais</p>
+                                  <a class="btn btn-primary btn-block" href="/geiq/assessment/[PK of ImplementationAssessment]/review">Corriger</a>
+                              </div>
+                          
+                      
+                      <div class="c-box c-box--structure">
+      <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse">
+          <i class="ri-community-line"></i>
+          <div>
+              <span data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip">GEIQ</span>
+              <h3>Acme inc.</h3>
+          </div>
+      </div>
+      <div class="c-box--structure__detail collapse show" id="collapseBoxStructure">
+          <hr class="my-4"/>
+          <ul class="c-box--structure__list-contact">
+              <li>
+                  <i class="ri-map-pin-2-line font-weight-normal me-2"></i>
+                  <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
+                  <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
+                      <i class="ri-file-copy-line"></i>
+                  </button>
+              </li>
+              
+                  
+      <li>
+      <i class="ri-mail-line font-weight-normal me-2"></i>
+      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
+      <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
+          <i class="ri-file-copy-line"></i>
+      </button>
+  </li>
+  
+  
+  
+  
+      
+  <li>
+      <i class="ri-phone-line font-weight-normal me-2"></i>
+      06 12 34 56 78
+      <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
+          <i class="ri-file-copy-line"></i>
+      </button>
+  </li>
+  
+  
+  
+  
+  
+              
+          </ul>
+          <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
+      </div>
+  </div>
+  
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_state_snapshot[remainder refused assessment as DDETS / title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/geiq/list/[PK of Institution]">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl font-weight-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1>Bilan d’exécution - Acme inc. - 2023</h1>
+      
+      
+          <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Bilan validé : solde refusé</span>
+      
+  
+  
+  
+                              
+      
+                                  
+  
+  
+                              
+      <div class="alert alert-info alert-dismissible fade show" role="status">
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+      <div class="row">
+          <div class="col-auto pe-0">
+              <i class="ri-information-line ri-xl text-info"></i>
+          </div>
+          <div class="col">
+              <p class="mb-2">
+                  <strong>Nouvelle fonctionnalité en phase d’expérimentation</strong>
+              </p>
+              <p class="mb-0">
+                  Dans le cadre de cette expérimentation, les bilans d’exécution GEIQ réalisés sur ce site n’ont aucune valeur officielle.
+              </p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+              <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
+                  <span>En savoir plus</span>
+                  <i class="ri-external-link-line ri-lg"></i>
+              </a>
+          </div>
+      </div>
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+  </div>
+  
+  
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: test_state_snapshot[remainder refused assessment as GEIQ / main section]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-box">
+                          
+                              <h2>Le dossier transmis par Label a été envoyé</h2>
+                              <p>
+                                  <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Certifié à jour le 01/07/2024</span>
+                              </p>
+                          
+                          <hr/>
+                          <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
+                              
+                                  <div class="d-flex flex-column flex-md-row justify-content-between">
+                                      <div>
+                                          <h3>Rapport d’activité</h3>
+                                      </div>
+                                      <div clas="text-center">
+                                          <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                              <span>Rapport d’activité 2023</span>
+                                              <i aria-hidden="true" class="ri-external-link-line font-weight-medium"></i>
+                                          </a>
+                                      </div>
+                                  </div>
+                              
+                              <hr/>
+                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div>
+                                      <h3>Données individuelles de parcours</h3>
+                                      <p id="label-last-synced-at">
+      Dernière synchronisation: 1 juin 2024 02:00
+      
+  </p>
+  
+                                  </div>
+                                  <div>
+                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Consulter les données salariés</a>
+                                  </div>
+                              </div>
+                              <hr/>
+                              <div>
+                                  <div class="form-row justify-content-end">
+                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                      
+                                      <div class="form-group form-group-required"><div class="form-check"><input checked="checked" class="form-check-input" disabled="disabled" id="id_up_to_date_information" name="up_to_date_information" required="" type="checkbox"/><label class="form-check-label" for="id_up_to_date_information">En cochant cette case, je certifie que les données de l’année concernée sont à jour.</label></div></div>
+                                      <div class="form-group mb-0 col-6 col-lg-auto">
+                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="Votre dossier a déjà été envoyé." type="submit">
+                                              <span>Envoyer le bilan d’exécution</span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </form>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4">
+                      
+                          
+                              <div class="c-box mb-4 bg-warning-lightest border-warning">
+                                  <span class="fs-sm">Financement</span>
+                                  <h4>Complément d’aide refusé</h4>
+                                  <p>La totalité de l’aide conventionnée n’a pas été accordée par DDETS 75.</p>
+                                  <strong>Commentaire de votre DDETS GEIQ</strong>
+                                  <p>Mouais</p>
+                                  <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                              </div>
+                          
+                      
+                  </div>
+              </div>
+          </div>
+          
+          
+      </section>
+  '''
+# ---
+# name: test_state_snapshot[remainder refused assessment as GEIQ / title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/dashboard/">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl font-weight-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1>Bilan d’exécution - Acme inc. - 2023</h1>
+      
+          
+              <span class="badge badge-sm rounded-pill text-nowrap bg-warning">Financement : solde refusé</span>
+          
+      
+  
+                              
+      
+                                  
+  
+  
+                              
+      <div class="alert alert-info alert-dismissible fade show" role="status">
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+      <div class="row">
+          <div class="col-auto pe-0">
+              <i class="ri-information-line ri-xl text-info"></i>
+          </div>
+          <div class="col">
+              <p class="mb-2">
+                  <strong>Nouvelle fonctionnalité en phase d’expérimentation</strong>
+              </p>
+              <p class="mb-0">
+                  Dans le cadre de cette expérimentation, les bilans d’exécution GEIQ réalisés sur ce site n’ont aucune valeur officielle.
+              </p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+              <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
+                  <span>En savoir plus</span>
+                  <i class="ri-external-link-line ri-lg"></i>
+              </a>
+          </div>
+      </div>
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+  </div>
+  
+  
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: test_state_snapshot[submitted assessment as DDETS / main section]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-box">
+                          
+                              <h2>Dossier transmis par le GEIQ</h2>
+                              <p>
+                                  <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Certifié à jour le 01/07/2024</span>
+                              </p>
+                              <hr/>
+                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div>
+                                      <h3>Rapport d’activité</h3>
+                                  </div>
+                                  <div clas="text-center">
+                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                          <span>Rapport d’activité 2023</span>
+                                          <i aria-hidden="true" class="ri-external-link-line font-weight-medium"></i>
+                                      </a>
+                                  </div>
+                              </div>
+                          
+                          <hr/>
+                          <div class="d-flex flex-column flex-md-row justify-content-between">
+                              <div>
+                                  <h3>Données individuelles de parcours</h3>
+                                  <p id="label-last-synced-at">
+      Dernière synchronisation: 1 juin 2024 02:00
+      
+  </p>
+  
+                              </div>
+                              <div>
+                                  <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Consulter les données salariés</a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4">
+                      
+                          <div class="c-box mb-4 bg-info-lightest border-info">
+                              <span class="fs-sm">Financement</span>
+                              <h4>Bilan d’exécution à valider</h4>
+                              <p>
+                                  Vous avez jusqu’au 01/08/2024 pour valider les informations de ce bilan d’exécution.
+                              </p>
+                              <a class="btn btn-primary btn-block" href="/geiq/assessment/[PK of ImplementationAssessment]/review">Valider le bilan</a>
+                          </div>
+                      
+                      <div class="c-box c-box--structure">
+      <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse">
+          <i class="ri-community-line"></i>
+          <div>
+              <span data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip">GEIQ</span>
+              <h3>Acme inc.</h3>
+          </div>
+      </div>
+      <div class="c-box--structure__detail collapse show" id="collapseBoxStructure">
+          <hr class="my-4"/>
+          <ul class="c-box--structure__list-contact">
+              <li>
+                  <i class="ri-map-pin-2-line font-weight-normal me-2"></i>
+                  <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
+                  <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
+                      <i class="ri-file-copy-line"></i>
+                  </button>
+              </li>
+              
+                  
+      <li>
+      <i class="ri-mail-line font-weight-normal me-2"></i>
+      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
+      <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
+          <i class="ri-file-copy-line"></i>
+      </button>
+  </li>
+  
+  
+  
+  
+      
+  <li>
+      <i class="ri-phone-line font-weight-normal me-2"></i>
+      06 12 34 56 78
+      <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
+          <i class="ri-file-copy-line"></i>
+      </button>
+  </li>
+  
+  
+  
+  
+  
+              
+          </ul>
+          <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
+      </div>
+  </div>
+  
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_state_snapshot[submitted assessment as DDETS / title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/geiq/list/[PK of Institution]">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl font-weight-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1>Bilan d’exécution - Acme inc. - 2023</h1>
+      
+      <span class="badge badge-sm rounded-pill text-nowrap bg-info">Bilan à l’étude</span>
+  
+  
+  
+                              
+      
+                                  
+  
+  
+                              
+      <div class="alert alert-info alert-dismissible fade show" role="status">
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+      <div class="row">
+          <div class="col-auto pe-0">
+              <i class="ri-information-line ri-xl text-info"></i>
+          </div>
+          <div class="col">
+              <p class="mb-2">
+                  <strong>Nouvelle fonctionnalité en phase d’expérimentation</strong>
+              </p>
+              <p class="mb-0">
+                  Dans le cadre de cette expérimentation, les bilans d’exécution GEIQ réalisés sur ce site n’ont aucune valeur officielle.
+              </p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+              <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
+                  <span>En savoir plus</span>
+                  <i class="ri-external-link-line ri-lg"></i>
+              </a>
+          </div>
+      </div>
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+  </div>
+  
+  
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: test_state_snapshot[submitted assessment as GEIQ / main section]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-box">
+                          
+                              <h2>Le dossier transmis par Label a été envoyé</h2>
+                              <p>
+                                  <span class="badge badge-sm rounded-pill text-nowrap bg-success-lighter text-success">Certifié à jour le 01/07/2024</span>
+                              </p>
+                          
+                          <hr/>
+                          <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
+                              
+                                  <div class="d-flex flex-column flex-md-row justify-content-between">
+                                      <div>
+                                          <h3>Rapport d’activité</h3>
+                                      </div>
+                                      <div clas="text-center">
+                                          <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/report" rel="noopener" target="_blank">
+                                              <span>Rapport d’activité 2023</span>
+                                              <i aria-hidden="true" class="ri-external-link-line font-weight-medium"></i>
+                                          </a>
+                                      </div>
+                                  </div>
+                              
+                              <hr/>
+                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div>
+                                      <h3>Données individuelles de parcours</h3>
+                                      <p id="label-last-synced-at">
+      Dernière synchronisation: 1 juin 2024 02:00
+      
+  </p>
+  
+                                  </div>
+                                  <div>
+                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Consulter les données salariés</a>
+                                  </div>
+                              </div>
+                              <hr/>
+                              <div>
+                                  <div class="form-row justify-content-end">
+                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                      
+                                      <div class="form-group form-group-required"><div class="form-check"><input checked="checked" class="form-check-input" disabled="disabled" id="id_up_to_date_information" name="up_to_date_information" required="" type="checkbox"/><label class="form-check-label" for="id_up_to_date_information">En cochant cette case, je certifie que les données de l’année concernée sont à jour.</label></div></div>
+                                      <div class="form-group mb-0 col-6 col-lg-auto">
+                                          <button class="btn btn-primary" data-bs-placement="top" data-bs-toggle="tooltip" disabled="" title="Votre dossier a déjà été envoyé." type="submit">
+                                              <span>Envoyer le bilan d’exécution</span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </form>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4">
+                      
+                          <div class="c-box mb-4 bg-info-lightest border-info">
+                              <span class="fs-sm">Financement</span>
+                              <h4>Bilan d’exécution à l’étude</h4>
+                              <p class="mb-0">
+                                  Votre bilan d’exécution a été transmis à votre DDETS. La décision relative au version de l’aide financière vous sera communiquée par mail.
+                              </p>
+                              <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                          </div>
+                      
+                  </div>
+              </div>
+          </div>
+          
+          
+      </section>
+  '''
+# ---
+# name: test_state_snapshot[submitted assessment as GEIQ / title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/dashboard/">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl font-weight-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1>Bilan d’exécution - Acme inc. - 2023</h1>
+      
+          <span class="badge badge-sm rounded-pill text-nowrap bg-info">Bilan à l’étude</span>
+      
+  
+                              
+      
+                                  
+  
+  
+                              
+      <div class="alert alert-info alert-dismissible fade show" role="status">
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+      <div class="row">
+          <div class="col-auto pe-0">
+              <i class="ri-information-line ri-xl text-info"></i>
+          </div>
+          <div class="col">
+              <p class="mb-2">
+                  <strong>Nouvelle fonctionnalité en phase d’expérimentation</strong>
+              </p>
+              <p class="mb-0">
+                  Dans le cadre de cette expérimentation, les bilans d’exécution GEIQ réalisés sur ce site n’ont aucune valeur officielle.
+              </p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+              <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
+                  <span>En savoir plus</span>
+                  <i class="ri-external-link-line ri-lg"></i>
+              </a>
+          </div>
+      </div>
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+  </div>
+  
+  
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: test_state_snapshot[unsubmitted assessment as DDETS / main section]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-box">
+                          
+                              <h2>En attente du dossier</h2>
+                              <p>Le rapport d’activité sera disponible lorsque le GEIQ aura validé le dossier sur son espace dédié.</p>
+                          
+                          <hr/>
+                          <div class="d-flex flex-column flex-md-row justify-content-between">
+                              <div>
+                                  <h3>Données individuelles de parcours</h3>
+                                  <p id="label-last-synced-at">
+      Dernière synchronisation: -
+      
+  </p>
+  
+                              </div>
+                              <div>
+                                  <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Consulter les données salariés</a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4">
+                      
+                          <div class="c-box mb-4 bg-warning-lightest border-warning">
+                              <span class="fs-sm">Financement</span>
+                              <h4>En attente du bilan d’exécution</h4>
+                              <p class="mb-0">
+                                  Le GEIQ a jusqu’au 01/07/2024 pour importer son rapport d’activité et valider le bilan.
+                              </p>
+                          </div>
+                      
+                      <div class="c-box c-box--structure">
+      <div aria-controls="collapseBoxStructure" aria-expanded="true" class="c-box--structure__summary" data-bs-target="#collapseBoxStructure" data-bs-toggle="collapse">
+          <i class="ri-community-line"></i>
+          <div>
+              <span data-bs-title="Groupement d'employeurs pour l'insertion et la qualification" data-bs-toggle="tooltip">GEIQ</span>
+              <h3>Acme inc.</h3>
+          </div>
+      </div>
+      <div class="c-box--structure__detail collapse show" id="collapseBoxStructure">
+          <hr class="my-4"/>
+          <ul class="c-box--structure__list-contact">
+              <li>
+                  <i class="ri-map-pin-2-line font-weight-normal me-2"></i>
+                  <address class="m-0">112 rue de la Croix-Nivert, 75015 Paris</address>
+                  <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="112 rue de la Croix-Nivert, 75015 Paris">
+                      <i class="ri-file-copy-line"></i>
+                  </button>
+              </li>
+              
+                  
+      <li>
+      <i class="ri-mail-line font-weight-normal me-2"></i>
+      <a aria-label="Contact par mail" class="text-break" href="mailto:contact@acmeinc.com">contact@acmeinc.com</a>
+      <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="contact@acmeinc.com">
+          <i class="ri-file-copy-line"></i>
+      </button>
+  </li>
+  
+  
+  
+  
+      
+  <li>
+      <i class="ri-phone-line font-weight-normal me-2"></i>
+      06 12 34 56 78
+      <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678">
+          <i class="ri-file-copy-line"></i>
+      </button>
+  </li>
+  
+  
+  
+  
+  
+              
+          </ul>
+          <a class="btn btn-secondary btn-block mt-4" href="/company/[PK of Company]/card">Voir la fiche de l'entreprise</a>
+      </div>
+  </div>
+  
+                  </div>
+              </div>
+          </div>
+      </section>
+  '''
+# ---
+# name: test_state_snapshot[unsubmitted assessment as DDETS / title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/geiq/list/[PK of Institution]">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl font-weight-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1>Bilan d’exécution - Acme inc. - 2023</h1>
+      
+      <span class="badge badge-sm rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>
+  
+  
+  
+                              
+      
+                                  
+  
+  
+                              
+      <div class="alert alert-info alert-dismissible fade show" role="status">
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+      <div class="row">
+          <div class="col-auto pe-0">
+              <i class="ri-information-line ri-xl text-info"></i>
+          </div>
+          <div class="col">
+              <p class="mb-2">
+                  <strong>Nouvelle fonctionnalité en phase d’expérimentation</strong>
+              </p>
+              <p class="mb-0">
+                  Dans le cadre de cette expérimentation, les bilans d’exécution GEIQ réalisés sur ce site n’ont aucune valeur officielle.
+              </p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+              <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
+                  <span>En savoir plus</span>
+                  <i class="ri-external-link-line ri-lg"></i>
+              </a>
+          </div>
+      </div>
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+  </div>
+  
+  
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---
+# name: test_state_snapshot[unsubmitted assessment as GEIQ / main section]
+  '''
+  <section class="s-section">
+          <div class="s-section__container container">
+              <div class="row">
+                  <div class="col-12 col-lg-8">
+                      <div class="c-box">
+                          
+                              <h2>Compléter le dossier à transmettre à la DDETS/DREETS</h2>
+                              <p>
+                                  Importez votre rapport d’activité et vérifiez l’exactitude des données de vos salariés avant de les valider. Lorsque vous aurez validé ce dossier, votre DDETS
+                                  ou votre DREETS en charge de votre bilan pourra procéder à son étude depuis son espace dédié.
+                              </p>
+                          
+                          <hr/>
+                          <form class="js-prevent-multiple-submit" enctype="multipart/form-data" method="post">
+                              
+                                  <div class="d-flex flex-column flex-md-row justify-content-between">
+                                      <div>
+                                          <h3>Rapport d’activité</h3>
+                                          <p>Veuillez importer ci-dessous votre rapport d’activité au format PDF généré par le logiciel Label.</p>
+                                          <div class="form-group form-group-required"><label class="form-label" for="id_activity_report_file">Importer un fichier</label><div class="c-dropzone position-relative file-dropzone">
+      <input accept="application/pdf" aria-describedby="id_activity_report_file_helptext" class="form-control" id="id_activity_report_file" name="activity_report_file" required="" type="file"/>
+  
+  
+  
+      <div class="file-dropzone-selector">
+          <p aria-hidden="true" class="mb-1 text-nuance-06">
+              <i class="ri-upload-cloud-2-line ri-2x"></i>
+          </p>
+          <p class="mb-2">
+              Glissez vos fichiers ici ou <strong>rechercher</strong> dans vos fichiers
+          </p>
+          <label class="btn btn-link btn-sm btn-ico mb-2 stretched-link" for="id_activity_report_file">
+              <i class="ri-folder-line ri-xl"></i>
+              <span>Rechercher dans vos fichiers</span>
+          </label>
+          <p class="small text-nuance-06 mb-0">
+              Taille maximale : 5 Mo
+              
+                  <br/>
+                  Type de fichier : PDF
+              
+          </p>
+      </div>
+  
+      <div class="file-dropzone-preview d-none p-5">
+          <p>Fichier sélectionné :</p>
+          <div class="fs-sm mb-3">
+              <strong class="file-dropzone-filename"></strong>
+          </div>
+          <button class="btn btn-sm btn-ico btn-secondary file-dropzone-clear" type="button">
+              <i class="ri-delete-bin-line ri-xl"></i>
+              <span>Supprimer</span>
+          </button>
+      </div>
+  </div><div class="form-text">
+                  <p>
+                      <i class="ri-question-line mr-1"></i>
+                      Ce fichier n'est pas un PDF ?
+                      <a aria-label="Découvrez comment le convertir (ouverture dans un nouvel onglet)" class="matomo-event has-external-link" data-matomo-action="clic" data-matomo-category="ajout-fichier-candidature" data-matomo-event="true" data-matomo-option="clic-sur-lien-aide-pdf" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/16875396981777--Convertir-votre-document-en-format-PDF" rel="noopener" target="_blank">
+                          Découvrez comment le convertir.
+                      </a>
+                  </p>
+                 </div>
+  </div>
+                                      </div>
+                                  </div>
+                              
+                              <hr/>
+                              <div class="d-flex flex-column flex-md-row justify-content-between">
+                                  <div>
+                                      <h3>Données individuelles de parcours</h3>
+                                      <p id="label-last-synced-at">
+      Dernière synchronisation: -
+      
+          <button class="btn" hx-include="#label-sync-form" hx-post="/geiq/assessment/[PK of ImplementationAssessment]/label-sync" hx-swap="outerHTML" hx-target="#label-last-synced-at" type="button">
+              Mettre à jour
+          </button>
+      
+  </p>
+  
+                                  </div>
+                                  <div>
+                                      <a class="btn btn-outline-primary" href="/geiq/assessment/[PK of ImplementationAssessment]/employees/personal-information">Consulter les données salariés</a>
+                                  </div>
+                              </div>
+                              <hr/>
+                              <div>
+                                  <div class="form-row justify-content-end">
+                                      <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+                                      
+                                      <div class="form-group form-group-required"><div class="form-check"><input class="form-check-input" id="id_up_to_date_information" name="up_to_date_information" required="" type="checkbox"/><label class="form-check-label" for="id_up_to_date_information">En cochant cette case, je certifie que les données de l’année concernée sont à jour.</label></div></div>
+                                      <div class="form-group mb-0 col-6 col-lg-auto">
+                                          <button class="btn btn-primary" type="submit">
+                                              <span>Envoyer le bilan d’exécution</span>
+                                          </button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </form>
+                      </div>
+                  </div>
+                  <div class="col-12 col-lg-4">
+                      
+                          <div class="c-box mb-4 bg-warning-lightest border-warning">
+                              <span class="fs-sm">Financement</span>
+                              <h4>En attente du bilan d’exécution</h4>
+                              <p class="mb-0">
+                                  Vous avez jusqu’au 01/07/2024 pour valider les informations de votre bilan d’exécution.
+                              </p>
+                              <p>Pour tout complément d’information, veuillez contacter directement votre DDETS.</p>
+                          </div>
+                      
+                  </div>
+              </div>
+          </div>
+          
+          
+              <form id="label-sync-form">
+                  <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              </form>
+          
+      </section>
+  '''
+# ---
+# name: test_state_snapshot[unsubmitted assessment as GEIQ / title]
+  '''
+  <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+      
+  
+  
+      <div class="c-prevstep">
+          <a aria-label="Retour à la page précédente" class="btn btn-ico btn-link ps-0" href="/dashboard/">
+              <i aria-hidden="true" class="ri-arrow-drop-left-line ri-xl font-weight-medium"></i>
+              <span>
+                  Retour
+                  
+              </span>
+          </a>
+      </div>
+  
+  
+  
+                              
+      <h1>Bilan d’exécution - Acme inc. - 2023</h1>
+      
+          <span class="badge badge-sm rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>
+      
+  
+                              
+      
+                                  
+  
+  
+                              
+      <div class="alert alert-info alert-dismissible fade show" role="status">
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+      <div class="row">
+          <div class="col-auto pe-0">
+              <i class="ri-information-line ri-xl text-info"></i>
+          </div>
+          <div class="col">
+              <p class="mb-2">
+                  <strong>Nouvelle fonctionnalité en phase d’expérimentation</strong>
+              </p>
+              <p class="mb-0">
+                  Dans le cadre de cette expérimentation, les bilans d’exécution GEIQ réalisés sur ce site n’ont aucune valeur officielle.
+              </p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+              <a aria-label="Plus d’informations sur l’expérimentation" class="btn btn-sm btn-primary btn-ico" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/25713585083409--Exp%C3%A9rimentation-du-bilan-d-ex%C3%A9cution-GEIQ" rel="noopener" target="_blank">
+                  <span>En savoir plus</span>
+                  <i class="ri-external-link-line ri-lg"></i>
+              </a>
+          </div>
+      </div>
+      <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
+  </div>
+  
+  
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  '''
+# ---

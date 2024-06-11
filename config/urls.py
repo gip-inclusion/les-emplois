@@ -61,6 +61,7 @@ urlpatterns = [
     path("autocomplete/", include("itou.www.autocomplete.urls")),
     path("dashboard/", include("itou.www.dashboard.urls")),
     path("employee_record/", include("itou.www.employee_record_views.urls")),
+    path("geiq/", include("itou.www.geiq_views.urls")),
     path("institutions/", include("itou.www.institutions_views.urls")),
     path("invitations/", include("itou.www.invitations_views.urls")),
     path("prescribers/", include("itou.www.prescribers_views.urls")),

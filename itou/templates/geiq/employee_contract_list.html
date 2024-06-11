@@ -1,0 +1,43 @@
+{% extends "geiq/list_base.html" %}
+{% load format_filters %}
+
+
+{% block title %}Contrats {{ block.super }}{% endblock %}
+
+{% block data_list %}
+
+    <div class="tab-content" id="result_page">
+        <div class="table-responsive-lg mt-3 mt-md-4">
+            <table class="table">
+                <caption class="visually-hidden">Liste des contrats</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Nom Prénom</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Poste occupé</th>
+                        <th scope="col">Durée hebdo</th>
+                        <th scope="col">Date de début</th>
+                        <th scope="col">Date de fin prévisionnelle</th>
+                        <th scope="col">Date de fin effective</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contract in data_page %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'geiq:employee_details' employee_pk=contract.employee.pk %}?back_url={{ request.get_full_path|urlencode }}">{{ contract.employee.get_full_name }}</a>
+                            </td>
+                            <td>{{ contract.other_data.nature_contrat.libelle|default:"-" }}</td>
+                            <td>{{ contract.other_data.metier_prepare|default:"-" }}</td>
+                            <td>{{ contract.other_data.nb_heure_hebdo|formatfloat_with_unit:"h"|default:"-" }}</td>
+                            <td>{{ contract.start_at|date:"d/m/Y" }}</td>
+                            <td>{{ contract.planned_end_at|date:"d/m/Y" }}</td>
+                            <td>{{ contract.end_at|date:"d/m/Y"|default:"-" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

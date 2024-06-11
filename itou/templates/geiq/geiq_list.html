@@ -1,0 +1,80 @@
+{% extends "layout/base.html" %}
+
+{% block title %}Rechercher un GEIQ - {{ request.current_organization.display_name }} {{ block.super }}{% endblock %}
+
+{% block breadcrumbs %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block content_title %}<h1>Rechercher un GEIQ</h1>{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="c-box container">
+                        <div class="s-tabs-01__row row">
+                            {% if not assessments %}
+                                <div class="text-center my-3 my-md-4">
+                                    <p class="mb-1 mt-3">
+                                        <strong>Aucun GEIQ</strong>
+                                    </p>
+                                </div>
+                            {% else %}
+                                <div class="tab-content" id="result_page">
+                                    <div class="table-responsive-lg mt-3 mt-md-4">
+                                        <table class="table">
+                                            <caption class="visually-hidden">Liste des GEIQ</caption>
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Statut du bilan</th>
+                                                    <th scope="col">Nom</th>
+                                                    <th scope="col">Commune</th>
+                                                    <th scope="col">Dernier bilan</th>
+                                                    <th scope="col">Salariés éligibles à l’aide</th>
+                                                    <th scope="col">Financement accordé</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for assessment in assessments %}
+                                                    <tr>
+                                                        <td>
+                                                            {% include "geiq/includes/labor_inspector_assessment_state_badge_for_list.html" with assessment=assessment only %}
+                                                        </td>
+                                                        <td>
+                                                            <a href="{% url 'geiq:assessment_info' assessment_pk=assessment.pk %}">{{ assessment.company.display_name }}</a>
+                                                        </td>
+                                                        <td>{{ assessment.company.insee_city.display_name|default:assessment.company.city }}</td>
+                                                        <td>{{ assessment.campaign.year }}</td>
+                                                        <td>{{ assessment.eligible_employees_nb }}</td>
+                                                        <td>
+                                                            {% if assessment.review_state == ReviewState.ACCEPTED %}
+                                                                <span class="text-success">100%</span>
+                                                            {% elif assessment.review_state == ReviewState.PARTIAL_ACCEPTED %}
+                                                                <span class="text-success">&gt;75%</span>
+                                                            {% elif assessment.review_state == ReviewState.REMAINDER_REFUSED %}
+                                                                <span class="text-warning">75%</span>
+
+                                                            {% elif assessment.review_state == ReviewState.PARTIAL_REFUND %}
+                                                                <span class="text-warning">&lt;75%</span>
+                                                            {% elif assessment.review_state == ReviewState.FULL_REFUND %}
+                                                                <span class="text-danger">0%</span>
+                                                            {% else %}
+                                                                -
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -49,6 +49,7 @@ from tests.companies.factories import (
     CompanyPendingGracePeriodFactory,
 )
 from tests.employee_record.factories import EmployeeRecordFactory
+from tests.geiq.factories import ImplementationAssessmentCampaignFactory, ImplementationAssessmentFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberFactory
 from tests.openid_connect.inclusion_connect.test import (
@@ -90,6 +91,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
     HIRE_LINK_LABEL = "Déclarer une embauche"
     DORA_LABEL = "DORA"
     DORA_CARD_MSG = "Consultez l’offre de service de vos partenaires"
+    IMPLEMENTATION_ASSESSMENT = "Bilan d’exécution & salariés"
 
     @staticmethod
     def apply_start_url(company):
@@ -761,6 +763,69 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
 
         response = self.client.get(reverse("dashboard:index"))
         assert response.status_code == 200
+
+    @parametrize(
+        "institution_kind, campaign_year, card_visible, note_visible",
+        [
+            (InstitutionKind.DDETS_GEIQ, 2023, True, True),
+            (InstitutionKind.DDETS_IAE, 2023, False, False),
+            (InstitutionKind.DDETS_GEIQ, 2024, True, False),
+            (InstitutionKind.DREETS_GEIQ, 2023, True, True),
+            (InstitutionKind.DREETS_IAE, 2023, False, False),
+            (InstitutionKind.DREETS_GEIQ, 2024, True, False),
+        ],
+    )
+    @freeze_time("2024-03-10")
+    def test_institution_with_geiq_assessment_campaign(
+        self, institution_kind, campaign_year, card_visible, note_visible
+    ):
+        membership = InstitutionMembershipFactory(institution__kind=institution_kind)
+        user = membership.user
+        self.client.force_login(user)
+        ImplementationAssessmentCampaignFactory(
+            year=campaign_year,
+            submission_deadline=date(campaign_year + 1, 7, 1),
+            review_deadline=date(campaign_year + 1, 8, 1),
+        )
+        response = self.client.get(reverse("dashboard:index"))
+        list_link_assertion = self.assertContains if card_visible else self.assertNotContains
+        list_link_assertion(response, reverse("geiq:geiq_list", kwargs={"institution_pk": membership.institution.pk}))
+        note_assertion = self.assertContains if note_visible else self.assertNotContains
+        note_assertion(response, "Période de contrôle bilans 2023")
+        note_assertion(response, "Le contrôle devra se faire entre le 01/07/2024 et le 01/08/2024.")
+
+    @freeze_time("2024-03-10")
+    def test_geiq_implement_assessment_card(self):
+        campaign = ImplementationAssessmentCampaignFactory(
+            year=2022,
+            submission_deadline=date(2023, 7, 1),
+            review_deadline=date(2023, 8, 1),
+        )
+        membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+        user = membership.user
+        self.client.force_login(user)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertNotContains(response, self.IMPLEMENTATION_ASSESSMENT)
+        assessment = ImplementationAssessmentFactory(campaign=campaign, company=membership.company)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, self.IMPLEMENTATION_ASSESSMENT)
+        self.assertContains(response, reverse("geiq:assessment_info", kwargs={"assessment_pk": assessment.pk}))
+        self.assertContains(
+            response,
+            reverse(
+                "geiq:employee_list", kwargs={"assessment_pk": assessment.pk, "info_type": "personal-information"}
+            ),
+        )
+        # With several assessments, the last one is shown
+        new_assessment = ImplementationAssessmentFactory(campaign__year=2023, company=membership.company)
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, reverse("geiq:assessment_info", kwargs={"assessment_pk": new_assessment.pk}))
+        self.assertContains(
+            response,
+            reverse(
+                "geiq:employee_list", kwargs={"assessment_pk": new_assessment.pk, "info_type": "personal-information"}
+            ),
+        )
 
 
 @pytest.mark.usefixtures("unittest_compatibility")

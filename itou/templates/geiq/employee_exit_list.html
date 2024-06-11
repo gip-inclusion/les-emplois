@@ -1,0 +1,48 @@
+{% extends "geiq/list_base.html" %}
+
+
+{% block title %}Sorties {{ block.super }}{% endblock %}
+
+{% block data_list %}
+
+    <div class="tab-content" id="result_page">
+        <div class="table-responsive-lg mt-3 mt-md-4">
+            <table class="table">
+                <caption class="visually-hidden">Liste des sorties</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Nom Prénom</th>
+                        <th scope="col">Type de rupture anticipée</th>
+                        <th scope="col">Date de rupture anticipée</th>
+                        <th scope="col">Type de qualification obtenue</th>
+                        <th scope="col">Niveau de qualification obtenue</th>
+                        <th scope="col">Situation post-contrat</th>
+                        <th scope="col">Précision</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contract in data_page %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'geiq:employee_details' employee_pk=contract.employee.pk %}?back_url={{ request.get_full_path|urlencode }}">{{ contract.employee.get_full_name }}</a>
+                            </td>
+                            <td>{{ contract.other_data.rupture|yesno:"Hors période d’essai,En période d’essai,-" }}</td>
+                            <td>
+                                {% if contract.end_at and contract.end_at != contract.planned_end_at %}
+                                    {{ contract.end_at|date:"d/m/Y" }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>{{ contract.other_data.type_qualification_obtenu.libelle|default:"-" }}</td>
+                            <td>{{ contract.other_data.qualification_obtenu.libelle|default:"-" }}</td>
+                            <td>{{ contract.other_data.emploi_sorti.libelle|default:"-" }}</td>
+                            <td>{{ contract.other_data.emploi_sorti_precision.libelle|default:"-" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

@@ -22,9 +22,12 @@ from rest_framework.authtoken.models import Token
 from itou.api.token_auth.views import TOKEN_ID_STR
 from itou.approvals.enums import ProlongationRequestStatus
 from itou.approvals.models import ProlongationRequest
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
+from itou.geiq.models import ImplementationAssessmentCampaign
+from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.job_applications.enums import JobApplicationState
 from itou.openid_connect.inclusion_connect import constants as ic_constants
@@ -103,6 +106,10 @@ def _employer_dashboard_context(request):
         "num_rejected_employee_records": (
             EmployeeRecord.objects.for_company(current_org).filter(status=Status.REJECTED).count()
         ),
+        "last_geiq_execution_assessment": (
+            current_org.kind == CompanyKind.GEIQ
+            and current_org.implementation_assessments.select_related("campaign").order_by("campaign__year").last()
+        ),
         "siae_suspension_text_with_dates": (
             current_org.get_active_suspension_text_with_dates()
             # Otherwise they cannot be suspended
@@ -116,6 +123,7 @@ def _employer_dashboard_context(request):
 @login_required
 def dashboard(request, template_name="dashboard/dashboard.html"):
     context = {
+        "active_geiq_campaign": None,
         "active_campaigns": [],
         "closed_campaigns": [],
         "job_applications_categories": [],
@@ -237,6 +245,11 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                 context["active_campaigns"].append(campaign)
             else:
                 context["closed_campaigns"].append(campaign)
+        context["active_geiq_campaign"] = (
+            ImplementationAssessmentCampaign.objects.filter(year=timezone.localdate().year - 1).first()
+            if current_org.kind in (InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ)
+            else None
+        )
     elif request.user.is_job_seeker:
         # Force job seekers to complete their profile.
         required_attributes = ["title", "first_name", "last_name", "address_line_1", "post_code", "city"]

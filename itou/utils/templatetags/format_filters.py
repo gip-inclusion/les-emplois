@@ -7,7 +7,7 @@ import re
 from textwrap import wrap
 
 from django import template
-from django.template.defaultfilters import stringfilter
+from django.template.defaultfilters import floatformat, stringfilter
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
@@ -82,3 +82,30 @@ def format_approval_number(number, autoescape=True):
 @stringfilter
 def remove_json_extension(filename):
     return filename.removesuffix(".json")
+
+
+@register.filter(is_safe=True)
+def formatfloat_with_unit(number, unit):
+    if number is not None:
+        return f"{floatformat(number)} {unit}"
+    return None
+
+
+@register.filter
+def label_object_format(data):
+    if data is None:
+        return "-"
+    elif not isinstance(data, dict):
+        return data
+    if "libelle" in data and "libelle_abr" in data:
+        other_data = {
+            "abr": data["libelle_abr"],
+            **{k: v for k, v in data.items() if k not in ("libelle", "libelle_abr")},
+        }
+        other_data_str = ", ".join(f"{k}: {v}" for k, v in other_data.items())
+        return f"{data['libelle']} | [{other_data_str}]"
+    if "nom" in data:
+        other_data = {k: v for k, v in data.items() if k != "nom"}
+        other_data_str = ", ".join(f"{k}: {v}" for k, v in other_data.items())
+        return f"{data['nom']} - [{other_data_str}]"
+    return str(data)
