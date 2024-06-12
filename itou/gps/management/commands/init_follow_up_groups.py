@@ -149,7 +149,9 @@ class Command(BaseCommand):
             logger.info(f"Empty groups not created: {empty_groups_counter}.")
             if wet_run:
                 logger.info(f"Creating {len(groups_to_create)} FollowUpGroups.")
+
                 FollowUpGroup.objects.bulk_create(groups_to_create)
+
                 logger.info(f"Creating {len(memberships_to_create)} FollowUpGroupMembership.")
                 FollowUpGroupMembership.objects.bulk_create(memberships_to_create)
                 logger.info("GPS is live. Congrats! 🥳")
