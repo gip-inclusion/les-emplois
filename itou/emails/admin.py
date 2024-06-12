@@ -20,8 +20,8 @@ class EmailStatusFilter(admin.SimpleListFilter):
 
     def lookups(self, request, model_admin):
         return [
-            ("0", "Oui"),
-            ("1", "Non"),
+            ("0", "Non"),
+            ("1", "Oui"),
         ]
 
     def queryset(self, request, queryset):
