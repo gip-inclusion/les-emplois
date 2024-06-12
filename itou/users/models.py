@@ -269,6 +269,7 @@ class User(AbstractUser, AddressMixin):
     public_id = models.UUIDField(
         verbose_name="identifiant public opaque, pour les API",
         default=uuid.uuid4,
+        unique=True,
     )
 
     address_filled_at = models.DateTimeField(
