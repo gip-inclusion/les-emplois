@@ -308,51 +308,42 @@ def test_can_view_stats_ph(kind, region):
     assert utils.can_view_stats_ph(request)
 
 
-def test_can_view_stats_ddets_iae():
+@pytest.mark.parametrize(
+    "kind, is_admin, expected_can_view_stats_ddets_iae",
+    [
+        # Admin member of DDETS IAE can access.
+        (InstitutionKind.DDETS_IAE, True, True),
+        # Non admin member of DDETS IAE can access as well.
+        (InstitutionKind.DDETS_IAE, False, True),
+        # Member of institution of wrong kind cannot access.
+        (InstitutionKind.OTHER, True, False),
+    ],
+)
+def test_can_view_stats_ddets_iae(kind, is_admin, expected_can_view_stats_ddets_iae):
+    institution = InstitutionWithMembershipFactory(kind=kind, membership__is_admin=is_admin, department="93")
+    request = get_request(institution.members.get())
+    assert utils.can_view_stats_ddets_iae(request) is expected_can_view_stats_ddets_iae
+    assert utils.can_view_stats_dashboard_widget(request)
+
+
+@pytest.mark.parametrize(
+    "kind, is_admin, expected_can_view_stats_ddets_iae_aci",
+    [
+        # Admin member of DDETS IAE can access.
+        (InstitutionKind.DDETS_IAE, True, True),
+        # Non admin member of DDETS IAE can access as well.
+        (InstitutionKind.DDETS_IAE, False, True),
+        # Member of institution of wrong kind cannot access.
+        (InstitutionKind.OTHER, True, False),
+    ],
+)
+def test_can_view_stats_ddets_iae_aci(kind, is_admin, expected_can_view_stats_ddets_iae_aci):
     # Admin member of DDETS IAE can access.
-    institution = InstitutionWithMembershipFactory(kind=InstitutionKind.DDETS_IAE, department="93")
-    request = get_request(institution.members.get())
-    assert utils.can_view_stats_ddets_iae(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-    # Non admin member of DDETS IAE can access as well.
     institution = InstitutionWithMembershipFactory(
-        kind=InstitutionKind.DDETS_IAE, membership__is_admin=False, department="93"
+        kind=kind, membership__is_admin=is_admin, department=factory.fuzzy.FuzzyChoice([31, 84])
     )
     request = get_request(institution.members.get())
-    assert utils.can_view_stats_ddets_iae(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-    # Member of institution of wrong kind cannot access.
-    institution = InstitutionWithMembershipFactory(kind=InstitutionKind.OTHER, department="93")
-    request = get_request(institution.members.get())
-    assert not utils.can_view_stats_ddets_iae(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-
-def test_can_view_stats_ddets_iae_aci():
-    # Admin member of DDETS IAE can access.
-    institution = InstitutionWithMembershipFactory(
-        kind=InstitutionKind.DDETS_IAE, department=factory.fuzzy.FuzzyChoice([31, 84])
-    )
-    request = get_request(institution.members.get())
-    assert utils.can_view_stats_ddets_iae_aci(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-    # Non admin member of DDETS IAE can access as well.
-    institution = InstitutionWithMembershipFactory(
-        kind=InstitutionKind.DDETS_IAE, membership__is_admin=False, department=factory.fuzzy.FuzzyChoice([31, 84])
-    )
-    request = get_request(institution.members.get())
-    assert utils.can_view_stats_ddets_iae_aci(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-    # Member of institution of wrong kind cannot access.
-    institution = InstitutionWithMembershipFactory(
-        kind=InstitutionKind.OTHER, department=factory.fuzzy.FuzzyChoice([31, 84])
-    )
-    request = get_request(institution.members.get())
-    assert not utils.can_view_stats_ddets_iae_aci(request)
+    assert utils.can_view_stats_ddets_iae_aci(request) is expected_can_view_stats_ddets_iae_aci
     assert utils.can_view_stats_dashboard_widget(request)
 
 

@@ -7,6 +7,7 @@ from pytest_django.asserts import assertMessages, assertNumQueries
 
 from itou.siae_evaluations import enums as evaluation_enums
 from tests.companies.factories import CompanyMembershipFactory
+from tests.institutions.factories import InstitutionFactory
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
@@ -20,7 +21,8 @@ from tests.utils.test import BASE_NUM_QUERIES, get_rows_from_streaming_response
 class TestEvaluationCampaignAdmin:
     @freeze_time("2022-12-07 11:11:00")
     def test_export(self, client):
-        campaign1 = EvaluationCampaignFactory(name="Contrôle 01/01/2022", institution__name="DDETS 01")
+        institution = InstitutionFactory(name="DDETS 01", department="01")
+        campaign1 = EvaluationCampaignFactory(name="Contrôle 01/01/2022", institution=institution)
         campaign1_siae = EvaluatedSiaeFactory(
             evaluation_campaign=campaign1,
             siae__name="les jardins",
@@ -30,7 +32,7 @@ class TestEvaluationCampaignAdmin:
         )
         CompanyMembershipFactory(company=campaign1_siae.siae, user__email="campaign1+1@beta.gouv.fr")
         CompanyMembershipFactory(company=campaign1_siae.siae, user__email="campaign1+2@beta.gouv.fr")
-        campaign2 = EvaluationCampaignFactory(name="Contrôle 01/01/2021", institution__name="DDETS 01")
+        campaign2 = EvaluationCampaignFactory(name="Contrôle 01/01/2021", institution=institution)
         campaign2_siae = EvaluatedSiaeFactory(
             evaluation_campaign=campaign2,
             siae__name="les trucs du bazar",
@@ -41,7 +43,7 @@ class TestEvaluationCampaignAdmin:
         )
         CompanyMembershipFactory(company=campaign2_siae.siae, user__email="campaign2@beta.gouv.fr")
         campaign3 = EvaluationCampaignFactory(
-            name="Contrôle 01/01/2019", institution__name="DDETS 01", ended_at=timezone.now()
+            name="Contrôle 01/01/2019", institution=institution, ended_at=timezone.now()
         )
         campaign3_siae = EvaluatedSiaeFactory(
             evaluation_campaign=campaign3,
@@ -54,7 +56,7 @@ class TestEvaluationCampaignAdmin:
             notification_reason=evaluation_enums.EvaluatedSiaeNotificationReason.MISSING_PROOF,
         )
         CompanyMembershipFactory(company=campaign3_siae.siae, user__email="campaign3@beta.gouv.fr")
-        campaign4 = EvaluationCampaignFactory(name="Contrôle 01/01/2018", institution__name="DDETS 01")
+        campaign4 = EvaluationCampaignFactory(name="Contrôle 01/01/2018", institution=institution)
         campaign4_siae = EvaluatedSiaeFactory(
             evaluation_campaign=campaign4,
             siae__name="les machins",
@@ -78,7 +80,9 @@ class TestEvaluationCampaignAdmin:
         )
         CompanyMembershipFactory(company=campaign4_siae.siae, user__email="campaign4@beta.gouv.fr")
         # Not selected.
-        EvaluatedSiaeFactory(evaluation_campaign__name="Contrôle 02/02/2020")
+        EvaluatedSiaeFactory(
+            evaluation_campaign__name="Contrôle 02/02/2020", evaluation_campaign__institution__department="02"
+        )
         admin_user = ItouStaffFactory(is_superuser=True)
         client.force_login(admin_user)
         with assertNumQueries(
@@ -188,12 +192,12 @@ class TestEvaluationCampaignAdmin:
         ]
 
     def test_freeze(self, client):
-        campaign1 = EvaluationCampaignFactory()
+        campaign1 = EvaluationCampaignFactory(institution__department="01")
         campaign1_siae = EvaluatedSiaeFactory(
             evaluation_campaign=campaign1,
             submission_freezed_at=timezone.now() - relativedelta(days=1),
         )
-        campaign2 = EvaluationCampaignFactory()
+        campaign2 = EvaluationCampaignFactory(institution__department="02")
         campaign2_siae = EvaluatedSiaeFactory(
             evaluation_campaign=campaign2,
         )

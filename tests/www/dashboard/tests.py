@@ -409,8 +409,11 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
 
     def test_dashboard_siae_evaluation_campaign_notifications(self):
         membership = CompanyMembershipFactory()
+        # Unique institution to avoid constraints failures
+        evaluating_institution = InstitutionFactory(kind=InstitutionKind.DDETS_IAE)
         evaluated_siae_with_final_decision = EvaluatedSiaeFactory(
             evaluation_campaign__name="Final decision reached",
+            evaluation_campaign__institution=evaluating_institution,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             siae=membership.company,
@@ -421,6 +424,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         in_progress_name = "In progress"
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__name=in_progress_name,
+            evaluation_campaign__institution=evaluating_institution,
             siae=membership.company,
             evaluation_campaign__evaluations_asked_at=timezone.now(),
         )
@@ -434,6 +438,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         not_notified_name = "Not notified"
         EvaluatedSiaeFactory(
             evaluation_campaign__name=not_notified_name,
+            evaluation_campaign__institution=evaluating_institution,
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
             siae=membership.company,
@@ -441,6 +446,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         just_closed_name = "Just closed"
         evaluated_siae_campaign_closed = EvaluatedSiaeFactory(
             evaluation_campaign__name=just_closed_name,
+            evaluation_campaign__institution=evaluating_institution,
             complete=True,
             siae=membership.company,
             evaluation_campaign__ended_at=timezone.now() - relativedelta(days=4),
@@ -452,6 +458,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         long_closed_name = "Long closed"
         EvaluatedSiaeFactory(
             evaluation_campaign__name=long_closed_name,
+            evaluation_campaign__institution=evaluating_institution,
             complete=True,
             siae=membership.company,
             evaluation_campaign__ended_at=timezone.now() - CAMPAIGN_VIEWABLE_DURATION,
