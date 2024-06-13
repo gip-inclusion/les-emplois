@@ -22,6 +22,16 @@ class Institution(AddressMixin, OrganizationAbstract):
         verbose_name = "institution partenaire"
         verbose_name_plural = "institutions partenaires"
 
+        constraints = [
+            models.UniqueConstraint(
+                fields=("kind", "department"),
+                name="unique_ddets_per_department",
+                condition=models.Q(
+                    kind__in=(InstitutionKind.DDETS_GEIQ, InstitutionKind.DDETS_IAE, InstitutionKind.DDETS_LOG)
+                ),
+            ),
+        ]
+
     kind = models.CharField(
         verbose_name="type", max_length=20, choices=InstitutionKind.choices, default=InstitutionKind.OTHER
     )
