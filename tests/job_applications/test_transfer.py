@@ -10,7 +10,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.enums import UserKind
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
+from tests.eligibility.factories import EligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByCompanyFactory,
@@ -112,7 +112,7 @@ class JobApplicationTransferModelTest(TestCase):
         job_application = JobApplicationSentByCompanyFactory(
             state=JobApplicationState.PROCESSING,
             to_company=origin_company,
-            eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
+            eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
         )
         eligibility_diagnosis_pk = job_application.eligibility_diagnosis.pk
         job_application.transfer(user=origin_user, target_company=target_company)
@@ -157,7 +157,7 @@ class JobApplicationTransferModelTest(TestCase):
         job_application = JobApplicationSentByCompanyFactory(
             state=JobApplicationState.PROCESSING,
             to_company=origin_company,
-            eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
+            eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
             answer="Answer to job seeker",
             answer_to_prescriber="Answer to prescriber",
         )
@@ -222,7 +222,7 @@ class JobApplicationTransferModelTest(TestCase):
         job_application = JobApplicationSentByCompanyFactory(
             state=JobApplicationState.PROCESSING,
             to_company=origin_company,
-            eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
+            eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
         )
         job_seeker = job_application.job_seeker
 
@@ -283,7 +283,7 @@ class JobApplicationTransferModelTest(TestCase):
         job_application = JobApplicationSentByCompanyFactory(
             state=JobApplicationState.PROCESSING,
             to_company=origin_company,
-            eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
+            eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True),
         )
         job_seeker = job_application.job_seeker
 

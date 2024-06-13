@@ -1,3 +1,5 @@
+import functools
+
 import factory
 from django.utils import timezone
 
@@ -9,7 +11,25 @@ from tests.prescribers.factories import PrescriberOrganizationWithMembershipFact
 from tests.users.factories import JobSeekerFactory
 
 
-class GEIQEligibilityDiagnosisFactory(factory.django.DjangoModelFactory):
+class AbstractEligibilityDiagnosisModelFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        abstract = True
+
+    class Params:
+        from_prescriber = factory.Trait(
+            author_kind=AuthorKind.PRESCRIBER,
+            author_prescriber_organization=factory.SubFactory(
+                PrescriberOrganizationWithMembershipFactory, authorized=True
+            ),
+            author=factory.LazyAttribute(lambda obj: obj.author_prescriber_organization.members.first()),
+        )
+        expired = factory.Trait(expires_at=factory.LazyFunction(timezone.now))
+
+    created_at = factory.LazyFunction(timezone.now)
+    job_seeker = factory.SubFactory(JobSeekerFactory)
+
+
+class GEIQEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
     """Same as factories below, but :
     - with all possible author types
     - tailored for GEIQ tests."""
@@ -23,58 +43,21 @@ class GEIQEligibilityDiagnosisFactory(factory.django.DjangoModelFactory):
             author_geiq=factory.SubFactory(CompanyWith2MembershipsFactory, kind=CompanyKind.GEIQ, with_jobs=True),
             author=factory.LazyAttribute(lambda obj: obj.author_geiq.members.first()),
         )
-        with_prescriber = factory.Trait(
-            author_kind=AuthorKind.PRESCRIBER,
-            author_prescriber_organization=factory.SubFactory(
-                PrescriberOrganizationWithMembershipFactory, authorized=True
-            ),
-            author=factory.LazyAttribute(lambda obj: obj.author_prescriber_organization.members.first()),
-        )
-        expired = factory.Trait(expires_at=factory.LazyFunction(timezone.now))
-
-    created_at = factory.LazyFunction(timezone.now)
-    job_seeker = factory.SubFactory(JobSeekerFactory)
+        with_prescriber = factory.Trait(from_prescriber=True)
 
 
-class EligibilityDiagnosisFactory(factory.django.DjangoModelFactory):
+class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
     """Generate an EligibilityDiagnosis() object whose author is an authorized prescriber organization."""
 
     class Meta:
         model = models.EligibilityDiagnosis
 
-    created_at = factory.LazyFunction(timezone.now)
-    author = factory.LazyAttribute(lambda obj: obj.author_prescriber_organization.members.first())
-    author_kind = AuthorKind.PRESCRIBER
-    author_prescriber_organization = factory.SubFactory(PrescriberOrganizationWithMembershipFactory, authorized=True)
-    job_seeker = factory.SubFactory(JobSeekerFactory)
+    class Params:
+        from_employer = factory.Trait(
+            author_kind=AuthorKind.EMPLOYER,
+            author_siae=factory.SubFactory(CompanyFactory, subject_to_eligibility=True, with_membership=True),
+            author=factory.LazyAttribute(lambda obj: obj.author_siae.members.first()),
+        )
 
 
-class EligibilityDiagnosisMadeBySiaeFactory(factory.django.DjangoModelFactory):
-    """Generate an EligibilityDiagnosis() object whose author is an SIAE."""
-
-    class Meta:
-        model = models.EligibilityDiagnosis
-
-    created_at = factory.LazyFunction(timezone.now)
-    author = factory.LazyAttribute(lambda obj: obj.author_siae.members.first())
-    author_kind = AuthorKind.EMPLOYER
-    author_siae = factory.SubFactory(CompanyFactory, with_membership=True)
-    job_seeker = factory.SubFactory(JobSeekerFactory)
-
-
-class ExpiredEligibilityDiagnosisFactory(EligibilityDiagnosisFactory):
-    expires_at = factory.SelfAttribute("created_at")
-
-
-class ExpiredEligibilityDiagnosisMadeBySiaeFactory(EligibilityDiagnosisMadeBySiaeFactory):
-    expires_at = factory.SelfAttribute("created_at")
-
-
-class AdministrativeCriteriaFactory(factory.django.DjangoModelFactory):
-    """
-    The AdministrativeCriteria table is automatically populated with a fixture
-    after a `post_migrate` signal at the start of the `eligibility` app.
-    """
-
-    class Meta:
-        model = models.AdministrativeCriteria
+EligibilityDiagnosisFactory = functools.partial(IAEEligibilityDiagnosisFactory, from_prescriber=True)

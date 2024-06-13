@@ -17,7 +17,7 @@ from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
+from tests.eligibility.factories import EligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
@@ -526,14 +526,16 @@ class ProcessListSiaeTest(TestCase):
 
         # Diagnosis made by eddie_hit_pit's SIAE
         diagnosis.delete()
-        diagnosis = EligibilityDiagnosisMadeBySiaeFactory(job_seeker=self.maggie, author_siae=self.hit_pit)
+        diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker=self.maggie, from_employer=True, author_siae=self.hit_pit
+        )
         response = self.client.get(reverse("apply:list_for_siae"), params)
         # Maggie has two applications, one created in the state loop and the other created by SentByPrescriberFactory
         assert len(response.context["job_applications_page"].object_list) == 2
 
         # Diagnosis made by an other SIAE - it should be ignored
         diagnosis.delete()
-        diagnosis = EligibilityDiagnosisMadeBySiaeFactory(job_seeker=self.maggie)
+        diagnosis = IAEEligibilityDiagnosisFactory(job_seeker=self.maggie, from_employer=True)
         response = self.client.get(reverse("apply:list_for_siae"), params)
         assert len(response.context["job_applications_page"].object_list) == 0
 

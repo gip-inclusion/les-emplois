@@ -24,7 +24,10 @@ from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.companies.factories import CompanyFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
+from tests.eligibility.factories import (
+    EligibilityDiagnosisFactory,
+    IAEEligibilityDiagnosisFactory,
+)
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
@@ -1046,7 +1049,7 @@ class LatestApprovalTestCase(TestCase):
 
         # Waiting period cannot be bypassed if a valid diagnosis exists
         # but was not made by an authorized prescriber.
-        diag = EligibilityDiagnosisMadeBySiaeFactory(job_seeker=user)
+        diag = IAEEligibilityDiagnosisFactory(job_seeker=user, from_employer=True)
         assert user.new_approval_blocked_by_waiting_period(
             siae=CompanyFactory(kind=CompanyKind.ETTI),
             sender_prescriber_organization=None,

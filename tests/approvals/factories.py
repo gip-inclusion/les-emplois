@@ -25,7 +25,7 @@ from itou.approvals.models import (
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from tests.companies.factories import CompanyFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory
@@ -66,7 +66,9 @@ class ApprovalFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
     number = factory.fuzzy.FuzzyText(length=7, chars=string.digits, prefix=Approval.ASP_ITOU_PREFIX)
     start_at = factory.LazyFunction(datetime.date.today)
     end_at = factory.LazyAttribute(lambda obj: Approval.get_default_end_date(obj.start_at))
-    eligibility_diagnosis = factory.SubFactory(EligibilityDiagnosisFactory, job_seeker=factory.SelfAttribute("..user"))
+    eligibility_diagnosis = factory.SubFactory(
+        IAEEligibilityDiagnosisFactory, from_prescriber=True, job_seeker=factory.SelfAttribute("..user")
+    )
 
     @factory.post_generation
     def with_jobapplication(self, create, extracted, **kwargs):
