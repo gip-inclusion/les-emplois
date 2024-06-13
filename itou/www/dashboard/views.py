@@ -452,6 +452,11 @@ def api_token(request, template_name="dashboard/api_token.html"):
 class AccountMigrationView(LoginRequiredMixin, TemplateView):
     template_name = "account/activate_inclusion_connect_account.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.kind not in MATOMO_ACCOUNT_TYPE:
+            return HttpResponseRedirect(reverse("dashboard:index"))
+        return super().dispatch(request, *args, **kwargs)
+
     def _get_inclusion_connect_base_params(self):
         params = {
             "user_kind": self.request.user.kind,
