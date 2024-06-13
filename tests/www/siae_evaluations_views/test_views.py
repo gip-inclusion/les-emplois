@@ -12,7 +12,7 @@ from itou.siae_evaluations.models import Sanctions
 from itou.utils.types import InclusiveDateRange
 from tests.companies.factories import CompanyMembershipFactory
 from tests.files.factories import FileFactory
-from tests.institutions.factories import InstitutionMembershipFactory
+from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
@@ -467,9 +467,10 @@ class TestViewProof:
         assert httpx.get(response.url).content == pdf_file.read()
 
     def test_access_other_siae(self, client):
-        job_app = EvaluatedJobApplicationFactory()
+        institution = InstitutionFactory(name="DDETS 01", department="01")
+        job_app = EvaluatedJobApplicationFactory(evaluated_siae__evaluation_campaign__institution=institution)
         crit = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app)
-        other_evaluated_siae = EvaluatedSiaeFactory()
+        other_evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__institution=institution)
         membership = CompanyMembershipFactory(company=other_evaluated_siae.siae)
         url = reverse("siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": crit.pk})
         client.force_login(membership.user)

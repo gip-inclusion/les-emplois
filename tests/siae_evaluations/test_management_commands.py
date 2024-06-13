@@ -52,6 +52,7 @@ class TestManagementCommand:
             evaluated_period_start_at=datetime.date(2022, 1, 1),
             evaluated_period_end_at=datetime.date(2022, 9, 30),
             institution__name="DDETS 01",
+            institution__department="01",
             name="Campagne 1",
         )
         evaluated_company_1 = EvaluatedSiaeFactory.create(
@@ -64,6 +65,7 @@ class TestManagementCommand:
             evaluated_period_start_at=datetime.date(2022, 1, 1),
             evaluated_period_end_at=datetime.date(2022, 9, 30),
             institution__name="DDETS 02",
+            institution__department="02",
             name="Campagne 1",
         )
         evaluated_company_2 = EvaluatedSiaeFactory.create(

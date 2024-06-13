@@ -15,7 +15,7 @@ from itou.siae_evaluations.models import EvaluatedAdministrativeCriteria
 from itou.utils.templatetags.format_filters import format_approval_number
 from tests.companies.factories import CompanyMembershipFactory
 from tests.files.factories import FileFactory
-from tests.institutions.factories import InstitutionMembershipFactory
+from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
@@ -206,15 +206,18 @@ class SiaeJobApplicationListViewTest(TestCase):
 
     @freeze_time("2024-04-08")
     def test_state_hidden_with_submission_freezed_at(self):
+        institution = InstitutionFactory(name="DDETS 01", department="01")
         not_in_output = "This string should not be in output."
         evaluated_siae_phase_2bis = EvaluatedSiaeFactory(
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=10),
+            evaluation_campaign__institution=institution,
             siae=self.siae,
             submission_freezed_at=timezone.now() - relativedelta(days=1),
             reviewed_at=timezone.now(),
         )
         evaluated_siae_phase_3bis = EvaluatedSiaeFactory(
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=10),
+            evaluation_campaign__institution=institution,
             siae=self.siae,
             submission_freezed_at=timezone.now() - relativedelta(days=1),
             reviewed_at=timezone.now() - relativedelta(days=5),
@@ -271,6 +274,7 @@ class SiaeJobApplicationListViewTest(TestCase):
 
     @freeze_time("2024-04-08")
     def test_application_shown_after_submission_freeze_phase_3bis(self):
+        institution = InstitutionFactory(name="DDETS 01", department="01")
         test_data = [
             (
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
@@ -300,6 +304,7 @@ class SiaeJobApplicationListViewTest(TestCase):
                     evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=10),
                     evaluation_campaign__calendar__adversarial_stage_start=timezone.localdate()
                     - relativedelta(days=5),
+                    evaluation_campaign__institution=institution,
                     siae=self.siae,
                     submission_freezed_at=timezone.now() - relativedelta(days=1),
                     reviewed_at=timezone.now() - relativedelta(days=6),
@@ -629,6 +634,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
 
     @pytest.mark.ignore_unknown_variable_template_error("reviewed_at")
     def test_context_fields_list(self):
+        institution = InstitutionFactory(name="DDETS 01", department="01")
         self.client.force_login(self.user)
 
         # Combinations :
@@ -640,7 +646,11 @@ class SiaeSelectCriteriaViewTest(TestCase):
         for level_1, level_2 in [(True, False), (False, True), (True, True), (False, False)]:
             with self.subTest(level_1=level_1, level_2=level_2):
                 evaluated_job_application = create_evaluated_siae_with_consistent_datas(
-                    self.siae, self.user, level_1=level_1, level_2=level_2
+                    self.siae,
+                    self.user,
+                    level_1=level_1,
+                    level_2=level_2,
+                    institution=institution,
                 )
             response = self.client.get(
                 reverse(

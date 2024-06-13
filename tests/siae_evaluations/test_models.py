@@ -438,8 +438,9 @@ class EvaluationCampaignManagerTest(TestCase):
 
     @freeze_time("2023-01-02 11:11:11")
     def test_transition_to_adversarial_phase(self):
-        ignored_siae = EvaluatedSiaeFactory(pk=1000, siae__pk=2000)  # will be ignored
-        campaign = EvaluationCampaignFactory(institution__name="DDETS 1")
+        institution = InstitutionFactory(name="DDETS 1", department="01")
+        ignored_siae = EvaluatedSiaeFactory(pk=1000, siae__pk=2000, evaluation_campaign__institution=institution)
+        campaign = EvaluationCampaignFactory(institution=institution)
         # Did not select eligibility criteria to justify.
         evaluated_siae_no_response = EvaluatedSiaeFactory(
             pk=1001, evaluation_campaign=campaign, siae__name="Les grands jardins", siae__pk=2001
@@ -838,9 +839,12 @@ class EvaluatedSiaeQuerySetTest(TestCase):
 
     def test_in_progress(self):
         fake_now = timezone.now()
+        institution = InstitutionFactory(name="DDETS 01", department="01")
 
         # evaluations_asked_at is None
-        EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=None)
+        EvaluatedSiaeFactory(
+            evaluation_campaign__evaluations_asked_at=None, evaluation_campaign__institution=institution
+        )
         assert 0 == EvaluatedSiae.objects.in_progress().count()
 
         # ended_at is not None
@@ -848,7 +852,11 @@ class EvaluatedSiaeQuerySetTest(TestCase):
         assert 0 == EvaluatedSiae.objects.in_progress().count()
 
         # evaluations_asked_at is not None, ended_at is None
-        EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=fake_now, evaluation_campaign__ended_at=None)
+        EvaluatedSiaeFactory(
+            evaluation_campaign__evaluations_asked_at=fake_now,
+            evaluation_campaign__ended_at=None,
+            evaluation_campaign__institution=institution,
+        )
         assert 1 == EvaluatedSiae.objects.in_progress().count()
 
 
@@ -1440,12 +1448,13 @@ class EvaluatedAdministrativeCriteriaModelTest(TestCase):
 
 
 def test_siae_get_active_suspension_functions():
+    institution = InstitutionFactory(name="DDETS 01", department="01")
     company = CompanyFactory()
     assert company.get_active_suspension_dates() is None
 
     # Suspension in the past is inactive and not returned
     Sanctions.objects.create(
-        evaluated_siae=EvaluatedSiaeFactory(siae=company),
+        evaluated_siae=EvaluatedSiaeFactory(siae=company, evaluation_campaign__institution=institution),
         suspension_dates=InclusiveDateRange(
             timezone.localdate() - relativedelta(years=2), timezone.localdate() - relativedelta(years=1)
         ),
@@ -1466,7 +1475,7 @@ def test_siae_get_active_suspension_functions():
     )
     assert company.get_active_suspension_dates() == active_suspension
     Sanctions.objects.create(
-        evaluated_siae=EvaluatedSiaeFactory(siae=company),
+        evaluated_siae=EvaluatedSiaeFactory(siae=company, evaluation_campaign__institution=institution),
         suspension_dates=active_suspension2,
     )
     # We still get active_suspension that ends after active_suspension2
@@ -1481,7 +1490,7 @@ def test_siae_get_active_suspension_functions():
     # Suspension without end is prefered
     final_suspension = InclusiveDateRange(timezone.localdate() - relativedelta(years=2))
     Sanctions.objects.create(
-        evaluated_siae=EvaluatedSiaeFactory(siae=company),
+        evaluated_siae=EvaluatedSiaeFactory(siae=company, evaluation_campaign__institution=institution),
         suspension_dates=final_suspension,
     )
     assert company.get_active_suspension_dates() == final_suspension
