@@ -263,12 +263,20 @@ class GEIQAdministrativeCriteria(AbstractAdministrativeCriteria):
         ordering = [models.F("level").asc(nulls_last=True), "ui_rank"]
         constraints = [
             models.CheckConstraint(
-                name="ac_level_annex_coherence",
+                name="administrativecriteria_level_annex_consistency",
                 violation_error_message="Incohérence entre l'annexe du critère administratif et son niveau",
-                check=models.Q(annex=AdministrativeCriteriaAnnex.ANNEX_1, level__isnull=True)
-                | models.Q(annex=AdministrativeCriteriaAnnex.ANNEX_2, level__isnull=False)
-                | models.Q(annex=AdministrativeCriteriaAnnex.NO_ANNEX, level__isnull=True)
-                | models.Q(annex=AdministrativeCriteriaAnnex.BOTH_ANNEXES),
+                # Only criteria in Annex 2 (and hence those in both annexes) have a level
+                check=(
+                    models.Q(
+                        level__isnull=True,
+                        annex__in=(AdministrativeCriteriaAnnex.NO_ANNEX, AdministrativeCriteriaAnnex.ANNEX_1),
+                    )
+                    | models.Q(
+                        level__isnull=False,  # This condition is there to help Django's validate_constraints
+                        level__in=(AdministrativeCriteriaLevel.LEVEL_1, AdministrativeCriteriaLevel.LEVEL_2),
+                        annex__in=(AdministrativeCriteriaAnnex.ANNEX_2, AdministrativeCriteriaAnnex.BOTH_ANNEXES),
+                    )
+                ),
             ),
         ]
 
