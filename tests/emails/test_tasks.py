@@ -120,6 +120,7 @@ class TestAsyncSendMessage:
         )
         _async_send_message(email.pk)
         assert self.EXC_TEXT in caplog.text
+        assert f"Received invalid response from Mailjet, email_id={email.pk}. Payload: {error_text}" in caplog.text
         assert email.esp_response is None
 
     def test_task_failure(self, anymail_mailjet_settings, caplog, requests_mock):
