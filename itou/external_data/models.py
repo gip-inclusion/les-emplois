@@ -1,5 +1,5 @@
+from citext import CIEmailField
 from django.conf import settings
-from django.contrib.postgres.fields import CIEmailField
 from django.db import models
 from django.utils import timezone
 

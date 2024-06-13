@@ -1,3 +1,4 @@
+import citext
 import django.contrib.postgres.fields
 import django.contrib.postgres.fields.citext
 import django.contrib.postgres.indexes
@@ -18,7 +19,7 @@ class Migration(migrations.Migration):
                 (
                     "to",
                     django.contrib.postgres.fields.ArrayField(
-                        base_field=django.contrib.postgres.fields.citext.CIEmailField(max_length=254),
+                        base_field=citext.CIEmailField(max_length=254),
                         size=None,
                         verbose_name="à",
                     ),
@@ -26,7 +27,7 @@ class Migration(migrations.Migration):
                 (
                     "cc",
                     django.contrib.postgres.fields.ArrayField(
-                        base_field=django.contrib.postgres.fields.citext.CIEmailField(max_length=254),
+                        base_field=citext.CIEmailField(max_length=254),
                         default=list,
                         size=None,
                         verbose_name="cc",
@@ -35,7 +36,7 @@ class Migration(migrations.Migration):
                 (
                     "bcc",
                     django.contrib.postgres.fields.ArrayField(
-                        base_field=django.contrib.postgres.fields.citext.CIEmailField(max_length=254),
+                        base_field=citext.CIEmailField(max_length=254),
                         default=list,
                         size=None,
                         verbose_name="cci",
@@ -43,11 +44,11 @@ class Migration(migrations.Migration):
                 ),
                 ("subject", models.TextField(verbose_name="sujet")),
                 ("body_text", models.TextField(verbose_name="message")),
-                ("from_email", django.contrib.postgres.fields.citext.CIEmailField(max_length=254, verbose_name="de")),
+                ("from_email", citext.CIEmailField(max_length=254, verbose_name="de")),
                 (
                     "reply_to",
                     django.contrib.postgres.fields.ArrayField(
-                        base_field=django.contrib.postgres.fields.citext.CIEmailField(max_length=254),
+                        base_field=citext.CIEmailField(max_length=254),
                         default=list,
                         size=None,
                         verbose_name="répondre à",
