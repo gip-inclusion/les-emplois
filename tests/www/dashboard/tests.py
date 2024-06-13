@@ -2497,6 +2497,25 @@ def test_employer_using_django_has_to_activate_ic_account(client):
 
 
 @pytest.mark.parametrize(
+    "user_factory,is_redirected",
+    [
+        (ItouStaffFactory, True),
+        (JobSeekerFactory, True),
+        (PrescriberFactory, False),
+        (partial(EmployerFactory, with_company=True), False),
+        (partial(LaborInspectorFactory, membership=True), True),
+    ],
+)
+def test_activate_ic_account_permissions(client, user_factory, is_redirected):
+    client.force_login(user_factory())
+    response = client.get(reverse("dashboard:activate_ic_account"))
+    if is_redirected:
+        assertRedirects(response, reverse("dashboard:index"), fetch_redirect_response=False)
+    else:
+        assert response.status_code == 200
+
+
+@pytest.mark.parametrize(
     "factory,expected",
     [
         pytest.param(JobSeekerWithAddressFactory, assertNotContains, id="JobSeeker"),
