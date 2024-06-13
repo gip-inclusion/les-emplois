@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.forms",  # Required to override default Django widgets. See FORM_RENDERER
     # Third party apps.
     "anymail",
+    "citext",
     "django_bootstrap5",
     "django_select2",
     "formtools",

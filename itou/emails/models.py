@@ -1,4 +1,5 @@
-from django.contrib.postgres.fields import ArrayField, CIEmailField
+from citext import CIEmailField
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.utils import timezone

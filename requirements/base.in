@@ -24,6 +24,8 @@ django-allauth  # https://github.com/pennersr/django-allauth
 # django-anymail
 django-anymail  # https://github.com/anymail/django-anymail
 
+django-citext  # https://github.com/voiio/django-citext
+
 # django-pgtrigger (PostgresSQL triggers in models)
 django-pgtrigger  # https://github.com/Opus10/django-pgtrigger
 

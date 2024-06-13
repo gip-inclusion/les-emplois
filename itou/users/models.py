@@ -2,9 +2,9 @@ import time
 import uuid
 from collections import Counter
 
+from citext import CIEmailField
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
-from django.contrib.postgres.fields import CIEmailField
 from django.contrib.postgres.indexes import OpClass
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
