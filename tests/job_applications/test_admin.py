@@ -10,7 +10,7 @@ from itou.job_applications import models
 from itou.job_applications.enums import JobApplicationState
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
+from tests.eligibility.factories import EligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record import factories as employee_record_factories
 from tests.job_applications import factories
 from tests.users.factories import JobSeekerFactory
@@ -304,7 +304,7 @@ def test_available_transitions(admin_client, state, snapshot):
 def test_accept_job_application_for_job_seeker_with_approval(admin_client):
     # Create an approval with a diagnosis that would not be valid for the other company
     # (if the approval didn't exist)
-    existing_approval = ApprovalFactory(eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory())
+    existing_approval = ApprovalFactory(eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_employer=True))
     job_seeker = existing_approval.user
     job_application = factories.JobApplicationFactory(
         job_seeker=job_seeker,

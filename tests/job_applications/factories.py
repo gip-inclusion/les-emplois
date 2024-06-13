@@ -17,7 +17,10 @@ from itou.jobs.models import Appellation
 from itou.utils.types import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
+from tests.eligibility.factories import (
+    GEIQEligibilityDiagnosisFactory,
+    IAEEligibilityDiagnosisFactory,
+)
 from tests.prescribers.factories import (
     PrescriberOrganizationWithMembershipFactory,
     PrescriberPoleEmploiWithMembershipFactory,
@@ -110,7 +113,8 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
     sender_kind = SenderKind.PRESCRIBER  # Make explicit the model's default value
     sender = factory.SubFactory(PrescriberFactory)
     eligibility_diagnosis = factory.SubFactory(
-        EligibilityDiagnosisFactory,
+        IAEEligibilityDiagnosisFactory,
+        from_prescriber=True,
         job_seeker=factory.SelfAttribute("..job_seeker"),
         author=factory.SelfAttribute("..sender"),
     )

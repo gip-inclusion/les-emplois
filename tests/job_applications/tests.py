@@ -45,7 +45,7 @@ from tests.approvals.factories import (
     SuspensionFactory,
 )
 from tests.companies.factories import CompanyFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
+from tests.eligibility.factories import EligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import BareEmployeeRecordFactory, EmployeeRecordFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
@@ -1594,8 +1594,8 @@ class JobApplicationWorkflowTest(TestCase):
         to_employer_member = to_company.members.first()
         job_seeker = job_application.job_seeker
 
-        eligibility_diagnosis = EligibilityDiagnosisMadeBySiaeFactory(
-            job_seeker=job_seeker, author=to_employer_member, author_siae=to_company
+        eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
+            job_seeker=job_seeker, from_employer=True, author=to_employer_member, author_siae=to_company
         )
 
         # A valid Pôle emploi ID should trigger an automatic approval delivery.

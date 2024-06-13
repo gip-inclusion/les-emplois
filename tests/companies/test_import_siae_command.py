@@ -30,7 +30,7 @@ from itou.companies.management.commands._import_siae.vue_structure import (
 from itou.companies.models import Company
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory, SiaeConventionFactory
-from tests.eligibility.factories import EligibilityDiagnosisMadeBySiaeFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.test import TestCase
 
@@ -240,7 +240,7 @@ class TestCouldSiaeBeDeleted:
         assert could_siae_be_deleted(company)
 
         # An eligibility diagnosis without related approval
-        EligibilityDiagnosisMadeBySiaeFactory(author_siae=company, author=company.members.first())
+        IAEEligibilityDiagnosisFactory(from_employer=True, author_siae=company, author=company.members.first())
         assert could_siae_be_deleted(company)
 
         # Approval with eligibility diagnosis authored by SIAE
