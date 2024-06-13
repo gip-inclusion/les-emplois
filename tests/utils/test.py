@@ -153,6 +153,8 @@ def assert_previous_step(response, url, back_to_list=False):
 
 def create_fake_postcode():
     postcode = random.choice(list(DEPARTMENTS))
+    if postcode in ["2A", "2B"]:
+        postcode = "20"
     # add 3 numbers
     postcode += f"{int(random.randint(0, 999)):03}"
     # trunc to keep only 5 numbers, in case the department was 3 number long
