@@ -2515,6 +2515,11 @@ def test_activate_ic_account_permissions(client, user_factory, is_redirected):
         assert response.status_code == 200
 
 
+def test_activate_ic_account_anonymous(client):
+    response = client.get(reverse("dashboard:activate_ic_account"))
+    assertRedirects(response, "/accounts/login/?next=/dashboard/activate_ic_account")
+
+
 @pytest.mark.parametrize(
     "factory,expected",
     [

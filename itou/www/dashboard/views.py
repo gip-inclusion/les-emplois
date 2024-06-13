@@ -453,7 +453,7 @@ class AccountMigrationView(LoginRequiredMixin, TemplateView):
     template_name = "account/activate_inclusion_connect_account.html"
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.kind not in MATOMO_ACCOUNT_TYPE:
+        if request.user.is_authenticated and request.user.kind not in MATOMO_ACCOUNT_TYPE:
             return HttpResponseRedirect(reverse("dashboard:index"))
         return super().dispatch(request, *args, **kwargs)
 
