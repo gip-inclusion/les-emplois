@@ -18,23 +18,25 @@
                     </a>
                 </li>
             </ul>
-            <div class="alert alert-info" role="status">
-                <p class="mb-0"></p>
+            {% if not last_geiq_execution_assessment.submitted_at %}
+                <div class="alert alert-info" role="status">
+                    <p class="mb-0"></p>
 
-                <div class="row">
-                    <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl text-important" aria-hidden="true"></i>
-                    </div>
-                    <div class="col">
-                        <p class="mb-2">
-                            <strong>Validez votre bilan {{ last_geiq_execution_assessment.campaign.year }}</strong>
-                        </p>
-                        <p class="mb-0">
-                            Vous avez jusqu’au {{ last_geiq_execution_assessment.campaign.submission_deadline|date:"d/m/Y" }} pour valider le dossier de votre bilan d’exécution qui sera automatiquement transmis à votre DDETS/DREETS.
-                        </p>
+                    <div class="row">
+                        <div class="col-auto pe-0">
+                            <i class="ri-information-line ri-xl text-important" aria-hidden="true"></i>
+                        </div>
+                        <div class="col">
+                            <p class="mb-2">
+                                <strong>Validez votre bilan {{ last_geiq_execution_assessment.campaign.year }}</strong>
+                            </p>
+                            <p class="mb-0">
+                                Vous avez jusqu’au {{ last_geiq_execution_assessment.campaign.submission_deadline|date:"d/m/Y" }} pour valider le dossier de votre bilan d’exécution qui sera automatiquement transmis à votre DDETS/DREETS.
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
     </div>
 </div>

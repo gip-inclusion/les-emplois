@@ -49,6 +49,7 @@ from tests.companies.factories import (
     CompanyPendingGracePeriodFactory,
 )
 from tests.employee_record.factories import EmployeeRecordFactory
+from tests.files.factories import FileFactory
 from tests.geiq.factories import ImplementationAssessmentCampaignFactory, ImplementationAssessmentFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory, LaborInspectorFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberFactory
@@ -91,7 +92,6 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
     HIRE_LINK_LABEL = "Déclarer une embauche"
     DORA_LABEL = "DORA"
     DORA_CARD_MSG = "Consultez l’offre de service de vos partenaires"
-    IMPLEMENTATION_ASSESSMENT = "Bilan d’exécution & salariés"
 
     @staticmethod
     def apply_start_url(company):
@@ -796,6 +796,8 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
 
     @freeze_time("2024-03-10")
     def test_geiq_implement_assessment_card(self):
+        IMPLEMENTATION_ASSESSMENT = "Bilan d’exécution & salariés"
+        VALIDATE_ADMONITION = "Validez votre bilan"
         campaign = ImplementationAssessmentCampaignFactory(
             year=2022,
             submission_deadline=date(2023, 7, 1),
@@ -805,10 +807,12 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         user = membership.user
         self.client.force_login(user)
         response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, self.IMPLEMENTATION_ASSESSMENT)
+        self.assertNotContains(response, IMPLEMENTATION_ASSESSMENT)
+        self.assertNotContains(response, VALIDATE_ADMONITION)
         assessment = ImplementationAssessmentFactory(campaign=campaign, company=membership.company)
         response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, self.IMPLEMENTATION_ASSESSMENT)
+        self.assertContains(response, IMPLEMENTATION_ASSESSMENT)
+        self.assertContains(response, VALIDATE_ADMONITION)
         self.assertContains(response, reverse("geiq:assessment_info", kwargs={"assessment_pk": assessment.pk}))
         self.assertContains(
             response,
@@ -816,9 +820,27 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
                 "geiq:employee_list", kwargs={"assessment_pk": assessment.pk, "info_type": "personal-information"}
             ),
         )
+        assessment.last_synced_at = timezone.now()
+        assessment.submitted_at = timezone.now()
+        assessment.activity_report_file = FileFactory()
+        assessment.save()
+        # submitted assessment
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, IMPLEMENTATION_ASSESSMENT)
+        self.assertNotContains(response, VALIDATE_ADMONITION)
+        self.assertContains(response, reverse("geiq:assessment_info", kwargs={"assessment_pk": assessment.pk}))
+        self.assertContains(
+            response,
+            reverse(
+                "geiq:employee_list", kwargs={"assessment_pk": assessment.pk, "info_type": "personal-information"}
+            ),
+        )
+
         # With several assessments, the last one is shown
         new_assessment = ImplementationAssessmentFactory(campaign__year=2023, company=membership.company)
         response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, IMPLEMENTATION_ASSESSMENT)
+        self.assertContains(response, VALIDATE_ADMONITION)
         self.assertContains(response, reverse("geiq:assessment_info", kwargs={"assessment_pk": new_assessment.pk}))
         self.assertContains(
             response,
