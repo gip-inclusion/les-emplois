@@ -1,6 +1,8 @@
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError, transaction
+from django.db.models import Max
 from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
@@ -420,3 +422,44 @@ def test_authored_by_prescriber_or_geiq():
     )
 
     assert [prescriber_diagnosis, geiq_diagnosis_with_hiring] == list(valid_diagnoses)
+
+
+def test_administrativecriteria_level_annex_consistency():
+    # Sequences are not uptodate
+    pk_max = GEIQAdministrativeCriteria.objects.aggregate(Max("pk"))["pk__max"]
+    GEIQAdministrativeCriteria.objects.create(
+        pk=pk_max + 1,
+        name="Test",
+        level=AdministrativeCriteriaLevel.LEVEL_1,
+        annex=AdministrativeCriteriaAnnex.BOTH_ANNEXES,
+    )
+
+    # Annex 2 without level
+    with pytest.raises(IntegrityError):
+        with transaction.atomic():
+            GEIQAdministrativeCriteria.objects.create(
+                pk=pk_max + 2, name="Test", level=None, annex=AdministrativeCriteriaAnnex.ANNEX_2
+            )
+    with pytest.raises(IntegrityError):
+        with transaction.atomic():
+            GEIQAdministrativeCriteria.objects.create(
+                pk=pk_max + 3, name="Test", level=None, annex=AdministrativeCriteriaAnnex.BOTH_ANNEXES
+            )
+
+    # Level where not allowed
+    with pytest.raises(IntegrityError):
+        with transaction.atomic():
+            GEIQAdministrativeCriteria.objects.create(
+                pk=pk_max + 4,
+                name="Test",
+                level=AdministrativeCriteriaLevel.LEVEL_1,
+                annex=AdministrativeCriteriaAnnex.ANNEX_1,
+            )
+    with pytest.raises(IntegrityError):
+        with transaction.atomic():
+            GEIQAdministrativeCriteria.objects.create(
+                pk=pk_max + 5,
+                name="Test",
+                level=AdministrativeCriteriaLevel.LEVEL_2,
+                annex=AdministrativeCriteriaAnnex.NO_ANNEX,
+            )
