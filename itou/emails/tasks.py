@@ -15,8 +15,6 @@ from itou.emails.models import Email
 from itou.utils.iterators import chunks
 
 
-# Reduce verbosity of huey logs (INFO by default)
-logging.getLogger("huey").setLevel(logging.WARNING)
 logger = logging.getLogger("itou.emails")
 
 # Mailjet max number of recipients (CC, BCC, TO)
