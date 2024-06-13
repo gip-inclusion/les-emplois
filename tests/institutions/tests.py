@@ -1,8 +1,11 @@
 import pytest
+from django.db import IntegrityError, transaction
 from django.forms import ValidationError
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects
 
+from itou.institutions.enums import InstitutionKind
+from itou.institutions.models import Institution
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.institutions.factories import (
     InstitutionFactory,
@@ -190,3 +193,18 @@ def test_add_admin(admin_client):
     response = admin_client.get(change_url)
 
     assert_set_admin_role__creation(labor_inspector, institution)
+
+
+@pytest.mark.parametrize(
+    "kind",
+    [
+        InstitutionKind.DDETS_GEIQ,
+        InstitutionKind.DDETS_IAE,
+        InstitutionKind.DDETS_LOG,
+    ],
+)
+def test_unique_ddets_per_department_constraint(kind):
+    first_institution = InstitutionFactory(kind=kind)
+    with pytest.raises(IntegrityError):
+        with transaction.atomic():
+            Institution.objects.create(kind=kind, department=first_institution.department)
