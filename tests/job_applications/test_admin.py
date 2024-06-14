@@ -1,17 +1,20 @@
+import pytest
 from django.contrib import messages
 from django.contrib.admin import helpers
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertFormError, assertMessages
+from pytest_django.asserts import assertContains, assertMessages, assertRedirects
 
 from itou.employee_record import models as employee_record_models
 from itou.job_applications import models
+from itou.job_applications.enums import JobApplicationState
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
 from tests.employee_record import factories as employee_record_factories
 from tests.job_applications import factories
 from tests.users.factories import JobSeekerFactory
+from tests.utils.test import parse_response_to_soup
 
 
 def test_create_employee_record(admin_client):
@@ -159,12 +162,11 @@ JOB_APPLICATION_FORMSETS_PAYLOAD = {
 }
 
 
-def test_create_accepted_job_application(admin_client):
+def test_create_then_accept_job_application(admin_client):
     job_seeker = JobSeekerFactory()
     company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
     employer = company.members.first()
     post_data = {
-        "state": "accepted",
         "job_seeker": job_seeker.pk,
         "to_company": company.pk,
         "sender_kind": "employer",
@@ -174,141 +176,158 @@ def test_create_accepted_job_application(admin_client):
         **JOB_APPLICATION_FORMSETS_PAYLOAD,
     }
     response = admin_client.post(reverse("admin:job_applications_jobapplication_add"), post_data)
-    assert response.status_code == 200
-    assertFormError(
-        response.context["adminform"].form,
-        "hiring_start_at",
-        "Ce champ est obligatoire pour les candidatures acceptées.",
+    assertRedirects(response, reverse("admin:job_applications_jobapplication_changelist"))
+    job_application = models.JobApplication.objects.get()
+    assert job_application.state == JobApplicationState.NEW
+    url = reverse("admin:job_applications_jobapplication_change", args=(job_application.pk,))
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                messages.SUCCESS,
+                f'L\'objet candidature «\xa0<a href="{url}">{job_application.pk}</a>\xa0» a été ajouté avec succès.',
+            )
+        ],
     )
-    assertFormError(
-        response.context["adminform"].form,
-        None,
-        (
-            "Un diagnostic d'éligibilité valide pour ce candidat "
-            "et cette SIAE est obligatoire pour pouvoir créer un PASS IAE."
-        ),
+
+    response = admin_client.get(url)
+    assertContains(response, 'value="Passer à l\'étude"')
+
+    response = admin_client.post(url, {**post_data, "transition_process": True})
+    assertRedirects(response, url)
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.PROCESSING
+
+    response = admin_client.get(url)
+    assertContains(response, 'value="Accepter"')
+
+    response = admin_client.post(url, {**post_data, "transition_accept": True})
+    assertRedirects(response, url, fetch_redirect_response=False)  # don't flush the messages
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.PROCESSING
+
+    response = admin_client.get(url)
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                messages.ERROR,
+                "Le champ 'Date de début du contrat' est obligatoire pour accepter une candidature",
+            )
+        ],
     )
+    assertContains(response, 'value="Accepter"')
 
     # Retry with the mandatory date
     post_data["hiring_start_at"] = timezone.localdate()
+    response = admin_client.post(url, {**post_data, "transition_accept": True})
+    assertRedirects(response, url, fetch_redirect_response=False)  # don't flush the messages
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.PROCESSING
+
+    response = admin_client.get(url)
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                messages.ERROR,
+                "Un diagnostic d'éligibilité valide pour ce candidat "
+                "et cette SIAE est obligatoire pour pouvoir créer un PASS IAE.",
+            )
+        ],
+    )
+
     # and make sure a diagnosis exists
     EligibilityDiagnosisFactory(job_seeker=job_seeker)
-    response = admin_client.post(reverse("admin:job_applications_jobapplication_add"), post_data)
-    assert response.status_code == 302
 
-    job_app = models.JobApplication.objects.get()
-    assert job_app.state.is_accepted
-    assert job_app.logs.count() == 2  # new->processing & processing->accepted
-    assert job_app.approval
+    response = admin_client.post(url, {**post_data, "transition_accept": True})
+    assertRedirects(response, url)
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.ACCEPTED
+    assert job_application.logs.count() == 2
+    assert job_application.approval
 
 
-def test_accept_existing_job_application(admin_client):
+def test_accept_job_application_not_subject_to_eligibility(admin_client):
     job_application = factories.JobApplicationFactory(
-        eligibility_diagnosis=None,
-        to_company__subject_to_eligibility=True,
-        state=models.JobApplicationState.REFUSED,
+        to_company__not_subject_to_eligibility=True,
+        state=JobApplicationState.PROCESSING,
     )
-    change_url = reverse("admin:job_applications_jobapplication_change", args=[job_application.pk])
+
+    url = reverse("admin:job_applications_jobapplication_change", args=(job_application.pk,))
+    response = admin_client.get(url)
+    assertContains(response, 'value="Accepter"')
+
     post_data = {
-        "state": "accepted",
-        "job_seeker": job_application.job_seeker.pk,
-        "to_company": job_application.to_company.pk,
+        "job_seeker": job_application.job_seeker_id,
+        "to_company": job_application.to_company_id,
         "sender_kind": job_application.sender_kind,
-        "sender": job_application.sender.pk,
+        "sender": job_application.sender_id,
         # Formsets to please django admin
         **JOB_APPLICATION_FORMSETS_PAYLOAD,
     }
-    response = admin_client.post(change_url, post_data)
-    assert response.status_code == 200
-    assertFormError(
-        response.context["adminform"].form,
-        "hiring_start_at",
-        "Ce champ est obligatoire pour les candidatures acceptées.",
+
+    response = admin_client.post(url, {**post_data, "transition_accept": True})
+    assertRedirects(response, url, fetch_redirect_response=False)  # don't flush the messages
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.PROCESSING
+
+    response = admin_client.get(url)
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                messages.ERROR,
+                "Le champ 'Date de début du contrat' est obligatoire pour accepter une candidature",
+            )
+        ],
     )
-    assertFormError(
-        response.context["adminform"].form,
-        None,
-        (
-            "Un diagnostic d'éligibilité valide pour ce candidat "
-            "et cette SIAE est obligatoire pour pouvoir créer un PASS IAE."
-        ),
-    )
+    assertContains(response, 'value="Accepter"')
 
     # Retry with the mandatory date
     post_data["hiring_start_at"] = timezone.localdate()
-    # and make sure a diagnosis exists
-    EligibilityDiagnosisFactory(job_seeker=job_application.job_seeker)
-    response = admin_client.post(change_url, post_data)
-    assert response.status_code == 302
-
-    job_app = models.JobApplication.objects.get()
-    assert job_app.state.is_accepted
-    assert job_app.logs.count() == 1  # refused->accepted
-    assert job_app.approval
+    response = admin_client.post(url, {**post_data, "transition_accept": True})
+    assertRedirects(response, url)
+    job_application.refresh_from_db()
+    assert job_application.state.is_accepted
+    assert job_application.logs.count() == 1  # processing->accepted
+    assert job_application.approval is None
 
 
-def test_create_accepted_job_application_not_subject_to_eligibility(admin_client):
-    job_seeker = JobSeekerFactory()
-    company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True)
-    post_data = {
-        "state": "accepted",
-        "job_seeker": job_seeker.pk,
-        "to_company": company.pk,
-        "sender_kind": "employer",
-        "sender_company": company.pk,
-        "sender": company.members.first().pk,
-        # Formsets to please django admin
-        **JOB_APPLICATION_FORMSETS_PAYLOAD,
-    }
-    response = admin_client.post(reverse("admin:job_applications_jobapplication_add"), post_data)
-    assert response.status_code == 200
-    assertFormError(
-        response.context["adminform"].form,
-        "hiring_start_at",
-        "Ce champ est obligatoire pour les candidatures acceptées.",
-    )
-
-    # Retry with the mandatory date
-    post_data["hiring_start_at"] = timezone.localdate()
-    response = admin_client.post(reverse("admin:job_applications_jobapplication_add"), post_data)
-    assert response.status_code == 302
-
-    job_app = models.JobApplication.objects.get()
-    assert job_app.state.is_accepted
-    assert job_app.logs.count() == 2  # new->processing & processing->accepted
-    assert job_app.approval is None
+@pytest.mark.parametrize("state", JobApplicationState)
+def test_available_transitions(admin_client, state, snapshot):
+    job_application = factories.JobApplicationFactory(state=state)
+    response = admin_client.get(reverse("admin:job_applications_jobapplication_change", args=(job_application.pk,)))
+    assert str(parse_response_to_soup(response, "#job-app-transitions")) == snapshot
 
 
-def test_create_accepted_job_application_for_job_seeker_with_approval(admin_client):
+def test_accept_job_application_for_job_seeker_with_approval(admin_client):
     # Create an approval with a diagnosis that would not be valid for the other company
     # (if the approval didn't exist)
     existing_approval = ApprovalFactory(eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory())
     job_seeker = existing_approval.user
-    company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
+    job_application = factories.JobApplicationFactory(
+        job_seeker=job_seeker,
+        state=JobApplicationState.PROCESSING,
+    )
+
+    url = reverse("admin:job_applications_jobapplication_change", args=(job_application.pk,))
+    response = admin_client.get(url)
+    assertContains(response, 'value="Accepter"')
+
     post_data = {
-        "state": "accepted",
         "job_seeker": job_seeker.pk,
-        "to_company": company.pk,
-        "sender_kind": "employer",
-        "sender_company": company.pk,
-        "sender": company.members.first().pk,
+        "to_company": job_application.to_company_id,
+        "sender_kind": job_application.sender_kind,
+        "sender": job_application.sender_id,
+        "hiring_start_at": timezone.localdate(),
         # Formsets to please django admin
         **JOB_APPLICATION_FORMSETS_PAYLOAD,
     }
-    response = admin_client.post(reverse("admin:job_applications_jobapplication_add"), post_data)
-    assert response.status_code == 200
-    assertFormError(
-        response.context["adminform"].form,
-        "hiring_start_at",
-        "Ce champ est obligatoire pour les candidatures acceptées.",
-    )
 
-    # Retry with the mandatory date
-    post_data["hiring_start_at"] = timezone.localdate()
-    response = admin_client.post(reverse("admin:job_applications_jobapplication_add"), post_data)
-    assert response.status_code == 302
-
-    job_app = models.JobApplication.objects.get()
-    assert job_app.state.is_accepted
-    assert job_app.logs.count() == 2  # new->processing & processing->accepted
-    assert job_app.approval == existing_approval
+    response = admin_client.post(url, {**post_data, "transition_accept": True})
+    assertRedirects(response, url)
+    job_application.refresh_from_db()
+    assert job_application.state.is_accepted
+    assert job_application.logs.count() == 1  # processing->accepted
+    assert job_application.approval == existing_approval
