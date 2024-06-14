@@ -57,6 +57,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     TRANSITION_CANCEL = "cancel"
     TRANSITION_RENDER_OBSOLETE = "render_obsolete"
     TRANSITION_TRANSFER = "transfer"
+    TRANSITION_RESET = "reset"
 
     TRANSITION_CHOICES = (
         (TRANSITION_PROCESS, "Étudier la candidature"),
@@ -68,6 +69,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_CANCEL, "Annuler la candidature"),
         (TRANSITION_RENDER_OBSOLETE, "Rendre obsolete la candidature"),
         (TRANSITION_TRANSFER, "Transfert de la candidature vers une autre SIAE"),
+        (TRANSITION_RESET, "Réinitialiser la candidature"),
     )
 
     CAN_BE_ACCEPTED_STATES = [
@@ -111,12 +113,16 @@ class JobApplicationWorkflow(xwf_models.Workflow):
             JobApplicationState.OBSOLETE,
         ),
         (TRANSITION_TRANSFER, CAN_BE_TRANSFERRED_STATES, JobApplicationState.NEW),
+        (TRANSITION_RESET, JobApplicationState.OBSOLETE, JobApplicationState.NEW),
     )
 
     PENDING_STATES = [JobApplicationState.NEW, JobApplicationState.PROCESSING, JobApplicationState.POSTPONED]
     initial_state = JobApplicationState.NEW
 
     log_model = "job_applications.JobApplicationTransitionLog"
+
+    error_missing_hiring_start_at = "Cannot accept a job application with no hiring start date."
+    error_missing_eligibility_diagnostic = "Cannot create an approval without eligibility diagnosis here."
 
 
 class JobApplicationQuerySet(models.QuerySet):
@@ -883,6 +889,14 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def is_in_transferable_state(self):
         return self.state in JobApplicationWorkflow.CAN_BE_TRANSFERRED_STATES
 
+    @property
+    def is_in_acceptable_state(self):
+        return self.state in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES
+
+    @property
+    def is_in_refusable_state(self):
+        return self.state in JobApplicationWorkflow.CAN_BE_REFUSED_STATES
+
     def can_be_transferred(self, user, target_company):
         # User must be member of both origin and target companies to make a transfer
         if not (self.to_company.has_member(user) and target_company.has_member(user)):
@@ -957,7 +971,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @xwf_models.transition()
     def accept(self, *, user):
         if not self.hiring_start_at:
-            raise xwf_models.AbortTransition("Cannot accept a job application with no hiring start date.")
+            raise xwf_models.AbortTransition(JobApplicationWorkflow.error_missing_hiring_start_at)
 
         # Link to the job seeker's eligibility diagnosis.
         if self.to_company.is_subject_to_eligibility_rules:
@@ -992,7 +1006,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             ):
                 # Security check: it's supposed to be blocked upstream.
                 if self.eligibility_diagnosis is None:
-                    raise xwf_models.AbortTransition("Cannot create an approval without eligibility diagnosis here")
+                    raise xwf_models.AbortTransition(JobApplicationWorkflow.error_missing_eligibility_diagnostic)
                 # Automatically create a new approval.
                 new_approval = Approval(
                     start_at=self.hiring_start_at,

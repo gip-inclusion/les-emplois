@@ -1,7 +1,10 @@
+import copy
 import uuid
 
+import xworkflows
 from django.contrib import admin, messages
 from django.db.models import Q
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -101,6 +104,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "transferred_at",
         "transferred_from",
         "origin",
+        "state",
     )
     inlines = (JobsInline, PriorActionInline, TransitionLogInline, UUIDSupportRemarkInline)
 
@@ -269,11 +273,6 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
             obj.origin = Origin.ADMIN
 
         super().save_model(request, obj, form, change)
-        if form._job_application_to_accept:
-            if obj.state.is_new:
-                # The new -> accepted transition doesn't exist
-                obj.process(user=request.user)
-            obj.accept(user=request.user)
 
     def get_form(self, request, obj=None, **kwargs):
         """
@@ -286,6 +285,39 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
             help_texts = {"approval_manually_delivered_by": mark_safe(f'<a href="{url}">{text}</a>')}
             kwargs.update({"help_texts": help_texts})
         return super().get_form(request, obj, **kwargs)
+
+    def transition_error(self, request, error):
+        message = None
+        if error.args[0] == models.JobApplicationWorkflow.error_missing_eligibility_diagnostic:
+            message = (
+                "Un diagnostic d'éligibilité valide pour ce candidat "
+                "et cette SIAE est obligatoire pour pouvoir créer un PASS IAE."
+            )
+        elif error.args[0] == models.JobApplicationWorkflow.error_missing_hiring_start_at:
+            message = "Le champ 'Date de début du contrat' est obligatoire pour accepter une candidature"
+        self.message_user(request, message or error, messages.ERROR)
+        return HttpResponseRedirect(request.get_full_path())
+
+    def response_change(self, request, obj):
+        """
+        Override to add custom "actions" in `self.change_form_template` for:
+        * processing the job application
+        * accepting the job application
+        * refusing the job application
+        * reseting the job applciation
+        """
+        for transition in ["accept", "cancel", "reset", "process"]:
+            if f"transition_{transition}" in request.POST:
+                try:
+                    getattr(obj, transition)(user=request.user)
+                    # Stay on same page
+                    updated_request = copy.deepcopy(request.POST)
+                    updated_request.update({"_continue": ["please"]})
+                    request.POST = updated_request
+                except xworkflows.AbortTransition as e:
+                    return self.transition_error(request, e)
+
+        return super().response_change(request, obj)
 
 
 @admin.register(models.JobApplicationTransitionLog)
