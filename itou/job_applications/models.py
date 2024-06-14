@@ -956,14 +956,8 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @xwf_models.transition()
     def accept(self, *, user):
-        # Mark other related job applications as obsolete.
-        for job_application in self.job_seeker.job_applications.exclude(pk=self.pk).pending():
-            job_application.render_obsolete(user=user)
-
-        # Notifications & emails.
-        self.notifications_accept_for_job_seeker.send()
-        if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
-            self.notifications_accept_for_proxy.send()
+        if not self.hiring_start_at:
+            raise xwf_models.AbortTransition("Cannot accept a job application with no hiring start date.")
 
         # Link to the job seeker's eligibility diagnosis.
         if self.to_company.is_subject_to_eligibility_rules:
@@ -1020,6 +1014,15 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 self.email_manual_approval_delivery_required_notification(user).send()
             else:
                 raise xwf_models.AbortTransition("Job seeker has an invalid PE status, cannot issue approval.")
+
+        # Mark other related job applications as obsolete.
+        for job_application in self.job_seeker.job_applications.exclude(pk=self.pk).pending():
+            job_application.render_obsolete(user=user)
+
+        # Notifications & emails.
+        self.notifications_accept_for_job_seeker.send()
+        if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
+            self.notifications_accept_for_proxy.send()
 
         if self.approval:
             self.approval_number_sent_by_email = True
