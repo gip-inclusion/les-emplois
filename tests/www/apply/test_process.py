@@ -2632,6 +2632,11 @@ class ProcessTransferJobApplicationTest(TestCase):
         assert len(messages) == 1
         assert str(messages[0]) == self.snapshot(name="job application transfer message")
 
+        job_application.refresh_from_db()
+        assert job_application.state == job_applications_enums.JobApplicationState.NEW
+        assert job_application.logs.get().transition == "transfer"
+        assert job_application.to_company_id == other_company.pk
+
     def test_job_application_transfer_without_rights(self):
         company = CompanyFactory()
         other_company = CompanyFactory()
