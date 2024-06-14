@@ -549,7 +549,7 @@ def transfer(request, job_application_id):
     back_url = get_safe_url(request, "back_url", reverse("apply:list_for_siae"))
 
     try:
-        job_application.transfer_to(request.user, target_company)
+        job_application.transfer(user=request.user, target_company=target_company)
         messages.success(
             request,
             (

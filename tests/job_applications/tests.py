@@ -57,7 +57,7 @@ from tests.job_applications.factories import (
     JobApplicationWithoutApprovalFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase, get_rows_from_streaming_response
 
 
@@ -685,7 +685,7 @@ class JobApplicationQuerySetTest(TestCase):
         job_application.process()  # 1 transition but no accept
         assert JobApplication.objects.with_accepted_at().first().accepted_at is None
 
-        job_application.refuse(job_application.sender)  # 2 transitions, still no accept
+        job_application.refuse(user=job_application.sender)  # 2 transitions, still no accept
         assert JobApplication.objects.with_accepted_at().first().accepted_at is None
 
     def test_with_accepted_at_for_accepted_with_no_transition(self):
@@ -924,7 +924,7 @@ class JobApplicationNotificationsTest(TestCase):
         job_application.sender = None
         job_application.save(update_fields=["sender"])
         with self.captureOnCommitCallbacks(execute=True):
-            job_application.refuse()
+            job_application.refuse(user=job_application.to_company.members.first())
         [email] = mail.outbox
         assert email.to == [job_application.job_seeker.email]
         assert self.AFPA not in email.body
@@ -1584,7 +1584,7 @@ class JobApplicationWorkflowTest(TestCase):
 
         for job_application in user.job_applications.all():
             with self.captureOnCommitCallbacks(execute=True):
-                job_application.refuse()
+                job_application.refuse(user=EmployerFactory())
             # Check sent email.
             assert len(mail.outbox) == 1
             assert "Candidature déclinée" in mail.outbox[0].subject
@@ -1639,6 +1639,31 @@ class JobApplicationWorkflowTest(TestCase):
         cancellation_user = job_application.to_company.active_members.first()
         with pytest.raises(xwf_models.AbortTransition):
             job_application.cancel(user=cancellation_user)
+
+
+_transitions_for_parametrize = [
+    [transition, from_state] for transition in JobApplicationWorkflow.transitions for from_state in transition.source
+]
+
+
+@pytest.mark.parametrize(
+    "transition,from_state",
+    _transitions_for_parametrize,
+    ids=[
+        f"transition={transition.name} from_state={from_state}"
+        for transition, from_state in _transitions_for_parametrize
+    ],
+)
+def test_job_application_transitions(transition, from_state):
+    job_application = JobApplicationFactory(state=from_state)
+    user = job_application.to_company.members.first()
+    kwargs = {"user": user}
+    if transition.name == "transfer":
+        target_company = CompanyFactory(with_membership=True)
+        target_company.members.add(user)
+        kwargs["target_company"] = target_company
+    getattr(job_application, transition.name)(**kwargs)
+    assert job_application.logs.get().transition == transition.name
 
 
 class JobApplicationXlsxExportTest(TestCase):
@@ -1743,7 +1768,7 @@ class JobApplicationXlsxExportTest(TestCase):
         }
 
         job_application = JobApplicationFactory(state=JobApplicationState.PROCESSING, **kwargs)
-        job_application.refuse()
+        job_application.refuse(user=job_application.to_company.members.get())
 
         response = stream_xlsx_export(JobApplication.objects.all(), "filename")
         assert get_rows_from_streaming_response(response) == [

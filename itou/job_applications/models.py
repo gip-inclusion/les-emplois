@@ -78,7 +78,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         JobApplicationState.REFUSED,
         JobApplicationState.CANCELLED,
     ]
-    CAN_BE_TRANSFERRED_STATES = CAN_BE_ACCEPTED_STATES
+    CAN_BE_TRANSFERRED_STATES = [JobApplicationState.NEW] + CAN_BE_ACCEPTED_STATES
     CAN_BE_REFUSED_STATES = [
         JobApplicationState.NEW,
         JobApplicationState.PROCESSING,
@@ -881,7 +881,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def is_in_transferable_state(self):
-        return self.state != JobApplicationState.ACCEPTED
+        return self.state in JobApplicationWorkflow.CAN_BE_TRANSFERRED_STATES
 
     def can_be_transferred(self, user, target_company):
         # User must be member of both origin and target companies to make a transfer
@@ -893,64 +893,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if not user.is_employer:
             return False
         return self.is_in_transferable_state
-
-    def transfer_to(self, transferred_by, target_company):
-        if not (self.is_in_transferable_state and self.can_be_transferred(transferred_by, target_company)):
-            raise ValidationError(
-                f"Cette candidature n'est pas transferable ({transferred_by=}, {target_company=}, {self.to_company=})"
-            )
-
-        self.transferred_from = self.to_company
-        self.transferred_by = transferred_by
-        self.transferred_at = timezone.now()
-        self.to_company = target_company
-        self.state = JobApplicationState.NEW
-        # Consider job application as new : don't keep answers
-        self.answer = self.answer_to_prescriber = ""
-
-        # Delete eligibility diagnosis if not provided by an authorized prescriber
-        eligibility_diagnosis = self.eligibility_diagnosis
-        is_eligibility_diagnosis_made_by_siae = (
-            eligibility_diagnosis and eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER
-        )
-        if is_eligibility_diagnosis_made_by_siae:
-            self.eligibility_diagnosis = None
-
-        self.save(
-            update_fields=[
-                "eligibility_diagnosis",
-                "to_company",
-                "state",
-                "transferred_at",
-                "transferred_by",
-                "transferred_from",
-                "answer",
-                "answer_to_prescriber",
-            ]
-        )
-
-        # As 1:N or 1:1 objects must have a pk before being saved,
-        # eligibility diagnosis must be deleted after saving current object.
-        if is_eligibility_diagnosis_made_by_siae:
-            eligibility_diagnosis.delete()
-
-        notification_context = {
-            "job_application": self,
-            "transferred_by": transferred_by,
-            "origin_company": self.transferred_from,
-            "target_company": target_company,
-        }
-
-        # Always send notifications to original SIAE members
-        for previous_employer in self.transferred_from.active_members.all():
-            self.notifications_transfer_for_previous_employer(previous_employer, notification_context).send()
-
-        # Always send notification to job seeker
-        self.notifications_transfer_for_job_seeker(notification_context).send()
-
-        # Send a notification to prescriber or orienter if any
-        if self.sender_kind == SenderKind.PRESCRIBER and self.sender_id:  # Sender user may have been deleted.
-            self.notifications_transfer_for_proxy(notification_context).send()
 
     def get_eligibility_diagnosis(self):
         """
@@ -967,16 +909,56 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # Workflow transitions.
 
     @xwf_models.transition()
-    def process(self, *args, **kwargs):
-        pass
+    def transfer(self, *, user, target_company):
+        if not self.can_be_transferred(user, target_company):
+            raise ValidationError(
+                f"Cette candidature n'est pas transférable ({user=}, {target_company=}, {self.to_company=})"
+            )
+
+        self.transferred_from = self.to_company
+        self.transferred_by = user
+        self.transferred_at = timezone.now()
+        self.to_company = target_company
+        self.state = JobApplicationState.NEW
+        # Consider job application as new : don't keep answers
+        self.answer = self.answer_to_prescriber = ""
+
+        # Delete eligibility diagnosis if not provided by an authorized prescriber
+        eligibility_diagnosis = self.eligibility_diagnosis
+        is_eligibility_diagnosis_made_by_siae = (
+            eligibility_diagnosis and eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER
+        )
+        if is_eligibility_diagnosis_made_by_siae:
+            self.eligibility_diagnosis = None
+
+        # As 1:N or 1:1 objects must have a pk before being saved,
+        # eligibility diagnosis must be deleted after saving current object.
+        if is_eligibility_diagnosis_made_by_siae:
+            eligibility_diagnosis.delete()
+
+        notification_context = {
+            "job_application": self,
+            "transferred_by": user,
+            "origin_company": self.transferred_from,
+            "target_company": target_company,
+        }
+
+        # Always send notifications to original SIAE members
+        for previous_employer in self.transferred_from.active_members.all():
+            self.notifications_transfer_for_previous_employer(previous_employer, notification_context).send()
+
+        # Always send notification to job seeker
+        self.notifications_transfer_for_job_seeker(notification_context).send()
+
+        # Send a notification to prescriber or orienter if any
+        if self.sender_kind == SenderKind.PRESCRIBER and self.sender_id:  # Sender user may have been deleted.
+            self.notifications_transfer_for_proxy(notification_context).send()
 
     @xwf_models.transition()
-    def accept(self, *args, **kwargs):
-        accepted_by = kwargs.get("user")
-
+    def accept(self, *, user):
         # Mark other related job applications as obsolete.
         for job_application in self.job_seeker.job_applications.exclude(pk=self.pk).pending():
-            job_application.render_obsolete(*args, **kwargs)
+            job_application.render_obsolete(user=user)
 
         # Notifications & emails.
         self.notifications_accept_for_job_seeker.send()
@@ -1005,7 +987,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     # As a job seeker can have multiple contracts at the same time,
                     # the approval should start at the same time as most recent contract.
                     self.approval.update_start_date(new_start_date=self.hiring_start_at)
-                self.notifications_deliver_approval(accepted_by).send()
+                self.notifications_deliver_approval(user).send()
             elif (
                 self.job_seeker.has_no_common_approval
                 and (self.job_seeker.jobseeker_profile.nir or self.job_seeker.jobseeker_profile.pole_emploi_id)
@@ -1027,7 +1009,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                 )
                 new_approval.save()
                 self.approval = new_approval
-                self.notifications_deliver_approval(accepted_by).send()
+                self.notifications_deliver_approval(user).send()
             elif not self.job_seeker.jobseeker_profile.nir or (
                 not self.job_seeker.jobseeker_profile.pole_emploi_id
                 and self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason
@@ -1035,7 +1017,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             ):
                 # Trigger a manual approval creation.
                 self.approval_delivery_mode = self.APPROVAL_DELIVERY_MODE_MANUAL
-                self.email_manual_approval_delivery_required_notification(accepted_by).send()
+                self.email_manual_approval_delivery_required_notification(user).send()
             else:
                 raise xwf_models.AbortTransition("Job seeker has an invalid PE status, cannot issue approval.")
 
@@ -1046,7 +1028,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval.unsuspend(self.hiring_start_at)
 
     @xwf_models.transition()
-    def refuse(self, *args, **kwargs):
+    def refuse(self, *, user):
         # Send notification.
         self.notifications_refuse_for_job_seeker.send()
         if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
@@ -1071,10 +1053,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         self.notifications_cancel_for_employer(user).send()
         if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
             self.notifications_cancel_for_proxy.send()
-
-    @xwf_models.transition()
-    def render_obsolete(self, *args, **kwargs):
-        pass
 
     def manually_deliver_approval(self, delivered_by):
         self.approval_number_sent_by_email = True

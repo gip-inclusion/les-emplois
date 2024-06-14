@@ -1,4 +1,5 @@
 import pytest
+import xworkflows
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.exceptions import ValidationError
@@ -68,7 +69,7 @@ class JobApplicationTransferModelTest(TestCase):
 
         assert job_application.can_be_transferred(origin_user, target_company)
 
-    def test_transfer_to(self):
+    def test_transfer(self):
         # If all conditions are valid, a user can transfer job applications between SIAE they are member of,
         # provided job application is in an acceptable state.
         # After transfer:
@@ -89,17 +90,17 @@ class JobApplicationTransferModelTest(TestCase):
         )
 
         # Conditions hould be covered by previous test, but does not hurt (and tests raise)
-        with pytest.raises(ValidationError):
-            job_application.transfer_to(lambda_user, target_company)
-        with pytest.raises(ValidationError):
-            job_application.transfer_to(origin_user, origin_company)
-        with pytest.raises(ValidationError):
-            job_application.transfer_to(target_user, target_company)
-        with pytest.raises(ValidationError):
-            job_application.transfer_to(origin_user, target_company)
+        with pytest.raises(xworkflows.InvalidTransitionError):
+            job_application.transfer(user=lambda_user, target_company=target_company)
+        with pytest.raises(xworkflows.InvalidTransitionError):
+            job_application.transfer(user=origin_user, target_company=origin_company)
+        with pytest.raises(xworkflows.InvalidTransitionError):
+            job_application.transfer(user=target_user, target_company=target_company)
+        with pytest.raises(xworkflows.InvalidTransitionError):
+            job_application.transfer(user=origin_user, target_company=target_company)
 
         job_application.state = JobApplicationState.PROCESSING
-        job_application.transfer_to(origin_user, target_company)
+        job_application.transfer(user=origin_user, target_company=target_company)
         job_application.refresh_from_db()
 
         # "Normal" transfer
@@ -114,7 +115,7 @@ class JobApplicationTransferModelTest(TestCase):
             eligibility_diagnosis=EligibilityDiagnosisMadeBySiaeFactory(),
         )
         eligibility_diagnosis_pk = job_application.eligibility_diagnosis.pk
-        job_application.transfer_to(origin_user, target_company)
+        job_application.transfer(user=origin_user, target_company=target_company)
         job_application.refresh_from_db()
 
         assert job_application.to_company == target_company
@@ -138,7 +139,7 @@ class JobApplicationTransferModelTest(TestCase):
         job_application.sender = None
         job_application.save(update_fields=["sender"])
 
-        job_application.transfer_to(origin_user, target_company)
+        job_application.transfer(user=origin_user, target_company=target_company)
         job_application.refresh_from_db()
 
         assert job_application.to_company == target_company
@@ -163,7 +164,7 @@ class JobApplicationTransferModelTest(TestCase):
 
         # Failing to transfer must not update new fields
         with pytest.raises(ValidationError):
-            job_application.transfer_to(target_user, target_company)
+            job_application.transfer(user=target_user, target_company=target_company)
         assert job_application.transferred_by is None
         assert job_application.transferred_from is None
         assert job_application.transferred_at is None
@@ -172,9 +173,6 @@ class JobApplicationTransferModelTest(TestCase):
         ContentType.objects.get_for_model(target_company)
         with self.assertNumQueries(
             2  # Check user is in both origin and dest siae
-            + 6  # Caused by `full_clean()` : `clean_fields()`
-            + 3  # Integrity constraints check (full clean)
-            + 1  # Update job application
             + 1  # Check if approvals are linked to diagnosis because of on_delete=set_null
             + 1  # Check if job applications are linked because of on_delete=set_null
             + 2  # Delete diagnosis and criteria made by the SIAE
@@ -183,8 +181,12 @@ class JobApplicationTransferModelTest(TestCase):
             + 1  # Insert employer email in emails table
             + 1  # Select job seeker notification settings
             + 1  # Insert job seeker email in emails table
+            + 6  # Caused by `full_clean()` : `clean_fields()`
+            + 3  # Integrity constraints check (full clean)
+            + 1  # Update job application
+            + 1  # Add job application transition log
         ):
-            job_application.transfer_to(origin_user, target_company)
+            job_application.transfer(user=origin_user, target_company=target_company)
 
         job_application.refresh_from_db()
 
@@ -224,7 +226,7 @@ class JobApplicationTransferModelTest(TestCase):
         job_seeker = job_application.job_seeker
 
         with self.captureOnCommitCallbacks(execute=True):
-            job_application.transfer_to(origin_user, target_company)
+            job_application.transfer(user=origin_user, target_company=target_company)
 
         # Eligigibility diagnosis is done by SIAE : must not send an email
         assert len(mail.outbox) == 2
@@ -257,7 +259,7 @@ class JobApplicationTransferModelTest(TestCase):
         job_seeker = job_application.job_seeker
 
         with self.captureOnCommitCallbacks(execute=True):
-            job_application.transfer_to(origin_user, target_company)
+            job_application.transfer(user=origin_user, target_company=target_company)
 
         assert len(mail.outbox) == 3
 
@@ -285,7 +287,7 @@ class JobApplicationTransferModelTest(TestCase):
         job_seeker = job_application.job_seeker
 
         with self.captureOnCommitCallbacks(execute=True):
-            job_application.transfer_to(origin_user_1, target_company)
+            job_application.transfer(user=origin_user_1, target_company=target_company)
 
         # Only checking SIAE email
         assert len(mail.outbox) == 3
