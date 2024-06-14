@@ -193,7 +193,7 @@ class JobApplicationInline(ItouTabularInline):
 
 class SentJobApplicationInline(JobApplicationInline):
     fk_name = "sender"
-    fields = ("pk_link", "job_seeker_link", "to_company_link", "state")
+    fields = ("pk_link", "created_at", "job_seeker_link", "to_company_link", "state")
     readonly_fields = fields
     verbose_name = "candidature envoyée"
     verbose_name_plural = "candidatures envoyées"

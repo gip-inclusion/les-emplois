@@ -34,6 +34,7 @@ class JobApplicationInline(ItouStackedInline):
         "to_company_link",
         "hiring_start_at",
         "hiring_end_at",
+        "created_at",
         "approval",
         "approval_number_sent_by_email",
         "approval_number_sent_at",
