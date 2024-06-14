@@ -108,10 +108,10 @@ class EvaluationCampaignMiscMethodsTest(TestCase):
 
 class EvaluationCampaignQuerySetTest(TestCase):
     def test_for_institution(self):
-        institution1 = InstitutionFactory()
+        institution1 = InstitutionFactory(department="01")
         EvaluationCampaignFactory(institution=institution1)
 
-        institution2 = InstitutionFactory()
+        institution2 = InstitutionFactory(department="02")
         now = timezone.now()
         EvaluationCampaignFactory(
             institution=institution2,
