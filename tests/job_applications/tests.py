@@ -675,7 +675,7 @@ class JobApplicationQuerySetTest(TestCase):
         for email in mail.outbox:
             [recipient] = email.to
             recipients.append(recipient)
-        assert recipients == [job_application.job_seeker.email, employer.email]
+        assert recipients == [employer.email, job_application.job_seeker.email]
 
     def test_with_accepted_at_default_value(self):
         job_application = JobApplicationSentByCompanyFactory()
@@ -1151,10 +1151,10 @@ class JobApplicationWorkflowTest(TestCase):
 
         # Check sent emails.
         assert len(mail.outbox) == 2
-        # Email sent to the job seeker.
-        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[0].subject
         # Email sent to the employer.
-        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[1].subject
+        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[0].subject
+        # Email sent to the job seeker.
+        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
     def test_accept_obsolete(self):
         """
@@ -1188,10 +1188,10 @@ class JobApplicationWorkflowTest(TestCase):
 
         # Check sent emails.
         assert len(mail.outbox) == 2
-        # Email sent to the job seeker.
-        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[0].subject
         # Email sent to the employer.
-        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[1].subject
+        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[0].subject
+        # Email sent to the job seeker.
+        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
     def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval(self):
         """
@@ -1217,10 +1217,10 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.approval.origin_prescriber_organization_kind == ""
         # Check sent emails.
         assert len(mail.outbox) == 2
-        # Email sent to the job seeker.
-        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[0].subject
         # Email sent to the employer.
-        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[1].subject
+        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[0].subject
+        # Email sent to the job seeker.
+        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
     def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval_with_nir(self):
         job_seeker = JobSeekerFactory(jobseeker_profile__pole_emploi_id="", birthdate=None)
@@ -1241,10 +1241,10 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.approval.origin_prescriber_organization_kind == ""
         # Check sent emails.
         assert len(mail.outbox) == 2
-        # Email sent to the job seeker.
-        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[0].subject
         # Email sent to the employer.
-        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[1].subject
+        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[0].subject
+        # Email sent to the job seeker.
+        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
     def test_accept_job_application_sent_by_job_seeker_with_forgotten_pole_emploi_id(self):
         """
@@ -1264,10 +1264,10 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_MANUAL
         # Check sent email.
         assert len(mail.outbox) == 2
-        # Email sent to the job seeker.
-        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[0].subject
         # Email sent to the team.
-        assert "PASS IAE requis sur Itou" in mail.outbox[1].subject
+        assert "PASS IAE requis sur Itou" in mail.outbox[0].subject
+        # Email sent to the job seeker.
+        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
     def test_accept_job_application_sent_by_job_seeker_with_a_nir_no_pe_approval(self):
         job_seeker = JobSeekerFactory(
@@ -1287,8 +1287,10 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.approval.origin_sender_kind == job_application.sender_kind
         assert job_application.approval.origin_prescriber_organization_kind == ""
         assert len(mail.outbox) == 2
-        assert "Candidature acceptée" in mail.outbox[0].subject
-        assert "PASS IAE pour " in mail.outbox[1].subject
+        # Email sent to the employer.
+        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[0].subject
+        # Email sent to the job seeker.
+        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
     def test_accept_job_application_sent_by_job_seeker_with_a_pole_emploi_id_no_pe_approval(self):
         job_seeker = JobSeekerFactory(
@@ -1305,8 +1307,10 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.approval is not None
         assert job_application.approval_delivery_mode == JobApplication.APPROVAL_DELIVERY_MODE_AUTOMATIC
         assert len(mail.outbox) == 2
-        assert "Candidature acceptée" in mail.outbox[0].subject
-        assert "PASS IAE pour " in mail.outbox[1].subject
+        # Email sent to the employer.
+        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[0].subject
+        # Email sent to the job seeker.
+        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
     def test_accept_job_application_sent_by_job_seeker_unregistered_no_pe_approval(self):
         job_seeker = JobSeekerFactory(
@@ -1328,8 +1332,10 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.approval.origin_sender_kind == SenderKind.JOB_SEEKER
         assert job_application.approval.origin_prescriber_organization_kind == ""
         assert len(mail.outbox) == 2
-        assert "Candidature acceptée" in mail.outbox[0].subject
-        assert "PASS IAE pour " in mail.outbox[1].subject
+        # Email sent to the employer.
+        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[0].subject
+        # Email sent to the job seeker.
+        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
     def test_accept_job_application_sent_by_prescriber(self):
         """
@@ -1355,12 +1361,12 @@ class JobApplicationWorkflowTest(TestCase):
         )
         # Check sent email.
         assert len(mail.outbox) == 3
-        # Email sent to the job seeker.
-        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[0].subject
-        # Email sent to the proxy.
-        assert self.ACCEPT_EMAIL_SUBJECT_PROXY in mail.outbox[1].subject
         # Email sent to the employer.
-        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[2].subject
+        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[0].subject
+        # Email sent to the job seeker.
+        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
+        # Email sent to the proxy.
+        assert self.ACCEPT_EMAIL_SUBJECT_PROXY in mail.outbox[2].subject
 
     def test_accept_job_application_sent_by_authorized_prescriber(self):
         """
@@ -1388,12 +1394,12 @@ class JobApplicationWorkflowTest(TestCase):
         )
         # Check sent email.
         assert len(mail.outbox) == 3
-        # Email sent to the job seeker.
-        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[0].subject
-        # Email sent to the proxy.
-        assert self.ACCEPT_EMAIL_SUBJECT_PROXY in mail.outbox[1].subject
         # Email sent to the employer.
-        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[2].subject
+        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[0].subject
+        # Email sent to the job seeker.
+        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
+        # Email sent to the proxy.
+        assert self.ACCEPT_EMAIL_SUBJECT_PROXY in mail.outbox[2].subject
 
     def test_accept_job_application_sent_by_authorized_prescriber_with_approval_in_waiting_period(self):
         """
@@ -1431,12 +1437,12 @@ class JobApplicationWorkflowTest(TestCase):
         )
         # Check sent emails.
         assert len(mail.outbox) == 3
-        # Email sent to the job seeker.
-        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[0].subject
-        # Email sent to the proxy.
-        assert self.ACCEPT_EMAIL_SUBJECT_PROXY in mail.outbox[1].subject
         # Email sent to the employer.
-        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[2].subject
+        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[0].subject
+        # Email sent to the job seeker.
+        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
+        # Email sent to the proxy.
+        assert self.ACCEPT_EMAIL_SUBJECT_PROXY in mail.outbox[2].subject
 
     def test_accept_job_application_sent_by_prescriber_with_approval_in_waiting_period(self):
         """
@@ -1493,10 +1499,10 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.approval.origin_prescriber_organization_kind == ""
         # Check sent emails.
         assert len(mail.outbox) == 2
-        # Email sent to the job seeker.
-        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[0].subject
         # Email sent to the employer.
-        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[1].subject
+        assert self.SENT_PASS_EMAIL_SUBJECT in mail.outbox[0].subject
+        # Email sent to the job seeker.
+        assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
     def test_accept_job_application_by_siae_with_no_approval(self):
         """
