@@ -1,4 +1,5 @@
 import functools
+import random
 
 import factory
 from django.utils import timezone
@@ -45,11 +46,22 @@ class GEIQEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
         )
 
 
+def _get_iae_administrative_criteria(self, create, extracted, **kwargs):
+    if not create:
+        # Simple build, do nothing.
+        return
+
+    # Pick random results.
+    criteria = models.AdministrativeCriteria.objects.order_by("?")[: random.randint(2, 5)]
+    self.administrative_criteria.add(*criteria)
+
+
 class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
     """Generate an EligibilityDiagnosis() object whose author is an authorized prescriber organization."""
 
     class Meta:
         model = models.EligibilityDiagnosis
+        skip_postgeneration_save = True
 
     class Params:
         from_employer = factory.Trait(
@@ -57,6 +69,7 @@ class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
             author_siae=factory.SubFactory(CompanyFactory, subject_to_eligibility=True, with_membership=True),
             author=factory.LazyAttribute(lambda obj: obj.author_siae.members.first()),
         )
+        with_criteria = factory.Trait(romes=factory.PostGeneration(_get_iae_administrative_criteria))
 
 
 EligibilityDiagnosisFactory = functools.partial(IAEEligibilityDiagnosisFactory, from_prescriber=True)

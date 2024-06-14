@@ -232,12 +232,12 @@ class JobApplicationQuerySet(models.QuerySet):
     def with_jobseeker_eligibility_diagnosis(self):
         """
         Gives the "eligibility_diagnosis" linked to the job application or if none is found
-        the last eligibility diagnosis for jobseeker
+        the last valid eligibility diagnosis for this job seeker and this SIAE
         """
         sub_query = Subquery(
             (
-                EligibilityDiagnosis.objects.filter(job_seeker=OuterRef("job_seeker"))
-                .order_by("-created_at")
+                EligibilityDiagnosis.objects.valid()
+                .for_job_seeker_and_siae(job_seeker=OuterRef("job_seeker"), siae=OuterRef("to_company"))
                 .values("id")[:1]
             ),
             output_field=models.IntegerField(),

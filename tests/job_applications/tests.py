@@ -369,6 +369,7 @@ def test_prescriptions_of_exclude_auto_prescription():
     assert list(JobApplication.objects.prescriptions_of(job_application.sender, job_application.to_company)) == []
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class JobApplicationQuerySetTest(TestCase):
     def test_created_in_past(self):
         now = timezone.now()
@@ -424,6 +425,53 @@ class JobApplicationQuerySetTest(TestCase):
         diagnosis = job_app.eligibility_diagnosis
         qs = JobApplication.objects.with_jobseeker_eligibility_diagnosis().get(pk=job_app.pk)
         assert qs.jobseeker_eligibility_diagnosis == diagnosis.pk
+
+    def test_with_jobseeker_eligibility_diagnosis_with_a_denormalized_diagnosis_from_prescriber(self):
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            to_company__subject_to_eligibility=True,
+            eligibility_diagnosis=None,
+        )
+        eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
+            from_prescriber=True,
+            with_criteria=True,
+            job_seeker=job_application.job_seeker,
+        )
+
+        qs = JobApplication.objects.with_jobseeker_eligibility_diagnosis()
+        assert list(qs) == [job_application]
+        assert qs.first().jobseeker_eligibility_diagnosis == eligibility_diagnosis.pk
+
+    def test_with_jobseeker_eligibility_diagnosis_with_a_denormalized_diagnosis_from_current_employer(self):
+        job_application = JobApplicationSentByCompanyFactory(
+            to_company__subject_to_eligibility=True,
+            eligibility_diagnosis=None,
+        )
+        eligibility_diagnosis = IAEEligibilityDiagnosisFactory(
+            from_employer=True,
+            author_siae=job_application.sender_company,
+            with_criteria=True,
+            job_seeker=job_application.job_seeker,
+        )
+
+        qs = JobApplication.objects.with_jobseeker_eligibility_diagnosis()
+        assert list(qs) == [job_application]
+        assert qs.first().jobseeker_eligibility_diagnosis == eligibility_diagnosis.pk
+
+    def test_with_jobseeker_eligibility_diagnosis_with_a_denormalized_diagnosis_from_another_employer(self):
+        job_application = JobApplicationSentByCompanyFactory(
+            to_company__subject_to_eligibility=True,
+            eligibility_diagnosis=None,
+        )
+        IAEEligibilityDiagnosisFactory(
+            from_employer=True,
+            with_criteria=True,
+            job_seeker=job_application.job_seeker,
+        )
+
+        qs = JobApplication.objects.with_jobseeker_eligibility_diagnosis()
+        assert list(qs) == [job_application]
+        assert qs.first().jobseeker_eligibility_diagnosis is None
 
     def test_with_eligibility_diagnosis_criterion(self):
         diagnosis = EligibilityDiagnosisFactory(created_at=timezone.now())
