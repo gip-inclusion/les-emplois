@@ -182,7 +182,7 @@ class JobApplicationTransferModelTest(TestCase):
             + 1  # Select job seeker notification settings
             + 1  # Insert job seeker email in emails table
             + 6  # Caused by `full_clean()` : `clean_fields()`
-            + 3  # Integrity constraints check (full clean)
+            + 4  # Integrity constraints check (full clean)
             + 1  # Update job application
             + 1  # Add job application transition log
         ):
