@@ -105,7 +105,6 @@ INSTALLED_APPS = [
     "itou.status",
     "itou.antivirus",
     "itou.scripts",
-    "itou.settings_viewer",
     "itou.analytics",
     "itou.communications",
     "itou.gps",
