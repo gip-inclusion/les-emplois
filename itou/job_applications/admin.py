@@ -96,6 +96,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
     readonly_fields = (
         "created_at",
         "updated_at",
+        "processed_at",
         "approval_number_sent_at",
         "approval_manually_delivered_by",
         "approval_manually_refused_by",
@@ -181,6 +182,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                     "transferred_from",
                     "created_at",
                     "updated_at",
+                    "processed_at",
                 ]
             },
         ),

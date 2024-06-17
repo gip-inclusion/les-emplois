@@ -205,6 +205,7 @@ class JobApplicationTransferModelTest(TestCase):
             with self.subTest(from_state):
                 job_application = JobApplicationSentByCompanyFactory(state=from_state)
                 job_application.state = JobApplicationState.NEW
+                job_application.processed_at = None
                 job_application.save()  # Triggers transition check
 
     def test_transfer_must_notify_siae_and_job_seeker(self):

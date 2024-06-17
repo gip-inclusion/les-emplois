@@ -1886,6 +1886,8 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         # Right states
         for state in JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES:
             job_application.state = state
+            if state in JobApplicationWorkflow.JOB_APPLICATION_PROCESSED_STATES:
+                job_application.processed_at = timezone.now()
             job_application.save()
             self.client.force_login(employer)
             url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
@@ -1895,6 +1897,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
 
         # Wrong state
         job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
+        job_application.processed_at = timezone.now()
         job_application.save()
         self.client.force_login(employer)
         url = reverse("apply:eligibility", kwargs={"job_application_id": job_application.pk})
@@ -2431,6 +2434,7 @@ class ProcessTemplatesTest(TestCase):
     def test_details_template_for_state_obsolete(self):
         self.client.force_login(self.employer)
         self.job_application.state = job_applications_enums.JobApplicationState.OBSOLETE
+        self.job_application.processed_at = timezone.now()
         self.job_application.save()
 
         response = self.client.get(self.url_details)
@@ -2446,6 +2450,7 @@ class ProcessTemplatesTest(TestCase):
         self.client.force_login(self.employer)
         EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
         self.job_application.state = job_applications_enums.JobApplicationState.OBSOLETE
+        self.job_application.processed_at = timezone.now()
         self.job_application.save()
 
         response = self.client.get(self.url_details)
@@ -2461,6 +2466,7 @@ class ProcessTemplatesTest(TestCase):
         """Test actions available for other states."""
         self.client.force_login(self.employer)
         self.job_application.state = job_applications_enums.JobApplicationState.REFUSED
+        self.job_application.processed_at = timezone.now()
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
@@ -2475,6 +2481,7 @@ class ProcessTemplatesTest(TestCase):
         self.client.force_login(self.employer)
         EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
         self.job_application.state = job_applications_enums.JobApplicationState.REFUSED
+        self.job_application.processed_at = timezone.now()
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
@@ -2488,6 +2495,7 @@ class ProcessTemplatesTest(TestCase):
         """Test actions available for other states."""
         self.client.force_login(self.employer)
         self.job_application.state = job_applications_enums.JobApplicationState.CANCELLED
+        self.job_application.processed_at = timezone.now()
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
@@ -2502,6 +2510,7 @@ class ProcessTemplatesTest(TestCase):
         self.client.force_login(self.employer)
         EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
         self.job_application.state = job_applications_enums.JobApplicationState.CANCELLED
+        self.job_application.processed_at = timezone.now()
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
@@ -2515,6 +2524,7 @@ class ProcessTemplatesTest(TestCase):
         """Test actions available for other states."""
         self.client.force_login(self.employer)
         self.job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
+        self.job_application.processed_at = timezone.now()
         self.job_application.save()
         response = self.client.get(self.url_details)
         # Test template content.
@@ -2878,7 +2888,8 @@ def test_add_prior_action_processing(client, snapshot):
 
     # State is accepted
     job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
-    job_application.save(update_fields=("state",))
+    job_application.processed_at = timezone.now()
+    job_application.save(update_fields=("state", "processed_at"))
     response = client.post(
         add_prior_action_url,
         data={
@@ -2936,7 +2947,8 @@ def test_modify_prior_action(client):
     assert prior_action.action == job_applications_enums.ProfessionalSituationExperience.PMSMP
 
     job_application.state = job_applications_enums.JobApplicationState.ACCEPTED
-    job_application.save(update_fields=("state",))
+    job_application.processed_at = timezone.now()
+    job_application.save(update_fields=("state", "processed_at"))
     response = client.post(
         modify_prior_action_url,
         data={

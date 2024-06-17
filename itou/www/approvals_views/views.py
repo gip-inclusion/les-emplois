@@ -823,6 +823,7 @@ def pe_approval_create(request, pe_approval_id):
         return HttpResponseRedirect(next_url)
 
     # Then we build the necessary JobApplication for redirection
+    now = timezone.now()
     job_application = JobApplication(
         job_seeker=job_seeker,
         to_company=siae,
@@ -831,6 +832,8 @@ def pe_approval_create(request, pe_approval_id):
         sender=request.user,
         sender_kind=SenderKind.EMPLOYER,
         sender_company=siae,
+        created_at=now,
+        processed_at=now,
     )
 
     # Then we create an Approval based on the PoleEmploiApproval data
