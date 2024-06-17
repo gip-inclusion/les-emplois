@@ -25,7 +25,7 @@
                     <div class="c-box">
                         {% if not assessment.submitted_at %}
                             <h2>En attente du dossier</h2>
-                            <p>Le rapport d’activité sera disponible lorsque le GEIQ aura validé le dossier sur son espace dédié.</p>
+                            <p>La synthèse Label sera disponible lorsque le GEIQ aura validé le dossier sur son espace dédié.</p>
                         {% else %}
                             <h2>Dossier transmis par le GEIQ</h2>
                             <p>
@@ -34,11 +34,11 @@
                             <hr>
                             <div class="d-flex flex-column flex-md-row justify-content-between">
                                 <div>
-                                    <h3>Rapport d’activité</h3>
+                                    <h3>Document de synthèse</h3>
                                 </div>
                                 <div clas="text-center">
                                     <a class="btn btn-outline-primary" href="{% url 'geiq:assessment_report' assessment_pk=assessment.pk %}" rel="noopener" target="_blank">
-                                        <span>Rapport d’activité {{ assessment.campaign.year }}</span>
+                                        <span>Synthèse {{ assessment.campaign.year }}.pdf</span>
                                         <i class="ri-external-link-line font-weight-medium" aria-hidden="true"></i>
                                     </a>
                                 </div>
@@ -62,7 +62,7 @@
                             <span class="fs-sm">Financement</span>
                             <h4>En attente du bilan d’exécution</h4>
                             <p class="mb-0">
-                                Le GEIQ a jusqu’au {{ assessment.campaign.submission_deadline|date:"d/m/Y" }} pour importer son rapport d’activité et valider le bilan.
+                                Le GEIQ a jusqu’au {{ assessment.campaign.submission_deadline|date:"d/m/Y" }} pour importer son document de synthèse pdf et valider le bilan.
                             </p>
                         </div>
                     {% elif not assessment.reviewed_at %}

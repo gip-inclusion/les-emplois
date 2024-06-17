@@ -42,7 +42,7 @@
                         {% if not assessment.submitted_at %}
                             <h2>Compléter le dossier à transmettre à la DDETS/DREETS</h2>
                             <p>
-                                Importez votre rapport d’activité et vérifiez l’exactitude des données de vos salariés avant de les valider. Lorsque vous aurez validé ce dossier, votre DDETS
+                                Importez votre synthèse Label et vérifiez l’exactitude des données de vos salariés avant de les valider. Lorsque vous aurez validé ce dossier, votre DDETS
                                 ou votre DREETS en charge de votre bilan pourra procéder à son étude depuis son espace dédié.
                             </p>
                         {% else %}
@@ -56,11 +56,11 @@
                             {% if assessment.activity_report_file %}
                                 <div class="d-flex flex-column flex-md-row justify-content-between">
                                     <div>
-                                        <h3>Rapport d’activité</h3>
+                                        <h3>Document de synthèse</h3>
                                     </div>
                                     <div clas="text-center">
                                         <a class="btn btn-outline-primary" href="{% url 'geiq:assessment_report' assessment_pk=assessment.pk %}" rel="noopener" target="_blank">
-                                            <span>Rapport d’activité {{ assessment.campaign.year }}</span>
+                                            <span>Synthèse {{ assessment.campaign.year }}.pdf</span>
                                             <i class="ri-external-link-line font-weight-medium" aria-hidden="true"></i>
                                         </a>
                                     </div>
@@ -68,8 +68,8 @@
                             {% else %}
                                 <div class="d-flex flex-column flex-md-row justify-content-between">
                                     <div>
-                                        <h3>Rapport d’activité</h3>
-                                        <p>Veuillez importer ci-dessous votre rapport d’activité au format PDF généré par le logiciel Label.</p>
+                                        <h3>Document de synthèse</h3>
+                                        <p>Veuillez importer ci-dessous votre synthèse PDF générée par l’interface du Label.</p>
                                         {% bootstrap_field submission_form.activity_report_file %}
                                     </div>
                                 </div>
