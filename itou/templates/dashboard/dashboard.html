@@ -240,14 +240,21 @@
 {% block content_title_after_alerts %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" role="tablist" data-it-sliding-tabs="true">
         <li class="nav-item" role="presentation">
-            <a class="nav-link active" id="ensemble-tab" data-bs-toggle="tab" href="#ensemble" role="tab" aria-controls="ensemble" aria-selected="true">Vue d’ensemble</a>
+            <a class="nav-link active" id="ensemble-tab" data-bs-toggle="tab" href="#ensemble" role="tab" aria-controls="ensemble" aria-selected="true" {% matomo_event "dashboard" "clic-onglet" "vue-d-ensemble" %}>Vue d’ensemble</a>
         </li>
         <li class="nav-item" role="presentation">
-            <a class="nav-link" id="statistiques-tab" data-bs-toggle="tab" href="#statistiques" role="tab" aria-controls="statistiques" aria-selected="false">Statistiques</a>
+            <a class="nav-link"
+               id="statistiques-tab"
+               data-bs-toggle="tab"
+               href="#statistiques"
+               role="tab"
+               aria-controls="statistiques"
+               aria-selected="false"
+               {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>Statistiques</a>
         </li>
         {% if user.is_employer or user.is_prescriber %}
             <li class="nav-item" role="presentation">
-                <a class="nav-link" id="evenements-tab" data-bs-toggle="tab" href="#evenements" role="tab" aria-controls="evenements" aria-selected="false">Événements à venir</a>
+                <a class="nav-link" id="evenements-tab" data-bs-toggle="tab" href="#evenements" role="tab" aria-controls="evenements" aria-selected="false" {% matomo_event "dashboard" "clic-onglet" "evenements" %}>Événements à venir</a>
             </li>
         {% endif %}
     </ul>
