@@ -9,6 +9,7 @@ class NotificationCategory(StrEnum):
     IAE_PASS = "PASS IAE"
     MEMBERS_MANAGEMENT = "Gestion des collaborateurs"
     JOB_APPLICATION = "Candidature"
+    GEIQ_IMPLEMENTATION_ASSESSMENT = "Bilan d’exécution GEIQ"
 
 
 class NotificationRegistry:
