@@ -109,6 +109,11 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
         job_seeker=factory.SelfAttribute("..job_seeker"),
         author=factory.SelfAttribute("..sender"),
     )
+    processed_at = factory.LazyAttribute(
+        lambda o: datetime.now(UTC)
+        if str(o.state) in models.JobApplicationWorkflow.JOB_APPLICATION_PROCESSED_STATES
+        else None
+    )
 
     @factory.post_generation
     def selected_jobs(self, create, extracted, **kwargs):

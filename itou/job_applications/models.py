@@ -10,6 +10,7 @@ from django.db.models.functions import Coalesce, Greatest, TruncMonth
 from django.urls import reverse
 from django.utils import timezone
 from django_xworkflows import models as xwf_models
+from xworkflows import before_transition
 
 from itou.approvals.models import Approval, Prolongation, Suspension
 from itou.approvals.notifications import PassAcceptedEmployerNotification
@@ -93,6 +94,12 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         JobApplicationState.OBSOLETE,
         JobApplicationState.REFUSED,
         JobApplicationState.CANCELLED,
+    ]
+    JOB_APPLICATION_PROCESSED_STATES = [
+        JobApplicationState.ACCEPTED,
+        JobApplicationState.REFUSED,
+        JobApplicationState.CANCELLED,
+        JobApplicationState.OBSOLETE,
     ]
 
     transitions = (
@@ -649,6 +656,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now, db_index=True)
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True, db_index=True)
+    # Whenever a job application enters a "processed" state (see JOB_APPLICATION_PROCESSED_STATES)
+    # we store the timestamp here.
+    processed_at = models.DateTimeField(verbose_name="date de traitement", null=True, blank=True)
 
     # GEIQ only
     prehiring_guidance_days = models.PositiveSmallIntegerField(
@@ -921,6 +931,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, for_siae=self.to_company)
 
     # Workflow transitions.
+    @before_transition("accept", "refuse", "cancel", "render_obsolete")
+    def set_processed_at(self, *args, **kwargs):
+        self.processed_at = timezone.now()
+
+    @before_transition("process", "postpone", "move_to_prior_to_hire", "cancel_prior_to_hire", "transfer", "reset")
+    def unset_processed_at(self, *args, **kwargs):
+        self.processed_at = None
 
     @xwf_models.transition()
     def transfer(self, *, user, target_company):

@@ -167,6 +167,7 @@ class TestApprovalDetailView:
         )
 
         job_application.state = JobApplicationState.ACCEPTED
+        job_application.processed_at = timezone.now()
         job_application.save()
         response = client.get(url)
         assertNotContains(
