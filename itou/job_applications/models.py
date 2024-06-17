@@ -755,6 +755,17 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     qualification_type=QualificationType.STATE_DIPLOMA,
                 ),
             ),
+            models.CheckConstraint(
+                name="processed_coherence",
+                violation_error_message="Incohérence du champ date de traitement",
+                check=models.Q(
+                    state__in=JobApplicationWorkflow.JOB_APPLICATION_PROCESSED_STATES, processed_at__isnull=False
+                )
+                | (
+                    ~models.Q(state__in=JobApplicationWorkflow.JOB_APPLICATION_PROCESSED_STATES)
+                    & models.Q(processed_at=None)
+                ),
+            ),
         ]
 
     def __str__(self):
