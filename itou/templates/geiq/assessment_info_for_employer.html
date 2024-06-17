@@ -184,3 +184,31 @@
         {% endif %}
     </section>
 {% endblock %}
+{# djlint:off #}
+{% block script %}
+    {{ block.super }}
+    {% if assessment.submitted_at %}
+    <script async src="https://tally.so/widgets/embed.js"></script>
+    <script nonce="{{ CSP_NONCE }}">
+        window.TallyConfig = {
+            "formId": "wAJjQy",
+            "popup": {
+                "emoji": {
+                    "text": "👋",
+                    "animation": "wave"
+                },
+                "layout": "modal",
+                "width": 800,
+                "hideTitle": true,
+                "autoClose": 0,
+                "doNotShowAfterSubmit": true,
+                "hiddenFields": {
+                    "IDuser": {{ request.user.id }},
+                    "IDGEIQ": {{ request.current_organization.id }},
+                }
+            }
+        };
+</script>
+    {% endif %}
+{% endblock %}
+{# djlint:on #}
