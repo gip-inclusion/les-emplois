@@ -1773,7 +1773,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
 
     @classmethod
     def setUpTestData(cls):
-        membership = InstitutionMembershipFactory(institution__name="DDETS 14")
+        membership = InstitutionMembershipFactory(institution__name="DDETS 14", institution__department="01")
         cls.user = membership.user
         cls.institution = membership.institution
 
@@ -1784,16 +1784,19 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         evaluated_siae = EvaluatedSiaeFactory(
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            evaluation_campaign__institution=self.institution,
         )
         url = reverse(self.urlname, kwargs={"evaluated_siae_pk": evaluated_siae.pk})
         response = self.client.get(url)
         self.assertRedirects(response, reverse("account_login") + f"?next={url}")
 
     def test_access_other_institution(self):
+        other_institution = InstitutionMembershipFactory(institution__department="02").institution
         evaluated_siae = EvaluatedSiaeFactory(
             # Evaluation of another institution.
             complete=True,
             job_app__criteria__review_state=evaluation_enums.EvaluatedJobApplicationsState.REFUSED_2,
+            evaluation_campaign__institution=other_institution,
         )
         self.login(evaluated_siae)
         response = self.client.get(
@@ -1805,7 +1808,7 @@ class InstitutionEvaluatedSiaeNotifyViewAccessTestMixin:
         assert response.status_code == 404
 
     def test_access_incomplete_on_active_campaign(self):
-        evaluated_siae = EvaluatedSiaeFactory()
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__institution=self.institution)
         self.login(evaluated_siae)
         response = self.client.get(
             reverse(
