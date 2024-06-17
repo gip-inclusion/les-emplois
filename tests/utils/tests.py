@@ -402,10 +402,10 @@ class TestItouCurrentOrganizationMiddleware:
     def test_labor_inspector_member_of_2_institutions(self, mocked_get_response_for_middlewaremixin):
         factory = RequestFactory()
         request = factory.get("/")
-        institution1 = InstitutionWithMembershipFactory(name="1")
+        institution1 = InstitutionWithMembershipFactory(name="1", department="01")
         request.user = institution1.members.first()
         institution2 = InstitutionMembershipFactory(
-            is_admin=False, user=request.user, institution__name="2"
+            is_admin=False, user=request.user, institution__name="2", institution__department="02"
         ).institution
         SessionMiddleware(get_response_for_middlewaremixin).process_request(request)
         request.session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = institution2.pk
@@ -469,9 +469,9 @@ def test_logout_as_siae_multiple_memberships(client):
 
 
 def test_logout_as_labor_inspector_multiple_institutions(client):
-    institution1 = InstitutionWithMembershipFactory(name="1st institution")
+    institution1 = InstitutionWithMembershipFactory(name="1st institution", department="01")
     user = institution1.members.first()
-    institution2 = InstitutionFactory(name="2nd institution")
+    institution2 = InstitutionFactory(name="2nd institution", department="02")
     institution2.members.add(user)
 
     client.force_login(user)

@@ -23,9 +23,9 @@ class InstitutionModelTest(TestCase):
         Test that if a user is admin of org1 and regular user
         of org2 he is not considered as admin of org2.
         """
-        institution1 = InstitutionWithMembershipFactory()
+        institution1 = InstitutionWithMembershipFactory(department="01")
         institution1_admin_user = institution1.members.first()
-        institution2 = InstitutionWithMembershipFactory()
+        institution2 = InstitutionWithMembershipFactory(department="02")
         institution2.members.add(institution1_admin_user)
 
         assert institution1_admin_user in institution1.active_admin_members
