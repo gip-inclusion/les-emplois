@@ -1,0 +1,17 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+Bonjour,
+
+Un GEIQ a transmis son bilan d’exécution sur les emplois de l’inclusion:
+
+Nom: {{ assessment.company.display_name }}
+Département: {{ assessment.company.department }}
+
+Pour accéder directement à ce bilan d’exécution, cliquez sur le lien suivant : {{ assessment_absolute_url }}
+
+Cette notification e-mail est transmise par défaut à la DDETS et la DREETS, la gestion du bilan d’exécution est réalisée par l’institution compétente selon l’organisation mise en place sur votre territoire.
+
+Pour consulter et traiter les bilans d’exécution, connectez-vous sur votre espace "Institution partenaire" sur le site des emplois de l’inclusion: {{ itou_protocol }}://{{ itou_fqdn }}.
+
+Cordialement,
+{% endblock %}

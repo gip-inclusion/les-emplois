@@ -12,6 +12,7 @@ from itou.geiq.models import ReviewState
 from itou.institutions.enums import InstitutionKind
 from itou.users.enums import Title
 from itou.utils.apis import geiq_label
+from itou.utils.urls import get_absolute_url
 from itou.www.geiq_views.views import InfoType
 from tests.cities.factories import create_city_vannes
 from tests.companies.factories import (
@@ -38,10 +39,23 @@ def label_settings(settings):
     return settings
 
 
-def test_assessment_process_for_geiq(client, label_settings, mocker, pdf_file):
-    membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ)
+def test_assessment_process_for_geiq(client, label_settings, mailoutbox, mocker, pdf_file):
+    membership = CompanyMembershipFactory(company__kind=CompanyKind.GEIQ, company__department="29")
     assessment = ImplementationAssessmentFactory(campaign__year=2023, company=membership.company)
     geiq_user = membership.user
+
+    ddets_membership = InstitutionMembershipFactory(
+        institution__kind=InstitutionKind.DDETS_GEIQ,
+        institution__department=membership.company.department,
+    )
+    dreets_membership = InstitutionMembershipFactory(
+        institution__kind=InstitutionKind.DREETS_GEIQ,
+        institution__department=membership.company.department,
+    )
+    # Add a user of both DDETS & DREETS
+    both_institution_user = InstitutionMembershipFactory(institution=dreets_membership.institution).user
+    InstitutionMembershipFactory(institution=ddets_membership.institution, user=both_institution_user)
+
     client.force_login(geiq_user)
     assessment_info_url = reverse("geiq:assessment_info", kwargs={"assessment_pk": assessment.pk})
     response = client.get(assessment_info_url)
@@ -99,10 +113,18 @@ def test_assessment_process_for_geiq(client, label_settings, mocker, pdf_file):
     assert assessment.last_synced_at is not None
     assertContains(response, "Dernière synchronisation:")
 
+    assert mailoutbox == []
     response = client.post(
         assessment_info_url,
         data={"activity_report_file": pdf_file, "up_to_date_information": True},
     )
+    [institution_email] = mailoutbox
+    assert sorted(institution_email.to) == sorted(
+        [ddets_membership.user.email, dreets_membership.user.email, both_institution_user.email]
+    )
+    assert assessment.company.display_name in institution_email.subject
+    assert assessment.company.display_name in institution_email.body
+    assert get_absolute_url(assessment_info_url) in institution_email.body
     assertContains(
         response,
         '<span class="badge badge-sm rounded-pill text-nowrap bg-info">Bilan à l’étude</span>',

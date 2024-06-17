@@ -1,0 +1,1 @@
+{{ assessment.company.display_name }} a transmis son bilan d’exécution
