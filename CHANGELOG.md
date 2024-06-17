@@ -1,5 +1,38 @@
 # Journal des modifications
 
+## 2024-06-17
+
+### Ajouté
+
+- [Admin: Ajout de la date des candidatures dans certaines pages](https://github.com/gip-inclusion/les-emplois/pull/4230) 🖼
+- [Admin: Créer une action export_cta dans l’admin](https://github.com/gip-inclusion/les-emplois/pull/4118) 🖼
+- [Contrôle a posteriori: Ajout d'un lien contacter le support si un prescripteur souhaite retirer des justificatifs attendus lors du contrôle](https://github.com/gip-inclusion/les-emplois/pull/4187)
+- [GEIQ: Ajout de nouveaux types d'institutions partenaires](https://github.com/gip-inclusion/les-emplois/pull/4190)
+- [GPS : ajout d'un lien vers Tally pour inviter des partenaires](https://github.com/gip-inclusion/les-emplois/pull/4188) 🖼
+- [GPS : création d'un bénéficiaire](https://github.com/gip-inclusion/les-emplois/pull/4058) 🖼
+- [Pilotage : Mettre un encart pour promouvoir un webinaire pour les SIAE](https://github.com/gip-inclusion/les-emplois/pull/4207)
+- [Pilotage: Donner accès au CD-31 de la Haute-Garonne l’accès à 2 TB privés](https://github.com/gip-inclusion/les-emplois/pull/4206)
+
+### Modifié
+
+- [Admin : Améliorer le suivi des emails envoyés](https://github.com/gip-inclusion/les-emplois/pull/4180)
+- [Admin : Autoriser la modification des emails à envoyer par le support](https://github.com/gip-inclusion/les-emplois/pull/4181)
+- [Demandeur d’emploi : Mise à jour du label adresse e-mail candidat pour préciser qu’elle doit être personnelle](https://github.com/gip-inclusion/les-emplois/pull/4174)
+- [GEIQ: adapte les codes d'API des critères des diagnostics exposés pour Label](https://github.com/gip-inclusion/les-emplois/pull/4202)
+- [Inscription : Retirer la page de confirmation d’email pour les candidats](https://github.com/gip-inclusion/les-emplois/pull/4217)
+- [Lancement de GPS !](https://github.com/gip-inclusion/les-emplois/pull/4205)
+- [UX/UI : Remplacer le bandeau promotionnel « Besoin d’un chiffre » par un bloc d’information](https://github.com/gip-inclusion/les-emplois/pull/4214) 🖼
+- [UX/UI : Remplacer l’alerte de la liste des organisations accréditées par le conseil départemental par un bloc d’information](https://github.com/gip-inclusion/les-emplois/pull/4213) 🖼
+- [UX/UI : Remplacer l’alerte nouveauté du parcours déclarer une embauche/candidature par un texte explicatif](https://github.com/gip-inclusion/les-emplois/pull/4215) 🖼
+- [UX/UI : Retirer le bandeau d’information pour le passage aux fiches salarié des EITI](https://github.com/gip-inclusion/les-emplois/pull/4216)
+- [UX/UI : Transformer l’alerte d’information à la demande d’invitation prescripteur en du texte simple](https://github.com/gip-inclusion/les-emplois/pull/4211) 🖼
+- [UX/UI : Utiliser un bandeau d’alerte globale pour la refonte](https://github.com/gip-inclusion/les-emplois/pull/4210) 🖼
+- [UX/UI: correction du lien d'aide à la conversion d'un pdf sur le widget d'upload de fichier](https://github.com/gip-inclusion/les-emplois/pull/4185)
+
+### Supprimé
+
+- [Tableau de bord: Retrait d'un section vide pour les institutions](https://github.com/gip-inclusion/les-emplois/pull/4186) 🖼
+
 ## 2024-06-10
 
 ### Ajouté
