@@ -42,7 +42,8 @@ class DatumCode(models.TextChoices):
     API_TOTAL_UV_ER = "API-008", "API FS : total de visiteurs uniques"
     API_TOTAL_CALLS_MARCHE = "API-009", "API Le marché : total d'appels reçus"
     API_TOTAL_CALLS_SIAES = "API-010", "API siaes : total d'appels reçus"
-    API_TOTAL_CALLS_STRUCTURES = "API-011", "API structures : total d'appels reçus"
+    API_TOTAL_UV_SIAES = "API-011", "API siaes : total de visiteurs uniques (par adresse IP)"
+    API_TOTAL_CALLS_STRUCTURES = "API-012", "API structures : total d'appels reçus"
 
 
 class Datum(models.Model):

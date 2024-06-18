@@ -46,20 +46,22 @@ class DatadogApiClient:
         try:
             data_received = data_received[0]["computes"]["c0"]
         except (IndexError, KeyError):
-            raise DatadogBadResponseException(data_sent=data, data_received=response.json())
+            exc = DatadogBadResponseException(data_sent=data, data_received=response.json())
+            logger.error(exc)
+            raise exc
 
         return data_received
 
-    def default_data(self, metric_kind, agregation_kind, endpoint, now):
+    def default_data(self, metric_kind, agregation_kind, endpoint, start, end):
         # timestamp in milliseconds
-        from_ts = round((now - relativedelta(days=1)).timestamp()) * 1000
-        to_ts = round(now.timestamp()) * 1000
+        start_ts = round(start.timestamp()) * 1000
+        end_ts = round(end.timestamp()) * 1000
         data = {
             "compute": [{"metric": metric_kind, "aggregation": agregation_kind, "type": "total"}],
             "filter": {
                 "query": f"@http.url:/api/v1/{endpoint}* @logger.method_name:log_response -@http.url:/api/v1/redoc/* ",
-                "from": f"{from_ts}",
-                "to": f"{to_ts}",
+                "from": f"{start_ts}",
+                "to": f"{end_ts}",
                 "indexes": ["*"],
             },
             "group_by": [],
@@ -69,11 +71,17 @@ class DatadogApiClient:
     def count_daily_logs(self, before="", endpoint=""):
         if not before:
             before = timezone.now()
-        data = self.default_data(metric_kind="count", agregation_kind="count", endpoint=endpoint, now=before)
+        start = (before - relativedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+        end = before.replace(hour=0, minute=0, second=0, microsecond=0)
+        data = self.default_data(metric_kind="count", agregation_kind="count", endpoint=endpoint, start=start, end=end)
         return self._get_data_from_datadog(data=data)
 
     def count_daily_unique_users(self, before="", endpoint=""):
         if not before:
             before = timezone.now()
-        data = self.default_data(metric_kind="@usr.id", agregation_kind="cardinality", endpoint=endpoint, now=before)
+        start = (before - relativedelta(days=1)).replace(hour=0, minute=0, second=0)
+        end = before.replace(hour=0, minute=0, second=0)
+        data = self.default_data(
+            metric_kind="@usr.id", agregation_kind="cardinality", endpoint=endpoint, start=start, end=end
+        )
         return self._get_data_from_datadog(data=data)

@@ -1,5 +1,6 @@
 import pytest
 import tenacity
+from freezegun import freeze_time
 
 from itou.utils.apis.datadog import DatadogApiClient, DatadogBadResponseException
 
@@ -59,6 +60,7 @@ def test_no_result(settings, respx_mock):
     assert client.count_daily_unique_users() == 0
 
 
+@freeze_time("2024-06-18")
 def test_datadog_exceptions(settings, respx_mock, mocker, caplog):
     settings.API_DATADOG_BASE_URL = "https://un-toutou-nomme-donnee.fr/"
     respx_mock.post("https://un-toutou-nomme-donnee.fr/logs/analytics/aggregate").respond(
@@ -75,11 +77,10 @@ def test_datadog_exceptions(settings, respx_mock, mocker, caplog):
     client = DatadogApiClient()
     with pytest.raises(DatadogBadResponseException):
         client.count_daily_unique_users()
-        data_sent = {"compute": [{"metric": "@usr.id", "aggregation": "cardinality", "type": "total"}]}
-        data_received = [{"computes": {"c100000000": "nothing"}, "by": {}}]
-        assert data_sent in caplog.text
-        assert data_received in caplog.text
-        assert DatadogBadResponseException in caplog.text
+    assert "DatadogBadResponseException" in caplog.text
+    # from and to timestamps are logged when a DatadogBadResponse raises.
+    # This is the `from` timestamp.
+    assert "1718582400000" in caplog.text
 
     mocker.patch("tenacity.nap.time.sleep", mocker.MagicMock())
     respx_mock.post("https://un-toutou-nomme-donnee.fr/logs/analytics/aggregate").respond(
@@ -96,4 +97,3 @@ def test_datadog_exceptions(settings, respx_mock, mocker, caplog):
     client = DatadogApiClient()
     with pytest.raises(tenacity.RetryError):
         client.count_daily_unique_users()
-        assert tenacity.RetryError in caplog.text
