@@ -117,8 +117,14 @@ def test_assessment_process_for_geiq(client, label_settings, mocker, pdf_file):
     # Check access to uploaded report
     report_url = reverse("geiq:assessment_report", kwargs={"assessment_pk": assessment.pk})
     assertContains(response, report_url)
-    response = client.get(report_url)
-    assertRedirects(response, default_storage.url(assessment.activity_report_file_id), fetch_redirect_response=False)
+    # Boto3 signed requests depend on the current date, with a second resolution.
+    # See X-Amz-Date in
+    # https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-query-string-auth.html
+    with freeze_time():
+        response = client.get(report_url)
+        assertRedirects(
+            response, default_storage.url(assessment.activity_report_file_id), fetch_redirect_response=False
+        )
 
     institution_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
     assessment.reviewed_at = timezone.now()
