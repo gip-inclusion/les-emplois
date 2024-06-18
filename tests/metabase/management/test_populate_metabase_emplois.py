@@ -897,7 +897,7 @@ def test_populate_memberships():
     prescriber_membership = PrescriberMembershipFactory()
     PrescriberMembershipFactory(is_active=False)
     institution_membership = InstitutionMembershipFactory()
-    InstitutionMembershipFactory(is_active=False)
+    InstitutionMembershipFactory(is_active=False, institution=institution_membership.institution)
 
     num_queries = 1  # Count siae memberships
     num_queries += 1  # Count prescriber memberships
