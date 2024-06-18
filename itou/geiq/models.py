@@ -45,7 +45,7 @@ class ImplementationAssessment(models.Model):
 
     activity_report_file = models.ForeignKey(
         File,
-        verbose_name="rapport d’activité",
+        verbose_name="document de synthèse",
         null=True,
         blank=True,
         unique=True,
