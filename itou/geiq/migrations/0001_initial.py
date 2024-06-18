@@ -150,7 +150,7 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.PROTECT,
                         to="files.file",
                         unique=True,
-                        verbose_name="rapport d’activité",
+                        verbose_name="document de synthèse",
                     ),
                 ),
                 (
