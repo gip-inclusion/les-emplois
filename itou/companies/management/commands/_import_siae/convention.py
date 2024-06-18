@@ -92,7 +92,7 @@ def update_existing_conventions(siret_to_siae_row, conventions_by_siae_key):
 
     print(f"{reactivations} conventions have been reactivated")
 
-    if len(conventions_to_deactivate) >= CONVENTION_DEACTIVATION_THRESHOLD:
+    if len(conventions_to_deactivate) >= CONVENTION_DEACTIVATION_THRESHOLD and timezone.localdate().month <= 6:
         # Early each year, all or most AF for the new year are missing in ASP AF data.
         # Instead of brutally deactivating all SIAE, we patiently wait until enough AF data is present.
         # While we wait, no SIAE is deactivated whatsoever.
