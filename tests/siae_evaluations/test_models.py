@@ -288,7 +288,8 @@ class EvaluationCampaignManagerTest(TestCase):
                 assert len(mail.outbox) == 0
 
         # institution DDETS IAE
-        InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS_IAE)
+        InstitutionWith2MembershipFactory(kind=InstitutionKind.DDETS_IAE, department="O1")
+        InstitutionWith2MembershipFactory(kind=InstitutionKind.DDETS_IAE, department="1O")
         with self.captureOnCommitCallbacks(execute=True):
             assert 2 == create_campaigns_and_calendar(
                 evaluated_period_start_at, evaluated_period_end_at, adversarial_stage_start
