@@ -1,6 +1,7 @@
 import factory
 import httpx
 import pytest
+from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.core.files.storage import default_storage
 from django.template import loader
@@ -172,6 +173,29 @@ def test_grant_view(client):
     )
     prolongation_request.refresh_from_db()
     assert prolongation_request.status == ProlongationRequestStatus.GRANTED
+
+
+def test_grant_view_invalid_dates(client):
+    prolongation = approvals_factories.ProlongationFactory()
+    prolongation_request = approvals_factories.ProlongationRequestFactory(
+        approval=prolongation.approval,
+        start_at=prolongation.end_at - relativedelta(days=1),
+    )
+    client.force_login(prolongation_request.validated_by)
+
+    response = client.post(
+        reverse("approvals:prolongation_request_grant", kwargs={"prolongation_request_id": prolongation_request.pk}),
+    )
+    expected_url = reverse(
+        "approvals:prolongation_request_show", kwargs={"prolongation_request_id": prolongation_request.pk}
+    )
+    assertRedirects(response, expected_url, fetch_redirect_response=False)
+    assertMessages(
+        response,
+        [messages.Message(messages.ERROR, "Erreur: veuillez contacter le support.")],
+    )
+    prolongation_request.refresh_from_db()
+    assert prolongation_request.status == ProlongationRequestStatus.PENDING
 
 
 def test_grant_view_is_not_accessible_by_get_method(client):

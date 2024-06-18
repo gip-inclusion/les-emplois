@@ -1,3 +1,4 @@
+import logging
 import pathlib
 import urllib.parse
 from datetime import date, timedelta
@@ -7,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
+from django.db import IntegrityError
 from django.db.models import Prefetch
 from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -49,6 +51,9 @@ from itou.www.approvals_views.forms import (
     SuspensionForm,
     get_prolongation_form,
 )
+
+
+logger = logging.getLogger(__name__)
 
 
 SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE = timedelta(days=365)
@@ -461,7 +466,18 @@ class ProlongationRequestGrantView(ProlongationRequestViewMixin, View):
     http_method_names = ["post"]
 
     def post(self, request, *args, **kwargs):
-        self.prolongation_request.grant(request.user)
+        try:
+            self.prolongation_request.grant(request.user)
+        except IntegrityError:
+            messages.error(request, "Erreur: veuillez contacter le support.", extra_tags="toast")
+            logger.exception("Failed to accept approval prolongation request")
+            return HttpResponseRedirect(
+                reverse(
+                    "approvals:prolongation_request_show",
+                    kwargs={"prolongation_request_id": self.prolongation_request.pk},
+                )
+            )
+
         messages.success(
             request,
             f"La prolongation de {self.prolongation_request.approval.user.get_full_name()} a bien été acceptée.",
