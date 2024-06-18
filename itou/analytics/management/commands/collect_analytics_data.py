@@ -46,7 +46,6 @@ class Command(BaseCommand):
     def save_data(self, data, before):
         bucket = (before.date() - datetime.timedelta(days=1)).isoformat()
         self.stderr.write(f"Saving analytics data in bucket '{bucket}'.")
-
         for code, value in data.items():
             datum = Datum(
                 code=code.value,
