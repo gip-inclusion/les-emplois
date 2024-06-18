@@ -268,10 +268,11 @@ def get_view_name(request):
 def metabase_embedded_url(request=None, dashboard_id=None, params=None, with_title=False):
     """
     Creates an embed/signed URL for embedded Metabase dashboards:
-    * expiration delay of token set at 10 minutes, kept short on purpose due to the fact that during this short time
-      the user can share the iframe URL to non authorized third parties
-    * do not display title of the dashboard in the iframe
-    * optional parameters typically for locked filters (e.g. allow viewing data of one departement only)
+    * expiration delay of token
+        * long enough so that the filters don't stop working too early and cause user confusion and frustration
+        * short enough to mitigate the security risk that the iframe URL could be shared to unauthorized third parties
+    * optionally display title of the dashboard in the iframe
+    * optional extra parameters typically for locked filters (e.g. allow viewing data of one departement only)
     """
     if params is None:
         params = {}
@@ -280,6 +281,11 @@ def metabase_embedded_url(request=None, dashboard_id=None, params=None, with_tit
         metabase_dashboard = METABASE_DASHBOARDS.get(view_name)
         dashboard_id = metabase_dashboard["dashboard_id"] if metabase_dashboard else None
 
-    payload = {"resource": {"dashboard": dashboard_id}, "params": params, "exp": round(time.time()) + (10 * 60)}
+    token_duration_in_seconds = 30 * 60
+    payload = {
+        "resource": {"dashboard": dashboard_id},
+        "params": params,
+        "exp": round(time.time()) + token_duration_in_seconds,
+    }
     is_titled = "true" if with_title else "false"
     return settings.METABASE_SITE_URL + "/embed/dashboard/" + _get_token(payload) + f"#titled={is_titled}"
