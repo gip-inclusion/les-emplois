@@ -38,17 +38,15 @@
               </button>
               <div class="dropdown-menu" id="dashboardUserDropdown">
                   <ul class="list-unstyled">
-                      <li>
-                          <div class="dropdown-item">
-                              <div class="d-flex align-items-center">
-                                  <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
-                                  <div class="flex-grow-1 ms-2 lh-sm">
-                                      
-                                          <span>Pierre DUPONT</span>
-                                          <br/>
-                                      
-                                      <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
-                                  </div>
+                      <li class="dropdown-item">
+                          <div class="d-flex align-items-center">
+                              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+                              <div class="flex-grow-1 ms-2 lh-sm">
+                                  
+                                      <span>Pierre DUPONT</span>
+                                      <br/>
+                                  
+                                  <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
                               </div>
                           </div>
                       </li>
@@ -63,21 +61,17 @@
                               <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
                           </li>
                       
-                      <li>
-                          <div class="dropdown-divider"></div>
-                      </li>
+                      <li class="dropdown-divider"></li>
                       <li>
                           <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
                       </li>
                       
-                      <li>
-                          <div class="dropdown-divider"></div>
-                      </li>
+                      <li class="dropdown-divider"></li>
                       
-                      <li>
+                      <li class="dropdown-item">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="dropdown-item text-danger">Déconnexion</button>
+                              <button class="text-danger">Déconnexion</button>
                           </form>
                       </li>
                   </ul>
@@ -128,17 +122,15 @@
               </button>
               <div class="dropdown-menu" id="dashboardUserDropdown">
                   <ul class="list-unstyled">
-                      <li>
-                          <div class="dropdown-item">
-                              <div class="d-flex align-items-center">
-                                  <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
-                                  <div class="flex-grow-1 ms-2 lh-sm">
-                                      
-                                          <span>John DOE</span>
-                                          <br/>
-                                      
-                                      <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
-                                  </div>
+                      <li class="dropdown-item">
+                          <div class="d-flex align-items-center">
+                              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+                              <div class="flex-grow-1 ms-2 lh-sm">
+                                  
+                                      <span>John DOE</span>
+                                      <br/>
+                                  
+                                  <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
                               </div>
                           </div>
                       </li>
@@ -153,28 +145,22 @@
                               <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
                           </li>
                       
-                      <li>
-                          <div class="dropdown-divider"></div>
-                      </li>
+                      <li class="dropdown-divider"></li>
                       <li>
                           <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
                       </li>
                       
-                      <li>
-                          <div class="dropdown-divider"></div>
-                      </li>
+                      <li class="dropdown-divider"></li>
                       
                           <li>
                               <a class="dropdown-item text-primary" href="/dashboard/token_api">Accès aux APIs</a>
                           </li>
-                          <li>
-                              <div class="dropdown-divider"></div>
-                          </li>
+                          <li class="dropdown-divider"></li>
                       
-                      <li>
+                      <li class="dropdown-item">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="dropdown-item text-danger">Déconnexion</button>
+                              <button class="text-danger">Déconnexion</button>
                           </form>
                       </li>
                   </ul>
@@ -221,17 +207,15 @@
               </button>
               <div class="dropdown-menu" id="dashboardUserDropdown">
                   <ul class="list-unstyled">
-                      <li>
-                          <div class="dropdown-item">
-                              <div class="d-flex align-items-center">
-                                  <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
-                                  <div class="flex-grow-1 ms-2 lh-sm">
-                                      
-                                          <span>Jane DOE</span>
-                                          <br/>
-                                      
-                                      <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
-                                  </div>
+                      <li class="dropdown-item">
+                          <div class="d-flex align-items-center">
+                              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+                              <div class="flex-grow-1 ms-2 lh-sm">
+                                  
+                                      <span>Jane DOE</span>
+                                      <br/>
+                                  
+                                  <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
                               </div>
                           </div>
                       </li>
@@ -246,9 +230,7 @@
                               <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
                           </li>
                       
-                      <li>
-                          <div class="dropdown-divider"></div>
-                      </li>
+                      <li class="dropdown-divider"></li>
                       <li>
                           <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
                       </li>
@@ -260,14 +242,12 @@
                               <a class="dropdown-item" href="/dashboard/edit_user_email">Modifier mon adresse e-mail</a>
                           </li>
                       
-                      <li>
-                          <div class="dropdown-divider"></div>
-                      </li>
+                      <li class="dropdown-divider"></li>
                       
-                      <li>
+                      <li class="dropdown-item">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="dropdown-item text-danger">Déconnexion</button>
+                              <button class="text-danger">Déconnexion</button>
                           </form>
                       </li>
                   </ul>
@@ -314,17 +294,15 @@
               </button>
               <div class="dropdown-menu" id="dashboardUserDropdown">
                   <ul class="list-unstyled">
-                      <li>
-                          <div class="dropdown-item">
-                              <div class="d-flex align-items-center">
-                                  <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
-                                  <div class="flex-grow-1 ms-2 lh-sm">
-                                      
-                                          <span>John DOE</span>
-                                          <br/>
-                                      
-                                      <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
-                                  </div>
+                      <li class="dropdown-item">
+                          <div class="d-flex align-items-center">
+                              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+                              <div class="flex-grow-1 ms-2 lh-sm">
+                                  
+                                      <span>John DOE</span>
+                                      <br/>
+                                  
+                                  <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
                               </div>
                           </div>
                       </li>
@@ -335,9 +313,7 @@
                           <a class="dropdown-item" href="/dashboard/">Tableau de bord</a>
                       </li>
                       
-                      <li>
-                          <div class="dropdown-divider"></div>
-                      </li>
+                      <li class="dropdown-divider"></li>
                       <li>
                           <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
                       </li>
@@ -349,14 +325,12 @@
                               <a class="dropdown-item" href="/dashboard/edit_user_email">Modifier mon adresse e-mail</a>
                           </li>
                       
-                      <li>
-                          <div class="dropdown-divider"></div>
-                      </li>
+                      <li class="dropdown-divider"></li>
                       
-                      <li>
+                      <li class="dropdown-item">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="dropdown-item text-danger">Déconnexion</button>
+                              <button class="text-danger">Déconnexion</button>
                           </form>
                       </li>
                   </ul>
@@ -403,17 +377,15 @@
               </button>
               <div class="dropdown-menu" id="dashboardUserDropdown">
                   <ul class="list-unstyled">
-                      <li>
-                          <div class="dropdown-item">
-                              <div class="d-flex align-items-center">
-                                  <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
-                                  <div class="flex-grow-1 ms-2 lh-sm">
-                                      
-                                          <span>Pierre DUPONT</span>
-                                          <br/>
-                                      
-                                      <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
-                                  </div>
+                      <li class="dropdown-item">
+                          <div class="d-flex align-items-center">
+                              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+                              <div class="flex-grow-1 ms-2 lh-sm">
+                                  
+                                      <span>Pierre DUPONT</span>
+                                      <br/>
+                                  
+                                  <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
                               </div>
                           </div>
                       </li>
@@ -428,21 +400,17 @@
                               <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
                           </li>
                       
-                      <li>
-                          <div class="dropdown-divider"></div>
-                      </li>
+                      <li class="dropdown-divider"></li>
                       <li>
                           <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
                       </li>
                       
-                      <li>
-                          <div class="dropdown-divider"></div>
-                      </li>
+                      <li class="dropdown-divider"></li>
                       
-                      <li>
+                      <li class="dropdown-item">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="dropdown-item text-danger">Déconnexion</button>
+                              <button class="text-danger">Déconnexion</button>
                           </form>
                       </li>
                   </ul>
@@ -489,17 +457,15 @@
               </button>
               <div class="dropdown-menu" id="dashboardUserDropdown">
                   <ul class="list-unstyled">
-                      <li>
-                          <div class="dropdown-item">
-                              <div class="d-flex align-items-center">
-                                  <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
-                                  <div class="flex-grow-1 ms-2 lh-sm">
-                                      
-                                          <span>Pierre DUPONT</span>
-                                          <br/>
-                                      
-                                      <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
-                                  </div>
+                      <li class="dropdown-item">
+                          <div class="d-flex align-items-center">
+                              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+                              <div class="flex-grow-1 ms-2 lh-sm">
+                                  
+                                      <span>Pierre DUPONT</span>
+                                      <br/>
+                                  
+                                  <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
                               </div>
                           </div>
                       </li>
@@ -514,21 +480,17 @@
                               <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
                           </li>
                       
-                      <li>
-                          <div class="dropdown-divider"></div>
-                      </li>
+                      <li class="dropdown-divider"></li>
                       <li>
                           <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
                       </li>
                       
-                      <li>
-                          <div class="dropdown-divider"></div>
-                      </li>
+                      <li class="dropdown-divider"></li>
                       
-                      <li>
+                      <li class="dropdown-item">
                           <form action="/accounts/logout/" method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <button class="dropdown-item text-danger">Déconnexion</button>
+                              <button class="text-danger">Déconnexion</button>
                           </form>
                       </li>
                   </ul>
