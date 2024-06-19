@@ -39,15 +39,14 @@ class SiaeAPIFetchListTest(APITestCase):
 
     def test_fetch_siae_list_without_params(self):
         """
-        The query parameters for INSEE code and distance are mandatories
+        The query parameters need to contain either a department or both an INSEE code and a distance
         """
         response = self.client.get(ENDPOINT_URL, format="json")
 
         assert response.status_code == 400
-        assert response.json() == {
-            "code_insee": ["Ce champ est obligatoire."],
-            "distance_max_km": ["Ce champ est obligatoire."],
-        }
+        assert response.json() == [
+            "Les paramètres `code_insee` et `distance_max_km` sont obligatoires si `departement` n'est pas spécifié."
+        ]
 
     def test_fetch_siae_list_with_too_high_distance(self):
         """
@@ -163,6 +162,18 @@ class SiaeAPIFetchListTest(APITestCase):
         assert response.json()["count"] == 2
         assert response.status_code == 200
 
+        # Add a department filter matching the companies
+        query_params["departement"] = "44"
+        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        assert response.status_code == 200
+        assert response.json()["count"] == 2
+
+        # Add a department filter NOT matching the companies
+        query_params["departement"] = "33"
+        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        assert response.status_code == 200
+        assert response.json()["count"] == 0
+
     def test_fetch_siae_list_too_far(self):
         """
         Search for siaes in a city that has no SIAES
@@ -173,6 +184,17 @@ class SiaeAPIFetchListTest(APITestCase):
 
         assert response.json()["count"] == 0
         assert response.status_code == 200
+
+    def test_fetch_siae_list_by_department(self):
+        # Declare company in 56 despite its coordinates
+        company56 = CompanyFactory(kind=CompanyKind.EI, department="56", coords=self.saint_andre.coords)
+        query_params = {"departement": "44"}
+        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+
+        body = response.json()
+        assert body["count"] == 2
+        assert response.status_code == 200
+        assert company56.siret not in {company["siret"] for company in body["results"]}
 
     def test_fetch_siae_list_rate_limits(self):
         query_params = {"code_insee": self.saint_andre.code_insee, "distance_max_km": 100}
