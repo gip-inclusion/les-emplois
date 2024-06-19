@@ -74,21 +74,6 @@ def test_join_group_of_a_job_seeker(is_referent, client, snapshot):
 
     response = client.get(url)
 
-    company = response.context["request"].current_organization
-
-    assert (
-        str(
-            parse_response_to_soup(
-                response,
-                "#join_group",
-                replace_in_attr=[
-                    ("data-no-results-url", f"/apply/{company.pk}/start", "/apply/[PK of Company]/start"),
-                ],
-            )
-        )
-        == snapshot
-    )
-
     post_data = {
         "user": job_seeker.id,
         "is_referent": is_referent,

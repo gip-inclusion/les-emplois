@@ -8,6 +8,8 @@ from django.utils import timezone
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.asp.models import RSAAllocation
+from itou.companies import enums as companies_enums
+from itou.companies.models import Company
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.users.models import User
@@ -18,6 +20,7 @@ from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import (
+    EmployerFactory,
     JobSeekerFactory,
     JobSeekerWithAddressFactory,
     PrescriberFactory,
@@ -34,7 +37,7 @@ from tests.users.factories import (
 )
 def test_create_job_seeker(_mock, client):
     [city] = create_test_cities(["67"], num_per_department=1)
-    company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+    singleton = Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
 
     prescriber_organization = PrescriberOrganizationWithMembershipFactory(with_pending_authorization=True)
     user = prescriber_organization.members.first()
@@ -48,10 +51,10 @@ def test_create_job_seeker(_mock, client):
 
     response = client.get(reverse("dashboard:index"))
 
-    apply_start_url = reverse("apply:start", kwargs={"company_pk": company.pk}) + "?gps=true"
+    apply_start_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
 
     response = client.get(apply_start_url)
-    next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk}) + "?gps=true"
+    next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     assertRedirects(response, next_url)
 
     response = client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
@@ -60,7 +63,7 @@ def test_create_job_seeker(_mock, client):
     next_url = (
         reverse(
             "apply:search_by_email_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"company_pk": singleton.pk, "session_uuid": job_seeker_session_name},
         )
         + "?gps=true"
     )
@@ -84,7 +87,7 @@ def test_create_job_seeker(_mock, client):
     next_url = (
         reverse(
             "apply:create_job_seeker_step_1_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"company_pk": singleton.pk, "session_uuid": job_seeker_session_name},
         )
         + "?gps=true"
     )
@@ -103,7 +106,7 @@ def test_create_job_seeker(_mock, client):
         response,
         reverse(
             "apply:search_by_email_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"company_pk": singleton.pk, "session_uuid": job_seeker_session_name},
         ),
     )
 
@@ -123,7 +126,7 @@ def test_create_job_seeker(_mock, client):
     next_url = (
         reverse(
             "apply:create_job_seeker_step_2_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"company_pk": singleton.pk, "session_uuid": job_seeker_session_name},
         )
         + "?gps=true"
     )
@@ -147,7 +150,7 @@ def test_create_job_seeker(_mock, client):
     next_url = (
         reverse(
             "apply:create_job_seeker_step_3_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"company_pk": singleton.pk, "session_uuid": job_seeker_session_name},
         )
         + "?gps=true"
     )
@@ -181,7 +184,7 @@ def test_create_job_seeker(_mock, client):
     next_url = (
         reverse(
             "apply:create_job_seeker_step_end_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"company_pk": singleton.pk, "session_uuid": job_seeker_session_name},
         )
         + "?gps=true"
     )
@@ -197,34 +200,20 @@ def test_create_job_seeker(_mock, client):
     assert list(created_job_seeker.follow_up_group.members.all()) == [user]
 
 
-def test_create_job_seeker_for_any_company(client):
-    company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
-
-    user = PrescriberFactory()
-    client.force_login(user)
-
-    # Create user for a company that is not the same that the user logged-in
-    apply_start_url = reverse("apply:start", kwargs={"company_pk": company.pk}) + "?gps=true"
-    response = client.get(apply_start_url)
-
-    next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk}) + "?gps=true"
-    assertRedirects(response, next_url)
-
-
 def test_gps_bypass(client):
     # The sender has a pending authorization, but we should be able to create the user anyway
     # Check that we are not redirected to apply:pending_authorization_for_sender"
 
-    company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+    singleton = Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
 
     prescriber_organization = PrescriberOrganizationWithMembershipFactory(with_pending_authorization=True)
     user = prescriber_organization.members.first()
     client.force_login(user)
 
-    apply_start_url = reverse("apply:start", kwargs={"company_pk": company.pk}) + "?gps=true"
+    apply_start_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     response = client.get(apply_start_url)
 
-    next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk}) + "?gps=true"
+    next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     assertRedirects(response, next_url)
 
     # SIAE has an active suspension, but we should be able to create the job_seeker for GPS
@@ -237,32 +226,19 @@ def test_gps_bypass(client):
     user = company.members.first()
     client.force_login(user)
 
-    apply_start_url = reverse("apply:start", kwargs={"company_pk": company.pk}) + "?gps=true"
+    apply_start_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     response = client.get(apply_start_url)
 
-    next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk}) + "?gps=true"
-    assertRedirects(response, next_url)
-
-    # The company has block job applications but we should be able to create the job_seeker anyway
-
-    company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"), block_job_applications="True")
-
-    user = PrescriberFactory()
-    client.force_login(user)
-
-    apply_start_url = reverse("apply:start", kwargs={"company_pk": company.pk}) + "?gps=true"
-    response = client.get(apply_start_url)
-
-    next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk}) + "?gps=true"
+    next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     assertRedirects(response, next_url)
 
 
 @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
 def test_existing_user_with_email(client):
     """
-    An user with the same email already exists, create the group with this user
+    A user with the same email already exists, create the group with this user
     """
-    company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+    singleton = Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
     # Only authorized prescribers can add a NIR.
     # See User.can_add_nir
     prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
@@ -272,12 +248,12 @@ def test_existing_user_with_email(client):
     client.force_login(user)
 
     # Follow all redirections…
-    response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}) + "?gps=true", follow=True)
+    response = client.get(reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true", follow=True)
 
     # …until a job seeker has to be determined.
     assert response.status_code == 200
     last_url = response.redirect_chain[-1][0]
-    assert last_url == reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk}) + "?gps=true"
+    assert last_url == reverse("apply:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
 
     # Enter a non-existing NIR.
     # ----------------------------------------------------------------------
@@ -288,7 +264,7 @@ def test_existing_user_with_email(client):
     next_url = (
         reverse(
             "apply:search_by_email_for_sender",
-            kwargs={"company_pk": company.pk, "session_uuid": job_seeker_session_name},
+            kwargs={"company_pk": singleton.pk, "session_uuid": job_seeker_session_name},
         )
         + "?gps=true"
     )
@@ -323,7 +299,7 @@ def test_existing_user_with_nir(client):
     """
     An user with the same NIR already exists, create the group with this user
     """
-    company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
+    singleton = Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
 
     nir = "141068078200557"
     prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
@@ -333,12 +309,12 @@ def test_existing_user_with_nir(client):
     client.force_login(user)
 
     # Follow all redirections…
-    response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}) + "?gps=true", follow=True)
+    response = client.get(reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true", follow=True)
 
     # …until a job seeker has to be determined.
     assert response.status_code == 200
     last_url = response.redirect_chain[-1][0]
-    assert last_url == reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk}) + "?gps=true"
+    assert last_url == reverse("apply:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
 
     # Enter an existing NIR.
     # ----------------------------------------------------------------------
@@ -358,3 +334,27 @@ def test_existing_user_with_nir(client):
     job_seeker.refresh_from_db()
     assert job_seeker.follow_up_group is not None
     assert user in job_seeker.follow_up_group.members.all()
+
+
+@pytest.mark.parametrize(
+    "UserFactory, factory_args",
+    [
+        (PrescriberFactory, {"membership": True}),
+        (PrescriberFactory, {"membership": False}),
+        (EmployerFactory, {"with_company": True}),
+    ],
+)
+def test_creation_by_user_kind(client, UserFactory, factory_args):
+    singleton = Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
+    user = UserFactory(**factory_args)
+    client.force_login(user)
+    # Assert contains link.
+    create_beneficiary_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+    response = client.get(reverse("gps:join_group"))
+    assertContains(response, create_beneficiary_url)
+    response = client.get(create_beneficiary_url)
+    assert response.status_code == 302
+    assert (
+        response["Location"]
+        == reverse("apply:check_nir_for_sender", kwargs={"company_pk": singleton.pk}) + "?gps=true"
+    )

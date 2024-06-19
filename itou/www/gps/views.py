@@ -45,7 +45,7 @@ def my_groups(request, template_name="gps/my_groups.html"):
     redirect_field_name=None,
 )
 def join_group(request, template_name="gps/join_group.html"):
-    form = GpsUserSearchForm(request.current_organization, data=request.POST or None)
+    form = GpsUserSearchForm(data=request.POST or None)
 
     my_groups_url = reverse("gps:my_groups")
     back_url = get_safe_url(request, "back_url", my_groups_url)
