@@ -308,7 +308,10 @@ class EvaluationCampaignManagerTest(TestCase):
         evaluated_period_start_at = timezone.now() - relativedelta(months=2)
         evaluated_period_end_at = timezone.now() - relativedelta(months=1)
         adversarial_stage_start = timezone.localdate() + relativedelta(months=1)
-        institution_ids = InstitutionWith2MembershipFactory.create_batch(2, kind=InstitutionKind.DDETS_IAE)
+        institution_ids = [
+            InstitutionWith2MembershipFactory(kind=InstitutionKind.DDETS_IAE, department="O1"),
+            InstitutionWith2MembershipFactory(kind=InstitutionKind.DDETS_IAE, department="1O"),
+        ]
         assert 1 == create_campaigns_and_calendar(
             evaluated_period_start_at,
             evaluated_period_end_at,
