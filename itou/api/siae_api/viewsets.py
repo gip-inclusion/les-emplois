@@ -1,7 +1,7 @@
 import logging
 
 from django.db.models import Prefetch
-from django_filters.filters import CharFilter, NumberFilter, OrderingFilter
+from django_filters.filters import CharFilter, ChoiceFilter, NumberFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
@@ -11,6 +11,7 @@ from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.throttling import UserRateThrottle
 
 from itou.cities.models import City
+from itou.common_apps.address.departments import DEPARTMENTS
 from itou.companies.models import Company, JobDescription
 
 from .serializers import SiaeSerializer
@@ -48,26 +49,28 @@ class CompanyFilterSet(FilterSet):
 
     code_insee = CharFilter(
         method=noop,  # Noop filter since filtering happens in filter_queryset method
-        required=True,
-        help_text="Filtre par code INSEE de la ville",
+        help_text="Filtre par code INSEE de la ville. À utiliser avec `distance_max_km`.",
     )
     distance_max_km = NumberFilter(
         method=noop,  # Noop filter since filtering happens in filter_queryset method
-        required=True,
         min_value=0,
         max_value=MAX_DISTANCE_RADIUS_KM,
         help_text=(
             "Filtre par rayon de recherche autour de la ville, en kilomètres. "
-            f"Maximum {MAX_DISTANCE_RADIUS_KM} kilomètres."
+            f"Maximum {MAX_DISTANCE_RADIUS_KM} kilomètres. À utiliser avec `code_insee`."
         ),
+    )
+
+    departement = ChoiceFilter(
+        field_name="department", choices=list(DEPARTMENTS.items()), help_text="Département de la structure"
     )
 
     def filter_queryset(self, queryset):
         filtered_queryset = super().filter_queryset(queryset)
-        code_insee = self.form.cleaned_data["code_insee"]
-        distance = self.form.cleaned_data["distance_max_km"]
+        code_insee = self.form.cleaned_data.get("code_insee")
+        distance = self.form.cleaned_data.get("distance_max_km")
+        department = self.form.cleaned_data.get("departement")
 
-        t = f"Les paramètres `{CODE_INSEE_PARAM_NAME}` et `{DISTANCE_FROM_CODE_INSEE_PARAM_NAME}` sont obligatoires."
         if distance and code_insee:
             try:
                 city = City.objects.get(code_insee=code_insee)
@@ -76,8 +79,13 @@ class CompanyFilterSet(FilterSet):
                 # Ensure the error comes from a missing city, which may not be that clear
                 # with get_object_or_404
                 raise NotFound(f"Pas de ville avec pour code_insee {code_insee}")
-        else:
-            raise ValidationError(t)
+        elif not department:
+            raise ValidationError(
+                f"Les paramètres `{CODE_INSEE_PARAM_NAME}` et `{DISTANCE_FROM_CODE_INSEE_PARAM_NAME}` sont "
+                "obligatoires si `departement` n'est pas spécifié."
+            )
+        # Here the department filter has been applied
+        return filtered_queryset
 
 
 class RestrictedUserRateThrottle(UserRateThrottle):
