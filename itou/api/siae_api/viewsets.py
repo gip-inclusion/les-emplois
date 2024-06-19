@@ -10,6 +10,7 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.throttling import UserRateThrottle
 
+from itou.api.auth import DepartmentTokenAuthentication
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.companies.models import Company, JobDescription
@@ -162,7 +163,8 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_class = CompanyFilterSet
     ordering = ["id"]
 
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    # The authentication is mainly here to have some information on who uses our API
+    authentication_classes = [DepartmentTokenAuthentication, TokenAuthentication, SessionAuthentication]
     # No permission is required on this API and everybody can query anything − it’s read-only.
     permission_classes = []
     throttling_classes = [RestrictedUserRateThrottle]
