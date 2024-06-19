@@ -2,12 +2,14 @@ import pytest
 from bs4 import BeautifulSoup
 from django.test.utils import override_settings
 from django.urls import reverse
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertNumQueries
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.enums import UserKind
 from itou.users.models import User
+from tests.companies.factories import CompanyMembershipFactory
 from tests.gps.factories import FollowUpGroupFactory
+from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
     JobSeekerFactory,
@@ -246,6 +248,7 @@ def test_beneficiary_details(client, snapshot):
     html_details = parse_response_to_soup(response, selector="#beneficiary_details_container")
     assert str(html_details) == snapshot
     user_dropdown_menu = parse_response_to_soup(response, selector="div#dashboardUserDropdown")
+
     assert prescriber.email in str(user_dropdown_menu)
     assert beneficiary.email not in str(user_dropdown_menu)
 
@@ -345,3 +348,35 @@ def test_follow_beneficiary():
     assert group.memberships.count() == 2
     other_membership = group.memberships.get(member=other_member)
     assert other_membership.is_referent is True  # No limit to the number of referent
+
+
+@pytest.mark.parametrize(
+    "UserFactory,MembershipFactory,relation_name",
+    [
+        (EmployerFactory, CompanyMembershipFactory, "company"),
+        (PrescriberFactory, PrescriberMembershipFactory, "organization"),
+    ],
+)
+def test_manager_organizations_names(UserFactory, MembershipFactory, relation_name):
+    user = UserFactory()
+    first_membership = MembershipFactory(is_active=True, is_admin=False, user=user)
+    admin_membership = MembershipFactory(is_active=True, is_admin=True, user=user)
+    last_membership = MembershipFactory(is_active=True, is_admin=False, user=user)
+    FollowUpGroupFactory(memberships=True, memberships__member=user)
+    with assertNumQueries(1):
+        group_membership = FollowUpGroupMembership.objects.with_members_organizations_names().get(member_id=user.pk)
+
+    # The organization we are admin of should come first
+    assert group_membership.organization_name == getattr(admin_membership, relation_name).name
+    admin_membership.delete()
+
+    group_membership = FollowUpGroupMembership.objects.with_members_organizations_names().get(member_id=user.pk)
+    # Then it's ordered by membership creation date.
+    assert group_membership.organization_name == getattr(first_membership, relation_name).name
+
+    # No membership
+    first_membership.delete()
+    last_membership.delete()
+
+    group_membership = FollowUpGroupMembership.objects.with_members_organizations_names().get(member_id=user.pk)
+    assert not group_membership.organization_name

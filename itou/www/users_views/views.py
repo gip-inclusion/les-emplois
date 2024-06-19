@@ -19,7 +19,8 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["gps_memberships"] = (
-            FollowUpGroupMembership.objects.filter(follow_up_group=self.object.follow_up_group)
+            FollowUpGroupMembership.objects.with_members_organizations_names()
+            .filter(follow_up_group=self.object.follow_up_group)
             .filter(is_active=True)
             .order_by("-is_referent")
             .select_related("follow_up_group", "member")

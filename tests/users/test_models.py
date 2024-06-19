@@ -23,9 +23,8 @@ from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploi
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import EligibilityDiagnosisFactory, EligibilityDiagnosisMadeBySiaeFactory
-from tests.institutions.factories import InstitutionMembershipFactory
 from tests.prescribers.factories import (
     PrescriberMembershipFactory,
     PrescriberOrganizationFactory,
@@ -1265,37 +1264,6 @@ def test_is_prescriber_with_authorized_org(user_active, membership_active, organ
     assert prescriber.is_prescriber_with_authorized_org is all(
         [user_active, membership_active, organization_authorized]
     )
-
-
-@pytest.mark.parametrize(
-    "UserFactory,MembershipFactory,relation_name, factories_extra",
-    [
-        (EmployerFactory, CompanyMembershipFactory, "company", [{}] * 3),
-        (
-            LaborInspectorFactory,
-            InstitutionMembershipFactory,
-            "institution",
-            [
-                {"institution__department": "01"},
-                {"institution__department": "02"},
-                {"institution__department": "03"},
-            ],
-        ),
-        (PrescriberFactory, PrescriberMembershipFactory, "organization", [{}] * 3),
-    ],
-)
-def test_employer_organizations(UserFactory, MembershipFactory, relation_name, factories_extra):
-    user = UserFactory()
-    first_membership = MembershipFactory(is_active=True, is_admin=False, user=user, **factories_extra[0])
-    admin_membership = MembershipFactory(is_active=True, is_admin=True, user=user, **factories_extra[1])
-    MembershipFactory(is_active=True, is_admin=False, user=user, **factories_extra[2])
-
-    assert len(user.organizations) == 3
-
-    # The organization we are admin of should come first
-    assert user.organizations[0] == getattr(admin_membership, relation_name)
-    # Then it's ordered by membership creation date.
-    assert user.organizations[1] == getattr(first_membership, relation_name)
 
 
 def test_user_first_login(client):

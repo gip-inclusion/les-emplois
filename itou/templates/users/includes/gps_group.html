@@ -15,13 +15,17 @@
                         <i class="ri-user-line" aria-hidden="true"></i>
 
                         <div>
-
                             <h3>
                                 {{ membership.member.get_full_name }}
-
-                                {% if membership.member.organizations %}
-                                    <span class="font-weight-normal fs-6 fst-italic">({{ membership.member.organizations.0 }})</span>
-                                {% endif %}
+                                <span class="font-weight-normal fs-6 fst-italic">
+                                    {% comment %}
+                                    DJlint wants to move the if block and the closing parenthesis to the next line,
+                                    adding two inelegant spaces.
+                                    {% endcomment %}
+                                    {# djlint:off #}
+                                    ({{ membership.member.get_kind_display }}{% if membership.organization_name %} pour {{ membership.organization_name }}{% endif %})
+                                    {# djlint:on #}
+                                </span>
                             </h3>
 
                             <div class="d-flex flex-column flex-md-column gap-1 gap-md-2">

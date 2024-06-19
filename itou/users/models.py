@@ -32,9 +32,6 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Company
-from itou.institutions.models import Institution
-from itou.prescribers.models import PrescriberOrganization
 from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
@@ -753,29 +750,6 @@ class User(AbstractUser, AddressMixin):
 
     def autocomplete_display(self):
         return self.get_full_name()
-
-    @property
-    def organizations(self):
-        """
-        Get organizations depending on the type of the user. Orgs we are admins are sorted first.
-        """
-
-        if self.is_employer:
-            org_model = Company
-
-        elif self.is_prescriber:
-            org_model = PrescriberOrganization
-
-        elif self.is_labor_inspector:
-            org_model = Institution
-
-        membership_name = org_model.members.through.user.field.remote_field.name
-        qs_filters = {f"{membership_name}__user": self, f"{membership_name}__is_active": True}
-        organizations = org_model.objects.filter(**qs_filters).order_by(
-            f"-{membership_name}__is_admin", f"{membership_name}__created_at"
-        )
-
-        return organizations
 
 
 def get_allauth_account_user_display(user):
