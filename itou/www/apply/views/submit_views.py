@@ -17,6 +17,7 @@ from django.utils.html import format_html
 from django.views.generic import TemplateView
 
 from itou.approvals.models import Approval
+from itou.companies import enums as companies_enums
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, JobDescription
 from itou.eligibility.models import EligibilityDiagnosis
@@ -83,31 +84,35 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
         self.is_gps = False
 
     def setup(self, request, *args, **kwargs):
-        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
+        self.is_gps = "gps" in request.GET and request.GET["gps"] == "true"
+        self.company = (
+            get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
+            if not self.is_gps
+            else Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
+        )
         self.apply_session = SessionNamespace(request.session, f"job_application-{self.company.pk}")
         self.hire_process = kwargs.pop("hire_process", False)
 
         super().setup(request, *args, **kwargs)
 
-        self.is_gps = "gps" in request.GET and request.GET["gps"] == "true"
-
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            if self.hire_process and request.user.kind != UserKind.EMPLOYER:
-                raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches")
-            elif request.user.kind not in [
-                UserKind.JOB_SEEKER,
-                UserKind.PRESCRIBER,
-                UserKind.EMPLOYER,
-            ]:
-                raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
-            elif request.user.is_employer and not self.company.has_member(request.user):
-                raise PermissionDenied("Vous ne pouvez postuler pour un candidat que dans votre structure.")
+        if not self.is_gps:
+            if request.user.is_authenticated:
+                if self.hire_process and request.user.kind != UserKind.EMPLOYER:
+                    raise PermissionDenied("Seuls les employeurs sont autorisés à déclarer des embauches")
+                elif request.user.kind not in [
+                    UserKind.JOB_SEEKER,
+                    UserKind.PRESCRIBER,
+                    UserKind.EMPLOYER,
+                ]:
+                    raise PermissionDenied("Vous n'êtes pas autorisé à déposer de candidature.")
+                elif request.user.is_employer and not self.company.has_member(request.user):
+                    raise PermissionDenied("Vous ne pouvez postuler pour un candidat que dans votre structure.")
 
-        if not self.company.has_active_members and not self.is_gps:
-            raise PermissionDenied(
-                "Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne."
-            )
+            if not self.company.has_active_members:
+                raise PermissionDenied(
+                    "Cet employeur n'est pas inscrit, vous ne pouvez pas déposer de candidatures en ligne."
+                )
         return super().dispatch(request, *args, **kwargs)
 
     def get_back_url(self):
