@@ -234,6 +234,21 @@ def test_referent_group(client):
     assert not membership.is_referent
 
 
+def test_beneficiary_details(client):
+    prescriber = PrescriberFactory(membership=True)
+    beneficiary = JobSeekerFactory()
+    FollowUpGroupFactory(beneficiary=beneficiary, memberships=4, memberships__member=prescriber)
+
+    client.force_login(prescriber)
+
+    user_details_url = reverse("users:details", kwargs={"public_id": beneficiary.public_id})
+    response = client.get(user_details_url)
+    soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
+    user_dropdown_menu = str(soup.select("div#dashboardUserDropdown")[0])
+    assert prescriber.email in user_dropdown_menu
+    assert beneficiary.email not in user_dropdown_menu
+
+
 def test_remove_members_from_group(client):
     prescriber = PrescriberFactory(membership=True)
 

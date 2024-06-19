@@ -14,7 +14,7 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
     template_name = "users/details.html"
     slug_field = "public_id"
     slug_url_kwarg = "public_id"
-    context_object_name = "user"
+    context_object_name = "beneficiary"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

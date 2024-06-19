@@ -3,9 +3,9 @@
 {% load str_filters %}
 {% load format_filters %}
 
-{% block title %}Profil salarié - {{ user.get_full_name }} {{ block.super }}{% endblock %}
+{% block title %}Profil salarié - {{ beneficiary.get_full_name }} {{ block.super }}{% endblock %}
 
-{% block content_title %}<h1>{{ user.get_full_name }}</h1>{% endblock %}
+{% block content_title %}<h1>{{ beneficiary.get_full_name }}</h1>{% endblock %}
 
 {% block breadcrumbs %}
     {% include "layout/breadcrumbs_from_dashboard.html" %}
@@ -25,42 +25,42 @@
                                 <ul class="list-data mb-3">
                                     <li>
                                         <small>Prénom</small>
-                                        <strong>{{ user.first_name|mask_unless:can_view_personal_information }}</strong>
+                                        <strong>{{ beneficiary.first_name|mask_unless:can_view_personal_information }}</strong>
                                     </li>
                                     <li>
                                         <small>Nom</small>
-                                        <strong>{{ user.last_name|mask_unless:can_view_personal_information }}</strong>
+                                        <strong>{{ beneficiary.last_name|mask_unless:can_view_personal_information }}</strong>
                                     </li>
 
                                     <li>
                                         <small>Date de naissance</small>
-                                        <strong>{{ user.birthdate|date:"d/m/Y" }}</strong>
+                                        <strong>{{ beneficiary.birthdate|date:"d/m/Y" }}</strong>
                                     </li>
                                     <li>
                                         <small>Adresse e-mail</small>
-                                        <strong>{{ user.email }}</strong>
+                                        <strong>{{ beneficiary.email }}</strong>
                                         <button class="btn-link"
                                                 data-bs-toggle="tooltip"
                                                 data-bs-placement="top"
                                                 data-bs-trigger="manual"
                                                 data-bs-title="Copié!"
                                                 data-it-clipboard-button="copy"
-                                                data-it-copy-to-clipboard="{{ user.email }}"
+                                                data-it-copy-to-clipboard="{{ beneficiary.email }}"
                                                 {% matomo_event "gps" "clic" "copied_user_email" %}>
                                             <i class="ri-file-copy-line"></i>
                                         </button>
                                     </li>
                                     <li>
                                         <small>Téléphone</small>
-                                        {% if user.phone %}
-                                            <strong>{{ user.phone|format_phone }}</strong>
+                                        {% if beneficiary.phone %}
+                                            <strong>{{ beneficiary.phone|format_phone }}</strong>
                                             <button class="btn-link"
                                                     data-bs-toggle="tooltip"
                                                     data-bs-placement="top"
                                                     data-bs-trigger="manual"
                                                     data-bs-title="Copié!"
                                                     data-it-clipboard-button="copy"
-                                                    data-it-copy-to-clipboard="{{ user.phone|cut:" " }}"
+                                                    data-it-copy-to-clipboard="{{ beneficiary.phone|cut:" " }}"
                                                     {% matomo_event "gps" "clic" "copied_user_phone" %}>
                                                 <i class="ri-file-copy-line"></i>
                                             </button>
@@ -70,8 +70,8 @@
                                     </li>
                                     <li>
                                         <small>Adresse</small>
-                                        {% if user.address_on_one_line %}
-                                            <address>{{ user.address_on_one_line }}</address>
+                                        {% if beneficiary.address_on_one_line %}
+                                            <address>{{ beneficiary.address_on_one_line }}</address>
                                         {% else %}
                                             <i class="text-disabled">Non renseignée</i>
                                         {% endif %}
