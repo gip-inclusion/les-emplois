@@ -1,6 +1,11 @@
+import io
+import logging
+from unittest.mock import patch
+
 from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
+from itou.api.models import DepartmentToken
 from itou.companies.enums import CompanyKind, ContractType
 from tests.cities.factories import create_city_guerande, create_city_saint_andre
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
@@ -240,3 +245,21 @@ class SiaeAPIFetchListTest(APITestCase):
         response = self.client.get(ENDPOINT_URL, query_params, format="json")
         # Rate limited.
         assert response.status_code == 429
+
+    def test_department_token_datadog_info(self):
+        token = DepartmentToken.objects.create(department="33")
+        api_client = APIClient(headers={"Authorization": f"Token {token.key}"})
+
+        root_logger = logging.getLogger()
+        stream_handler = root_logger.handlers[0]
+        assert isinstance(stream_handler, logging.StreamHandler)
+        with io.StringIO() as captured:
+            # caplog cannot be used since the organization_id is written by the log formatter
+            # capsys/capfd did not want to work because https://github.com/pytest-dev/pytest/issues/5997
+            with patch.object(stream_handler, "stream", captured):
+                response = api_client.get(
+                    ENDPOINT_URL, {"code_insee": self.saint_andre.code_insee, "distance_max_km": 100}
+                )
+            assert response.status_code == 200
+            # Check that the organization_id is properly logged to stdout
+            assert f'"token": "DepartmentToken-{token.pk}-for-33"' in captured.getvalue()
