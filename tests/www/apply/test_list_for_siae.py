@@ -665,6 +665,8 @@ def test_list_for_siae_filter_for_different_kind(client, snapshot):
         response = client.get(reverse("apply:list_for_siae"))
         assert response.status_code == 200
         filter_form = parse_response_to_soup(response, "#asideFiltersCollapse")
+        # GEIQ and non IAE kind do not have a filter on approval and eligibility.
+        # Non IAE kind do not have prior action.
         assert str(filter_form) == snapshot(name=kind_snapshot[kind])
 
 
