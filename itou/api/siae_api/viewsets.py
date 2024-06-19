@@ -1,7 +1,7 @@
 import logging
 
 from django.db.models import Prefetch
-from django_filters.filters import OrderingFilter
+from django_filters.filters import CharFilter, NumberFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiParameter, extend_schema
@@ -32,12 +32,33 @@ SIAE_ORDERING_FILTER_MAPPING = {
 }
 
 
-class SiaeOrderingFilter(FilterSet):
+def noop(queryset, name, value):
+    return queryset
+
+
+class CompanyFilterSet(FilterSet):
     # Mapping of the model property names -> query parameter names used to order the results:
     # - keys: the name of the property in the model in order to order the results
     # - values: the name of the ordering criterion in the query parameter
     # If you want to query https://some_api?o=cree_le, it will perform queryset.order_by("created_at")
-    o = OrderingFilter(fields=SIAE_ORDERING_FILTER_MAPPING)
+    o = OrderingFilter(
+        fields=SIAE_ORDERING_FILTER_MAPPING,
+        help_text="Critère de tri",
+    )
+
+    code_insee = CharFilter(
+        method=noop,  # Noop filter since filtering happens elsewhere
+        required=True,
+        help_text="Filtre par code INSEE de la ville",
+    )
+    distance_max_km = NumberFilter(
+        method=noop,  # Noop filter since filtering happens elsewhere
+        required=True,
+        help_text=(
+            "Filtre par rayon de recherche autour de la ville, en kilomètres. "
+            f"Maximum {MAX_DISTANCE_RADIUS_KM} kilomètres."
+        ),
+    )
 
 
 class RestrictedUserRateThrottle(UserRateThrottle):
@@ -93,7 +114,7 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
 
     serializer_class = SiaeSerializer
     filter_backends = [DjangoFilterBackend]
-    filterset_class = SiaeOrderingFilter
+    filterset_class = CompanyFilterSet
     ordering = ["id"]
 
     authentication_classes = [TokenAuthentication, SessionAuthentication]
@@ -119,32 +140,10 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
         response_only=True,
         status_codes=["404"],
     )
-    sort_description = """
-Critère de tri.
-
-On peut spécifier la direction de tri :
- - o=critère pour l’ordre croissant
- - o=-critère pour l’ordre décroissant
-    """
 
     @extend_schema(
         parameters=[
-            OpenApiParameter(
-                name=CODE_INSEE_PARAM_NAME, description="Filtre par code INSEE de la ville", required=True, type=str
-            ),
-            OpenApiParameter(
-                name=DISTANCE_FROM_CODE_INSEE_PARAM_NAME,
-                description=f"Filtre par rayon de recherche autour de la ville, en kilomètres. Maximum {MAX_DISTANCE_RADIUS_KM} kilomètres",  # noqa: E501
-                required=True,
-                type=str,
-            ),
             OpenApiParameter(name="format", description="Format de sortie", required=False, enum=["json", "api"]),
-            OpenApiParameter(
-                name="o",
-                description=sort_description,
-                required=False,
-                enum=SIAE_ORDERING_FILTER_MAPPING.values(),
-            ),
         ],
         responses={200: SiaeSerializer, 404: OpenApiTypes.OBJECT},
         examples=[
