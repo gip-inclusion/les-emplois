@@ -1,3 +1,4 @@
+from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models, transaction
 from django.utils import timezone
 
@@ -52,6 +53,23 @@ class FollowUpGroup(models.Model):
         return "Groupe de " + self.beneficiary.get_full_name()
 
 
+class FollowUpGroupMembershipQueryset(models.QuerySet):
+    def with_members_organizations_names(self):
+        qs = self.annotate(
+            prescriber_org_names=ArrayAgg(
+                "member__prescribermembership__organization__name",
+                ordering=("-member__prescribermembership__is_admin", "member__prescribermembership__joined_at"),
+            )
+        ).annotate(
+            companies_names=ArrayAgg(
+                "member__companymembership__company__name",
+                ordering=("-member__companymembership__is_admin", "member__companymembership__joined_at"),
+            )
+        )
+
+        return qs
+
+
 class FollowUpGroupMembership(models.Model):
     is_referent = models.BooleanField(default=False, verbose_name="référent")
 
@@ -88,5 +106,11 @@ class FollowUpGroupMembership(models.Model):
         on_delete=models.RESTRICT,
     )
 
+    objects = FollowUpGroupMembershipQueryset.as_manager()
+
     def __str__(self):
         return self.follow_up_group.beneficiary.get_full_name() + " => " + self.member.get_full_name()
+
+    @property
+    def organization_name(self):
+        return next((name for name in (*self.prescriber_org_names, *self.companies_names) if name), None)

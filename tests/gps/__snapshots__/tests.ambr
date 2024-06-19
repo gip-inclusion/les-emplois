@@ -100,13 +100,14 @@
                           <i aria-hidden="true" class="ri-user-line"></i>
   
                           <div>
-  
                               <h3>
                                   Pierre DUPONT
-  
-                                  
-                                      <span class="font-weight-normal fs-6 fst-italic">(Les Olivades)</span>
-                                  
+                                  <span class="font-weight-normal fs-6 fst-italic">
+                                      
+                                      
+                                      (prescripteur pour Les Olivades)
+                                      
+                                  </span>
                               </h3>
   
                               <div class="d-flex flex-column flex-md-column gap-1 gap-md-2">
