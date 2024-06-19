@@ -47,18 +47,37 @@ class CompanyFilterSet(FilterSet):
     )
 
     code_insee = CharFilter(
-        method=noop,  # Noop filter since filtering happens elsewhere
+        method=noop,  # Noop filter since filtering happens in filter_queryset method
         required=True,
         help_text="Filtre par code INSEE de la ville",
     )
     distance_max_km = NumberFilter(
-        method=noop,  # Noop filter since filtering happens elsewhere
+        method=noop,  # Noop filter since filtering happens in filter_queryset method
         required=True,
+        min_value=0,
+        max_value=MAX_DISTANCE_RADIUS_KM,
         help_text=(
             "Filtre par rayon de recherche autour de la ville, en kilomètres. "
             f"Maximum {MAX_DISTANCE_RADIUS_KM} kilomètres."
         ),
     )
+
+    def filter_queryset(self, queryset):
+        filtered_queryset = super().filter_queryset(queryset)
+        code_insee = self.form.cleaned_data["code_insee"]
+        distance = self.form.cleaned_data["distance_max_km"]
+
+        t = f"Les paramètres `{CODE_INSEE_PARAM_NAME}` et `{DISTANCE_FROM_CODE_INSEE_PARAM_NAME}` sont obligatoires."
+        if distance and code_insee:
+            try:
+                city = City.objects.get(code_insee=code_insee)
+                return filtered_queryset.within(city.coords, distance)
+            except City.DoesNotExist:
+                # Ensure the error comes from a missing city, which may not be that clear
+                # with get_object_or_404
+                raise NotFound(f"Pas de ville avec pour code_insee {code_insee}")
+        else:
+            raise ValidationError(t)
 
 
 class RestrictedUserRateThrottle(UserRateThrottle):
@@ -158,9 +177,6 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
         # We only get to this point if permissions are OK
         queryset = super().get_queryset()
 
-        # Get (registered) query parameters filters
-        queryset = self._filter_by_query_params(self.request, queryset)
-
         try:
             return queryset.order_by("id")
         finally:
@@ -169,24 +185,3 @@ class SiaeViewSet(viewsets.ReadOnlyModelViewSet):
                 "User-Agent: %s",
                 self.request.headers.get("User-Agent"),
             )
-
-    def _filter_by_query_params(self, request, queryset):
-        params = request.query_params
-        code_insee = params.get(CODE_INSEE_PARAM_NAME)
-        t = f"Les paramètres `{CODE_INSEE_PARAM_NAME}` et `{DISTANCE_FROM_CODE_INSEE_PARAM_NAME}` sont obligatoires."
-        if params.get(DISTANCE_FROM_CODE_INSEE_PARAM_NAME) and code_insee:
-            distance_filter = int(params.get(DISTANCE_FROM_CODE_INSEE_PARAM_NAME))
-            if distance_filter < 0 or distance_filter > MAX_DISTANCE_RADIUS_KM:
-                raise ValidationError(
-                    f"Le paramètre `{DISTANCE_FROM_CODE_INSEE_PARAM_NAME}` doit être compris entre 0 et {MAX_DISTANCE_RADIUS_KM}."  # noqa: E501
-                )
-
-            try:
-                city = City.objects.get(code_insee=code_insee)
-                return queryset.within(city.coords, distance_filter)
-            except City.DoesNotExist:
-                # Ensure the error comes from a missing city, which may not be that clear
-                # with get_object_or_404
-                raise NotFound(f"Pas de ville avec pour code_insee {code_insee}")
-        else:
-            raise ValidationError(t)
