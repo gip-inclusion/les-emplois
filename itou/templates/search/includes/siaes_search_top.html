@@ -41,7 +41,11 @@
                         </div>
                     </div>
                     {% if form.company %}
-                        {% bootstrap_field form.company wrapper_class="w-lg-400px" show_label=False %}
+                        <form action="{% url "search:employers_results" %}" class="submit-on-change">
+                            {% bootstrap_field form.company wrapper_class="w-lg-400px" show_label=False %}
+                            <input type="hidden" name="city" value="{{ form.city.value }}">
+                            <input type="hidden" name="distance" value="{{ form.distance.value }}">
+                        </form>
                     {% endif %}
                 {% endif %}
             </div>

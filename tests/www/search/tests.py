@@ -395,7 +395,10 @@ class SearchCompanyTest(TestCase):
         simulated_page = parse_response_to_soup(response)
 
         def distance_radio(distance):
-            [elt] = simulated_page.find_all("input", attrs={"name": "distance", "value": f"{distance}"})
+            [elt] = simulated_page.find_all(
+                "input",
+                attrs={"type": "radio", "name": "distance", "value": f"{distance}"},
+            )
             return elt
 
         distance_radio(100)["checked"] = ""
