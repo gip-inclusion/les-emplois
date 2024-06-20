@@ -86,7 +86,9 @@ class EmployerSearchBaseView(FormView):
             )
         )
 
-        self.add_form_choices(form, siaes, job_descriptions)
+        form.add_field_departements(city)
+
+        self.add_form_choices(form, siaes)
 
         if kinds:
             siaes = siaes.filter(kind__in=kinds)
@@ -157,25 +159,19 @@ class EmployerSearchBaseView(FormView):
 
 
 class EmployerSearchView(EmployerSearchBaseView):
-    def add_form_choices(self, form, siaes, _job_descriptions):
+    def add_form_choices(self, form, siaes):
         # Extract departments from results to inject them as filters
         # The DB contains around 4k SIAE (always fast in Python and no need of iterator())
-        departments = set()
         departments_districts = defaultdict(set)
         company_choices = []
         for siae in siaes:
             company_choices.append((siae.pk, siae.display_name))
-            # Extract the department of SIAE
-            if siae.department:
-                departments.add(siae.department)
-                # Extract the post_code if it's a district to use it as criteria
-                if siae.department in DEPARTMENTS_WITH_DISTRICTS:
-                    if int(siae.post_code) <= DEPARTMENTS_WITH_DISTRICTS[siae.department]["max"]:
-                        departments_districts[siae.department].add(siae.post_code)
-
-        if departments:
-            departments = sorted(departments)
-            form.add_field_departements(departments)
+            # Extract the post_code if it's a district to use it as criteria
+            if (
+                siae.department in DEPARTMENTS_WITH_DISTRICTS
+                and int(siae.post_code) <= DEPARTMENTS_WITH_DISTRICTS[siae.department]["max"]
+            ):
+                departments_districts[siae.department].add(siae.post_code)
 
         city = form.cleaned_data["city"]
         if departments_districts and city.code_insee in INSEE_CODES_WITH_DISTRICTS:
@@ -229,27 +225,16 @@ class EmployerSearchView(EmployerSearchBaseView):
 class JobDescriptionSearchView(EmployerSearchBaseView):
     form_class = JobDescriptionSearchForm
 
-    def add_form_choices(self, form, _siaes, job_descriptions):
-        departments = set()
-        for job_description in job_descriptions:
-            department = None
-            if job_description.location:
-                department = job_description.location.department
-                # FIXME(vperron): on a un problème ici, c'est que les gens ne peuvent pas sélectionner
-                # un arrondissement au moment de la création d'une JobDescription: ils n'ont accès que aux "Cities"
-                # qui ne détaillent pas les arrondissements.
-                # Ce qui signifie que l'info est perdue dès le départ, à moins que l'on ne change le parcours
-                # de création des fiches de poste ou en enrichissant la table "Cities" de tous les arrondissements
-                # de Paris, Lyon et Marseille.
-                # En attendant on ne pourra pas trier par arrondissement pour ces offres.
-            elif job_description.company.department:
-                department = job_description.company.department
-            if department:
-                departments.add(department)
+    # FIXME(vperron): on a un problème ici, c'est que les gens ne peuvent pas sélectionner
+    # un arrondissement au moment de la création d'une JobDescription: ils n'ont accès que aux "Cities"
+    # qui ne détaillent pas les arrondissements.
+    # Ce qui signifie que l'info est perdue dès le départ, à moins que l'on ne change le parcours
+    # de création des fiches de poste ou en enrichissant la table "Cities" de tous les arrondissements
+    # de Paris, Lyon et Marseille.
+    # En attendant on ne pourra pas trier par arrondissement pour ces offres.
 
-        if departments:
-            departments = sorted(departments)
-            form.add_field_departements(departments)
+    def add_form_choices(self, form, siaes):
+        pass
 
     def get_results_page_and_counts(self, siaes, job_descriptions):
         job_descriptions = job_descriptions.order_by(

@@ -6,7 +6,12 @@ from django.utils.text import format_lazy
 from django_select2.forms import Select2Widget
 
 from itou.cities.models import City
-from itou.common_apps.address.departments import DEPARTMENTS, DEPARTMENTS_WITH_DISTRICTS, format_district
+from itou.common_apps.address.departments import (
+    DEPARTMENTS,
+    DEPARTMENTS_ADJACENCY,
+    DEPARTMENTS_WITH_DISTRICTS,
+    format_district,
+)
 from itou.companies.enums import CompanyKind, ContractNature, ContractType
 from itou.jobs.models import ROME_DOMAINS
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
@@ -62,8 +67,8 @@ class SiaeSearchForm(forms.Form):
             distance = self.fields["distance"].initial
         return distance
 
-    def add_field_departements(self, departments):
-        # Build list of choices
+    def add_field_departements(self, city):
+        departments = sorted([city.department, *DEPARTMENTS_ADJACENCY[city.department]])
         choices = ((department, DEPARTMENTS[department]) for department in departments)
         self.fields["departments"] = forms.ChoiceField(
             label="Départements",
