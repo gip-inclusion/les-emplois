@@ -153,7 +153,7 @@
             // Hotjar.
             (tarteaucitron.job = tarteaucitron.job || []).push('hotjar');
             {% if ITOU_ENVIRONMENT == "PROD" %}tarteaucitron.user.hotjarId = 2360441;{% endif %}
-            {% if ITOU_ENVIRONMENT == "DEMO" %}tarteaucitron.user.hotjarId = 1861487;{% endif %}
+            {% if ITOU_ENVIRONMENT == "DEMO" or ITOU_ENVIRONMENT == "PENTEST" %}tarteaucitron.user.hotjarId = 1861487;{% endif %}
             tarteaucitron.user.HotjarSv = 6;
 
             {% if MATOMO_BASE_URL %}

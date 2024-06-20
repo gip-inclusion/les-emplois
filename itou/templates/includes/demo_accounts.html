@@ -8,10 +8,7 @@
     <div class="sticky-top shadow bg-danger text-white text-center layout test-accounts-banner-overlay">
         <div class="layout-content py-0">
             <div class="d-flex align-items-center text-center p-1">
-                <p class="font-weight-bold flex-grow-1 mb-0 p-1 text-white h3">
-                    {{ ITOU_ENVIRONMENT }}
-                    {% if ITOU_ENVIRONMENT == "DEMO" %}- Données fictives{% endif %}
-                </p>
+                <p class="font-weight-bold flex-grow-1 mb-0 p-1 text-white h3">{{ ITOU_ENVIRONMENT }} - Données fictives</p>
                 {% if not user.is_authenticated %}
                     <div>
                         <button class="btn btn-sm btn-outline-primary bg-white" data-bs-toggle="modal" data-bs-target="#testAccountsModal">
