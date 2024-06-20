@@ -127,6 +127,7 @@ def load_data():
                     sender_kind=users_enums.KIND_EMPLOYER,
                     state=JobApplicationState.ACCEPTED,
                     to_company=controlled_siae,
+                    processed_at=datetime_within_period_range,
                 ).id
             ]
 

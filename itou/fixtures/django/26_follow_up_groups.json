@@ -1,28 +1,28 @@
 [
   {
     "fields": {
-      "created_at": "2020-12-01T10:55:25.283Z",
-      "beneficiary_id": 17
+      "beneficiary_id": 17,
+      "created_at": "2020-12-01T10:55:25.283Z"
     },
     "model": "gps.followupgroup",
     "pk": 1
   },
   {
     "fields": {
-      "created_at": "2020-12-01T10:55:25.283Z",
-      "beneficiary_id": 18
+      "beneficiary_id": 18,
+      "created_at": "2020-12-01T10:55:25.283Z"
     },
     "model": "gps.followupgroup",
     "pk": 2
   },
   {
     "fields": {
-      "is_referent": true,
-      "is_active": true,
-      "ended_at": null,
       "created_at": "2020-12-01T10:55:25.283Z",
       "creator_id": 6,
+      "ended_at": null,
       "follow_up_group_id": 1,
+      "is_active": true,
+      "is_referent": true,
       "member_id": 6
     },
     "model": "gps.followupgroupmembership",
@@ -30,12 +30,12 @@
   },
   {
     "fields": {
-      "is_referent": true,
-      "is_active": true,
-      "ended_at": null,
       "created_at": "2020-12-01T10:55:25.283Z",
       "creator_id": 6,
+      "ended_at": null,
       "follow_up_group_id": 2,
+      "is_active": true,
+      "is_referent": true,
       "member_id": 6
     },
     "model": "gps.followupgroupmembership",
