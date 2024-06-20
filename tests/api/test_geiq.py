@@ -6,7 +6,7 @@ from rest_framework.test import APIClient
 
 from itou.api.geiq import serializers
 from itou.api.geiq.views import GeiqApiAnonymousUser
-from itou.api.models import CompanyApiToken
+from itou.api.models import CompanyToken
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
@@ -24,7 +24,7 @@ def _api_client():
 
 
 def _api_token_for(companies):
-    token = CompanyApiToken(label="test")
+    token = CompanyToken(label="test")
     token.save()
     for company in companies:
         token.companies.add(company)
@@ -33,7 +33,7 @@ def _api_token_for(companies):
 
 def test_candidatures_geiq_token_authentication():
     TOKEN_KEY = "00000000-bf01-45d8-adf6-2706d83c78bd"
-    token = CompanyApiToken(label="test-token", key=TOKEN_KEY)
+    token = CompanyToken(label="test-token", key=TOKEN_KEY)
     token.save()
 
     geiq = CompanyFactory(siret="11832575900001", kind=CompanyKind.GEIQ)

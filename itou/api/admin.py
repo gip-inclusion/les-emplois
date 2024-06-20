@@ -2,7 +2,7 @@ from django.contrib import admin
 from rest_framework.authtoken.admin import TokenAdmin
 
 from ..utils.admin import ItouModelAdmin
-from .models import CompanyApiToken
+from .models import CompanyToken
 
 
 # Patching TokenAdmin for all sub-APIs
@@ -11,9 +11,9 @@ from .models import CompanyApiToken
 TokenAdmin.raw_id_fields = ("user",)
 
 
-@admin.register(CompanyApiToken)
-class CompanyApiTokenAdmin(ItouModelAdmin):
-    list_display = ["key", "label", "created_at"]
+@admin.register(CompanyToken)
+class CompanyTokenAdmin(ItouModelAdmin):
+    list_display = ["label", "created_at"]
     ordering = ["-created_at"]
     read_only_fields = ["key", "created_at"]
     autocomplete_fields = ["companies"]

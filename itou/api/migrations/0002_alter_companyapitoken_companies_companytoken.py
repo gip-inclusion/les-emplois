@@ -6,6 +6,18 @@ from django.db import migrations, models
 import itou.api.models
 
 
+def _migrate_companies_list(apps, schema_editor):
+    CompanyApiToken = apps.get_model("api", "CompanyApiToken")
+    CompanyToken = apps.get_model("api", "CompanyToken")
+    for company_api_token in CompanyApiToken.objects.prefetch_related("companies"):
+        new_model_instance = CompanyToken.objects.create(
+            key=company_api_token.key,
+            label=company_api_token.label,
+            created_at=company_api_token.created_at,
+        )
+        new_model_instance.companies.set(company_api_token.companies.all())
+
+
 class Migration(migrations.Migration):
     dependencies = [
         ("api", "0001_initial"),
@@ -24,7 +36,7 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "key",
-                    models.UUIDField(default=itou.api.models._generate_random_token_uuid, editable=False, unique=True),
+                    models.CharField(default=itou.api.models._generate_random_token_uuid, editable=False, unique=True),
                 ),
                 (
                     "label",
@@ -40,11 +52,8 @@ class Migration(migrations.Migration):
                 "verbose_name_plural": "jetons d'API SIAE",
             },
         ),
-        migrations.RunSQL(
-            (
-                "INSERT INTO api_companytoken (key, label, created_at) "
-                "SELECT key, label, created_at FROM api_companyapitoken;"
-            ),
-            reverse_sql=migrations.RunSQL.noop,
+        migrations.RunPython(
+            _migrate_companies_list,
+            reverse_code=migrations.RunPython.noop,
         ),
     ]
