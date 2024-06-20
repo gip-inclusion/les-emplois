@@ -1,12 +1,9 @@
-import json
-
 from django.urls import reverse
 from rest_framework.test import APIClient, APITestCase
 
 from itou.companies.enums import CompanyKind, ContractType
 from tests.cities.factories import create_city_guerande, create_city_saint_andre
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
-from tests.users.factories import EmployerFactory
 from tests.utils.test import BASE_NUM_QUERIES
 
 from ..utils import _str_with_tz
@@ -16,18 +13,19 @@ ENDPOINT_URL = reverse("v1:siaes-list")
 
 
 class SiaeAPIFetchListTest(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        # We create 2 cities and 2 siaes in Saint-Andre.
+        cls.saint_andre = create_city_saint_andre()
+        cls.guerande = create_city_guerande()
+        cls.company_without_jobs = CompanyFactory(kind=CompanyKind.EI, department="44", coords=cls.saint_andre.coords)
+        cls.company_with_jobs = CompanyFactory(
+            with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"), department="44", coords=cls.saint_andre.coords
+        )
+
     def setUp(self):
         super().setUp()
         self.client = APIClient()
-        self.user = EmployerFactory()
-
-        # We create 2 cities and 2 siaes in Saint-Andre.
-        self.saint_andre = create_city_saint_andre()
-        self.guerande = create_city_guerande()
-        CompanyFactory(kind=CompanyKind.EI, department="44", coords=self.saint_andre.coords)
-        CompanyFactory(
-            with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"), department="44", coords=self.saint_andre.coords
-        )
 
     def test_performances(self):
         num_queries = BASE_NUM_QUERIES
@@ -162,8 +160,7 @@ class SiaeAPIFetchListTest(APITestCase):
         query_params = {"code_insee": self.saint_andre.code_insee, "distance_max_km": 100}
         response = self.client.get(ENDPOINT_URL, query_params, format="json")
 
-        body = json.loads(response.content)
-        assert body["count"] == 2
+        assert response.json()["count"] == 2
         assert response.status_code == 200
 
     def test_fetch_siae_list_too_far(self):
@@ -174,8 +171,7 @@ class SiaeAPIFetchListTest(APITestCase):
         query_params = {"code_insee": self.guerande.code_insee, "distance_max_km": 10}
         response = self.client.get(ENDPOINT_URL, query_params, format="json")
 
-        body = json.loads(response.content)
-        assert body["count"] == 0
+        assert response.json()["count"] == 0
         assert response.status_code == 200
 
     def test_fetch_siae_list_rate_limits(self):
