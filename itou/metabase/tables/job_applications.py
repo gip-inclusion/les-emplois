@@ -181,7 +181,7 @@ TABLE.add_columns(
             "name": "motif_de_refus",
             "type": "varchar",
             "comment": "Motif de refus de la candidature",
-            "fn": lambda o: o.get_refusal_reason_display() if o.refusal_reason != "" else None,
+            "fn": lambda o: str(o.refusal_reason) if o.refusal_reason != "" else None,
         },
         {
             "name": "id_candidat",
