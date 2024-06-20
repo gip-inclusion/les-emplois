@@ -1268,18 +1268,27 @@ def test_is_prescriber_with_authorized_org(user_active, membership_active, organ
 
 
 @pytest.mark.parametrize(
-    "UserFactory,MembershipFactory,relation_name",
+    "UserFactory,MembershipFactory,relation_name, factories_extra",
     [
-        (EmployerFactory, CompanyMembershipFactory, "company"),
-        (LaborInspectorFactory, InstitutionMembershipFactory, "institution"),
-        (PrescriberFactory, PrescriberMembershipFactory, "organization"),
+        (EmployerFactory, CompanyMembershipFactory, "company", [{}] * 3),
+        (
+            LaborInspectorFactory,
+            InstitutionMembershipFactory,
+            "institution",
+            [
+                {"institution__department": "01"},
+                {"institution__department": "02"},
+                {"institution__department": "03"},
+            ],
+        ),
+        (PrescriberFactory, PrescriberMembershipFactory, "organization", [{}] * 3),
     ],
 )
-def test_employer_organizations(UserFactory, MembershipFactory, relation_name):
+def test_employer_organizations(UserFactory, MembershipFactory, relation_name, factories_extra):
     user = UserFactory()
-    first_membership = MembershipFactory(is_active=True, is_admin=False, user=user)
-    admin_membership = MembershipFactory(is_active=True, is_admin=True, user=user)
-    MembershipFactory(is_active=True, is_admin=False, user=user)
+    first_membership = MembershipFactory(is_active=True, is_admin=False, user=user, **factories_extra[0])
+    admin_membership = MembershipFactory(is_active=True, is_admin=True, user=user, **factories_extra[1])
+    MembershipFactory(is_active=True, is_admin=False, user=user, **factories_extra[2])
 
     assert len(user.organizations) == 3
 
