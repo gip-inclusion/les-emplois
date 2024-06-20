@@ -487,7 +487,6 @@ class JobDescriptionSearchViewTest(TestCase):
         with self.assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # select the city
-            + 1  # select job descriptions for departments filters
             + 1  # select count of job descriptions for the paginator
             + 1  # select job descriptions
             + 1  # select prefetch job applications (for the popular annotation)
@@ -550,7 +549,6 @@ class JobDescriptionSearchViewTest(TestCase):
         with self.assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # select the city
-            + 1  # select job descriptions for departments filters
             + 1  # select count of job descriptions for the paginator
             + 1  # select job descriptions
             + 1  # select prefetch job applications (for the popular annotation)
