@@ -61,6 +61,10 @@ htmx.onLoad((target) => {
     $('a.btn', this).attr("aria-disabled", $(selector).length !== 0 || null)
   })
 
+  document.querySelectorAll("form.submit-on-change").forEach((form) => {
+    form.addEventListener("change", form.submit);
+  });
+
   /*
    * File selector.
    */
