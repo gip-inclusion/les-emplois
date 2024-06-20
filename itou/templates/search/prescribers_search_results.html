@@ -9,6 +9,7 @@
 {% block script %}
     {{ block.super }}
     <script src='{% static "js/htmx_compat.js" %}'></script>
+    <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -30,13 +31,15 @@
                 <div class="s-section__row row">
                     <div class="col-12">
                         {% include "search/includes/prescribers_search_form.html" with form=form is_home=False only %}
-                        <h2 class="mt-4">Prescripteurs</h2>
+                        <h2 class="my-3 my-md-4">Prescripteurs</h2>
+                        <div class="btn-dropdown-filter-group my-3 my-md-4">
+                            {% include "includes/btn_dropdown_filter/radio.html" with field=form.distance only %}
+                        </div>
                         {% include "search/includes/prescribers_search_summary.html" %}
                     </div>
                 </div>
                 <div class="s-section__row row">
-                    <div class="col-12 col-md-4">{% include "search/includes/prescribers_search_filters.html" with form=form %}</div>
-                    <div class="col-12 col-md-8">{% include "search/includes/prescribers_search_results.html" %}</div>
+                    <div class="col-12">{% include "search/includes/prescribers_search_results.html" %}</div>
                 </div>
             </div>
         </section>

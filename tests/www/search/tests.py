@@ -476,7 +476,7 @@ class SearchPrescriberTest(TestCase):
             [elt] = simulated_page.find_all("input", attrs={"name": "distance", "value": f"{distance}"})
             return elt
 
-        distance_radio(100)["checked"] = "checked"
+        distance_radio(100)["checked"] = ""
         del distance_radio(10)["checked"]
         response = self.client.get(url, {"city": guerande.slug, "distance": 100}, headers={"HX-Request": "true"})
         update_page_with_htmx(simulated_page, f"form[hx-get='{url}']", response)
