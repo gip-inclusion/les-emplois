@@ -45,7 +45,8 @@ class SiaeAPIFetchListTest(APITestCase):
 
         assert response.status_code == 400
         assert response.json() == [
-            "Les paramètres `code_insee` et `distance_max_km` sont obligatoires si `departement` n'est pas spécifié."
+            "Les paramètres `code_insee` et `distance_max_km` sont obligatoires si ni `departement` ni "
+            "`postes_dans_le_departement` ne sont spécifiés."
         ]
 
     def test_fetch_siae_list_with_too_high_distance(self):
@@ -195,6 +196,41 @@ class SiaeAPIFetchListTest(APITestCase):
         assert body["count"] == 2
         assert response.status_code == 200
         assert company56.siret not in {company["siret"] for company in body["results"]}
+
+    def test_fetch_siae_list_by_postes_dans_le_departement(self):
+        # Declare company in 56
+        company56 = CompanyFactory(kind=CompanyKind.EI, department="56")
+        query_params = {"postes_dans_le_departement": "56"}
+        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+
+        assert response.status_code == 200
+        assert response.json()["count"] == 0  # No job in 56
+
+        # Add a job without location, it should use the company department
+        JobDescriptionFactory(company=company56, location=None)
+        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        assert response.status_code == 200
+        assert response.json()["count"] == 1
+
+        query_params = {"postes_dans_le_departement": "44"}
+        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+
+        assert response.status_code == 200
+        body = response.json()
+        assert body["count"] == 1
+        assert body["results"][0]["siret"] == self.company_with_jobs.siret
+
+        # Add a new job for company 56 in department 44
+        JobDescriptionFactory(company=company56, location=self.guerande)
+        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+
+        assert response.status_code == 200
+        body = response.json()
+        assert body["count"] == 2
+        assert {body["results"][0]["siret"], body["results"][1]["siret"]} == {
+            self.company_with_jobs.siret,
+            company56.siret,
+        }
 
     def test_fetch_siae_list_rate_limits(self):
         query_params = {"code_insee": self.saint_andre.code_insee, "distance_max_km": 100}

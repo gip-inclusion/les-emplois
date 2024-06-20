@@ -1,6 +1,6 @@
 import logging
 
-from django.db.models import Prefetch
+from django.db.models import Exists, OuterRef, Prefetch, Q
 from django_filters.filters import CharFilter, ChoiceFilter, NumberFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from drf_spectacular.types import OpenApiTypes
@@ -65,11 +65,29 @@ class CompanyFilterSet(FilterSet):
         field_name="department", choices=list(DEPARTMENTS.items()), help_text="Département de la structure"
     )
 
+    postes_dans_le_departement = ChoiceFilter(
+        choices=list(DEPARTMENTS.items()),
+        help_text="Département d'un poste de la structure.",
+        method="having_job_in_department",
+    )
+
+    def having_job_in_department(self, queryset, name, value):
+        # Either a Job in one of the department cities
+        # or a Job without city when the company department matches
+        return queryset.filter(
+            Exists(JobDescription.objects.filter(company=OuterRef("pk"), location__department=value))
+            | (
+                Q(department=value)
+                & Exists(JobDescription.objects.filter(company=OuterRef("pk"), location__isnull=True))
+            )
+        )
+
     def filter_queryset(self, queryset):
         filtered_queryset = super().filter_queryset(queryset)
         code_insee = self.form.cleaned_data.get("code_insee")
         distance = self.form.cleaned_data.get("distance_max_km")
         department = self.form.cleaned_data.get("departement")
+        jobs_in_department = self.form.cleaned_data.get("postes_dans_le_departement")
 
         if distance and code_insee:
             try:
@@ -79,12 +97,12 @@ class CompanyFilterSet(FilterSet):
                 # Ensure the error comes from a missing city, which may not be that clear
                 # with get_object_or_404
                 raise NotFound(f"Pas de ville avec pour code_insee {code_insee}")
-        elif not department:
+        elif not (department or jobs_in_department):
             raise ValidationError(
                 f"Les paramètres `{CODE_INSEE_PARAM_NAME}` et `{DISTANCE_FROM_CODE_INSEE_PARAM_NAME}` sont "
-                "obligatoires si `departement` n'est pas spécifié."
+                "obligatoires si ni `departement` ni `postes_dans_le_departement` ne sont spécifiés."
             )
-        # Here the department filter has been applied
+        # Here the department/job_department filters have been applied
         return filtered_queryset
 
 
