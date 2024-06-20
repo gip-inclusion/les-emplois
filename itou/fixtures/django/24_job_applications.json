@@ -29,9 +29,11 @@
       "origin": "default",
       "planned_training_hours": null,
       "prehiring_guidance_days": null,
+      "processed_at": "2024-06-17T08:46:15.289Z",
       "qualification_level": "",
       "qualification_type": "",
       "refusal_reason": "incompatible",
+      "refusal_reason_shared_with_job_seeker": false,
       "resume_link": "",
       "selected_jobs": [],
       "sender": 10,
@@ -43,7 +45,7 @@
       "transferred_at": null,
       "transferred_by": null,
       "transferred_from": null,
-      "updated_at": "2024-01-10T13:12:47.086Z"
+      "updated_at": "2024-06-17T08:46:15.289Z"
     },
     "model": "job_applications.jobapplication",
     "pk": "4edf8044-b892-4167-b872-f2ef5ac9e05f"
@@ -78,9 +80,11 @@
       "origin": "default",
       "planned_training_hours": null,
       "prehiring_guidance_days": null,
+      "processed_at": "2021-05-12T09:39:28.064Z",
       "qualification_level": "",
       "qualification_type": "",
       "refusal_reason": "",
+      "refusal_reason_shared_with_job_seeker": false,
       "resume_link": "",
       "selected_jobs": [],
       "sender": 3,
@@ -92,7 +96,7 @@
       "transferred_at": null,
       "transferred_by": null,
       "transferred_from": null,
-      "updated_at": "2024-01-10T13:12:47.086Z"
+      "updated_at": "2024-06-17T08:46:15.289Z"
     },
     "model": "job_applications.jobapplication",
     "pk": "5f844eff-2dbb-450e-8f8b-6ec99f216c31"
@@ -127,9 +131,11 @@
       "origin": "default",
       "planned_training_hours": null,
       "prehiring_guidance_days": null,
+      "processed_at": "2021-05-12T09:24:56.938Z",
       "qualification_level": "",
       "qualification_type": "",
       "refusal_reason": "",
+      "refusal_reason_shared_with_job_seeker": false,
       "resume_link": "",
       "selected_jobs": [],
       "sender": 3,
@@ -141,7 +147,7 @@
       "transferred_at": null,
       "transferred_by": null,
       "transferred_from": null,
-      "updated_at": "2024-01-10T13:12:47.086Z"
+      "updated_at": "2024-06-17T08:46:15.289Z"
     },
     "model": "job_applications.jobapplication",
     "pk": "61883223-4a9b-45d6-afa6-25ab6fccaaab"
@@ -176,9 +182,11 @@
       "origin": "default",
       "planned_training_hours": null,
       "prehiring_guidance_days": null,
+      "processed_at": "2021-05-12T09:19:31.662Z",
       "qualification_level": "",
       "qualification_type": "",
       "refusal_reason": "",
+      "refusal_reason_shared_with_job_seeker": false,
       "resume_link": "",
       "selected_jobs": [],
       "sender": 3,
@@ -190,7 +198,7 @@
       "transferred_at": null,
       "transferred_by": null,
       "transferred_from": null,
-      "updated_at": "2024-01-10T13:12:47.086Z"
+      "updated_at": "2024-06-17T08:46:15.290Z"
     },
     "model": "job_applications.jobapplication",
     "pk": "6e09f9d5-aa9b-42db-89c3-63db5a9d323b"
@@ -225,9 +233,11 @@
       "origin": "default",
       "planned_training_hours": null,
       "prehiring_guidance_days": null,
+      "processed_at": null,
       "qualification_level": "",
       "qualification_type": "",
       "refusal_reason": "",
+      "refusal_reason_shared_with_job_seeker": false,
       "resume_link": "",
       "selected_jobs": [],
       "sender": 26,
@@ -239,7 +249,7 @@
       "transferred_at": null,
       "transferred_by": null,
       "transferred_from": null,
-      "updated_at": "2024-01-10T13:12:47.086Z"
+      "updated_at": "2024-06-17T08:46:15.290Z"
     },
     "model": "job_applications.jobapplication",
     "pk": "76a64dcd-eacb-42b2-a396-0ce8077da37a"
@@ -274,9 +284,11 @@
       "origin": "default",
       "planned_training_hours": null,
       "prehiring_guidance_days": null,
+      "processed_at": null,
       "qualification_level": "",
       "qualification_type": "",
       "refusal_reason": "",
+      "refusal_reason_shared_with_job_seeker": false,
       "resume_link": "",
       "selected_jobs": [],
       "sender": 4,
@@ -288,7 +300,7 @@
       "transferred_at": null,
       "transferred_by": null,
       "transferred_from": null,
-      "updated_at": "2024-01-10T13:12:47.086Z"
+      "updated_at": "2024-06-17T08:46:15.290Z"
     },
     "model": "job_applications.jobapplication",
     "pk": "86821a94-d876-4f70-9bbb-18cafdd045b8"
@@ -323,9 +335,11 @@
       "origin": "default",
       "planned_training_hours": null,
       "prehiring_guidance_days": null,
+      "processed_at": null,
       "qualification_level": "",
       "qualification_type": "",
       "refusal_reason": "",
+      "refusal_reason_shared_with_job_seeker": false,
       "resume_link": "",
       "selected_jobs": [],
       "sender": 8,
@@ -337,7 +351,7 @@
       "transferred_at": null,
       "transferred_by": null,
       "transferred_from": null,
-      "updated_at": "2024-01-10T13:12:47.086Z"
+      "updated_at": "2024-06-17T08:46:15.290Z"
     },
     "model": "job_applications.jobapplication",
     "pk": "995f96b7-b52d-4abf-9f96-4897f282eee0"
@@ -372,9 +386,11 @@
       "origin": "default",
       "planned_training_hours": null,
       "prehiring_guidance_days": null,
+      "processed_at": null,
       "qualification_level": "",
       "qualification_type": "",
       "refusal_reason": "",
+      "refusal_reason_shared_with_job_seeker": false,
       "resume_link": "",
       "selected_jobs": [],
       "sender": 2,
@@ -386,7 +402,7 @@
       "transferred_at": null,
       "transferred_by": null,
       "transferred_from": null,
-      "updated_at": "2024-01-10T13:12:47.086Z"
+      "updated_at": "2024-06-17T08:46:15.290Z"
     },
     "model": "job_applications.jobapplication",
     "pk": "b1a63482-6cb4-4935-ad7b-a0a9cefd9231"
@@ -421,9 +437,11 @@
       "origin": "default",
       "planned_training_hours": null,
       "prehiring_guidance_days": null,
+      "processed_at": "2021-05-12T09:11:46.159Z",
       "qualification_level": "",
       "qualification_type": "",
       "refusal_reason": "",
+      "refusal_reason_shared_with_job_seeker": false,
       "resume_link": "",
       "selected_jobs": [],
       "sender": 3,
@@ -435,7 +453,7 @@
       "transferred_at": null,
       "transferred_by": null,
       "transferred_from": null,
-      "updated_at": "2024-01-10T13:12:47.086Z"
+      "updated_at": "2024-06-17T08:46:15.291Z"
     },
     "model": "job_applications.jobapplication",
     "pk": "bca602f3-9249-46cf-b949-4d5a9324a5a5"
@@ -470,9 +488,11 @@
       "origin": "default",
       "planned_training_hours": null,
       "prehiring_guidance_days": null,
+      "processed_at": "2021-05-11T15:59:22.823Z",
       "qualification_level": "",
       "qualification_type": "",
       "refusal_reason": "",
+      "refusal_reason_shared_with_job_seeker": false,
       "resume_link": "",
       "selected_jobs": [],
       "sender": 3,
@@ -484,7 +504,7 @@
       "transferred_at": null,
       "transferred_by": null,
       "transferred_from": null,
-      "updated_at": "2024-01-10T13:12:47.086Z"
+      "updated_at": "2024-06-17T08:46:15.291Z"
     },
     "model": "job_applications.jobapplication",
     "pk": "fe868b07-4df9-4696-aaee-2409e83c4b84"
