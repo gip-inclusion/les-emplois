@@ -487,11 +487,12 @@ class JobDescriptionSearchViewTest(TestCase):
         with self.assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # select the city
-            + 1  # fetch initial job descriptions to add to the form fields
-            + 2  # count the number of results for companies & job descriptions
-            + 1  # prefetch job applications for the is_popular attribute
-            + 1  # refetch the city for widget rendering
-            + 1  # select the job descriptions for the page
+            + 1  # select job descriptions for departments filters
+            + 1  # select count of job descriptions for the paginator
+            + 1  # select job descriptions
+            + 1  # select prefetch job applications (for the popular annotation)
+            + 1  # select count companies
+            + 1  # select city (again) for the select2 widget display
         ):
             response = self.client.get(self.URL, {"city": city_slug})
 
@@ -549,11 +550,12 @@ class JobDescriptionSearchViewTest(TestCase):
         with self.assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # select the city
-            + 1  # fetch initial job descriptions to add to the form fields
-            + 2  # count the number of results for companies & job descriptions
-            + 1  # prefetch job applications for the is_popular attribute
-            + 1  # refetch the city for widget rendering
-            + 1  # select the job descriptions for the page
+            + 1  # select job descriptions for departments filters
+            + 1  # select count of job descriptions for the paginator
+            + 1  # select job descriptions
+            + 1  # select prefetch job applications (for the popular annotation)
+            + 1  # select count companies
+            + 1  # select city (again) for the select2 widget display
         ):
             response = self.client.get(self.URL, {"city": city_slug})
 
