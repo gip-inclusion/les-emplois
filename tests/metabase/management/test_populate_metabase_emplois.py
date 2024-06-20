@@ -969,7 +969,7 @@ def test_populate_enums():
     num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
     num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
     num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
-    num_queries *= 3  # We inject thus many enums so far.
+    num_queries *= 4  # We inject thus many enums so far.
     with assertNumQueries(num_queries):
         management.call_command("populate_metabase_emplois", mode="enums")
 
@@ -992,6 +992,11 @@ def test_populate_enums():
         cursor.execute("SELECT * FROM c1_ref_type_prescripteur ORDER BY code")
         rows = cursor.fetchall()
         assert rows[0] == ("AFPA", "AFPA - Agence nationale pour la formation professionnelle des adultes")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM c1_ref_motif_de_refus ORDER BY code")
+        rows = cursor.fetchall()
+        assert rows[0] == ("approval_expiration_too_close", "La date de fin du PASS IAE / agrément est trop proche")
 
 
 def test_data_inconsistencies(capsys):

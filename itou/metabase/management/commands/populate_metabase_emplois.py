@@ -37,7 +37,7 @@ from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.institutions.models import Institution, InstitutionMembership
-from itou.job_applications.enums import JobApplicationState, Origin, SenderKind
+from itou.job_applications.enums import JobApplicationState, Origin, RefusalReason, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.jobs.models import Rome
 from itou.metabase.dataframes import get_df_from_rows, store_df
@@ -487,6 +487,7 @@ class Command(BaseCommand):
             Origin: "c1_ref_origine_candidature",
             ContractType: "c1_ref_type_contrat",
             PrescriberOrganizationKind: "c1_ref_type_prescripteur",
+            RefusalReason: "c1_ref_motif_de_refus",
         }
         for enum, table_name in enum_to_table.items():
             self.stdout.write(f"Preparing content for {table_name} table...")

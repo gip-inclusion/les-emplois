@@ -13,12 +13,12 @@ class MetabaseJobApplicationTest(TestCase):
     def test_refusal_reason_old_value(self):
         ja = JobApplicationFactory(refusal_reason=RefusalReason.ELIGIBILITY_DOUBT.value)
         assert ja.refusal_reason in RefusalReason.hidden()
-        assert TABLE.get(column_name="motif_de_refus", input=ja) == ja.get_refusal_reason_display()
+        assert TABLE.get(column_name="motif_de_refus", input=ja) == str(ja.refusal_reason)
 
     def test_refusal_reason_current_value(self):
         ja = JobApplicationFactory(refusal_reason=RefusalReason.DID_NOT_COME.value)
         assert ja.refusal_reason not in RefusalReason.hidden()
-        assert TABLE.get(column_name="motif_de_refus", input=ja) == ja.get_refusal_reason_display()
+        assert TABLE.get(column_name="motif_de_refus", input=ja) == str(ja.refusal_reason)
 
     def test_refusal_reason_empty_value(self):
         ja = JobApplicationFactory(refusal_reason="")
