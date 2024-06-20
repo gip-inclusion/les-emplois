@@ -343,7 +343,6 @@ SELECT2_THEME = "bootstrap-5"
 # -------------
 
 
-# Environment, sets the type of env of the app (PROD, FAST-MACHINE, DEMO, DEV…)
 ITOU_ENVIRONMENT = ItouEnvironment(os.getenv("ITOU_ENVIRONMENT", ItouEnvironment.PROD))
 ITOU_PROTOCOL = "https"
 ITOU_FQDN = os.getenv("ITOU_FQDN", "emplois.inclusion.beta.gouv.fr")
@@ -356,7 +355,11 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@inclusion.beta.gou
 SENTRY_DSN = os.getenv("SENTRY_DSN")
 sentry_init()
 
-SHOW_DEMO_ACCOUNTS_BANNER = ITOU_ENVIRONMENT in (ItouEnvironment.DEMO, ItouEnvironment.REVIEW_APP)
+SHOW_DEMO_ACCOUNTS_BANNER = ITOU_ENVIRONMENT in (
+    ItouEnvironment.DEMO,
+    ItouEnvironment.PENTEST,
+    ItouEnvironment.REVIEW_APP,
+)
 
 # https://adresse.data.gouv.fr/faq
 API_BAN_BASE_URL = os.getenv("API_BAN_BASE_URL")
@@ -445,7 +448,7 @@ STATS_PH_PRESCRIPTION_REGION_WHITELIST = ["Pays de la Loire", "Nouvelle-Aquitain
 # Slack notifications sent by Metabase cronjobs.
 SLACK_CRON_WEBHOOK_URL = os.getenv("SLACK_CRON_WEBHOOK_URL")
 
-# Production instances (`PROD`, `DEMO`, `FAST-MACHINE`, ...) share the same redis but different DB
+# Production instances (`PROD`, `DEMO`, `PENTEST`, `FAST-MACHINE`, ...) share the same redis but different DB
 redis_url = os.getenv("REDIS_URL", "redis://127.0.0.1:6379")
 redis_db = os.getenv("REDIS_DB")
 redis_django_settings = {
