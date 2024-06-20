@@ -148,10 +148,9 @@ def test_assessment_process_for_geiq(client, label_settings, mailoutbox, mocker,
             response, default_storage.url(assessment.activity_report_file_id), fetch_redirect_response=False
         )
 
-    institution_membership = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_GEIQ)
     assessment.reviewed_at = timezone.now()
-    assessment.reviewed_by = institution_membership.user
-    assessment.review_institution = institution_membership.institution
+    assessment.reviewed_by = ddets_membership.user
+    assessment.review_institution = ddets_membership.institution
     assessment.review_state = ReviewState.ACCEPTED
     assessment.review_comment = "Bon boulot !"
     assessment.save()
