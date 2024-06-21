@@ -10,11 +10,15 @@ htmx.onLoad((target) => {
         placeholder: 'Jean DUPONT',
         escapeMarkup: function (markup) { return markup; },
         language: {
-          ...frTranslations.dict,
-          noResults: () => `
+            ...frTranslations.dict,
+            noResults: () => `
               <div class="d-inline-flex w-100 mb-2">
                   <span class="text-muted d-block pe-1">Aucun résultat.</span>
-                  <a href="${searchUserInputField.data('noResultsUrl')}" class="link">Enregistrer un nouveau bénéficiaire</a>
+                  <a href="${searchUserInputField.data('noResultsUrl')}" class="link" data-matomo-event="true"
+                  data-matomo-category="GPS_formulaire_recherche" data-matomo-action="clic"
+                  data-matomo-option="creation_beneficiaire">
+                  Enregistrer un nouveau bénéficiaire
+                  </a>
               </div>
           `,
         },
