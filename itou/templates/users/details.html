@@ -25,11 +25,11 @@
                                 <ul class="list-data mb-3">
                                     <li>
                                         <small>Prénom</small>
-                                        <strong>{{ beneficiary.first_name|mask_unless:can_view_personal_information }}</strong>
+                                        <strong>{{ beneficiary.first_name }}</strong>
                                     </li>
                                     <li>
                                         <small>Nom</small>
-                                        <strong>{{ beneficiary.last_name|mask_unless:can_view_personal_information }}</strong>
+                                        <strong>{{ beneficiary.last_name }}</strong>
                                     </li>
 
                                     <li>
