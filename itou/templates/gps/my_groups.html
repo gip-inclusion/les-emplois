@@ -2,6 +2,7 @@
 {% load tally %}
 {% load matomo %}
 {% load str_filters %}
+{% load matomo %}
 
 
 {% block content_title %}<h1>Mes bénéficiaires</h1>{% endblock %}
@@ -52,7 +53,7 @@
                             </h3>
                             <div class="flex-column flex-md-row btn-group btn-group-sm btn-group-action" role="group" aria-label="Actions sur les groupes de suivi">
 
-                                <a href="{% url 'gps:join_group' %}" class="btn btn-ico btn-primary mt-3 mt-md-0" aria-label="Rejoindre un group de suivi">
+                                <a href="{% url 'gps:join_group' %}" class="btn btn-ico btn-primary mt-3 mt-md-0" aria-label="Rejoindre un group de suivi" {% matomo_event "GPS_liste_groupes" "clic" "ajout_groupe" %}>
                                     <i class="ri-user-add-line" aria-hidden="true"></i>
                                     <span>Ajouter un bénéficiaire</span>
                                 </a>
