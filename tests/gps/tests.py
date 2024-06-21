@@ -1,6 +1,7 @@
 import freezegun
 import pytest
 from bs4 import BeautifulSoup
+from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNumQueries
@@ -13,6 +14,7 @@ from tests.gps.factories import FollowUpGroupFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
+    ItouStaffFactory,
     JobSeekerFactory,
     JobSeekerWithAddressFactory,
     PrescriberFactory,
@@ -143,31 +145,72 @@ def test_join_group_of_a_prescriber(client):
 
 
 @override_settings(TALLY_URL="https://hello-tally.so")
-def test_navigation(snapshot, client):
+def test_dashboard_card(snapshot, client):
     member = PrescriberFactory(for_snapshot=True)
-    member_first_beneficiary = JobSeekerFactory(first_name="gps first beneficiary first_name")
-    member_second_beneficiary = JobSeekerFactory(first_name="gps second beneficiary first_name")
-
-    FollowUpGroupFactory(beneficiary=member_first_beneficiary, memberships=4, memberships__member=member)
-    FollowUpGroupFactory(beneficiary=member_second_beneficiary, memberships=2, memberships__member=member)
-
     client.force_login(member)
-
     response = client.get(reverse("dashboard:index"))
-
     assert str(parse_response_to_soup(response, "#gps-card")) == snapshot
 
+
+def test_my_groups(snapshot, client):
+    user = PrescriberFactory()
+    beneficiary = JobSeekerFactory(for_snapshot=True)
+    group = FollowUpGroupFactory(pk=34, beneficiary=beneficiary, memberships=1)
+    FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=user)
+
+    client.force_login(user)
     response = client.get(reverse("gps:my_groups"))
+    assert response.status_code == 200
+    first_group_soup = parse_response_to_soup(response, selector=".membership-card")
+    assert str(first_group_soup) == snapshot(name="test_my_groups__group_card")
 
-    assertContains(response, member_first_beneficiary.get_full_name())
-    assertContains(response, member_second_beneficiary.get_full_name())
+    # Second group.
+    # Groups created latelly should come first.
+    group = FollowUpGroupFactory(
+        memberships=1,
+        beneficiary__first_name="Leonard",
+        beneficiary__last_name="Cohen",
+    )
+    FollowUpGroup.objects.follow_beneficiary(beneficiary=group.beneficiary, user=user)
 
-    assertContains(response, member_first_beneficiary.email)
-    assertContains(response, member_second_beneficiary.email)
+    response = client.get(reverse("gps:my_groups"))
+    groups = parse_response_to_soup(response, selector="#follow-up-groups-section").select(".membership-card")
+    assert len(groups) == 2
+    second_group_soup = groups[0]
+    assert "Leonard COHEN" in str(second_group_soup)
+    assert "Vous avez ajouté ce bénéficiaire le" in str(second_group_soup)
+    assert "et êtes <strong>référent</strong>" not in str(second_group_soup)
 
-    assertContains(response, "référent")
+    # Third group.
+    # Test created by developer.
+    settings.GPS_GROUPS_CREATED_BY_EMAIL = "rocking@developer.com"
+    admin = ItouStaffFactory(email="rocking@developer.com")
+    group = FollowUpGroupFactory(
+        memberships=1,
+        beneficiary__first_name="Paco",
+        beneficiary__last_name="de Lucia",
+    )
+    FollowUpGroup.objects.follow_beneficiary(beneficiary=group.beneficiary, user=user)
+    membership = group.memberships.get(member=user)
+    membership.creator = admin
+    membership.save()
 
-    assertContains(response, "2 bénéficiaires suivis")
+    response = client.get(reverse("gps:my_groups"))
+    groups = parse_response_to_soup(response, selector="#follow-up-groups-section").select(".membership-card")
+    assert len(groups) == 3
+    third_group_soup = groups[0]
+    assert "Vous avez ajouté ce bénéficiaire le" not in str(third_group_soup)
+
+    # Fourth group.
+    # Test `is_referent` display.
+    group = FollowUpGroupFactory(memberships=1, beneficiary__first_name="Janis", beneficiary__last_name="Joplin")
+    FollowUpGroup.objects.follow_beneficiary(beneficiary=group.beneficiary, user=user, is_referent=True)
+
+    response = client.get(reverse("gps:my_groups"))
+    groups = parse_response_to_soup(response, selector="#follow-up-groups-section").select(".membership-card")
+    assert len(groups) == 4
+    fourth_group_soup = groups[0]
+    assert "et êtes <strong>référent</strong>" in str(fourth_group_soup)
 
 
 def test_access_as_jobseeker(client):
@@ -293,26 +336,6 @@ def test_remove_members_from_group(client):
     response = client.get(user_details_url)
     soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
     assert len(soup.select("div.gps_intervenant")) == 3
-
-
-def test_dashboard_card(client):
-    user = PrescriberFactory()
-    client.force_login(user)
-    response = client.get(reverse("dashboard:index"))
-    gps_card = str(parse_response_to_soup(response, selector="#gps-card"))
-    assert str(user.public_id) in gps_card
-    assert user.first_name in gps_card
-    assert user.last_name in gps_card
-    assert "user_organization_uid" not in gps_card
-    assert "user_organization_name" not in gps_card
-
-    user = PrescriberFactory(membership=True)
-    organization = user.prescriberorganization_set.first()
-    client.force_login(user)
-    response = client.get(reverse("dashboard:index"))
-    gps_card = str(parse_response_to_soup(response, selector="#gps-card"))
-    assert str(organization.uid) in gps_card
-    assert organization.display_name in gps_card
 
 
 def test_follow_beneficiary():
