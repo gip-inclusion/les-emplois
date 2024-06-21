@@ -16,12 +16,11 @@ from itou.www.gps.forms import GpsUserSearchForm
     redirect_field_name=None,
 )
 def my_groups(request, template_name="gps/my_groups.html"):
-    current_user = request.user
-
     memberships = (
-        FollowUpGroupMembership.objects.filter(member=current_user)
+        FollowUpGroupMembership.objects.filter(member=request.user)
         .filter(is_active=True)
         .annotate(nb_members=Count("follow_up_group__members"))
+        .order_by("-created_at")
         .select_related("follow_up_group", "follow_up_group__beneficiary", "member")
         .prefetch_related("follow_up_group__members")
     )

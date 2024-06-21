@@ -3,6 +3,7 @@ Base settings to build other settings files upon.
 https://docs.djangoproject.com/en/dev/ref/settings
 """
 
+import datetime
 import json
 import os
 import warnings
@@ -673,3 +674,4 @@ DORA_BASE_URL = os.getenv("DORA_BASE_URL", "https://dora.inclusion.beta.gouv.fr"
 # ------------------------------------------------------------------------------
 # Until GPS goes live for everyone, keep the feature hidden in production.
 GPS_GROUPS_CREATED_BY_EMAIL = os.getenv("GPS_GROUPS_CREATED_BY_EMAIL", None)
+GPS_GROUPS_CREATED_AT_DATE = datetime.date(2024, 6, 12)
