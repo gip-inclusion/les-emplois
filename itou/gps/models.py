@@ -71,6 +71,9 @@ class FollowUpGroupMembershipQueryset(models.QuerySet):
 
 
 class FollowUpGroupMembership(models.Model):
+    class Meta:
+        verbose_name = "relation"
+
     is_referent = models.BooleanField(default=False, verbose_name="référent")
 
     # Is this user still an active member of the group?

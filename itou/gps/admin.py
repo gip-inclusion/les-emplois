@@ -13,9 +13,18 @@ class MemberInline(admin.TabularInline):
     readonly_fields = ["creator"]
 
 
+@admin.register(models.FollowUpGroupMembership)
+class FollowUpGroupMembershipAdmin(ItouModelAdmin):
+    list_display = ("created_at", "member", "follow_up_group", "is_referent")
+    list_filter = ("is_referent",)
+    raw_id_fields = ["follow_up_group"]
+    readonly_fields = ["member", "creator", "created_at", "ended_at"]
+    ordering = ["-created_at"]
+
+
 @admin.register(models.FollowUpGroup)
 class FollowUpGroupAdmin(ItouModelAdmin):
-    list_display = ("pk", "created_at", "updated_at", "beneficiary", "display_members")
+    list_display = ("created_at", "updated_at", "beneficiary", "display_members")
 
     fields = ["beneficiary"]
 

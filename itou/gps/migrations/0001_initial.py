@@ -78,6 +78,7 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
+            options={"verbose_name": "relation"},
         ),
         migrations.AddField(
             model_name="followupgroup",
