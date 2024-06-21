@@ -1,3 +1,5 @@
+import datetime
+
 import freezegun
 import pytest
 from bs4 import BeautifulSoup
@@ -10,11 +12,10 @@ from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.enums import UserKind
 from itou.users.models import User
 from tests.companies.factories import CompanyMembershipFactory
-from tests.gps.factories import FollowUpGroupFactory
+from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
-    ItouStaffFactory,
     JobSeekerFactory,
     JobSeekerWithAddressFactory,
     PrescriberFactory,
@@ -152,65 +153,49 @@ def test_dashboard_card(snapshot, client):
     assert str(parse_response_to_soup(response, "#gps-card")) == snapshot
 
 
+@freezegun.freeze_time("2024-06-22", tick=True)
 def test_my_groups(snapshot, client):
     user = PrescriberFactory()
-    beneficiary = JobSeekerFactory(for_snapshot=True)
-    group = FollowUpGroupFactory(pk=34, beneficiary=beneficiary, memberships=1)
-    FollowUpGroup.objects.follow_beneficiary(beneficiary=beneficiary, user=user)
-
     client.force_login(user)
-    response = client.get(reverse("gps:my_groups"))
-    assert response.status_code == 200
-    first_group_soup = parse_response_to_soup(response, selector=".membership-card")
-    assert str(first_group_soup) == snapshot(name="test_my_groups__group_card")
 
-    # Second group.
-    # Groups created latelly should come first.
+    # Was created in bulk.
     group = FollowUpGroupFactory(
         memberships=1,
-        beneficiary__first_name="Leonard",
-        beneficiary__last_name="Cohen",
+        beneficiary__first_name="Paco",
+        beneficiary__last_name="de Lucia",
+        created_in_bulk=True,
     )
+    FollowUpGroup.objects.follow_beneficiary(beneficiary=group.beneficiary, user=user, is_referent=True)
+    membership = group.memberships.get(member=user)
+    membership.created_at = datetime.datetime.combine(
+        settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(), tzinfo=datetime.UTC
+    )
+    membership.save()
+
+    response = client.get(reverse("gps:my_groups"))
+    assert response.status_code == 200
+    groups = parse_response_to_soup(response, selector="#follow-up-groups-section").select(".membership-card")
+    assert len(groups) == 1
+    assert "Vous avez ajouté ce bénéficiaire le" not in str(groups[0])
+
+    # Nominal case
+    # Groups created latelly should come first.
+    group = FollowUpGroupFactory(pk=34, memberships=1, for_snapshot=True)
     FollowUpGroup.objects.follow_beneficiary(beneficiary=group.beneficiary, user=user)
 
     response = client.get(reverse("gps:my_groups"))
     groups = parse_response_to_soup(response, selector="#follow-up-groups-section").select(".membership-card")
     assert len(groups) == 2
-    second_group_soup = groups[0]
-    assert "Leonard COHEN" in str(second_group_soup)
-    assert "Vous avez ajouté ce bénéficiaire le" in str(second_group_soup)
-    assert "et êtes <strong>référent</strong>" not in str(second_group_soup)
+    assert str(groups[0]) == snapshot(name="test_my_groups__group_card")
 
-    # Third group.
-    # Test created by developer.
-    settings.GPS_GROUPS_CREATED_BY_EMAIL = "rocking@developer.com"
-    admin = ItouStaffFactory(email="rocking@developer.com")
-    group = FollowUpGroupFactory(
-        memberships=1,
-        beneficiary__first_name="Paco",
-        beneficiary__last_name="de Lucia",
-    )
-    FollowUpGroup.objects.follow_beneficiary(beneficiary=group.beneficiary, user=user)
-    membership = group.memberships.get(member=user)
-    membership.creator = admin
-    membership.save()
-
-    response = client.get(reverse("gps:my_groups"))
-    groups = parse_response_to_soup(response, selector="#follow-up-groups-section").select(".membership-card")
-    assert len(groups) == 3
-    third_group_soup = groups[0]
-    assert "Vous avez ajouté ce bénéficiaire le" not in str(third_group_soup)
-
-    # Fourth group.
     # Test `is_referent` display.
     group = FollowUpGroupFactory(memberships=1, beneficiary__first_name="Janis", beneficiary__last_name="Joplin")
     FollowUpGroup.objects.follow_beneficiary(beneficiary=group.beneficiary, user=user, is_referent=True)
-
     response = client.get(reverse("gps:my_groups"))
     groups = parse_response_to_soup(response, selector="#follow-up-groups-section").select(".membership-card")
-    assert len(groups) == 4
-    fourth_group_soup = groups[0]
-    assert "et êtes <strong>référent</strong>" in str(fourth_group_soup)
+    assert len(groups) == 3
+    assert "Janis" in str(groups[0])
+    assert "et êtes <strong>référent</strong>" in str(groups[0])
 
 
 def test_access_as_jobseeker(client):
@@ -336,6 +321,20 @@ def test_remove_members_from_group(client):
     response = client.get(user_details_url)
     soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
     assert len(soup.select("div.gps_intervenant")) == 3
+
+
+##############################################################
+######################### MODELS #############################
+##############################################################
+# TODO(cms): split tests into a new file.
+def test_membership_is_from_bulk_creation():
+    membership = FollowUpGroupMembershipFactory()
+    assert not membership.is_from_bulk_creation
+
+    membership.created_at = datetime.datetime.combine(
+        settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(), tzinfo=datetime.UTC
+    )
+    assert membership.is_from_bulk_creation
 
 
 def test_follow_beneficiary():

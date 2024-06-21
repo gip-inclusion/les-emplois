@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models, transaction
 from django.utils import timezone
@@ -117,3 +118,7 @@ class FollowUpGroupMembership(models.Model):
     @property
     def organization_name(self):
         return next((name for name in (*self.prescriber_org_names, *self.companies_names) if name), None)
+
+    @property
+    def is_from_bulk_creation(self):
+        return self.created_at.date() == settings.GPS_GROUPS_CREATED_AT_DATE
