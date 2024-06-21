@@ -1,44 +1,65 @@
 [
-  {
-    "fields": {
-      "beneficiary_id": 17,
-      "created_at": "2020-12-01T10:55:25.283Z"
+    {
+        "model": "gps.followupgroup",
+        "pk": 1,
+        "fields": {
+            "created_at": "2024-06-12T00:00:00Z",
+            "updated_at": "2024-06-24T14:29:09.346Z",
+            "beneficiary": 2
+        }
     },
-    "model": "gps.followupgroup",
-    "pk": 1
-  },
-  {
-    "fields": {
-      "beneficiary_id": 18,
-      "created_at": "2020-12-01T10:55:25.283Z"
+    {
+        "model": "gps.followupgroup",
+        "pk": 2,
+        "fields": {
+            "created_at": "2024-06-12T00:00:00Z",
+            "updated_at": "2024-06-24T14:29:09.346Z",
+            "beneficiary": 15
+        }
     },
-    "model": "gps.followupgroup",
-    "pk": 2
-  },
-  {
-    "fields": {
-      "created_at": "2020-12-01T10:55:25.283Z",
-      "creator_id": 6,
-      "ended_at": null,
-      "follow_up_group_id": 1,
-      "is_active": true,
-      "is_referent": true,
-      "member_id": 6
+    {
+        "model": "gps.followupgroup",
+        "pk": 3,
+        "fields": {
+            "created_at": "2024-06-12T00:00:00Z",
+            "updated_at": "2024-06-24T14:29:09.346Z",
+            "beneficiary": 17
+        }
     },
-    "model": "gps.followupgroupmembership",
-    "pk": 1
-  },
-  {
-    "fields": {
-      "created_at": "2020-12-01T10:55:25.283Z",
-      "creator_id": 6,
-      "ended_at": null,
-      "follow_up_group_id": 2,
-      "is_active": true,
-      "is_referent": true,
-      "member_id": 6
+    {
+        "model": "gps.followupgroup",
+        "pk": 4,
+        "fields": {
+            "created_at": "2024-06-12T00:00:00Z",
+            "updated_at": "2024-06-24T14:29:09.346Z",
+            "beneficiary": 18
+        }
     },
-    "model": "gps.followupgroupmembership",
-    "pk": 2
-  }
+    {
+        "model": "gps.followupgroup",
+        "pk": 5,
+        "fields": {
+            "created_at": "2024-06-12T00:00:00Z",
+            "updated_at": "2024-06-24T14:29:09.346Z",
+            "beneficiary": 19
+        }
+    },
+    {
+        "model": "gps.followupgroup",
+        "pk": 6,
+        "fields": {
+            "created_at": "2024-06-12T00:00:00Z",
+            "updated_at": "2024-06-24T14:29:09.346Z",
+            "beneficiary": 20
+        }
+    },
+    {
+        "model": "gps.followupgroup",
+        "pk": 7,
+        "fields": {
+            "created_at": "2024-06-12T00:00:00Z",
+            "updated_at": "2024-06-24T14:29:09.346Z",
+            "beneficiary": 21
+        }
+    }
 ]
