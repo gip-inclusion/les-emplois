@@ -89,6 +89,7 @@ class PrescriberFactory(UserFactory):
             last_name="Dupont",
             email="pierre.dupont@test.local",
             public_id="03580247-b036-4578-bf9d-f92c9c2f68cd",
+            phone="0612345678",
         )
 
     @factory.post_generation
