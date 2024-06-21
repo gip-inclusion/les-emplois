@@ -1,7 +1,9 @@
-import time
+import datetime
 
 import jwt
+import pytz
 from django.conf import settings
+from django.utils import timezone
 
 
 ASP_SIAE_FILTER_KEY_FLAVOR1 = "identifiant_de_la_structure"
@@ -281,11 +283,11 @@ def metabase_embedded_url(request=None, dashboard_id=None, params=None, with_tit
         metabase_dashboard = METABASE_DASHBOARDS.get(view_name)
         dashboard_id = metabase_dashboard["dashboard_id"] if metabase_dashboard else None
 
-    token_duration_in_seconds = 30 * 60
+    initial_dt = datetime.datetime(1970, 1, 1, 0, 0, 0, 0, pytz.UTC)
     payload = {
         "resource": {"dashboard": dashboard_id},
         "params": params,
-        "exp": round(time.time()) + token_duration_in_seconds,
+        "exp": int((timezone.now() + datetime.timedelta(minutes=30) - initial_dt).total_seconds()),
     }
     is_titled = "true" if with_title else "false"
     return settings.METABASE_SITE_URL + "/embed/dashboard/" + _get_token(payload) + f"#titled={is_titled}"
