@@ -186,6 +186,7 @@ class JobSeekerFactory(UserFactory):
             geocoding_score=0.8745736363636364,
         )
         for_snapshot = factory.Trait(
+            public_id="7614fc4b-aef9-4694-ab17-12324300180a",
             title="MME",
             first_name="Jane",
             last_name="Doe",
