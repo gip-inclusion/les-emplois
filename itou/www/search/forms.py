@@ -68,7 +68,7 @@ class SiaeSearchForm(forms.Form):
         return distance
 
     def add_field_departements(self, city):
-        departments = sorted([city.department, *DEPARTMENTS_ADJACENCY[city.department]])
+        departments = sorted([city.department, *DEPARTMENTS_ADJACENCY.get(city.department, ())])
         choices = ((department, DEPARTMENTS[department]) for department in departments)
         self.fields["departments"] = forms.ChoiceField(
             label="Départements",
