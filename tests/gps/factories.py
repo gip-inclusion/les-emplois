@@ -2,6 +2,7 @@ import datetime
 
 import factory.fuzzy
 from django.conf import settings
+from django.utils import timezone
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
@@ -15,17 +16,20 @@ class FollowUpGroupFactory(factory.django.DjangoModelFactory):
         skip_postgeneration_save = True
 
     class Params:
-        created_in_bulk = factory.Trait(
-            created_at=(
-                datetime.datetime.combine(settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(), tzinfo=datetime.UTC)
-            )
-        )
         for_snapshot = factory.Trait(
             beneficiary__for_snapshot=True,
             created_at=datetime.datetime(2024, 6, 21, 0, 0, 0, tzinfo=datetime.UTC),
         )
 
     beneficiary = factory.SubFactory(JobSeekerFactory)
+    created_at = factory.LazyAttribute(
+        lambda o: datetime.datetime.combine(
+            settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(12, 0, 0), tzinfo=datetime.UTC
+        )
+        if o.created_in_bulk
+        else timezone.now()
+    )
+    created_in_bulk = False
 
     @factory.post_generation
     def memberships(self, create, extracted, **kwargs):
@@ -41,6 +45,8 @@ class FollowUpGroupFactory(factory.django.DjangoModelFactory):
                     creator=PrescriberFactory(),
                     follow_up_group=self,
                     is_referent=True if i == 0 else False,
+                    created_at=self.created_at,
+                    created_in_bulk=self.created_in_bulk,
                 )
 
 
@@ -48,13 +54,15 @@ class FollowUpGroupMembershipFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = FollowUpGroupMembership
 
-    class Params:
-        created_in_bulk = factory.Trait(
-            created_at=(
-                datetime.datetime.combine(settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(), tzinfo=datetime.UTC)
-            )
+    created_at = factory.LazyAttribute(
+        lambda o: datetime.datetime.combine(
+            settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(12, 0, 0), tzinfo=datetime.UTC
         )
+        if o.created_in_bulk
+        else timezone.now()
+    )
 
+    created_in_bulk = False
     follow_up_group = factory.SubFactory(FollowUpGroupFactory)
     member = factory.SubFactory(PrescriberFactory)
     creator = factory.SubFactory(PrescriberFactory)

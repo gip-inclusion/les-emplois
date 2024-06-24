@@ -81,7 +81,7 @@
                                     <div>
                                         {% with membership.nb_members|add:"-1" as counter %}
                                             <div>
-                                                {% if not membership.is_from_bulk_creation %}
+                                                {% if not membership.created_in_bulk %}
                                                     <div>
                                                         {# djlint:off #}
                                                         {# Don't let djlint add a newline before the . or it will add a space after référent and . #}

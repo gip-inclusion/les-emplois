@@ -1,9 +1,16 @@
-from django.conf import settings
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models, transaction
 from django.utils import timezone
 
 from itou.users.models import User
+
+
+class BulkCreatedAtQuerysetProxy:
+    def bulk_created(self):
+        return self.filter(created_in_bulk=True)
+
+    def not_bulk_created(self):
+        return self.exclude(created_in_bulk=True)
 
 
 class FollowUpGroupManager(models.Manager):
@@ -23,10 +30,15 @@ class FollowUpGroupManager(models.Manager):
                 )
 
 
+class FollowUpGroupQueryset(BulkCreatedAtQuerysetProxy, models.QuerySet):
+    pass
+
+
 class FollowUpGroup(models.Model):
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    created_in_bulk = models.BooleanField(verbose_name="créé massivement", default=False, db_index=True)
 
-    objects = FollowUpGroupManager()
+    objects = FollowUpGroupManager.from_queryset(FollowUpGroupQueryset)()
 
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
@@ -54,7 +66,7 @@ class FollowUpGroup(models.Model):
         return "Groupe de " + self.beneficiary.get_full_name()
 
 
-class FollowUpGroupMembershipQueryset(models.QuerySet):
+class FollowUpGroupMembershipQueryset(BulkCreatedAtQuerysetProxy, models.QuerySet):
     def with_members_organizations_names(self):
         qs = self.annotate(
             prescriber_org_names=ArrayAgg(
@@ -82,9 +94,10 @@ class FollowUpGroupMembership(models.Model):
     is_active = models.BooleanField(default=True, verbose_name="actif")
 
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
+    created_in_bulk = models.BooleanField(verbose_name="créé massivement", default=False, db_index=True)
 
     # Keep track of when the membership was ended
-    ended_at = models.DateTimeField(null=True)
+    ended_at = models.DateTimeField(verbose_name="date de désactivation", null=True)
 
     updated_at = models.DateTimeField(verbose_name="date de modification", auto_now=True)
 
@@ -118,7 +131,3 @@ class FollowUpGroupMembership(models.Model):
     @property
     def organization_name(self):
         return next((name for name in (*self.prescriber_org_names, *self.companies_names) if name), None)
-
-    @property
-    def is_from_bulk_creation(self):
-        return self.created_at.date() == settings.GPS_GROUPS_CREATED_AT_DATE
