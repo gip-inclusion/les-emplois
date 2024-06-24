@@ -2,7 +2,7 @@
 # name: test_beneficiary_details
   '''
   <div class="col-12" id="beneficiary_details_container">
-
+                      
                       <div class="c-box mb-3 mb-lg-5">
                           <h2>Données administratives</h2>
                           <hr/>
@@ -17,7 +17,7 @@
                                           <small>Nom</small>
                                           <strong>Doe</strong>
                                       </li>
-
+  
                                       <li>
                                           <small>Date de naissance</small>
                                           <strong>01/01/1990</strong>
@@ -31,116 +31,116 @@
                                       </li>
                                       <li>
                                           <small>Téléphone</small>
-
+                                          
                                               <strong>06 12 34 56 78</strong>
                                               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
                                                   <i class="ri-file-copy-line"></i>
                                               </button>
-
+                                          
                                       </li>
                                       <li>
                                           <small>Adresse</small>
-
+                                          
                                               <address>12 rue Georges Bizet, 35000 Rennes</address>
-
+                                          
                                       </li>
-
+  
                                       <li>
                                           <small>Numéro de sécurité sociale</small>
-
+                                          
                                               <strong>290010101010125</strong>
-
+                                          
                                       </li>
                                   </ul>
-
+  
                               </div>
                               <div class="col-6">
                                   <ul class="list-data mb-3">
                                       <li>
                                           <small>Niveau de formation</small>
-
+                                          
                                               <strong>Formation de niveau BAC</strong>
-
+                                          
                                       </li>
-
-
-
-
-
-
-
-
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
+                                      
                                       <li>
                                           <small>Identifiant France Travail (ex Pôle emploi)</small>
-
-
+  
+                                          
                                               <i class="text-disabled">Non renseigné</i>
-
+                                          
                                       </li>
-
+  
                                   </ul>
                               </div>
                           </div>
                       </div>
-
-
-
-
+  
+                      
+  
+  
   <div class="c-box mb-3 mb-lg-5" id="gps_intervenants">
-
+  
       <h2>Intervenant</h2>
       <hr/>
       <div class="p-0 m-0">
-
-
+          
+  
               <div class="c-box--results__header px-0 gps_intervenant">
                   <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
-
+  
                       <div class="c-box--results__summary flex-grow-1">
                           <i aria-hidden="true" class="ri-user-line"></i>
-
+  
                           <div>
                               <h3>
                                   Pierre DUPONT
                                   <span class="font-weight-normal fs-6 fst-italic">
-
-
+                                      
+                                      
                                       (prescripteur pour Les Olivades)
-
+                                      
                                   </span>
                               </h3>
-
+  
                               <div class="d-flex flex-column flex-md-column gap-1 gap-md-2">
                                   <span>
                                       <i aria-hidden="true" class="ri-mail-line font-weight-normal me-1"></i>pierre.dupont@test.local
                                   </span>
-
-
+  
+                                  
                                       <span>
                                           <i aria-hidden="true" class="ri-phone-line font-weight-normal me-1"></i>06 12 34 56 78
                                       </span>
-
-
-
+  
+  
+                                  
                                   <span>
                                       <i aria-hidden="true" class="ri-calendar-line font-weight-normal me-1"></i>Suivi depuis le <strong>21/06/2024</strong>
                                   </span>
-
+                                  
                                       <span>
                                           <i aria-hidden="true" class="ri-map-pin-user-line font-weight-normal me-1"></i><strong>Référent</strong>
                                       </span>
-
+                                  
                               </div>
                           </div>
                       </div>
                   </div>
               </div>
-
-
+  
+          
       </div>
-
+  
   </div>
-
+  
                   </div>
   '''
 # ---
@@ -182,7 +182,7 @@
   '''
   <div class="my-3 my-md-4 s-box__row row membership-card">
                                   <div class="c-box--results__header">
-
+  
                                       <div class="c-box--results__summary">
                                           <i aria-hidden="true" class="ri-user-line"></i>
                                           <div>
@@ -191,67 +191,67 @@
                                           </div>
                                       </div>
                                   </div>
-
+  
                                   <hr class="m-0 pb-4"/>
-
+  
                                   <div class="d-flex justify-content-between mb-4">
                                       <div>
-
+                                          
                                               <div>
-
-
+                                                  
+                                                  
                                                       <div>
-
+                                                          
                                                           Vous avez ajouté ce bénéficiaire le <strong>21/06/2024</strong>.
                                                       </div>
-
-
+                                                  
+                                                  
                                                       1 autre professionnel
                                                       est
                                                       intervenu auprès de ce bénéficiaire.
-
+                                                  
                                               </div>
-
+                                          
                                       </div>
-
-
+  
+  
                                   </div>
                                   <div class="d-flex justify-content-between">
-
-
+  
+                                      
                                           <div>
-
-
+  
+                                              
                                               <a aria-label="Ne plus suivre Jane DOE" class="btn btn-warning btn-block w-100 w-md-auto btn-ico" data-bs-body="Vous pourrez toujours suivre ce bénéficiaire de nouveau plus tard." data-bs-confirm-class="btn-danger" data-bs-confirm-text="Ne plus suivre" data-bs-confirm-url="/gps/groups/34/leave" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de ne plus vouloir suivre Jane DOE ?" data-bs-toggle="modal" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                                   <i aria-hidden="true" class="ri-user-unfollow-line"></i>
                                                   <span>Ne plus suivre</span>
-
+  
                                               </a>
-
-
-
+  
+  
+                                              
                                           </div>
-
-
+  
+  
                                           <div>
-
-
-
+                                              
+                                                  
+  
                                                   <a aria-label="Devenir référent de Jane DOE" class="btn btn-outline-success btn-block w-100 w-md-auto btn-ico" data-bs-body="Vous pourrez toujours ne plus être référent de ce bénéficiaire plus tard." data-bs-confirm-class="btn-success" data-bs-confirm-text="Devenir référent" data-bs-confirm-url="/gps/groups/34/toggle_referent" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de vouloir devenir référent de Jane DOE ?" data-bs-toggle="modal" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
-
+  
                                                       <i aria-hidden="true" class="ri-map-pin-user-line font-weight-normal me-1"></i>
                                                       <span>Devenir référent</span>
-
+  
                                                   </a>
-
-
+  
+                                              
                                               <a aria-label="Consulter la fiche de Jane DOE" class="btn btn-outline-primary btn-block btn-ico w-100 w-md-auto" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                                   <i aria-hidden="true" class="ri-eye-line ri-xl font-weight-medium"></i>
                                                   <span>Consulter la fiche</span>
                                               </a>
                                           </div>
-
-
+                                      
+  
                                   </div>
                               </div>
   '''
