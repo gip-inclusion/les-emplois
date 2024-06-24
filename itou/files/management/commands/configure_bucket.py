@@ -5,6 +5,7 @@ import httpx
 from django.conf import settings
 
 from itou.utils.command import BaseCommand
+from itou.utils.enums import ItouEnvironment
 from itou.utils.storage.s3 import TEMPORARY_STORAGE_PREFIX, s3_client
 
 
@@ -42,7 +43,7 @@ class Command(BaseCommand):
 
         # MinIO does not support setting CORS.
         if not is_minio:
-            protocol = "https" if settings.ITOU_ENVIRONMENT != "DEV" else "http"
+            protocol = "https" if settings.ITOU_ENVIRONMENT != ItouEnvironment.DEV else "http"
             allowed_origins = []
             for origin in settings.ALLOWED_HOSTS:
                 if origin.startswith("."):
@@ -64,7 +65,7 @@ class Command(BaseCommand):
 
         auto_expire_rule_filter = {"Prefix": TEMPORARY_STORAGE_PREFIX}
         if autoexpire:
-            assert settings.ITOU_ENVIRONMENT == "DEV"
+            assert settings.ITOU_ENVIRONMENT == ItouEnvironment.DEV
             auto_expire_rule_filter = {}
         client.put_bucket_lifecycle_configuration(
             Bucket=bucket,

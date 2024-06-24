@@ -9,6 +9,8 @@ import warnings
 
 from dotenv import load_dotenv
 
+from itou.utils.enums import ItouEnvironment
+
 from ..sentry import sentry_init
 
 
@@ -342,7 +344,7 @@ SELECT2_THEME = "bootstrap-5"
 
 
 # Environment, sets the type of env of the app (PROD, FAST-MACHINE, DEMO, DEV…)
-ITOU_ENVIRONMENT = os.getenv("ITOU_ENVIRONMENT", "PROD")
+ITOU_ENVIRONMENT = ItouEnvironment(os.getenv("ITOU_ENVIRONMENT", ItouEnvironment.PROD))
 ITOU_PROTOCOL = "https"
 ITOU_FQDN = os.getenv("ITOU_FQDN", "emplois.inclusion.beta.gouv.fr")
 ITOU_EMAIL_CONTACT = os.getenv("ITOU_EMAIL_CONTACT", "assistance@inclusion.beta.gouv.fr")
@@ -354,7 +356,7 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@inclusion.beta.gou
 SENTRY_DSN = os.getenv("SENTRY_DSN")
 sentry_init()
 
-SHOW_DEMO_ACCOUNTS_BANNER = ITOU_ENVIRONMENT in ("DEMO", "REVIEW-APP")
+SHOW_DEMO_ACCOUNTS_BANNER = ITOU_ENVIRONMENT in (ItouEnvironment.DEMO, ItouEnvironment.REVIEW_APP)
 
 # https://adresse.data.gouv.fr/faq
 API_BAN_BASE_URL = os.getenv("API_BAN_BASE_URL")
@@ -468,7 +470,7 @@ HUEY = {
         "workers": 2,
         "worker_type": "thread",
     },
-    "immediate": ITOU_ENVIRONMENT not in ("DEMO", "PROD"),
+    "immediate": ITOU_ENVIRONMENT not in (ItouEnvironment.DEMO, ItouEnvironment.PROD),
 }
 
 MAILJET_API_KEY_PRINCIPAL = os.getenv("API_MAILJET_KEY_PRINCIPAL")
