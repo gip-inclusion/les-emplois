@@ -18,5 +18,5 @@ class CompanyToken(models.Model):
     companies = models.ManyToManyField(Company, related_name="api_tokens")
 
     class Meta:
-        verbose_name = "jeton d'API SIAE"
-        verbose_name_plural = "jetons d'API SIAE"
+        verbose_name = "jeton d'API entreprise"
+        verbose_name_plural = "jetons d'API entreprise"
