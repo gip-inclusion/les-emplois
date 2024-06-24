@@ -1,12 +1,9 @@
-import datetime
-
 import pytest
-from django.conf import settings
 from pytest_django.asserts import assertNumQueries
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from tests.companies.factories import CompanyMembershipFactory
-from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
+from tests.gps.factories import FollowUpGroupFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -15,14 +12,14 @@ from tests.users.factories import (
 )
 
 
-def test_membership_is_from_bulk_creation():
-    membership = FollowUpGroupMembershipFactory()
-    assert not membership.is_from_bulk_creation
+def test_bulk_created():
+    FollowUpGroupFactory.create_batch(2, memberships=2)  # 4 memberships
+    FollowUpGroupFactory.create_batch(3, created_in_bulk=True, memberships=2)  # 6 memberships
+    assert FollowUpGroup.objects.not_bulk_created().count() == 2
+    assert FollowUpGroup.objects.bulk_created().count() == 3
 
-    membership.created_at = datetime.datetime.combine(
-        settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(), tzinfo=datetime.UTC
-    )
-    assert membership.is_from_bulk_creation
+    assert FollowUpGroupMembership.objects.not_bulk_created().count() == 4
+    assert FollowUpGroupMembership.objects.bulk_created().count() == 6
 
 
 def test_follow_beneficiary():

@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
                     "created_at",
                     models.DateTimeField(default=django.utils.timezone.now, verbose_name="date de création"),
                 ),
-                ("ended_at", models.DateTimeField(null=True)),
+                ("ended_at", models.DateTimeField(null=True, verbose_name="date de désactivation")),
                 ("updated_at", models.DateTimeField(auto_now=True, verbose_name="date de modification")),
                 (
                     "creator",

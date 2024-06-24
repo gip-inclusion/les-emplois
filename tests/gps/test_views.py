@@ -202,11 +202,13 @@ def test_my_groups(snapshot, client):
         beneficiary__last_name="de Lucia",
         created_in_bulk=True,
     )
+
     FollowUpGroup.objects.follow_beneficiary(beneficiary=group.beneficiary, user=user, is_referent=True)
     membership = group.memberships.get(member=user)
     membership.created_at = datetime.datetime.combine(
         settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(), tzinfo=datetime.UTC
     )
+    membership.created_in_bulk = True
     membership.save()
 
     response = client.get(reverse("gps:my_groups"))
