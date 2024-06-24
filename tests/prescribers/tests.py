@@ -212,7 +212,7 @@ class PrescriberOrganizationModelTest(TestCase):
         organization_2 = job_application_2.sender_prescriber_organization
 
         geiq_diagnosis = GEIQEligibilityDiagnosisFactory(
-            with_prescriber=True, author_prescriber_organization=organization_1
+            from_prescriber=True, author_prescriber_organization=organization_1
         )
 
         count_job_applications = job_applications_models.JobApplication.objects.count()

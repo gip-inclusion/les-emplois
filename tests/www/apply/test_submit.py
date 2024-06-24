@@ -3677,7 +3677,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         cls.geiq = CompanyFactory(with_membership=True, with_jobs=True, kind=CompanyKind.GEIQ)
         cls.prescriber_org = PrescriberOrganizationWithMembershipFactory(authorized=True)
         cls.orienter = PrescriberFactory()
-        cls.job_seeker_with_geiq_diagnosis = GEIQEligibilityDiagnosisFactory(with_prescriber=True).job_seeker
+        cls.job_seeker_with_geiq_diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True).job_seeker
         cls.company = CompanyFactory(with_membership=True, kind=CompanyKind.EI)
 
     def _setup_session(self, company_pk=None):
@@ -3820,7 +3820,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
 
         # Badge is KO if job seeker has a valid diagnosis without allowance
-        diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True)
+        diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
         assert diagnosis.allowance_amount == 0
         assert not diagnosis.eligibility_confirmed
 
@@ -4422,7 +4422,7 @@ class GEIQEligibilityForHireTestCase(TestCase):
         assert response.status_code == 404
 
     def test_job_seeker_with_valid_diagnosis(self):
-        diagnosis = GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, with_geiq=True)
+        diagnosis = GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_geiq=True)
         diagnosis.administrative_criteria.add(GEIQAdministrativeCriteria.objects.get(pk=19))
         self.company = diagnosis.author_geiq
         self.client.force_login(self.company.members.first())
@@ -4553,7 +4553,7 @@ class HireConfirmationTestCase(TestCase):
         assert job_application.resume_link == ""
 
     def test_as_geiq(self):
-        diagnosis = GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, with_geiq=True)
+        diagnosis = GEIQEligibilityDiagnosisFactory(job_seeker=self.job_seeker, from_geiq=True)
         diagnosis.administrative_criteria.add(GEIQAdministrativeCriteria.objects.get(pk=19))
         self.company = diagnosis.author_geiq
         self.client.force_login(self.company.members.first())

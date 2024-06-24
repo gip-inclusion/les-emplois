@@ -38,12 +38,11 @@ class GEIQEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
         model = models.GEIQEligibilityDiagnosis
 
     class Params:
-        with_geiq = factory.Trait(
+        from_geiq = factory.Trait(
             author_kind=AuthorKind.GEIQ,
             author_geiq=factory.SubFactory(CompanyWith2MembershipsFactory, kind=CompanyKind.GEIQ, with_jobs=True),
             author=factory.LazyAttribute(lambda obj: obj.author_geiq.members.first()),
         )
-        with_prescriber = factory.Trait(from_prescriber=True)
 
 
 class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
