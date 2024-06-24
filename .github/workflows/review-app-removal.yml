@@ -35,6 +35,7 @@ jobs:
       run: |
         curl $CLEVER_TOOLS_DOWNLOAD_URL > $CLEVER_TAR_FILE
         tar -xvf $CLEVER_TAR_FILE
+        echo "Clever CLI version: $($CLEVER_CLI version)"
         $CLEVER_CLI login --token $CLEVER_TOKEN --secret $CLEVER_SECRET
         $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
 
