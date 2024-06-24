@@ -96,12 +96,12 @@ def test_update_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
         GEIQEligibilityDiagnosis.update_eligibility_diagnosis(None, None, ())
 
     # Trying to update an expired diagnosis
-    diagnosis = GEIQEligibilityDiagnosisFactory(with_prescriber=True, expired=True)
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
     with pytest.raises(ValueError, match="Impossible de modifier un diagnostic GEIQ expiré"):
         GEIQEligibilityDiagnosis.update_eligibility_diagnosis(diagnosis, diagnosis.author, administrative_criteria=())
 
     # correct update case:
-    diagnosis = GEIQEligibilityDiagnosisFactory(with_prescriber=True)
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
     GEIQEligibilityDiagnosis.update_eligibility_diagnosis(
         diagnosis, diagnosis.author, [administrative_criteria_annex_1]
     )
@@ -110,7 +110,7 @@ def test_update_geiq_eligibility_diagnosis(administrative_criteria_annex_1):
 
 
 def test_update_geiq_eligibility_diagnosis_author():
-    diagnosis = GEIQEligibilityDiagnosisFactory(with_prescriber=True)
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
     other_user = ItouStaffFactory()
     GEIQEligibilityDiagnosis.update_eligibility_diagnosis(diagnosis, other_user, ())
     diagnosis.refresh_from_db()
@@ -119,10 +119,10 @@ def test_update_geiq_eligibility_diagnosis_author():
 
 
 def test_geiq_eligibility_diagnosis_validation():
-    diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True)
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
     diagnosis.clean()
 
-    diagnosis = GEIQEligibilityDiagnosisFactory(with_prescriber=True)
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
     diagnosis.clean()
 
     # Only prescriber org or GEIQ are possible authors
@@ -150,7 +150,7 @@ def test_geiq_administrative_criteria_validation(
     administrative_criteria_annex_2_level_2,
 ):
     # GEIQ diagnosis can be created with all kind of administrative criteria
-    diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True)
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
     diagnosis.administrative_criteria.set(
         [
             administrative_criteria_annex_1,
@@ -230,13 +230,13 @@ def test_geiq_eligibility_diagnosis_allowance_and_eligibility(
         annex=AdministrativeCriteriaAnnex.ANNEX_2,
         level=AdministrativeCriteriaLevel.LEVEL_2,
     )[:2]
-    diagnosis = GEIQEligibilityDiagnosisFactory(with_prescriber=True)
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
 
     # Prescriber author gets it all
     assert diagnosis.eligibility_confirmed
     assert diagnosis.allowance_amount == GEIQ_ALLOWANCE_AMOUNT_1400
 
-    diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True)
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
 
     assert not diagnosis.eligibility_confirmed
     assert diagnosis.allowance_amount == 0
@@ -253,13 +253,13 @@ def test_geiq_eligibility_diagnosis_allowance_and_eligibility(
     assert diagnosis.allowance_amount == GEIQ_ALLOWANCE_AMOUNT_1400
 
     # One L1 is enough to get max allowance
-    diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True)
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
     diagnosis.administrative_criteria.add(administrative_criteria_annex_2_level_1)
 
     assert diagnosis.eligibility_confirmed
     assert diagnosis.allowance_amount == GEIQ_ALLOWANCE_AMOUNT_1400
 
-    diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True)
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
     diagnosis.administrative_criteria.add(administrative_criteria_annex_1)
 
     assert diagnosis.eligibility_confirmed
@@ -274,7 +274,7 @@ def test_geiq_eligibility_diagnosis_allowance_and_eligibility(
     # Special case of dual-annex criteria:
 
     # Counts as Annex 1 criterion...
-    diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True)
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
     diagnosis.administrative_criteria.add(administrative_criteria_both_annexes)
 
     assert diagnosis.eligibility_confirmed
@@ -287,18 +287,18 @@ def test_geiq_eligibility_diagnosis_allowance_and_eligibility(
     assert diagnosis.allowance_amount == GEIQ_ALLOWANCE_AMOUNT_1400
 
     # GEIQ eligibility is not confirmed with valid criteria and expired diagnosis
-    diagnosis = GEIQEligibilityDiagnosisFactory(with_prescriber=True, expires_at=timezone.now())
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True, expires_at=timezone.now())
     assert not diagnosis.eligibility_confirmed
 
 
 def test_create_duplicate_diagnosis_in_same_geiq():
-    diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True)
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
 
     # Check for duplicates : *valid* diagnosis, with same author structure for the same job seeker
     # Should have been nice as a unique constraint but does not work as expected because of mutable timestamps
     with pytest.raises(ValidationError, match="Il existe déjà un diagnostic GEIQ valide pour "):
         GEIQEligibilityDiagnosisFactory(
-            with_geiq=True,
+            from_geiq=True,
             author_geiq=diagnosis.author_geiq,
             job_seeker=diagnosis.job_seeker,
             author=diagnosis.author_geiq.members.first(),
@@ -310,12 +310,12 @@ def test_invalidate_obsolete_diagnosis():
     # and hiring must occur during validity period of the diagnosis
     job_application = JobApplicationFactory(with_geiq_eligibility_diagnosis=True)
     diagnosis_with_hiring = job_application.geiq_eligibility_diagnosis
-    diagnosis_without_hiring = GEIQEligibilityDiagnosisFactory(with_geiq=True, job_seeker=job_application.job_seeker)
+    diagnosis_without_hiring = GEIQEligibilityDiagnosisFactory(from_geiq=True, job_seeker=job_application.job_seeker)
 
     assert diagnosis_with_hiring.is_valid
     assert diagnosis_without_hiring.is_valid
 
-    GEIQEligibilityDiagnosisFactory(with_prescriber=True, job_seeker=job_application.job_seeker)
+    GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_application.job_seeker)
 
     diagnosis_with_hiring.refresh_from_db()
     diagnosis_without_hiring.refresh_from_db()
@@ -330,7 +330,7 @@ def test_invalidate_obsolete_diagnosis():
 
 def test_create_dup_geiq_eligibility_diagnosis_with_geiq_and_prescriber(new_geiq, administrative_criteria_annex_1):
     # Create a diagnosis with a prescriber author
-    diagnosis = GEIQEligibilityDiagnosisFactory(with_prescriber=True)
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
 
     # If the diagnosis is valid, then new GEIQ authored diagnoses are not allowed
     with pytest.raises(ValidationError, match=r"Il existe déjà un diagnostic GEIQ valide"):
@@ -355,14 +355,14 @@ def test_create_dup_geiq_eligibility_diagnosis_with_geiq_and_prescriber(new_geiq
 
 def test_create_dup_geiq_eligibility_diagnosis_with_two_geiq():
     # Creating duplicate GEIQ diagnosis with the same GEIQ and job seeker is not allowed
-    geiq_diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True)
+    geiq_diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
 
     with pytest.raises(
         ValidationError,
         match="Il existe déjà un diagnostic GEIQ valide pour cet utilisateur",
     ):
         GEIQEligibilityDiagnosisFactory(
-            with_geiq=True,
+            from_geiq=True,
             author_geiq=geiq_diagnosis.author_geiq,
             job_seeker=geiq_diagnosis.job_seeker,
         )
@@ -372,7 +372,7 @@ def test_create_dup_geiq_eligibility_diagnosis_with_two_geiq():
     geiq_diagnosis.save()
 
     assert GEIQEligibilityDiagnosisFactory(
-        with_geiq=True,
+        from_geiq=True,
         author_geiq=geiq_diagnosis.author_geiq,
         job_seeker=geiq_diagnosis.job_seeker,
     )
@@ -382,9 +382,9 @@ def test_prescriber_geiq_diagnosis_priority():
     # If there are existing valid GEIQ diagnoses for the same job seeker and created by GEIQs,
     # they are automatically "expired" when a prescriber creates a new diagnosis (it has priority over GEIQ ones)
     # GEIQ diagnoses linked to a hiring are kept valid
-    geiq_diagnosis = GEIQEligibilityDiagnosisFactory(with_geiq=True)
+    geiq_diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
     job_seeker = geiq_diagnosis.job_seeker
-    geiq_diagnosis_with_hiring = GEIQEligibilityDiagnosisFactory(with_geiq=True, job_seeker=job_seeker)
+    geiq_diagnosis_with_hiring = GEIQEligibilityDiagnosisFactory(from_geiq=True, job_seeker=job_seeker)
     JobApplicationFactory(
         with_geiq_eligibility_diagnosis=True,
         job_seeker=job_seeker,
@@ -394,7 +394,7 @@ def test_prescriber_geiq_diagnosis_priority():
     assert geiq_diagnosis.is_valid
     assert geiq_diagnosis_with_hiring.is_valid
 
-    prescriber_diagnosis = GEIQEligibilityDiagnosisFactory(with_prescriber=True, job_seeker=job_seeker)
+    prescriber_diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker)
     geiq_diagnosis.refresh_from_db()
     geiq_diagnosis_with_hiring.refresh_from_db()
 
@@ -406,14 +406,14 @@ def test_prescriber_geiq_diagnosis_priority():
 def test_authored_by_prescriber_or_geiq():
     # When using this query set method, if there are multiple valid GEIQ diagnoses,
     # the prescriber diagnosis must come out in first position
-    geiq_diagnosis_with_hiring = GEIQEligibilityDiagnosisFactory(with_geiq=True)
+    geiq_diagnosis_with_hiring = GEIQEligibilityDiagnosisFactory(from_geiq=True)
     JobApplicationFactory(
         with_geiq_eligibility_diagnosis=True,
         geiq_eligibility_diagnosis=geiq_diagnosis_with_hiring,
     )
     # Order matters
     prescriber_diagnosis = GEIQEligibilityDiagnosisFactory(
-        with_prescriber=True,
+        from_prescriber=True,
         job_seeker=geiq_diagnosis_with_hiring.job_seeker,
     )
 
