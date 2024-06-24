@@ -42,7 +42,7 @@ from tests.approvals.factories import (
     SuspensionFactory,
 )
 from tests.companies.factories import CompanyFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
@@ -838,7 +838,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
 
         url = reverse("admin:approvals_approval_add")
 
-        diagnosis = EligibilityDiagnosisFactory()
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
         post_data = {
             "start_at": "01/01/2100",
             "end_at": "31/12/2102",
@@ -931,7 +931,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
         user.user_permissions.add(permission)
         self.client.force_login(user)
 
-        diagnosis = EligibilityDiagnosisFactory()
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
         other_job_seeker = JobSeekerFactory()
         url = reverse("admin:approvals_approval_add")
 

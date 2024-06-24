@@ -24,7 +24,7 @@ from tests.approvals.factories import (
     ProlongationWithRequestFactory,
 )
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.geo.factories import QPVFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -194,7 +194,8 @@ def test_populate_job_seekers():
         created_at=datetime.datetime(2022, 1, 1, tzinfo=datetime.UTC),
     )
 
-    EligibilityDiagnosisFactory(
+    IAEEligibilityDiagnosisFactory(
+        from_prescriber=True,
         job_seeker=user_3,
         created_at=datetime.datetime(2020, 1, 1, tzinfo=datetime.UTC),
     )

@@ -19,7 +19,7 @@ from tests.approvals.factories import (
     SuspensionFactory,
 )
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
 from tests.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory
@@ -44,7 +44,9 @@ class TestApprovalDetailView:
             sender_prescriber_organization=PrescriberOrganizationFactory(authorized=True),
         )
         assert job_application.is_sent_by_authorized_prescriber
-        EligibilityDiagnosisFactory(job_seeker=approval.user, author_siae=job_application.to_company)
+        IAEEligibilityDiagnosisFactory(
+            from_prescriber=True, job_seeker=approval.user, author_siae=job_application.to_company
+        )
 
         # Another job applcation on the same SIAE, by a non authorized prescriber
         same_siae_job_application = JobApplicationSentByPrescriberOrganizationFactory(
@@ -89,7 +91,7 @@ class TestApprovalDetailView:
         employer = company.members.first()
         # Make sure the job seeker infos can be edited by the siae member
         approval = ApprovalFactory(user__created_by=employer)
-        EligibilityDiagnosisFactory(job_seeker=approval.user, author_siae=company)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=approval.user, author_siae=company)
 
         client.force_login(employer)
 

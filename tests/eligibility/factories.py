@@ -1,4 +1,3 @@
-import functools
 import random
 
 import factory
@@ -70,6 +69,3 @@ class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
             author=factory.LazyAttribute(lambda obj: obj.author_siae.members.first()),
         )
         with_criteria = factory.Trait(romes=factory.PostGeneration(_get_iae_administrative_criteria))
-
-
-EligibilityDiagnosisFactory = functools.partial(IAEEligibilityDiagnosisFactory, from_prescriber=True)

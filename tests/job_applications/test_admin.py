@@ -10,7 +10,7 @@ from itou.job_applications import models
 from itou.job_applications.enums import JobApplicationState
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record import factories as employee_record_factories
 from tests.job_applications import factories
 from tests.users.factories import JobSeekerFactory
@@ -238,7 +238,7 @@ def test_create_then_accept_job_application(admin_client):
     )
 
     # and make sure a diagnosis exists
-    EligibilityDiagnosisFactory(job_seeker=job_seeker)
+    IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker)
 
     response = admin_client.post(url, {**post_data, "transition_accept": True})
     assertRedirects(response, url)

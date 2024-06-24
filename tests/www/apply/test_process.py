@@ -40,7 +40,7 @@ from itou.www.apply.forms import AcceptForm
 from tests.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
@@ -2433,7 +2433,7 @@ class ProcessTemplatesTest(TestCase):
     def test_details_template_for_state_postponed_valid_diagnosis(self):
         """Test actions available when the state is postponed."""
         self.client.force_login(self.employer)
-        EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_application.job_seeker)
         self.job_application.state = job_applications_enums.JobApplicationState.POSTPONED
         self.job_application.save()
         response = self.client.get(self.url_details)
@@ -2461,7 +2461,7 @@ class ProcessTemplatesTest(TestCase):
 
     def test_details_template_for_state_obsolete_valid_diagnosis(self):
         self.client.force_login(self.employer)
-        EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_application.job_seeker)
         self.job_application.state = job_applications_enums.JobApplicationState.OBSOLETE
         self.job_application.processed_at = timezone.now()
         self.job_application.save()
@@ -2492,7 +2492,7 @@ class ProcessTemplatesTest(TestCase):
     def test_details_template_for_state_refused_valid_diagnosis(self):
         """Test actions available for other states."""
         self.client.force_login(self.employer)
-        EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_application.job_seeker)
         self.job_application.state = job_applications_enums.JobApplicationState.REFUSED
         self.job_application.processed_at = timezone.now()
         self.job_application.save()
@@ -2521,7 +2521,7 @@ class ProcessTemplatesTest(TestCase):
     def test_details_template_for_state_canceled_valid_diagnosis(self):
         """Test actions available for other states."""
         self.client.force_login(self.employer)
-        EligibilityDiagnosisFactory(job_seeker=self.job_application.job_seeker)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_application.job_seeker)
         self.job_application.state = job_applications_enums.JobApplicationState.CANCELLED
         self.job_application.processed_at = timezone.now()
         self.job_application.save()

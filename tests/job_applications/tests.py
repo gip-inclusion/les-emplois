@@ -45,7 +45,7 @@ from tests.approvals.factories import (
     SuspensionFactory,
 )
 from tests.companies.factories import CompanyFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import BareEmployeeRecordFactory, EmployeeRecordFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
@@ -225,7 +225,8 @@ class JobApplicationModelTest(TestCase):
             ValidationError, "Une candidature ne peut avoir les deux types de diagnostics \\(IAE et GEIQ\\)"
         ):
             JobApplicationFactory(
-                with_geiq_eligibility_diagnosis=True, eligibility_diagnosis=EligibilityDiagnosisFactory()
+                with_geiq_eligibility_diagnosis=True,
+                eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True),
             )
 
         # Validators
@@ -474,7 +475,7 @@ class JobApplicationQuerySetTest(TestCase):
         assert qs.first().jobseeker_eligibility_diagnosis is None
 
     def test_with_eligibility_diagnosis_criterion(self):
-        diagnosis = EligibilityDiagnosisFactory(created_at=timezone.now())
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, created_at=timezone.now())
         job_app = JobApplicationFactory(
             with_approval=True, job_seeker=diagnosis.job_seeker, eligibility_diagnosis=diagnosis
         )
@@ -488,8 +489,8 @@ class JobApplicationQuerySetTest(TestCase):
         diagnosis.administrative_criteria.add(level1_criterion)
         diagnosis.administrative_criteria.add(level2_criterion)
 
-        older_diagnosis = EligibilityDiagnosisFactory(
-            job_seeker=job_app.job_seeker, created_at=timezone.now() - relativedelta(months=1)
+        older_diagnosis = IAEEligibilityDiagnosisFactory(
+            from_prescriber=True, job_seeker=job_app.job_seeker, created_at=timezone.now() - relativedelta(months=1)
         )
         older_diagnosis.administrative_criteria.add(level1_other_criterion)
 
@@ -522,7 +523,7 @@ class JobApplicationQuerySetTest(TestCase):
 
     def test_with_list_related_data(self):
         job_app = JobApplicationFactory(with_approval=True)
-        diagnosis = EligibilityDiagnosisFactory(job_seeker=job_app.job_seeker)
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_app.job_seeker)
 
         level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
         level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()
@@ -1351,7 +1352,7 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
-            eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
+            eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
         )
         with self.captureOnCommitCallbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
@@ -1375,7 +1376,7 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
-            eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
+            eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
         )
         with self.captureOnCommitCallbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
@@ -1396,7 +1397,7 @@ class JobApplicationWorkflowTest(TestCase):
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
-            eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
+            eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
         )
         with self.captureOnCommitCallbacks(execute=True):
             job_application.accept(user=job_application.to_company.members.first())
@@ -1559,7 +1560,7 @@ class JobApplicationWorkflowTest(TestCase):
         )
         assert approval.is_in_waiting_period
 
-        diagnosis = EligibilityDiagnosisFactory(job_seeker=user)
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=user)
         assert diagnosis.is_valid
 
         job_application = JobApplicationSentByJobSeekerFactory(job_seeker=user, state=JobApplicationState.PROCESSING)
@@ -1755,7 +1756,7 @@ class JobApplicationXlsxExportTest(TestCase):
             job_seeker=job_seeker,
             state=JobApplicationState.PROCESSING,
             selected_jobs=Appellation.objects.all(),
-            eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
+            eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
         )
         job_application.accept(user=job_application.to_company.members.first())
 
@@ -1802,7 +1803,7 @@ class JobApplicationXlsxExportTest(TestCase):
                 job_seeker=job_seeker,
                 state=JobApplicationState.PROCESSING,
                 selected_jobs=Appellation.objects.all(),
-                eligibility_diagnosis=EligibilityDiagnosisFactory(job_seeker=job_seeker),
+                eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker),
             )
             job_application.accept(user=job_application.to_company.members.first())
 

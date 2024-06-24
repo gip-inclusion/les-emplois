@@ -17,7 +17,7 @@ from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.cities.factories import create_city_saint_andre
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByJobSeekerFactory,
@@ -127,7 +127,7 @@ class ProcessListSiaeTest(TestCase):
             job_application.selected_jobs.set([job1, job2])
 
         # Add a diagnosis present on 2 applications
-        diagnosis = EligibilityDiagnosisFactory(job_seeker=self.maggie)
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.maggie)
         level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
         level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()
         diagnosis.administrative_criteria.add(level1_criterion)
@@ -219,7 +219,7 @@ class ProcessListSiaeTest(TestCase):
 
     def test_list_for_siae_show_criteria(self):
         # Add a diagnosis present on 2 applications
-        diagnosis = EligibilityDiagnosisFactory(job_seeker=self.maggie)
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.maggie)
         criteria = AdministrativeCriteria.objects.filter(
             name__in=[
                 # Level 1 criteria
@@ -260,7 +260,7 @@ class ProcessListSiaeTest(TestCase):
 
     def test_list_for_siae_hide_criteria_for_non_SIAE_employers(self):
         # Add a diagnosis present on 2 applications
-        diagnosis = EligibilityDiagnosisFactory(job_seeker=self.maggie)
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.maggie)
         # Level 1 criteria
         diagnosis.administrative_criteria.add(AdministrativeCriteria.objects.get(name="Allocataire AAH"))
 
@@ -513,7 +513,7 @@ class ProcessListSiaeTest(TestCase):
         assert len(response.context["job_applications_page"].object_list) == 0
 
         # Authorized prescriber diagnosis
-        diagnosis = EligibilityDiagnosisFactory(job_seeker=self.maggie)
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.maggie)
         response = self.client.get(reverse("apply:list_for_siae"), params)
         # Maggie has two applications, one created in the state loop and the other created by SentByPrescriberFactory
         assert len(response.context["job_applications_page"].object_list) == 2
@@ -560,7 +560,7 @@ class ProcessListSiaeTest(TestCase):
         """
         self.client.force_login(self.eddie_hit_pit)
 
-        diagnosis = EligibilityDiagnosisFactory(job_seeker=self.maggie)
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.maggie)
 
         level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
         level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()
