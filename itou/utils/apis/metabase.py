@@ -1,7 +1,6 @@
 import datetime
 
 import jwt
-import pytz
 from django.conf import settings
 from django.utils import timezone
 
@@ -283,11 +282,10 @@ def metabase_embedded_url(request=None, dashboard_id=None, params=None, with_tit
         metabase_dashboard = METABASE_DASHBOARDS.get(view_name)
         dashboard_id = metabase_dashboard["dashboard_id"] if metabase_dashboard else None
 
-    initial_dt = datetime.datetime(1970, 1, 1, 0, 0, 0, 0, pytz.UTC)
     payload = {
         "resource": {"dashboard": dashboard_id},
         "params": params,
-        "exp": int((timezone.now() + datetime.timedelta(minutes=30) - initial_dt).total_seconds()),
+        "exp": int((timezone.now() + datetime.timedelta(minutes=30)).timestamp()),
     }
     is_titled = "true" if with_title else "false"
     return settings.METABASE_SITE_URL + "/embed/dashboard/" + _get_token(payload) + f"#titled={is_titled}"
