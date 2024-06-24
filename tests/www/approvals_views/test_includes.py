@@ -6,7 +6,7 @@ from freezegun import freeze_time
 
 import itou.job_applications.enums as job_applications_enums
 from tests.approvals.factories import ApprovalFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
 from tests.utils.test import remove_static_hash
 
@@ -56,7 +56,7 @@ class TestStatusInclude:
 
     def test_expired_approval_with_eligibility_diagnosis_for_employer(self, snapshot, db):
         approval = ApprovalFactory(for_snapshot=True, end_at=datetime.date(2022, 1, 1))
-        approval.eligibility_diagnosis = EligibilityDiagnosisFactory(job_seeker=approval.user)
+        approval.eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=approval.user)
         context = Context(
             {
                 "common_approval": approval,
@@ -73,7 +73,7 @@ class TestStatusInclude:
 
     def test_expired_approval_with_eligibility_diagnosis_for_prescriber(self, snapshot, db):
         approval = ApprovalFactory(for_snapshot=True, end_at=datetime.date(2022, 1, 1))
-        approval.eligibility_diagnosis = EligibilityDiagnosisFactory(job_seeker=approval.user)
+        approval.eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=approval.user)
         context = Context(
             {
                 "common_approval": approval,
@@ -90,7 +90,7 @@ class TestStatusInclude:
 
     def test_expired_approval_with_eligibility_diagnosis_for_jobseeker(self, snapshot, db):
         approval = ApprovalFactory(for_snapshot=True, end_at=datetime.date(2022, 1, 1))
-        approval.eligibility_diagnosis = EligibilityDiagnosisFactory(job_seeker=approval.user)
+        approval.eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=approval.user)
         context = Context(
             {
                 "common_approval": approval,

@@ -9,7 +9,6 @@ from itou.eligibility.models.common import AdministrativeCriteriaQuerySet
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import (
-    EligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
 )
 from tests.job_applications.factories import JobApplicationFactory
@@ -52,7 +51,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert not has_considered_valid
 
     def test_itou_diagnosis(self):
-        diagnosis = EligibilityDiagnosisFactory(job_seeker=self.job_seeker)
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=diagnosis.job_seeker)
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=diagnosis.job_seeker)
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=diagnosis.job_seeker)
@@ -88,7 +87,9 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert last_expired is None
 
     def test_expired_itou_diagnosis(self):
-        expired_diagnosis = EligibilityDiagnosisFactory(job_seeker=self.job_seeker, expired=True)
+        expired_diagnosis = IAEEligibilityDiagnosisFactory(
+            from_prescriber=True, job_seeker=self.job_seeker, expired=True
+        )
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(
             job_seeker=expired_diagnosis.job_seeker
         )
@@ -101,7 +102,9 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert last_expired is not None
 
     def test_expired_itou_diagnosis_with_ongoing_approval(self):
-        expired_diagnosis = EligibilityDiagnosisFactory(job_seeker=self.job_seeker, expired=True)
+        expired_diagnosis = IAEEligibilityDiagnosisFactory(
+            from_prescriber=True, job_seeker=self.job_seeker, expired=True
+        )
         ApprovalFactory(user=expired_diagnosis.job_seeker, eligibility_diagnosis=expired_diagnosis)
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(
             job_seeker=expired_diagnosis.job_seeker
@@ -145,7 +148,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
 
     def test_itou_diagnosis_by_prescriber(self):
         company = CompanyFactory(with_membership=True)
-        prescriber_diagnosis = EligibilityDiagnosisFactory(job_seeker=self.job_seeker)
+        prescriber_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         # From siae perspective.
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(
             job_seeker=prescriber_diagnosis.job_seeker, for_siae=company
@@ -162,7 +165,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
 
     def test_itou_diagnosis_both_siae_and_prescriber(self):
         company = CompanyFactory(with_membership=True)
-        prescriber_diagnosis = EligibilityDiagnosisFactory(job_seeker=self.job_seeker)
+        prescriber_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         # From `siae` perspective.
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(
             job_seeker=self.job_seeker, for_siae=company
@@ -192,8 +195,8 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert last_expired is None
 
     def test_itou_diagnosis_one_valid_other_expired(self):
-        EligibilityDiagnosisFactory(job_seeker=self.job_seeker, expired=True)
-        EligibilityDiagnosisFactory(job_seeker=self.job_seeker)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker, expired=True)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=self.job_seeker)
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=self.job_seeker)
         # When has a valid diagnosis, `last_expired` return None
@@ -202,16 +205,16 @@ class EligibilityDiagnosisManagerTest(TestCase):
 
     def test_itou_diagnosis_one_valid_other_expired_same_siae(self):
         company = CompanyFactory(with_membership=True)
-        EligibilityDiagnosisFactory(
+        IAEEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
             author_siae=company,
-            author_kind=AuthorKind.EMPLOYER,
+            from_employer=True,
             expired=True,
         )
-        new_diag = EligibilityDiagnosisFactory(
+        new_diag = IAEEligibilityDiagnosisFactory(
             job_seeker=self.job_seeker,
             author_siae=company,
-            author_kind=AuthorKind.EMPLOYER,
+            from_employer=True,
         )
         # An approval causes the system to ignore expires_at.
         ApprovalFactory(user=self.job_seeker, eligibility_diagnosis=new_diag)
@@ -225,10 +228,14 @@ class EligibilityDiagnosisManagerTest(TestCase):
             timezone.now() - relativedelta(months=EligibilityDiagnosis.EXPIRATION_DELAY_MONTHS) - relativedelta(day=1)
         )
         date_12m = date_6m - relativedelta(months=6)
-        expired_diagnosis_old = EligibilityDiagnosisFactory(job_seeker=self.job_seeker, created_at=date_12m)
+        expired_diagnosis_old = IAEEligibilityDiagnosisFactory(
+            from_prescriber=True, job_seeker=self.job_seeker, created_at=date_12m
+        )
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=self.job_seeker)
         assert last_expired == expired_diagnosis_old
-        expired_diagnosis_last = EligibilityDiagnosisFactory(job_seeker=self.job_seeker, created_at=date_6m)
+        expired_diagnosis_last = IAEEligibilityDiagnosisFactory(
+            from_prescriber=True, job_seeker=self.job_seeker, created_at=date_6m
+        )
         last_expired = EligibilityDiagnosis.objects.last_expired(job_seeker=self.job_seeker)
         assert last_expired == expired_diagnosis_last
 
@@ -281,7 +288,7 @@ class EligibilityDiagnosisModelTest(TestCase):
     def test_update_diagnosis(self):
         company = CompanyFactory(with_membership=True)
 
-        current_diagnosis = EligibilityDiagnosisFactory()
+        current_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
         new_diagnosis = EligibilityDiagnosis.update_diagnosis(
             current_diagnosis, author=company.members.first(), author_organization=company, administrative_criteria=[]
         )
@@ -302,7 +309,7 @@ class EligibilityDiagnosisModelTest(TestCase):
         assert new_diagnosis.is_valid
 
     def test_update_diagnosis_extend_the_validity_only_when_we_have_the_same_author_and_the_same_criteria(self):
-        first_diagnosis = EligibilityDiagnosisFactory()
+        first_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
 
         # Same author, same criteria
         previous_expires_at = first_diagnosis.expires_at
@@ -350,24 +357,24 @@ class EligibilityDiagnosisModelTest(TestCase):
 
     def test_is_valid(self):
         # Valid diagnosis.
-        diagnosis = EligibilityDiagnosisFactory()
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
         assert diagnosis.is_valid
 
         # Expired diagnosis.
-        diagnosis = EligibilityDiagnosisFactory(expired=True)
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
         assert not diagnosis.is_valid
 
     def test_is_considered_valid(self):
         # Valid diagnosis.
-        diagnosis = EligibilityDiagnosisFactory()
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
         assert diagnosis.is_considered_valid
 
         # Expired diagnosis.
-        diagnosis = EligibilityDiagnosisFactory(expired=True)
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
         assert not diagnosis.is_considered_valid
 
         # Expired diagnosis but ongoing PASS IAE.
-        diagnosis = EligibilityDiagnosisFactory(expired=True)
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
         ApprovalFactory(user=diagnosis.job_seeker)
         assert diagnosis.is_considered_valid
 

@@ -35,7 +35,7 @@ from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import PoleEmploiApprovalFactory
 from tests.cities.factories import create_city_geispolsheim, create_city_in_zrr, create_test_cities
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWithMembershipAndJobsFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory, GEIQEligibilityDiagnosisFactory
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.geo.factories import ZRRFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -2785,7 +2785,7 @@ class ApplicationViewTest(TestCase):
 
     def test_application_eligibility_is_bypassed_when_the_job_seeker_already_has_an_approval(self):
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True)
-        eligibility_diagnosis = EligibilityDiagnosisFactory()
+        eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
 
         self.client.force_login(company.members.first())
         apply_session = SessionNamespace(self.client.session, f"job_application-{company.pk}")
@@ -2810,7 +2810,7 @@ class ApplicationViewTest(TestCase):
     def test_application_eligibility_update_diagnosis_only_if_not_shrouded(self):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
-        eligibility_diagnosis = EligibilityDiagnosisFactory()
+        eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
 
         self.client.force_login(prescriber)
         apply_session = SessionNamespace(self.client.session, f"job_application-{company.pk}")
@@ -4376,7 +4376,7 @@ class EligibilityForHireTestCase(TestCase):
 
     def test_job_seeker_with_valid_diagnosis(self):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
-        EligibilityDiagnosisFactory(job_seeker=self.job_seeker)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         self.client.force_login(self.company.members.first())
         response = self.client.get(self._reverse("apply:eligibility_for_hire"))
         self.assertRedirects(response, self._reverse("apply:hire_confirmation"))
@@ -4489,7 +4489,7 @@ class HireConfirmationTestCase(TestCase):
     )
     def test_as_company(self, _mock):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
-        EligibilityDiagnosisFactory(job_seeker=self.job_seeker)
+        IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         self.client.force_login(self.company.members.first())
         with self.assertNumQueries(
             BASE_NUM_QUERIES

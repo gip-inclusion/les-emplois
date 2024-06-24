@@ -12,7 +12,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.www.itou_staff_views.forms import DEPARTMENTS_CHOICES
 from tests.approvals.factories import ApprovalFactory, ProlongationFactory
 from tests.companies.factories import CompanyFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import (
@@ -60,7 +60,8 @@ class TestExportJobApplications:
                 jobseeker_profile__pe_last_certification_attempt_at=timezone.now(),
                 jobseeker_profile__hexa_post_code="35000",
             )
-            eligibility_diag = EligibilityDiagnosisFactory(
+            eligibility_diag = IAEEligibilityDiagnosisFactory(
+                from_prescriber=True,
                 job_seeker=job_seeker,
                 author_prescriber_organization__siret="12345678900012",
             )

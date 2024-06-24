@@ -10,7 +10,7 @@ from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.users.enums import UserKind
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import (
     JobApplicationFactory,
     JobApplicationSentByCompanyFactory,
@@ -255,7 +255,7 @@ class JobApplicationTransferModelTest(TestCase):
         job_application = JobApplicationSentByPrescriberFactory(
             state=JobApplicationState.PROCESSING,
             to_company=origin_company,
-            eligibility_diagnosis=EligibilityDiagnosisFactory(),
+            eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True),
         )
         job_seeker = job_application.job_seeker
 

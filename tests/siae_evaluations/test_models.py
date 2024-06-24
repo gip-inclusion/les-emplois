@@ -32,7 +32,7 @@ from itou.siae_evaluations.models import (
 from itou.utils.models import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
-from tests.eligibility.factories import EligibilityDiagnosisFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionWith2MembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -63,7 +63,7 @@ class EvaluationCampaignMiscMethodsTest(TestCase):
         company = CompanyFactory()
         job_seeker = JobSeekerFactory()
         sender = PrescriberFactory()
-        eligibility_diagnosis = EligibilityDiagnosisFactory(job_seeker=job_seeker)
+        eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker)
 
         def create_job_apps(count):
             return JobApplicationFactory.create_batch(
@@ -152,7 +152,7 @@ def campaign_eligible_job_app_objects():
     company = CompanyWith2MembershipsFactory(department="14")
     job_seeker = JobSeekerFactory()
     approval = ApprovalFactory(user=job_seeker)
-    diag = EligibilityDiagnosisFactory(
+    diag = IAEEligibilityDiagnosisFactory(
         job_seeker=job_seeker,
         author_kind=AuthorKind.EMPLOYER,
         author_siae=company,
