@@ -48,8 +48,8 @@ class Migration(migrations.Migration):
                 ("companies", models.ManyToManyField(related_name="api_tokens", to="companies.company")),
             ],
             options={
-                "verbose_name": "jeton d'API SIAE",
-                "verbose_name_plural": "jetons d'API SIAE",
+                "verbose_name": "jeton d'API entreprise",
+                "verbose_name_plural": "jetons d'API entreprise",
             },
         ),
         migrations.RunPython(
