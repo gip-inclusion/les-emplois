@@ -167,6 +167,27 @@ class SearchCompanyTest(TestCase):
         )
         self.assertContains(response, COMPANY_VANNES.capitalize())
 
+    def test_departments_without_neighbors(self):
+        kourou_coords = Point(5.1614382, -52.6482039)
+        kourou = City.objects.create(
+            name="Kourou",
+            slug="kourou-973",
+            department="973",
+            coords=kourou_coords,
+            post_codes=["97310"],
+            code_insee="97304",
+        )
+        CompanyFactory(name="Rocket Science", department="973", coords=kourou_coords, post_code="97310")
+
+        response = self.client.get(self.URL, {"city": kourou.slug, "distance": 100})
+        # Department has no adjacent departments.
+        self.assertContains(
+            response,
+            '<span>Employeur</span><span class="badge badge-sm rounded-pill ms-2">1</span>',
+            html=True,
+            count=1,
+        )
+
     def test_order_by(self):
         """
         Check company results sorting.
