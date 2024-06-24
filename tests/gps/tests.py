@@ -1,3 +1,4 @@
+import freezegun
 import pytest
 from bs4 import BeautifulSoup
 from django.test.utils import override_settings
@@ -236,6 +237,7 @@ def test_referent_group(client):
     assert not membership.is_referent
 
 
+@freezegun.freeze_time("2024-06-21")
 def test_beneficiary_details(client, snapshot):
     prescriber = PrescriberFactory(membership=True, for_snapshot=True, membership__organization__name="Les Olivades")
     beneficiary = JobSeekerFactory(for_snapshot=True)
