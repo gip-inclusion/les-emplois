@@ -462,7 +462,8 @@ CACHES = {
 }
 
 HUEY = {
-    "name": "ITOU",
+    # Use value from CleverCloud deployment config, or a value per REVIEW-APP.
+    "name": os.getenv("HUEY_QUEUE_NAME", DATABASES["default"]["NAME"]),
     # Don't store task results (see our Redis Post-Morten in documentation for more information)
     "results": False,
     "url": f"{redis_url}/?db={redis_db}",
@@ -470,7 +471,8 @@ HUEY = {
         "workers": 2,
         "worker_type": "thread",
     },
-    "immediate": ITOU_ENVIRONMENT not in (ItouEnvironment.DEMO, ItouEnvironment.PROD),
+    # Send emails immediately in FAST-MACHINE, there are no queue consumers in that environment.
+    "immediate": ITOU_ENVIRONMENT != ItouEnvironment.FAST_MACHINE,
 }
 
 MAILJET_API_KEY_PRINCIPAL = os.getenv("API_MAILJET_KEY_PRINCIPAL")
