@@ -85,4 +85,6 @@ class UserAdapter(DefaultAccountAdapter):
 
     def send_mail(self, template_prefix, email, context):
         context["itou_environment"] = settings.ITOU_ENVIRONMENT
+        context["itou_protocol"] = settings.ITOU_PROTOCOL
+        context["itou_fqdn"] = settings.ITOU_FQDN
         super().send_mail(template_prefix, email, context)

@@ -6,7 +6,5 @@ Afin de finaliser votre inscription, cliquez sur le lien suivant :
 {{ activate_url }}
 
 Si vous n'êtes pas à l'origine de cette demande, merci de ne pas prendre en compte ce message.
-{% if itou_environment == "DEMO" %}
-[DEMO] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEMO]
-{% endif %}
-emplois.inclusion.beta.gouv.fr{% endautoescape %}
+{% include "layout/base_email_signature.txt" %}
+{% endautoescape %}
