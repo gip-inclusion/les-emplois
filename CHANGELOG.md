@@ -1,5 +1,22 @@
 # Journal des modifications
 
+## 2024-06-24
+
+### Ajouté
+
+- [Employeur: Ajout de marqueurs Matomo sur certains onglets](https://github.com/gip-inclusion/les-emplois/pull/4242)
+- [GEIQ: ajout d'une notification aux DDETS/DREETS lors de la transmission d'un bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/4257)
+- [GEIQ: Bilan d'exécution](https://github.com/gip-inclusion/les-emplois/pull/4110)
+- [GPS : dans la liste des membres d'un groupe, affichage du type de membre](https://github.com/gip-inclusion/les-emplois/pull/4261) 🖼
+
+### Modifié
+
+- [Candidature: Amélioration des transitions d'état](https://github.com/gip-inclusion/les-emplois/pull/4240)
+- [Demandes de prolongation: Gestion des chevauchements de date](https://github.com/gip-inclusion/les-emplois/pull/4251)
+- [GPS : correctif pour les prescripteurs sans organisation](https://github.com/gip-inclusion/les-emplois/pull/4265)
+- [GPS: correction de deux erreurs d'affichage (nom du candidat et nom de l'utilisateur connecté)](https://github.com/gip-inclusion/les-emplois/pull/4263)
+- [UX/UI : Simplification de l’affichage des listes dans les `dropdown`](https://github.com/gip-inclusion/les-emplois/pull/4254)
+
 ## 2024-06-17
 
 ### Ajouté
