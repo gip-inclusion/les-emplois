@@ -1,0 +1,13 @@
+Bonjour,
+
+Suite à une vérification, nous avons constaté qu{{ evaluated_job_apps|pluralize:"’une,e plusieurs" }} de vos auto-prescriptions réalisées au sein de l’entreprise [{{ company.kind }}] {{ company.display_name }} basée à {{ company.city }} enregistrée avec le numéro de siret {{ company.siret }} n’auraient pas dû être soumises au contrôle a posteriori.
+
+Auto-prescription{{ evaluated_job_apps|pluralize }} concernée{{ evaluated_job_apps|pluralize }}:
+{% for evaluated_job_app in evaluated_job_apps %}
+- {{ evaluated_job_app.job_application.job_seeker.get_full_name }}, PASS N°{{ evaluated_job_app.job_application.approval.number }}{% endfor %}
+
+Nous avons donc retiré ces auto-prescriptions de votre dossier de contrôle.
+
+Veuillez nous excuser pour la gêne occasionnée.
+Cordialement,
+L’équipe des emplois de l’inclusion
