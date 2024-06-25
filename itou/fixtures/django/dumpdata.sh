@@ -24,6 +24,8 @@ echo "Dump models data into $FIXTURES_DIRECTORY"
 ./manage.py dumpdata approvals.poleemploiapproval -o "$FIXTURES_DIRECTORY/23_pe_approvals.json"
 ./manage.py dumpdata job_applications.jobapplication -o "$FIXTURES_DIRECTORY/24_job_applications.json"
 ./manage.py dumpdata companies.jobdescription -o "$FIXTURES_DIRECTORY/25_job_descriptions.json"
+./manage.py dumpdata geiq.implementationassessmentcampaign -o "$FIXTURES_DIRECTORY/28_implementation_assessment_campaigns.json"
+./manage.py dumpdata geiq.implementationassessment -o "$FIXTURES_DIRECTORY/29_implementation_assessment.json"
 
 
 for file in $(find "$FIXTURES_DIRECTORY" -iname '*.json' | sort); do

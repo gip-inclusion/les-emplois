@@ -1,0 +1,3270 @@
+[
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3641,
+      "label_id": 3641,
+      "last_synced_at": "2024-06-25T09:41:33.634Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 3
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3642,
+      "label_id": 3642,
+      "last_synced_at": "2024-06-25T09:41:33.638Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 4
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3643,
+      "label_id": 3643,
+      "last_synced_at": "2024-06-25T09:41:33.640Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 5
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3644,
+      "label_id": 3644,
+      "last_synced_at": "2024-06-25T09:41:33.642Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 6
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3645,
+      "label_id": 3645,
+      "last_synced_at": "2024-06-25T09:41:33.643Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 7
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3646,
+      "label_id": 3646,
+      "last_synced_at": "2024-06-25T09:41:33.644Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 8
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3647,
+      "label_id": 3647,
+      "last_synced_at": "2024-06-25T09:41:33.645Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 9
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3648,
+      "label_id": 3648,
+      "last_synced_at": "2024-06-25T09:41:33.646Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 10
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3649,
+      "label_id": 3649,
+      "last_synced_at": "2024-06-25T09:41:33.647Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 11
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3650,
+      "label_id": 3650,
+      "last_synced_at": "2024-06-25T09:41:33.648Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 12
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3651,
+      "label_id": 3651,
+      "last_synced_at": "2024-06-25T09:41:33.649Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 13
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3652,
+      "label_id": 3652,
+      "last_synced_at": "2024-06-25T09:41:33.650Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 14
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3653,
+      "label_id": 3653,
+      "last_synced_at": "2024-06-25T09:41:33.651Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 15
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3654,
+      "label_id": 3654,
+      "last_synced_at": "2024-06-25T09:41:33.652Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 16
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3655,
+      "label_id": 3655,
+      "last_synced_at": "2024-06-25T09:41:33.653Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 17
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3656,
+      "label_id": 3656,
+      "last_synced_at": "2024-06-25T09:41:33.654Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 18
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3657,
+      "label_id": 3657,
+      "last_synced_at": "2024-06-25T09:41:33.655Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 19
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3658,
+      "label_id": 3658,
+      "last_synced_at": "2024-06-25T09:41:33.657Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 20
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3659,
+      "label_id": 3659,
+      "last_synced_at": "2024-06-25T09:41:33.658Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 21
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3660,
+      "label_id": 3660,
+      "last_synced_at": "2024-06-25T09:41:33.659Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 22
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3661,
+      "label_id": 3661,
+      "last_synced_at": "2024-06-25T09:41:33.660Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 23
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3662,
+      "label_id": 3662,
+      "last_synced_at": "2024-06-25T09:41:33.661Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 24
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3663,
+      "label_id": 3663,
+      "last_synced_at": "2024-06-25T09:41:33.662Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 25
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3664,
+      "label_id": 3664,
+      "last_synced_at": "2024-06-25T09:41:33.663Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 26
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3665,
+      "label_id": 3665,
+      "last_synced_at": "2024-06-25T09:41:33.664Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 27
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3666,
+      "label_id": 3666,
+      "last_synced_at": "2024-06-25T09:41:33.665Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 28
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3667,
+      "label_id": 3667,
+      "last_synced_at": "2024-06-25T09:41:33.666Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 29
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3668,
+      "label_id": 3668,
+      "last_synced_at": "2024-06-25T09:41:33.667Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 30
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3669,
+      "label_id": 3669,
+      "last_synced_at": "2024-06-25T09:41:33.668Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 31
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3670,
+      "label_id": 3670,
+      "last_synced_at": "2024-06-25T09:41:33.669Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 32
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3671,
+      "label_id": 3671,
+      "last_synced_at": "2024-06-25T09:41:33.670Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 33
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3672,
+      "label_id": 3672,
+      "last_synced_at": "2024-06-25T09:41:33.671Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 34
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3673,
+      "label_id": 3673,
+      "last_synced_at": "2024-06-25T09:41:33.672Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 35
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3674,
+      "label_id": 3674,
+      "last_synced_at": "2024-06-25T09:41:33.673Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 36
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3675,
+      "label_id": 3675,
+      "last_synced_at": "2024-06-25T09:41:33.674Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 37
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3676,
+      "label_id": 3676,
+      "last_synced_at": "2024-06-25T09:41:33.675Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 38
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3677,
+      "label_id": 3677,
+      "last_synced_at": "2024-06-25T09:41:33.676Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 39
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3678,
+      "label_id": 3678,
+      "last_synced_at": "2024-06-25T09:41:33.677Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 40
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3679,
+      "label_id": 3679,
+      "last_synced_at": "2024-06-25T09:41:33.678Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 41
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3680,
+      "label_id": 3680,
+      "last_synced_at": "2024-06-25T09:41:33.680Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 42
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3681,
+      "label_id": 3681,
+      "last_synced_at": "2024-06-25T09:41:33.681Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 43
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3682,
+      "label_id": 3682,
+      "last_synced_at": "2024-06-25T09:41:33.682Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 44
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3683,
+      "label_id": 3683,
+      "last_synced_at": "2024-06-25T09:41:33.683Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 45
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3684,
+      "label_id": 3684,
+      "last_synced_at": "2024-06-25T09:41:33.684Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 46
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3685,
+      "label_id": 3685,
+      "last_synced_at": "2024-06-25T09:41:33.685Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 47
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3686,
+      "label_id": 3686,
+      "last_synced_at": "2024-06-25T09:41:33.686Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 48
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3687,
+      "label_id": 3687,
+      "last_synced_at": "2024-06-25T09:41:33.687Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 49
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3688,
+      "label_id": 3688,
+      "last_synced_at": "2024-06-25T09:41:33.688Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 50
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3689,
+      "label_id": 3689,
+      "last_synced_at": "2024-06-25T09:41:33.689Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 51
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3690,
+      "label_id": 3690,
+      "last_synced_at": "2024-06-25T09:41:33.690Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 52
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3691,
+      "label_id": 3691,
+      "last_synced_at": "2024-06-25T09:41:33.691Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 53
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3692,
+      "label_id": 3692,
+      "last_synced_at": "2024-06-25T09:41:33.692Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 54
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3693,
+      "label_id": 3693,
+      "last_synced_at": "2024-06-25T09:41:33.693Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 55
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3694,
+      "label_id": 3694,
+      "last_synced_at": "2024-06-25T09:41:33.694Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 56
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3695,
+      "label_id": 3695,
+      "last_synced_at": "2024-06-25T09:41:33.695Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 57
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3696,
+      "label_id": 3696,
+      "last_synced_at": "2024-06-25T09:41:33.696Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 58
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3697,
+      "label_id": 3697,
+      "last_synced_at": "2024-06-25T09:41:33.698Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 59
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3698,
+      "label_id": 3698,
+      "last_synced_at": "2024-06-25T09:41:33.699Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 60
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3699,
+      "label_id": 3699,
+      "last_synced_at": "2024-06-25T09:41:33.700Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 61
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3700,
+      "label_id": 3700,
+      "last_synced_at": "2024-06-25T09:41:33.701Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 62
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3701,
+      "label_id": 3701,
+      "last_synced_at": "2024-06-25T09:41:33.702Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 63
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3702,
+      "label_id": 3702,
+      "last_synced_at": "2024-06-25T09:41:33.703Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 64
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3703,
+      "label_id": 3703,
+      "last_synced_at": "2024-06-25T09:41:33.704Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 65
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3704,
+      "label_id": 3704,
+      "last_synced_at": "2024-06-25T09:41:33.705Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 66
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3705,
+      "label_id": 3705,
+      "last_synced_at": "2024-06-25T09:41:33.706Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 67
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3706,
+      "label_id": 3706,
+      "last_synced_at": "2024-06-25T09:41:33.707Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 68
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3707,
+      "label_id": 3707,
+      "last_synced_at": "2024-06-25T09:41:33.708Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 69
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3708,
+      "label_id": 3708,
+      "last_synced_at": "2024-06-25T09:41:33.709Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 70
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3709,
+      "label_id": 3709,
+      "last_synced_at": "2024-06-25T09:41:33.710Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 71
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3710,
+      "label_id": 3710,
+      "last_synced_at": "2024-06-25T09:41:33.711Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 72
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3711,
+      "label_id": 3711,
+      "last_synced_at": "2024-06-25T09:41:33.712Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 73
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3712,
+      "label_id": 3712,
+      "last_synced_at": "2024-06-25T09:41:33.713Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 74
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3713,
+      "label_id": 3713,
+      "last_synced_at": "2024-06-25T09:41:33.714Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 75
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3714,
+      "label_id": 3714,
+      "last_synced_at": "2024-06-25T09:41:33.716Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 76
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3715,
+      "label_id": 3715,
+      "last_synced_at": "2024-06-25T09:41:33.717Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 77
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3716,
+      "label_id": 3716,
+      "last_synced_at": "2024-06-25T09:41:33.718Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 78
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3717,
+      "label_id": 3717,
+      "last_synced_at": "2024-06-25T09:41:33.719Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 79
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3718,
+      "label_id": 3718,
+      "last_synced_at": "2024-06-25T09:41:33.720Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 80
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3719,
+      "label_id": 3719,
+      "last_synced_at": "2024-06-25T09:41:33.721Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 81
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3720,
+      "label_id": 3720,
+      "last_synced_at": "2024-06-25T09:41:33.722Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 82
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3721,
+      "label_id": 3721,
+      "last_synced_at": "2024-06-25T09:41:33.723Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 83
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3722,
+      "label_id": 3722,
+      "last_synced_at": "2024-06-25T09:41:33.724Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 84
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3723,
+      "label_id": 3723,
+      "last_synced_at": "2024-06-25T09:41:33.725Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 85
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3724,
+      "label_id": 3724,
+      "last_synced_at": "2024-06-25T09:41:33.727Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 86
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3725,
+      "label_id": 3725,
+      "last_synced_at": "2024-06-25T09:41:33.728Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 87
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3726,
+      "label_id": 3726,
+      "last_synced_at": "2024-06-25T09:41:33.729Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 88
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3727,
+      "label_id": 3727,
+      "last_synced_at": "2024-06-25T09:41:33.730Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 89
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3728,
+      "label_id": 3728,
+      "last_synced_at": "2024-06-25T09:41:33.731Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 90
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3729,
+      "label_id": 3729,
+      "last_synced_at": "2024-06-25T09:41:33.732Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 91
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3730,
+      "label_id": 3730,
+      "last_synced_at": "2024-06-25T09:41:33.733Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 92
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3731,
+      "label_id": 3731,
+      "last_synced_at": "2024-06-25T09:41:33.734Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 93
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3732,
+      "label_id": 3732,
+      "last_synced_at": "2024-06-25T09:41:33.736Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 94
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3733,
+      "label_id": 3733,
+      "last_synced_at": "2024-06-25T09:41:33.737Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 95
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3734,
+      "label_id": 3734,
+      "last_synced_at": "2024-06-25T09:41:33.739Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 96
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3735,
+      "label_id": 3735,
+      "last_synced_at": "2024-06-25T09:41:33.740Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 97
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3736,
+      "label_id": 3736,
+      "last_synced_at": "2024-06-25T09:41:33.742Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 98
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3737,
+      "label_id": 3737,
+      "last_synced_at": "2024-06-25T09:41:33.744Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 99
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3738,
+      "label_id": 3738,
+      "last_synced_at": "2024-06-25T09:41:33.745Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 100
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3739,
+      "label_id": 3739,
+      "last_synced_at": "2024-06-25T09:41:33.747Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 101
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3740,
+      "label_id": 3740,
+      "last_synced_at": "2024-06-25T09:41:33.749Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 102
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3741,
+      "label_id": 3741,
+      "last_synced_at": "2024-06-25T09:41:33.751Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 103
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3742,
+      "label_id": 3742,
+      "last_synced_at": "2024-06-25T09:41:33.754Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 104
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3743,
+      "label_id": 3743,
+      "last_synced_at": "2024-06-25T09:41:33.757Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 105
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3744,
+      "label_id": 3744,
+      "last_synced_at": "2024-06-25T09:41:33.760Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 106
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3745,
+      "label_id": 3745,
+      "last_synced_at": "2024-06-25T09:41:33.762Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 107
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3746,
+      "label_id": 3746,
+      "last_synced_at": "2024-06-25T09:41:33.765Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 108
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3747,
+      "label_id": 3747,
+      "last_synced_at": "2024-06-25T09:41:33.767Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 109
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3748,
+      "label_id": 3748,
+      "last_synced_at": "2024-06-25T09:41:33.769Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 110
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3749,
+      "label_id": 3749,
+      "last_synced_at": "2024-06-25T09:41:33.771Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 111
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3750,
+      "label_id": 3750,
+      "last_synced_at": "2024-06-25T09:41:33.772Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 112
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3751,
+      "label_id": 3751,
+      "last_synced_at": "2024-06-25T09:41:33.774Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 113
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3752,
+      "label_id": 3752,
+      "last_synced_at": "2024-06-25T09:41:33.775Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 114
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3753,
+      "label_id": 3753,
+      "last_synced_at": "2024-06-25T09:41:33.776Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 115
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3754,
+      "label_id": 3754,
+      "last_synced_at": "2024-06-25T09:41:33.777Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 116
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3755,
+      "label_id": 3755,
+      "last_synced_at": "2024-06-25T09:41:33.778Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 117
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3756,
+      "label_id": 3756,
+      "last_synced_at": "2024-06-25T09:41:33.778Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 118
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3757,
+      "label_id": 3757,
+      "last_synced_at": "2024-06-25T09:41:33.779Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 119
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3758,
+      "label_id": 3758,
+      "last_synced_at": "2024-06-25T09:41:33.779Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 120
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3759,
+      "label_id": 3759,
+      "last_synced_at": "2024-06-25T09:41:33.780Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 121
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3760,
+      "label_id": 3760,
+      "last_synced_at": "2024-06-25T09:41:33.781Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 122
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3761,
+      "label_id": 3761,
+      "last_synced_at": "2024-06-25T09:41:33.782Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 123
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3762,
+      "label_id": 3762,
+      "last_synced_at": "2024-06-25T09:41:33.783Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 124
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3763,
+      "label_id": 3763,
+      "last_synced_at": "2024-06-25T09:41:33.784Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 125
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3764,
+      "label_id": 3764,
+      "last_synced_at": "2024-06-25T09:41:33.784Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 126
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3765,
+      "label_id": 3765,
+      "last_synced_at": "2024-06-25T09:41:33.785Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 127
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3766,
+      "label_id": 3766,
+      "last_synced_at": "2024-06-25T09:41:33.786Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 128
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3767,
+      "label_id": 3767,
+      "last_synced_at": "2024-06-25T09:41:33.787Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 129
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3768,
+      "label_id": 3768,
+      "last_synced_at": "2024-06-25T09:41:33.788Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 130
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3769,
+      "label_id": 3769,
+      "last_synced_at": "2024-06-25T09:41:33.788Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 131
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3770,
+      "label_id": 3770,
+      "last_synced_at": "2024-06-25T09:41:33.789Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 132
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3771,
+      "label_id": 3771,
+      "last_synced_at": "2024-06-25T09:41:33.790Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 133
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3772,
+      "label_id": 3772,
+      "last_synced_at": "2024-06-25T09:41:33.790Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 134
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3773,
+      "label_id": 3773,
+      "last_synced_at": "2024-06-25T09:41:33.791Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 135
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3774,
+      "label_id": 3774,
+      "last_synced_at": "2024-06-25T09:41:33.792Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 136
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3775,
+      "label_id": 3775,
+      "last_synced_at": "2024-06-25T09:41:33.792Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 137
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3776,
+      "label_id": 3776,
+      "last_synced_at": "2024-06-25T09:41:33.793Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 138
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3777,
+      "label_id": 3777,
+      "last_synced_at": "2024-06-25T09:41:33.794Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 139
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3778,
+      "label_id": 3778,
+      "last_synced_at": "2024-06-25T09:41:33.794Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 140
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3779,
+      "label_id": 3779,
+      "last_synced_at": "2024-06-25T09:41:33.795Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 141
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3780,
+      "label_id": 3780,
+      "last_synced_at": "2024-06-25T09:41:33.795Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 142
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3781,
+      "label_id": 3781,
+      "last_synced_at": "2024-06-25T09:41:33.796Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 143
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3782,
+      "label_id": 3782,
+      "last_synced_at": "2024-06-25T09:41:33.797Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 144
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3783,
+      "label_id": 3783,
+      "last_synced_at": "2024-06-25T09:41:33.797Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 145
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3784,
+      "label_id": 3784,
+      "last_synced_at": "2024-06-25T09:41:33.798Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 146
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3785,
+      "label_id": 3785,
+      "last_synced_at": "2024-06-25T09:41:33.799Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 147
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3786,
+      "label_id": 3786,
+      "last_synced_at": "2024-06-25T09:41:33.799Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 148
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3787,
+      "label_id": 3787,
+      "last_synced_at": "2024-06-25T09:41:33.800Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 149
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3788,
+      "label_id": 3788,
+      "last_synced_at": "2024-06-25T09:41:33.801Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 150
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3789,
+      "label_id": 3789,
+      "last_synced_at": "2024-06-25T09:41:33.801Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 151
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3790,
+      "label_id": 3790,
+      "last_synced_at": "2024-06-25T09:41:33.802Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 152
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3791,
+      "label_id": 3791,
+      "last_synced_at": "2024-06-25T09:41:33.803Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 153
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3792,
+      "label_id": 3792,
+      "last_synced_at": "2024-06-25T09:41:33.803Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 154
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3793,
+      "label_id": 3793,
+      "last_synced_at": "2024-06-25T09:41:33.804Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 155
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3794,
+      "label_id": 3794,
+      "last_synced_at": "2024-06-25T09:41:33.805Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 156
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3795,
+      "label_id": 3795,
+      "last_synced_at": "2024-06-25T09:41:33.805Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 157
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3796,
+      "label_id": 3796,
+      "last_synced_at": "2024-06-25T09:41:33.806Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 158
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3797,
+      "label_id": 3797,
+      "last_synced_at": "2024-06-25T09:41:33.806Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 159
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3798,
+      "label_id": 3798,
+      "last_synced_at": "2024-06-25T09:41:33.807Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 160
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3799,
+      "label_id": 3799,
+      "last_synced_at": "2024-06-25T09:41:33.808Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 161
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3800,
+      "label_id": 3800,
+      "last_synced_at": "2024-06-25T09:41:33.808Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 162
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3801,
+      "label_id": 3801,
+      "last_synced_at": "2024-06-25T09:41:33.809Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 163
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3802,
+      "label_id": 3802,
+      "last_synced_at": "2024-06-25T09:41:33.809Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 164
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3803,
+      "label_id": 3803,
+      "last_synced_at": "2024-06-25T09:41:33.810Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 165
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3804,
+      "label_id": 3804,
+      "last_synced_at": "2024-06-25T09:41:33.810Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 166
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3805,
+      "label_id": 3805,
+      "last_synced_at": "2024-06-25T09:41:33.811Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 167
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3806,
+      "label_id": 3806,
+      "last_synced_at": "2024-06-25T09:41:33.812Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 168
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3807,
+      "label_id": 3807,
+      "last_synced_at": "2024-06-25T09:41:33.812Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 169
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3808,
+      "label_id": 3808,
+      "last_synced_at": "2024-06-25T09:41:33.813Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 170
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3809,
+      "label_id": 3809,
+      "last_synced_at": "2024-06-25T09:41:33.814Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 171
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3810,
+      "label_id": 3810,
+      "last_synced_at": "2024-06-25T09:41:33.814Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 172
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3811,
+      "label_id": 3811,
+      "last_synced_at": "2024-06-25T09:41:33.815Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 173
+  },
+  {
+    "fields": {
+      "activity_report_file": null,
+      "campaign": 1,
+      "company": 3851,
+      "label_id": 3851,
+      "last_synced_at": "2024-06-25T09:41:33.815Z",
+      "other_data": {},
+      "review_comment": "",
+      "review_institution": null,
+      "review_state": null,
+      "reviewed_at": null,
+      "reviewed_by": null,
+      "submitted_at": null,
+      "submitted_by": null
+    },
+    "model": "geiq.implementationassessment",
+    "pk": 174
+  }
+]
