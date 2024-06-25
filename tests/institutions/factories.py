@@ -14,7 +14,7 @@ class InstitutionFactory(factory.django.DjangoModelFactory):
 
     name = factory.Faker("name", locale="fr_FR")
     kind = InstitutionKind.DDETS_IAE
-    department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
+    department = factory.Iterator(DEPARTMENTS.keys())
 
 
 class InstitutionMembershipFactory(factory.django.DjangoModelFactory):
