@@ -472,7 +472,7 @@ HUEY = {
         "worker_type": "thread",
     },
     # Send emails immediately in FAST-MACHINE, there are no queue consumers in that environment.
-    "immediate": ITOU_ENVIRONMENT != ItouEnvironment.FAST_MACHINE,
+    "immediate": ITOU_ENVIRONMENT == ItouEnvironment.FAST_MACHINE,
 }
 
 MAILJET_API_KEY_PRINCIPAL = os.getenv("API_MAILJET_KEY_PRINCIPAL")
