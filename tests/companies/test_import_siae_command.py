@@ -216,7 +216,7 @@ class ImportSiaeManagementCommandsTest(TestCase):
         assert len(mail.outbox) == 6
         assert reverse("signup:company_select") in mail.outbox[0].body
         assert collections.Counter(mail.subject for mail in mail.outbox) == collections.Counter(
-            f"Activez le compte de votre {kind} {name} sur les emplois de l'inclusion"
+            f"[DEV] Activez le compte de votre {kind} {name} sur les emplois de l'inclusion"
             for (kind, name) in Company.objects.values_list("kind", "name")
         )
 

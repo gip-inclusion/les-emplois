@@ -2409,7 +2409,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mail.outbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "Notification de sanction"
+        assert email.subject == "[DEV] Notification de sanction"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -2465,7 +2465,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mail.outbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "Notification de sanction"
+        assert email.subject == "[DEV] Notification de sanction"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -2799,7 +2799,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mail.outbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "Notification de sanction"
+        assert email.subject == "[DEV] Notification de sanction"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -2910,7 +2910,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mail.outbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "Notification de sanction"
+        assert email.subject == "[DEV] Notification de sanction"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -3057,7 +3057,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mail.outbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "Notification de sanction"
+        assert email.subject == "[DEV] Notification de sanction"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -3118,7 +3118,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mail.outbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "Notification de sanction"
+        assert email.subject == "[DEV] Notification de sanction"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -3175,7 +3175,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mail.outbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "Notification de sanction"
+        assert email.subject == "[DEV] Notification de sanction"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "
@@ -3234,7 +3234,7 @@ class InstitutionEvaluatedSiaeNotifyViewStep3Test(InstitutionEvaluatedSiaeNotify
         assert evaluated_siae.notification_text == "A envoyé une photo de son chat."
         [email] = mail.outbox
         assert email.to == ["siae@mailinator.com"]
-        assert email.subject == "Notification de sanctions"
+        assert email.subject == "[DEV] Notification de sanctions"
         assert email.body == (
             "Bonjour,\n\n"
             "Suite aux manquements constatés lors du dernier contrôle a posteriori des auto-prescriptions réalisées "

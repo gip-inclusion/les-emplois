@@ -7,6 +7,7 @@ from django.template.loader import get_template
 
 from itou.utils import constants as global_constants
 from itou.utils.context_processors import expose_enums
+from itou.utils.enums import ItouEnvironment
 
 
 def remove_extra_line_breaks(text):
@@ -32,7 +33,11 @@ def get_email_text_template(template, context):
 
 
 def get_email_message(to, context, subject, body, from_email=settings.DEFAULT_FROM_EMAIL, bcc=None, cc=None):
-    subject_prefix = "[DEMO] " if settings.ITOU_ENVIRONMENT == "DEMO" else ""
+    subject_prefix = (
+        ""
+        if settings.ITOU_ENVIRONMENT in (ItouEnvironment.PROD, ItouEnvironment.FAST_MACHINE)
+        else f"[{settings.ITOU_ENVIRONMENT}] "
+    )
     # Mailjet max subject length is 255
     subject = textwrap.shorten(
         subject_prefix + get_email_text_template(subject, context), width=250, placeholder="..."

@@ -234,7 +234,7 @@ class JobApplicationTransferModelTest(TestCase):
 
         assert len(mail.outbox[0].to) == 1
         assert origin_user.email in mail.outbox[0].to
-        assert f"La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[0].subject
+        assert f"[DEV] La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[0].subject
         assert "a transféré la candidature de :" in mail.outbox[0].body
 
         assert len(mail.outbox[1].to) == 1
@@ -268,7 +268,7 @@ class JobApplicationTransferModelTest(TestCase):
         # Focusing on prescriber email content
         assert len(mail.outbox[2].to) == 1
         assert job_application.sender.email in mail.outbox[2].to
-        assert f"La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[2].subject
+        assert f"[DEV] La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[2].subject
         assert "a transféré la candidature de :" in mail.outbox[2].body
 
     def test_transfer_notifications_to_many_employers(self):
@@ -297,8 +297,8 @@ class JobApplicationTransferModelTest(TestCase):
         assert first_mail_to != second_mail_to
         assert first_mail_to in [origin_user_1.email, origin_user_2.email]
         assert second_mail_to in [origin_user_1.email, origin_user_2.email]
-        assert f"La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[0].subject
-        assert f"La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[1].subject
+        assert f"[DEV] La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[0].subject
+        assert f"[DEV] La candidature de {job_seeker.get_full_name()} a été transférée" == mail.outbox[1].subject
         assert "a transféré la candidature de :" in mail.outbox[0].body
         assert "a transféré la candidature de :" in mail.outbox[1].body
-        assert "Votre candidature a été transférée à une autre structure" == mail.outbox[2].subject
+        assert "[DEV] Votre candidature a été transférée à une autre structure" == mail.outbox[2].subject
