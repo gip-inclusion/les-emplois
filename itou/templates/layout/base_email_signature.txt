@@ -1,4 +1,4 @@
 ---
-{% if itou_environment != "PROD" %}[{{ itou_environment }}] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [{{ itou_environment }}]{% endif %}
+{% if itou_environment != "PROD" and itou_environment != "FAST-MACHINE" %}[{{ itou_environment }}] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [{{ itou_environment }}]{% endif %}
 Les emplois de l'inclusion
 {{ itou_protocol }}://{{ itou_fqdn }}
