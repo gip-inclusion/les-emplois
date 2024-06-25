@@ -19,3 +19,7 @@ class CompanyToken(models.Model):
     class Meta:
         verbose_name = "jeton d'API entreprise"
         verbose_name_plural = "jetons d'API entreprise"
+
+    def datadog_info(self):
+        """Method returning the token representation in our Datadog logs (no secret here!)"""
+        return f"CompanyToken-{self.pk}"

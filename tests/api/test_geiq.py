@@ -1,3 +1,7 @@
+import io
+import logging
+from unittest.mock import patch
+
 import pytest
 from django.urls import reverse
 from freezegun import freeze_time
@@ -235,3 +239,20 @@ def test_criteres_eligibilite():
     zrr_crit = GEIQAdministrativeCriteria.objects.get(slug="resident-zrr")
     job_application.geiq_eligibility_diagnosis.administrative_criteria.add(zrr_crit)
     assert serializer.get_criteres_eligibilite(job_application) == ["QPV/ZRR", "RSA", "ZRR"]
+
+
+def test_log_token_datadog_info():
+    token = CompanyToken.objects.create(label="test-token")
+    api_client = APIClient(headers={"Authorization": f"Token {token.key}"})
+
+    root_logger = logging.getLogger()
+    stream_handler = root_logger.handlers[0]
+    assert isinstance(stream_handler, logging.StreamHandler)
+    with io.StringIO() as captured:
+        # caplog cannot be used since the organization_id is written by the log formatter
+        # capsys/capfd did not want to work because https://github.com/pytest-dev/pytest/issues/5997
+        with patch.object(stream_handler, "stream", captured):
+            response = api_client.get(reverse("v1:geiq_jobapplication_list"))
+        assert response.status_code == 200
+        # Check that the organization_id is properly logged to stdout
+        assert f'"token": "CompanyToken-{token.pk}"' in captured.getvalue()
