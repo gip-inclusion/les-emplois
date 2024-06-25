@@ -50,7 +50,7 @@
   '''
 # ---
 # name: test_prolongation_request_created[subject]
-  'Demande de prolongation du PASS IAE de Jane DOE'
+  '[DEV] Demande de prolongation du PASS IAE de Jane DOE'
 # ---
 # name: test_prolongation_request_created_reminder[body]
   '''
@@ -109,7 +109,7 @@
   '''
 # ---
 # name: test_prolongation_request_created_reminder[subject]
-  'Relance - Demande de prolongation du PASS IAE de Jane DOE'
+  '[DEV] Relance - Demande de prolongation du PASS IAE de Jane DOE'
 # ---
 # name: test_prolongation_request_denied_employer[body]
   '''
@@ -144,7 +144,7 @@
   '''
 # ---
 # name: test_prolongation_request_denied_employer[subject]
-  'Prolongation du PASS IAE de Jane DOE refusée'
+  '[DEV] Prolongation du PASS IAE de Jane DOE refusée'
 # ---
 # name: test_prolongation_request_denied_jobseeker[body]
   '''
@@ -177,7 +177,7 @@
   '''
 # ---
 # name: test_prolongation_request_denied_jobseeker[subject]
-  'Prolongation de votre PASS IAE refusée'
+  '[DEV] Prolongation de votre PASS IAE refusée'
 # ---
 # name: test_prolongation_request_granted_employer[body]
   '''
@@ -198,7 +198,7 @@
   '''
 # ---
 # name: test_prolongation_request_granted_employer[subject]
-  'Prolongation du PASS IAE de Jane DOE acceptée'
+  '[DEV] Prolongation du PASS IAE de Jane DOE acceptée'
 # ---
 # name: test_prolongation_request_granted_jobseeker[body]
   '''
@@ -217,5 +217,5 @@
   '''
 # ---
 # name: test_prolongation_request_granted_jobseeker[subject]
-  'Prolongation de votre PASS IAE acceptée'
+  '[DEV] Prolongation de votre PASS IAE acceptée'
 # ---

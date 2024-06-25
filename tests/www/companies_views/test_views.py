@@ -945,7 +945,7 @@ class UserMembershipDeactivationTest(TestCase):
         # User must have been notified of deactivation (we're human after all)
         assert len(mail.outbox) == 1
         email = mail.outbox[0]
-        assert f"[Désactivation] Vous n'êtes plus membre de {company.display_name}" == email.subject
+        assert f"[DEV] [Désactivation] Vous n'êtes plus membre de {company.display_name}" == email.subject
         assert "Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion" in email.body
         assert email.to[0] == guest.email
 

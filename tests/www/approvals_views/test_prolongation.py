@@ -356,7 +356,7 @@ class ApprovalProlongationTest(TestCase):
 
         [email] = mail.outbox
         assert email.to == [post_data["email"]]
-        assert email.subject == f"Demande de prolongation du PASS IAE de {self.approval.user.get_full_name()}"
+        assert email.subject == f"[DEV] Demande de prolongation du PASS IAE de {self.approval.user.get_full_name()}"
         assert (
             reverse(
                 "approvals:prolongation_request_report_file",

@@ -531,34 +531,36 @@ class EvaluationCampaignManagerTest(TestCase):
             institution_email,
         ] = sorted(mail.outbox, key=lambda mail: mail.subject)
         assert (
-            siae_refused_email.subject == f"Résultat du contrôle - EI Geo refused ID-{evaluated_siae_refused.siae_id}"
+            siae_refused_email.subject
+            == f"[DEV] Résultat du contrôle - EI Geo refused ID-{evaluated_siae_refused.siae_id}"
         )
         assert siae_refused_email.body == self.snapshot(name="refused review email body")
 
         assert (
             siae_accepted_email.subject
-            == f"Résultat du contrôle - EI Geo accepted ID-{evaluated_siae_accepted.siae_id}"
+            == f"[DEV] Résultat du contrôle - EI Geo accepted ID-{evaluated_siae_accepted.siae_id}"
         )
         assert siae_accepted_email.body == self.snapshot(name="accepted review email body")
 
         assert (
             siae_no_response_email.subject
-            == f"Résultat du contrôle - EI Les grands jardins ID-{evaluated_siae_no_response.siae_id}"
+            == f"[DEV] Résultat du contrôle - EI Les grands jardins ID-{evaluated_siae_no_response.siae_id}"
         )
         assert siae_no_response_email.body == self.snapshot(name="no response email body")
 
         assert (
             siae_no_docs_email.subject
-            == f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae_no_docs.siae_id}"
+            == f"[DEV] Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae_no_docs.siae_id}"
         )
         assert siae_no_docs_email.body == self.snapshot(name="no docs email body")
 
         assert (
-            siae_force_accepted.subject == f"Résultat du contrôle - EI Prim’vert ID-{evaluated_siae_submitted.siae_id}"
+            siae_force_accepted.subject
+            == f"[DEV] Résultat du contrôle - EI Prim’vert ID-{evaluated_siae_submitted.siae_id}"
         )
         assert siae_force_accepted.body == self.snapshot(name="force accepted email body")
 
-        assert institution_email.subject == "[Contrôle a posteriori] Passage en phase contradictoire"
+        assert institution_email.subject == "[DEV] [Contrôle a posteriori] Passage en phase contradictoire"
         assert institution_email.body == self.snapshot(name="institution summary email body")
 
     @freeze_time("2023-01-02 11:11:11")
@@ -581,11 +583,11 @@ class EvaluationCampaignManagerTest(TestCase):
         [siae_no_response_email, institution_email] = sorted(mail.outbox, key=lambda mail: mail.subject)
         assert (
             siae_no_response_email.subject
-            == f"Résultat du contrôle - EI Les grands jardins ID-{evaluated_siae_no_response.siae_id}"
+            == f"[DEV] Résultat du contrôle - EI Les grands jardins ID-{evaluated_siae_no_response.siae_id}"
         )
         assert siae_no_response_email.body == self.snapshot(name="no response email body")
 
-        assert institution_email.subject == "[Contrôle a posteriori] Passage en phase contradictoire"
+        assert institution_email.subject == "[DEV] [Contrôle a posteriori] Passage en phase contradictoire"
         assert institution_email.body == self.snapshot(name="institution summary email body")
 
     @freeze_time("2023-01-02 11:11:11")
@@ -614,9 +616,9 @@ class EvaluationCampaignManagerTest(TestCase):
         assert evaluated_siae_submitted.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
 
         [siae_email, institution_email] = mail.outbox
-        assert institution_email.subject == "[Contrôle a posteriori] Passage en phase contradictoire"
+        assert institution_email.subject == "[DEV] [Contrôle a posteriori] Passage en phase contradictoire"
         assert institution_email.body == self.snapshot(name="institution summary email body")
-        assert siae_email.subject == f"Résultat du contrôle - EI Prim’vert ID-{evaluated_siae_submitted.siae_id}"
+        assert siae_email.subject == f"[DEV] Résultat du contrôle - EI Prim’vert ID-{evaluated_siae_submitted.siae_id}"
         assert siae_email.body == self.snapshot(name="force accepted email body")
 
     @freeze_time("2023-01-02 11:11:11")
@@ -647,7 +649,7 @@ class EvaluationCampaignManagerTest(TestCase):
         assert evaluated_siae_submitted.state == evaluation_enums.EvaluatedSiaeState.ACCEPTED
 
         [siae_email] = mail.outbox
-        assert siae_email.subject == f"Résultat du contrôle - EI Prim’vert ID-{evaluated_siae_submitted.siae_id}"
+        assert siae_email.subject == f"[DEV] Résultat du contrôle - EI Prim’vert ID-{evaluated_siae_submitted.siae_id}"
         assert siae_email.body == self.snapshot(name="positive review email body")
 
     @freeze_time("2023-01-02 11:11:11")
@@ -675,7 +677,7 @@ class EvaluationCampaignManagerTest(TestCase):
         assert evaluated_siae_submitted.state == evaluation_enums.EvaluatedSiaeState.ADVERSARIAL_STAGE
 
         [siae_email] = mail.outbox
-        assert siae_email.subject == f"Résultat du contrôle - EI Prim’vert ID-{evaluated_siae_submitted.siae_id}"
+        assert siae_email.subject == f"[DEV] Résultat du contrôle - EI Prim’vert ID-{evaluated_siae_submitted.siae_id}"
         assert siae_email.body == self.snapshot(name="negative review email body")
 
     def test_close_no_response(self):
@@ -700,14 +702,14 @@ class EvaluationCampaignManagerTest(TestCase):
         [siae_email, institution_email] = mail.outbox
         assert siae_email.to == list(evaluated_siae.siae.active_admin_members.values_list("email", flat=True))
         assert siae_email.subject == (
-            "[Contrôle a posteriori] "
+            "[DEV] [Contrôle a posteriori] "
             f"Absence de réponse de la structure EI Les petits jardins ID-{evaluated_siae.siae_id}"
         )
         assert siae_email.body == self.snapshot(name="no docs email body")
         assert sorted(institution_email.to) == sorted(
             evaluation_campaign.institution.active_members.values_list("email", flat=True)
         )
-        assert institution_email.subject == "[Contrôle a posteriori] Notification des sanctions"
+        assert institution_email.subject == "[DEV] [Contrôle a posteriori] Notification des sanctions"
         assert institution_email.body == self.snapshot(name="sanction notification email body")
 
         with self.captureOnCommitCallbacks(execute=True):
@@ -749,7 +751,8 @@ class EvaluationCampaignManagerTest(TestCase):
         [accepted_siae_email] = mail.outbox
         assert accepted_siae_email.to == list(evaluated_siae.siae.active_admin_members.values_list("email", flat=True))
         assert (
-            accepted_siae_email.subject == f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}"
+            accepted_siae_email.subject
+            == f"[DEV] Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}"
         )
         assert accepted_siae_email.body == self.snapshot(name="accepted email body")
 
@@ -793,14 +796,15 @@ class EvaluationCampaignManagerTest(TestCase):
         [refused_siae_email, institution_email] = mail.outbox
         assert refused_siae_email.to == list(evaluated_siae.siae.active_admin_members.values_list("email", flat=True))
         assert (
-            refused_siae_email.subject == f"Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}"
+            refused_siae_email.subject
+            == f"[DEV] Résultat du contrôle - EI Les petits jardins ID-{evaluated_siae.siae_id}"
         )
         assert refused_siae_email.body == self.snapshot(name="refused email body")
 
         assert sorted(institution_email.to) == sorted(
             evaluation_campaign.institution.active_members.values_list("email", flat=True)
         )
-        assert institution_email.subject == "[Contrôle a posteriori] Notification des sanctions"
+        assert institution_email.subject == "[DEV] [Contrôle a posteriori] Notification des sanctions"
         assert institution_email.body == self.snapshot(name="sanction notification email body")
 
         with self.captureOnCommitCallbacks(execute=True):

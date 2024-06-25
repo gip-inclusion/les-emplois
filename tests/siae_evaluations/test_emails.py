@@ -39,7 +39,7 @@ class TestInstitutionEmailFactory:
 
         assert email.to == list(u.email for u in evaluated_siae.siae.active_admin_members)
         assert email.subject == (
-            "Contrôle a posteriori sur vos embauches réalisées "
+            "[DEV] Contrôle a posteriori sur vos embauches réalisées "
             + f"du {dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_start_at, 'd E Y')} "
             + f"au {dateformat.format(evaluated_siae.evaluation_campaign.evaluated_period_end_at, 'd E Y')}"
         )
@@ -85,10 +85,10 @@ class TestInstitutionEmailFactory:
         [siae_refused_email, institution_email] = mailoutbox
 
         assert sorted(institution_email.to) == sorted(institution.active_members.values_list("email", flat=True))
-        assert institution_email.subject == "[Contrôle a posteriori] Notification des sanctions"
+        assert institution_email.subject == "[DEV] [Contrôle a posteriori] Notification des sanctions"
         assert institution_email.body == self.snapshot(name="sanction notification email")
 
-        assert siae_refused_email.subject == "Résultat du contrôle - EI les petits jardins ID-1000"
+        assert siae_refused_email.subject == "[DEV] Résultat du contrôle - EI les petits jardins ID-1000"
         assert siae_refused_email.body == self.snapshot(name="refused result email")
 
     def test_close_does_not_notify_when_siae_has_been_notified(self, django_capture_on_commit_callbacks, mailoutbox):
@@ -140,7 +140,7 @@ class TestInstitutionEmailFactory:
             campaign.close()
 
         [siae_accepted_email] = mailoutbox
-        assert siae_accepted_email.subject == "Résultat du contrôle - EI les petits jardins ID-1000"
+        assert siae_accepted_email.subject == "[DEV] Résultat du contrôle - EI les petits jardins ID-1000"
         assert siae_accepted_email.body == self.snapshot(name="accepted result email")
 
     def test_close_does_not_notify_when_siae_has_positive_result_in_amicable_phase(

@@ -87,7 +87,7 @@ class TestManagementCommand:
         # EvaluatedSiae are not ordered.
         [mail1, mail2, mail3] = sorted(mailoutbox, key=lambda mail: (mail.subject, mail.body))
         assert mail1.subject == (
-            "Contrôle a posteriori des auto-prescriptions : "
+            "[DEV] Contrôle a posteriori des auto-prescriptions : "
             "Plus que quelques jours pour transmettre vos justificatifs à la DDETS 01"
         )
         assert (
@@ -103,7 +103,7 @@ class TestManagementCommand:
             f"http://localhost:8000/siae_evaluation/siae_job_applications_list/{evaluated_company_1.pk}/" in mail1.body
         )
         assert mail2.subject == (
-            "Contrôle a posteriori des auto-prescriptions : "
+            "[DEV] Contrôle a posteriori des auto-prescriptions : "
             "Plus que quelques jours pour transmettre vos justificatifs à la DDETS 02"
         )
         assert (
@@ -119,7 +119,7 @@ class TestManagementCommand:
             f"http://localhost:8000/siae_evaluation/siae_job_applications_list/{evaluated_company_2.pk}/" in mail2.body
         )
         assert mail3.subject == (
-            "Contrôle a posteriori des auto-prescriptions : "
+            "[DEV] Contrôle a posteriori des auto-prescriptions : "
             "Plus que quelques jours pour transmettre vos justificatifs à la DDETS 02"
         )
         assert (
@@ -157,7 +157,7 @@ class TestManagementCommand:
         assert stderr == ""
         [mail] = mailoutbox
         assert mail.subject == (
-            "Contrôle a posteriori des auto-prescriptions : "
+            "[DEV] Contrôle a posteriori des auto-prescriptions : "
             "Plus que quelques jours pour transmettre vos justificatifs à la DDETS 01"
         )
         assert (
@@ -291,7 +291,7 @@ class TestManagementCommand:
             # EvaluatedSiae are not ordered, email order is not deterministic.
             mail2, mail1 = mail1, mail2
         assert mail1.subject == (
-            "Contrôle a posteriori des auto-prescriptions : "
+            "[DEV] Contrôle a posteriori des auto-prescriptions : "
             "Plus que quelques jours pour transmettre vos justificatifs à la DDETS 01"
         )
         assert (
@@ -308,7 +308,7 @@ class TestManagementCommand:
             in mail1.body
         )
         assert mail2.subject == (
-            "Contrôle a posteriori des auto-prescriptions : "
+            "[DEV] Contrôle a posteriori des auto-prescriptions : "
             "Plus que quelques jours pour transmettre vos justificatifs à la DDETS 01"
         )
         assert (
@@ -392,7 +392,7 @@ class TestManagementCommand:
             # EvaluatedSiae are not ordered, email order is not deterministic.
             mail2, mail1 = mail1, mail2
         assert mail1.subject == (
-            "Contrôle a posteriori des auto-prescriptions : "
+            "[DEV] Contrôle a posteriori des auto-prescriptions : "
             "Plus que quelques jours pour transmettre vos justificatifs à la DDETS 01"
         )
         assert (
@@ -409,7 +409,7 @@ class TestManagementCommand:
             in mail1.body
         )
         assert mail2.subject == (
-            "Contrôle a posteriori des auto-prescriptions : "
+            "[DEV] Contrôle a posteriori des auto-prescriptions : "
             "Plus que quelques jours pour transmettre vos justificatifs à la DDETS 01"
         )
         assert (
@@ -512,7 +512,8 @@ class TestManagementCommand:
         assert stderr == ""
         [email] = mailoutbox
         assert (
-            email.subject == "[Contrôle a posteriori] Contrôle des justificatifs à réaliser avant la clôture de phase"
+            email.subject
+            == "[DEV] [Contrôle a posteriori] Contrôle des justificatifs à réaliser avant la clôture de phase"
         )
 
     @freeze_time("2023-01-18 11:11:11")
@@ -536,7 +537,8 @@ class TestManagementCommand:
         assert stderr == ""
         [email] = mailoutbox
         assert (
-            email.subject == "[Contrôle a posteriori] Contrôle des justificatifs à réaliser avant la clôture de phase"
+            email.subject
+            == "[DEV] [Contrôle a posteriori] Contrôle des justificatifs à réaliser avant la clôture de phase"
         )
 
     @freeze_time("2023-01-18 11:11:11")
@@ -602,7 +604,7 @@ class TestManagementCommand:
         assert stdout == "Reminded “DDETS 01” to control SIAE during the submission freeze.\n"
         assert stderr == ""
         [email] = mailoutbox
-        assert email.subject == "[Contrôle a posteriori] Rappel : Contrôle des justificatifs à finaliser"
+        assert email.subject == "[DEV] [Contrôle a posteriori] Rappel : Contrôle des justificatifs à finaliser"
         assert email.body == snapshot()
 
     @freeze_time("2023-01-18 11:11:11")
