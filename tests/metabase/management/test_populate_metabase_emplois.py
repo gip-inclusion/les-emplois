@@ -447,6 +447,7 @@ def test_populate_job_applications():
                 "Nouvelle candidature",
                 "Orienteur",
                 "Orienteur sans organisation",
+                None,
                 "default",
                 None,
                 None,
