@@ -1,5 +1,6 @@
 {% extends "admin/base.html" %}
 {% load static %}
+{% load theme_inclusion %}
 
 {% block title %}{{ title }} | Les emplois de l'inclusion{% endblock %}
 
@@ -12,6 +13,7 @@
 {% block nav-global %}{% endblock %}
 
 {% block extrahead %}
+    <link rel="shortcut icon" href="{% static_theme_images "favicon.ico" %}" type="image/ico">
     <style>
         input[type=radio] {
             -webkit-appearance: none;
