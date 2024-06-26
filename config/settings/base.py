@@ -685,3 +685,10 @@ GPS_GROUPS_CREATED_AT_DATE = datetime.date(2024, 6, 12)
 API_DATADOG_BASE_URL = "https://api.datadoghq.eu/api/v2"
 API_DATADOG_API_KEY = os.getenv("API_DATADOG_API_KEY", None)
 API_DATADOG_APPLICATION_KEY = os.getenv("API_DATADOG_APPLICATION_KEY", None)
+
+# RDV-I/S
+# ------------------------------------------------------------------------------
+RDV_SOLIDARITES_API_BASE_URL = os.getenv("RDV_SOLIDARITES_API_BASE_URL")
+RDV_SOLIDARITES_EMAIL = os.getenv("RDV_SOLIDARITES_EMAIL")
+RDV_SOLIDARITES_PASSWORD = os.getenv("RDV_SOLIDARITES_PASSWORD")
+RDV_SOLIDARITES_TOKEN_EXPIRY = os.getenv("RDV_SOLIDARITES_TOKEN_EXPIRY", 86000)  # Token expires after 24h (86400s)
