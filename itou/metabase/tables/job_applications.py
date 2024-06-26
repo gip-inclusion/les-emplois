@@ -152,6 +152,12 @@ TABLE.add_columns(
             "fn": get_job_application_detailed_origin,
         },
         {
+            "name": "origine_id_structure",
+            "type": "integer",
+            "comment": "ID de la structure d'origine de la candidature",
+            "fn": lambda o: o.sender_company_id,
+        },
+        {
             "name": "parcours_de_création",
             "type": "varchar",
             "comment": (
