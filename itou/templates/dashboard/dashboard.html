@@ -179,6 +179,15 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
     {% endif %}
+
+    {% if user.is_prescriber or user.is_employer %}
+        <div class="alert alert-info alert-dismissible-once fade show d-none" role="status" id="GPS_banner">
+            <p class="mb-0">
+                Une nouvelle entrée dans votre tableau de bord vous permet de visualiser l’ensemble des intervenants auprès des personnes pour lesquelles vous avez réalisé une action. Il s’agit de l’encart GPS (Guide de Partage et de Suivi).
+            </p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        </div>
+    {% endif %}
 {% endblock %}
 
 {% block content_title %}
