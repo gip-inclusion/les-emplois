@@ -81,10 +81,10 @@
                                     <div>
                                         {% with membership.nb_members|add:"-1" as counter %}
                                             <div>
-                                                {# Don't let djlint add a newline before the . or it will add a space after référent and . #}
                                                 {% if not membership.is_from_bulk_creation %}
                                                     <div>
                                                         {# djlint:off #}
+                                                        {# Don't let djlint add a newline before the . or it will add a space after référent and . #}
                                                         Vous avez ajouté ce bénéficiaire le <strong>{{ membership.created_at|date:"d/m/Y" }}</strong>{% if membership.is_referent %} et êtes <strong>référent</strong>{% endif %}.{# djlint:on #}
                                                     </div>
                                                 {% elif membership.is_referent %}
