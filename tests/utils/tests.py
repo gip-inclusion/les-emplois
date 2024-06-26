@@ -686,29 +686,38 @@ class UtilsTemplateTagsTestCase(TestCase):
     def test_redirection_input_field(self):
         name = "next"
         value = reverse("search:employers_home")
+        template = Template(
+            """
+            {% load redirection_fields %}
+            {% redirection_input_field value=redirect_field_value %}
+            """
+        )
+        context = {"redirect_field_value": value}
+        out = template.render(Context(context)).strip()
+        expected = f'<input type="hidden" name="{name}" value="{value}">'
+        assert out == expected
 
-        # Redirection value.
+    def test_redirection_input_field_escapes_value(self):
+        value = '<script>alert("XSS");</script>'
         context = {"redirect_field_value": value}
         template = Template(
             """
             {% load redirection_fields %}
             {% redirection_input_field value=redirect_field_value %}
-        """
+            """
         )
         out = template.render(Context(context)).strip()
-        expected = f'<input type="hidden" name="{name}" value="{value}">'
+        expected = '<input type="hidden" name="next" value="&lt;script&gt;alert(&quot;XSS&quot;);&lt;/script&gt;">'
         assert out == expected
 
-        # No redirection expected.
+    def test_redirection_input_field_no_redirection(self):
         template = Template(
             """
             {% load redirection_fields %}
             {% redirection_input_field value=redirect_field_value|default:"" %}
-        """
+            """
         )
-        out = template.render(Context()).strip()
-        expected = ""
-        assert out == expected
+        assert template.render(Context({})).strip() == ""
 
     def test_call_method(self):
         """Test `call_method` template tag."""
