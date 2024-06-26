@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
                 ("id", models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
                 (
                     "key",
-                    models.CharField(default=itou.api.models._generate_random_token_uuid, editable=False, unique=True),
+                    models.CharField(default=itou.api.models._generate_key, editable=False, unique=True),
                 ),
                 (
                     "label",

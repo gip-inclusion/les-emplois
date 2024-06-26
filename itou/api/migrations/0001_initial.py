@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 (
                     "key",
                     models.UUIDField(
-                        default=itou.api.models._generate_random_token_uuid,
+                        default=itou.api.models._generate_key,
                         editable=False,
                         primary_key=True,
                         serialize=False,
