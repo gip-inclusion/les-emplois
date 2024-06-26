@@ -4,7 +4,7 @@ https://docs.djangoproject.com/en/dev/howto/custom-template-tags/
 
 from django import template
 from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.utils.safestring import mark_safe
+from django.utils.html import format_html
 
 
 register = template.Library()
@@ -34,5 +34,5 @@ def redirection_input_field(value):
         {% redirection_input_field value=redirect_field_value %}
     """
     if value:
-        return mark_safe(f'<input type="hidden" name="{REDIRECT_FIELD_NAME}" value="{value}">')
+        return format_html('<input type="hidden" name="{}" value="{}">', REDIRECT_FIELD_NAME, value)
     return ""
