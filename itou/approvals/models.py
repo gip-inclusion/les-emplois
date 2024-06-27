@@ -1312,6 +1312,7 @@ class CommonProlongation(models.Model):
     PROLONGATION_RULES = {
         enums.ProlongationReason.SENIOR_CDI: {
             "max_duration": MAX_DURATION,
+            "max_duration_label": "10 ans",
             "max_cumulative_duration": None,
             "help_text": (
                 "Pour le CDI Inclusion, jusqu’à la retraite "
@@ -1320,6 +1321,7 @@ class CommonProlongation(models.Model):
         },
         enums.ProlongationReason.COMPLETE_TRAINING: {
             "max_duration": datetime.timedelta(days=365),
+            "max_duration_label": "12 mois",
             "max_cumulative_duration": None,
             "help_text": mark_safe(
                 "12 mois (365 jours) maximum pour chaque demande.<br> "
@@ -1328,6 +1330,7 @@ class CommonProlongation(models.Model):
         },
         enums.ProlongationReason.RQTH: {
             "max_duration": datetime.timedelta(days=365),
+            "max_duration_label": "12 mois",
             "max_cumulative_duration": datetime.timedelta(days=3 * 365),
             "help_text": mark_safe(
                 "12 mois (365 jours) maximum pour chaque demande.<br> "
@@ -1337,6 +1340,7 @@ class CommonProlongation(models.Model):
         },
         enums.ProlongationReason.SENIOR: {
             "max_duration": datetime.timedelta(days=365),
+            "max_duration_label": "12 mois",
             "max_cumulative_duration": datetime.timedelta(days=5 * 365),
             "help_text": mark_safe(
                 "12 mois (365 jours) maximum pour chaque demande.<br> "
@@ -1346,6 +1350,7 @@ class CommonProlongation(models.Model):
         },
         enums.ProlongationReason.PARTICULAR_DIFFICULTIES: {
             "max_duration": datetime.timedelta(days=365),
+            "max_duration_label": "12 mois",
             "max_cumulative_duration": datetime.timedelta(days=3 * 365),
             "help_text": mark_safe(
                 "12 mois (365 jours) maximum pour chaque demande.<br> "
@@ -1355,6 +1360,7 @@ class CommonProlongation(models.Model):
         },
         enums.ProlongationReason.HEALTH_CONTEXT: {
             "max_duration": datetime.timedelta(days=365),
+            "max_duration_label": "12 mois",
             "max_cumulative_duration": datetime.timedelta(days=365),
             "help_text": "NE PAS UTILISER",  # This value shouldn't appear anywhere but just in case
         },

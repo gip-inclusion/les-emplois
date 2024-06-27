@@ -181,3 +181,15 @@ class JobSeekerAddressAutocompleteWidget(AddressAutocompleteWidget):
 
     class Media:
         js = ["js/address_autocomplete_fields.js"]
+
+
+class RadioSelectWithDisabledChoices(forms.RadioSelect):
+    def __init__(self, attrs=None, choices=(), *, disabled_values=()):
+        super().__init__(attrs=attrs, choices=choices)
+        self.disabled_values = set(disabled_values)
+
+    def create_option(self, name, value, *args, **kwargs):
+        option = super().create_option(name, value, *args, **kwargs)
+        if value in self.disabled_values:
+            option["attrs"]["disabled"] = True
+        return option

@@ -35,6 +35,21 @@
   </div>
   '''
 # ---
+# name: ApprovalProlongationTest.test_end_at_with_existing_prolongation[max_limit_info]
+  '''
+  <div class="c-info mb-3">
+              <button aria-controls="maxEndAtCollapseInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#maxEndAtCollapseInfo" data-bs-toggle="collapse" type="button">
+                  <span>IMPORTANT: La date de fin maximale autorisée pour ce motif est le 22 octobre 2026 afin de respecter la durée légale autorisée</span>
+              </button>
+              <div class="c-info__detail collapse" id="maxEndAtCollapseInfo">
+                  <p>
+                      Il n’est pas possible de sélectionner 12 mois (365 jours) pour cette demande car ce PASS IAE aura atteint la limite des renouvellements possibles.
+                      Retrouvez le détail des conditions dans <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738994643217--Prolonger-un-PASS-IAE" rel="noopener" target="_blank">notre documentation</a>.
+                  </p>
+              </div>
+          </div>
+  '''
+# ---
 # name: ApprovalProlongationTest.test_prolong_approval_view_no_end_at
   '''
   <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_end_at">Du 23/10/2023 au</label><duet-date-picker aria-describedby="id_end_at_helptext" aria-invalid="true" class="is-invalid" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required=""></duet-date-picker>
@@ -48,5 +63,98 @@
   '''
   <div class="form-group form-group-required"><label class="form-label" for="id_end_at">Du 23/10/2023 au</label><duet-date-picker aria-describedby="id_end_at_helptext" class="" identifier="id_end_at" max="2033-10-20" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required="" value="2033-10-20"></duet-date-picker><div class="form-text">Pour le CDI Inclusion, jusqu’à la retraite (pour des raisons techniques, une durée de 10 ans (3650 jours) est appliquée par défaut).</div>
   </div>
+  '''
+# ---
+# name: ApprovalProlongationTest.test_prolongation_approval_view_with_disabled_values[RQTH & SENIOR disabled]
+  '''
+  <div class="form-group form-group-required"><label class="form-label">Motif</label><div class="" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason" hx-swap="outerHTML" hx-target="#mainForm" hx-trigger="change" id="id_reason" required="">
+      
+          
+          
+              <div class="form-check">
+                  <input class="form-check-input" id="id_reason_0" name="reason" type="radio" value="SENIOR_CDI"/>
+                  <label class="form-check-label" for="id_reason_0">CDI conclu avec une personne de plus de 57 ans</label>
+              </div>
+          
+      
+          
+          
+              <div class="form-check">
+                  <input class="form-check-input" id="id_reason_1" name="reason" type="radio" value="COMPLETE_TRAINING"/>
+                  <label class="form-check-label" for="id_reason_1">Fin d'une formation</label>
+              </div>
+          
+      
+          
+          
+              <div class="form-check">
+                  <input class="form-check-input" disabled="" id="id_reason_2" name="reason" type="radio" value="RQTH"/>
+                  <label class="form-check-label" for="id_reason_2">RQTH - Reconnaissance de la qualité de travailleur handicapé</label>
+              </div>
+          
+      
+          
+          
+              <div class="form-check">
+                  <input class="form-check-input" disabled="" id="id_reason_3" name="reason" type="radio" value="SENIOR"/>
+                  <label class="form-check-label" for="id_reason_3">50 ans et plus</label>
+              </div>
+          
+      
+  </div></div>
+  '''
+# ---
+# name: ApprovalProlongationTest.test_prolongation_approval_view_with_disabled_values[RQTH disabled]
+  '''
+  <div class="form-group form-group-required"><label class="form-label">Motif</label><div class="" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason" hx-swap="outerHTML" hx-target="#mainForm" hx-trigger="change" id="id_reason" required="">
+      
+          
+          
+              <div class="form-check">
+                  <input class="form-check-input" id="id_reason_0" name="reason" type="radio" value="SENIOR_CDI"/>
+                  <label class="form-check-label" for="id_reason_0">CDI conclu avec une personne de plus de 57 ans</label>
+              </div>
+          
+      
+          
+          
+              <div class="form-check">
+                  <input class="form-check-input" id="id_reason_1" name="reason" type="radio" value="COMPLETE_TRAINING"/>
+                  <label class="form-check-label" for="id_reason_1">Fin d'une formation</label>
+              </div>
+          
+      
+          
+          
+              <div class="form-check">
+                  <input class="form-check-input" disabled="" id="id_reason_2" name="reason" type="radio" value="RQTH"/>
+                  <label class="form-check-label" for="id_reason_2">RQTH - Reconnaissance de la qualité de travailleur handicapé</label>
+              </div>
+          
+      
+          
+          
+              <div class="form-check">
+                  <input class="form-check-input" id="id_reason_3" name="reason" type="radio" value="SENIOR"/>
+                  <label class="form-check-label" for="id_reason_3">50 ans et plus</label>
+              </div>
+          
+      
+  </div></div>
+  '''
+# ---
+# name: ApprovalProlongationTest.test_prolongation_approval_view_with_disabled_values[missing_reason_info]
+  '''
+  <div class="c-info mb-3">
+              <button aria-controls="disabledChoicesCollapseInfo" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#disabledChoicesCollapseInfo" data-bs-toggle="collapse" type="button">
+                  <span>Pourquoi n’est-il pas possible de sélectionner certains éléments ?</span>
+              </button>
+              <div class="c-info__detail collapse" id="disabledChoicesCollapseInfo">
+                  <p>
+                      Les prolongations de PASS IAE doivent respecter certaines conditions réglementaires pour être délivrées.
+                      Retrouvez le détail des conditions dans <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738994643217--Prolonger-un-PASS-IAE" rel="noopener" target="_blank">notre documentation</a>.
+                  </p>
+              </div>
+          </div>
   '''
 # ---
