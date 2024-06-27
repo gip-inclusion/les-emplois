@@ -5,27 +5,6 @@
         {% include "includes/btn_dropdown_filter/checkboxes.html" with field=filters_form.departments id_suffix="-top" only %}
     {% else %}
         <hr>
-        <fieldset>
-            <legend>
-                <button class="btn btn-outline-transparent has-collapse-caret collapsed"
-                        data-bs-toggle="collapse"
-                        data-bs-target="#collapseDepartments"
-                        type="button"
-                        aria-expanded="false"
-                        aria-controls="collapseDepartments">{{ filters_form.departments.label | capfirst }}</button>
-            </legend>
-            <div class="my-3 collapse" id="collapseDepartments">
-                <ul>
-                    {% for choice in filters_form.departments %}
-                        <li>
-                            <div class="form-check">
-                                <input id="{{ choice.id_for_label }}" class="form-check-input" name="{{ choice.data.name }}" type="checkbox" value="{{ choice.data.value }}"{% if choice.data.selected %} checked{% endif %}>
-                                <label for="{{ choice.id_for_label }}" class="form-check-label">{{ choice.choice_label }}</label>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </fieldset>
+        {% include "apply/includes/job_applications_filters/field_collapse_checkbox.html" with field=filters_form.departments only %}
     {% endif %}
 {% endif %}

@@ -4,8 +4,14 @@
         {% include "apply/includes/job_applications_filters/selected_jobs.html" %}
         {% include "apply/includes/job_applications_filters/departments.html" %}
         {% include "apply/includes/job_applications_filters/sender.html" %}
-        {% include "apply/includes/job_applications_filters/criteria.html" %}
-        {% include "apply/includes/job_applications_filters/eligibility_validated.html" %}
+        {% if filters_form.criteria %}
+            <hr>
+            {% include "apply/includes/job_applications_filters/field_collapse.html" with field=filters_form.criteria legend="Critères administratifs déclarés" only %}
+        {% endif %}
+        {% if filters_form.eligibility_validated %}
+            <hr>
+            {% include "apply/includes/job_applications_filters/field_collapse.html" with field=filters_form.eligibility_validated legend="Éligibilité IAE" only %}
+        {% endif %}
         {% include "apply/includes/job_applications_filters/pass.html" %}
         {% comment %}
         Do not render job_seekers:
