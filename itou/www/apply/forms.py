@@ -848,8 +848,6 @@ class FilterJobApplicationsForm(forms.Form):
     Allow users to filter job applications based on specific fields.
     """
 
-    top_bar_filters = ("states",)
-
     states = forms.MultipleChoiceField(
         required=False,
         choices=job_applications_enums.JobApplicationState,
@@ -934,18 +932,11 @@ class FilterJobApplicationsForm(forms.Form):
         """
         return sum(bool(self.cleaned_data.get(field.name)) for field in self)
 
-    def hiddens_for_htmx_form(self):
-        for fieldname, field in self.fields.items():
-            if fieldname not in self.top_bar_filters and fieldname in self.data:
-                yield field.get_bound_field(self, fieldname).as_hidden()
-
 
 class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     """
     Job applications filters common to companies and Prescribers.
     """
-
-    top_bar_filters = FilterJobApplicationsForm.top_bar_filters + ("departments", "job_seekers", "selected_jobs")
 
     senders = forms.MultipleChoiceField(required=False, label="Nom de la personne", widget=Select2MultipleWidget)
     job_seekers = forms.MultipleChoiceField(

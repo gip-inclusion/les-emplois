@@ -76,20 +76,21 @@ def test_list_for_job_seeker_htmx_filters(client):
     url = reverse("apply:list_for_job_seeker")
     response = client.get(url)
     page = parse_response_to_soup(response, selector="#main")
-    # Check the refused checkbox, that triggers the HTMX request.
-    [dropdown_filters] = page.find_all("div", class_="btn-dropdown-filter-group")
-    [refused_checkbox] = dropdown_filters.find_all(
+    # Simulate the data-sync-with and check both checkboxes.
+    refused_checkboxes = page.find_all(
         "input",
         attrs={"name": "states", "value": "refused"},
     )
-    refused_checkbox["checked"] = ""
+    assert len(refused_checkboxes) == 2
+    for refused_checkbox in refused_checkboxes:
+        refused_checkbox["checked"] = ""
 
     response = client.get(
         url,
         {"states": ["refused"]},
         headers={"HX-Request": "true"},
     )
-    update_page_with_htmx(page, f".s-section form[hx-get='{url}']", response)
+    update_page_with_htmx(page, f"form[hx-get='{url}']", response)
 
     response = client.get(url, {"states": ["refused"]})
     fresh_page = parse_response_to_soup(response, selector="#main")
