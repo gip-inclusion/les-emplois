@@ -13,7 +13,7 @@ from django.conf import settings
 from psycopg import sql
 from sentry_sdk.crons import monitor
 
-from itou.metabase.db import MetabaseDatabaseCursor, create_table
+from itou.metabase.db import DB_CURSOR, create_table, get_cursor
 from itou.utils import constants
 from itou.utils.command import BaseCommand
 
@@ -101,7 +101,7 @@ def update_table_at_date(table_name, column_names, at, rows):
         table_name,
         [(col_name, "varchar") for col_name in column_names],
     )
-    with MetabaseDatabaseCursor() as (cursor, conn):
+    with get_cursor(DB_CURSOR.C2) as (cursor, conn):
         cursor.execute(
             sql.SQL("""DELETE FROM {table_name} WHERE "Date" = {value}""").format(
                 table_name=sql.Identifier(table_name),
