@@ -134,16 +134,14 @@
   
   
           
+              <hr/>
+              
   
-  
-      <hr/>
-      <fieldset>
-          <legend>
-              <button aria-controls="collapseCriteria" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseCriteria" data-bs-toggle="collapse" type="button">
-                  Critères administratifs déclarés
-              </button>
-          </legend>
-          <div class="mt-3 collapse" id="collapseCriteria"><div class="form-group"><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
+  <fieldset>
+      <legend>
+          <button aria-controls="collapse-criteria" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-criteria" data-bs-toggle="collapse" type="button">Critères administratifs déclarés</button>
+      </legend>
+      <div class="mt-3 collapse" id="collapse-criteria"><div class="form-group"><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_criteria" lang="fr" multiple="" name="criteria">
     <option value="1">Bénéficiaire du RSA</option>
   
     <option value="2">Allocataire ASS</option>
@@ -181,21 +179,21 @@
     <option value="18">Mobilité</option>
   
   </select></div></div>
-      </fieldset>
-  
+  </fieldset>
   
           
+          
+              <hr/>
+              
   
+  <fieldset>
+      <legend>
+          <button aria-controls="collapse-eligibility_validated" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-eligibility_validated" data-bs-toggle="collapse" type="button">Éligibilité IAE</button>
+      </legend>
+      <div class="mt-3 collapse" id="collapse-eligibility_validated"><div class="form-group"><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Éligibilité validée</label></div></div></div>
+  </fieldset>
   
-      <hr/>
-      <fieldset>
-          <legend>
-              <button aria-controls="collapseEligibilityIAE" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapseEligibilityIAE" data-bs-toggle="collapse" type="button">Éligibilité IAE</button>
-          </legend>
-          <div class="mt-3 collapse" id="collapseEligibilityIAE"><div class="form-group"><div class="form-check"><input class="form-check-input" id="id_eligibility_validated" name="eligibility_validated" type="checkbox"/><label class="form-check-label" for="id_eligibility_validated">Éligibilité validée</label></div></div></div>
-      </fieldset>
-  
-  
+          
           
   
   

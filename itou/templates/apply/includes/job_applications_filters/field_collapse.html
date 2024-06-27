@@ -1,0 +1,17 @@
+{% load django_bootstrap5 %}
+{% comment %}
+Arguments:
+- field
+- legend
+{% endcomment %}
+<fieldset>
+    <legend>
+        <button class="btn btn-outline-transparent has-collapse-caret collapsed"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapse-{{ field.name }}"
+                type="button"
+                aria-expanded="false"
+                aria-controls="collapse-{{ field.name }}">{{ legend }}</button>
+    </legend>
+    <div class="mt-3 collapse" id="collapse-{{ field.name }}">{% bootstrap_field field %}</div>
+</fieldset>
