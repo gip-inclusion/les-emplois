@@ -206,7 +206,7 @@
   </div>
   
           <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
-      <button class="btn btn-block btn-primary">Voir</button>
+      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
       
   
   
@@ -433,7 +433,7 @@
   </div>
   
           <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
-      <button class="btn btn-block btn-primary">Voir</button>
+      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
       
   
   
@@ -634,7 +634,7 @@
   </div>
   
           <div class="offcanvas-footer gap-3" id="offcanvasApplyFiltersButtons">
-      <button class="btn btn-block btn-primary">Voir</button>
+      <button class="btn btn-block btn-primary" data-bs-dismiss="offcanvas" type="button">Voir</button>
       
   
   

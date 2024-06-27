@@ -18,6 +18,7 @@ Arguments:
                            name="{{ choice.data.name }}"
                            type="checkbox"
                            value="{{ choice.data.value }}"
+                           {% if id_suffix|default:"" %}data-sync-with="{{ choice.id_for_label }}"{% endif %}
                            {% if choice.data.selected %}checked{% endif %}>
                     <label for="{{ choice.id_for_label }}{{ id_suffix|default:'' }}" class="form-check-label">
                         {{ choice.choice_label }}

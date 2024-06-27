@@ -231,14 +231,22 @@ class ProcessListSiaeTest(TestCase):
             <ul class="dropdown-menu">
             <li class="dropdown-item">
             <div class="form-check">
-            <input id="id_selected_jobs_0-top" class="form-check-input" name="{self.SELECTED_JOBS}" type="checkbox"
+            <input id="id_selected_jobs_0-top"
+                   class="form-check-input"
+                   data-sync-with="id_selected_jobs_0"
+                   name="{self.SELECTED_JOBS}"
+                   type="checkbox"
                    value="{job1.appellation.code}">
             <label for="id_selected_jobs_0-top" class="form-check-label">{job1.appellation.name}</label>
             </div>
             </li>
             <li class="dropdown-item">
             <div class="form-check">
-                <input id="id_selected_jobs_1-top" class="form-check-input" name="{self.SELECTED_JOBS}" type="checkbox"
+                <input id="id_selected_jobs_1-top"
+                       class="form-check-input"
+                       data-sync-with="id_selected_jobs_1"
+                       name="{self.SELECTED_JOBS}"
+                       type="checkbox"
                        value="{job2.appellation.code}">
                 <label for="id_selected_jobs_1-top" class="form-check-label">{job2.appellation.name}</label>
             </div>
@@ -725,19 +733,20 @@ def test_list_for_siae_htmx_filters(client):
     url = reverse("apply:list_for_siae")
     response = client.get(url)
     page = parse_response_to_soup(response, selector="#main")
-    # Check the refused checkbox, that triggers the HTMX request.
-    [dropdown_filters] = page.find_all("div", class_="btn-dropdown-filter-group")
-    [refused_checkbox] = dropdown_filters.find_all(
+    # Simulate the data-sync-with and check both checkboxes.
+    refused_checkboxes = page.find_all(
         "input",
         attrs={"name": "states", "value": "refused"},
     )
-    refused_checkbox["checked"] = ""
+    assert len(refused_checkboxes) == 2
+    for refused_checkbox in refused_checkboxes:
+        refused_checkbox["checked"] = ""
     response = client.get(
         url,
         {"states": ["refused"]},
         headers={"HX-Request": "true"},
     )
-    update_page_with_htmx(page, f".s-section form[hx-get='{url}']", response)
+    update_page_with_htmx(page, f"form[hx-get='{url}']", response)
     response = client.get(url, {"states": ["refused"]})
     fresh_page = parse_response_to_soup(response, selector="#main")
     assertSoupEqual(page, fresh_page)

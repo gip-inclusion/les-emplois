@@ -1,37 +1,76 @@
 "use strict";
 
 (function() {
-  const filtersContentId = "offcanvasApplyFiltersContent";
-  const filtersContent = document.getElementById(filtersContentId);
+  const filtersOffcanvas = document.getElementById("offcanvasApplyFilters");
+  const filtersContent = document.getElementById("offcanvasApplyFiltersContent");
   const filtersCount = document.getElementById("all-filters-btn");
 
   function fieldHasValue(container) {
+    // selects and select2 do not update the DOM on change, so
+    // a query selector cannot be used to know their current value.
+    if (container.querySelector(".django-select2")) {
+      const selects = container.querySelectorAll(".django-select2");
+      for (const select of selects) {
+        if (select.value) {
+          return true;
+        }
+      }
+    }
     return (
       container.querySelector('input:checked:not([value=""])')
       || container.querySelector('input[value]:not([type=checkbox]):not([type=radio]):not([value=""])')
       || container.querySelector('duet-date-picker[value]:not([value=""])')
-      || container.querySelector("select > option:not([value=''])[selected]")
     );
   }
 
   function toggleHasSelectedItem() {
+    // Can be called from any element within a dropdown.
     const dropdown = this.closest('.dropdown');
-    this.classList.toggle('has-selected-item', fieldHasValue(dropdown));
-    this.classList.toggle('font-weight-bold', fieldHasValue(dropdown));
+    const btnFilter = dropdown.querySelector(".btn-dropdown-filter");
+    const hasValue = fieldHasValue(dropdown);
+    btnFilter.classList.toggle('has-selected-item', hasValue);
+    btnFilter.classList.toggle('font-weight-bold', hasValue);
   }
 
-  function initFilters(sidebar) {
-    let activeFiltersCount = 0;
-    Array.from(sidebar.querySelectorAll(".collapsed")).forEach((collapse) => {
-      const collapseTarget = document.querySelector(collapse.dataset.bsTarget);
-      if (fieldHasValue(collapseTarget)) {
-        activeFiltersCount++;
-        bootstrap.Collapse.getOrCreateInstance(collapseTarget, { delay: 0 }).show();
-      }
-    });
+  function updateFiltersCount() {
     if (filtersCount) {
+      const activeFiltersCount = Array.from(filtersContent.querySelectorAll(".collapse")).reduce(
+        (acc, collapse) => acc + (fieldHasValue(collapse) ? 1 : 0),
+        0,
+      );
       filtersCount.textContent = activeFiltersCount ? ` (${activeFiltersCount})` : "";
     }
+  }
+
+  function toggleActiveFilters() {
+    Array.from(filtersContent.querySelectorAll("button[data-bs-toggle]")).forEach((collapse) => {
+      const collapseTarget = document.querySelector(collapse.dataset.bsTarget);
+      // Avoid transitions as the offcanvas element is shown and associated motion sickness.
+      const originalTransitionValue = collapseTarget.style.getPropertyValue("transition");
+      collapseTarget.style.setProperty("transition", "none");
+      const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseTarget, { toggle: false });
+      if (fieldHasValue(collapseTarget)) {
+        bsCollapse.show();
+      } else {
+        bsCollapse.hide();
+      }
+      collapseTarget.style.setProperty("transition", originalTransitionValue);
+    });
+  }
+
+  function syncInputs(target) {
+    target.querySelectorAll("input[data-sync-with]").forEach((syncedInputOrigin) => {
+      const syncedInputTarget = document.getElementById(syncedInputOrigin.dataset.syncWith);
+      syncedInputOrigin.addEventListener("change", function(event) {
+        syncedInputTarget.checked = event.target.checked;
+        // Trigger HTMX form submission.
+        syncedInputTarget.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+      syncedInputTarget.addEventListener("change", function(event) {
+        syncedInputOrigin.checked = event.target.checked;
+        toggleHasSelectedItem.call(syncedInputOrigin);
+      });
+    })
   }
 
   function onLoad(target) {
@@ -39,13 +78,12 @@
       dropdownFilter.addEventListener('hide.bs.dropdown', toggleHasSelectedItem);
       toggleHasSelectedItem.call(dropdownFilter);
     });
-    if (target.id === filtersContentId) {
-      initFilters(target);
-    }
+    syncInputs(target);
+    updateFiltersCount();
   }
 
-  if (filtersContent) {
-    initFilters(filtersContent);
+  if (filtersOffcanvas) {
+    filtersOffcanvas.addEventListener("show.bs.offcanvas", toggleActiveFilters);
   }
   htmx.onLoad(onLoad);
 })();

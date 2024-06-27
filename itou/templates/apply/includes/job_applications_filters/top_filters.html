@@ -2,34 +2,16 @@
 
 <div class="s-section__row row">
     <div class="col-12">
-        {% if job_applications_list_kind is JobApplicationsListKind.SENT %}
-            {% url 'apply:list_prescriptions' as form_url %}
-        {% elif job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
-            {% url 'apply:list_for_siae' as form_url %}
-        {% else %}
-            {# job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %} #}
-            {% url 'apply:list_for_job_seeker' as form_url %}
-        {% endif %}
-        <form hx-get="{{ form_url }}"
-              hx-trigger="change delay:.5s, duetChange delay:.5s{% if not request.user.is_job_seeker %}, change from:#id_job_seekers{% endif %}"
-              hx-indicator="#job-applications-section"
-              hx-target="#job-applications-section"
-              {% if not request.user.is_job_seeker %}hx-include="#id_job_seekers"{% endif %}
-              hx-swap="outerHTML"
-              hx-push-url="true">
-            <div>{% bootstrap_form_errors filters_form %}</div>
-            <div class="btn-dropdown-filter-group mb-3 mb-md-4">
-                {% include "apply/includes/job_applications_filters/status.html" with btn_dropdown_filter=True %}
-                {% include "apply/includes/job_applications_filters/selected_jobs.html" with btn_dropdown_filter=True %}
-                {% include "apply/includes/job_applications_filters/departments.html" with btn_dropdown_filter=True %}
-                <button type="button" class="btn btn-ico btn-dropdown-filter" data-bs-toggle="offcanvas" data-bs-target="#offcanvasApplyFilters" aria-controls="offcanvasApplyFilters">
-                    <i class="ri-sound-module-fill font-weight-bold" aria-hidden="true"></i>
-                    <span>Tous les filtres <span id="all-filters-btn"></span></span>
-                </button>
-                {% include "apply/includes/list_reset_filters.html" with btn_dropdown_filter=True %}
-                {# Keep active filters from offcanvas when filtering with HTMX. #}
-                {% for hidden in filters_form.hiddens_for_htmx_form %}{{ hidden }}{% endfor %}
-            </div>
-        </form>
+        <div>{% bootstrap_form_errors filters_form %}</div>
+        <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+            {% include "apply/includes/job_applications_filters/status.html" with btn_dropdown_filter=True %}
+            {% include "apply/includes/job_applications_filters/selected_jobs.html" with btn_dropdown_filter=True %}
+            {% include "apply/includes/job_applications_filters/departments.html" with btn_dropdown_filter=True %}
+            <button type="button" class="btn btn-ico btn-dropdown-filter" data-bs-toggle="offcanvas" data-bs-target="#offcanvasApplyFilters" aria-controls="offcanvasApplyFilters">
+                <i class="ri-sound-module-fill font-weight-bold" aria-hidden="true"></i>
+                <span>Tous les filtres <span id="all-filters-btn"></span></span>
+            </button>
+            {% include "apply/includes/list_reset_filters.html" with btn_dropdown_filter=True %}
+        </div>
     </div>
 </div>
