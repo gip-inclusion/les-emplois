@@ -12,7 +12,7 @@ def _generate_key():
 
 
 class CompanyToken(models.Model):
-    key = models.CharField(default=_generate_key, unique=True, editable=False)
+    key = models.CharField(default=_generate_key, unique=True)
     label = models.CharField(verbose_name="mémo permettant d'identifier l'usage du jeton", max_length=60, unique=True)
     created_at = models.DateTimeField(default=timezone.now)
     companies = models.ManyToManyField(Company, related_name="api_tokens")
@@ -20,6 +20,9 @@ class CompanyToken(models.Model):
     class Meta:
         verbose_name = "jeton d'API entreprise"
         verbose_name_plural = "jetons d'API entreprise"
+
+    def __str__(self):
+        return self.label
 
     def datadog_info(self):
         """Method returning the token representation in our Datadog logs (no secret here!)"""
