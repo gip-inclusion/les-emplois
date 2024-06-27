@@ -25,6 +25,7 @@ class PrescriberOrganizationFactory(factory.django.DjangoModelFactory):
             authorization_status=PrescriberAuthorizationStatus.NOT_SET,
         )
         for_snapshot = factory.Trait(
+            uid="0260ad4f-2008-48bd-88cc-b41c0211e219",
             name="Pres. Org.",
             address_line_1="39 rue d'Artois",
             post_code="75008",

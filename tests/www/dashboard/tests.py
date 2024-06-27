@@ -631,10 +631,17 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
             self.client.get(reverse("dashboard:index"))
 
     def test_gps_card_is_shown_for_prescriber(self):
-        prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory()
+        prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory(authorized=True)
         self.client.force_login(prescriber_organization.members.first())
 
         with self.assertTemplateUsed("dashboard/includes/gps_card.html"):
+            self.client.get(reverse("dashboard:index"))
+
+    def test_gps_card_is_not_shown_for_orienter(self):
+        prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory()
+        self.client.force_login(prescriber_organization.members.first())
+
+        with self.assertTemplateNotUsed("dashboard/includes/gps_card.html"):
             self.client.get(reverse("dashboard:index"))
 
     def test_dashboard_prescriber_without_organization_message(self):

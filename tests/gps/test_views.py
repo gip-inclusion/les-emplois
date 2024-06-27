@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
-from pytest_django.asserts import assertContains
+from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.enums import UserKind
@@ -18,6 +18,41 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.test import TestCase, parse_response_to_soup
+
+
+def test_job_seeker_cannot_use_gps(client):
+    job_seeker = JobSeekerFactory()
+    client.force_login(job_seeker)
+    group = FollowUpGroupFactory(beneficiary=job_seeker)
+
+    for route, kwargs in [
+        ("gps:my_groups", {}),
+        ("gps:join_group", {}),
+        ("gps:leave_group", {"group_id": group.pk}),
+        ("gps:toggle_referent", {"group_id": group.pk}),
+    ]:
+        response = client.get(reverse(route, kwargs=kwargs))
+        assertRedirects(response, reverse("dashboard:index"), fetch_redirect_response=False)
+    response = client.get(reverse("users:details", kwargs={"public_id": job_seeker.public_id}))
+    assert response.status_code == 403
+
+
+def test_orienter_cannot_use_gps(client):
+    prescriber = PrescriberFactory()
+    job_seeker = JobSeekerFactory()
+    client.force_login(prescriber)
+    group = FollowUpGroupFactory(beneficiary=job_seeker, memberships__member=prescriber)
+
+    for route, kwargs in [
+        ("gps:my_groups", {}),
+        ("gps:join_group", {}),
+        ("gps:leave_group", {"group_id": group.pk}),
+        ("gps:toggle_referent", {"group_id": group.pk}),
+    ]:
+        response = client.get(reverse(route, kwargs=kwargs))
+        assertRedirects(response, reverse("dashboard:index"), fetch_redirect_response=False)
+    response = client.get(reverse("users:details", kwargs={"public_id": job_seeker.public_id}))
+    assert response.status_code == 403
 
 
 # To be able to use assertCountEqual
@@ -68,7 +103,7 @@ class GpsTest(TestCase):
     ],
 )
 def test_join_group_of_a_job_seeker(is_referent, client, snapshot):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory(membership__organization__authorized=True)
     job_seeker = JobSeekerFactory()
 
     client.force_login(prescriber)
@@ -96,7 +131,7 @@ def test_join_group_of_a_job_seeker(is_referent, client, snapshot):
     assert membership.is_referent == is_referent
 
     # Login with another prescriber and join the same follow_up_group
-    other_prescriber = PrescriberFactory(membership=True)
+    other_prescriber = PrescriberFactory(membership__organization__authorized=True)
 
     client.force_login(other_prescriber)
 
@@ -117,7 +152,7 @@ def test_join_group_of_a_job_seeker(is_referent, client, snapshot):
 
 
 def test_join_group_of_a_prescriber(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory(membership__organization__authorized=True)
     another_prescriber = PrescriberFactory(membership=True)
 
     client.force_login(prescriber)
@@ -144,7 +179,12 @@ def test_join_group_of_a_prescriber(client):
 
 @override_settings(TALLY_URL="https://hello-tally.so")
 def test_dashboard_card(snapshot, client):
-    member = PrescriberFactory(for_snapshot=True)
+    member = PrescriberFactory(
+        for_snapshot=True,
+        membership=True,
+        membership__organization__authorized=True,
+        membership__organization__for_snapshot=True,
+    )
     client.force_login(member)
     response = client.get(reverse("dashboard:index"))
     assert str(parse_response_to_soup(response, "#gps-card")) == snapshot
@@ -152,7 +192,7 @@ def test_dashboard_card(snapshot, client):
 
 @freezegun.freeze_time("2024-06-21", tick=True)
 def test_my_groups(snapshot, client):
-    user = PrescriberFactory()
+    user = PrescriberFactory(membership__organization__authorized=True, membership__organization__for_snapshot=True)
     client.force_login(user)
 
     # Was created in bulk.
@@ -207,7 +247,7 @@ def test_access_as_jobseeker(client):
 
 
 def test_leave_group(client):
-    member = PrescriberFactory(membership=True)
+    member = PrescriberFactory(membership__organization__authorized=True)
     another_member = PrescriberFactory(membership=True)
 
     beneficiary = JobSeekerFactory()
@@ -243,7 +283,7 @@ def test_leave_group(client):
 
 
 def test_referent_group(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory(membership__organization__authorized=True)
 
     beneficiary = JobSeekerFactory()
 
@@ -264,7 +304,12 @@ def test_referent_group(client):
 
 @freezegun.freeze_time("2024-06-21")
 def test_beneficiary_details(client, snapshot):
-    prescriber = PrescriberFactory(membership=True, for_snapshot=True, membership__organization__name="Les Olivades")
+    prescriber = PrescriberFactory(
+        membership=True,
+        for_snapshot=True,
+        membership__organization__name="Les Olivades",
+        membership__organization__authorized=True,
+    )
     beneficiary = JobSeekerFactory(for_snapshot=True)
     FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
 
@@ -281,7 +326,7 @@ def test_beneficiary_details(client, snapshot):
 
 
 def test_remove_members_from_group(client):
-    prescriber = PrescriberFactory(membership=True)
+    prescriber = PrescriberFactory(membership__organization__authorized=True)
 
     beneficiary = JobSeekerFactory()
 

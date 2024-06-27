@@ -180,7 +180,7 @@
         </div>
     {% endif %}
 
-    {% if user.is_prescriber or user.is_employer %}
+    {% if can_view_gps_card %}
         <div class="alert alert-info alert-dismissible-once fade show d-none" role="status" id="GPS_banner">
             <p class="mb-0">
                 Une nouvelle entrée dans votre tableau de bord vous permet de visualiser l’ensemble des intervenants auprès des personnes pour lesquelles vous avez réalisé une action. Il s’agit de l’encart GPS (Guide de Partage et de Suivi).
@@ -338,7 +338,9 @@
                             {% if user.is_employer or user.is_prescriber %}
                                 <h2>Services partenaires</h2>
                                 <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
-                                    {% include "dashboard/includes/gps_card.html" %}
+                                    {% if can_view_gps_card %}
+                                        {% include "dashboard/includes/gps_card.html" %}
+                                    {% endif %}
                                     {% include "dashboard/includes/dora_card.html" with siret=request.current_organization.siret|default:"" tracker="mtm_campaign=LesEmplois&mtm_kwd=Dashboard" %}
                                 </div>
                             {% endif %}

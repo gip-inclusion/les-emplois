@@ -93,6 +93,7 @@ def _employer_dashboard_context(request):
                 "evaluated_job_applications__evaluated_administrative_criteria",
             )
         ),
+        "can_view_gps_card": True,
         "can_create_siae_antenna": request.user.can_create_siae_antenna(parent_siae=current_org),
         "can_show_employee_records": current_org.can_use_employee_record,
         "can_show_financial_annexes": current_org.convention_can_be_accessed_by(request.user),
@@ -131,6 +132,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_create_siae_antenna": False,
         "can_show_financial_annexes": False,
         "can_show_employee_records": False,
+        "can_view_gps_card": False,
         "can_view_stats_dashboard_widget": stats_utils.can_view_stats_dashboard_widget(request),
         "can_view_stats_siae": stats_utils.can_view_stats_siae(request),
         "can_view_stats_siae_aci": stats_utils.can_view_stats_siae_aci(request),
@@ -202,6 +204,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                         }
                     )
             if current_org.is_authorized:
+                context["can_view_gps_card"] = True
                 context["pending_prolongation_requests"] = ProlongationRequest.objects.filter(
                     prescriber_organization=current_org,
                     status=ProlongationRequestStatus.PENDING,

@@ -166,7 +166,7 @@
                       </a>
                   </li>
                   <li class="d-flex justify-content-between align-items-center mb-3">
-                      <a aria-label="Inviter un partenaire." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_inviter_partenaire" href="https://hello-tally.so/r/w5kLqM?user_public_id=03580247-b036-4578-bf9d-f92c9c2f68cd&amp;user_first_name=Pierre&amp;user_last_name=Dupont&amp;" rel="noopener" target="_blank">
+                      <a aria-label="Inviter un partenaire." class="btn-link btn-ico" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="tdb_inviter_partenaire" href="https://hello-tally.so/r/w5kLqM?user_public_id=03580247-b036-4578-bf9d-f92c9c2f68cd&amp;user_first_name=Pierre&amp;user_last_name=Dupont&amp;&amp;user_organization_uid=0260ad4f-2008-48bd-88cc-b41c0211e219&amp;user_organization_name=Pres. Org." rel="noopener" target="_blank">
                           <i class="ri-mail-send-line ri-lg font-weight-normal align-self-start"></i>
                           <span>Inviter un partenaire</span>
                           <i class="ri-external-link-line font-weight-normal ms-2"></i>
