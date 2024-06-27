@@ -1,9 +1,14 @@
+{% comment %}
+Arguments:
+- field
+- label: defaults to the field label
+{% endcomment %}
 <div class="dropdown">
     <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-        Fin du parcours en IAE
+        {{ label|default:field.label }}
     </button>
     <ul class="dropdown-menu">
-        {% for choice in filters_form.expiry %}
+        {% for choice in field %}
             <li class="dropdown-item">
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="{{ choice.data.name }}" id="{{ choice.id_for_label }}" value="{{ choice.data.value }}"{% if choice.data.selected %} checked{% endif %}>
