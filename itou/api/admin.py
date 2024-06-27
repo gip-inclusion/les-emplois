@@ -15,7 +15,7 @@ TokenAdmin.raw_id_fields = ("user",)
 class CompanyTokenAdmin(ItouModelAdmin):
     list_display = ["label", "created_at"]
     ordering = ["-created_at"]
-    read_only_fields = ["key", "created_at"]
+    readonly_fields = ["key", "created_at"]
     autocomplete_fields = ["companies"]
 
 
