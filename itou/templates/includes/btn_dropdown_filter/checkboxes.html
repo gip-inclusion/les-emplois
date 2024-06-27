@@ -1,0 +1,29 @@
+{% comment %}
+Arguments:
+- field
+- label: (defaults to the field label)
+- id_suffix: When the field is present multiple times on the page, use the
+    suffix to make its input id unique.
+{% endcomment %}
+<div class="dropdown">
+    <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+        {{ label|default:field.label }}
+    </button>
+    <ul class="dropdown-menu">
+        {% for choice in field %}
+            <li class="dropdown-item">
+                <div class="form-check">
+                    <input id="{{ choice.id_for_label }}{{ id_suffix|default:'' }}"
+                           class="form-check-input"
+                           name="{{ choice.data.name }}"
+                           type="checkbox"
+                           value="{{ choice.data.value }}"
+                           {% if choice.data.selected %}checked{% endif %}>
+                    <label for="{{ choice.id_for_label }}{{ id_suffix|default:'' }}" class="form-check-label">
+                        {{ choice.choice_label }}
+                    </label>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

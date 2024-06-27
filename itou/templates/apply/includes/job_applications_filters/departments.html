@@ -2,21 +2,7 @@
 
 {% if filters_form.departments and filters_form.fields.departments.choices %}
     {% if btn_dropdown_filter|default:False %}
-        <div class="dropdown">
-            <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                {{ filters_form.departments.label | capfirst }}
-            </button>
-            <ul class="dropdown-menu">
-                {% for choice in filters_form.departments %}
-                    <li class="dropdown-item">
-                        <div class="form-check">
-                            <input id="{{ choice.id_for_label }}-top" class="form-check-input" name="{{ choice.data.name }}" type="checkbox" value="{{ choice.data.value }}"{% if choice.data.selected %} checked{% endif %}>
-                            <label for="{{ choice.id_for_label }}-top" class="form-check-label">{{ choice.choice_label }}</label>
-                        </div>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
+        {% include "includes/btn_dropdown_filter/checkboxes.html" with field=filters_form.departments id_suffix="-top" only %}
     {% else %}
         <hr>
         <fieldset>
