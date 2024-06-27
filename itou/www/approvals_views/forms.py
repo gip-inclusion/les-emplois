@@ -29,7 +29,7 @@ from itou.users.models import User
 from itou.utils.constants import MB
 from itou.utils.db import or_queries
 from itou.utils.validators import MaxDateValidator, MinDateValidator
-from itou.utils.widgets import DuetDatePickerWidget
+from itou.utils.widgets import DuetDatePickerWidget, RadioSelectWithDisabledChoices
 
 
 class ApprovalExpiry(TextChoices):
@@ -135,7 +135,7 @@ class CreateProlongationForm(forms.ModelForm):
         label="Motif",
         choices=ProlongationReason.choices,
         initial=None,  # Uncheck radio buttons.
-        widget=forms.RadioSelect(),
+        widget=RadioSelectWithDisabledChoices,
     )
     end_at = forms.DateField(widget=DuetDatePickerWidget())
 
@@ -149,6 +149,9 @@ class CreateProlongationForm(forms.ModelForm):
     def __init__(self, *args, approval, siae, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Used to display an explanation if the max duration is not possible
+        self.max_end_limit = None
+
         if not self.instance.pk:
             # `approval` must be set before model validation to avoid violating a not-null constraint.
             self.instance.approval = approval
@@ -159,6 +162,22 @@ class CreateProlongationForm(forms.ModelForm):
 
         # Customize "reason" field
         self.fields["reason"].choices = ProlongationReason.for_company(self.instance.declared_by_siae)
+        other_prolongation_duration = Prolongation.objects.get_cumulative_duration_for(approval.pk)
+        disabled_values = set()
+        for reason, _reason_label in self.fields["reason"].choices:
+            if (
+                max_cumulative_duration := Prolongation.PROLONGATION_RULES[reason]["max_cumulative_duration"]
+            ) is not None:
+                if max_cumulative_duration <= other_prolongation_duration:
+                    disabled_values.add(reason)
+
+        if disabled_values:
+            # Make those options appear as disabled
+            self.fields["reason"].widget.disabled_values = disabled_values
+            # Prevent those options to be accepted
+            self.fields["reason"]._choices = [
+                (value, label) for value, label in self.fields["reason"]._choices if value not in disabled_values
+            ]
         self.fields["reason"].widget.attrs.update(
             {
                 "hx-trigger": "change",
@@ -182,10 +201,18 @@ class CreateProlongationForm(forms.ModelForm):
             end_at.disabled = True
         else:
             end_at.help_text = rule_details["help_text"]
-            max_end_at = min(
-                self.instance.start_at + rule_details["max_duration"],
-                Prolongation.get_max_end_at(self.instance.approval_id, self.instance.start_at, reason_not_validated),
+            max_duration_end_at = self.instance.start_at + rule_details["max_duration"]
+            max_cumulative_duration_end_at = Prolongation.get_max_end_at(
+                self.instance.approval_id, self.instance.start_at, reason_not_validated
             )
+            max_end_at = min(max_duration_end_at, max_cumulative_duration_end_at)
+            if max_cumulative_duration_end_at < max_duration_end_at:
+                self.max_end_limit = {
+                    "max_date": max_end_at,
+                    "max_duration": (
+                        f"{rule_details['max_duration_label']} ({rule_details['max_duration'].days} jours)"
+                    ),
+                }
             end_at.widget.attrs["max"] = max_end_at
             if reason_not_validated == ProlongationReason.SENIOR_CDI and not self.data.get("end_at"):
                 # The field should have an initial value, but Django ignores `initial` when the form is bound.
