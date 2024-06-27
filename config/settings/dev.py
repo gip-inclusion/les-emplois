@@ -77,6 +77,13 @@ METABASE_USER = os.getenv("METABASE_USER", os.getenv("PGUSER", "postgres"))  # n
 METABASE_PASSWORD = os.getenv("METABASE_PASSWORD", os.getenv("PGPASSWORD", "password"))  # noqa: F405
 METABASE_DATABASE = os.getenv("METABASE_DATABASE", os.getenv("PGDATABASE", "metabase"))  # noqa: F405
 
+# use almost the same settings for C1 analyses db as base PG.
+C1_METABASE_HOST = os.getenv("C1_METABASE_HOST", os.getenv("PGHOST", "127.0.0.1"))
+C1_METABASE_PORT = os.getenv("C1_METABASE_PORT", os.getenv("PGPORT", "5432"))
+C1_METABASE_USER = os.getenv("C1_METABASE_USER", os.getenv("PGUSER", "postgres"))
+C1_METABASE_PASSWORD = os.getenv("C1_METABASE_PASSWORD", os.getenv("PGPASSWORD", "password"))
+C1_METABASE_DATABASE = os.getenv("C1_METABASE_DATABASE", os.getenv("PGDATABASE", "metabase"))
+
 FORCE_IC_LOGIN = os.getenv("FORCE_IC_LOGIN", "True") == "True"
 
 AWS_STORAGE_BUCKET_NAME = "dev"
