@@ -24,7 +24,7 @@
                           hx-include="#id_users">
                         <div class="btn-dropdown-filter-group mb-3 mb-md-4">
                             {% include "approvals/includes/approvals_filters/status.html" %}
-                            {% include "approvals/includes/approvals_filters/expiry.html" %}
+                            {% include "includes/btn_dropdown_filter/radio.html" with field=filters_form.expiry only %}
                             {% include "approvals/includes/list_reset_filters.html" %}
                         </div>
                     </form>
