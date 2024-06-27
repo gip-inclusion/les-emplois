@@ -9,9 +9,13 @@ from itou.utils.urls import get_safe_url
 from itou.www.gps.forms import GpsUserSearchForm
 
 
+def is_allowed_to_use_gps(user):
+    return user.is_employer or user.is_prescriber_with_authorized_org
+
+
 @login_required
 @user_passes_test(
-    lambda u: not u.is_job_seeker,
+    is_allowed_to_use_gps,
     login_url=reverse_lazy("dashboard:index"),
     redirect_field_name=None,
 )
@@ -39,7 +43,7 @@ def my_groups(request, template_name="gps/my_groups.html"):
 
 @login_required
 @user_passes_test(
-    lambda u: not u.is_job_seeker,
+    is_allowed_to_use_gps,
     login_url=reverse_lazy("dashboard:index"),
     redirect_field_name=None,
 )
@@ -69,7 +73,7 @@ def join_group(request, template_name="gps/join_group.html"):
 
 @login_required
 @user_passes_test(
-    lambda u: not u.is_job_seeker,
+    is_allowed_to_use_gps,
     login_url=reverse_lazy("dashboard:index"),
     redirect_field_name=None,
 )
@@ -87,7 +91,7 @@ def leave_group(request, group_id):
 
 @login_required
 @user_passes_test(
-    lambda u: not u.is_job_seeker,
+    is_allowed_to_use_gps,
     login_url=reverse_lazy("dashboard:index"),
     redirect_field_name=None,
 )

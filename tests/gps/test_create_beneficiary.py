@@ -39,7 +39,7 @@ def test_create_job_seeker(_mock, client):
     [city] = create_test_cities(["67"], num_per_department=1)
     singleton = Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
 
-    prescriber_organization = PrescriberOrganizationWithMembershipFactory(with_pending_authorization=True)
+    prescriber_organization = PrescriberOrganizationWithMembershipFactory(authorized=True)
     user = prescriber_organization.members.first()
     client.force_login(user)
 
@@ -337,21 +337,26 @@ def test_existing_user_with_nir(client):
 
 
 @pytest.mark.parametrize(
-    "UserFactory, factory_args",
+    "UserFactory, factory_args, expected_access",
     [
-        (PrescriberFactory, {"membership": True}),
-        (PrescriberFactory, {"membership": False}),
-        (EmployerFactory, {"with_company": True}),
+        (PrescriberFactory, {"membership": False}, False),
+        (PrescriberFactory, {"membership": True}, False),
+        (PrescriberFactory, {"membership__organization__authorized": True}, True),
+        (EmployerFactory, {"with_company": True}, True),
     ],
 )
-def test_creation_by_user_kind(client, UserFactory, factory_args):
+def test_creation_by_user_kind(client, UserFactory, factory_args, expected_access):
     singleton = Company.unfiltered_objects.get(siret=companies_enums.POLE_EMPLOI_SIRET)
     user = UserFactory(**factory_args)
     client.force_login(user)
     # Assert contains link.
     create_beneficiary_url = reverse("apply:start", kwargs={"company_pk": singleton.pk}) + "?gps=true"
     response = client.get(reverse("gps:join_group"))
-    assertContains(response, create_beneficiary_url)
+    if expected_access:
+        assertContains(response, create_beneficiary_url)
+    else:
+        assertRedirects(response, reverse("dashboard:index"))
+
     response = client.get(create_beneficiary_url)
     assert response.status_code == 302
     assert (
