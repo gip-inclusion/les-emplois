@@ -748,9 +748,6 @@ class User(AbstractUser, AddressMixin):
     def get_kind_display(self):
         return UserKind(self.kind).label
 
-    def autocomplete_display(self):
-        return self.get_full_name()
-
 
 def get_allauth_account_user_display(user):
     return user.email
