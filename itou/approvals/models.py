@@ -13,6 +13,7 @@ from django.db.models import Case, Count, F, OuterRef, Q, Subquery, When
 from django.db.models.functions import Now, TruncDate
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.safestring import mark_safe
 from unidecode import unidecode
 
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
@@ -1308,13 +1309,55 @@ class CommonProlongation(models.Model):
     # Max duration: 10 years but it depends on the `reason` field, see `get_max_end_at`.
     MAX_DURATION = datetime.timedelta(days=10 * 365)
 
-    MAX_CUMULATIVE_DURATION = {
-        enums.ProlongationReason.SENIOR_CDI: MAX_DURATION,
-        enums.ProlongationReason.COMPLETE_TRAINING: datetime.timedelta(days=2 * 365),
-        enums.ProlongationReason.RQTH: datetime.timedelta(days=3 * 365),
-        enums.ProlongationReason.SENIOR: datetime.timedelta(days=5 * 365),
-        enums.ProlongationReason.PARTICULAR_DIFFICULTIES: datetime.timedelta(days=3 * 365),
-        enums.ProlongationReason.HEALTH_CONTEXT: datetime.timedelta(days=365),
+    PROLONGATION_RULES = {
+        enums.ProlongationReason.SENIOR_CDI: {
+            "max_duration": MAX_DURATION,
+            "max_cumulative_duration": MAX_DURATION,
+            "help_text": (
+                "Pour le CDI Inclusion, jusqu’à la retraite "
+                "(pour des raisons techniques, une durée de 10 ans (3650 jours) est appliquée par défaut)."
+            ),
+        },
+        enums.ProlongationReason.COMPLETE_TRAINING: {
+            "max_duration": datetime.timedelta(days=365),
+            "max_cumulative_duration": datetime.timedelta(days=2 * 365),
+            "help_text": mark_safe(
+                "12 mois (365 jours) maximum pour chaque demande.<br> "
+                "Renouvellements possibles jusqu’à la fin de l’action de formation."
+            ),
+        },
+        enums.ProlongationReason.RQTH: {
+            "max_duration": datetime.timedelta(days=365),
+            "max_cumulative_duration": datetime.timedelta(days=3 * 365),
+            "help_text": mark_safe(
+                "12 mois (365 jours) maximum pour chaque demande.<br> "
+                "Renouvellements possibles dans la limite de 5 ans de parcours IAE "
+                "(2 ans de parcours initial + 3 ans (1095 jours))."
+            ),
+        },
+        enums.ProlongationReason.SENIOR: {
+            "max_duration": datetime.timedelta(days=365),
+            "max_cumulative_duration": datetime.timedelta(days=5 * 365),
+            "help_text": mark_safe(
+                "12 mois (365 jours) maximum pour chaque demande.<br> "
+                "Renouvellements possibles dans la limite de 7 ans de parcours IAE "
+                "(2 ans de parcours initial + 5 ans (1825 jours))."
+            ),
+        },
+        enums.ProlongationReason.PARTICULAR_DIFFICULTIES: {
+            "max_duration": datetime.timedelta(days=365),
+            "max_cumulative_duration": datetime.timedelta(days=3 * 365),
+            "help_text": mark_safe(
+                "12 mois (365 jours) maximum pour chaque demande.<br> "
+                "Renouvellements possibles dans la limite de 5 ans de parcours IAE "
+                "(2 ans de parcours initial + 3 ans (1095 jours))."
+            ),
+        },
+        enums.ProlongationReason.HEALTH_CONTEXT: {
+            "max_duration": datetime.timedelta(days=365),
+            "max_cumulative_duration": datetime.timedelta(days=365),
+            "help_text": "NE PAS UTILISER",  # This value shouldn't appear anywhere but just in case
+        },
     }
 
     REASONS_NOT_NEED_PRESCRIBER_OPINION = (
@@ -1490,7 +1533,7 @@ class CommonProlongation(models.Model):
         Returns the maximum date on which a prolongation can end.
         """
         try:
-            max_cumulative_duration = Prolongation.MAX_CUMULATIVE_DURATION[reason]
+            max_cumulative_duration = Prolongation.PROLONGATION_RULES[reason]["max_cumulative_duration"]
         except KeyError:
             max_end = start_at + Prolongation.MAX_DURATION
         else:
