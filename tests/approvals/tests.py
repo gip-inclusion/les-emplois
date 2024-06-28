@@ -1570,13 +1570,11 @@ class ProlongationModelTest(TestCase):
         prolongation.clean()
 
     def test_clean_too_long_reason_duration_error(self):
-        for reason, info in Prolongation.MAX_CUMULATIVE_DURATION.items():
+        for reason, duration in Prolongation.MAX_CUMULATIVE_DURATION.items():
             with self.subTest(reason=reason):
                 prolongation = ProlongationFactory(
                     reason=reason,
-                    end_at=factory.LazyAttribute(
-                        lambda obj: obj.start_at + info["duration"] + datetime.timedelta(days=1)
-                    ),
+                    end_at=factory.LazyAttribute(lambda obj: obj.start_at + duration + datetime.timedelta(days=1)),
                     declared_by_siae__kind=CompanyKind.AI,
                 )
                 with pytest.raises(ValidationError) as error:
@@ -1584,7 +1582,7 @@ class ProlongationModelTest(TestCase):
                 assert error.match("La durée totale est trop longue pour le motif")
 
     def test_clean_end_at_do_not_block_edition(self):
-        max_cumulative_duration = Prolongation.MAX_CUMULATIVE_DURATION[ProlongationReason.SENIOR]["duration"]
+        max_cumulative_duration = Prolongation.MAX_CUMULATIVE_DURATION[ProlongationReason.SENIOR]
         first_prolongation = ProlongationFactory(
             reason=ProlongationReason.SENIOR,
         )
