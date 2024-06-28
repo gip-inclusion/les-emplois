@@ -171,7 +171,7 @@ def gps_users_autocomplete(request):
     if term:
         users = [
             {
-                "text": user.autocomplete_display(),
+                "text": user.get_full_name(),
                 "id": user.pk,
             }
             for user in User.objects.autocomplete(term, limit=10, current_user=current_user)

@@ -651,7 +651,6 @@ class ModelTest(TestCase):
         assert len(JobSeekerFactory(first_name=too_long_name, last_name="maréchal").get_full_name()) == 70
 
 
-
 class JobSeekerProfileModelTest(TestCase):
     def setUp(self):
         super().setUp()

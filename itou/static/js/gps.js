@@ -8,10 +8,9 @@ htmx.onLoad((target) => {
     const frTranslations = Translation.loadPath("./i18n/fr");
     searchUserInputField.select2({
         placeholder: 'Jean DUPONT',
-        escapeMarkup: function (markup) { return markup; },
         language: {
             ...frTranslations.dict,
-            noResults: () => `
+            noResults: () => $(`
               <div class="d-inline-flex w-100 mb-2">
                   <span class="text-muted d-block pe-1">Aucun résultat.</span>
                   <a href="${searchUserInputField.data('noResultsUrl')}" class="link" data-matomo-event="true"
@@ -20,7 +19,7 @@ htmx.onLoad((target) => {
                   Enregistrer un nouveau bénéficiaire
                   </a>
               </div>
-          `,
+          `),
         },
     });
     searchUserInputField.on("select2:select", function (e) {
