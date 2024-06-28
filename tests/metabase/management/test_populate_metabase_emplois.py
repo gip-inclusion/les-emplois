@@ -896,10 +896,13 @@ def test_populate_users():
 def test_populate_memberships():
     company_membership = CompanyMembershipFactory()
     CompanyMembershipFactory(is_active=False)  # Inactive siae memberships are ignored.
+    CompanyMembershipFactory(user__is_active=False)  # memberships of inactive users are also ignored
     prescriber_membership = PrescriberMembershipFactory()
     PrescriberMembershipFactory(is_active=False)
+    PrescriberMembershipFactory(user__is_active=False)
     institution_membership = InstitutionMembershipFactory()
     InstitutionMembershipFactory(is_active=False, institution=institution_membership.institution)
+    InstitutionMembershipFactory(user__is_active=False, institution=institution_membership.institution)
 
     num_queries = 1  # Count siae memberships
     num_queries += 1  # Count prescriber memberships
