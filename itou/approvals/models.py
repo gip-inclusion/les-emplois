@@ -1309,30 +1309,12 @@ class CommonProlongation(models.Model):
     MAX_DURATION = datetime.timedelta(days=10 * 365)
 
     MAX_CUMULATIVE_DURATION = {
-        enums.ProlongationReason.SENIOR_CDI: {
-            "duration": MAX_DURATION,
-            "label": "10 ans (3650 jours)",
-        },
-        enums.ProlongationReason.COMPLETE_TRAINING: {
-            "duration": datetime.timedelta(days=2 * 365),
-            "label": "2 ans (730 jours)",
-        },
-        enums.ProlongationReason.RQTH: {
-            "duration": datetime.timedelta(days=3 * 365),
-            "label": "3 ans (1095 jours)",
-        },
-        enums.ProlongationReason.SENIOR: {
-            "duration": datetime.timedelta(days=5 * 365),
-            "label": "5 ans (1825 jours)",
-        },
-        enums.ProlongationReason.PARTICULAR_DIFFICULTIES: {
-            "duration": datetime.timedelta(days=3 * 365),
-            "label": "3 ans (1095 jours)",
-        },
-        enums.ProlongationReason.HEALTH_CONTEXT: {
-            "duration": datetime.timedelta(days=365),
-            "label": "12 mois (365 jours)",
-        },
+        enums.ProlongationReason.SENIOR_CDI: MAX_DURATION,
+        enums.ProlongationReason.COMPLETE_TRAINING: datetime.timedelta(days=2 * 365),
+        enums.ProlongationReason.RQTH: datetime.timedelta(days=3 * 365),
+        enums.ProlongationReason.SENIOR: datetime.timedelta(days=5 * 365),
+        enums.ProlongationReason.PARTICULAR_DIFFICULTIES: datetime.timedelta(days=3 * 365),
+        enums.ProlongationReason.HEALTH_CONTEXT: datetime.timedelta(days=365),
     }
 
     REASONS_NOT_NEED_PRESCRIBER_OPINION = (
@@ -1513,7 +1495,7 @@ class CommonProlongation(models.Model):
             max_end = start_at + Prolongation.MAX_DURATION
         else:
             used = Prolongation.objects.get_cumulative_duration_for(approval_id, reason, ignore=ignore)
-            remaining_days = max_cumulative_duration["duration"] - used
+            remaining_days = max_cumulative_duration - used
             max_end = start_at + remaining_days
         return max_end
 
