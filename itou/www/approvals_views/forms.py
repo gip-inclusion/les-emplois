@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.exceptions import ValidationError
@@ -141,47 +139,6 @@ class CreateProlongationForm(forms.ModelForm):
     )
     end_at = forms.DateField(widget=DuetDatePickerWidget())
 
-    PROLONGATION_RULES = {
-        ProlongationReason.SENIOR_CDI: {
-            "max_duration": Prolongation.MAX_DURATION,
-            "help_text": (
-                "Pour le CDI Inclusion, jusqu’à la retraite "
-                "(pour des raisons techniques, une durée de 10 ans (3650 jours) est appliquée par défaut)."
-            ),
-        },
-        ProlongationReason.COMPLETE_TRAINING: {
-            "max_duration": timedelta(days=365),
-            "help_text": mark_safe(
-                "12 mois (365 jours) maximum pour chaque demande.<br> "
-                "Renouvellements possibles jusqu’à la fin de l’action de formation."
-            ),
-        },
-        ProlongationReason.RQTH: {
-            "max_duration": timedelta(days=365),
-            "help_text": mark_safe(
-                "12 mois (365 jours) maximum pour chaque demande.<br> "
-                "Renouvellements possibles dans la limite de 5 ans de parcours IAE "
-                "(2 ans de parcours initial + 3 ans (1095 jours))."
-            ),
-        },
-        ProlongationReason.SENIOR: {
-            "max_duration": timedelta(days=365),
-            "help_text": mark_safe(
-                "12 mois (365 jours) maximum pour chaque demande.<br> "
-                "Renouvellements possibles dans la limite de 7 ans de parcours IAE "
-                "(2 ans de parcours initial + 5 ans (1825 jours))."
-            ),
-        },
-        ProlongationReason.PARTICULAR_DIFFICULTIES: {
-            "max_duration": timedelta(days=365),
-            "help_text": mark_safe(
-                "12 mois (365 jours) maximum pour chaque demande.<br> "
-                "Renouvellements possibles dans la limite de 5 ans de parcours IAE "
-                "(2 ans de parcours initial + 3 ans (1095 jours))."
-            ),
-        },
-    }
-
     class Meta:
         model = Prolongation
         fields = [
@@ -220,7 +177,7 @@ class CreateProlongationForm(forms.ModelForm):
         end_at.label = f"Du {self.instance.start_at:%d/%m/%Y} au"
         reason_not_validated = self.data.get("reason")
         try:
-            rule_details = self.PROLONGATION_RULES[reason_not_validated]
+            rule_details = Prolongation.PROLONGATION_RULES[reason_not_validated]
         except KeyError:
             end_at.disabled = True
         else:
