@@ -1,9 +1,10 @@
 import pytest
 from django.contrib import messages
 from django.contrib.admin import helpers
+from django.contrib.auth.models import Permission
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertMessages, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.employee_record import models as employee_record_models
 from itou.job_applications import models
@@ -13,7 +14,7 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record import factories as employee_record_factories
 from tests.job_applications import factories
-from tests.users.factories import JobSeekerFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 from tests.utils.test import parse_response_to_soup
 
 
@@ -295,10 +296,20 @@ def test_accept_job_application_not_subject_to_eligibility(admin_client):
 
 
 @pytest.mark.parametrize("state", JobApplicationState)
-def test_available_transitions(admin_client, state, snapshot):
+def test_available_transitions(client, state, snapshot):
+    superuser = ItouStaffFactory(is_superuser=True)
+    ro_user = ItouStaffFactory(is_superuser=False)
+    ro_user.user_permissions.add(Permission.objects.get(codename="view_jobapplication"))
     job_application = factories.JobApplicationFactory(state=state)
-    response = admin_client.get(reverse("admin:job_applications_jobapplication_change", args=(job_application.pk,)))
+    url = reverse("admin:job_applications_jobapplication_change", args=(job_application.pk,))
+
+    client.force_login(superuser)
+    response = client.get(url)
     assert str(parse_response_to_soup(response, "#job-app-transitions")) == snapshot
+
+    client.force_login(ro_user)
+    response = client.get(url)
+    assertNotContains(response, '<div class="submit-row" id="job-app-transitions">')
 
 
 def test_accept_job_application_for_job_seeker_with_approval(admin_client):

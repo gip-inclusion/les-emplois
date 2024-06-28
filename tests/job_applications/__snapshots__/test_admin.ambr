@@ -2,106 +2,106 @@
 # name: test_available_transitions[accepted]
   '''
   <div class="submit-row" id="job-app-transitions">
-          <p>Changer l'état de la candidature :</p>
-          
-          
-          
-              <input class="danger js-with-confirm" name="transition_cancel" type="submit" value="Annuler"/>
-          
-          
-      </div>
+              <p>Changer l'état de la candidature :</p>
+              
+              
+              
+                  <input class="danger js-with-confirm" name="transition_cancel" type="submit" value="Annuler"/>
+              
+              
+          </div>
   '''
 # ---
 # name: test_available_transitions[cancelled]
   '''
   <div class="submit-row" id="job-app-transitions">
-          <p>Changer l'état de la candidature :</p>
-          
-          
-              <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
-          
-          
-          
-      </div>
+              <p>Changer l'état de la candidature :</p>
+              
+              
+                  <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
+              
+              
+              
+          </div>
   '''
 # ---
 # name: test_available_transitions[new]
   '''
   <div class="submit-row" id="job-app-transitions">
-          <p>Changer l'état de la candidature :</p>
-          
-              <input class="danger js-with-confirm" name="transition_process" type="submit" value="Passer à l'étude"/>
-          
-          
-          
-          
-      </div>
+              <p>Changer l'état de la candidature :</p>
+              
+                  <input class="danger js-with-confirm" name="transition_process" type="submit" value="Passer à l'étude"/>
+              
+              
+              
+              
+          </div>
   '''
 # ---
 # name: test_available_transitions[obsolete]
   '''
   <div class="submit-row" id="job-app-transitions">
-          <p>Changer l'état de la candidature :</p>
-          
-          
-              <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
-          
-          
-          
-              <input class="danger js-with-confirm" name="transition_reset" type="submit" value="Remettre au statut nouveau"/>
-          
-      </div>
+              <p>Changer l'état de la candidature :</p>
+              
+              
+                  <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
+              
+              
+              
+                  <input class="danger js-with-confirm" name="transition_reset" type="submit" value="Remettre au statut nouveau"/>
+              
+          </div>
   '''
 # ---
 # name: test_available_transitions[postponed]
   '''
   <div class="submit-row" id="job-app-transitions">
-          <p>Changer l'état de la candidature :</p>
-          
-          
-              <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
-          
-          
-          
-      </div>
+              <p>Changer l'état de la candidature :</p>
+              
+              
+                  <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
+              
+              
+              
+          </div>
   '''
 # ---
 # name: test_available_transitions[prior_to_hire]
   '''
   <div class="submit-row" id="job-app-transitions">
-          <p>Changer l'état de la candidature :</p>
-          
-          
-              <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
-          
-          
-          
-      </div>
+              <p>Changer l'état de la candidature :</p>
+              
+              
+                  <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
+              
+              
+              
+          </div>
   '''
 # ---
 # name: test_available_transitions[processing]
   '''
   <div class="submit-row" id="job-app-transitions">
-          <p>Changer l'état de la candidature :</p>
-          
-          
-              <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
-          
-          
-          
-      </div>
+              <p>Changer l'état de la candidature :</p>
+              
+              
+                  <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
+              
+              
+              
+          </div>
   '''
 # ---
 # name: test_available_transitions[refused]
   '''
   <div class="submit-row" id="job-app-transitions">
-          <p>Changer l'état de la candidature :</p>
-          
-          
-              <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
-          
-          
-          
-      </div>
+              <p>Changer l'état de la candidature :</p>
+              
+              
+                  <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
+              
+              
+              
+          </div>
   '''
 # ---
