@@ -1411,10 +1411,8 @@ class ProlongationManagerTest(TestCase):
             reason=ProlongationReason.RQTH.value,
         )
 
-        expected_duration = datetime.timedelta(days=prolongation2_days + prolongation3_days)
-        assert expected_duration == Prolongation.objects.get_cumulative_duration_for(
-            approval, ProlongationReason.RQTH.value
-        )
+        expected_duration = datetime.timedelta(days=prolongation1_days + prolongation2_days + prolongation3_days)
+        assert expected_duration == Prolongation.objects.get_cumulative_duration_for(approval)
 
 
 class ProlongationModelTestTrigger(TestCase):
@@ -1644,7 +1642,7 @@ class ProlongationModelTest(TestCase):
         approval = ApprovalFactory()
         for reason, expected_max_end_at in [
             (ProlongationReason.SENIOR_CDI, datetime.date(2031, 1, 30)),  # 3650 days (~10 years).
-            (ProlongationReason.COMPLETE_TRAINING, datetime.date(2023, 2, 1)),  # 730 days (2 years).
+            (ProlongationReason.COMPLETE_TRAINING, datetime.date(2031, 1, 30)),  # 3650 days (~10 years).
             (ProlongationReason.RQTH, datetime.date(2024, 2, 1)),  # 1095 days (3 years).
             (ProlongationReason.SENIOR, datetime.date(2026, 1, 31)),  # 1825 days (~5 years).
             (ProlongationReason.PARTICULAR_DIFFICULTIES, datetime.date(2024, 2, 1)),  # 1095 days (3 years).

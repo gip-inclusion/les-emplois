@@ -1320,7 +1320,7 @@ class CommonProlongation(models.Model):
         },
         enums.ProlongationReason.COMPLETE_TRAINING: {
             "max_duration": datetime.timedelta(days=365),
-            "max_cumulative_duration": datetime.timedelta(days=2 * 365),
+            "max_cumulative_duration": MAX_DURATION,
             "help_text": mark_safe(
                 "12 mois (365 jours) maximum pour chaque demande.<br> "
                 "Renouvellements possibles jusqu’à la fin de l’action de formation."
@@ -1537,7 +1537,7 @@ class CommonProlongation(models.Model):
         except KeyError:
             max_end = start_at + Prolongation.MAX_DURATION
         else:
-            used = Prolongation.objects.get_cumulative_duration_for(approval_id, reason, ignore=ignore)
+            used = Prolongation.objects.get_cumulative_duration_for(approval_id, ignore=ignore)
             remaining_days = max_cumulative_duration - used
             max_end = start_at + remaining_days
         return max_end
@@ -1678,12 +1678,9 @@ class ProlongationQuerySet(models.QuerySet):
 
 
 class ProlongationManager(models.Manager):
-    def get_cumulative_duration_for(self, approval_id, reason, ignore=None):
-        """
-        Returns the total duration of all prolongations for the given approval and the given reason.
-        """
+    def get_cumulative_duration_for(self, approval_id, ignore=None):
         duration = datetime.timedelta(0)
-        for prolongation in self.filter(approval_id=approval_id, reason=reason).exclude(pk__in=ignore or []):
+        for prolongation in self.filter(approval_id=approval_id).exclude(pk__in=ignore or []):
             duration += prolongation.duration
         return duration
 
