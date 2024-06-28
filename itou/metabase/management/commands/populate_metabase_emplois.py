@@ -427,9 +427,9 @@ class Command(BaseCommand):
         populate_table(users.TABLE, batch_size=1000, querysets=[queryset])
 
     def populate_memberships(self):
-        siae_queryset = CompanyMembership.objects.filter(is_active=True)
-        prescriber_queryset = PrescriberMembership.objects.filter(is_active=True)
-        institution_queryset = InstitutionMembership.objects.filter(is_active=True)
+        siae_queryset = CompanyMembership.objects.active()
+        prescriber_queryset = PrescriberMembership.objects.active()
+        institution_queryset = InstitutionMembership.objects.active()
 
         populate_table(
             memberships.TABLE, batch_size=1000, querysets=[siae_queryset, prescriber_queryset, institution_queryset]
