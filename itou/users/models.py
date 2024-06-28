@@ -379,7 +379,7 @@ class User(AbstractUser, AddressMixin):
         Return the first_name plus the last_name, with a space in between.
         """
         full_name = f"{self.first_name.strip().title()} {self.last_name.upper()}"
-        return full_name.strip()
+        return full_name.strip()[:70]
 
     @property
     def is_job_seeker(self):
