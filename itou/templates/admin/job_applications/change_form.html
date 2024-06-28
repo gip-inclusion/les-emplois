@@ -4,30 +4,32 @@
 
     {{ block.super }}
 
-    <div class="submit-row" id="job-app-transitions">
-        <p>Changer l'état de la candidature :</p>
-        {% if original.state.is_new %}
-            <input type='submit' class="danger js-with-confirm" name="transition_process" value="Passer à l'étude">
-        {% endif %}
-        {% if original.is_in_acceptable_state %}
-            <input type='submit' class="danger js-with-confirm" name="transition_accept" value="Accepter">
-        {% endif %}
-        {% if original.state.is_accepted and original.can_be_cancelled %}
-            <input type='submit' class="danger js-with-confirm" name="transition_cancel" value="Annuler">
-        {% endif %}
-        {% if original.state.is_obsolete %}
-            <input type='submit' class="danger js-with-confirm" name="transition_reset" value="Remettre au statut nouveau">
-        {% endif %}
-    </div>
+    {% if perms.job_applications.change_jobapplication %}
+        <div class="submit-row" id="job-app-transitions">
+            <p>Changer l'état de la candidature :</p>
+            {% if original.state.is_new %}
+                <input type='submit' class="danger js-with-confirm" name="transition_process" value="Passer à l'étude">
+            {% endif %}
+            {% if original.is_in_acceptable_state %}
+                <input type='submit' class="danger js-with-confirm" name="transition_accept" value="Accepter">
+            {% endif %}
+            {% if original.state.is_accepted and original.can_be_cancelled %}
+                <input type='submit' class="danger js-with-confirm" name="transition_cancel" value="Annuler">
+            {% endif %}
+            {% if original.state.is_obsolete %}
+                <input type='submit' class="danger js-with-confirm" name="transition_reset" value="Remettre au statut nouveau">
+            {% endif %}
+        </div>
 
-    <script nonce="{{ CSP_NONCE }}">
-        var buttons = document.getElementsByClassName("js-with-confirm");
-        Array.prototype.forEach.call(buttons, function(button) {
-            button.addEventListener("click", function(event) {
-                if (!confirm('Êtes vous certain de vouloir **' + event.target.value.toUpperCase() + '** la candidature ?')) {
-                    event.preventDefault();
-                }
+        <script nonce="{{ CSP_NONCE }}">
+            var buttons = document.getElementsByClassName("js-with-confirm");
+            Array.prototype.forEach.call(buttons, function(button) {
+                button.addEventListener("click", function(event) {
+                    if (!confirm('Êtes vous certain de vouloir **' + event.target.value.toUpperCase() + '** la candidature ?')) {
+                        event.preventDefault();
+                    }
+                });
             });
-        });
-    </script>
+        </script>
+    {% endif %}
 {% endblock %}
