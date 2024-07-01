@@ -35,6 +35,7 @@ class IdentityProvider(models.TextChoices):
     DJANGO = "DJANGO", "Django"
     FRANCE_CONNECT = "FC", "FranceConnect"
     INCLUSION_CONNECT = "IC", "Inclusion Connect"
+    PRO_CONNECT = "PC", "Pro Connect"
     PE_CONNECT = "PEC", "Pôle emploi Connect"
 
 

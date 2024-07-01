@@ -1,0 +1,14 @@
+from django.urls import path
+
+from . import views
+
+
+app_name = "pro_connect"
+
+urlpatterns = [
+    path("authorize", views.pro_connect_authorize, name="authorize"),
+    path("activate_account", views.pro_connect_activate_account, name="activate_account"),
+    path("callback", views.pro_connect_callback, name="callback"),
+    path("logout", views.pro_connect_logout, name="logout"),
+    path("logout_callback", views.pro_connect_logout_callback, name="logout_callback"),
+]
