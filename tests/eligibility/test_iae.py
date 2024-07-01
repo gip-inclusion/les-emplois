@@ -224,6 +224,25 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert last_considered_valid == prescriber_diagnosis
         assert last_expired is None
 
+    def test_prescribers_do_not_see_company_diag(self):
+        eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_employer=True, job_seeker=self.job_seeker)
+        company = eligibility_diagnosis.author_siae
+        prescriber_org = PrescriberOrganizationWithMembershipFactory()
+        prescriber = prescriber_org.members.get()
+        assert (
+            EligibilityDiagnosis.objects.has_considered_valid(prescriber, job_seeker=self.job_seeker, for_siae=company)
+            is False
+        )
+        assert (
+            EligibilityDiagnosis.objects.last_considered_valid(
+                prescriber, job_seeker=self.job_seeker, for_siae=company
+            )
+            is None
+        )
+        assert (
+            EligibilityDiagnosis.objects.last_expired(prescriber, job_seeker=self.job_seeker, for_siae=company) is None
+        )
+
     def test_expired_itou_diagnosis_by_another_siae(self):
         company_1 = CompanyFactory(with_membership=True)
         employer_1 = company_1.members.get()
