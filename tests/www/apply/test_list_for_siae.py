@@ -267,7 +267,7 @@ class ProcessListSiaeTest(TestCase):
 
         self.client.force_login(self.eddie_hit_pit)
         # Only show maggie's applications
-        params = {"job_seekers": [self.maggie.id]}
+        params = {"job_seeker": self.maggie.id}
         response = self.client.get(reverse("apply:list_for_siae"), params)
 
         # 4 criteria: all are shown
@@ -320,7 +320,7 @@ class ProcessListSiaeTest(TestCase):
                 self.hit_pit.kind = kind
                 self.hit_pit.save(update_fields=("kind",))
                 # Only show maggie's applications
-                response = self.client.get(reverse("apply:list_for_siae"), {"job_seekers": [self.maggie.id]})
+                response = self.client.get(reverse("apply:list_for_siae"), {"job_seeker": self.maggie.id})
                 if expect_to_see_criteria[kind]:
                     assertContains(response, TITLE, html=True)
                     assertContains(response, CRITERION, html=True)
@@ -449,13 +449,12 @@ class ProcessListSiaeTest(TestCase):
         Eddie wants to see Maggie's job applications.
         """
         self.client.force_login(self.eddie_hit_pit)
-        job_seekers_ids = [self.maggie.id]
-        response = self.client.get(reverse("apply:list_for_siae"), {"job_seekers": job_seekers_ids})
+        response = self.client.get(reverse("apply:list_for_siae"), {"job_seeker": self.maggie.pk})
 
         applications = response.context["job_applications_page"].object_list
 
         assert len(applications) == 2
-        assert applications[0].job_seeker.id in job_seekers_ids
+        assert applications[0].job_seeker_id == self.maggie.pk
 
     def test_list_for_siae_filtered_by_many_organization_names(self):
         """

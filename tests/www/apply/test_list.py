@@ -133,7 +133,7 @@ def test_list_hidden_fields(client):
         "departments",
         "eligibility_validated",
         "end_date",
-        "job_seekers",
+        "job_seeker",
         "pass_iae_active",
         "pass_iae_suspended",
         "selected_jobs",
@@ -150,7 +150,7 @@ def test_list_hidden_fields(client):
         "criteria": criteria.pk,
         "eligibility_validated": "on",
         "end_date": datetime.date.max,
-        "job_seekers": [job_seeker1.pk, job_seeker2.pk],
+        "job_seeker": job_seeker1.pk,
         "pass_iae_active": "on",
         "pass_iae_suspended": "on",
         "sender_companies": [job_app.sender_company.pk],
@@ -186,7 +186,6 @@ def test_list_hidden_fields(client):
     offcanvas_form = parse_response_to_soup(response, selector="#offcanvasApplyFilters")
     hidden_fields = offcanvas_form.find_all("input", {"type": "hidden"})
     expected_hiddens = {
-        ("job_seekers", f"{job_seeker1.pk}"),
-        ("job_seekers", f"{job_seeker2.pk}"),
+        ("job_seeker", f"{job_seeker1.pk}"),
     }
     assert set((hidden["name"], hidden["value"]) for hidden in hidden_fields) == expected_hiddens
