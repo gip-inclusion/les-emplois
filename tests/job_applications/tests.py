@@ -80,7 +80,7 @@ class JobApplicationModelTest(TestCase):
             job_application.job_seeker, for_siae=job_application.to_company
         )
         assert not has_considered_valid_diagnoses
-        assert not job_application.eligibility_diagnosis_by_siae_required
+        assert not job_application.eligibility_diagnosis_by_siae_required()
 
         job_application = JobApplicationFactory(
             state=JobApplicationState.PROCESSING,
@@ -91,7 +91,7 @@ class JobApplicationModelTest(TestCase):
             job_application.job_seeker, for_siae=job_application.to_company
         )
         assert not has_considered_valid_diagnoses
-        assert job_application.eligibility_diagnosis_by_siae_required
+        assert job_application.eligibility_diagnosis_by_siae_required()
 
     def test_accepted_by(self):
         job_application = JobApplicationFactory(
