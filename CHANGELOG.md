@@ -1,5 +1,37 @@
 # Journal des modifications
 
+## 2024-07-01
+
+### Ajouté
+
+- [API: ajout de token de département avec leur authentification](https://github.com/gip-inclusion/les-emplois/pull/4307)
+- [API: ajout des filtres `departement` et `departement_postes` sur la route `/api/v1/siaes/`](https://github.com/gip-inclusion/les-emplois/pull/4270)
+- [Candidature: ajout d'une enquête Tally auprès des employeurs pour connaître leurs pratiques quant aux candidatures faites par des candidats en autonomie](https://github.com/gip-inclusion/les-emplois/pull/4288)
+- [Candidature: ajout d'une enquête Tally auprès des prescripteurs habilités sur l'expérience candidat](https://github.com/gip-inclusion/les-emplois/pull/4285)
+- [En tant qu’employeur je peux postuler pour des candidats vers d’autres employeurs (Employeur Orienteur)](https://github.com/gip-inclusion/les-emplois/pull/4197) 🖼
+- [GPS : visualiser les relations dans l'admin](https://github.com/gip-inclusion/les-emplois/pull/4280) 🖼
+- [GPS: envoi d'événements à Matomo](https://github.com/gip-inclusion/les-emplois/pull/4278)
+- [Statistiques: Ajout d'une contrainte en base de donnée sur le champ `processed_at` des candidatures](https://github.com/gip-inclusion/les-emplois/pull/4246)
+- [Statistiques: Dénormalisation de la date de traitement d'une candidature.](https://github.com/gip-inclusion/les-emplois/pull/4160)
+
+### Modifié
+
+- [Admin : Ajouter une icône à la partie administration du site](https://github.com/gip-inclusion/les-emplois/pull/4303)
+- [Admin: Correction de permissions](https://github.com/gip-inclusion/les-emplois/pull/4322)
+- [Admin: Robustifier le changement d'état des candidatures](https://github.com/gip-inclusion/les-emplois/pull/4244)
+- [Candidature : N'utiliser que les diagnostiques considérés comme valides pour la SIAE](https://github.com/gip-inclusion/les-emplois/pull/4229)
+- [GPS : liste des groupes > la date n'apparaît pas pour les groupes créés en masse // changement de l'ordre](https://github.com/gip-inclusion/les-emplois/pull/4279) 🖼
+- [Import IAE : Limiter la période de grâce pour le déconventionnement au premier semestre](https://github.com/gip-inclusion/les-emplois/pull/4255)
+- [Recherche employeur: Correction d’un bug lors de la recherche de département adjacent](https://github.com/gip-inclusion/les-emplois/pull/4290)
+- [Recherche employeur: Correction d’un bug lors de la recherche en Corse](https://github.com/gip-inclusion/les-emplois/pull/4296)
+- [Statistiques: Correction de l'export des comptes de collaborateurs](https://github.com/gip-inclusion/les-emplois/pull/4321)
+- [Sécurité : Empêcher une injection HTML (et éventuellement XSS) sur la page de login](https://github.com/gip-inclusion/les-emplois/pull/4316)
+- [Sécurité : Toujours préfixer le sujet des emails par l’environnement depuis lequel ils sont envoyés](https://github.com/gip-inclusion/les-emplois/pull/4301)
+- [Tableau de bord : ne pas afficher GPS aux orienteurs](https://github.com/gip-inclusion/les-emplois/pull/4318)
+- [Tableau de bord : suppression de Diagoriente, déplacement de GPS et ajout d'un message informatif](https://github.com/gip-inclusion/les-emplois/pull/4308) 🖼
+- [UX/UI : Modification des filtres sur la liste de candidatures](https://github.com/gip-inclusion/les-emplois/pull/4199) 🖼
+- [UX/UI : Simplifier la création des filtres de départements pour la recherche employeur / postes](https://github.com/gip-inclusion/les-emplois/pull/4272)
+
 ## 2024-06-24
 
 ### Ajouté
