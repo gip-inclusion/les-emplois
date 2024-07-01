@@ -1,3 +1,5 @@
+"use strict";
+
 (function() {
   const filtersContentId = "offcanvasApplyFiltersContent";
   const filtersContent = document.getElementById(filtersContentId);
