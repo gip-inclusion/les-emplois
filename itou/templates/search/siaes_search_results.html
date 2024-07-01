@@ -11,7 +11,34 @@
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block content_title %}<h1>Rechercher un emploi inclusif</h1>{% endblock %}
+{% block content_title %}
+    <h1>Rechercher un emploi inclusif</h1>
+    <div class="alert alert-important alert-dismissible fade show" role="status">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        <div class="row">
+          <div class="d-none d-md-inline col-md-auto">
+            <img src="https://gip-inclusion.github.io/itou-theme/images/ico-bicro-important.svg" alt="" height="80">
+          </div>
+          <div class="col-12 col-md px-md-0">
+            <p class="mb-2"><strong>Test d'alerte Antoine</strong></p>
+            <p class="mb-0">J'espère que ça fonctionne</p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+            <a href='{% tally_form_url form_id="w5kLqM"'
+                       rel="noopener"
+                       target="_blank"
+                       aria-label="Test de formulaire Tally."
+                       class="btn btn-sm btn-primary"
+                       >
+                <i class="ri-mail-send-line ri-lg font-weight-normal align-self-start"></i>
+                <span>Ca fonctionne ?</span>
+                <i class="ri-external-link-line font-weight-normal ms-2"></i>
+            </a>
+          </div>
+        </div>
+    </div>
+    
+{% endblock %}
 
 {% block content %}
     <section class="s-tabs-01">
