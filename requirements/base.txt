@@ -321,9 +321,9 @@ django-pgtrigger==4.11.1 \
     --hash=sha256:39862f229405c6fe49b33451e13910a70578ba569f7e8bea6ea82049058b371f \
     --hash=sha256:9ef664932b3b7fb06e6dc091e4e292d029c221804469ff42968dad272076915f
     # via -r requirements/base.in
-django-select2==8.1.2 \
-    --hash=sha256:dc09e09299988dd7cc1f31c27582976377f0e1479101be1f3bb0d1f24216477f \
-    --hash=sha256:f44685ee1c39090aade01e3ebc256702f05620f3c78a3c268440ad9a66070876
+django-select2==8.2.0 \
+    --hash=sha256:0e173ce49c6ea91efa9fc24c5ca8d1f8a3c545e60db779cf2c623d4e07405360 \
+    --hash=sha256:43ca01fecff1bd9ffaf87de90a4beca86fe801edd0c0102c3230c34f81490b9a
     # via -r requirements/base.in
 django-storages==1.14.3 \
     --hash=sha256:31f263389e95ce3a1b902fb5f739a7ed32895f7d8b80179fe7453ecc0dfe102e \
