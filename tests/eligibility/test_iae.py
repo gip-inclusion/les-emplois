@@ -166,6 +166,8 @@ class EligibilityDiagnosisManagerTest(TestCase):
     def test_itou_diagnosis_both_siae_and_prescriber(self):
         company = CompanyFactory(with_membership=True)
         prescriber_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
+        # More recent than the prescriber diagnosis.
+        IAEEligibilityDiagnosisFactory(from_employer=True, author_siae=company, job_seeker=self.job_seeker)
         # From `siae` perspective.
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(
             job_seeker=self.job_seeker, for_siae=company
