@@ -342,9 +342,9 @@ django-formtools==2.5.1 \
     --hash=sha256:47cb34552c6efca088863d693284d04fc36eaaf350eb21e1a1d935e0df523c93 \
     --hash=sha256:bce9b64eda52cc1eef6961cc649cf75aacd1a707c2fff08d6c3efcbc8e7e761a
     # via -r requirements/base.txt
-django-hijack==3.5.1 \
-    --hash=sha256:497dfa1764b9331800def8cbe05669fc06dbda28adc133bc1521d4d33bbbcdb4 \
-    --hash=sha256:df56a23794f842cdc1ddbe460bea2670d1d4f7d6017d35c89ba3b9307a9fd330
+django-hijack==3.5.4 \
+    --hash=sha256:981360fe1b993b28355788f47b9ef5a41dae2c898eae4d5df03e5c305c600fc1 \
+    --hash=sha256:acd80231742371669ed3cef3b0dca7b80f4a2e9eb0c6a9d6d145c0150fff057f
     # via -r requirements/base.txt
 django-htmx==1.18.0 \
     --hash=sha256:48f3b8a784467bfcc30562067b87ecbc4ad9b739cc269eec5f3789c16d2cb2ce \
@@ -785,9 +785,9 @@ numpy==1.25.1 \
     # via
     #   -r requirements/base.txt
     #   pandas
-openpyxl==3.1.4 \
-    --hash=sha256:8d2c8adf5d20d6ce8f9bca381df86b534835e974ed0156dacefa76f68c1d69fb \
-    --hash=sha256:ec17f6483f2b8f7c88c57e5e5d3b0de0e3fb9ac70edc084d28e864f5b33bbefd
+openpyxl==3.1.5 \
+    --hash=sha256:5282c12b107bffeef825f4617dc029afaf41d0ea60823bbb665ef3079dc79de2 \
+    --hash=sha256:cf0e3cf56142039133628b5acffe8ef0c12bc902d2aadd3e0fe5878dc08d1050
     # via -r requirements/base.txt
 packaging==23.1 \
     --hash=sha256:994793af429502c4ea2ebf6bf664629d07c1a9fe974af92966e4b8d2df7edc61 \
@@ -1075,9 +1075,9 @@ pyzipper==0.3.6 \
     --hash=sha256:0adca90a00c36a93fbe49bfa8c5add452bfe4ef85a1b8e3638739dd1c7b26bfc \
     --hash=sha256:6d097f465bfa47796b1494e12ea65d1478107d38e13bc56f6e58eedc4f6c1a87
     # via -r requirements/base.txt
-redis==5.0.6 \
-    --hash=sha256:38473cd7c6389ad3e44a91f4c3eaf6bcb8a9f746007f29bf4fb20824ff0b2197 \
-    --hash=sha256:c0d6d990850c627bbf7be01c5c4cbaadf67b48593e913bb71c9819c30df37eee
+redis==5.0.7 \
+    --hash=sha256:0e479e24da960c690be5d9b96d21f7b918a98c0cf49af3b6fafaa0753f93a0db \
+    --hash=sha256:8f611490b93c8109b50adc317b31bfd84fff31def3475b92e7e80bf39f48175b
     # via -r requirements/base.txt
 referencing==0.29.1 \
     --hash=sha256:90cb53782d550ba28d2166ef3f55731f38397def8832baac5d45235f1995e35e \
@@ -1293,24 +1293,25 @@ rpds-py==0.8.11 \
     #   -r requirements/base.txt
     #   jsonschema
     #   referencing
-ruff==0.4.10 \
-    --hash=sha256:0f54c481b39a762d48f64d97351048e842861c6662d63ec599f67d515cb417f6 \
-    --hash=sha256:18238c80ee3d9100d3535d8eb15a59c4a0753b45cc55f8bf38f38d6a597b9739 \
-    --hash=sha256:330421543bd3222cdfec481e8ff3460e8702ed1e58b494cf9d9e4bf90db52b9d \
-    --hash=sha256:338a64ef0748f8c3a80d7f05785930f7965d71ca260904a9321d13be24b79695 \
-    --hash=sha256:3aa4f2bc388a30d346c56524f7cacca85945ba124945fe489952aadb6b5cd804 \
-    --hash=sha256:3cea07079962b2941244191569cf3a05541477286f5cafea638cd3aa94b56815 \
-    --hash=sha256:5c2c4d0859305ac5a16310eec40e4e9a9dec5dcdfbe92697acd99624e8638dac \
-    --hash=sha256:67f67cef43c55ffc8cc59e8e0b97e9e60b4837c8f21e8ab5ffd5d66e196e25f7 \
-    --hash=sha256:67fe086b433b965c22de0b4259ddfe6fa541c95bf418499bedb9ad5fb8d1c631 \
-    --hash=sha256:9e9b6fb3a37b772628415b00c4fc892f97954275394ed611056a4b8a2631365e \
-    --hash=sha256:a79489607d1495685cdd911a323a35871abfb7a95d4f98fc6f85e799227ac46e \
-    --hash=sha256:acfaaab59543382085f9eb51f8e87bac26bf96b164839955f244d07125a982ef \
-    --hash=sha256:b1dd1681dfa90a41b8376a61af05cc4dc5ff32c8f14f5fe20dba9ff5deb80cd6 \
-    --hash=sha256:c75c53bb79d71310dc79fb69eb4902fba804a81f374bc86a9b117a8d077a1784 \
-    --hash=sha256:d8f71885bce242da344989cae08e263de29752f094233f932d4f5cfb4ef36a81 \
-    --hash=sha256:dd1fcee327c20addac7916ca4e2653fbbf2e8388d8a6477ce5b4e986b68ae6c0 \
-    --hash=sha256:ffe3cd2f89cb54561c62e5fa20e8f182c0a444934bf430515a4b422f1ab7b7ca
+ruff==0.5.0 \
+    --hash=sha256:2c4dfcd8d34b143916994b3876b63d53f56724c03f8c1a33a253b7b1e6bf2a7d \
+    --hash=sha256:38f3b8327b3cb43474559d435f5fa65dacf723351c159ed0dc567f7ab735d1b6 \
+    --hash=sha256:46e193b36f2255729ad34a49c9a997d506e58f08555366b2108783b3064a0e1e \
+    --hash=sha256:49141d267100f5ceff541b4e06552e98527870eafa1acc9dec9139c9ec5af64c \
+    --hash=sha256:7594f8df5404a5c5c8f64b8311169879f6cf42142da644c7e0ba3c3f14130370 \
+    --hash=sha256:81e5facfc9f4a674c6a78c64d38becfbd5e4f739c31fcd9ce44c849f1fad9e4c \
+    --hash=sha256:9dc5cfd3558f14513ed0d5b70ce531e28ea81a8a3b1b07f0f48421a3d9e7d80a \
+    --hash=sha256:adc7012d6ec85032bc4e9065110df205752d64010bed5f958d25dbee9ce35de3 \
+    --hash=sha256:b1a321c4f68809fddd9b282fab6a8d8db796b270fff44722589a8b946925a2a8 \
+    --hash=sha256:cd096e23c6a4f9c819525a437fa0a99d1c67a1b6bb30948d46f33afbc53596cf \
+    --hash=sha256:d2ffbc3715a52b037bcb0f6ff524a9367f642cdc5817944f6af5479bbb2eb50e \
+    --hash=sha256:d505fb93b0fabef974b168d9b27c3960714d2ecda24b6ffa6a87ac432905ea38 \
+    --hash=sha256:db3ca35265de239a1176d56a464b51557fce41095c37d6c406e658cf80bbb362 \
+    --hash=sha256:e589e27971c2a3efff3fadafb16e5aef7ff93250f0134ec4b52052b673cf988d \
+    --hash=sha256:e9118f60091047444c1b90952736ee7b1792910cab56e9b9a9ac20af94cd0440 \
+    --hash=sha256:eb641b5873492cf9bd45bc9c5ae5320648218e04386a5f0c264ad6ccce8226a1 \
+    --hash=sha256:ed5c4df5c1fb4518abcb57725b576659542bdbe93366f4f329e8f398c4b71178 \
+    --hash=sha256:ee770ea8ab38918f34e7560a597cc0a8c9a193aaa01bfbd879ef43cb06bd9c4c
     # via -r requirements/test.in
 s3transfer==0.6.1 \
     --hash=sha256:3c0da2d074bf35d6870ef157158641178a4204a6e689e82546083e31e0311346 \
@@ -1318,9 +1319,9 @@ s3transfer==0.6.1 \
     # via
     #   -r requirements/base.txt
     #   boto3
-sentry-sdk==2.6.0 \
-    --hash=sha256:422b91cb49378b97e7e8d0e8d5a1069df23689d45262b86f54988a7db264e874 \
-    --hash=sha256:65cc07e9c6995c5e316109f138570b32da3bd7ff8d0d0ee4aaf2628c3dd8127d
+sentry-sdk==2.7.1 \
+    --hash=sha256:25006c7e68b75aaa5e6b9c6a420ece22e8d7daec4b7a906ffd3a8607b67c037b \
+    --hash=sha256:ef1b3d54eb715825657cd4bb3cb42bb4dc85087bac14c56b0fd8c21abd968c9a
     # via -r requirements/base.txt
 shellcheck-py==0.10.0.1 \
     --hash=sha256:390826b340b8c19173922b0da5ef7b66ef34d4d087dc48aad3e01f7e77e164d9 \
@@ -1366,9 +1367,9 @@ tablib==3.5.0 \
     # via
     #   -r requirements/base.txt
     #   django-import-export
-tenacity==8.4.1 \
-    --hash=sha256:28522e692eda3e1b8f5e99c51464efcc0b9fc86933da92415168bc1c4e2308fa \
-    --hash=sha256:54b1412b878ddf7e1f1577cd49527bad8cdef32421bd599beac0c6c3f10582fd
+tenacity==8.4.2 \
+    --hash=sha256:9e6f7cf7da729125c7437222f8a522279751cdfbe6b67bfe64f75d3a348661b2 \
+    --hash=sha256:cd80a53a79336edba8489e767f729e4f391c896956b57140b5d7511a64bbd3ef
     # via -r requirements/base.txt
 tqdm==4.66.4 \
     --hash=sha256:b75ca56b413b030bc3f00af51fd2c1a1a5eac6a0c1cca83cbb37a5c52abce644 \
