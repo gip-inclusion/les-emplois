@@ -131,7 +131,7 @@ def test_list_prescriptions_filtered_by_job_seeker(client):
     JobApplicationFactory.create_batch(2, sender=prescriber)
     client.force_login(prescriber)
 
-    response = client.get(reverse("apply:list_prescriptions"), {"job_seekers": [job_seeker.pk]})
+    response = client.get(reverse("apply:list_prescriptions"), {"job_seeker": job_seeker.pk})
     applications = response.context["job_applications_page"].object_list
     assert len(applications) == 1
     assert applications[0].job_seeker.pk == job_seeker.pk

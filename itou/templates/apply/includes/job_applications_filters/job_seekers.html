@@ -1,15 +1,13 @@
 {% load django_bootstrap5 %}
 
-{% if filters_form.job_seekers %}
+{% if filters_form.job_seeker %}
     <hr>
     <fieldset>
         <legend>
-            <button class="btn has-collapse-caret collapsed" data-bs-toggle="collapse" data-bs-target="#collapseJobSeekers" type="button" aria-expanded="false" aria-controls="collapseJobSeekers">
-                {{ filters_form.job_seekers.label | capfirst }}
+            <button class="btn has-collapse-caret collapsed" data-bs-toggle="collapse" data-bs-target="#collapseJobSeekers" type="button" aria-expanded="false" aria-controls="collapseJobSeeker">
+                {{ filters_form.job_seeker.label | capfirst }}
             </button>
         </legend>
-        <div class="mt-3 collapse" id="collapseJobSeekers">
-            {% bootstrap_field filters_form.job_seekers show_label=False %}
-        </div>
+        <div class="mt-3 collapse" id="collapseJobSeeker">{% bootstrap_field filters_form.job_seeker show_label=False %}</div>
     </fieldset>
 {% endif %}

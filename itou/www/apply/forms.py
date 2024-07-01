@@ -10,7 +10,7 @@ from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
-from django_select2.forms import Select2MultipleWidget
+from django_select2.forms import Select2MultipleWidget, Select2Widget
 
 from itou.approvals.models import Approval
 from itou.asp import models as asp_models
@@ -939,10 +939,10 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     """
 
     senders = forms.MultipleChoiceField(required=False, label="Nom de la personne", widget=Select2MultipleWidget)
-    job_seekers = forms.MultipleChoiceField(
+    job_seeker = forms.ChoiceField(
         required=False,
         label="Nom du candidat",
-        widget=Select2MultipleWidget(
+        widget=Select2Widget(
             attrs={"data-placeholder": "Nom du candidat"},
         ),
     )
@@ -969,7 +969,7 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         senders = self.job_applications_qs.get_unique_fk_objects("sender")
         self.fields["senders"].choices += self._get_choices_for(senders)
         job_seekers = self.job_applications_qs.get_unique_fk_objects("job_seeker")
-        self.fields["job_seekers"].choices = self._get_choices_for(job_seekers)
+        self.fields["job_seeker"].choices = self._get_choices_for(job_seekers)
         self.fields["criteria"].choices = self._get_choices_for_administrativecriteria()
         self.fields["departments"].choices = self._get_choices_for_departments(job_seekers)
         self.fields["selected_jobs"].choices = self._get_choices_for_jobs()
@@ -1005,8 +1005,8 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         if senders := self.cleaned_data.get("senders"):
             queryset = queryset.filter(sender__id__in=senders)
 
-        if job_seekers := self.cleaned_data.get("job_seekers"):
-            queryset = queryset.filter(job_seeker__id__in=job_seekers)
+        if job_seeker := self.cleaned_data.get("job_seeker"):
+            queryset = queryset.filter(job_seeker__id=job_seeker)
         return queryset
 
 
