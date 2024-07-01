@@ -1,4 +1,31 @@
+{% load tally %}
+
 {% extends "layout/base.html" %}
+
+<div class="alert alert-important alert-dismissible fade show" role="status">
+<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+<div class="row">
+  <div class="d-none d-md-inline col-md-auto">
+    <img src="https://gip-inclusion.github.io/itou-theme/images/ico-bicro-important.svg" alt="" height="80">
+  </div>
+  <div class="col-12 col-md px-md-0">
+    <p class="mb-2"><strong>We need you !!</strong></p>
+    <p class="mb-0">Vos retours sont importants pour nous (et surtout pour vous) alors prenez 5 minutes de votre temps pour vous aidez ;-)</p>
+  </div>
+  <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+    <a href='{% tally_form_url form_id="w5kLqM" origin="LesEmplois" user_kind="partenaire"'
+                       rel="noopener"
+                       target="_blank"
+                       aria-label="Inviter un partenaire."
+                       class="btn btn-sm btn-primary"
+    >
+    <i class="ri-mail-send-line ri-lg font-weight-normal align-self-start"></i>
+    <span>Répondre à l'enquête</span>
+    <i class="ri-external-link-line font-weight-normal ms-2"></i>
+    </a>
+  </div>
+</div>
+</div>
 
 {% block title %}Rechercher des prescripteurs habilités {{ block.super }}{% endblock %}
 
