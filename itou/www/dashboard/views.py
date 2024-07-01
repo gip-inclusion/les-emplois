@@ -156,8 +156,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "num_rejected_employee_records": 0,
         "pending_prolongation_requests": None,
         "evaluated_siae_notifications": EvaluatedSiae.objects.none(),
-        "show_mobilemploi_banner": False,
-        "show_mobilemploi_prescriber_banner": False,
         "siae_suspension_text_with_dates": None,
         "siae_search_form": SiaeSearchForm(),
         "pilotage_webinar_banners": [],
@@ -209,15 +207,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                     prescriber_organization=current_org,
                     status=ProlongationRequestStatus.PENDING,
                 ).count()
-            context["show_mobilemploi_prescriber_banner"] = (
-                current_org.department in MOBILEMPLOI_DEPARTMENTS
-                and current_org.kind
-                not in (
-                    PrescriberOrganizationKind.CAP_EMPLOI,
-                    PrescriberOrganizationKind.PE,
-                    PrescriberOrganizationKind.ML,
-                )
-            )
         elif request.user.email.endswith("pole-emploi.fr"):
             messages.info(
                 request,
@@ -263,13 +252,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             timezone.now() - relativedelta(months=6),
             timezone.now() - relativedelta(months=1),
         ]
-        context["show_mobilemploi_banner"] = (
-            request.user.department in MOBILEMPLOI_DEPARTMENTS
-            and request.user.job_applications.filter(created_at__range=active_user_job_applications_interval)
-            .exclude(state__in=[JobApplicationState.ACCEPTED, JobApplicationState.OBSOLETE])
-            .exists()
-        )
-
     context["pilotage_webinar_banners"] = [
         banner for banner in context["pilotage_webinar_banners"] if banner["is_displayable"]()
     ]
