@@ -187,6 +187,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
             },
         ),
     ]
+    change_form_template = "admin/job_applications/jobapplication_change_form.html"
 
     INCONSISTENCY_CHECKS = [
         (
