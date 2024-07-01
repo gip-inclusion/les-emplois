@@ -1366,9 +1366,9 @@ tablib==3.5.0 \
     # via
     #   -r requirements/base.txt
     #   django-import-export
-tenacity==8.4.1 \
-    --hash=sha256:28522e692eda3e1b8f5e99c51464efcc0b9fc86933da92415168bc1c4e2308fa \
-    --hash=sha256:54b1412b878ddf7e1f1577cd49527bad8cdef32421bd599beac0c6c3f10582fd
+tenacity==8.4.2 \
+    --hash=sha256:9e6f7cf7da729125c7437222f8a522279751cdfbe6b67bfe64f75d3a348661b2 \
+    --hash=sha256:cd80a53a79336edba8489e767f729e4f391c896956b57140b5d7511a64bbd3ef
     # via -r requirements/base.txt
 tqdm==4.66.4 \
     --hash=sha256:b75ca56b413b030bc3f00af51fd2c1a1a5eac6a0c1cca83cbb37a5c52abce644 \
