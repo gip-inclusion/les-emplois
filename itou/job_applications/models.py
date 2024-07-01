@@ -58,6 +58,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     TRANSITION_CANCEL = "cancel"
     TRANSITION_RENDER_OBSOLETE = "render_obsolete"
     TRANSITION_TRANSFER = "transfer"
+    TRANSITION_OUTWARD_TRANSFER = "outward_transfer"
     TRANSITION_RESET = "reset"
 
     TRANSITION_CHOICES = (
@@ -71,6 +72,8 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_RENDER_OBSOLETE, "Rendre obsolete la candidature"),
         (TRANSITION_TRANSFER, "Transfert de la candidature vers une autre SIAE"),
         (TRANSITION_RESET, "Réinitialiser la candidature"),
+        # How to differentiate form TRANSITION_TRANSFER wording?
+        (TRANSITION_OUTWARD_TRANSFER, "Transfert de la candidature vers une autre SIAE"),
     )
 
     CAN_BE_ACCEPTED_STATES = [
@@ -121,6 +124,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         ),
         (TRANSITION_TRANSFER, CAN_BE_TRANSFERRED_STATES, JobApplicationState.NEW),
         (TRANSITION_RESET, JobApplicationState.OBSOLETE, JobApplicationState.NEW),
+        (TRANSITION_OUTWARD_TRANSFER, JobApplicationState.REFUSED, JobApplicationState.REFUSED),
     )
 
     PENDING_STATES = [JobApplicationState.NEW, JobApplicationState.PROCESSING, JobApplicationState.POSTPONED]
@@ -130,6 +134,9 @@ class JobApplicationWorkflow(xwf_models.Workflow):
 
     error_missing_hiring_start_at = "Cannot accept a job application with no hiring start date."
     error_missing_eligibility_diagnostic = "Cannot create an approval without eligibility diagnosis here."
+
+    def db_log(self, transition, from_state, instance, *args, **kwargs):
+        super().db_log(transition, from_state, instance, *args, **kwargs)
 
 
 class JobApplicationQuerySet(models.QuerySet):
@@ -999,6 +1006,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.notifications_transfer_for_proxy(notification_context).send()
 
     @xwf_models.transition()
+    def outward_transfer(self, *, user, target_company):
+        # Probably do nothing here since it will be handled in the view ?
+        pass
+
+    @xwf_models.transition()
     def accept(self, *, user):
         if not self.hiring_start_at:
             raise xwf_models.AbortTransition(JobApplicationWorkflow.error_missing_hiring_start_at)
@@ -1263,9 +1275,20 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     """
 
     MODIFIED_OBJECT_FIELD = "job_application"
-    EXTRA_LOG_ATTRIBUTES = (("user", "user", None),)
+    EXTRA_LOG_ATTRIBUTES = (
+        ("user", "user", None),
+        # It will also fill for state=tranfer logs, maybe change the transition_arg ?
+        ("target_company", "to_company", None),
+    )
     job_application = models.ForeignKey(JobApplication, related_name="logs", on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
+    target_company = models.ForeignKey(
+        "companies.Company",
+        verbose_name="entreprise destinataire",
+        on_delete=models.CASCADE,  # Or SET_NULL ?
+        related_name="job_application_log_transfers",
+        null=True,
+    )
 
     class Meta:
         verbose_name = "log des transitions de la candidature"
