@@ -2,6 +2,9 @@
 
 {% extends "layout/base.html" %}
 
+{% block title %}Rechercher des prescripteurs habilités {{ block.super }}{% endblock %}
+
+{% block content_title %}
 <div class="alert alert-important alert-dismissible fade show" role="status">
 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
 <div class="row">
@@ -26,10 +29,8 @@
   </div>
 </div>
 </div>
-
-{% block title %}Rechercher des prescripteurs habilités {{ block.super }}{% endblock %}
+{% endblock %}
 
 {% block content %}
     {% include "search/includes/generic_search_home.html" with form=form title="Rechercher des prescripteurs habilités" url_search="search:prescribers_results" template_form_name="search/includes/prescribers_search_form.html" %}
 {% endblock %}
-
