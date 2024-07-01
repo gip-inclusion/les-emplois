@@ -26,7 +26,30 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
     {% endif %}
-
+      <div class="alert alert-important alert-dismissible fade show" role="status">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        <div class="row">
+          <div class="d-none d-md-inline col-md-auto">
+            <img src="https://gip-inclusion.github.io/itou-theme/images/ico-bicro-important.svg" alt="" height="80">
+          </div>
+          <div class="col-12 col-md px-md-0">
+            <p class="mb-2"><strong>Votre avis nous intéresse</strong></p>
+            <p class="mb-0">ULes designers savent mettre un tally dans les emplois !</p>
+          </div>
+          <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+            <a href='{% tally_form_url form_id="waBJr9"'
+                       rel="noopener"
+                       target="_blank"
+                       aria-label="Votre avis nous intéresse."
+                       class="btn btn-sm btn-primary"
+                       >
+                        <i class="ri-mail-send-line ri-lg font-weight-normal align-self-start"></i>
+                        <span>Répondre au questionnaire</span>
+                        <i class="ri-external-link-line font-weight-normal ms-2"></i>
+            </a>
+          </div>
+        </div>
+      </div>
     {# Alerte pour les employeurs en cas d'absence ou de mauvais score de geocoding. #}
     {% if user.is_employer and request.current_organization and not request.current_organization.has_reliable_coords_legacy %}
         <div class="alert alert-warning alert-dismissible show" role="status">
