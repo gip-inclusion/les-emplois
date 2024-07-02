@@ -3,6 +3,7 @@
     {% if job_applications_list_kind is JobApplicationsListKind.SENT or job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
         {% include "apply/includes/job_applications_filters/selected_jobs.html" %}
         {% include "apply/includes/job_applications_filters/departments.html" %}
+        {% include "apply/includes/job_applications_filters/to_companies.html" %}
         {% include "apply/includes/job_applications_filters/sender.html" %}
         {% if filters_form.criteria %}
             <hr>
