@@ -66,7 +66,7 @@
                     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
                         {% include "apply/includes/list_counter.html" %}
                         <div class="flex-column flex-md-row mt-3 mt-md-0">
-                            {% bootstrap_field filters_form.job_seekers wrapper_class="w-lg-400px" show_label=False %}
+                            {% bootstrap_field filters_form.job_seeker wrapper_class="w-lg-400px" show_label=False %}
                         </div>
                     </div>
                     {% include "apply/includes/list_job_applications.html" with job_applications_page=job_applications_page filters_counter=filters_counter request=request pending_states_job_applications_count=pending_states_job_applications_count list_exports_url=list_exports_url SenderKind=SenderKind job_applications_list_kind=job_applications_list_kind JobApplicationsListKind=JobApplicationsListKind JobApplicationOrigin=JobApplicationOrigin only %}
