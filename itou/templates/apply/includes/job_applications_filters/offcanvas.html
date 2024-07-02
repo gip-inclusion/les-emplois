@@ -1,12 +1,4 @@
-{% if job_applications_list_kind is JobApplicationsListKind.SENT %}
-    {% url 'apply:list_prescriptions' as form_url %}
-{% elif job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
-    {% url 'apply:list_for_siae' as form_url %}
-{% else %}
-    {# job_applications_list_kind is JobApplicationsListKind.SENT_FOR_ME %} #}
-    {% url 'apply:list_for_job_seeker' as form_url %}
-{% endif %}
-<form hx-get="{{ form_url }}"
+<form hx-get="{{ request.path }}"
       hx-trigger="change delay:.5s, duetChange delay:.5s{% if not request.user.is_job_seeker %}, change from:#id_job_seekers{% endif %}"
       hx-indicator="#job-applications-section"
       hx-target="#job-applications-section"
