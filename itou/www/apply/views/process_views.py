@@ -31,6 +31,7 @@ from itou.www.apply.forms import (
     PriorActionForm,
 )
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
+from itou.www.search.forms import SiaeSearchForm
 
 
 def check_waiting_period(job_application):
@@ -161,6 +162,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
             PriorActionForm(action_only=True) if job_application.can_change_prior_actions else None
         ),
         "matomo_custom_title": "Candidature",
+        "siae_search_form": SiaeSearchForm(),
     }
 
     return render(request, template_name, context)
