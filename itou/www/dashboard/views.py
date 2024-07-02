@@ -169,16 +169,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             if current_org.is_subject_to_eligibility_rules:
                 context["pilotage_webinar_banners"].append(
                     {
-                        "title": "Inscrivez-vous à un webinaire pour faire le point à mi-année sur vos candidatures & prescriptions",  # noqa: E501
-                        "description": "Des difficultés de recrutement ? Le mardi 9 juillet à 14h, le Pilotage de l’inclusion organise un webinaire pour vous aider à vous saisir des données utiles à la réalisation d’un bilan avec vos prescripteurs.",  # noqa: E501
-                        "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-siae-difficultes-de-recrutement-faites-le-point-a-mi-annee-sur-vos-candidatures-and-prescriptions",  # noqa: E501
-                        "is_displayable": lambda: (
-                            datetime.date(2024, 6, 17) <= timezone.localdate() <= datetime.date(2024, 7, 9)
-                        ),
-                    }
-                )
-                context["pilotage_webinar_banners"].append(
-                    {
                         "title": (
                             "Testez en avant première votre nouveau tableau de bord de suivi de vos "
                             "ETP conventionnés et réalisés !"
