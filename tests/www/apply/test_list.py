@@ -127,7 +127,8 @@ def test_list_hidden_fields(client):
     )
     job_app = JobApplicationFactory(sent_by_another_employer=True, to_company=company, job_seeker__department="23")
 
-    form = CompanyFilterJobApplicationsForm(JobApplication.objects.all(), company)
+    user = company.members.get()
+    form = CompanyFilterJobApplicationsForm(user, JobApplication.objects.all(), company)
     known_filters = {
         "criteria",
         "departments",
@@ -145,7 +146,7 @@ def test_list_hidden_fields(client):
     }
     assert set(form.fields) == known_filters
 
-    client.force_login(company.members.get())
+    client.force_login(user)
     filters = {
         "criteria": criteria.pk,
         "eligibility_validated": "on",

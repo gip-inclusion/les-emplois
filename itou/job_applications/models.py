@@ -229,7 +229,7 @@ class JobApplicationQuerySet(models.QuerySet):
             )
         )
 
-    def with_jobseeker_eligibility_diagnosis(self):
+    def with_jobseeker_eligibility_diagnosis(self, viewing_user):
         """
         Gives the "eligibility_diagnosis" linked to the job application or if none is found
         the last valid eligibility diagnosis for this job seeker and this SIAE
@@ -237,14 +237,14 @@ class JobApplicationQuerySet(models.QuerySet):
         sub_query = Subquery(
             (
                 EligibilityDiagnosis.objects.valid()
-                .for_job_seeker_and_siae(job_seeker=OuterRef("job_seeker"), siae=OuterRef("to_company"))
+                .for_job_seeker_and_siae(viewing_user, OuterRef("job_seeker"), siae=OuterRef("to_company"))
                 .values("id")[:1]
             ),
             output_field=models.IntegerField(),
         )
         return self.annotate(jobseeker_eligibility_diagnosis=Coalesce(F("eligibility_diagnosis"), sub_query, None))
 
-    def eligibility_validated(self):
+    def eligibility_validated(self, viewing_user):
         return self.filter(
             Exists(
                 Approval.objects.filter(
@@ -253,7 +253,9 @@ class JobApplicationQuerySet(models.QuerySet):
             )
             | Exists(
                 EligibilityDiagnosis.objects.for_job_seeker_and_siae(
-                    OuterRef("job_seeker"), siae=OuterRef("to_company")
+                    viewing_user,
+                    job_seeker=OuterRef("job_seeker"),
+                    siae=OuterRef("to_company"),
                 ).valid()
             )
         )
@@ -268,7 +270,7 @@ class JobApplicationQuerySet(models.QuerySet):
         )
         return self.annotate(**{f"eligibility_diagnosis_criterion_{criterion}": Exists(subquery)})
 
-    def with_list_related_data(self, criteria=None):
+    def with_list_related_data(self, viewing_user, criteria=None):
         """
         Stop the deluge of database queries that is caused by accessing related
         objects in job applications's lists.
@@ -290,7 +292,7 @@ class JobApplicationQuerySet(models.QuerySet):
             Prefetch("job_seeker__approvals", queryset=Approval.objects.order_by("-start_at")),
         )
 
-        qs = qs.with_last_change().with_jobseeker_eligibility_diagnosis()
+        qs = qs.with_last_change().with_jobseeker_eligibility_diagnosis(viewing_user)
 
         # Adding an annotation by selected criterion
         for criterion in criteria:
@@ -815,13 +817,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     def is_spontaneous(self):
         return not self.selected_jobs.exists()
 
-    def eligibility_diagnosis_by_siae_required(self):
+    def eligibility_diagnosis_by_siae_required(self, viewing_user):
         """
         Returns True if an eligibility diagnosis must be made by an SIAE
         when processing an application, False otherwise.
         """
         return self.to_company.is_subject_to_eligibility_rules and not self.job_seeker.has_valid_diagnosis(
-            for_siae=self.to_company
+            viewing_user, for_siae=self.to_company
         )
 
     @property
@@ -931,7 +933,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             return False
         return self.is_in_transferable_state
 
-    def get_eligibility_diagnosis(self):
+    def get_eligibility_diagnosis(self, viewing_user):
         """
         Returns the eligibility diagnosis linked to this job application or None.
         """
@@ -941,7 +943,9 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             return self.eligibility_diagnosis
         # As long as the job application has not been accepted, diagnosis-related
         # business rules may still prioritize one diagnosis over another.
-        return EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, for_siae=self.to_company)
+        return EligibilityDiagnosis.objects.last_considered_valid(
+            viewing_user, self.job_seeker, for_siae=self.to_company
+        )
 
     # Workflow transitions.
     @before_transition("accept", "refuse", "cancel", "render_obsolete")
@@ -1006,14 +1010,16 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         # Link to the job seeker's eligibility diagnosis.
         if self.to_company.is_subject_to_eligibility_rules:
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-                self.job_seeker, for_siae=self.to_company
+                user, self.job_seeker, for_siae=self.to_company
             )
 
         # Approval issuance logic.
         if not self.hiring_without_approval and self.to_company.is_subject_to_eligibility_rules:
             if self.job_seeker.has_common_approval_in_waiting_period:
                 if self.job_seeker.new_approval_blocked_by_waiting_period(
-                    siae=self.to_company, sender_prescriber_organization=self.sender_prescriber_organization
+                    user,
+                    siae=self.to_company,
+                    sender_prescriber_organization=self.sender_prescriber_organization,
                 ):
                     # Security check: it's supposed to be blocked upstream.
                     raise xwf_models.AbortTransition("Job seeker has an approval in waiting period.")

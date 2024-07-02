@@ -1802,7 +1802,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.client.force_login(employer)
 
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
-            job_application.job_seeker, for_siae=job_application.to_company
+            employer, job_application.job_seeker, for_siae=job_application.to_company
         )
         assert not has_considered_valid_diagnoses
 
@@ -1835,12 +1835,12 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.assertRedirects(response, next_url)
 
         has_considered_valid_diagnoses = EligibilityDiagnosis.objects.has_considered_valid(
-            job_application.job_seeker, for_siae=job_application.to_company
+            employer, job_application.job_seeker, for_siae=job_application.to_company
         )
         assert has_considered_valid_diagnoses
 
         # Check diagnosis.
-        eligibility_diagnosis = job_application.get_eligibility_diagnosis()
+        eligibility_diagnosis = job_application.get_eligibility_diagnosis(employer)
         assert eligibility_diagnosis.author == employer
         assert eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER
         assert eligibility_diagnosis.author_siae == job_application.to_company

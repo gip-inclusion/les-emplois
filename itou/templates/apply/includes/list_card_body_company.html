@@ -1,3 +1,4 @@
+{% load call_method %}
 {% load str_filters %}
 
 <div class="c-box--results__header">
@@ -22,7 +23,8 @@
                                 PASS IAE {{ approval.get_state_display|lower }}
                             </span>
                         {% else %}
-                            {% if job_application.iae_eligibility_diagnosis_required %}
+                            {% call_method job_application "eligibility_diagnosis_by_siae_required" request.user as eligibility_diagnosis_required %}
+                            {% if eligibility_diagnosis_required %}
                                 <span class="badge badge-xs rounded-pill bg-accent-02-lighter text-primary">
                                     <i class="ri-error-warning-line" aria-hidden="true"></i>
                                     Éligibilité IAE à valider

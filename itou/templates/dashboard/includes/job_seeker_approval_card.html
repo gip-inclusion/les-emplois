@@ -1,3 +1,5 @@
+{% load call_method %}
+
 <div class="col-md-8 mb-3 mb-md-5">
     <div class="c-box p-0 h-100">
         <div class="d-flex p-3 p-lg-4">
@@ -14,7 +16,8 @@
                 <li class="mb-2">{% include "approvals/includes/status.html" with common_approval=user.latest_common_approval %}</li>
                 {% if user.has_common_approval_in_waiting_period %}
                     <li class="mb-2">
-                        {% if user.has_valid_diagnosis %}
+                        {% call_method user "has_valid_diagnosis" request.user as has_valid_diagnosis %}
+                        {% if has_valid_diagnosis %}
                             <p class="mb-0">
                                 Un prescripteur habilité a réalisé un diagnostic d'éligibilité. <b>Vous pouvez commencer un nouveau parcours.</b>
                             </p>
