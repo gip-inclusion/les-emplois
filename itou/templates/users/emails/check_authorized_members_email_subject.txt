@@ -1,0 +1,4 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+Rappel sécurité : vérifiez la liste des membres de l’organisation {{ structure.name }}
+{% endblock %}
