@@ -172,7 +172,7 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         related_name="authorization_status_set",
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
+        on_delete=models.RESTRICT,  # Only staff can update it, and we shouldn't delete one of those accounts
     )
 
     # Use the generic relation to let NotificationSettings being collected on deletion
@@ -345,7 +345,7 @@ class PrescriberMembership(MembershipAbstract):
         settings.AUTH_USER_MODEL,
         related_name="updated_prescribermembership_set",
         null=True,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         verbose_name="mis à jour par",
     )
 

@@ -56,7 +56,7 @@ class InstitutionMembership(MembershipAbstract):
         settings.AUTH_USER_MODEL,
         related_name="updated_institutionmembership_set",
         null=True,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         verbose_name="mis à jour par",
     )
 
