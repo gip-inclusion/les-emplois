@@ -16,12 +16,12 @@
             <div class="s-section__row row">
                 <div class="col-12">
                     <form hx-get="{% url 'approvals:list' %}"
-                          hx-trigger="change delay:.5s, change from:#id_users"
+                          hx-trigger="change delay:.5s, change from:#id_job_seeker"
                           hx-indicator="#approvals-list"
                           hx-target="#approvals-list"
                           hx-swap="outerHTML"
                           hx-push-url="true"
-                          hx-include="#id_users">
+                          hx-include="#id_job_seeker">
                         <div class="btn-dropdown-filter-group mb-3 mb-md-4">
                             {% include "approvals/includes/approvals_filters/status.html" %}
                             {% include "includes/btn_dropdown_filter/radio.html" with field=filters_form.expiry only %}
@@ -34,7 +34,7 @@
                 <div class="col-12">
                     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
                         {% include "approvals/includes/list_counter.html" %}
-                        <div class="flex-column flex-md-row mt-3 mt-md-0">{% bootstrap_field filters_form.users layout="inline" %}</div>
+                        <div class="flex-column flex-md-row mt-3 mt-md-0">{% bootstrap_field filters_form.job_seeker layout="inline" %}</div>
                     </div>
                     {% include "approvals/includes/list_results.html" %}
                 </div>
