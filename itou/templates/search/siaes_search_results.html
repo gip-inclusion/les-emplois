@@ -27,13 +27,7 @@
                             <div class="col-12">
                                 {% include "search/includes/siaes_search_subtitle.html" %}
                                 <div class="d-block w-100">
-                                    <form hx-get="{% url request.resolver_match.view_name %}"
-                                          hx-trigger="change delay:.5s"
-                                          hx-include="#id_city"
-                                          hx-indicator="#job-search-results"
-                                          hx-target="#job-search-results"
-                                          hx-swap="outerHTML"
-                                          hx-push-url="true">
+                                    <form hx-get="{{ request.path }}" hx-trigger="change delay:.5s" hx-include="#id_city" hx-indicator="#job-search-results" hx-target="#job-search-results" hx-swap="outerHTML" hx-push-url="true">
                                         <div class="btn-dropdown-filter-group mb-3 mb-md-4">
                                             {% include "includes/btn_dropdown_filter/radio.html" with field=form.distance only %}
                                             {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.kinds only %}
