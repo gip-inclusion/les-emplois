@@ -4,7 +4,7 @@ from django.core.validators import MinLengthValidator, RegexValidator
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.text import format_lazy
-from django_select2.forms import Select2MultipleWidget, Select2Widget
+from django_select2.forms import Select2Widget
 
 from itou.asp.models import Commune, Country, RSAAllocation
 from itou.companies.models import SiaeFinancialAnnex
@@ -80,10 +80,11 @@ class SelectEmployeeRecordStatusForm(forms.Form):
 
 
 class EmployeeRecordFilterForm(forms.Form):
-    job_seekers = forms.MultipleChoiceField(
+    job_seeker = forms.TypedChoiceField(
+        coerce=int,
         required=False,
         label="Nom du salarié",
-        widget=Select2MultipleWidget(
+        widget=Select2Widget(
             attrs={
                 "data-placeholder": "Nom du salarié",
             }
@@ -93,7 +94,7 @@ class EmployeeRecordFilterForm(forms.Form):
     def __init__(self, job_seekers, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields["job_seekers"].choices = sorted(
+        self.fields["job_seeker"].choices = sorted(
             [(user.id, user.get_full_name().title()) for user in job_seekers if user.get_full_name()],
             key=lambda u: u[1],
         )
