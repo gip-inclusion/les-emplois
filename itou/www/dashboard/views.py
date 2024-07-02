@@ -177,6 +177,21 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                         ),
                     }
                 )
+                context["pilotage_webinar_banners"].append(
+                    {
+                        "title": (
+                            "Testez en avant première votre nouveau tableau de bord de suivi de vos "
+                            "ETP conventionnés et réalisés !"
+                        ),
+                        "description": (
+                            "Avant la diffusion de ce nouvel outil, nous travaillons à l’affiner et l’adapter "
+                            "selon vos besoins. "
+                            "Nous recherchons 30 SIAE pour faire partie de notre panel de testeurs. Intéressés ?"
+                        ),
+                        "url": "https://tally.so/r/3qP5kg",
+                        "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 7, 31),
+                    }
+                )
     elif request.user.is_prescriber:
         if current_org := request.current_organization:
             if stats_utils.can_view_stats_ph(request):
