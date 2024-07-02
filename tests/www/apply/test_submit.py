@@ -806,7 +806,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
 
         next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk})
-        self.assertContains(response, "Status de prescripteur habilité non vérifié")
+        self.assertContains(response, "Statut de prescripteur habilité non vérifié")
         self.assertContains(response, next_url)
 
         # Step determine the job seeker with a NIR.
