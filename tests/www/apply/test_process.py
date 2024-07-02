@@ -2581,11 +2581,10 @@ class ProcessTemplatesTest(TestCase):
         self.assertNotContains(response, self.url_accept)
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class ProcessTransferJobApplicationTest(TestCase):
+class TestProcessTransferJobApplication:
     TRANSFER_TO_OTHER_COMPANY_SENTENCE = "Transférer cette candidature vers"
 
-    def test_job_application_transfer_disabled_for_lone_users(self):
+    def test_job_application_transfer_disabled_for_lone_users(self, client):
         # A user member of only one company
         # must not be able to transfer a job application to another company
         company = CompanyFactory(with_membership=True)
@@ -2596,14 +2595,11 @@ class ProcessTransferJobApplicationTest(TestCase):
             state=job_applications_enums.JobApplicationState.PROCESSING,
         )
 
-        self.client.force_login(user)
-        response = self.client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        )
+        client.force_login(user)
+        response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
+        assertNotContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
 
-        self.assertNotContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
-
-    def test_job_application_transfer_disabled_for_bad_state(self):
+    def test_job_application_transfer_disabled_for_bad_state(self, client):
         # A user member of only one company must not be able to transfert
         # to another company
         company = CompanyFactory(with_membership=True)
@@ -2619,19 +2615,19 @@ class ProcessTransferJobApplicationTest(TestCase):
             state=job_applications_enums.JobApplicationState.ACCEPTED,
         )
 
-        self.client.force_login(user)
-        response = self.client.get(
+        client.force_login(user)
+        response = client.get(
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application_1.pk})
         )
-        self.assertNotContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
+        assertNotContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
 
-        response = self.client.get(
+        response = client.get(
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application_2.pk})
         )
 
-        self.assertNotContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
+        assertNotContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
 
-    def test_job_application_transfer_enabled(self):
+    def test_job_application_transfer_enabled(self, client):
         # A user member of several company can transfer a job application
         company = CompanyFactory(with_membership=True)
         other_company = CompanyFactory(with_membership=True)
@@ -2645,13 +2641,11 @@ class ProcessTransferJobApplicationTest(TestCase):
 
         assert 2 == user.companymembership_set.count()
 
-        self.client.force_login(user)
-        response = self.client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        )
-        self.assertContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
+        client.force_login(user)
+        response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
+        assertContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
 
-    def test_job_application_transfer_redirection(self):
+    def test_job_application_transfer_redirection(self, client, snapshot):
         # After transfering a job application,
         # user must be redirected to job application list
         # with a nice message
@@ -2668,32 +2662,30 @@ class ProcessTransferJobApplicationTest(TestCase):
         )
         transfer_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
 
-        self.client.force_login(user)
-        response = self.client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        )
+        client.force_login(user)
+        response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
 
-        self.assertContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
-        self.assertContains(response, f"transfer_confirmation_modal_{other_company.pk}")
-        self.assertContains(response, "target_company_id")
-        self.assertContains(response, transfer_url)
+        assertContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
+        assertContains(response, f"transfer_confirmation_modal_{other_company.pk}")
+        assertContains(response, "target_company_id")
+        assertContains(response, transfer_url)
 
         # Confirm from modal window
         post_data = {"target_company_id": other_company.pk}
-        response = self.client.post(transfer_url, data=post_data, follow=True)
+        response = client.post(transfer_url, data=post_data, follow=True)
         messages = list(response.context.get("messages"))
 
-        self.assertRedirects(response, reverse("apply:list_for_siae"))
+        assertRedirects(response, reverse("apply:list_for_siae"))
         assert messages
         assert len(messages) == 1
-        assert str(messages[0]) == self.snapshot(name="job application transfer message")
+        assert str(messages[0]) == snapshot(name="job application transfer message")
 
         job_application.refresh_from_db()
         assert job_application.state == job_applications_enums.JobApplicationState.NEW
         assert job_application.logs.get().transition == "transfer"
         assert job_application.to_company_id == other_company.pk
 
-    def test_job_application_transfer_without_rights(self):
+    def test_job_application_transfer_without_rights(self, client):
         company = CompanyFactory()
         other_company = CompanyFactory()
         user = JobSeekerFactory()
@@ -2703,10 +2695,10 @@ class ProcessTransferJobApplicationTest(TestCase):
             state=job_applications_enums.JobApplicationState.PROCESSING,
         )
         # Forge query
-        self.client.force_login(user)
+        client.force_login(user)
         post_data = {"target_company_id": other_company.pk}
         transfer_url = reverse("apply:transfer", kwargs={"job_application_id": job_application.pk})
-        response = self.client.post(transfer_url, data=post_data)
+        response = client.post(transfer_url, data=post_data)
         assert response.status_code == 404
 
 
