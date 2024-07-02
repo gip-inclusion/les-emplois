@@ -450,19 +450,24 @@ STATS_PH_PRESCRIPTION_REGION_WHITELIST = ["Pays de la Loire", "Nouvelle-Aquitain
 SLACK_CRON_WEBHOOK_URL = os.getenv("SLACK_CRON_WEBHOOK_URL")
 
 # Production instances (`PROD`, `DEMO`, `PENTEST`, `FAST-MACHINE`, ...) share the same redis but different DB
-redis_url = os.getenv("REDIS_URL", "redis://127.0.0.1:6379")
-redis_db = os.getenv("REDIS_DB")
-redis_django_settings = {
-    "LOCATION": redis_url,
+redis_url = os.environ["REDIS_URL"]
+redis_db = os.environ["REDIS_DB"]
+redis_common_django_settings = {
+    "BACKEND": "itou.utils.cache.UnclearableCache",
+    "LOCATION": f"{redis_url}?db={redis_db}",
     "KEY_PREFIX": "django",
-    "OPTIONS": {
-        "db": redis_db,
-    },
 }
 
 CACHES = {
-    "default": {"BACKEND": "itou.utils.cache.UnclearableCache", **redis_django_settings},
-    "failsafe": {"BACKEND": "itou.utils.cache.FailSafeRedisCache", **redis_django_settings},
+    "default": {
+        **redis_common_django_settings,
+    },
+    "failsafe": {
+        **redis_common_django_settings,
+        "OPTIONS": {
+            "CLIENT_CLASS": "itou.utils.cache.FailSafeRedisCacheClient",
+        },
+    },
 }
 
 HUEY = {
