@@ -211,9 +211,9 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     if status == Status.NEW:
         # Browse to get only the linked employee record in "new" state
         data = eligible_job_applications
-        if job_seekers := filters_form.cleaned_data.get("job_seekers"):
+        if job_seeker_id := filters_form.cleaned_data.get("job_seeker"):
             # The queryset was already evaluated for badges, so it's faster to iterate because of the non-trivial query
-            data = [ja for ja in data if str(ja.job_seeker_id) in job_seekers]
+            data = [ja for ja in data if ja.job_seeker_id == job_seeker_id]
 
         for item in data:
             item.date_were_not_transmitted = item.has_suspension or item.has_prolongation
@@ -238,8 +238,8 @@ def list_employee_records(request, template_name="employee_record/list.html"):
             .filter(status=status)
             .order_by(*employee_record_order_by)
         )
-        if job_seekers := filters_form.cleaned_data.get("job_seekers"):
-            data = data.filter(job_application__job_seeker__in=job_seekers)
+        if job_seeker_id := filters_form.cleaned_data.get("job_seeker"):
+            data = data.filter(job_application__job_seeker=job_seeker_id)
 
     context = {
         "form": form,
