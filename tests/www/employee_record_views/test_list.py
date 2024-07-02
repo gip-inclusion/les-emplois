@@ -114,11 +114,11 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
         self.assertContains(response, approval_number_formatted)
         self.assertContains(response, other_approval_number_formatted)
 
-        response = self.client.get(self.URL + f"?job_seekers={self.job_seeker.pk}")
+        response = self.client.get(self.URL + f"?job_seeker={self.job_seeker.pk}")
         self.assertContains(response, approval_number_formatted)
         self.assertNotContains(response, other_approval_number_formatted)
 
-        response = self.client.get(self.URL + "?job_seekers=0")
+        response = self.client.get(self.URL + "?job_seeker=0")
         self.assertContains(response, "Sélectionnez un choix valide. 0 n’en fait pas partie.")
         self.assertContains(response, approval_number_formatted)
         self.assertContains(response, other_approval_number_formatted)
@@ -545,7 +545,7 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
         # form to no longer pick up change events from the select2.
         # Given that options aren’t added frequently to that dropdown, wait
         # until the next full page load to get new job seekers.
-        [new_jobseeker_opt] = fresh_page.select(f'#id_job_seekers > option[value="{new_job_app.job_seeker_id}"]')
+        [new_jobseeker_opt] = fresh_page.select(f'#id_job_seeker > option[value="{new_job_app.job_seeker_id}"]')
         new_jobseeker_opt.decompose()
         assertSoupEqual(simulated_page, fresh_page)
 
