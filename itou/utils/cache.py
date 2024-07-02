@@ -1,12 +1,15 @@
 from functools import wraps
 
-from django.core.cache.backends.redis import RedisCache, RedisCacheClient
+from django_redis.cache import RedisCache
+from django_redis.client import DefaultClient
+from django_redis.exceptions import ConnectionInterrupted
 from redis import exceptions as redis_exceptions
 from sentry_sdk.api import capture_exception
 
 
 IGNORED_EXCEPTIONS = (
     OSError,
+    ConnectionInterrupted,
     redis_exceptions.ConnectionError,
     redis_exceptions.ResponseError,
     redis_exceptions.TimeoutError,
@@ -30,7 +33,7 @@ FAILSAFE_METHODS = frozenset(
 )
 
 
-class FailSafeRedisCacheClient(RedisCacheClient):
+class FailSafeRedisCacheClient(DefaultClient):
     def __getattribute__(self, name):
         attr_or_meth = super().__getattribute__(name)
         if name in FAILSAFE_METHODS:
@@ -46,17 +49,6 @@ class FailSafeRedisCacheClient(RedisCacheClient):
 
             return report_failure
         return attr_or_meth
-
-
-class FailSafeRedisCache(RedisCache):
-    def __init__(self, server, params):
-        super().__init__(server, params)
-        self._class = FailSafeRedisCacheClient
-
-    def clear(self):
-        # RedisCache calls FLUSHDB, which is not concerned with KEY_PREFIX.
-        # That’s an issue for tests isolation.
-        raise RuntimeError("Don’t clear the cache.")
 
 
 class UnclearableCache(RedisCache):

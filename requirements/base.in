@@ -49,6 +49,9 @@ django-storages  # https://github.com/jschneier/django-storages
 # Datadog logger (who could have guessed?!)
 django-datadog-logger
 
+# django-redis (full featured cache backend)
+django-redis  # https://github.com/jazzband/django-redis
+
 # Front-end
 # ------------------------------------------------------------------------------
 
