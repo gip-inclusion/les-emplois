@@ -7,7 +7,7 @@ from django.db.models import Exists, OuterRef, Q, TextChoices
 from django.shortcuts import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django_select2.forms import Select2MultipleWidget
+from django_select2.forms import Select2Widget
 
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
 from itou.approvals.enums import (
@@ -42,10 +42,10 @@ class ApprovalExpiry(TextChoices):
 
 
 class ApprovalForm(forms.Form):
-    users = forms.MultipleChoiceField(
+    job_seeker = forms.ChoiceField(
         required=False,
         label="Nom",
-        widget=Select2MultipleWidget(
+        widget=Select2Widget(
             attrs={
                 "data-placeholder": "Nom du salarié",
             }
@@ -67,7 +67,7 @@ class ApprovalForm(forms.Form):
     def __init__(self, siae_pk, data, *args, **kwargs):
         self.siae_pk = siae_pk
         super().__init__(data, *args, **kwargs)
-        self.fields["users"].choices = self._get_choices_for_job_seekers()
+        self.fields["job_seeker"].choices = self._get_choices_for_job_seekers()
 
     def get_approvals_qs_filter(self):
         return Exists(
@@ -94,8 +94,8 @@ class ApprovalForm(forms.Form):
         qs_filters_list = []
         data = self.cleaned_data
 
-        if users := data.get("users"):
-            qs_filters_list.append(Q(user_id__in=users))
+        if job_seeker_id := data.get("job_seeker"):
+            qs_filters_list.append(Q(user_id=job_seeker_id))
 
         status_filters_list = []
         now = timezone.localdate()

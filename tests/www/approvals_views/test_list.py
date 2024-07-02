@@ -74,7 +74,7 @@ class TestApprovalsListView:
 
         assertContains(response, "1 résultat")
 
-    def test_users_filters(self, client):
+    def test_job_seeker_filters(self, client):
         approval = ApprovalFactory(
             with_jobapplication=True,
             user__first_name="Jean",
@@ -111,23 +111,16 @@ class TestApprovalsListView:
         assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_company.pk}))
 
         form = response.context["filters_form"]
-        assert form.fields["users"].choices == [
+        assert form.fields["job_seeker"].choices == [
             (approval.user_id, "Jean VIER"),
             (approval_same_company.user_id, "Seb TAMBRE"),
         ]
 
-        url = f"{reverse('approvals:list')}?users={approval.user_id}&expiry="
+        url = f"{reverse('approvals:list')}?job_seeker={approval.user_id}&expiry="
         response = client.get(url)
         assertContains(response, "1 résultat")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
         assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_same_company.pk}))
-        assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_company.pk}))
-
-        url = f"{reverse('approvals:list')}?users={approval.user_id}&users={approval_same_company.user_id}&expiry="
-        response = client.get(url)
-        assertContains(response, "2 résultats")
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_same_company.pk}))
         assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_company.pk}))
 
     def test_approval_state_filters(self, client):
