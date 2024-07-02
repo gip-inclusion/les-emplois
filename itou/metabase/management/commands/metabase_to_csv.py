@@ -18,7 +18,7 @@ import os
 
 from psycopg import sql
 
-from itou.metabase.db import MetabaseDatabaseCursor
+from itou.metabase.db import DB_CURSOR, get_cursor
 from itou.utils.command import BaseCommand
 
 
@@ -30,7 +30,7 @@ class Command(BaseCommand):
         parser.add_argument("--table_name", action="store", dest="table_name", type=str)
 
     def handle(self, prefix, table_name, **kwargs):
-        with MetabaseDatabaseCursor() as (cursor, _conn):
+        with get_cursor(DB_CURSOR.C2) as (cursor, _conn):
             self.stdout.write(f"exporting {table_name=}")
             cursor.execute(
                 sql.SQL(

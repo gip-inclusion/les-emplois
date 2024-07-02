@@ -3,6 +3,7 @@ Helper methods for manipulating tables used by both populate_metabase_emplois an
 """
 
 import copy
+import enum
 import gc
 import os
 import urllib
@@ -17,17 +18,21 @@ from itou.metabase.utils import chunked_queryset, compose, convert_boolean_to_in
 
 
 class MetabaseDatabaseCursor:
-    def __init__(self):
+    def __init__(self, settings_prefix):
+        self.settings_prefix = settings_prefix
         self.cursor = None
         self.connection = None
 
+    def get_setting(self, name):
+        return getattr(settings, f"{self.setting_prefix}{name}")
+
     def __enter__(self):
         self.connection = psycopg.connect(
-            host=settings.METABASE_HOST,
-            port=settings.METABASE_PORT,
-            dbname=settings.METABASE_DATABASE,
-            user=settings.METABASE_USER,
-            password=settings.METABASE_PASSWORD,
+            host=self.get_setting("HOST"),
+            port=self.get_setting("PORT"),
+            dbname=self.get_setting("DATABASE"),
+            user=self.get_setting("USER"),
+            password=self.get_setting("PASSWORD"),
             keepalives=1,
             keepalives_idle=30,
             keepalives_interval=5,
@@ -43,6 +48,20 @@ class MetabaseDatabaseCursor:
             self.connection.close()
 
 
+class DB_CURSOR(enum.Enum):
+    C1 = "C1"
+    C2 = "C2"
+
+
+def get_cursor(cursor_name):
+    """Allow to easily monkey patch cursor in tests"""
+    settings_prefix = {
+        DB_CURSOR.C2: "METABASE_",
+        DB_CURSOR.C1: "C1_METABASE_",
+    }[cursor_name]
+    return MetabaseDatabaseCursor(settings_prefix)
+
+
 def get_current_dir():
     return os.path.dirname(os.path.realpath(__file__))
 
@@ -55,7 +74,7 @@ def get_old_table_name(table_name):
     return f"z_old_{table_name}"
 
 
-def rename_table_atomically(from_table_name, to_table_name):
+def rename_table_atomically(from_table_name, to_table_name, cursor_name=DB_CURSOR.C2):
     """
     Rename from_table_name to to_table_name.
     Most of the time, we replace an existing table, so we will first rename
@@ -65,7 +84,7 @@ def rename_table_atomically(from_table_name, to_table_name):
     are deleted as well, they will be rebuilt by the next run of the airflow DAG `dbt_daily`.
     """
 
-    with MetabaseDatabaseCursor() as (cur, conn):
+    with get_cursor(cursor_name) as (cur, conn):
         # CASCADE will drop airflow staging views (e.g. stg_structures) as well.
         cur.execute(
             sql.SQL("DROP TABLE IF EXISTS {} CASCADE").format(sql.Identifier(get_old_table_name(to_table_name)))
@@ -91,9 +110,9 @@ def rename_table_atomically(from_table_name, to_table_name):
         conn.commit()
 
 
-def create_table(table_name: str, columns: list[str, str], reset=False):
+def create_table(table_name: str, columns: list[str, str], reset=False, cursor_name=DB_CURSOR.C2):
     """Create table from columns names and types"""
-    with MetabaseDatabaseCursor() as (cursor, conn):
+    with get_cursor(cursor_name) as (cursor, conn):
         if reset:
             cursor.execute(sql.SQL("DROP TABLE IF EXISTS {table_name}").format(table_name=sql.Identifier(table_name)))
         create_table_query = sql.SQL("CREATE TABLE IF NOT EXISTS {table_name} ({fields_with_type})").format(
@@ -133,7 +152,7 @@ def create_unversioned_tables_if_needed():
     The present function creates these unversioned tables without any content, at least now all the requests
     can complete locally and we have a good visibility of how many tables are left to be automated.
     """
-    with MetabaseDatabaseCursor() as (cur, conn):
+    with get_cursor(DB_CURSOR.C2) as (cur, conn):
         create_table_sql_requests = """
             /* TODO @defajait DROP ASAP - use codes_insee_vs_codes_postaux instead */
             CREATE TABLE IF NOT EXISTS "commune_gps" (
@@ -249,7 +268,7 @@ def create_unversioned_tables_if_needed():
         print("Done.")
 
 
-def populate_table(table, batch_size, querysets=None, extra_object=None):
+def populate_table(table, batch_size, querysets=None, extra_object=None, cursor_name=DB_CURSOR.C2):
     """
     About commits: a single final commit freezes the itou-metabase-db temporarily, making
     our GUI unable to connect to the db during this commit.
@@ -290,9 +309,9 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
     print(f"Injecting {total_rows} rows with {len(table.columns)} columns into table {table_name}:")
 
     new_table_name = get_new_table_name(table_name)
-    create_table(new_table_name, [(c["name"], c["type"]) for c in table.columns], reset=True)
+    create_table(new_table_name, [(c["name"], c["type"]) for c in table.columns], reset=True, cursor_name=cursor_name)
 
-    with MetabaseDatabaseCursor() as (cur, conn):
+    with get_cursor(cursor_name) as (cur, conn):
 
         def inject_chunk(table_columns, chunk, new_table_name):
             rows = [[c["fn"](row) for c in table_columns] for row in chunk]
@@ -339,4 +358,4 @@ def populate_table(table, batch_size, querysets=None, extra_object=None):
             # Trigger garbage collection to optimize memory use.
             gc.collect()
 
-    rename_table_atomically(new_table_name, table_name)
+    rename_table_atomically(new_table_name, table_name, cursor_name=cursor_name)
