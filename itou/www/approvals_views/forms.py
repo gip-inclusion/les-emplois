@@ -82,7 +82,7 @@ class ApprovalForm(forms.Form):
         approvals_qs = Approval.objects.filter(self.get_approvals_qs_filter())
         users_qs = User.objects.filter(kind=UserKind.JOB_SEEKER, approvals__in=approvals_qs)
         return [
-            (user.pk, user.get_full_name().title())
+            (user.pk, user.get_full_name())
             for user in users_qs.order_by("first_name", "last_name")
             if user.get_full_name()
         ]

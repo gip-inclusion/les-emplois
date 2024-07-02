@@ -55,7 +55,7 @@ class TestApprovalsListView:
         response = client.get(url)
 
         assertContains(response, "2 résultats")
-        assertContains(response, approval.user.get_full_name(), count=2)
+        assertContains(response, f"<h3>{approval.user.get_full_name()}</h3>", html=True, count=1)
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
         assertContains(response, reverse("approvals:detail", kwargs={"pk": another_approval.pk}))
 
@@ -112,8 +112,8 @@ class TestApprovalsListView:
 
         form = response.context["filters_form"]
         assert form.fields["users"].choices == [
-            (approval.user_id, "Jean Vier"),
-            (approval_same_company.user_id, "Seb Tambre"),
+            (approval.user_id, "Jean VIER"),
+            (approval_same_company.user_id, "Seb TAMBRE"),
         ]
 
         url = f"{reverse('approvals:list')}?users={approval.user_id}&expiry="
