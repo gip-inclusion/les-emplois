@@ -92,6 +92,7 @@ class CompanyMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
         "updated_at",
         "updated_by",
     )
+    fields = readonly_fields
     can_delete = True
     show_change_link = True
     fk_name = "user"
@@ -120,6 +121,7 @@ class PrescriberMembershipInline(DisabledNotificationsMixin, ItouTabularInline):
         "updated_at",
         "updated_by",
     )
+    fields = readonly_fields
     can_delete = True
     fk_name = "user"
 
@@ -150,6 +152,7 @@ class InstitutionMembershipInline(ItouTabularInline):
         "updated_at",
         "updated_by",
     )
+    fields = readonly_fields
     can_delete = True
     fk_name = "user"
 
