@@ -11,8 +11,8 @@ from freezegun import freeze_time
 
 from itou.approvals.enums import Origin
 from itou.companies.enums import CompanyKind
-from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
-from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.eligibility.enums import AuthorKind
+from itou.eligibility.models import AdministrativeCriteria
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationQuerySet
@@ -384,22 +384,7 @@ class EvaluationCampaignManagerTest(TestCase):
         # integration tests
         evaluation_campaign = EvaluationCampaignFactory()
         company = CompanyFactory(department=evaluation_campaign.institution.department, with_membership=True)
-        job_seeker = JobSeekerFactory()
-        user = company.members.first()
-        criteria1 = AdministrativeCriteria.objects.get(
-            level=AdministrativeCriteriaLevel.LEVEL_1, name="Bénéficiaire du RSA"
-        )
-        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
-            job_seeker, author=user, author_organization=company, administrative_criteria=[criteria1]
-        )
-        JobApplicationFactory.create_batch(
-            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
-            with_approval=True,
-            to_company=company,
-            sender_company=company,
-            eligibility_diagnosis=eligibility_diagnosis,
-            hiring_start_at=timezone.now() - relativedelta(months=2),
-        )
+        create_batch_of_job_applications(company)
         fake_now = timezone.now() - relativedelta(weeks=1)
 
         assert 0 == EvaluatedSiae.objects.all().count()
