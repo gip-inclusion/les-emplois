@@ -15,7 +15,7 @@ Cependant, il est recommandé d'en prendre connaissance pour noter par exemple
 que les emails ne sont pas réellement envoyés mais que leur contenu est
 simplement écrit dans la sortie standard.
 
-Le reste de la configuration se fait avec des variables d'environnement.
+Le reste de la configuration se fait avec des [variables d'environnement](./docs/environment.md).
 
 Celles concernant notre hébergeur CleverCloud sont définis au niveau du déploiement et
 de l'app CleverCloud tandis que les autres paramètres applicatifs indépendants du PaaS
@@ -87,6 +87,11 @@ $ make venv
 
 Dans un `virtualenv`, vous pouvez utiliser les commandes Django habituelles
 (`./manage.py`) mais également les recettes du [Makefile](./Makefile).
+
+Par défaut l'environment sera stocké dans le répertoire `.venv`. En bash/zsh c'est activé
+avec la commande `source .venv/bin/activate` ([doc](https://docs.python.org/3/library/venv.html#how-venvs-work)).
+
+Il est recommandé d'utiliser [direnv](./docs/developing.md) qui permet l'activation de l'environment automatique.
 
 ### Création des *buckets S3*
 
