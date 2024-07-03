@@ -1,15 +1,19 @@
 import datetime
-from urllib.parse import quote
+from urllib.parse import quote, urljoin
 
+import httpx
+import sentry_sdk
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.urls import reverse, reverse_lazy
-from django.utils import timezone
+from django.utils import formats, timezone
 from django.views.decorators.http import require_POST
 from django.views.generic.base import TemplateView
 from django_xworkflows import models as xwf_models
@@ -21,6 +25,9 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
+from itou.rdv_insertion.api import get_api_credentials
+from itou.rdv_insertion.models import Invitation, InvitationRequest
+from itou.users.enums import Title
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
@@ -981,3 +988,99 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
         "final_hr": prior_action is not None,
     }
     return render(request, "apply/includes/job_application_prior_action_form.html", context)
+
+
+@login_required
+@require_POST
+def rdv_insertion_invite(request, job_application_id):
+    try:
+        job_application = (
+            JobApplication.objects.is_active_company_member(request.user)
+            .select_related("job_seeker__jobseeker_profile", "to_company")
+            .get(id=job_application_id)
+        )
+    except JobApplication.DoesNotExist:
+        return render(
+            request,
+            "apply/includes/buttons/rdv_insertion_invite.html",
+            {"job_application": None, "state": "error"},
+        )
+
+    # Ensure company has RDV-I configured
+    if not job_application.to_company.rdv_solidarites_id:
+        return render(
+            request,
+            "apply/includes/buttons/rdv_insertion_invite.html",
+            {"job_application": None, "state": "error"},
+        )
+
+    invitation_request = InvitationRequest.objects.filter(
+        job_seeker=job_application.job_seeker,
+        company=job_application.to_company,
+        created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
+    ).first()
+
+    if not invitation_request:
+        try:
+            with transaction.atomic():
+                url = urljoin(
+                    settings.RDV_INSERTION_API_BASE_URL,
+                    f"organisations/{job_application.to_company.rdv_solidarites_id}/users/create_and_invite",
+                )
+                headers = {"Content-Type": "application/json; charset=utf-8", **get_api_credentials()}
+
+                data = {
+                    "first_name": job_application.job_seeker.first_name,  # Required
+                    "last_name": job_application.job_seeker.last_name,  # Required
+                    "title": "madame" if job_application.job_seeker.title == Title.MME else "monsieur",  # Required!
+                    "role": "demandeur",  # Required
+                    "email": job_application.job_seeker.email,
+                    "phone_number": job_application.job_seeker.phone,
+                    "birth_date": (
+                        formats.date_format(job_application.job_seeker.jobseeker_profile.birthdate, "d/m/Y")
+                        if job_application.job_seeker.jobseeker_profile.birthdate
+                        else None
+                    ),
+                    "france_travail_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
+                    "address": job_application.job_seeker.address_on_one_line,
+                }
+
+                response = httpx.post(url=url, headers=headers, json=data, timeout=10)
+                if response.status_code in (httpx.codes.UNAUTHORIZED, httpx.codes.FORBIDDEN):
+                    headers = get_api_credentials(refresh=True)
+                    response = httpx.post(url=url, headers=headers, json=data, timeout=10)
+
+                response.raise_for_status()
+                response_data = response.json()
+
+                invitation_request = InvitationRequest.objects.create(
+                    job_seeker=job_application.job_seeker,
+                    company=job_application.to_company,
+                    api_response=response_data,
+                    rdv_insertion_user_id=response_data["user"]["id"],
+                )
+                invitations = []
+                for invitation in response_data["invitations"]:
+                    invitations.append(
+                        Invitation(
+                            type=Invitation.Type(invitation["format"]),
+                            invitation_request=invitation_request,
+                            rdv_insertion_invitation_id=invitation["id"],
+                        )
+                    )
+                Invitation.objects.bulk_create(invitations)
+        except Exception as e:
+            sentry_sdk.capture_exception(e)
+            return render(
+                request,
+                "apply/includes/buttons/rdv_insertion_invite.html",
+                {"job_application": job_application, "state": "error"},
+            )
+
+    job_application.has_pending_rdv_insertion_invitation_request = True
+
+    return render(
+        request,
+        "apply/includes/buttons/rdv_insertion_invite.html",
+        {"job_application": job_application, "state": "ok"},
+    )

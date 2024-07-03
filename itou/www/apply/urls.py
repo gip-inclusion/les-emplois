@@ -349,4 +349,9 @@ urlpatterns = [
         process_views.ReloadJobDescriptionFields.as_view(),
         name="reload_job_description_fields",
     ),
+    path(
+        "<uuid:job_application_id>/rdv-insertion-invite",
+        process_views.rdv_insertion_invite,
+        name="rdv_insertion_invite",
+    ),
 ]

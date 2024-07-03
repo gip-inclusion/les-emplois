@@ -72,7 +72,7 @@
                             {% bootstrap_field filters_form.job_seeker wrapper_class="w-lg-400px" show_label=False %}
                         </div>
                     </div>
-                    {% include "apply/includes/list_job_applications.html" with job_applications_page=job_applications_page filters_counter=filters_counter request=request pending_states_job_applications_count=pending_states_job_applications_count list_exports_url=list_exports_url SenderKind=SenderKind job_applications_list_kind=job_applications_list_kind JobApplicationsListKind=JobApplicationsListKind JobApplicationOrigin=JobApplicationOrigin only %}
+                    {% include "apply/includes/list_job_applications.html" with job_applications_page=job_applications_page filters_counter=filters_counter request=request csrf_token=csrf_token pending_states_job_applications_count=pending_states_job_applications_count list_exports_url=list_exports_url SenderKind=SenderKind job_applications_list_kind=job_applications_list_kind JobApplicationsListKind=JobApplicationsListKind JobApplicationOrigin=JobApplicationOrigin only %}
                 </div>
             </div>
         </div>

@@ -22,6 +22,7 @@ from tests.utils.test import TestCase
     RDV_SOLIDARITES_EMAIL="tech@inclusion.beta.gouv.fr",
     RDV_SOLIDARITES_PASSWORD="password",
     RDV_SOLIDARITES_TOKEN_EXPIRY=86000,
+    RDV_INSERTION_API_BASE_URL="https://rdv-insertion.fake/api/v1/",
     CACHES={
         "default": {
             "BACKEND": "itou.utils.cache.UnclearableCache",
