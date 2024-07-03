@@ -17,6 +17,7 @@ from tests.users.factories import (
     JobSeekerWithAddressFactory,
     PrescriberFactory,
 )
+from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import TestCase, parse_response_to_soup
 
 
@@ -367,13 +368,56 @@ def test_remove_members_from_group(client):
     assert len(soup.select("div.gps_intervenant")) == 3
 
 
-def test_groups_pagination(client):
+def test_groups_pagination_and_name_filter(client):
     prescriber = PrescriberFactory(membership__organization__authorized=True)
-    FollowUpGroupFactory.create_batch(11, memberships=1, memberships__member=prescriber)
+    created_groups = FollowUpGroupFactory.create_batch(11, memberships=1, memberships__member=prescriber)
 
     client.force_login(prescriber)
     my_groups_url = reverse("gps:my_groups")
     response = client.get(my_groups_url)
-    groups = response.context["memberships_page"]
-    assert len(groups) == 10
+    assert len(response.context["memberships_page"].object_list) == 10
     assert f"{my_groups_url}?page=2" in response.content.decode()
+
+    # Filter by beneficiary name.
+    beneficiary = created_groups[0].beneficiary
+    response = client.get(my_groups_url, {"beneficiary": beneficiary.pk})
+    memberships_page = response.context["memberships_page"]
+    assert len(memberships_page.object_list) == 1
+    assert memberships_page[0].follow_up_group.beneficiary == beneficiary
+    # Assert 11 names are displayed in the dropdown.
+    form = response.context["filters_form"]
+    assert len(form.fields["beneficiary"].choices) == 11
+
+    # Inactive memberships should not be displayed in the dropdown.
+    membership = created_groups[0].memberships.first()
+    membership.is_active = False
+    membership.save()
+    response = client.get(my_groups_url)
+    form = response.context["filters_form"]
+    assert len(form.fields["beneficiary"].choices) == 10
+
+    # Filtering by another beneficiary should not be allowed.
+    beneficiary = FollowUpGroupFactory().beneficiary
+    response = client.get(my_groups_url, {"beneficiary": beneficiary.pk})
+    memberships_page = response.context["memberships_page"]
+    assert len(memberships_page.object_list) == 10
+
+    # HTMX
+    beneficiary = created_groups[-1].beneficiary
+    response = client.get(my_groups_url, {"beneficiary": beneficiary.pk})
+    page = parse_response_to_soup(response, selector="#main")
+    [results] = page.select("#follow-up-groups-section")
+
+    response = client.get(
+        my_groups_url,
+        {"beneficiary": beneficiary.pk},
+        headers={"HX-Request": "true"},
+    )
+    update_page_with_htmx(page, f"form[hx-get='{my_groups_url}']", response)
+
+    response = client.get(
+        my_groups_url,
+        {"beneficiary": beneficiary.pk},
+    )
+    fresh_results = parse_response_to_soup(response, selector="#follow-up-groups-section")
+    assertSoupEqual(results, fresh_results)
