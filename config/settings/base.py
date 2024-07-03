@@ -112,6 +112,7 @@ INSTALLED_APPS = [
     "itou.analytics",
     "itou.communications",
     "itou.gps",
+    "itou.rdv_insertion",
 ]
 
 # TODO: Remove with Django 6.0
@@ -688,3 +689,5 @@ RDV_SOLIDARITES_API_BASE_URL = os.getenv("RDV_SOLIDARITES_API_BASE_URL")
 RDV_SOLIDARITES_EMAIL = os.getenv("RDV_SOLIDARITES_EMAIL")
 RDV_SOLIDARITES_PASSWORD = os.getenv("RDV_SOLIDARITES_PASSWORD")
 RDV_SOLIDARITES_TOKEN_EXPIRY = os.getenv("RDV_SOLIDARITES_TOKEN_EXPIRY", 86000)  # Token expires after 24h (86400s)
+RDV_INSERTION_API_BASE_URL = os.getenv("RDV_INSERTION_API_BASE_URL")
+RDV_INSERTION_INVITE_HOLD_DURATION = datetime.timedelta(days=int(os.getenv("RDV_INSERTION_INVITE_HOLD_DAYS", 10)))

@@ -1,7 +1,9 @@
 import enum
 from collections import defaultdict
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import Exists, OuterRef
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -11,6 +13,7 @@ from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.eligibility.models import SelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.rdv_insertion.models import InvitationRequest
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.urls import get_safe_url
@@ -249,6 +252,16 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         job_applications = filters_form.filter(job_applications)
         filters_counter = filters_form.get_qs_filters_counter()
         title = annotate_title(title, filters_form.cleaned_data["archived"])
+
+    job_applications = job_applications.annotate(
+        has_pending_rdv_insertion_invitation_request=Exists(
+            InvitationRequest.objects.filter(
+                job_seeker=OuterRef("job_seeker"),
+                company=OuterRef("to_company"),
+                created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
+            )
+        )
+    )
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
     _add_pending_for_weeks(job_applications_page)
