@@ -2,7 +2,7 @@
 
 ## direnv
 
-Nous conseillons d'installer le minuscule utilitaire `direnv` pour charger et
+Nous conseillons d'installer le minuscule utilitaire [direnv](https://direnv.net/) pour charger et
 décharger automatiquement des variables d'environnement à l'entrée dans un
 répertoire.
 
