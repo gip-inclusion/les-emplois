@@ -17,7 +17,7 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_siae_etp' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivre les effectifs annuels et mensuels en ETP</span>
+                            <span>Suivre les effectifs annuels et mensuels en ETP de ma ou mes structures</span>
                         </a>
                         {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
@@ -26,19 +26,19 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_siae_hiring' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivre le traitement et les résultats des candidatures reçues par ma structure - vision mensuelle</span>
+                            <span>Traitement et résultats des candidatures reçues par ma ou mes structures</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_siae_auto_prescription' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Focus auto-prescription</span>
+                            <span>Auto-prescription réalisées par ma ou mes structures</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_siae_follow_siae_evaluation' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivre le contrôle a posteriori</span>
+                            <span>Suivi du contrôle a posteriori pour ma ou mes structures</span>
                         </a>
                     </li>
                 {% endif %}
@@ -46,7 +46,7 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_siae_hiring_report' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Déclaration d’embauche</span>
+                            <span>Déclarations d’embauche de ma ou mes structures</span>
                         </a>
                         {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
@@ -55,7 +55,7 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_cd_iae' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données IAE de mon département</span>
+                            <span>Données IAE de mon département</span>
                         </a>
                         {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
@@ -64,13 +64,13 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_cd_hiring' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données facilitation de l'embauche</span>
+                            <span>Données facilitation à l'embauche des structures de mon département</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_cd_brsa' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivre les prescriptions des accompagnateurs des publics bRSA</span>
+                            <span>Prescriptions des accompagnateurs des publics allocataires du RSA de mon département</span>
                         </a>
                     </li>
                 {% endif %}
@@ -78,7 +78,7 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_cd_aci' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivi du cofinancement des ACI</span>
+                            <span>Suivi du cofinancement des ACI de mon département</span>
                         </a>
                     </li>
                 {% endif %}
@@ -96,25 +96,25 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_pe_state_main' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données de l’état des candidatures orientées</span>
+                            <span>Traitement et résultat des candidatures orientées par mes agences</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_pe_conversion_main' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données du taux de transformation</span>
+                            <span>Taux de transformation de mes agences</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_pe_tension' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données des fiches de poste en tension</span>
+                            <span>Fiches de poste en tension de mon territoire</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_pe_delay_main' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données du délai d'entrée en IAE</span>
+                            <span>Délai d'entrée en IAE pour mon territoire</span>
                         </a>
                     </li>
                 {% endif %}
@@ -122,7 +122,7 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ph_state_main' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données de l’état des candidatures orientées</span>
+                            <span>Traitement et résultat des candidatures orientées par mon organisation</span>
                         </a>
                     </li>
                 {% endif %}
@@ -130,14 +130,14 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ddets_iae_auto_prescription' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Focus auto-prescription</span>
+                            <span>Focus auto-prescription des structures de mon département</span>
                         </a>
                     </li>
                     {% if can_view_stats_ddets_iae_ph_prescription %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'stats:stats_ddets_iae_ph_prescription' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                                <span>Suivi des prescriptions des prescripteurs habilités</span>
+                                <span>Suivi des prescriptions des prescripteurs habilités de mon département</span>
                             </a>
                             {% include "dashboard/includes/stats_new_badge.html" %}
                         </li>
@@ -145,46 +145,46 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ddets_iae_follow_siae_evaluation' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivre le contrôle à posteriori</span>
+                            <span>Suivi du contrôle à posteriori pour les structures de mon département</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ddets_iae_follow_prolongation' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivre les demandes de prolongation</span>
+                            <span>Suivi des demandes de prolongation de mon département</span>
                         </a>
                     </li>
                     <!-- Stats temporarily suspended until we stabilize them
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'stats:stats_ddets_iae_iae' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                                <span>Voir les données IAE de mon département</span>
+                                <span>Données IAE de mon département</span>
                             </a>
                         </li>
                     -->
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ddets_iae_tension' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données des fiches de poste en tension</span>
+                            <span>Fiches de poste en tension des structures de mon département</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ddets_iae_hiring' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données facilitation de l'embauche</span>
+                            <span>Données facilitation à l'embauche de mon département</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ddets_iae_state' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivre les prescriptions des AHI de ma région</span>
+                            <span>Prescriptions des acteurs AHI de ma région</span>
                         </a>
                     </li>
                     {% if can_view_stats_ddets_iae_aci %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'stats:stats_ddets_iae_aci' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                                <span>Suivi du cofinancement des ACI</span>
+                                <span>Suivi du cofinancement des ACI de mon département</span>
                             </a>
                         </li>
                     {% endif %}
@@ -193,7 +193,7 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_ddets_log_state' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivre les prescriptions des AHI de ma région</span>
+                            <span>Prescriptions des acteurs AHI de ma région</span>
                         </a>
                     </li>
                 {% endif %}
@@ -201,14 +201,14 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dreets_iae_auto_prescription' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Focus auto-prescription</span>
+                            <span>Les auto-prescription des structures de ma région</span>
                         </a>
                     </li>
                     {% if can_view_stats_dreets_iae_ph_prescription %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'stats:stats_dreets_iae_ph_prescription' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                                <span>Suivi des prescriptions des prescripteurs habilités</span>
+                                <span>Suivi des prescriptions des prescripteurs habilités de ma région</span>
                             </a>
                             {% include "dashboard/includes/stats_new_badge.html" %}
                         </li>
@@ -216,39 +216,39 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dreets_iae_follow_siae_evaluation' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivre le contrôle à posteriori</span>
+                            <span>Suivi du contrôle à posteriori des structures de ma région</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dreets_iae_follow_prolongation' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivre les demandes de prolongation</span>
+                            <span>Suivi des demandes de prolongation de ma région</span>
                         </a>
                     </li>
                     <!-- Stats temporarily suspended until we stabilize them
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'stats:stats_dreets_iae_iae' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                                <span>Voir les données IAE de ma région</span>
+                                <span>Données IAE de ma région</span>
                             </a>
                         </li>
                     -->
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dreets_iae_tension' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données des fiches de poste en tension</span>
+                            <span>Fiches de poste en tension des structures de ma région</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dreets_iae_hiring' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données facilitation de l'embauche</span>
+                            <span>Données facilitation à l'embauche des structures de ma région</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dreets_iae_state' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivre les prescriptions des AHI de ma région</span>
+                            <span>Prescriptions des acteurs AHI de ma région</span>
                         </a>
                     </li>
                 {% endif %}
@@ -262,13 +262,13 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dgefp_follow_siae_evaluation' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivre le contrôle à posteriori</span>
+                            <span>Suivi du contrôle à posteriori</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dgefp_follow_prolongation' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivre les demandes de prolongation</span>
+                            <span>Suivi des demandes de prolongation</span>
                         </a>
                     </li>
                     <!-- Stats temporarily suspended until we stabilize them
@@ -276,7 +276,7 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dgefp_iae' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données IAE France entière</span>
+                            <span>Données IAE France entière</span>
                         </a>
                     </li>
                     -->
@@ -289,19 +289,19 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dgefp_tension' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données des fiches de poste en tension</span>
+                            <span>Fiches de poste en tension</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dgefp_hiring' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données facilitation de l'embauche</span>
+                            <span>Données facilitation à l'embauche</span>
                         </a>
                     </li>
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dgefp_state' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivre les prescriptions des AHI</span>
+                            <span>Prescriptions des acteurs AHI</span>
                         </a>
                     </li>
                 {% endif %}
@@ -309,7 +309,7 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_dihal_state' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivre les prescriptions des AHI</span>
+                            <span>Prescriptions des acteurs AHI</span>
                         </a>
                     </li>
                 {% endif %}
@@ -317,7 +317,7 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_drihl_state' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Suivre les prescriptions des AHI</span>
+                            <span>Prescriptions des acteurs AHI de ma région</span>
                         </a>
                         {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
@@ -326,7 +326,7 @@
                     <li class="d-flex justify-content-between align-items-center mb-3">
                         <a href="{% url 'stats:stats_iae_network_hiring' %}" class="btn-link btn-ico">
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                            <span>Voir les données de candidatures des adhérents de mon réseau IAE</span>
+                            <span>Traitement et résultats des candidatures orientées par mes adhérents</span>
                         </a>
                         {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
