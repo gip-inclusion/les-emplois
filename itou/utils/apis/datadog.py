@@ -68,19 +68,27 @@ class DatadogApiClient:
         }
         return data
 
-    def count_daily_logs(self, before="", endpoint=""):
+    def _format_dates(self, before=None):
         if not before:
             before = timezone.now()
         start = (before - relativedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
         end = before.replace(hour=0, minute=0, second=0, microsecond=0)
+        return (start, end)
+
+    def count_daily_logs(self, before=None, endpoint=""):
+        start, end = self._format_dates(before=before)
         data = self.default_data(metric_kind="count", agregation_kind="count", endpoint=endpoint, start=start, end=end)
         return self._get_data_from_datadog(data=data)
 
-    def count_daily_unique_users(self, before="", endpoint=""):
-        if not before:
-            before = timezone.now()
-        start = (before - relativedelta(days=1)).replace(hour=0, minute=0, second=0)
-        end = before.replace(hour=0, minute=0, second=0)
+    def count_daily_unique_ip_addresses(self, before=None, endpoint=""):
+        start, end = self._format_dates(before=before)
+        data = self.default_data(
+            metric_kind="@network.client.ip", agregation_kind="cardinality", endpoint=endpoint, start=start, end=end
+        )
+        return self._get_data_from_datadog(data=data)
+
+    def count_daily_unique_users(self, before=None, endpoint=""):
+        start, end = self._format_dates(before=before)
         data = self.default_data(
             metric_kind="@usr.id", agregation_kind="cardinality", endpoint=endpoint, start=start, end=end
         )

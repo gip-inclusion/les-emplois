@@ -17,9 +17,10 @@ def _mocked_client(mocker, now):
             "employee-records/": 7,
             "marche/": 9,
             "siaes/": 10,
-            "structures/": 11,
+            "structures/": 12,
         },
         "count_daily_unique_visitors": {"": 2, "candidats/": 4, "embauches-geiq/": 6, "employee-records/": 8},
+        "count_daily_unique_ip_addresses": {"siaes/": 11},
     }
 
     def side_effect_count_daily_logs(*args, **kwargs):
@@ -27,6 +28,9 @@ def _mocked_client(mocker, now):
 
     def side_effect_count_daily_uv(*args, **kwargs):
         return mapping["count_daily_unique_visitors"][kwargs.get("endpoint", "")]
+
+    def side_effect_count_daily_unique_ip_addresses(*args, **kwargs):
+        return mapping["count_daily_unique_ip_addresses"][kwargs.get("endpoint", "")]
 
     client = DatadogApiClient()
     mocker.patch.object(
@@ -103,6 +107,13 @@ def _mocked_client(mocker, now):
         call_args=[now],
         call_kwargs={"endpoint": "structures/"},
         side_effect=side_effect_count_daily_logs,
+    )
+    mocker.patch.object(
+        client,
+        "count_daily_unique_ip_addresses",
+        call_args=[now],
+        call_kwargs={"endpoint": "siaes/"},
+        side_effect=side_effect_count_daily_unique_ip_addresses,
     )
     return client
 
