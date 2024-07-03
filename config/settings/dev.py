@@ -66,6 +66,9 @@ if API_BAN_BASE_URL:
 API_GEO_BASE_URL = os.getenv("API_GEO_BASE_URL", "https://geo.api.gouv.fr")
 MATOMO_BASE_URL = os.getenv("MATOMO_BASE_URL", "https://matomo.inclusion.beta.gouv.fr/")
 MATOMO_SITE_ID = 220
+CSP_IMG_SRC.append(MATOMO_BASE_URL)  # noqa: F405
+CSP_SCRIPT_SRC.append(MATOMO_BASE_URL)  # noqa: F405
+CSP_CONNECT_SRC.append(MATOMO_BASE_URL)  # noqa: F405
 
 # use almost the same settings for metabase as base PG.
 METABASE_HOST = os.getenv("METABASE_HOST", os.getenv("PGHOST", "127.0.0.1"))  # noqa: F405
