@@ -227,6 +227,8 @@ class EvaluationCampaign(models.Model):
                 state=JobApplicationState.ACCEPTED,
                 eligibility_diagnosis__author_kind=KIND_EMPLOYER,
                 eligibility_diagnosis__author_siae=F("to_company"),
+                # The job application must have created the approval.
+                approval__start_at=F("hiring_start_at"),
                 hiring_start_at__gte=self.evaluated_period_start_at,
                 hiring_start_at__lte=self.evaluated_period_end_at,
                 approval__number__startswith=settings.ASP_ITOU_PREFIX,
