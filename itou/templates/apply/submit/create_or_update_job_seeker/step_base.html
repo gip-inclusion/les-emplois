@@ -72,7 +72,7 @@
                         {% endif %}
                         <hr class="mt-5">
                         {% bootstrap_form_errors form type="all" %}
-                        <form method="post" class="js-collapsable-subfields js-format-nir">
+                        <form method="post" class="js-collapsable-subfields js-format-nir" data-matomo-name="apply-create-or-update-job-seeker">
                             {% csrf_token %}
 
                             {% block form_content %}{% endblock %}
