@@ -365,3 +365,15 @@ def test_remove_members_from_group(client):
     response = client.get(user_details_url)
     soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
     assert len(soup.select("div.gps_intervenant")) == 3
+
+
+def test_groups_pagination(client):
+    prescriber = PrescriberFactory(membership__organization__authorized=True)
+    FollowUpGroupFactory.create_batch(11, memberships=1, memberships__member=prescriber)
+
+    client.force_login(prescriber)
+    my_groups_url = reverse("gps:my_groups")
+    response = client.get(my_groups_url)
+    groups = response.context["memberships_page"]
+    assert len(groups) == 10
+    assert f"{my_groups_url}?page=2" in response.content.decode()
