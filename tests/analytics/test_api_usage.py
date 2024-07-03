@@ -16,6 +16,7 @@ def test_collect_analytics_data_return_all_codes(datadog_client):
         models.DatumCode.API_TOTAL_UV_ER,
         models.DatumCode.API_TOTAL_CALLS_MARCHE,
         models.DatumCode.API_TOTAL_CALLS_SIAES,
+        models.DatumCode.API_TOTAL_UV_SIAES,
         models.DatumCode.API_TOTAL_CALLS_STRUCTURES,
     }
 
@@ -33,5 +34,6 @@ def test_collect_analytics_data_with_data(datadog_client):
         models.DatumCode.API_TOTAL_UV_ER: 8,
         models.DatumCode.API_TOTAL_CALLS_MARCHE: 9,
         models.DatumCode.API_TOTAL_CALLS_SIAES: 10,
-        models.DatumCode.API_TOTAL_CALLS_STRUCTURES: 11,
+        models.DatumCode.API_TOTAL_UV_SIAES: 11,
+        models.DatumCode.API_TOTAL_CALLS_STRUCTURES: 12,
     }

@@ -43,6 +43,25 @@ def test_count_daily_unique_users(settings, respx_mock):
     assert result == expected
 
 
+def test_count_daily_unique_ip_addresses(settings, respx_mock):
+    settings.API_DATADOG_BASE_URL = "https://un-toutou-nomme-donnee.fr/"
+    expected = 12
+    respx_mock.post("https://un-toutou-nomme-donnee.fr/logs/analytics/aggregate").respond(
+        200,
+        json={
+            "meta": {
+                "elapsed": 192,
+                "request_id": "blablabla",
+                "status": "done",
+            },
+            "data": {"buckets": [{"computes": {"c0": expected}, "by": {}}]},
+        },
+    )
+    client = DatadogApiClient()
+    result = client.count_daily_unique_ip_addresses()
+    assert result == expected
+
+
 def test_no_result(settings, respx_mock):
     settings.API_DATADOG_BASE_URL = "https://un-toutou-nomme-donnee.fr/"
     respx_mock.post("https://un-toutou-nomme-donnee.fr/logs/analytics/aggregate").respond(
