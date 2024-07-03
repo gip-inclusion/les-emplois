@@ -65,7 +65,7 @@
 
                         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
                             <h3 class="h4 mb-0" id="results">
-                                {% with memberships|length as counter %}
+                                {% with memberships_page.paginator.count as counter %}
                                     {{ counter }} bénéficiaire{{ counter|pluralizefr }} suivi{{ counter|pluralizefr }}
                                 {% endwith %}
                             </h3>
@@ -80,7 +80,7 @@
 
                         <div class="col-6 col-lg-auto"></div>
 
-                        {% for membership in memberships %}
+                        {% for membership in memberships_page %}
                             <div class="my-3 my-md-4 s-box__row row membership-card">
                                 <div class="c-box--results__header">
 
@@ -202,7 +202,9 @@
                             </div>
                         {% endfor %}
                     </section>
-
+                </div>
+                <div class="col-12 mt-2">
+                    {% include "includes/pagination.html" with page=memberships_page boost=False boost_target=""  boost_indicator="" %}
                 </div>
             </div>
         </div>

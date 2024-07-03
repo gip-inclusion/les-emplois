@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.utils.pagination import pager
 from itou.utils.urls import get_safe_url
 from itou.www.gps.forms import GpsUserSearchForm
 
@@ -28,6 +29,7 @@ def my_groups(request, template_name="gps/my_groups.html"):
         .select_related("follow_up_group", "follow_up_group__beneficiary", "member")
         .prefetch_related("follow_up_group__members")
     )
+    memberships_page = pager(memberships, request.GET.get("page"), items_per_page=10)
 
     breadcrumbs = {
         "Mes bénéficiaires": reverse("gps:my_groups"),
@@ -35,7 +37,7 @@ def my_groups(request, template_name="gps/my_groups.html"):
 
     context = {
         "breadcrumbs": breadcrumbs,
-        "memberships": memberships,
+        "memberships_page": memberships_page,
     }
 
     return render(request, template_name, context)
