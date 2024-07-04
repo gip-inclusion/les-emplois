@@ -27,16 +27,22 @@ class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
         is_job_seeker_q = models.Q(job_seeker=viewing_user)
         # Prescriber diagnosis are viewable to all.
         author_q = models.Q(author_kind=AuthorKind.PRESCRIBER)
-        if (
-            viewing_user.is_employer
-            or viewing_user is None  # In Django admin, the viewing user does not matter and None is provided.
-        ) and siae is not None:
-            siae_q = models.Q(author_siae=siae)
-            if viewing_user.is_employer:
-                # SIAE make their own diagnosis for auto-prescriptions.
-                # Only viewable to members of that SIAE.
-                siae_q &= models.Q(Exists(CompanyMembership.objects.active().filter(company=siae, user=viewing_user)))
-            author_q |= siae_q
+        if siae is not None:
+            if (
+                viewing_user.is_employer
+                or viewing_user is None  # In Django admin, the viewing user does not matter and None is provided.
+            ):
+                siae_q = models.Q(author_siae=siae)
+                if viewing_user.is_employer:
+                    # SIAE make their own diagnosis for auto-prescriptions.
+                    # Only viewable to members of that SIAE.
+                    siae_q &= models.Q(
+                        Exists(CompanyMembership.objects.active().filter(company=siae, user=viewing_user))
+                    )
+                author_q |= siae_q
+            else:
+                # foo
+                pass
         return qs.filter(
             is_job_seeker_q  # Job seekers see all diagnoses about them.
             | ~is_job_seeker_q & author_q
