@@ -8,7 +8,7 @@ import pandas as pd
 from psycopg import sql
 from tqdm import tqdm
 
-from itou.metabase.db import DB_CURSOR, create_table, get_cursor, get_new_table_name, rename_table_atomically
+from itou.metabase.db import MetabaseDatabaseCursor, create_table, get_new_table_name, rename_table_atomically
 
 
 PANDA_DATAFRAME_TO_PSQL_TYPES_MAPPING = {
@@ -59,7 +59,7 @@ def store_df(df, table_name, max_attempts=5):
             create_table(new_table_name, columns, reset=True)
             for df_chunk in tqdm(df_chunks):
                 rows = df_chunk.replace({np.nan: None}).to_dict(orient="split")["data"]
-                with get_cursor(DB_CURSOR.C2) as (cursor, conn):
+                with MetabaseDatabaseCursor() as (cursor, conn):
                     with cursor.copy(
                         sql.SQL("COPY {table_name} FROM STDIN WITH (FORMAT BINARY)").format(
                             table_name=sql.Identifier(new_table_name),

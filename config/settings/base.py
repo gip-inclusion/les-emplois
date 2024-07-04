@@ -420,13 +420,6 @@ METABASE_DATABASE = os.getenv("METABASE_DATABASE")
 METABASE_USER = os.getenv("METABASE_USER")
 METABASE_PASSWORD = os.getenv("METABASE_PASSWORD")
 
-# use almost the same settings for C1 analyses db as base PG.
-C1_METABASE_HOST = os.getenv("C1_METABASE_HOST")
-C1_METABASE_PORT = os.getenv("C1_METABASE_PORT")
-C1_METABASE_USER = os.getenv("C1_METABASE_USER")
-C1_METABASE_PASSWORD = os.getenv("C1_METABASE_PASSWORD")
-C1_METABASE_DATABASE = os.getenv("C1_METABASE_DATABASE")
-
 # Embedding signed Metabase dashboard
 METABASE_SITE_URL = os.getenv("METABASE_SITE_URL")
 METABASE_SECRET_KEY = os.getenv("METABASE_SECRET_KEY")
