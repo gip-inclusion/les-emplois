@@ -8,7 +8,7 @@
 {% load django_bootstrap5 %}
 {% load buttons_form %}
 
-<form method="post" class="js-prevent-multiple-submit js-format-nir">
+<form method="post" class="js-prevent-multiple-submit js-format-nir" data-matomo-name="dashboard-edit-job-seeker-identity">
     {% csrf_token %}
 
     {% if form.nir_error %}{{ form.nir_error|safe }}{% endif %}

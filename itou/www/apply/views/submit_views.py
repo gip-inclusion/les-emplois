@@ -563,6 +563,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
+            "matomo_form_name": "apply-create-job-seeker-identity",
             "progress": "20",
         }
 
@@ -1367,6 +1368,7 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
         return super().get_context_data(**kwargs) | {
             "confirmation_needed": False,
             "form": self.form,
+            "matomo_form_name": "apply-update-job-seeker-identity",
             "readonly_form": not self.request.user.can_edit_personal_information(self.job_seeker),
             "progress": "20",
         }
