@@ -29,7 +29,6 @@
 
   "0 0 * * 1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
   "0 2 * * 1 $ROOT/clevercloud/crons/populate_metabase_matomo.sh",
-  "0 3 * * 1 $ROOT/clevercloud/crons/populate_c1_analyses.sh",
 
   "0 0 1 * * $ROOT/clevercloud/run_management_command.sh delete_old_emails --wet-run",
   "0 0 1 * * $ROOT/clevercloud/run_management_command.sh sync_cities --wet-run",
