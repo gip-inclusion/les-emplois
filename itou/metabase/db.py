@@ -24,7 +24,7 @@ class MetabaseDatabaseCursor:
         self.connection = None
 
     def get_setting(self, name):
-        return getattr(settings, f"{self.setting_prefix}{name}")
+        return getattr(settings, f"{self.settings_prefix}{name}")
 
     def __enter__(self):
         self.connection = psycopg.connect(
