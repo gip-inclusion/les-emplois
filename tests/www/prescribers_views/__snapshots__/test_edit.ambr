@@ -217,11 +217,15 @@
   
     <option value="978">978 - Saint-Martin</option>
   
+    <option value="984">984 - Terres australes et antarctiques françaises</option>
+  
     <option value="986">986 - Wallis-et-Futuna</option>
   
     <option value="987">987 - Polynésie française</option>
   
     <option value="988">988 - Nouvelle-Calédonie</option>
+  
+    <option value="989">989 - Île Clipperton</option>
   
   </select></div><div class="form-group"><label class="form-label" for="id_phone">Téléphone</label><input class="form-control" disabled="" id="id_phone" maxlength="20" name="phone" placeholder="Téléphone" type="text" value="0600000000"/></div><div class="form-group"><label class="form-label" for="id_email">E-mail</label><input class="form-control" disabled="" id="id_email" maxlength="254" name="email" placeholder="E-mail" type="email" value="pe@mailinator.com"/></div><div class="form-group"><label class="form-label" for="id_website">Site web</label><input aria-describedby="id_website_helptext" class="form-control" disabled="" id="id_website" maxlength="200" name="website" placeholder="Site web" type="url"/><div class="form-text">Votre site web doit commencer par http:// ou https://</div>
   </div><div class="form-group"><label class="form-label" for="id_description">Description</label><textarea aria-describedby="id_description_helptext" class="form-control" cols="40" disabled="" id="id_description" name="description" placeholder="Description" rows="10"></textarea><div class="form-text">Texte de présentation de votre structure.</div>
