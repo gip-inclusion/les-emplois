@@ -144,12 +144,11 @@ class Migration(migrations.Migration):
                 ("review_comment", models.TextField(blank=True, verbose_name="commentaire")),
                 (
                     "activity_report_file",
-                    models.ForeignKey(
+                    models.OneToOneField(
                         blank=True,
                         null=True,
                         on_delete=django.db.models.deletion.PROTECT,
                         to="files.file",
-                        unique=True,
                         verbose_name="document de synthèse",
                     ),
                 ),
