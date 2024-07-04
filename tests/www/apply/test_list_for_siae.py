@@ -10,6 +10,7 @@ from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.export import JOB_APPLICATION_CSV_HEADERS
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.utils.urls import add_url_params
@@ -30,7 +31,13 @@ from tests.prescribers.factories import (
 )
 from tests.users.factories import JobSeekerFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, assert_previous_step, parse_response_to_soup
+from tests.utils.test import (
+    BASE_NUM_QUERIES,
+    TestCase,
+    assert_previous_step,
+    get_rows_from_streaming_response,
+    parse_response_to_soup,
+)
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
@@ -785,6 +792,9 @@ def test_list_for_siae_exports_download(client):
     response = client.get(reverse("apply:list_for_siae_exports_download"))
     assert 200 == response.status_code
     assert "spreadsheetml" in response.get("Content-Type")
+    rows = get_rows_from_streaming_response(response)
+    assert rows[0] == JOB_APPLICATION_CSV_HEADERS
+    assert len(rows) == 2
 
 
 def test_list_for_siae_exports_download_as_prescriber(client):
