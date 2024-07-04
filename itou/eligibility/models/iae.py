@@ -7,8 +7,9 @@ from django.db.models import Case, Exists, OuterRef, When
 from django.utils import timezone
 
 from itou.approvals.models import Approval
-from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
+from itou.prescribers.models import PrescriberMembership
+from itou.users.models import UserKind
 
 from .common import (
     AbstractAdministrativeCriteria,
@@ -23,23 +24,27 @@ logger = logging.getLogger(__name__)
 
 class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
     def for_job_seeker_and_siae(self, viewing_user, job_seeker, *, siae=None):
+        if viewing_user.is_superuser:
+            return self
+        if viewing_user.is_labor_inspector:
+            raise NotImplementedError
+        assert viewing_user.kind in [UserKind.ITOU_STAFF, UserKind.EMPLOYER, UserKind.JOB_SEEKER, UserKind.PRESCRIBER]
         qs = self.filter(job_seeker=job_seeker)
-        is_job_seeker_q = models.Q(job_seeker=viewing_user)
         # Prescriber diagnosis are viewable to all.
-        author_q = models.Q(author_kind=AuthorKind.PRESCRIBER)
-        if (
-            viewing_user.is_employer
-            or viewing_user is None  # In Django admin, the viewing user does not matter and None is provided.
-        ) and siae is not None:
-            siae_q = models.Q(author_siae=siae)
-            if viewing_user.is_employer:
-                # SIAE make their own diagnosis for auto-prescriptions.
-                # Only viewable to members of that SIAE.
-                siae_q &= models.Q(Exists(CompanyMembership.objects.active().filter(company=siae, user=viewing_user)))
-            author_q |= siae_q
+        author_q = models.Q(
+            Exists(PrescriberMembership.objects.active().filter(organization__is_authorized=True)),
+            author_kind=AuthorKind.PRESCRIBER,
+        )
+        if siae is not None and viewing_user.is_employer:
+            # SIAE make their own diagnosis for auto-prescriptions, only viewable to active members of that SIAE.
+            author_q |= models.Q(
+                author_siae=siae,
+                author_siae__members__user=viewing_user,
+                author_siae__members__is_active=True,
+            )
         return qs.filter(
-            is_job_seeker_q  # Job seekers see all diagnoses about them.
-            | ~is_job_seeker_q & author_q
+            models.Q(job_seeker=viewing_user)  # Job seekers see all diagnoses about them.
+            | author_q
         )
 
     def has_approval(self):
