@@ -7,6 +7,7 @@ from django.db.models import Case, Exists, OuterRef, When
 from django.utils import timezone
 
 from itou.approvals.models import Approval
+from itou.companies.models import CompanyMembership
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 
 from .common import (
@@ -27,12 +28,15 @@ class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
         # Prescriber diagnosis are viewable to all.
         author_q = models.Q(author_kind=AuthorKind.PRESCRIBER)
         if (
-            viewing_user is None  # In Django admin, the viewing user does not matter and None is provided.
-            or viewing_user.is_employer
+            viewing_user.is_employer
+            or viewing_user is None  # In Django admin, the viewing user does not matter and None is provided.
         ) and siae is not None:
-            # SIAE make their own diagnosis for auto-prescriptions.
-            # Only viewable to members of that SIAE.
-            author_q |= models.Q(author_siae=siae)
+            siae_q = models.Q(author_siae=siae)
+            if viewing_user.is_employer:
+                # SIAE make their own diagnosis for auto-prescriptions.
+                # Only viewable to members of that SIAE.
+                siae_q &= models.Q(Exists(CompanyMembership.objects.active().filter(company=siae, user=viewing_user)))
+            author_q |= siae_q
         return qs.filter(
             is_job_seeker_q  # Job seekers see all diagnoses about them.
             | ~is_job_seeker_q & author_q

@@ -7,7 +7,7 @@ from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.common import AdministrativeCriteriaQuerySet
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
-from tests.companies.factories import CompanyFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.eligibility.factories import (
     IAEEligibilityDiagnosisFactory,
 )
@@ -290,6 +290,50 @@ class EligibilityDiagnosisManagerTest(TestCase):
         )
         assert (
             EligibilityDiagnosis.objects.last_expired(other_job_seeker, job_seeker=self.job_seeker, for_siae=company)
+            is None
+        )
+
+    def test_employer_diagnosis_not_seen_by_other_employers(self):
+        eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_employer=True, job_seeker=self.job_seeker)
+        company = eligibility_diagnosis.author_siae
+        other_company_member = CompanyMembershipFactory().user
+        assert (
+            EligibilityDiagnosis.objects.has_considered_valid(
+                other_company_member, job_seeker=self.job_seeker, for_siae=company
+            )
+            is False
+        )
+        assert (
+            EligibilityDiagnosis.objects.last_considered_valid(
+                other_company_member, job_seeker=self.job_seeker, for_siae=company
+            )
+            is None
+        )
+        assert (
+            EligibilityDiagnosis.objects.last_expired(
+                other_company_member, job_seeker=self.job_seeker, for_siae=company
+            )
+            is None
+        )
+
+    def test_employer_diagnosis_not_seen_by_inactive_members(self):
+        eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_employer=True, job_seeker=self.job_seeker)
+        company = eligibility_diagnosis.author_siae
+        inactive_member = CompanyMembershipFactory(company=company, is_active=False).user
+        assert (
+            EligibilityDiagnosis.objects.has_considered_valid(
+                inactive_member, job_seeker=self.job_seeker, for_siae=company
+            )
+            is False
+        )
+        assert (
+            EligibilityDiagnosis.objects.last_considered_valid(
+                inactive_member, job_seeker=self.job_seeker, for_siae=company
+            )
+            is None
+        )
+        assert (
+            EligibilityDiagnosis.objects.last_expired(inactive_member, job_seeker=self.job_seeker, for_siae=company)
             is None
         )
 
