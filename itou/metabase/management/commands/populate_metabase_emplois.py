@@ -269,7 +269,7 @@ class Command(BaseCommand):
         """
         queryset = (
             User.objects.filter(kind=UserKind.JOB_SEEKER)
-            .select_related("jobseeker_profile")
+            .select_related("jobseeker_profile", "created_by")
             .prefetch_related(
                 Prefetch(
                     "eligibility_diagnoses",
@@ -297,7 +297,6 @@ class Command(BaseCommand):
                     "job_applications",
                     queryset=JobApplication.objects.select_related("to_company"),
                 ),
-                "created_by",
             )
             .annotate(
                 eligibility_diagnoses_count=Count("eligibility_diagnoses", distinct=True),
@@ -327,6 +326,7 @@ class Command(BaseCommand):
             .only(
                 "pk",
                 "created_at",
+                "processed_at",
                 "hiring_start_at",
                 "origin",
                 "sender_kind",

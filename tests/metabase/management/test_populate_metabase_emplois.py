@@ -14,6 +14,7 @@ from itou.companies.enums import ContractType
 from itou.companies.models import JobDescription
 from itou.eligibility.models import AdministrativeCriteria
 from itou.geo.utils import coords_to_geometry
+from itou.job_applications.enums import JobApplicationState
 from itou.metabase.tables.utils import hash_content
 from itou.users.enums import IdentityProvider, UserKind
 from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
@@ -139,6 +140,7 @@ def test_populate_job_seekers():
         identity_provider=IdentityProvider.PE_CONNECT,
         jobseeker_profile__pole_emploi_id="",
         last_login=timezone.now(),
+        first_login=timezone.now(),
         jobseeker_profile__nir="179038704133768",
         post_code="33360",
         geocoding_score=1,
@@ -209,7 +211,6 @@ def test_populate_job_seekers():
     num_queries += 1  # Select job seekers chunck (with annotations)
     num_queries += 1  # Prefetch EligibilityDiagnosis with anotations, author_prescriber_organization and author_siae
     num_queries += 1  # Prefetch JobApplications with Siaes
-    num_queries += 1  # Prefetch created_by Users
     num_queries += 1  # Get QPV users
     num_queries += 1  # Select AI stock approvals pks
     num_queries += 1  # COMMIT (inject_chunk)
@@ -235,6 +236,7 @@ def test_populate_job_seekers():
             "par prescripteur",
             1,
             0,
+            datetime.date.today(),
             datetime.date.today(),
             1,
             "33360",
@@ -287,6 +289,7 @@ def test_populate_job_seekers():
             0,
             1,
             None,
+            None,
             0,
             "",
             "",
@@ -337,6 +340,7 @@ def test_populate_job_seekers():
             "autonome",
             0,
             1,
+            None,
             None,
             0,
             "",
@@ -417,7 +421,11 @@ def test_populate_job_applications():
         kind="GEIQ",
     )
     job = JobDescriptionFactory(is_active=True, company=company)
-    ja = JobApplicationFactory(with_geiq_eligibility_diagnosis=True, contract_type=ContractType.APPRENTICESHIP)
+    ja = JobApplicationFactory(
+        with_geiq_eligibility_diagnosis=True,
+        contract_type=ContractType.APPRENTICESHIP,
+        state=JobApplicationState.ACCEPTED,
+    )
     ja.selected_jobs.add(job)
 
     num_queries = 1  # Select siaes for get_active_companies_pks()
@@ -444,7 +452,8 @@ def test_populate_job_applications():
                 ja.pk,
                 ja.created_at.date(),
                 ja.hiring_start_at,
-                "Nouvelle candidature",
+                ja.processed_at.date(),
+                "Candidature acceptée",
                 "Orienteur",
                 "Orienteur sans organisation",
                 None,
