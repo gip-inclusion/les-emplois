@@ -131,6 +131,12 @@ TABLE.add_columns(
             "fn": lambda o: o.hiring_start_at,
         },
         {
+            "name": "date_traitement",
+            "type": "date",
+            "comment": "Date de dernière traitement de la candidature",
+            "fn": lambda o: o.processed_at,
+        },
+        {
             "name": "état",
             "type": "varchar",
             "comment": "Etat de la candidature",
