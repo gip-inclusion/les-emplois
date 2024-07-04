@@ -1573,7 +1573,9 @@ class ProlongationModelTest(TestCase):
                 prolongation = ProlongationFactory(
                     reason=reason,
                     end_at=factory.LazyAttribute(
-                        lambda obj: obj.start_at + info["max_cumulative_duration"] + datetime.timedelta(days=1)
+                        lambda obj: obj.start_at
+                        + (info["max_cumulative_duration"] or info["max_duration"])
+                        + datetime.timedelta(days=1)
                     ),
                     declared_by_siae__kind=CompanyKind.AI,
                 )
@@ -1642,7 +1644,7 @@ class ProlongationModelTest(TestCase):
         approval = ApprovalFactory()
         for reason, expected_max_end_at in [
             (ProlongationReason.SENIOR_CDI, datetime.date(2031, 1, 30)),  # 3650 days (~10 years).
-            (ProlongationReason.COMPLETE_TRAINING, datetime.date(2031, 1, 30)),  # 3650 days (~10 years).
+            (ProlongationReason.COMPLETE_TRAINING, datetime.date(2022, 2, 1)),  # 365 days.
             (ProlongationReason.RQTH, datetime.date(2024, 2, 1)),  # 1095 days (3 years).
             (ProlongationReason.SENIOR, datetime.date(2026, 1, 31)),  # 1825 days (~5 years).
             (ProlongationReason.PARTICULAR_DIFFICULTIES, datetime.date(2024, 2, 1)),  # 1095 days (3 years).

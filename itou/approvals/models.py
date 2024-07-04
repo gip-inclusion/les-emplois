@@ -1312,7 +1312,7 @@ class CommonProlongation(models.Model):
     PROLONGATION_RULES = {
         enums.ProlongationReason.SENIOR_CDI: {
             "max_duration": MAX_DURATION,
-            "max_cumulative_duration": MAX_DURATION,
+            "max_cumulative_duration": None,
             "help_text": (
                 "Pour le CDI Inclusion, jusqu’à la retraite "
                 "(pour des raisons techniques, une durée de 10 ans (3650 jours) est appliquée par défaut)."
@@ -1320,7 +1320,7 @@ class CommonProlongation(models.Model):
         },
         enums.ProlongationReason.COMPLETE_TRAINING: {
             "max_duration": datetime.timedelta(days=365),
-            "max_cumulative_duration": MAX_DURATION,
+            "max_cumulative_duration": None,
             "help_text": mark_safe(
                 "12 mois (365 jours) maximum pour chaque demande.<br> "
                 "Renouvellements possibles jusqu’à la fin de l’action de formation."
@@ -1532,15 +1532,12 @@ class CommonProlongation(models.Model):
         """
         Returns the maximum date on which a prolongation can end.
         """
-        try:
-            max_cumulative_duration = Prolongation.PROLONGATION_RULES[reason]["max_cumulative_duration"]
-        except KeyError:
-            max_end = start_at + Prolongation.MAX_DURATION
-        else:
-            used = Prolongation.objects.get_cumulative_duration_for(approval_id, ignore=ignore)
-            remaining_days = max_cumulative_duration - used
-            max_end = start_at + remaining_days
-        return max_end
+        max_cumulative_duration = Prolongation.PROLONGATION_RULES[reason]["max_cumulative_duration"]
+        if max_cumulative_duration is None:
+            return start_at + Prolongation.PROLONGATION_RULES[reason]["max_duration"]
+        used = Prolongation.objects.get_cumulative_duration_for(approval_id, ignore=ignore)
+        remaining_days = max_cumulative_duration - used
+        return start_at + remaining_days
 
 
 class ProlongationRequest(CommonProlongation):
