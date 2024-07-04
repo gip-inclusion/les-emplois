@@ -22,13 +22,21 @@ logger = logging.getLogger(__name__)
 
 class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
     def for_job_seeker_and_siae(self, viewing_user, job_seeker, *, siae=None):
-        author_filter = models.Q(author_kind=AuthorKind.PRESCRIBER)
-        # In most cases, the viewing user is the acting user and only employers
-        # should see their eligibility diagnosis.
-        # In Django admin, the viewing user does not matter and None is provided.
-        if (viewing_user is None or viewing_user.is_employer) and siae is not None:
-            author_filter |= models.Q(author_siae=siae)
-        return self.filter(author_filter, job_seeker=job_seeker)
+        qs = self.filter(job_seeker=job_seeker)
+        is_job_seeker_q = models.Q(job_seeker=viewing_user)
+        # Prescriber diagnosis are viewable to all.
+        author_q = models.Q(author_kind=AuthorKind.PRESCRIBER)
+        if (
+            viewing_user is None  # In Django admin, the viewing user does not matter and None is provided.
+            or viewing_user.is_employer
+        ) and siae is not None:
+            # SIAE make their own diagnosis for auto-prescriptions.
+            # Only viewable to members of that SIAE.
+            author_q |= models.Q(author_siae=siae)
+        return qs.filter(
+            is_job_seeker_q  # Job seekers see all diagnoses about them.
+            | ~is_job_seeker_q & author_q
+        )
 
     def has_approval(self):
         """
