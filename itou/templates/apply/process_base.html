@@ -32,7 +32,7 @@
                                 {% with common_approval=job_application.job_seeker.latest_common_approval %}
                                     {% if common_approval %}
                                         <div class="c-box mb-4">
-                                            {% include "approvals/includes/status.html" with common_approval=common_approval job_application=job_application hiring_pending=job_application.is_pending %}
+                                            {% include "approvals/includes/status.html" with common_approval=common_approval hiring_pending=job_application.is_pending %}
                                         </div>
                                     {% endif %}
                                 {% endwith %}
