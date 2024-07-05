@@ -422,7 +422,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.assertContains(response, job_seeker.address_line_1)
         self.assertContains(response, job_seeker.city)
         self.assertContains(response, f"<small>Prénom</small><strong>{job_seeker.first_name}</strong>", html=True)
-        self.assertContains(response, f"<small>Nom</small><strong>{job_seeker.last_name}</strong>", html=True)
+        self.assertContains(response, f"<small>Nom</small><strong>{job_seeker.last_name.upper()}</strong>", html=True)
         self.assertContains(
             response,
             f"{job_seeker.first_name} {job_seeker.last_name.upper()}",
