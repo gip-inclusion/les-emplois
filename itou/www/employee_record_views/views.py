@@ -103,6 +103,13 @@ class AddView(LoginRequiredMixin, NamedUrlSessionWizardView):
             }
         return {}
 
+    def get_prefix(self, request, *args, **kwargs):
+        """
+        Ensure that each add session is bound to a company.
+        Avoid session conflicts when using multiple tabs.
+        """
+        return f"company_{self.company.pk}_add_employee_record"
+
     def done(self, form_list, *args, **kwargs):
         approval = Approval.objects.get(
             pk=self.get_all_cleaned_data()["approval"], user=self.get_all_cleaned_data()["employee"]
