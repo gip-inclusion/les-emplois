@@ -688,7 +688,6 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, self.SUSPEND_TEXT)
 
-    @pytest.mark.ignore_unknown_variable_template_error("hiring_pending", "job_application")
     @freeze_time("2022-09-15")
     def test_dashboard_access_by_a_jobseeker(self):
         user = JobSeekerWithAddressFactory()
