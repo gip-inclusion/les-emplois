@@ -16,6 +16,7 @@ from itou.users.models import User
 from itou.utils.admin import (
     InconsistencyCheckMixin,
     ItouModelAdmin,
+    ItouStackedInline,
     ItouTabularInline,
     UUIDSupportRemarkInline,
     get_admin_view_link,
@@ -66,6 +67,27 @@ class ManualApprovalDeliveryRequiredFilter(admin.SimpleListFilter):
         return queryset
 
 
+class EmployeeRecordInline(ItouStackedInline):
+    model = employee_record_models.EmployeeRecord
+    extra = 0
+    can_delete = False
+    fields = ("link",)
+    readonly_fields = ("link",)
+
+    @admin.display(description="situation fiche salarié")
+    def link(self, obj):
+        return get_admin_view_link(
+            obj,
+            content=mark_safe(f"<b>{obj.get_status_display()} (ID: {obj.pk})</b>"),
+        )
+
+    def has_add_permission(self, request, obj=None):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(models.JobApplication)
 class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
     form = JobApplicationAdminForm
@@ -107,7 +129,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "origin",
         "state",
     )
-    inlines = (JobsInline, PriorActionInline, TransitionLogInline, UUIDSupportRemarkInline)
+    inlines = (JobsInline, PriorActionInline, TransitionLogInline, UUIDSupportRemarkInline, EmployeeRecordInline)
 
     fieldsets = [
         (

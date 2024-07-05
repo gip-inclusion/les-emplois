@@ -160,6 +160,10 @@ JOB_APPLICATION_FORMSETS_PAYLOAD = {
     "utils-uuidsupportremark-content_type-object_id-0-id": "",
     "utils-uuidsupportremark-content_type-object_id-__prefix__-remark": "",
     "utils-uuidsupportremark-content_type-object_id-__prefix__-id": "",
+    "employee_record-TOTAL_FORMS": 0,
+    "employee_record-INITIAL_FORMS": 0,
+    "employee_record-MIN_NUM_FORMS": 0,
+    "employee_record-MAX_NUM_FORMS": 0,
 }
 
 
