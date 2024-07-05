@@ -320,6 +320,8 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
             )
         elif error.args[0] == models.JobApplicationWorkflow.error_missing_hiring_start_at:
             message = "Le champ 'Date de début du contrat' est obligatoire pour accepter une candidature"
+        elif error.args[0] == models.JobApplicationWorkflow.error_wrong_eligibility_diagnosis:
+            message = "Le diagnostic d'eligibilité n'est pas valide pour ce candidat et cette entreprise"
         self.message_user(request, message or error, messages.ERROR)
         return HttpResponseRedirect(request.get_full_path())
 
