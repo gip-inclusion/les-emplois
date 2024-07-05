@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 ADDED = "ajouté"
 CHANGED = "modifié"
 REMOVED = "supprimé"
+TECH = "tech"
 SKIP = "no-changelog"
 DEPS = "dependencies"
 
@@ -27,6 +28,7 @@ LABEL_TITLES = {
     ADDED: "Ajouté",
     CHANGED: "Modifié",
     REMOVED: "Supprimé",
+    TECH: "Tech",
 }
 
 
@@ -79,7 +81,7 @@ def list_pull_requests(start, end, labels):
 
 
 def list_missing_pull_requests(start, end):
-    return list_pull_requests(start, end, f"-label:{ADDED},{CHANGED},{REMOVED},{DEPS},{SKIP}")
+    return list_pull_requests(start, end, f"-label:{ADDED},{CHANGED},{REMOVED},{DEPS},{SKIP},{TECH}")
 
 
 def list_merged_pull_requests(start, end):
