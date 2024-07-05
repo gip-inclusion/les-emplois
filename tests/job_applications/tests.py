@@ -1909,7 +1909,7 @@ class JobApplicationXlsxExportTest(TestCase):
                 "Acme inc.",
                 "EI",
                 "",
-                "Auto-prescription",
+                "Ma structure",
                 "",
                 "",
                 "05/07/2024",
