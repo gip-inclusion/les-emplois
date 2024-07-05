@@ -19,6 +19,9 @@
               
               
                   <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
+                  <p>
+                      <strong>Vous pouvez choisir un diagnostic d'eligibilité IAE, mais sa date d'expiration ne sera pas vérifiée. Si vous souhaitez que le système choisisse le dernier diagnostic valide, laissez le champ vide.</strong>
+                  </p>
               
               
               
@@ -45,6 +48,9 @@
               
               
                   <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
+                  <p>
+                      <strong>Vous pouvez choisir un diagnostic d'eligibilité IAE, mais sa date d'expiration ne sera pas vérifiée. Si vous souhaitez que le système choisisse le dernier diagnostic valide, laissez le champ vide.</strong>
+                  </p>
               
               
               
@@ -60,6 +66,9 @@
               
               
                   <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
+                  <p>
+                      <strong>Vous pouvez choisir un diagnostic d'eligibilité IAE, mais sa date d'expiration ne sera pas vérifiée. Si vous souhaitez que le système choisisse le dernier diagnostic valide, laissez le champ vide.</strong>
+                  </p>
               
               
               
@@ -73,6 +82,9 @@
               
               
                   <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
+                  <p>
+                      <strong>Vous pouvez choisir un diagnostic d'eligibilité IAE, mais sa date d'expiration ne sera pas vérifiée. Si vous souhaitez que le système choisisse le dernier diagnostic valide, laissez le champ vide.</strong>
+                  </p>
               
               
               
@@ -86,6 +98,9 @@
               
               
                   <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
+                  <p>
+                      <strong>Vous pouvez choisir un diagnostic d'eligibilité IAE, mais sa date d'expiration ne sera pas vérifiée. Si vous souhaitez que le système choisisse le dernier diagnostic valide, laissez le champ vide.</strong>
+                  </p>
               
               
               
@@ -99,6 +114,9 @@
               
               
                   <input class="danger js-with-confirm" name="transition_accept" type="submit" value="Accepter"/>
+                  <p>
+                      <strong>Vous pouvez choisir un diagnostic d'eligibilité IAE, mais sa date d'expiration ne sera pas vérifiée. Si vous souhaitez que le système choisisse le dernier diagnostic valide, laissez le champ vide.</strong>
+                  </p>
               
               
               
