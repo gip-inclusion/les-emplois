@@ -575,7 +575,7 @@ class ProlongationRequestAdmin(ProlongationCommonAdmin):
         return obj.deny_information.proposed_actions_explanation
 
     def get_readonly_fields(self, request, obj=None):
-        fields = ProlongationCommonAdmin.readonly_fields + ("processed_at", "processed_by", "prolongation")
+        fields = ProlongationCommonAdmin.readonly_fields + ("processed_at", "processed_by", "prolongation", "status")
         if not obj:
             return fields
 
