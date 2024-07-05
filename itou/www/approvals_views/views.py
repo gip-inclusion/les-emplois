@@ -261,6 +261,7 @@ def declare_prolongation(request, approval_id, template_name="approvals/declare_
         siae=siae,
         data=request.POST or None,
         files=request.FILES or None,
+        back_url=back_url,
     )
 
     # The file was saved before the preview step, and its reference is stored in the session.
@@ -349,6 +350,7 @@ class DeclareProlongationHTMXFragmentView(TemplateView):
             siae=self.siae,
             data=request.POST or None,
             files=request.FILES or None,
+            back_url=prolongation_back_url(request),
         )
 
     def get_context_data(self, **kwargs):
