@@ -29,7 +29,7 @@ class Command(BaseCommand):
             queryset.prefetch_related(
                 Prefetch(
                     "members",
-                    queryset=User.objects.order_by("date_joined").filter(
+                    queryset=User.objects.order_by("pk").filter(
                         Exists(
                             queryset.model.members.through.objects.filter(
                                 user=OuterRef("pk"), is_active=True, is_admin=True
