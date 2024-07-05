@@ -259,7 +259,8 @@ def test_accept_job_application_with_old_eligibility_diagnosis(admin_client):
         eligibility_diagnosis__expires_at=timezone.now() - timezone.timedelta(days=1),
     )
     old_diag = job_application.eligibility_diagnosis
-    other_diag = IAEEligibilityDiagnosisFactory(from_employer=True)
+    other_job_seeker_diag = IAEEligibilityDiagnosisFactory(from_employer=True)
+    other_company_diag = IAEEligibilityDiagnosisFactory(job_seeker=job_application.job_seeker, from_employer=True)
     post_data = {
         "job_seeker": job_application.job_seeker_id,
         "to_company": job_application.to_company_id,
@@ -282,7 +283,21 @@ def test_accept_job_application_with_old_eligibility_diagnosis(admin_client):
     response = admin_client.get(url)
     assertContains(response, 'value="Accepter"')
 
-    response = admin_client.post(url, {**post_data, "eligibility_diagnosis": other_diag.pk, "transition_accept": True})
+    # use a bad diag (wrong job seeker)
+    response = admin_client.post(
+        url, {**post_data, "eligibility_diagnosis": other_job_seeker_diag.pk, "transition_accept": True}
+    )
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.PROCESSING
+    assert response.context["errors"] == [
+        ["Le diagnostic d'eligibilité n'appartient pas au candidat de la candidature."]
+    ]
+    assertContains(response, 'value="Accepter"')
+
+    # use a bad diag (wrong company)
+    response = admin_client.post(
+        url, {**post_data, "eligibility_diagnosis": other_company_diag.pk, "transition_accept": True}
+    )
     assertRedirects(response, url, fetch_redirect_response=False)  # don't flush the messages
     job_application.refresh_from_db()
     assert job_application.state == JobApplicationState.PROCESSING
