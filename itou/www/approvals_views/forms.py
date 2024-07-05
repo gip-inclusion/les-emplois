@@ -28,6 +28,7 @@ from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.constants import MB
 from itou.utils.db import or_queries
+from itou.utils.urls import add_url_params
 from itou.utils.validators import MaxDateValidator, MinDateValidator
 from itou.utils.widgets import DuetDatePickerWidget, RadioSelectWithDisabledChoices
 
@@ -146,8 +147,9 @@ class CreateProlongationForm(forms.ModelForm):
             "end_at",
         ]
 
-    def __init__(self, *args, approval, siae, **kwargs):
+    def __init__(self, *args, approval, siae, back_url, **kwargs):
         super().__init__(*args, **kwargs)
+        self.back_url = back_url
 
         # Used to display an explanation if the max duration is not possible
         self.max_end_limit = None
@@ -181,9 +183,12 @@ class CreateProlongationForm(forms.ModelForm):
         self.fields["reason"].widget.attrs.update(
             {
                 "hx-trigger": "change",
-                "hx-post": reverse(
-                    "approvals:prolongation_form_for_reason",
-                    kwargs={"approval_id": self.instance.approval_id},
+                "hx-post": add_url_params(
+                    reverse(
+                        "approvals:prolongation_form_for_reason",
+                        kwargs={"approval_id": self.instance.approval_id},
+                    ),
+                    {"back_url": self.back_url},
                 ),
                 "hx-params": "not end_at",  # Clear "end_at" when switching reason
                 "hx-swap": "outerHTML",

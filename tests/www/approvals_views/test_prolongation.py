@@ -12,6 +12,7 @@ from freezegun import freeze_time
 from itou.approvals.enums import ProlongationReason
 from itou.approvals.models import Prolongation
 from itou.companies.enums import CompanyKind
+from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import ProlongationFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -262,6 +263,44 @@ class ApprovalProlongationTest(TestCase):
         assert response.status_code == 200
         fresh_page = parse_response_to_soup(response, selector="#main")
         assertSoupEqual(page, fresh_page)
+
+    def test_htmx_on_reason_with_back_url(self):
+        self.client.force_login(self.employer)
+        back_url = "/somewhere/over/the/rainbow"
+        page_url = add_url_params(
+            reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
+            params={"back_url": back_url},
+        )
+        response = self.client.get(page_url)
+        assert response.status_code == 200
+        page = parse_response_to_soup(response, selector="#main")
+        [reset_button] = page.select("a[aria-label='Annuler la saisie de ce formulaire']")
+        assert str(reset_button) == self.snapshot(name="reset button with correct back_url")
+
+        [reason] = page.select("#id_reason")
+        expected_hx_post = add_url_params(
+            reverse("approvals:prolongation_form_for_reason", kwargs={"approval_id": self.approval.pk}),
+            params={"back_url": back_url},
+        )
+        assert reason["hx-post"] == expected_hx_post
+        data = {
+            "reason": ProlongationReason.RQTH,
+            # Workaround the validation of the initial page by providing enough data.
+            "end_at": self.approval.end_at + relativedelta(days=30),
+            "email": self.prescriber.email,
+        }
+        response = self.client.post(reason["hx-post"], data)
+        update_page_with_htmx(
+            page,
+            "#id_reason",  # RQTH
+            response,
+        )
+        response = self.client.post(page_url, data)
+        assert response.status_code == 200
+        fresh_page = parse_response_to_soup(response, selector="#main")
+        assertSoupEqual(page, fresh_page)
+        [reset_button] = fresh_page.select("a[aria-label='Annuler la saisie de ce formulaire']")
+        assert str(reset_button) == self.snapshot(name="reset button with correct back_url")
 
     @freeze_time("2023-08-23")
     def test_end_at_limits(self):

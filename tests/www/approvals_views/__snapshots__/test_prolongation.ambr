@@ -50,6 +50,14 @@
           </div>
   '''
 # ---
+# name: ApprovalProlongationTest.test_htmx_on_reason_with_back_url[reset button with correct back_url]
+  '''
+  <a aria-label="Annuler la saisie de ce formulaire" class="btn btn-link btn-ico ps-lg-0 w-100 w-lg-auto" href="/somewhere/over/the/rainbow">
+                          <i aria-hidden="true" class="ri-close-line ri-lg"></i>
+                          <span>Annuler</span>
+                      </a>
+  '''
+# ---
 # name: ApprovalProlongationTest.test_prolong_approval_view_no_end_at
   '''
   <div class="form-group is-invalid form-group-required"><label class="form-label" for="id_end_at">Du 23/10/2023 au</label><duet-date-picker aria-describedby="id_end_at_helptext" aria-invalid="true" class="is-invalid" identifier="id_end_at" max="2024-10-22" min="2023-10-23" name="end_at" placeholder="Du 23/10/2023 au" required=""></duet-date-picker>
@@ -67,7 +75,7 @@
 # ---
 # name: ApprovalProlongationTest.test_prolongation_approval_view_with_disabled_values[RQTH & SENIOR disabled]
   '''
-  <div class="form-group form-group-required"><label class="form-label">Motif</label><div class="" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason" hx-swap="outerHTML" hx-target="#mainForm" hx-trigger="change" id="id_reason" required="">
+  <div class="form-group form-group-required"><label class="form-label">Motif</label><div class="" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#mainForm" hx-trigger="change" id="id_reason" required="">
       
           
           
@@ -106,7 +114,7 @@
 # ---
 # name: ApprovalProlongationTest.test_prolongation_approval_view_with_disabled_values[RQTH disabled]
   '''
-  <div class="form-group form-group-required"><label class="form-label">Motif</label><div class="" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason" hx-swap="outerHTML" hx-target="#mainForm" hx-trigger="change" id="id_reason" required="">
+  <div class="form-group form-group-required"><label class="form-label">Motif</label><div class="" hx-params="not end_at" hx-post="/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason?back_url=%2Fdashboard%2F" hx-swap="outerHTML" hx-target="#mainForm" hx-trigger="change" id="id_reason" required="">
       
           
           
