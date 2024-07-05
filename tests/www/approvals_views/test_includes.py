@@ -4,7 +4,7 @@ import pytest  # noqa
 from django.template import Context, Template
 from freezegun import freeze_time
 
-import itou.job_applications.enums as job_applications_enums
+import itou.approvals.enums as approvals_enums
 from tests.approvals.factories import ApprovalFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
@@ -20,7 +20,7 @@ class TestStatusInclude:
                 "user": EmployerFactory(),
                 "hiring_pending": False,
                 "job_application": None,
-                "JobApplicationOrigin": job_applications_enums.Origin,
+                "ApprovalOrigin": approvals_enums.Origin,
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
@@ -33,7 +33,7 @@ class TestStatusInclude:
                 "user": PrescriberFactory(),
                 "hiring_pending": False,
                 "job_application": None,
-                "JobApplicationOrigin": job_applications_enums.Origin,
+                "ApprovalOrigin": approvals_enums.Origin,
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
@@ -46,7 +46,7 @@ class TestStatusInclude:
                 "user": EmployerFactory(),
                 "hiring_pending": False,
                 "job_application": None,
-                "JobApplicationOrigin": job_applications_enums.Origin,
+                "ApprovalOrigin": approvals_enums.Origin,
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
@@ -63,7 +63,7 @@ class TestStatusInclude:
                 "user": EmployerFactory(),
                 "hiring_pending": False,
                 "job_application": None,
-                "JobApplicationOrigin": job_applications_enums.Origin,
+                "ApprovalOrigin": approvals_enums.Origin,
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
@@ -80,7 +80,7 @@ class TestStatusInclude:
                 "user": PrescriberFactory(),
                 "hiring_pending": False,
                 "job_application": None,
-                "JobApplicationOrigin": job_applications_enums.Origin,
+                "ApprovalOrigin": approvals_enums.Origin,
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
@@ -97,10 +97,29 @@ class TestStatusInclude:
                 "user": approval.user,
                 "hiring_pending": False,
                 "job_application": None,
-                "JobApplicationOrigin": job_applications_enums.Origin,
+                "ApprovalOrigin": approvals_enums.Origin,
             }
         )
         rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
         assert remove_static_hash(rendered_template) == snapshot(
             name="expired_approval_with_eligibility_diagnosis_for_jobseeker"
         )
+
+    def test_valid_approval_for_employer_not_from_pe_approval(self, snapshot, db):
+        context = Context(
+            {
+                "common_approval": ApprovalFactory(
+                    number="999999999999",
+                    user__for_snapshot=True,
+                    start_at=datetime.date(2000, 1, 1),
+                    end_at=datetime.date(3000, 1, 1),
+                    origin_ai_stock=True,
+                ),
+                "user": EmployerFactory(),
+                "hiring_pending": False,
+                "job_application": None,
+                "ApprovalOrigin": approvals_enums.Origin,
+            }
+        )
+        rendered_template = Template('{% include "approvals/includes/status.html" %}').render(context)
+        assert remove_static_hash(rendered_template) == snapshot(name="valid_approval_for_employer")

@@ -9,7 +9,6 @@ Arguments:
     user
     common_approval  (which may be an Approval or PE Approval)
     hiring_pending
-    job_application
 
 {% endcomment %}
 
@@ -46,7 +45,7 @@ Arguments:
         {% endif %}
     </p>
 
-    {% if job_application.origin == JobApplicationOrigin.PE_APPROVAL %}
+    {% if common_approval.origin == ApprovalOrigin.PE_APPROVAL %}
         <p class="mb-1">Ce PASS IAE a été importé depuis un agrément Pôle emploi.</p>
     {% endif %}
 
