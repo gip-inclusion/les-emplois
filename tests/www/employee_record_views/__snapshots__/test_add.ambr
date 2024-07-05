@@ -17,7 +17,7 @@
                       <div class="c-form mb-3 mb-lg-5">
                           <form method="post">
                               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                              <input id="id_add_view-current_step" name="add_view-current_step" type="hidden" value="choose-approval"/>
+                              <input id="id_company_[PK of Company]_add_employee_record-current_step" name="company_[PK of Company]_add_employee_record-current_step" type="hidden" value="choose-approval"/>
   
                               <div class="form-group form-group-required"><label class="form-label" for="id_choose-approval-approval">PASS IAE de Jane DOE</label><select aria-describedby="id_choose-approval-approval_helptext" class="form-select" id="id_choose-approval-approval" name="choose-approval-approval">
     <option value="[PK of Approval]">999999999999 — Du 01/01/2000 au 01/01/3000</option>
