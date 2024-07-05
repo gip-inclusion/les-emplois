@@ -63,4 +63,12 @@ class JobApplicationAdminForm(forms.ModelForm):
         elif sender_prescriber_organization is not None:
             raise ValidationError("Organisation du prescripteur émettrice inattendue.")
 
+        eligibility_diagnosis = self.cleaned_data.get("eligibility_diagnosis") or self.cleaned_data.get(
+            "geiq_eligibility_diagnosis"
+        )
+        if eligibility_diagnosis:
+            job_seeker = self.cleaned_data.get("job_seeker")
+            if job_seeker.pk != eligibility_diagnosis.job_seeker_id:
+                raise ValidationError("Le diagnostic d'eligibilité n'appartient pas au candidat de la candidature.")
+
         return

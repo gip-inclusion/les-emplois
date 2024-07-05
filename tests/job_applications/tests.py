@@ -2122,11 +2122,20 @@ class JobApplicationAdminFormTest(TestCase):
         assert form.is_valid()
 
     def test_application_on_non_job_seeker(self):
-        job_application = JobApplicationFactory()
+        job_application = JobApplicationFactory(eligibility_diagnosis=None)
         job_application.job_seeker = PrescriberFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
         assert ["Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte candidat"] == form.errors[
+            "__all__"
+        ]
+
+    def test_application_bad_eligibility_diagnosis_job_seeker(self):
+        job_application = JobApplicationFactory()
+        job_application.job_seeker = JobSeekerFactory()
+        form = JobApplicationAdminForm(model_to_dict(job_application))
+        assert not form.is_valid()
+        assert ["Le diagnostic d'eligibilité n'appartient pas au candidat de la candidature."] == form.errors[
             "__all__"
         ]
 
