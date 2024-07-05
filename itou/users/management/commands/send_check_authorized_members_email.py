@@ -1,6 +1,6 @@
 from dateutil.relativedelta import relativedelta
 from django.db import transaction
-from django.db.models import Count, Prefetch, Q
+from django.db.models import Count, Exists, OuterRef, Prefetch, Q
 from django.db.models.functions import Coalesce
 from django.urls import reverse
 from django.utils import timezone
@@ -30,11 +30,12 @@ class Command(BaseCommand):
                 Prefetch(
                     "members",
                     queryset=User.objects.order_by("date_joined").filter(
-                        **{
-                            "is_active": True,
-                            f"{membership_attname}__is_active": True,
-                            f"{membership_attname}__is_admin": True,
-                        },
+                        Exists(
+                            queryset.model.members.through.objects.filter(
+                                user=OuterRef("pk"), is_active=True, is_admin=True
+                            )
+                        ),
+                        is_active=True,
                     ),
                     to_attr="admin_members",
                 )
