@@ -19,6 +19,14 @@
                             <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                             <span>Suivre les effectifs annuels et mensuels en ETP</span>
                         </a>
+                    </li>
+                {% endif %}
+                {% if can_view_stats_siae_orga_etp %}
+                    <li class="d-flex justify-content-between align-items-center mb-3">
+                        <a href="{% url 'stats:stats_siae_orga_etp' %}" class="btn-link btn-ico">
+                            <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                            <span>Suivre les effectifs annuels et mensuels en ETP de ma structure</span>
+                        </a>
                         {% include "dashboard/includes/stats_new_badge.html" %}
                     </li>
                 {% endif %}

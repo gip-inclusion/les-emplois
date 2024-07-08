@@ -31,6 +31,9 @@ METABASE_DASHBOARDS = {
         "dashboard_id": 327,
     },
     "stats_siae_etp": {
+        "dashboard_id": 465,
+    },
+    "stats_siae_orga_etp": {
         "dashboard_id": 440,
     },
     "stats_siae_hiring": {
