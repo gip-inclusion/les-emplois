@@ -19,7 +19,9 @@
                 <div class="col-12 col-lg-8">
                     {% if not preview %}
                         {# Edit mode. #}
-                        <div class="c-box mb-4">{% include "approvals/includes/status.html" with common_approval=approval %}</div>
+                        <div class="c-box mb-4">
+                            {% include "approvals/includes/status.html" with common_approval=approval hiring_pending=False %}
+                        </div>
                         <div class="c-box my-4">{% include "approvals/includes/prolongation_declaration_form.html" %}</div>
                     {% else %}
                         {# Preview mode: ask for confirmation before committing to DB. #}

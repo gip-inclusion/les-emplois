@@ -20,7 +20,9 @@
                     {% if not preview %}
                         {# Edit mode. #}
 
-                        <div class="c-box mb-4">{% include "approvals/includes/status.html" with common_approval=approval %}</div>
+                        <div class="c-box mb-4">
+                            {% include "approvals/includes/status.html" with common_approval=approval hiring_pending=False %}
+                        </div>
                         <div class="c-form">
                             <form method="post" class="js-prevent-multiple-submit">
 

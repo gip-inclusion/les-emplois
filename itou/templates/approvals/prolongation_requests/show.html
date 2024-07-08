@@ -22,7 +22,9 @@
                 <div class="col-12 col-lg-8">
                     <div class="c-box mb-3 mb-lg-5">
                         {# Approval status. #}
-                        <div>{% include "approvals/includes/status.html" with common_approval=prolongation_request.approval %}</div>
+                        <div>
+                            {% include "approvals/includes/status.html" with common_approval=prolongation_request.approval hiring_pending=False %}
+                        </div>
                     </div>
 
                     <div class="c-box mb-3 mb-lg-5">
