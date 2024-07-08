@@ -40,6 +40,7 @@ from itou.utils import constants as global_constants
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.institution import get_current_institution_or_404
 from itou.utils.urls import add_url_params, get_absolute_url, get_safe_url
+from itou.www.apply.views.utils import get_job_seeker_public_id
 from itou.www.dashboard.forms import (
     EditJobSeekerInfoForm,
     EditUserEmailForm,
@@ -350,9 +351,13 @@ def edit_user_info(request, template_name="dashboard/edit_user_info.html"):
 
 
 @login_required
-def edit_job_seeker_info(request, job_seeker_pk, template_name="dashboard/edit_job_seeker_info.html"):
+def edit_job_seeker_info(request, job_seeker_public_id, template_name="dashboard/edit_job_seeker_info.html"):
+    if isinstance(job_seeker_public_id, int):
+        job_seeker_public_id = get_job_seeker_public_id(job_seeker_public_id)
+
     job_seeker = get_object_or_404(
-        User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile"), pk=job_seeker_pk
+        User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile"),
+        public_id=job_seeker_public_id,
     )
     from_application_uuid = request.GET.get("from_application")
     tally_form_query = from_application_uuid and f"jobapplication={from_application_uuid}"
