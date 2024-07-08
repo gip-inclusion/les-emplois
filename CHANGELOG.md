@@ -1,5 +1,42 @@
 # Journal des modifications
 
+## 2024-07-08
+
+### Ajouté
+
+- [Admin : ajout d'un filtre et affichage du `updated_at` pour GPS](https://github.com/gip-inclusion/les-emplois/pull/4310) 🖼
+- [Ajout d'un rappel périodique par email pour inviter les administrateurs d'organisations à s'assurer que leurs membres sont bien actifs et autorisés](https://github.com/gip-inclusion/les-emplois/pull/4015)
+- [Statistiques: Export de données anonymes pour analyses d'impact](https://github.com/gip-inclusion/les-emplois/pull/4315)
+
+### Modifié
+
+- [Admin : Limiter les champs des `inline` d’appartenance à une entreprise ou organisation aux champs en lecture seule](https://github.com/gip-inclusion/les-emplois/pull/4349)
+- [Admin: le statut d'une demande de prolongation est maintenant en lecture seule](https://github.com/gip-inclusion/les-emplois/pull/4377)
+- [Ajout des départements 984 et 989](https://github.com/gip-inclusion/les-emplois/pull/4364)
+- [Candidats : limitation du nom à 70 caractères et correctif et sécurité](https://github.com/gip-inclusion/les-emplois/pull/4320) 🖼
+- [Contrôle a posteriori : Correction de l’algorithme de sélection des auto-prescriptions](https://github.com/gip-inclusion/les-emplois/pull/4360)
+- [Employeur: changer la mention “auto-prescription” par “ma structure” dans l'export de candidatures](https://github.com/gip-inclusion/les-emplois/pull/4373)
+- [Employeur: toujours afficher le nom de famille du candidat en majuscule](https://github.com/gip-inclusion/les-emplois/pull/4374)
+- [PASS IAE: Mise en conformité des règles de  prolongations](https://github.com/gip-inclusion/les-emplois/pull/4329)
+- [PASS IAE: suppression du bouton retour et correction de l'URL du bouton annuler dans le formulaire de demande de prolongation](https://github.com/gip-inclusion/les-emplois/pull/4375)
+- [Pilotage : Ajout d’une bannière d’inscription pour tester le nouveau tableau de bord données ETP maille structure](https://github.com/gip-inclusion/les-emplois/pull/4351)
+- [Statistiques: Ajout de nouvelles données pour le pilotage](https://github.com/gip-inclusion/les-emplois/pull/4369)
+- [UX/UI : Afficher le nom du candidat en majuscule dans le filtre des PASS IAE et salariés](https://github.com/gip-inclusion/les-emplois/pull/4347) 🖼
+- [UX/UI : bandeau « chercher un bénéficiaire » sur GPS](https://github.com/gip-inclusion/les-emplois/pull/4359) 🖼
+- [UX/UI : Correction d’un petit bug sur la recherche employeur](https://github.com/gip-inclusion/les-emplois/pull/4277)
+- [UX/UI : Limiter la sélection rapide à un candidat dans la liste des candidatures](https://github.com/gip-inclusion/les-emplois/pull/4341) 🖼
+- [UX/UI : Limiter la sélection rapide à un candidat dans la liste des fiches salarié](https://github.com/gip-inclusion/les-emplois/pull/4344) 🖼
+- [UX/UI : Limiter la sélection rapide à un candidat dans la liste des PASS IAE et salariés](https://github.com/gip-inclusion/les-emplois/pull/4345) 🖼
+- [UX/UI : Mise en cohérence de l'aspect de la carte "Orientation" sur le Tableau de bord des Employeurs](https://github.com/gip-inclusion/les-emplois/pull/4353)
+- [UX/UI : Modification des filtres de la recherche employeur et fiche de poste](https://github.com/gip-inclusion/les-emplois/pull/4200) 🖼
+- [UX/UI : Rajouter le champ « Structure destinataire » à la liste des candidatures pour les prescripteurs](https://github.com/gip-inclusion/les-emplois/pull/4343) 🖼
+- [UX/UI : Refonte de la page de recherche prescripteur habilité](https://github.com/gip-inclusion/les-emplois/pull/4276) 🖼
+- [UX/UI : remplacer Status par Statut](https://github.com/gip-inclusion/les-emplois/pull/4352)
+
+### Tech
+
+- [Journal des changements: ajouter une section Tech](https://github.com/gip-inclusion/les-emplois/pull/4376)
+
 ## 2024-07-01
 
 ### Ajouté
