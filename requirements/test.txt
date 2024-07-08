@@ -855,7 +855,6 @@ psycopg[binary]==3.1.10 \
     # via
     #   -r requirements/base.txt
     #   django-citext
-    #   psycopg
 psycopg-binary==3.1.10 \
     --hash=sha256:0471869e658d0c6b8c3ed53153794739c18d7dad2dd5b8e6ff023a364c20f7df \
     --hash=sha256:0f062f20256708929a58c41d44f350efced4c00a603323d1413f6dc0b84d95a5 \
@@ -1375,9 +1374,9 @@ tablib==3.5.0 \
     # via
     #   -r requirements/base.txt
     #   django-import-export
-tenacity==8.4.2 \
-    --hash=sha256:9e6f7cf7da729125c7437222f8a522279751cdfbe6b67bfe64f75d3a348661b2 \
-    --hash=sha256:cd80a53a79336edba8489e767f729e4f391c896956b57140b5d7511a64bbd3ef
+tenacity==8.5.0 \
+    --hash=sha256:8bc6c0c8a09b31e6cad13c47afbed1a567518250a9a171418582ed8d9c20ca78 \
+    --hash=sha256:b594c2a5945830c267ce6b79a166228323ed52718f30302c1359836112346687
     # via -r requirements/base.txt
 tqdm==4.66.4 \
     --hash=sha256:b75ca56b413b030bc3f00af51fd2c1a1a5eac6a0c1cca83cbb37a5c52abce644 \
