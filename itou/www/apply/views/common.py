@@ -275,7 +275,7 @@ def _geiq_eligibility_criteria(
         "progress": 66,
         "back_url": reverse(
             "apply:check_job_seeker_info_for_hire",
-            kwargs={"job_seeker_pk": job_seeker.pk, "company_pk": company.pk},
+            kwargs={"job_seeker_public_id": job_seeker.public_id, "company_pk": company.pk},
         ),
     }
 

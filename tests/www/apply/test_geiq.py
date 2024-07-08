@@ -231,7 +231,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": self.geiq.pk, "job_seeker_pk": self.job_seeker.pk},
+                kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": self.job_seeker.public_id},
             )
         )
 
@@ -256,7 +256,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": self.geiq.pk, "job_seeker_pk": self.job_seeker_in_qpv.pk},
+                kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": self.job_seeker_in_qpv.public_id},
             )
         )
 
@@ -283,7 +283,7 @@ class TestJobSeekerGeoDetailsForGEIQDiagnosis(TestCase):
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": self.geiq.pk, "job_seeker_pk": self.job_seeker_in_zrr.pk},
+                kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": self.job_seeker_in_zrr.public_id},
             )
         )
 
