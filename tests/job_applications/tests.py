@@ -1883,6 +1883,7 @@ class JobApplicationXlsxExportTest(TestCase):
             ],
         ]
 
+    @freeze_time("2024-07-05")
     def test_auto_prescription_xlsx_export(self):
         job_seeker = JobSeekerFactory(for_snapshot=True)
         company = CompanyFactory(for_snapshot=True)
