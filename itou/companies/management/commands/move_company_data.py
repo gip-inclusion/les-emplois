@@ -1,16 +1,8 @@
 import argparse
 
 from django.db import transaction
-from django.utils import timezone
 
-from itou.approvals import models as approvals_models
-from itou.companies import models as companies_models
-from itou.eligibility import models as eligibility_models
-from itou.employee_record.models import EmployeeRecord
-from itou.invitations import models as invitations_models
-from itou.job_applications import models as job_applications_models
-from itou.siae_evaluations.models import EvaluatedSiae
-from itou.users import models as users_models
+from itou.companies import models as companies_models, transfer
 from itou.utils.command import BaseCommand
 
 
@@ -36,6 +28,10 @@ HELP_TEXT = """
     And in production:
     $ cd && cd app_* && django-admin move_company_data --from 3243 --to 9612 --wet-run
 """
+
+
+class DryRunException(Exception):
+    """Used to rollback database changes"""
 
 
 class Command(BaseCommand):
@@ -99,12 +95,6 @@ class Command(BaseCommand):
         except companies_models.Company.DoesNotExist:
             self.stderr.write(f"Unable to find the company ID {from_id}\n")
             return
-        if not ignore_siae_evaluations and EvaluatedSiae.objects.filter(siae=from_company).exists():
-            self.stderr.write(
-                f"Cannot move data for company ID {from_id}, it has an SIAE evaluation object. "
-                "Double check the procedure with the support team."
-            )
-            return
 
         to_company_qs = companies_models.Company.objects.filter(pk=to_id)
         try:
@@ -116,6 +106,20 @@ class Command(BaseCommand):
         # Intermediate variable for better readability
         move_all_data = not only_job_applications
 
+        if only_job_applications:
+            fields_to_transfer = [
+                transfer.TransferField.JOB_APPLICATIONS_RECEIVED,
+                transfer.TransferField.JOB_APPLICATIONS_SENT,
+            ]
+        elif preserve_to_company_data:
+            fields_to_transfer = [
+                transfer_field
+                for transfer_field in transfer.TransferField
+                if not transfer.TRANSFER_SPECS[transfer_field].get("model_field")
+            ]
+        else:
+            fields_to_transfer = list(transfer.TransferField)
+
         self.stdout.write(
             "MOVE {} OF company.id={} - {} {} - {}\n".format(
                 "DATA" if move_all_data else "JOB APPLICATIONS",
@@ -125,131 +129,52 @@ class Command(BaseCommand):
                 from_company.display_name,
             )
         )
-
-        job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_company_id=from_id)
-        self.stdout.write(f"| Job applications sent: {job_applications_sent.count()}")
-
-        job_applications_received = job_applications_models.JobApplication.objects.filter(to_company_id=from_id)
-        self.stdout.write(f"| Job applications received: {job_applications_received.count()}")
-
-        employee_records_created_count = EmployeeRecord.objects.filter(job_application__to_company_id=from_id).count()
-        self.stdout.write(f"| Employee records created: {employee_records_created_count}")
-
-        if move_all_data:
-            job_descriptions = companies_models.JobDescription.objects.filter(company_id=from_id)
-            self.stdout.write(f"| Job descriptions: {job_descriptions.count()}\n")
-
-            # Move users not already present in company destination
-            members = companies_models.CompanyMembership.objects.filter(company_id=from_id).exclude(
-                user__in=users_models.User.objects.filter(companymembership__company_id=to_id)
-            )
-            self.stdout.write(f"| Members: {members.count()}\n")
-
-            diagnoses = eligibility_models.EligibilityDiagnosis.objects.filter(author_siae_id=from_id)
-            self.stdout.write(f"| Diagnoses: {diagnoses.count()}\n")
-
-            prolongations = approvals_models.Prolongation.objects.filter(declared_by_siae_id=from_id)
-            self.stdout.write(f"| Prolongations: {prolongations.count()}\n")
-
-            suspensions = approvals_models.Suspension.objects.filter(siae_id=from_id)
-            self.stdout.write(f"| Suspensions: {suspensions.count()}\n")
-
-            # Don't move invitations for existing members
-            # The goal is to keep information about the original information
-            invitations = invitations_models.EmployerInvitation.objects.filter(company_id=from_id).exclude(
-                email__in=users_models.User.objects.filter(companymembership__company_id=to_id).values_list(
-                    "email", flat=True
-                )
-            )
-            self.stdout.write(f"| Invitations: {invitations.count()}\n")
+        for field_to_transfer in fields_to_transfer:
+            spec = transfer.TRANSFER_SPECS[field_to_transfer]
+            if "model_field" in spec:
+                continue
+            all_items_count = transfer.get_transfer_queryset(from_company, None, spec).count()
+            to_transfer_count = transfer.get_transfer_queryset(from_company, to_company, spec).count()
+            suffix = f" (dont {to_transfer_count} à transférer)" if to_transfer_count != all_items_count else ""
+            self.stdout.write(f"| {field_to_transfer.label}: {all_items_count}{suffix}\n")
 
         self.stdout.write(
             f"INTO company.id={to_company.pk} - {to_company.kind} {to_company.siret} - {to_company.display_name}\n"
         )
+        for field_to_transfer in fields_to_transfer:
+            spec = transfer.TRANSFER_SPECS[field_to_transfer]
+            if "model_field" in spec:
+                continue
+            all_items_count = transfer.get_transfer_queryset(to_company, None, spec).count()
+            self.stdout.write(f"| {field_to_transfer.label}: {all_items_count}\n")
 
-        dest_company_job_applications_sent = job_applications_models.JobApplication.objects.filter(
-            sender_company_id=to_id
-        )
-        self.stdout.write(f"| Job applications sent: {dest_company_job_applications_sent.count()}\n")
-
-        dest_company_job_applications_received = job_applications_models.JobApplication.objects.filter(
-            to_company_id=to_id
-        )
-        self.stdout.write(f"| Job applications received: {dest_company_job_applications_received.count()}\n")
-
-        dest_employee_records_created_count = EmployeeRecord.objects.filter(
-            job_application__to_company_id=to_id
-        ).count()
-        self.stdout.write(f"| Employee records created: {dest_employee_records_created_count}")
-
-        if move_all_data and not preserve_to_company_data:
-            self.stdout.write(f"| Brand '{to_company.brand}' will be updated with '{from_company.display_name}'\n")
-            self.stdout.write(
-                f"| Description \n{to_company.description}\nwill be updated with\n{from_company.description}\n"
-            )
-            self.stdout.write(f"| Phone '{to_company.phone}' will be updated with '{from_company.phone}'\n")
-
-        if not wet_run:
-            self.stdout.write("Nothing to do in dry run mode.\n")
-            return
-
-        with transaction.atomic():
-            # If we move the job applications without moving the job descriptions as well, we need to unlink them,
-            # as job applications will be attached to company B but job descriptions will stay attached to company A.
-            if only_job_applications:
-                for job_application in job_applications_sent:
-                    job_application.selected_jobs.clear()
-                for job_application in job_applications_received:
-                    job_application.selected_jobs.clear()
-
-            job_applications_sent.update(sender_company_id=to_id)
-            job_applications_received.update(to_company_id=to_id)
-
-            if move_all_data:
-                job_descriptions.update(company_id=to_id)
-                members.update(company_id=to_id)
-                diagnoses.update(author_siae_id=to_id)
-                prolongations.update(declared_by_siae_id=to_id)
-                suspensions.update(siae_id=to_id)
-                invitations.update(company_id=to_id)
-                if not preserve_to_company_data:
-                    to_company_qs.update(
-                        brand=from_company.display_name,
-                        description=from_company.description,
-                        phone=from_company.phone,
-                        is_searchable=True,  # Make sure the new company appears in results
-                    )
-                from_company_qs.update(
-                    block_job_applications=True,
-                    job_applications_blocked_at=timezone.now(),
-                    is_searchable=False,  # Make sure the old company no longer appears in results
+        self.stdout.write("Rapport du transfert:\n")
+        disable_from_company = not only_job_applications
+        try:
+            with transaction.atomic():
+                reporter = transfer.transfer_company_data(
+                    from_company,
+                    to_company,
+                    fields_to_transfer,
+                    disable_from_company=disable_from_company,
+                    ignore_siae_evaluations=ignore_siae_evaluations,
                 )
+                for section, section_changes in reporter.changes.items():
+                    if transfer.TRANSFER_SPECS.get(section, {}).get("model_field"):
+                        self.stdout.write(
+                            f"| {section.label}: {section_changes[0] if section_changes else 'Pas de changement'}"
+                        )
+                    else:
+                        self.stdout.write(f"| {section.label}: {len(section_changes)}")
+                        if wet_run:
+                            # Print more info to help a possible rollback
+                            for section_change in section_changes:
+                                self.stdout.write(f"| - {section_change}")
 
-        self.stdout.write(
-            "MOVE {} OF company.id={} FINISHED\n".format(
-                "DATA" if move_all_data else "JOB APPLICATIONS", from_company.pk
-            )
-        )
-        orig_job_applications_sent = job_applications_models.JobApplication.objects.filter(sender_company_id=from_id)
-        self.stdout.write(f"| Job applications sent: {orig_job_applications_sent.count()}\n")
-
-        orig_job_applications_received = job_applications_models.JobApplication.objects.filter(to_company_id=from_id)
-        self.stdout.write(f"| Job applications received: {orig_job_applications_received.count()}\n")
-
-        orig_employee_records = EmployeeRecord.objects.filter(job_application__to_company_id=from_id)
-        self.stdout.write(f"| Employee records created: {orig_employee_records.count()}")
-
-        self.stdout.write(f"INTO company.id={to_company.pk}\n")
-
-        dest_company_job_applications_sent = job_applications_models.JobApplication.objects.filter(
-            sender_company_id=to_id
-        )
-        self.stdout.write(f"| Job applications sent: {dest_company_job_applications_sent.count()}\n")
-
-        dest_company_job_applications_received = job_applications_models.JobApplication.objects.filter(
-            to_company_id=to_id
-        )
-        self.stdout.write(f"| Job applications received: {dest_company_job_applications_received.count()}\n")
-
-        dest_employee_records = EmployeeRecord.objects.filter(job_application__to_company_id=to_id)
-        self.stdout.write(f"| Employee records created: {dest_employee_records.count()}")
+                if not wet_run:
+                    raise DryRunException("Rollback!")
+        except transfer.TransferError as e:
+            self.stderr.write(e.args[0])
+        except DryRunException:
+            self.stdout.write("Transfer rolled back in dry run mode.\n")
+            return

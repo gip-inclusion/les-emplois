@@ -1,0 +1,82 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{# Adapted from Django's admin/change_form.html #}
+{% block extrahead %}
+    {{ block.super }}
+    <script src="{% url 'admin:jsi18n' %}"></script>
+    {{ media }}
+    <script nonce="{{ CSP_NONCE }}">
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.getElementsByClassName("with-confirm");
+            Array.from(buttons).forEach(function(button) {
+                button.addEventListener("click", function(event) {
+                    if (!confirm('Êtes vous certain ?')) {
+                        event.preventDefault();
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static "admin/css/forms.css" %}">
+{% endblock %}
+
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+        &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+        &rsaquo;
+        {% if has_view_permission %}
+            <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+        {% else %}
+            {{ opts.verbose_name_plural|capfirst }}
+        {% endif %}
+        &rsaquo; Transférer les données de <a href="{% url opts|admin_urlname:'change' object_id=from_company.pk %}">{{ from_company|truncatewords:"18" }}</a>
+        {% if to_company %}
+            vers <a href="{% url opts|admin_urlname:'change' object_id=to_company.pk %}">{{ to_company|truncatewords:"18" }}</a>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <h2>Données à transférer</h2>
+    {% for transfer_field, field_data in transfer_data.items %}
+        <h3>{{ transfer_field.label }}</h3>
+        <div class="form-row">
+            <div>
+                <ul>
+                    {% if field_data.data is None %}
+                        <li class="quiet">Rien à transférer: valeur identique pour les deux entreprises</li>
+                    {% else %}
+                        {% for item in field_data.data %}
+                            <li>
+                                <strong>{{ item }}</strong>
+                            </li>
+                        {% empty %}
+                            <li class="quiet">Rien à transférer</li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    {% endfor %}
+
+    <h2>Transfert</h2>
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="form-row">
+            {{ form }}
+            {% if to_company %}
+                <strong>Dans le cas d’un transfert partiel des objets : merci de vérifier que les objets ne seront pas orphelins.</strong>
+            {% endif %}
+        </div>
+        <div class="submit-row">
+            <input class="default{% if to_company %} with-confirm{% endif %}" type="submit" value="Valider">
+        </div>
+    </form>
+
+{% endblock %}
