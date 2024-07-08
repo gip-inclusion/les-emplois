@@ -138,6 +138,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_view_stats_siae": stats_utils.can_view_stats_siae(request),
         "can_view_stats_siae_aci": stats_utils.can_view_stats_siae_aci(request),
         "can_view_stats_siae_etp": stats_utils.can_view_stats_siae_etp(request),
+        "can_view_stats_siae_orga_etp": stats_utils.can_view_stats_siae_orga_etp(request),
         "can_view_stats_siae_hiring_report": stats_utils.can_view_stats_siae_hiring_report(request),
         "can_view_stats_cd": stats_utils.can_view_stats_cd(request),
         "can_view_stats_cd_whitelist": stats_utils.can_view_stats_cd_whitelist(request),

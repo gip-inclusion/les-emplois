@@ -33,6 +33,9 @@ METABASE_DASHBOARDS = {
         "tally_embed_form_id": "w4jrLk",
     },
     "stats_siae_etp": {
+        "dashboard_id": 465,
+    },
+    "stats_siae_orga_etp": {
         "dashboard_id": 440,
         "tally_popup_form_id": "3N0oLB",
         "tally_embed_form_id": "3qPVOY",

@@ -234,6 +234,30 @@ def stats_siae_etp(request):
     )
 
 
+@login_required
+def stats_siae_orga_etp(request):
+    """
+    SIAE stats shown to their own members.
+    They can only view data for their own SIAE.
+    These stats are about ETP data from the ASP.
+    """
+    current_org = get_stats_siae_current_org(request)
+    if not utils.can_view_stats_siae_orga_etp(request):
+        raise PermissionDenied
+    context = {
+        "page_title": "Suivi des effectifs annuels et mensuels en ETP",
+        "department": current_org.department,
+        "matomo_custom_url_suffix": format_region_and_department_for_matomo(current_org.department),
+    }
+    return render_stats(
+        request=request,
+        context=context,
+        params={
+            mb.ASP_SIAE_FILTER_KEY_FLAVOR3: [str(current_org.convention.asp_id)],
+        },
+    )
+
+
 def render_stats_siae(request, page_title):
     """
     SIAE stats shown only to their own members.

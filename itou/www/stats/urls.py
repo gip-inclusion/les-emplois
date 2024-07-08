@@ -13,6 +13,7 @@ urlpatterns = [
     # Employer stats.
     path("siae/aci", views.stats_siae_aci, name="stats_siae_aci"),
     path("siae/etp", views.stats_siae_etp, name="stats_siae_etp"),
+    path("siae/orga_etp", views.stats_siae_orga_etp, name="stats_siae_orga_etp"),
     path("siae/hiring", views.stats_siae_hiring, name="stats_siae_hiring"),
     path("siae/auto_prescription", views.stats_siae_auto_prescription, name="stats_siae_auto_prescription"),
     path(
