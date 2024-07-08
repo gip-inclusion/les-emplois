@@ -264,7 +264,8 @@ class User(AbstractUser, AddressMixin):
     last_checked_at = models.DateTimeField(verbose_name="date de dernière vérification", default=timezone.now)
 
     public_id = models.UUIDField(
-        verbose_name="identifiant public opaque, pour les API",
+        verbose_name="identifiant public",
+        help_text="identifiant opaque, pour les API et les URLs publiques",
         default=uuid.uuid4,
         unique=True,
     )
