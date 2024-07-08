@@ -1,9 +1,7 @@
-import datetime
-
 from django.contrib import admin, messages
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.html import format_html
-from django.utils.timezone import now
 from import_export import resources
 from import_export.admin import ExportActionMixin
 from import_export.fields import Field
@@ -191,7 +189,7 @@ class CompanyAdmin(
     inlines = (CompanyMembersInline, JobsInline, PkSupportRemarkInline)
 
     def get_export_filename(self, request, queryset, file_format):
-        return f"Entreprises-{now():%Y-%m-%d}.{file_format.get_extension()}"
+        return f"Entreprises-{timezone.now():%Y-%m-%d}.{file_format.get_extension()}"
 
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = [
@@ -360,11 +358,11 @@ class SiaeConventionAdmin(ItouModelAdmin):
             if obj.is_active and not old_obj.is_active:
                 # Itou staff manually reactivated convention.
                 obj.reactivated_by = request.user
-                obj.reactivated_at = datetime.datetime.now()
+                obj.reactivated_at = timezone.now()
             if not obj.is_active and old_obj.is_active:
                 # Itou staff manually deactivated convention.
                 # Start grace period.
-                obj.deactivated_at = datetime.datetime.now()
+                obj.deactivated_at = timezone.now()
         super().save_model(request, obj, form, change)
 
 
