@@ -23,7 +23,6 @@ from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
 from itou.users import models
 from itou.users.admin_forms import (
-    ChooseFieldsToTransfer,
     ItouUserCreationForm,
     JobSeekerProfileAdminForm,
     SelectTargetUserForm,
@@ -31,6 +30,7 @@ from itou.users.admin_forms import (
 )
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils.admin import (
+    ChooseFieldsToTransfer,
     InconsistencyCheckMixin,
     ItouModelAdmin,
     ItouTabularInline,

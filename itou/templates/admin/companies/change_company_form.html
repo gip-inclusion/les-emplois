@@ -1,0 +1,14 @@
+{% extends 'admin/change_form.html' %}
+
+{% block object-tools-items %}
+
+    {% if request.user.is_superuser %}
+        {# Change to if has_change_permission in a few weeks #}
+        <li>
+            <a href="{% url 'admin:transfer_company_data' from_company_pk=original.pk %}">Transférer</a>
+        </li>
+    {% endif %}
+
+    {{ block.super }}
+
+{% endblock %}

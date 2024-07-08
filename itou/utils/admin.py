@@ -1,5 +1,6 @@
 from unittest import mock
 
+from django import forms
 from django.contrib.admin import ModelAdmin, StackedInline, TabularInline
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.contrib.contenttypes.fields import GenericRelation
@@ -166,3 +167,16 @@ class ReadonlyMixin:
 
     def has_delete_permission(self, *args, **kwargs):
         return False
+
+
+class ChooseFieldsToTransfer(forms.Form):
+    fields_to_transfer = forms.MultipleChoiceField(
+        choices=[],
+        required=True,
+        label="Choisissez les objets à transférer",
+        widget=forms.CheckboxSelectMultiple(),
+    )
+
+    def __init__(self, *args, fields_choices, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["fields_to_transfer"].choices = fields_choices
