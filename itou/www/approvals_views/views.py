@@ -121,7 +121,6 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
         context["approval_can_be_suspended_by_siae"] = approval.can_be_suspended_by_siae(self.siae)
         context["approval_can_be_prolonged"] = approval.can_be_prolonged
         context["job_application"] = job_application
-        context["hiring_pending"] = job_application and job_application.is_pending
         context["matomo_custom_title"] = "Profil salarié"
         context["eligibility_diagnosis"] = job_application and job_application.get_eligibility_diagnosis()
         context["approval_deletion_form_url"] = None
