@@ -3,6 +3,7 @@ from unittest import mock
 from django.contrib.admin import ModelAdmin, StackedInline, TabularInline
 from django.contrib.contenttypes.admin import GenericStackedInline
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.gis.forms import fields as gis_fields
 from django.contrib.messages import WARNING
 from django.urls import reverse
@@ -137,3 +138,14 @@ class ItouModelAdmin(ModelAdmin):
         # Eager-loading all relations, but only when editing one object because `list_select_related` exists
         with mock.patch.object(self, "get_queryset", self._get_queryset_with_relations):
             return super().get_object(request, object_id, from_field)
+
+
+def add_support_remark_to_obj(obj, text):
+    obj_content_type = ContentType.objects.get_for_model(obj)
+    try:
+        remark = PkSupportRemark.objects.filter(content_type=obj_content_type, object_id=obj.pk).get()
+    except PkSupportRemark.DoesNotExist:
+        PkSupportRemark.objects.create(content_type=obj_content_type, object_id=obj.pk, remark=text)
+    else:
+        remark.remark += "\n" + text
+        remark.save(update_fields=("remark",))
