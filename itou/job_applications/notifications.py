@@ -63,6 +63,28 @@ class JobApplicationNewForEmployerNotification(EmployerNotification, EmailNotifi
 
 
 @notifications_registry.register
+class JobApplicationPostponedForJobSeekerNotification(JobSeekerNotification, EmailNotification):
+    """Notification sent to job seeker when postponed"""
+
+    name = "Mise en attente de candidature"
+    category = NotificationCategory.JOB_APPLICATION
+    can_be_disabled = False
+    subject_template = "apply/email/postpone_for_job_seeker_subject.txt"
+    body_template = "apply/email/postpone_for_job_seeker_body.txt"
+
+
+@notifications_registry.register
+class JobApplicationPostponedForProxyNotification(PrescriberOrEmployerNotification, EmailNotification):
+    """Notification sent to proxy (prescriber or employer/orienter) when postponed"""
+
+    name = "Mise en attente d’une candidature envoyée"
+    category = NotificationCategory.JOB_APPLICATION
+    can_be_disabled = False
+    subject_template = "apply/email/postpone_for_proxy_subject.txt"
+    body_template = "apply/email/postpone_for_proxy_body.txt"
+
+
+@notifications_registry.register
 class JobApplicationAcceptedForJobSeekerNotification(JobSeekerNotification, EmailNotification):
     """Notification sent to job seeker when accepted"""
 

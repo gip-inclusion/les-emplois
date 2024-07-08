@@ -1085,6 +1085,13 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             self.approval.unsuspend(self.hiring_start_at)
 
     @xwf_models.transition()
+    def postpone(self, *, user):
+        # Send notification.
+        self.notifications_postpone_for_job_seeker.send()
+        if self.is_sent_by_proxy and self.sender_id:  # Sender user may have been deleted.
+            self.notifications_postpone_for_proxy.send()
+
+    @xwf_models.transition()
     def refuse(self, *, user):
         # Send notification.
         self.notifications_refuse_for_job_seeker.send()
@@ -1163,6 +1170,21 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return job_application_notifications.JobApplicationAcceptedForPrescriberNotification(
             self.sender,
             self.sender_prescriber_organization,
+            job_application=self,
+        )
+
+    @property
+    def notifications_postpone_for_proxy(self):
+        return job_application_notifications.JobApplicationPostponedForProxyNotification(
+            self.sender,
+            self.sender_prescriber_organization,
+            job_application=self,
+        )
+
+    @property
+    def notifications_postpone_for_job_seeker(self):
+        return job_application_notifications.JobApplicationPostponedForJobSeekerNotification(
+            self.job_seeker,
             job_application=self,
         )
 
