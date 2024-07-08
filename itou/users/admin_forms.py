@@ -106,16 +106,3 @@ class SelectTargetUserForm(forms.Form):
         if to_user.pk == self.from_user.pk:
             raise ValidationError("L'utilisateur cible doit être différent de celui d'origine")
         return to_user
-
-
-class ChooseFieldsToTransfer(forms.Form):
-    fields_to_transfer = forms.MultipleChoiceField(
-        choices=[],
-        required=True,
-        label="Choisissez les objets à transférer",
-        widget=forms.CheckboxSelectMultiple(),
-    )
-
-    def __init__(self, *args, fields_choices, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields["fields_to_transfer"].choices = fields_choices

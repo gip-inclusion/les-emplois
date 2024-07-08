@@ -9,6 +9,7 @@ from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind
 from tests.companies import factories as companies_factories
+from tests.eligibility import factories as eligibility_factories
 from tests.job_applications.factories import JobApplicationFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 
@@ -31,12 +32,30 @@ class TestMoveCompanyData:
 
     def test_does_not_stop_if_kind_is_different(self):
         company_1 = companies_factories.CompanyWithMembershipAndJobsFactory(kind=CompanyKind.ACI)
-        company_2 = companies_factories.CompanyFactory(kind=CompanyKind.EATT)
+        company_2 = companies_factories.CompanyFactory(kind=CompanyKind.EI)
         management.call_command("move_company_data", from_id=company_1.pk, to_id=company_2.pk, wet_run=True)
         assert company_1.jobs.count() == 0
         assert company_1.members.count() == 0
         assert company_2.jobs.count() == 4
         assert company_2.members.count() == 1
+
+    def test_prevent_move_outside_iae(self, capsys):
+        company_1 = eligibility_factories.IAEEligibilityDiagnosisFactory(from_employer=True).author_siae
+        company_2 = companies_factories.CompanyFactory(kind=CompanyKind.EATT)
+        management.call_command("move_company_data", from_id=company_1.pk, to_id=company_2.pk, wet_run=True)
+        assert company_1.members.count() == 1
+        assert company_2.members.count() == 0
+        _stdout, stderr = capsys.readouterr()
+        assert stderr == "Objets impossibles à transférer hors-IAE: Diagnostics IAE créés\n"
+
+    def test_prevent_move_outside_geiq(self, capsys):
+        company_1 = eligibility_factories.GEIQEligibilityDiagnosisFactory(from_geiq=True).author_geiq
+        company_2 = companies_factories.CompanyFactory(kind=CompanyKind.EATT)
+        management.call_command("move_company_data", from_id=company_1.pk, to_id=company_2.pk, wet_run=True)
+        assert company_1.members.count() == 2
+        assert company_2.members.count() == 0
+        _stdout, stderr = capsys.readouterr()
+        assert stderr == "Objets impossibles à transférer hors-GEIQ: Diagnostics GEIQ créés\n"
 
     @pytest.mark.parametrize(
         "preserve,predicate",
@@ -83,12 +102,11 @@ class TestMoveCompanyData:
         company2 = companies_factories.CompanyFactory()
 
         management.call_command("move_company_data", from_id=company1.pk, to_id=company2.pk, wet_run=True)
-        stdout, stderr = capsys.readouterr()
+        _stdout, stderr = capsys.readouterr()
         assert stderr == (
-            f"Cannot move data for company ID {company1.pk}, it has an SIAE evaluation object. "
-            "Double check the procedure with the support team.\n"
+            f"Impossible de transférer les objets de l'entreprise ID={company1.pk}: "
+            "il y a un contrôle a posteriori lié. Vérifiez avec l'équipe support.\n"
         )
-        assert stdout == ""
 
         management.call_command(
             "move_company_data", from_id=company1.pk, to_id=company2.pk, wet_run=True, ignore_siae_evaluations=True
