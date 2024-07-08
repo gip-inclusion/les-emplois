@@ -1,0 +1,17 @@
+{% extends 'admin/change_form.html' %}
+
+{% block object-tools-items %}
+
+    {% if has_change_permission %}
+        <li>
+            {% if original.source != original.SOURCE_ASP %}
+                <a href="{% url 'admin:transfer_company_data' from_company_pk=original.pk %}">Transférer</a>
+            {% else %}
+                <a href="">Transfert impossible (source ASP)</a>
+            {% endif %}
+        </li>
+    {% endif %}
+
+    {{ block.super }}
+
+{% endblock %}
