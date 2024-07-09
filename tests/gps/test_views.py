@@ -2,7 +2,6 @@ import datetime
 
 import freezegun
 import pytest
-from bs4 import BeautifulSoup
 from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
@@ -103,7 +102,7 @@ class GpsTest(TestCase):
         False,
     ],
 )
-def test_join_group_of_a_job_seeker(is_referent, client, snapshot):
+def test_join_group_of_a_job_seeker(is_referent, client):
     prescriber = PrescriberFactory(membership__organization__authorized=True)
     job_seeker = JobSeekerFactory()
 
@@ -327,45 +326,45 @@ def test_beneficiary_details(client, snapshot):
     assert prescriber.email in str(user_dropdown_menu)
     assert beneficiary.email not in str(user_dropdown_menu)
 
+    # Membership card: missing member information.
+    prescriber.phone = ""
+    prescriber.save()
+    response = client.get(user_details_url)
+    assert "Téléphone non renseigné" in str(response.content.decode())
+
 
 def test_remove_members_from_group(client):
     prescriber = PrescriberFactory(membership__organization__authorized=True)
-
     beneficiary = JobSeekerFactory()
-
     my_group = FollowUpGroupFactory(beneficiary=beneficiary, memberships=4, memberships__member=prescriber)
+    my_groups_url = reverse("gps:my_groups")
+    user_details_url = reverse("users:details", kwargs={"public_id": beneficiary.public_id})
 
     client.force_login(prescriber)
 
-    user_details_url = reverse("users:details", kwargs={"public_id": beneficiary.public_id})
-    my_groups_url = reverse("gps:my_groups")
-
+    # Prescriber has only one group.
     response = client.get(my_groups_url)
-    soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
+    groups = response.context["memberships_page"]
+    assert len(groups.object_list) == 1
 
-    # Prescriber has only one group
-    assert len(soup.select("div.c-box--results__header")) == 1
-
+    # The group of this beneficiary contains 4 members.
     response = client.get(user_details_url)
-    soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
+    members = response.context["gps_memberships"]
+    assert members.count() == 4
 
-    # The group of this beneficiary contains 4 members
-    assert len(soup.select("div.gps_intervenant")) == 4
-
-    # Setting is_active False to the prescriber membership should remove it from the group
+    # Setting is_active False to the prescriber membership should remove it from the group.
     membership = FollowUpGroupMembership.objects.filter(member=prescriber).filter(follow_up_group=my_group).first()
     membership.is_active = False
     membership.save()
 
+    # Prescriber doesn't belong to a group anymore.
     response = client.get(my_groups_url)
-    soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
-
-    # Prescriber doesn't have group anymore
-    assert len(soup.select("div.c-box--results__header")) == 0
+    groups = response.context["memberships_page"]
+    assert len(groups.object_list) == 0
 
     response = client.get(user_details_url)
-    soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
-    assert len(soup.select("div.gps_intervenant")) == 3
+    members = response.context["gps_memberships"]
+    assert members.count() == 3
 
 
 def test_groups_pagination_and_name_filter(client):
