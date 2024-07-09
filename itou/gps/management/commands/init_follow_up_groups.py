@@ -134,7 +134,7 @@ class Command(BaseCommand):
                     continue
                 if verbose:
                     logger.info("creating group for %s with partners=%s", beneficiary_id, beneficiary_partners)
-                group = FollowUpGroup(beneficiary_id=beneficiary_id)
+                group = FollowUpGroup(beneficiary_id=beneficiary_id, created_in_bulk=True)
                 groups_to_create.append(group)
                 memberships_to_create += [
                     FollowUpGroupMembership(
@@ -142,6 +142,7 @@ class Command(BaseCommand):
                         member_id=partner_id,
                         creator_id=objects_created_by.id,
                         follow_up_group=group,
+                        created_in_bulk=True,
                     )
                     for partner_id in beneficiary_partners
                 ]
