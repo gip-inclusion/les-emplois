@@ -1,49 +1,79 @@
 {% extends "apply/process_base.html" %}
 {% load django_bootstrap5 %}
 {% load format_filters %}
+{% load matomo %}
+{% load static %}
 
 {% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
+{% block title_extra %}
+    <ul class="s-tabs-01__nav nav nav-tabs mb-0" role="tablist" data-it-sliding-tabs="true">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active"
+               id="informations-tab"
+               data-bs-toggle="tab"
+               href="#informations"
+               role="tab"
+               aria-controls="informations"
+               aria-selected="true"
+               {% matomo_event "candidature" "clic-onglet" "informations-generales" %}>Informations générales</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="historique-tab" data-bs-toggle="tab" href="#historique" role="tab" aria-controls="historique" aria-selected="false" {% matomo_event "candidature" "clic-onglet" "historique" %}>Historique</a>
+        </li>
+    </ul>
+{% endblock %}
+
 {% block content_extend %}
-    {# Job seeker info ------------------------------------------------------------------------- #}
-    <div class="c-box mb-4">
-        <h3>Informations personnelles</h3>
-        {% include "apply/includes/job_seeker_info.html" with job_seeker=job_application.job_seeker job_application=job_application can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request csrf_token=csrf_token SenderKind=SenderKind only %}
-        {% if job_application.to_company.kind == CompanyKind.GEIQ and geiq_eligibility_diagnosis %}
-            {# GEIQ eligibility details #}
-            {% include "apply/includes/geiq/geiq_diagnosis_details.html" with diagnosis=geiq_eligibility_diagnosis %}
-        {% else %}
-            {# IAE Eligibility ------------------------------------------------------------------------- #}
-            {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_seeker=job_application.job_seeker is_sent_by_authorized_prescriber=job_application.is_sent_by_authorized_prescriber siae=job_application.to_company %}
-        {% endif %}
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="informations" role="tabpanel" aria-labelledby="informations-tab">
+            <h2>Informations générales</h2>
+            {# Job seeker info ------------------------------------------------------------------------- #}
+            <div class="c-box mb-4">
+                <h3>Informations personnelles</h3>
+                {% include "apply/includes/job_seeker_info.html" with job_seeker=job_application.job_seeker job_application=job_application can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request csrf_token=csrf_token SenderKind=SenderKind only %}
+                {% if job_application.to_company.kind == CompanyKind.GEIQ and geiq_eligibility_diagnosis %}
+                    {# GEIQ eligibility details #}
+                    {% include "apply/includes/geiq/geiq_diagnosis_details.html" with diagnosis=geiq_eligibility_diagnosis %}
+                {% else %}
+                    {# IAE Eligibility ------------------------------------------------------------------------- #}
+                    {% include "apply/includes/eligibility_diagnosis.html" with eligibility_diagnosis=eligibility_diagnosis job_seeker=job_application.job_seeker is_sent_by_authorized_prescriber=job_application.is_sent_by_authorized_prescriber siae=job_application.to_company %}
+                {% endif %}
+            </div>
+
+            {# Job application info ------------------------------------------------------------------------- #}
+            <div class="c-box mb-4">
+                <h2>Candidature</h2>
+                {# Sender info ------------------------------------------------------------------------- #}
+                {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
+
+                {% include "apply/includes/job_application_info.html" with job_application=job_application %}
+
+                {# Prior actions info #}
+                {% if job_application.can_have_prior_action and job_application.prior_actions.all %}
+                    <hr>
+                    <h3>Action préalable à l'embauche</h3>
+                    {% for prior_action in job_application.prior_actions.all %}
+                        {% include "apply/includes/job_application_prior_action.html" with job_application=job_application prior_action=prior_action add_prior_action_form=None hide_final_hr=forloop.last %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            {# Negative answers ------------------------------------------------------------------------- #}
+            {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
+        </div>
+
+        <div class="tab-pane fade" id="historique" role="tabpanel" aria-labelledby="historique-tab">
+            <h2>Historique des modifications</h2>
+            {# History ------------------------------------------------------ #}
+            {% include "apply/includes/transition_logs.html" with job_application=job_application transition_logs=transition_logs %}
+        </div>
     </div>
+{% endblock %}
 
-    {# Job application info ------------------------------------------------------------------------- #}
-    <div class="c-box mb-4">
-        <h2>Candidature</h2>
-        {# Sender info ------------------------------------------------------------------------- #}
-        {% include "apply/includes/job_application_sender_info.html" with job_application=job_application %}
-
-        {% include "apply/includes/job_application_info.html" with job_application=job_application %}
-
-        {# Prior actions info #}
-        {% if job_application.can_have_prior_action and job_application.prior_actions.all %}
-            <hr>
-            <h3>Action préalable à l'embauche</h3>
-            {% for prior_action in job_application.prior_actions.all %}
-                {% include "apply/includes/job_application_prior_action.html" with job_application=job_application prior_action=prior_action add_prior_action_form=None hide_final_hr=forloop.last %}
-            {% endfor %}
-        {% endif %}
-    </div>
-
-    {# Negative answers ------------------------------------------------------------------------- #}
-    {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
-
-    {# History ------------------------------------------------------ #}
-    <div class="c-box mb-4">
-        <h3>Historique des modifications</h3>
-        {% include "apply/includes/transition_logs.html" with job_application=job_application transition_logs=transition_logs %}
-    </div>
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js'%}"></script>
 {% endblock %}

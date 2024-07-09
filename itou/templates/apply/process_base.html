@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load job_applications %}
 {% load str_filters %}
+{% load matomo %}
 
 {% block title %}
     Candidature
@@ -23,42 +24,42 @@
     <section class="s-section">
         <div class="s-section__container container">
             <div class="row">
-                <div class="col-12 col-lg-8">
-                    {% if job_application.to_company.is_subject_to_eligibility_rules %}
-                        {% if request.user.is_employer %}
-                            {% if not job_application.state.is_accepted and not job_application.state.is_cancelled %}
-                                {# Employers need to know the expiration date of an approval #}
-                                {# to decide whether they may accept a job application or not. #}
-                                {% with common_approval=job_application.job_seeker.latest_common_approval %}
-                                    {% if common_approval %}
-                                        <div class="c-box mb-4">
-                                            {% include "approvals/includes/status.html" with common_approval=common_approval hiring_pending=job_application.is_pending %}
-                                        </div>
-                                    {% endif %}
-                                {% endwith %}
-                            {% endif %}
-                        {% elif request.user.is_prescriber %}
-                            <div class="c-box mb-4">
-                                {# Approval status. #}
-                                {% if job_application.approval %}
-                                    {% include "approvals/includes/status.html" with common_approval=job_application.approval hiring_pending=job_application.is_pending %}
-                                {% elif job_application.job_seeker.has_valid_common_approval %}
-                                    {% include "approvals/includes/status.html" with common_approval=job_application.job_seeker.latest_common_approval hiring_pending=job_application.is_pending %}
-                                {% elif job_application.hiring_without_approval %}
-                                    Vous n'avez pas demandé de PASS IAE (agrément).
-                                {% elif job_application.approval_manually_refused_at %}
-                                    PASS IAE refusé (délai de carence non respecté).
-                                {% else %}
-                                    PASS IAE (agrément) en cours de délivrance.
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                    {% endif %}
-
+                <div class="col-12 col-lg-8 order-2 order-lg-1">
                     {% block content_extend %}{% endblock %}
                 </div>
-                <div class="col-12 col-lg-4">
-                    {% block sidebar %}{% endblock %}
+                <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                    {% block sidebar %}
+                        {% if job_application.to_company.is_subject_to_eligibility_rules %}
+                            {% if request.user.is_employer %}
+                                {% if not job_application.state.is_accepted and not job_application.state.is_cancelled %}
+                                    {# Employers need to know the expiration date of an approval #}
+                                    {# to decide whether they may accept a job application or not. #}
+                                    {% with common_approval=job_application.job_seeker.latest_common_approval %}
+                                        {% if common_approval %}
+                                            <div class="c-box mb-4">
+                                                {% include "approvals/includes/status.html" with common_approval=common_approval hiring_pending=job_application.is_pending %}
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% endif %}
+                            {% elif request.user.is_prescriber %}
+                                <div class="c-box mb-4">
+                                    {# Approval status. #}
+                                    {% if job_application.approval %}
+                                        {% include "approvals/includes/status.html" with common_approval=job_application.approval hiring_pending=job_application.is_pending %}
+                                    {% elif job_application.job_seeker.has_valid_common_approval %}
+                                        {% include "approvals/includes/status.html" with common_approval=job_application.job_seeker.latest_common_approval hiring_pending=job_application.is_pending %}
+                                    {% elif job_application.hiring_without_approval %}
+                                        Vous n'avez pas demandé de PASS IAE (agrément).
+                                    {% elif job_application.approval_manually_refused_at %}
+                                        PASS IAE refusé (délai de carence non respecté).
+                                    {% else %}
+                                        PASS IAE (agrément) en cours de délivrance.
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    {% endblock %}
                 </div>
             </div>
         </div>
