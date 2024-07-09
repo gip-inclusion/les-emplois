@@ -1,15 +1,20 @@
+import datetime
 from io import StringIO
 
+from django.conf import settings
 from django.core import management
 from django.test import override_settings
+from django.utils import timezone
+from freezegun import freeze_time
 
 from itou.companies.enums import CompanyKind
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.job_applications.enums import JobApplicationState
 from tests.companies.factories import CompanyWith4MembershipsFactory
+from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.gps.factories import FollowUpGroupFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase
 
 
@@ -284,3 +289,82 @@ class GpsManagementCommandTest(TestCase):
         self.assertCountEqual(
             FollowUpGroup.objects.filter(members=first_job_application.sender).all(), first_sender_groups
         )
+
+    def test_group_create_at_update(self):
+        job_seeker = JobSeekerFactory()
+        prescriber = PrescriberFactory()
+        employer = EmployerFactory()
+        with freeze_time("2022-06-01 00:00:01"):
+            # A sent job application in NEW status (ignored)
+            new_job_app = JobApplicationFactory(
+                job_seeker=job_seeker, sender=prescriber, state=JobApplicationState.NEW, eligibility_diagnosis=None
+            )
+        with freeze_time("2022-06-01 00:00:02"):
+            # >>> Prescriber membership & group creation date
+            prescriber_membership_date = timezone.now()
+            # A first iae diag from the prescriber (this is the date of the prescriber membership)
+            IAEEligibilityDiagnosisFactory(job_seeker=job_seeker, from_prescriber=True, author=prescriber)
+        with freeze_time("2022-06-01 00:00:03"):
+            # Another iae diag from the prescriber
+            IAEEligibilityDiagnosisFactory(job_seeker=job_seeker, from_prescriber=True, author=prescriber)
+        with freeze_time("2022-06-01 00:00:04"):
+            # A geiq diag stil from the prescriber
+            GEIQEligibilityDiagnosisFactory(job_seeker=job_seeker, from_prescriber=True, author=prescriber)
+        with freeze_time("2022-06-01 00:00:05"):
+            # Another sent job application
+            accepted_job_app = JobApplicationFactory(
+                job_seeker=job_seeker, sender=prescriber, state=JobApplicationState.NEW
+            )
+        with freeze_time("2022-06-01 00:00:06"):
+            # the employer process the last job app
+            accepted_job_app.process(user=employer)
+        with freeze_time("2022-06-01 00:00:07"):
+            # >>> Employer membership creation date
+            employer_membership_date = timezone.now()
+            # the employer accepts the last job app
+            accepted_job_app.accept(user=employer)
+        with freeze_time("2022-06-01 00:00:08"):
+            # Another iae diag from the employer
+            IAEEligibilityDiagnosisFactory(job_seeker=job_seeker, from_employer=True, author=employer)
+
+        # reset first job app that was rendered obsolete (this instance is still new)
+        new_job_app.save()
+
+        # initialise the groups
+        init_created_at = datetime.datetime.combine(
+            settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(10, 0, 0), tzinfo=datetime.UTC
+        )
+        with freeze_time(init_created_at):
+            self.call_command("init_follow_up_groups", wet_run=True)
+
+        assert list(
+            FollowUpGroup.objects.values_list("beneficiary_id", "created_at", "created_in_bulk", "updated_at")
+        ) == [
+            (job_seeker.pk, init_created_at, True, init_created_at),
+        ]
+        assert list(
+            FollowUpGroupMembership.objects.order_by("member_id").values_list(
+                "member_id", "created_at", "created_in_bulk", "updated_at"
+            )
+        ) == [
+            (prescriber.pk, init_created_at, True, init_created_at),
+            (employer.pk, init_created_at, True, init_created_at),
+        ]
+
+        # Update created_at
+        with freeze_time(timezone.now()):
+            update_script_launched_at = timezone.now()
+            self.call_command("update_follow_up_groups_member_created_at", wet_run=True)
+        assert list(
+            FollowUpGroup.objects.values_list("beneficiary_id", "created_at", "created_in_bulk", "updated_at")
+        ) == [
+            (job_seeker.pk, prescriber_membership_date, True, update_script_launched_at),
+        ]
+        assert list(
+            FollowUpGroupMembership.objects.order_by("member_id").values_list(
+                "member_id", "created_at", "created_in_bulk", "updated_at"
+            )
+        ) == [
+            (prescriber.pk, prescriber_membership_date, True, update_script_launched_at),
+            (employer.pk, employer_membership_date, True, update_script_launched_at),
+        ]
