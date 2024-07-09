@@ -20,6 +20,7 @@ from itou.companies.management.commands._import_siae.siae import (
 )
 from itou.companies.management.commands._import_siae.utils import anonymize_fluxiae_df, could_siae_be_deleted
 from itou.companies.management.commands._import_siae.vue_af import (
+    Convention,
     get_conventions_by_siae_key,
     get_vue_af_df,
 )
@@ -51,6 +52,23 @@ class ImportSiaeManagementCommandsTest(TestCase):
         ]
         for file in files:
             shutil.copy(file, self.tmp_path)
+
+    @freeze_time("2024-07-09")
+    def test_get_conventions_by_siae_key(self):
+        data = [
+            (1, "ACI", False, pd.Timestamp("2024-12-31 00:00")),
+            (1, "ACI", True, pd.Timestamp("2024-09-30 00:00")),
+            (2, "AI", False, pd.Timestamp("2024-08-31 00:00")),
+            (2, "AI", False, pd.Timestamp("2024-07-31 00:00")),
+            (3, "AI", False, pd.Timestamp("2024-07-31 00:00")),
+        ]
+        # This is missing a bunch of columns, but only those are relevant for get_conventions_by_siae_key
+        vue_af_df_simplified = pd.DataFrame(data, columns=["asp_id", "kind", "has_active_state", "end_at"])
+        assert get_conventions_by_siae_key(vue_af_df_simplified) == {
+            (1, "ACI"): Convention(True, datetime.date(2024, 9, 30)),
+            (2, "AI"): Convention(False, datetime.date(2024, 8, 31)),
+            (3, "AI"): Convention(False, datetime.date(2024, 7, 31)),
+        }
 
     def test_uncreatable_conventions_for_active_siae_with_active_convention(self):
         siret_to_siae_row = get_siret_to_siae_row(get_vue_structure_df())
