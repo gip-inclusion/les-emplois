@@ -118,7 +118,10 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
     birth_place = forms.ModelChoiceField(
         queryset=Commune.objects,
         label="Commune de naissance",
-        help_text="La commune de naissance ne doit être saisie que lorsque le salarié est né en France",
+        help_text=(
+            "La commune de naissance est obligatoire lorsque le salarié est né en France. "
+            "Elle ne doit pas être renseignée s’il est né à l'étranger."
+        ),
         widget=RemoteAutocompleteSelect2Widget(
             attrs={
                 "data-ajax--url": reverse_lazy("autocomplete:communes"),
@@ -132,7 +135,7 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
     )
 
     # This is a JobSeekerProfile field
-    birth_country = forms.ModelChoiceField(Country.objects, label="pays de naissance")
+    birth_country = forms.ModelChoiceField(Country.objects, label="Pays de naissance")
 
     class Meta:
         model = User
