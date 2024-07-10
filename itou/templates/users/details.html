@@ -43,31 +43,15 @@
                                     <li>
                                         <small>Adresse e-mail</small>
                                         <strong>{{ beneficiary.email }}</strong>
-                                        <button class="btn-link"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-placement="top"
-                                                data-bs-trigger="manual"
-                                                data-bs-title="Copié!"
-                                                data-it-clipboard-button="copy"
-                                                data-it-copy-to-clipboard="{{ beneficiary.email }}"
-                                                {% matomo_event "gps" "clic" "copied_user_email" %}>
-                                            <i class="ri-file-copy-line"></i>
-                                        </button>
+                                        {% matomo_event "gps" "clic" "copied_user_email" as matomo_event_attrs %}
+                                        {% include 'includes/copy_to_clipboard.html' with content=beneficiary.email css_classes="btn-link" matomo_event_attrs=matomo_event_attrs text=" " %}
                                     </li>
                                     <li>
                                         <small>Téléphone</small>
                                         {% if beneficiary.phone %}
                                             <strong>{{ beneficiary.phone|format_phone }}</strong>
-                                            <button class="btn-link"
-                                                    data-bs-toggle="tooltip"
-                                                    data-bs-placement="top"
-                                                    data-bs-trigger="manual"
-                                                    data-bs-title="Copié!"
-                                                    data-it-clipboard-button="copy"
-                                                    data-it-copy-to-clipboard="{{ beneficiary.phone|cut:" " }}"
-                                                    {% matomo_event "gps" "clic" "copied_user_phone" %}>
-                                                <i class="ri-file-copy-line"></i>
-                                            </button>
+                                            {% matomo_event "gps" "clic" "copied_user_phone" as matomo_event_attrs %}
+                                            {% include 'includes/copy_to_clipboard.html' with content=beneficiary.phone css_classes="btn-link" matomo_event_attrs=matomo_event_attrs text=" " %}
                                         {% else %}
                                             <i class="text-disabled">Non renseigné</i>
                                         {% endif %}
@@ -157,15 +141,8 @@
                                         {% if profile.pole_emploi_id or profile.lack_of_pole_emploi_id_reason %}
                                             {% if profile.pole_emploi_id %}
                                                 <strong>{{ profile.pole_emploi_id }}</strong>
-                                                <button class="btn-link"
-                                                        data-bs-toggle="tooltip"
-                                                        data-bs-placement="top"
-                                                        data-bs-trigger="manual"
-                                                        data-bs-title="Copié!"
-                                                        data-it-clipboard-button="copy"
-                                                        data-it-copy-to-clipboard="{{ profile.pole_emploi_id }}">
-                                                    <i class="ri-file-copy-line"></i>
-                                                </button>
+                                                {% matomo_event "gps" "clic" "copied_user_pe_id" as matomo_event_attrs %}
+                                                {% include 'includes/copy_to_clipboard.html' with content=profile.pole_emploi_id css_classes="btn-link" matomo_event_attrs=matomo_event_attrs text=" " %}
                                             {% else %}
                                                 <strong>{{ profile.get_lack_of_pole_emploi_id_reason_display }}</strong>
                                             {% endif %}
