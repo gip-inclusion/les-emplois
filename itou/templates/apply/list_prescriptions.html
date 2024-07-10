@@ -24,32 +24,6 @@
     </div>
 {% endblock %}
 
-{% block messages %}
-    {{ block.super }}
-    {% if request.user.is_prescriber_with_authorized_org %}
-        <div id="authorized-prescribers-survey-about-autonomous-candidates" class="alert alert-important alert-dismissible-once d-none" role="status">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-            <div class="row">
-                <div class="d-none d-md-inline col-md-auto">
-                    <img src="{% static_theme_images "ico-bicro-important.svg" %}" alt="" height="80">
-                </div>
-                <div class="col-12 col-md px-md-0">
-                    <p class="mb-2">
-                        <strong>Votre avis sur l’expérience candidat nous intéresse !</strong>
-                    </p>
-                    <p class="mb-0">
-                        Dites-nous en plus sur vos pratiques vis-à-vis des candidats qui postulent en autonomie.
-                        Prenez 5 min pour répondre à notre enquête.
-                    </p>
-                </div>
-                <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
-                    <a href="https://tally.so/r/3xdblE" class="btn btn-sm btn-primary btn-ico" target="_blank" rel="noopener"><span>Répondre à l’enquête</span><i class="ri-external-link-line font-weight-medium" aria-hidden="true"></i></a>
-                </div>
-            </div>
-        </div>
-    {% endif %}
-{% endblock %}
-
 {% block content %}
     {% include "apply/includes/job_applications_filters/offcanvas.html" %}
     <section class="s-section">
