@@ -25,7 +25,7 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["gps_memberships"] = (
+        gps_memberships = (
             FollowUpGroupMembership.objects.with_members_organizations_names()
             .filter(follow_up_group=self.object.follow_up_group)
             .filter(is_active=True)
@@ -33,15 +33,18 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
             .select_related("follow_up_group", "member")
         )
 
-        context["profile"] = self.object.jobseeker_profile
-
-        context["can_view_personal_information"] = self.request.user.can_view_personal_information(self.object)
-
-        context["breadcrumbs"] = {
+        breadcrumbs = {
             "Mes bénéficiaires": reverse("gps:my_groups"),
             f"Fiche de {self.object.get_full_name()}": reverse(
                 "users:details", kwargs={"public_id": self.object.public_id}
             ),
+        }
+
+        context = context | {
+            "breadcrumbs": breadcrumbs,
+            "can_view_personal_information": self.request.user.can_view_personal_information(self.object),
+            "gps_memberships": gps_memberships,
+            "profile": self.object.jobseeker_profile,
         }
 
         return context
