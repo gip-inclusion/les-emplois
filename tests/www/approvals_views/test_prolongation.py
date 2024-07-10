@@ -12,6 +12,7 @@ from freezegun import freeze_time
 from itou.approvals.enums import ProlongationReason
 from itou.approvals.models import Prolongation
 from itou.companies.enums import CompanyKind
+from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import ProlongationFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -20,7 +21,6 @@ from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import TestCase, parse_response_to_soup
 
 
-@pytest.mark.ignore_unknown_variable_template_error("job_application", "hiring_pending")
 @pytest.mark.usefixtures("unittest_compatibility")
 @freeze_time("2023-08-23")
 class ApprovalProlongationTest(TestCase):
@@ -150,6 +150,75 @@ class ApprovalProlongationTest(TestCase):
             count=1,
         )
 
+    def test_prolongation_approval_view_with_disabled_values(self):
+        """
+        Test the deactivation of reasons if too many prolongations have already been created.
+        """
+        # This should be several succeeding prolongations but this is good enough for our test
+        prolongation = ProlongationFactory(
+            approval=self.approval,
+            start_at=self.approval.end_at,
+            end_at=self.approval.end_at + timedelta(days=365 * 3 + 10),
+            reason=ProlongationReason.COMPLETE_TRAINING,
+        )
+        url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
+
+        # For reason fields snapshots
+        replace_in_attr = [
+            (
+                "hx-post",
+                f"/approvals/declare_prolongation/{self.approval.pk}/prolongation_form_for_reason",
+                "/approvals/declare_prolongation/[PK of Approval]/prolongation_form_for_reason",
+            )
+        ]
+
+        with freeze_time(prolongation.end_at):
+            self.client.force_login(self.employer)
+            response = self.client.get(url)
+            # Check the information card
+            soup = parse_response_to_soup(response, selector="div:has(> #disabledChoicesCollapseInfo)")
+            assert str(soup) == self.snapshot(name="missing_reason_info")
+            # Check the reason field
+            assert response.context["form"]["reason"].field.widget.disabled_values == {"RQTH"}
+            assert {v for v, _label in response.context["form"]["reason"].field._choices} == {
+                "COMPLETE_TRAINING",
+                "SENIOR",
+                "SENIOR_CDI",
+            }
+            # Check reason field
+            soup = parse_response_to_soup(response, selector="div:has(> #id_reason)", replace_in_attr=replace_in_attr)
+            assert str(soup) == self.snapshot(name="RQTH disabled")
+
+            # Try using a disabled choice
+            response = self.client.post(url, data={"reason": ProlongationReason.RQTH})
+            self.assertContains(response, "Sélectionnez un choix valide.")
+
+        # Add even more prolongations
+        other_prolongation = ProlongationFactory(
+            approval=self.approval,
+            start_at=prolongation.end_at,
+            end_at=prolongation.end_at + timedelta(days=365 * 2),
+            reason=ProlongationReason.RQTH,
+        )
+        with freeze_time(other_prolongation.end_at):
+            self.client.force_login(self.employer)
+            response = self.client.get(url)
+            # Check the information card is still there
+            soup = parse_response_to_soup(response, selector="div:has(> #disabledChoicesCollapseInfo)")
+            assert str(soup) == self.snapshot(name="missing_reason_info")
+            # Check the reason field: SENIOR is now also disabled
+            assert response.context["form"]["reason"].field.widget.disabled_values == {
+                "RQTH",
+                "SENIOR",
+            }
+            assert {v for v, _label in response.context["form"]["reason"].field._choices} == {
+                "COMPLETE_TRAINING",
+                "SENIOR_CDI",
+            }
+            # Check reason field
+            soup = parse_response_to_soup(response, selector="div:has(> #id_reason)", replace_in_attr=replace_in_attr)
+            assert str(soup) == self.snapshot(name="RQTH & SENIOR disabled")
+
     def test_prolong_approval_view_no_end_at(self):
         self.client.force_login(self.employer)
         response = self.client.post(
@@ -194,6 +263,44 @@ class ApprovalProlongationTest(TestCase):
         fresh_page = parse_response_to_soup(response, selector="#main")
         assertSoupEqual(page, fresh_page)
 
+    def test_htmx_on_reason_with_back_url(self):
+        self.client.force_login(self.employer)
+        back_url = "/somewhere/over/the/rainbow"
+        page_url = add_url_params(
+            reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk}),
+            params={"back_url": back_url},
+        )
+        response = self.client.get(page_url)
+        assert response.status_code == 200
+        page = parse_response_to_soup(response, selector="#main")
+        [reset_button] = page.select("a[aria-label='Annuler la saisie de ce formulaire']")
+        assert str(reset_button) == self.snapshot(name="reset button with correct back_url")
+
+        [reason] = page.select("#id_reason")
+        expected_hx_post = add_url_params(
+            reverse("approvals:prolongation_form_for_reason", kwargs={"approval_id": self.approval.pk}),
+            params={"back_url": back_url},
+        )
+        assert reason["hx-post"] == expected_hx_post
+        data = {
+            "reason": ProlongationReason.RQTH,
+            # Workaround the validation of the initial page by providing enough data.
+            "end_at": self.approval.end_at + relativedelta(days=30),
+            "email": self.prescriber.email,
+        }
+        response = self.client.post(reason["hx-post"], data)
+        update_page_with_htmx(
+            page,
+            "#id_reason",  # RQTH
+            response,
+        )
+        response = self.client.post(page_url, data)
+        assert response.status_code == 200
+        fresh_page = parse_response_to_soup(response, selector="#main")
+        assertSoupEqual(page, fresh_page)
+        [reset_button] = fresh_page.select("a[aria-label='Annuler la saisie de ce formulaire']")
+        assert str(reset_button) == self.snapshot(name="reset button with correct back_url")
+
     @freeze_time("2023-08-23")
     def test_end_at_limits(self):
         assert len(ProlongationReason.choices) == 6
@@ -234,6 +341,18 @@ class ApprovalProlongationTest(TestCase):
         )
         with freeze_time(end_at):
             self.client.force_login(self.employer)
+
+            # Check htmx response
+            response = self.client.post(
+                reverse("approvals:prolongation_form_for_reason", kwargs={"approval_id": self.approval.pk}),
+                data={
+                    "reason": reason,
+                },
+            )
+            # Check the information card
+            soup = parse_response_to_soup(response, selector="div:has(> #maxEndAtCollapseInfo)")
+            assert str(soup) == self.snapshot(name="max_limit_info")
+
             url = reverse("approvals:declare_prolongation", kwargs={"approval_id": self.approval.pk})
             response = self.client.post(
                 url,
@@ -245,6 +364,8 @@ class ApprovalProlongationTest(TestCase):
                     "prescriber_organization": self.prescriber_organization.pk,
                 },
             )
+            soup = parse_response_to_soup(response, selector="div:has(> #maxEndAtCollapseInfo)")
+            assert str(soup) == self.snapshot(name="max_limit_info")
             max_end_at = self.approval.end_at + timedelta(days=3 * 365)
             self.assertContains(
                 response,

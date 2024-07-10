@@ -27,7 +27,10 @@ class Migration(migrations.Migration):
             model_name="user",
             name="public_id",
             field=models.UUIDField(
-                default=uuid.uuid4, unique=True, verbose_name="identifiant public opaque, pour les API"
+                default=uuid.uuid4,
+                unique=True,
+                verbose_name="identifiant public",
+                help_text="identifiant opaque, pour les API et les URLs publiques",
             ),
         ),
     ]

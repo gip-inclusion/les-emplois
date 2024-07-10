@@ -1391,3 +1391,45 @@ class SendCheckAuthorizedMembersEmailManagementCommandTest(TestCase):
         assert mail.outbox[0].body == self.snapshot(name="company")
         assert mail.outbox[1].body == self.snapshot(name="prescriber_organization")
         assert mail.outbox[2].body == self.snapshot(name="institution")
+
+    def test_check_authorized_members_with_users_admins_of_multiple_organizations(self):
+        CompanyMembershipFactory(company=self.employer_1.company, is_admin=False)
+        PrescriberMembershipFactory(organization=self.prescriber_1.organization, is_admin=False)
+        InstitutionMembershipFactory(institution=self.labor_inspector_1.institution, is_admin=False)
+        self.employer_1.company.created_at -= relativedelta(months=3)
+        self.employer_1.company.save(update_fields=["created_at"])
+        self.labor_inspector_1.institution.created_at -= relativedelta(days=1)
+        self.labor_inspector_1.institution.save(update_fields=["created_at"])
+
+        # Create other organizations with same users
+        DT_3_MONTHS_AGO = timezone.now() - relativedelta(months=3)
+        other_employer = CompanyMembershipFactory(
+            user=self.employer_1.user, company__name="Company 2", company__created_at=DT_3_MONTHS_AGO
+        )
+        CompanyMembershipFactory(company=other_employer.company, is_admin=False)
+        other_prescriber = PrescriberMembershipFactory(
+            user=self.prescriber_1.user, organization__name="Organization 2", organization__created_at=DT_3_MONTHS_AGO
+        )
+        PrescriberMembershipFactory(organization=other_prescriber.organization, is_admin=False)
+        other_labor_inspector = InstitutionMembershipFactory(
+            user=self.labor_inspector_1.user,
+            institution__name="Institution 2",
+            institution__created_at=DT_3_MONTHS_AGO,
+        )
+        InstitutionMembershipFactory(institution=other_labor_inspector.institution, is_admin=False)
+
+        with self.captureOnCommitCallbacks(execute=True):
+            self.command.handle()
+        assert len(mail.outbox) == 6
+        expected_organization_names = [
+            "Company 1",
+            "Company 2",
+            "Organization 1",
+            "Organization 2",
+            "Institution 1",
+            "Institution 2",
+        ]
+        for idx, expected_organization_name in enumerate(expected_organization_names):
+            assert mail.outbox[idx].subject == (
+                f"[DEV] Rappel sécurité : vérifiez la liste des membres de l’organisation {expected_organization_name}"
+            )

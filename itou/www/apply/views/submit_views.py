@@ -563,6 +563,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "form": self.form,
+            "matomo_form_name": "apply-create-job-seeker-identity",
             "progress": "20",
         }
 
@@ -796,7 +797,6 @@ class CheckJobSeekerInformationsForHire(ApplicationBaseView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "profile": self.job_seeker.jobseeker_profile,
-            "hiring_pending": True,
             "back_url": reverse("apply:check_nir_for_hire", kwargs={"company_pk": self.company.pk}),
         }
 
@@ -1367,6 +1367,7 @@ class UpdateJobSeekerStep1View(UpdateJobSeekerBaseView):
         return super().get_context_data(**kwargs) | {
             "confirmation_needed": False,
             "form": self.form,
+            "matomo_form_name": "apply-update-job-seeker-identity",
             "readonly_form": not self.request.user.can_edit_personal_information(self.job_seeker),
             "progress": "20",
         }

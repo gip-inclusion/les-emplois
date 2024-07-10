@@ -245,6 +245,12 @@ def get_table():
                 "fn": lambda o: o.last_login,
             },
             {
+                "name": "date_premiere_connexion",
+                "type": "date",
+                "comment": "Date de première connexion",
+                "fn": lambda o: o.first_login,
+            },
+            {
                 "name": "actif",
                 "type": "boolean",
                 "comment": "Dernière connexion dans les 7 jours",

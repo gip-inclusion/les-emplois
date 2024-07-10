@@ -450,19 +450,24 @@ STATS_PH_PRESCRIPTION_REGION_WHITELIST = ["Pays de la Loire", "Nouvelle-Aquitain
 SLACK_CRON_WEBHOOK_URL = os.getenv("SLACK_CRON_WEBHOOK_URL")
 
 # Production instances (`PROD`, `DEMO`, `PENTEST`, `FAST-MACHINE`, ...) share the same redis but different DB
-redis_url = os.getenv("REDIS_URL", "redis://127.0.0.1:6379")
-redis_db = os.getenv("REDIS_DB")
-redis_django_settings = {
-    "LOCATION": redis_url,
+redis_url = os.environ["REDIS_URL"]
+redis_db = os.environ["REDIS_DB"]
+redis_common_django_settings = {
+    "BACKEND": "itou.utils.cache.UnclearableCache",
+    "LOCATION": f"{redis_url}?db={redis_db}",
     "KEY_PREFIX": "django",
-    "OPTIONS": {
-        "db": redis_db,
-    },
 }
 
 CACHES = {
-    "default": {"BACKEND": "itou.utils.cache.UnclearableCache", **redis_django_settings},
-    "failsafe": {"BACKEND": "itou.utils.cache.FailSafeRedisCache", **redis_django_settings},
+    "default": {
+        **redis_common_django_settings,
+    },
+    "failsafe": {
+        **redis_common_django_settings,
+        "OPTIONS": {
+            "CLIENT_CLASS": "itou.utils.cache.FailSafeRedisCacheClient",
+        },
+    },
 }
 
 HUEY = {
@@ -672,6 +677,11 @@ DORA_BASE_URL = os.getenv("DORA_BASE_URL", "https://dora.inclusion.beta.gouv.fr"
 
 # GPS
 # ------------------------------------------------------------------------------
-# Until GPS goes live for everyone, keep the feature hidden in production.
 GPS_GROUPS_CREATED_BY_EMAIL = os.getenv("GPS_GROUPS_CREATED_BY_EMAIL", None)
 GPS_GROUPS_CREATED_AT_DATE = datetime.date(2024, 6, 12)
+
+# Datadog
+# ------------------------------------------------------------------------------
+API_DATADOG_BASE_URL = "https://api.datadoghq.eu/api/v2"
+API_DATADOG_API_KEY = os.getenv("API_DATADOG_API_KEY", None)
+API_DATADOG_APPLICATION_KEY = os.getenv("API_DATADOG_APPLICATION_KEY", None)

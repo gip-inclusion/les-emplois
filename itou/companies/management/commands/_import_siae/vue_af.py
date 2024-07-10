@@ -150,4 +150,6 @@ def get_conventions_by_siae_key(vue_af_df):
                 end_at=timezone.make_aware(row.end_at).date(),
             )
         )
-    return {key: max(conventions, key=lambda i: i.end_at) for key, conventions in siae_conventions.items()}
+    return {
+        key: max(conventions, key=lambda i: (i.is_active, i.end_at)) for key, conventions in siae_conventions.items()
+    }

@@ -13,6 +13,7 @@ from django.db.models import Case, Count, F, OuterRef, Q, Subquery, When
 from django.db.models.functions import Now, TruncDate
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.safestring import mark_safe
 from unidecode import unidecode
 
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
@@ -1308,30 +1309,60 @@ class CommonProlongation(models.Model):
     # Max duration: 10 years but it depends on the `reason` field, see `get_max_end_at`.
     MAX_DURATION = datetime.timedelta(days=10 * 365)
 
-    MAX_CUMULATIVE_DURATION = {
+    PROLONGATION_RULES = {
         enums.ProlongationReason.SENIOR_CDI: {
-            "duration": MAX_DURATION,
-            "label": "10 ans (3650 jours)",
+            "max_duration": MAX_DURATION,
+            "max_duration_label": "10 ans",
+            "max_cumulative_duration": None,
+            "help_text": (
+                "Pour le CDI Inclusion, jusqu’à la retraite "
+                "(pour des raisons techniques, une durée de 10 ans (3650 jours) est appliquée par défaut)."
+            ),
         },
         enums.ProlongationReason.COMPLETE_TRAINING: {
-            "duration": datetime.timedelta(days=2 * 365),
-            "label": "2 ans (730 jours)",
+            "max_duration": datetime.timedelta(days=365),
+            "max_duration_label": "12 mois",
+            "max_cumulative_duration": None,
+            "help_text": mark_safe(
+                "12 mois (365 jours) maximum pour chaque demande.<br> "
+                "Renouvellements possibles jusqu’à la fin de l’action de formation."
+            ),
         },
         enums.ProlongationReason.RQTH: {
-            "duration": datetime.timedelta(days=3 * 365),
-            "label": "3 ans (1095 jours)",
+            "max_duration": datetime.timedelta(days=365),
+            "max_duration_label": "12 mois",
+            "max_cumulative_duration": datetime.timedelta(days=3 * 365),
+            "help_text": mark_safe(
+                "12 mois (365 jours) maximum pour chaque demande.<br> "
+                "Renouvellements possibles dans la limite de 5 ans de parcours IAE "
+                "(2 ans de parcours initial + 3 ans (1095 jours))."
+            ),
         },
         enums.ProlongationReason.SENIOR: {
-            "duration": datetime.timedelta(days=5 * 365),
-            "label": "5 ans (1825 jours)",
+            "max_duration": datetime.timedelta(days=365),
+            "max_duration_label": "12 mois",
+            "max_cumulative_duration": datetime.timedelta(days=5 * 365),
+            "help_text": mark_safe(
+                "12 mois (365 jours) maximum pour chaque demande.<br> "
+                "Renouvellements possibles dans la limite de 7 ans de parcours IAE "
+                "(2 ans de parcours initial + 5 ans (1825 jours))."
+            ),
         },
         enums.ProlongationReason.PARTICULAR_DIFFICULTIES: {
-            "duration": datetime.timedelta(days=3 * 365),
-            "label": "3 ans (1095 jours)",
+            "max_duration": datetime.timedelta(days=365),
+            "max_duration_label": "12 mois",
+            "max_cumulative_duration": datetime.timedelta(days=3 * 365),
+            "help_text": mark_safe(
+                "12 mois (365 jours) maximum pour chaque demande.<br> "
+                "Renouvellements possibles dans la limite de 5 ans de parcours IAE "
+                "(2 ans de parcours initial + 3 ans (1095 jours))."
+            ),
         },
         enums.ProlongationReason.HEALTH_CONTEXT: {
-            "duration": datetime.timedelta(days=365),
-            "label": "12 mois (365 jours)",
+            "max_duration": datetime.timedelta(days=365),
+            "max_duration_label": "12 mois",
+            "max_cumulative_duration": datetime.timedelta(days=365),
+            "help_text": "NE PAS UTILISER",  # This value shouldn't appear anywhere but just in case
         },
     }
 
@@ -1507,15 +1538,12 @@ class CommonProlongation(models.Model):
         """
         Returns the maximum date on which a prolongation can end.
         """
-        try:
-            max_cumulative_duration = Prolongation.MAX_CUMULATIVE_DURATION[reason]
-        except KeyError:
-            max_end = start_at + Prolongation.MAX_DURATION
-        else:
-            used = Prolongation.objects.get_cumulative_duration_for(approval_id, reason, ignore=ignore)
-            remaining_days = max_cumulative_duration["duration"] - used
-            max_end = start_at + remaining_days
-        return max_end
+        max_cumulative_duration = Prolongation.PROLONGATION_RULES[reason]["max_cumulative_duration"]
+        if max_cumulative_duration is None:
+            return start_at + Prolongation.PROLONGATION_RULES[reason]["max_duration"]
+        used = Prolongation.objects.get_cumulative_duration_for(approval_id, ignore=ignore)
+        remaining_days = max_cumulative_duration - used
+        return start_at + remaining_days
 
 
 class ProlongationRequest(CommonProlongation):
@@ -1653,12 +1681,9 @@ class ProlongationQuerySet(models.QuerySet):
 
 
 class ProlongationManager(models.Manager):
-    def get_cumulative_duration_for(self, approval_id, reason, ignore=None):
-        """
-        Returns the total duration of all prolongations for the given approval and the given reason.
-        """
+    def get_cumulative_duration_for(self, approval_id, ignore=None):
         duration = datetime.timedelta(0)
-        for prolongation in self.filter(approval_id=approval_id, reason=reason).exclude(pk__in=ignore or []):
+        for prolongation in self.filter(approval_id=approval_id).exclude(pk__in=ignore or []):
             duration += prolongation.duration
         return duration
 

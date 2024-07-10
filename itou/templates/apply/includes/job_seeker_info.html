@@ -9,7 +9,7 @@
     </li>
     <li>
         <small>Nom</small>
-        <strong>{{ job_seeker.last_name|mask_unless:can_view_personal_information }}</strong>
+        <strong>{{ job_seeker.last_name|upper|mask_unless:can_view_personal_information }}</strong>
     </li>
     <li>
         <small>Numéro de sécurité sociale</small>

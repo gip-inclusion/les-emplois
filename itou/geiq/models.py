@@ -43,12 +43,11 @@ class ImplementationAssessment(models.Model):
 
     other_data = models.JSONField(verbose_name="autres données")
 
-    activity_report_file = models.ForeignKey(
+    activity_report_file = models.OneToOneField(
         File,
         verbose_name="document de synthèse",
         null=True,
         blank=True,
-        unique=True,
         on_delete=models.PROTECT,
     )
 

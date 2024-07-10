@@ -181,78 +181,78 @@
 # name: test_my_groups[test_my_groups__group_card]
   '''
   <div class="my-3 my-md-4 s-box__row row membership-card">
-                                  <div class="c-box--results__header">
+                  <div class="c-box--results__header">
   
-                                      <div class="c-box--results__summary">
-                                          <i aria-hidden="true" class="ri-user-line"></i>
-                                          <div>
-                                              <h3>Jane DOE</h3>
-                                              <span>jane.doe@test.local</span>
-                                          </div>
-                                      </div>
-                                  </div>
+                      <div class="c-box--results__summary">
+                          <i aria-hidden="true" class="ri-user-line"></i>
+                          <div>
+                              <h3>Jane DOE</h3>
+                              <span>jane.doe@test.local</span>
+                          </div>
+                      </div>
+                  </div>
   
-                                  <hr class="m-0 pb-4"/>
+                  <hr class="m-0 pb-4"/>
   
-                                  <div class="d-flex justify-content-between mb-4">
+                  <div class="d-flex justify-content-between mb-4">
+                      <div>
+                          
+                              <div>
+                                  
                                       <div>
                                           
-                                              <div>
-                                                  
-                                                      <div>
-                                                          
-                                                          
-                                                          Vous avez ajouté ce bénéficiaire le <strong>21/06/2024</strong>.
-                                                      </div>
-                                                  
-                                                  
-                                                      1 autre professionnel
-                                                      est
-                                                      intervenu auprès de ce bénéficiaire.
-                                                  
-                                              </div>
                                           
+                                          Vous avez ajouté ce bénéficiaire le <strong>21/06/2024</strong>.
                                       </div>
-  
-  
-                                  </div>
-                                  <div class="d-flex justify-content-between">
-  
-                                      
-                                          <div>
-  
-                                              
-                                              <a aria-label="Ne plus suivre Jane DOE" class="btn btn-warning btn-block w-100 w-md-auto btn-ico" data-bs-body="Vous pourrez toujours suivre ce bénéficiaire de nouveau plus tard." data-bs-confirm-class="btn-danger" data-bs-confirm-text="Ne plus suivre" data-bs-confirm-url="/gps/groups/34/leave" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de ne plus vouloir suivre Jane DOE ?" data-bs-toggle="modal" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
-                                                  <i aria-hidden="true" class="ri-user-unfollow-line"></i>
-                                                  <span>Ne plus suivre</span>
-  
-                                              </a>
-  
-  
-                                              
-                                          </div>
-  
-  
-                                          <div>
-                                              
-                                                  
-  
-                                                  <a aria-label="Devenir référent de Jane DOE" class="btn btn-outline-success btn-block w-100 w-md-auto btn-ico" data-bs-body="Vous pourrez toujours ne plus être référent de ce bénéficiaire plus tard." data-bs-confirm-class="btn-success" data-bs-confirm-text="Devenir référent" data-bs-confirm-url="/gps/groups/34/toggle_referent" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de vouloir devenir référent de Jane DOE ?" data-bs-toggle="modal" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
-  
-                                                      <i aria-hidden="true" class="ri-map-pin-user-line font-weight-normal me-1"></i>
-                                                      <span>Devenir référent</span>
-  
-                                                  </a>
-  
-                                              
-                                              <a aria-label="Consulter la fiche de Jane DOE" class="btn btn-outline-primary btn-block btn-ico w-100 w-md-auto" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
-                                                  <i aria-hidden="true" class="ri-eye-line ri-xl font-weight-medium"></i>
-                                                  <span>Consulter la fiche</span>
-                                              </a>
-                                          </div>
-                                      
-  
-                                  </div>
+                                  
+                                  
+                                      1 autre professionnel
+                                      est
+                                      intervenu auprès de ce bénéficiaire.
+                                  
                               </div>
+                          
+                      </div>
+  
+  
+                  </div>
+                  <div class="d-flex justify-content-between">
+  
+                      
+                          <div>
+  
+                              
+                              <a aria-label="Ne plus suivre Jane DOE" class="btn btn-warning btn-block w-100 w-md-auto btn-ico" data-bs-body="Vous pourrez toujours suivre ce bénéficiaire de nouveau plus tard." data-bs-confirm-class="btn-danger" data-bs-confirm-text="Ne plus suivre" data-bs-confirm-url="/gps/groups/34/leave" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de ne plus vouloir suivre Jane DOE ?" data-bs-toggle="modal" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                  <i aria-hidden="true" class="ri-user-unfollow-line"></i>
+                                  <span>Ne plus suivre</span>
+  
+                              </a>
+  
+  
+                              
+                          </div>
+  
+  
+                          <div>
+                              
+                                  
+  
+                                  <a aria-label="Devenir référent de Jane DOE" class="btn btn-outline-success btn-block w-100 w-md-auto btn-ico" data-bs-body="Vous pourrez toujours ne plus être référent de ce bénéficiaire plus tard." data-bs-confirm-class="btn-success" data-bs-confirm-text="Devenir référent" data-bs-confirm-url="/gps/groups/34/toggle_referent" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de vouloir devenir référent de Jane DOE ?" data-bs-toggle="modal" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
+  
+                                      <i aria-hidden="true" class="ri-map-pin-user-line font-weight-normal me-1"></i>
+                                      <span>Devenir référent</span>
+  
+                                  </a>
+  
+                              
+                              <a aria-label="Consulter la fiche de Jane DOE" class="btn btn-outline-primary btn-block btn-ico w-100 w-md-auto" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                  <i aria-hidden="true" class="ri-eye-line ri-xl font-weight-medium"></i>
+                                  <span>Consulter la fiche</span>
+                              </a>
+                          </div>
+                      
+  
+                  </div>
+              </div>
   '''
 # ---

@@ -23,7 +23,7 @@ REGIONS = {
     "Pays de la Loire": ["44", "49", "53", "72", "85"],
     "Provence-Alpes-Côte d'Azur": ["04", "05", "06", "13", "83", "84"],
     "Collectivités d'outre-mer": ["975", "977", "978"],
-    "Anciens territoires d'outre-mer": ["986", "987", "988"],
+    "Anciens territoires d'outre-mer": ["984", "986", "987", "988", "989"],
 }
 
 
@@ -142,9 +142,11 @@ DEPARTMENTS = {
     "976": "976 - Mayotte",
     "977": "977 - Saint-Barthélémy",
     "978": "978 - Saint-Martin",
+    "984": "984 - Terres australes et antarctiques françaises",
     "986": "986 - Wallis-et-Futuna",
     "987": "987 - Polynésie française",
     "988": "988 - Nouvelle-Calédonie",
+    "989": "989 - Île Clipperton",
 }
 
 # Marseille, Lyon and Paris

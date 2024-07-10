@@ -497,9 +497,9 @@ class TestViewProof:
         assert httpx.get(response.url).content == pdf_file.read()
 
     def test_access_other_institution(self, client):
-        job_app = EvaluatedJobApplicationFactory()
+        job_app = EvaluatedJobApplicationFactory(evaluated_siae__evaluation_campaign__institution__department="01")
         crit = EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=job_app)
-        membership = InstitutionMembershipFactory()
+        membership = InstitutionMembershipFactory(institution__department="02")
         EvaluationCampaignFactory(institution=membership.institution)
         url = reverse("siae_evaluations_views:view_proof", kwargs={"evaluated_administrative_criteria_id": crit.pk})
         client.force_login(membership.user)

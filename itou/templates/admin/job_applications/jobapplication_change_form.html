@@ -12,9 +12,16 @@
             {% endif %}
             {% if original.is_in_acceptable_state %}
                 <input type='submit' class="danger js-with-confirm" name="transition_accept" value="Accepter">
+                <p>
+                    <strong>Vous pouvez choisir un diagnostic d'eligibilité IAE, mais sa date d'expiration ne sera pas vérifiée. Si vous souhaitez que le système choisisse le dernier diagnostic valide, laissez le champ vide.</strong>
+                </p>
             {% endif %}
-            {% if original.state.is_accepted and original.can_be_cancelled %}
-                <input type='submit' class="danger js-with-confirm" name="transition_cancel" value="Annuler">
+            {% if original.state.is_accepted %}
+                <input type='submit'
+                       class="danger js-with-confirm"
+                       name="transition_cancel"
+                       value="Annuler"
+                       {% if not original.can_be_cancelled %} disabled data-bs-toggle="tooltip" data-bs-placement="top" title=" Une fichie salarié doit probablement être supprimée avant de pouvoir annuler cette candidature " {% endif %}>
             {% endif %}
             {% if original.state.is_obsolete %}
                 <input type='submit' class="danger js-with-confirm" name="transition_reset" value="Remettre au statut nouveau">

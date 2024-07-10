@@ -36,7 +36,10 @@ def test_wizard(snapshot, client):
     # )
     response = client.post(
         choose_employee_url,
-        {"choose-employee-employee": job_application.job_seeker.pk, "add_view-current_step": "choose-employee"},
+        {
+            "choose-employee-employee": job_application.job_seeker.pk,
+            f"company_{company.pk}_add_employee_record-current_step": "choose-employee",
+        },
     )
     assertRedirects(response, choose_approval_url)
 
@@ -44,12 +47,15 @@ def test_wizard(snapshot, client):
     soup = parse_response_to_soup(client.get(choose_approval_url), selector="#main .s-section")
     assert soup.find(id="id_choose-approval-approval").option["value"] == str(approval.pk)
     soup.find(id="id_choose-approval-approval").option["value"] = "[PK of Approval]"
+    [input] = soup.select(selector=f"#id_company_{company.pk}_add_employee_record-current_step")
+    input["name"] = input["name"].replace(str(company.pk), "[PK of Company]")
+    input["id"] = input["id"].replace(str(company.pk), "[PK of Company]")
     assert str(soup) == snapshot(name="choose-approval")
     response = client.post(
         choose_approval_url,
         {
             "choose-approval-approval": job_application.approval.pk,
-            "add_view-current_step": "choose-approval",
+            f"company_{company.pk}_add_employee_record-current_step": "choose-approval",
         },
     )
 
@@ -70,13 +76,16 @@ def test_done_step_when_the_employee_record_need_to_be_created(client):
 
     client.post(
         choose_employee_url,
-        {"choose-employee-employee": job_application.job_seeker.pk, "add_view-current_step": "choose-employee"},
+        {
+            "choose-employee-employee": job_application.job_seeker.pk,
+            f"company_{company.pk}_add_employee_record-current_step": "choose-employee",
+        },
     )
     response = client.post(
         choose_approval_url,
         {
             "choose-approval-approval": job_application.approval.pk,
-            "add_view-current_step": "choose-approval",
+            f"company_{company.pk}_add_employee_record-current_step": "choose-approval",
         },
         follow=True,  # Don't stop to the `done` step
     )
@@ -105,14 +114,17 @@ def test_done_step_when_a_new_employee_record_already_exists(client):
 
     client.post(
         choose_employee_url,
-        {"choose-employee-employee": job_application.job_seeker.pk, "add_view-current_step": "choose-employee"},
+        {
+            "choose-employee-employee": job_application.job_seeker.pk,
+            f"company_{company.pk}_add_employee_record-current_step": "choose-employee",
+        },
     )
 
     response = client.post(
         choose_approval_url,
         {
             "choose-approval-approval": job_application.approval.pk,
-            "add_view-current_step": "choose-approval",
+            f"company_{company.pk}_add_employee_record-current_step": "choose-approval",
         },
         follow=True,  # Don't stop to the `done` step
     )
@@ -140,14 +152,17 @@ def test_done_step_when_a_other_than_new_employee_record_already_exists(client):
 
     client.post(
         choose_employee_url,
-        {"choose-employee-employee": job_application.job_seeker.pk, "add_view-current_step": "choose-employee"},
+        {
+            "choose-employee-employee": job_application.job_seeker.pk,
+            f"company_{company.pk}_add_employee_record-current_step": "choose-employee",
+        },
     )
 
     response = client.post(
         choose_approval_url,
         {
             "choose-approval-approval": job_application.approval.pk,
-            "add_view-current_step": "choose-approval",
+            f"company_{company.pk}_add_employee_record-current_step": "choose-approval",
         },
         follow=True,  # Don't stop to the `done` step
     )

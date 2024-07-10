@@ -12,7 +12,13 @@
             <div class="row">
                 <div class="col-12 col-lg-8">
                     {% if is_subject_to_eligibility_rules %}
-                        {% include "approvals/includes/card.html" with common_approval=job_seeker.latest_common_approval %}
+                        {% with common_approval=job_seeker.latest_common_approval %}
+                            {% if common_approval %}
+                                <div class="c-box mb-4">
+                                    {% include "approvals/includes/status.html" with common_approval=common_approval hiring_pending=True %}
+                                </div>
+                            {% endif %}
+                        {% endwith %}
                     {% endif %}
 
                     {% block content_extend %}{% endblock %}

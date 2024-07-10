@@ -56,9 +56,9 @@ botocore==1.31.85 \
     #   -r requirements/base.in
     #   boto3
     #   s3transfer
-certifi==2023.7.22 \
-    --hash=sha256:539cc1d13202e33ca466e88b2807e29f4c13049d6d87031a3c110744495cb082 \
-    --hash=sha256:92d6037539857d8206b8f6ae472e8b77db8058fec5937a1ef3f54304089edbb9
+certifi==2024.7.4 \
+    --hash=sha256:5a1e7645bc0ec61a09e26c36f6106dd4cf40c6db3a1fb6352b0244e7fb057c7b \
+    --hash=sha256:c198e21b1289c2ab85ee4e67bb4b4ef3ead0892059901a8d5b622f24a1101e90
     # via
     #   httpcore
     #   httpx
@@ -265,6 +265,7 @@ django==5.0.6 \
     #   django-htmx
     #   django-import-export
     #   django-pgtrigger
+    #   django-redis
     #   django-select2
     #   django-storages
     #   django-xworkflows
@@ -305,9 +306,9 @@ django-formtools==2.5.1 \
     --hash=sha256:47cb34552c6efca088863d693284d04fc36eaaf350eb21e1a1d935e0df523c93 \
     --hash=sha256:bce9b64eda52cc1eef6961cc649cf75aacd1a707c2fff08d6c3efcbc8e7e761a
     # via -r requirements/base.in
-django-hijack==3.5.4 \
-    --hash=sha256:981360fe1b993b28355788f47b9ef5a41dae2c898eae4d5df03e5c305c600fc1 \
-    --hash=sha256:acd80231742371669ed3cef3b0dca7b80f4a2e9eb0c6a9d6d145c0150fff057f
+django-hijack==3.6.0 \
+    --hash=sha256:4554f7ceb1a5b39aecacd06fee08933a90a357a9c7eeb018d9483d25938dc637 \
+    --hash=sha256:698bbe2bcc95c240e4706d465c3ea6c78c66cdcef357802d171ba7036079b075
     # via -r requirements/base.in
 django-htmx==1.18.0 \
     --hash=sha256:48f3b8a784467bfcc30562067b87ecbc4ad9b739cc269eec5f3789c16d2cb2ce \
@@ -320,6 +321,10 @@ django-import-export==4.1.0 \
 django-pgtrigger==4.11.1 \
     --hash=sha256:39862f229405c6fe49b33451e13910a70578ba569f7e8bea6ea82049058b371f \
     --hash=sha256:9ef664932b3b7fb06e6dc091e4e292d029c221804469ff42968dad272076915f
+    # via -r requirements/base.in
+django-redis==5.4.0 \
+    --hash=sha256:6a02abaa34b0fea8bf9b707d2c363ab6adc7409950b2db93602e6cb292818c42 \
+    --hash=sha256:ebc88df7da810732e2af9987f7f426c96204bf89319df4c6da6ca9a2942edd5b
     # via -r requirements/base.in
 django-select2==8.2.0 \
     --hash=sha256:0e173ce49c6ea91efa9fc24c5ca8d1f8a3c545e60db779cf2c623d4e07405360 \
@@ -904,7 +909,9 @@ pyzipper==0.3.6 \
 redis==5.0.7 \
     --hash=sha256:0e479e24da960c690be5d9b96d21f7b918a98c0cf49af3b6fafaa0753f93a0db \
     --hash=sha256:8f611490b93c8109b50adc317b31bfd84fff31def3475b92e7e80bf39f48175b
-    # via -r requirements/base.in
+    # via
+    #   -r requirements/base.in
+    #   django-redis
 referencing==0.29.1 \
     --hash=sha256:90cb53782d550ba28d2166ef3f55731f38397def8832baac5d45235f1995e35e \
     --hash=sha256:d3c8f323ee1480095da44d55917cfb8278d73d6b4d5f677e3e40eb21314ac67f
@@ -1022,9 +1029,9 @@ s3transfer==0.6.1 \
     --hash=sha256:3c0da2d074bf35d6870ef157158641178a4204a6e689e82546083e31e0311346 \
     --hash=sha256:640bb492711f4c0c0905e1f62b6aaeb771881935ad27884852411f8e9cacbca9
     # via boto3
-sentry-sdk==2.7.1 \
-    --hash=sha256:25006c7e68b75aaa5e6b9c6a420ece22e8d7daec4b7a906ffd3a8607b67c037b \
-    --hash=sha256:ef1b3d54eb715825657cd4bb3cb42bb4dc85087bac14c56b0fd8c21abd968c9a
+sentry-sdk==2.8.0 \
+    --hash=sha256:6051562d2cfa8087bb8b4b8b79dc44690f8a054762a29c07e22588b1f619bfb5 \
+    --hash=sha256:aa4314f877d9cd9add5a0c9ba18e3f27f99f7de835ce36bd150e48a41c7c646f
     # via -r requirements/base.in
 six==1.16.0 \
     --hash=sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926 \
@@ -1047,9 +1054,9 @@ tablib==3.5.0 \
     --hash=sha256:9821caa9eca6062ff7299fa645e737aecff982e6b2b42046928a6413c8dabfd9 \
     --hash=sha256:f6661dfc45e1d4f51fa8a6239f9c8349380859a5bfaa73280645f046d6c96e33
     # via django-import-export
-tenacity==8.4.2 \
-    --hash=sha256:9e6f7cf7da729125c7437222f8a522279751cdfbe6b67bfe64f75d3a348661b2 \
-    --hash=sha256:cd80a53a79336edba8489e767f729e4f391c896956b57140b5d7511a64bbd3ef
+tenacity==8.5.0 \
+    --hash=sha256:8bc6c0c8a09b31e6cad13c47afbed1a567518250a9a171418582ed8d9c20ca78 \
+    --hash=sha256:b594c2a5945830c267ce6b79a166228323ed52718f30302c1359836112346687
     # via -r requirements/base.in
 tqdm==4.66.4 \
     --hash=sha256:b75ca56b413b030bc3f00af51fd2c1a1a5eac6a0c1cca83cbb37a5c52abce644 \

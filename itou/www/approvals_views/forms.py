@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.exceptions import ValidationError
@@ -30,8 +28,9 @@ from itou.users.enums import UserKind
 from itou.users.models import User
 from itou.utils.constants import MB
 from itou.utils.db import or_queries
+from itou.utils.urls import add_url_params
 from itou.utils.validators import MaxDateValidator, MinDateValidator
-from itou.utils.widgets import DuetDatePickerWidget
+from itou.utils.widgets import DuetDatePickerWidget, RadioSelectWithDisabledChoices
 
 
 class ApprovalExpiry(TextChoices):
@@ -137,50 +136,9 @@ class CreateProlongationForm(forms.ModelForm):
         label="Motif",
         choices=ProlongationReason.choices,
         initial=None,  # Uncheck radio buttons.
-        widget=forms.RadioSelect(),
+        widget=RadioSelectWithDisabledChoices,
     )
     end_at = forms.DateField(widget=DuetDatePickerWidget())
-
-    PROLONGATION_RULES = {
-        ProlongationReason.SENIOR_CDI: {
-            "max_duration": Prolongation.MAX_DURATION,
-            "help_text": (
-                "Pour le CDI Inclusion, jusqu’à la retraite "
-                "(pour des raisons techniques, une durée de 10 ans (3650 jours) est appliquée par défaut)."
-            ),
-        },
-        ProlongationReason.COMPLETE_TRAINING: {
-            "max_duration": timedelta(days=365),
-            "help_text": mark_safe(
-                "12 mois (365 jours) maximum pour chaque demande.<br> "
-                "Renouvellements possibles jusqu’à la fin de l’action de formation."
-            ),
-        },
-        ProlongationReason.RQTH: {
-            "max_duration": timedelta(days=365),
-            "help_text": mark_safe(
-                "12 mois (365 jours) maximum pour chaque demande.<br> "
-                "Renouvellements possibles dans la limite de 5 ans de parcours IAE "
-                "(2 ans de parcours initial + 3 ans (1095 jours))."
-            ),
-        },
-        ProlongationReason.SENIOR: {
-            "max_duration": timedelta(days=365),
-            "help_text": mark_safe(
-                "12 mois (365 jours) maximum pour chaque demande.<br> "
-                "Renouvellements possibles dans la limite de 7 ans de parcours IAE "
-                "(2 ans de parcours initial + 5 ans (1825 jours))."
-            ),
-        },
-        ProlongationReason.PARTICULAR_DIFFICULTIES: {
-            "max_duration": timedelta(days=365),
-            "help_text": mark_safe(
-                "12 mois (365 jours) maximum pour chaque demande.<br> "
-                "Renouvellements possibles dans la limite de 5 ans de parcours IAE "
-                "(2 ans de parcours initial + 3 ans (1095 jours))."
-            ),
-        },
-    }
 
     class Meta:
         model = Prolongation
@@ -189,8 +147,12 @@ class CreateProlongationForm(forms.ModelForm):
             "end_at",
         ]
 
-    def __init__(self, *args, approval, siae, **kwargs):
+    def __init__(self, *args, approval, siae, back_url, **kwargs):
         super().__init__(*args, **kwargs)
+        self.back_url = back_url
+
+        # Used to display an explanation if the max duration is not possible
+        self.max_end_limit = None
 
         if not self.instance.pk:
             # `approval` must be set before model validation to avoid violating a not-null constraint.
@@ -202,12 +164,31 @@ class CreateProlongationForm(forms.ModelForm):
 
         # Customize "reason" field
         self.fields["reason"].choices = ProlongationReason.for_company(self.instance.declared_by_siae)
+        other_prolongation_duration = Prolongation.objects.get_cumulative_duration_for(approval.pk)
+        disabled_values = set()
+        for reason, _reason_label in self.fields["reason"].choices:
+            if (
+                max_cumulative_duration := Prolongation.PROLONGATION_RULES[reason]["max_cumulative_duration"]
+            ) is not None:
+                if max_cumulative_duration <= other_prolongation_duration:
+                    disabled_values.add(reason)
+
+        if disabled_values:
+            # Make those options appear as disabled
+            self.fields["reason"].widget.disabled_values = disabled_values
+            # Prevent those options to be accepted
+            self.fields["reason"]._choices = [
+                (value, label) for value, label in self.fields["reason"]._choices if value not in disabled_values
+            ]
         self.fields["reason"].widget.attrs.update(
             {
                 "hx-trigger": "change",
-                "hx-post": reverse(
-                    "approvals:prolongation_form_for_reason",
-                    kwargs={"approval_id": self.instance.approval_id},
+                "hx-post": add_url_params(
+                    reverse(
+                        "approvals:prolongation_form_for_reason",
+                        kwargs={"approval_id": self.instance.approval_id},
+                    ),
+                    {"back_url": self.back_url},
                 ),
                 "hx-params": "not end_at",  # Clear "end_at" when switching reason
                 "hx-swap": "outerHTML",
@@ -220,15 +201,23 @@ class CreateProlongationForm(forms.ModelForm):
         end_at.label = f"Du {self.instance.start_at:%d/%m/%Y} au"
         reason_not_validated = self.data.get("reason")
         try:
-            rule_details = self.PROLONGATION_RULES[reason_not_validated]
+            rule_details = Prolongation.PROLONGATION_RULES[reason_not_validated]
         except KeyError:
             end_at.disabled = True
         else:
             end_at.help_text = rule_details["help_text"]
-            max_end_at = min(
-                self.instance.start_at + rule_details["max_duration"],
-                Prolongation.get_max_end_at(self.instance.approval_id, self.instance.start_at, reason_not_validated),
+            max_duration_end_at = self.instance.start_at + rule_details["max_duration"]
+            max_cumulative_duration_end_at = Prolongation.get_max_end_at(
+                self.instance.approval_id, self.instance.start_at, reason_not_validated
             )
+            max_end_at = min(max_duration_end_at, max_cumulative_duration_end_at)
+            if max_cumulative_duration_end_at < max_duration_end_at:
+                self.max_end_limit = {
+                    "max_date": max_end_at,
+                    "max_duration": (
+                        f"{rule_details['max_duration_label']} ({rule_details['max_duration'].days} jours)"
+                    ),
+                }
             end_at.widget.attrs["max"] = max_end_at
             if reason_not_validated == ProlongationReason.SENIOR_CDI and not self.data.get("end_at"):
                 # The field should have an initial value, but Django ignores `initial` when the form is bound.

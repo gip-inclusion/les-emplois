@@ -2,6 +2,7 @@
 
 
 import argparse
+import collections
 import datetime
 import json
 import logging
@@ -18,8 +19,17 @@ logger = logging.getLogger(__name__)
 ADDED = "ajouté"
 CHANGED = "modifié"
 REMOVED = "supprimé"
+TECH = "tech"
 SKIP = "no-changelog"
 DEPS = "dependencies"
+
+# To appear in the changelog, the PR needs to have one (and only one!) of those labels
+LABEL_TITLES = {
+    ADDED: "Ajouté",
+    CHANGED: "Modifié",
+    REMOVED: "Supprimé",
+    TECH: "Tech",
+}
 
 
 def prepare_branch(branch):
@@ -71,11 +81,11 @@ def list_pull_requests(start, end, labels):
 
 
 def list_missing_pull_requests(start, end):
-    return list_pull_requests(start, end, f"-label:{ADDED},{CHANGED},{REMOVED},{DEPS},{SKIP}")
+    return list_pull_requests(start, end, f"-label:{ADDED},{CHANGED},{REMOVED},{DEPS},{SKIP},{TECH}")
 
 
 def list_merged_pull_requests(start, end):
-    return list_pull_requests(start, end, f"label:{ADDED},{CHANGED},{REMOVED}")
+    return list_pull_requests(start, end, f"label:{','.join(LABEL_TITLES)}")
 
 
 def open_pull_request(branch, title):
@@ -111,43 +121,30 @@ def main(publish):
                 missing_pull_requests = "\n- ".join(pr["url"] for pr in missing)
                 sys.exit(f"The following pull requests should have a label:\n- {missing_pull_requests}\n")
 
-            added, changed, removed = [], [], []
+            log_entries = collections.defaultdict(list)
             for pull_request in list_merged_pull_requests(sprint_start, sprint_end):
                 title = re.sub(r"\[(GEN|ITOU)-[0-9]+\]", "", pull_request["title"]).strip()
                 title = f"[{title}]({pull_request['url']})"
                 if re.search(r"\!\[[^]]+]", pull_request["body"]):
                     title += " 🖼"
-                labels = [label["name"] for label in pull_request["labels"]]
-                if len({ADDED, CHANGED, REMOVED}.intersection(set(labels))) != 1:
-                    label_names = " ".join(labels)
+                pr_labels = {label["name"] for label in pull_request["labels"]}
+                pr_changelog_labels = set(LABEL_TITLES).intersection(pr_labels)
+                if len(pr_changelog_labels) != 1:
                     raise ValueError(
-                        f"Expected only one of “{ADDED}”, “{CHANGED}” or “{REMOVED}” in labels, got {label_names}."
+                        f"Expected only one of {', '.join(LABEL_TITLES)} in labels, got {' '.join(pr_labels)}."
                     )
-                if ADDED in labels:
-                    added.append(title)
-                elif CHANGED in labels:
-                    changed.append(title)
-                else:
-                    removed.append(title)
+                log_entries[pr_changelog_labels.pop()].append(title)
 
-            if added or changed or removed:
+            if any(log_entries.values()):
                 # Changelog entries are up to the next Monday (excluded).
                 new_changelog.write(f"## {sprint_end + datetime.timedelta(days=1)}\n\n")
-            if added:
-                new_changelog.write("### Ajouté\n\n")
-                for title in ci_sort(added):
-                    new_changelog.write(f"- {title}\n")
-                new_changelog.write("\n")
-            if changed:
-                new_changelog.write("### Modifié\n\n")
-                for title in ci_sort(changed):
-                    new_changelog.write(f"- {title}\n")
-                new_changelog.write("\n")
-            if removed:
-                new_changelog.write("### Supprimé\n\n")
-                for title in ci_sort(removed):
-                    new_changelog.write(f"- {title}\n")
-                new_changelog.write("\n")
+
+            for label, label_title in LABEL_TITLES.items():
+                if log_entries[label]:
+                    new_changelog.write(f"### {label_title}\n\n")
+                    for title in ci_sort(log_entries[label]):
+                        new_changelog.write(f"- {title}\n")
+                    new_changelog.write("\n")
 
             # Don’t forget the previous header.
             new_changelog.write(last_entry_header)

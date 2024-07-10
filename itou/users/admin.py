@@ -2,7 +2,6 @@ from allauth.account.admin import EmailAddressAdmin
 from allauth.account.models import EmailAddress
 from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.db.models import Exists, OuterRef
 from django.shortcuts import get_object_or_404, redirect
@@ -35,9 +34,9 @@ from itou.utils.admin import (
     ItouModelAdmin,
     ItouTabularInline,
     PkSupportRemarkInline,
+    add_support_remark_to_obj,
     get_admin_view_link,
 )
-from itou.utils.models import PkSupportRemark
 
 
 class EmailAddressInline(ItouTabularInline):
@@ -293,17 +292,6 @@ JOB_SEEKER_FIELDS_TO_TRANSFER = {
 def get_fields_to_transfer_for_job_seekers():
     # Get list of fields pointing to the User models
     return {models.User._meta.get_field(name) for name in JOB_SEEKER_FIELDS_TO_TRANSFER}
-
-
-def add_support_remark_to_user(user, text):
-    user_content_type = ContentType.objects.get_for_model(models.User)
-    try:
-        remark = PkSupportRemark.objects.filter(content_type=user_content_type, object_id=user.pk).get()
-    except PkSupportRemark.DoesNotExist:
-        PkSupportRemark.objects.create(content_type=user_content_type, object_id=user.pk, remark=text)
-    else:
-        remark.remark += "\n" + text
-        remark.save(update_fields=("remark",))
 
 
 @admin.register(models.User)
@@ -670,8 +658,8 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
                         + [f"- {item_title} {item} transféré " for item_title, item in items_transfered]
                         + ["-" * 20]
                     )
-                    add_support_remark_to_user(from_user, summary_text)
-                    add_support_remark_to_user(to_user, summary_text)
+                    add_support_remark_to_obj(from_user, summary_text)
+                    add_support_remark_to_obj(to_user, summary_text)
                     message = format_html(
                         "Transfert effectué avec succès de l'utilisateur {from_user} vers {to_user}.",
                         from_user=from_user,

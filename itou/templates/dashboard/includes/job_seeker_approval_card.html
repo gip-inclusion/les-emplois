@@ -11,7 +11,9 @@
         </div>
         <div class="px-3 px-lg-4">
             <ul class="list-unstyled mb-lg-5">
-                <li class="mb-2">{% include "approvals/includes/status.html" with common_approval=user.latest_common_approval %}</li>
+                <li class="mb-2">
+                    {% include "approvals/includes/status.html" with common_approval=user.latest_common_approval hiring_pending=False %}
+                </li>
                 {% if user.has_common_approval_in_waiting_period %}
                     <li class="mb-2">
                         {% if user.has_valid_diagnosis %}

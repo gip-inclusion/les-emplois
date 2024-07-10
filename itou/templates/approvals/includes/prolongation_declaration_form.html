@@ -9,7 +9,35 @@
     {% bootstrap_field form.reason %}
     {% bootstrap_field form.end_at %}
 
+    {% if form.max_end_limit %}
+        <div class="c-info mb-3">
+            <button type="button" class="c-info__summary collapsed" data-bs-toggle="collapse" data-bs-target="#maxEndAtCollapseInfo" aria-expanded="false" aria-controls="maxEndAtCollapseInfo">
+                <span>IMPORTANT: La date de fin maximale autorisée pour ce motif est le {{ form.max_end_limit.max_date }} afin de respecter la durée légale autorisée</span>
+            </button>
+            <div class="c-info__detail collapse" id="maxEndAtCollapseInfo">
+                <p>
+                    Il n’est pas possible de sélectionner {{ form.max_end_limit.max_duration }} pour cette demande car ce PASS IAE aura atteint la limite des renouvellements possibles.
+                    Retrouvez le détail des conditions dans <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14738994643217--Prolonger-un-PASS-IAE" rel="noopener" target="_blank">notre documentation</a>.
+                </p>
+            </div>
+        </div>
+    {% endif %}
+
+    {% if form.reason.field.widget.disabled_values %}
+        <div class="c-info mb-3">
+            <button type="button" class="c-info__summary collapsed" data-bs-toggle="collapse" data-bs-target="#disabledChoicesCollapseInfo" aria-expanded="false" aria-controls="disabledChoicesCollapseInfo">
+                <span>Pourquoi n’est-il pas possible de sélectionner certains éléments ?</span>
+            </button>
+            <div class="c-info__detail collapse" id="disabledChoicesCollapseInfo">
+                <p>
+                    Les prolongations de PASS IAE doivent respecter certaines conditions réglementaires pour être délivrées.
+                    Retrouvez le détail des conditions dans <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14738994643217--Prolonger-un-PASS-IAE" rel="noopener" target="_blank">notre documentation</a>.
+                </p>
+            </div>
+        </div>
+    {% endif %}
+
     {% include "approvals/includes/declaration_upload_panel.html" %}
 
-    {% itou_buttons_form primary_label="Valider la déclaration" secondary_url=back_url primary_name="preview" primary_value="1" %}
+    {% itou_buttons_form primary_label="Valider la déclaration" reset_url=back_url primary_name="preview" primary_value="1" %}
 </form>

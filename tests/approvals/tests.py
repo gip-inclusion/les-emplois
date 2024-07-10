@@ -1411,10 +1411,8 @@ class ProlongationManagerTest(TestCase):
             reason=ProlongationReason.RQTH.value,
         )
 
-        expected_duration = datetime.timedelta(days=prolongation2_days + prolongation3_days)
-        assert expected_duration == Prolongation.objects.get_cumulative_duration_for(
-            approval, ProlongationReason.RQTH.value
-        )
+        expected_duration = datetime.timedelta(days=prolongation1_days + prolongation2_days + prolongation3_days)
+        assert expected_duration == Prolongation.objects.get_cumulative_duration_for(approval)
 
 
 class ProlongationModelTestTrigger(TestCase):
@@ -1570,12 +1568,14 @@ class ProlongationModelTest(TestCase):
         prolongation.clean()
 
     def test_clean_too_long_reason_duration_error(self):
-        for reason, info in Prolongation.MAX_CUMULATIVE_DURATION.items():
+        for reason, info in Prolongation.PROLONGATION_RULES.items():
             with self.subTest(reason=reason):
                 prolongation = ProlongationFactory(
                     reason=reason,
                     end_at=factory.LazyAttribute(
-                        lambda obj: obj.start_at + info["duration"] + datetime.timedelta(days=1)
+                        lambda obj: obj.start_at
+                        + (info["max_cumulative_duration"] or info["max_duration"])
+                        + datetime.timedelta(days=1)
                     ),
                     declared_by_siae__kind=CompanyKind.AI,
                 )
@@ -1584,7 +1584,7 @@ class ProlongationModelTest(TestCase):
                 assert error.match("La durée totale est trop longue pour le motif")
 
     def test_clean_end_at_do_not_block_edition(self):
-        max_cumulative_duration = Prolongation.MAX_CUMULATIVE_DURATION[ProlongationReason.SENIOR]["duration"]
+        max_cumulative_duration = Prolongation.PROLONGATION_RULES[ProlongationReason.SENIOR]["max_cumulative_duration"]
         first_prolongation = ProlongationFactory(
             reason=ProlongationReason.SENIOR,
         )
@@ -1644,7 +1644,7 @@ class ProlongationModelTest(TestCase):
         approval = ApprovalFactory()
         for reason, expected_max_end_at in [
             (ProlongationReason.SENIOR_CDI, datetime.date(2031, 1, 30)),  # 3650 days (~10 years).
-            (ProlongationReason.COMPLETE_TRAINING, datetime.date(2023, 2, 1)),  # 730 days (2 years).
+            (ProlongationReason.COMPLETE_TRAINING, datetime.date(2022, 2, 1)),  # 365 days.
             (ProlongationReason.RQTH, datetime.date(2024, 2, 1)),  # 1095 days (3 years).
             (ProlongationReason.SENIOR, datetime.date(2026, 1, 31)),  # 1825 days (~5 years).
             (ProlongationReason.PARTICULAR_DIFFICULTIES, datetime.date(2024, 2, 1)),  # 1095 days (3 years).

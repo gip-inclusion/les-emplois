@@ -43,7 +43,7 @@
                             <b>Ou utilisez votre adresse e-mail</b>
                         </div>
 
-                        <form method="post" action="{% url 'signup:job_seeker' %}" role="form" class="js-prevent-multiple-submit">
+                        <form method="post" action="{% url 'signup:job_seeker' %}" role="form" class="js-prevent-multiple-submit" data-matomo-name="signup-job-seeker-identity">
 
                             {% csrf_token %}
 

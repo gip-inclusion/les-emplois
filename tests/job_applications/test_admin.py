@@ -160,6 +160,10 @@ JOB_APPLICATION_FORMSETS_PAYLOAD = {
     "utils-uuidsupportremark-content_type-object_id-0-id": "",
     "utils-uuidsupportremark-content_type-object_id-__prefix__-remark": "",
     "utils-uuidsupportremark-content_type-object_id-__prefix__-id": "",
+    "employee_record-TOTAL_FORMS": 0,
+    "employee_record-INITIAL_FORMS": 0,
+    "employee_record-MIN_NUM_FORMS": 0,
+    "employee_record-MAX_NUM_FORMS": 0,
 }
 
 
@@ -247,6 +251,80 @@ def test_create_then_accept_job_application(admin_client):
     assert job_application.state == JobApplicationState.ACCEPTED
     assert job_application.logs.count() == 2
     assert job_application.approval
+
+
+def test_accept_job_application_with_old_eligibility_diagnosis(admin_client):
+    job_application = factories.JobApplicationFactory(
+        sent_by_another_employer=True,
+        eligibility_diagnosis__expires_at=timezone.now() - timezone.timedelta(days=1),
+    )
+    old_diag = job_application.eligibility_diagnosis
+    other_job_seeker_diag = IAEEligibilityDiagnosisFactory(from_employer=True)
+    other_company_diag = IAEEligibilityDiagnosisFactory(job_seeker=job_application.job_seeker, from_employer=True)
+    post_data = {
+        "job_seeker": job_application.job_seeker_id,
+        "to_company": job_application.to_company_id,
+        "sender_kind": "employer",
+        "sender_company": job_application.sender_company_id,
+        "sender": job_application.sender_id,
+        "hiring_start_at": timezone.localdate(),
+        # Formsets to please django admin
+        **JOB_APPLICATION_FORMSETS_PAYLOAD,
+    }
+    url = reverse("admin:job_applications_jobapplication_change", args=(job_application.pk,))
+    response = admin_client.get(url)
+    assertContains(response, 'value="Passer à l\'étude"')
+
+    response = admin_client.post(url, {**post_data, "transition_process": True})
+    assertRedirects(response, url)
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.PROCESSING
+
+    response = admin_client.get(url)
+    assertContains(response, 'value="Accepter"')
+
+    # use a bad diag (wrong job seeker)
+    response = admin_client.post(
+        url, {**post_data, "eligibility_diagnosis": other_job_seeker_diag.pk, "transition_accept": True}
+    )
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.PROCESSING
+    assert response.context["errors"] == [
+        ["Le diagnostic d'eligibilité n'appartient pas au candidat de la candidature."]
+    ]
+    assertContains(response, 'value="Accepter"')
+
+    # use a bad diag (wrong company)
+    response = admin_client.post(
+        url, {**post_data, "eligibility_diagnosis": other_company_diag.pk, "transition_accept": True}
+    )
+    assertRedirects(response, url, fetch_redirect_response=False)  # don't flush the messages
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.PROCESSING
+
+    response = admin_client.get(url)
+    assertMessages(
+        response,
+        [
+            messages.Message(
+                messages.ERROR,
+                "Le diagnostic d'eligibilité n'est pas valide pour ce candidat et cette entreprise",
+            )
+        ],
+    )
+    assertContains(response, 'value="Accepter"')
+
+    # Retry with a correct but too old eligibility diagnosis
+    response = admin_client.post(
+        url,
+        {**post_data, "transition_accept": True, "eligibility_diagnosis": old_diag.pk},
+    )
+    assertRedirects(response, url)
+    job_application.refresh_from_db()
+    assert job_application.state == JobApplicationState.ACCEPTED
+    assert job_application.logs.count() == 2
+    assert job_application.approval
+    assert job_application.eligibility_diagnosis == old_diag
 
 
 def test_accept_job_application_not_subject_to_eligibility(admin_client):

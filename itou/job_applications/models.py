@@ -129,6 +129,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     log_model = "job_applications.JobApplicationTransitionLog"
 
     error_missing_hiring_start_at = "Cannot accept a job application with no hiring start date."
+    error_wrong_eligibility_diagnosis = "Cannot use the eligibility diagnosis"
     error_missing_eligibility_diagnostic = "Cannot create an approval without eligibility diagnosis here."
 
 
@@ -1005,9 +1006,18 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
         # Link to the job seeker's eligibility diagnosis.
         if self.to_company.is_subject_to_eligibility_rules:
-            self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
-                self.job_seeker, for_siae=self.to_company
-            )
+            # If request user is itou_staff keep the existing eligibility diagnosis
+            if user.kind == UserKind.ITOU_STAFF and self.eligibility_diagnosis:
+                if not (
+                    EligibilityDiagnosis.objects.for_job_seeker_and_siae(self.job_seeker, siae=self.to_company)
+                    .filter(pk=self.eligibility_diagnosis.pk)
+                    .exists()
+                ):
+                    raise xwf_models.AbortTransition(JobApplicationWorkflow.error_wrong_eligibility_diagnosis)
+            else:
+                self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
+                    self.job_seeker, for_siae=self.to_company
+                )
 
         # Approval issuance logic.
         if not self.hiring_without_approval and self.to_company.is_subject_to_eligibility_rules:

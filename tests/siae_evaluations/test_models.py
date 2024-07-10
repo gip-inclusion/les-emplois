@@ -11,8 +11,8 @@ from freezegun import freeze_time
 
 from itou.approvals.enums import Origin
 from itou.companies.enums import CompanyKind
-from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
-from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.eligibility.enums import AuthorKind
+from itou.eligibility.models import AdministrativeCriteria
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
 from itou.job_applications.models import JobApplication, JobApplicationQuerySet
@@ -47,15 +47,22 @@ from tests.utils.test import TestCase
 
 
 def create_batch_of_job_applications(company):
-    JobApplicationFactory.create_batch(
-        evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
-        with_approval=True,
-        to_company=company,
-        sender_company=company,
-        eligibility_diagnosis__author_kind=AuthorKind.EMPLOYER,
-        eligibility_diagnosis__author_siae=company,
-        hiring_start_at=timezone.now() - relativedelta(months=2),
-    )
+    start = timezone.localdate() - relativedelta(months=2)
+    for _ in range(evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN):
+        approval = ApprovalFactory(
+            start_at=start,
+            eligibility_diagnosis__author_kind=AuthorKind.EMPLOYER,
+            eligibility_diagnosis__author_siae=company,
+        )
+        JobApplicationFactory.create(
+            state=JobApplicationState.ACCEPTED,
+            job_seeker=approval.user,
+            eligibility_diagnosis=approval.eligibility_diagnosis,
+            to_company=company,
+            sender_company=company,
+            hiring_start_at=start,
+            approval=approval,
+        )
 
 
 class EvaluationCampaignMiscMethodsTest(TestCase):
@@ -151,7 +158,8 @@ class EvaluationCampaignQuerySetTest(TestCase):
 def campaign_eligible_job_app_objects():
     company = CompanyWith2MembershipsFactory(department="14")
     job_seeker = JobSeekerFactory()
-    approval = ApprovalFactory(user=job_seeker)
+    start = timezone.now() - relativedelta(months=2)
+    approval = ApprovalFactory(user=job_seeker, start_at=start)
     diag = IAEEligibilityDiagnosisFactory(
         job_seeker=job_seeker,
         author_kind=AuthorKind.EMPLOYER,
@@ -164,7 +172,7 @@ def campaign_eligible_job_app_objects():
         to_company=company,
         sender_company=company,
         eligibility_diagnosis=diag,
-        hiring_start_at=timezone.now() - relativedelta(months=2),
+        hiring_start_at=start,
         state=JobApplicationState.ACCEPTED,
     )
     return {
@@ -355,6 +363,47 @@ class EvaluationCampaignManagerTest(TestCase):
             "to_company_count": evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN * 2,
         } in eligible_siaes_res
 
+    def test_eligible_siae_approval_from_past_year(self):
+        evaluation_campaign = EvaluationCampaignFactory(
+            evaluated_period_start_at=datetime.date(2023, 1, 1),
+            evaluated_period_end_at=datetime.date(2023, 12, 31),
+        )
+        company = CompanyFactory(department=evaluation_campaign.institution.department, with_membership=True)
+        before_evaluated_period = datetime.date(2022, 4, 4)
+        approval1 = ApprovalFactory(
+            start_at=before_evaluated_period,  # Before evaluated period.
+            eligibility_diagnosis__author_kind=AuthorKind.EMPLOYER,
+            eligibility_diagnosis__author_siae=company,
+        )
+        job_app_approval1_args = {
+            "state": JobApplicationState.ACCEPTED,
+            "job_seeker": approval1.user,
+            "eligibility_diagnosis": approval1.eligibility_diagnosis,
+            "to_company": company,
+            "approval": approval1,
+        }
+        JobApplicationFactory.create(**job_app_approval1_args, hiring_start_at=before_evaluated_period)
+        # Should be ignored, it did not create the approval.
+        JobApplicationFactory.create(
+            **job_app_approval1_args,
+            hiring_start_at=datetime.date(2023, 5, 6),  # Within evaluated period.
+        )
+        within_evaluated_period = datetime.date(2023, 2, 1)
+        approval2 = ApprovalFactory(
+            start_at=within_evaluated_period,
+            eligibility_diagnosis__author_kind=AuthorKind.EMPLOYER,
+            eligibility_diagnosis__author_siae=company,
+        )
+        JobApplicationFactory.create(
+            state=JobApplicationState.ACCEPTED,
+            job_seeker=approval2.user,
+            eligibility_diagnosis=approval2.eligibility_diagnosis,
+            to_company=company,
+            approval=approval2,
+            hiring_start_at=within_evaluated_period,
+        )
+        assert not evaluation_campaign.eligible_siaes()
+
     def test_number_of_siaes_to_select(self):
         evaluation_campaign = EvaluationCampaignFactory()
         assert 0 == evaluation_campaign.number_of_siaes_to_select()
@@ -384,22 +433,7 @@ class EvaluationCampaignManagerTest(TestCase):
         # integration tests
         evaluation_campaign = EvaluationCampaignFactory()
         company = CompanyFactory(department=evaluation_campaign.institution.department, with_membership=True)
-        job_seeker = JobSeekerFactory()
-        user = company.members.first()
-        criteria1 = AdministrativeCriteria.objects.get(
-            level=AdministrativeCriteriaLevel.LEVEL_1, name="Bénéficiaire du RSA"
-        )
-        eligibility_diagnosis = EligibilityDiagnosis.create_diagnosis(
-            job_seeker, author=user, author_organization=company, administrative_criteria=[criteria1]
-        )
-        JobApplicationFactory.create_batch(
-            evaluation_enums.EvaluationJobApplicationsBoundariesNumber.MIN,
-            with_approval=True,
-            to_company=company,
-            sender_company=company,
-            eligibility_diagnosis=eligibility_diagnosis,
-            hiring_start_at=timezone.now() - relativedelta(months=2),
-        )
+        create_batch_of_job_applications(company)
         fake_now = timezone.now() - relativedelta(weeks=1)
 
         assert 0 == EvaluatedSiae.objects.all().count()

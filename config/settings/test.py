@@ -6,6 +6,10 @@ from itou.utils.enums import ItouEnvironment
 ITOU_ENVIRONMENT = ItouEnvironment.DEV
 os.environ["ITOU_ENVIRONMENT"] = ITOU_ENVIRONMENT
 
+# Inject default redis settings
+os.environ["REDIS_URL"] = os.getenv("REDIS_URL", "redis://127.0.0.1:6379")
+os.environ["REDIS_DB"] = os.getenv("REDIS_DB", "0")
+
 from .base import *  # noqa: E402,F403
 
 
@@ -37,3 +41,6 @@ AWS_S3_ENDPOINT_URL = f"http://{os.getenv('CELLAR_ADDON_HOST', 'localhost:9000')
 AWS_S3_ACCESS_KEY_ID = "minioadmin"
 AWS_S3_SECRET_ACCESS_KEY = "minioadmin"
 AWS_STORAGE_BUCKET_NAME = "tests"
+
+API_DATADOG_API_KEY = "abcde"
+API_DATADOG_APPLICATION_KEY = "fghij"

@@ -5,8 +5,9 @@ from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.utils.pagination import pager
 from itou.utils.urls import get_safe_url
-from itou.www.gps.forms import GpsUserSearchForm
+from itou.www.gps.forms import GpsUserSearchForm, MembershipsFiltersForm
 
 
 def is_allowed_to_use_gps(user):
@@ -28,17 +29,23 @@ def my_groups(request, template_name="gps/my_groups.html"):
         .select_related("follow_up_group", "follow_up_group__beneficiary", "member")
         .prefetch_related("follow_up_group__members")
     )
+    filters_form = MembershipsFiltersForm(memberships_qs=memberships, data=request.GET or None)
 
+    if filters_form.is_valid():
+        memberships = filters_form.filter()
+
+    memberships_page = pager(memberships, request.GET.get("page"), items_per_page=10)
     breadcrumbs = {
         "Mes bénéficiaires": reverse("gps:my_groups"),
     }
 
     context = {
         "breadcrumbs": breadcrumbs,
-        "memberships": memberships,
+        "filters_form": filters_form,
+        "memberships_page": memberships_page,
     }
 
-    return render(request, template_name, context)
+    return render(request, "gps/includes/memberships_results.html" if request.htmx else template_name, context)
 
 
 @login_required

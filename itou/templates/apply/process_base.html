@@ -29,7 +29,13 @@
                             {% if not job_application.state.is_accepted and not job_application.state.is_cancelled %}
                                 {# Employers need to know the expiration date of an approval #}
                                 {# to decide whether they may accept a job application or not. #}
-                                {% include "approvals/includes/card.html" with common_approval=job_application.job_seeker.latest_common_approval job_application=job_application hiring_pending=job_application.is_pending %}
+                                {% with common_approval=job_application.job_seeker.latest_common_approval %}
+                                    {% if common_approval %}
+                                        <div class="c-box mb-4">
+                                            {% include "approvals/includes/status.html" with common_approval=common_approval hiring_pending=job_application.is_pending %}
+                                        </div>
+                                    {% endif %}
+                                {% endwith %}
                             {% endif %}
                         {% elif request.user.is_prescriber %}
                             <div class="c-box mb-4">

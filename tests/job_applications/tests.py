@@ -1883,6 +1883,49 @@ class JobApplicationXlsxExportTest(TestCase):
             ],
         ]
 
+    @freeze_time("2024-07-05")
+    def test_auto_prescription_xlsx_export(self):
+        job_seeker = JobSeekerFactory(for_snapshot=True)
+        company = CompanyFactory(for_snapshot=True)
+        job_application = JobApplicationFactory(
+            job_seeker=job_seeker,
+            to_company=company,
+            sender_company=company,
+            sender_kind=SenderKind.EMPLOYER,
+        )
+        job_application.sender = company.memberships.first()
+        job_application.save(update_fields={"sender"})
+        response = stream_xlsx_export(JobApplication.objects.all(), "filename")
+        assert get_rows_from_streaming_response(response) == [
+            JOB_APPLICATION_CSV_HEADERS,
+            [
+                "MME",
+                "Doe",
+                "Jane",
+                "jane.doe@test.local",
+                "0612345678",
+                "01/01/1990",
+                "Rennes",
+                "35000",
+                "Acme inc.",
+                "EI",
+                "",
+                "Ma structure",
+                "",
+                "",
+                "05/07/2024",
+                "Nouvelle candidature",
+                "05/07/2024",
+                "05/07/2026",
+                "",
+                "oui",
+                "",
+                "",
+                "",
+                "",
+            ],
+        ]
+
     def test_all_gender_cases_in_export(self):
         assert _resolve_title(title="", nir="") == ""
         assert _resolve_title(title=Title.M, nir="") == Title.M
@@ -2079,11 +2122,20 @@ class JobApplicationAdminFormTest(TestCase):
         assert form.is_valid()
 
     def test_application_on_non_job_seeker(self):
-        job_application = JobApplicationFactory()
+        job_application = JobApplicationFactory(eligibility_diagnosis=None)
         job_application.job_seeker = PrescriberFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
         assert ["Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte candidat"] == form.errors[
+            "__all__"
+        ]
+
+    def test_application_bad_eligibility_diagnosis_job_seeker(self):
+        job_application = JobApplicationFactory()
+        job_application.job_seeker = JobSeekerFactory()
+        form = JobApplicationAdminForm(model_to_dict(job_application))
+        assert not form.is_valid()
+        assert ["Le diagnostic d'eligibilité n'appartient pas au candidat de la candidature."] == form.errors[
             "__all__"
         ]
 
