@@ -34,7 +34,11 @@
 
                                     <li>
                                         <small>Date de naissance</small>
-                                        <strong>{{ beneficiary.birthdate|date:"d/m/Y" }}</strong>
+                                        {% if beneficiary.birthdate %}
+                                            <strong>{{ beneficiary.birthdate|date:"d/m/Y" }}</strong>
+                                        {% else %}
+                                            <i class="text-disabled">Non renseignée</i>
+                                        {% endif %}
                                     </li>
                                     <li>
                                         <small>Adresse e-mail</small>
