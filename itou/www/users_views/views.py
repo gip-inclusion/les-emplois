@@ -44,6 +44,7 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
             "breadcrumbs": breadcrumbs,
             "can_view_personal_information": self.request.user.can_view_personal_information(self.object),
             "gps_memberships": gps_memberships,
+            "matomo_custom_title": "Profil GPS",
             "profile": self.object.jobseeker_profile,
         }
 
