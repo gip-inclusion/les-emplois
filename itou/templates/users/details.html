@@ -44,14 +44,14 @@
                                         <small>Adresse e-mail</small>
                                         <strong>{{ beneficiary.email }}</strong>
                                         {% matomo_event "gps" "clic" "copied_user_email" as matomo_event_attrs %}
-                                        {% include 'includes/copy_to_clipboard.html' with content=beneficiary.email css_classes="btn-link" matomo_event_attrs=matomo_event_attrs text=" " %}
+                                        {% include 'includes/copy_to_clipboard.html' with content=beneficiary.email css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
                                     </li>
                                     <li>
                                         <small>Téléphone</small>
                                         {% if beneficiary.phone %}
                                             <strong>{{ beneficiary.phone|format_phone }}</strong>
                                             {% matomo_event "gps" "clic" "copied_user_phone" as matomo_event_attrs %}
-                                            {% include 'includes/copy_to_clipboard.html' with content=beneficiary.phone css_classes="btn-link" matomo_event_attrs=matomo_event_attrs text=" " %}
+                                            {% include 'includes/copy_to_clipboard.html' with content=beneficiary.phone css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
                                         {% else %}
                                             <i class="text-disabled">Non renseigné</i>
                                         {% endif %}
@@ -142,7 +142,7 @@
                                             {% if profile.pole_emploi_id %}
                                                 <strong>{{ profile.pole_emploi_id }}</strong>
                                                 {% matomo_event "gps" "clic" "copied_user_pe_id" as matomo_event_attrs %}
-                                                {% include 'includes/copy_to_clipboard.html' with content=profile.pole_emploi_id css_classes="btn-link" matomo_event_attrs=matomo_event_attrs text=" " %}
+                                                {% include 'includes/copy_to_clipboard.html' with content=profile.pole_emploi_id css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
                                             {% else %}
                                                 <strong>{{ profile.get_lack_of_pole_emploi_id_reason_display }}</strong>
                                             {% endif %}
