@@ -219,11 +219,17 @@ def test_my_groups(snapshot, client):
 
     # Nominal case
     # Groups created latelly should come first.
-    group = FollowUpGroupFactory(pk=34, memberships=1, for_snapshot=True)
+    group = FollowUpGroupFactory(memberships=1, for_snapshot=True)
     FollowUpGroup.objects.follow_beneficiary(beneficiary=group.beneficiary, user=user)
 
     response = client.get(reverse("gps:my_groups"))
-    groups = parse_response_to_soup(response, selector="#follow-up-groups-section").select(".membership-card")
+    groups = parse_response_to_soup(
+        response,
+        selector="#follow-up-groups-section",
+        replace_in_attr=[
+            ("data-bs-confirm-url", f"/gps/groups/{group.pk}", "/gps/groups/[PK of Group]"),
+        ],
+    ).select(".membership-card")
     assert len(groups) == 2
     assert str(groups[0]) == snapshot(name="test_my_groups__group_card")
 
