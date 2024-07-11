@@ -1575,10 +1575,14 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
 
 @login_required
 def eligibility_for_hire(
-    request, company_pk, job_seeker_public_id, template_name="apply/submit/eligibility_for_hire.html"
+    request,
+    company_pk,
+    job_seeker_public_id=None,
+    job_seeker_pk=None,
+    template_name="apply/submit/eligibility_for_hire.html",
 ):
-    if isinstance(job_seeker_public_id, int):
-        job_seeker_public_id = get_job_seeker_public_id(job_seeker_public_id)
+    if job_seeker_public_id is None:
+        job_seeker_public_id = get_job_seeker_public_id(job_seeker_pk)
 
     company = get_object_or_404(Company.objects.member_required(request.user), pk=company_pk)
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id)
@@ -1610,10 +1614,14 @@ def eligibility_for_hire(
 
 @login_required
 def geiq_eligibility_for_hire(
-    request, company_pk, job_seeker_public_id, template_name="apply/submit/geiq_eligibility_for_hire.html"
+    request,
+    company_pk,
+    job_seeker_public_id=None,
+    job_seeker_pk=None,
+    template_name="apply/submit/geiq_eligibility_for_hire.html",
 ):
-    if isinstance(job_seeker_public_id, int):
-        job_seeker_public_id = get_job_seeker_public_id(job_seeker_public_id)
+    if job_seeker_public_id is None:
+        job_seeker_public_id = get_job_seeker_public_id(job_seeker_pk)
 
     company = get_object_or_404(
         Company.objects.member_required(request.user).filter(kind=CompanyKind.GEIQ), pk=company_pk
@@ -1646,9 +1654,9 @@ def geiq_eligibility_for_hire(
 
 
 @login_required
-def geiq_eligibility_criteria_for_hire(request, company_pk, job_seeker_public_id):
-    if isinstance(job_seeker_public_id, int):
-        job_seeker_public_id = get_job_seeker_public_id(job_seeker_public_id)
+def geiq_eligibility_criteria_for_hire(request, company_pk, job_seeker_public_id=None, job_seeker_pk=None):
+    if job_seeker_public_id is None:
+        job_seeker_public_id = get_job_seeker_public_id(job_seeker_pk)
 
     company = get_object_or_404(
         Company.objects.member_required(request.user).filter(kind=CompanyKind.GEIQ), pk=company_pk
@@ -1662,9 +1670,15 @@ def geiq_eligibility_criteria_for_hire(request, company_pk, job_seeker_public_id
 
 
 @login_required
-def hire_confirmation(request, company_pk, job_seeker_public_id, template_name="apply/submit/hire_confirmation.html"):
-    if isinstance(job_seeker_public_id, int):
-        job_seeker_public_id = get_job_seeker_public_id(job_seeker_public_id)
+def hire_confirmation(
+    request,
+    company_pk,
+    job_seeker_public_id=None,
+    job_seeker_pk=None,
+    template_name="apply/submit/hire_confirmation.html",
+):
+    if job_seeker_public_id is None:
+        job_seeker_public_id = get_job_seeker_public_id(job_seeker_pk)
 
     company = get_object_or_404(Company.objects.member_required(request.user), pk=company_pk)
     job_seeker = get_object_or_404(
