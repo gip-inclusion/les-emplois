@@ -4,11 +4,11 @@
 
 {% block title %}Modifier cette organisation {{ block.super }}{% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block messages %}
+{% block title_messages %}
     {{ block.super }}
     <div class="alert alert-info">
         <p class="mb-0">
@@ -22,7 +22,7 @@
     </div>
 {% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <h1>Modifier cette organisation</h1>
     <h2>{{ organization.display_name }}</h2>
 {% endblock %}

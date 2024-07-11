@@ -7,11 +7,11 @@
     Détail fiche salarié ASP - {{ request.current_organization.display_name }} {{ block.super }}
 {% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <h1>Détail fiche salarié ASP: {{ employee_record.job_application.job_seeker.get_full_name }}</h1>
     <p>{% include 'employee_record/includes/_status.html' with employee_record=employee_record only %}</p>
 {% endblock %}

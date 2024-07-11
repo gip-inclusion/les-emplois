@@ -72,12 +72,12 @@
                 <div class="s-title-02__container container">
                     <div class="s-title-02__row row">
                         <div class="s-title-02__col col-12">
-                            {% block breadcrumbs %}{% endblock %}
-                            {% block content_title %}{% endblock %}
-                            {% block messages %}
+                            {% block title_prevstep %}{% endblock %}
+                            {% block title_content %}{% endblock %}
+                            {% block title_messages %}
                                 {% bootstrap_messages %}
                             {% endblock %}
-                            {% block content_title_after_alerts %}{% endblock %}
+                            {% block title_extra %}{% endblock %}
                         </div>
                     </div>
                 </div>

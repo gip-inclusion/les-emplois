@@ -8,7 +8,7 @@
     Nouvelle fiche salarié ASP - étape {{ step }} - {{ request.current_organization.display_name }} {{ block.super }}
 {% endblock %}
 
-{% block content_title %}<h1>Fiches salarié ASP : {{ job_application.job_seeker.get_full_name }}</h1>{% endblock %}
+{% block title_content %}<h1>Fiches salarié ASP : {{ job_application.job_seeker.get_full_name }}</h1>{% endblock %}
 
 {% block content %}
     <section class="s-section">

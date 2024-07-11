@@ -4,7 +4,7 @@
 
 {% block title %}Postuler {{ block.super }}{% endblock %}
 
-{% block messages %}
+{% block title_messages %}
     {{ block.super }}
     {% if new_check_needed %}
         <div class="alert alert-warning alert-dismissible fade show">
@@ -26,7 +26,7 @@
     {% endif %}
 {% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <div class="w-100 w-lg-66">
         <div class="d-flex align-items-center">
             <h1 class="flex-grow-1">{% include 'apply/includes/_submit_title.html' %}</h1>

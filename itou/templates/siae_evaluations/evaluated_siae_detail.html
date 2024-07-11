@@ -6,7 +6,7 @@
 {% block title %}Contrôler les pièces justificatives {{ block.super }}{% endblock %}
 
 {% if back_url %}
-    {% block breadcrumbs %}
+    {% block title_prevstep %}
         <div class="c-prevstep">
             <a href="{{ back_url }}" class="btn btn-ico btn-link ps-0">
                 <i class="ri-arrow-drop-left-line ri-xl font-weight-medium" aria-hidden="true"></i>
@@ -16,7 +16,7 @@
     {% endblock %}
 {% endif %}
 
-{% block messages %}
+{% block title_messages %}
     {{ block.super }}
     {% if campaign_closed_before_final_evaluation or accepted_by_default %}
         <div class="alert alert-info">
@@ -48,7 +48,7 @@
     {% endif %}
 {% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <h1 class="h1">
         {% if evaluated_siae.evaluation_is_final %}
             Pièces justificatives

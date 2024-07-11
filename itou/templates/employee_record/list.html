@@ -4,11 +4,11 @@
 
 {% block title %}Fiches salarié ASP - {{ request.current_organization.display_name }} {{ block.super }}{% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block messages %}
+{% block title_messages %}
     {{ block.super }}
     {% if need_manual_regularization %}
         <div class="alert alert-warning">
@@ -29,7 +29,7 @@
     {% endif %}
 {% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <h1>Fiches salarié ASP - {{ request.current_organization.display_name }}</h1>
     <h2 class="h3">Nous transférons vos fiches salarié à l'ASP afin de vous faire gagner du temps</h2>
     <p>Une fois envoyées et validées, vous retrouverez directement vos données sur l'extranet de l'ASP.</p>

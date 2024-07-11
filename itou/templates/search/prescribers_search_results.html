@@ -12,11 +12,11 @@
     <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
 {% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block content_title %}<h1>Rechercher des prescripteurs habilités</h1>{% endblock %}
+{% block title_content %}<h1>Rechercher des prescripteurs habilités</h1>{% endblock %}
 
 {% block content %}
     <form class="d-block w-100"

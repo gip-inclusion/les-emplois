@@ -2,12 +2,12 @@
 
 {% block title %}Liste des organisations conventionnées {{ block.super }}{% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <h1>Liste des organisations conventionnées</h1>
     <h2>{{ prescriber_org.display_name }}</h2>
 {% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
