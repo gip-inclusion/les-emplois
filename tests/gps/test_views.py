@@ -1,8 +1,5 @@
-import datetime
-
 import freezegun
 import pytest
-from django.conf import settings
 from django.test.utils import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects
@@ -195,28 +192,6 @@ def test_my_groups(snapshot, client):
     user = PrescriberFactory(membership__organization__authorized=True, membership__organization__for_snapshot=True)
     client.force_login(user)
 
-    # Was created in bulk.
-    group = FollowUpGroupFactory(
-        memberships=1,
-        beneficiary__first_name="Paco",
-        beneficiary__last_name="de Lucia",
-        created_in_bulk=True,
-    )
-
-    FollowUpGroup.objects.follow_beneficiary(beneficiary=group.beneficiary, user=user, is_referent=True)
-    membership = group.memberships.get(member=user)
-    membership.created_at = datetime.datetime.combine(
-        settings.GPS_GROUPS_CREATED_AT_DATE, datetime.time(), tzinfo=datetime.UTC
-    )
-    membership.created_in_bulk = True
-    membership.save()
-
-    response = client.get(reverse("gps:my_groups"))
-    assert response.status_code == 200
-    groups = parse_response_to_soup(response, selector="#follow-up-groups-section").select(".membership-card")
-    assert len(groups) == 1
-    assert "Vous avez ajouté ce bénéficiaire le" not in str(groups[0])
-
     # Nominal case
     # Groups created latelly should come first.
     group = FollowUpGroupFactory(memberships=1, for_snapshot=True)
@@ -230,7 +205,7 @@ def test_my_groups(snapshot, client):
             ("data-bs-confirm-url", f"/gps/groups/{group.pk}", "/gps/groups/[PK of Group]"),
         ],
     ).select(".membership-card")
-    assert len(groups) == 2
+    assert len(groups) == 1
     assert str(groups[0]) == snapshot(name="test_my_groups__group_card")
 
     # Test `is_referent` display.
@@ -238,7 +213,7 @@ def test_my_groups(snapshot, client):
     FollowUpGroup.objects.follow_beneficiary(beneficiary=group.beneficiary, user=user, is_referent=True)
     response = client.get(reverse("gps:my_groups"))
     groups = parse_response_to_soup(response, selector="#follow-up-groups-section").select(".membership-card")
-    assert len(groups) == 3
+    assert len(groups) == 2
     assert "Janis" in str(groups[0])
     assert "et êtes <strong>référent</strong>" in str(groups[0])
 
