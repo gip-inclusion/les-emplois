@@ -7,17 +7,26 @@ from ..utils.admin import ItouModelAdmin
 
 class MemberInline(admin.TabularInline):
     model = models.FollowUpGroup.members.through
-
-    fields = ["is_referent", "is_active", "creator"]
-    raw_id_fields = [
-        "member",
-    ]
-
+    extra = 0
+    can_delete = False
     readonly_fields = [
-        "creator",
-        "created_at",
+        "is_active",
+        "ended_at",
+        "is_referent",
+        "member",
         "updated_at",
+        "created_in_bulk",
+        "created_at",
+        "creator",
     ]
+
+    show_change_link = True
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_add_permission(self, request, obj=None):
+        return False
 
 
 @admin.register(models.FollowUpGroupMembership)
