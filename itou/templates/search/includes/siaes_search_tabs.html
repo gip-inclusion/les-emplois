@@ -1,6 +1,6 @@
 {% load matomo %}
 {% load str_filters %}
-<ul id="job-search-tabs" class="s-tabs-01__nav nav nav-tabs mt-3"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+<ul id="job-search-tabs" class="s-tabs-01__nav nav nav-tabs mt-3 mt-md-4 mb-0"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
     <li class="nav-item">
         <a class="nav-link{% if request.resolver_match.view_name == "search:employers_results" %} active{% endif %}"
            {% matomo_event "candidature" "clic" "clic-onglet-employeur" %}
