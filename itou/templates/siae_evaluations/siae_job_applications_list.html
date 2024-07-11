@@ -5,7 +5,7 @@
 
 {% block title %}Liste de mes auto-prescriptions à justifier {{ block.super }}{% endblock %}
 
-{% block messages %}
+{% block title_messages %}
     {{ block.super }}
     <div class="alert alert-info" role="status">
         <p class="font-weight-bold">Précision</p>
@@ -16,7 +16,7 @@
     </div>
 {% endblock %}
 
-{% block content_title %}<h1>Justifier mes auto-prescriptions</h1>{% endblock %}
+{% block title_content %}<h1>Justifier mes auto-prescriptions</h1>{% endblock %}
 
 {% block content %}
     <section class="s-section">

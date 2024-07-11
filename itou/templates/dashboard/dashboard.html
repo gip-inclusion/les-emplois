@@ -15,7 +15,7 @@
     </div>
 {% endblock global_messages %}
 
-{% block messages %}
+{% block title_messages %}
     {{ block.super }}
 
     {% if show_mobilemploi_banner %}
@@ -190,7 +190,7 @@
     {% endif %}
 {% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
         <div>
             <h1 class="mb-0">
@@ -246,7 +246,7 @@
     </div>
 {% endblock %}
 
-{% block content_title_after_alerts %}
+{% block title_extra %}
     <ul class="s-tabs-01__nav nav nav-tabs mb-0" role="tablist" data-it-sliding-tabs="true">
         <li class="nav-item" role="presentation">
             <a class="nav-link active" id="ensemble-tab" data-bs-toggle="tab" href="#ensemble" role="tab" aria-controls="ensemble" aria-selected="true" {% matomo_event "dashboard" "clic-onglet" "vue-d-ensemble" %}>Vue d’ensemble</a>

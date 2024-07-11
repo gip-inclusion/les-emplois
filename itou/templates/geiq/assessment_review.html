@@ -4,11 +4,11 @@
 
 {% block title %}Bilan d’exécution - {{ assessment.company.display_name }} {{ block.super }}{% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <h1>Valider le bilan d’exécution - {{ assessment.company.display_name }} - {{ assessment.campaign.year }}</h1>
     {% include "geiq/includes/labor_inspector_assessment_state_badge.html" with assessment=assessment extra_class="" ReviewState=ReviewState only %}
 {% endblock %}

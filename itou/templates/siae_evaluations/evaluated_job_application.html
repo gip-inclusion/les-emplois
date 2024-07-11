@@ -7,7 +7,7 @@
 {% block title %}Contrôler les pièces justificatives {{ block.super }}{% endblock %}
 
 {% if back_url %}
-    {% block breadcrumbs %}
+    {% block title_prevstep %}
         <div class="c-prevstep">
             <a href="{{ back_url }}" class="btn btn-ico btn-link ps-0">
                 <i class="ri-arrow-drop-left-line ri-xl font-weight-medium" aria-hidden="true"></i>
@@ -17,7 +17,7 @@
     {% endblock %}
 {% endif %}
 
-{% block content_title_wrapper %}{% endblock %}
+{% block title_content_wrapper %}{% endblock %}
 
 {% block content %}
     <section class="s-section">

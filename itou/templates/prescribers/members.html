@@ -2,11 +2,11 @@
 
 {% block title %}Collaborateurs {{ block.super }}{% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <h1>Collaborateurs</h1>
     <p>
         Vous êtes connecté(e) en tant que <b>{{ user.get_full_name }}</b> ({{ user.email }})

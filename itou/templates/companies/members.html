@@ -5,11 +5,11 @@
 
 {% block title %}Collaborateurs {{ block.super }}{% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <h1>Structure</h1>
     <h2>{{ siae.kind }} {{ siae.display_name }}</h2>
     <p>

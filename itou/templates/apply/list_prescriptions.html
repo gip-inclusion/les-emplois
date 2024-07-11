@@ -7,11 +7,11 @@
 
 {% block title %}Candidatures envoyées {{ block.super }}{% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
         <h1 class="m-0">Candidatures envoyées</h1>
         <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur les candidatures">

@@ -5,11 +5,11 @@
 
 {% block title %}Invitation {{ block.super }}{% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <h1>Envoyer une invitation</h1>
     <h2>{{ organization.display_name }}</h2>
     <p>Une fois vos invitations envoyées, vos invités recevront un e-mail contenant un lien de validation</p>

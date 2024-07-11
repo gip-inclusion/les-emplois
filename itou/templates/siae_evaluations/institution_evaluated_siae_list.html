@@ -6,7 +6,7 @@
 {% block title %}Contrôler les pièces justificatives {{ block.super }}{% endblock %}
 
 {% if back_url %}
-    {% block breadcrumbs %}
+    {% block title_prevstep %}
         <div class="c-prevstep">
             <a href="{{ back_url }}" class="btn btn-ico btn-link ps-0">
                 <i class="ri-arrow-drop-left-line ri-xl font-weight-medium" aria-hidden="true"></i>
@@ -16,7 +16,7 @@
     {% endblock %}
 {% endif %}
 
-{% block content_title %}
+{% block title_content %}
     <h1>Contrôler les pièces justificatives</h1>
     <h2 class="h3">
         Liste des Siae

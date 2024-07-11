@@ -9,7 +9,7 @@
     {{ block.super }}
 {% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <div class="d-md-flex align-items-center">
         <h1 class="mb-1 mb-md-0 me-3">
             Candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}

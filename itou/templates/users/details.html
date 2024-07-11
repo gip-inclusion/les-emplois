@@ -5,9 +5,9 @@
 
 {% block title %}Profil de {{ beneficiary.get_full_name }} {{ block.super }}{% endblock %}
 
-{% block content_title %}<h1>{{ beneficiary.get_full_name }}</h1>{% endblock %}
+{% block title_content %}<h1>{{ beneficiary.get_full_name }}</h1>{% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/breadcrumbs_from_dashboard.html" %}
 {% endblock %}
 
