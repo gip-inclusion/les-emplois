@@ -70,6 +70,11 @@ class TestMoveCompanyData:
         company_2.refresh_from_db()
         for field in ["brand", "description", "phone"]:
             assert predicate(getattr(company_2, field), getattr(company_1, field))
+        # In move_all_data, the from_company should not appear in search results anymore
+        # and its coords are erased
+        company_1.refresh_from_db()
+        assert company_1.coords is None
+        assert company_1.geocoding_score is None
 
 
 def test_update_companies_job_app_score():
