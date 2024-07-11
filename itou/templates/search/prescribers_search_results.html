@@ -18,30 +18,39 @@
 
 {% block title_content %}<h1>Rechercher des prescripteurs habilités</h1>{% endblock %}
 
+{% block title_extra %}
+    <form class="mt-md-4">
+        {% include "search/includes/prescribers_search_form.html" with form=form is_home=False only %}
+    </form>
+{% endblock %}
+
 {% block content %}
-    <form class="d-block w-100"
-          hx-get="{% url 'search:prescribers_results' %}"
-          hx-trigger="change delay:.5s"
-          hx-indicator="#prescribers-search-results"
-          hx-target="#prescribers-search-results"
-          hx-swap="outerHTML"
-          hx-push-url="true">
-        <section class="s-section mb-0">
-            <div class="s-section__container container">
-                <div class="s-section__row row">
-                    <div class="col-12">
-                        {% include "search/includes/prescribers_search_form.html" with form=form is_home=False only %}
-                        <h2 class="my-3 my-md-4">Prescripteurs</h2>
-                        <div class="btn-dropdown-filter-group my-3 my-md-4">
-                            {% include "includes/btn_dropdown_filter/radio.html" with field=form.distance only %}
-                        </div>
-                        {% include "search/includes/prescribers_search_summary.html" %}
+    <section class="s-section mb-0">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="col-12">
+                    <h2 class="mb-3 mb-md-4">Prescripteurs</h2>
+                    <div class="d-block w-100">
+                        <form hx-get="{% url 'search:prescribers_results' %}"
+                              hx-trigger="change delay:.5s"
+                              hx-include="#id_city"
+                              hx-indicator="#prescribers-search-results"
+                              hx-target="#prescribers-search-results"
+                              hx-swap="outerHTML"
+                              hx-push-url="true">
+                            <div class="btn-dropdown-filter-group my-3 my-md-4">
+                                {% include "includes/btn_dropdown_filter/radio.html" with field=form.distance only %}
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <div class="s-section__row row">
-                    <div class="col-12">{% include "search/includes/prescribers_search_results.html" %}</div>
+            </div>
+            <div class="s-section__row row">
+                <div class="col-12">
+                    {% include "search/includes/prescribers_search_summary.html" %}
+                    {% include "search/includes/prescribers_search_results.html" %}
                 </div>
             </div>
-        </section>
-    </form>
+        </div>
+    </section>
 {% endblock %}

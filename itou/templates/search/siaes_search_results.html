@@ -13,15 +13,18 @@
 
 {% block title_content %}<h1>Rechercher un emploi inclusif</h1>{% endblock %}
 
+{% block title_extra %}
+    <form class="mt-md-4">
+        {% include "search/includes/siaes_search_form.html" with form=form is_home=False only %}
+    </form>
+    {% include "search/includes/siaes_search_tabs.html" %}
+{% endblock %}
+
 {% block content %}
-    <section class="s-tabs-01">
-        <div class="s-tabs-01__container container">
-            <div class="s-tabs-01__row row">
-                <div class="s-tabs-01__col col-12">
-                    <form>
-                        {% include "search/includes/siaes_search_form.html" with form=form is_home=False only %}
-                    </form>
-                    {% include "search/includes/siaes_search_tabs.html" %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
                     <div class="tab-content">
                         <div class="row">
                             <div class="col-12">

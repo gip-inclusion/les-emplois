@@ -2,9 +2,9 @@
 
 <div id="search-subtitle"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
     {% if request.resolver_match.view_name == "search:employers_results" %}
-        <h2 class="my-3 my-md-4">Employeur{{ siaes_count|pluralizefr }}</h2>
+        <h2 class="mb-3 mb-md-4">Employeur{{ siaes_count|pluralizefr }}</h2>
     {% else %}
-        <h2 class="my-3 my-md-4">
+        <h2 class="mb-3 mb-md-4">
             Poste{{ job_descriptions_count|pluralizefr }} ouvert{{ job_descriptions_count|pluralizefr }} au recrutement
         </h2>
     {% endif %}
