@@ -62,7 +62,7 @@ class Command(BaseCommand):
             "--preserve-to-company-data",
             action=argparse.BooleanOptionalAction,
             default=False,
-            help="Do not override <TO> company brand, description, phone and coords with <FROM> data.",
+            help="Do not override <TO> company brand, description and phone with <FROM> data.",
         )
         parser.add_argument(
             "--only-job-applications",
@@ -175,10 +175,6 @@ class Command(BaseCommand):
                 f"| Description \n{to_company.description}\nwill be updated with\n{from_company.description}\n"
             )
             self.stdout.write(f"| Phone '{to_company.phone}' will be updated with '{from_company.phone}'\n")
-            self.stdout.write(f"| Coords '{to_company.coords}' will be updated with '{from_company.coords}'\n")
-            self.stdout.write(
-                f"| Geoscore '{to_company.geocoding_score}' will be updated with '{from_company.geocoding_score}'\n"
-            )
 
         if not wet_run:
             self.stdout.write("Nothing to do in dry run mode.\n")
@@ -231,8 +227,6 @@ class Command(BaseCommand):
                         brand=from_company.display_name,
                         description=from_company.description,
                         phone=from_company.phone,
-                        coords=from_company.coords,
-                        geocoding_score=from_company.geocoding_score,
                     )
                 from_company_qs.update(
                     block_job_applications=True,

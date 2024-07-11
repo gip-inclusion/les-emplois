@@ -68,7 +68,7 @@ class TestMoveCompanyData:
             wet_run=True,
         )
         company_2.refresh_from_db()
-        for field in ["brand", "description", "phone", "coords", "geocoding_score"]:
+        for field in ["brand", "description", "phone"]:
             assert predicate(getattr(company_2, field), getattr(company_1, field))
 
 
