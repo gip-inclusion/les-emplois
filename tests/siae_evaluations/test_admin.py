@@ -209,7 +209,7 @@ class TestEvaluationCampaignAdmin:
             + 1  # Count the filtered results (paginator)
             + 1  # Count the full results
             + 1  # Fetch selected evaluation_campaigns
-            + 2  # Update EvaluatedSiae for each selected campaign
+            + 2 * 2  # For each campaign: update EvaluatedSiae & check if a notification is needed
         ):
             response = client.post(
                 reverse("admin:siae_evaluations_evaluationcampaign_changelist"),
