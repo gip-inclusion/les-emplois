@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "django_filters",
     "django_htmx",
-    "import_export",
     "hijack",
     "hijack.contrib.admin",
     "pgtrigger",

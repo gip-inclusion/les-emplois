@@ -21,3 +21,37 @@
           </div>
   '''
 # ---
+# name: test_companies_export
+  list([
+    list([
+      'SIRET',
+      'Nom',
+      'Adresse complète',
+      'Nom',
+      'Prénom',
+      'Téléphone',
+      'Adresse e-mail',
+      'Date de création',
+    ]),
+    list([
+      '012345678910',
+      'ACME Inc.',
+      '112 rue de la Croix-Nivert, 75015 Paris',
+      '',
+      '',
+      '',
+      '',
+      '2024/05/17 11:11',
+    ]),
+    list([
+      '012345678910',
+      'ACME Inc.',
+      '112 rue de la Croix-Nivert, 75015 Paris',
+      'Doe',
+      'John',
+      '0606060606',
+      'john.doe@test.local',
+      '2024/05/17 11:11',
+    ]),
+  ])
+# ---
