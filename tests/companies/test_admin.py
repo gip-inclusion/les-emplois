@@ -1,13 +1,16 @@
 import pytest
+from django.contrib.admin import helpers
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNumQueries, assertRedirects
 
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.companies.factories import CompanyFactory
-from tests.users.factories import EmployerFactory
-from tests.utils.test import parse_response_to_soup
+from tests.users.factories import EmployerFactory, ItouStaffFactory
+from tests.utils.test import BASE_NUM_QUERIES, get_rows_from_streaming_response, parse_response_to_soup
 
 
 class TestCompanyAdmin:
@@ -156,3 +159,27 @@ class TestCompanyAdmin:
         response = admin_client.get(change_url)
 
         assert_set_admin_role__creation(employer, company)
+
+
+@freeze_time("2024-05-17T11:11:11+02:00")
+def test_companies_export(admin_client, snapshot):
+    company_1 = CompanyFactory(for_snapshot=True, created_by=ItouStaffFactory(for_snapshot=True))
+    company_2 = CompanyFactory(for_snapshot=True, kind=CompanyKind.AI)
+
+    with assertNumQueries(
+        BASE_NUM_QUERIES
+        + 1  # Load Django session
+        + 1  # Load user
+        + 2  # count companies in admin list
+        + 1  # select companies and created_by relation
+    ):
+        response = admin_client.post(
+            reverse("admin:companies_company_changelist"),
+            {
+                "action": "export",
+                helpers.ACTION_CHECKBOX_NAME: [company_1.pk, company_2.pk],
+            },
+        )
+        assert response.status_code == 200
+        assert response["Content-Disposition"] == ("attachment; " 'filename="entreprises_2024-05-17_11-11-11.xlsx"')
+        assert get_rows_from_streaming_response(response) == snapshot

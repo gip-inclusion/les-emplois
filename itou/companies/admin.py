@@ -2,9 +2,6 @@ from django.contrib import admin, messages
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
-from import_export import resources
-from import_export.admin import ExportActionMixin
-from import_export.fields import Field
 
 from itou.approvals.models import Approval
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
@@ -18,6 +15,7 @@ from itou.utils.admin import (
     get_admin_view_link,
 )
 from itou.utils.apis.exceptions import GeocodingDataError
+from itou.utils.export import to_streaming_response
 from itou.utils.urls import add_url_params
 
 
@@ -87,56 +85,47 @@ class CompaniesInline(ItouTabularInline):
         return get_admin_view_link(obj)
 
 
-class CompanyResource(resources.ModelResource):
-    siret = Field(attribute="siret", column_name="SIRET")
-    name = Field(attribute="name", column_name="Nom")
-    address_line_1 = Field(attribute="address_line_1", column_name="Adresse")
-    address_line_2 = Field(attribute="address_line_2", column_name="Adresse (extra)")
-    post_code = Field(attribute="post_code", column_name="Code postal")
-    city = Field(attribute="city", column_name="Ville")
-    last_name = Field(attribute="created_by__last_name", column_name="Nom")
-    first_name = Field(attribute="created_by__first_name", column_name="Prénom")
-    phone = Field(attribute="created_by__phone", column_name="Téléphone")
-    email = Field(attribute="created_by__email", column_name="Adresse e-mail")
-    created_at = Field(attribute="created_at", column_name="Date de création")
-
-    class Meta:
-        model = models.Company
-        fields = (
-            "siret",
-            "name",
-            "address_line_1",
-            "address_line_2",
-            "post_code",
-            "city",
-            "last_name",
-            "first_name",
-            "phone",
-            "email",
-            "created_at",
+def _companies_serializer(queryset):
+    tz = timezone.get_current_timezone()
+    return [
+        (
+            company.siret,
+            company.name,
+            company.address_on_one_line,
+            company.created_by.last_name if company.created_by else "",
+            company.created_by.first_name if company.created_by else "",
+            company.created_by.phone if company.created_by else "",
+            company.created_by.email if company.created_by else "",
+            company.created_at.astimezone(tz).strftime("%Y/%m/%d %H:%M"),
         )
-        export_order = (
-            "siret",
-            "name",
-            "address_line_1",
-            "address_line_2",
-            "post_code",
-            "city",
-            "last_name",
-            "first_name",
-            "phone",
-            "email",
-            "created_at",
-        )
+        for company in queryset
+    ]
 
 
 @admin.register(models.Company)
-class CompanyAdmin(
-    ItouGISMixin,
-    ExportActionMixin,  # 2024-06-01: Used to verify OPCS.
-    OrganizationAdmin,
-):
-    resource_class = CompanyResource
+class CompanyAdmin(ItouGISMixin, OrganizationAdmin):
+    @admin.action(description="Exporter les entreprises selectionnées")
+    def export(self, request, queryset):
+        export_qs = queryset.select_related("created_by")
+        headers = [
+            "SIRET",
+            "Nom",
+            "Adresse complète",
+            "Nom",
+            "Prénom",
+            "Téléphone",
+            "Adresse e-mail",
+            "Date de création",
+        ]
+
+        return to_streaming_response(
+            export_qs,
+            "entreprises",
+            headers,
+            _companies_serializer,
+            with_time=True,
+        )
+
     form = CompanyAdminForm
     list_display = ("pk", "siret", "kind", "name", "department", "geocoding_score", "member_count", "created_at")
     list_filter = (HasMembersFilter, "kind", "block_job_applications", "source", "department")
@@ -187,6 +176,7 @@ class CompanyAdmin(
     )
     search_fields = ("pk", "siret", "name", "city", "department", "post_code", "address_line_1")
     inlines = (CompanyMembersInline, JobsInline, PkSupportRemarkInline)
+    actions = [export]
 
     def get_export_filename(self, request, queryset, file_format):
         return f"Entreprises-{timezone.now():%Y-%m-%d}.{file_format.get_extension()}"

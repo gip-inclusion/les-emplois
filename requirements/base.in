@@ -122,9 +122,6 @@ botocore  # https://github.com/boto/botocore
 uritemplate  # https://github.com/python-hyper/uritemplate
 pyyaml  # https://github.com/yaml/pyyaml
 
-# For automatic export/import of models in the admin
-django-import-export  # https://github.com/django-import-export/django-import-export
-
 # To impersonate users from the admin
 django-hijack  # https://github.com/django-hijack/django-hijack
 
