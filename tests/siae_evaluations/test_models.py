@@ -34,7 +34,10 @@ from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.files.factories import FileFactory
-from tests.institutions.factories import InstitutionFactory, InstitutionWith2MembershipFactory
+from tests.institutions.factories import (
+    InstitutionFactory,
+    InstitutionWith2MembershipFactory,
+)
 from tests.job_applications.factories import JobApplicationFactory
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
@@ -868,6 +871,125 @@ class EvaluationCampaignManagerTest(TestCase):
         campaign.freeze(timezone.now())
         evaluated_siae.refresh_from_db()
         assert evaluated_siae.submission_freezed_at is not None
+
+    @freeze_time("2023-01-18 11:11:11")
+    def test_institution_submission_freeze_notification(self):
+        campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=3),
+            institution__name="DDETS 01",
+            name="Campagne de test",
+        )
+        evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae, complete=True)
+        with self.captureOnCommitCallbacks(execute=True):
+            campaign.freeze(timezone.now())
+
+        assert campaign.submission_freeze_notified_at is not None
+        [email] = mail.outbox
+        assert (
+            email.subject
+            == "[DEV] [Contrôle a posteriori] Contrôle des justificatifs à réaliser avant la clôture de phase"
+        )
+
+    @freeze_time("2023-01-18 11:11:11")
+    def test_institution_submission_freeze_adversarial(self):
+        campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
+            calendar__adversarial_stage_start=timezone.localdate() - relativedelta(weeks=3),
+            institution__name="DDETS 01",
+            name="Campagne de test",
+        )
+        evaluated_ = EvaluatedSiaeFactory(
+            evaluation_campaign=campaign, reviewed_at=timezone.now() - relativedelta(days=15)
+        )
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
+        with self.captureOnCommitCallbacks(execute=True):
+            campaign.freeze(timezone.now())
+
+        assert campaign.submission_freeze_notified_at is not None
+        [email] = mail.outbox
+        assert (
+            email.subject
+            == "[DEV] [Contrôle a posteriori] Contrôle des justificatifs à réaliser avant la clôture de phase"
+        )
+
+    @freeze_time("2023-01-18 11:11:11")
+    def test_institution_submission_freeze_notification_ignores_already_notified(self):
+        campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=3),
+            submission_freeze_notified_at=timezone.now(),
+            institution__name="DDETS 01",
+            name="Campagne de test",
+        )
+        evaluated_ = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
+        with self.captureOnCommitCallbacks(execute=True):
+            campaign.freeze(timezone.now())
+        assert mail.outbox == []
+
+    @freeze_time("2023-01-18 11:11:11")
+    def test_institution_submission_freeze_notification_ignores_siae_evaluated(self):
+        campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=3),
+            institution__name="DDETS 01",
+            name="Campagne de test",
+        )
+        evaluated_ = EvaluatedSiaeFactory(evaluation_campaign=campaign, reviewed_at=timezone.now())
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
+        with self.captureOnCommitCallbacks(execute=True):
+            campaign.freeze(timezone.now())
+        assert campaign.submission_freeze_notified_at is None
+        assert mail.outbox == []
+
+    @freeze_time("2023-01-18 11:11:11")
+    def test_institution_submission_freeze_no_notification_without_docs(self):
+        campaign = EvaluationCampaignFactory(evaluations_asked_at=timezone.now() - relativedelta(weeks=3))
+        evaluated_ = EvaluatedSiaeFactory(evaluation_campaign=campaign)
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_)
+        with self.captureOnCommitCallbacks(execute=True):
+            campaign.freeze(timezone.now())
+        assert campaign.submission_freeze_notified_at is None
+        assert mail.outbox == []
+
+    @freeze_time("2023-01-18 11:11:11")
+    def test_institution_submission_freeze_ignores_final_reviewed_at_before_adversarial_start(self):
+        campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
+            calendar__adversarial_stage_start=datetime.date(2023, 2, 1),
+            institution__name="DDETS 01",
+            name="Campagne de test",
+        )
+        evaluated_ = EvaluatedSiaeFactory(
+            evaluation_campaign=campaign,
+            reviewed_at=timezone.now() - relativedelta(days=20),
+            final_reviewed_at=timezone.now() - relativedelta(days=20),
+        )
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
+
+        with self.captureOnCommitCallbacks(execute=True):
+            campaign.freeze(timezone.now())
+        assert campaign.submission_freeze_notified_at is None
+        assert mail.outbox == []
+
+    @freeze_time("2023-01-18 11:11:11")
+    def test_institution_submission_freeze_ignores_final_reviewed_at_after_adversarial_start(self):
+        campaign = EvaluationCampaignFactory(
+            evaluations_asked_at=timezone.now() - relativedelta(weeks=6),
+            calendar__adversarial_stage_start=datetime.date(2023, 1, 1),
+            institution__name="DDETS 01",
+            name="Campagne de test",
+        )
+        evaluated_ = EvaluatedSiaeFactory(
+            evaluation_campaign=campaign,
+            reviewed_at=timezone.now() - relativedelta(days=20),
+            final_reviewed_at=timezone.now() - relativedelta(days=20),
+        )
+        EvaluatedJobApplicationFactory(evaluated_siae=evaluated_, complete=True)
+
+        with self.captureOnCommitCallbacks(execute=True):
+            campaign.freeze(timezone.now())
+        assert campaign.submission_freeze_notified_at is None
+        assert mail.outbox == []
 
 
 class EvaluatedSiaeQuerySetTest(TestCase):

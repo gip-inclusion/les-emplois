@@ -290,6 +290,13 @@ class EvaluationCampaign(models.Model):
         EvaluatedSiae.objects.filter(evaluation_campaign=self, submission_freezed_at__isnull=True).update(
             submission_freezed_at=freeze_at
         )
+        if self.submission_freeze_notified_at is None:
+            # Notification hasn't been sent already
+            if EvaluatedSiae.objects.to_control_in_campaign(campaign_id=self.pk).exists():
+                # There are still SIAE to review
+                send_email_messages([CampaignEmailFactory(self).submission_frozen()])
+                self.submission_freeze_notified_at = timezone.now()
+                self.save(update_fields=["submission_freeze_notified_at"])
 
     def transition_to_adversarial_phase(self):
         now = timezone.now()
@@ -434,6 +441,25 @@ class EvaluatedSiaeQuerySet(models.QuerySet):
                     evaluated_job_application__evaluated_siae=OuterRef("pk"),
                     submitted_at__isnull=False,
                 )
+            )
+        )
+
+    def to_control_in_campaign(self, campaign_id):
+        today = timezone.localdate()
+        return (
+            self.filter(evaluation_campaign_id=campaign_id)
+            .filter(
+                Exists(
+                    EvaluatedAdministrativeCriteria.objects.filter(
+                        evaluated_job_application__evaluated_siae=OuterRef("pk"),
+                        review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING,
+                        submitted_at__isnull=False,
+                    )
+                ),
+            )
+            .filter(
+                Q(reviewed_at=None, evaluation_campaign__calendar__adversarial_stage_start__gt=today)
+                | Q(final_reviewed_at=None, evaluation_campaign__calendar__adversarial_stage_start__lte=today)
             )
         )
 
