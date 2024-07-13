@@ -115,8 +115,7 @@ class TestEvaluationCampaignAdmin:
         assert response.status_code == 200
         assert response["Content-Type"] == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         assert (
-            response["Content-Disposition"]
-            == 'attachment; filename="export-siaes-campagnes-2022-12-07T11-11-00+00-00.xlsx"'
+            response["Content-Disposition"] == 'attachment; filename="export-siaes-campagnes_2022-12-07_12-11-00.xlsx"'
         )
         assert excel_export == [
             [

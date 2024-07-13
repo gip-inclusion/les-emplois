@@ -6,6 +6,8 @@ from django import http
 from django.utils import timezone
 from django.utils.http import content_disposition_header
 
+from itou.www.itou_staff_views.export_utils import get_export_ts
+
 
 def generate_excel_sheet(headers, rows):
     workbook = openpyxl.Workbook()
@@ -40,7 +42,6 @@ def to_streaming_response(queryset, filename, headers, serializer, with_time=Fal
     stream = xlsx_streaming.stream_queryset_as_xlsx(queryset, template, serializer=serializer)
     response = http.StreamingHttpResponse(stream, content_type=openxml_mimetype)
     if with_time:
-        now = timezone.now().isoformat(timespec="seconds").replace(":", "-")
-        filename = f"{filename}-{now}"
+        filename = f"{filename}_{get_export_ts()}"
     response["Content-Disposition"] = content_disposition_header(as_attachment=True, filename=f"{filename}.xlsx")
     return response
