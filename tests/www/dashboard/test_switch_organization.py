@@ -1,4 +1,3 @@
-import pytest
 from django.urls import reverse
 
 from tests.companies.factories import (
@@ -16,7 +15,6 @@ from tests.utils.test import TestCase
 
 
 class SwitchCompanyTest(TestCase):
-    @pytest.mark.ignore_unknown_variable_template_error("matomo_event_attrs")
     def test_switch_company(self):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()

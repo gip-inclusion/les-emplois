@@ -132,7 +132,6 @@ def test_show_view_access(client):
     assert response.status_code == 404
 
 
-@pytest.mark.ignore_unknown_variable_template_error("matomo_event_attrs")
 def test_show_view(snapshot, client):
     prolongation_request = approvals_factories.ProlongationRequestFactory(for_snapshot=True)
     client.force_login(prolongation_request.validated_by)
@@ -145,7 +144,6 @@ def test_show_view(snapshot, client):
     assert_previous_step(response, reverse("approvals:prolongation_requests_list") + "?only_pending=on")
 
 
-@pytest.mark.ignore_unknown_variable_template_error("matomo_event_attrs")
 def test_show_view_no_siae(client):
     prolongation_request = approvals_factories.ProlongationRequestFactory()
     prolongation_request.declared_by_siae.delete()

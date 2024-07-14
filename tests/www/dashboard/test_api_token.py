@@ -1,4 +1,3 @@
-import pytest
 from django.urls import reverse, reverse_lazy
 from pytest_django.asserts import assertContains, assertNotContains
 from rest_framework.authtoken.models import Token
@@ -13,7 +12,6 @@ TOKEN_MENU_STR = "Accès aux APIs"
 API_TOKEN_URL = reverse_lazy("dashboard:api_token")
 
 
-@pytest.mark.ignore_unknown_variable_template_error("matomo_event_attrs")
 def test_api_token_view_for_company_admin(client):
     employer = CompanyMembershipFactory().user
     client.force_login(employer)
