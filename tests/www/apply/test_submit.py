@@ -33,6 +33,7 @@ from itou.utils.session import SessionNamespace
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from tests.approvals.factories import PoleEmploiApprovalFactory
+from tests.asp.factories import CommuneFactory, CountryFranceFactory
 from tests.cities.factories import create_city_geispolsheim, create_city_in_zrr, create_test_cities
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyWithMembershipAndJobsFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
@@ -2446,6 +2447,7 @@ class DirectHireFullProcessTest(TestCase):
         response = self.client.get(next_url)
         self.assertTemplateNotUsed(response, "approvals/includes/status.html")
 
+        # TODO: convert to a Trait instead?
         criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
         criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
         criterion3 = AdministrativeCriteria.objects.level2().get(pk=15)
@@ -2469,6 +2471,10 @@ class DirectHireFullProcessTest(TestCase):
 
         # Hire confirmation
         # ----------------------------------------------------------------------
+        # FIXME(cms): create a Trait instead.
+        birth_country = CountryFranceFactory()
+        birth_place = CommuneFactory()
+
         response = self.client.get(next_url)
         self.assertTemplateNotUsed(response, "approvals/includes/status.html")
         self.assertContains(response, "Valider l’embauche")
@@ -2489,6 +2495,9 @@ class DirectHireFullProcessTest(TestCase):
             "fill_mode": "ban_api",
             # Select the first and only one option
             "address_for_autocomplete": "0",
+            # BRSA criterion certification.
+            "birth_place": birth_place.pk,
+            "birth_country": birth_country.pk,
         }
         response = self.client.post(
             next_url,
@@ -4604,12 +4613,15 @@ class HireConfirmationTestCase(TestCase):
             + 1  # eligibility_eligibilitydiagnosis (EligibilityDiagnosis.objects.last_considered_valid)
             + 1  # companies_jobdescription (AcceptForm.__init__)
             + 1  # eligibility_administrativecriteria (/apply/includes/eligibility_diagnosis.html)
+            + 1  # asp_country: countries dropdown list.
             + 3  # update session with savepoint & release
         ):
             response = self.client.get(self._reverse("apply:hire_confirmation"))
         self.assertContains(response, "Déclarer l’embauche de Clara SION")
         self.assertContains(response, "Éligible à l’IAE")
 
+        birth_country = CountryFranceFactory()
+        birth_place = CommuneFactory()
         hiring_start_at = timezone.localdate()
         post_data = {
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -4625,6 +4637,9 @@ class HireConfirmationTestCase(TestCase):
             "phone": self.job_seeker.phone,
             "fill_mode": "ban_api",
             "address_for_autocomplete": "0",
+            # CertifiedCriteriaForm
+            "birth_country": birth_country.pk,
+            "birth_place": birth_place.pk,
         }
         response = self.client.post(
             self._reverse("apply:hire_confirmation"),

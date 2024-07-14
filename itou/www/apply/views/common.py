@@ -22,6 +22,7 @@ from itou.utils.htmx import hx_trigger_modal_control
 from itou.utils.urls import add_url_params, get_external_link_markup, get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
+    CertifiedCriteriaInfoRequiredForm,
     CheckJobSeekerGEIQEligibilityForm,
     JobSeekerPersonalDataForm,
 )
@@ -36,6 +37,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
     # This will ensure a smooth Approval delivery.
     form_personal_data = None
     form_user_address = None
+    form_certified_criteria = None
     creating = job_application is None
 
     if siae.is_subject_to_eligibility_rules:
@@ -50,6 +52,11 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
         form_user_address = JobSeekerAddressForm(instance=job_seeker, data=request.POST or None)
         forms.append(form_user_address)
 
+        form_certified_criteria = CertifiedCriteriaInfoRequiredForm(
+            instance=job_seeker.jobseeker_profile, data=request.POST or None
+        )
+        forms.append(form_certified_criteria)
+
     form_accept = AcceptForm(instance=job_application, company=siae, data=request.POST or None)
     forms.append(form_accept)
 
@@ -57,6 +64,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
         "form_accept": form_accept,
         "form_user_address": form_user_address,
         "form_personal_data": form_personal_data,
+        "form_certified_criteria": form_certified_criteria,
         "has_form_error": any(form.errors for form in forms),
         "can_view_personal_information": True,  # SIAE members have access to personal info
         "hide_value": ContractType.OTHER.value,
@@ -83,6 +91,8 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
                     form_personal_data.save()
                 if form_user_address:
                     form_user_address.save()
+                if form_certified_criteria:
+                    form_certified_criteria.save()
                 # After each successful transition, a save() is performed by django-xworkflows,
                 # so use `commit=False` to avoid a double save.
                 job_application = form_accept.save(commit=False)

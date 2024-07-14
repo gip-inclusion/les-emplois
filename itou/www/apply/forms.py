@@ -7,9 +7,10 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.db.models.fields import BLANK_CHOICE_DASH
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.html import format_html
+from django.utils.text import format_lazy
 from django_select2.forms import Select2MultipleWidget, Select2Widget
 
 from itou.approvals.models import Approval
@@ -30,7 +31,7 @@ from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
 from itou.utils.types import InclusiveDateRange
 from itou.utils.validators import validate_nir
-from itou.utils.widgets import DuetDatePickerWidget
+from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Widget
 from itou.www.companies_views.forms import JobAppellationAndLocationMixin
 
 
@@ -858,6 +859,7 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileFieldsM
 
     class Meta:
         model = User
+        # TODO(celinems): birthdate should be on JobSeekerProfile.
         fields = ["birthdate"]
         help_texts = {"birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978."}
 
@@ -873,6 +875,59 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileFieldsM
     def clean(self):
         super().clean()
         JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
+
+
+class CertifiedCriteriaInfoRequiredForm(forms.ModelForm):
+    """API Particulier required information.
+    https://github.com/etalab/siade_staging_data/blob/develop/payloads/api_particulier_v2_cnav_allocation_adulte_handicape/200_beneficiaire.yaml
+    """
+
+    birth_place = forms.ModelChoiceField(
+        queryset=asp_models.Commune.objects,
+        label="Commune de naissance",
+        help_text="La commune de naissance ne doit être saisie que lorsque le salarié est né en France",
+        widget=RemoteAutocompleteSelect2Widget(
+            attrs={
+                "data-ajax--url": format_lazy("{}?select2=", reverse_lazy("autocomplete:communes")),
+                "data-ajax--cache": "true",
+                "data-ajax--type": "GET",
+                "data-minimum-input-length": 2,
+                "data-placeholder": "Nom de la commune",
+            },
+        ),
+        required=False,
+    )
+
+    birth_country = forms.ModelChoiceField(asp_models.Country.objects, label="Pays de naissance")
+
+    class Meta:
+        model = JobSeekerProfile
+        fields = ("birth_place", "birth_country")
+
+    def clean(self):
+        super().clean()
+
+        birth_place = self.cleaned_data.get("birth_place")
+        birth_date = self.instance.user.birthdate
+
+        if birth_place and birth_date:
+            try:
+                self.cleaned_data["birth_place"] = asp_models.Commune.objects.by_insee_code_and_period(
+                    birth_place.code, birth_date
+                )
+            except asp_models.Commune.DoesNotExist as ex:
+                raise forms.ValidationError(
+                    f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {birth_date:%d/%m/%Y}"
+                ) from ex
+
+    def _post_clean(self):
+        super()._post_clean()
+        try:
+            self.instance.birth_place = self.cleaned_data.get("birth_place")
+            self.instance.birth_country = self.cleaned_data.get("birth_country")
+            self.instance._clean_birth_fields()
+        except ValidationError as e:
+            self._update_errors(e)
 
 
 class FilterJobApplicationsForm(forms.Form):
