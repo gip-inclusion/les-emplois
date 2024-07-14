@@ -17,7 +17,6 @@ from tests.users.factories import JobSeekerFactory
 from tests.utils.test import BASE_NUM_QUERIES, TestCase, assert_previous_step, parse_response_to_soup
 
 
-@pytest.mark.ignore_unknown_variable_template_error("matomo_event_attrs")
 @pytest.mark.usefixtures("unittest_compatibility")
 class CardViewTest(TestCase):
     OTHER_TAB_ID = "autres-metiers"
@@ -227,7 +226,6 @@ class CardViewTest(TestCase):
         self.assertContains(response, company_card_url_other_formatting)
 
 
-@pytest.mark.ignore_unknown_variable_template_error("matomo_event_attrs")
 @pytest.mark.usefixtures("unittest_compatibility")
 class JobDescriptionCardViewTest(TestCase):
     @classmethod

@@ -1,11 +1,9 @@
-import pytest
 from django.urls import reverse
 from pytest_django.asserts import assertRedirects
 
 from tests.companies.factories import CompanyFactory
 
 
-@pytest.mark.ignore_unknown_variable_template_error("matomo_event_attrs")
 def test_redirect_siae_views(client):
     company = CompanyFactory()
 

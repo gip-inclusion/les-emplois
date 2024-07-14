@@ -1398,7 +1398,6 @@ def test_redact_email_adresse(email, expected):
     assert redact_email_address(email) == expected
 
 
-@pytest.mark.ignore_unknown_variable_template_error("matomo_event_attrs")
 def test_matomo_context_processor(client, settings, snapshot):
     """Test on a canically problematic view that we get the right Matomo properties.
 
