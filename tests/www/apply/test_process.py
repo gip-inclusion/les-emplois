@@ -74,7 +74,7 @@ REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY = (
 
 @pytest.mark.ignore_unknown_variable_template_error("has_form_error", "with_matomo_event")
 @pytest.mark.usefixtures("unittest_compatibility")
-class ProcessViewsTest(MessagesTestMixin, TestCase):
+class ProcessViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
     DIAGORIENTE_INVITE_TITLE = "Ce candidat n’a pas de CV ?"
     DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE = "Invitez le prescripteur à en créer un via notre partenaire Diagoriente."
     DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE = "Invitez-le à en créer un via notre partenaire Diagoriente."
@@ -2393,6 +2393,47 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         approval = job_application.job_seeker.approvals.first()
         assert approval.start_at == job_application.hiring_start_at
         assert job_application.state.is_accepted
+
+    # TODO: refactor
+    def test_accept_criteria_certification_required(self):
+        birth_country = CountryFranceFactory()
+        birth_place = CommuneFactory()
+
+        ######### Case 1: if BRSA is one the diagnosis criteria,
+        ######### birth place and birth country are required.
+        # Query by name instead of PK to make it more understandable.
+        brsa_criteria = AdministrativeCriteria.objects.get(name="Bénéficiaire du RSA")
+        job_application = self.create_job_application()
+        eligibility_diagnosis = job_application.eligibility_diagnosis
+        eligibility_diagnosis.administrative_criteria.add(brsa_criteria)
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
+
+        response = self.client.get(url_accept)
+        self.assertContains(response, "Pays de naissance")
+        self.assertContains(response, "Commune de naissance")
+
+        post_data = {
+            # CertifiedCriteriaForm
+            "birth_country": birth_country.pk,
+            "birth_place": birth_place.pk,
+        }
+
+        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
+
+        jobseeker_profile = job_application.job_seeker.jobseeker_profile
+        jobseeker_profile.refresh_from_db()
+        assert jobseeker_profile.birth_country == birth_country
+        assert jobseeker_profile.birth_place == birth_place
+
+        # TODO: test form edge cases on a FormTest: tests/www/apply/test_forms.py
+        # The form should not appear.
+
+        # TODO: create a new Trait in IAEEligibilityDiagnosisFactory
+        # for certified criteria and take them out of the `with_criteria`.
+        # Otherwise, flaky tests may appear if BRSA criteria is selected.
 
 
 class ProcessTemplatesTest(TestCase):
