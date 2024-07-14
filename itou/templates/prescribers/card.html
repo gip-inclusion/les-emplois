@@ -3,7 +3,7 @@
 
 {% block title %}{{ prescriber_org.display_name }} {{ block.super }}{% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <p>
         <b>Prescripteur habilité</b>
         -
@@ -12,7 +12,7 @@
     <h1>{{ prescriber_org.name }}</h1>
 {% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 

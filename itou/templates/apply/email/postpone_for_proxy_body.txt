@@ -1,0 +1,12 @@
+{% extends "layout/base_email_text_body.txt" %}
+{% block body %}
+Bonjour,
+
+La candidature de {{ job_application.job_seeker.get_full_name }} au sein de la structure {{ job_application.to_company.kind }} {{ job_application.to_company.display_name }} a été mise en attente par l’employeur.
+
+{% if job_application.answer %}
+Commentaire de l’employeur:
+
+{{ job_application.answer }}
+{% endif %}
+{% endblock body %}

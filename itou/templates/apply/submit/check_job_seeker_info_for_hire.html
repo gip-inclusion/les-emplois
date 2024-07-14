@@ -2,7 +2,7 @@
 {% load django_bootstrap5 %}
 {% load buttons_form %}
 
-{% block content_title %}
+{% block title_content %}
     <h1>
         Informations personnelles de <span class="text-muted">{{ job_seeker.get_full_name|title }}</span>
     </h1>
@@ -14,12 +14,12 @@
     <div class="c-box my-4">
         <h1>
             Informations personnelles
-            <a class="btn btn-outline-primary float-end" href="{% url "apply:update_job_seeker_step_1_for_hire" company_pk=siae.pk job_seeker_pk=job_seeker.pk %}">Mettre à jour</a>
+            <a class="btn btn-outline-primary float-end" href="{% url "apply:update_job_seeker_step_1_for_hire" company_pk=siae.pk job_seeker_public_id=job_seeker.public_id %}">Mettre à jour</a>
         </h1>
 
         {% include "apply/includes/profile_infos.html" %}
 
-        {% url 'apply:check_prev_applications_for_hire' company_pk=siae.pk job_seeker_pk=job_seeker.pk as primary_url %}
+        {% url 'apply:check_prev_applications_for_hire' company_pk=siae.pk job_seeker_public_id=job_seeker.public_id as primary_url %}
         {% itou_buttons_form primary_url=primary_url primary_label="Poursuivre l'embauche" secondary_url=back_url show_mandatory_fields_mention=False %}
     </div>
 

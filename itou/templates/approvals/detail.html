@@ -3,11 +3,11 @@
 
 {% block title %}Profil salarié - {{ approval.user.get_full_name }} {{ block.super }}{% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block content_title %}<h1>{{ approval.user.get_full_name }}</h1>{% endblock %}
+{% block title_content %}<h1>{{ approval.user.get_full_name }}</h1>{% endblock %}
 
 {% block content %}
     <section class="s-section">

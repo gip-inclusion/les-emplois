@@ -6,7 +6,7 @@
 
 {% block title %}Mes notifications {{ block.super }}{% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <h1>Mes notifications</h1>
     {% if request.current_organization %}<h2>{{ request.current_organization.display_name }}</h2>{% endif %}
 {% endblock %}

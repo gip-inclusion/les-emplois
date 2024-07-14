@@ -110,6 +110,93 @@
   </ul>
   '''
 # ---
+# name: ProcessViewsTest.test_postpone_from_employer_orienter[postpone_email_to_job_seeker_body]
+  '''
+  Bonjour,
+  
+  Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a mis votre candidature en attente.
+  
+  Commentaire de l’employeur:
+  
+  On vous rappellera.
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: ProcessViewsTest.test_postpone_from_employer_orienter[postpone_email_to_job_seeker_subject]
+  '[DEV] Votre candidature mise en attente par EI Acme inc.'
+# ---
+# name: ProcessViewsTest.test_postpone_from_employer_orienter[postpone_email_to_proxy_body]
+  '''
+  Bonjour,
+  
+  La candidature de Jane DOE au sein de la structure EI Acme inc. a été mise en attente par l’employeur.
+  
+  Commentaire de l’employeur:
+  
+  On vous rappellera.
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: ProcessViewsTest.test_postpone_from_employer_orienter[postpone_email_to_proxy_subject]
+  '[DEV] Candidature de Jane DOE mise en attente par EI Acme inc.'
+# ---
+# name: ProcessViewsTest.test_postpone_from_job_seeker[postpone_email_to_job_seeker_body]
+  '''
+  Bonjour,
+  
+  Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a mis votre candidature en attente.
+  
+  Commentaire de l’employeur:
+  
+  On vous rappellera.
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: ProcessViewsTest.test_postpone_from_job_seeker[postpone_email_to_job_seeker_subject]
+  '[DEV] Votre candidature mise en attente par EI Acme inc.'
+# ---
+# name: ProcessViewsTest.test_postpone_from_prescriber[postpone_email_to_job_seeker_body]
+  '''
+  Bonjour,
+  
+  Suite à votre candidature au sein de la structure EI Acme inc., l’employeur a mis votre candidature en attente.
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: ProcessViewsTest.test_postpone_from_prescriber[postpone_email_to_job_seeker_subject]
+  '[DEV] Votre candidature mise en attente par EI Acme inc.'
+# ---
+# name: ProcessViewsTest.test_postpone_from_prescriber[postpone_email_to_proxy_body]
+  '''
+  Bonjour,
+  
+  La candidature de Jane DOE au sein de la structure EI Acme inc. a été mise en attente par l’employeur.
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
+# name: ProcessViewsTest.test_postpone_from_prescriber[postpone_email_to_proxy_subject]
+  '[DEV] Candidature de Jane DOE mise en attente par EI Acme inc.'
+# ---
 # name: test_add_prior_action_processing
   '''
   <ul class="list-step" hx-swap-oob="true" id="transition_logs_11111111-1111-1111-1111-111111111111">

@@ -124,7 +124,7 @@
     {% include "apply/includes/job_application_diagoriente_invite.html" with job_application=job_application %}
 {% endif %}
 
-<a href="{% if can_edit_personal_information %}{% url 'dashboard:edit_job_seeker_info' job_seeker_pk=job_seeker.pk %}?back_url={{ request.get_full_path|urlencode }}{% if job_application %}&from_application={{ job_application.pk }}{% endif %}{% endif %}"
+<a href="{% if can_edit_personal_information %}{% url 'dashboard:edit_job_seeker_info' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}{% if job_application %}&from_application={{ job_application.pk }}{% endif %}{% endif %}"
    class="btn btn-ico btn-secondary{% if not can_edit_personal_information %} disabled{% endif %}"
    {% if with_matomo_event %}{% matomo_event "salaries" "clic" "edit_jobseeker_infos" %}{% endif %}
    aria-label="Modifier les informations personnelles de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}">

@@ -4,20 +4,43 @@
 
 {% block title %}Export des candidatures {{ block.super }}{% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block content_title %}
-    <h1>
-        Exporter les candidatures
-        {% if export_for == "siae" %}
-            reçues
-        {% else %}
-            envoyées
-        {% endif %}
-    </h1>
-    {% if export_for == "siae" %}<h2>{{ siae.display_name }}</h2>{% endif %}
+{% block title_content %}
+    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
+        <div>
+            <h1>
+                Exporter les candidatures
+                {% if export_for == "siae" %}
+                    reçues
+                {% else %}
+                    envoyées
+                {% endif %}
+            </h1>
+            {% if export_for == "siae" %}<h2>{{ siae.display_name }}</h2>{% endif %}
+        </div>
+        <div>
+            {% if export_for == "siae" %}
+                <a class="btn btn-lg btn-primary btn-ico w-100 w-md-auto"
+                   {% matomo_event "candidature" "exports" "export-siae" %}
+                   aria-label="Télécharger cet export SIAE"
+                   href="{% url 'apply:list_for_siae_exports_download' %}">
+                    <i class="ri-download-line font-weight-medium" aria-hidden="true"></i>
+                    <span>Télécharger toutes les candidatures</span>
+                </a>
+            {% else %}
+                <a class="btn btn-lg btn-primary btn-ico w-100 w-md-auto"
+                   {% matomo_event "candidature" "exports" "export-prescripteur" %}
+                   aria-label="Télécharger cet export prescripteur"
+                   href="{% url 'apply:list_prescriptions_exports_download' %}">
+                    <i class="ri-download-line font-weight-medium" aria-hidden="true"></i>
+                    <span>Télécharger toutes les candidatures</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
 
 {% block content %}

@@ -3,11 +3,11 @@
 
 {% block title %}Compte inactif {{ block.super }}{% endblock %}
 
-{% block messages %}
+{% block title_messages %}
     {{ block.super }}
     <div class="alert alert-warning">
         <p class="mb-0">Ce compte est inactif.</p>
     </div>
 {% endblock %}
 
-{% block content_title %}<h1>Compte inactif</h1>{% endblock %}
+{% block title_content %}<h1>Compte inactif</h1>{% endblock %}

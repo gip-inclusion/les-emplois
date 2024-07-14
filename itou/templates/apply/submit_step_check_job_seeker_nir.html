@@ -6,7 +6,7 @@
 {% load buttons_form %}
 {% load static %}
 
-{% block content_title %}
+{% block title_content %}
     {{ block.super }}
     {% if auto_prescription_process or hire_process %}
         {% if siae.is_subject_to_eligibility_rules or siae.kind == CompanyKind.GEIQ %}
@@ -30,7 +30,7 @@
             </p>
         {% endif %}
     {% endif %}
-{% endblock content_title %}
+{% endblock title_content %}
 
 {% block left_column %}
     <form method="post" class="js-prevent-multiple-submit js-format-nir">

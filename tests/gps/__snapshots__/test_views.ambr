@@ -20,22 +20,30 @@
   
                                       <li>
                                           <small>Date de naissance</small>
-                                          <strong>01/01/1990</strong>
+                                          
+                                              <strong>01/01/1990</strong>
+                                          
                                       </li>
                                       <li>
                                           <small>Adresse e-mail</small>
                                           <strong>jane.doe@test.local</strong>
-                                          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email">
-                                              <i class="ri-file-copy-line"></i>
-                                          </button>
+                                          
+                                          <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email">
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      
+  </button>
+  
                                       </li>
                                       <li>
                                           <small>Téléphone</small>
                                           
                                               <strong>06 12 34 56 78</strong>
-                                              <button class="btn-link" data-bs-placement="top" data-bs-title="Copié!" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
-                                                  <i class="ri-file-copy-line"></i>
-                                              </button>
+                                              
+                                              <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      
+  </button>
+  
                                           
                                       </li>
                                       <li>
@@ -86,59 +94,62 @@
                       
   
   
+  
   <div class="c-box mb-3 mb-lg-5" id="gps_intervenants">
-  
-      <h2>Intervenant</h2>
-      <hr/>
-      <div class="p-0 m-0">
+      <h2 class="border-bottom pb-3">Intervenant</h2>
+      <ul class="list-unstyled p-0 m-0">
           
+              <li class="c-box--results__header px-0 gps_intervenant">
+                  <div class="c-box--results__summary flex-grow-1">
+                      <i aria-hidden="true" class="ri-user-line"></i>
+                      <div>
+                          <h3 class="mb-2">
+                              Pierre DUPONT
+                              <span class="font-weight-normal fs-6 fst-italic">
+                                  
+                                  
+                                  (prescripteur pour Les Olivades)
+                                  
+                              </span>
+                          </h3>
   
-              <div class="c-box--results__header px-0 gps_intervenant">
-                  <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                          <ul class="list-unstyled">
+                              <li class="py-1">
+                                  <i aria-hidden="true" class="ri-mail-line font-weight-normal me-1"></i>
+                                  <span>pierre.dupont@test.local</span>
+                                  
+                                  <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dupont@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_member_email">
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      
+  </button>
   
-                      <div class="c-box--results__summary flex-grow-1">
-                          <i aria-hidden="true" class="ri-user-line"></i>
-  
-                          <div>
-                              <h3>
-                                  Pierre DUPONT
-                                  <span class="font-weight-normal fs-6 fst-italic">
+                              </li>
+                              <li class="py-1">
+                                  <i aria-hidden="true" class="ri-phone-line font-weight-normal me-1"></i>
+                                  
+                                      <span>06 12 34 56 78</span>
                                       
-                                      
-                                      (prescripteur pour Les Olivades)
-                                      
-                                  </span>
-                              </h3>
-  
-                              <div class="d-flex flex-column flex-md-column gap-1 gap-md-2">
-                                  <span>
-                                      <i aria-hidden="true" class="ri-mail-line font-weight-normal me-1"></i>pierre.dupont@test.local
-                                  </span>
+                                      <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_member_phone">
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      
+  </button>
   
                                   
-                                      <span>
-                                          <i aria-hidden="true" class="ri-phone-line font-weight-normal me-1"></i>06 12 34 56 78
-                                      </span>
-  
-  
-                                  
-                                  <span>
-                                      <i aria-hidden="true" class="ri-calendar-line font-weight-normal me-1"></i>Suivi depuis le <strong>21/06/2024</strong>
-                                  </span>
-                                  
-                                      <span>
-                                          <i aria-hidden="true" class="ri-map-pin-user-line font-weight-normal me-1"></i><strong>Référent</strong>
-                                      </span>
-                                  
-                              </div>
-                          </div>
+                              </li>
+                              <li class="py-1">
+                                  <i aria-hidden="true" class="ri-calendar-line font-weight-normal me-1"></i>Suivi depuis le <strong>21/06/2024</strong>
+                              </li>
+                              
+                                  <li class="py-1">
+                                      <i aria-hidden="true" class="ri-map-pin-user-line font-weight-normal me-1"></i><strong>Référent</strong>
+                                  </li>
+                              
+                          </ul>
                       </div>
                   </div>
-              </div>
-  
+              </li>
           
-      </div>
-  
+      </ul>
   </div>
   
                   </div>
@@ -222,7 +233,7 @@
                           <div>
   
                               
-                              <a aria-label="Ne plus suivre Jane DOE" class="btn btn-warning btn-block w-100 w-md-auto btn-ico" data-bs-body="Vous pourrez toujours suivre ce bénéficiaire de nouveau plus tard." data-bs-confirm-class="btn-danger" data-bs-confirm-text="Ne plus suivre" data-bs-confirm-url="/gps/groups/34/leave" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de ne plus vouloir suivre Jane DOE ?" data-bs-toggle="modal" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                              <a aria-label="Ne plus suivre Jane DOE" class="btn btn-warning btn-block w-100 w-md-auto btn-ico" data-bs-body="Vous pourrez toujours suivre ce bénéficiaire de nouveau plus tard." data-bs-confirm-class="btn-danger" data-bs-confirm-text="Ne plus suivre" data-bs-confirm-url="/gps/groups/[PK of Group]/leave" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de ne plus vouloir suivre Jane DOE ?" data-bs-toggle="modal" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                   <i aria-hidden="true" class="ri-user-unfollow-line"></i>
                                   <span>Ne plus suivre</span>
   
@@ -237,7 +248,7 @@
                               
                                   
   
-                                  <a aria-label="Devenir référent de Jane DOE" class="btn btn-outline-success btn-block w-100 w-md-auto btn-ico" data-bs-body="Vous pourrez toujours ne plus être référent de ce bénéficiaire plus tard." data-bs-confirm-class="btn-success" data-bs-confirm-text="Devenir référent" data-bs-confirm-url="/gps/groups/34/toggle_referent" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de vouloir devenir référent de Jane DOE ?" data-bs-toggle="modal" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                                  <a aria-label="Devenir référent de Jane DOE" class="btn btn-outline-success btn-block w-100 w-md-auto btn-ico" data-bs-body="Vous pourrez toujours ne plus être référent de ce bénéficiaire plus tard." data-bs-confirm-class="btn-success" data-bs-confirm-text="Devenir référent" data-bs-confirm-url="/gps/groups/[PK of Group]/toggle_referent" data-bs-target="#confirm_modal" data-bs-title="Êtes-vous sûr de vouloir devenir référent de Jane DOE ?" data-bs-toggle="modal" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
   
                                       <i aria-hidden="true" class="ri-map-pin-user-line font-weight-normal me-1"></i>
                                       <span>Devenir référent</span>

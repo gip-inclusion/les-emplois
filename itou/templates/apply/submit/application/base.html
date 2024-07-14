@@ -4,7 +4,7 @@
 
 {% block title %}Postuler {{ block.super }}{% endblock %}
 
-{% block messages %}
+{% block title_messages %}
     {{ block.super }}
     {% if new_check_needed %}
         <div class="alert alert-warning alert-dismissible fade show">
@@ -26,7 +26,7 @@
     {% endif %}
 {% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <div class="w-100 w-lg-66">
         <div class="d-flex align-items-center">
             <h1 class="flex-grow-1">{% include 'apply/includes/_submit_title.html' %}</h1>
@@ -35,7 +35,7 @@
         <p>
             Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}
             {% if can_view_personal_information and not request.user.is_job_seeker %}
-                <a class="btn btn-link" href="{% url "apply:update_job_seeker_step_1" company_pk=siae.pk job_seeker_pk=job_seeker.pk %}">Vérifier le profil</a>
+                <a class="btn btn-link" href="{% url "apply:update_job_seeker_step_1" company_pk=siae.pk job_seeker_public_id=job_seeker.public_id %}">Vérifier le profil</a>
             {% endif %}
             {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning"></i>{% endif %}
         </p>

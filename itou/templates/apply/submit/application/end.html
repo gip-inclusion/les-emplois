@@ -6,7 +6,7 @@
 
 {% block title %}Création du compte candidat {{ block.super }}{% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <h1>{{ auto_prescription_process|yesno:"Auto-prescription enregistrée !,Candidature envoyée !" }}</h1>
     <p>
         {% if request.user.is_job_seeker %}

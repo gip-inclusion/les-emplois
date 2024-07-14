@@ -76,7 +76,9 @@ class EditJobSeekerInfo(TestCase):
         self.client.force_login(user)
 
         back_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
-        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
+        url = reverse(
+            "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
+        )
         url = f"{url}?back_url={back_url}&from_application={job_application.pk}"
 
         with self.assertNumQueries(
@@ -150,7 +152,9 @@ class EditJobSeekerInfo(TestCase):
         self.client.force_login(user)
 
         back_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
-        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
+        url = reverse(
+            "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
+        )
         url = f"{url}?back_url={back_url}"
 
         response = self.client.get(url)
@@ -200,7 +204,9 @@ class EditJobSeekerInfo(TestCase):
         self.client.force_login(user)
 
         back_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
-        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
+        url = reverse(
+            "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
+        )
         url = f"{url}?back_url={back_url}"
 
         response = self.client.get(url)
@@ -273,7 +279,9 @@ class EditJobSeekerInfo(TestCase):
         job_application.job_seeker.save()
 
         self.client.force_login(user)
-        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
+        url = reverse(
+            "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
+        )
         with self.assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # session
@@ -300,7 +308,9 @@ class EditJobSeekerInfo(TestCase):
             user=other_prescriber, organization=job_application.sender_prescriber_organization
         )
         self.client.force_login(other_prescriber)
-        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
+        url = reverse(
+            "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
+        )
         response = self.client.get(url)
         assert response.status_code == 200
 
@@ -310,7 +320,9 @@ class EditJobSeekerInfo(TestCase):
         user = job_application.sender
         self.client.force_login(user)
 
-        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
+        url = reverse(
+            "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
+        )
 
         response = self.client.get(url)
         assert response.status_code == 403
@@ -322,7 +334,9 @@ class EditJobSeekerInfo(TestCase):
         # Lambda prescriber not member of the sender organization
         prescriber = PrescriberFactory()
         self.client.force_login(prescriber)
-        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
+        url = reverse(
+            "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
+        )
 
         response = self.client.get(url)
         assert response.status_code == 403
@@ -340,7 +354,9 @@ class EditJobSeekerInfo(TestCase):
 
         self.client.force_login(user)
         response = self.client.post(
-            reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id}),
+            reverse(
+                "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
+            ),
             data=post_data,
         )
         self.assertContains(
@@ -386,7 +402,9 @@ class EditJobSeekerInfo(TestCase):
         self.client.force_login(user)
 
         back_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
-        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
+        url = reverse(
+            "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
+        )
         url = f"{url}?back_url={back_url}"
 
         response = self.client.get(url)
@@ -441,7 +459,9 @@ class EditJobSeekerInfo(TestCase):
         self.client.force_login(user)
 
         back_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.id})
-        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
+        url = reverse(
+            "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
+        )
         url = f"{url}?back_url={back_url}"
 
         response = self.client.get(url)
@@ -489,7 +509,9 @@ class EditJobSeekerInfo(TestCase):
         job_application.job_seeker.save()
 
         self.client.force_login(user)
-        url = reverse("dashboard:edit_job_seeker_info", kwargs={"job_seeker_pk": job_application.job_seeker_id})
+        url = reverse(
+            "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
+        )
         post_data = {
             "title": "M",
             "email": user.email,

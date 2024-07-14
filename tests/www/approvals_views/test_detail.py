@@ -377,7 +377,7 @@ class TestApprovalDetailView:
 
         user_info_edit_url = reverse(
             "dashboard:edit_job_seeker_info",
-            kwargs={"job_seeker_pk": job_application.job_seeker_id},
+            kwargs={"job_seeker_public_id": job_application.job_seeker.public_id},
         )
         user_info_edit_url = f"{user_info_edit_url}?back_url={url}&from_application={job_application.pk}"
         user_info_not_allowed = "Vous ne pouvez pas modifier ses informations"

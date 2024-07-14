@@ -38,6 +38,7 @@
 
     {% include "includes/pagination.html" with page=prescriber_orgs_page boost=True boost_target="#prescribers-search-results" boost_indicator="#prescribers-search-results" %}
 </div>
+
 {% if request.htmx %}
     {% include "search/includes/prescribers_search_summary.html" %}
     <title hx-swap-oob="outerHTML,title">

@@ -1,60 +1,57 @@
 {% load str_filters %}
 {% load format_filters %}
+{% load matomo %}
 
 <div class="c-box mb-3 mb-lg-5" id="gps_intervenants">
-
-    <h2>Intervenant{{ gps_memberships|length|pluralizefr }}</h2>
-    <hr />
-    <div class="p-0 m-0">
+    <h2 class="border-bottom pb-3">Intervenant{{ gps_memberships|length|pluralizefr }}</h2>
+    <ul class="list-unstyled p-0 m-0">
         {% for membership in gps_memberships %}
+            <li class="c-box--results__header px-0 gps_intervenant">
+                <div class="c-box--results__summary flex-grow-1">
+                    <i class="ri-user-line" aria-hidden="true"></i>
+                    <div>
+                        <h3 class="mb-2">
+                            {{ membership.member.get_full_name }}
+                            <span class="font-weight-normal fs-6 fst-italic">
+                                {% comment %}
+                                DJlint wants to move the if block and the closing parenthesis to the next line,
+                                adding two inelegant spaces.
+                                {% endcomment %}
+                                {# djlint:off #}
+                                ({{ membership.member.get_kind_display }}{% if membership.organization_name %} pour {{ membership.organization_name }}{% endif %})
+                                {# djlint:on #}
+                            </span>
+                        </h3>
 
-            <div class="c-box--results__header px-0 gps_intervenant">
-                <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
-
-                    <div class="c-box--results__summary flex-grow-1">
-                        <i class="ri-user-line" aria-hidden="true"></i>
-
-                        <div>
-                            <h3>
-                                {{ membership.member.get_full_name }}
-                                <span class="font-weight-normal fs-6 fst-italic">
-                                    {% comment %}
-                                    DJlint wants to move the if block and the closing parenthesis to the next line,
-                                    adding two inelegant spaces.
-                                    {% endcomment %}
-                                    {# djlint:off #}
-                                    ({{ membership.member.get_kind_display }}{% if membership.organization_name %} pour {{ membership.organization_name }}{% endif %})
-                                    {# djlint:on #}
-                                </span>
-                            </h3>
-
-                            <div class="d-flex flex-column flex-md-column gap-1 gap-md-2">
-                                <span>
-                                    <i class="ri-mail-line font-weight-normal me-1" aria-hidden="true"></i>{{ membership.member.email }}
-                                </span>
-
+                        <ul class="list-unstyled">
+                            <li class="py-1">
+                                <i class="ri-mail-line font-weight-normal me-1" aria-hidden="true"></i>
+                                <span>{{ membership.member.email }}</span>
+                                {% matomo_event "gps" "clic" "copied_member_email" as matomo_event_attrs %}
+                                {% include 'includes/copy_to_clipboard.html' with content=membership.member.email css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
+                            </li>
+                            <li class="py-1">
+                                <i class="ri-phone-line font-weight-normal me-1" aria-hidden="true"></i>
                                 {% if membership.member.phone %}
-                                    <span>
-                                        <i class="ri-phone-line font-weight-normal me-1" aria-hidden="true"></i>{{ membership.member.phone|format_phone }}
-                                    </span>
-
-
+                                    <span>{{ membership.member.phone|format_phone }}</span>
+                                    {% matomo_event "gps" "clic" "copied_member_phone" as matomo_event_attrs %}
+                                    {% include 'includes/copy_to_clipboard.html' with content=membership.member.phone css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
+                                {% else %}
+                                    <span class="text-disabled">Téléphone non renseigné</span>
                                 {% endif %}
-                                <span>
-                                    <i class="ri-calendar-line font-weight-normal me-1" aria-hidden="true"></i>Suivi depuis le <strong>{{ membership.created_at|date:"d/m/Y" }}</strong>
-                                </span>
-                                {% if membership.is_referent %}
-                                    <span>
-                                        <i class="ri-map-pin-user-line font-weight-normal me-1" aria-hidden="true"></i><strong>Référent</strong>
-                                    </span>
-                                {% endif %}
-                            </div>
-                        </div>
+                            </li>
+                            <li class="py-1">
+                                <i class="ri-calendar-line font-weight-normal me-1" aria-hidden="true"></i>Suivi depuis le <strong>{{ membership.created_at|date:"d/m/Y" }}</strong>
+                            </li>
+                            {% if membership.is_referent %}
+                                <li class="py-1">
+                                    <i class="ri-map-pin-user-line font-weight-normal me-1" aria-hidden="true"></i><strong>Référent</strong>
+                                </li>
+                            {% endif %}
+                        </ul>
                     </div>
                 </div>
-            </div>
-
+            </li>
         {% endfor %}
-    </div>
-
+    </ul>
 </div>

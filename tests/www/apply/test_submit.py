@@ -59,6 +59,30 @@ from tests.utils.test import BASE_NUM_QUERIES, TestCase
 BACK_BUTTON_ARIA_LABEL = "Retourner à l’étape précédente"
 
 
+class ApplyTestPKConversion(TestCase):
+    """
+    Temporary test case for the conversion of primary keys to public IDs
+    """
+
+    def test_redirect_on_job_seeker_pk_with_for_hire_property(self):
+        company = CompanyFactory(with_jobs=True, with_membership=True)
+        job_seeker = JobSeekerFactory()
+        self.client.force_login(company.members.first())
+
+        response = self.client.get(
+            reverse(
+                "apply:update_job_seeker_step_1_for_hire_pk_redirect",
+                kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk},
+            ),
+        )
+
+        assert response.status_code == 200
+        assert response.context["step_3_url"] == reverse(
+            "apply:update_job_seeker_step_3_for_hire",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+        )
+
+
 class ApplyTest(TestCase):
     def test_company_with_no_members(self):
         company = CompanyFactory()
@@ -97,7 +121,7 @@ class ApplyTest(TestCase):
             "apply:application_geiq_eligibility",
             "apply:application_resume",
         ):
-            url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+            url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id})
             response = self.client.get(url)
             self.assertRedirects(response, reverse("account_login") + f"?next={url}")
 
@@ -146,7 +170,7 @@ class ApplyTest(TestCase):
             "apply:application_geiq_eligibility",
             "apply:application_resume",
         ):
-            url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_pk": prescriber.pk})
+            url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_public_id": prescriber.public_id})
             response = self.client.get(url)
             assert response.status_code == 404
 
@@ -155,7 +179,10 @@ class ApplyTest(TestCase):
         job_seeker = JobSeekerFactory()
         self.client.force_login(job_seeker)
         response = self.client.post(
-            reverse("apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}),
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
             {"message": "Hire me?"},
         )
         job_application = JobApplication.objects.get()
@@ -181,7 +208,7 @@ class HireTest(TestCase):
             "apply:geiq_eligibility_criteria_for_hire",
             "apply:hire_confirmation",
         ):
-            url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+            url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id})
             response = self.client.get(url)
             self.assertRedirects(response, reverse("account_login") + f"?next={url}")
 
@@ -227,7 +254,7 @@ class HireTest(TestCase):
             "apply:update_job_seeker_step_3_for_hire",
             "apply:update_job_seeker_step_end_for_hire",
         ):
-            url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_pk": prescriber.pk})
+            url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_public_id": prescriber.public_id})
             response = self.client.get(url)
             assert response.status_code == 404
 
@@ -243,7 +270,7 @@ class HireTest(TestCase):
             "apply:geiq_eligibility_criteria_for_hire",
             "apply:hire_confirmation",
         ):
-            url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_pk": prescriber.pk})
+            url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_public_id": prescriber.public_id})
             response = self.client.get(url)
             assert response.status_code == 404
 
@@ -257,7 +284,7 @@ class HireTest(TestCase):
             "apply:eligibility_for_hire",
             "apply:hire_confirmation",
         ):
-            url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+            url = reverse(viewname, kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id})
             response = self.client.get(url)
             self.assertContains(
                 response, "Le candidat a terminé un parcours il y a moins de deux ans", status_code=403
@@ -370,7 +397,8 @@ class ApplyAsJobSeekerTest(TestCase):
         assert session_data == self.default_session_data
 
         next_url = reverse(
-            "apply:step_check_job_seeker_info", kwargs={"company_pk": company.pk, "job_seeker_pk": user.pk}
+            "apply:step_check_job_seeker_info",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id},
         )
         assert response.url == next_url
 
@@ -392,7 +420,8 @@ class ApplyAsJobSeekerTest(TestCase):
         assert user.jobseeker_profile.pole_emploi_id == post_data["pole_emploi_id"]
 
         next_url = reverse(
-            "apply:step_check_prev_applications", kwargs={"company_pk": company.pk, "job_seeker_pk": user.pk}
+            "apply:step_check_prev_applications",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id},
         )
         assert response.url == next_url
 
@@ -402,7 +431,9 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.get(next_url)
         assert response.status_code == 302
 
-        next_url = reverse("apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_pk": user.pk})
+        next_url = reverse(
+            "apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id}
+        )
         assert response.url == next_url
 
         # Step application's jobs.
@@ -433,7 +464,7 @@ class ApplyAsJobSeekerTest(TestCase):
         }
 
         next_url = reverse(
-            "apply:application_eligibility", kwargs={"company_pk": company.pk, "job_seeker_pk": user.pk}
+            "apply:application_eligibility", kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id}
         )
         assert response.url == next_url
 
@@ -442,7 +473,9 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.get(next_url)
         assert response.status_code == 302
 
-        next_url = reverse("apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_pk": user.pk})
+        next_url = reverse(
+            "apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id}
+        )
         assert response.url == next_url
 
         # Step application's resume.
@@ -519,7 +552,7 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.post(next_url, data={"nir": "123456789KLOIU", "skip": 1}, follow=True)
         assert response.status_code == 200
         assert response.redirect_chain[-1][0] == reverse(
-            "apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_pk": user.pk}
+            "apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id}
         )
 
         user.jobseeker_profile.refresh_from_db()
@@ -557,18 +590,22 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.get(next_url)
 
         next_url = reverse(
-            "apply:step_check_job_seeker_info", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}
+            "apply:step_check_job_seeker_info",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         assert response.url == next_url
         response = self.client.get(next_url)
 
         next_url = reverse(
-            "apply:step_check_prev_applications", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}
+            "apply:step_check_prev_applications",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         assert response.url == next_url
         response = self.client.get(next_url)
 
-        next_url = reverse("apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+        next_url = reverse(
+            "apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id}
+        )
         assert response.url == next_url
         response = self.client.get(next_url)
 
@@ -598,7 +635,7 @@ class ApplyAsJobSeekerTest(TestCase):
                     "apply:application_resume",
                     kwargs={
                         "company_pk": company.pk,
-                        "job_seeker_pk": user.pk,
+                        "job_seeker_public_id": user.public_id,
                     },
                 ),
                 data={
@@ -632,7 +669,7 @@ class ApplyAsJobSeekerTest(TestCase):
                     "apply:application_resume",
                     kwargs={
                         "company_pk": company.pk,
-                        "job_seeker_pk": user.pk,
+                        "job_seeker_public_id": user.public_id,
                     },
                 ),
                 data={
@@ -666,7 +703,7 @@ class ApplyAsJobSeekerTest(TestCase):
                     "apply:application_resume",
                     kwargs={
                         "company_pk": company.pk,
-                        "job_seeker_pk": user.pk,
+                        "job_seeker_public_id": user.public_id,
                     },
                 ),
                 data={
@@ -961,7 +998,8 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data
 
         next_url = reverse(
-            "apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_pk": new_job_seeker.pk}
+            "apply:application_jobs",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assert response.url == next_url
 
@@ -979,7 +1017,8 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         }
 
         next_url = reverse(
-            "apply:application_eligibility", kwargs={"company_pk": company.pk, "job_seeker_pk": new_job_seeker.pk}
+            "apply:application_eligibility",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assert response.url == next_url
 
@@ -989,7 +1028,8 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         assert response.status_code == 302
 
         next_url = reverse(
-            "apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_pk": new_job_seeker.pk}
+            "apply:application_resume",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assert response.url == next_url
 
@@ -1224,7 +1264,8 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data
 
         next_url = reverse(
-            "apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_pk": new_job_seeker.pk}
+            "apply:application_jobs",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assert response.url == next_url
 
@@ -1255,7 +1296,8 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         }
 
         next_url = reverse(
-            "apply:application_eligibility", kwargs={"company_pk": company.pk, "job_seeker_pk": new_job_seeker.pk}
+            "apply:application_eligibility",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assert response.url == next_url
 
@@ -1278,7 +1320,8 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         assert EligibilityDiagnosis.objects.has_considered_valid(new_job_seeker, for_siae=company)
 
         next_url = reverse(
-            "apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_pk": new_job_seeker.pk}
+            "apply:application_resume",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assert response.url == next_url
 
@@ -1598,7 +1641,8 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
         assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data
 
         next_url = reverse(
-            "apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_pk": new_job_seeker.pk}
+            "apply:application_jobs",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assert response.url == next_url
 
@@ -1616,7 +1660,8 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
         }
 
         next_url = reverse(
-            "apply:application_eligibility", kwargs={"company_pk": company.pk, "job_seeker_pk": new_job_seeker.pk}
+            "apply:application_eligibility",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assert response.url == next_url
 
@@ -1626,7 +1671,8 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
         assert response.status_code == 302
 
         next_url = reverse(
-            "apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_pk": new_job_seeker.pk}
+            "apply:application_resume",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assert response.url == next_url
 
@@ -1772,7 +1818,8 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         self.assertRedirects(
             response,
             reverse(
-                "apply:step_check_job_seeker_info", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}
+                "apply:step_check_job_seeker_info",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
             target_status_code=302,
         )
@@ -1827,7 +1874,8 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         self.assertRedirects(
             response,
             reverse(
-                "apply:step_check_job_seeker_info", kwargs={"company_pk": siae.pk, "job_seeker_pk": job_seeker.pk}
+                "apply:step_check_job_seeker_info",
+                kwargs={"company_pk": siae.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
             target_status_code=302,
         )
@@ -2053,7 +2101,8 @@ class ApplyAsCompanyTest(TestCase):
         assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data
 
         next_url = reverse(
-            "apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_pk": new_job_seeker.pk}
+            "apply:application_jobs",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assert response.url == next_url
 
@@ -2071,7 +2120,8 @@ class ApplyAsCompanyTest(TestCase):
         }
 
         next_url = reverse(
-            "apply:application_eligibility", kwargs={"company_pk": company.pk, "job_seeker_pk": new_job_seeker.pk}
+            "apply:application_eligibility",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assert response.url == next_url
 
@@ -2081,7 +2131,8 @@ class ApplyAsCompanyTest(TestCase):
         assert response.status_code == 302
 
         next_url = reverse(
-            "apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_pk": new_job_seeker.pk}
+            "apply:application_resume",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assert response.url == next_url
 
@@ -2225,7 +2276,8 @@ class DirectHireFullProcessTest(TestCase):
 
         response = self.client.get(
             reverse(
-                "apply:eligibility_for_hire", kwargs={"company_pk": company.pk, "job_seeker_pk": JobSeekerFactory().pk}
+                "apply:eligibility_for_hire",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": JobSeekerFactory().public_id},
             )
         )
         self.assertContains(
@@ -2407,7 +2459,8 @@ class DirectHireFullProcessTest(TestCase):
         assert new_job_seeker.jobseeker_profile.nir
 
         next_url = reverse(
-            "apply:eligibility_for_hire", kwargs={"company_pk": company.pk, "job_seeker_pk": new_job_seeker.pk}
+            "apply:eligibility_for_hire",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assert response.url == next_url
 
@@ -2433,7 +2486,8 @@ class DirectHireFullProcessTest(TestCase):
         assert response.status_code == 302
 
         next_url = reverse(
-            "apply:hire_confirmation", kwargs={"company_pk": company.pk, "job_seeker_pk": new_job_seeker.pk}
+            "apply:hire_confirmation",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": new_job_seeker.public_id},
         )
         assert response.url == next_url
 
@@ -2508,7 +2562,8 @@ class DirectHireFullProcessTest(TestCase):
 
         response = self.client.post(check_nir_url, data={"nir": job_seeker.jobseeker_profile.nir, "confirm": 1})
         check_infos_url = reverse(
-            "apply:check_job_seeker_info_for_hire", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}
+            "apply:check_job_seeker_info_for_hire",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         self.assertRedirects(response, check_infos_url, fetch_redirect_response=False)
 
@@ -2519,7 +2574,8 @@ class DirectHireFullProcessTest(TestCase):
         self.assertTemplateNotUsed(response, "approvals/includes/status.html")
 
         prev_applicaitons_url = reverse(
-            "apply:check_prev_applications_for_hire", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}
+            "apply:check_prev_applications_for_hire",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         self.assertContains(response, prev_applicaitons_url)
         self.assertContains(response, "Éligibilité GEIQ non confirmée")
@@ -2530,7 +2586,8 @@ class DirectHireFullProcessTest(TestCase):
         response = self.client.get(prev_applicaitons_url)
         self.assertTemplateNotUsed(response, "approvals/includes/status.html")
         geiq_eligibility_url = reverse(
-            "apply:geiq_eligibility_for_hire", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}
+            "apply:geiq_eligibility_for_hire",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         self.assertRedirects(response, geiq_eligibility_url, fetch_redirect_response=False)
 
@@ -2538,10 +2595,10 @@ class DirectHireFullProcessTest(TestCase):
         # ----------------------------------------------------------------------
         geiq_criteria_url = reverse(
             "apply:geiq_eligibility_criteria_for_hire",
-            kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk},
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         confirmation_url = reverse(
-            "apply:hire_confirmation", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}
+            "apply:hire_confirmation", kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id}
         )
 
         response = self.client.get(geiq_eligibility_url)
@@ -2678,7 +2735,10 @@ class ApplicationViewTest(TestCase):
         apply_session.save()
 
         response = self.client.get(
-            reverse("apply:application_jobs", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+            reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
         )
         assert response.status_code == 200
         assert response.context["form"].initial["selected_jobs"] == [
@@ -2699,7 +2759,10 @@ class ApplicationViewTest(TestCase):
         apply_session.save()
 
         response = self.client.get(
-            reverse("apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
         )
         self.assertContains(response, 'name="selected_jobs"')
         self.assertContains(response, 'name="resume"')
@@ -2710,7 +2773,10 @@ class ApplicationViewTest(TestCase):
         self.client.force_login(job_seeker)
 
         response = self.client.get(
-            reverse("apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
         )
         self.assertContains(response, self.DIAGORIENTE_JOB_SEEKER_TITLE)
         self.assertContains(response, self.DIAGORIENTE_JOB_SEEKER_DESCRIPTION)
@@ -2724,7 +2790,10 @@ class ApplicationViewTest(TestCase):
         self.client.force_login(company.members.first())
 
         response = self.client.get(
-            reverse("apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
         )
         self.assertNotContains(response, self.DIAGORIENTE_JOB_SEEKER_TITLE)
         self.assertNotContains(response, self.DIAGORIENTE_JOB_SEEKER_DESCRIPTION)
@@ -2739,7 +2808,10 @@ class ApplicationViewTest(TestCase):
         self.client.force_login(prescriber)
 
         response = self.client.get(
-            reverse("apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
         )
         self.assertNotContains(response, self.DIAGORIENTE_JOB_SEEKER_TITLE)
         self.assertNotContains(response, self.DIAGORIENTE_JOB_SEEKER_DESCRIPTION)
@@ -2757,11 +2829,17 @@ class ApplicationViewTest(TestCase):
         apply_session.save()
 
         response = self.client.get(
-            reverse("apply:application_eligibility", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+            reverse(
+                "apply:application_eligibility",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
         )
         self.assertRedirects(
             response,
-            reverse("apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}),
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
             fetch_redirect_response=False,
         )
 
@@ -2776,11 +2854,17 @@ class ApplicationViewTest(TestCase):
         apply_session.save()
 
         response = self.client.get(
-            reverse("apply:application_eligibility", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk})
+            reverse(
+                "apply:application_eligibility",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
         )
         self.assertRedirects(
             response,
-            reverse("apply:application_resume", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}),
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
             fetch_redirect_response=False,
         )
 
@@ -2796,14 +2880,14 @@ class ApplicationViewTest(TestCase):
         response = self.client.get(
             reverse(
                 "apply:application_eligibility",
-                kwargs={"company_pk": company.pk, "job_seeker_pk": eligibility_diagnosis.job_seeker.pk},
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": eligibility_diagnosis.job_seeker.public_id},
             )
         )
         self.assertRedirects(
             response,
             reverse(
                 "apply:application_resume",
-                kwargs={"company_pk": company.pk, "job_seeker_pk": eligibility_diagnosis.job_seeker.pk},
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": eligibility_diagnosis.job_seeker.public_id},
             ),
             fetch_redirect_response=False,
         )
@@ -2822,7 +2906,7 @@ class ApplicationViewTest(TestCase):
         response = self.client.post(
             reverse(
                 "apply:application_eligibility",
-                kwargs={"company_pk": company.pk, "job_seeker_pk": eligibility_diagnosis.job_seeker.pk},
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": eligibility_diagnosis.job_seeker.public_id},
             ),
             {"level_1_1": True, "shrouded": "whatever"},
         )
@@ -2830,7 +2914,7 @@ class ApplicationViewTest(TestCase):
             response,
             reverse(
                 "apply:application_resume",
-                kwargs={"company_pk": company.pk, "job_seeker_pk": eligibility_diagnosis.job_seeker.pk},
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": eligibility_diagnosis.job_seeker.public_id},
             ),
             fetch_redirect_response=False,
         )
@@ -2842,7 +2926,7 @@ class ApplicationViewTest(TestCase):
         response = self.client.post(
             reverse(
                 "apply:application_eligibility",
-                kwargs={"company_pk": company.pk, "job_seeker_pk": eligibility_diagnosis.job_seeker.pk},
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": eligibility_diagnosis.job_seeker.public_id},
             ),
             {"level_1_1": True},
         )
@@ -2850,7 +2934,7 @@ class ApplicationViewTest(TestCase):
             response,
             reverse(
                 "apply:application_resume",
-                kwargs={"company_pk": company.pk, "job_seeker_pk": eligibility_diagnosis.job_seeker.pk},
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": eligibility_diagnosis.job_seeker.public_id},
             ),
             fetch_redirect_response=False,
         )
@@ -2906,7 +2990,8 @@ class LastCheckedAtViewTest(TestCase):
         apply_session.save()
 
         url = reverse(
-            "apply:application_jobs", kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk}
+            "apply:application_jobs",
+            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
         )
         response = self.client.get(url)
         assert response.status_code == 200
@@ -2914,7 +2999,7 @@ class LastCheckedAtViewTest(TestCase):
         # Check the presence of the verify link
         update_url = reverse(
             "apply:update_job_seeker_step_1",
-            kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
+            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
         )
         link_check = self.assertContains if sees_verify_link else self.assertNotContains
         link_check(response, f'<a class="btn btn-link" href="{update_url}">Vérifier le profil</a>', html=True)
@@ -2956,21 +3041,25 @@ class UpdateJobSeekerBaseTestCase(TestCase):
         cls.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         cls.job_seeker = JobSeekerFactory(with_ban_geoloc_address=True)
         cls.step_1_url = reverse(
-            cls.STEP_1_VIEW_NAME, kwargs={"company_pk": cls.company.pk, "job_seeker_pk": cls.job_seeker.pk}
+            cls.STEP_1_VIEW_NAME,
+            kwargs={"company_pk": cls.company.pk, "job_seeker_public_id": cls.job_seeker.public_id},
         )
         cls.step_2_url = reverse(
-            cls.STEP_2_VIEW_NAME, kwargs={"company_pk": cls.company.pk, "job_seeker_pk": cls.job_seeker.pk}
+            cls.STEP_2_VIEW_NAME,
+            kwargs={"company_pk": cls.company.pk, "job_seeker_public_id": cls.job_seeker.public_id},
         )
         cls.step_3_url = reverse(
-            cls.STEP_3_VIEW_NAME, kwargs={"company_pk": cls.company.pk, "job_seeker_pk": cls.job_seeker.pk}
+            cls.STEP_3_VIEW_NAME,
+            kwargs={"company_pk": cls.company.pk, "job_seeker_public_id": cls.job_seeker.public_id},
         )
         cls.step_end_url = reverse(
-            cls.STEP_END_VIEW_NAME, kwargs={"company_pk": cls.company.pk, "job_seeker_pk": cls.job_seeker.pk}
+            cls.STEP_END_VIEW_NAME,
+            kwargs={"company_pk": cls.company.pk, "job_seeker_public_id": cls.job_seeker.public_id},
         )
         [cls.city] = create_test_cities(["67"], num_per_department=1)
 
         cls.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT = "Informations modifiables par le candidat uniquement"
-        cls.job_seeker_session_key = f"job_seeker-{cls.job_seeker.pk}"
+        cls.job_seeker_session_key = f"job_seeker-{cls.job_seeker.public_id}"
 
     def _check_nothing_permitted(self, user):
         self.client.force_login(user)
@@ -3150,7 +3239,7 @@ class UpdateJobSeekerBaseTestCase(TestCase):
             response,
             reverse(
                 self.FINAL_REDIRECT_VIEW_NAME,
-                kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
+                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
             ),
             fetch_redirect_response=False,
         )
@@ -3239,7 +3328,7 @@ class UpdateJobSeekerBaseTestCase(TestCase):
             response,
             reverse(
                 self.FINAL_REDIRECT_VIEW_NAME,
-                kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk},
+                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
             ),
             fetch_redirect_response=False,
         )
@@ -3525,7 +3614,8 @@ class UpdateJobSeekerStep3ViewTestCase(TestCase):
         # STEP 1 to setup jobseeker session
         response = self.client.get(
             reverse(
-                "apply:update_job_seeker_step_1", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}
+                "apply:update_job_seeker_step_1",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
         assert response.status_code == 200
@@ -3533,7 +3623,8 @@ class UpdateJobSeekerStep3ViewTestCase(TestCase):
         # Go straight to STEP 3
         response = self.client.get(
             reverse(
-                "apply:update_job_seeker_step_3", kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk}
+                "apply:update_job_seeker_step_3",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
         self.assertContains(
@@ -3702,14 +3793,17 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk},
+                kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
 
         # Must redirect to resume
         assertRedirects(
             response,
-            reverse("apply:application_resume", kwargs={"company_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk}),
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
             fetch_redirect_response=False,
         )
         self.assertTemplateNotUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
@@ -3721,14 +3815,17 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk},
+                kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
 
         # Must redirect to resume
         assertRedirects(
             response,
-            reverse("apply:application_resume", kwargs={"company_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk}),
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
             fetch_redirect_response=False,
         )
         self.assertTemplateNotUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
@@ -3741,14 +3838,17 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk},
+                kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
 
         # Must redirect to resume
         assertRedirects(
             response,
-            reverse("apply:application_resume", kwargs={"company_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk}),
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
             fetch_redirect_response=False,
         )
         self.assertTemplateNotUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
@@ -3763,7 +3863,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": self.company.pk, "job_seeker_pk": job_seeker.pk},
+                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
         assert response.status_code == 404
@@ -3774,7 +3874,8 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         self._setup_session()
 
         geiq_eligibility_url = reverse(
-            "apply:application_geiq_eligibility", kwargs={"company_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk}
+            "apply:application_geiq_eligibility",
+            kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": job_seeker.public_id},
         )
         response = self.client.get(geiq_eligibility_url)
 
@@ -3785,7 +3886,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         response = self.client.get(
             reverse(
                 "apply:application_resume",
-                kwargs={"company_pk": self.geiq.pk, "job_seeker_pk": job_seeker.pk},
+                kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
         )
         self.assertContains(response, geiq_eligibility_url)
@@ -3798,7 +3899,10 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": self.geiq.pk, "job_seeker_pk": self.job_seeker_with_geiq_diagnosis.pk},
+                kwargs={
+                    "company_pk": self.geiq.pk,
+                    "job_seeker_public_id": self.job_seeker_with_geiq_diagnosis.public_id,
+                },
             ),
             follow=True,
         )
@@ -3812,7 +3916,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": self.geiq.pk, "job_seeker_pk": job_seeker_without_diagnosis.pk},
+                kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": job_seeker_without_diagnosis.public_id},
             ),
             follow=True,
         )
@@ -3830,7 +3934,10 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         response = self.client.get(
             reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": diagnosis.author_geiq.pk, "job_seeker_pk": job_seeker_without_diagnosis.pk},
+                kwargs={
+                    "company_pk": diagnosis.author_geiq.pk,
+                    "job_seeker_public_id": job_seeker_without_diagnosis.public_id,
+                },
             ),
             follow=True,
         )
@@ -3844,7 +3951,10 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         response = self.client.post(
             reverse(
                 "apply:application_geiq_eligibility",
-                kwargs={"company_pk": self.geiq.pk, "job_seeker_pk": self.job_seeker_with_geiq_diagnosis.pk},
+                kwargs={
+                    "company_pk": self.geiq.pk,
+                    "job_seeker_public_id": self.job_seeker_with_geiq_diagnosis.public_id,
+                },
             ),
             data={"jeune_26_ans": True},
         )
@@ -3853,7 +3963,10 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
             response,
             reverse(
                 "apply:application_resume",
-                kwargs={"company_pk": self.geiq.pk, "job_seeker_pk": self.job_seeker_with_geiq_diagnosis.pk},
+                kwargs={
+                    "company_pk": self.geiq.pk,
+                    "job_seeker_public_id": self.job_seeker_with_geiq_diagnosis.public_id,
+                },
             ),
             fetch_redirect_response=False,
         )
@@ -3871,7 +3984,10 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
                 response = self.client.post(
                     reverse(
                         "apply:application_geiq_eligibility",
-                        kwargs={"company_pk": self.geiq.pk, "job_seeker_pk": self.job_seeker_with_geiq_diagnosis.pk},
+                        kwargs={
+                            "company_pk": self.geiq.pk,
+                            "job_seeker_public_id": self.job_seeker_with_geiq_diagnosis.public_id,
+                        },
                     ),
                     data=post_data,
                     follow=True,
@@ -3889,14 +4005,15 @@ class CheckPreviousApplicationsViewTestCase(TestCase):
         cls.job_seeker = JobSeekerFactory()
         cls.check_infos_url = reverse(
             "apply:step_check_job_seeker_info",
-            kwargs={"company_pk": cls.company.pk, "job_seeker_pk": cls.job_seeker.pk},
+            kwargs={"company_pk": cls.company.pk, "job_seeker_public_id": cls.job_seeker.public_id},
         )
         cls.check_prev_applications_url = reverse(
             "apply:step_check_prev_applications",
-            kwargs={"company_pk": cls.company.pk, "job_seeker_pk": cls.job_seeker.pk},
+            kwargs={"company_pk": cls.company.pk, "job_seeker_public_id": cls.job_seeker.public_id},
         )
         cls.application_jobs_url = reverse(
-            "apply:application_jobs", kwargs={"company_pk": cls.company.pk, "job_seeker_pk": cls.job_seeker.pk}
+            "apply:application_jobs",
+            kwargs={"company_pk": cls.company.pk, "job_seeker_public_id": cls.job_seeker.public_id},
         )
 
     def _login_and_setup_session(self, user):
@@ -4135,7 +4252,7 @@ class FindJobSeekerForHireViewTestCase(TestCase):
             response,
             reverse(
                 "apply:check_job_seeker_info_for_hire",
-                kwargs={"company_pk": self.company.pk, "job_seeker_pk": job_seeker.pk},
+                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
         )
 
@@ -4176,7 +4293,7 @@ class FindJobSeekerForHireViewTestCase(TestCase):
             response,
             reverse(
                 "apply:check_job_seeker_info_for_hire",
-                kwargs={"company_pk": self.company.pk, "job_seeker_pk": job_seeker.pk},
+                kwargs={"company_pk": self.company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
         )
 
@@ -4241,7 +4358,7 @@ class CheckJobSeekerInformationsForHireTestCase(TestCase):
         response = self.client.get(
             reverse(
                 "apply:check_job_seeker_info_for_hire",
-                kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk},
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
         self.assertContains(
@@ -4255,14 +4372,14 @@ class CheckJobSeekerInformationsForHireTestCase(TestCase):
             response,
             reverse(
                 "apply:update_job_seeker_step_1_for_hire",
-                kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk},
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
         )
         self.assertContains(
             response,
             reverse(
                 "apply:check_prev_applications_for_hire",
-                kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk},
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
         )
 
@@ -4284,7 +4401,7 @@ class CheckJobSeekerInformationsForHireTestCase(TestCase):
         response = self.client.get(
             reverse(
                 "apply:check_job_seeker_info_for_hire",
-                kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk},
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
         self.assertContains(
@@ -4297,14 +4414,14 @@ class CheckJobSeekerInformationsForHireTestCase(TestCase):
             response,
             reverse(
                 "apply:update_job_seeker_step_1_for_hire",
-                kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk},
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
         )
         self.assertContains(
             response,
             reverse(
                 "apply:check_prev_applications_for_hire",
-                kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk},
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             ),
         )
         self.assertContains(response, reverse("dashboard:index"))
@@ -4317,7 +4434,9 @@ class CheckPreviousApplicationsForHireViewTestCase(TestCase):
         cls.job_seeker = JobSeekerFactory()
 
     def _reverse(self, view_name):
-        return reverse(view_name, kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk})
+        return reverse(
+            view_name, kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id}
+        )
 
     def test_no_previous_as_employer(self):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
@@ -4367,7 +4486,9 @@ class EligibilityForHireTestCase(TestCase):
         cls.job_seeker = JobSeekerFactory(first_name="Ellie", last_name="Gibilitay")
 
     def _reverse(self, view_name):
-        return reverse(view_name, kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk})
+        return reverse(
+            view_name, kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id}
+        )
 
     def test_not_subject_to_eligibility(self):
         self.company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True)
@@ -4414,7 +4535,9 @@ class GEIQEligibilityForHireTestCase(TestCase):
         cls.job_seeker = JobSeekerFactory(first_name="Ellie", last_name="Gibilitay")
 
     def _reverse(self, view_name):
-        return reverse(view_name, kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk})
+        return reverse(
+            view_name, kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id}
+        )
 
     def test_not_geiq(self):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
@@ -4481,7 +4604,9 @@ class HireConfirmationTestCase(TestCase):
         cls.city = create_city_geispolsheim()
 
     def _reverse(self, view_name):
-        return reverse(view_name, kwargs={"company_pk": self.company.pk, "job_seeker_pk": self.job_seeker.pk})
+        return reverse(
+            view_name, kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id}
+        )
 
     @override_settings(API_BAN_BASE_URL="http://ban-api")
     @mock.patch(

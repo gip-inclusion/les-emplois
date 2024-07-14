@@ -1,7 +1,6 @@
 import argparse
 
 from django.db import transaction
-from django.db.models import Exists, OuterRef, Subquery
 from django.utils import timezone
 
 from itou.approvals import models as approvals_models
@@ -62,7 +61,7 @@ class Command(BaseCommand):
             "--preserve-to-company-data",
             action=argparse.BooleanOptionalAction,
             default=False,
-            help="Do not override <TO> company brand, description, phone and coords with <FROM> data.",
+            help="Do not override <TO> company brand, description and phone with <FROM> data.",
         )
         parser.add_argument(
             "--only-job-applications",
@@ -114,16 +113,7 @@ class Command(BaseCommand):
         self.stdout.write(f"| Employee records created: {employee_records_created_count}")
 
         if move_all_data:
-            # Move Job Description not already present in company destination, Job Applications
-            # related will be attached to Job Description present in company destination
-            appellation_subquery = Subquery(
-                companies_models.JobDescription.objects.filter(
-                    company_id=to_id, appellation_id=OuterRef("appellation_id")
-                )
-            )
-            job_descriptions = companies_models.JobDescription.objects.filter(company_id=from_id).exclude(
-                Exists(appellation_subquery)
-            )
+            job_descriptions = companies_models.JobDescription.objects.filter(company_id=from_id)
             self.stdout.write(f"| Job descriptions: {job_descriptions.count()}\n")
 
             # Move users not already present in company destination
@@ -175,10 +165,6 @@ class Command(BaseCommand):
                 f"| Description \n{to_company.description}\nwill be updated with\n{from_company.description}\n"
             )
             self.stdout.write(f"| Phone '{to_company.phone}' will be updated with '{from_company.phone}'\n")
-            self.stdout.write(f"| Coords '{to_company.coords}' will be updated with '{from_company.coords}'\n")
-            self.stdout.write(
-                f"| Geoscore '{to_company.geocoding_score}' will be updated with '{from_company.geocoding_score}'\n"
-            )
 
         if not wet_run:
             self.stdout.write("Nothing to do in dry run mode.\n")
@@ -193,34 +179,11 @@ class Command(BaseCommand):
                 for job_application in job_applications_received:
                     job_application.selected_jobs.clear()
 
-            # If we move job_description, we have to take care of existant job_description linked
-            # to company B (destination), because we can't have 2 job_applications with the same Appellation
-            # for one company. Job applications linked to these kind of job_description have to be
-            # unlinked to be transfered. Job_description can be different enough to be irrelevant.
-            if move_all_data:
-                # find Appellation linked to job_description company B
-                to_company_appellation_id = companies_models.JobDescription.objects.filter(
-                    company_id=to_id
-                ).values_list("appellation_id", flat=True)
-
-                # find job_applications in company A, linked with job_description which Appellation is found in siae B
-                job_applications_to_clear = job_applications_models.JobApplication.objects.filter(
-                    to_company_id=from_id,
-                    selected_jobs__in=companies_models.JobDescription.objects.filter(
-                        company_id=from_id, appellation_id__in=to_company_appellation_id
-                    ),
-                )
-
-                # clean job_applications to let them be transfered in company B
-                for job_application in job_applications_to_clear:
-                    job_application.selected_jobs.clear()
-
             job_applications_sent.update(sender_company_id=to_id)
             job_applications_received.update(to_company_id=to_id)
 
             if move_all_data:
-                # do not move duplicated job_descriptions
-                job_descriptions.exclude(appellation_id__in=to_company_appellation_id).update(company_id=to_id)
+                job_descriptions.update(company_id=to_id)
                 members.update(company_id=to_id)
                 diagnoses.update(author_siae_id=to_id)
                 prolongations.update(declared_by_siae_id=to_id)
@@ -231,8 +194,6 @@ class Command(BaseCommand):
                         brand=from_company.display_name,
                         description=from_company.description,
                         phone=from_company.phone,
-                        coords=from_company.coords,
-                        geocoding_score=from_company.geocoding_score,
                     )
                 from_company_qs.update(
                     block_job_applications=True,

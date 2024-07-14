@@ -5,11 +5,11 @@
 
 {% block title %}{{ siae.display_name }} {{ block.super }}{% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <h1>{{ siae.display_name }}</h1>
     <h2>{{ siae.get_kind_display }}</h2>
     <div class="c-box c-box--action">

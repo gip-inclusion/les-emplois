@@ -5,11 +5,11 @@
 
 {% block title %}Collaborateurs {{ block.super }}{% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <h1>Structure</h1>
     <h2>{{ siae.kind }} {{ siae.display_name }}</h2>
     <p>
@@ -17,28 +17,31 @@
     </p>
 {% endblock %}
 
+{% block title_extra %}
+    <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="1">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'companies_views:job_description_list' %}" {% matomo_event "employeurs" "clic" "voir-liste-metiers" %}>
+                <span>Métiers et recrutements</span>
+                <span class="badge badge-sm rounded-pill ms-2">{{ jobs_count }}</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'companies_views:members' %}" {% matomo_event "employeurs" "clic" "gerer-collaborateurs" %}>
+                <span>Collaborateurs</span>
+                <span class="badge badge-sm rounded-pill ms-2">{{ siae.active_members.count }}</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'companies_views:show_financial_annexes' %}">Annexes financières</a>
+        </li>
+    </ul>
+{% endblock %}
+
 {% block content %}
-    <section class="s-tabs-01">
-        <div class="s-tabs-01__container container">
-            <div class="s-tabs-01__row row">
-                <div class="s-tabs-01__col col-12">
-                    <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true" data-it-sliding-tabs-startindex="1">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'companies_views:job_description_list' %}" {% matomo_event "employeurs" "clic" "voir-liste-metiers" %}>
-                                <span>Métiers et recrutements</span>
-                                <span class="badge badge-sm rounded-pill ms-2">{{ jobs_count }}</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="{% url 'companies_views:members' %}" {% matomo_event "employeurs" "clic" "gerer-collaborateurs" %}>
-                                <span>Collaborateurs</span>
-                                <span class="badge badge-sm rounded-pill ms-2">{{ siae.active_members.count }}</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'companies_views:show_financial_annexes' %}">Annexes financières</a>
-                        </li>
-                    </ul>
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="s-section__row row">
+                <div class="s-section__col col-12">
                     <div class="tab-content">
                         <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
                             <h2 class="mb-0">Collaborateurs</h2>

@@ -8,11 +8,11 @@
 
 {% block nb_columns %}8{% endblock %}
 
-{% block breadcrumbs %}
+{% block title_prevstep %}
     {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
-{% block content_title %}
+{% block title_content %}
     <h1>{{ job.display_name }}</h1>
     {% if job.is_active %}
         <p>

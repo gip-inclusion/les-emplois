@@ -51,32 +51,32 @@ urlpatterns = [
     ),
     # Submit - common.
     path(
-        "<int:company_pk>/create/<int:job_seeker_pk>/check_job_seeker_info",
+        "<int:company_pk>/create/<uuid:job_seeker_public_id>/check_job_seeker_info",
         submit_views.CheckJobSeekerInformations.as_view(),
         name="step_check_job_seeker_info",
     ),
     path(
-        "<int:company_pk>/create/<int:job_seeker_pk>/check_prev_applications",
+        "<int:company_pk>/create/<uuid:job_seeker_public_id>/check_prev_applications",
         submit_views.CheckPreviousApplications.as_view(),
         name="step_check_prev_applications",
     ),
     path(
-        "<int:company_pk>/create/<int:job_seeker_pk>/select_jobs",
+        "<int:company_pk>/create/<uuid:job_seeker_public_id>/select_jobs",
         submit_views.ApplicationJobsView.as_view(),
         name="application_jobs",
     ),
     path(
-        "<int:company_pk>/create/<int:job_seeker_pk>/eligibility",
+        "<int:company_pk>/create/<uuid:job_seeker_public_id>/eligibility",
         submit_views.ApplicationEligibilityView.as_view(),
         name="application_eligibility",
     ),
     path(
-        "<int:company_pk>/create/<int:job_seeker_pk>/geiq_eligibility",
+        "<int:company_pk>/create/<uuid:job_seeker_public_id>/geiq_eligibility",
         submit_views.ApplicationGEIQEligibilityView.as_view(),
         name="application_geiq_eligibility",
     ),
     path(
-        "<int:company_pk>/create/<int:job_seeker_pk>/resume",
+        "<int:company_pk>/create/<uuid:job_seeker_public_id>/resume",
         submit_views.ApplicationResumeView.as_view(),
         name="application_resume",
     ),
@@ -87,22 +87,22 @@ urlpatterns = [
     ),
     # Job seeker check/updates
     path(
-        "<int:company_pk>/update_job_seeker/<int:job_seeker_pk>/1",
+        "<int:company_pk>/update_job_seeker/<uuid:job_seeker_public_id>/1",
         submit_views.UpdateJobSeekerStep1View.as_view(),
         name="update_job_seeker_step_1",
     ),
     path(
-        "<int:company_pk>/update_job_seeker/<int:job_seeker_pk>/2",
+        "<int:company_pk>/update_job_seeker/<uuid:job_seeker_public_id>/2",
         submit_views.UpdateJobSeekerStep2View.as_view(),
         name="update_job_seeker_step_2",
     ),
     path(
-        "<int:company_pk>/update_job_seeker/<int:job_seeker_pk>/3",
+        "<int:company_pk>/update_job_seeker/<uuid:job_seeker_public_id>/3",
         submit_views.UpdateJobSeekerStep3View.as_view(),
         name="update_job_seeker_step_3",
     ),
     path(
-        "<int:company_pk>/update_job_seeker/<int:job_seeker_pk>/end",
+        "<int:company_pk>/update_job_seeker/<uuid:job_seeker_public_id>/end",
         submit_views.UpdateJobSeekerStepEndView.as_view(),
         name="update_job_seeker_step_end",
     ),
@@ -144,58 +144,58 @@ urlpatterns = [
         kwargs={"hire_process": True},
     ),
     path(
-        "<int:company_pk>/hire/update-job-seeker/<int:job_seeker_pk>/1",
+        "<int:company_pk>/hire/update-job-seeker/<uuid:job_seeker_public_id>/1",
         submit_views.UpdateJobSeekerStep1View.as_view(),
         name="update_job_seeker_step_1_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
-        "<int:company_pk>/hire/update-job-seeker/<int:job_seeker_pk>/2",
+        "<int:company_pk>/hire/update-job-seeker/<uuid:job_seeker_public_id>/2",
         submit_views.UpdateJobSeekerStep2View.as_view(),
         name="update_job_seeker_step_2_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
-        "<int:company_pk>/hire/update-job-seeker/<int:job_seeker_pk>/3",
+        "<int:company_pk>/hire/update-job-seeker/<uuid:job_seeker_public_id>/3",
         submit_views.UpdateJobSeekerStep3View.as_view(),
         name="update_job_seeker_step_3_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
-        "<int:company_pk>/hire/update-job-seeker/<int:job_seeker_pk>/end",
+        "<int:company_pk>/hire/update-job-seeker/<uuid:job_seeker_public_id>/end",
         submit_views.UpdateJobSeekerStepEndView.as_view(),
         name="update_job_seeker_step_end_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
-        "<int:company_pk>/hire/<int:job_seeker_pk>/check-infos",
+        "<int:company_pk>/hire/<uuid:job_seeker_public_id>/check-infos",
         submit_views.CheckJobSeekerInformationsForHire.as_view(),
         name="check_job_seeker_info_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
-        "<int:company_pk>/hire/<int:job_seeker_pk>/check-previous-applications",
+        "<int:company_pk>/hire/<uuid:job_seeker_public_id>/check-previous-applications",
         submit_views.CheckPreviousApplications.as_view(),
         name="check_prev_applications_for_hire",
         kwargs={"hire_process": True},
     ),
     path(
-        "<int:company_pk>/hire/<int:job_seeker_pk>/eligibility",
+        "<int:company_pk>/hire/<uuid:job_seeker_public_id>/eligibility",
         submit_views.eligibility_for_hire,
         name="eligibility_for_hire",
     ),
     path(
-        "<int:company_pk>/hire/<int:job_seeker_pk>/geiq-eligibility",
+        "<int:company_pk>/hire/<uuid:job_seeker_public_id>/geiq-eligibility",
         submit_views.geiq_eligibility_for_hire,
         name="geiq_eligibility_for_hire",
     ),
     path(
-        "<int:company_pk>/hire/<int:job_seeker_pk>/geiq-eligibility-criteria",
+        "<int:company_pk>/hire/<uuid:job_seeker_public_id>/geiq-eligibility-criteria",
         submit_views.geiq_eligibility_criteria_for_hire,
         name="geiq_eligibility_criteria_for_hire",
     ),
     path(
-        "<int:company_pk>/hire/<int:job_seeker_pk>/confirm",
+        "<int:company_pk>/hire/<uuid:job_seeker_public_id>/confirm",
         submit_views.hire_confirmation,
         name="hire_confirmation",
     ),
@@ -302,5 +302,96 @@ urlpatterns = [
         "<int:company_pk>/accept/reload_job_description_fields",
         process_views.ReloadJobDescriptionFields.as_view(),
         name="reload_job_description_fields",
+    ),
+]
+
+# NOTE: temporary URL patterns to help with migration which will be removed next week
+urlpatterns += [
+    path(
+        "<int:company_pk>/create/<int:job_seeker_pk>/check_job_seeker_info",
+        submit_views.CheckJobSeekerInformations.as_view(),
+    ),
+    path(
+        "<int:company_pk>/create/<int:job_seeker_pk>/check_prev_applications",
+        submit_views.CheckPreviousApplications.as_view(),
+    ),
+    path(
+        "<int:company_pk>/create/<int:job_seeker_pk>/select_jobs",
+        submit_views.ApplicationJobsView.as_view(),
+    ),
+    path(
+        "<int:company_pk>/create/<int:job_seeker_pk>/eligibility",
+        submit_views.ApplicationEligibilityView.as_view(),
+    ),
+    path(
+        "<int:company_pk>/create/<int:job_seeker_pk>/geiq_eligibility",
+        submit_views.ApplicationGEIQEligibilityView.as_view(),
+    ),
+    path(
+        "<int:company_pk>/create/<int:job_seeker_pk>/resume",
+        submit_views.ApplicationResumeView.as_view(),
+    ),
+    path(
+        "<int:company_pk>/update_job_seeker/<int:job_seeker_pk>/1",
+        submit_views.UpdateJobSeekerStep1View.as_view(),
+    ),
+    path(
+        "<int:company_pk>/update_job_seeker/<int:job_seeker_pk>/2",
+        submit_views.UpdateJobSeekerStep2View.as_view(),
+    ),
+    path(
+        "<int:company_pk>/update_job_seeker/<int:job_seeker_pk>/3",
+        submit_views.UpdateJobSeekerStep3View.as_view(),
+    ),
+    path(
+        "<int:company_pk>/update_job_seeker/<int:job_seeker_pk>/end",
+        submit_views.UpdateJobSeekerStepEndView.as_view(),
+    ),
+    path(
+        "<int:company_pk>/hire/update-job-seeker/<int:job_seeker_pk>/1",
+        submit_views.UpdateJobSeekerStep1View.as_view(),
+        name="update_job_seeker_step_1_for_hire_pk_redirect",
+        kwargs={"hire_process": True},
+    ),
+    path(
+        "<int:company_pk>/hire/update-job-seeker/<int:job_seeker_pk>/2",
+        submit_views.UpdateJobSeekerStep2View.as_view(),
+        kwargs={"hire_process": True},
+    ),
+    path(
+        "<int:company_pk>/hire/update-job-seeker/<int:job_seeker_pk>/3",
+        submit_views.UpdateJobSeekerStep3View.as_view(),
+        kwargs={"hire_process": True},
+    ),
+    path(
+        "<int:company_pk>/hire/update-job-seeker/<int:job_seeker_pk>/end",
+        submit_views.UpdateJobSeekerStepEndView.as_view(),
+        kwargs={"hire_process": True},
+    ),
+    path(
+        "<int:company_pk>/hire/<int:job_seeker_pk>/check-infos",
+        submit_views.CheckJobSeekerInformationsForHire.as_view(),
+        kwargs={"hire_process": True},
+    ),
+    path(
+        "<int:company_pk>/hire/<int:job_seeker_pk>/check-previous-applications",
+        submit_views.CheckPreviousApplications.as_view(),
+        kwargs={"hire_process": True},
+    ),
+    path(
+        "<int:company_pk>/hire/<int:job_seeker_pk>/eligibility",
+        submit_views.eligibility_for_hire,
+    ),
+    path(
+        "<int:company_pk>/hire/<int:job_seeker_pk>/geiq-eligibility",
+        submit_views.geiq_eligibility_for_hire,
+    ),
+    path(
+        "<int:company_pk>/hire/<int:job_seeker_pk>/geiq-eligibility-criteria",
+        submit_views.geiq_eligibility_criteria_for_hire,
+    ),
+    path(
+        "<int:company_pk>/hire/<int:job_seeker_pk>/confirm",
+        submit_views.hire_confirmation,
     ),
 ]

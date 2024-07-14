@@ -1,0 +1,4 @@
+{% extends "layout/base_email_text_subject.txt" %}
+{% block subject %}
+Votre candidature mise en attente par {{ job_application.to_company.kind }} {{ job_application.to_company.display_name }}
+{% endblock %}

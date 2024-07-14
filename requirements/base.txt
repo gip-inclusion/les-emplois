@@ -247,9 +247,9 @@ diff-match-patch==20230430 \
     --hash=sha256:953019cdb9c9d2c9e47b5b12bcff3cf4746fc4598eb406076fa1fc27e6a1f15c \
     --hash=sha256:dce43505fb7b1b317de7195579388df0746d90db07015ed47a85e5e44930ef93
     # via django-import-export
-django==5.0.6 \
-    --hash=sha256:8363ac062bb4ef7c3f12d078f6fa5d154031d129a15170a1066412af49d30905 \
-    --hash=sha256:ff1b61005004e476e0aeea47c7f79b85864c70124030e95146315396f1e7951f
+django==5.0.7 \
+    --hash=sha256:bd4505cae0b9bd642313e8fb71810893df5dc2ffcacaa67a33af2d5cd61888f2 \
+    --hash=sha256:f216510ace3de5de01329463a315a629f33480e893a9024fc93d8c32c22913da
     # via
     #   -r requirements/base.in
     #   django-allauth
