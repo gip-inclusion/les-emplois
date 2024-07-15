@@ -306,8 +306,8 @@ django==5.0.7 \
     #   django-xworkflows
     #   djangorestframework
     #   drf-spectacular
-django-allauth==0.63.3 \
-    --hash=sha256:2374164c468a309e6badf70bc3405136df6036f24a20a13387f2a063066bdaa9
+django-allauth==0.63.6 \
+    --hash=sha256:f15f49defb09e0604dad5214e53a69a1f723cb03176bb115c8930bcd19b91749
     # via -r requirements/base.txt
 django-anymail==11.0 \
     --hash=sha256:add43d8dc496b559146be112e8088a9986d5a1253fb8fe1fbd225924db64d947 \
@@ -855,7 +855,6 @@ psycopg[binary]==3.1.10 \
     # via
     #   -r requirements/base.txt
     #   django-citext
-    #   psycopg
 psycopg-binary==3.1.10 \
     --hash=sha256:0471869e658d0c6b8c3ed53153794739c18d7dad2dd5b8e6ff023a364c20f7df \
     --hash=sha256:0f062f20256708929a58c41d44f350efced4c00a603323d1413f6dc0b84d95a5 \
