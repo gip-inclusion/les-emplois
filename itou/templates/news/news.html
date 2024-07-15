@@ -1,0 +1,49 @@
+{% extends "layout/base.html" %}
+{% load theme_inclusion %}
+
+{% block title %}Nouveautés {{ block.super }}{% endblock %}
+
+{% block title_content %}<h1>Nouveautés</h1>{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            {# NOTE: news is paginated by year #}
+            {% for month_news in news %}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h4>
+                        {{ month_news.start_date|date:"F Y"|capfirst }}
+                        <span class="badge badge-base bg-emploi-light text-info fs-sm mb-1 mx-1 rounded-pill" aria-label="nombre des articles">{{ month_news.items.count }}</span>
+                    </h4>
+                </div>
+                {% for news_item in month_news.items.all %}
+                    <div class="row mb-4">
+                        <div class="col-12 col-md-4 border border-muted rounded text-center" aria-hidden="true">
+                            {% if news_item.image %}
+                            <img src="{{ news_item.image.url }}" class="w-100" />
+                            {% else %}
+                            <img src="{% static_theme_images 'ico-bicro-important.svg' %}" class="w-100" style="filter: grayscale(100%); opacity: 0.3" />
+                            {% endif %}
+                        </div>
+                        <div class="col-12 col-md-8">
+                            <p aria-label="groupes d'utilisateurs concernées">
+                                {% for tag in news_item.user_kind_labels %}
+                                <span class="badge badge-base bg-emploi-light text-info fs-sm">
+                                    {{ tag|upper }}
+                                </span>
+                                {% endfor %}
+                            </p>
+                            <h4>{{ news_item.title }}</h4>
+                            <p>{{ news_item.description }}</p>
+                            {% if news_item.link %}
+                            <a href="{{ news_item.link }}" rel="noopener" target="_blank" class="font-weight-bold text-decoration-none" aria-label="Plus d'infos">En savoir plus <i class="ri-external-link-line ri-lg"></i></a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}

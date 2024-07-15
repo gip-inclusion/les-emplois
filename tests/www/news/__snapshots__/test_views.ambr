@@ -1,0 +1,663 @@
+# serializer version: 1
+# name: TestNewsRender.test_campaign_rendered_dashboard
+  '''
+  <!DOCTYPE html>
+  <html lang="fr"><head>
+          <meta charset="utf-8"/>
+          <title> Nouveautés - Les emplois de l'inclusion </title>
+          
+              <meta content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs inclusifs (structures de l'insertion par l'activité économique et du secteur adapté)" name="description"/>
+          
+          <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  
+          
+          <meta content="Les emplois de l'inclusion" name="title"/>
+          
+          <meta content='{"includeIndicatorStyles": false, "allowScriptTags":false, "requestClass": "has-spinner-loading"}' name="htmx-config"/>
+          
+          <meta content="website" property="og:type"/>
+          <meta content="http://localhost:8000" property="og:url"/>
+          <meta content="Les emplois de l'inclusion" property="og:title"/>
+          <meta content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs inclusifs (structures de l'insertion par l'activité économique et du secteur adapté)" property="og:description"/>
+          <meta content="http://localhost:8000/static/img/logo_metatags.png" property="og:image"/>
+          
+          <meta content="summary_large_image" property="twitter:card"/>
+          <meta content="http://localhost:8000" property="twitter:url"/>
+          <meta content="Les emplois de l'inclusion" property="twitter:title"/>
+          <meta content="Les emplois de l'inclusion facilitent le retour à l'emploi des personnes en situation d'exclusion par l'orientation et le recrutement auprès d'employeurs inclusifs (structures de l'insertion par l'activité économique et du secteur adapté)" property="twitter:description"/>
+          <meta content="http://localhost:8000/static/img/logo_metatags.png" property="twitter:image"/>
+  
+          <link href="/static/vendor/theme-inclusion/images/favicon.ico" rel="shortcut icon" type="image/ico"/>
+          <link href="/static/vendor/theme-inclusion/stylesheets/app.css" rel="stylesheet"/>
+          <link href="/static/css/itou.css" rel="stylesheet"/>
+          
+      </head>
+      <body class="">
+          <noscript>
+              <div class="alert alert-info">
+                  <p class="mb-0">
+                      Pour bénéficier de toutes les fonctionnalités de ce site, l’activation de JavaScript est nécessaire.
+                      Voici les <a href="https://www.enablejavascript.io/" rel="noopener" target="_blank">
+                      instructions pour activer JavaScript dans votre navigateur Web</a>.
+                  </p>
+              </div>
+          </noscript>
+          <nav aria-label="Accès rapide" class="visually-hidden" role="navigation" tabindex="0">
+              <ul>
+                  <li>
+                      <a href="#nav-primary">Aller au menu principal</a>
+                  </li>
+                  <li>
+                      <a href="#main">Aller au contenu principal</a>
+                  </li>
+              </ul>
+          </nav>
+          <div class="global-messages-container">
+              
+          </div>
+  
+          
+  
+  
+  
+  
+  
+          
+  
+  
+  <header id="header" role="banner">
+      <section class="s-header">
+          <div class="s-header__container container">
+              <div class="s-header__row row">
+                  <div class="s-header__col s-header__col--logo-ministere col col-md-auto d-flex align-items-center pe-0">
+                      <a class="s-header__logo-ministere" href="/">
+                          <img alt="Rébublique Française" src="/static/vendor/theme-inclusion/images/logo-republique-francaise.svg"/>
+                      </a>
+                  </div>
+                  <div class="s-header__col s-header__col--logo-service col-auto d-flex align-items-center px-0">
+                      <a href="/">
+                          <img alt="Les emplois de l'inclusion" height="90" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion.svg"/>
+                      </a>
+                  </div>
+                  <div class="s-header__col s-header__col--nav col d-none d-xl-inline-flex d-xl-flex align-items-center justify-content-end">
+                      <nav aria-label="Menu de navigation principale" id="nav-primary" role="navigation">
+                          
+  
+  
+  <ul>
+      <li class="dropdown">
+          <button aria-controls="helpDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-link dropdown-toggle" data-bs-toggle="dropdown" type="button">Besoin d'aide ?</button>
+          <div class="dropdown-menu" id="helpDropdown">
+              <ul class="list-unstyled">
+                  <li>
+                      <a aria-label="Accéder à l'espace de documentation (nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_documentation" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" rel="noopener" target="_blank">Documentation</a>
+                  </li>
+                  <li>
+                      <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">Qui peut bénéficier des contrats d'IAE ?</a>
+                  </li>
+                  
+                  <li>
+                      <a aria-label="Les nouveautés du site des emplois de l'inclusion (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_nouveautes" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/categories/25225629682321--Nouveaut%C3%A9s" rel="noopener" target="_blank">Nouveautés</a>
+                  </li>
+              </ul>
+          </div>
+      </li>
+      
+          <li>
+              <a class="btn btn-ico btn-outline-primary" href="/signup/">
+                  <i aria-hidden="true" class="ri-user-add-line"></i>
+                  <span>S'inscrire</span>
+              </a>
+          </li>
+          <li class="dropdown">
+              <button aria-controls="loginUserDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-ico btn-primary" data-bs-toggle="dropdown">
+                  <i aria-hidden="true" class="ri-login-box-line"></i>
+                  <span>Se connecter</span>
+              </button>
+              <div class="dropdown-menu" id="loginUserDropdown">
+                  <ul class="list-unstyled">
+                      <li>
+                          <a class="dropdown-item" href="/login/job_seeker">
+                              Candidat
+                          </a>
+                      </li>
+                      <li>
+                          <a class="dropdown-item" href="/login/prescriber">
+                              Prescripteur
+                          </a>
+                      </li>
+                      <li>
+                          <a class="dropdown-item" href="/login/employer">
+                              Employeur inclusif
+                          </a>
+                      </li>
+                      <li>
+                          <a class="dropdown-item" href="/login/labor_inspector">
+                              Institution partenaire
+                          </a>
+                      </li>
+                  </ul>
+              </div>
+          </li>
+      
+  </ul>
+  
+                      </nav>
+                  </div>
+                  <div class="s-header__col s-header__col--burger col d-flex align-items-center justify-content-end d-xl-none">
+                      <button aria-controls="burgerNav" aria-label="Ouvrir la navigation principale pour mobile" data-bs-target="#burgerNav" data-bs-toggle="offcanvas" type="button">
+                          <i aria-hidden="true" class="ri-menu-line"></i>
+                      </button>
+                  </div>
+                  <div aria-label="Navigation principale pour mobile" class="offcanvas offcanvas-end" id="burgerNav">
+                      <button aria-label="Fermer la navigation principale pour mobile" data-bs-dismiss="offcanvas" type="button">
+                          <i aria-hidden="true" class="ri-close-line" id="close"></i>
+                      </button>
+                      <nav aria-label="Menu de navigation principale pour mobile" role="navigation">
+                          
+  
+  
+  <ul>
+      <li class="dropdown">
+          <button aria-controls="helpDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-link dropdown-toggle mh-auto p-0" data-bs-toggle="dropdown" type="button">Besoin d'aide ?</button>
+          <div class="dropdown-menu" id="helpDropdownMobile">
+              <ul class="list-unstyled">
+                  <li>
+                      <a aria-label="Accéder à l'espace de documentation (nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_documentation" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" rel="noopener" target="_blank">Documentation</a>
+                  </li>
+                  <li>
+                      <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">Qui peut bénéficier des contrats d'IAE ?</a>
+                  </li>
+                  
+                  <li>
+                      <a aria-label="Les nouveautés du site des emplois de l'inclusion (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_nouveautes" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/categories/25225629682321--Nouveaut%C3%A9s" rel="noopener" target="_blank">Nouveautés</a>
+                  </li>
+              </ul>
+          </div>
+      </li>
+      
+          <li>
+              <a class="btn btn-ico btn-outline-primary" href="/signup/">
+                  <i aria-hidden="true" class="ri-user-add-line"></i>
+                  <span>S'inscrire</span>
+              </a>
+          </li>
+          <li class="dropdown">
+              <button aria-controls="loginUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-ico btn-primary" data-bs-toggle="dropdown">
+                  <i aria-hidden="true" class="ri-login-box-line"></i>
+                  <span>Se connecter</span>
+              </button>
+              <div class="dropdown-menu" id="loginUserDropdownMobile">
+                  <ul class="list-unstyled">
+                      <li>
+                          <a class="dropdown-item" href="/login/job_seeker">
+                              Candidat
+                          </a>
+                      </li>
+                      <li>
+                          <a class="dropdown-item" href="/login/prescriber">
+                              Prescripteur
+                          </a>
+                      </li>
+                      <li>
+                          <a class="dropdown-item" href="/login/employer">
+                              Employeur inclusif
+                          </a>
+                      </li>
+                      <li>
+                          <a class="dropdown-item" href="/login/labor_inspector">
+                              Institution partenaire
+                          </a>
+                      </li>
+                  </ul>
+              </div>
+          </li>
+      
+  </ul>
+  
+                          <ul>
+      
+      <li>
+          <a class="" href="/search/employers">Rechercher un emploi inclusif</a>
+      </li>
+      <li>
+          <a class="" href="/search/prescribers">Rechercher des prescripteurs habilités</a>
+      </li>
+  </ul>
+  
+                      </nav>
+                  </div>
+              </div>
+          </div>
+      </section>
+      <section class="s-postheader d-none d-xl-block">
+          <div class="s-postheader__container container">
+              <div class="s-postheader__row row">
+                  <div class="s-postheader__col col-12 d-flex align-items-center">
+                      <nav aria-label="Navigation secondaire" role="navigation">
+                          <ul>
+      
+      <li>
+          <a class="" href="/search/employers">Rechercher un emploi inclusif</a>
+      </li>
+      <li>
+          <a class="" href="/search/prescribers">Rechercher des prescripteurs habilités</a>
+      </li>
+  </ul>
+  
+                      </nav>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </header>
+  
+  
+          <main class="s-main" id="main" role="main">
+              <div aria-atomic="true" aria-live="polite" class="toast-container">
+  
+  </div>
+  
+              <section class="s-title-02">
+                  <div class="s-title-02__container container">
+                      <div class="s-title-02__row row">
+                          <div class="s-title-02__col col-12">
+                              
+                              <h1>Nouveautés</h1>
+                              
+                                  
+  
+  
+                              
+                              
+                          </div>
+                      </div>
+                  </div>
+              </section>
+  
+              
+      <section class="s-section">
+          <div class="s-section__container container">
+              
+              
+              <div class="row mb-4">
+                  <div class="col-12">
+                      <h4>
+                          Janvier 2024
+                          <span aria-label="nombre des articles" class="badge badge-base bg-emploi-light text-info fs-sm mb-1 mx-1 rounded-pill">4</span>
+                      </h4>
+                  </div>
+                  
+                      <div class="row mb-4">
+                          <div aria-hidden="true" class="col-12 col-md-4 border border-muted rounded text-center">
+                              
+                              <img class="w-100" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg" style="filter: grayscale(100%); opacity: 0.3"/>
+                              
+                          </div>
+                          <div class="col-12 col-md-8">
+                              <p aria-label="groupes d'utilisateurs concernées">
+                                  
+                                  <span class="badge badge-base bg-emploi-light text-info fs-sm">
+                                      CANDIDAT
+                                  </span>
+                                  
+                                  <span class="badge badge-base bg-emploi-light text-info fs-sm">
+                                      PRESCRIPTEUR
+                                  </span>
+                                  
+                              </p>
+                              <h4>Nouveau fonctionnalité sur notre site</h4>
+                              <p>C'est désormais possible de faire des nouveaux actions avec votre compte</p>
+                              
+                              <a aria-label="Plus d'infos" class="font-weight-bold text-decoration-none" href="https://emplois.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">En savoir plus <i class="ri-external-link-line ri-lg"></i></a>
+                              
+                          </div>
+                      </div>
+                  
+                      <div class="row mb-4">
+                          <div aria-hidden="true" class="col-12 col-md-4 border border-muted rounded text-center">
+                              
+                              <img class="w-100" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg" style="filter: grayscale(100%); opacity: 0.3"/>
+                              
+                          </div>
+                          <div class="col-12 col-md-8">
+                              <p aria-label="groupes d'utilisateurs concernées">
+                                  
+                                  <span class="badge badge-base bg-emploi-light text-info fs-sm">
+                                      CANDIDAT
+                                  </span>
+                                  
+                                  <span class="badge badge-base bg-emploi-light text-info fs-sm">
+                                      PRESCRIPTEUR
+                                  </span>
+                                  
+                              </p>
+                              <h4>Nouveau fonctionnalité sur notre site</h4>
+                              <p>C'est désormais possible de faire des nouveaux actions avec votre compte</p>
+                              
+                              <a aria-label="Plus d'infos" class="font-weight-bold text-decoration-none" href="https://emplois.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">En savoir plus <i class="ri-external-link-line ri-lg"></i></a>
+                              
+                          </div>
+                      </div>
+                  
+                      <div class="row mb-4">
+                          <div aria-hidden="true" class="col-12 col-md-4 border border-muted rounded text-center">
+                              
+                              <img class="w-100" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg" style="filter: grayscale(100%); opacity: 0.3"/>
+                              
+                          </div>
+                          <div class="col-12 col-md-8">
+                              <p aria-label="groupes d'utilisateurs concernées">
+                                  
+                                  <span class="badge badge-base bg-emploi-light text-info fs-sm">
+                                      CANDIDAT
+                                  </span>
+                                  
+                                  <span class="badge badge-base bg-emploi-light text-info fs-sm">
+                                      PRESCRIPTEUR
+                                  </span>
+                                  
+                              </p>
+                              <h4>Nouveau fonctionnalité sur notre site</h4>
+                              <p>C'est désormais possible de faire des nouveaux actions avec votre compte</p>
+                              
+                              <a aria-label="Plus d'infos" class="font-weight-bold text-decoration-none" href="https://emplois.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">En savoir plus <i class="ri-external-link-line ri-lg"></i></a>
+                              
+                          </div>
+                      </div>
+                  
+                      <div class="row mb-4">
+                          <div aria-hidden="true" class="col-12 col-md-4 border border-muted rounded text-center">
+                              
+                              <img class="w-100" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg" style="filter: grayscale(100%); opacity: 0.3"/>
+                              
+                          </div>
+                          <div class="col-12 col-md-8">
+                              <p aria-label="groupes d'utilisateurs concernées">
+                                  
+                                  <span class="badge badge-base bg-emploi-light text-info fs-sm">
+                                      CANDIDAT
+                                  </span>
+                                  
+                                  <span class="badge badge-base bg-emploi-light text-info fs-sm">
+                                      PRESCRIPTEUR
+                                  </span>
+                                  
+                              </p>
+                              <h4>Nouveau fonctionnalité sur notre site</h4>
+                              <p>C'est désormais possible de faire des nouveaux actions avec votre compte</p>
+                              
+                              <a aria-label="Plus d'infos" class="font-weight-bold text-decoration-none" href="https://emplois.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">En savoir plus <i class="ri-external-link-line ri-lg"></i></a>
+                              
+                          </div>
+                      </div>
+                  
+              </div>
+              
+          </div>
+      </section>
+  
+          </main>
+  
+          
+  
+  
+  
+  <footer id="footer" role="contentinfo">
+  
+      <section class="s-footer-quick">
+          <div class="s-footer-quick__container container">
+              <div class="s-footer-quick__row row">
+                  <div class="s-footer-quick__col col-12 col-md-6 col-lg-auto">
+                      <strong>Accès rapides</strong>
+                      <ul>
+                          
+                          <li>
+                              <a href="/search/employers">Rechercher un emploi inclusif</a>
+                          </li>
+                          <li>
+                              <a href="/search/prescribers">Rechercher des prescripteurs habilités</a>
+                          </li>
+                          <li>
+                              <a href="/versions/">Journal des modifications</a>
+                          </li>
+                      </ul>
+                  </div>
+  
+                  <div class="s-footer-quick__col col-12 col-md-6 col-lg-auto">
+                      <strong>Besoin d'aide ?</strong>
+                      <ul>
+                          <li>
+                              <a aria-label="Accéder à l'espace de documentation (nouvel onglet)" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="footer_documentation" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" rel="noopener" target="_blank">Documentation</a>
+                          </li>
+                          <li>
+                              <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="footer_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">Qui peut bénéficier des contrats d'IAE ?</a>
+                          </li>
+                          <li>
+                              <a aria-label="Disponibilité (ouverture dans un nouvel onglet)" href="https://updown.io/p/vjjst" target="_blank">Disponibilité</a>
+                          </li>
+                      </ul>
+                  </div>
+  
+                  <div class="s-footer-quick__col col-12 col-lg-auto">
+                      <strong>Réseaux sociaux</strong>
+                      <ul>
+                          <li>
+                              <a aria-label="Rejoignez-nous sur Twitter (lien externe)" href="https://twitter.com/inclusion_gouv" target="_blank"><i aria-hidden="true" class="ri-twitter-fill text-dark"></i> Twitter</a>
+                          </li>
+                          <li>
+                              <a aria-label="Rejoignez-nous sur Linkedin (lien externe)" href="https://www.linkedin.com/company/inclusion-gouv/" target="_blank"><i aria-hidden="true" class="ri-linkedin-box-fill text-dark"></i> LinkedIn</a>
+                          </li>
+                          <li>
+                              <a aria-label="Rejoignez-nous sur Facebook (lien externe)" href="https://www.facebook.com/inclusion.gouv/" target="_blank"><i aria-hidden="true" class="ri-facebook-box-fill text-dark"></i> Facebook</a>
+                          </li>
+                          <li>
+                              <a aria-label="Rejoignez-nous sur Instagram (lien externe)" href="https://www.instagram.com/inclusion_gouv/" target="_blank"><i aria-hidden="true" class="ri-instagram-fill text-dark"></i> Instagram</a>
+                          </li>
+                          <li>
+                              <a aria-label="Rejoignez-nous sur Youtube (lien externe)" href="https://www.youtube.com/channel/UC06_yIYfzAiDOMTemH9q3OQ" target="_blank"><i aria-hidden="true" class="ri-youtube-fill text-dark"></i> Youtube</a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+      <section class="s-footer-gip">
+          <div class="s-footer-gip__container container">
+              <div class="s-footer-gip__row row">
+                  <div class="s-footer-gip__col s-footer-gip__col--logo col-12 col-md-6 col-lg-auto">
+                      <a aria-label="Découvrez les services de la plateforme de l'inclusion (lien externe)" href="https://inclusion.beta.gouv.fr/" target="_blank">
+                          <img alt="Logo de la Plateforme de l'inclusion" height="80" src="/static/vendor/theme-inclusion/images/logo-plateforme-inclusion.svg"/>
+                      </a>
+                  </div>
+                  <div class="s-footer-gip__col col-12 col-md-6 col-lg">
+                      <p class="mb-1">
+                          <strong>Ce service fait partie de la Plateforme de l’inclusion</strong>
+                      </p>
+                      <p class="m-0">
+                          Découvrez les outils qui portent l'inclusion au
+                          <br class="d-none d-md-inline"/>
+                          coeur de leur service. A chaque service, son objectif.
+                          <br/>
+                          <a aria-label="Découvrez les services de la plateforme de l'inclusion (lien externe)" class="has-external-link" href="https://inclusion.beta.gouv.fr/" target="_blank">Découvrez nos services</a>
+                      </p>
+                  </div>
+                  <div class="s-footer-gip__col s-footer-gip__col--links col-12 col-lg-auto">
+                      <ul>
+                          <li>
+                              <a aria-label="Incubateur de services publics numériques — beta.gouv.fr (lien externe)" href="https://beta.gouv.fr/" target="_blank">beta.gouv.fr</a>
+                          </li>
+                          <li>
+                              <a aria-label="Data.gouv.fr (lien externe)" href="https://www.data.gouv.fr/fr/" target="_blank">data.gouv.fr</a>
+                          </li>
+                          <li>
+                              <a aria-label="Simplifiez le partage et la circulation des données administratives grace à api.gouv.fr (lien externe)" href="https://api.gouv.fr/" target="_blank">api.gouv.fr</a>
+                          </li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </section>
+  
+      <section class="s-footer-legal">
+          <div class="s-footer-legal__container container">
+              <div class="s-footer-legal__row row">
+                  <div class="s-footer-legal__col col-12">
+                      <ul>
+                          <li>
+                              <a href="/accessibility/">Accessibilité : partiellement conforme</a>
+                          </li>
+                          <li>
+                              <a href="/legal/notice/">Mentions légales</a>
+                          </li>
+                          <li>
+                              <a href="/legal/terms/">Conditions générales</a>
+                          </li>
+                          <li>
+                              <a href="/legal/privacy/">Confidentialité</a>
+                          </li>
+                          <li>
+                              <a href="/stats/">Statistiques, lexiques et indicateurs</a>
+                          </li>
+                      </ul>
+                      <p>
+                          Sauf mention contraire, tous les contenus de ce site sont sous licence <a aria-label="Licence ouverte Etalab (lien externe)" href="https://github.com/etalab/licence-ouverte/blob/master/LO.md" target="_blank">etalab-2.0</a>
+                      </p>
+                  </div>
+              </div>
+          </div>
+      </section>
+  </footer>
+  
+  
+          <div class="visually-hidden">
+              <a href="#header">Retour au début de la page</a>
+          </div>
+  
+          <script src="/static/vendor/jquery/jquery.min.js"></script>
+          <script src="/static/vendor/bootstrap/popper.min.js"></script>
+          <script src="/static/vendor/bootstrap/bootstrap.min.js"></script>
+          <script src="/static/vendor/duetds-date-picker/duet.js"></script>
+          <script src="/static/vendor/tarteaucitron/tarteaucitron.js"></script>
+          <script src="/static/vendor/tiny-slider/min/tiny-slider.js"></script>
+          <script src="/static/vendor/theme-inclusion/javascripts/app.js"></script>
+          <script src="/static/vendor/htmx/htmx.min.js"></script>
+          
+          <script src="/static/js/htmx_handlers.js"></script>
+          <script src="/static/js/modal_control.js"></script>
+          <script src="/static/js/prevent_multiple_submit.js"></script>
+          <script src="/static/js/utils.js"></script>
+          <script src="/static/js/duet_date_picker_widget.js"></script>
+          <script src="/static/admin/js/vendor/select2/select2.full.min.js"></script>
+          <script src="/static/admin/js/vendor/select2/i18n/fr.js"></script>
+          <script src="/static/django_select2/django_select2.js"></script>
+  
+          <script nonce="NORMALIZED_CSP_NONCE">
+              // Tarteaucitron's language is set according to the browser configuration
+              // but a lot of users don't know how to change it.
+              // This can be forced only by using a global `var` statement.
+              // https://github.com/AmauriC/tarteaucitron.js/blob/98b02b0bdda670bd953752d85443c3fd77dde724/tarteaucitron.js#L5
+              var tarteaucitronForceLanguage = "fr";
+  
+              /* beautify ignore:start */
+              tarteaucitron.init({
+                  "privacyUrl": "", /* Privacy policy url */
+                  "bodyPosition": "bottom", /* or top to bring it as first element for accessibility */
+                  "hashtag": "#tarteaucitron", /* Open the panel with this hashtag */
+                  "cookieName": "tarteaucitron", /* Cookie name */
+                  "orientation": "bottom", /* Banner position (top - bottom) */
+                  "groupServices": false, /* Group services by category */
+                  "serviceDefaultState": "wait", /* Default state (true - wait - false) */
+                  "showAlertSmall": false, /* Show the small banner on bottom right */
+                  "cookieslist": false, /* Show the cookie list */
+                  "closePopup": false, /* Show a close X on the banner */
+                  "showIcon": true, /* Show cookie icon to manage cookies */
+                  //"iconSrc": "", /* Optionnal: URL or base64 encoded image */
+                  "iconPosition": "BottomLeft", /* BottomRight, BottomLeft, TopRight and TopLeft */
+                  "adblocker": false, /* Show a Warning if an adblocker is detected */
+                  "DenyAllCta" : true, /* Show the deny all button */
+                  "AcceptAllCta" : true, /* Show the accept all button when highPrivacy on */
+                  "highPrivacy": true, /* HIGHLY RECOMMANDED Disable auto consent */
+                  "handleBrowserDNTRequest": false, /* If Do Not Track == 1, disallow all */
+                  "removeCredit": true, /* Remove credit link */
+                  "moreInfoLink": true, /* Show more info link */
+                  "useExternalCss": true, /* If false, the tarteaucitron.css file will be loaded */
+                  "useExternalJs": false, /* If false, the tarteaucitron.js file will be loaded */
+                  //"cookieDomain": ".my-multisite-domaine.fr", /* Shared cookie for multisite */
+                  "readmoreLink": "/legal/privacy/#cookies", /* Change the default readmore link */
+                  "mandatory": true, /* Show a message about mandatory cookies */
+                  "mandatoryCta": true /* Show the disabled accept button when mandatory on */
+              });
+  
+              // Hotjar.
+              (tarteaucitron.job = tarteaucitron.job || []).push('hotjar');
+              
+              
+              tarteaucitron.user.HotjarSv = 6;
+  
+              
+              /* beautify ignore:end */
+  
+              // livestorm
+              const tablet_width = 750;
+              tarteaucitron.services.livestorm = {
+                  "key": "livestorm",
+                  "type": "video",
+                  "name": "Livestorm",
+                  "uri": "https://livestorm.co/fr/politique-confidentialite",
+                  "needConsent": true,
+                  "cookies": [],
+                  "js": function() {
+                      "use strict";
+                      tarteaucitron.fallback(['js-tac-livestorm'], function(x) {
+                          var frame_title = tarteaucitron.fixSelfXSS(x.getAttribute("title") || 'livestorm iframe'),
+                              width = x.getAttribute("width"),
+                              height = x.getAttribute("height"),
+                              url = x.getAttribute("data-url");
+  
+                          // Poor attempt to make the Livestorm iframe responsive.
+                          if (document.body.clientWidth > tablet_width) {
+                              height = "365px";
+                          }
+                          return '<iframe title="' + frame_title + '" src="' + url + '" style="min-height:' + height + ';" allowtransparency allowfullscreen></iframe>';
+                      });
+                  },
+                  "fallback": function() {
+                      "use strict";
+                      var id = 'livestorm';
+                      tarteaucitron.fallback(['js-tac-livestorm'], function(elem) {
+                          elem.style.width = elem.getAttribute('width');
+                          if (document.body.clientWidth > tablet_width) {
+                              elem.style.height = "310px";
+                          } else {
+                              elem.style.height = elem.getAttribute('height');
+                          }
+                          return tarteaucitron.engage(id);
+                      });
+                  }
+              };
+              (tarteaucitron.job = tarteaucitron.job || []).push('livestorm');
+          </script>
+  
+          
+  
+          <script nonce="NORMALIZED_CSP_NONCE">
+              // Show any toasts present in the loaded DOM
+              htmx.onLoad((target) => {
+                  $(".toast-container .toast", target).each(function() {
+                      $(this).toast("show");
+                  });
+              });
+          </script>
+  
+          
+  
+          
+  
+          
+      
+  
+  </body></html>
+  '''
+# ---

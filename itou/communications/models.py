@@ -4,9 +4,14 @@ from datetime import date
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import ArrayField
+from django.core.files.storage import storages
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
+
+from itou.files.models import File
+from itou.users.enums import UserKind
 
 
 class NotificationRecordQuerySet(models.QuerySet):
@@ -188,6 +193,10 @@ class AnnouncementItemQuerySet(models.QuerySet):
         return super().get_queryset().select_related("campaign")
 
 
+def image_upload(instance, filename):
+    return f"news-images/{filename}"
+
+
 class AnnouncementItem(models.Model):
     campaign = models.ForeignKey(
         AnnouncementCampaign, on_delete=models.CASCADE, related_name="items", verbose_name="campagne"
@@ -198,6 +207,34 @@ class AnnouncementItem(models.Model):
     title = models.TextField(null=False, blank=False, verbose_name="titre", help_text="résumé de nouveauté")
     description = models.TextField(
         null=False, blank=False, verbose_name="description", help_text="détail du nouveauté ; le contenu"
+    )
+    user_kind_tags = ArrayField(
+        null=True,
+        blank=True,
+        base_field=models.CharField(choices=UserKind.choices),
+        verbose_name="utilisateurs concernés",
+    )
+    image = models.ImageField(
+        null=True,
+        blank=True,
+        upload_to=image_upload,
+        storage=storages["public"],
+        verbose_name="capture d'écran",
+        help_text="1200x600 recommandé",
+    )
+    image_storage = models.OneToOneField(
+        File,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        verbose_name="image du stockage S3",
+    )
+    link = models.URLField(
+        null=True,
+        blank=True,
+        max_length=200,
+        verbose_name="lien externe",
+        help_text="en suivant l'utilisateur peut obtenir plus d'informations sur l'article",
     )
 
     objects = AnnouncementItemQuerySet.as_manager()
@@ -219,8 +256,26 @@ class AnnouncementItem(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
+        def get_image_storage_key():
+            return self.image.name
+
+        def create_image_storage():
+            self.image_storage = File.objects.create(key=get_image_storage_key())
+
+        if self.image:
+            if self.image_storage is None:
+                create_image_storage()
+            elif self.image_storage.key != get_image_storage_key():
+                self.image_storage.delete()
+                create_image_storage()
+
         self._update_cached_active_announcement()
 
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
         self._update_cached_active_announcement()
+
+    @property
+    def user_kind_labels(self):
+        return [UserKind(u).label for u in self.user_kind_tags]

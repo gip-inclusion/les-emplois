@@ -1,5 +1,7 @@
 from urllib.parse import urlencode
 
+from django.core.cache import cache
+
 import itou.approvals.enums as approvals_enums
 import itou.companies.enums as companies_enums
 import itou.institutions.enums as institutions_enums

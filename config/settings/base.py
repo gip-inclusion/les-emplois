@@ -621,6 +621,7 @@ CSP_IMG_SRC = [
     "https://*.tile.openstreetmap.org",
     "*.hotjar.com",
     "https://cdn.redoc.ly",
+    AWS_S3_ENDPOINT_URL,
 ]
 CSP_STYLE_SRC = [
     "'self'",

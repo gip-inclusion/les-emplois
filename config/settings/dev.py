@@ -67,6 +67,7 @@ API_GEO_BASE_URL = os.getenv("API_GEO_BASE_URL", "https://geo.api.gouv.fr")
 MATOMO_BASE_URL = os.getenv("MATOMO_BASE_URL", "https://matomo.inclusion.beta.gouv.fr/")
 MATOMO_SITE_ID = 220
 CSP_IMG_SRC.append(MATOMO_BASE_URL)  # noqa: F405
+CSP_IMG_SRC.append(AWS_S3_ENDPOINT_URL)  # noqa: F405
 CSP_SCRIPT_SRC.append(MATOMO_BASE_URL)  # noqa: F405
 CSP_CONNECT_SRC.append(MATOMO_BASE_URL)  # noqa: F405
 

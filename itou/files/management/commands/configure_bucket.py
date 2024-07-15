@@ -30,6 +30,13 @@ class Command(BaseCommand):
                 "Action": "s3:GetObject",
                 "Resource": f"arn:aws:s3:::{bucket}/resume/*",
             },
+            {
+                "Sid": "AllowPublicRead",
+                "Effect": "Allow",
+                "Principal": {"AWS": "*"},
+                "Action": "s3:GetObject",
+                "Resource": f"arn:aws:s3:::{bucket}/news-images/*",
+            },
         ]
         client.put_bucket_policy(
             Bucket=bucket,
