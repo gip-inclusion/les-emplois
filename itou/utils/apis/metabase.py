@@ -29,9 +29,13 @@ METABASE_DASHBOARDS = {
     #
     "stats_siae_aci": {
         "dashboard_id": 327,
+        "tally_popup_form_id": "3E0WLX",
+        "tally_embed_form_id": "w4jrLk",
     },
     "stats_siae_etp": {
         "dashboard_id": 440,
+        "tally_popup_form_id": "3N0oLB",
+        "tally_embed_form_id": "3qPVOY",
     },
     "stats_siae_hiring": {
         "dashboard_id": 185,
@@ -40,9 +44,13 @@ METABASE_DASHBOARDS = {
     },
     "stats_siae_auto_prescription": {
         "dashboard_id": 295,
+        "tally_popup_form_id": "nW0zPj",
+        "tally_embed_form_id": "waGd0v",
     },
     "stats_siae_follow_siae_evaluation": {
         "dashboard_id": 298,
+        "tally_popup_form_id": "mK01LA",
+        "tally_embed_form_id": "wL0pXj",
     },
     "stats_siae_hiring_report": {
         "dashboard_id": 394,
@@ -59,9 +67,13 @@ METABASE_DASHBOARDS = {
     },
     "stats_cd_hiring": {
         "dashboard_id": 346,
+        "tally_popup_form_id": "wg4GLl",
+        "tally_embed_form_id": "3Xq0Ej",
     },
     "stats_cd_brsa": {
         "dashboard_id": 330,
+        "tally_popup_form_id": "wzeYZa",
+        "tally_embed_form_id": "w52xL6",
     },
     "stats_cd_aci": {
         "dashboard_id": 327,
@@ -103,6 +115,8 @@ METABASE_DASHBOARDS = {
     #
     "stats_ph_state_main": {
         "dashboard_id": 149,
+        "tally_popup_form_id": "mRG61J",
+        "tally_embed_form_id": "3qLKad",
     },
     #
     # Institution stats - DDETS IAE - department level.
@@ -124,9 +138,13 @@ METABASE_DASHBOARDS = {
     },
     "stats_ddets_iae_follow_prolongation": {
         "dashboard_id": 357,
+        "tally_popup_form_id": "nG0lDp",
+        "tally_embed_form_id": "mO0GY7",
     },
     "stats_ddets_iae_tension": {
         "dashboard_id": 389,
+        "tally_popup_form_id": "nrEPLl",
+        "tally_embed_form_id": "3jxPWx",
     },
     "stats_ddets_iae_iae": {
         "dashboard_id": 117,
