@@ -1,10 +1,13 @@
 from urllib.parse import urlencode
 
+from django.core.cache import cache
+
 import itou.approvals.enums as approvals_enums
 import itou.companies.enums as companies_enums
 import itou.institutions.enums as institutions_enums
 import itou.job_applications.enums as job_applications_enums
 import itou.prescribers.enums as prescribers_enums
+from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENT_CAMPAIGN_KEY, update_active_announcement_cache
 
 
 def expose_enums(*args):
@@ -38,3 +41,17 @@ def matomo(request):
     context["matomo_custom_url"] = url
     context["matomo_user_id"] = getattr(request.user, "pk", None)
     return context
+
+
+def active_announcement_campaign(request):
+    active_campaign_announce = cache.get(CACHE_ACTIVE_ANNOUNCEMENT_CAMPAIGN_KEY)
+    if active_campaign_announce is None:
+        active_campaign_announce = update_active_announcement_cache()
+    else:
+        active_campaign_announce = active_campaign_announce["value"]
+
+    return {
+        "active_campaign_announce": active_campaign_announce
+        if active_campaign_announce and active_campaign_announce.items.count()
+        else None
+    }

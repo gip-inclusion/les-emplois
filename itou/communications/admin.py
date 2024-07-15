@@ -1,0 +1,19 @@
+from django.contrib import admin
+
+from itou.communications import models
+from itou.communications.admin_forms import AnnouncementCampaignAdminForm
+from itou.utils.admin import ItouModelAdmin, ItouTabularInline
+
+
+class AnnouncementItemInline(ItouTabularInline):
+    model = models.AnnouncementItem
+    fields = ("priority", "title", "description")
+    extra = 0
+
+
+@admin.register(models.AnnouncementCampaign)
+class AnnouncementCampaignAdmin(ItouModelAdmin):
+    list_display = ("start_date", "end_date")
+    fields = ("max_items", "start_date", "end_date")
+    inlines = (AnnouncementItemInline,)
+    form = AnnouncementCampaignAdminForm

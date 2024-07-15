@@ -1,0 +1,33 @@
+# serializer version: 1
+# name: TestRenderAnnouncementCampaign.test_campaign_rendered_dashboard
+  '''
+  <div aria-labelledby="news-modal-label" aria-modal="true" class="modal" id="news-modal" role="dialog" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title" id="news-modal-label">Il y a du nouveau !</h3>
+                  <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+              </div>
+              <div class="modal-body">
+                  <div aria-hidden="true" class="text-center mb-5">
+                      <img alt="Dessin d'étoiles" class="img-fluid color-filter-primary" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg"/>
+                  </div>
+                  
+                      <h6>1. Item A</h6>
+                      <p>Item A</p>
+                  
+                      <h6>2. Item B</h6>
+                      <p>Item B</p>
+                  
+                      <h6>3. Item C</h6>
+                      <p>Item C</p>
+                  
+              </div>
+              <div class="modal-footer">
+                  <a class="btn btn-sm btn-primary" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/categories/25225629682321--Nouveaut%C3%A9s">Voir toutes les nouveautés</a>
+              </div>
+          </div>
+      </div>
+  </div>
+  '''
+# ---

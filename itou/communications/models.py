@@ -107,3 +107,44 @@ class NotificationSettings(models.Model):
     @property
     def disabled_notifications_names(self):
         return self.disabled_notifications.actives().values_list("name", flat=True)
+
+
+class AnnouncementCampaign(models.Model):
+    """
+    It is possible on the website to launch announcement content for a limited time period,
+    intended for displaying the new features of the site to returning visitors
+    """
+
+    max_items = models.PositiveIntegerField(default=3, verbose_name="nombre d'articles affiché")
+    start_date = models.DateField(null=False)
+    end_date = models.DateField(null=False)
+
+    class Meta:
+        verbose_name = "campagne d'annonce"
+        ordering = ["start_date"]
+
+    def __str__(self):
+        return f"Campagne d'annonce du { self.start_date } à { self.end_date }"
+
+    def items_for_template(self):
+        return self.items.all()[: self.max_items]
+
+
+class AnnouncementItem(models.Model):
+    campaign = models.ForeignKey(
+        AnnouncementCampaign, on_delete=models.CASCADE, related_name="items", verbose_name="campagne"
+    )
+    priority = models.PositiveIntegerField(
+        default=0, verbose_name="priorité", help_text="le plus bas le valeur, le plus haut dans le fil des articles"
+    )
+    title = models.TextField(null=False, blank=False, verbose_name="titre", help_text="résumé de nouveauté")
+    description = models.TextField(
+        null=False, blank=False, verbose_name="description", help_text="détail du nouveauté ; le contenu"
+    )
+
+    class Meta:
+        verbose_name = "article d'annonce"
+        ordering = ["priority"]
+
+    def __str__(self):
+        return self.title
