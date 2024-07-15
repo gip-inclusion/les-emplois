@@ -394,3 +394,11 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
 .w-lg-400px .select2-selection__rendered {
     white-space: nowrap !important;
 }
+
+/* News Page
+--------------------------------------------------------------------------- */
+/* utility class soon included in the itou theme */
+.img-muted {
+    filter: grayscale(100%);
+    opacity: 0.3;
+}

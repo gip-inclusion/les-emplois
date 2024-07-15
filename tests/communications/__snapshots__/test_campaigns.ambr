@@ -24,7 +24,7 @@
                   
               </div>
               <div class="modal-footer">
-                  <a class="btn btn-sm btn-primary" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/categories/25225629682321--Nouveaut%C3%A9s">Voir toutes les nouveautés</a>
+                  <a class="btn btn-sm btn-primary" data-matomo-action="clic" data-matomo-category="modale-nouveautes" data-matomo-event="true" data-matomo-option="toutes-les-nouveautes" href="/announcements/news/">Voir toutes les nouveautés</a>
               </div>
           </div>
       </div>

@@ -28,8 +28,9 @@ class Command(BaseCommand):
                 "Effect": "Allow",
                 "Principal": {"AWS": "*"},
                 "Action": "s3:GetObject",
-                "Resource": f"arn:aws:s3:::{bucket}/resume/*",
-            },
+                "Resource": f"arn:aws:s3:::{bucket}/{path}/*",
+            }
+            for path in ["resume", "news-images"]
         ]
         client.put_bucket_policy(
             Bucket=bucket,

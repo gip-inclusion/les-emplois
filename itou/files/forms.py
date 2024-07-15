@@ -30,6 +30,15 @@ class ItouFileInput(forms.FileInput):
         return context
 
 
+class ItouAdminImageInput(forms.FileInput):
+    template_name = "utils/widgets/news_image_input.html"
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        context["selected_img_src"] = value.url if value and value.url else None
+        return context
+
+
 class ContentTypeValidator:
     content_type = None
     extension = None

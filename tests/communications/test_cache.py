@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 
+import pytest
 from django.core.cache import cache
 from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries
@@ -11,9 +12,12 @@ from tests.utils.test import TestCase
 
 
 class AnnouncementCampaignCacheTest(TestCase):
+    @pytest.fixture(autouse=True)
+    def empty_announcements_cache(self, empty_active_announcements_cache):
+        pass
+
     def test_active_announcement_campaign_context_processor_cached(self):
-        cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
-        campaign = AnnouncementCampaignFactory(with_item=True)
+        campaign = AnnouncementCampaignFactory(with_item=True, start_date=date.today().replace(day=1), live=True)
 
         with assertNumQueries(0):
             active_announcement_campaign(None)["active_campaign_announce"] == campaign
@@ -47,7 +51,6 @@ class AnnouncementCampaignCacheTest(TestCase):
             active_announcement_campaign(None)["active_campaign_announce"] is None
 
     def test_costless_announcement_campaign_cache_when_no_announcement_created(self):
-        cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
         cache_updated_query_cost = 1
 
         with assertNumQueries(cache_updated_query_cost):
@@ -58,7 +61,6 @@ class AnnouncementCampaignCacheTest(TestCase):
 
     @freeze_time("2024-01-30")
     def test_active_announcement_campaign_cache_timeout(self):
-        cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
         campaign = AnnouncementCampaignFactory(start_date=date(2024, 1, 1), with_item=True)
 
         with assertNumQueries(0):

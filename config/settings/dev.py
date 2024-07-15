@@ -80,6 +80,7 @@ METABASE_DATABASE = os.getenv("METABASE_DATABASE", os.getenv("PGDATABASE", "meta
 FORCE_IC_LOGIN = os.getenv("FORCE_IC_LOGIN", "True") == "True"
 
 AWS_STORAGE_BUCKET_NAME = "dev"
+CSP_IMG_SRC.append(f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/")  # noqa: F405
 
 # Don't use json formatter in dev
 del LOGGING["handlers"]["console"]["formatter"]  # noqa: F405
