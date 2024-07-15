@@ -21,6 +21,7 @@ from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.template import Context, Template
@@ -38,6 +39,7 @@ from itou.approvals.models import Suspension
 from itou.asp.models import Commune
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
+from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership
 from itou.job_applications.enums import JobApplicationState
@@ -73,6 +75,7 @@ from itou.utils.validators import (
     validate_siret,
 )
 from tests.approvals.factories import SuspensionFactory
+from tests.communications.factories import AnnouncementCampaignFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, CompanyPendingGracePeriodFactory
 from tests.institutions.factories import (
     InstitutionFactory,
@@ -1440,6 +1443,15 @@ def test_job_application_state_badge_processing(state, snapshot):
 def test_job_application_state_badge_oob_swap(snapshot):
     job_application = JobApplicationFactory(id="00000000-0000-0000-0000-000000000000")
     assert job_applications.state_badge(job_application, hx_swap_oob=True) == snapshot
+
+
+def test_active_announcement_campaign_context_processor(client):
+    cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
+    campaign = AnnouncementCampaignFactory(with_item=True)
+
+    response = client.get(reverse("search:employers_home"))
+    assert response.status_code == 200
+    assert response.context["active_campaign_announce"] == campaign
 
 
 class UtilsParseResponseToSoupTest(TestCase):
