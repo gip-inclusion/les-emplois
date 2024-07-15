@@ -1,5 +1,29 @@
 # Journal des modifications
 
+## 2024-07-15
+
+### Ajouté
+
+- [Candidature: ajout d'une notification au candidat et au prescripteur/orienteur éventuel lors d'une mise en attente](https://github.com/gip-inclusion/les-emplois/pull/4387)
+- [GPS : pagination et filtre par nom de bénéficiaire](https://github.com/gip-inclusion/les-emplois/pull/4361) 🖼
+- [Vie privée: utilisation du ID public en place de PK dans les URLs](https://github.com/gip-inclusion/les-emplois/pull/4395)
+
+### Modifié
+
+- [Admin: Amélioration de la page des candidature pour les actions du support](https://github.com/gip-inclusion/les-emplois/pull/4379) 🖼
+- [Annexes financières: corrige le calcul du statut actif de la convention](https://github.com/gip-inclusion/les-emplois/pull/4402)
+- [Candidature: Double fermeture de form sur les filtres candidats](https://github.com/gip-inclusion/les-emplois/pull/4401) 🖼
+- [GPS : indiquer que le téléphone du membre n'est pas renseigné ou que la date de naissance du bénéficiaire n'est pas renseignée](https://github.com/gip-inclusion/les-emplois/pull/4405) 🖼
+- [GPS: Corriger les dates de création des groupes de suivi créés par script](https://github.com/gip-inclusion/les-emplois/pull/4403)
+- [PASS IAE: modification des règles d'affichage de l'encart](https://github.com/gip-inclusion/les-emplois/pull/4386)
+- [UX/UI : changer la couleur de l'icone en bleu](https://github.com/gip-inclusion/les-emplois/pull/4346)
+- [UX/UI: Finalisation de l'adaptation de la section .s-title-02](https://github.com/gip-inclusion/les-emplois/pull/4411) 🖼
+
+### Supprimé
+
+- [Candidature: suppression des enquêtes Tally auprès des SIAE et des prescripteurs pour connaître leur pratiques concernant les candidatures faites par des candidats en autonomie](https://github.com/gip-inclusion/les-emplois/pull/4406)
+- [Tableau de bord: suppression de la bannière annonçant une enquête Tally aux employeurs SIAE](https://github.com/gip-inclusion/les-emplois/pull/4410)
+
 ## 2024-07-08
 
 ### Ajouté
