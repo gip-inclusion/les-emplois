@@ -1,0 +1,5 @@
+{% if selected_img_src %}
+    <img src="{{ selected_img_src }}" alt="l'image actuellement sélectionnée" class="img-preview-admin" />
+{% endif %}
+
+{% include "django/forms/widgets/file.html" %}

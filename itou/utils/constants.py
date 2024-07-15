@@ -19,3 +19,5 @@ ITOU_SESSION_NIR_KEY = "job_seeker_nir"
 MATOMO_SITE_PILOTAGE_ID = "146"
 
 MB = 1024 * 1024
+
+SUPPORTED_IMAGE_FILE_TYPES = {"image/png": "png", "image/jpeg": "jpeg", "image/jpg": "jpg", "image/gif": "gif"}

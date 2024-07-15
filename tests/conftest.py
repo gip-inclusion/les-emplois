@@ -169,6 +169,14 @@ def cached_announce_campaign():
 
 
 @pytest.fixture
+def empty_active_announcements_cache(cached_announce_campaign):
+    from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY
+
+    cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
+    yield
+
+
+@pytest.fixture
 def temporary_bucket():
     with override_settings(AWS_STORAGE_BUCKET_NAME=f"tests-{uuid.uuid4()}"):
         call_command("configure_bucket")

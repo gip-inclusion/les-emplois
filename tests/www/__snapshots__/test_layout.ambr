@@ -370,7 +370,7 @@
       </li>
       
       <li>
-          <a aria-label="Les nouveautés du site des emplois de l'inclusion (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_nouveautes" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/categories/25225629682321--Nouveaut%C3%A9s" rel="noopener" target="_blank">Nouveautés</a>
+          <a aria-label="Les nouveautés du site des emplois de l'inclusion" class="dropdown-item" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_nouveautes" href="/announcements/news/">Nouveautés</a>
       </li>
   </ul>
   

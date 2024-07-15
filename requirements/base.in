@@ -52,6 +52,9 @@ django-datadog-logger
 # django-redis (full featured cache backend)
 django-redis  # https://github.com/jazzband/django-redis
 
+# Pillow (image manipulation)
+pillow  # https://python-pillow.org/
+
 # Front-end
 # ------------------------------------------------------------------------------
 

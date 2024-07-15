@@ -1,6 +1,7 @@
 {% load static %}
 {% load theme_inclusion %}
 {% load django_bootstrap5 %}
+{% load matomo %}
 
 <input id="news-modal-start-date" type="hidden" value="{{ active_campaign_announce.start_date|date:'Y-m-d' }}" />
 
@@ -21,7 +22,7 @@
                 {% endfor %}
             </div>
             <div class="modal-footer">
-                <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/categories/25225629682321--Nouveaut%C3%A9s" class="btn btn-sm btn-primary">Voir toutes les nouveautés</a>
+                <a href="{% url 'announcements:news' %}" class="btn btn-sm btn-primary" {% matomo_event "modale-nouveautes" "clic" "toutes-les-nouveautes" %}>Voir toutes les nouveautés</a>
             </div>
         </div>
     </div>

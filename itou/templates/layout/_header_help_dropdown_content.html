@@ -30,11 +30,6 @@
         {% endif %}
     {% endif %}
     <li>
-        <a href="{{ ITOU_HELP_CENTER_URL }}/categories/25225629682321--Nouveaut%C3%A9s"
-           rel="noopener"
-           class="dropdown-item has-external-link"
-           target="_blank"
-           aria-label="Les nouveautés du site des emplois de l'inclusion (ouverture dans un nouvel onglet)"
-           {% matomo_event "help" "clic" "header_nouveautes" %}>Nouveautés</a>
+        <a href="{% url 'announcements:news' %}" class="dropdown-item" aria-label="Les nouveautés du site des emplois de l'inclusion" {% matomo_event "help" "clic" "header_nouveautes" %}>Nouveautés</a>
     </li>
 </ul>

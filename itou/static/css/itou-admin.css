@@ -16,3 +16,7 @@ form .aligned ul.inline li,
 form .form-row ul.inline li {
     list-style-type: none;
 }
+
+.img-preview-admin {
+    max-width: 300px
+}
