@@ -56,7 +56,11 @@ class FinancialAnnexesInline(ItouTabularInline):
     readonly_fields = ("number", "state", "start_at", "end_at", "is_active")
     can_delete = False
 
-    ordering = ("-number",)
+    ordering = (
+        "-end_at",
+        "-start_at",
+        "-number",
+    )
 
     @admin.display(boolean=True, description="active")
     def is_active(self, obj):
