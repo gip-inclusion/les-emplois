@@ -168,6 +168,7 @@ TEMPLATES = [
                 "itou.utils.settings_context_processors.expose_settings",
                 "itou.utils.context_processors.expose_enums",
                 "itou.utils.context_processors.matomo",
+                "itou.utils.context_processors.active_announcement_campaign",
             ]
         },
     }

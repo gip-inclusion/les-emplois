@@ -1,0 +1,44 @@
+{% load static %}
+{% load theme_inclusion %}
+{% load django_bootstrap5 %}
+
+<input id="news-modal-start-date" type="hidden" value="{{ active_campaign_announce.start_date|date:'Y-m-d' }}" />
+
+<div class="modal" id="news-modal" tabindex="-1" role="dialog" aria-labelledby="news-modal-label" aria-modal="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="news-modal-label">Il y a du nouveau !</h3>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-5" aria-hidden="true">
+                    <img class="img-fluid color-filter-primary" src="{% static_theme_images 'ico-bicro-important.svg' %}" alt="Dessin d'étoiles" />
+                </div>
+                {% for item in active_campaign_announce.items_for_template %}
+                    <h6>{{ forloop.counter }}. {{ item.title }}</h6>
+                    <p>{{ item.description }}</p>
+                {% endfor %}
+            </div>
+            <div class="modal-footer">
+                <a href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/categories/25225629682321--Nouveaut%C3%A9s" class="btn btn-sm btn-primary">Voir toutes les nouveautés</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script nonce="{{ CSP_NONCE }}">
+    $(document).ready(function() {
+        // news modal is rendered if there are recent updates which haven't been viewed on this device
+        if (supports_local_storage()) {
+            let lastNewsModalViewed = localStorage.getItem("lastNewsModalViewed");
+            let newsModalUpdated = new Date($("#news-modal-start-date").val());
+
+            if (!lastNewsModalViewed || new Date(lastNewsModalViewed) < newsModalUpdated) {
+                localStorage.setItem("lastNewsModalViewed", new Date().toISOString());
+                const newsModal = new bootstrap.Modal("#news-modal");
+                newsModal.show();
+            }
+        }
+    });
+</script>

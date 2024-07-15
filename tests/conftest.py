@@ -10,6 +10,7 @@ import pytest
 from django.conf import settings
 from django.contrib.gis.db.models.fields import get_srid_info
 from django.core import management
+from django.core.cache import cache
 from django.core.files.storage import default_storage, storages
 from django.core.management import call_command
 from django.db import connection
@@ -24,6 +25,7 @@ from rest_framework.test import APIClient
 # Rewrite before importing itou code.
 pytest.register_assert_rewrite("tests.utils.test", "tests.utils.htmx.test")
 
+from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY  # noqa: E402
 from itou.utils import faker_providers  # noqa: E402
 from itou.utils.storage.s3 import s3_client  # noqa: E402
 from tests.users.factories import ItouStaffFactory  # noqa: E402
@@ -141,9 +143,19 @@ def storage_prefix_per_test():
 @pytest.fixture(autouse=True)
 def cache_per_test(settings):
     caches = copy.deepcopy(settings.CACHES)
-    for cache in caches.values():
-        cache["KEY_PREFIX"] = f"{uuid.uuid4()}"
+    for cache_config in caches.values():
+        cache_config["KEY_PREFIX"] = f"{uuid.uuid4()}"
     settings.CACHES = caches
+
+
+@pytest.fixture(autouse=True)
+def cached_announce_campaign():
+    """
+    Populates cache for AnnouncementCampaign to avoid an extra database hit in many tests
+    """
+    cache.set(CACHE_ACTIVE_ANNOUNCEMENTS_KEY, None, None)
+    yield
+    cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
 
 
 @pytest.fixture

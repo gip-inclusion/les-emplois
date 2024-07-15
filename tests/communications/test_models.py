@@ -1,7 +1,12 @@
+from datetime import date
+
+from django.db import IntegrityError
+
 from itou.communications import registry as notifications_registry
 from itou.communications.apps import sync_notifications
 from itou.communications.dispatch.base import BaseNotification
 from itou.communications.models import NotificationRecord, NotificationSettings
+from tests.communications.factories import AnnouncementCampaignFactory
 from tests.companies.factories import CompanyMembershipFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase
@@ -93,3 +98,34 @@ class NotificationSettingsModelTest(TestCase):
             str(NotificationSettings.get_or_create(self.prescriber, self.prescriber_structure)[0])
             == f"Paramètres de notification de Bob DOE ({self.prescriber_structure})"
         )
+
+
+class AnnouncementCampaignModelTest(TestCase):
+    def test_end_date(self):
+        campaign = AnnouncementCampaignFactory(start_date=date(2024, 1, 1))
+        self.assertEqual(campaign.end_date, date(2024, 1, 31))
+
+    def test_max_items_constraint_too_low(self):
+        with self.assertRaises(IntegrityError):
+            AnnouncementCampaignFactory(max_items=0)
+
+    def test_max_items_constraint_too_high(self):
+        with self.assertRaises(IntegrityError):
+            AnnouncementCampaignFactory(max_items=11)
+
+    def test_start_date_day_constraint(self):
+        # must be on first day of month
+        with self.assertRaises(IntegrityError):
+            AnnouncementCampaignFactory(start_date=date(2024, 1, 2))
+
+    def test_start_date_conflict_constraint(self):
+        existing_campaign = AnnouncementCampaignFactory()
+
+        # can modify existing value without triggering constraint
+        existing_campaign = AnnouncementCampaignFactory(start_date=date(2024, 1, 1))
+        existing_campaign.start_date = date(2024, 2, 1)
+        existing_campaign.save()
+
+        # cannot conflict existing date with a new instance
+        with self.assertRaises(IntegrityError):
+            AnnouncementCampaignFactory(start_date=existing_campaign.start_date)
