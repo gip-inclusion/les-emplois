@@ -52,6 +52,14 @@
                         </a>
                     </div>
                 {% endif %}
+                {% if others_active_jobs and not siae.block_job_applications %}
+                    <div class="form-group col col-lg-auto">
+                        <a href="#recrutements" class="btn btn-lg btn-outline-white btn-block btn-ico">
+                            <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
+                            <span>Voir tous les métiers</span>
+                        </a>
+                    </div>
+                {% endif %}
                 <div class="form-group col-12 col-lg d-flex justify-content-center justify-content-lg-end">
                     <button class="btn btn-lg btn-ico btn-link-white" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Ouverture et fermeture du menu des actions complémentaires">
                         <i class="ri-more-2-line ri-lg font-weight-normal" aria-hidden="true"></i>
@@ -91,7 +99,7 @@
     </section>
 
     {% if others_active_jobs and not siae.block_job_applications %}
-        <section class="s-tabs-01 mt-0 pt-0">
+        <section id="recrutements" class="s-tabs-01 mt-0 pt-0">
             <div class="s-tabs-01__container container">
                 <div class="s-tabs-01__row row">
                     <div class="s-tabs-01__col col-12">

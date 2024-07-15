@@ -280,7 +280,14 @@ class JobDescriptionCardViewTest(TestCase):
         self.client.force_login(JobSeekerFactory(pk=10))
         response = self.client.get(url)
         soup = parse_response_to_soup(response, selector=".c-box--action")
-        assert str(soup) == self.snapshot()
+        assert str(soup) == self.snapshot(name="without_other_jobs")
+        # Create other job_description
+        JobDescriptionFactory(company=job_description.company)
+        response = self.client.get(url)
+        soup = parse_response_to_soup(response, selector=".c-box--action")
+        assert str(soup) == self.snapshot(name="with_other_jobs")
+        # Check link consistency
+        assert parse_response_to_soup(response, selector="#recrutements")
 
     def test_card_tally_url_no_user(self):
         job_description = JobDescriptionFactory(
