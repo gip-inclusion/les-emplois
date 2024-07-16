@@ -637,6 +637,8 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         # Hiring in the past is *temporarily* possible for GEIQ
         if hiring_start_at and hiring_start_at < datetime.date.today() and not self.is_geiq:
             self.add_error("hiring_start_at", forms.ValidationError(JobApplication.ERROR_START_IN_PAST))
+        elif hiring_start_at and hiring_start_at > datetime.date.today() + relativedelta(months=6):
+            self.add_error("hiring_start_at", forms.ValidationError(JobApplication.ERROR_START_IN_FAR_FUTURE))
         else:
             return hiring_start_at
 
