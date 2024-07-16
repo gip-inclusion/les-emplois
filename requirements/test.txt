@@ -356,9 +356,9 @@ django-select2==8.2.0 \
     --hash=sha256:0e173ce49c6ea91efa9fc24c5ca8d1f8a3c545e60db779cf2c623d4e07405360 \
     --hash=sha256:43ca01fecff1bd9ffaf87de90a4beca86fe801edd0c0102c3230c34f81490b9a
     # via -r requirements/base.txt
-django-storages==1.14.3 \
-    --hash=sha256:31f263389e95ce3a1b902fb5f739a7ed32895f7d8b80179fe7453ecc0dfe102e \
-    --hash=sha256:95a12836cd998d4c7a4512347322331c662d9114c4344f932f5e9c0fce000608
+django-storages==1.14.4 \
+    --hash=sha256:69aca94d26e6714d14ad63f33d13619e697508ee33ede184e462ed766dc2a73f \
+    --hash=sha256:d61930acb4a25e3aebebc6addaf946a3b1df31c803a6bf1af2f31c9047febaa3
     # via -r requirements/base.txt
 django-xworkflows==1.0.0 \
     --hash=sha256:b233b5244fb864f95ba935bd3f2214c55600db6294dbca544a6f9eb14918fb06 \
@@ -844,7 +844,6 @@ psycopg[binary]==3.1.10 \
     # via
     #   -r requirements/base.txt
     #   django-citext
-    #   psycopg
 psycopg-binary==3.1.10 \
     --hash=sha256:0471869e658d0c6b8c3ed53153794739c18d7dad2dd5b8e6ff023a364c20f7df \
     --hash=sha256:0f062f20256708929a58c41d44f350efced4c00a603323d1413f6dc0b84d95a5 \
