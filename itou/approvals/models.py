@@ -27,6 +27,7 @@ from itou.utils.apis import enums as api_enums, pole_emploi_api_client
 from itou.utils.apis.pole_emploi import DATE_FORMAT, PoleEmploiAPIBadResponse, PoleEmploiAPIException
 from itou.utils.db import or_queries
 from itou.utils.models import DateRange
+from itou.utils.templatetags.str_filters import pluralizefr
 from itou.utils.validators import alphanumeric, validate_siret
 
 from . import enums, notifications
@@ -134,6 +135,28 @@ class CommonApprovalMixin(models.Model):
             datetime.timedelta(0),
         ) - max(obj.start_at - timezone.localdate(), datetime.timedelta(0))
 
+    def _get_human_readable_estimate(self, days):
+        split = []
+        years = days // 365
+        if years:
+            split.append(f"{years} an{pluralizefr(years)}")
+        days = days % 365
+        months = days // 30
+        if months:
+            split.append(f"{months} mois")
+        if years:
+            return "Environ " + " et ".join(split)
+        days = days % 30
+        weeks = days // 7
+        if weeks:
+            split.append(f"{weeks} semaine{pluralizefr(weeks)}")
+        if months:
+            return "Environ " + " et ".join(split)
+        days = days % 7
+        if days:
+            split.append(f"{days} jour{pluralizefr(days)}")
+        return " et ".join(split)
+
     @cached_property
     def remainder(self):
         """
@@ -148,6 +171,14 @@ class CommonApprovalMixin(models.Model):
                 datetime.timedelta(0),
             )
         return result
+
+    def get_remainder_display(self):
+        remainder_display = f"{self.remainder.days} jour{pluralizefr(self.remainder.days)}"
+        if self.remainder.days:
+            remainder_display += f" ({self._get_human_readable_estimate(self.remainder.days)})"
+        return remainder_display
+
+    get_remainder_display.short_description = "Reliquat"
 
     @property
     def remainder_as_date(self):

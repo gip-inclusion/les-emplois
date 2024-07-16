@@ -127,7 +127,7 @@ class TestApprovalDetailView:
             + 1  # approval.suspension active today
             + 1  # Suspension.can_be_handled_by_siae >> get_user_last_accepted_siae_job_application()
             + 1  # select latest approval for user (can_be_prolonged)
-            + 1  # approval.remainder fetches approval suspensions to compute remaining days.
+            + 1  # approval.get_remainder_display fetches approval suspensions to compute remaining days.
             + 1  # release savepoint before the template rendering
             + 1  # template: approval.suspensions_for_status_card lists approval suspensions
             + 1  # template: approval prolongations list.
@@ -151,7 +151,7 @@ class TestApprovalDetailView:
         response = client.get(url)
         assertContains(response, format_approval_number(approval))
         assertContains(response, approval.start_at.strftime("%d/%m/%Y"))
-        assertContains(response, f"{approval.remainder.days} jours")
+        assertContains(response, approval.get_remainder_display())
         assertNotContains(
             response,
             "PASS IAE valide jusqu’au 24/04/2025, si le contrat démarre aujourd’hui.",
@@ -212,7 +212,7 @@ class TestApprovalDetailView:
             # context processors
             + 1  # siae membership (get_context_siae)
             # template: approvals/includes/status.html
-            + 1  # template: approval.remainder fetches approval suspensions to compute remaining days
+            + 1  # template: approval.get_remainder_display fetches approval suspensions to compute remaining days
             + 1  # template: approval.prolongations_for_status_card
             + 1  # template: approval.prolongation_requests_for_status_card lists not accepted prolongation requests
             # template: eligibility_diagnosis.html

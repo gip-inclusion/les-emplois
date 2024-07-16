@@ -232,7 +232,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "origin_sender_kind",
         "origin_siae_kind",
         "origin_siae_siret",
-        "remainder",
+        "get_remainder_display",
     )
     fieldsets = (
         (
@@ -242,7 +242,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                     "number",
                     "start_at",
                     "end_at",
-                    "remainder",
+                    "get_remainder_display",
                     "user",
                     "eligibility_diagnosis",
                     "assigned_company",
@@ -390,10 +390,6 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                 company.siret,
             )
         return "-"
-
-    @admin.display(description="Reliquat")
-    def remainder(self, obj):
-        return f"{obj.remainder.days} jour{pluralizefr(obj.duration.days)}"
 
 
 class IsInProgressFilter(admin.SimpleListFilter):

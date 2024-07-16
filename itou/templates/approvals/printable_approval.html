@@ -78,7 +78,7 @@
                 un PASS IAE pour un parcours d'insertion par l'activité économique,
                 conformément aux dispositions des articles L 5132-1 à L 5132-17 du code du travail.
             </p>
-            <p>Nombre de jours restants sur le PASS IAE : {{ approval.remainder.days }} jours*.</p>
+            <p>Nombre de jours restants sur le PASS IAE : {{ approval.get_remainder_display }}*.</p>
             <p class="font-italic">
                 * Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroit
                 donc tous les jours (samedi, dimanche et jours fériés compris).
