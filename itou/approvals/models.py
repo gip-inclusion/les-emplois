@@ -74,7 +74,7 @@ class CommonApprovalMixin(models.Model):
 
     def is_valid(self):
         now = timezone.now().date()
-        return (self.start_at <= now <= self.end_at) or (self.start_at >= now)
+        return now <= self.end_at
 
     @classmethod
     def last_number(cls):
