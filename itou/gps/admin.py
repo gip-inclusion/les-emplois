@@ -47,7 +47,7 @@ class FollowUpGroupAdmin(ItouModelAdmin):
     readonly_fields = [
         "created_in_bulk",
     ]
-    list_filter = ("created_in_bulk",)
+    list_filter = ("created_in_bulk", "beneficiary__department")
 
     raw_id_fields = [
         "beneficiary",
