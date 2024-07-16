@@ -43,7 +43,7 @@ class FollowUpGroupMembershipAdmin(ItouModelAdmin):
 
 @admin.register(models.FollowUpGroup)
 class FollowUpGroupAdmin(ItouModelAdmin):
-    list_display = ("created_at", "updated_at", "beneficiary", "display_members")
+    list_display = ("created_at", "updated_at", "beneficiary", "beneficiary_department", "display_members")
     readonly_fields = [
         "created_in_bulk",
     ]
@@ -54,6 +54,10 @@ class FollowUpGroupAdmin(ItouModelAdmin):
     ]
 
     inlines = (MemberInline,)
+
+    @admin.display(description="Département")
+    def beneficiary_department(self, obj):
+        return obj.beneficiary.department
 
     @admin.display(description="Membres du groupe de suivi")
     def display_members(self, obj):
