@@ -1258,10 +1258,9 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         )
 
         # Wrong dates.
-        hiring_start_at = today
-        hiring_end_at = Approval.get_default_end_date(hiring_start_at)
         # Force `hiring_start_at` in past.
-        hiring_start_at = hiring_start_at - relativedelta(days=1)
+        hiring_start_at = today - relativedelta(days=1)
+        hiring_end_at = hiring_start_at + relativedelta(months=1)
         post_data = {
             "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
             "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -1272,6 +1271,22 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             job_application=job_application, post_data=post_data, assert_successful=False
         )
         self.assertFormError(response.context["form_accept"], "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
+
+        # Force `hiring_start_at` in more than 6 monts.
+        hiring_start_at = today + relativedelta(months=6, days=1)
+        hiring_end_at = hiring_start_at + relativedelta(months=1)
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "answer": "",
+            **address,
+        }
+        response, _ = self.accept_job_application(
+            job_application=job_application, post_data=post_data, assert_successful=False
+        )
+        self.assertFormError(
+            response.context["form_accept"], "hiring_start_at", JobApplication.ERROR_START_IN_FAR_FUTURE
+        )
 
         # Wrong dates: end < start.
         hiring_start_at = today
@@ -1556,7 +1571,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         # Its contract starts later than the corresponding approval.
         # Approval's starting date should not be updated.
         user = job_app_starting_later.to_company.members.first()
-        hiring_start_at = hiring_start_at + relativedelta(months=6)
+        hiring_start_at = hiring_start_at + relativedelta(months=5)
         hiring_end_at = hiring_start_at + relativedelta(months=2)
         job_app_starting_later.refresh_from_db()
         assert job_app_starting_later.state.is_obsolete
