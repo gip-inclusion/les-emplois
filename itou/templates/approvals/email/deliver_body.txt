@@ -5,7 +5,7 @@
 Merci d'avoir confirmé l'embauche d'un candidat sur les emplois de l'inclusion. Vous trouverez ci-dessous votre PASS IAE (il équivaut à l'agrément Pôle emploi conformément aux articles L 5132-1 à L 5132-17 du code du travail) :
 
 PASS IAE N° : {{ job_application.approval.number_with_spaces }}
-Nombre de jours restants sur le PASS IAE débutant le {{ job_application.approval.start_at|date:"d/m/Y" }} : {{ job_application.approval.remainder.days }} jours*.
+Nombre de jours restants sur le PASS IAE débutant le {{ job_application.approval.start_at|date:"d/m/Y" }} : {{ job_application.approval.get_remainder_display }}*.
 
 Délivré pour l'embauche de :
 Nom : {{ job_application.approval.user.last_name|upper }}

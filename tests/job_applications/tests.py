@@ -1036,7 +1036,7 @@ class JobApplicationNotificationsTest(TestCase):
         assert approval.user.get_full_name() in email.subject
         assert approval.number_with_spaces in email.body
         assert approval.start_at.strftime("%d/%m/%Y") in email.body
-        assert f"{approval.remainder.days} jours" in email.body
+        assert approval.get_remainder_display() in email.body
         assert approval.user.last_name.upper() in email.body
         assert approval.user.first_name.title() in email.body
         assert approval.user.birthdate.strftime("%d/%m/%Y") in email.body

@@ -53,7 +53,7 @@ Arguments:
         <p class="mb-1">Date de début : {{ common_approval.start_at|date:"d/m/Y" }}</p>
         <ul class="list-unstyled">
             <li class="h4 mt-4 mb-2">
-                Nombre de jours restants sur le PASS IAE : {{ common_approval.remainder.days }} jour{{ common_approval.remainder.days|pluralizefr }}
+                Nombre de jours restants sur le PASS IAE : {{ common_approval.get_remainder_display }}
                 <i class="ri-information-line ri-xl text-info"
                    data-bs-toggle="tooltip"
                    title="Le reliquat est calculé sur la base d'un nombre de jours calendaires. Si le PASS IAE n'est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i>

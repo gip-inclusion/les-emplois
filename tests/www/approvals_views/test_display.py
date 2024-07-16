@@ -30,7 +30,7 @@ class TestDisplayApproval(TestCase):
         self.assertContains(response, global_constants.ITOU_HELP_CENTER_URL)
         self.assertContains(response, "Imprimer ce PASS IAE")
         self.assertContains(response, job_application.approval.start_at.strftime("%d/%m/%Y"))
-        self.assertContains(response, f"{job_application.approval.remainder.days} jours")
+        self.assertContains(response, job_application.approval.get_remainder_display())
 
     def test_display_approval_multiple_job_applications(self, *args, **kwargs):
         job_application = JobApplicationFactory(with_approval=True)
