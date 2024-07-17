@@ -85,4 +85,5 @@ CSP_IMG_SRC.append(f"{AWS_S3_ENDPOINT_URL}{AWS_STORAGE_BUCKET_NAME}/news-images/
 # Don't use json formatter in dev
 del LOGGING["handlers"]["console"]["formatter"]  # noqa: F405
 
-API_PARTICULIER_BASE_URL = "https://staging.particulier.api.gouv.fr/api/"
+API_PARTICULIER_BASE_URL = os.getenv("API_PARTICULIER_BASE_URL", "https://staging.particulier.api.gouv.fr/api/")
+API_PARTICULIER_TOKEN = os.getenv("API_PARTICULIER_TOKEN")
