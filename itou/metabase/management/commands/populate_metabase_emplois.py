@@ -36,6 +36,7 @@ from itou.companies.enums import ContractType
 from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.institutions.models import Institution, InstitutionMembership
 from itou.job_applications.enums import JobApplicationState, Origin, RefusalReason, SenderKind
 from itou.job_applications.models import JobApplication
@@ -51,6 +52,7 @@ from itou.metabase.tables import (
     evaluated_job_applications,
     evaluated_siaes,
     evaluation_campaigns,
+    gps,
     insee_codes,
     institutions,
     job_applications,
@@ -113,6 +115,8 @@ class Command(BaseCommand):
             "departments": self.populate_departments,
             "enums": self.populate_enums,
             "dbt_daily": self.build_dbt_daily,
+            "gps_groups": self.populate_gps_groups,
+            "gps_memberships": self.populate_gps_memberships,
             "data_inconsistencies": self.report_data_inconsistencies,
         }
 
@@ -494,6 +498,32 @@ class Command(BaseCommand):
             rows = [OrderedDict(code=str(item), label=item.label) for item in enum]
             df = get_df_from_rows(rows)
             store_df(df=df, table_name=table_name)
+
+    def populate_gps_groups(self):
+        queryset = FollowUpGroup.objects.all().annotate(beneficiary_department=F("beneficiary__department"))
+        populate_table(gps.GroupsTable, batch_size=100_000, querysets=[queryset])
+
+    def populate_gps_memberships(self):
+        queryset = (
+            FollowUpGroupMembership.objects.all()
+            .annotate(
+                companies_departments=ArrayAgg(
+                    "member__companymembership__company__department",
+                    filter=Q(member__companymembership__is_active=True),
+                    distinct=True,
+                    ordering="member__companymembership__company__department",
+                )
+            )
+            .annotate(
+                prescriber_departments=ArrayAgg(
+                    "member__prescribermembership__organization__department",
+                    filter=Q(member__prescribermembership__is_active=True),
+                    distinct=True,
+                    ordering="member__prescribermembership__organization__department",
+                )
+            )
+        )
+        populate_table(gps.MembershipsTable, batch_size=100_000, querysets=[queryset])
 
     @timeit
     def report_data_inconsistencies(self):

@@ -15,6 +15,7 @@ from itou.companies.models import JobDescription
 from itou.eligibility.models import AdministrativeCriteria
 from itou.geo.utils import coords_to_geometry
 from itou.job_applications.enums import JobApplicationState
+from itou.metabase.tables import gps
 from itou.metabase.tables.utils import hash_content
 from itou.users.enums import IdentityProvider, UserKind
 from tests.analytics.factories import DatumFactory, StatsDashboardVisitFactory
@@ -27,6 +28,7 @@ from tests.approvals.factories import (
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.geo.factories import QPVFactory
+from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFactory
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
@@ -1204,6 +1206,84 @@ def test_populate_companies():
                 None,
                 4,
                 0,
+                datetime.date(2023, 2, 1),
+            ),
+        ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_gps_groups():
+    group = FollowUpGroupFactory(for_snapshot=True)
+
+    num_queries = 1  # Count FollowUpGroups
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
+    num_queries += 1  # Select FollowUpGroups pks
+    num_queries += 1  # Select one chunk of FollowUpGroups
+    num_queries += 1  # Select FollowUpGroups with annotations
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="gps_groups")
+
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM {gps.GroupsTable.name} ORDER BY id")
+        rows = cursor.fetchall()
+        assert len(rows) == 1
+        assert rows == [
+            (
+                group.pk,
+                group.created_at,
+                group.updated_at,
+                group.created_in_bulk,
+                group.beneficiary.department,
+                datetime.date(2023, 2, 1),
+            ),
+        ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_gps_memberships():
+    membership = FollowUpGroupMembershipFactory(follow_up_group__for_snapshot=True, member__for_snapshot=True)
+    prescriber = membership.member
+    PrescriberMembershipFactory(user=prescriber, organization__department="63")
+    PrescriberMembershipFactory(user=prescriber, organization__department="13")
+    PrescriberMembershipFactory(user=prescriber, organization__department="75")
+
+    num_queries = 1  # Count FollowUpGroupMemberships
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT Create table
+    num_queries += 1  # Select FollowUpGroupMemberships pks
+    num_queries += 1  # Select one chunk of FollowUpGroupMemberships
+    num_queries += 1  # Select FollowUpGroupMemberships with annotations
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="gps_memberships")
+
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT * FROM {gps.MembershipsTable.name} ORDER BY id")
+        rows = cursor.fetchall()
+        assert len(rows) == 1
+        assert rows == [
+            (
+                membership.pk,
+                membership.follow_up_group.pk,
+                membership.created_at,
+                membership.updated_at,
+                membership.ended_at,
+                int(membership.is_referent),
+                membership.member.pk,
+                ["13", "63", "75"],
+                int(membership.created_in_bulk),
                 datetime.date(2023, 2, 1),
             ),
         ]
