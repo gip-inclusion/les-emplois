@@ -3,7 +3,6 @@ from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import Max
-from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaAnnex, AdministrativeCriteriaLevel
@@ -220,7 +219,7 @@ GEIQ_ALLOWANCE_AMOUNT_1400 = 1400
 GEIQ_ALLOWANCE_AMOUNT_814 = 814
 
 
-def test_geiq_eligibility_diagnosis_allowance_and_eligibility(
+def test_geiq_eligibility_diagnosis_allowance(
     administrative_criteria_annex_1,
     administrative_criteria_annex_2_level_1,
     administrative_criteria_annex_2_level_2,
@@ -230,45 +229,33 @@ def test_geiq_eligibility_diagnosis_allowance_and_eligibility(
         annex=AdministrativeCriteriaAnnex.ANNEX_2,
         level=AdministrativeCriteriaLevel.LEVEL_2,
     )[:2]
-    diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
 
     # Prescriber author gets it all
-    assert diagnosis.eligibility_confirmed
+    diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True)
     assert diagnosis.allowance_amount == GEIQ_ALLOWANCE_AMOUNT_1400
 
     diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
-
-    assert not diagnosis.eligibility_confirmed
     assert diagnosis.allowance_amount == 0
 
-    diagnosis.administrative_criteria.add(a2l2_crits[0])
-
     # One A2L2 is not enough
-    assert not diagnosis.eligibility_confirmed
+    diagnosis.administrative_criteria.add(a2l2_crits[0])
     assert diagnosis.allowance_amount == 0
 
     # Two is ok
     diagnosis.administrative_criteria.add(a2l2_crits[1])
-    assert diagnosis.eligibility_confirmed
     assert diagnosis.allowance_amount == GEIQ_ALLOWANCE_AMOUNT_1400
 
     # One L1 is enough to get max allowance
     diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
     diagnosis.administrative_criteria.add(administrative_criteria_annex_2_level_1)
-
-    assert diagnosis.eligibility_confirmed
     assert diagnosis.allowance_amount == GEIQ_ALLOWANCE_AMOUNT_1400
 
     diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
     diagnosis.administrative_criteria.add(administrative_criteria_annex_1)
-
-    assert diagnosis.eligibility_confirmed
     assert diagnosis.allowance_amount == GEIQ_ALLOWANCE_AMOUNT_814
 
     # Adding another criteria will max allowance
     diagnosis.administrative_criteria.add(administrative_criteria_annex_2_level_1)
-
-    assert diagnosis.eligibility_confirmed
     assert diagnosis.allowance_amount == GEIQ_ALLOWANCE_AMOUNT_1400
 
     # Special case of dual-annex criteria:
@@ -276,19 +263,11 @@ def test_geiq_eligibility_diagnosis_allowance_and_eligibility(
     # Counts as Annex 1 criterion...
     diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
     diagnosis.administrative_criteria.add(administrative_criteria_both_annexes)
-
-    assert diagnosis.eligibility_confirmed
     assert diagnosis.allowance_amount == GEIQ_ALLOWANCE_AMOUNT_814
 
     # ... and also as Annex 2 Level 2 criterion
     diagnosis.administrative_criteria.add(administrative_criteria_annex_2_level_2)
-
-    assert diagnosis.eligibility_confirmed
     assert diagnosis.allowance_amount == GEIQ_ALLOWANCE_AMOUNT_1400
-
-    # GEIQ eligibility is not confirmed with valid criteria and expired diagnosis
-    diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True, expires_at=timezone.now())
-    assert not diagnosis.eligibility_confirmed
 
 
 def test_create_duplicate_diagnosis_in_same_geiq():

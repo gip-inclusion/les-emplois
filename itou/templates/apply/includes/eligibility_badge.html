@@ -16,7 +16,7 @@
         </span>
     {% endif %}
 {% elif is_subject_to_geiq_eligibility_rules %}
-    {% if geiq_eligibility_diagnosis.eligibility_confirmed %}
+    {% if geiq_eligibility_diagnosis.is_valid and geiq_eligibility_diagnosis.allowance_amount %}
         <span class="badge badge-base rounded-pill bg-success-lighter text-success">
             <i class="ri-check-line" aria-hidden="true"></i>
             Éligibilité GEIQ confirmée

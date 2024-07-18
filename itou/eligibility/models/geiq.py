@@ -152,10 +152,6 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         return result
 
     @property
-    def eligibility_confirmed(self) -> bool:
-        return bool(self.allowance_amount) and self.is_valid
-
-    @property
     def allowance_amount(self) -> int:
         return geiq_allowance_amount(self.author.is_prescriber_with_authorized_org, self.administrative_criteria.all())
 

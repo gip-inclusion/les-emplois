@@ -3903,7 +3903,6 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         # Badge is KO if job seeker has a valid diagnosis without allowance
         diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
         assert diagnosis.allowance_amount == 0
-        assert not diagnosis.eligibility_confirmed
 
         self.client.force_login(self.prescriber_org.members.first())
         self._setup_session(diagnosis.author_geiq.pk)
