@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
+from django.views.generic.base import TemplateView
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
@@ -111,42 +112,49 @@ def report_tally_url(user, company, job_description=None):
 ### Job description views
 
 
-def job_description_card(request, job_description_id, template_name="companies/job_description_card.html"):
-    job_description = get_object_or_404(
-        JobDescription.objects.select_related("appellation", "company", "location"), pk=job_description_id
-    )
-    back_url = get_safe_url(request, "back_url")
-    company = job_description.company
-    can_update_job_description = (
-        request.user.is_authenticated and request.user.is_employer and request.current_organization.pk == company.pk
-    )
+class JobDescriptionCardView(TemplateView):
+    template_name = "companies/job_description_card.html"
 
-    # select_related on company, location useful for _list_siae_actives_jobs_row.html template
-    others_active_jobs = (
-        JobDescription.objects.select_related("appellation", "company", "location")
-        .filter(is_active=True, company=company)
-        .exclude(id=job_description_id)
-        .order_by("-updated_at", "-created_at")
-    )
+    def setup(self, request, job_description_id, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.job_description = get_object_or_404(
+            JobDescription.objects.select_related("appellation", "company", "location"), pk=job_description_id
+        )
 
-    if job_description.location:
-        code_insee = job_description.location.code_insee
-    elif company.insee_city:
-        code_insee = company.insee_city.code_insee
-    else:
-        code_insee = None
+    def get_context_data(self, **kwargs):
+        back_url = get_safe_url(self.request, "back_url")
+        company = self.job_description.company
+        can_update_job_description = (
+            self.request.user.is_authenticated
+            and self.request.user.is_employer
+            and self.request.current_organization.pk == company.pk
+        )
 
-    context = {
-        "job": job_description,
-        "siae": company,
-        "can_update_job_description": can_update_job_description,
-        "others_active_jobs": others_active_jobs,
-        "back_url": back_url,
-        "matomo_custom_title": "Détails de la fiche de poste",
-        "code_insee": code_insee,
-        "report_tally_url": report_tally_url(request.user, company, job_description),
-    }
-    return render(request, template_name, context)
+        # select_related on company, location useful for _list_siae_actives_jobs_row.html template
+        others_active_jobs = (
+            JobDescription.objects.select_related("appellation", "company", "location")
+            .filter(is_active=True, company=company)
+            .exclude(id=self.job_description.pk)
+            .order_by("-updated_at", "-created_at")
+        )
+
+        if self.job_description.location:
+            code_insee = self.job_description.location.code_insee
+        elif company.insee_city:
+            code_insee = company.insee_city.code_insee
+        else:
+            code_insee = None
+
+        return super().get_context_data(**kwargs) | {
+            "job": self.job_description,
+            "siae": company,
+            "can_update_job_description": can_update_job_description,
+            "others_active_jobs": others_active_jobs,
+            "back_url": back_url,
+            "matomo_custom_title": "Détails de la fiche de poste",
+            "code_insee": code_insee,
+            "report_tally_url": report_tally_url(self.request.user, company, self.job_description),
+        }
 
 
 @login_required
@@ -493,32 +501,41 @@ def select_financial_annex(request, template_name="companies/select_financial_an
 ### Company CRUD views
 
 
-def card(request, siae_id, template_name="companies/card.html"):
-    back_url = get_safe_url(request, "back_url")
-    company = get_object_or_404(Company.objects.with_has_active_members(), pk=siae_id)
-    jobs_descriptions = JobDescription.objects.filter(company=company).select_related("appellation", "location")
-    active_jobs_descriptions = []
-    if company.block_job_applications:
-        other_jobs_descriptions = jobs_descriptions
-    else:
-        other_jobs_descriptions = []
-        for job_desc in jobs_descriptions:
-            if job_desc.is_active:
-                active_jobs_descriptions.append(job_desc)
-            else:
-                other_jobs_descriptions.append(job_desc)
+class CompanyCardView(TemplateView):
+    template_name = "companies/card.html"
 
-    context = {
-        "siae": company,
-        "active_jobs_descriptions": active_jobs_descriptions,
-        "other_jobs_descriptions": other_jobs_descriptions,
-        "matomo_custom_title": "Fiche de la structure d'insertion",
-        "code_insee": company.insee_city.code_insee if company.insee_city else None,
-        "siae_card_absolute_url": get_absolute_url(reverse("companies_views:card", kwargs={"siae_id": company.pk})),
-        "report_tally_url": report_tally_url(request.user, company),
-        "back_url": back_url,
-    }
-    return render(request, template_name, context)
+    def setup(self, request, siae_id, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=siae_id)
+
+    def get_context_data(self, **kwargs):
+        back_url = get_safe_url(self.request, "back_url")
+        jobs_descriptions = JobDescription.objects.filter(company=self.company).select_related(
+            "appellation", "location"
+        )
+        active_jobs_descriptions = []
+        if self.company.block_job_applications:
+            other_jobs_descriptions = jobs_descriptions
+        else:
+            other_jobs_descriptions = []
+            for job_desc in jobs_descriptions:
+                if job_desc.is_active:
+                    active_jobs_descriptions.append(job_desc)
+                else:
+                    other_jobs_descriptions.append(job_desc)
+
+        return super().get_context_data(**kwargs) | {
+            "siae": self.company,
+            "active_jobs_descriptions": active_jobs_descriptions,
+            "other_jobs_descriptions": other_jobs_descriptions,
+            "matomo_custom_title": "Fiche de la structure d'insertion",
+            "code_insee": self.company.insee_city.code_insee if self.company.insee_city else None,
+            "siae_card_absolute_url": get_absolute_url(
+                reverse("companies_views:card", kwargs={"siae_id": self.company.pk})
+            ),
+            "report_tally_url": report_tally_url(self.request.user, self.company),
+            "back_url": back_url,
+        }
 
 
 @login_required

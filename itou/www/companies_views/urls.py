@@ -7,8 +7,12 @@ from itou.www.companies_views import views
 app_name = "companies_views"
 
 urlpatterns = [
-    path("<int:siae_id>/card", views.card, name="card"),
-    path("job_description/<int:job_description_id>/card", views.job_description_card, name="job_description_card"),
+    path("<int:siae_id>/card", views.CompanyCardView.as_view(), name="card"),
+    path(
+        "job_description/<int:job_description_id>/card",
+        views.JobDescriptionCardView.as_view(),
+        name="job_description_card",
+    ),
     path("job_description_list", views.job_description_list, name="job_description_list"),
     path("edit_job_description", views.edit_job_description, name="edit_job_description"),
     path("edit_job_description_details", views.edit_job_description_details, name="edit_job_description_details"),
