@@ -181,7 +181,7 @@ class EligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
 class GEIQEligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
     raw_id_fields = AbstractEligibilityDiagnosisAdmin.raw_id_fields + ("author_geiq",)
     readonly_fields = AbstractEligibilityDiagnosisAdmin.readonly_fields + (
-        "has_eligibility",
+        "is_valid",
         "allowance_amount",
     )
     inlines = (
@@ -189,10 +189,6 @@ class GEIQEligibilityDiagnosisAdmin(AbstractEligibilityDiagnosisAdmin):
         JobApplicationInline,
         PkSupportRemarkInline,
     )
-
-    @admin.display(boolean=True, description="éligibilité GEIQ confirmée")
-    def has_eligibility(self, obj):
-        return obj.eligibility_confirmed
 
     @admin.display(description="montant de l'aide")
     def allowance_amount(self, obj):
