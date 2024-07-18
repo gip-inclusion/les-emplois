@@ -14,6 +14,7 @@ from django.db.models.functions import Now, TruncDate
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
+from django.utils.timesince import timeuntil
 from unidecode import unidecode
 
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
@@ -135,27 +136,13 @@ class CommonApprovalMixin(models.Model):
             datetime.timedelta(0),
         ) - max(obj.start_at - timezone.localdate(), datetime.timedelta(0))
 
-    def _get_human_readable_estimate(self, days):
-        split = []
-        years = days // 365
-        if years:
-            split.append(f"{years} an{pluralizefr(years)}")
-        days = days % 365
-        months = days // 30
-        if months:
-            split.append(f"{months} mois")
-        if years:
-            return "Environ " + " et ".join(split)
-        days = days % 30
-        weeks = days // 7
-        if weeks:
-            split.append(f"{weeks} semaine{pluralizefr(weeks)}")
-        if months:
-            return "Environ " + " et ".join(split)
-        days = days % 7
-        if days:
-            split.append(f"{days} jour{pluralizefr(days)}")
-        return " et ".join(split)
+    def _get_human_readable_estimate(self, dt):
+        res = timeuntil(dt)
+        res = res.replace("année", "an")
+        res = res.split(", ")
+        if any(v in res[0] for v in ["an", "mois"]):
+            return "Environ " + " et ".join(res)
+        return " et ".join(res)
 
     @cached_property
     def remainder(self):
@@ -175,7 +162,7 @@ class CommonApprovalMixin(models.Model):
     def get_remainder_display(self):
         remainder_display = f"{self.remainder.days} jour{pluralizefr(self.remainder.days)}"
         if self.remainder.days:
-            remainder_display += f" ({self._get_human_readable_estimate(self.remainder.days)})"
+            remainder_display += f" ({self._get_human_readable_estimate(self.remainder_as_date)})"
         return remainder_display
 
     get_remainder_display.short_description = "Reliquat"

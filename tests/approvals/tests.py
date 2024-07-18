@@ -529,7 +529,7 @@ class ApprovalModelTest(TestCase):
             end_at=datetime.date(2023, 3, 24),
         )
         assert approval.remainder == datetime.timedelta(days=123)
-        assert approval.get_remainder_display() == "123 jours (Environ 4 mois)"
+        assert approval.get_remainder_display() == "123 jours (Environ 4 mois)"
 
         # Futur prolongation, adding 4 days to approval.end_date.
         ProlongationFactory(
@@ -554,7 +554,7 @@ class ApprovalModelTest(TestCase):
         approval.refresh_from_db()
         prolonged_remainder = 123 + 4 + 5 + 30
         assert approval.remainder == datetime.timedelta(days=prolonged_remainder)
-        assert approval.get_remainder_display() == "162 jours (Environ 5 mois et 1 semaine)"
+        assert approval.get_remainder_display() == "162 jours (Environ 5 mois et 1 semaine)"
 
         # Past suspension (ignored), adding 5 days to approval.end_date.
         SuspensionFactory(
@@ -573,25 +573,26 @@ class ApprovalModelTest(TestCase):
         approval.refresh_from_db()
         # Substract to remainder the remaining suspension time
         assert approval.remainder == datetime.timedelta(days=(prolonged_remainder + 5 + 30 - 10))
-        assert approval.get_remainder_display() == "187 jours (Environ 6 mois et 1 semaine)"
+        assert approval.get_remainder_display() == "187 jours (Environ 6 mois)"
 
+    @freeze_time("2024-07-18")
     def test_human_readable_estimate(self):
         approval = Approval()
-        for days, expected_display in [
-            (730, "Environ 2 ans"),
-            (705, "Environ 1 an et 11 mois"),
-            (380, "Environ 1 an"),
-            (235, "Environ 7 mois et 3 semaines"),
-            (158, "Environ 5 mois et 1 semaine"),
-            (121, "Environ 4 mois"),
-            (15, "2 semaines et 1 jour"),
-            (14, "2 semaines"),
-            (13, "1 semaine et 6 jours"),
-            (7, "1 semaine"),
-            (6, "6 jours"),
-            (1, "1 jour"),
+        for date, expected_display in [
+            (datetime.date(2026, 7, 18), "Environ 2 ans"),
+            (datetime.date(2026, 7, 17), "Environ 1 an et 11 mois"),
+            (datetime.date(2025, 7, 28), "Environ 1 an"),
+            (datetime.date(2025, 3, 13), "Environ 7 mois et 3 semaines"),
+            (datetime.date(2024, 12, 26), "Environ 5 mois et 1 semaine"),
+            (datetime.date(2024, 11, 18), "Environ 4 mois"),
+            (datetime.date(2024, 8, 2), "2 semaines et 1 jour"),
+            (datetime.date(2024, 8, 1), "2 semaines"),
+            (datetime.date(2024, 7, 31), "1 semaine et 6 jours"),
+            (datetime.date(2024, 7, 25), "1 semaine"),
+            (datetime.date(2024, 7, 24), "6 jours"),
+            (datetime.date(2024, 7, 19), "1 jour"),
         ]:
-            assert approval._get_human_readable_estimate(days) == expected_display
+            assert approval._get_human_readable_estimate(date) == expected_display
 
     @freeze_time("2023-04-26")
     def test_remainder_as_date(self):
@@ -756,7 +757,7 @@ class PoleEmploiApprovalModelTest(TestCase):
             start_at=datetime.date(2021, 3, 25),
             end_at=datetime.date(2023, 3, 24),
         )
-        assert pole_emploi_approval.get_remainder_display() == "123 jours (Environ 4 mois)"
+        assert pole_emploi_approval.get_remainder_display() == "123 jours (Environ 4 mois)"
 
 
 class PoleEmploiApprovalManagerTest(TestCase):
