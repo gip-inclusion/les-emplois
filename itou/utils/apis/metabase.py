@@ -306,7 +306,7 @@ def metabase_embedded_url(request=None, dashboard_id=None, params=None, with_tit
     payload = {
         "resource": {"dashboard": dashboard_id},
         "params": params,
-        "exp": int((timezone.now() + datetime.timedelta(minutes=30)).timestamp()),
+        "exp": int((timezone.now() + datetime.timedelta(minutes=60)).timestamp()),
     }
     is_titled = "true" if with_title else "false"
     return settings.METABASE_SITE_URL + "/embed/dashboard/" + _get_token(payload) + f"#titled={is_titled}"
