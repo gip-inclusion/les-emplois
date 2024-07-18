@@ -1,5 +1,3 @@
-import datetime
-
 from allauth.account.views import PasswordChangeView
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
@@ -162,37 +160,12 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "show_mobilemploi_prescriber_banner": False,
         "siae_suspension_text_with_dates": None,
         "siae_search_form": SiaeSearchForm(),
-        "pilotage_webinar_banners": [],
     }
 
     if request.user.is_employer:
         context.update(_employer_dashboard_context(request))
     elif request.user.is_prescriber:
         if current_org := request.current_organization:
-            if stats_utils.can_view_stats_ph(request):
-                if current_org.kind in [PrescriberOrganizationKind.ML, PrescriberOrganizationKind.CAP_EMPLOI]:
-                    context["pilotage_webinar_banners"].append(
-                        {
-                            "title": "Inscrivez-vous à un webinaire pour découvrir votre tout nouveau tableau de bord !",  # noqa: E501
-                            "description": "En juin, deux sessions vous sont proposées pour vous familiariser avec votre nouvel outil de suivi et d'analyse des résultats de vos prescriptions.",  # noqa: E501
-                            "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-professionnels-missions-locales-et-cap-emploi-decouvrez-votre-nouveau-tableau-de-bord-personnalise-et-faites-le-point-sur-vos-prescriptions?type=detailed",  # noqa: E501
-                            "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 6, 11),
-                        }
-                    )
-                elif current_org.kind in [
-                    PrescriberOrganizationKind.CHRS,
-                    PrescriberOrganizationKind.CHU,
-                    PrescriberOrganizationKind.OIL,
-                    PrescriberOrganizationKind.RS_FJT,
-                ]:
-                    context["pilotage_webinar_banners"].append(
-                        {
-                            "title": "Inscrivez-vous à un webinaire pour découvrir votre tout nouveau tableau de bord !",  # noqa: E501
-                            "description": "En juin, deux sessions vous sont proposées pour vous familiariser avec votre nouvel outil de suivi et d'analyse des résultats de vos prescriptions.",  # noqa: E501
-                            "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-prescripteurs-de-laccueil-de-lhebergement-et-de-linsertion-decouvrez-votre-nouveau-tableau-de-bord-personnalise-et-faites-le-point-sur-vos-prescriptions?type=detailed",  # noqa: E501
-                            "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 6, 13),
-                        }
-                    )
             if current_org.is_authorized:
                 context["can_view_gps_card"] = True
                 context["pending_prolongation_requests"] = ProlongationRequest.objects.filter(
@@ -259,10 +232,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             .exclude(state__in=[JobApplicationState.ACCEPTED, JobApplicationState.OBSOLETE])
             .exists()
         )
-
-    context["pilotage_webinar_banners"] = [
-        banner for banner in context["pilotage_webinar_banners"] if banner["is_displayable"]()
-    ]
 
     return render(request, template_name, context)
 
