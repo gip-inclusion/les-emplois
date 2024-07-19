@@ -242,7 +242,7 @@
                               <div class="form-group"><label class="form-label" for="id_hexa_additional_address">Complément d'adresse</label><input class="form-control" id="id_hexa_additional_address" maxlength="32" name="hexa_additional_address" placeholder="Complément d'adresse" type="text"/></div>
                               <div class="form-row">
                                   <div class="col-12 col-md-3"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_post_code">Code postal</label><input class="form-control" id="id_hexa_post_code" maxlength="6" name="hexa_post_code" placeholder="Code postal" required="" type="text" value="58160"/></div></div>
-                                  <div class="col-12 col-md-9"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_commune">Commune</label><select class="form-select django-select2" data-ajax--cache="true" data-ajax--type="GET" data-ajax--url="/autocomplete/communes?select2=" data-allow-clear="false" data-minimum-input-length="2" data-placeholder="Nom de la commune" data-theme="bootstrap-5" id="id_hexa_commune" lang="fr" name="hexa_commune" required="">
+                                  <div class="col-12 col-md-9"><div class="form-group form-group-required"><label class="form-label" for="id_hexa_commune">Commune</label><select class="form-select django-select2" data-ajax--cache="true" data-ajax--type="GET" data-ajax--url="/autocomplete/communes" data-allow-clear="false" data-minimum-input-length="2" data-placeholder="Nom de la commune" data-theme="bootstrap-5" id="id_hexa_commune" lang="fr" name="hexa_commune" required="">
     <option selected="" value="47612">SAUVIGNY-LES-BOIS (058)</option>
   
   </select></div></div>

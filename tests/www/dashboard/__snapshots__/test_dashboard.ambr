@@ -14,7 +14,7 @@
               <div class="input-group-text bg-white rounded-start ps-3 pe-2">
                   <i aria-hidden="true" class="ri-map-pin-line ri-lg text-disabled"></i>
               </div>
-              <select class="form-control django-select2" data-ajax--url="/autocomplete/cities?select2=&amp;slug=" data-allow-clear="false" data-minimum-input-length="2" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
+              <select class="form-control django-select2" data-ajax--url="/autocomplete/cities?slug=" data-allow-clear="false" data-minimum-input-length="2" data-placeholder="Rechercher un emploi inclusif autour de…" data-theme="bootstrap-5" id="id_city" lang="fr" name="city" required="">
   </select>
               <div class="input-group-text bg-white p-0">
                   <button aria-label="Rechercher un emploi inclusif" class="btn btn-ico btn-link">

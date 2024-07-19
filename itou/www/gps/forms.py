@@ -1,6 +1,5 @@
 from django import forms
 from django.urls import reverse_lazy
-from django.utils.text import format_lazy
 from django_select2.forms import Select2Widget
 
 from itou.companies import enums as companies_enums
@@ -19,7 +18,7 @@ class GpsUserSearchForm(forms.Form):
         label="Nom et prénom du bénéficiaire",
         widget=RemoteAutocompleteSelect2Widget(
             attrs={
-                "data-ajax--url": format_lazy("{}?select2=", reverse_lazy("autocomplete:gps_users")),
+                "data-ajax--url": reverse_lazy("autocomplete:gps_users"),
                 "data-ajax--cache": "true",
                 "data-ajax--type": "GET",
                 "data-minimum-input-length": 2,
