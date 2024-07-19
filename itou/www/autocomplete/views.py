@@ -45,15 +45,11 @@ def autocomplete_name(qs, term, extra_ordering_by):
 
 def cities_autocomplete(request):
     """
-    Returns JSON data compliant with the jQuery UI Autocomplete Widget:
-    https://api.jqueryui.com/autocomplete/#option-source
+    Returns JSON data compliant with Select2
     """
 
     term = request.GET.get("term", "").strip()
-    # TODO(xfernandez): drop legacy support a few weeks after all autocomplete fields have migrated
-    # and only keep select2 mode
-    select2_mode = "select2" in request.GET
-    slug_mode = "slug" in request.GET  # Only used in select2 mode
+    slug_mode = "slug" in request.GET
     cities = []
 
     if term:
@@ -62,48 +58,32 @@ def cities_autocomplete(request):
         else:
             cities = autocomplete_name(City.objects.all(), term, extra_ordering_by="department")
 
-        if select2_mode:
-            cities = [
-                {"text": city.autocomplete_display(), "id": city.slug if slug_mode else city.pk}
-                for city in cities[:MAX_CITIES_TO_RETURN]
-            ]
-        else:
-            cities = [{"value": city.display_name, "slug": city.slug} for city in cities[:MAX_CITIES_TO_RETURN]]
+        cities = [
+            {"text": city.autocomplete_display(), "id": city.slug if slug_mode else city.pk}
+            for city in cities[:MAX_CITIES_TO_RETURN]
+        ]
 
-    return JsonResponse({"results": cities} if select2_mode else cities, safe=False)
+    return JsonResponse({"results": cities}, safe=False)
 
 
 def jobs_autocomplete(request):
     """
-    Returns JSON data compliant with either the jQuery UI Autocomplete Widget or Select2
+    Returns JSON data compliant with Select2
     """
 
     term = request.GET.get("term", "").strip()
-    # TODO(xfernandez): drop legacy support in a few weeks and only keep select2 mode
-    select2_mode = "select2" in request.GET
     appellations = []
 
     if term:
-        if select2_mode:
-            appellations = [
-                {
-                    "text": appellation.autocomplete_display(),
-                    "id": appellation.pk,
-                }
-                for appellation in Appellation.objects.autocomplete(term, limit=10)
-            ]
-        else:
-            appellations = [
-                {
-                    "value": appellation.autocomplete_display(),
-                    "code": appellation.code,
-                    "rome": appellation.rome.code,
-                    "name": appellation.name,
-                }
-                for appellation in Appellation.objects.autocomplete(term, limit=10)
-            ]
+        appellations = [
+            {
+                "text": appellation.autocomplete_display(),
+                "id": appellation.pk,
+            }
+            for appellation in Appellation.objects.autocomplete(term, limit=10)
+        ]
 
-    return JsonResponse({"results": appellations} if select2_mode else appellations, safe=False)
+    return JsonResponse({"results": appellations}, safe=False)
 
 
 def communes_autocomplete(request):
@@ -114,13 +94,10 @@ def communes_autocomplete(request):
     in order to get valid INSEE codes (with this date within a period between
     commune.start_date and commune.end_date)
 
-    Returns JSON data compliant with the jQuery UI Autocomplete Widget:
-    https://api.jqueryui.com/autocomplete/#option-source
+    Returns JSON data compliant with Select2
     """
     communes = []
     term = request.GET.get("term", "").strip()
-    # TODO(xfernandez): drop legacy support in a few weeks and only keep select2 mode
-    select2_mode = "select2" in request.GET
 
     try:
         dt = datetime.fromisoformat(request.GET.get("date", ""))
@@ -135,25 +112,15 @@ def communes_autocomplete(request):
         else:
             communes = autocomplete_name(active_communes_qs, term, extra_ordering_by="code")
 
-        if select2_mode:
-            communes = [
-                {
-                    "text": commune.autocomplete_display(),
-                    "id": commune.pk,
-                }
-                for commune in communes[:MAX_CITIES_TO_RETURN]
-            ]
-        else:
-            communes = [
-                {
-                    "value": f"{commune.name} ({commune.department_code})",
-                    "code": commune.code,
-                    "department": commune.department_code,
-                }
-                for commune in communes[:MAX_CITIES_TO_RETURN]
-            ]
+        communes = [
+            {
+                "text": commune.autocomplete_display(),
+                "id": commune.pk,
+            }
+            for commune in communes[:MAX_CITIES_TO_RETURN]
+        ]
 
-    return JsonResponse({"results": communes} if select2_mode else communes, safe=False)
+    return JsonResponse({"results": communes}, safe=False)
 
 
 @login_required
