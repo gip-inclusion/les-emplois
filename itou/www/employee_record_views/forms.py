@@ -3,7 +3,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, RegexValidator
 from django.urls import reverse_lazy
 from django.utils import timezone
-from django.utils.text import format_lazy
 from django_select2.forms import Select2Widget
 
 from itou.asp.models import Commune, Country, RSAAllocation
@@ -122,7 +121,7 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         help_text="La commune de naissance ne doit être saisie que lorsque le salarié est né en France",
         widget=RemoteAutocompleteSelect2Widget(
             attrs={
-                "data-ajax--url": format_lazy("{}?select2=", reverse_lazy("autocomplete:communes")),
+                "data-ajax--url": reverse_lazy("autocomplete:communes"),
                 "data-ajax--cache": "true",
                 "data-ajax--type": "GET",
                 "data-minimum-input-length": 2,
@@ -216,7 +215,7 @@ class NewEmployeeRecordStep2Form(forms.ModelForm):
         label="Commune",
         widget=RemoteAutocompleteSelect2Widget(
             attrs={
-                "data-ajax--url": format_lazy("{}?select2=", reverse_lazy("autocomplete:communes")),
+                "data-ajax--url": reverse_lazy("autocomplete:communes"),
                 "data-ajax--cache": "true",
                 "data-ajax--type": "GET",
                 "data-minimum-input-length": 2,

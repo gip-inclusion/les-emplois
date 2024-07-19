@@ -38,7 +38,7 @@ class SiaeSearchForm(forms.Form):
         widget=RemoteAutocompleteSelect2Widget(
             attrs={
                 "class": "form-control",
-                "data-ajax--url": format_lazy("{}?select2=&slug=", reverse_lazy("autocomplete:cities")),
+                "data-ajax--url": format_lazy("{}?slug=", reverse_lazy("autocomplete:cities")),
                 "data-minimum-input-length": 2,
                 "data-placeholder": "Rechercher un emploi inclusif autour de…",
             }
@@ -144,7 +144,7 @@ class PrescriberSearchForm(forms.Form):
         widget=RemoteAutocompleteSelect2Widget(
             attrs={
                 "class": "form-control",
-                "data-ajax--url": format_lazy("{}?select2=&slug=", reverse_lazy("autocomplete:cities")),
+                "data-ajax--url": format_lazy("{}?slug=", reverse_lazy("autocomplete:cities")),
                 "data-minimum-input-length": 2,
                 "data-placeholder": "Rechercher un prescripteur autour de…",
             }

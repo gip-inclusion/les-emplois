@@ -3,7 +3,6 @@ from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from django.utils.text import format_lazy
 
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
@@ -228,7 +227,7 @@ class JobAppellationAndLocationMixin(forms.Form):
         label="Poste (code ROME)",
         widget=RemoteAutocompleteSelect2Widget(
             attrs={
-                "data-ajax--url": format_lazy("{}?select2=", reverse_lazy("autocomplete:jobs")),
+                "data-ajax--url": reverse_lazy("autocomplete:jobs"),
                 "data-ajax--cache": "true",
                 "data-ajax--type": "GET",
                 "data-minimum-input-length": 2,
@@ -243,7 +242,7 @@ class JobAppellationAndLocationMixin(forms.Form):
         label="Localisation du poste (si différente du siège)",
         widget=RemoteAutocompleteSelect2Widget(
             attrs={
-                "data-ajax--url": format_lazy("{}?select2=", reverse_lazy("autocomplete:cities")),
+                "data-ajax--url": reverse_lazy("autocomplete:cities"),
                 "data-ajax--cache": "true",
                 "data-ajax--type": "GET",
                 "data-minimum-input-length": 2,
