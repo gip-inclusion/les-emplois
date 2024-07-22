@@ -1,5 +1,5 @@
-{% if diagnosis.is_valid %}
-    {% if diagnosis.has_eligibility %}
+{% if diagnosis.is_valid or job_application.state.is_accepted and diagnosis %}
+    {% if diagnosis.allowance_amount %}
         <hr class="my-4">
         <h3>Éligibilité public prioritaire GEIQ validée</h3>
     {% else %}
@@ -7,7 +7,7 @@
         <h3>Éligibilité public prioritaire GEIQ non confirmée</h3>
     {% endif %}
 
-    {% if diagnosis.has_eligibility %}
+    {% if diagnosis.allowance_amount %}
         <p>
             Éligibilité GEIQ confirmée par <b>{{ diagnosis.author.get_full_name }} ({{ diagnosis.author_structure.display_name }})</b>
         </p>
@@ -26,7 +26,7 @@
         {% endif %}
     {% endwith %}
 
-    {% if diagnosis.has_eligibility %}
+    {% if diagnosis.allowance_amount %}
         <p>
             <b>Durée de validité du diagnostic :</b> du {{ diagnosis.created_at|date:"d/m/Y" }} au {{ diagnosis.expires_at|date:"d/m/Y" }}.
         </p>
