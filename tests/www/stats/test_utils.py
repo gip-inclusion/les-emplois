@@ -291,18 +291,32 @@ def test_can_view_stats_pe_as_dgpe():
     [
         PrescriberOrganizationKind.CHRS,
         PrescriberOrganizationKind.CHU,
-        PrescriberOrganizationKind.CAP_EMPLOI,
-        PrescriberOrganizationKind.ML,
         PrescriberOrganizationKind.OIL,
         PrescriberOrganizationKind.RS_FJT,
     ],
 )
 @pytest.mark.parametrize("region", ["Île-de-France", "Auvergne-Rhône-Alpes", "Nouvelle-Aquitaine"])
-def test_can_view_stats_ph(kind, region):
+def test_can_view_stats_ph_limited_access_organization_kind_whitelist(kind, region):
     organization = PrescriberOrganizationWithMembershipFactory(
         authorized=True,
         kind=kind,
-        department=factory.fuzzy.FuzzyChoice(departments.REGIONS[region]),
+        department=factory.fuzzy.FuzzyChoice(REGIONS[region]),
+    )
+    request = get_request(organization.members.get())
+    assert utils.can_view_stats_ph(request)
+
+
+@pytest.mark.parametrize(
+    "kind",
+    [
+        PrescriberOrganizationKind.CAP_EMPLOI,
+        PrescriberOrganizationKind.ML,
+    ],
+)
+def test_can_view_stats_ph_full_access_organization_kind_whitelist(kind):
+    organization = PrescriberOrganizationWithMembershipFactory(
+        authorized=True,
+        kind=kind,
     )
     request = get_request(organization.members.get())
     assert utils.can_view_stats_ph(request)

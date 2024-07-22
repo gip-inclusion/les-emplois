@@ -124,21 +124,29 @@ def can_view_stats_pe(request):
 
 
 def can_view_stats_ph(request):
-    organization_kind_whitelist = [
-        PrescriberOrganizationKind.CHRS,
-        PrescriberOrganizationKind.CHU,
+    full_access_organization_kind_whitelist = [
         PrescriberOrganizationKind.CAP_EMPLOI,
         PrescriberOrganizationKind.ML,
+    ]
+    limited_access_organization_kind_whitelist = [
+        PrescriberOrganizationKind.CHRS,
+        PrescriberOrganizationKind.CHU,
         PrescriberOrganizationKind.OIL,
         PrescriberOrganizationKind.RS_FJT,
     ]
     return (
         request.user.is_prescriber
         and isinstance(request.current_organization, PrescriberOrganization)
-        and request.current_organization.kind in organization_kind_whitelist
+        and (
+            request.current_organization.kind in full_access_organization_kind_whitelist
+            or (
+                request.current_organization.kind in limited_access_organization_kind_whitelist
+                and request.current_organization.region
+                in ["Île-de-France", "Auvergne-Rhône-Alpes", "Nouvelle-Aquitaine"]
+            )
+        )
         and request.current_organization.is_authorized
         and request.current_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
-        and request.current_organization.region in ["Île-de-France", "Auvergne-Rhône-Alpes", "Nouvelle-Aquitaine"]
     )
 
 
