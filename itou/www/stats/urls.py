@@ -118,6 +118,11 @@ urlpatterns = [
         name="stats_dgefp_tension",
     ),
     path("dgefp/iae", views.stats_dgefp_iae, name="stats_dgefp_iae"),
+    path(
+        "dgefp/ph_prescription",
+        views.stats_dgefp_iae_ph_prescription,
+        name="stats_dgefp_iae_ph_prescription",
+    ),
     path("dgefp/hiring", views.stats_dgefp_hiring, name="stats_dgefp_hiring"),
     path("dgefp/state", views.stats_dgefp_state, name="stats_dgefp_state"),
     path("dgefp/siae_evaluation", views.stats_dgefp_siae_evaluation, name="stats_dgefp_siae_evaluation"),
