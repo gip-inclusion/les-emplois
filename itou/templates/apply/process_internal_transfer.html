@@ -29,7 +29,7 @@
                                     Êtes-vous sûr de vouloir transférer la candidature de <b>{{ job_app_to_transfer.job_seeker.get_full_name }}</b> dans la structure suivante ?
                                 </p>
                             {% endif %}
-                            {% include "companies/includes/_company_info.html" with company=company extra_box_class="mb-3 mb-lg-5" only %}
+                            {% include "companies/includes/_company_info.html" with company=company extra_box_class="mb-3 mb-lg-5" open_in_tab=True only %}
                         </div>
 
                         {% if job_app_to_transfer.to_company == company %}
