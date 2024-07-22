@@ -452,6 +452,7 @@ def test_populate_job_applications():
         assert rows == [
             (
                 ja.pk,
+                0,
                 ja.created_at.date(),
                 ja.hiring_start_at,
                 ja.processed_at.date(),
