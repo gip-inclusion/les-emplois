@@ -6,13 +6,18 @@ import string
 import factory.fuzzy
 from allauth.account import models as allauth_models
 from django.contrib.auth.hashers import make_password
+from django.utils.text import slugify
 
 from itou.asp.models import AllocationDuration, EducationLevel, LaneType
+from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.communications.models import NotificationRecord, NotificationSettings
 from itou.users import models
 from itou.users.enums import IdentityProvider, Title, UserKind
-from itou.utils.mocks.address_format import get_random_geocoding_api_result
+from itou.utils.mocks.address_format import (
+    BAN_GEOCODING_API_RESULTS_MOCK,
+    get_random_geocoding_api_result,
+)
 from itou.utils.validators import validate_nir
 from tests.asp.factories import CommuneFactory, CountryFactory, CountryFranceFactory
 from tests.cities.factories import create_city_in_zrr, create_city_partially_in_zrr
@@ -274,6 +279,42 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
             create_city_partially_in_zrr()
 
         return kwargs
+
+    @factory.post_generation
+    def with_ban_api_mocked_address(self, create, extracted, **kwargs):
+        # Needs ASP test fixtures installed
+        if not extracted:
+            # Do nothing
+            return
+
+        first_address = [
+            address for address in BAN_GEOCODING_API_RESULTS_MOCK if address.get("ban_api_resolved_address")
+        ][0]
+        address = first_address if extracted is True else extracted
+
+        city, _ = City.objects.get_or_create(
+            name=address["city"],
+            defaults={
+                "slug": slugify(address["city"]),
+                "department": address["post_code"][:2],
+                "coords": f"POINT({address['longitude']} {address['latitude']})",
+                "post_codes": [address["post_code"]],
+                "code_insee": address["insee_code"],
+            },
+        )
+
+        self.address_line_1 = address.get("address_line_1")
+        self.post_code = city.post_codes[0]
+        self.insee_code = city.code_insee
+        self.geocoding_score = address.get("score")
+        self.coords = city.coords
+        # String...
+        self.city = city.name
+        # Foreign key
+        self.insee_city = city
+
+        if create:
+            self.save()
 
     @factory.post_generation
     def with_mocked_address(self, create, extracted, **kwargs):

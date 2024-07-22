@@ -18,6 +18,7 @@ from django.utils.formats import date_format
 from django.utils.http import urlencode
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateUsed
+from unittest_parametrize import ParametrizedTestCase, parametrize
 
 from itou.approvals.models import Approval, Suspension
 from itou.cities.models import City
@@ -26,7 +27,7 @@ from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.job_applications import enums as job_applications_enums
-from itou.job_applications.enums import SenderKind
+from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.siae_evaluations.models import Sanctions
@@ -38,7 +39,8 @@ from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
 from tests.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
-from tests.cities.factories import create_city_geispolsheim, create_test_cities
+from tests.asp.factories import CommuneFactory, CountryFranceFactory
+from tests.cities.factories import create_test_cities
 from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
@@ -111,73 +113,6 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
     def _get_transition_logs_content(self, response, job_application):
         soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
         return soup.find("ul", attrs={"id": "transition_logs_" + str(job_application.id)})
-
-    @override_settings(API_BAN_BASE_URL="http://ban-api")
-    @mock.patch(
-        "itou.utils.apis.geocoding.get_geocoding_data",
-        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-    )
-    def accept_job_application(
-        self, _mock, job_application, post_data=None, city=None, assert_successful=True, job_description=None
-    ):
-        """
-        This is not a test. It's a shortcut to process "apply:accept" view steps:
-        - GET
-        - POST: show the confirmation modal
-        - POST: hide the modal and redirect to the next url.
-
-        If needed a job description can be passed as parameter, as it is now mandatory for each hiring.
-        If not provided, a new one will be created and linked to the given job application.
-        """
-        job_description = JobDescriptionFactory(company=job_application.to_company)
-
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url_accept)
-        self.assertContains(response, "Confirmation de l’embauche")
-        # Make sure modal is hidden.
-        assert response.headers.get("HX-Trigger") is None
-
-        if not post_data:
-            hiring_start_at = timezone.localdate()
-            hiring_end_at = Approval.get_default_end_date(hiring_start_at)
-            post_data = {
-                "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
-                "answer": "",
-                "ban_api_resolved_address": job_application.job_seeker.geocoding_address,
-                "address_line_1": job_application.job_seeker.address_line_1,
-                "post_code": city.post_codes[0],
-                "insee_code": city.code_insee,
-                "city": city.name,
-                "hired_job": job_description.pk,
-                "geocoding_score": 0.9714,
-                "fill_mode": "ban_api",
-                # Select the first and only one option
-                "address_for_autocomplete": "0",
-            }
-
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
-
-        if assert_successful:
-            assert (
-                response.headers.get("HX-Trigger")
-                == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
-            )
-        else:
-            assert response.headers.get("HX-Trigger") is None
-
-        post_data = post_data | {"confirmed": "True"}
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
-        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        # django-htmx triggers a client side redirect when it receives a response with the HX-Redirect header.
-        # It renders an HttpResponseRedirect subclass which, unfortunately, responds with a 200 status code.
-        # I guess it's normal as it's an AJAX response.
-        # See https://django-htmx.readthedocs.io/en/latest/http.html#django_htmx.http.HttpResponseClientRedirect # noqa
-        if assert_successful:
-            self.assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
-
-        return response, next_url
 
     def test_details_for_company(self, *args, **kwargs):
         """Display the details of a job application."""
@@ -1173,738 +1108,6 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
                 assert mail_to_other_employer.subject == self.snapshot(name="postpone_email_to_proxy_subject")
                 assert mail_to_other_employer.body == self.snapshot(name="postpone_email_to_proxy_body")
 
-    def test_accept(self, *args, **kwargs):
-        # This is the city matching with_ban_geoloc_address trait
-        city = create_city_geispolsheim()
-        today = timezone.localdate()
-
-        job_seeker = JobSeekerWithAddressFactory(
-            city=city.name, with_pole_emploi_id=True, with_ban_geoloc_address=True
-        )
-
-        address = {
-            "ban_api_resolved_address": job_seeker.geocoding_address,
-            "address_line_1": job_seeker.address_line_1,
-            "post_code": city.post_codes[0],
-            "insee_code": city.code_insee,
-            "city": city.name,
-            "geocoding_score": 0.9714,
-            "fill_mode": "ban_api",
-            # Select the first and only one option
-            "address_for_autocomplete": "0",
-        }
-        company = CompanyFactory(with_membership=True)
-        employer = company.members.first()
-        self.client.force_login(employer)
-
-        hiring_end_dates = [
-            Approval.get_default_end_date(today),
-            None,
-        ]
-        cases = list(product(hiring_end_dates, JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES))
-
-        for hiring_end_at, state in cases:
-            with self.subTest(hiring_end_at=hiring_end_at, state=state):
-                job_application = JobApplicationFactory(
-                    state=state,
-                    job_seeker=job_seeker,
-                    to_company=company,
-                )
-                previous_last_checked_at = job_seeker.last_checked_at
-
-                # Good duration.
-                hiring_start_at = today
-                post_data = {
-                    # Data for `JobSeekerPersonalDataForm`.
-                    "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
-                    # Data for `AcceptForm`.
-                    "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-                    "answer": "",
-                    **address,
-                }
-                if hiring_end_at:
-                    post_data["hiring_end_at"] = hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT)
-
-                _, next_url = self.accept_job_application(job_application=job_application, post_data=post_data)
-
-                job_application = JobApplication.objects.get(pk=job_application.pk)
-                assert job_application.hiring_start_at == hiring_start_at
-                assert job_application.hiring_end_at == hiring_end_at
-                assert job_application.state.is_accepted
-
-                # test how hiring_end_date is displayed
-                response = self.client.get(next_url)
-                # test case hiring_end_at
-                if hiring_end_at:
-                    self.assertContains(
-                        response,
-                        f"<small>Fin</small><strong>{date_format(hiring_end_at, 'd F Y')}</strong>",
-                        html=True,
-                    )
-                else:
-                    self.assertContains(
-                        response, '<small>Fin</small><i class="text-disabled">Non renseigné</i>', html=True
-                    )
-                # last_checked_at has been updated
-                assert job_application.job_seeker.last_checked_at > previous_last_checked_at
-
-        ##############
-        # Exceptions #
-        ##############
-        job_application = JobApplicationFactory(
-            state=state,
-            job_seeker=job_seeker,
-            to_company=company,
-        )
-
-        # Wrong dates.
-        # Force `hiring_start_at` in past.
-        hiring_start_at = today - relativedelta(days=1)
-        hiring_end_at = hiring_start_at + relativedelta(months=1)
-        post_data = {
-            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "answer": "",
-            **address,
-        }
-        response, _ = self.accept_job_application(
-            job_application=job_application, post_data=post_data, assert_successful=False
-        )
-        self.assertFormError(response.context["form_accept"], "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
-
-        # Force `hiring_start_at` in more than 6 monts.
-        hiring_start_at = today + relativedelta(months=6, days=1)
-        hiring_end_at = hiring_start_at + relativedelta(months=1)
-        post_data = {
-            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "answer": "",
-            **address,
-        }
-        response, _ = self.accept_job_application(
-            job_application=job_application, post_data=post_data, assert_successful=False
-        )
-        self.assertFormError(
-            response.context["form_accept"], "hiring_start_at", JobApplication.ERROR_START_IN_FAR_FUTURE
-        )
-
-        # Wrong dates: end < start.
-        hiring_start_at = today
-        hiring_end_at = hiring_start_at - relativedelta(days=1)
-        post_data = {
-            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "answer": "",
-            **address,
-        }
-        response, _ = self.accept_job_application(
-            job_application=job_application, post_data=post_data, assert_successful=False
-        )
-        self.assertFormError(response.context["form_accept"], None, JobApplication.ERROR_END_IS_BEFORE_START)
-
-        # No address provided.
-        job_application = JobApplicationFactory(
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-            to_company=company,
-        )
-
-        hiring_start_at = today
-        hiring_end_at = Approval.get_default_end_date(hiring_start_at)
-        post_data = {
-            # Data for `JobSeekerPersonalDataForm`.
-            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
-            # Data for `AcceptForm`.
-            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "answer": "",
-        }
-        response, _ = self.accept_job_application(
-            job_application=job_application, post_data=post_data, assert_successful=False
-        )
-        self.assertFormError(
-            response.context["form_user_address"], "address_for_autocomplete", "Ce champ est obligatoire."
-        )
-
-        # No eligibility diagnosis -> if job_seeker has a valid eligibility diagnosis, it's OK
-        job_application = JobApplicationSentByJobSeekerFactory(
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker=job_seeker,
-            to_company=company,
-            eligibility_diagnosis=None,
-        )
-        post_data = {
-            # Data for `JobSeekerPersonalDataForm`.
-            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
-            # Data for `AcceptForm`.
-            "hiring_start_at": today.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "answer": "",
-            **address,
-        }
-        self.accept_job_application(job_application=job_application, post_data=post_data)
-
-        # if no, should not see the confirm button, nor accept posted data
-        job_application = JobApplicationSentByJobSeekerFactory(
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker=job_seeker,
-            to_company=company,
-            eligibility_diagnosis=None,
-        )
-        for approval in job_application.job_seeker.approvals.all():
-            approval.delete()
-        job_application.job_seeker.eligibility_diagnoses.all().delete()
-        post_data = {
-            # Data for `JobSeekerPersonalDataForm`.
-            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
-            # Data for `AcceptForm`.
-            "hiring_start_at": today.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "answer": "",
-            **address,
-        }
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url_accept, follow=True)
-        self.assertRedirects(
-            response, reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        )
-        assert "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée." == str(
-            list(response.context["messages"])[-1]
-        )
-
-    def test_accept_with_active_suspension(self, *args, **kwargs):
-        """Test the `accept` transition with active suspension for active user"""
-        city = self.get_random_city()
-        today = timezone.localdate()
-        # the old job of job seeker
-        job_seeker_user = JobSeekerWithAddressFactory(
-            with_pole_emploi_id=True,
-            with_ban_geoloc_address=True,
-        )
-        old_job_application = JobApplicationFactory(
-            with_approval=True,
-            job_seeker=job_seeker_user,
-            # Ensure that the old_job_application cannot be canceled.
-            hiring_start_at=today - relativedelta(days=100),
-        )
-        # create suspension for the job seeker
-        approval_job_seeker = old_job_application.approval
-        employer = old_job_application.to_company.members.first()
-        susension_start_at = today
-        suspension_end_at = today + relativedelta(days=50)
-
-        SuspensionFactory(
-            approval=approval_job_seeker,
-            start_at=susension_start_at,
-            end_at=suspension_end_at,
-            created_by=employer,
-            reason=Suspension.Reason.BROKEN_CONTRACT.value,
-        )
-
-        # Now, another company wants to hire the job seeker
-        other_company = CompanyFactory(with_membership=True)
-        job_application = JobApplicationFactory(
-            approval=approval_job_seeker,
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker=job_seeker_user,
-            to_company=other_company,
-        )
-        other_employer = job_application.to_company.members.first()
-
-        # login with other company
-        self.client.force_login(other_employer)
-        hiring_start_at = today + relativedelta(days=20)
-        hiring_end_at = Approval.get_default_end_date(hiring_start_at)
-
-        post_data = {
-            # Data for `JobSeekerPersonalDataForm`.
-            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
-            # Data for `AcceptForm`.
-            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "answer": "",
-            "ban_api_resolved_address": job_seeker_user.geocoding_address,
-            "address_line_1": job_seeker_user.address_line_1,
-            "post_code": city.post_codes[0],
-            "insee_code": city.code_insee,
-            "city": city.name,
-            "geocoding_score": 0.9714,
-            "fill_mode": "ban_api",
-            # Select the first and only one option
-            "address_for_autocomplete": "0",
-        }
-        self.accept_job_application(job_application=job_application, post_data=post_data)
-        get_job_application = JobApplication.objects.get(pk=job_application.pk)
-        g_suspension = get_job_application.approval.suspension_set.in_progress().last()
-
-        # The end date of suspension is set to d-1 of hiring start day
-        assert g_suspension.end_at == get_job_application.hiring_start_at - relativedelta(days=1)
-        # Check if the duration of approval was updated correctly
-        assert get_job_application.approval.end_at == approval_job_seeker.end_at + relativedelta(
-            days=(g_suspension.end_at - g_suspension.start_at).days
-        )
-
-    def test_accept_with_manual_approval_delivery(self, *args, **kwargs):
-        """
-        Test the "manual approval delivery mode" path of the view.
-        """
-        city = self.get_random_city()
-
-        job_application = JobApplicationFactory(
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-            # The state of the 3 `pole_emploi_*` fields will trigger a manual delivery.
-            job_seeker__jobseeker_profile__nir="",
-            job_seeker__jobseeker_profile__pole_emploi_id="",
-            job_seeker__jobseeker_profile__lack_of_pole_emploi_id_reason=LackOfPoleEmploiId.REASON_FORGOTTEN,
-            job_seeker__with_ban_geoloc_address=True,
-        )
-
-        employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
-
-        post_data = {
-            # Data for `JobSeekerPersonalDataForm`.
-            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
-            "lack_of_nir": True,
-            "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
-            "ban_api_resolved_address": job_application.job_seeker.geocoding_address,
-            "address_line_1": job_application.job_seeker.address_line_1,
-            "post_code": city.post_codes[0],
-            "insee_code": city.code_insee,
-            "city": city.name,
-            "geocoding_score": 0.9714,
-            "fill_mode": "ban_api",
-            # Select the first and only one option
-            "address_for_autocomplete": "0",
-            # Data for `AcceptForm`.
-            "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": (timezone.localdate() + relativedelta(days=360)).strftime(
-                DuetDatePickerWidget.INPUT_DATE_FORMAT
-            ),
-            "answer": "",
-        }
-
-        self.accept_job_application(job_application=job_application, post_data=post_data)
-        job_application.refresh_from_db()
-        assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_MANUAL
-
-    def test_accept_and_update_hiring_start_date_of_two_job_applications(self, *args, **kwargs):
-        city = self.get_random_city()
-        job_seeker = JobSeekerWithAddressFactory(with_pole_emploi_id=True, with_ban_geoloc_address=True)
-
-        base_for_post_data = {
-            "ban_api_resolved_address": job_seeker.geocoding_address,
-            "address_line_1": job_seeker.address_line_1,
-            "post_code": city.post_codes[0],
-            "insee_code": city.code_insee,
-            "city": city.name,
-            "geocoding_score": 0.9714,
-            "fill_mode": "ban_api",
-            # Select the first and only one option
-            "address_for_autocomplete": "0",
-            "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
-            "answer": "",
-        }
-        hiring_start_at = timezone.localdate() + relativedelta(months=2)
-        hiring_end_at = hiring_start_at + relativedelta(months=2)
-        approval_default_ending = Approval.get_default_end_date(start_at=hiring_start_at)
-
-        # Send 3 job applications to 3 different structures
-        job_application = JobApplicationFactory(
-            job_seeker=job_seeker,
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-        )
-        job_app_starting_earlier = JobApplicationFactory(
-            job_seeker=job_seeker,
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-        )
-        job_app_starting_later = JobApplicationFactory(
-            job_seeker=job_seeker,
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-        )
-
-        # company 1 logs in and accepts the first job application.
-        # The delivered approval should start at the same time as the contract.
-        user = job_application.to_company.members.first()
-        self.client.force_login(user)
-        post_data = {
-            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            **base_for_post_data,
-        }
-
-        self.accept_job_application(job_application=job_application, post_data=post_data)
-
-        # First job application has been accepted.
-        # All other job applications are obsolete.
-        job_application.refresh_from_db()
-        assert job_application.state.is_accepted
-        assert job_application.approval.start_at == job_application.hiring_start_at
-        assert job_application.approval.end_at == approval_default_ending
-        self.client.logout()
-
-        # company 2 accepts the second job application
-        # but its contract starts earlier than the approval delivered the first time.
-        # Approval's starting date should be brought forward.
-        user = job_app_starting_earlier.to_company.members.first()
-        hiring_start_at = hiring_start_at - relativedelta(months=1)
-        hiring_end_at = hiring_start_at + relativedelta(months=2)
-        approval_default_ending = Approval.get_default_end_date(start_at=hiring_start_at)
-        job_app_starting_earlier.refresh_from_db()
-        assert job_app_starting_earlier.state.is_obsolete
-
-        self.client.force_login(user)
-        post_data = {
-            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            **base_for_post_data,
-        }
-        self.accept_job_application(job_application=job_app_starting_earlier, post_data=post_data)
-        job_app_starting_earlier.refresh_from_db()
-
-        # Second job application has been accepted.
-        # The job seeker has now two part-time jobs at the same time.
-        assert job_app_starting_earlier.state.is_accepted
-        assert job_app_starting_earlier.approval.start_at == job_app_starting_earlier.hiring_start_at
-        assert job_app_starting_earlier.approval.end_at == approval_default_ending
-        self.client.logout()
-
-        # company 3 accepts the third job application.
-        # Its contract starts later than the corresponding approval.
-        # Approval's starting date should not be updated.
-        user = job_app_starting_later.to_company.members.first()
-        hiring_start_at = hiring_start_at + relativedelta(months=5)
-        hiring_end_at = hiring_start_at + relativedelta(months=2)
-        job_app_starting_later.refresh_from_db()
-        assert job_app_starting_later.state.is_obsolete
-
-        self.client.force_login(user)
-        post_data = {
-            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            **base_for_post_data,
-        }
-        self.accept_job_application(job_application=job_app_starting_later, post_data=post_data)
-        job_app_starting_later.refresh_from_db()
-
-        # Third job application has been accepted.
-        # The job seeker has now three part-time jobs at the same time.
-        assert job_app_starting_later.state.is_accepted
-        assert job_app_starting_later.approval.start_at == job_app_starting_earlier.hiring_start_at
-
-    def test_accept_with_double_user(self, *args, **kwargs):
-        # This is the city matching with_ban_geoloc_address trait
-        city = create_city_geispolsheim()
-
-        company = CompanyFactory(with_membership=True)
-        job_seeker = JobSeekerWithAddressFactory(
-            city=city.name,
-            with_pole_emploi_id=True,
-            with_ban_geoloc_address=True,
-        )
-        job_application = JobApplicationFactory(
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker=job_seeker,
-            to_company=company,
-        )
-
-        # Create a "PE Approval" that will be converted to a PASS IAE when accepting the process
-        pole_emploi_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id, birthdate=job_seeker.birthdate
-        )
-
-        # Accept the job application for the first job seeker.
-        self.client.force_login(company.members.first())
-        _, next_url = self.accept_job_application(job_application=job_application, city=city)
-        response = self.client.get(next_url)
-        assert "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. " not in str(
-            list(response.context["messages"])[0]
-        )
-
-        # This approval is found thanks to the PE Approval number
-        approval = Approval.objects.get(number=pole_emploi_approval.number)
-        assert approval.user == job_seeker
-
-        # Now generate a job seeker that is "almost the same"
-        almost_same_job_seeker = JobSeekerWithAddressFactory(
-            city=city.name,
-            jobseeker_profile__pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
-            birthdate=job_seeker.birthdate,
-            with_ban_geoloc_address=True,
-        )
-        another_job_application = JobApplicationFactory(
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker=almost_same_job_seeker,
-            to_company=company,
-        )
-
-        # Gracefully display a message instead of just plain crashing
-        _, next_url = self.accept_job_application(job_application=another_job_application, city=city)
-        response = self.client.get(next_url)
-        assert "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. " in str(
-            list(response.context["messages"])[0]
-        )
-
-    @override_settings(TALLY_URL="https://tally.so")
-    def test_accept_nir_readonly(self, *args, **kwargs):
-        job_application = JobApplicationFactory(
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-        )
-
-        employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url_accept)
-        self.assertContains(response, "Confirmation de l’embauche")
-        # Check that the NIR field is disabled
-        self.assertContains(response, DISABLED_NIR)
-        self.assertContains(
-            response,
-            "Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.",
-            html=True,
-        )
-
-        job_application.job_seeker.last_login = None
-        job_application.job_seeker.created_by = PrescriberFactory()
-        job_application.job_seeker.save()
-        response = self.client.get(url_accept)
-        self.assertContains(response, "Confirmation de l’embauche")
-        # Check that the NIR field is disabled
-        self.assertContains(response, DISABLED_NIR)
-        self.assertContains(
-            response,
-            (
-                f'<a href="https://tally.so/r/wzxQlg?jobapplication={job_application.pk}" target="_blank" '
-                'rel="noopener">Demander la correction du numéro de sécurité sociale</a>'
-            ),
-            html=True,
-        )
-
-    def test_accept_no_nir_update(self, *args, **kwargs):
-        city = self.get_random_city()
-
-        job_application = JobApplicationSentByJobSeekerFactory(
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker__jobseeker_profile__nir="",
-            job_seeker__with_pole_emploi_id=True,
-            job_seeker__with_ban_geoloc_address=True,
-        )
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-
-        employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
-
-        response = self.client.get(url_accept)
-        self.assertContains(response, "Confirmation de l’embauche")
-        # Check that the NIR field is not disabled
-        self.assertNotContains(response, DISABLED_NIR)
-
-        post_data = {
-            # Data for `JobSeekerPersonalDataForm`.
-            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
-            # Data for `AcceptForm`.
-            "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": (timezone.localdate() + relativedelta(days=360)).strftime(
-                DuetDatePickerWidget.INPUT_DATE_FORMAT
-            ),
-            "answer": "",
-            "ban_api_resolved_address": job_application.job_seeker.geocoding_address,
-            "address_line_1": job_application.job_seeker.address_line_1,
-            "post_code": city.post_codes[0],
-            "insee_code": city.code_insee,
-            "city": city.name,
-            "geocoding_score": 0.9714,
-            "fill_mode": "ban_api",
-            # Select the first and only one option
-            "address_for_autocomplete": "0",
-        }
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
-        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
-
-        post_data["nir"] = "1234"
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
-        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
-        self.assertFormError(
-            response.context["form_personal_data"],
-            "nir",
-            "Le numéro de sécurité sociale est trop court (15 caractères autorisés).",
-        )
-
-        NEW_NIR = "197013625838386"
-        post_data["nir"] = NEW_NIR
-
-        self.accept_job_application(job_application=job_application, post_data=post_data)
-        job_application.job_seeker.jobseeker_profile.refresh_from_db()
-        assert job_application.job_seeker.jobseeker_profile.nir == NEW_NIR
-
-    def test_accept_no_nir_other_user(self, *args, **kwargs):
-        city = self.get_random_city()
-
-        job_application = JobApplicationFactory(
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker__jobseeker_profile__nir="",
-            job_seeker__with_pole_emploi_id=True,
-        )
-        other_job_seeker = JobSeekerWithAddressFactory()
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-
-        employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
-
-        post_data = {
-            # Data for `JobSeekerPersonalDataForm`.
-            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
-            "nir": other_job_seeker.jobseeker_profile.nir,
-            # Data for `JobSeekerAddressForm`.
-            "address_line_1": "11 rue des Lilas",
-            "post_code": "57000",
-            "city": city.name,
-            # Data for `AcceptForm`.
-            "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": (timezone.localdate() + relativedelta(days=360)).strftime(
-                DuetDatePickerWidget.INPUT_DATE_FORMAT
-            ),
-            "answer": "",
-        }
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
-        self.assertContains(
-            response, "Le numéro de sécurité sociale est déjà associé à un autre utilisateur", html=True
-        )
-        self.assertFormError(
-            response.context["form_personal_data"],
-            None,
-            "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.",
-        )
-
-    def test_accept_no_nir_update_with_reason(self, *args, **kwargs):
-        city = self.get_random_city()
-
-        job_application = JobApplicationSentByJobSeekerFactory(
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker__jobseeker_profile__nir="",
-            job_seeker__with_pole_emploi_id=True,
-            job_seeker__with_ban_geoloc_address=True,
-        )
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-
-        employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
-
-        post_data = {
-            # Data for `JobSeekerPersonalDataForm`.
-            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
-            "ban_api_resolved_address": job_application.job_seeker.geocoding_address,
-            "address_line_1": job_application.job_seeker.address_line_1,
-            "post_code": city.post_codes[0],
-            "insee_code": city.code_insee,
-            "city": city.name,
-            "geocoding_score": 0.9714,
-            "fill_mode": "ban_api",
-            # Select the first and only one option
-            "address_for_autocomplete": "0",
-            # Data for `AcceptForm`.
-            "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": (timezone.localdate() + relativedelta(days=360)).strftime(
-                DuetDatePickerWidget.INPUT_DATE_FORMAT
-            ),
-            "answer": "",
-        }
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
-        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
-
-        # Check the box
-        post_data["lack_of_nir"] = True
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
-        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
-        self.assertContains(response, "Veuillez sélectionner un motif pour continuer", html=True)
-
-        post_data["lack_of_nir_reason"] = LackOfNIRReason.NO_NIR
-        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
-        job_application.job_seeker.refresh_from_db()
-        assert job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NO_NIR
-
-    def test_accept_lack_of_nir_reason_update(self, *args, **kwargs):
-        city = self.get_random_city()
-
-        job_application = JobApplicationFactory(
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker__jobseeker_profile__nir="",
-            job_seeker__jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
-            job_seeker__with_pole_emploi_id=True,
-            job_seeker__with_ban_geoloc_address=True,
-        )
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-
-        employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
-
-        response = self.client.get(url_accept)
-        self.assertContains(response, "Confirmation de l’embauche")
-        # Check that the NIR field is initially disabled
-        # since the job seeker has a lack_of_nir_reason
-        assert response.context["form_personal_data"].fields["nir"].disabled
-        self.assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
-
-        NEW_NIR = "197013625838386"
-        post_data = {
-            # Data for `JobSeekerPersonalDataForm`.
-            "nir": NEW_NIR,
-            "lack_of_nir_reason": job_application.job_seeker.jobseeker_profile.lack_of_nir_reason,
-            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
-            "lack_of_pole_emploi_id_reason": job_application.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason,  # noqa: E501
-            # Data for `AcceptForm`.
-            "hiring_start_at": timezone.localdate().strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
-            "hiring_end_at": (timezone.localdate() + relativedelta(days=360)).strftime(
-                DuetDatePickerWidget.INPUT_DATE_FORMAT
-            ),
-            "answer": "",
-            "ban_api_resolved_address": job_application.job_seeker.geocoding_address,
-            "address_line_1": job_application.job_seeker.address_line_1,
-            "post_code": city.post_codes[0],
-            "insee_code": city.code_insee,
-            "city": city.name,
-            "geocoding_score": 0.9714,
-            "fill_mode": "ban_api",
-            # Select the first and only one option
-            "address_for_autocomplete": "0",
-        }
-
-        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
-        job_application.job_seeker.refresh_from_db()
-        # New NIR is set and the lack_of_nir_reason is cleaned
-        assert not job_application.job_seeker.jobseeker_profile.lack_of_nir_reason
-        assert job_application.job_seeker.jobseeker_profile.nir == NEW_NIR
-
-    @override_settings(TALLY_URL="https://tally.so")
-    def test_accept_lack_of_nir_reason_other_user(self, *args, **kwargs):
-        job_application = JobApplicationFactory(
-            state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker__jobseeker_profile__nir="",
-            job_seeker__jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER,
-        )
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-
-        employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
-
-        response = self.client.get(url_accept)
-        self.assertContains(response, "Confirmation de l’embauche")
-        # Check that the NIR field is initially disabled
-        # since the job seeker has a lack_of_nir_reason
-        assert response.context["form_personal_data"].fields["nir"].disabled
-        self.assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
-
-        # Check that the tally link is there
-        self.assertContains(
-            response,
-            (
-                f'<a href="https://tally.so/r/wzxQlg?jobapplication={job_application.pk}" target="_blank" '
-                'rel="noopener">Demander la correction du numéro de sécurité sociale</a>'
-            ),
-            html=True,
-        )
-
     def test_eligibility(self, *args, **kwargs):
         """Test eligibility."""
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
@@ -2096,29 +1299,6 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
 
         job_application.refresh_from_db()
         assert not job_application.state.is_cancelled
-
-    def test_accept_after_cancel(self, *args, **kwargs):
-        # A canceled job application is not linked to an approval
-        # unless the job seeker has an accepted job application.
-        # This is the city matching with_ban_geoloc_address trait
-        city = create_city_geispolsheim()
-        job_seeker = JobSeekerWithAddressFactory(
-            city=city.name, with_pole_emploi_id=True, with_ban_geoloc_address=True
-        )
-        job_application = JobApplicationFactory(
-            state=job_applications_enums.JobApplicationState.CANCELLED,
-            job_seeker=job_seeker,
-        )
-        employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
-
-        self.accept_job_application(job_application=job_application, city=city)
-
-        job_application.refresh_from_db()
-        assert job_seeker.approvals.count() == 1
-        approval = job_seeker.approvals.first()
-        assert approval.start_at == job_application.hiring_start_at
-        assert job_application.state.is_accepted
 
     def test_archive(self, *args, **kwargs):
         """Ensure that when a company archives a job_application, the hidden_for_company flag is updated."""
@@ -2450,6 +1630,745 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             in mail.outbox[0].body
         )
         assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 in mail.outbox[0].body
+
+
+class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.company = CompanyFactory(with_membership=True, with_jobs=True, name="La brigade - entreprise par défaut")
+
+    def setUp(self):
+        self.job_seeker = JobSeekerWithAddressFactory(
+            with_pole_emploi_id=True,
+            with_ban_api_mocked_address=True,
+        )
+
+    def create_job_application(self, *args, **kwargs):
+        extra_kwargs = kwargs or {}
+        kwargs = {
+            "selected_jobs": self.company.jobs.all(),
+            "state": JobApplicationState.PROCESSING,
+            "job_seeker": self.job_seeker,
+            "to_company": self.company,
+            "hiring_end_at": None,
+        } | extra_kwargs
+        return JobApplicationSentByJobSeekerFactory(**kwargs)
+
+    def _accept_view_post_data(self, job_application, post_data=None):
+        extra_post_data = post_data or {}
+        job_seeker = job_application.job_seeker
+        # JobSeekerAddressForm
+        address_default_fields = {
+            "ban_api_resolved_address": job_seeker.geocoding_address,
+            "address_line_1": job_seeker.address_line_1,
+            "post_code": job_seeker.insee_city.post_codes[0],
+            "insee_code": job_seeker.insee_city.code_insee,
+            "city": job_seeker.insee_city.name,
+            "fill_mode": "ban_api",
+            # Select the first and only one option
+            "address_for_autocomplete": "0",
+            "geocoding_score": 0.9714,
+        }
+        # JobSeekerPersonalDataForm
+        personal_data_default_fields = {
+            "pole_emploi_id": job_seeker.jobseeker_profile.pole_emploi_id,
+        }
+        # AcceptForm
+        job_description = job_application.selected_jobs.first()
+        hiring_start_at = timezone.localdate()
+        hiring_end_at = Approval.get_default_end_date(hiring_start_at)
+        accept_default_fields = {
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "answer": "",
+            "hired_job": job_description.pk,
+        }
+        # CertifiedCriteriaForm
+        birth_country = CountryFranceFactory()
+        birth_place = CommuneFactory()
+        certified_criteria_default_fields = {
+            "birth_country": birth_country.pk,
+            "birth_place": birth_place.pk,
+        }
+
+        return {
+            **personal_data_default_fields,
+            **address_default_fields,
+            **accept_default_fields,
+            **certified_criteria_default_fields,
+        } | extra_post_data
+
+    @override_settings(API_BAN_BASE_URL="http://ban-api")
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+    )
+    def accept_job_application(self, _mock, job_application, post_data=None, city=None, assert_successful=True):
+        """
+        This is not a test. It's a shortcut to process "apply:accept" view steps:
+        - GET
+        - POST: show the confirmation modal
+        - POST: hide the modal and redirect to the next url.
+
+        If needed a job description can be passed as parameter, as it is now mandatory for each hiring.
+        If not provided, a new one will be created and linked to the given job application.
+        """
+
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url_accept)
+        self.assertContains(response, "Confirmation de l’embauche")
+        # Make sure modal is hidden.
+        assert response.headers.get("HX-Trigger") is None
+
+        # if not post_data:
+        post_data = self._accept_view_post_data(job_application=job_application, post_data=post_data)
+
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
+
+        if assert_successful:
+            # Easier to debug than just a « sorry, the modal goes on a strike ».
+            assert not response.context["has_form_error"]
+            assert (
+                response.headers.get("HX-Trigger")
+                == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
+            )
+        else:
+            assert response.headers.get("HX-Trigger") is None
+
+        post_data = post_data | {"confirmed": "True"}
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
+        next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        # django-htmx triggers a client side redirect when it receives a response with the HX-Redirect header.
+        # It renders an HttpResponseRedirect subclass which, unfortunately, responds with a 200 status code.
+        # I guess it's normal as it's an AJAX response.
+        # See https://django-htmx.readthedocs.io/en/latest/http.html#django_htmx.http.HttpResponseClientRedirect # noqa
+        if assert_successful:
+            self.assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
+
+        return response, next_url
+
+    @parametrize(
+        "hiring_end_at,state",
+        list(
+            product(
+                [
+                    Approval.get_default_end_date(timezone.localdate()),
+                    None,
+                ],
+                JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES,
+            )
+        ),
+    )
+    def test_nominal_case(self, hiring_end_at, state):
+        today = timezone.localdate()
+        job_application = self.create_job_application(state=state)
+        previous_last_checked_at = self.job_seeker.last_checked_at
+
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+        # Good duration.
+        hiring_start_at = today
+        post_data = {
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT) if hiring_end_at else ""
+        }
+
+        _, next_url = self.accept_job_application(job_application=job_application, post_data=post_data)
+
+        job_application = JobApplication.objects.get(pk=job_application.pk)
+        assert job_application.hiring_start_at == hiring_start_at
+        assert job_application.hiring_end_at == hiring_end_at
+        assert job_application.state.is_accepted
+
+        # test how hiring_end_date is displayed
+        response = self.client.get(next_url)
+        # test case hiring_end_at
+        if hiring_end_at:
+            self.assertContains(
+                response,
+                f"<small>Fin</small><strong>{date_format(hiring_end_at, 'd F Y')}</strong>",
+                html=True,
+            )
+        else:
+            self.assertContains(response, '<small>Fin</small><i class="text-disabled">Non renseigné</i>', html=True)
+        # last_checked_at has been updated
+        assert job_application.job_seeker.last_checked_at > previous_last_checked_at
+
+    def test_select_other_job_description_for_job_application(self, *args, **kwargs):
+        job_application = self.create_job_application()
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+
+        city = City.objects.order_by("?").first()
+        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+
+        assertContains(response, "Postes ouverts au recrutement")
+        assertNotContains(response, "Postes fermés au recrutement")
+        assertNotContains(response, "Préciser le nom du poste (code ROME)")
+
+        # Select "Autre": must provide new job detail fields
+        post_data = {
+            "hired_job": AcceptForm.OTHER_HIRED_JOB,
+        }
+        post_data = self._accept_view_post_data(job_application=job_application, post_data=post_data)
+        response = self.client.post(url, data=post_data)
+        assertContains(response, "Préciser le nom du poste (code ROME)")
+
+        # Check form errors.
+        # NOTE(cms): Not sure if this is really useful...
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 200
+
+        post_data |= {"location": city.pk}
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 200
+
+        appellation = Appellation.objects.order_by("?").first()
+        post_data |= {"appellation": appellation.pk}
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 200
+
+        tomorrow = timezone.localdate() + relativedelta(days=1)
+        post_data |= {"hiring_start_at": f"{tomorrow:%Y-%m-%d}"}
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 200
+
+        # Modal window
+        post_data |= {"confirmed": True}
+        response = self.client.post(url, data=post_data, follow=False)
+        # Caution: should redirect after that point, but done via HTMX we get a 200 status code
+        assert response.status_code == 200
+        assert response.url == reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+
+        # Perform some checks on job description now attached to job application
+        job_application.refresh_from_db()
+        assert job_application.hired_job
+        assert job_application.hired_job.creation_source == JobDescriptionSource.HIRING
+        assert not job_application.hired_job.is_active
+        assert job_application.hired_job.description == "La structure n’a pas encore renseigné cette rubrique"
+
+    def test_select_job_description_for_job_application(self):
+        job_application = self.create_job_application()
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+
+        url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+
+        response = self.client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+
+        # Check optgroup labels
+        job_description = JobDescriptionFactory(company=job_application.to_company, is_active=True)
+        response = self.client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+        assert response.status_code == 200
+        assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
+        assertContains(response, "Postes ouverts au recrutement")
+        assertNotContains(response, "Postes fermés au recrutement")
+        assertNotContains(response, "Préciser le nom du poste (code ROME)")
+
+        # Inactive job description must also appear in select
+        job_description = JobDescriptionFactory(company=job_application.to_company, is_active=False)
+        response = self.client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+        assert response.status_code == 200
+        assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
+        assertContains(response, "Postes ouverts au recrutement")
+        assertContains(response, "Postes fermés au recrutement")
+        assertNotContains(response, "Préciser le nom du poste (code ROME)")
+
+    def test_no_job_description_for_job_application(self):
+        job_descriptions = self.company.jobs.all()
+        job_descriptions.delete()
+        job_application = self.create_job_application()
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+        response = self.client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+        assertNotContains(response, "Postes ouverts au recrutement")
+        assertNotContains(response, "Postes fermés au recrutement")
+        assertNotContains(response, "Préciser le nom du poste (code ROME)")
+
+    def test_wrong_dates(self):
+        today = timezone.localdate()
+        job_application = self.create_job_application()
+        hiring_start_at = today
+        hiring_end_at = Approval.get_default_end_date(hiring_start_at)
+        # Force `hiring_start_at` in past.
+        hiring_start_at = hiring_start_at - relativedelta(days=1)
+
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+        }
+        response, _ = self.accept_job_application(
+            job_application=job_application, post_data=post_data, assert_successful=False
+        )
+        self.assertFormError(response.context["form_accept"], "hiring_start_at", JobApplication.ERROR_START_IN_PAST)
+
+        # Wrong dates: end < start.
+        hiring_start_at = today
+        hiring_end_at = hiring_start_at - relativedelta(days=1)
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+        }
+        response, _ = self.accept_job_application(
+            job_application=job_application, post_data=post_data, assert_successful=False
+        )
+        self.assertFormError(response.context["form_accept"], None, JobApplication.ERROR_END_IS_BEFORE_START)
+
+    def test_no_address(self):
+        job_application = self.create_job_application()
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+
+        post_data = {
+            "ban_api_resolved_address": "",
+            "address_line_1": "",
+            "post_code": "",
+            "insee_code": "",
+            "city": "",
+            "geocoding_score": "",
+            "fill_mode": "ban_api",
+            "address_for_autocomplete": "",
+        }
+
+        response, _ = self.accept_job_application(
+            job_application=job_application, post_data=post_data, assert_successful=False
+        )
+        self.assertFormError(
+            response.context["form_user_address"], "address_for_autocomplete", "Ce champ est obligatoire."
+        )
+
+    def test_no_diagnosis(self):
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
+        job_application = self.create_job_application()
+        self.job_seeker.eligibility_diagnoses.add(diagnosis)
+        # No eligibility diagnosis -> if job_seeker has a valid eligibility diagnosis, it's OK
+        job_application.eligibility_diagnosis = None
+        job_application.save()
+
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+        self.accept_job_application(job_application=job_application, assert_successful=True, post_data={})
+
+        # if no, should not see the confirm button, nor accept posted data
+        job_application = self.create_job_application()
+        job_application.eligibility_diagnosis = None
+        job_application.save()
+        for approval in job_application.job_seeker.approvals.all():
+            approval.delete()
+        job_application.job_seeker.eligibility_diagnoses.all().delete()
+
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url_accept, follow=True)
+        self.assertRedirects(
+            response, reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        )
+        assert "Cette candidature requiert un diagnostic d'éligibilité pour être acceptée." == str(
+            list(response.context["messages"])[-1]
+        )
+
+    def test_with_active_suspension(self, *args, **kwargs):
+        """Test the `accept` transition with active suspension for active user"""
+        employer = self.company.members.first()
+        today = timezone.localdate()
+        # Old job application of job seeker
+        old_job_application = self.create_job_application(
+            with_approval=True, hiring_start_at=today - relativedelta(days=100)
+        )
+        job_seeker = old_job_application.job_seeker
+        # Create suspension for the job seeker
+        approval = old_job_application.approval
+        susension_start_at = today
+        suspension_end_at = today + relativedelta(days=50)
+
+        SuspensionFactory(
+            approval=approval,
+            start_at=susension_start_at,
+            end_at=suspension_end_at,
+            created_by=employer,
+            reason=Suspension.Reason.BROKEN_CONTRACT.value,
+        )
+
+        # Now, another company wants to hire the job seeker
+        other_company = CompanyFactory(with_membership=True, with_jobs=True)
+        job_application = JobApplicationFactory(
+            approval=approval,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
+            job_seeker=job_seeker,
+            to_company=other_company,
+            selected_jobs=other_company.jobs.all(),
+        )
+        other_employer = job_application.to_company.members.first()
+
+        # login with other company
+        self.client.force_login(other_employer)
+        hiring_start_at = today + relativedelta(days=20)
+
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+        }
+        self.accept_job_application(job_application=job_application, post_data=post_data)
+
+        job_application = JobApplication.objects.get(pk=job_application.pk)
+        suspension = job_application.approval.suspension_set.in_progress().last()
+
+        # The end date of suspension is set to d-1 of hiring start day.
+        assert suspension.end_at == job_application.hiring_start_at - relativedelta(days=1)
+        # Check if the duration of approval was updated correctly.
+        assert job_application.approval.end_at == approval.end_at + relativedelta(
+            days=(suspension.end_at - suspension.start_at).days
+        )
+
+    def test_with_manual_approval_delivery(self, *args, **kwargs):
+        """
+        Test the "manual approval delivery mode" path of the view.
+        """
+
+        jobseeker_profile = self.job_seeker.jobseeker_profile
+        # The state of the 3 `pole_emploi_*` fields will trigger a manual delivery.
+        jobseeker_profile.nir = ""
+        jobseeker_profile.pole_emploi_id = ""
+        jobseeker_profile.lack_of_pole_emploi_id_reason = LackOfPoleEmploiId.REASON_FORGOTTEN
+        jobseeker_profile.save()
+        job_application = self.create_job_application()
+
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+
+        post_data = {
+            # Data for `JobSeekerPersonalDataForm`.
+            "pole_emploi_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": jobseeker_profile.lack_of_pole_emploi_id_reason,
+            "lack_of_nir": True,
+            "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
+        }
+
+        self.accept_job_application(job_application=job_application, post_data=post_data)
+        job_application.refresh_from_db()
+        assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_MANUAL
+
+    def test_update_hiring_start_date_of_two_job_applications(self, *args, **kwargs):
+        hiring_start_at = timezone.localdate() + relativedelta(months=2)
+        hiring_end_at = hiring_start_at + relativedelta(months=2)
+        approval_default_ending = Approval.get_default_end_date(start_at=hiring_start_at)
+        # Send 3 job applications to 3 different structures
+        job_application = self.create_job_application(hiring_start_at=hiring_start_at, hiring_end_at=hiring_end_at)
+        job_seeker = job_application.job_seeker
+
+        wall_e = CompanyFactory(with_membership=True, with_jobs=True, name="WALL-E")
+        job_app_starting_earlier = JobApplicationFactory(
+            job_seeker=job_seeker,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
+            to_company=wall_e,
+            selected_jobs=wall_e.jobs.all(),
+        )
+        vice_versa = CompanyFactory(with_membership=True, with_jobs=True, name="Vice-versa")
+        job_app_starting_later = JobApplicationFactory(
+            job_seeker=job_seeker,
+            state=job_applications_enums.JobApplicationState.PROCESSING,
+            to_company=vice_versa,
+            selected_jobs=vice_versa.jobs.all(),
+        )
+
+        # company 1 logs in and accepts the first job application.
+        # The delivered approval should start at the same time as the contract.
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+        }
+
+        self.accept_job_application(job_application=job_application, post_data=post_data)
+
+        # First job application has been accepted.
+        # All other job applications are obsolete.
+        job_application.refresh_from_db()
+        assert job_application.state.is_accepted
+        assert job_application.approval.start_at == job_application.hiring_start_at
+        assert job_application.approval.end_at == approval_default_ending
+        self.client.logout()
+
+        # company 2 accepts the second job application
+        # but its contract starts earlier than the approval delivered the first time.
+        # Approval's starting date should be brought forward.
+        employer = wall_e.members.first()
+        hiring_start_at = hiring_start_at - relativedelta(months=1)
+        hiring_end_at = hiring_start_at + relativedelta(months=2)
+        approval_default_ending = Approval.get_default_end_date(start_at=hiring_start_at)
+        job_app_starting_earlier.refresh_from_db()
+        assert job_app_starting_earlier.state.is_obsolete
+
+        self.client.force_login(employer)
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+        }
+        self.accept_job_application(job_application=job_app_starting_earlier, post_data=post_data)
+        job_app_starting_earlier.refresh_from_db()
+
+        # Second job application has been accepted.
+        # The job seeker has now two part-time jobs at the same time.
+        assert job_app_starting_earlier.state.is_accepted
+        assert job_app_starting_earlier.approval.start_at == job_app_starting_earlier.hiring_start_at
+        assert job_app_starting_earlier.approval.end_at == approval_default_ending
+        self.client.logout()
+
+        # company 3 accepts the third job application.
+        # Its contract starts later than the corresponding approval.
+        # Approval's starting date should not be updated.
+        employer = vice_versa.members.first()
+        hiring_start_at = hiring_start_at + relativedelta(months=5)
+        hiring_end_at = hiring_start_at + relativedelta(months=2)
+        job_app_starting_later.refresh_from_db()
+        assert job_app_starting_later.state.is_obsolete
+
+        self.client.force_login(employer)
+        post_data = {
+            "hiring_start_at": hiring_start_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+            "hiring_end_at": hiring_end_at.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+        }
+        self.accept_job_application(job_application=job_app_starting_later, post_data=post_data)
+        job_app_starting_later.refresh_from_db()
+
+        # Third job application has been accepted.
+        # The job seeker has now three part-time jobs at the same time.
+        assert job_app_starting_later.state.is_accepted
+        assert job_app_starting_later.approval.start_at == job_app_starting_earlier.hiring_start_at
+
+    def test_with_double_user(self, *args, **kwargs):
+        job_application = self.create_job_application()
+        job_seeker = job_application.job_seeker
+
+        # Create a "PE Approval" that will be converted to a PASS IAE when accepting the process
+        pole_emploi_approval = PoleEmploiApprovalFactory(
+            pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id, birthdate=job_seeker.birthdate
+        )
+
+        # Accept the job application for the first job seeker.
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+        _, next_url = self.accept_job_application(job_application=job_application)
+        response = self.client.get(next_url)
+        assert "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. " not in str(
+            list(response.context["messages"])[0]
+        )
+
+        # This approval is found thanks to the PE Approval number
+        approval = Approval.objects.get(number=pole_emploi_approval.number)
+        assert approval.user == job_seeker
+
+        # Now generate a job seeker that is "almost the same"
+        almost_same_job_seeker = JobSeekerWithAddressFactory(
+            with_pole_emploi_id=True,
+            with_ban_api_mocked_address=True,
+            jobseeker_profile__pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
+            birthdate=job_seeker.birthdate,
+        )
+        another_job_application = self.create_job_application(job_seeker=almost_same_job_seeker)
+
+        # Gracefully display a message instead of just plain crashing
+        _, next_url = self.accept_job_application(job_application=another_job_application)
+        response = self.client.get(next_url)
+        assert "Un PASS IAE lui a déjà été délivré mais il est associé à un autre compte. " in str(
+            list(response.context["messages"])[0]
+        )
+
+    @override_settings(TALLY_URL="https://tally.so")
+    def test_nir_readonly(self, *args, **kwargs):
+        job_application = self.create_job_application()
+
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url_accept)
+        self.assertContains(response, "Confirmation de l’embauche")
+        # Check that the NIR field is disabled
+        self.assertContains(response, DISABLED_NIR)
+        self.assertContains(
+            response,
+            "Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations.",
+            html=True,
+        )
+
+        job_application.job_seeker.last_login = None
+        job_application.job_seeker.created_by = PrescriberFactory()
+        job_application.job_seeker.save()
+        response = self.client.get(url_accept)
+        self.assertContains(response, "Confirmation de l’embauche")
+        # Check that the NIR field is disabled
+        self.assertContains(response, DISABLED_NIR)
+        self.assertContains(
+            response,
+            (
+                f'<a href="https://tally.so/r/wzxQlg?jobapplication={job_application.pk}" target="_blank" '
+                'rel="noopener">Demander la correction du numéro de sécurité sociale</a>'
+            ),
+            html=True,
+        )
+
+    def test_no_nir_update(self, *args, **kwargs):
+        jobseeker_profile = self.job_seeker.jobseeker_profile
+        jobseeker_profile.nir = ""
+        jobseeker_profile.save()
+        job_application = self.create_job_application()
+
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url_accept)
+        self.assertContains(response, "Confirmation de l’embauche")
+        # Check that the NIR field is not disabled
+        self.assertNotContains(response, DISABLED_NIR)
+
+        post_data = self._accept_view_post_data(job_application)
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
+        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+
+        post_data["nir"] = "1234"
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
+        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+        self.assertFormError(
+            response.context["form_personal_data"],
+            "nir",
+            "Le numéro de sécurité sociale est trop court (15 caractères autorisés).",
+        )
+
+        NEW_NIR = "197013625838386"
+        post_data["nir"] = NEW_NIR
+        self.accept_job_application(job_application=job_application, post_data=post_data)
+        jobseeker_profile.refresh_from_db()
+        assert jobseeker_profile.nir == NEW_NIR
+
+    def test_no_nir_other_user(self, *args, **kwargs):
+        jobseeker_profile = self.job_seeker.jobseeker_profile
+        jobseeker_profile.nir = ""
+        jobseeker_profile.save()
+        job_application = self.create_job_application()
+        other_job_seeker = JobSeekerWithAddressFactory(
+            with_pole_emploi_id=True,
+            with_ban_api_mocked_address=True,
+        )
+
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        post_data = {
+            "pole_emploi_id": jobseeker_profile.pole_emploi_id,
+            "nir": other_job_seeker.jobseeker_profile.nir,
+        }
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
+        self.assertContains(
+            response, "Le numéro de sécurité sociale est déjà associé à un autre utilisateur", html=True
+        )
+        self.assertFormError(
+            response.context["form_personal_data"],
+            None,
+            "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.",
+        )
+
+    def test_no_nir_update_with_reason(self, *args, **kwargs):
+        jobseeker_profile = self.job_seeker.jobseeker_profile
+        jobseeker_profile.nir = ""
+        jobseeker_profile.save()
+        job_application = self.create_job_application()
+
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+
+        post_data = self._accept_view_post_data(job_application=job_application)
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
+        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+
+        # Check the box
+        post_data["lack_of_nir"] = True
+        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
+        self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
+        self.assertContains(response, "Veuillez sélectionner un motif pour continuer", html=True)
+
+        post_data["lack_of_nir_reason"] = LackOfNIRReason.NO_NIR
+        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
+        job_application.job_seeker.refresh_from_db()
+        assert job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NO_NIR
+
+    def test_lack_of_nir_reason_update(self, *args, **kwargs):
+        jobseeker_profile = self.job_seeker.jobseeker_profile
+        jobseeker_profile.nir = ""
+        jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
+        jobseeker_profile.save()
+        job_application = self.create_job_application()
+
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url_accept)
+        self.assertContains(response, "Confirmation de l’embauche")
+        # Check that the NIR field is initially disabled
+        # since the job seeker has a lack_of_nir_reason
+        assert response.context["form_personal_data"].fields["nir"].disabled
+        NEW_NIR = "197013625838386"
+
+        post_data = {
+            "nir": NEW_NIR,
+            "lack_of_nir_reason": jobseeker_profile.lack_of_nir_reason,
+            "pole_emploi_id": jobseeker_profile.pole_emploi_id,
+            "lack_of_pole_emploi_id_reason": jobseeker_profile.lack_of_pole_emploi_id_reason,
+        }
+        post_data = self._accept_view_post_data(job_application=job_application, post_data=post_data)
+        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
+        job_application.job_seeker.refresh_from_db()
+        # New NIR is set and the lack_of_nir_reason is cleaned
+        assert not job_application.job_seeker.jobseeker_profile.lack_of_nir_reason
+        assert job_application.job_seeker.jobseeker_profile.nir == NEW_NIR
+
+    @override_settings(TALLY_URL="https://tally.so")
+    def test_lack_of_nir_reason_other_user(self, *args, **kwargs):
+        jobseeker_profile = self.job_seeker.jobseeker_profile
+        jobseeker_profile.nir = ""
+        jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
+        jobseeker_profile.save()
+        job_application = self.create_job_application()
+
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+
+        response = self.client.get(url_accept)
+        self.assertContains(response, "Confirmation de l’embauche")
+        # Check that the NIR field is initially disabled
+        # since the job seeker has a lack_of_nir_reason
+        assert response.context["form_personal_data"].fields["nir"].disabled
+
+        # Check that the tally link is there
+        self.assertContains(
+            response,
+            (
+                f'<a href="https://tally.so/r/wzxQlg?jobapplication={job_application.pk}" target="_blank" '
+                'rel="noopener">Demander la correction du numéro de sécurité sociale</a>'
+            ),
+            html=True,
+        )
+
+    def test_accept_after_cancel(self, *args, **kwargs):
+        # A canceled job application is not linked to an approval
+        # unless the job seeker has an accepted job application.
+        job_application = self.create_job_application(state=job_applications_enums.JobApplicationState.CANCELLED)
+
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+        self.accept_job_application(job_application=job_application)
+
+        job_application.refresh_from_db()
+        assert job_application.job_seeker.approvals.count() == 1
+        approval = job_application.job_seeker.approvals.first()
+        assert approval.start_at == job_application.hiring_start_at
+        assert job_application.state.is_accepted
 
 
 class ProcessTemplatesTest(TestCase):
@@ -3494,7 +3413,7 @@ def test_reload_contract_type_and_options_404(client):
     assert response.status_code == 404
 
 
-def test_htmx_reload_contract_type_and_options(client, snapshot):
+def test_htmx_reload_contract_type_and_options(client):
     job_application = JobApplicationFactory(
         to_company__kind=CompanyKind.GEIQ, state=job_applications_enums.JobApplicationState.PROCESSING
     )
@@ -3532,130 +3451,3 @@ def test_htmx_reload_contract_type_and_options(client, snapshot):
     response = client.post(accept_url, data=data)
     reloaded_form_soup = parse_response_to_soup(response, selector="#acceptForm")
     assertSoupEqual(form_soup, reloaded_form_soup)
-
-
-# Hirings must now be linked to a job description
-
-ACTIVE_JOBS_LABEL = "Postes ouverts au recrutement"
-INACTIVE_JOBS_LABEL = "Postes fermés au recrutement"
-JOB_DETAILS_LABEL = "Préciser le nom du poste (code ROME)"
-
-
-def test_select_job_description_for_job_application(client):
-    create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
-    job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.EI, state=job_applications_enums.JobApplicationState.PROCESSING
-    )
-    user = job_application.to_company.members.first()
-
-    client.force_login(user)
-    response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
-
-    # Check optgroup labels
-    job_description = JobDescriptionFactory(company=job_application.to_company, is_active=True)
-    response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
-    assert response.status_code == 200
-    assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
-    assertContains(response, ACTIVE_JOBS_LABEL)
-    assertNotContains(response, INACTIVE_JOBS_LABEL)
-    assertNotContains(response, JOB_DETAILS_LABEL)
-
-    # Inactive job description must also appear in select
-    job_description = JobDescriptionFactory(company=job_application.to_company, is_active=False)
-    response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
-    assert response.status_code == 200
-    assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
-    assertContains(response, ACTIVE_JOBS_LABEL)
-    assertContains(response, INACTIVE_JOBS_LABEL)
-    assertNotContains(response, JOB_DETAILS_LABEL)
-
-
-@override_settings(API_BAN_BASE_URL="http://ban-api")
-def test_select_other_job_description_for_job_application(client, mocker):
-    mocker.patch(
-        "itou.utils.apis.geocoding.get_geocoding_data",
-        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
-    )
-
-    create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
-    create_test_cities(["54", "57"], num_per_department=2)
-
-    job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.EI, state=job_applications_enums.JobApplicationState.PROCESSING
-    )
-    user = job_application.to_company.members.first()
-    JobDescriptionFactory(company=job_application.to_company, is_active=True)
-    city = City.objects.order_by("?").first()
-    url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-    data = {
-        "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_FORGOTTEN,
-        "lack_of_nir": True,
-        "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER,
-        "address_line_1": "37 B Rue du Général De Gaulle",
-        "post_code": city.post_codes[0],
-        "insee_code": city.code_insee,
-        "city": city.name,
-        "geocoding_score": 0.9714,
-        # Select the first and only one option
-        "address_for_autocomplete": "0",
-    }
-
-    client.force_login(user)
-    response = client.get(url)
-
-    assertContains(response, ACTIVE_JOBS_LABEL)
-    assertNotContains(response, INACTIVE_JOBS_LABEL)
-    assertNotContains(response, JOB_DETAILS_LABEL)
-
-    # Select "Autre": must provide new job detail fields
-    response = client.post(url, data={"hired_job": AcceptForm.OTHER_HIRED_JOB})
-    assertContains(response, JOB_DETAILS_LABEL)
-
-    # Check form errors
-    data |= {"hired_job": AcceptForm.OTHER_HIRED_JOB}
-
-    response = client.post(url, data=data)
-    assert response.status_code == 200
-
-    data |= {"location": city.pk}
-    response = client.post(url, data=data)
-    assert response.status_code == 200
-
-    appellation = Appellation.objects.order_by("?").first()
-    data |= {"appellation": appellation.pk}
-    response = client.post(url, data=data)
-    assert response.status_code == 200
-
-    tomorrow = timezone.localdate() + relativedelta(days=1)
-    data |= {"hiring_start_at": f"{tomorrow:%Y-%m-%d}"}
-    response = client.post(url, data=data)
-    assert response.status_code == 200
-
-    # Modal window
-    data |= {"confirmed": True}
-    response = client.post(url, data=data, follow=False)
-    # Caution: should redirect after that point, but done via HTMX we get a 200 status code
-    assert response.status_code == 200
-    assert response.url == reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-
-    # Perform some checks on job description now attached to job application
-    job_application.refresh_from_db()
-    assert job_application.hired_job
-    assert job_application.hired_job.creation_source == JobDescriptionSource.HIRING
-    assert not job_application.hired_job.is_active
-    assert job_application.hired_job.description == "La structure n’a pas encore renseigné cette rubrique"
-
-
-def test_no_job_description_for_job_application(client):
-    create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
-    job_application = JobApplicationFactory(
-        to_company__kind=CompanyKind.EI, state=job_applications_enums.JobApplicationState.PROCESSING
-    )
-    user = job_application.to_company.members.first()
-
-    client.force_login(user)
-    response = client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
-
-    assertNotContains(response, ACTIVE_JOBS_LABEL)
-    assertNotContains(response, INACTIVE_JOBS_LABEL)
-    assertNotContains(response, JOB_DETAILS_LABEL)
