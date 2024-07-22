@@ -59,30 +59,6 @@ from tests.utils.test import BASE_NUM_QUERIES, TestCase
 BACK_BUTTON_ARIA_LABEL = "Retourner à l’étape précédente"
 
 
-class ApplyTestPKConversion(TestCase):
-    """
-    Temporary test case for the conversion of primary keys to public IDs
-    """
-
-    def test_redirect_on_job_seeker_pk_with_for_hire_property(self):
-        company = CompanyFactory(with_jobs=True, with_membership=True)
-        job_seeker = JobSeekerFactory()
-        self.client.force_login(company.members.first())
-
-        response = self.client.get(
-            reverse(
-                "apply:update_job_seeker_step_1_for_hire_pk_redirect",
-                kwargs={"company_pk": company.pk, "job_seeker_pk": job_seeker.pk},
-            ),
-        )
-
-        assert response.status_code == 200
-        assert response.context["step_3_url"] == reverse(
-            "apply:update_job_seeker_step_3_for_hire",
-            kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
-        )
-
-
 class ApplyTest(TestCase):
     def test_company_with_no_members(self):
         company = CompanyFactory()

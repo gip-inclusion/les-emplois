@@ -20,11 +20,3 @@ urlpatterns = [
         name="activate_ic_account",
     ),
 ]
-
-# NOTE: temporary URL patterns to help with migration which will be removed next week
-urlpatterns += [
-    path(
-        "edit_job_seeker_info/<int:job_seeker_public_id>",
-        views.edit_job_seeker_info,
-    )
-]

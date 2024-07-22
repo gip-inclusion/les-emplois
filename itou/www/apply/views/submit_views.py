@@ -41,7 +41,6 @@ from itou.www.apply.forms import (
     SubmitJobApplicationForm,
 )
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
-from itou.www.apply.views.utils import get_job_seeker_public_id
 from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForm
 
@@ -161,13 +160,8 @@ class ApplicationBaseView(ApplyStepBaseView):
             # Do nothing, LoginRequiredMixin will raise in dispatch()
             return
 
-        job_seeker_public_id = (
-            kwargs["job_seeker_public_id"]
-            if "job_seeker_public_id" in kwargs
-            else get_job_seeker_public_id(kwargs["job_seeker_pk"])
-        )
         self.job_seeker = get_object_or_404(
-            User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id
+            User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=kwargs["job_seeker_public_id"]
         )
         _check_job_seeker_approval(request, self.job_seeker, self.company)
         if self.company.kind == CompanyKind.GEIQ:
@@ -1280,13 +1274,7 @@ class UpdateJobSeekerBaseView(SessionNamespaceRequiredMixin, ApplyStepBaseView):
         return User.objects.filter(kind=UserKind.JOB_SEEKER)
 
     def setup(self, request, *args, **kwargs):
-        job_seeker_public_id = (
-            kwargs["job_seeker_public_id"]
-            if "job_seeker_public_id" in kwargs
-            else get_job_seeker_public_id(kwargs["job_seeker_pk"])
-        )
-
-        self.job_seeker = get_object_or_404(self.get_job_seeker_queryset(), public_id=job_seeker_public_id)
+        self.job_seeker = get_object_or_404(self.get_job_seeker_queryset(), public_id=kwargs["job_seeker_public_id"])
         self.job_seeker_session = SessionNamespace(request.session, f"job_seeker-{self.job_seeker.public_id}")
         if request.user.is_authenticated and (
             request.user.is_job_seeker or not request.user.can_view_personal_information(self.job_seeker)
@@ -1577,13 +1565,9 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
 def eligibility_for_hire(
     request,
     company_pk,
-    job_seeker_public_id=None,
-    job_seeker_pk=None,
+    job_seeker_public_id,
     template_name="apply/submit/eligibility_for_hire.html",
 ):
-    if job_seeker_public_id is None:
-        job_seeker_public_id = get_job_seeker_public_id(job_seeker_pk)
-
     company = get_object_or_404(Company.objects.member_required(request.user), pk=company_pk)
     job_seeker = get_object_or_404(User.objects.filter(kind=UserKind.JOB_SEEKER), public_id=job_seeker_public_id)
     _check_job_seeker_approval(request, job_seeker, company)
@@ -1616,13 +1600,9 @@ def eligibility_for_hire(
 def geiq_eligibility_for_hire(
     request,
     company_pk,
-    job_seeker_public_id=None,
-    job_seeker_pk=None,
+    job_seeker_public_id,
     template_name="apply/submit/geiq_eligibility_for_hire.html",
 ):
-    if job_seeker_public_id is None:
-        job_seeker_public_id = get_job_seeker_public_id(job_seeker_pk)
-
     company = get_object_or_404(
         Company.objects.member_required(request.user).filter(kind=CompanyKind.GEIQ), pk=company_pk
     )
@@ -1654,10 +1634,7 @@ def geiq_eligibility_for_hire(
 
 
 @login_required
-def geiq_eligibility_criteria_for_hire(request, company_pk, job_seeker_public_id=None, job_seeker_pk=None):
-    if job_seeker_public_id is None:
-        job_seeker_public_id = get_job_seeker_public_id(job_seeker_pk)
-
+def geiq_eligibility_criteria_for_hire(request, company_pk, job_seeker_public_id):
     company = get_object_or_404(
         Company.objects.member_required(request.user).filter(kind=CompanyKind.GEIQ), pk=company_pk
     )
@@ -1673,13 +1650,9 @@ def geiq_eligibility_criteria_for_hire(request, company_pk, job_seeker_public_id
 def hire_confirmation(
     request,
     company_pk,
-    job_seeker_public_id=None,
-    job_seeker_pk=None,
+    job_seeker_public_id,
     template_name="apply/submit/hire_confirmation.html",
 ):
-    if job_seeker_public_id is None:
-        job_seeker_public_id = get_job_seeker_public_id(job_seeker_pk)
-
     company = get_object_or_404(Company.objects.member_required(request.user), pk=company_pk)
     job_seeker = get_object_or_404(
         User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile"),
