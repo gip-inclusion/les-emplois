@@ -75,6 +75,10 @@ class JobSeekerNIRUpdateMixin:
 
         if self["lack_of_nir_reason"].value():
             self.initial["lack_of_nir"] = True
+            self.fields["nir"].help_text += (
+                " Pour ajouter le numéro de sécurité sociale, "
+                "veuillez décocher la case “Impossible de renseigner le numéro de sécurité sociale”."
+            )
 
         if self["lack_of_nir"].value():
             self.fields["nir"].disabled = True
