@@ -50,6 +50,23 @@ class TestJobApplicationGEIQEligibilityDetails:
         assertTemplateUsed(response, "apply/includes/geiq/geiq_diagnosis_details.html")
         assertContains(response, "Éligibilité public prioritaire GEIQ non confirmée")
 
+    def test_details_accepted_job_application_with_vaild_diangosis(self, client):
+        diagnosis = GEIQEligibilityDiagnosisFactory(from_prescriber=True, expired=True)
+        job_application = JobApplicationFactory(
+            to_company__kind=CompanyKind.GEIQ,
+            geiq_eligibility_diagnosis=diagnosis,
+            eligibility_diagnosis=None,
+            was_hired=True,
+        )
+        client.force_login(job_application.to_company.members.first())
+        response = client.get(
+            reverse(
+                "apply:details_for_company",
+                kwargs={"job_application_id": job_application.pk},
+            )
+        )
+        assertContains(response, "Éligibilité public prioritaire GEIQ validée")
+
     def test_details_as_geiq_with_valid_eligibility_diagnosis(self, client):
         diagnosis = GEIQEligibilityDiagnosisFactory(from_geiq=True)
         job_application = JobApplicationFactory(
