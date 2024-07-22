@@ -19,37 +19,36 @@ from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import PrescriberFactory
-from tests.utils.test import TestCase
 
 
-class StatsViewTest(TestCase):
+class TestStatsView:
     @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
-    def test_stats_public(self):
+    def test_stats_public(self, client):
         url = reverse("stats:stats_public")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
-    def test_stats_pilotage_unauthorized_dashboard_id(self):
+    def test_stats_pilotage_unauthorized_dashboard_id(self, client):
         url = reverse("stats:stats_pilotage", kwargs={"dashboard_id": 123})
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 403
 
     @override_settings(
         PILOTAGE_DASHBOARDS_WHITELIST=[123], METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar"
     )
-    def test_stats_pilotage_authorized_dashboard_id(self):
+    def test_stats_pilotage_authorized_dashboard_id(self, client):
         url = reverse("stats:stats_pilotage", kwargs={"dashboard_id": 123})
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
     @override_settings(
         PILOTAGE_DASHBOARDS_WHITELIST=[123], METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar"
     )
-    def test_stats_pilotage_authorized_dashboard_id_while_authenticated(self):
+    def test_stats_pilotage_authorized_dashboard_id_while_authenticated(self, client):
         user = PrescriberFactory()
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("stats:stats_pilotage", kwargs={"dashboard_id": 123})
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
 

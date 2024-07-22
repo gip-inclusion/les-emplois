@@ -1,5 +1,3 @@
-from unittest import mock
-
 import pytest
 from django.contrib.gis.geos import Point
 
@@ -9,16 +7,15 @@ from itou.prescribers.models import PrescriberOrganization
 from itou.utils.apis.exceptions import GeocodingDataError
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK, BAN_GEOCODING_API_RESULT_MOCK
 from tests.prescribers.factories import PrescriberOrganizationFactory
-from tests.utils.test import TestCase
 
 
-class UtilsAddressMixinTest(TestCase):
-    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_geocode_address(self, _mock_call_ban_geocoding_api):
+class TestUtilsAddressMixinTest:
+    def test_geocode_address(self, mocker):
         """
         Test `AddressMixin.geocode_address()`.
         Use `PrescriberOrganization` which inherits from abstract `AddressMixin`.
         """
+        mocker.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
         org = PrescriberOrganizationFactory(
             siret="12000015300011", address_line_1="3 rue Machin", post_code="11000", city="Mars"
         )
@@ -46,19 +43,19 @@ class UtilsAddressMixinTest(TestCase):
         assert org.latitude == expected_latitude
         assert org.longitude == expected_longitude
 
-    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
-    def test_geocode_address_with_bad_address(self, _mock_call_ban_geocoding_api):
+    def test_geocode_address_with_bad_address(self, mocker):
         """
         Test `AddressMixin.geocode_address()` with bad address.
         Use `PrescriberOrganization` which inherits from abstract `AddressMixin`.
         """
+        mocker.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
         prescriber = PrescriberOrganization.objects.create(siret="12000015300011")
 
         with pytest.raises(GeocodingDataError):
             prescriber.geocode_address()
 
 
-class UtilsDepartmentsTest(TestCase):
+class TestUtilsDepartments:
     def test_department_from_postcode(self):
         # Corsica south == 2A
         post_codes = ["20000", "20137", "20700"]
@@ -81,7 +78,7 @@ class UtilsDepartmentsTest(TestCase):
             assert department_from_postcode(post_code) == post_code[:2]
 
 
-class UtilsMiscTestCase(TestCase):
+class TestUtilsMisc:
     def test_lat_lon_to_coords(self):
         assert lat_lon_to_coords(None, None) is None
         assert lat_lon_to_coords(1, None) is None

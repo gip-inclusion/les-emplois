@@ -1,12 +1,12 @@
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
-from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.core.files.storage import default_storage
 from django.urls import reverse
 from django.utils import dateformat, html, timezone
 from freezegun import freeze_time
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertNumQueries, assertRedirects
 
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
@@ -24,7 +24,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase
+from tests.utils.test import BASE_NUM_QUERIES
 
 
 # fixme vincentporte : convert this method into factory
@@ -64,13 +64,13 @@ def create_evaluated_siae_with_consistent_datas(siae, user, level_1=True, level_
     return evaluated_job_application
 
 
-class SiaeJobApplicationListViewTest(TestCase):
-    refused_html = (
-        '<span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>'
-    )
+SIAE_JOB_APPLICATION_LIST_REFUSED_HTML = (
+    '<span class="badge badge-sm rounded-pill text-nowrap bg-danger text-white">Problème constaté</span>'
+)
 
-    def setUp(self):
-        super().setUp()
+
+class TestSiaeJobApplicationListView:
+    def setup_method(self):
         membership = CompanyMembershipFactory()
         self.user = membership.user
         self.siae = membership.company
@@ -81,13 +81,13 @@ class SiaeJobApplicationListViewTest(TestCase):
             "siae_evaluations_views:siae_job_applications_list", kwargs={"evaluated_siae_pk": evaluated_siae.pk}
         )
 
-    def test_access(self):
+    def test_access(self, client):
         # siae with active campaign
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=timezone.now(), siae=self.siae)
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
 
-        self.client.force_login(self.user)
-        with self.assertNumQueries(
+        client.force_login(self.user)
+        with assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # fetch django session
             + 1  # fetch user
@@ -103,26 +103,26 @@ class SiaeJobApplicationListViewTest(TestCase):
             + 1  # Update the Django session
             + 1  # Release savepoint
         ):
-            response = self.client.get(self.url(evaluated_siae))
+            response = client.get(self.url(evaluated_siae))
 
         assert evaluated_job_application == response.context["evaluated_job_applications"][0]
         assert reverse("dashboard:index") == response.context["back_url"]
 
-        self.assertContains(
+        assertContains(
             response,
             f"Contrôle initié le "
             f"{dateformat.format(evaluated_siae.evaluation_campaign.evaluations_asked_at, 'd E Y').lower()}",
         )
 
-    def test_redirection(self):
+    def test_redirection(self, client):
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=timezone.now(), siae=self.siae)
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
 
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
         # no criterion selected
-        response = self.client.get(self.url(evaluated_siae))
-        self.assertContains(
+        response = client.get(self.url(evaluated_siae))
+        assertContains(
             response,
             reverse(
                 "siae_evaluations_views:siae_select_criteria",
@@ -135,8 +135,8 @@ class SiaeJobApplicationListViewTest(TestCase):
             evaluated_job_application=evaluated_job_application,
             proof=None,
         )
-        response = self.client.get(self.url(evaluated_siae))
-        self.assertContains(
+        response = client.get(self.url(evaluated_siae))
+        assertContains(
             response,
             reverse(
                 "siae_evaluations_views:siae_upload_doc",
@@ -144,7 +144,7 @@ class SiaeJobApplicationListViewTest(TestCase):
             ),
         )
 
-    def test_redirection_with_submission_freezed_at(self):
+    def test_redirection_with_submission_freezed_at(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__evaluations_asked_at=timezone.now(),
             siae=self.siae,
@@ -152,23 +152,23 @@ class SiaeJobApplicationListViewTest(TestCase):
         )
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
 
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
         # no criterion selected
         assert (
             evaluated_job_application.should_select_criteria
             == evaluation_enums.EvaluatedJobApplicationsSelectCriteriaState.NOTEDITABLE
         )
-        response = self.client.get(self.url(evaluated_siae))
+        response = client.get(self.url(evaluated_siae))
         siae_select_criteria_url = reverse(
             "siae_evaluations_views:siae_select_criteria",
             kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
         )
-        self.assertNotContains(
+        assertNotContains(
             response,
             siae_select_criteria_url,
         )
-        response = self.client.get(siae_select_criteria_url)
+        response = client.get(siae_select_criteria_url)
         assert response.status_code == 403
 
         # at least one criterion selected
@@ -177,26 +177,26 @@ class SiaeJobApplicationListViewTest(TestCase):
             proof=None,
         )
         assert not evaluated_administrative_criteria.can_upload()
-        response = self.client.get(self.url(evaluated_siae))
+        response = client.get(self.url(evaluated_siae))
         siae_upload_doc_url = reverse(
             "siae_evaluations_views:siae_upload_doc",
             kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
         )
-        self.assertNotContains(
+        assertNotContains(
             response,
             siae_upload_doc_url,
         )
         SHOW_PROOF_URL_LABEL = "Voir le justificatif"
-        self.assertNotContains(response, SHOW_PROOF_URL_LABEL)
-        response = self.client.get(siae_upload_doc_url)
+        assertNotContains(response, SHOW_PROOF_URL_LABEL)
+        response = client.get(siae_upload_doc_url)
         assert response.status_code == 403
 
         # If the criteria had a proof, it should be present
         evaluated_administrative_criteria.proof = FileFactory()
         evaluated_administrative_criteria.save(update_fields=("proof",))
-        response = self.client.get(self.url(evaluated_siae))
-        self.assertContains(response, SHOW_PROOF_URL_LABEL)
-        self.assertContains(
+        response = client.get(self.url(evaluated_siae))
+        assertContains(response, SHOW_PROOF_URL_LABEL)
+        assertContains(
             response,
             reverse(
                 "siae_evaluations_views:view_proof",
@@ -204,53 +204,51 @@ class SiaeJobApplicationListViewTest(TestCase):
             ),
         )
 
-    @freeze_time("2024-04-08")
-    def test_state_hidden_with_submission_freezed_at(self):
-        institution = InstitutionFactory(name="DDETS 01", department="01")
-        not_in_output = "This string should not be in output."
-        evaluated_siae_phase_2bis = EvaluatedSiaeFactory(
-            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=10),
-            evaluation_campaign__institution=institution,
-            siae=self.siae,
-            submission_freezed_at=timezone.now() - relativedelta(days=1),
-            reviewed_at=timezone.now(),
-        )
-        evaluated_siae_phase_3bis = EvaluatedSiaeFactory(
-            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=10),
-            evaluation_campaign__institution=institution,
-            siae=self.siae,
-            submission_freezed_at=timezone.now() - relativedelta(days=1),
-            reviewed_at=timezone.now() - relativedelta(days=5),
-            final_reviewed_at=timezone.now(),
-        )
-        for evaluated_siae, state, approval_number in [
-            (evaluated_siae_phase_2bis, evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED, "XXXXX2412345"),
-            (
-                evaluated_siae_phase_3bis,
+    @pytest.mark.parametrize(
+        "evaluated_siae_kwargs,state,approval_number",
+        [
+            [
+                {"reviewed_at": timezone.now()},
+                evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
+                "XXXXX2412345",
+            ],
+            [
+                {"reviewed_at": timezone.now() - relativedelta(days=5), "final_reviewed_at": timezone.now()},
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED_2,
                 "XXXXX2423456",
-            ),
-        ]:
-            with self.subTest(evaluated_siae):
-                evaluated_job_app = EvaluatedJobApplicationFactory(
-                    evaluated_siae=evaluated_siae,
-                    job_application__job_seeker__first_name="Manny",
-                    job_application__job_seeker__last_name="Calavera",
-                    job_application__approval__number=approval_number,
-                    labor_inspector_explanation=not_in_output,
-                )
-                EvaluatedAdministrativeCriteriaFactory(
-                    evaluated_job_application=evaluated_job_app,
-                    uploaded_at=timezone.now() - relativedelta(days=5),
-                    submitted_at=timezone.now() - relativedelta(days=3),
-                    review_state=state,
-                )
-                self.client.force_login(self.user)
-                response = self.client.get(self.url(evaluated_siae))
-                approval_number_html = format_approval_number(approval_number)
-                self.assertContains(
-                    response,
-                    f"""
+            ],
+        ],
+    )
+    @freeze_time("2024-04-08")
+    def test_state_hidden_with_submission_freezed_at(self, client, evaluated_siae_kwargs, state, approval_number):
+        institution = InstitutionFactory(name="DDETS 01", department="01")
+        not_in_output = "This string should not be in output."
+        evaluated_siae = EvaluatedSiaeFactory(
+            submission_freezed_at=timezone.now() - relativedelta(days=1),
+            siae=self.siae,
+            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=10),
+            evaluation_campaign__institution=institution,
+            **evaluated_siae_kwargs,
+        )
+        evaluated_job_app = EvaluatedJobApplicationFactory(
+            evaluated_siae=evaluated_siae,
+            job_application__job_seeker__first_name="Manny",
+            job_application__job_seeker__last_name="Calavera",
+            job_application__approval__number=approval_number,
+            labor_inspector_explanation=not_in_output,
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            uploaded_at=timezone.now() - relativedelta(days=5),
+            submitted_at=timezone.now() - relativedelta(days=3),
+            review_state=state,
+        )
+        client.force_login(self.user)
+        response = client.get(self.url(evaluated_siae))
+        approval_number_html = format_approval_number(approval_number)
+        assertContains(
+            response,
+            f"""
                     <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
                         <div class="c-box--results__summary flex-grow-1">
                             <i class="ri-pass-valid-line" aria-hidden="true"></i>
@@ -266,16 +264,16 @@ class SiaeJobApplicationListViewTest(TestCase):
                         </div>
                     </div>
                     """,
-                    html=True,
-                    count=1,
-                )
-                self.assertNotContains(response, not_in_output)
-                self.assertNotContains(response, self.refused_html, html=True)
+            html=True,
+            count=1,
+        )
+        assertNotContains(response, not_in_output)
+        assertNotContains(response, SIAE_JOB_APPLICATION_LIST_REFUSED_HTML, html=True)
 
     @freeze_time("2024-04-08")
-    def test_application_shown_after_submission_freeze_phase_3bis(self):
-        institution = InstitutionFactory(name="DDETS 01", department="01")
-        test_data = [
+    @pytest.mark.parametrize(
+        "state,approval_number,expected_jobapp_html,expected_criteria_html",
+        [
             (
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.ACCEPTED,
                 "XXXXX2412345",
@@ -289,66 +287,68 @@ class SiaeJobApplicationListViewTest(TestCase):
             (
                 evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
                 "XXXXX2423456",
-                self.refused_html,
+                SIAE_JOB_APPLICATION_LIST_REFUSED_HTML,
                 """
                 <strong class="text-danger"><i class="ri-close-line"></i> Refusé</strong>
                 <br>
                 <strong class="fs-sm">Bénéficiaire du RSA</strong>
                 """,
             ),
-        ]
+        ],
+    )
+    def test_application_shown_after_submission_freeze_phase_3bis(
+        self, client, state, approval_number, expected_jobapp_html, expected_criteria_html
+    ):
+        institution = InstitutionFactory(name="DDETS 01", department="01")
         brsa = AdministrativeCriteria.objects.get(name="Bénéficiaire du RSA")
-        for state, approval_number, expected_jobapp_html, expected_criteria_html in test_data:
-            with self.subTest(state):
-                evaluated_siae_phase_3bis = EvaluatedSiaeFactory(
-                    evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=10),
-                    evaluation_campaign__calendar__adversarial_stage_start=timezone.localdate()
-                    - relativedelta(days=5),
-                    evaluation_campaign__institution=institution,
-                    siae=self.siae,
-                    submission_freezed_at=timezone.now() - relativedelta(days=1),
-                    reviewed_at=timezone.now() - relativedelta(days=6),
-                    final_reviewed_at=timezone.now() - relativedelta(days=6),
-                )
-                evaluated_job_app = EvaluatedJobApplicationFactory(
-                    evaluated_siae=evaluated_siae_phase_3bis,
-                    job_application__job_seeker__first_name="Manny",
-                    job_application__job_seeker__last_name="Calavera",
-                    job_application__approval__number=approval_number,
-                )
-                EvaluatedAdministrativeCriteriaFactory(
-                    evaluated_job_application=evaluated_job_app,
-                    administrative_criteria=brsa,
-                    uploaded_at=timezone.now() - relativedelta(days=9),
-                    submitted_at=timezone.now() - relativedelta(days=8),
-                    review_state=state,
-                )
-                approval_number_html = format_approval_number(approval_number)
-                self.client.force_login(self.user)
-                response = self.client.get(self.url(evaluated_siae_phase_3bis))
-                self.assertContains(
-                    response,
-                    f"""
-                    <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
-                        <div class="c-box--results__summary flex-grow-1">
-                            <i class="ri-pass-valid-line" aria-hidden="true"></i>
-                            <div>
-                                <h3>PASS IAE {approval_number_html} délivré le 08 Avril 2024</h3>
-                                <span>Manny CALAVERA</span>
-                            </div>
-                        </div>
-                        <div>
-                            {expected_jobapp_html}
-                        </div>
+        evaluated_siae_phase_3bis = EvaluatedSiaeFactory(
+            evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=10),
+            evaluation_campaign__calendar__adversarial_stage_start=timezone.localdate() - relativedelta(days=5),
+            evaluation_campaign__institution=institution,
+            siae=self.siae,
+            submission_freezed_at=timezone.now() - relativedelta(days=1),
+            reviewed_at=timezone.now() - relativedelta(days=6),
+            final_reviewed_at=timezone.now() - relativedelta(days=6),
+        )
+        evaluated_job_app = EvaluatedJobApplicationFactory(
+            evaluated_siae=evaluated_siae_phase_3bis,
+            job_application__job_seeker__first_name="Manny",
+            job_application__job_seeker__last_name="Calavera",
+            job_application__approval__number=approval_number,
+        )
+        EvaluatedAdministrativeCriteriaFactory(
+            evaluated_job_application=evaluated_job_app,
+            administrative_criteria=brsa,
+            uploaded_at=timezone.now() - relativedelta(days=9),
+            submitted_at=timezone.now() - relativedelta(days=8),
+            review_state=state,
+        )
+        approval_number_html = format_approval_number(approval_number)
+        client.force_login(self.user)
+        response = client.get(self.url(evaluated_siae_phase_3bis))
+        assertContains(
+            response,
+            f"""
+            <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
+                <div class="c-box--results__summary flex-grow-1">
+                    <i class="ri-pass-valid-line" aria-hidden="true"></i>
+                    <div>
+                        <h3>PASS IAE {approval_number_html} délivré le 08 Avril 2024</h3>
+                        <span>Manny CALAVERA</span>
                     </div>
-                    """,
-                    html=True,
-                    count=1,
-                )
-                self.assertContains(response, expected_criteria_html, html=True, count=1)
+                </div>
+                <div>
+                    {expected_jobapp_html}
+                </div>
+            </div>
+            """,
+            html=True,
+            count=1,
+        )
+        assertContains(response, expected_criteria_html, html=True, count=1)
 
     @freeze_time("2024-04-08")
-    def test_state_when_not_sent_before_submission_freeze(self):
+    def test_state_when_not_sent_before_submission_freeze(self, client):
         evaluated_siae = EvaluatedSiaeFactory(
             evaluation_campaign__evaluations_asked_at=timezone.now() - relativedelta(days=10),
             siae=self.siae,
@@ -361,10 +361,10 @@ class SiaeJobApplicationListViewTest(TestCase):
             job_application__job_seeker__last_name="Calavera",
             job_application__approval__number=approval_number,
         )
-        self.client.force_login(self.user)
-        response = self.client.get(self.url(evaluated_siae))
+        client.force_login(self.user)
+        response = client.get(self.url(evaluated_siae))
         approval_number_html = format_approval_number(approval_number)
-        self.assertContains(
+        assertContains(
             response,
             f"""
             <div class="d-flex flex-column flex-lg-row gap-2 gap-lg-3">
@@ -384,12 +384,12 @@ class SiaeJobApplicationListViewTest(TestCase):
             count=1,
         )
 
-    def test_content_with_selected_criteria(self):
+    def test_content_with_selected_criteria(self, client):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application, proof=None
         )
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
         siae_select_criteria_url = reverse(
             "siae_evaluations_views:siae_select_criteria",
@@ -400,34 +400,34 @@ class SiaeJobApplicationListViewTest(TestCase):
             "siae_evaluations_views:siae_upload_doc",
             kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
         )
-        response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
-        self.assertContains(response, siae_select_criteria_url)
-        self.assertContains(response, html.escape(evaluated_administrative_criteria.administrative_criteria.name))
-        self.assertContains(response, siae_upload_doc_url)
+        response = client.get(self.url(evaluated_job_application.evaluated_siae))
+        assertContains(response, siae_select_criteria_url)
+        assertContains(response, html.escape(evaluated_administrative_criteria.administrative_criteria.name))
+        assertContains(response, siae_upload_doc_url)
 
         # Freeze submission
         evaluated_job_application.evaluated_siae.evaluation_campaign.freeze(timezone.now())
 
-        response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
-        self.assertNotContains(response, siae_select_criteria_url)
-        self.assertContains(response, html.escape(evaluated_administrative_criteria.administrative_criteria.name))
-        self.assertContains(
+        response = client.get(self.url(evaluated_job_application.evaluated_siae))
+        assertNotContains(response, siae_select_criteria_url)
+        assertContains(response, html.escape(evaluated_administrative_criteria.administrative_criteria.name))
+        assertContains(
             response, '<span class="badge badge-sm rounded-pill text-nowrap bg-info text-white">En cours</span>'
         )
-        self.assertNotContains(response, siae_upload_doc_url)
+        assertNotContains(response, siae_upload_doc_url)
 
         # Transition to adversarial phase
         evaluated_job_application.evaluated_siae.evaluation_campaign.transition_to_adversarial_phase()
-        response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
-        self.assertContains(response, html.escape(evaluated_administrative_criteria.administrative_criteria.name))
-        self.assertContains(
+        response = client.get(self.url(evaluated_job_application.evaluated_siae))
+        assertContains(response, html.escape(evaluated_administrative_criteria.administrative_criteria.name))
+        assertContains(
             response,
             '<span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">À traiter</span>',
         )
-        self.assertNotContains(response, siae_select_criteria_url)
-        self.assertContains(response, siae_upload_doc_url)
+        assertNotContains(response, siae_select_criteria_url)
+        assertContains(response, siae_upload_doc_url)
 
-    def test_post_buttons_state(self):
+    def test_post_buttons_state(self, client):
         fake_now = timezone.now()
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
 
@@ -446,12 +446,12 @@ class SiaeJobApplicationListViewTest(TestCase):
             kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
         )
 
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
         # no criterion selected
-        response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
-        self.assertContains(response, submit_disabled, html=True, count=1)
-        self.assertContains(response, select_criteria)
+        response = client.get(self.url(evaluated_job_application.evaluated_siae))
+        assertContains(response, submit_disabled, html=True, count=1)
+        assertContains(response, select_criteria)
 
         # criterion selected
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
@@ -461,19 +461,19 @@ class SiaeJobApplicationListViewTest(TestCase):
             "siae_evaluations_views:siae_upload_doc",
             kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
         )
-        response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
-        self.assertContains(response, submit_disabled, html=True, count=1)
-        self.assertContains(response, select_criteria)
-        self.assertContains(response, upload_proof)
+        response = client.get(self.url(evaluated_job_application.evaluated_siae))
+        assertContains(response, submit_disabled, html=True, count=1)
+        assertContains(response, select_criteria)
+        assertContains(response, upload_proof)
 
         # criterion with uploaded proof
         evaluated_administrative_criteria.proof = FileFactory()
         evaluated_administrative_criteria.save(update_fields=["proof"])
-        response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
-        self.assertContains(response, submit_active, html=True, count=2)
-        self.assertContains(response, select_criteria)
-        self.assertContains(response, upload_proof)
-        self.assertContains(
+        response = client.get(self.url(evaluated_job_application.evaluated_siae))
+        assertContains(response, submit_active, html=True, count=2)
+        assertContains(response, select_criteria)
+        assertContains(response, upload_proof)
+        assertContains(
             response,
             """
             <span class="badge badge-sm rounded-pill text-nowrap bg-accent-03 text-primary">
@@ -486,19 +486,19 @@ class SiaeJobApplicationListViewTest(TestCase):
         # criterion submitted
         evaluated_administrative_criteria.submitted_at = fake_now
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
-        response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
-        self.assertContains(response, submit_disabled, html=True, count=1)
-        self.assertNotContains(response, select_criteria)
-        self.assertNotContains(response, upload_proof)
+        response = client.get(self.url(evaluated_job_application.evaluated_siae))
+        assertContains(response, submit_disabled, html=True, count=1)
+        assertNotContains(response, select_criteria)
+        assertNotContains(response, upload_proof)
 
         # Once the criteria has been submitted, you can't reupload it anymore
-        response = self.client.get(upload_proof)
+        response = client.get(upload_proof)
         assert response.status_code == 403
         # and you can't change or add criteria
-        response = self.client.get(select_criteria)
+        response = client.get(select_criteria)
         assert response.status_code == 403
 
-    def test_post_buttons_state_with_submission_freezed(self):
+    def test_post_buttons_state_with_submission_freezed(self, client):
         timezone.now()
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
 
@@ -517,7 +517,7 @@ class SiaeJobApplicationListViewTest(TestCase):
             kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
         )
 
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
         # criterion selected with uploaded proof
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
@@ -529,28 +529,28 @@ class SiaeJobApplicationListViewTest(TestCase):
             kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
         )
 
-        response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
-        self.assertContains(response, submit_active, html=True, count=2)
-        self.assertContains(response, select_criteria)
-        self.assertContains(response, upload_proof)
+        response = client.get(self.url(evaluated_job_application.evaluated_siae))
+        assertContains(response, submit_active, html=True, count=2)
+        assertContains(response, select_criteria)
+        assertContains(response, upload_proof)
 
         # submission freezed
         evaluated_job_application.evaluated_siae.evaluation_campaign.freeze(timezone.now())
 
-        response = self.client.get(self.url(evaluated_job_application.evaluated_siae))
-        self.assertContains(response, submit_disabled, html=True, count=1)
-        self.assertNotContains(response, submit_active)
-        self.assertNotContains(response, select_criteria)
-        self.assertNotContains(response, upload_proof)
+        response = client.get(self.url(evaluated_job_application.evaluated_siae))
+        assertContains(response, submit_disabled, html=True, count=1)
+        assertNotContains(response, submit_active)
+        assertNotContains(response, select_criteria)
+        assertNotContains(response, upload_proof)
 
         # Once the submission has been freezed, you can't reupload it anymore
-        response = self.client.get(upload_proof)
+        response = client.get(upload_proof)
         assert response.status_code == 403
         # and you can't change or add criteria
-        response = self.client.get(select_criteria)
+        response = client.get(select_criteria)
         assert response.status_code == 403
 
-    def test_shows_labor_inspector_explanation_when_refused(self):
+    def test_shows_labor_inspector_explanation_when_refused(self, client):
         explanation = "Justificatif invalide au moment de l’embauche."
         evaluated_siae = EvaluatedSiaeFactory(
             siae=self.siae,
@@ -566,23 +566,22 @@ class SiaeJobApplicationListViewTest(TestCase):
             submitted_at=timezone.now() - relativedelta(days=12),
             review_state=evaluation_enums.EvaluatedAdministrativeCriteriaState.REFUSED,
         )
-        self.client.force_login(self.user)
-        response = self.client.get(self.url(evaluated_siae))
-        self.assertContains(response, explanation)
+        client.force_login(self.user)
+        response = client.get(self.url(evaluated_siae))
+        assertContains(response, explanation)
 
 
-class SiaeSelectCriteriaViewTest(TestCase):
-    def setUp(self):
-        super().setUp()
+class TestSiaeSelectCriteriaView:
+    def setup_method(self):
         membership = CompanyMembershipFactory()
         self.user = membership.user
         self.siae = membership.company
 
-    def test_access_without_activ_campaign(self):
-        self.client.force_login(self.user)
+    def test_access_without_activ_campaign(self, client):
+        client.force_login(self.user)
 
         evaluated_job_application = EvaluatedJobApplicationFactory()
-        response = self.client.get(
+        response = client.get(
             reverse(
                 "siae_evaluations_views:siae_select_criteria",
                 kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
@@ -591,13 +590,13 @@ class SiaeSelectCriteriaViewTest(TestCase):
 
         assert response.status_code == 404
 
-    def test_access_on_ended_campaign(self):
-        self.client.force_login(self.user)
+    def test_access_on_ended_campaign(self, client):
+        client.force_login(self.user)
 
         evaluated_job_application = EvaluatedJobApplicationFactory(
             evaluated_siae__evaluation_campaign__ended_at=timezone.now()
         )
-        response = self.client.get(
+        response = client.get(
             reverse(
                 "siae_evaluations_views:siae_select_criteria",
                 kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
@@ -607,13 +606,13 @@ class SiaeSelectCriteriaViewTest(TestCase):
         assert response.status_code == 404
 
     @pytest.mark.ignore_unknown_variable_template_error("reviewed_at")
-    def test_access(self):
-        self.client.force_login(self.user)
+    def test_access(self, client):
+        client.force_login(self.user)
 
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=timezone.now(), siae=self.siae)
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
 
-        response = self.client.get(
+        response = client.get(
             reverse(
                 "siae_evaluations_views:siae_select_criteria",
                 kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
@@ -633,9 +632,10 @@ class SiaeSelectCriteriaViewTest(TestCase):
         assert evaluated_siae.siae.kind == response.context["kind"]
 
     @pytest.mark.ignore_unknown_variable_template_error("reviewed_at")
-    def test_context_fields_list(self):
+    @pytest.mark.parametrize("level_1,level_2", [(True, False), (False, True), (True, True), (False, False)])
+    def test_context_fields_list(self, client, level_1, level_2):
         institution = InstitutionFactory(name="DDETS 01", department="01")
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
         # Combinations :
         # (True, False) = eligibility diagnosis with level 1 administrative criteria
@@ -643,27 +643,25 @@ class SiaeSelectCriteriaViewTest(TestCase):
         # (True, True) = eligibility diagnosis with level 1 and level 2 administrative criteria
         # (False, False) = eligibility diagnosis ~without~ administrative criteria
 
-        for level_1, level_2 in [(True, False), (False, True), (True, True), (False, False)]:
-            with self.subTest(level_1=level_1, level_2=level_2):
-                evaluated_job_application = create_evaluated_siae_with_consistent_datas(
-                    self.siae,
-                    self.user,
-                    level_1=level_1,
-                    level_2=level_2,
-                    institution=institution,
-                )
-            response = self.client.get(
-                reverse(
-                    "siae_evaluations_views:siae_select_criteria",
-                    kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
-                )
+        evaluated_job_application = create_evaluated_siae_with_consistent_datas(
+            self.siae,
+            self.user,
+            level_1=level_1,
+            level_2=level_2,
+            institution=institution,
+        )
+        response = client.get(
+            reverse(
+                "siae_evaluations_views:siae_select_criteria",
+                kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
             )
-            assert response.status_code == 200
-            assert level_1 is bool(response.context["level_1_fields"])
-            assert level_2 is bool(response.context["level_2_fields"])
+        )
+        assert response.status_code == 200
+        assert level_1 is bool(response.context["level_1_fields"])
+        assert level_2 is bool(response.context["level_2_fields"])
 
     @pytest.mark.ignore_unknown_variable_template_error("reviewed_at")
-    def test_post(self):
+    def test_post(self, client):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         criterion = (
             evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
@@ -674,13 +672,13 @@ class SiaeSelectCriteriaViewTest(TestCase):
             kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
         )
 
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         post_data = {criterion.administrative_criteria.key: True}
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
         assert 1 == EvaluatedAdministrativeCriteria.objects.count()
         assert (
@@ -688,7 +686,7 @@ class SiaeSelectCriteriaViewTest(TestCase):
             == EvaluatedAdministrativeCriteria.objects.first().administrative_criteria
         )
 
-    def test_post_with_submission_freezed_at(self):
+    def test_post_with_submission_freezed_at(self, client):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         criterion = (
             evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
@@ -701,15 +699,15 @@ class SiaeSelectCriteriaViewTest(TestCase):
             kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
         )
 
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
         post_data = {criterion.administrative_criteria.key: "on"}
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 403
         assert evaluated_job_application.evaluated_administrative_criteria.count() == 0
 
     @pytest.mark.ignore_unknown_variable_template_error("reviewed_at")
-    def test_initial_data_form(self):
+    def test_initial_data_form(self, client):
         # no preselected criteria
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         url = reverse(
@@ -717,17 +715,19 @@ class SiaeSelectCriteriaViewTest(TestCase):
             kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
         )
 
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         for i in range(len(response.context["level_1_fields"])):
-            with self.subTest(i):
-                assert "checked" not in response.context["level_1_fields"][i].subwidgets[0].data["attrs"]
+            assert (
+                "checked" not in response.context["level_1_fields"][i].subwidgets[0].data["attrs"]
+            ), f"{response.context['level_1_fields'][i].name} should not be checked"
         for i in range(len(response.context["level_2_fields"])):
-            with self.subTest(i):
-                assert "checked" not in response.context["level_2_fields"][i].subwidgets[0].data["attrs"]
+            assert (
+                "checked" not in response.context["level_2_fields"][i].subwidgets[0].data["attrs"]
+            ), f"{response.context['level_2_fields'][i].name} should not be checked"
 
         # preselected criteria
         criterion = (
@@ -738,29 +738,29 @@ class SiaeSelectCriteriaViewTest(TestCase):
             administrative_criteria=criterion.administrative_criteria,
         )
 
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         assert "checked" in response.context["level_1_fields"][0].subwidgets[0].data["attrs"]
         for i in range(1, len(response.context["level_1_fields"])):
-            with self.subTest(i):
-                assert "checked" not in response.context["level_1_fields"][i].subwidgets[0].data["attrs"]
+            assert (
+                "checked" not in response.context["level_1_fields"][i].subwidgets[0].data["attrs"]
+            ), f"{response.context['level_1_fields'][i].name} should not be checked"
         for i in range(len(response.context["level_2_fields"])):
-            with self.subTest(i):
-                assert "checked" not in response.context["level_2_fields"][i].subwidgets[0].data["attrs"]
+            assert (
+                "checked" not in response.context["level_2_fields"][i].subwidgets[0].data["attrs"]
+            ), f"{response.context['level_2_fields'][i].name} should not be checked"
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class SiaeUploadDocsViewTest(TestCase):
-    def setUp(self):
-        super().setUp()
+class TestSiaeUploadDocsView:
+    def setup_method(self):
         membership = CompanyMembershipFactory()
         self.user = membership.user
         self.siae = membership.company
 
-    def test_access_on_unknown_evaluated_job_application(self):
-        self.client.force_login(self.user)
-        response = self.client.get(
+    def test_access_on_unknown_evaluated_job_application(self, client):
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:siae_upload_doc",
                 kwargs={"evaluated_administrative_criteria_pk": 10000},
@@ -768,7 +768,7 @@ class SiaeUploadDocsViewTest(TestCase):
         )
         assert response.status_code == 404
 
-    def test_access_without_ownership(self):
+    def test_access_without_ownership(self, client):
         membership = CompanyMembershipFactory()
         user = membership.user
         siae = membership.company
@@ -781,8 +781,8 @@ class SiaeUploadDocsViewTest(TestCase):
             administrative_criteria=criterion.administrative_criteria,
         )
 
-        self.client.force_login(self.user)
-        response = self.client.get(
+        client.force_login(self.user)
+        response = client.get(
             reverse(
                 "siae_evaluations_views:siae_upload_doc",
                 kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
@@ -790,8 +790,8 @@ class SiaeUploadDocsViewTest(TestCase):
         )
         assert response.status_code == 404
 
-    def test_access_on_ended_campaign(self):
-        self.client.force_login(self.user)
+    def test_access_on_ended_campaign(self, client):
+        client.force_login(self.user)
 
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
@@ -805,13 +805,13 @@ class SiaeUploadDocsViewTest(TestCase):
             "siae_evaluations_views:siae_upload_doc",
             kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
         )
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 404
 
     @freeze_time("2022-09-14 11:11:11")
-    def test_access(self):
+    def test_access(self, client):
         self.maxDiff = None
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         criterion = (
@@ -826,7 +826,7 @@ class SiaeUploadDocsViewTest(TestCase):
             "siae_evaluations_views:siae_upload_doc",
             kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
         )
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         assert evaluated_administrative_criteria == response.context["evaluated_administrative_criteria"]
@@ -840,9 +840,9 @@ class SiaeUploadDocsViewTest(TestCase):
         )
         assert evaluated_administrative_criteria == response.context["evaluated_administrative_criteria"]
 
-    def test_post(self):
+    def test_post(self, client, pdf_file):
         fake_now = timezone.now()
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         criterion = (
@@ -858,10 +858,10 @@ class SiaeUploadDocsViewTest(TestCase):
             "siae_evaluations_views:siae_upload_doc",
             kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
         )
-        response = self.client.get(url)
+        response = client.get(url)
 
-        post_data = {"proof": self.pdf_file}
-        response = self.client.post(url, data=post_data)
+        post_data = {"proof": pdf_file}
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         next_url = (
@@ -881,13 +881,13 @@ class SiaeUploadDocsViewTest(TestCase):
             evaluated_administrative_criteria.review_state
             == evaluation_enums.EvaluatedAdministrativeCriteriaState.PENDING
         )
-        self.pdf_file.seek(0)
+        pdf_file.seek(0)
         with default_storage.open(evaluated_administrative_criteria.proof_id) as saved_file:
-            assert saved_file.read() == self.pdf_file.read()
+            assert saved_file.read() == pdf_file.read()
 
-    def test_post_with_submission_freezed_at(self):
+    def test_post_with_submission_freezed_at(self, client, pdf_file):
         fake_now = timezone.now()
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         criterion = (
@@ -909,17 +909,16 @@ class SiaeUploadDocsViewTest(TestCase):
             kwargs={"evaluated_administrative_criteria_pk": evaluated_administrative_criteria.pk},
         )
 
-        post_data = {"proof": self.pdf_file}
-        response = self.client.post(url, data=post_data)
+        post_data = {"proof": pdf_file}
+        response = client.post(url, data=post_data)
         assert response.status_code == 403
         evaluated_administrative_criteria.refresh_from_db()
         assert evaluated_administrative_criteria.uploaded_at == fake_now - relativedelta(days=1)
         assert evaluated_administrative_criteria.proof == proof
 
 
-class SiaeSubmitProofsViewTest(MessagesTestMixin, TestCase):
-    def setUp(self):
-        super().setUp()
+class TestSiaeSubmitProofsView:
+    def setup_method(self):
         membership = CompanyMembershipFactory()
         self.user = membership.user
         self.company = membership.company
@@ -931,14 +930,14 @@ class SiaeSubmitProofsViewTest(MessagesTestMixin, TestCase):
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
 
-    def test_is_submittable(self):
+    def test_is_submittable(self, client):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.company, self.user)
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application
         )
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
-        with self.assertNumQueries(
+        with assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # fetch django session
             + 1  # fetch user
@@ -957,26 +956,26 @@ class SiaeSubmitProofsViewTest(MessagesTestMixin, TestCase):
             + 1  # email: release savepoint
             + 2  # update session, release savepoint
         ):
-            response = self.client.post(self.url(evaluated_job_application.evaluated_siae))
+            response = client.post(self.url(evaluated_job_application.evaluated_siae))
 
         assert response.status_code == 302
         assert response.url == reverse("dashboard:index")
         evaluated_administrative_criteria.refresh_from_db()
         assert evaluated_administrative_criteria.submitted_at is not None
 
-    def test_is_not_submittable(self):
+    def test_is_not_submittable(self, client):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.company, self.user)
         EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application, proof=None)
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
-        response = self.client.post(self.url(evaluated_job_application.evaluated_siae))
+        response = client.post(self.url(evaluated_job_application.evaluated_siae))
         assert response.status_code == 302
         assert response.url == reverse(
             "siae_evaluations_views:siae_job_applications_list",
             kwargs={"evaluated_siae_pk": evaluated_job_application.evaluated_siae_id},
         )
 
-    def test_is_submittable_with_accepted(self):
+    def test_is_submittable_with_accepted(self, client):
         fake_now = timezone.now()
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.company, self.user)
 
@@ -989,8 +988,8 @@ class SiaeSubmitProofsViewTest(MessagesTestMixin, TestCase):
             submitted_at=fake_now - relativedelta(days=1),
         )
 
-        self.client.force_login(self.user)
-        response = self.client.post(self.url(evaluated_job_application.evaluated_siae))
+        client.force_login(self.user)
+        response = client.post(self.url(evaluated_job_application.evaluated_siae))
         assert response.status_code == 302
 
         evaluated_administrative_criteria0.refresh_from_db()
@@ -1006,7 +1005,7 @@ class SiaeSubmitProofsViewTest(MessagesTestMixin, TestCase):
         )
         assert evaluated_administrative_criteria1.submitted_at < evaluated_administrative_criteria0.submitted_at
 
-    def test_is_submittable_with_a_forgotten_submitted_doc(self):
+    def test_is_submittable_with_a_forgotten_submitted_doc(self, client):
         fake_now = timezone.now()
         not_yet_submitted_job_application = create_evaluated_siae_with_consistent_datas(self.company, self.user)
         EvaluatedAdministrativeCriteriaFactory(
@@ -1024,12 +1023,12 @@ class SiaeSubmitProofsViewTest(MessagesTestMixin, TestCase):
             submitted_at=fake_now,
         )
 
-        self.client.force_login(self.user)
-        response = self.client.post(self.url(submitted_job_application.evaluated_siae))
+        client.force_login(self.user)
+        response = client.post(self.url(submitted_job_application.evaluated_siae))
         assert response.status_code == 302
         assert response.url == "/dashboard/"
 
-    def test_is_not_submittable_with_submission_freezed(self):
+    def test_is_not_submittable_with_submission_freezed(self, client):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.company, self.user)
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application
@@ -1037,9 +1036,9 @@ class SiaeSubmitProofsViewTest(MessagesTestMixin, TestCase):
         # Freeze submission
         evaluated_job_application.evaluated_siae.evaluation_campaign.freeze(timezone.now())
 
-        self.client.force_login(self.user)
+        client.force_login(self.user)
 
-        with self.assertNumQueries(
+        with assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # fetch django session
             + 1  # fetch user
@@ -1048,27 +1047,27 @@ class SiaeSubmitProofsViewTest(MessagesTestMixin, TestCase):
             + 1  # fetch evaluatedsiae and see that submission is freezed, abort
             + 3  # savepoint, update session, release savepoint
         ):
-            response = self.client.post(self.url(evaluated_job_application.evaluated_siae))
+            response = client.post(self.url(evaluated_job_application.evaluated_siae))
 
-        self.assertRedirects(
+        assertRedirects(
             response,
             reverse(
                 "siae_evaluations_views:siae_job_applications_list",
                 kwargs={"evaluated_siae_pk": evaluated_job_application.evaluated_siae_id},
             ),
         )
-        self.assertMessages(response, [messages.Message(messages.ERROR, "Impossible de soumettre les documents.")])
+        assertMessages(response, [messages.Message(messages.ERROR, "Impossible de soumettre les documents.")])
         evaluated_administrative_criteria.refresh_from_db()
         assert evaluated_administrative_criteria.submitted_at is None
 
-    def test_submitted_email(self):
+    def test_submitted_email(self, client):
         institution_membership = InstitutionMembershipFactory()
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(
             self.company, self.user, institution=institution_membership.institution
         )
         EvaluatedAdministrativeCriteriaFactory(evaluated_job_application=evaluated_job_application)
-        self.client.force_login(self.user)
-        response = self.client.post(self.url(evaluated_job_application.evaluated_siae))
+        client.force_login(self.user)
+        response = client.post(self.url(evaluated_job_application.evaluated_siae))
         assert response.status_code == 302
 
         assert len(mail.outbox) == 1
@@ -1086,7 +1085,7 @@ class SiaeSubmitProofsViewTest(MessagesTestMixin, TestCase):
             == evaluated_job_application.evaluated_siae.evaluation_campaign.institution.active_members.first().email
         )
 
-    def test_campaign_is_ended(self):
+    def test_campaign_is_ended(self, client):
         # fixme vincentporte : convert data preparation into factory
         institution_membership = InstitutionMembershipFactory()
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(
@@ -1099,22 +1098,21 @@ class SiaeSubmitProofsViewTest(MessagesTestMixin, TestCase):
         evaluation_campaign.ended_at = timezone.now()
         evaluation_campaign.save(update_fields=["ended_at"])
 
-        self.client.force_login(self.user)
-        response = self.client.post(self.url(evaluated_job_application.evaluated_siae))
+        client.force_login(self.user)
+        response = client.post(self.url(evaluated_job_application.evaluated_siae))
 
         assert response.status_code == 404
         evaluated_administrative_criteria.refresh_from_db()
         assert evaluated_administrative_criteria.submitted_at is None
 
 
-class SiaeCalendarViewTest(TestCase):
-    def setUp(self):
-        super().setUp()
+class TestSiaeCalendarView:
+    def setup_method(self):
         membership = CompanyMembershipFactory()
         self.user = membership.user
         self.siae = membership.company
 
-    def test_active_campaign_calendar(self):
+    def test_active_campaign_calendar(self, client):
         calendar_html = """
             <table class="table">
                 <thead class="thead-light">
@@ -1145,26 +1143,26 @@ class SiaeCalendarViewTest(TestCase):
             "siae_evaluations_views:campaign_calendar", args=[evaluated_siae.evaluation_campaign.pk]
         )
 
-        self.client.force_login(self.user)
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, calendar_url)
+        client.force_login(self.user)
+        response = client.get(reverse("dashboard:index"))
+        assertContains(response, calendar_url)
 
-        response = self.client.get(calendar_url)
-        self.assertContains(response, calendar_html)
+        response = client.get(calendar_url)
+        assertContains(response, calendar_html)
 
         # Old campaigns don't have a calendar.
         evaluated_siae.evaluation_campaign.calendar.delete()
-        response = self.client.get(reverse("dashboard:index"))
-        self.assertNotContains(response, calendar_url)
+        response = client.get(reverse("dashboard:index"))
+        assertNotContains(response, calendar_url)
 
 
-class SiaeEvaluatedSiaeDetailViewTest(TestCase):
-    def test_access(self):
+class TestSiaeEvaluatedSiaeDetailView:
+    def test_access(self, client):
         membership = CompanyMembershipFactory()
         user = membership.user
         siae = membership.company
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(siae, user)
         evaluated_siae = evaluated_job_application.evaluated_siae
@@ -1173,25 +1171,25 @@ class SiaeEvaluatedSiaeDetailViewTest(TestCase):
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
 
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 404
 
         evaluation_campaign = evaluated_siae.evaluation_campaign
         evaluation_campaign.ended_at = timezone.now()
         evaluation_campaign.save(update_fields=["ended_at"])
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
 
-class SiaeEvaluatedJobApplicationViewTest(TestCase):
+class TestSiaeEvaluatedJobApplicationView:
     refusal_comment_txt = "Commentaire de la DDETS"
 
-    def test_access(self):
+    def test_access(self, client):
         membership = CompanyMembershipFactory()
         user = membership.user
         siae = membership.company
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(siae, user)
         evaluated_siae = evaluated_job_application.evaluated_siae
@@ -1200,14 +1198,14 @@ class SiaeEvaluatedJobApplicationViewTest(TestCase):
             "siae_evaluations_views:evaluated_job_application",
             kwargs={"evaluated_job_application_pk": evaluated_job_application.pk},
         )
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 404
 
         evaluation_campaign = evaluated_siae.evaluation_campaign
         evaluation_campaign.ended_at = timezone.now()
         evaluation_campaign.save(update_fields=["ended_at"])
-        response = self.client.get(url)
-        self.assertNotContains(response, self.refusal_comment_txt)
+        response = client.get(url)
+        assertNotContains(response, self.refusal_comment_txt)
 
         # Refusal comment is only displayed when state is refused
         EvaluatedAdministrativeCriteriaFactory(
@@ -1217,5 +1215,5 @@ class SiaeEvaluatedJobApplicationViewTest(TestCase):
         )
         evaluated_siae.reviewed_at = timezone.now()
         evaluated_siae.save(update_fields=["reviewed_at"])
-        response = self.client.get(url)
-        self.assertContains(response, self.refusal_comment_txt)
+        response = client.get(url)
+        assertContains(response, self.refusal_comment_txt)
