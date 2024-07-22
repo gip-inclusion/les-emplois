@@ -759,6 +759,15 @@ def stats_dgefp_iae(request):
 
 
 @login_required
+def stats_dgefp_iae_ph_prescription(request):
+    return render_stats_dgefp(
+        request=request,
+        page_title="Suivi des prescriptions des prescripteurs habilités",
+        extra_params=get_params_for_whole_country(),
+    )
+
+
+@login_required
 def stats_dgefp_siae_evaluation(request):
     return render_stats_dgefp(
         request=request,

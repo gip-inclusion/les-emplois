@@ -251,6 +251,11 @@ METABASE_DASHBOARDS = {
     "stats_dgefp_iae": {
         "dashboard_id": 117,
     },
+    "stats_dgefp_iae_ph_prescription": {
+        "dashboard_id": 289,
+        "tally_popup_form_id": "wbWKEo",
+        "tally_embed_form_id": "wvPEvQ",
+    },
     "stats_dgefp_siae_evaluation": {
         "dashboard_id": 144,
     },
