@@ -1113,9 +1113,9 @@ pytest-randomly==3.15.0 \
     --hash=sha256:0516f4344b29f4e9cdae8bce31c4aeebf59d0b9ef05927c33354ff3859eeeca6 \
     --hash=sha256:b908529648667ba5e54723088edd6f82252f540cc340d748d1fa985539687047
     # via -r requirements/test.txt
-pytest-subtests==0.13.0 \
-    --hash=sha256:5a142064218df37a52299ddb393b1a6b2c1161ca19e71ca60c3a8040eb17e811 \
-    --hash=sha256:9e02b9d243c0379b02abf3e0887da122bcb2714b021c3608a37f17ce210adce5
+pytest-subtests==0.13.1 \
+    --hash=sha256:989e38f0f1c01bc7c6b2e04db7d9fd859db35d77c2c1a430c831a70cbf3fde2d \
+    --hash=sha256:ab616a22f64cd17c1aee65f18af94dbc30c444f8683de2b30895c3778265e3bd
     # via -r requirements/test.txt
 pytest-xdist==3.5.0 \
     --hash=sha256:cbb36f3d67e0c478baa57fa4edc8843887e0f6cfc42d677530a36d7472b32d8a \
