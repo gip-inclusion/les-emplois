@@ -18,6 +18,7 @@ from django.test import override_settings
 from factory import Faker
 from pytest_django.lazy_django import django_settings_is_configured
 from pytest_django.plugin import INVALID_TEMPLATE_VARS_ENV
+from rest_framework.test import APIClient
 
 
 # Rewrite before importing itou code.
@@ -68,6 +69,11 @@ def admin_client():
 @pytest.fixture
 def client():
     return ItouClient()
+
+
+@pytest.fixture
+def api_client():
+    return APIClient()
 
 
 @pytest.fixture()

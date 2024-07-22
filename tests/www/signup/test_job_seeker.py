@@ -1,12 +1,12 @@
 import uuid
 
-import pytest
 import respx
 from allauth.account.models import EmailConfirmationHMAC
 from django.conf import settings
 from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
+from pytest_django.asserts import assertContains, assertFormError, assertRedirects
 
 from itou.openid_connect.france_connect import constants as fc_constants
 from itou.users.enums import UserKind
@@ -16,89 +16,87 @@ from itou.www.signup.forms import JobSeekerSituationForm
 from tests.cities.factories import create_test_cities
 from tests.openid_connect.france_connect.tests import FC_USERINFO, mock_oauth_dance
 from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
-from tests.utils.test import TestCase, parse_response_to_soup, reload_module
+from tests.utils.test import parse_response_to_soup, reload_module
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class JobSeekerSignupTest(TestCase):
-    def setUp(self):
-        super().setUp()
+class TestJobSeekerSignup:
+    def setup_method(self):
         [self.city] = create_test_cities(["67"], num_per_department=1)
 
-    def test_choose_user_kind(self):
+    def test_choose_user_kind(self, client):
         url = reverse("signup:choose_user_kind")
-        response = self.client.get(url)
-        self.assertContains(response, "Candidat")
+        response = client.get(url)
+        assertContains(response, "Candidat")
 
-        response = self.client.post(url, data={"kind": UserKind.JOB_SEEKER})
-        self.assertRedirects(response, reverse("signup:job_seeker_situation"))
+        response = client.post(url, data={"kind": UserKind.JOB_SEEKER})
+        assertRedirects(response, reverse("signup:job_seeker_situation"))
 
-    def test_job_seeker_signup_situation(self):
+    def test_job_seeker_signup_situation(self, client):
         """
         Test the redirects according to the chosen situations
         """
 
         # Check if the form page is displayed correctly.
         url = reverse("signup:job_seeker_situation")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         # Check if none of the boxes are checked 'some data' needed to raise
         # form error.
         post_data = {"some": "data"}
-        response = self.client.post(url, post_data)
+        response = client.post(url, post_data)
         assert response.status_code == 200
-        self.assertFormError(response.context["form"], "situation", [JobSeekerSituationForm.ERROR_NOTHING_CHECKED])
+        assertFormError(response.context["form"], "situation", [JobSeekerSituationForm.ERROR_NOTHING_CHECKED])
 
         # Check if one of eligibility criterion is checked.
         next_url = reverse("signup:job_seeker_nir")
         for choice in JobSeekerSituationForm.ELIGIBLE_SITUATION:
             post_data = {"situation": [choice]}
-            response = self.client.post(url, data=post_data)
+            response = client.post(url, data=post_data)
             assert response.status_code == 302
-            self.assertRedirects(response, next_url)
+            assertRedirects(response, next_url)
 
             post_data["situation"].append("autre")
-            response = self.client.post(url, data=post_data)
+            response = client.post(url, data=post_data)
             assert response.status_code == 302
-            self.assertRedirects(response, next_url)
+            assertRedirects(response, next_url)
 
         # Check if all the eligibility criteria are checked.
         post_data = {"situation": JobSeekerSituationForm.ELIGIBLE_SITUATION}
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
-        self.assertRedirects(response, next_url)
+        assertRedirects(response, next_url)
 
         # Check if "Autre" is the only one checked.
         post_data = {"situation": "autre"}
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
         next_url = reverse("signup:job_seeker_situation_not_eligible")
-        self.assertRedirects(response, next_url)
+        assertRedirects(response, next_url)
 
         # Check not eligible destination page.
         url = reverse("signup:job_seeker_situation_not_eligible")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
-    def test_job_seeker_nir(self):
+    def test_job_seeker_nir(self, client):
         nir = "141068078200557"
 
         # Get the NIR.
         # It will be saved in the next view.
         url = reverse("signup:job_seeker_nir")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         post_data = {"nir": nir}
-        response = self.client.post(url, post_data)
-        self.assertRedirects(response, reverse("signup:job_seeker"))
-        assert global_constants.ITOU_SESSION_NIR_KEY in list(self.client.session.keys())
-        assert self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
+        response = client.post(url, post_data)
+        assertRedirects(response, reverse("signup:job_seeker"))
+        assert global_constants.ITOU_SESSION_NIR_KEY in list(client.session.keys())
+        assert client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
 
         # NIR is stored with user information.
         url = reverse("signup:job_seeker")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
         # Since provided NIR starts with a 1, suggest Monsieur title
         assert response.context["form"]["title"].initial == "M"
@@ -121,16 +119,16 @@ class JobSeekerSignupTest(TestCase):
             "city": self.city.slug,
         }
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
+        assertRedirects(response, reverse("account_email_verification_sent"))
 
         job_seeker = User.objects.get(email=post_data["email"])
         assert nir == job_seeker.jobseeker_profile.nir
         assert job_seeker.title == "M"
         assert job_seeker.has_jobseeker_profile
 
-    def test_job_seeker_temporary_nir(self):
+    def test_job_seeker_temporary_nir(self, client):
         """
         For the moment, we don't handle temporary social numbers.
         Skipping NIR verification is allowed if a temporary one should be used instead.
@@ -141,19 +139,19 @@ class JobSeekerSignupTest(TestCase):
 
         url = reverse("signup:job_seeker_nir")
         post_data = {"nir": nir}
-        response = self.client.post(url, post_data)
+        response = client.post(url, post_data)
         assert response.status_code == 200
         assert not response.context.get("form").is_valid()
 
         post_data = {"nir": nir, "skip": 1}
-        response = self.client.post(url, post_data)
-        self.assertRedirects(response, reverse("signup:job_seeker"))
-        assert global_constants.ITOU_SESSION_NIR_KEY not in list(self.client.session.keys())
-        assert not self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
+        response = client.post(url, post_data)
+        assertRedirects(response, reverse("signup:job_seeker"))
+        assert global_constants.ITOU_SESSION_NIR_KEY not in list(client.session.keys())
+        assert not client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
 
         # Temporary NIR is not stored with user information.
         url = reverse("signup:job_seeker")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
         # Since no NIR was provided (or it was a temporary number), suggest nothing
         assert response.context["form"]["title"].initial is None
@@ -176,27 +174,27 @@ class JobSeekerSignupTest(TestCase):
             "city": self.city.slug,
         }
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
+        assertRedirects(response, reverse("account_email_verification_sent"))
 
         job_seeker = User.objects.get(email=post_data["email"])
         assert job_seeker.jobseeker_profile.nir == ""
         assert job_seeker.title == "M"
         assert job_seeker.has_jobseeker_profile
 
-    def test_job_seeker_signup(self):
+    def test_job_seeker_signup(self, client, snapshot):
         """Job-seeker signup."""
         # NIR is set on a previous step and tested separately.
         # See self.test_job_seeker_nir
         nir = "141068078200557"
-        self.client.post(reverse("signup:job_seeker_nir"), {"nir": nir})
+        client.post(reverse("signup:job_seeker_nir"), {"nir": nir})
 
         url = reverse("signup:job_seeker")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
         form = parse_response_to_soup(response, selector="form.js-prevent-multiple-submit")
-        assert str(form) == self.snapshot(name="job_seeker_signup_form")
+        assert str(form) == snapshot(name="job_seeker_signup_form")
 
         address_line_1 = "Test adresse"
         address_line_2 = "Test adresse complémentaire"
@@ -216,9 +214,9 @@ class JobSeekerSignupTest(TestCase):
             "city": self.city.slug,
         }
 
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
-        self.assertRedirects(response, reverse("account_email_verification_sent"))
+        assertRedirects(response, reverse("account_email_verification_sent"))
 
         # Check `User` state.
         user = User.objects.get(email=post_data["email"])
@@ -245,7 +243,7 @@ class JobSeekerSignupTest(TestCase):
         # User cannot log in until confirmation.
         post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
         url = reverse("login:job_seeker")
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
         assert response.url == reverse("account_email_verification_sent")
 
@@ -253,14 +251,14 @@ class JobSeekerSignupTest(TestCase):
         confirmation_token = EmailConfirmationHMAC(user_email).key
         confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
         # User clicks on the confirm link in the email, that is a GET request.
-        response = self.client.get(confirm_email_url)
-        self.assertRedirects(response, reverse("welcoming_tour:index"))
+        response = client.get(confirm_email_url)
+        assertRedirects(response, reverse("welcoming_tour:index"))
         user_email = user.emailaddress_set.first()
         assert user_email.verified
 
-        response = self.client.get(confirm_email_url)
+        response = client.get(confirm_email_url)
         # Uses the custom template to display errors.
-        self.assertContains(
+        assertContains(
             response,
             f"""
             <div class="alert alert-danger">
@@ -274,10 +272,10 @@ class JobSeekerSignupTest(TestCase):
             count=1,
         )
 
-    def test_job_seeker_signup_with_existing_email(self):
+    def test_job_seeker_signup_with_existing_email(self, client):
         JobSeekerFactory(email="alice@evil.com")
         url = reverse("signup:job_seeker")
-        response = self.client.post(
+        response = client.post(
             url,
             {
                 "title": "MME",
@@ -305,21 +303,21 @@ class JobSeekerSignupTest(TestCase):
         FRANCE_CONNECT_CLIENT_SECRET="IC_CLIENT_SECRET_123",
     )
     @reload_module(fc_constants)
-    def test_job_seeker_nir_with_france_connect(self):
+    def test_job_seeker_nir_with_france_connect(self, client):
         # NIR is set on a previous step and tested separately.
         # See self.test_job_seeker_nir
         nir = "141068078200557"
-        self.client.post(reverse("signup:job_seeker_nir"), {"nir": nir})
-        assert global_constants.ITOU_SESSION_NIR_KEY in list(self.client.session.keys())
-        assert self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
+        client.post(reverse("signup:job_seeker_nir"), {"nir": nir})
+        assert global_constants.ITOU_SESSION_NIR_KEY in list(client.session.keys())
+        assert client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
 
         url = reverse("signup:job_seeker")
-        response = self.client.get(url)
+        response = client.get(url)
         fc_url = reverse("france_connect:authorize")
-        self.assertContains(response, fc_url)
+        assertContains(response, fc_url)
 
         # New created job seeker has no title and is redirected to complete its infos
-        mock_oauth_dance(self.client, expected_route="dashboard:edit_user_info")
+        mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
         assert nir == job_seeker.jobseeker_profile.nir
         assert job_seeker.has_jobseeker_profile
@@ -331,21 +329,21 @@ class JobSeekerSignupTest(TestCase):
         FRANCE_CONNECT_CLIENT_SECRET="IC_CLIENT_SECRET_123",
     )
     @reload_module(fc_constants)
-    def test_job_seeker_temporary_nir_with_france_connect(self):
+    def test_job_seeker_temporary_nir_with_france_connect(self, client):
         # temporary NIR is discarded on a previous step and tested separately.
         # See self.test_job_seeker_temporary_nir
 
-        assert global_constants.ITOU_SESSION_NIR_KEY not in list(self.client.session.keys())
-        assert not self.client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
+        assert global_constants.ITOU_SESSION_NIR_KEY not in list(client.session.keys())
+        assert not client.session.get(global_constants.ITOU_SESSION_NIR_KEY)
 
         # Temporary NIR is not stored with user information.
         url = reverse("signup:job_seeker")
-        response = self.client.get(url)
+        response = client.get(url)
         fc_url = reverse("france_connect:authorize")
-        self.assertContains(response, fc_url)
+        assertContains(response, fc_url)
 
         # New created job seeker has no title and is redirected to complete its infos
-        mock_oauth_dance(self.client, expected_route="dashboard:edit_user_info")
+        mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
         job_seeker = User.objects.get(email=FC_USERINFO["email"])
         assert not job_seeker.jobseeker_profile.nir
         assert job_seeker.has_jobseeker_profile

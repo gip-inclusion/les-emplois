@@ -1,5 +1,6 @@
 from django.urls import reverse
-from rest_framework.test import APIClient, APITestCase
+from pytest_django.asserts import assertNumQueries
+from rest_framework.test import APIClient
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
@@ -16,9 +17,7 @@ NUM_QUERIES += 1  # count
 NUM_QUERIES += 1  # get siae / organization
 
 
-class DataInclusionStructureTest(APITestCase):
-    maxDiff = None
-
+class TestDataInclusionStructure:
     def test_list_missing_type_query_param(self):
         user = EmployerFactory()
         authenticated_client = APIClient()
@@ -29,25 +28,22 @@ class DataInclusionStructureTest(APITestCase):
         assert response.status_code == 400
 
 
-class DataInclusionSiaeStructureTest(APITestCase):
+class TestDataInclusionSiaeStructure:
     url = reverse("v1:structures-list")
-    maxDiff = None
 
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
         self.user = EmployerFactory()
-        self.client = APIClient()
         self.authenticated_client = APIClient()
         self.authenticated_client.force_authenticate(self.user)
 
-    def test_list_structures_unauthenticated(self):
-        response = self.client.get(self.url, format="json", data={"type": "siae"})
+    def test_list_structures_unauthenticated(self, api_client):
+        response = api_client.get(self.url, format="json", data={"type": "siae"})
         assert response.status_code == 401
 
     def test_list_structures(self):
         company = CompanyFactory(siret="10000000000001")
 
-        with self.assertNumQueries(NUM_QUERIES):
+        with assertNumQueries(NUM_QUERIES):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
@@ -85,14 +81,14 @@ class DataInclusionSiaeStructureTest(APITestCase):
             }
         ]
 
-    def test_list_structures_antenne_with_user_created_with_proper_siret(self):
+    def test_list_structures_antenne_with_user_created_with_proper_siret(self, subtests):
         company_1 = CompanyFactory(siret="10000000000001")
         company_2 = CompanyFactory(siret="10000000000002", convention=company_1.convention)
         company_2 = CompanyFactory(
             siret="10000000000003", source=Company.SOURCE_USER_CREATED, convention=company_1.convention
         )
 
-        with self.assertNumQueries(NUM_QUERIES):
+        with assertNumQueries(NUM_QUERIES):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
@@ -113,12 +109,12 @@ class DataInclusionSiaeStructureTest(APITestCase):
                 (structure_data for structure_data in structure_data_list if structure_data["id"] == str(siae.uid)),
                 None,
             )
-            with self.subTest(siret=siae.siret):
+            with subtests.test(siret=siae.siret):
                 assert structure_data is not None
                 assert structure_data["siret"] == siret
                 assert structure_data["antenne"] == antenne
 
-    def test_list_structures_antenne_with_user_created_and_999(self):
+    def test_list_structures_antenne_with_user_created_and_999(self, subtests):
         company_1 = CompanyFactory(siret="10000000000001")
         company_2 = CompanyFactory(siret="10000000000002", source=Company.SOURCE_ASP, convention=company_1.convention)
         company_3 = CompanyFactory(
@@ -127,7 +123,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
 
         num_queries = NUM_QUERIES
         num_queries += 1  # get parent siae
-        with self.assertNumQueries(num_queries):
+        with assertNumQueries(num_queries):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
@@ -147,7 +143,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
                 (structure_data for structure_data in structure_data_list if structure_data["id"] == str(siae.uid)),
                 None,
             )
-            with self.subTest(siret=siae.siret):
+            with subtests.test(siret=siae.siret):
                 assert structure_data is not None
                 assert structure_data["siret"] == siret
                 assert structure_data["antenne"] == antenne
@@ -157,7 +153,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
 
         num_queries = NUM_QUERIES
         num_queries += 1  # get parent siae
-        with self.assertNumQueries(num_queries):
+        with assertNumQueries(num_queries):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
@@ -170,11 +166,11 @@ class DataInclusionSiaeStructureTest(APITestCase):
 
         assert structure_data_list[0]["siret"] == company.siret[:9]  # fake nic is removed
 
-    def test_list_structures_duplicated_siret(self):
+    def test_list_structures_duplicated_siret(self, subtests):
         company_1 = CompanyFactory(siret="10000000000001", kind=CompanyKind.ACI)
         company_2 = CompanyFactory(siret=company_1.siret, kind=CompanyKind.EI)
 
-        with self.assertNumQueries(NUM_QUERIES):
+        with assertNumQueries(NUM_QUERIES):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
@@ -195,7 +191,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
                 (structure_data for structure_data in structure_data_list if structure_data["id"] == str(siae.uid)),
                 None,
             )
-            with self.subTest(siret=siae.siret):
+            with subtests.test(siret=siae.siret):
                 assert structure_data is not None
                 assert structure_data["siret"] == siret
                 assert structure_data["antenne"] == antenne
@@ -203,7 +199,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
     def test_list_structures_description_longer_than_280(self):
         company = CompanyFactory(description="a" * 300)
 
-        with self.assertNumQueries(NUM_QUERIES):
+        with assertNumQueries(NUM_QUERIES):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
@@ -221,7 +217,7 @@ class DataInclusionSiaeStructureTest(APITestCase):
 
         num_queries = NUM_QUERIES
         num_queries -= 1  # no siae to fetch
-        with self.assertNumQueries(num_queries):
+        with assertNumQueries(num_queries):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
@@ -232,25 +228,22 @@ class DataInclusionSiaeStructureTest(APITestCase):
         assert response.json()["results"] == []
 
 
-class DataInclusionPrescriberStructureTest(APITestCase):
+class TestDataInclusionPrescriberStructure:
     url = reverse("v1:structures-list")
-    maxDiff = None
 
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
         self.user = PrescriberFactory()
-        self.client = APIClient()
         self.authenticated_client = APIClient()
         self.authenticated_client.force_authenticate(self.user)
 
-    def test_list_structures_unauthenticated(self):
-        response = self.client.get(self.url, format="json", data={"type": "orga"})
+    def test_list_structures_unauthenticated(self, api_client):
+        response = api_client.get(self.url, format="json", data={"type": "orga"})
         assert response.status_code == 401
 
     def test_list_structures(self):
         orga = PrescriberOrganizationFactory(is_authorized=True)
 
-        with self.assertNumQueries(NUM_QUERIES):
+        with assertNumQueries(NUM_QUERIES):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
@@ -291,7 +284,7 @@ class DataInclusionPrescriberStructureTest(APITestCase):
     def test_list_structures_date_maj_value(self):
         orga = PrescriberOrganizationFactory()
 
-        with self.assertNumQueries(NUM_QUERIES):
+        with assertNumQueries(NUM_QUERIES):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",
@@ -317,7 +310,7 @@ class DataInclusionPrescriberStructureTest(APITestCase):
     def test_list_structures_description_longer_than_280(self):
         orga = PrescriberOrganizationFactory(description="a" * 300)
 
-        with self.assertNumQueries(NUM_QUERIES):
+        with assertNumQueries(NUM_QUERIES):
             response = self.authenticated_client.get(
                 self.url,
                 format="json",

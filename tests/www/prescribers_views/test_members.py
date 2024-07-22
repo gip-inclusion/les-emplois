@@ -1,5 +1,6 @@
 from django.core import mail
 from django.urls import reverse
+from pytest_django.asserts import assertContains, assertNotContains
 
 from tests.prescribers.factories import (
     PrescriberFactory,
@@ -8,22 +9,22 @@ from tests.prescribers.factories import (
     PrescriberOrganizationWith2MembershipFactory,
     PrescriberOrganizationWithMembershipFactory,
 )
-from tests.utils.test import TestCase, assert_previous_step
+from tests.utils.test import assert_previous_step
 
 
-class MembersTest(TestCase):
+class TestMembers:
     MORE_ADMIN_MSG = "Nous vous recommandons de nommer plusieurs administrateurs"
 
-    def test_members(self):
+    def test_members(self, client):
         organization = PrescriberOrganizationWithMembershipFactory()
         user = organization.members.first()
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("prescribers_views:members")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
         assert_previous_step(response, reverse("dashboard:index"))
 
-    def test_active_members(self):
+    def test_active_members(self, client):
         organization = PrescriberOrganizationFactory()
         active_member_active_user = PrescriberMembershipFactory(organization=organization)
         active_member_inactive_user = PrescriberMembershipFactory(organization=organization, user__is_active=False)
@@ -32,9 +33,9 @@ class MembersTest(TestCase):
             organization=organization, is_active=False, user__is_active=False
         )
 
-        self.client.force_login(active_member_active_user.user)
+        client.force_login(active_member_active_user.user)
         url = reverse("prescribers_views:members")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
         assert len(response.context["members"]) == 1
         assert active_member_active_user in response.context["members"]
@@ -42,40 +43,40 @@ class MembersTest(TestCase):
         assert inactive_member_active_user not in response.context["members"]
         assert inactive_member_inactive_user not in response.context["members"]
 
-    def test_members_admin_warning_one_user(self):
+    def test_members_admin_warning_one_user(self, client):
         organization = PrescriberOrganizationWithMembershipFactory()
         user = organization.members.first()
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("prescribers_views:members")
-        response = self.client.get(url)
-        self.assertNotContains(response, self.MORE_ADMIN_MSG)
+        response = client.get(url)
+        assertNotContains(response, self.MORE_ADMIN_MSG)
 
-    def test_members_admin_warning_two_users(self):
+    def test_members_admin_warning_two_users(self, client):
         organization = PrescriberOrganizationWith2MembershipFactory()
         user = organization.members.first()
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("prescribers_views:members")
-        response = self.client.get(url)
-        self.assertContains(response, self.MORE_ADMIN_MSG)
+        response = client.get(url)
+        assertContains(response, self.MORE_ADMIN_MSG)
 
         # Set all users admins
         organization.memberships.update(is_admin=True)
-        response = self.client.get(url)
-        self.assertNotContains(response, self.MORE_ADMIN_MSG)
+        response = client.get(url)
+        assertNotContains(response, self.MORE_ADMIN_MSG)
 
-    def test_members_admin_warning_many_users(self):
+    def test_members_admin_warning_many_users(self, client):
         organization = PrescriberOrganizationWith2MembershipFactory()
         PrescriberMembershipFactory(organization=organization, user__is_active=False)
         PrescriberMembershipFactory(organization=organization, is_admin=False, user__is_active=False)
         user = organization.members.first()
-        self.client.force_login(user)
+        client.force_login(user)
         url = reverse("prescribers_views:members")
-        response = self.client.get(url)
-        self.assertContains(response, self.MORE_ADMIN_MSG)
+        response = client.get(url)
+        assertContains(response, self.MORE_ADMIN_MSG)
 
 
-class UserMembershipDeactivationTest(TestCase):
-    def test_self_deactivation(self):
+class TestUserMembershipDeactivation:
+    def test_self_deactivation(self, client):
         """
         A user, even if admin, can't self-deactivate
         (must be done by another admin)
@@ -85,9 +86,9 @@ class UserMembershipDeactivationTest(TestCase):
         memberships = admin.prescribermembership_set.all()
         membership = memberships.first()
 
-        self.client.force_login(admin)
+        client.force_login(admin)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": admin.id})
-        response = self.client.post(url)
+        response = client.post(url)
         assert response.status_code == 403
 
         # Trying to change self membership is not allowed
@@ -95,7 +96,7 @@ class UserMembershipDeactivationTest(TestCase):
         membership.refresh_from_db()
         assert membership.is_active
 
-    def test_deactivate_user(self):
+    def test_deactivate_user(self, client):
         """
         Standard use case of user deactivation.
         Everything should be fine ...
@@ -107,9 +108,9 @@ class UserMembershipDeactivationTest(TestCase):
         memberships = guest.prescribermembership_set.all()
         membership = memberships.first()
 
-        self.client.force_login(admin)
+        client.force_login(admin)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
-        response = self.client.post(url)
+        response = client.post(url)
         assert response.status_code == 302
 
         # User should be deactivated now
@@ -126,7 +127,7 @@ class UserMembershipDeactivationTest(TestCase):
         assert "Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion" in email.body
         assert email.to[0] == guest.email
 
-    def test_deactivate_with_no_perms(self):
+    def test_deactivate_with_no_perms(self, client):
         """
         Non-admin user can't change memberships
         """
@@ -134,12 +135,12 @@ class UserMembershipDeactivationTest(TestCase):
         guest = PrescriberFactory()
         organization.members.add(guest)
 
-        self.client.force_login(guest)
+        client.force_login(guest)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
-        response = self.client.post(url)
+        response = client.post(url)
         assert response.status_code == 403
 
-    def test_deactivated_prescriber_is_orienter(self):
+    def test_deactivated_prescriber_is_orienter(self, client):
         """
         A prescriber deactivated from a prescriber organization
         and without any membership becomes an "orienteur".
@@ -149,18 +150,18 @@ class UserMembershipDeactivationTest(TestCase):
         admin = organization.members.filter(prescribermembership__is_admin=True).first()
         guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
-        self.client.force_login(admin)
+        client.force_login(admin)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
-        response = self.client.post(url)
+        response = client.post(url)
         assert response.status_code == 302
 
         # guest is now an orienter
-        self.client.force_login(guest)
+        client.force_login(guest)
         url = reverse("dashboard:index")
-        response = self.client.post(url)
+        response = client.post(url)
         assert response.status_code == 200
 
-    def test_structure_selector(self):
+    def test_structure_selector(self, client):
         """
         Check that a deactivated member can't access the structure
         from dashboard selector
@@ -176,16 +177,16 @@ class UserMembershipDeactivationTest(TestCase):
         assert len(memberships) == 2
 
         # Admin remove guest from structure
-        self.client.force_login(admin)
+        client.force_login(admin)
         url = reverse("prescribers_views:deactivate_member", kwargs={"user_id": guest.id})
-        response = self.client.post(url)
+        response = client.post(url)
         assert response.status_code == 302
-        self.client.logout()
+        client.logout()
 
         # guest must be able to login
-        self.client.force_login(guest)
+        client.force_login(guest)
         url = reverse("dashboard:index")
-        response = self.client.get(url)
+        response = client.get(url)
 
         # Wherever guest lands should give a 200 OK
         assert response.status_code == 200

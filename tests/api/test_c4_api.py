@@ -2,7 +2,7 @@ import datetime
 
 from django.test import override_settings
 from django.urls import reverse
-from rest_framework.test import APIClient, APITestCase
+from pytest_django.asserts import assertNumQueries
 
 from itou.companies.enums import COMPANY_KIND_RESERVED
 from itou.companies.models import Company
@@ -17,34 +17,32 @@ NUM_QUERIES += 1  # get siaes
 NUM_QUERIES += 1  # Prefetch members
 
 
-class C4CompanyAPITestCase(APITestCase):
+class TestC4CompanyAPI:
     url = reverse("v1:marche-company-list")
     auth_header = {"HTTP_AUTHORIZATION": "Token C4SecretToken"}
 
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
         self.user = EmployerFactory()
-        self.client = APIClient()
 
-    def test_list_companies_unauthenticated(self):
-        response = self.client.get(self.url, format="json")
+    def test_list_companies_unauthenticated(self, api_client):
+        response = api_client.get(self.url, format="json")
         assert response.status_code == 401
 
-    def test_list_companies_no_setting(self):
-        response = self.client.get(self.url, format="json", **self.auth_header)
+    def test_list_companies_no_setting(self, api_client):
+        response = api_client.get(self.url, format="json", **self.auth_header)
         assert response.status_code == 401
 
     @override_settings(C4_TOKEN="AnotherToken")
-    def test_list_companies_bad_token(self):
-        response = self.client.get(self.url, format="json", **self.auth_header)
+    def test_list_companies_bad_token(self, api_client):
+        response = api_client.get(self.url, format="json", **self.auth_header)
         assert response.status_code == 401
 
     @override_settings(C4_TOKEN="C4SecretToken")
-    def test_list_companies(self):
+    def test_list_companies(self, api_client):
         company = CompanyFactory(siret="10000000000001", with_membership=True)
 
-        with self.assertNumQueries(NUM_QUERIES):
-            response = self.client.get(self.url, format="json", **self.auth_header)
+        with assertNumQueries(NUM_QUERIES):
+            response = api_client.get(self.url, format="json", **self.auth_header)
         assert response.status_code == 200
         assert response.json()["results"] == [
             {
@@ -74,15 +72,15 @@ class C4CompanyAPITestCase(APITestCase):
         ]
 
     @override_settings(C4_TOKEN="C4SecretToken")
-    def test_list_companies_antenne_with_user_created_with_proper_siret(self):
+    def test_list_companies_antenne_with_user_created_with_proper_siret(self, api_client, subtests):
         company_1 = CompanyFactory(siret="10000000000001")
         company_2 = CompanyFactory(siret="10000000000002", convention=company_1.convention)
         company_3 = CompanyFactory(
             siret="10000000000003", source=Company.SOURCE_USER_CREATED, convention=company_1.convention
         )
 
-        with self.assertNumQueries(NUM_QUERIES):
-            response = self.client.get(self.url, format="json", **self.auth_header)
+        with assertNumQueries(NUM_QUERIES):
+            response = api_client.get(self.url, format="json", **self.auth_header)
         assert response.status_code == 200
         company_data_list = response.json()["results"]
 
@@ -95,12 +93,12 @@ class C4CompanyAPITestCase(APITestCase):
                 (company_data for company_data in company_data_list if company_data["id"] == company.pk),
                 None,
             )
-            with self.subTest(siret=company.siret):
+            with subtests.test(siret=company.siret):
                 assert company_data is not None
                 assert company_data["siret"] == siret
 
     @override_settings(C4_TOKEN="C4SecretToken")
-    def test_list_companies_antenne_with_user_created_and_999(self):
+    def test_list_companies_antenne_with_user_created_and_999(self, api_client, subtests):
         company_1 = CompanyFactory(siret="10000000000001")
         company_2 = CompanyFactory(siret="10000000000002", source=Company.SOURCE_ASP, convention=company_1.convention)
         company_3 = CompanyFactory(
@@ -109,8 +107,8 @@ class C4CompanyAPITestCase(APITestCase):
 
         num_queries = NUM_QUERIES
         num_queries += 1  # get parent siae
-        with self.assertNumQueries(num_queries):
-            response = self.client.get(self.url, format="json", **self.auth_header)
+        with assertNumQueries(num_queries):
+            response = api_client.get(self.url, format="json", **self.auth_header)
         assert response.status_code == 200
 
         company_data_list = response.json()["results"]
@@ -124,18 +122,18 @@ class C4CompanyAPITestCase(APITestCase):
                 (company_data for company_data in company_data_list if company_data["id"] == company.pk),
                 None,
             )
-            with self.subTest(siret=company.siret):
+            with subtests.test(siret=company.siret):
                 assert company_data is not None
                 assert company_data["siret"] == siret
 
     @override_settings(C4_TOKEN="C4SecretToken")
-    def test_list_companies_siret_with_999_and_no_other_siret_available(self):
+    def test_list_companies_siret_with_999_and_no_other_siret_available(self, api_client):
         company = CompanyFactory(siret="10000000099991", source=Company.SOURCE_USER_CREATED)
 
         num_queries = NUM_QUERIES
         num_queries += 1  # get parent siae
-        with self.assertNumQueries(num_queries):
-            response = self.client.get(self.url, format="json", **self.auth_header)
+        with assertNumQueries(num_queries):
+            response = api_client.get(self.url, format="json", **self.auth_header)
         assert response.status_code == 200
 
         company_data_list = response.json()["results"]
@@ -144,12 +142,12 @@ class C4CompanyAPITestCase(APITestCase):
         assert company_data_list[0]["siret"] == company.siret[:9]  # fake nic is removed
 
     @override_settings(C4_TOKEN="C4SecretToken")
-    def test_list_companies_without_convention(self):
+    def test_list_companies_without_convention(self, api_client):
         CompanyFactory(convention=None)
 
         num_queries = NUM_QUERIES
-        with self.assertNumQueries(num_queries):
-            response = self.client.get(self.url, format="json", **self.auth_header)
+        with assertNumQueries(num_queries):
+            response = api_client.get(self.url, format="json", **self.auth_header)
         assert response.status_code == 200
 
         company_data_list = response.json()["results"]
@@ -159,7 +157,7 @@ class C4CompanyAPITestCase(APITestCase):
         assert company_data_list[0]["convention_asp_id"] is None
 
     @override_settings(C4_TOKEN="C4SecretToken")
-    def test_list_companies_without_admins(self):
+    def test_list_companies_without_admins(self, api_client):
         company = CompanyFactory(convention=None)
         # An active admin membership on a disabled user
         CompanyMembershipFactory(company=company, user__is_active=False, is_active=True, is_admin=True)
@@ -169,8 +167,8 @@ class C4CompanyAPITestCase(APITestCase):
         CompanyMembershipFactory(company=company, is_active=True, is_admin=False)
 
         num_queries = NUM_QUERIES
-        with self.assertNumQueries(num_queries):
-            response = self.client.get(self.url, format="json", **self.auth_header)
+        with assertNumQueries(num_queries):
+            response = api_client.get(self.url, format="json", **self.auth_header)
         assert response.status_code == 200
 
         company_data_list = response.json()["results"]
@@ -180,7 +178,7 @@ class C4CompanyAPITestCase(APITestCase):
         assert company_data_list[0]["admin_email"] is None
 
     @override_settings(C4_TOKEN="C4SecretToken")
-    def test_list_companies_with_multiple_admins(self):
+    def test_list_companies_with_multiple_admins(self, api_client):
         company = CompanyFactory(convention=None)
         CompanyMembershipFactory(company=company, joined_at=datetime.datetime(2021, 1, 1, tzinfo=datetime.UTC))
         latest_admin = CompanyMembershipFactory(
@@ -188,8 +186,8 @@ class C4CompanyAPITestCase(APITestCase):
         ).user
 
         num_queries = NUM_QUERIES
-        with self.assertNumQueries(num_queries):
-            response = self.client.get(self.url, format="json", **self.auth_header)
+        with assertNumQueries(num_queries):
+            response = api_client.get(self.url, format="json", **self.auth_header)
         assert response.status_code == 200
 
         company_data_list = response.json()["results"]
@@ -199,12 +197,12 @@ class C4CompanyAPITestCase(APITestCase):
         assert company_data_list[0]["admin_email"] == latest_admin.email
 
     @override_settings(C4_TOKEN="C4SecretToken")
-    def test_list_no_reserved_companies(self):
+    def test_list_no_reserved_companies(self, api_client):
         CompanyFactory(kind=COMPANY_KIND_RESERVED, convention=None)
 
         num_queries = NUM_QUERIES
         num_queries -= 2  # no company and no prefetch memberships
-        with self.assertNumQueries(num_queries):
-            response = self.client.get(self.url, format="json", **self.auth_header)
+        with assertNumQueries(num_queries):
+            response = api_client.get(self.url, format="json", **self.auth_header)
         assert response.status_code == 200
         assert response.json() == {"count": 0, "next": None, "previous": None, "results": []}

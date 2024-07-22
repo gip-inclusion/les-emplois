@@ -4,9 +4,9 @@ import json
 from unittest.mock import patch
 
 import httpx
+import pytest
 import respx
 from django.core import management
-from django.test import override_settings
 from django.utils import timezone
 from freezegun import freeze_time
 
@@ -25,24 +25,22 @@ from tests.approvals.factories import ApprovalFactory, CancelledApprovalFactory,
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import TestCase
 
 
-@override_settings(
-    API_ESD={
+@pytest.fixture(autouse=True)
+def mock_api(settings):
+    respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
+        200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
+    )
+    settings.API_ESD = {
         "BASE_URL": "https://pe.fake",
         "AUTH_BASE_URL": "https://auth.fr",
         "KEY": "foobar",
         "SECRET": "pe-secret",
     }
-)
-class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
-    def setUp(self):
-        super().setUp()
-        respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
-            200, json={"token_type": "foo", "access_token": "batman", "expires_in": 3600}
-        )
 
+
+class TestApprovalNotifyPoleEmploiIntegration:
     def test_invalid_job_seeker_for_pole_emploi(self):
         """
         Error case: our job seeker is not valid (from PoleEmploi’s point of view: here, the NIR is missing)
@@ -198,7 +196,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         assert approval.pe_notification_exit_code is None
 
     @respx.mock
-    def test_notification_stays_pending_if_approval_starts_after_today(self):
+    def test_notification_stays_pending_if_approval_starts_after_today(self, caplog):
         now = timezone.now()
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
             200, json=API_RECHERCHE_RESULT_KNOWN
@@ -206,12 +204,12 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         tomorrow = (now + datetime.timedelta(days=1)).date()
         approval = ApprovalFactory(start_at=tomorrow)
-        with freeze_time() as frozen_now, self.assertLogs("itou.approvals.models") as logs:
+        with freeze_time() as frozen_now:
             approval.notify_pole_emploi()
         assert (
-            f"notify_pole_emploi approval={approval} "
+            f"! notify_pole_emploi approval={approval} "
             f"start_at={approval.start_at} "
-            f"starts after today={now.date()}" in logs.output[0]
+            f"starts after today={now.date()}" == caplog.messages[0]
         )
         approval.refresh_from_db()
         assert approval.pe_notification_status == "notification_pending"
@@ -337,15 +335,7 @@ class ApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         )
 
 
-@override_settings(
-    API_ESD={
-        "BASE_URL": "https://pe.fake",
-        "AUTH_BASE_URL": "https://auth.fr",
-        "KEY": "foobar",
-        "SECRET": "pe-secret",
-    }
-)
-class CancelledApprovalNotifyPoleEmploiIntegrationTest(TestCase):
+class TestCancelledApprovalNotifyPoleEmploiIntegration:
     def setUp(self):
         super().setUp()
         respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(
@@ -482,19 +472,18 @@ class CancelledApprovalNotifyPoleEmploiIntegrationTest(TestCase):
 
     @respx.mock
     @freeze_time()
-    def test_notification_stays_pending_if_approval_starts_after_today(self):
+    def test_notification_stays_pending_if_approval_starts_after_today(self, caplog):
         respx.post("https://pe.fake/rechercheindividucertifie/v1/rechercheIndividuCertifie").respond(
             200, json=API_RECHERCHE_RESULT_KNOWN
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
         tomorrow = (timezone.now() + datetime.timedelta(days=1)).date()
         cancelled_approval = CancelledApprovalFactory(start_at=tomorrow)
-        with self.assertLogs("itou.approvals.models") as logs:
-            cancelled_approval.notify_pole_emploi()
+        cancelled_approval.notify_pole_emploi()
         assert (
-            f"notify_pole_emploi cancelledapproval={cancelled_approval} "
+            f"! notify_pole_emploi cancelledapproval={cancelled_approval} "
             f"start_at={cancelled_approval.start_at} "
-            f"starts after today={timezone.now().date()}" in logs.output[0]
+            f"starts after today={timezone.now().date()}" == caplog.messages[0]
         )
         cancelled_approval.refresh_from_db()
         assert cancelled_approval.pe_notification_status == "notification_pending"
@@ -561,7 +550,7 @@ class CancelledApprovalNotifyPoleEmploiIntegrationTest(TestCase):
         assert cancelled_approval.pe_notification_exit_code == "INVALID_SIAE_KIND"
 
 
-class ApprovalsSendToPeManagementTestCase(TestCase):
+class TestApprovalsSendToPeManagement:
     @patch.object(CancelledApproval, "notify_pole_emploi")
     @patch.object(Approval, "notify_pole_emploi")
     @patch("itou.approvals.management.commands.send_approvals_to_pe.sleep")
@@ -644,15 +633,7 @@ class ApprovalsSendToPeManagementTestCase(TestCase):
             assert approval.pe_notification_status == api_enums.PEApiNotificationStatus.READY
 
 
-@override_settings(
-    API_ESD={
-        "BASE_URL": "https://pe.fake",
-        "AUTH_BASE_URL": "https://auth.fr",
-        "KEY": "foobar",
-        "SECRET": "pe-secret",
-    }
-)
-class PoleEmploiApprovalNotifyPoleEmploiIntegrationTest(TestCase):
+class TestPoleEmploiApprovalNotifyPoleEmploiIntegration:
     @respx.mock
     def test_notification_accepted_nominal(self):
         respx.post("https://auth.fr/connexion/oauth2/access_token?realm=%2Fpartenaire").respond(

@@ -1,10 +1,9 @@
 from django.urls import reverse
+from pytest_django.asserts import assertContains
 
-from tests.utils.test import TestCase
 
-
-class ReleaseTest(TestCase):
-    def test_list(self):
+class TestRelease:
+    def test_list(self, client):
         url = reverse("releases:list")
-        response = self.client.get(url)
-        self.assertContains(response, "Journal des modifications")
+        response = client.get(url)
+        assertContains(response, "Journal des modifications")

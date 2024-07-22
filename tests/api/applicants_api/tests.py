@@ -1,7 +1,7 @@
 import factory
+import pytest
 from django.urls import reverse_lazy
-from rest_framework.test import APIClient, APITestCase
-from unittest_parametrize import ParametrizedTestCase, parametrize
+from pytest_django.asserts import assertNumQueries
 
 from tests.asp.factories import CommuneFactory, CountryFactory
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
@@ -12,69 +12,65 @@ from tests.users.factories import EmployerFactory, JobSeekerFactory
 from tests.utils.test import BASE_NUM_QUERIES
 
 
-class ApplicantsAPITest(APITestCase, ParametrizedTestCase):
+class TestApplicantsAPI:
     URL = reverse_lazy("v1:applicants-list")
 
-    def setUp(self):
-        super().setUp()
-        self.client = APIClient()
-
-    def test_login_as_job_seeker(self):
+    def test_login_as_job_seeker(self, api_client):
         user = JobSeekerFactory()
-        self.client.force_authenticate(user)
+        api_client.force_authenticate(user)
 
-        response = self.client.get(self.URL, format="json")
+        response = api_client.get(self.URL, format="json")
         assert response.status_code == 403
 
-    def test_login_as_prescriber_organisation(self):
+    def test_login_as_prescriber_organisation(self, api_client):
         user = PrescriberOrganizationWithMembershipFactory().members.first()
-        self.client.force_authenticate(user)
+        api_client.force_authenticate(user)
 
-        response = self.client.get(self.URL, format="json")
+        response = api_client.get(self.URL, format="json")
         assert response.status_code == 403
 
-    def test_login_as_institution(self):
+    def test_login_as_institution(self, api_client):
         user = InstitutionWithMembershipFactory().members.first()
-        self.client.force_authenticate(user)
+        api_client.force_authenticate(user)
 
-        response = self.client.get(self.URL, format="json")
+        response = api_client.get(self.URL, format="json")
         assert response.status_code == 403
 
-    def test_api_user_has_non_memberships(self):
+    def test_api_user_has_non_memberships(self, api_client):
         # Connected user must have a membership
         user = EmployerFactory()
 
-        self.client.force_authenticate(user)
-        response = self.client.get(self.URL, format="json")
+        api_client.force_authenticate(user)
+        response = api_client.get(self.URL, format="json")
 
         assert response.status_code == 403
 
-    def test_api_user_is_not_only_admin(self):
+    def test_api_user_is_not_only_admin(self, api_client):
         # Connected user must be admin of all their structures
         user = CompanyFactory(with_membership=True).members.first()
         CompanyMembershipFactory(is_admin=False, user=user)
 
-        self.client.force_authenticate(user)
-        response = self.client.get(self.URL, format="json")
+        api_client.force_authenticate(user)
+        response = api_client.get(self.URL, format="json")
 
         assert response.status_code == 403
 
-    def test_login_as_siae(self):
+    def test_login_as_siae(self, api_client):
         # Connect with an admin user with member of a single SIAE
         user = CompanyFactory(with_membership=True).members.first()
-        self.client.force_authenticate(user)
+        api_client.force_authenticate(user)
 
-        with self.assertNumQueries(
+        with assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # companymembership.is_admin check (ApplicantsAPIPermission)
             + 1  # get_queryset: job_application subquery (job_applications__to_company_id__in)
             + 1  # get queryset main query.
         ):
-            response = self.client.get(self.URL, format="json")
+            response = api_client.get(self.URL, format="json")
         assert response.status_code == 200
         assert response.json().get("results") == []
 
-    @parametrize(
+    @pytest.mark.parametrize(
         ("mode_multi_structures", "uid_structures", "expected_first_names"),
         [
             ("", "", ["Bob", "Dylan"]),
@@ -90,7 +86,9 @@ class ApplicantsAPITest(APITestCase, ParametrizedTestCase):
             ("", "326dea3d-d17d-4f2c-9ffa-8e9cb305ae44", []),
         ],
     )
-    def test_login_as_siae_multiple_memberships(self, mode_multi_structures, uid_structures, expected_first_names):
+    def test_login_as_siae_multiple_memberships(
+        self, api_client, mode_multi_structures, uid_structures, expected_first_names
+    ):
         # Populate database with extra data to make sure filters work.
         JobApplicationFactory.create_batch(2, to_company_id=CompanyFactory().pk)
 
@@ -123,10 +121,10 @@ class ApplicantsAPITest(APITestCase, ParametrizedTestCase):
             # Subquery returned results, so the main query is executed.
             num_queries = num_queries + 1  # get_queryset: Fetch User + Profile
 
-        self.client.force_authenticate(employer)
+        api_client.force_authenticate(employer)
 
-        with self.assertNumQueries(num_queries):
-            response = self.client.get(
+        with assertNumQueries(num_queries):
+            response = api_client.get(
                 self.URL,
                 format="json",
                 data={
@@ -139,7 +137,7 @@ class ApplicantsAPITest(APITestCase, ParametrizedTestCase):
             assert sorted(expected_first_names) == sorted([result["prenom"] for result in results])
             assert len(results) == len(expected_first_names)
 
-    def test_applicant_data_mode_multiple_structures(self):
+    def test_applicant_data_mode_multiple_structures(self, api_client):
         # First company: 2 applicants, 3 job applications.
         company_1 = CompanyFactory(with_membership=True)
         employer = company_1.members.first()
@@ -176,10 +174,10 @@ class ApplicantsAPITest(APITestCase, ParametrizedTestCase):
             + 1  # get_queryset: Fetch User + Profile
         )
 
-        self.client.force_authenticate(employer)
+        api_client.force_authenticate(employer)
 
-        with self.assertNumQueries(num_queries):
-            response = self.client.get(self.URL, format="json", data={"mode_multi_structures": "1"})
+        with assertNumQueries(num_queries):
+            response = api_client.get(self.URL, format="json", data={"mode_multi_structures": "1"})
 
         assert response.status_code == 200
         results = response.json().get("results")
@@ -218,7 +216,7 @@ class ApplicantsAPITest(APITestCase, ParametrizedTestCase):
             },
         ] == results
 
-    def test_applicant_data(self):
+    def test_applicant_data(self, api_client):
         company = CompanyFactory(with_membership=True)
         job_seeker1 = JobApplicationFactory(to_company=company).job_seeker
         # Will not refactor ASP factories:
@@ -245,15 +243,15 @@ class ApplicantsAPITest(APITestCase, ParametrizedTestCase):
         job_seeker2.jobseeker_profile.save()
         user = company.members.first()
 
-        self.client.force_authenticate(user)
-        with self.assertNumQueries(
+        api_client.force_authenticate(user)
+        with assertNumQueries(
             BASE_NUM_QUERIES
             + 1  # companymembership.is_admin check (ApplicantsAPIPermission)
             + 1  # get_queryset: companies_uids aggregation
             + 1  # get_queryset: Count job_applications (Exists JobApplication)
             + 1  # get_queryset: Fetch User + Profile
         ):
-            response = self.client.get(self.URL, format="json")
+            response = api_client.get(self.URL, format="json")
 
         assert response.status_code == 200
 
@@ -281,14 +279,14 @@ class ApplicantsAPITest(APITestCase, ParametrizedTestCase):
                 "uid_structures": [str(company.uid)],
             } == result
 
-    def test_rate_limiting(self):
+    def test_rate_limiting(self, api_client):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
-        self.client.force_authenticate(user)
+        api_client.force_authenticate(user)
         # settings.REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"]["user"]
         for _ in range(120):
-            response = self.client.get(self.URL, format="json")
+            response = api_client.get(self.URL, format="json")
             assert response.status_code == 200
-        response = self.client.get(self.URL, format="json")
+        response = api_client.get(self.URL, format="json")
         # Rate-limited.
         assert response.status_code == 429

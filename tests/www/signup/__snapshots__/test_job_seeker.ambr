@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: JobSeekerSignupTest.test_job_seeker_signup[job_seeker_signup_form]
+# name: TestJobSeekerSignup.test_job_seeker_signup[job_seeker_signup_form]
   '''
   <form action="/signup/job_seeker" class="js-prevent-multiple-submit" data-matomo-name="signup-job-seeker-identity" method="post" role="form">
   

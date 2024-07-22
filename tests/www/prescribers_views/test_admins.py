@@ -4,11 +4,10 @@ from django.urls.exceptions import NoReverseMatch
 
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.prescribers.factories import PrescriberOrganizationWith2MembershipFactory
-from tests.utils.test import TestCase
 
 
-class PrescribersOrganizationAdminMembersManagementTest(TestCase):
-    def test_add_admin(self):
+class TestPrescribersOrganizationAdminMembersManagement:
+    def test_add_admin(self, client):
         """
         Check the ability for an admin to add another admin to the organization
         """
@@ -16,21 +15,21 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         admin = organization.members.filter(prescribermembership__is_admin=True).first()
         guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
-        self.client.force_login(admin)
+        client.force_login(admin)
         url = reverse("prescribers_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
 
         # Redirection to confirm page
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         # Confirm action
-        response = self.client.post(url)
+        response = client.post(url)
         assert response.status_code == 302
 
         organization.refresh_from_db()
         assert_set_admin_role__creation(user=guest, organization=organization)
 
-    def test_remove_admin(self):
+    def test_remove_admin(self, client):
         """
         Check the ability for an admin to remove another admin
         """
@@ -43,21 +42,21 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         membership.save()
         assert guest in organization.active_admin_members
 
-        self.client.force_login(admin)
+        client.force_login(admin)
         url = reverse("prescribers_views:update_admin_role", kwargs={"action": "remove", "user_id": guest.id})
 
         # Redirection to confirm page
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         # Confirm action
-        response = self.client.post(url)
+        response = client.post(url)
         assert response.status_code == 302
 
         organization.refresh_from_db()
         assert_set_admin_role__removal(user=guest, organization=organization)
 
-    def test_admin_management_permissions(self):
+    def test_admin_management_permissions(self, client):
         """
         Non-admin users can't update admin members
         """
@@ -65,27 +64,27 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         admin = organization.members.filter(prescribermembership__is_admin=True).first()
         guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
-        self.client.force_login(guest)
+        client.force_login(guest)
         url = reverse("prescribers_views:update_admin_role", kwargs={"action": "remove", "user_id": admin.id})
 
         # Redirection to confirm page
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 403
 
         # Confirm action
-        response = self.client.post(url)
+        response = client.post(url)
         assert response.status_code == 403
 
         # Add self as admin with no privilege
         url = reverse("prescribers_views:update_admin_role", kwargs={"action": "add", "user_id": guest.id})
 
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 403
 
-        response = self.client.post(url)
+        response = client.post(url)
         assert response.status_code == 403
 
-    def test_suspicious_action(self):
+    def test_suspicious_action(self, client):
         """
         Test "suspicious" actions: action code not registered for use (even if admin)
         """
@@ -94,7 +93,7 @@ class PrescribersOrganizationAdminMembersManagementTest(TestCase):
         admin = organization.members.filter(prescribermembership__is_admin=True).first()
         guest = organization.members.filter(prescribermembership__is_admin=False).first()
 
-        self.client.force_login(guest)
+        client.force_login(guest)
 
         # update: possible actions are now filtered via RE_PATH in urls.py
         with pytest.raises(NoReverseMatch):

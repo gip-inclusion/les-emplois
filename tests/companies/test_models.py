@@ -26,10 +26,9 @@ from tests.companies.factories import (
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import TestCase
 
 
-class CompanyFactoriesTest(TestCase):
+class TestCompanyFactories:
     def test_company_with_membership_factory(self):
         company = CompanyFactory(with_membership=True)
         assert company.members.count() == 1
@@ -61,7 +60,7 @@ class CompanyFactoriesTest(TestCase):
         assert company.active_admin_members.count() == 1
 
 
-class CompanyModelTest(TestCase):
+class TestCompanyModel:
     def test_accept_survey_url(self):
         company = CompanyFactory(kind=CompanyKind.EI, department="57")
         url = company.accept_survey_url
@@ -163,7 +162,7 @@ class CompanyModelTest(TestCase):
         assert company_2.has_member(company_1_admin_user)
         assert not company_2.has_admin(company_1_admin_user)
 
-    def test_new_signup_activation_email_to_official_contact(self):
+    def test_new_signup_activation_email_to_official_contact(self, django_capture_on_commit_callbacks):
         company = CompanyFactory(with_membership=True)
         token = company.get_token()
         with mock.patch("itou.utils.tokens.CompanySignupTokenGenerator.make_token", return_value=token):
@@ -171,7 +170,7 @@ class CompanyModelTest(TestCase):
             request = factory.get("/")
 
             message = company.new_signup_activation_email_to_official_contact(request)
-            with self.captureOnCommitCallbacks(execute=True):
+            with django_capture_on_commit_callbacks(execute=True):
                 message.send()
 
             assert len(mail.outbox) == 1
@@ -270,7 +269,7 @@ class CompanyModelTest(TestCase):
             company.add_or_activate_member(non_employer)
 
 
-class SiaeQuerySetTest(TestCase):
+class TestCompanyQuerySet:
     def test_with_count_recent_received_job_applications(self):
         company = CompanyFactory()
         model = JobApplicationFactory._meta.model
@@ -346,11 +345,7 @@ class SiaeQuerySetTest(TestCase):
         assert geiq.can_have_prior_action is True
 
 
-class JobDescriptionQuerySetTest(TestCase):
-    def setUp(self):
-        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
-        super().setUp()
-
+class TestJobDescriptionQuerySet:
     def test_with_annotation_is_popular(self):
         company = CompanyFactory(with_jobs=True)
         job_seeker = JobSeekerFactory()  # We don't care if it's always the same
@@ -397,6 +392,7 @@ class JobDescriptionQuerySetTest(TestCase):
         assert siae_job_description.job_applications_count == 1
 
     def test_is_active(self):
+        create_test_romes_and_appellations(("N1101", "N1105", "N1103", "N4105"))
         company = CompanyFactory(kind=CompanyKind.EI, convention=None)
         job = JobDescriptionFactory(company=company, is_active=False)
         assert JobDescription.objects.active().count() == 0
@@ -408,7 +404,7 @@ class JobDescriptionQuerySetTest(TestCase):
         assert JobDescription.objects.active().count() == 1
 
 
-class SiaeContractTypeTest(TestCase):
+class TestCompanyContractType:
     def test_choices_for_siae(self):
         # Test only for GEIQ as the logic is the same for other Siae kind.
         expected = [
