@@ -1844,8 +1844,9 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         # Check that the NIR field is initially disabled
         # since the job seeker has a lack_of_nir_reason
         assert response.context["form_personal_data"].fields["nir"].disabled
-        NEW_NIR = "197013625838386"
+        self.assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
 
+        NEW_NIR = "197013625838386"
         post_data = {
             # Data for `JobSeekerPersonalDataForm`.
             "nir": NEW_NIR,
@@ -1892,6 +1893,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         # Check that the NIR field is initially disabled
         # since the job seeker has a lack_of_nir_reason
         assert response.context["form_personal_data"].fields["nir"].disabled
+        self.assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
 
         # Check that the tally link is there
         self.assertContains(

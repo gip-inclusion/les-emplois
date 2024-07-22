@@ -267,6 +267,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         self.assertContains(response, DISABLED_NIR)
         self.assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label, html=True)
         self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+        self.assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
 
         NEW_NIR = "1 970 13625838386"
         post_data = {

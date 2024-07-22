@@ -161,6 +161,7 @@ class EditJobSeekerInfo(TestCase):
         self.assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label, html=True)
         self.assertContains(response, DISABLED_NIR)
         self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
+        self.assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
 
         NEW_NIR = "1 970 13625838386"
         post_data = {
@@ -243,6 +244,9 @@ class EditJobSeekerInfo(TestCase):
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
         assert job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.TEMPORARY_NUMBER
         assert job_seeker.jobseeker_profile.nir == ""
+
+        response = self.client.get(url)
+        self.assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
 
         post_data.update(
             {
