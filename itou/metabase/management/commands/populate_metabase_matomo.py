@@ -59,6 +59,7 @@ PUBLIC_DASHBOARDS = {
     "suivi-demandes-prolongation": "tb 336 - Suivi des prolongations",
     "bilan-candidatures-iae": "tb 337 - Bilan de la phase de candidatures en IAE",
     "requetage-ft": "tb 406 - Requêtage des données de l'expérimentation RSA",
+    "candidat-file-active-IAE": "tb 408 - Candidats dans la file active",
     # Note: keep those commented for reference. They're not used anymore but if we ever
     # need to regenerate values for the Q1 2022 or before, they're going to be required.
     # "recrutement": "tb 116 - Recrutement",
