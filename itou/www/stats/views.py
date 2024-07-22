@@ -299,8 +299,6 @@ def stats_siae_follow_siae_evaluation(request):
 
 @login_required
 def stats_siae_hiring_report(request):
-    if not utils.can_view_stats_siae_hiring_report(request):
-        raise PermissionDenied
     return render_stats_siae(request=request, page_title="Déclaration d’embauche")
 
 

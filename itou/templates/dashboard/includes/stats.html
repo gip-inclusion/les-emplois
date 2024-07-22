@@ -60,12 +60,10 @@
                                 <span>Suivi du contrôle a posteriori pour ma ou mes structures</span>
                             </a>
                         </li>
-                    {% endif %}
-                    {% if can_view_stats_siae_hiring_report %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'stats:stats_siae_hiring_report' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                                <span>Déclarations d’embauche réalisées par ma ou mes structures</span>
+                                <span>Déclarations d’embauche réalisées par ma ou mes structures sur le service des emplois</span>
                             </a>
                             {% include "dashboard/includes/stats_new_badge.html" %}
                         </li>
