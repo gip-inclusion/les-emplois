@@ -1,5 +1,26 @@
 # Journal des modifications
 
+## 2024-07-22
+
+### Ajouté
+
+- [Fiche de poste: ajout d'un bouton "Voir tous les métiers" pour accéder aux autres postes facilement](https://github.com/gip-inclusion/les-emplois/pull/4424)
+- [GPS: Ajouter le département des bénéficiaires dans l’admin](https://github.com/gip-inclusion/les-emplois/pull/4436)
+- [GPS: Ajouter un filtre par département dans l’admin](https://github.com/gip-inclusion/les-emplois/pull/4435)
+- [Statistiques: Ajout des données des groupes de suivi](https://github.com/gip-inclusion/les-emplois/pull/4438)
+- [UX/UI : Ajout d'une alerte Maze](https://github.com/gip-inclusion/les-emplois/pull/4399)
+
+### Modifié
+
+- [Admin: Correction de l'export des entreprises](https://github.com/gip-inclusion/les-emplois/pull/4416)
+- [admin: Remonter l’annexe financière valide en haut de liste](https://github.com/gip-inclusion/les-emplois/pull/4422)
+- [Candidature: ajout d'onglets dans les fiches candidature](https://github.com/gip-inclusion/les-emplois/pull/4404) 🖼
+- [Candidature: Bloquer l'embauche trop loin dans le futur](https://github.com/gip-inclusion/les-emplois/pull/4437)
+- [Contrôle a posteriori: envoi de la notification aux DDETS au moment du blocage des soumissions](https://github.com/gip-inclusion/les-emplois/pull/4417)
+- [GPS: Affichage de la date des objets créés par script](https://github.com/gip-inclusion/les-emplois/pull/4413)
+- [PASS IAE: Affichage de l'estimation de durée restante](https://github.com/gip-inclusion/les-emplois/pull/4434)
+- [PASS IAE: Amélioration de l'affichage de temps restant](https://github.com/gip-inclusion/les-emplois/pull/4441)
+
 ## 2024-07-15
 
 ### Ajouté
