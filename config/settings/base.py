@@ -444,7 +444,6 @@ STATS_SIAE_PK_WHITELIST = json.loads(os.getenv("STATS_SIAE_PK_WHITELIST", "[]"))
 STATS_SIAE_HIRING_REPORT_REGION_WHITELIST = ["Occitanie"]
 STATS_CD_DEPARTMENT_WHITELIST = ["13", "16", "18", "31", "37", "38", "41", "45", "48", "49", "55", "63", "93"]
 STATS_ACI_DEPARTMENT_WHITELIST = ["31", "84"]
-STATS_PH_PRESCRIPTION_REGION_WHITELIST = ["Pays de la Loire", "Nouvelle-Aquitaine", "Île-de-France"]
 
 # Slack notifications sent by Metabase cronjobs.
 SLACK_CRON_WEBHOOK_URL = os.getenv("SLACK_CRON_WEBHOOK_URL")
