@@ -152,15 +152,13 @@
                                 <span>Focus auto-prescription des structures de mon département</span>
                             </a>
                         </li>
-                        {% if can_view_stats_ddets_iae_ph_prescription %}
-                            <li class="d-flex justify-content-between align-items-center mb-3">
-                                <a href="{% url 'stats:stats_ddets_iae_ph_prescription' %}" class="btn-link btn-ico">
-                                    <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                                    <span>Suivi des prescriptions des prescripteurs habilités de mon département</span>
-                                </a>
-                                {% include "dashboard/includes/stats_new_badge.html" %}
-                            </li>
-                        {% endif %}
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'stats:stats_ddets_iae_ph_prescription' %}" class="btn-link btn-ico">
+                                <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                                <span>Suivi des prescriptions des prescripteurs habilités de mon département</span>
+                            </a>
+                            {% include "dashboard/includes/stats_new_badge.html" %}
+                        </li>
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'stats:stats_ddets_iae_follow_siae_evaluation' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
@@ -223,15 +221,13 @@
                                 <span>Les auto-prescription des structures de ma région</span>
                             </a>
                         </li>
-                        {% if can_view_stats_dreets_iae_ph_prescription %}
-                            <li class="d-flex justify-content-between align-items-center mb-3">
-                                <a href="{% url 'stats:stats_dreets_iae_ph_prescription' %}" class="btn-link btn-ico">
-                                    <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
-                                    <span>Suivi des prescriptions des prescripteurs habilités de ma région</span>
-                                </a>
-                                {% include "dashboard/includes/stats_new_badge.html" %}
-                            </li>
-                        {% endif %}
+                        <li class="d-flex justify-content-between align-items-center mb-3">
+                            <a href="{% url 'stats:stats_dreets_iae_ph_prescription' %}" class="btn-link btn-ico">
+                                <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
+                                <span>Suivi des prescriptions des prescripteurs habilités de ma région</span>
+                            </a>
+                            {% include "dashboard/includes/stats_new_badge.html" %}
+                        </li>
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="{% url 'stats:stats_dreets_iae_follow_siae_evaluation' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>

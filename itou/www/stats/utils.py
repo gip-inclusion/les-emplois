@@ -171,13 +171,6 @@ def can_view_stats_ddets_iae_aci(request):
     )
 
 
-def can_view_stats_ddets_iae_ph_prescription(request):
-    return (
-        can_view_stats_ddets_iae(request)
-        and request.current_organization.region in settings.STATS_PH_PRESCRIPTION_REGION_WHITELIST
-    )
-
-
 def can_view_stats_ddets_log(request):
     return (
         request.user.is_labor_inspector
@@ -194,13 +187,6 @@ def can_view_stats_dreets_iae(request):
         request.user.is_labor_inspector
         and isinstance(request.current_organization, Institution)
         and request.current_organization.kind == InstitutionKind.DREETS_IAE
-    )
-
-
-def can_view_stats_dreets_iae_ph_prescription(request):
-    return (
-        can_view_stats_dreets_iae(request)
-        and request.current_organization.region in settings.STATS_PH_PRESCRIPTION_REGION_WHITELIST
     )
 
 

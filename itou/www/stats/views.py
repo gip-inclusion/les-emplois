@@ -547,9 +547,6 @@ def stats_ddets_iae_auto_prescription(request):
 
 @login_required
 def stats_ddets_iae_ph_prescription(request):
-    get_current_institution_or_404(request)
-    if not utils.can_view_stats_ddets_iae_ph_prescription(request):
-        raise PermissionDenied
     return render_stats_ddets_iae(request=request, page_title="Suivi des prescriptions des prescripteurs habilités")
 
 
@@ -653,9 +650,6 @@ def stats_dreets_iae_auto_prescription(request):
 
 @login_required
 def stats_dreets_iae_ph_prescription(request):
-    get_current_institution_or_404(request)
-    if not utils.can_view_stats_dreets_iae_ph_prescription(request):
-        raise PermissionDenied
     return render_stats_dreets_iae(request=request, page_title="Suivi des prescriptions des prescripteurs habilités")
 
 

@@ -190,7 +190,6 @@ def test_stats_ddets_iae_log_visit(client, settings, view_name):
     user = institution.members.get()
 
     settings.STATS_ACI_DEPARTMENT_WHITELIST = [institution.department]
-    settings.STATS_PH_PRESCRIPTION_REGION_WHITELIST = [institution.region]
 
     client.force_login(user)
 
@@ -261,7 +260,6 @@ def test_stats_dreets_iae_log_visit(client, settings, view_name):
     institution = InstitutionWithMembershipFactory(kind="DREETS IAE")
     user = institution.members.get()
 
-    settings.STATS_PH_PRESCRIPTION_REGION_WHITELIST = [institution.region]
     client.force_login(user)
 
     assertQuerySetEqual(StatsDashboardVisit.objects.all(), [])
