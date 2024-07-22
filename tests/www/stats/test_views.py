@@ -153,7 +153,6 @@ def test_stats_siae_log_visit(client, settings, view_name):
 
     settings.STATS_SIAE_USER_PK_WHITELIST = [user.pk]
     settings.STATS_SIAE_PK_WHITELIST = [company.pk]
-    settings.STATS_SIAE_HIRING_REPORT_REGION_WHITELIST = [company.region]
     settings.STATS_ACI_DEPARTMENT_WHITELIST = [company.department]
 
     client.force_login(user)
