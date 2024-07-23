@@ -47,7 +47,7 @@
                 {% if job.is_active and not siae.block_job_applications %}
                     {% if job_app_to_transfer %}
                         <div class="form-group col col-lg-auto">
-                            <a href=""
+                            <a href="{% url 'apply:job_application_external_transfer_step_2' job_application_id=job_app_to_transfer.pk company_pk=siae.pk %}?job_description_id={{ job.pk }}&back_url={{ request.get_full_path|urlencode }}"
                                class="btn btn-lg btn-white btn-block btn-ico"
                                {% matomo_event "candidature" "clic" "job_app_transfer" %}
                                aria-label="Transférer la candidature à l'employeur inclusif {{ siae.display_name }}">

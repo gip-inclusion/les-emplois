@@ -143,6 +143,7 @@ class ApplyStepBaseView(LoginRequiredMixin, TemplateView):
             "auto_prescription_process": self.auto_prescription_process,
             "reset_url": reverse("dashboard:index"),
             "is_gps": self.is_gps,
+            "page_title": "Postuler",
         }
 
 
@@ -875,6 +876,9 @@ class ApplicationJobsView(ApplicationBaseView):
 
         self.form = None
 
+    def get_initial(self):
+        return {"selected_jobs": self.apply_session.get("selected_jobs", [])}
+
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
 
@@ -883,23 +887,24 @@ class ApplicationJobsView(ApplicationBaseView):
 
         self.form = ApplicationJobsForm(
             self.company,
-            initial={"selected_jobs": self.apply_session.get("selected_jobs", [])},
+            initial=self.get_initial(),
             data=request.POST or None,
+        )
+
+    def get_next_url(self):
+        # dispatching to IAE or GEIQ eligibility
+        path_name = (
+            "application_geiq_eligibility" if self.company.kind == CompanyKind.GEIQ else "application_eligibility"
+        )
+        return reverse(
+            "apply:" + path_name,
+            kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
         )
 
     def post(self, request, *args, **kwargs):
         if self.form.is_valid():
             self.apply_session.set("selected_jobs", self.form.cleaned_data.get("selected_jobs", []))
-            # dispatching to IAE or GEIQ eligibility
-            path_name = (
-                "application_geiq_eligibility" if self.company.kind == CompanyKind.GEIQ else "application_eligibility"
-            )
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:" + path_name,
-                    kwargs={"company_pk": self.company.pk, "job_seeker_public_id": self.job_seeker.public_id},
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url())
 
         return self.render_to_response(self.get_context_data(**kwargs))
 
