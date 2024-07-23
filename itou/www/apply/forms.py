@@ -371,6 +371,36 @@ class SubmitJobApplicationForm(forms.Form):
         message.help_text = help_text
 
 
+class TransferJobApplicationForm(SubmitJobApplicationForm):
+    keep_original_resume = forms.NullBooleanField(
+        widget=forms.RadioSelect(
+            choices=(
+                (True, "Oui, conserver le CV de la candidature d’origine."),
+                (False, "Non. Ne pas conserver le CV de la candidature d’origine. Je peux joindre un nouveau CV."),
+            )
+        ),
+        required=False,
+    )
+
+    def __init__(self, company, user, auto_prescription_process, *args, original_job_application, **kwargs):
+        super().__init__(company, user, auto_prescription_process, *args, **kwargs)
+        self.original_job_application = original_job_application
+        if self.original_job_application.resume_link:
+            self.fields["resume"].label = "Joindre un nouveau Curriculum Vitae (CV)"
+
+    def clean_keep_original_resume(self):
+        value = self.cleaned_data.get("keep_original_resume")
+        if self.original_job_application.resume_link and value is None:
+            raise forms.ValidationError("Ce champ est obligatoire.")
+        return value
+
+    def clean(self):
+        super().clean()
+        if self.cleaned_data.get("keep_original_resume") and self.cleaned_data.get("resume"):
+            # Don't load the file since we won't keep it
+            del self.cleaned_data["resume"]
+
+
 class JobApplicationRefusalReasonForm(forms.Form):
     refusal_reason = forms.ChoiceField(
         label="Choisir le motif de refus",

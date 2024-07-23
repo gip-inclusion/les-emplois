@@ -1,0 +1,61 @@
+{% extends "apply/submit/application/resume.html" %}
+{% load django_bootstrap5 %}
+{% load static %}
+{% load matomo %}
+{% load buttons_form %}
+
+{% block form_errors %}
+    <div id="form_errors">{% bootstrap_form_errors form type="non_fields" %}</div>
+{% endblock %}
+
+{% block form_resume_field %}
+    {% if job_app_to_transfer.resume_link %}
+        <h4>Curriculum Vitae (CV)</h4>
+        <div class="form-group">
+            <div class="d-flex">
+                <label class="form-label mb-0" for="id_keep_original_resume">
+                    Souhaitez-vous conserver le CV présent dans la candidature d’origine ?
+                </label>
+                <a href="{{ job_app_to_transfer.resume_link }}" class="btn-link btn-ico ms-3" target="_blank">
+                    <i class="ri-eye-line ri-lg font-weight-normal"></i>
+                    <span>Afficher</span>
+                </a>
+            </div>
+            <div class="form-text mb-0">Pour information, une candidature ne peut contenir qu’un seul fichier.</div>
+        </div>
+        {% bootstrap_field form.keep_original_resume show_label=False %}
+
+        {% bootstrap_field form.resume wrapper_class="collapse collapse-resume" %}
+    {% else %}
+        {% bootstrap_field form.resume %}
+    {% endif %}
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+
+    <script nonce="{{ CSP_NONCE }}">
+        htmx.onLoad((target) => {
+            const keepOriginalResume = target.querySelector("#id_keep_original_resume");
+            if (keepOriginalResume) {
+                const collapseResume = bootstrap.Collapse.getOrCreateInstance(
+                    target.querySelector(".collapse-resume"), {
+                        toggle: false
+                    },
+                );
+                window.addEventListener("pageshow", () => {
+                    if (target.querySelector("#id_keep_original_resume_1").checked) {
+                        collapseResume.show();
+                    }
+                });
+                keepOriginalResume.addEventListener("change", function collapse(event) {
+                    if (event.target.id === "id_keep_original_resume_1") {
+                        collapseResume.show();
+                    } else {
+                        collapseResume.hide();
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

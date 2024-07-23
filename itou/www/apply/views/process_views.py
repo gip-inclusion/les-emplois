@@ -1,4 +1,5 @@
 import datetime
+from urllib.parse import quote
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -29,9 +30,10 @@ from itou.www.apply.forms import (
     JobApplicationRefusalPrescriberAnswerForm,
     JobApplicationRefusalReasonForm,
     PriorActionForm,
+    TransferJobApplicationForm,
 )
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
-from itou.www.apply.views.submit_views import ApplicationJobsView
+from itou.www.apply.views.submit_views import ApplicationJobsView, ApplicationResumeView
 from itou.www.companies_views.views import CompanyCardView, JobDescriptionCardView
 from itou.www.search.views import EmployerSearchView
 
@@ -651,18 +653,22 @@ class JobApplicationExternalTransferStep1JobDescriptionCardView(LoginRequiredMix
         }
 
 
-class JobApplicationExternalTransferStep2View(ApplicationJobsView):
+class ApplicationOverrideMixin:
+    additionnal_related_models = []
+
     def setup(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             self.job_application = get_object_or_404(
                 JobApplication.objects.is_active_company_member(request.user).select_related(
-                    "job_seeker", "to_company"
+                    "job_seeker", "to_company", *self.additionnal_related_models
                 ),
                 pk=kwargs["job_application_id"],
             )
             kwargs["job_seeker_public_id"] = self.job_application.job_seeker.public_id
         return super().setup(request, *args, **kwargs)
 
+
+class JobApplicationExternalTransferStep2View(ApplicationOverrideMixin, ApplicationJobsView):
     def get_initial(self):
         selected_jobs = []
         if job_id := self.request.GET.get("job_description_id"):
@@ -670,7 +676,14 @@ class JobApplicationExternalTransferStep2View(ApplicationJobsView):
         return {"selected_jobs": selected_jobs}
 
     def get_next_url(self):
-        raise NotImplementedError()
+        base_url = reverse(
+            "apply:job_application_external_transfer_step_3",
+            kwargs={
+                "job_application_id": self.job_application.pk,
+                "company_pk": self.company.pk,
+            },
+        )
+        return f"{base_url}?back_url={quote(self.request.get_full_path())}"
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
@@ -682,6 +695,46 @@ class JobApplicationExternalTransferStep2View(ApplicationJobsView):
 
     def get_back_url(self):
         return get_safe_url(self.request, "back_url")
+
+
+class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, ApplicationResumeView):
+    additionnal_related_models = ["sender", "sender_company", "sender_prescriber_organization"]
+    template_name = "apply/process_external_transfer_resume.html"
+    form_class = TransferJobApplicationForm
+
+    def get_initial(self):
+        sender_display = self.job_application.sender.get_full_name()
+        if self.job_application.sender_company:
+            sender_display += f" {self.job_application.sender_company.name}"
+        elif self.job_application.sender_prescriber_organization:
+            sender_display += f" - {self.job_application.sender_prescriber_organization.name}"
+        initial_message = (
+            f"Le {self.job_application.created_at.strftime('%d/%m/%Y à %Hh%M')}, {sender_display} a écrit :\n\n"
+            + self.job_application.message
+        )
+        return super().get_initial() | {"message": initial_message}
+
+    def get_form_kwargs(self):
+        return super().get_form_kwargs() | {"original_job_application": self.job_application}
+
+    def form_valid(self):
+        new_job_application = super().form_valid()
+        self.job_application.external_transfer(target_company=self.company, user=self.request.user)
+        if self.form.cleaned_data.get("keep_original_resume"):
+            new_job_application.resume_link = self.job_application.resume_link
+            new_job_application.save()
+        return new_job_application
+
+    def get_next_url(self):
+        raise NotImplementedError()
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "job_app_to_transfer": self.job_application,
+            "step": 3,
+            "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk}),
+            "page_title": "Transférer la candidature",
+        }
 
 
 @login_required
