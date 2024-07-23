@@ -1,66 +1,61 @@
-from datetime import timedelta
+from datetime import date
 
 from django.core.cache import cache
+from django.forms import ModelForm
 from django.forms.models import model_to_dict
 from django.urls import reverse
 
-from itou.communications.admin_forms import AnnouncementCampaignAdminForm
 from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENT_CAMPAIGN_KEY
+from itou.communications.models import AnnouncementCampaign
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
 from tests.utils.test import TestCase, parse_response_to_soup
 
 
-class AnnouncementCampaignAdminFormTest(TestCase):
+class AnnouncementCampaignValidatorTest(TestCase):
+    class TestForm(ModelForm):
+        class Meta:
+            model = AnnouncementCampaign
+            fields = "__all__"
+
     def test_valid_campaign(self):
-        expected_form_fields = ["max_items", "start_date", "end_date"]
-        assert list(AnnouncementCampaignAdminForm().fields.keys()) == expected_form_fields
+        expected_form_fields = ["max_items", "start_date"]
+        assert list(self.TestForm().fields.keys()) == expected_form_fields
 
-        form = AnnouncementCampaignAdminForm(model_to_dict(AnnouncementCampaignFactory.build()))
+        form = self.TestForm(model_to_dict(AnnouncementCampaignFactory.build()))
         assert form.is_valid()
 
-    def test_invalid_campaign_date_range(self):
-        campaign = AnnouncementCampaignFactory.build()
-        campaign.end_date = campaign.start_date - timedelta(days=1)
+    def test_start_date_conflict(self):
+        AnnouncementCampaignFactory(start_date=date(2024, 1, 1))
+        campaign = AnnouncementCampaignFactory.build(start_date=date(2024, 1, 20))
+        form = self.TestForm(model_to_dict(campaign))
 
-        form = AnnouncementCampaignAdminForm(model_to_dict(campaign))
-
-        expected_form_errors = ["Impossible de finir la campagne avant qu'elle ne commence."]
+        expected_form_errors = ["Maximum 1 campagne par mois"]
         assert form.errors["__all__"] == expected_form_errors
 
-    def test_campaign_date_range_conflict(self):
-        existing_campaign = AnnouncementCampaignFactory()
-        campaign = AnnouncementCampaignFactory.build(
-            start_date=existing_campaign.start_date - timedelta(days=1), end_date=existing_campaign.end_date
-        )
-
-        form = AnnouncementCampaignAdminForm(model_to_dict(campaign))
-
-        expected_form_errors = [
-            (
-                "Il y a déjà une campagne entre ces dates "
-                f"({ existing_campaign.start_date } à { existing_campaign.end_date })"
-            )
-        ]
-        assert form.errors["__all__"] == expected_form_errors
-
-        campaign.start_date = existing_campaign.end_date + timedelta(days=1)
-        campaign.end_date = existing_campaign.end_date + timedelta(days=2)
-        form = AnnouncementCampaignAdminForm(model_to_dict(campaign))
+        campaign.start_date = date(2024, 2, 1)
+        form = self.TestForm(model_to_dict(campaign))
         assert form.is_valid()
 
-    def test_campaign_modify_date_range(self):
-        existing_campaign = AnnouncementCampaignFactory()
-        existing_campaign.start_date = existing_campaign.start_date - timedelta(days=1)
+    def test_modify_start_date(self):
+        existing_campaign = AnnouncementCampaignFactory(start_date=date(2024, 1, 1))
+        existing_campaign.start_date = date(2024, 1, 2)
 
-        form = AnnouncementCampaignAdminForm(model_to_dict(existing_campaign), instance=existing_campaign)
+        form = self.TestForm(model_to_dict(existing_campaign), instance=existing_campaign)
         assert form.is_valid()
 
-    def test_invalid_campaign_max_items(self):
+    def test_max_items_range(self):
         campaign = AnnouncementCampaignFactory.build(max_items=0)
 
-        form = AnnouncementCampaignAdminForm(model_to_dict(campaign))
-        expected_form_errors = ["Impossible de lancer une campagne sans articles."]
-        assert form.errors["max_items"] == expected_form_errors
+        form = self.TestForm(model_to_dict(campaign))
+        assert form.errors["max_items"] == ["Assurez-vous que cette valeur est supérieure ou égale à 1."]
+
+        campaign.max_items = 11
+        form = self.TestForm(model_to_dict(campaign))
+        assert form.errors["max_items"] == ["Assurez-vous que cette valeur est inférieure ou égale à 10."]
+
+        campaign.max_items = 10
+        form = self.TestForm(model_to_dict(campaign))
+        assert form.is_valid()
 
 
 class TestRenderAnnouncementCampaign:

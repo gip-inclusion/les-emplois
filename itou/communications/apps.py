@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 from django.conf import settings
 from django.db import OperationalError, ProgrammingError, transaction
-from django.db.models.signals import post_migrate, post_delete, post_save
+from django.db.models.signals import post_delete, post_migrate, post_save
 
 
 class CommunicationsConfig(AppConfig):

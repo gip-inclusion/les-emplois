@@ -1,3 +1,5 @@
+from datetime import date
+
 import factory
 
 from itou.communications.models import AnnouncementCampaign, AnnouncementItem
@@ -8,8 +10,7 @@ class AnnouncementCampaignFactory(factory.django.DjangoModelFactory):
         model = AnnouncementCampaign
         skip_postgeneration_save = True
 
-    start_date = factory.Faker("past_date")
-    end_date = factory.Faker("future_date")
+    start_date = factory.LazyFunction(date.today)
 
     @factory.post_generation
     def with_item(obj, create, extracted, **kwargs):

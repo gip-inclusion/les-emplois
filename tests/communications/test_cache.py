@@ -57,13 +57,10 @@ class AnnouncementCampaignCacheTest(TestCase):
         with assertNumQueries(0):
             assert active_announcement_campaign(None)["active_campaign_announce"] is None
 
-    @freeze_time("2024-01-01")
+    @freeze_time("2024-01-30")
     def test_active_announcement_campaign_cache_timeout(self):
         cache.delete(CACHE_ACTIVE_ANNOUNCEMENT_CAMPAIGN_KEY)
-
-        campaign = AnnouncementCampaignFactory(
-            start_date=date(2023, 12, 30), end_date=date(2024, 1, 2), with_item=True
-        )
+        campaign = AnnouncementCampaignFactory(start_date=date(2024, 1, 1), with_item=True)
 
         with assertNumQueries(0):
             assert active_announcement_campaign(None)["active_campaign_announce"] == campaign

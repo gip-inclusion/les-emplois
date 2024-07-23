@@ -1,7 +1,13 @@
+import calendar
+from datetime import date
+
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import Q
 
 
 class NotificationRecordQuerySet(models.QuerySet):
@@ -115,19 +121,65 @@ class AnnouncementCampaign(models.Model):
     intended for displaying the new features of the site to returning visitors
     """
 
-    max_items = models.PositiveIntegerField(default=3, verbose_name="nombre d'articles affiché")
-    start_date = models.DateField(null=False)
-    end_date = models.DateField(null=False)
+    max_items = models.PositiveIntegerField(
+        default=3,
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
+        verbose_name="nombre d'articles affiché",
+    )
+    start_date = models.DateField(
+        null=False,
+        verbose_name="date de début",
+        help_text="la date de lancement des articles sur le site. La date de fin est toujours le dernier jour du mois",
+    )
 
     class Meta:
         verbose_name = "campagne d'annonce"
         ordering = ["start_date"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["start_date"],
+                name="unique_announcement_campaign_month_year",
+                condition=Q(
+                    start_date__year=models.functions.ExtractYear("start_date"),
+                    start_date__month=models.functions.ExtractMonth("start_date"),
+                ),
+            ),
+            models.CheckConstraint(name="max_items_range", check=Q(max_items__gte=1, max_items__lte=10)),
+        ]
+
+    @property
+    def end_date(self):
+        """:return: the last day of the month targeted"""
+        return date(
+            self.start_date.year,
+            self.start_date.month,
+            calendar.monthrange(self.start_date.year, self.start_date.month)[1],
+        )
 
     def __str__(self):
-        return f"Campagne d'annonce du { self.start_date } à { self.end_date }"
+        return f"Campagne d'annonce du { self.start_date.strftime('%m/%Y') }"
+
+    def clean(self):
+        # prevent campaigns from sharing start_date
+        queryset = AnnouncementCampaign.objects.annotate(
+            year=models.functions.ExtractYear("start_date"), month=models.functions.ExtractMonth("start_date")
+        ).filter(year=self.start_date.year, month=self.start_date.month)
+
+        if self.pk:
+            queryset = queryset.exclude(pk=self.pk)
+
+        if queryset.exists():
+            raise ValidationError("Maximum 1 campagne par mois")
+
+        return super().clean()
 
     def items_for_template(self):
         return self.items.all()[: self.max_items]
+
+
+class AnnouncementItemQuerySet(models.QuerySet):
+    def get_queryset(self):
+        return super().get_queryset().select_related("campaign")
 
 
 class AnnouncementItem(models.Model):
@@ -142,9 +194,11 @@ class AnnouncementItem(models.Model):
         null=False, blank=False, verbose_name="description", help_text="détail du nouveauté ; le contenu"
     )
 
+    objects = AnnouncementItemQuerySet.as_manager()
+
     class Meta:
         verbose_name = "article d'annonce"
-        ordering = ["priority"]
+        ordering = ["campaign__start_date", "priority", "pk"]
 
     def __str__(self):
         return self.title
