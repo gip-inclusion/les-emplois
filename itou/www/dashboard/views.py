@@ -160,6 +160,9 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "siae_suspension_text_with_dates": None,
         "siae_search_form": SiaeSearchForm(),
     }
+    context["has_view_stats_items"] = any(
+        v for k, v in context.items() if k.startswith("can_view_stats_") and k != "can_view_stats_dashboard_widget"
+    )
 
     if request.user.is_employer:
         context.update(_employer_dashboard_context(request))
