@@ -1,6 +1,6 @@
 <div id="job-search-results">
     {% for item in results_page %}
-        {% if request.resolver_match.view_name == "search:employers_results" %}
+        {% if request.resolver_match.view_name == "search:employers_results" or job_app_to_transfer|default:False %}
             {% include "companies/includes/_card_siae.html" with siae=item %}
         {% else %}
             {% include "companies/includes/_card_jobdescription.html" with job_description=item %}

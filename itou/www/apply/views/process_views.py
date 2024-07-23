@@ -31,6 +31,8 @@ from itou.www.apply.forms import (
     PriorActionForm,
 )
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
+from itou.www.companies_views.views import CompanyCardView, JobDescriptionCardView
+from itou.www.search.views import EmployerSearchView
 
 
 def check_waiting_period(job_application):
@@ -575,6 +577,77 @@ def transfer(request, job_application_id):
         )
 
     return HttpResponseRedirect(back_url)
+
+
+class JobApplicationExternalTransferStep1View(LoginRequiredMixin, EmployerSearchView):
+    job_application = None
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        if request.user.is_authenticated:
+            self.job_application = get_object_or_404(
+                JobApplication.objects.is_active_company_member(request.user)
+                .filter(state=job_applications_enums.JobApplicationState.REFUSED)
+                .select_related("job_seeker", "to_company"),
+                pk=kwargs["job_application_id"],
+            )
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.job_application and not request.GET:
+            return HttpResponseRedirect(f"{request.path}?city={self.job_application.to_company.city_slug}")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        return data | {
+            "job_app_to_transfer": self.job_application,
+            "progress": 25,
+            "matomo_custom_title": data["matomo_custom_title"] + " (transfert)",
+        }
+
+    def get_template_names(self):
+        return [
+            "search/includes/siaes_search_results.html"
+            if self.request.htmx
+            else "apply/process_external_transfer_siaes_search_results.html"
+        ]
+
+
+class JobApplicationExternalTransferStep1CompanyCardView(LoginRequiredMixin, CompanyCardView):
+    def setup(self, request, job_application_id, company_pk, *args, **kwargs):
+        super().setup(request, company_pk, *args, **kwargs)
+
+        if request.user.is_authenticated:
+            self.job_application = get_object_or_404(
+                JobApplication.objects.is_active_company_member(request.user).not_archived(),
+                id=job_application_id,
+            )
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        return data | {
+            "job_app_to_transfer": self.job_application,
+            "matomo_custom_title": data["matomo_custom_title"] + " (transfert)",
+        }
+
+
+class JobApplicationExternalTransferStep1JobDescriptionCardView(LoginRequiredMixin, JobDescriptionCardView):
+    def setup(self, request, job_application_id, job_description_id, *args, **kwargs):
+        super().setup(request, job_description_id, *args, **kwargs)
+
+        if request.user.is_authenticated:
+            self.job_application = get_object_or_404(
+                JobApplication.objects.is_active_company_member(request.user).not_archived(),
+                id=job_application_id,
+            )
+
+    def get_context_data(self, **kwargs):
+        data = super().get_context_data(**kwargs)
+        return data | {
+            "job_app_to_transfer": self.job_application,
+            "matomo_custom_title": data["matomo_custom_title"] + " (transfert)",
+        }
 
 
 @login_required

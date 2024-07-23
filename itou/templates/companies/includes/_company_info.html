@@ -26,6 +26,11 @@
                 {% include "companies/includes/_company_details.html" with company=company only %}
             {% endif %}
         </ul>
-        <a href="{% url 'companies_views:card' siae_id=company.pk %}{% if back_url|default:"" %}?back_url={{ back_url|urlencode }}{% endif %}" class="btn btn-secondary btn-block mt-4">Voir la fiche de l'entreprise</a>
+        {% if job_app_to_transfer|default:False %}
+            <a href="{% url 'apply:job_application_external_transfer_step_1_company_card' job_application_id=job_app_to_transfer company_pk=company.pk %}{% if back_url|default:"" %}?back_url={{ back_url|urlencode }}{% endif %}"
+               class="btn btn-secondary btn-block mt-4">Voir la fiche de l'entreprise</a>
+        {% else %}
+            <a href="{% url 'companies_views:card' siae_id=company.pk %}{% if back_url|default:"" %}?back_url={{ back_url|urlencode }}{% endif %}" class="btn btn-secondary btn-block mt-4">Voir la fiche de l'entreprise</a>
+        {% endif %}
     </div>
 </div>

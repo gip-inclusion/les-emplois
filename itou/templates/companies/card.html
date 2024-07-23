@@ -10,21 +10,36 @@
 {% endblock %}
 
 {% block title_content %}
+    {% if job_app_to_transfer %}
+        {% include "apply/includes/job_application_external_transfer_progress.html" with job_app_to_transfer=job_app_to_transfer step=1 only %}
+    {% endif %}
     <h1>{{ siae.display_name }}</h1>
     <h2>{{ siae.get_kind_display }}</h2>
     <div class="c-box c-box--action">
         <h2 class="visually-hidden">Actions rapides</h2>
         <div class="form-row align-items-center gx-3">
             {% if siae.has_active_members and not siae.block_job_applications %}
-                <div class="form-group col col-lg-auto">
-                    <a href="{% url 'apply:start' company_pk=siae.pk %}"
-                       class="btn btn-lg btn-white btn-block btn-ico"
-                       {% matomo_event "candidature" "clic" "start_application" %}
-                       aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
-                        <i class="ri-draft-line font-weight-medium" aria-hidden="true"></i>
-                        <span>Postuler</span>
-                    </a>
-                </div>
+                {% if job_app_to_transfer %}
+                    <div class="form-group col col-lg-auto">
+                        <a href=""
+                           class="btn btn-lg btn-white btn-block btn-ico"
+                           {% matomo_event "candidature" "clic" "job_app_transfer" %}
+                           aria-label="Transférer la candidature à l'employeur inclusif {{ siae.display_name }}">
+                            <i class="ri-draft-line font-weight-medium" aria-hidden="true"></i>
+                            <span>Transférer la candidature</span>
+                        </a>
+                    </div>
+                {% else %}
+                    <div class="form-group col col-lg-auto">
+                        <a href="{% url 'apply:start' company_pk=siae.pk %}"
+                           class="btn btn-lg btn-white btn-block btn-ico"
+                           {% matomo_event "candidature" "clic" "start_application" %}
+                           aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
+                            <i class="ri-draft-line font-weight-medium" aria-hidden="true"></i>
+                            <span>Postuler</span>
+                        </a>
+                    </div>
+                {% endif %}
             {% endif %}
             {% if active_jobs_descriptions or other_jobs_descriptions %}
                 <div class="form-group col col-lg-auto">
@@ -163,15 +178,27 @@
                             </div>
                         {% endif %}
                         {% if not siae.block_job_applications and siae.has_active_members %}
-                            <div class="d-flex justify-content-end mt-3">
-                                <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
-                                   href="{% url 'apply:start' company_pk=siae.pk %}"
-                                   {% matomo_event "candidature" "clic" "start_application" %}
-                                   aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
-                                    <i class="ri-draft-line"></i>
-                                    <span>Postuler</span>
-                                </a>
-                            </div>
+                            {% if job_app_to_transfer %}
+                                <div class="d-flex justify-content-end mt-3">
+                                    <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
+                                       href=""
+                                       {% matomo_event "candidature" "clic" "job_app_transfer" %}
+                                       aria-label="Transférer la candidature à l'employeur inclusif {{ siae.display_name }}">
+                                        <i class="ri-draft-line"></i>
+                                        <span>Transférer la candidature</span>
+                                    </a>
+                                </div>
+                            {% else %}
+                                <div class="d-flex justify-content-end mt-3">
+                                    <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
+                                       href="{% url 'apply:start' company_pk=siae.pk %}"
+                                       {% matomo_event "candidature" "clic" "start_application" %}
+                                       aria-label="Postuler auprès de l'employeur inclusif {{ siae.display_name }}">
+                                        <i class="ri-draft-line"></i>
+                                        <span>Postuler</span>
+                                    </a>
+                                </div>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
