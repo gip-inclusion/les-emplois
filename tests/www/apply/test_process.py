@@ -41,7 +41,7 @@ from itou.www.apply.forms import AcceptForm
 from tests.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
 from tests.asp.factories import CommuneFactory, CountryFranceFactory
 from tests.cities.factories import create_test_cities
-from tests.companies.factories import CompanyFactory, JobDescriptionFactory
+from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import (
@@ -2584,9 +2584,26 @@ class ProcessTemplatesTest(TestCase):
 class TestProcessTransferJobApplication:
     TRANSFER_TO_OTHER_COMPANY_SENTENCE = "Transférer cette candidature vers"
 
-    def test_job_application_transfer_disabled_for_lone_users(self, client):
-        # A user member of only one company
-        # must not be able to transfer a job application to another company
+    def test_job_application_external_transfer_only_for_lone_users(self, client, snapshot):
+        # A user member of only one company will see the button but with
+        # only the "+ autre structure" link
+        company = CompanyFactory(with_membership=True)
+        user = company.members.first()
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True,
+            to_company=company,
+            state=job_applications_enums.JobApplicationState.REFUSED,
+        )
+
+        client.force_login(user)
+        response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
+        assertContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
+        assert (
+            str(parse_response_to_soup(response, ".dropdown-structure", replace_in_attr=[job_application])) == snapshot
+        )
+
+    def test_job_application_external_transfer_disabled_for_bad_state(self, client, snapshot):
+        # external transfer is disabled for non refused job applications
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
         job_application = JobApplicationFactory(
@@ -2597,34 +2614,23 @@ class TestProcessTransferJobApplication:
 
         client.force_login(user)
         response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
-        assertNotContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
+        assertContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
+        assert str(parse_response_to_soup(response, ".dropdown-structure")) == snapshot
 
     def test_job_application_transfer_disabled_for_bad_state(self, client):
-        # A user member of only one company must not be able to transfert
-        # to another company
+        # A user member of multiple companies must not be able to transfert
+        # an accepted job application to another company
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
-        job_application_1 = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
-            to_company=company,
-            state=job_applications_enums.JobApplicationState.NEW,
-        )
-        job_application_2 = JobApplicationFactory(
+        CompanyMembershipFactory(user=user)
+        job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             to_company=company,
             state=job_applications_enums.JobApplicationState.ACCEPTED,
         )
 
         client.force_login(user)
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application_1.pk})
-        )
-        assertNotContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
-
-        response = client.get(
-            reverse("apply:details_for_company", kwargs={"job_application_id": job_application_2.pk})
-        )
-
+        response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
         assertNotContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
 
     def test_job_application_transfer_enabled(self, client):

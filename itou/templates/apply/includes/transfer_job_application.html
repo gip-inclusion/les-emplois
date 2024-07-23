@@ -1,10 +1,10 @@
 {# Transfer job application to other SIAE #}
-{% if request.organizations|length != 1 %}
-    <div class="dropdown dropdown-structure">
-        <button id="transfer_to_button" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
-            Transférer cette candidature vers
-        </button>
-        <div class="dropdown-menu w-100" aria-labelledby="transfer_to_button">
+<div class="dropdown dropdown-structure">
+    <button id="transfer_to_button" class="btn btn-lg btn-link-white btn-block w-lg-auto dropdown-toggle" type="button" aria-haspopup="true" aria-expanded="false" data-bs-toggle="dropdown">
+        Transférer cette candidature vers
+    </button>
+    <div class="dropdown-menu w-100" aria-labelledby="transfer_to_button">
+        {% if request.organizations|length != 1 %}
             {% for siae in request.organizations %}
                 {% if siae != request.current_organization %}
                     <a class="dropdown-item dropdown-item__summary" data-bs-toggle="modal" data-bs-target="#transfer_confirmation_modal_{{ siae.pk }}">
@@ -14,42 +14,56 @@
                     </a>
                 {% endif %}
             {% endfor %}
-        </div>
+            <hr class="m-0">
+        {% endif %}
+        {% if job_application.state.is_refused %}
+            <a class="dropdown-item" href="">
+                <i class="ri-home-smile-line"></i>
+                <strong>Une autre structure</strong>
+            </a>
+        {% else %}
+            <div data-bs-toggle="tooltip" data-bs-placement="bottom" title="Vous devez d’abord décliner la candidature pour pouvoir la transférer à un autre employeur">
+                <div class="dropdown-item disabled">
+                    <i class="ri-home-smile-line"></i>
+                    <strong>Une autre structure</strong>
+                </div>
+            </div>
+        {% endif %}
     </div>
-    {% comment %}
+</div>
+{% comment %}
           Tranfer confirmation modal:
           Was supposed to be within the for-loop above.
           But apparently being in a dropdown-menu DIV prevents display of the modal.
           Hence a new loop to generate modals for each SIAE.
           Not pretty, but if anybody has a cleaner solution...
-    {% endcomment %}
-    {% for siae in request.organizations %}
-        {% if siae != request.current_organization %}
-            <div id="transfer_confirmation_modal_{{ siae.pk }}" class="modal" tabindex="-1" aria-labelledby="modal_title" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="modal_title">Confirmation du transfert</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                        </div>
-                        <div class="modal-body">
-                            <p>
-                                Êtes-vous sûr de vouloir transférer la candidature de <b>{{ job_application.job_seeker.get_full_name }}</b> dans la structure suivante ?
-                            </p>
-                            {% include "companies/includes/_company_info.html" with company=siae extra_box_class="mb-3 mb-lg-5" only %}
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Retour</button>
-                            <form method="post" action="{% url 'apply:transfer' job_application_id=job_application.id %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="target_company_id" value="{{ siae.pk }}" />
-                                <input type="hidden" name="back_url" value="{{ back_url }}" />
-                                <button class="btn btn-sm btn-primary">Confirmer</button>
-                            </form>
-                        </div>
+{% endcomment %}
+{% for siae in request.organizations %}
+    {% if siae != request.current_organization %}
+        <div id="transfer_confirmation_modal_{{ siae.pk }}" class="modal" tabindex="-1" aria-labelledby="modal_title" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal_title">Confirmation du transfert</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+                            Êtes-vous sûr de vouloir transférer la candidature de <b>{{ job_application.job_seeker.get_full_name }}</b> dans la structure suivante ?
+                        </p>
+                        {% include "companies/includes/_company_info.html" with company=siae extra_box_class="mb-3 mb-lg-5" only %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Retour</button>
+                        <form method="post" action="{% url 'apply:transfer' job_application_id=job_application.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="target_company_id" value="{{ siae.pk }}" />
+                            <input type="hidden" name="back_url" value="{{ back_url }}" />
+                            <button class="btn btn-sm btn-primary">Confirmer</button>
+                        </form>
                     </div>
                 </div>
             </div>
-        {% endif %}
-    {% endfor %}
-{% endif %}
+        </div>
+    {% endif %}
+{% endfor %}
