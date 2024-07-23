@@ -1099,11 +1099,25 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
 
 class ApplicationResumeView(ApplicationBaseView):
     template_name = "apply/submit/application/resume.html"
+    form_class = SubmitJobApplicationForm
 
     def __init__(self):
         super().__init__()
 
         self.form = None
+
+    def get_initial(self):
+        return {"selected_jobs": self.apply_session.get("selected_jobs", [])}
+
+    def get_form_kwargs(self):
+        return {
+            "company": self.company,
+            "user": self.request.user,
+            "auto_prescription_process": self.auto_prescription_process,
+            "initial": self.get_initial(),
+            "data": self.request.POST or None,
+            "files": self.request.FILES or None,
+        }
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -1115,14 +1129,56 @@ class ApplicationResumeView(ApplicationBaseView):
         if not self.apply_session.exists():
             self.apply_session.init({})
 
-        self.form = SubmitJobApplicationForm(
-            company=self.company,
-            user=request.user,
-            auto_prescription_process=self.auto_prescription_process,
-            initial={"selected_jobs": self.apply_session.get("selected_jobs", [])},
-            data=request.POST or None,
-            files=request.FILES or None,
+        self.form = self.form_class(**self.get_form_kwargs())
+
+    def get_next_url(self, job_application):
+        return reverse(
+            "apply:application_end",
+            kwargs={"company_pk": self.company.pk, "application_pk": job_application.pk},
         )
+
+    def form_valid(self):
+        # Fill the job application with the required information
+        job_application = JobApplication(
+            job_seeker=self.job_seeker,
+            to_company=self.company,
+            sender=self.request.user,
+            sender_kind=self.request.user.kind,
+            message=self.form.cleaned_data["message"],
+        )
+        if self.request.user.is_prescriber:
+            job_application.sender_prescriber_organization = self.request.current_organization
+        if self.request.user.is_employer:
+            job_application.sender_company = self.request.current_organization
+
+        if resume := self.form.cleaned_data.get("resume"):
+            key = f"resume/{uuid.uuid4()}.pdf"
+            File.objects.create(key=key)
+            public_storage = storages["public"]
+            name = public_storage.save(key, resume)
+            job_application.resume_link = public_storage.url(name)
+
+        # Save the job application
+        job_application.save()
+        job_application.selected_jobs.add(*self.form.cleaned_data["selected_jobs"])
+        # The job application is now saved in DB, delete the session early to avoid any problems
+        self.apply_session.delete()
+
+        try:
+            # Send notifications
+            company_recipients = User.objects.filter(
+                companymembership__company=job_application.to_company,
+                companymembership__is_active=True,
+            )
+            for employer in company_recipients:
+                job_application.notifications_new_for_employer(employer).send()
+            job_application.notifications_new_for_job_seeker.send()
+            if self.request.user.is_prescriber:
+                job_application.notifications_new_for_proxy.send()
+        finally:
+            # We are done, send to the (mostly) stateless final page as we now have no session.
+            # "company_pk" is kinda useless with "application_pk" but is kept for URL consistency.
+            return job_application
 
     def post(self, request, *args, **kwargs):
         # Prevent multiple rapid clicks on the submit button to create multiple job applications.
@@ -1130,60 +1186,10 @@ class ApplicationResumeView(ApplicationBaseView):
             self.job_seeker.job_applications.filter(to_company=self.company).created_in_past(seconds=10).first()
         )
         if job_application:
-            return HttpResponseRedirect(
-                reverse(
-                    "apply:application_end",
-                    kwargs={"company_pk": self.company.pk, "application_pk": job_application.pk},
-                )
-            )
+            return HttpResponseRedirect(self.get_next_url(job_application))
         if self.form.is_valid():
-            # Fill the job application with the required information
-            job_application = JobApplication(
-                job_seeker=self.job_seeker,
-                to_company=self.company,
-                sender=request.user,
-                sender_kind=request.user.kind,
-                message=self.form.cleaned_data["message"],
-            )
-            if request.user.is_prescriber:
-                job_application.sender_prescriber_organization = request.current_organization
-            if request.user.is_employer:
-                job_application.sender_company = request.current_organization
-
-            if resume := self.form.cleaned_data.get("resume"):
-                key = f"resume/{uuid.uuid4()}.pdf"
-                File.objects.create(key=key)
-                public_storage = storages["public"]
-                name = public_storage.save(key, resume)
-                job_application.resume_link = public_storage.url(name)
-
-            # Save the job application
-            with transaction.atomic():
-                job_application.save()
-                job_application.selected_jobs.add(*self.form.cleaned_data["selected_jobs"])
-            # The job application is now saved in DB, delete the session early to avoid any problems
-            self.apply_session.delete()
-
-            try:
-                # Send notifications
-                company_recipients = User.objects.filter(
-                    companymembership__company=job_application.to_company,
-                    companymembership__is_active=True,
-                )
-                for employer in company_recipients:
-                    job_application.notifications_new_for_employer(employer).send()
-                job_application.notifications_new_for_job_seeker.send()
-                if request.user.is_prescriber:
-                    job_application.notifications_new_for_proxy.send()
-            finally:
-                # We are done, send to the (mostly) stateless final page as we now have no session.
-                # "company_pk" is kinda useless with "application_pk" but is kept for URL consistency.
-                return HttpResponseRedirect(
-                    reverse(
-                        "apply:application_end",
-                        kwargs={"company_pk": self.company.pk, "application_pk": job_application.pk},
-                    )
-                )
+            job_application = self.form_valid()
+            return HttpResponseRedirect(self.get_next_url(job_application))
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_back_url(self):

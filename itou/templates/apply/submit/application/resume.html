@@ -193,7 +193,9 @@
     </div>
     <div class="row">
         <div class="col-12 col-lg-8">
-            {% bootstrap_field form.resume %}
+            {% block form_resume_field %}
+                {% bootstrap_field form.resume %}
+            {% endblock %}
             {% if prescription_process or request.user.is_job_seeker %}
                 <div class="c-info p-3 mb-4">
                     {% if prescription_process %}
