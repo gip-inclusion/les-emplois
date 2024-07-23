@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 from django.conf import settings
 from django.db import OperationalError, ProgrammingError, transaction
-from django.db.models.signals import post_migrate
+from django.db.models.signals import post_migrate, post_delete, post_save
 
 
 class CommunicationsConfig(AppConfig):
@@ -9,8 +9,6 @@ class CommunicationsConfig(AppConfig):
     name = "itou.communications"
 
     def ready(self):
-        from django.db.models.signals import post_delete, post_save
-
         from itou.communications.models import AnnouncementCampaign, AnnouncementItem
         from itou.communications.signals import update_cached_announcement_on_model_changes
 
