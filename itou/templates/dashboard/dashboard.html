@@ -346,7 +346,7 @@
                             {% endif %}
                         </div>
                         <div class="tab-pane fade" id="statistiques" role="tabpanel" aria-labelledby="statistiques-tab">
-                            {% if can_view_stats_dashboard_widget or user.is_employer or user.is_prescriber %}
+                            {% if can_view_stats_dashboard_widget %}
                                 <h2>Statistiques</h2>
                                 <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
                                     <img src="{% static_theme_images 'logo-pilotage-inclusion.svg' %}" height="80" alt="Le pilotage de l'inclusion">
