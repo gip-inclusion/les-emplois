@@ -251,16 +251,18 @@
         <li class="nav-item" role="presentation">
             <a class="nav-link active" id="ensemble-tab" data-bs-toggle="tab" href="#ensemble" role="tab" aria-controls="ensemble" aria-selected="true" {% matomo_event "dashboard" "clic-onglet" "vue-d-ensemble" %}>Vue d’ensemble</a>
         </li>
-        <li class="nav-item" role="presentation">
-            <a class="nav-link"
-               id="statistiques-tab"
-               data-bs-toggle="tab"
-               href="#statistiques"
-               role="tab"
-               aria-controls="statistiques"
-               aria-selected="false"
-               {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>Statistiques</a>
-        </li>
+        {% if can_view_stats_dashboard_widget %}
+            <li class="nav-item" role="presentation">
+                <a class="nav-link"
+                   id="statistiques-tab"
+                   data-bs-toggle="tab"
+                   href="#statistiques"
+                   role="tab"
+                   aria-controls="statistiques"
+                   aria-selected="false"
+                   {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>Statistiques</a>
+            </li>
+        {% endif %}
         {% if user.is_employer or user.is_prescriber %}
             <li class="nav-item" role="presentation">
                 <a class="nav-link" id="evenements-tab" data-bs-toggle="tab" href="#evenements" role="tab" aria-controls="evenements" aria-selected="false" {% matomo_event "dashboard" "clic-onglet" "evenements" %}>Événements à venir</a>
@@ -345,8 +347,8 @@
                                 </div>
                             {% endif %}
                         </div>
-                        <div class="tab-pane fade" id="statistiques" role="tabpanel" aria-labelledby="statistiques-tab">
-                            {% if can_view_stats_dashboard_widget %}
+                        {% if can_view_stats_dashboard_widget %}
+                            <div class="tab-pane fade" id="statistiques" role="tabpanel" aria-labelledby="statistiques-tab">
                                 <h2>Statistiques</h2>
                                 <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
                                     <img src="{% static_theme_images 'logo-pilotage-inclusion.svg' %}" height="80" alt="Le pilotage de l'inclusion">
@@ -356,8 +358,8 @@
                                         {% include "dashboard/includes/stats.html" %}
                                     {% endif %}
                                 </div>
-                            {% endif %}
-                        </div>
+                            </div>
+                        {% endif %}
                         {% if user.is_employer or user.is_prescriber %}
                             <div class="tab-pane fade" id="evenements" role="tabpanel" aria-labelledby="evenements-tab">
                                 <h2>Événements à venir</h2>
