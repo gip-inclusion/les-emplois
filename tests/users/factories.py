@@ -287,10 +287,11 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
             # Do nothing
             return
 
-        first_address = [
-            address for address in BAN_GEOCODING_API_RESULTS_MOCK if address.get("ban_api_resolved_address")
-        ][0]
-        address = first_address if extracted is True else extracted
+        address = (
+            next(address for address in BAN_GEOCODING_API_RESULTS_MOCK if address.get("ban_api_resolved_address"))
+            if extracted is True
+            else extracted
+        )
 
         city, _ = City.objects.get_or_create(
             name=address["city"],
