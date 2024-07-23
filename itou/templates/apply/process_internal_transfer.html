@@ -1,0 +1,57 @@
+{% extends "layout/base.html" %}
+{% load buttons_form %}
+
+{% block title %}
+    Transférer une candidature vers une autre structure
+    {{ block.super }}
+{% endblock %}
+
+{% block title_content %}
+    {% include "apply/includes/job_application_external_transfer_progress.html" with job_app_to_transfer=job_app_to_transfer step=3 only %}
+    {% if job_app_to_transfer.to_company == company %}
+        <h1>Transfert impossible</h1>
+    {% else %}
+        <h1>Confirmation du transfert</h1>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section-twocolumns s-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="c-form">
+                        <div class="col-12 p-0">
+                            {% if job_app_to_transfer.to_company == company %}
+                                <p>Impossible de transférer la candidature car elle appartient déjà à cette structure.</p>
+                            {% else %}
+                                <p>
+                                    Êtes-vous sûr de vouloir transférer la candidature de <b>{{ job_app_to_transfer.job_seeker.get_full_name }}</b> dans la structure suivante ?
+                                </p>
+                            {% endif %}
+                            {% include "companies/includes/_company_info.html" with company=company extra_box_class="mb-3 mb-lg-5" only %}
+                        </div>
+
+                        {% if job_app_to_transfer.to_company == company %}
+                            <hr class="mb-3">
+                            <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex justify-content-end">
+                                <a href="{{ back_url }}">
+                                    <span class="btn btn-outline-primary">Retour</span>
+                                </a>
+                            </div>
+                        {% else %}
+                            <form method="post" action="{% url 'apply:transfer' job_application_id=job_app_to_transfer.id %}">
+                                {% csrf_token %}
+
+                                <input type="hidden" name="target_company_id" value="{{ company.pk }}" />
+                                <input type="hidden" name="back_url" value="{{ back_url }}" />
+
+                                {% itou_buttons_form primary_label="Confirmer" secondary_url=back_url reset_url=reset_url show_mandatory_fields_mention=False %}
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -669,6 +669,18 @@ class ApplicationOverrideMixin:
 
 
 class JobApplicationExternalTransferStep2View(ApplicationOverrideMixin, ApplicationJobsView):
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and self.company in request.organizations:
+            # This is not an external transfer
+            url = reverse(
+                "apply:job_application_internal_transfer",
+                kwargs={"job_application_id": self.job_application.pk, "company_pk": self.company.pk},
+            )
+            if params := request.GET.urlencode():
+                url = f"{url}?{params}"
+            return HttpResponseRedirect(url)
+        return super().dispatch(request, *args, **kwargs)
+
     def get_initial(self):
         selected_jobs = []
         if job_id := self.request.GET.get("job_description_id"):
@@ -763,6 +775,31 @@ class JobApplicationExternalTransferStepEndView(ApplicationEndView):
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
             "page_title": "Candidature transférée",
+        }
+
+
+class JobApplicationInternalTranferView(LoginRequiredMixin, TemplateView):
+    template_name = "apply/process_internal_transfer.html"
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+
+        if request.user.is_authenticated:
+            self.job_application = get_object_or_404(
+                JobApplication.objects.is_active_company_member(request.user).select_related(
+                    "job_seeker", "to_company"
+                ),
+                pk=kwargs["job_application_id"],
+            )
+            self.company = get_object_or_404(Company.objects.with_has_active_members(), pk=kwargs["company_pk"])
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "job_app_to_transfer": self.job_application,
+            "company": self.company,
+            "progress": 75,
+            "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk}),
+            "back_url": get_safe_url(self.request, "back_url"),
         }
 
 
