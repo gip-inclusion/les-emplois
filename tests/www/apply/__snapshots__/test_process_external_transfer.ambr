@@ -1,0 +1,85 @@
+# serializer version: 1
+# name: test_step_1[progress]
+  '''
+  <div class="c-stepper mb-4">
+      <div class="d-flex">
+          <div class="flex-fill">
+              <h2>Transférer la candidature de Jane DOE</h2>
+              <div class="progress progress--emploi mb-3">
+                  
+                      <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="25" class="progress-bar progress-bar-25" role="progressbar">
+                      </div>
+                  
+              </div>
+              <span>
+                  
+                      Rechercher un emploi inclusif
+                  
+              </span>
+          </div>
+          <div class="d-flex justify-content-end">
+              <a class="btn btn-link btn-ico" href="/apply/11111111-1111-1111-1111-111111111111/siae/details">
+                  <i aria-hidden="true" class="ri-close-line"></i>
+                  <span>Quitter</span>
+              </a>
+          </div>
+      </div>
+  </div>
+  '''
+# ---
+# name: test_step_2[progress]
+  '''
+  <div class="c-stepper mb-4">
+      <div class="d-flex">
+          <div class="flex-fill">
+              <h2>Transférer la candidature de Jane DOE</h2>
+              <div class="progress progress--emploi mb-3">
+                  
+                      <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="50" class="progress-bar progress-bar-50" role="progressbar">
+                      </div>
+                  
+              </div>
+              <span>
+                  
+                      Sélectionner les métiers recherchés
+                  
+              </span>
+          </div>
+          <div class="d-flex justify-content-end">
+              <a class="btn btn-link btn-ico" href="/apply/11111111-1111-1111-1111-111111111111/siae/details">
+                  <i aria-hidden="true" class="ri-close-line"></i>
+                  <span>Quitter</span>
+              </a>
+          </div>
+      </div>
+  </div>
+  '''
+# ---
+# name: test_step_3[progress]
+  '''
+  <div class="c-stepper mb-4">
+      <div class="d-flex">
+          <div class="flex-fill">
+              <h2>Transférer la candidature de Jane DOE</h2>
+              <div class="progress progress--emploi mb-3">
+                  
+                      <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="75" class="progress-bar progress-bar-75" role="progressbar">
+                      </div>
+                  
+              </div>
+              <span>
+                  
+                      Finaliser la candidature
+                  
+              </span>
+          </div>
+          <div class="d-flex justify-content-end">
+              <a class="btn btn-link btn-ico" href="/apply/11111111-1111-1111-1111-111111111111/siae/details">
+                  <i aria-hidden="true" class="ri-close-line"></i>
+                  <span>Quitter</span>
+              </a>
+          </div>
+      </div>
+  </div>
+  '''
+# ---
