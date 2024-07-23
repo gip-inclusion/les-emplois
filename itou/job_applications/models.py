@@ -58,6 +58,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
     TRANSITION_CANCEL = "cancel"
     TRANSITION_RENDER_OBSOLETE = "render_obsolete"
     TRANSITION_TRANSFER = "transfer"
+    TRANSITION_EXTERNAL_TRANSFER = "external_transfer"
     TRANSITION_RESET = "reset"
 
     TRANSITION_CHOICES = (
@@ -69,8 +70,9 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         (TRANSITION_REFUSE, "Décliner la candidature"),
         (TRANSITION_CANCEL, "Annuler la candidature"),
         (TRANSITION_RENDER_OBSOLETE, "Rendre obsolete la candidature"),
-        (TRANSITION_TRANSFER, "Transfert de la candidature vers une autre SIAE"),
+        (TRANSITION_TRANSFER, "Transfert de la candidature vers une autre entreprise de l'utilisateur"),
         (TRANSITION_RESET, "Réinitialiser la candidature"),
+        (TRANSITION_EXTERNAL_TRANSFER, "Transfert de la candidature vers une entreprise externe"),
     )
 
     CAN_BE_ACCEPTED_STATES = [
@@ -121,6 +123,7 @@ class JobApplicationWorkflow(xwf_models.Workflow):
         ),
         (TRANSITION_TRANSFER, CAN_BE_TRANSFERRED_STATES, JobApplicationState.NEW),
         (TRANSITION_RESET, JobApplicationState.OBSOLETE, JobApplicationState.NEW),
+        (TRANSITION_EXTERNAL_TRANSFER, JobApplicationState.REFUSED, JobApplicationState.REFUSED),
     )
 
     PENDING_STATES = [JobApplicationState.NEW, JobApplicationState.PROCESSING, JobApplicationState.POSTPONED]
@@ -1299,9 +1302,19 @@ class JobApplicationTransitionLog(xwf_models.BaseTransitionLog):
     """
 
     MODIFIED_OBJECT_FIELD = "job_application"
-    EXTRA_LOG_ATTRIBUTES = (("user", "user", None),)
+    EXTRA_LOG_ATTRIBUTES = (
+        ("user", "user", None),
+        ("target_company", "target_company", None),  # used in external transfer and transfer
+    )
     job_application = models.ForeignKey(JobApplication, related_name="logs", on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, on_delete=models.SET_NULL)
+    target_company = models.ForeignKey(
+        "companies.Company",
+        verbose_name="entreprise destinataire",
+        on_delete=models.SET_NULL,
+        related_name="job_application_log_transfers",
+        null=True,
+    )
 
     class Meta:
         verbose_name = "log des transitions de la candidature"

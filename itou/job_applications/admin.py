@@ -29,7 +29,7 @@ class TransitionLogInline(ItouTabularInline):
     extra = 0
     raw_id_fields = ("user",)
     can_delete = False
-    readonly_fields = ("transition", "from_state", "to_state", "user", "timestamp")
+    readonly_fields = ("transition", "from_state", "to_state", "user", "timestamp", "target_company")
 
     def has_add_permission(self, request, obj=None):
         return False
