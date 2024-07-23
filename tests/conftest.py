@@ -12,7 +12,7 @@ from django.contrib.gis.db.models.fields import get_srid_info
 from django.core import management
 from django.core.files.storage import default_storage, storages
 from django.core.management import call_command
-from django.db import connection
+from django.db import connection, transaction
 from django.template import base as base_template
 from django.test import override_settings
 from factory import Faker
@@ -176,6 +176,15 @@ def django_loaddata_fixture(django_db_setup, django_db_blocker):
                 "test_asp_INSEE_countries_factory.json",
             },
         )
+
+
+@pytest.fixture(scope="class")
+def class_scoped_db(django_db_blocker):
+    with django_db_blocker.unblock():
+        with transaction.atomic():
+            sid = transaction.savepoint()
+            yield
+            transaction.savepoint_rollback(sid)
 
 
 @pytest.fixture(autouse=True, scope="session")

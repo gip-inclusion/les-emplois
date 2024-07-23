@@ -2,8 +2,9 @@ import io
 import logging
 from unittest.mock import patch
 
+import pytest
 from django.urls import reverse
-from rest_framework.test import APIClient, APITestCase
+from pytest_django.asserts import assertNumQueries
 
 from itou.api.models import DepartmentToken
 from itou.companies.enums import CompanyKind, ContractType
@@ -17,36 +18,44 @@ from ..utils import _str_with_tz
 ENDPOINT_URL = reverse("v1:siaes-list")
 
 
-class SiaeAPIFetchListTest(APITestCase):
-    @classmethod
-    def setUpTestData(cls):
+class TestSiaeAPIFetchList:
+    @pytest.fixture(scope="class")
+    def create_data(self, class_scoped_db):
         # We create 2 cities and 2 siaes in Saint-Andre.
-        cls.saint_andre = create_city_saint_andre()
-        cls.guerande = create_city_guerande()
-        cls.company_without_jobs = CompanyFactory(kind=CompanyKind.EI, department="44", coords=cls.saint_andre.coords)
-        cls.company_with_jobs = CompanyFactory(
-            with_jobs=True, romes=("N1101", "N1105", "N1103", "N4105"), department="44", coords=cls.saint_andre.coords
+        saint_andre = create_city_saint_andre()
+        guerande = create_city_guerande()
+        company_without_jobs = CompanyFactory(
+            kind=CompanyKind.EI,
+            department="44",
+            coords=saint_andre.coords,
         )
+        company_with_jobs = CompanyFactory(
+            with_jobs=True,
+            romes=("N1101", "N1105", "N1103", "N4105"),
+            department="44",
+            coords=saint_andre.coords,
+        )
+        return [saint_andre, guerande, company_without_jobs, company_with_jobs]
 
-    def setUp(self):
-        super().setUp()
-        self.client = APIClient()
+    @pytest.fixture(autouse=True)
+    def _prepare(self, create_data):
+        self.saint_andre, self.guerande, self.company_without_jobs, self.company_with_jobs = create_data
 
-    def test_performances(self):
+    def test_performances(self, api_client):
         num_queries = BASE_NUM_QUERIES
         num_queries += 1  # Get city with insee_code
         num_queries += 1  # Count siaes
         num_queries += 1  # Select sias
         num_queries += 1  # prefetch job_description_through
-        with self.assertNumQueries(num_queries):
+        with assertNumQueries(num_queries):
             query_params = {"code_insee": self.saint_andre.code_insee, "distance_max_km": 100}
-            self.client.get(ENDPOINT_URL, query_params, format="json")
+            api_client.get(ENDPOINT_URL, query_params, format="json")
 
-    def test_fetch_siae_list_without_params(self):
+    def test_fetch_siae_list_without_params(self, api_client):
         """
         The query parameters need to contain either a department or both an INSEE code and a distance
         """
-        response = self.client.get(ENDPOINT_URL, format="json")
+        response = api_client.get(ENDPOINT_URL, format="json")
 
         assert response.status_code == 400
         assert response.json() == [
@@ -54,37 +63,37 @@ class SiaeAPIFetchListTest(APITestCase):
             "`postes_dans_le_departement` ne sont spécifiés."
         ]
 
-    def test_fetch_siae_list_with_too_high_distance(self):
+    def test_fetch_siae_list_with_too_high_distance(self, api_client):
         """
         The query parameter distance must be <= 100
         """
         query_params = {"code_insee": 44056, "distance_max_km": 200}
-        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        response = api_client.get(ENDPOINT_URL, query_params, format="json")
 
         assert response.status_code == 400
         assert response.json() == {"distance_max_km": ["Assurez-vous que cette valeur est inférieure ou égale à 100."]}
 
-    def test_fetch_siae_list_with_negative_distance(self):
+    def test_fetch_siae_list_with_negative_distance(self, api_client):
         """
         The query parameter distance must be positive
         """
         query_params = {"code_insee": 44056, "distance_max_km": -10}
-        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        response = api_client.get(ENDPOINT_URL, query_params, format="json")
 
         assert response.status_code == 400
         assert response.json() == {"distance_max_km": ["Assurez-vous que cette valeur est supérieure ou égale à 0."]}
 
-    def test_fetch_siae_list_with_invalid_code_insee(self):
+    def test_fetch_siae_list_with_invalid_code_insee(self, api_client):
         """
         The query parameters for INSEE code and distance are mandatories
         """
         query_params = {"code_insee": 12345, "distance_max_km": 10}
-        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        response = api_client.get(ENDPOINT_URL, query_params, format="json")
 
         assert response.content == b'{"detail":"Pas de ville avec pour code_insee 12345"}'
         assert response.status_code == 404
 
-    def test_fetch_results(self):
+    def test_fetch_results(self, api_client):
         company = CompanyFactory(department="44", coords=self.guerande.coords, kind=CompanyKind.EI)
         job_1 = JobDescriptionFactory(
             company=company,
@@ -100,7 +109,7 @@ class SiaeAPIFetchListTest(APITestCase):
         )
 
         query_params = {"code_insee": self.guerande.code_insee, "distance_max_km": 1}
-        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        response = api_client.get(ENDPOINT_URL, query_params, format="json")
 
         body = response.json()
         assert response.status_code == 200
@@ -157,68 +166,68 @@ class SiaeAPIFetchListTest(APITestCase):
             },
         ]
 
-    def test_fetch_siae_list(self):
+    def test_fetch_siae_list(self, api_client):
         """
         Search for siaes in the city that has 2 SIAES
         """
 
         query_params = {"code_insee": self.saint_andre.code_insee, "distance_max_km": 100}
-        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        response = api_client.get(ENDPOINT_URL, query_params, format="json")
 
         assert response.json()["count"] == 2
         assert response.status_code == 200
 
         # Add a department filter matching the companies
         query_params["departement"] = "44"
-        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        response = api_client.get(ENDPOINT_URL, query_params, format="json")
         assert response.status_code == 200
         assert response.json()["count"] == 2
 
         # Add a department filter NOT matching the companies
         query_params["departement"] = "33"
-        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        response = api_client.get(ENDPOINT_URL, query_params, format="json")
         assert response.status_code == 200
         assert response.json()["count"] == 0
 
-    def test_fetch_siae_list_too_far(self):
+    def test_fetch_siae_list_too_far(self, api_client):
         """
         Search for siaes in a city that has no SIAES
         """
 
         query_params = {"code_insee": self.guerande.code_insee, "distance_max_km": 10}
-        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        response = api_client.get(ENDPOINT_URL, query_params, format="json")
 
         assert response.json()["count"] == 0
         assert response.status_code == 200
 
-    def test_fetch_siae_list_by_department(self):
+    def test_fetch_siae_list_by_department(self, api_client):
         # Declare company in 56 despite its coordinates
         company56 = CompanyFactory(kind=CompanyKind.EI, department="56", coords=self.saint_andre.coords)
         query_params = {"departement": "44"}
-        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        response = api_client.get(ENDPOINT_URL, query_params, format="json")
 
         body = response.json()
         assert body["count"] == 2
         assert response.status_code == 200
         assert company56.siret not in {company["siret"] for company in body["results"]}
 
-    def test_fetch_siae_list_by_postes_dans_le_departement(self):
+    def test_fetch_siae_list_by_postes_dans_le_departement(self, api_client):
         # Declare company in 56
         company56 = CompanyFactory(kind=CompanyKind.EI, department="56")
         query_params = {"postes_dans_le_departement": "56"}
-        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        response = api_client.get(ENDPOINT_URL, query_params, format="json")
 
         assert response.status_code == 200
         assert response.json()["count"] == 0  # No job in 56
 
         # Add a job without location, it should use the company department
         JobDescriptionFactory(company=company56, location=None)
-        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        response = api_client.get(ENDPOINT_URL, query_params, format="json")
         assert response.status_code == 200
         assert response.json()["count"] == 1
 
         query_params = {"postes_dans_le_departement": "44"}
-        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        response = api_client.get(ENDPOINT_URL, query_params, format="json")
 
         assert response.status_code == 200
         body = response.json()
@@ -227,7 +236,7 @@ class SiaeAPIFetchListTest(APITestCase):
 
         # Add a new job for company 56 in department 44
         JobDescriptionFactory(company=company56, location=self.guerande)
-        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+        response = api_client.get(ENDPOINT_URL, query_params, format="json")
 
         assert response.status_code == 200
         body = response.json()
@@ -237,18 +246,17 @@ class SiaeAPIFetchListTest(APITestCase):
             company56.siret,
         }
 
-    def test_fetch_siae_list_rate_limits(self):
+    def test_fetch_siae_list_rate_limits(self, api_client):
         query_params = {"code_insee": self.saint_andre.code_insee, "distance_max_km": 100}
         # Declared in itou.api.siae_api.viewsets.RestrictedUserRateThrottle.
         for _ in range(12):
-            self.client.get(ENDPOINT_URL, query_params, format="json")
-        response = self.client.get(ENDPOINT_URL, query_params, format="json")
+            api_client.get(ENDPOINT_URL, query_params, format="json")
+        response = api_client.get(ENDPOINT_URL, query_params, format="json")
         # Rate limited.
         assert response.status_code == 429
 
-    def test_department_token_datadog_info(self):
+    def test_department_token_datadog_info(self, api_client):
         token = DepartmentToken.objects.create(department="33")
-        api_client = APIClient(headers={"Authorization": f"Token {token.key}"})
 
         root_logger = logging.getLogger()
         stream_handler = root_logger.handlers[0]
@@ -258,7 +266,9 @@ class SiaeAPIFetchListTest(APITestCase):
             # capsys/capfd did not want to work because https://github.com/pytest-dev/pytest/issues/5997
             with patch.object(stream_handler, "stream", captured):
                 response = api_client.get(
-                    ENDPOINT_URL, {"code_insee": self.saint_andre.code_insee, "distance_max_km": 100}
+                    ENDPOINT_URL,
+                    {"code_insee": self.saint_andre.code_insee, "distance_max_km": 100},
+                    headers={"Authorization": f"Token {token.key}"},
                 )
             assert response.status_code == 200
             # Check that the organization_id is properly logged to stdout
