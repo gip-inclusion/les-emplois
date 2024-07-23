@@ -1273,6 +1273,7 @@ class ApplicationEndView(ApplyStepBaseView):
                 "apply:application_end",
                 kwargs={"company_pk": self.company.pk, "application_pk": self.job_application.pk},
             ),
+            "page_title": "Auto-prescription enregistrée" if self.auto_prescription_process else "Candidature envoyée",
         }
 
 

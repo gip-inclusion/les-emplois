@@ -286,6 +286,11 @@ urlpatterns = [
         name="job_application_external_transfer_step_3",
     ),
     path(
+        "<uuid:job_application_id>/siae/external-transfer/end",
+        process_views.JobApplicationExternalTransferStepEndView.as_view(),
+        name="job_application_external_transfer_step_end",
+    ),
+    path(
         "<uuid:job_application_id>/siae/prior-action/add",
         process_views.add_or_modify_prior_action,
         name="add_prior_action",

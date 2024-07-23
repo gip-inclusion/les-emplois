@@ -33,7 +33,7 @@ from itou.www.apply.forms import (
     TransferJobApplicationForm,
 )
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
-from itou.www.apply.views.submit_views import ApplicationJobsView, ApplicationResumeView
+from itou.www.apply.views.submit_views import ApplicationEndView, ApplicationJobsView, ApplicationResumeView
 from itou.www.companies_views.views import CompanyCardView, JobDescriptionCardView
 from itou.www.search.views import EmployerSearchView
 
@@ -725,8 +725,10 @@ class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, Applicat
             new_job_application.save()
         return new_job_application
 
-    def get_next_url(self):
-        raise NotImplementedError()
+    def get_next_url(self, job_application):
+        return reverse(
+            "apply:job_application_external_transfer_step_end", kwargs={"job_application_id": job_application.pk}
+        )
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs) | {
@@ -734,6 +736,33 @@ class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, Applicat
             "step": 3,
             "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk}),
             "page_title": "Transférer la candidature",
+        }
+
+    def get_back_url(self):
+        return get_safe_url(self.request, "back_url")
+
+
+class JobApplicationExternalTransferStepEndView(ApplicationEndView):
+    def setup(self, request, *args, **kwargs):
+        job_app_qs = JobApplication.objects.all()
+        if request.user.is_authenticated:
+            # Only check the user's ownership if he's authenticated
+            # because if he's not he will be redirected to login so we don't care
+            job_app_qs = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
+
+        job_application = get_object_or_404(job_app_qs, pk=kwargs["job_application_id"])
+
+        return super().setup(
+            request,
+            *args,
+            application_pk=kwargs["job_application_id"],
+            company_pk=job_application.to_company_id,
+            **kwargs,
+        )
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "page_title": "Candidature transférée",
         }
 
 
