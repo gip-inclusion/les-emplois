@@ -2644,7 +2644,7 @@ class TestProcessTransferJobApplication:
         assert str(parse_response_to_soup(response, ".dropdown-structure")) == snapshot
 
     def test_job_application_transfer_disabled_for_bad_state(self, client):
-        # A user member of multiple companies must not be able to transfert
+        # A user member of multiple companies must not be able to transfer
         # an accepted job application to another company
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
