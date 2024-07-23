@@ -1,0 +1,29 @@
+{% extends "layout/base.html" %}
+{% load django_bootstrap5 %}
+{% load static %}
+
+{% block title %}
+    Transférer une candidature vers une autre structure
+    {{ block.super }}
+{% endblock %}
+
+{% block title_content %}
+    {% include "apply/includes/job_application_external_transfer_progress.html" with job_app_to_transfer=job_app_to_transfer step=1 only %}
+    <h1>Rechercher un emploi inclusif</h1>
+{% endblock %}
+
+{% block title_extra %}
+    <form class="mt-md-4">
+        {% include "search/includes/siaes_search_form.html" with form=form is_home=False only %}
+    </form>
+{% endblock %}
+
+{% block content %}
+    {% include "search/includes/siaes_search_content.html" %}
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src='{% static "js/htmx_compat.js" %}'></script>
+    <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
+{% endblock %}

@@ -261,6 +261,21 @@ urlpatterns = [
     path("<uuid:job_application_id>/siae/archive", process_views.archive, name="archive"),
     path("<uuid:job_application_id>/siae/transfer", process_views.transfer, name="transfer"),
     path(
+        "<uuid:job_application_id>/siae/external-transfer/1",
+        process_views.JobApplicationExternalTransferStep1View.as_view(),
+        name="job_application_external_transfer_step_1",
+    ),
+    path(
+        "<uuid:job_application_id>/siae/external-transfer/1/company/<int:company_pk>",
+        process_views.JobApplicationExternalTransferStep1CompanyCardView.as_view(),
+        name="job_application_external_transfer_step_1_company_card",
+    ),
+    path(
+        "<uuid:job_application_id>/siae/external-transfer/1/job_description/<int:job_description_id>",
+        process_views.JobApplicationExternalTransferStep1JobDescriptionCardView.as_view(),
+        name="job_application_external_transfer_step_1_job_description_card",
+    ),
+    path(
         "<uuid:job_application_id>/siae/prior-action/add",
         process_views.add_or_modify_prior_action,
         name="add_prior_action",

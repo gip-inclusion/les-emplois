@@ -2,7 +2,7 @@
 {% load django_bootstrap5 %}
 
 <div id="job-search-top"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
-    {% if request.resolver_match.view_name == "search:employers_results" %}
+    {% if request.resolver_match.view_name == "search:employers_results" or job_app_to_transfer|default:False %}
         <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between mb-3 mb-md-4">
             <p class="mb-0">
                 <strong>{{ siaes_count }} résultat{{ siaes_count|pluralizefr }}</strong>

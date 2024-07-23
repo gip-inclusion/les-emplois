@@ -154,6 +154,7 @@ class JobDescriptionCardView(TemplateView):
             "matomo_custom_title": "Détails de la fiche de poste",
             "code_insee": code_insee,
             "report_tally_url": report_tally_url(self.request.user, company, self.job_description),
+            "job_app_to_transfer": None,
         }
 
 
@@ -535,6 +536,7 @@ class CompanyCardView(TemplateView):
             ),
             "report_tally_url": report_tally_url(self.request.user, self.company),
             "back_url": back_url,
+            "job_app_to_transfer": None,
         }
 
 

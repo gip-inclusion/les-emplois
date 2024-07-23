@@ -1,7 +1,7 @@
 {% load str_filters %}
 
 <div id="search-subtitle"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
-    {% if request.resolver_match.view_name == "search:employers_results" %}
+    {% if request.resolver_match.view_name == "search:employers_results" or job_app_to_transfer|default:False %}
         <h2 class="mb-3 mb-md-4">Employeur{{ siaes_count|pluralizefr }}</h2>
     {% else %}
         <h2 class="mb-3 mb-md-4">
