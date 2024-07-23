@@ -2,68 +2,76 @@
 {% load django_bootstrap5 %}
 {% load buttons_form %}
 
-{% block title %}Postuler {{ block.super }}{% endblock %}
+{% block title %}{{ page_title }} {{ block.super }}{% endblock %}
 
 {% block title_messages %}
     {{ block.super }}
-    {% if new_check_needed %}
-        <div class="alert alert-warning alert-dismissible fade show">
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-            <div class="row">
-                <div class="col-auto pe-0">
-                    <i class="ri-information-line ri-xl text-warning"></i>
-                </div>
-                <div class="col">
-                    <p>
-                        <strong>Veuillez vérifier les informations du candidat</strong>
-                    </p>
-                    <p>
-                        La situation du candidat a peut-être changé depuis le {{ job_seeker.last_checked_at|date }}. Merci de vérifier la validité des informations présentes sur son profil.
-                    </p>
+    {% if not job_app_to_transfer|default:False %}
+        {% if new_check_needed %}
+            <div class="alert alert-warning alert-dismissible fade show">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                <div class="row">
+                    <div class="col-auto pe-0">
+                        <i class="ri-information-line ri-xl text-warning"></i>
+                    </div>
+                    <div class="col">
+                        <p>
+                            <strong>Veuillez vérifier les informations du candidat</strong>
+                        </p>
+                        <p>
+                            La situation du candidat a peut-être changé depuis le {{ job_seeker.last_checked_at|date }}. Merci de vérifier la validité des informations présentes sur son profil.
+                        </p>
+                    </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
     {% endif %}
 {% endblock %}
 
 {% block title_content %}
-    <div class="w-100 w-lg-66">
-        <div class="d-flex align-items-center">
-            <h1 class="flex-grow-1">{% include 'apply/includes/_submit_title.html' %}</h1>
-            <div>{% include 'apply/includes/eligibility_badge.html' %}</div>
+    {% if not job_app_to_transfer|default:False %}
+        <div class="w-100 w-lg-66">
+            <div class="d-flex align-items-center">
+                <h1 class="flex-grow-1">{% include 'apply/includes/_submit_title.html' %}</h1>
+                <div>{% include 'apply/includes/eligibility_badge.html' %}</div>
+            </div>
+            <p>
+                Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}
+                {% if can_view_personal_information and not request.user.is_job_seeker %}
+                    <a class="btn btn-link" href="{% url "apply:update_job_seeker_step_1" company_pk=siae.pk job_seeker_public_id=job_seeker.public_id %}">Vérifier le profil</a>
+                {% endif %}
+                {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning"></i>{% endif %}
+            </p>
         </div>
-        <p>
-            Dernière actualisation du profil : {{ job_seeker.last_checked_at|date }} à {{ job_seeker.last_checked_at|time }}
-            {% if can_view_personal_information and not request.user.is_job_seeker %}
-                <a class="btn btn-link" href="{% url "apply:update_job_seeker_step_1" company_pk=siae.pk job_seeker_public_id=job_seeker.public_id %}">Vérifier le profil</a>
-            {% endif %}
-            {% if new_check_needed %}<i class="ri-information-line ri-xl text-warning"></i>{% endif %}
-        </p>
-    </div>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
     <section class="s-section-twocolumns s-section">
         <div class="container">
-            <div class="row">
-                <div class="col-12 col-lg-8">
-                    <div class="c-stepper mb-4">
-                        <div class="progress progress--emploi mb-2">
-                            <div class="progress-bar progress-bar-{{ progress }}" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
+            {% if job_app_to_transfer|default:False %}
+                {% include "apply/includes/job_application_external_transfer_progress.html" with job_app_to_transfer=job_app_to_transfer step=step only %}
+            {% else %}
+                <div class="row">
+                    <div class="col-12 col-lg-8">
+                        <div class="c-stepper mb-4">
+                            <div class="progress progress--emploi mb-2">
+                                <div class="progress-bar progress-bar-{{ progress }}" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100">
+                                </div>
                             </div>
+                            <span>
+                                {% block progress_title %}
+                                    {% if auto_prescription_process %}
+                                        Auto-prescription
+                                    {% else %}
+                                        Postuler
+                                    {% endif %}
+                                {% endblock %}
+                            </span>
                         </div>
-                        <span>
-                            {% block progress_title %}
-                                {% if auto_prescription_process %}
-                                    Auto-prescription
-                                {% else %}
-                                    Postuler
-                                {% endif %}
-                            {% endblock %}
-                        </span>
                     </div>
                 </div>
-            </div>
+            {% endif %}
             <div class="row">
                 <div class="col-12{% if not full_content_width %} col-lg-8{% endif %}">
                     <div class="c-form">
@@ -88,7 +96,11 @@
                             {% block form_content %}{% endblock %}
 
                             {% block form_submit_button %}
-                                {% itou_buttons_form primary_label="Suivant" secondary_url=back_url %}
+                                {% if reset_url %}
+                                    {% itou_buttons_form primary_label="Suivant" secondary_url=back_url reset_url=reset_url %}
+                                {% else %}
+                                    {% itou_buttons_form primary_label="Suivant" secondary_url=back_url %}
+                                {% endif %}
                             {% endblock %}
                         </form>
                     </div>

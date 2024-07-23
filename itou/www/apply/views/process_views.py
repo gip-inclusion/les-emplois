@@ -31,6 +31,7 @@ from itou.www.apply.forms import (
     PriorActionForm,
 )
 from itou.www.apply.views import common as common_views, constants as apply_view_constants
+from itou.www.apply.views.submit_views import ApplicationJobsView
 from itou.www.companies_views.views import CompanyCardView, JobDescriptionCardView
 from itou.www.search.views import EmployerSearchView
 
@@ -648,6 +649,39 @@ class JobApplicationExternalTransferStep1JobDescriptionCardView(LoginRequiredMix
             "job_app_to_transfer": self.job_application,
             "matomo_custom_title": data["matomo_custom_title"] + " (transfert)",
         }
+
+
+class JobApplicationExternalTransferStep2View(ApplicationJobsView):
+    def setup(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            self.job_application = get_object_or_404(
+                JobApplication.objects.is_active_company_member(request.user).select_related(
+                    "job_seeker", "to_company"
+                ),
+                pk=kwargs["job_application_id"],
+            )
+            kwargs["job_seeker_public_id"] = self.job_application.job_seeker.public_id
+        return super().setup(request, *args, **kwargs)
+
+    def get_initial(self):
+        selected_jobs = []
+        if job_id := self.request.GET.get("job_description_id"):
+            selected_jobs.append(job_id)
+        return {"selected_jobs": selected_jobs}
+
+    def get_next_url(self):
+        raise NotImplementedError()
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {
+            "job_app_to_transfer": self.job_application,
+            "step": 2,
+            "reset_url": reverse("apply:details_for_company", kwargs={"job_application_id": self.job_application.pk}),
+            "page_title": "Transférer la candidature",
+        }
+
+    def get_back_url(self):
+        return get_safe_url(self.request, "back_url")
 
 
 @login_required
