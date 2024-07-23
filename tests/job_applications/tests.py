@@ -1740,7 +1740,7 @@ def test_job_application_transitions(transition, from_state):
     job_application = JobApplicationFactory(state=from_state)
     user = job_application.to_company.members.first()
     kwargs = {"user": user}
-    if transition.name == "transfer":
+    if transition.name in ["transfer", "external_transfer"]:
         target_company = CompanyFactory(with_membership=True)
         target_company.members.add(user)
         kwargs["target_company"] = target_company
