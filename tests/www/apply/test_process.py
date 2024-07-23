@@ -1632,26 +1632,24 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 in mail.outbox[0].body
 
 
+@override_settings(API_BAN_BASE_URL="http://ban-api", TALLY_URL="https://tally.so")
 class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.company = CompanyFactory(with_membership=True, with_jobs=True, name="La brigade - entreprise par défaut")
-
-    def setUp(self):
-        self.job_seeker = JobSeekerWithAddressFactory(
+        cls.job_seeker = JobSeekerWithAddressFactory(
             with_pole_emploi_id=True,
             with_ban_api_mocked_address=True,
         )
 
     def create_job_application(self, *args, **kwargs):
-        extra_kwargs = kwargs or {}
         kwargs = {
             "selected_jobs": self.company.jobs.all(),
             "state": JobApplicationState.PROCESSING,
             "job_seeker": self.job_seeker,
             "to_company": self.company,
             "hiring_end_at": None,
-        } | extra_kwargs
+        } | kwargs
         return JobApplicationSentByJobSeekerFactory(**kwargs)
 
     def _accept_view_post_data(self, job_application, post_data=None):
@@ -1698,12 +1696,11 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             **certified_criteria_default_fields,
         } | extra_post_data
 
-    @override_settings(API_BAN_BASE_URL="http://ban-api")
     @mock.patch(
         "itou.utils.apis.geocoding.get_geocoding_data",
         side_effect=mock_get_geocoding_data_by_ban_api_resolved,
     )
-    def accept_job_application(self, _mock, job_application, post_data=None, city=None, assert_successful=True):
+    def accept_job_application(self, _mock, job_application, post_data=None, assert_successful=True):
         """
         This is not a test. It's a shortcut to process "apply:accept" view steps:
         - GET
@@ -1720,7 +1717,6 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         # Make sure modal is hidden.
         assert response.headers.get("HX-Trigger") is None
 
-        # if not post_data:
         post_data = self._accept_view_post_data(job_application=job_application, post_data=post_data)
 
         response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
@@ -1729,8 +1725,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             # Easier to debug than just a « sorry, the modal goes on a strike ».
             assert not response.context["has_form_error"]
             assert (
-                response.headers.get("HX-Trigger")
-                == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
+                response.headers["HX-Trigger"] == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
             )
         else:
             assert response.headers.get("HX-Trigger") is None
@@ -1747,19 +1742,19 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
         return response, next_url
 
+    _nominal_cases = list(
+        product(
+            [Approval.get_default_end_date(timezone.localdate()), None],
+            JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES,
+        )
+    )
+
     @parametrize(
         "hiring_end_at,state",
-        list(
-            product(
-                [
-                    Approval.get_default_end_date(timezone.localdate()),
-                    None,
-                ],
-                JobApplicationWorkflow.CAN_BE_ACCEPTED_STATES,
-            )
-        ),
+        _nominal_cases,
+        ids=[state + ("_no_end_date" if not end_at else "") for end_at, state in _nominal_cases],
     )
-    def test_nominal_case(self, hiring_end_at, state):
+    def test_nominal_case(self, *, hiring_end_at, state):
         today = timezone.localdate()
         job_application = self.create_job_application(state=state)
         previous_last_checked_at = self.job_seeker.last_checked_at
@@ -1793,12 +1788,16 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         # last_checked_at has been updated
         assert job_application.job_seeker.last_checked_at > previous_last_checked_at
 
-    def test_select_other_job_description_for_job_application(self, *args, **kwargs):
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+    )
+    def test_select_other_job_description_for_job_application(self, _mock):
+        create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
         job_application = self.create_job_application()
         employer = self.company.members.first()
         self.client.force_login(employer)
 
-        city = City.objects.order_by("?").first()
         url = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
         response = self.client.get(url)
 
@@ -1806,30 +1805,19 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assertNotContains(response, "Postes fermés au recrutement")
         assertNotContains(response, "Préciser le nom du poste (code ROME)")
 
-        # Select "Autre": must provide new job detail fields
+        # Selecting "Autre" must enable the employer to create a new job description
+        # linked to the accepted job application.
         post_data = {
             "hired_job": AcceptForm.OTHER_HIRED_JOB,
         }
         post_data = self._accept_view_post_data(job_application=job_application, post_data=post_data)
         response = self.client.post(url, data=post_data)
+        assertContains(response, "Localisation du poste")
         assertContains(response, "Préciser le nom du poste (code ROME)")
 
-        # Check form errors.
-        # NOTE(cms): Not sure if this is really useful...
-        response = self.client.post(url, data=post_data)
-        assert response.status_code == 200
-
-        post_data |= {"location": city.pk}
-        response = self.client.post(url, data=post_data)
-        assert response.status_code == 200
-
-        appellation = Appellation.objects.order_by("?").first()
-        post_data |= {"appellation": appellation.pk}
-        response = self.client.post(url, data=post_data)
-        assert response.status_code == 200
-
-        tomorrow = timezone.localdate() + relativedelta(days=1)
-        post_data |= {"hiring_start_at": f"{tomorrow:%Y-%m-%d}"}
+        city = City.objects.order_by("?").first()
+        appellation = Appellation.objects.get(rome_id="M1805")
+        post_data |= {"location": city.pk, "appellation": appellation.pk}
         response = self.client.post(url, data=post_data)
         assert response.status_code == 200
 
@@ -1969,7 +1957,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             list(response.context["messages"])[-1]
         )
 
-    def test_with_active_suspension(self, *args, **kwargs):
+    def test_with_active_suspension(self):
         """Test the `accept` transition with active suspension for active user"""
         employer = self.company.members.first()
         today = timezone.localdate()
@@ -2021,7 +2009,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             days=(suspension.end_at - suspension.start_at).days
         )
 
-    def test_with_manual_approval_delivery(self, *args, **kwargs):
+    def test_with_manual_approval_delivery(self):
         """
         Test the "manual approval delivery mode" path of the view.
         """
@@ -2049,7 +2037,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         job_application.refresh_from_db()
         assert job_application.approval_delivery_mode == job_application.APPROVAL_DELIVERY_MODE_MANUAL
 
-    def test_update_hiring_start_date_of_two_job_applications(self, *args, **kwargs):
+    def test_update_hiring_start_date_of_two_job_applications(self):
         hiring_start_at = timezone.localdate() + relativedelta(months=2)
         hiring_end_at = hiring_start_at + relativedelta(months=2)
         approval_default_ending = Approval.get_default_end_date(start_at=hiring_start_at)
@@ -2138,7 +2126,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert job_app_starting_later.state.is_accepted
         assert job_app_starting_later.approval.start_at == job_app_starting_earlier.hiring_start_at
 
-    def test_with_double_user(self, *args, **kwargs):
+    def test_with_double_user(self):
         job_application = self.create_job_application()
         job_seeker = job_application.job_seeker
 
@@ -2176,8 +2164,11 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             list(response.context["messages"])[0]
         )
 
-    @override_settings(TALLY_URL="https://tally.so")
-    def test_nir_readonly(self, *args, **kwargs):
+    @mock.patch(
+        "itou.utils.apis.geocoding.get_geocoding_data",
+        side_effect=mock_get_geocoding_data_by_ban_api_resolved,
+    )
+    def test_nir_readonly(self, _mock):
         job_application = self.create_job_application()
 
         employer = self.company.members.first()
@@ -2209,7 +2200,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             html=True,
         )
 
-    def test_no_nir_update(self, *args, **kwargs):
+    def test_no_nir_update(self):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.save()
@@ -2224,11 +2215,15 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         self.assertNotContains(response, DISABLED_NIR)
 
         post_data = self._accept_view_post_data(job_application)
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
+        response, _ = self.accept_job_application(
+            job_application=job_application, assert_successful=False, post_data=post_data
+        )
         self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
 
         post_data["nir"] = "1234"
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
+        response, _ = self.accept_job_application(
+            job_application=job_application, assert_successful=False, post_data=post_data
+        )
         self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
         self.assertFormError(
             response.context["form_personal_data"],
@@ -2242,7 +2237,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         jobseeker_profile.refresh_from_db()
         assert jobseeker_profile.nir == NEW_NIR
 
-    def test_no_nir_other_user(self, *args, **kwargs):
+    def test_no_nir_other_user(self):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.save()
@@ -2254,13 +2249,14 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
         employer = self.company.members.first()
         self.client.force_login(employer)
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         post_data = {
             "pole_emploi_id": jobseeker_profile.pole_emploi_id,
             "nir": other_job_seeker.jobseeker_profile.nir,
         }
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
+        response, _ = self.accept_job_application(
+            job_application=job_application, assert_successful=False, post_data=post_data
+        )
         self.assertContains(
             response, "Le numéro de sécurité sociale est déjà associé à un autre utilisateur", html=True
         )
@@ -2270,7 +2266,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             "Ce numéro de sécurité sociale est déjà associé à un autre utilisateur.",
         )
 
-    def test_no_nir_update_with_reason(self, *args, **kwargs):
+    def test_no_nir_update_with_reason(self):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.save()
@@ -2280,13 +2276,16 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         self.client.force_login(employer)
 
         post_data = self._accept_view_post_data(job_application=job_application)
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
+        response, _ = self.accept_job_application(
+            job_application=job_application, assert_successful=False, post_data=post_data
+        )
         self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
 
         # Check the box
         post_data["lack_of_nir"] = True
-        response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
+        response, _ = self.accept_job_application(
+            job_application=job_application, assert_successful=False, post_data=post_data
+        )
         self.assertContains(response, "Le numéro de sécurité sociale n'est pas valide", html=True)
         self.assertContains(response, "Veuillez sélectionner un motif pour continuer", html=True)
 
@@ -2295,7 +2294,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         job_application.job_seeker.refresh_from_db()
         assert job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NO_NIR
 
-    def test_lack_of_nir_reason_update(self, *args, **kwargs):
+    def test_lack_of_nir_reason_update(self):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
@@ -2326,8 +2325,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert not job_application.job_seeker.jobseeker_profile.lack_of_nir_reason
         assert job_application.job_seeker.jobseeker_profile.nir == NEW_NIR
 
-    @override_settings(TALLY_URL="https://tally.so")
-    def test_lack_of_nir_reason_other_user(self, *args, **kwargs):
+    def test_lack_of_nir_reason_other_user(self):
         jobseeker_profile = self.job_seeker.jobseeker_profile
         jobseeker_profile.nir = ""
         jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
@@ -2355,7 +2353,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             html=True,
         )
 
-    def test_accept_after_cancel(self, *args, **kwargs):
+    def test_accept_after_cancel(self):
         # A canceled job application is not linked to an approval
         # unless the job seeker has an accepted job application.
         job_application = self.create_job_application(state=job_applications_enums.JobApplicationState.CANCELLED)
