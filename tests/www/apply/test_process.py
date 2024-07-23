@@ -454,6 +454,32 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
 
         assert str(html_fragment) == self.snapshot
 
+    def test_external_transfer_log_display(self):
+        job_seeker = JobSeekerFactory()
+        with freeze_time("2023-12-10 11:11:00", tz_offset=-1):
+            job_app = JobApplicationFactory(
+                for_snapshot=True,
+                job_seeker=job_seeker,
+                sent_by_authorized_prescriber_organisation=True,
+            )
+
+        employer = job_app.to_company.active_members.first()
+        other_company = CompanyFactory()
+
+        # transition logs setup
+        with freeze_time("2023-12-12 13:37:00", tz_offset=-1):
+            job_app.refuse(user=employer)
+        with freeze_time("2023-12-12 13:38:00", tz_offset=-1):
+            job_app.external_transfer(user=employer, target_company=other_company)
+
+        self.client.force_login(employer)
+
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_app.pk})
+        response = self.client.get(url)
+        html_fragment = self._get_transition_logs_content(response, job_app)
+
+        assert str(html_fragment) == self.snapshot
+
     def test_details_for_company_transition_logs_hides_hired_by_other(self, *args, **kwargs):
         job_seeker = JobSeekerFactory()
         with freeze_time("2023-12-10 11:11:00", tz_offset=-1):

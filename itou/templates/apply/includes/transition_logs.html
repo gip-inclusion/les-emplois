@@ -4,7 +4,11 @@
             <li>
                 <time datetime="{{ log.timestamp.isoformat }}">Le {{ log.timestamp|date:dt_format }}</time>
                 <span>
-                    Passé en "{{ log.pretty_to_state }}"
+                    {% if log.transition == "external_transfer" %}
+                        Candidature transférée à un autre employeur
+                    {% else %}
+                        Passé en "{{ log.pretty_to_state }}"
+                    {% endif %}
                     {% if log.user and log.to_state != JobApplicationState.OBSOLETE %}par {{ log.user.get_full_name }}{% endif %}
                 </span>
             </li>
