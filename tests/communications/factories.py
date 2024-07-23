@@ -22,5 +22,5 @@ class AnnouncementItemFactory(factory.django.DjangoModelFactory):
         model = AnnouncementItem
 
     campaign = factory.SubFactory(AnnouncementCampaignFactory)
-    title = factory.Faker("word")
-    description = factory.Faker("word")
+    title = factory.Faker("sentence", locale="fr_FR")
+    description = factory.Faker("paragraph", locale="fr_FR")
