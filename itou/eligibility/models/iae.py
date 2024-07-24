@@ -21,6 +21,20 @@ logger = logging.getLogger(__name__)
 
 class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
     def for_job_seeker_and_siae(self, job_seeker, *, siae=None):
+        """
+        A diagnosis is visible:
+            - employer: when the diagnosis is made by an authorized
+              prescriber, or when the diagnosis is made by their SIAE
+              (auto-prescription).
+            - prescriber: when the diagnosis is made by an authorized
+              prescriber
+            - job_seeker: when the diagnosis is about them (both from
+              authorized prescribers and employers).
+
+        Only use the siae keyword argument when the viewer is:
+            - an active member of the siae, or
+            - the job seeker the diagnosis is about.
+        """
         author_filter = models.Q(author_kind=AuthorKind.PRESCRIBER)
         if siae is not None:
             author_filter |= models.Q(author_siae=siae)
@@ -65,7 +79,8 @@ class EligibilityDiagnosisManager(models.Manager):
 
         If the `for_siae` argument is passed, it means that we are looking for
         a diagnosis from an employer perspective. The scope is restricted to
-        avoid showing diagnoses made by other employers.
+        avoid showing diagnoses made by other employers. See
+        EligibilityDiagnosisManager.for_job_seeker_and_siae for details.
 
         A diagnosis made by a prescriber takes precedence even when an employer
         diagnosis already exists.
