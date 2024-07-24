@@ -41,7 +41,7 @@ class QPV(models.Model):
         return f"<pk={self.pk}, code={self.code},  name={self.name}>"
 
     def __contains__(self, geom: gis_geos.GEOSGeometry) -> bool:
-        return getattr(self, "geometry").contains(geom)
+        return self.geometry.contains(geom)
 
     @classmethod
     def in_qpv(cls, obj_with_geometry, geom_field="geom"):

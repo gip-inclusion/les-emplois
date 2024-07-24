@@ -665,7 +665,7 @@ class JobDescription(models.Model):
         # don't want full genericity yet. We could be DRYer by using a mixin later,
         # but we'd need to handle some extra edge cases.
         instance = super().from_db(db, field_names, values)
-        setattr(instance, "_old_is_active", instance.is_active)
+        instance._old_is_active = instance.is_active
         return instance
 
     def save(self, *args, **kwargs):

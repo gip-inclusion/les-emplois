@@ -318,7 +318,7 @@ class User(AbstractUser, AddressMixin):
     @classmethod
     def from_db(cls, db, field_names, values):
         instance = super().from_db(db, field_names, values)
-        instance._old_values = dict(zip(field_names, values))
+        instance._old_values = dict(zip(field_names, values, strict=True))
         return instance
 
     def has_data_changed(self, fields):
@@ -1044,7 +1044,7 @@ class JobSeekerProfile(models.Model):
     @classmethod
     def from_db(cls, db, field_names, values):
         instance = super().from_db(db, field_names, values)
-        instance._old_values = dict(zip(field_names, values))
+        instance._old_values = dict(zip(field_names, values, strict=True))
         return instance
 
     def has_data_changed(self, fields):

@@ -112,10 +112,10 @@ class Command(BaseCommand):
                         for obj in exc.restricted_objects:
                             if obj.birth_place == commune:
                                 obj.birth_place = None
-                                setattr(obj, "_birth_place", (commune.code, commune.name))
+                                obj._birth_place = commune.code, commune.name
                             if obj.hexa_commune == commune:
                                 obj.hexa_commune = None
-                                setattr(obj, "_hexa_commune", (commune.code, commune.name))
+                                obj._hexa_commune = commune.code, commune.name
                             profiles_to_remap.append(obj)
                         JobSeekerProfile.objects.bulk_update(
                             exc.restricted_objects,

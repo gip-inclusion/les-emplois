@@ -75,7 +75,7 @@ def geolocate_qs(qs, is_verbose=False):
         print(f"> count={localizable_qs.count()} of these have an address and a post code.")
 
     for obj, geo_result in zip(
-        localizable_qs, batch_geocode(localizable_qs.values("pk", "address_line_1", "post_code"))
+        localizable_qs, batch_geocode(localizable_qs.values("pk", "address_line_1", "post_code")), strict=True
     ):
         score = float(geo_result["result_score"] or 0.0)
         if is_verbose:

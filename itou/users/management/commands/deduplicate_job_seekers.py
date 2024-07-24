@@ -182,7 +182,7 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
 
         pbar = tqdm(total=len(duplicates_dict.items()))
 
-        for pe_id, duplicates in duplicates_dict.items():
+        for _pe_id, duplicates in duplicates_dict.items():
             pbar.update(1)
 
             users_with_approval = [u for u in duplicates if u.approvals.exists()]

@@ -263,6 +263,7 @@ class ApplicantsAPITest(APITestCase, ParametrizedTestCase):
         for job_seeker, result in zip(
             [job_seeker1, job_seeker2],
             [result_for_jobseeker1, result_for_jobseeker2],
+            strict=True,
         ):
             assert {
                 "civilite": job_seeker.title,

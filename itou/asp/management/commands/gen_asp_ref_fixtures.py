@@ -226,7 +226,7 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
         df = self.load_dataframe(path)
         records = []
 
-        for idx, row in df.iterrows():
+        for _idx, row in df.iterrows():
             start_date = parse_asp_date(row["Rme_date_debut_effet"])
             end_date = parse_asp_date(row["Rme_date_fin_effet"])
             elt = {
