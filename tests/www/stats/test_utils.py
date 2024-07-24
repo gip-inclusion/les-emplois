@@ -16,12 +16,9 @@ from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.www.stats import utils
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
-from tests.prescribers.factories import (
-    PrescriberOrganizationWithMembershipFactory,
-)
-from tests.users.factories import (
-    PrescriberFactory,
-)
+from tests.prescribers.factories import \
+    PrescriberOrganizationWithMembershipFactory
+from tests.users.factories import PrescriberFactory
 from tests.utils.tests import get_response_for_middlewaremixin
 
 
@@ -68,8 +65,7 @@ def test_can_view_stats_siae_aci():
 @pytest.mark.parametrize(
     "region,expected",
     itertools.chain(
-        [(region, True) for region in settings.STATS_SIAE_HIRING_REPORT_REGION_WHITELIST],
-        [(region, False) for region in set(REGIONS) - set(settings.STATS_SIAE_HIRING_REPORT_REGION_WHITELIST)],
+        [(region, True) for region in set(REGIONS)]
     ),
 )
 @pytest.mark.parametrize("is_admin", [True, False])

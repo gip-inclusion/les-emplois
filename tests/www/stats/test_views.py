@@ -17,7 +17,8 @@ from itou.www.stats import urls as stats_urls
 from itou.www.stats.views import get_params_aci_asp_ids_for_department
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
-from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.prescribers.factories import \
+    PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import PrescriberFactory
 from tests.utils.test import TestCase
 

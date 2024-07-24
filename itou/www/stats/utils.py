@@ -6,11 +6,9 @@ from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
-from itou.prescribers.enums import (
-    DTPE_SAFIR_CODE_TO_DEPARTMENTS,
-    PrescriberAuthorizationStatus,
-    PrescriberOrganizationKind,
-)
+from itou.prescribers.enums import (DTPE_SAFIR_CODE_TO_DEPARTMENTS,
+                                    PrescriberAuthorizationStatus,
+                                    PrescriberOrganizationKind)
 from itou.prescribers.models import PrescriberOrganization
 
 
@@ -69,10 +67,7 @@ def can_view_stats_siae_orga_etp(request):
 
 
 def can_view_stats_siae_hiring_report(request):
-    return (
-        can_view_stats_siae(request)
-        and request.current_organization.region in settings.STATS_SIAE_HIRING_REPORT_REGION_WHITELIST
-    )
+    return can_view_stats_siae(request)
 
 
 def can_view_stats_cd(request):
