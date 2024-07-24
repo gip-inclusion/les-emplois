@@ -12,11 +12,9 @@ def update_active_announcement_cache():
     today = date.today()
     last_edition_boundary = today.replace(day=1) - timedelta(days=1)
 
-    campaign = (
-        AnnouncementCampaign.objects.filter(
-            start_date__lte=today, start_date__gt=last_edition_boundary
-        ).prefetch_related("items")
-    )
+    campaign = AnnouncementCampaign.objects.filter(
+        start_date__lte=today, start_date__gt=last_edition_boundary
+    ).prefetch_related("items")
 
     def get_cache_expiration():
         if not len(campaign):

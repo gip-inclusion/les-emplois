@@ -1,13 +1,11 @@
 from urllib.parse import urlencode
 
-from django.core.cache import cache
-
 import itou.approvals.enums as approvals_enums
 import itou.companies.enums as companies_enums
 import itou.institutions.enums as institutions_enums
 import itou.job_applications.enums as job_applications_enums
 import itou.prescribers.enums as prescribers_enums
-from itou.communications.cache import get_cached_active_announcement, update_active_announcement_cache
+from itou.communications.cache import get_cached_active_announcement
 
 
 def expose_enums(*args):
@@ -47,7 +45,5 @@ def active_announcement_campaign(request):
     campaign = get_cached_active_announcement()
 
     return {
-        "active_campaign_announce": (
-            campaign if campaign is not None and campaign.items.count() else None
-        ),
+        "active_campaign_announce": (campaign if campaign is not None and campaign.items.count() else None),
     }

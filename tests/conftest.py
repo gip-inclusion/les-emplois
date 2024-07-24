@@ -26,7 +26,7 @@ from rest_framework.test import APIClient
 pytest.register_assert_rewrite("tests.utils.test", "tests.utils.htmx.test")
 
 from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY  # noqa: E402
-from itou.communications.models import AnnouncementCampaign # noqa: E402
+from itou.communications.models import AnnouncementCampaign  # noqa: E402
 from itou.utils import faker_providers  # noqa: E402
 from itou.utils.storage.s3 import s3_client  # noqa: E402
 from tests.users.factories import ItouStaffFactory  # noqa: E402
