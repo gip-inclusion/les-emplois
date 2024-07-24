@@ -422,6 +422,7 @@ METABASE_PASSWORD = os.getenv("METABASE_PASSWORD")
 # Embedding signed Metabase dashboard
 METABASE_SITE_URL = os.getenv("METABASE_SITE_URL")
 METABASE_SECRET_KEY = os.getenv("METABASE_SECRET_KEY")
+METABASE_API_KEY = os.getenv("METABASE_API_KEY")
 
 METABASE_HASH_SALT = os.getenv("METABASE_HASH_SALT")
 
@@ -462,6 +463,14 @@ CACHES = {
     },
     "failsafe": {
         **redis_common_django_settings,
+        "OPTIONS": {
+            "CLIENT_CLASS": "itou.utils.cache.FailSafeRedisCacheClient",
+        },
+    },
+    "stats": {
+        **redis_common_django_settings,
+        "KEY_PREFIX": "stats",
+        "TIMEOUT": 42 * 24 * 3600,  # Use a long (but not infinite) timeout to not handle deprecated keys ourselves
         "OPTIONS": {
             "CLIENT_CLASS": "itou.utils.cache.FailSafeRedisCacheClient",
         },
