@@ -27,9 +27,7 @@
     // Can be called from any element within a dropdown.
     const dropdown = this.closest('.dropdown');
     const btnFilter = dropdown.querySelector(".btn-dropdown-filter");
-    const hasValue = fieldHasValue(dropdown);
-    btnFilter.classList.toggle('has-selected-item', hasValue);
-    btnFilter.classList.toggle('font-weight-bold', hasValue);
+    btnFilter.classList.toggle('has-selected-item', fieldHasValue(dropdown));
   }
 
   function updateFiltersCount() {
