@@ -25,7 +25,8 @@ from rest_framework.test import APIClient
 # Rewrite before importing itou code.
 pytest.register_assert_rewrite("tests.utils.test", "tests.utils.htmx.test")
 
-from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENT_CAMPAIGN_KEY  # noqa: E402
+from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY  # noqa: E402
+from itou.communications.models import AnnouncementCampaign # noqa: E402
 from itou.utils import faker_providers  # noqa: E402
 from itou.utils.storage.s3 import s3_client  # noqa: E402
 from tests.users.factories import ItouStaffFactory  # noqa: E402
@@ -153,9 +154,9 @@ def cached_announce_campaign():
     """
     Populates cache for AnnouncementCampaign to avoid an extra database hit in many tests
     """
-    cache.set(CACHE_ACTIVE_ANNOUNCEMENT_CAMPAIGN_KEY, {"value": None}, None)
+    cache.set(CACHE_ACTIVE_ANNOUNCEMENTS_KEY, AnnouncementCampaign.objects.none(), None)
     yield
-    cache.delete(CACHE_ACTIVE_ANNOUNCEMENT_CAMPAIGN_KEY)
+    cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
 
 
 @pytest.fixture

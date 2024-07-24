@@ -1446,7 +1446,7 @@ def test_job_application_state_badge_oob_swap(snapshot):
 
 
 def test_active_announcement_campaign_context_processor(client):
-    cache.delete(CACHE_ACTIVE_ANNOUNCEMENT_CAMPAIGN_KEY)
+    cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
     campaign = AnnouncementCampaignFactory(with_item=True)
 
     response = client.get(reverse("search:employers_home"))

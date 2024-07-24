@@ -10,16 +10,19 @@ class CommunicationsConfig(AppConfig):
 
     def ready(self):
         from itou.communications.models import AnnouncementCampaign, AnnouncementItem
-        from itou.communications.signals import update_cached_announcement_on_model_changes
+        from itou.communications.signals import (
+            update_cached_announcement_on_campaign_changes,
+            update_cached_announcement_on_item_changes,
+        )
 
         self.module.autodiscover()
         post_migrate.connect(post_communications_migrate_handler, sender=self)
 
-        post_save.connect(update_cached_announcement_on_model_changes, sender=AnnouncementCampaign)
-        post_delete.connect(update_cached_announcement_on_model_changes, sender=AnnouncementCampaign)
+        post_save.connect(update_cached_announcement_on_campaign_changes, sender=AnnouncementCampaign)
+        post_delete.connect(update_cached_announcement_on_campaign_changes, sender=AnnouncementCampaign)
 
-        post_save.connect(update_cached_announcement_on_model_changes, sender=AnnouncementItem)
-        post_delete.connect(update_cached_announcement_on_model_changes, sender=AnnouncementItem)
+        post_save.connect(update_cached_announcement_on_item_changes, sender=AnnouncementItem)
+        post_delete.connect(update_cached_announcement_on_item_changes, sender=AnnouncementItem)
 
 
 def post_communications_migrate_handler(sender, app_config, **kwargs):

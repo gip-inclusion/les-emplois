@@ -4,7 +4,7 @@ from django.core.cache import cache
 from freezegun import freeze_time
 from pytest_django.asserts import assertNumQueries
 
-from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENT_CAMPAIGN_KEY
+from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY
 from itou.utils.context_processors import active_announcement_campaign
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
 from tests.utils.test import TestCase
@@ -12,7 +12,7 @@ from tests.utils.test import TestCase
 
 class AnnouncementCampaignCacheTest(TestCase):
     def test_active_announcement_campaign_context_processor_cached(self):
-        cache.delete(CACHE_ACTIVE_ANNOUNCEMENT_CAMPAIGN_KEY)
+        cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
         campaign = AnnouncementCampaignFactory(with_item=True)
 
         with assertNumQueries(0):
@@ -48,7 +48,7 @@ class AnnouncementCampaignCacheTest(TestCase):
             active_announcement_campaign(None)["active_campaign_announce"] is None
 
     def test_costless_announcement_campaign_cache_when_no_announcement_created(self):
-        cache.delete(CACHE_ACTIVE_ANNOUNCEMENT_CAMPAIGN_KEY)
+        cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
         cache_updated_query_cost = 1
 
         with assertNumQueries(cache_updated_query_cost):
@@ -59,13 +59,13 @@ class AnnouncementCampaignCacheTest(TestCase):
 
     @freeze_time("2024-01-30")
     def test_active_announcement_campaign_cache_timeout(self):
-        cache.delete(CACHE_ACTIVE_ANNOUNCEMENT_CAMPAIGN_KEY)
+        cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
         campaign = AnnouncementCampaignFactory(start_date=date(2024, 1, 1), with_item=True)
 
         with assertNumQueries(0):
             assert active_announcement_campaign(None)["active_campaign_announce"] == campaign
 
         # NOTE: this test requires that the cache client is Redis (for the ttl function)
-        cache_time_remaining = cache.ttl(CACHE_ACTIVE_ANNOUNCEMENT_CAMPAIGN_KEY)
+        cache_time_remaining = cache.ttl(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
         twenty_four_hours = 60 * 60 * 24
         assert cache_time_remaining == twenty_four_hours

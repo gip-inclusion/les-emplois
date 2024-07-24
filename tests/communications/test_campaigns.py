@@ -5,7 +5,7 @@ from django.forms import ModelForm
 from django.forms.models import model_to_dict
 from django.urls import reverse
 
-from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENT_CAMPAIGN_KEY
+from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY
 from itou.communications.models import AnnouncementCampaign
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
 from tests.utils.test import TestCase, parse_response_to_soup
@@ -60,7 +60,7 @@ class AnnouncementCampaignValidatorTest(TestCase):
 
 class TestRenderAnnouncementCampaign:
     def test_campaign_rendered_dashboard(self, client, snapshot):
-        cache.delete(CACHE_ACTIVE_ANNOUNCEMENT_CAMPAIGN_KEY)
+        cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
         campaign = AnnouncementCampaignFactory(max_items=3)
         AnnouncementItemFactory(campaign=campaign, title="Item A", description="Item A", priority=0)
         AnnouncementItemFactory(campaign=campaign, title="Item B", description="Item B", priority=1)
