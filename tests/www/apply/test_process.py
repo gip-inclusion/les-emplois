@@ -29,6 +29,7 @@ from itou.employee_record.enums import Status
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.utils import iae_diagnosis_for_user
 from itou.jobs.models import Appellation
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, UserKind
@@ -1159,7 +1160,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         assert has_considered_valid_diagnoses
 
         # Check diagnosis.
-        eligibility_diagnosis = job_application.get_eligibility_diagnosis()
+        eligibility_diagnosis = iae_diagnosis_for_user(employer, job_application)
         assert eligibility_diagnosis.author == employer
         assert eligibility_diagnosis.author_kind == AuthorKind.EMPLOYER
         assert eligibility_diagnosis.author_siae == job_application.to_company

@@ -32,6 +32,7 @@ from itou.approvals.utils import get_user_last_accepted_siae_job_application
 from itou.files.models import File
 from itou.job_applications.enums import JobApplicationState, Origin, SenderKind
 from itou.job_applications.models import JobApplication
+from itou.job_applications.utils import iae_diagnosis_for_user
 from itou.users.models import User
 from itou.utils import constants as global_constants
 from itou.utils.pagination import ItouPaginator, pager
@@ -122,7 +123,9 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
         context["approval_can_be_prolonged"] = approval.can_be_prolonged
         context["job_application"] = job_application
         context["matomo_custom_title"] = "Profil salarié"
-        context["eligibility_diagnosis"] = job_application and job_application.get_eligibility_diagnosis()
+        context["eligibility_diagnosis"] = job_application and iae_diagnosis_for_user(
+            self.request.user, job_application
+        )
         context["approval_deletion_form_url"] = None
         context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("approvals:list"))
 

@@ -6,7 +6,6 @@ from django.db import models, transaction
 from django.db.models import Case, Exists, OuterRef, When
 from django.utils import timezone
 
-from itou.approvals.models import Approval
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 
 from .common import (
@@ -33,6 +32,8 @@ class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
         filtered, e.g.:
         EligibilityDiagnosis.objects.has_approval().filter(_has_approval=True)
         """
+        from itou.approvals.models import Approval
+
         has_approval = Approval.objects.filter(user=OuterRef("job_seeker")).valid()
         return self.annotate(_has_approval=Exists(has_approval))
 

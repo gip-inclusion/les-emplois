@@ -511,7 +511,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     # (required for SIAEs subject to eligibility rules).
     # It is already linked to the job seeker but this double link is added
     # to easily find out which one was used for a given job application.
-    # Use `self.get_eligibility_diagnosis()` to handle business rules.
+    # Use `utils.iae_diagnosis_for_user()` to handle business rules.
     eligibility_diagnosis = models.ForeignKey(
         "eligibility.EligibilityDiagnosis",
         verbose_name="diagnostic d'éligibilité",
@@ -935,18 +935,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         if not user.is_employer:
             return False
         return self.is_in_transferable_state
-
-    def get_eligibility_diagnosis(self):
-        """
-        Returns the eligibility diagnosis linked to this job application or None.
-        """
-        if not self.to_company.is_subject_to_eligibility_rules:
-            return None
-        if self.eligibility_diagnosis:
-            return self.eligibility_diagnosis
-        # As long as the job application has not been accepted, diagnosis-related
-        # business rules may still prioritize one diagnosis over another.
-        return EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, for_siae=self.to_company)
 
     # Workflow transitions.
     @before_transition("accept", "refuse", "cancel", "render_obsolete")

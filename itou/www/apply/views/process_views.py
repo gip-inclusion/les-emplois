@@ -21,6 +21,7 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
+from itou.job_applications.utils import iae_diagnosis_for_user
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
     AcceptForm,
@@ -95,7 +96,7 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
         "can_view_personal_information": request.user.can_view_personal_information(job_application.job_seeker),
         "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
         "display_refusal_info": False,
-        "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
+        "eligibility_diagnosis": iae_diagnosis_for_user(request.user, job_application),
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "job_application": job_application,
@@ -150,7 +151,7 @@ def details_for_company(request, job_application_id, template_name="apply/proces
         "can_view_personal_information": True,  # SIAE members have access to personal info
         "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
         "display_refusal_info": False,
-        "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
+        "eligibility_diagnosis": iae_diagnosis_for_user(request.user, job_application),
         "eligibility_diagnosis_by_siae_required": job_application.eligibility_diagnosis_by_siae_required(),
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
@@ -223,7 +224,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     context = {
         "can_view_personal_information": request.user.can_view_personal_information(job_application.job_seeker),
         "can_edit_personal_information": request.user.can_edit_personal_information(job_application.job_seeker),
-        "eligibility_diagnosis": job_application.get_eligibility_diagnosis(),
+        "eligibility_diagnosis": iae_diagnosis_for_user(request.user, job_application),
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "job_application": job_application,
         "transition_logs": transition_logs,

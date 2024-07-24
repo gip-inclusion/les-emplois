@@ -18,7 +18,6 @@ from django.utils.functional import cached_property
 from django.utils.safestring import mark_safe
 
 from itou.approvals.enums import Origin
-from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.asp.models import (
     AllocationDuration,
     Commune,
@@ -471,6 +470,8 @@ class User(AbstractUser, AddressMixin):
 
     @cached_property
     def latest_pe_approval(self):
+        from itou.approvals.models import PoleEmploiApproval
+
         if not self.is_job_seeker:
             return None
 
@@ -556,6 +557,8 @@ class User(AbstractUser, AddressMixin):
         Returns an existing valid Approval or create a new entry from
         a pre-existing valid PoleEmploiApproval by copying its data.
         """
+        from itou.approvals.models import Approval
+
         # FIXME(vperron): move this method and all the other approval-related code to JobSeekerProfile.
         if not self.has_valid_common_approval:
             raise RuntimeError("Invalid approval.")
