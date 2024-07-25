@@ -17,6 +17,7 @@ make sure that the correct filters are "Verrouillé".
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.clickjacking import xframe_options_exempt
@@ -31,6 +32,7 @@ from itou.common_apps.address.departments import (
 )
 from itou.companies import models as companies_models
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
 from itou.utils.apis import metabase as mb
 from itou.utils.perms.company import get_current_company_or_404
@@ -183,6 +185,17 @@ def stats_pilotage(request, dashboard_id):
         "iframeurl": mb.metabase_embedded_url(dashboard_id=dashboard_id, with_title=True),
     }
     return render_stats(request=request, context=context, template_name="stats/stats_pilotage.html")
+
+
+@login_required
+def stats_redirect(request, dashboard_name):
+    match request.user.kind:
+        case UserKind.LABOR_INSPECTOR:
+            normalized_organization_kind = request.current_organization.kind.lower().replace(" ", "_")
+        case _:
+            return HttpResponseNotFound()
+
+    return HttpResponseRedirect(reverse(f"stats:stats_{normalized_organization_kind}_{dashboard_name}"))
 
 
 @login_required

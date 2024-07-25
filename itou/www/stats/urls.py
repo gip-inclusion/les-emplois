@@ -10,6 +10,7 @@ urlpatterns = [
     # Public stats.
     path("", views.stats_public, name="stats_public"),
     path("pilotage/<int:dashboard_id>", views.stats_pilotage, name="stats_pilotage"),
+    path("redirect/<str:dashboard_name>", views.stats_redirect, name="redirect"),
     # Employer stats.
     path("siae/aci", views.stats_siae_aci, name="stats_siae_aci"),
     path("siae/etp", views.stats_siae_etp, name="stats_siae_etp"),
