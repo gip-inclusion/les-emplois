@@ -145,7 +145,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_view_stats_ddets_iae_aci": stats_utils.can_view_stats_ddets_iae_aci(request),
         "can_view_stats_ddets_log": stats_utils.can_view_stats_ddets_log(request),
         "can_view_stats_dreets_iae": stats_utils.can_view_stats_dreets_iae(request),
-        "can_view_stats_dgefp": stats_utils.can_view_stats_dgefp(request),
+        "can_view_stats_dgefp_iae": stats_utils.can_view_stats_dgefp_iae(request),
         "can_view_stats_dihal": stats_utils.can_view_stats_dihal(request),
         "can_view_stats_drihl": stats_utils.can_view_stats_drihl(request),
         "can_view_stats_iae_network": stats_utils.can_view_stats_iae_network(request),

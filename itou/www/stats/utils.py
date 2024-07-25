@@ -183,7 +183,7 @@ def can_view_stats_dreets_iae(request):
     )
 
 
-def can_view_stats_dgefp(request):
+def can_view_stats_dgefp_iae(request):
     """
     Users of the DGEFP institution can view the confidential DGEFP stats for all regions and departments.
     """

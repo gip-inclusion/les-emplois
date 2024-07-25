@@ -359,11 +359,11 @@ def test_can_view_stats_dreets_iae():
     assert utils.can_view_stats_dashboard_widget(request)
 
 
-def test_can_view_stats_dgefp():
+def test_can_view_stats_dgefp_iae():
     # Admin member of DGEFP can access.
     institution = InstitutionWithMembershipFactory(kind=InstitutionKind.DGEFP_IAE, department="93")
     request = get_request(institution.members.get())
-    assert utils.can_view_stats_dgefp(request)
+    assert utils.can_view_stats_dgefp_iae(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
     # Non admin member of DGEFP can access as well.
@@ -371,11 +371,11 @@ def test_can_view_stats_dgefp():
         kind=InstitutionKind.DGEFP_IAE, membership__is_admin=False, department="93"
     )
     request = get_request(institution.members.get())
-    assert utils.can_view_stats_dgefp(request)
+    assert utils.can_view_stats_dgefp_iae(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
     # Member of institution of wrong kind cannot access.
     institution = InstitutionWithMembershipFactory(kind=InstitutionKind.OTHER, department="93")
     request = get_request(institution.members.get())
-    assert not utils.can_view_stats_dgefp(request)
+    assert not utils.can_view_stats_dgefp_iae(request)
     assert utils.can_view_stats_dashboard_widget(request)
