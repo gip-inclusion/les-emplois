@@ -685,3 +685,6 @@ GPS_GROUPS_CREATED_AT_DATE = datetime.date(2024, 6, 12)
 API_DATADOG_BASE_URL = "https://api.datadoghq.eu/api/v2"
 API_DATADOG_API_KEY = os.getenv("API_DATADOG_API_KEY", None)
 API_DATADOG_APPLICATION_KEY = os.getenv("API_DATADOG_APPLICATION_KEY", None)
+
+# API Particuliers
+API_PARTICULIERS_TOKEN = os.getenv("API_PARTICULIERS_TOKEN", None)
