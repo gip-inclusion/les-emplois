@@ -24,10 +24,6 @@ logger = logging.getLogger(__name__)
 
 class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
     def for_job_seeker_and_siae(self, viewing_user, job_seeker, *, siae=None):
-        if viewing_user.is_superuser:
-            return self
-        if viewing_user.is_labor_inspector:
-            raise NotImplementedError
         assert viewing_user.kind in [UserKind.ITOU_STAFF, UserKind.EMPLOYER, UserKind.JOB_SEEKER, UserKind.PRESCRIBER]
         qs = self.filter(job_seeker=job_seeker)
         # Prescriber diagnosis are viewable to all.
@@ -35,13 +31,15 @@ class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
             Exists(PrescriberMembership.objects.active().filter(organization__is_authorized=True)),
             author_kind=AuthorKind.PRESCRIBER,
         )
-        if siae is not None and viewing_user.is_employer:
-            # SIAE make their own diagnosis for auto-prescriptions, only viewable to active members of that SIAE.
-            author_q |= models.Q(
-                author_siae=siae,
-                author_siae__members__user=viewing_user,
-                author_siae__members__is_active=True,
-            )
+        if siae is not None and viewing_user.kind in [UserKind.ITOU_STAFF, UserKind.EMPLOYER]:
+            siae_q = models.Q(author_siae=siae)
+            if viewing_user.is_employer:
+                # SIAE make their own diagnosis for auto-prescriptions, only viewable to active members of that SIAE.
+                siae_q &= models.Q(
+                    author_siae__companymembership__user=viewing_user,
+                    author_siae__companymembership__is_active=True,
+                )
+            author_q |= siae_q
         return qs.filter(
             models.Q(job_seeker=viewing_user)  # Job seekers see all diagnoses about them.
             | author_q

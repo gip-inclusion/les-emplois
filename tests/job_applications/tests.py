@@ -1897,16 +1897,20 @@ class JobApplicationXlsxExportTest(TestCase):
     @freeze_time("2024-07-05")
     def test_auto_prescription_xlsx_export(self):
         job_seeker = JobSeekerFactory(for_snapshot=True)
-        company = CompanyFactory(for_snapshot=True)
-        job_application = JobApplicationFactory(
+        company = CompanyFactory(for_snapshot=True, with_membership=True)
+        employer = company.members.get()
+        JobApplicationFactory(
             job_seeker=job_seeker,
             to_company=company,
             sender_company=company,
             sender_kind=SenderKind.EMPLOYER,
+            sender=employer,
         )
-        job_application.sender = company.memberships.first()
-        job_application.save(update_fields={"sender"})
-        response = stream_xlsx_export(JobApplication.objects.all(), "filename")
+
+        class FakeRequest:
+            user = employer
+
+        response = stream_xlsx_export(FakeRequest(), JobApplication.objects.all(), "filename")
         assert get_rows_from_streaming_response(response) == [
             JOB_APPLICATION_CSV_HEADERS,
             [
@@ -1923,7 +1927,7 @@ class JobApplicationXlsxExportTest(TestCase):
                 "",
                 "Ma structure",
                 "",
-                "",
+                "John DOE",
                 "05/07/2024",
                 "Nouvelle candidature",
                 "05/07/2024",
