@@ -5,7 +5,7 @@ import sentry_sdk
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse
 from django.utils import timezone
@@ -19,7 +19,7 @@ from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType, JobDescriptionSource
 from itou.companies.models import JobDescription
-from itou.eligibility.models import AdministrativeCriteria
+from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.files.forms import ItouFileField
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, PriorAction
@@ -999,10 +999,19 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
                 jobs.add((job.appellation.code, job.appellation.name))
         return sorted(jobs, key=lambda job: job[1])
 
+    def update_eligibility_kwargs(self, eligibility_kwargs):
+        # Hook for CompanyFilterJobApplicationsForm.
+        pass
+
     def filter(self, queryset):
         queryset = super().filter(queryset)
         if self.cleaned_data.get("eligibility_validated"):
-            queryset = queryset.eligibility_validated()
+            eligibility_kwargs = {"job_seeker": OuterRef("job_seeker")}
+            self.update_eligibility_kwargs(eligibility_kwargs)
+            return queryset.filter(
+                Exists(Approval.objects.filter(user=OuterRef("job_seeker")).valid())
+                | Exists(EligibilityDiagnosis.objects.valid().for_job_seeker_and_siae(**eligibility_kwargs))
+            )
 
         if senders := self.cleaned_data.get("senders"):
             queryset = queryset.filter(sender__id__in=senders)
@@ -1046,6 +1055,9 @@ class CompanyFilterJobApplicationsForm(CompanyPrescriberFilterJobApplicationsFor
                 for k, v in self.fields["states"].choices
                 if k != job_applications_enums.JobApplicationState.PRIOR_TO_HIRE
             ]
+
+    def update_eligibility_kwargs(self, eligibility_kwargs):
+        eligibility_kwargs["siae"] = OuterRef("to_company")
 
     def filter(self, queryset):
         queryset = super().filter(queryset)

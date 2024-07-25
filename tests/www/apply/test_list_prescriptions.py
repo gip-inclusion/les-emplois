@@ -4,10 +4,13 @@ import factory
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries
 
+from itou.eligibility.enums import AuthorKind
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplicationWorkflow
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.utils.urls import add_url_params
+from tests.companies.factories import CompanyFactory
+from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import (
     PrescriberOrganizationWith2MembershipFactory,
@@ -154,6 +157,45 @@ def test_list_prescriptions_filtered_by_company(client):
     response = client.get(reverse("apply:list_prescriptions"))
     applications = response.context["job_applications_page"].object_list
     assert len(applications) == 3
+
+
+def test_filtered_by_eligibility_validated_employer(client):
+    to_company = CompanyFactory(with_membership=True)
+    to_company_employer = to_company.members.get()
+    employer_jobapp = JobApplicationFactory(
+        sent_by_another_employer=True,
+        to_company=to_company,
+        eligibility_diagnosis=None,
+    )
+    sender = employer_jobapp.sender
+    job_seeker = employer_jobapp.job_seeker
+    # Do not see their diagnosis as valid.
+    IAEEligibilityDiagnosisFactory(
+        job_seeker=job_seeker,
+        author_kind=AuthorKind.EMPLOYER,
+        author_siae=employer_jobapp.sender_company,
+        author=sender,
+    )
+    # Do not see diagnosis from other employers.
+    IAEEligibilityDiagnosisFactory(
+        job_seeker=job_seeker,
+        author_kind=AuthorKind.EMPLOYER,
+        author_siae=to_company,
+        author=to_company_employer,
+    )
+    client.force_login(sender)
+    response = client.get(reverse("apply:list_prescriptions"), {"eligibility_validated": "on"})
+    applications = response.context["job_applications_page"].object_list
+    assert applications == []
+
+
+def test_filtered_by_eligibility_validated_prescriber(client):
+    to_company = CompanyFactory(with_membership=True)
+    prescriber_jobapp = JobApplicationFactory(to_company=to_company)
+    client.force_login(prescriber_jobapp.sender)
+    response = client.get(reverse("apply:list_prescriptions"))
+    applications = response.context["job_applications_page"].object_list
+    assert applications == [prescriber_jobapp]
 
 
 def test_list_prescriptions_filters(client, snapshot):
