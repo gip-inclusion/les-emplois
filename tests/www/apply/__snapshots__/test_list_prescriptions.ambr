@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: test_list_prescriptions_exports_as_pole_emploi_prescriber
+# name: test_exports_as_pole_emploi_prescriber
   '''
   <div class="c-info mb-3 mb-md-4" id="besoin-dun-chiffre">
                               <button aria-controls="collapseBesoinChiffre" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseBesoinChiffre" data-bs-toggle="collapse">
@@ -21,7 +21,7 @@
                           </div>
   '''
 # ---
-# name: test_list_prescriptions_filters
+# name: test_filters
   '''
   <div aria-labelledby="offcanvasApplyFiltersLabel" class="c-offcanvas-filters offcanvas offcanvas-end" id="offcanvasApplyFilters" tabindex="-1">
           <div class="offcanvas-header">

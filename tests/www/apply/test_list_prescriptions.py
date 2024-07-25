@@ -20,7 +20,7 @@ from tests.utils.test import BASE_NUM_QUERIES, assert_previous_step, parse_respo
 BESOIN_DUN_CHIFFRE = "besoin-dun-chiffre"
 
 
-def test_list_prescriptions(client):
+def test_get(client):
     """
     Connect as Thibault to see a list of job applications
     sent by his organization (Pôle emploi).
@@ -56,7 +56,7 @@ def test_list_prescriptions(client):
     assert len(response.context["job_applications_page"].object_list) == organization.jobapplication_set.count()
 
 
-def test_list_prescriptions_as_unauthorized_prescriber(client):
+def test_as_unauthorized_prescriber(client):
     prescriber = PrescriberFactory()
     JobApplicationFactory(
         job_seeker_with_address=True,
@@ -91,7 +91,7 @@ def test_list_prescriptions_as_unauthorized_prescriber(client):
     # assertNotContains(response, "Supersecretname")
 
 
-def test_list_prescriptions_filtered_by_state(client):
+def test_filtered_by_state(client):
     """
     Thibault wants to filter a list of job applications
     by the default initial state.
@@ -112,7 +112,7 @@ def test_list_prescriptions_filtered_by_state(client):
     assert len(applications) == 3
 
 
-def test_list_prescriptions_filtered_by_sender(client):
+def test_filtered_by_sender(client):
     organization = PrescriberOrganizationWith2MembershipFactory()
     a_prescriber, another_prescriber = organization.members.all()
     JobApplicationFactory(sender=another_prescriber, sender_prescriber_organization=organization)
@@ -124,7 +124,7 @@ def test_list_prescriptions_filtered_by_sender(client):
     assert applications[0].sender.id == another_prescriber.pk
 
 
-def test_list_prescriptions_filtered_by_job_seeker(client):
+def test_filtered_by_job_seeker(client):
     job_seeker = JobSeekerFactory()
     prescriber = PrescriberFactory()
     JobApplicationFactory(sender=prescriber, job_seeker=job_seeker)
@@ -141,7 +141,7 @@ def test_list_prescriptions_filtered_by_job_seeker(client):
     assert len(applications) == 3
 
 
-def test_list_prescriptions_filtered_by_company(client):
+def test_filtered_by_company(client):
     prescriber = PrescriberFactory()
     job_application, *others = JobApplicationFactory.create_batch(3, sender=prescriber)
     client.force_login(prescriber)
@@ -156,7 +156,7 @@ def test_list_prescriptions_filtered_by_company(client):
     assert len(applications) == 3
 
 
-def test_list_prescriptions_filters(client, snapshot):
+def test_filters(client, snapshot):
     client.force_login(PrescriberFactory())
 
     response = client.get(reverse("apply:list_prescriptions"))
@@ -165,7 +165,7 @@ def test_list_prescriptions_filters(client, snapshot):
     assert str(filter_form) == snapshot()
 
 
-def test_list_prescriptions_htmx_filters(client):
+def test_htmx_filters(client):
     prescriber = PrescriberFactory()
     JobApplicationFactory(sender=prescriber, state=JobApplicationState.ACCEPTED)
     client.force_login(prescriber)
@@ -194,7 +194,7 @@ def test_list_prescriptions_htmx_filters(client):
     assertSoupEqual(page, fresh_page)
 
 
-def test_list_prescriptions_exports_without_organization(client):
+def test_exports_without_organization(client):
     client.force_login(PrescriberFactory())
 
     response = client.get(reverse("apply:list_prescriptions_exports"))
@@ -202,7 +202,7 @@ def test_list_prescriptions_exports_without_organization(client):
     assertNotContains(response, BESOIN_DUN_CHIFFRE)
 
 
-def test_list_prescriptions_exports_with_organization(client):
+def test_exports_with_organization(client):
     client.force_login(PrescriberFactory(membership=True))
 
     response = client.get(reverse("apply:list_prescriptions_exports"))
@@ -210,7 +210,7 @@ def test_list_prescriptions_exports_with_organization(client):
     assertNotContains(response, BESOIN_DUN_CHIFFRE)
 
 
-def test_list_prescriptions_exports_as_pole_emploi_prescriber(client, snapshot):
+def test_exports_as_pole_emploi_prescriber(client, snapshot):
     job_application = JobApplicationFactory(
         sent_by_authorized_prescriber_organisation=True,
         sender_prescriber_organization__kind=PrescriberOrganizationKind.PE,
@@ -224,7 +224,7 @@ def test_list_prescriptions_exports_as_pole_emploi_prescriber(client, snapshot):
     assert str(soup) == snapshot
 
 
-def test_list_prescriptions_exports_as_employer(client):
+def test_exports_as_employer(client):
     job_application = JobApplicationFactory()
     client.force_login(job_application.to_company.members.get())
 
@@ -232,7 +232,7 @@ def test_list_prescriptions_exports_as_employer(client):
     assertNotContains(response, BESOIN_DUN_CHIFFRE)
 
 
-def test_list_prescriptions_exports_back_to_list(client):
+def test_exports_back_to_list(client):
     client.force_login(PrescriberFactory())
 
     response = client.get(
@@ -242,7 +242,7 @@ def test_list_prescriptions_exports_back_to_list(client):
     assertNotContains(response, BESOIN_DUN_CHIFFRE)
 
 
-def test_list_prescriptions_exports_download(client):
+def test_exports_download(client):
     job_application = JobApplicationFactory()
     client.force_login(job_application.sender)
 
@@ -251,7 +251,7 @@ def test_list_prescriptions_exports_download(client):
     assert "spreadsheetml" in response.get("Content-Type")
 
 
-def test_list_prescriptions_exports_download_as_employer(client):
+def test_exports_download_as_employer(client):
     job_application = JobApplicationFactory()
     client.force_login(job_application.to_company.members.get())
 
@@ -260,7 +260,7 @@ def test_list_prescriptions_exports_download_as_employer(client):
     assert "spreadsheetml" in response.get("Content-Type")
 
 
-def test_list_prescriptions_exports_download_by_month(client):
+def test_exports_download_by_month(client):
     job_application = JobApplicationFactory()
     client.force_login(job_application.sender)
 
