@@ -265,21 +265,21 @@
                             </a>
                         </li>
                     {% endif %}
-                    {% if can_view_stats_dgefp %}
+                    {% if can_view_stats_dgefp_iae %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_dgefp_auto_prescription' %}" class="btn-link btn-ico">
+                            <a href="{% url 'stats:stats_dgefp_iae_auto_prescription' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                                 <span>Focus auto-prescription</span>
                             </a>
                         </li>
                         <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_dgefp_follow_siae_evaluation' %}" class="btn-link btn-ico">
+                            <a href="{% url 'stats:stats_dgefp_iae_follow_siae_evaluation' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                                 <span>Suivi du contrôle à posteriori</span>
                             </a>
                         </li>
                         <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_dgefp_follow_prolongation' %}" class="btn-link btn-ico">
+                            <a href="{% url 'stats:stats_dgefp_iae_follow_prolongation' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                                 <span>Suivi des demandes de prolongation</span>
                             </a>
@@ -287,32 +287,32 @@
                         <!-- Stats temporarily suspended until we stabilize them
                             Which should happen once the dgefp starts working with us properly
                         <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_dgefp_iae' %}" class="btn-link btn-ico">
+                            <a href="{% url 'stats:stats_dgefp_iae_iae' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                                 <span>Données IAE France entière</span>
                             </a>
                         </li>
                         -->
                         <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_dgefp_siae_evaluation' %}" class="btn-link btn-ico">
+                            <a href="{% url 'stats:stats_dgefp_iae_siae_evaluation' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                                 <span>Voir les données du contrôle a posteriori (version bêta)</span>
                             </a>
                         </li>
                         <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_dgefp_tension' %}" class="btn-link btn-ico">
+                            <a href="{% url 'stats:stats_dgefp_iae_tension' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                                 <span>Fiches de poste en tension</span>
                             </a>
                         </li>
                         <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_dgefp_hiring' %}" class="btn-link btn-ico">
+                            <a href="{% url 'stats:stats_dgefp_iae_hiring' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                                 <span>Données facilitation à l'embauche</span>
                             </a>
                         </li>
                         <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_dgefp_state' %}" class="btn-link btn-ico">
+                            <a href="{% url 'stats:stats_dgefp_iae_state' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                                 <span>Prescriptions des acteurs AHI</span>
                             </a>

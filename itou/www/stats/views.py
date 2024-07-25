@@ -54,9 +54,9 @@ def get_stats_dreets_iae_region(request):
     return current_org.region
 
 
-def ensure_stats_dgefp_permission(request):
+def ensure_stats_dgefp_iae_permission(request):
     get_current_institution_or_404(request)
-    if not utils.can_view_stats_dgefp(request):
+    if not utils.can_view_stats_dgefp_iae(request):
         raise PermissionDenied
 
 
@@ -690,12 +690,12 @@ def stats_dreets_iae_state(request):
     )
 
 
-def render_stats_dgefp(request, page_title, extra_params=None, extra_context=None):
+def render_stats_dgefp_iae(request, page_title, extra_params=None, extra_context=None):
     if extra_context is None:
         # Do not use mutable default arguments,
         # see https://florimond.dev/en/posts/2018/08/python-mutable-defaults-are-the-source-of-all-evil/
         extra_context = {}
-    ensure_stats_dgefp_permission(request)
+    ensure_stats_dgefp_iae_permission(request)
     context = {
         "page_title": page_title,
     }
@@ -704,29 +704,29 @@ def render_stats_dgefp(request, page_title, extra_params=None, extra_context=Non
 
 
 @login_required
-def stats_dgefp_auto_prescription(request):
-    return render_stats_dgefp(
+def stats_dgefp_iae_auto_prescription(request):
+    return render_stats_dgefp_iae(
         request=request, page_title="Focus auto-prescription", extra_params=get_params_for_whole_country()
     )
 
 
 @login_required
-def stats_dgefp_follow_siae_evaluation(request):
-    return render_stats_dgefp(
+def stats_dgefp_iae_follow_siae_evaluation(request):
+    return render_stats_dgefp_iae(
         request=request, page_title="Suivi du contrôle à posteriori", extra_params=get_params_for_whole_country()
     )
 
 
 @login_required
-def stats_dgefp_follow_prolongation(request):
-    return render_stats_dgefp(
+def stats_dgefp_iae_follow_prolongation(request):
+    return render_stats_dgefp_iae(
         request=request, page_title="Suivi des demandes de prolongation", extra_params=get_params_for_whole_country()
     )
 
 
 @login_required
-def stats_dgefp_tension(request):
-    return render_stats_dgefp(
+def stats_dgefp_iae_tension(request):
+    return render_stats_dgefp_iae(
         request=request,
         page_title="SIAE qui peinent à recruter sur le territoire",
         extra_params=get_params_for_whole_country(),
@@ -734,15 +734,15 @@ def stats_dgefp_tension(request):
 
 
 @login_required
-def stats_dgefp_hiring(request):
-    return render_stats_dgefp(
+def stats_dgefp_iae_hiring(request):
+    return render_stats_dgefp_iae(
         request=request, page_title="Données facilitation de l'embauche", extra_params=get_params_for_whole_country()
     )
 
 
 @login_required
-def stats_dgefp_state(request):
-    return render_stats_dgefp(
+def stats_dgefp_iae_state(request):
+    return render_stats_dgefp_iae(
         request=request,
         page_title="Suivi des prescriptions des AHI de ma région",
         extra_params=get_params_for_whole_country(),
@@ -750,15 +750,15 @@ def stats_dgefp_state(request):
 
 
 @login_required
-def stats_dgefp_iae(request):
-    return render_stats_dgefp(
+def stats_dgefp_iae_iae(request):
+    return render_stats_dgefp_iae(
         request=request, page_title="Données des régions", extra_params=get_params_for_whole_country()
     )
 
 
 @login_required
 def stats_dgefp_iae_ph_prescription(request):
-    return render_stats_dgefp(
+    return render_stats_dgefp_iae(
         request=request,
         page_title="Suivi des prescriptions des prescripteurs habilités",
         extra_params=get_params_for_whole_country(),
@@ -766,8 +766,8 @@ def stats_dgefp_iae_ph_prescription(request):
 
 
 @login_required
-def stats_dgefp_siae_evaluation(request):
-    return render_stats_dgefp(
+def stats_dgefp_iae_siae_evaluation(request):
+    return render_stats_dgefp_iae(
         request=request,
         page_title="Données (version bêta) du contrôle a posteriori",
         extra_context={"show_siae_evaluation_message": True},
@@ -776,8 +776,8 @@ def stats_dgefp_siae_evaluation(request):
 
 
 @login_required
-def stats_dgefp_af(request):
-    return render_stats_dgefp(request=request, page_title="Annexes financières actives")
+def stats_dgefp_iae_af(request):
+    return render_stats_dgefp_iae(request=request, page_title="Annexes financières actives")
 
 
 @login_required
