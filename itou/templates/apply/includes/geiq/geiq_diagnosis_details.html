@@ -52,7 +52,7 @@
                 </div>
             </div>
         {% endif %}
-    {% else %}
+    {% elif request.user.is_employer %}
         {# Existing GEIQ, diagnosis but no allowance #}
         <div class="alert alert-warning mt-4">
             <div class="row">
@@ -77,12 +77,12 @@
     {% endif %}
 {% else %}
     {# Diagnosis either does not exist or has expired : this part is for GEIQ only #}
-    {% if request.user.is_employer %}
-        <hr class="my-4">
-        <div class="row align-items-center">
-            <div class="col-12 col-md">
-                <h3 class="mb-2 mb-md-0">Éligibilité public prioritaire GEIQ non confirmée</h3>
-            </div>
+    <hr class="my-4">
+    <div class="row align-items-center">
+        <div class="col-12 col-md">
+            <h3 class="mb-2 mb-md-0">Éligibilité public prioritaire GEIQ non confirmée</h3>
+        </div>
+        {% if request.user.is_employer %}
             <div class="col-12 col-md-auto">
                 {% with back_and_next_url=request.get_full_path|urlencode %}
                     <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}" class="btn btn-secondary">
@@ -90,24 +90,24 @@
                     </a>
                 {% endwith %}
             </div>
-        </div>
-        {# GEIQ eligibility diagnosis expired #}
-        {% if diagnosis and not diagnosis.is_valid %}
-            <div class="alert alert-warning mt-4">
-                <div class="row">
-                    <div class="col-auto pe-0">
-                        <i class="ri-alert-line ri-xl text-warning"></i>
-                    </div>
-                    <div class="col">
-                        <p>
-                            <b>Aide à l'accompagement GEIQ</b>
-                        </p>
-                        <p>
-                            Le diagnostic du candidat a expiré le {{ diagnosis.expires_at|date:"d F Y" }}. Si vous souhaitez bénéficier d’une aide à l’accompagnement, veuillez renseigner à nouveau la situation administrative du candidat.
-                        </p>
+            {# GEIQ eligibility diagnosis expired #}
+            {% if diagnosis and not diagnosis.is_valid %}
+                <div class="alert alert-warning mt-4">
+                    <div class="row">
+                        <div class="col-auto pe-0">
+                            <i class="ri-alert-line ri-xl text-warning"></i>
+                        </div>
+                        <div class="col">
+                            <p>
+                                <b>Aide à l'accompagement GEIQ</b>
+                            </p>
+                            <p>
+                                Le diagnostic du candidat a expiré le {{ diagnosis.expires_at|date:"d F Y" }}. Si vous souhaitez bénéficier d’une aide à l’accompagnement, veuillez renseigner à nouveau la situation administrative du candidat.
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endif %}
         {% endif %}
-    {% endif %}
+    </div>
 {% endif %}

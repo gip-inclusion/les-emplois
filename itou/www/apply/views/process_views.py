@@ -49,14 +49,17 @@ def check_waiting_period(job_application):
         raise PermissionDenied(apply_view_constants.ERROR_CANNOT_OBTAIN_NEW_FOR_PROXY)
 
 
-def _get_geiq_eligibility_diagnosis_for_company(job_application):
-    # Get current GEIQ diagnosis or *last expired one*
-    return (
-        job_application.geiq_eligibility_diagnosis
-        or GEIQEligibilityDiagnosis.objects.diagnoses_for(
-            job_application.job_seeker, job_application.to_company
-        ).first()
-    )
+def _get_geiq_eligibility_diagnosis(job_application, only_prescriber):
+    # Return the job_application diagnosis if it's accepted
+    if job_application.state.is_accepted:
+        # but not if the viewer is a prescriber and the diangosis was made by the company
+        if only_prescriber and job_application.geiq_eligibility_diagnosis.author_geiq:
+            return None
+        return job_application.geiq_eligibility_diagnosis
+    return GEIQEligibilityDiagnosis.objects.diagnoses_for(
+        job_application.job_seeker,
+        job_application.to_company if not only_prescriber else None,
+    ).first()
 
 
 @login_required
@@ -86,10 +89,11 @@ def details_for_jobseeker(request, job_application_id, template_name="apply/proc
     )
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_job_seeker"))
-    geiq_eligibility_diagnosis = None
 
-    if job_application.to_company.kind == CompanyKind.GEIQ:
-        geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_company(job_application)
+    geiq_eligibility_diagnosis = (
+        job_application.to_company.kind == CompanyKind.GEIQ
+        and _get_geiq_eligibility_diagnosis(job_application, only_prescriber=False)
+    )
 
     context = {
         "can_view_personal_information": request.user.can_view_personal_information(job_application.job_seeker),
@@ -141,10 +145,11 @@ def details_for_company(request, job_application_id, template_name="apply/proces
     )
 
     back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_siae"))
-    geiq_eligibility_diagnosis = None
 
-    if job_application.to_company.kind == CompanyKind.GEIQ:
-        geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_company(job_application)
+    geiq_eligibility_diagnosis = (
+        job_application.to_company.kind == CompanyKind.GEIQ
+        and _get_geiq_eligibility_diagnosis(job_application, only_prescriber=False)
+    )
 
     context = {
         "can_view_personal_information": True,  # SIAE members have access to personal info
@@ -206,10 +211,7 @@ def details_for_prescriber(request, job_application_id, template_name="apply/pro
     # Latest GEIQ diagnosis for this job seeker created by a *prescriber*
     geiq_eligibility_diagnosis = (
         job_application.to_company.kind == CompanyKind.GEIQ
-        and GEIQEligibilityDiagnosis.objects.valid()
-        .filter(job_seeker=job_application.job_seeker, author_prescriber_organization__isnull=False)
-        .select_related("author", "author_geiq", "author_prescriber_organization")
-        .first()
+        and _get_geiq_eligibility_diagnosis(job_application, only_prescriber=True)
     )
 
     # Refused applications information is providen to prescribers
@@ -682,7 +684,7 @@ def delete_prior_action(request, job_application_id, prior_action_id):
                 # GEIQ cannot require IAE eligibility diagnosis, but shared templates need this variable.
                 "eligibility_diagnosis_by_siae_required": False,
                 "geiq_eligibility_diagnosis": (
-                    _get_geiq_eligibility_diagnosis_for_company(job_application)
+                    _get_geiq_eligibility_diagnosis(job_application, only_prescriber=False)
                     if job_application.to_company.kind == CompanyKind.GEIQ
                     else None
                 ),
@@ -751,7 +753,7 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
             form.save()
             geiq_eligibility_diagnosis = None
             if state_update and job_application.to_company.kind == CompanyKind.GEIQ:
-                geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis_for_company(job_application)
+                geiq_eligibility_diagnosis = _get_geiq_eligibility_diagnosis(job_application, only_prescriber=False)
             return render(
                 request,
                 "apply/includes/job_application_prior_action.html",

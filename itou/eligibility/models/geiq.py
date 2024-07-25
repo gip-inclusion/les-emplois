@@ -37,10 +37,9 @@ from .common import (
 
 class GEIQEligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
     def authored_by_prescriber_or_geiq(self, geiq):
-        # In ordering, priority is given to prescriber authored diagnoses
         return self.filter(
             models.Q(author_geiq=geiq) | models.Q(author_prescriber_organization__isnull=False)
-        ).order_by(models.F("author_prescriber_organization").desc(nulls_last=True), "-created_at")
+        ).order_by("-created_at")
 
     def diagnoses_for(self, job_seeker, for_geiq=None):
         # Get *all* GEIQ diagnoses for given job seeker (even expired)
