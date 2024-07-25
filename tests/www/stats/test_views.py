@@ -430,3 +430,16 @@ def test_get_params_aci_asp_ids_for_department_when_only_the_antenna_is_in_the_d
     assert get_params_aci_asp_ids_for_department(company.department) == {
         "id_asp_de_la_siae": [company.convention.asp_id]
     }
+
+
+@pytest.mark.parametrize("dashboard_name", ["ph_prescription", "state", "tension"])
+@pytest.mark.parametrize(
+    "institution_kind", [InstitutionKind.DGEFP_IAE, InstitutionKind.DREETS_IAE, InstitutionKind.DDETS_IAE]
+)
+@override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
+def test_stats_redirect_for_institution(client, institution_kind, dashboard_name):
+    institution = InstitutionWithMembershipFactory(kind=institution_kind)
+    client.force_login(institution.members.get())
+
+    response = client.get(reverse("stats:redirect", kwargs={"dashboard_name": dashboard_name}), follow=True)
+    assert response.status_code == 200
