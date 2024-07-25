@@ -9,6 +9,7 @@ from itou.companies.models import JobDescription
 from itou.eligibility.enums import AuthorKind
 from itou.job_applications import models
 from itou.job_applications.enums import (
+    JobApplicationState,
     Prequalification,
     ProfessionalSituationExperience,
     SenderKind,
@@ -65,8 +66,8 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
             eligibility_diagnosis=None,
         )
         with_geiq_eligibility_diagnosis_from_prescriber = factory.Trait(
+            sent_by_authorized_prescriber_organisation=True,
             to_company=factory.SubFactory(CompanyFactory, with_membership=True, kind=CompanyKind.GEIQ),
-            sender=factory.LazyAttribute(lambda obj: obj.sender_prescriber_organization.members.first()),
             geiq_eligibility_diagnosis=factory.SubFactory(
                 GEIQEligibilityDiagnosisFactory,
                 job_seeker=factory.SelfAttribute("..job_seeker"),
@@ -91,7 +92,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
             sender=factory.LazyAttribute(lambda obj: obj.sender_company.members.first()),
         )
         was_hired = factory.Trait(
-            state="accepted",
+            state=JobApplicationState.ACCEPTED,
             to_company__with_jobs=True,
             hired_job=factory.SubFactory(JobDescriptionFactory, company=factory.SelfAttribute("..to_company")),
         )

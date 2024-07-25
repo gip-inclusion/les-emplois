@@ -1,6 +1,7 @@
 import random
 
 import factory
+from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 from itou.companies.enums import CompanyKind
@@ -23,7 +24,10 @@ class AbstractEligibilityDiagnosisModelFactory(factory.django.DjangoModelFactory
             ),
             author=factory.LazyAttribute(lambda obj: obj.author_prescriber_organization.members.first()),
         )
-        expired = factory.Trait(expires_at=factory.LazyFunction(timezone.now))
+        expired = factory.Trait(
+            expires_at=factory.LazyFunction(timezone.now),
+            created_at=factory.LazyAttribute(lambda obj: obj.expires_at - relativedelta(months=6)),
+        )
 
     created_at = factory.LazyFunction(timezone.now)
     job_seeker = factory.SubFactory(JobSeekerFactory)
