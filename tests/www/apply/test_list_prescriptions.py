@@ -156,6 +156,14 @@ def test_filtered_by_company(client):
     assert len(applications) == 3
 
 
+def test_filtered_by_eligibility_validated_prescriber(client):
+    prescriber_jobapp = JobApplicationFactory()
+    client.force_login(prescriber_jobapp.sender)
+    response = client.get(reverse("apply:list_prescriptions"), {"eligiblity_validated": "on"})
+    applications = response.context["job_applications_page"].object_list
+    assert applications == [prescriber_jobapp]
+
+
 def test_filters(client, snapshot):
     client.force_login(PrescriberFactory())
 
