@@ -7,6 +7,7 @@ import json
 import logging
 import uuid
 from datetime import date
+from unittest import mock
 from unittest.mock import patch
 
 import faker
@@ -36,6 +37,7 @@ import itou.utils.session
 from itou.approvals.models import Suspension
 from itou.asp.models import Commune
 from itou.cities.models import City
+from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership
 from itou.job_applications.enums import JobApplicationState
@@ -87,7 +89,7 @@ from tests.users.factories import (
     LaborInspectorFactory,
     PrescriberFactory,
 )
-from tests.utils.test import TestCase, parse_response_to_soup
+from tests.utils.test import TestCase, create_fake_postcode, parse_response_to_soup
 
 
 def get_response_for_middlewaremixin(request):
@@ -1559,3 +1561,21 @@ def test_log_current_organization(client):
     assert response.status_code == 200
     # Check that the organization_id is properly logged to stdout
     assert f'"usr.organization_id": {membership.company_id}' in captured.getvalue()
+
+
+def test_create_fake_postcode():
+    with mock.patch.dict(DEPARTMENTS, {"2A": "2A - Corse-du-Sud"}):
+        postcode = create_fake_postcode()
+        assert department_from_postcode(postcode)
+    with mock.patch.dict(DEPARTMENTS, {"2B": "2B - Haute-Corse"}):
+        postcode = create_fake_postcode()
+        assert department_from_postcode(postcode)
+    with mock.patch.dict(DEPARTMENTS, {"971": "971 - Guadeloupe"}):
+        postcode = create_fake_postcode()
+        assert department_from_postcode(postcode)
+    with mock.patch.dict(DEPARTMENTS, {"989": "989 - Île Clipperton"}):
+        postcode = create_fake_postcode()
+        assert department_from_postcode(postcode)
+    with mock.patch.dict(DEPARTMENTS, {"80": "80 - Somme"}):
+        postcode = create_fake_postcode()
+        assert department_from_postcode(postcode)
