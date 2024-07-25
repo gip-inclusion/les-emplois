@@ -1,4 +1,3 @@
-import functools
 import string
 
 import factory.fuzzy
@@ -174,7 +173,9 @@ class CompanyWith4MembershipsFactory(CompanyFactory):
     membership4 = factory.RelatedFactory(CompanyMembershipFactory, "company", is_admin=False, user__is_active=False)
 
 
-CompanyWithMembershipAndJobsFactory = functools.partial(CompanyFactory, with_membership=True, with_jobs=True)
+class CompanyWithMembershipAndJobsFactory(CompanyFactory):
+    with_membership = True
+    with_jobs = True
 
 
 class SiaeConventionPendingGracePeriodFactory(SiaeConventionFactory):
