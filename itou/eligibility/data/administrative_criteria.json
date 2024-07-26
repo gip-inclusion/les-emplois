@@ -10,7 +10,8 @@
       "written_proof_url": "",
       "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 1,
-      "created_at": "2020-03-23T20:00:00.000Z"
+      "created_at": "2020-03-23T20:00:00.000Z",
+      "certifiable": true
     }
   },
   {
@@ -24,7 +25,8 @@
       "written_proof_url": "",
       "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 2,
-      "created_at": "2020-03-23T20:00:00.000Z"
+      "created_at": "2020-03-23T20:00:00.000Z",
+      "certifiable": false
     }
   },
   {
@@ -38,7 +40,8 @@
       "written_proof_url": "",
       "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 3,
-      "created_at": "2020-03-23T20:00:00.000Z"
+      "created_at": "2020-03-23T20:00:00.000Z",
+      "certifiable": true
     }
   },
   {
@@ -52,7 +55,8 @@
       "written_proof_url": "",
       "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 4,
-      "created_at": "2020-03-23T20:00:00.000Z"
+      "created_at": "2020-03-23T20:00:00.000Z",
+      "certifiable": false
     }
   },
   {
@@ -66,7 +70,8 @@
       "written_proof_url": "https://www.service-public.fr/particuliers/vosdroits/F199",
       "written_proof_validity": "Attestation sur l'honneur datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 1,
-      "created_at": "2020-03-23T20:00:00.000Z"
+      "created_at": "2020-03-23T20:00:00.000Z",
+      "certifiable": false
     }
   },
   {
@@ -80,7 +85,8 @@
       "written_proof_url": "",
       "written_proof_validity": "",
       "ui_rank": 2,
-      "created_at": "2020-03-23T20:00:00.000Z"
+      "created_at": "2020-03-23T20:00:00.000Z",
+      "certifiable": false
     }
   },
   {
@@ -94,7 +100,8 @@
       "written_proof_url": "",
       "written_proof_validity": "",
       "ui_rank": 3,
-      "created_at": "2020-03-23T20:00:00.000Z"
+      "created_at": "2020-03-23T20:00:00.000Z",
+      "certifiable": false
     }
   },
   {
@@ -108,7 +115,8 @@
       "written_proof_url": "",
       "written_proof_validity": "Datant de moins de 12 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 4,
-      "created_at": "2020-03-23T20:00:00.000Z"
+      "created_at": "2020-03-23T20:00:00.000Z",
+      "certifiable": false
     }
   },
   {
@@ -122,7 +130,8 @@
       "written_proof_url": "",
       "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 5,
-      "created_at": "2020-03-23T20:00:00.000Z"
+      "created_at": "2020-03-23T20:00:00.000Z",
+      "certifiable": false
     }
   },
   {
@@ -136,7 +145,8 @@
       "written_proof_url": "",
       "written_proof_validity": "Décision valide au moment du recrutement",
       "ui_rank": 6,
-      "created_at": "2020-03-23T20:00:00.000Z"
+      "created_at": "2020-03-23T20:00:00.000Z",
+      "certifiable": false
     }
   },
   {
@@ -150,7 +160,8 @@
       "written_proof_url": "",
       "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 7,
-      "created_at": "2020-03-23T20:00:00.000Z"
+      "created_at": "2020-03-23T20:00:00.000Z",
+      "certifiable": true
     }
   },
   {
@@ -164,7 +175,8 @@
       "written_proof_url": "",
       "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 8,
-      "created_at": "2020-03-23T20:00:00.000Z"
+      "created_at": "2020-03-23T20:00:00.000Z",
+      "certifiable": false
     }
   },
   {
@@ -178,7 +190,8 @@
       "written_proof_url": "",
       "written_proof_validity": "Titre valide au moment de la délivrance du PASS IAE",
       "ui_rank": 9,
-      "created_at": "2020-03-23T20:00:00.000Z"
+      "created_at": "2020-03-23T20:00:00.000Z",
+      "certifiable": false
     }
   },
   {
@@ -192,7 +205,8 @@
       "written_proof_url": "https://www.data.gouv.fr/fr/datasets/zones-de-revitalisation-rurale-zrr",
       "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 10,
-      "created_at": "2020-03-23T20:00:00.000Z"
+      "created_at": "2020-03-23T20:00:00.000Z",
+      "certifiable": false
     }
   },
   {
@@ -206,49 +220,53 @@
       "written_proof_url": "https://sig.ville.gouv.fr",
       "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 11,
-      "created_at": "2020-03-23T20:00:00.000Z"
+      "created_at": "2020-03-23T20:00:00.000Z",
+      "certifiable": false
     }
   },
   {
     "model": "eligibility.administrativecriteria",
     "pk": 16,
     "fields": {
-      "level" : "2",
-      "name" : "Sortant de détention ou personne placée sous main de justice",
-      "desc" : "",
-      "written_proof" : "Billet de sortie ou attestation du juge d'application des peines",
-      "written_proof_url" : "",
-      "written_proof_validity" : "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
-      "ui_rank" : 12,
-      "created_at" : "2021-09-03T20:00:00.000Z"
+      "level": "2",
+      "name": "Sortant de détention ou personne placée sous main de justice",
+      "desc": "",
+      "written_proof": "Billet de sortie ou attestation du juge d'application des peines",
+      "written_proof_url": "",
+      "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
+      "ui_rank": 12,
+      "created_at": "2021-09-03T20:00:00.000Z",
+      "certifiable": false
     }
   },
   {
     "model": "eligibility.administrativecriteria",
     "pk": 17,
     "fields": {
-      "level" : "2",
-      "name" : "Maîtrise de la langue française",
-      "desc" : "",
-      "written_proof" : "Evaluation FLE inférieure au niveau A1",
-      "written_proof_url" : "",
-      "written_proof_validity" : "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
-      "ui_rank" : 13,
-      "created_at" : "2021-09-03T20:00:00.000Z"
+      "level": "2",
+      "name": "Maîtrise de la langue française",
+      "desc": "",
+      "written_proof": "Evaluation FLE inférieure au niveau A1",
+      "written_proof_url": "",
+      "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
+      "ui_rank": 13,
+      "created_at": "2021-09-03T20:00:00.000Z",
+      "certifiable": false
     }
   },
   {
     "model": "eligibility.administrativecriteria",
     "pk": 18,
     "fields": {
-      "level" : "2",
-      "name" : "Mobilité",
-      "desc" : "",
-      "written_proof" : "Diagnostic mobilité délivré par un prescripteur habilité",
-      "written_proof_url" : "",
-      "written_proof_validity" : "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
-      "ui_rank" : 14,
-      "created_at" : "2021-09-03T20:00:00.000Z"
+      "level": "2",
+      "name": "Mobilité",
+      "desc": "",
+      "written_proof": "Diagnostic mobilité délivré par un prescripteur habilité",
+      "written_proof_url": "",
+      "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
+      "ui_rank": 14,
+      "created_at": "2021-09-03T20:00:00.000Z",
+      "certifiable": false
     }
   }
 ]
