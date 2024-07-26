@@ -52,10 +52,12 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
         form_user_address = JobSeekerAddressForm(instance=job_seeker, data=request.POST or None)
         forms.append(form_user_address)
 
-        form_certified_criteria = CertifiedCriteriaInfoRequiredForm(
-            instance=job_seeker.jobseeker_profile, data=request.POST or None
-        )
-        forms.append(form_certified_criteria)
+        diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker, for_siae=siae)
+        if diagnosis.criteria_certification_required:
+            form_certified_criteria = CertifiedCriteriaInfoRequiredForm(
+                instance=job_seeker.jobseeker_profile, data=request.POST or None
+            )
+            forms.append(form_certified_criteria)
 
     form_accept = AcceptForm(instance=job_application, company=siae, data=request.POST or None)
     forms.append(form_accept)
