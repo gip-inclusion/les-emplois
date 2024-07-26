@@ -1,4 +1,5 @@
 import datetime
+import logging
 import random
 from itertools import product
 from unittest import mock
@@ -63,6 +64,8 @@ from tests.users.factories import (
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import TestCase, assert_previous_step, parse_response_to_soup
 
+
+logger = logging.getLogger(__name__)
 
 DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
 PRIOR_ACTION_SECTION_TITLE = "Action préalable à l'embauche"
@@ -1714,8 +1717,8 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         }
         # CertifiedCriteriaForm
         certified_criteria_default_fields = {
-            "birth_country": extra_post_data.get("birth_country", CountryFranceFactory().pk),
-            "birth_place": extra_post_data.get("birth_country", CommuneFactory().pk),
+            "birth_country": extra_post_data.setdefault("birth_country", CountryFranceFactory().pk),
+            "birth_place": extra_post_data.setdefault("birth_place", CommuneFactory().pk),
         }
         # GEIQ-only mandatory fields
         if job_application.to_company.kind == CompanyKind.GEIQ:
@@ -1760,6 +1763,15 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
         if assert_successful:
             # Easier to debug than just a « sorry, the modal goes on a strike ».
+            if response.context["has_form_error"]:
+                forms = [
+                    response.context.get("form_accept"),
+                    response.context.get("form_user_address"),
+                    response.context.get("form_personal_data"),
+                    response.context.get("form_certified_criteria"),
+                ]
+                for form in forms:
+                    logger.error(f"{form.errors=}")
             assert not response.context["has_form_error"]
             assert (
                 response.headers["HX-Trigger"] == '{"modalControl": {"id": "js-confirmation-modal", "action": "show"}}'
@@ -2408,7 +2420,11 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
     def test_accept_iae__criteria_certification_available(self):
         ######### Case 1: if BRSA is one the diagnosis criteria,
         ######### birth place and birth country are required.
-        job_application = self.create_job_application(eligibility_diagnosis__with_certifiable_criteria=True)
+        birthdate = datetime.date(1995, 12, 27)
+        job_application = self.create_job_application(
+            eligibility_diagnosis__with_certifiable_criteria=True,
+            job_seeker__birthdate=birthdate,
+        )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         employer = job_application.to_company.members.first()
@@ -2460,10 +2476,13 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert jobseeker_profile.birth_place == birth_place
 
     def test_accept_geiq__criteria_certification_available(self):
+        birthdate = datetime.date(1995, 12, 27)
         self.company.kind = CompanyKind.GEIQ
         self.company.save()
         job_application = self.create_job_application(
-            with_geiq_eligibility_diagnosis=True, geiq_eligibility_diagnosis__with_certifiable_criteria=True
+            with_geiq_eligibility_diagnosis=True,
+            geiq_eligibility_diagnosis__with_certifiable_criteria=True,
+            job_seeker__birthdate=birthdate,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
