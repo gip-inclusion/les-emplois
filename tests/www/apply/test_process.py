@@ -1675,6 +1675,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             "job_seeker": self.job_seeker,
             "to_company": self.company,
             "hiring_end_at": None,
+            "eligibility_diagnosis__with_certifiable_criteria": True,
         } | kwargs
         return JobApplicationSentByJobSeekerFactory(**kwargs)
 
@@ -1708,11 +1709,9 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             "hired_job": job_description.pk,
         }
         # CertifiedCriteriaForm
-        birth_country = CountryFranceFactory()
-        birth_place = CommuneFactory()
         certified_criteria_default_fields = {
-            "birth_country": birth_country.pk,
-            "birth_place": birth_place.pk,
+            "birth_country": extra_post_data.get("birth_country", CountryFranceFactory().pk),
+            "birth_place": extra_post_data.get("birth_country", CommuneFactory().pk),
         }
 
         return {
@@ -2394,18 +2393,10 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert approval.start_at == job_application.hiring_start_at
         assert job_application.state.is_accepted
 
-    # TODO: refactor
-    def test_accept_criteria_certification_required(self):
-        birth_country = CountryFranceFactory()
-        birth_place = CommuneFactory()
-
+    def test_accept__criteria_certification_required(self):
         ######### Case 1: if BRSA is one the diagnosis criteria,
         ######### birth place and birth country are required.
-        # Query by name instead of PK to make it more understandable.
-        brsa_criteria = AdministrativeCriteria.objects.get(name="Bénéficiaire du RSA")
-        job_application = self.create_job_application()
-        eligibility_diagnosis = job_application.eligibility_diagnosis
-        eligibility_diagnosis.administrative_criteria.add(brsa_criteria)
+        job_application = self.create_job_application(eligibility_diagnosis__with_certifiable_criteria=True)
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         employer = job_application.to_company.members.first()
@@ -2415,12 +2406,13 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         self.assertContains(response, "Pays de naissance")
         self.assertContains(response, "Commune de naissance")
 
+        # CertifiedCriteriaForm
+        birth_country = CountryFranceFactory()
+        birth_place = CommuneFactory()
         post_data = {
-            # CertifiedCriteriaForm
             "birth_country": birth_country.pk,
             "birth_place": birth_place.pk,
         }
-
         self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
@@ -2428,12 +2420,51 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert jobseeker_profile.birth_country == birth_country
         assert jobseeker_profile.birth_place == birth_place
 
-        # TODO: test form edge cases on a FormTest: tests/www/apply/test_forms.py
-        # The form should not appear.
+    def test_criteria__criteria_not_certificable(self):
+        # ############################
+        # No criteria to be certified: the form should not appear
+        # and it should be valid.
+        ##############################
+        job_application = self.create_job_application(eligibility_diagnosis__with_not_certifiable_criteria=True)
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
-        # TODO: create a new Trait in IAEEligibilityDiagnosisFactory
-        # for certified criteria and take them out of the `with_criteria`.
-        # Otherwise, flaky tests may appear if BRSA criteria is selected.
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
+
+        response = self.client.get(url_accept)
+        self.assertNotContains(response, "Pays de naissance")
+        self.assertNotContains(response, "Commune de naissance")
+
+        # CertifiedCriteriaForm
+        post_data = self._accept_view_post_data(job_application=job_application)
+        del post_data["birth_country"]
+        del post_data["birth_place"]
+        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
+
+    def test_criteria__company_not_siae(self):
+        # ############################
+        # Company is not subject to eligibility rules: hide the form.
+        ##############################
+        company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True, with_jobs=True)
+        job_application = self.create_job_application(
+            eligibility_diagnosis__with_certifiable_criteria=True,
+            selected_jobs=company.jobs.all(),
+            to_company=company,
+        )
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
+
+        response = self.client.get(url_accept)
+        self.assertNotContains(response, "Pays de naissance")
+        self.assertNotContains(response, "Commune de naissance")
+
+        # CertifiedCriteriaForm
+        post_data = self._accept_view_post_data(job_application=job_application)
+        del post_data["birth_country"]
+        del post_data["birth_place"]
+        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
 
 
 class ProcessTemplatesTest(TestCase):

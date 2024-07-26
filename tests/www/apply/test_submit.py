@@ -4614,6 +4614,7 @@ class HireConfirmationTestCase(TestCase):
             + 1  # companies_jobdescription (AcceptForm.__init__)
             + 1  # eligibility_administrativecriteria (/apply/includes/eligibility_diagnosis.html)
             + 1  # asp_country: countries dropdown list.
+            + 1  # eligibility_diagnosis.criteria_certification_required
             + 3  # update session with savepoint & release
         ):
             response = self.client.get(self._reverse("apply:hire_confirmation"))
