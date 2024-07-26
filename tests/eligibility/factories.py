@@ -59,6 +59,26 @@ def _get_iae_administrative_criteria(self, create, extracted, **kwargs):
     self.administrative_criteria.add(*criteria)
 
 
+def _get_iae_certifiable_criteria(self, create, extracted, **kwargs):
+    if not create:
+        # Simple build, do nothing.
+        return
+
+    # Pick random results.
+    criteria = models.AdministrativeCriteria.objects.certifiable().order_by("?")[: random.randint(2, 5)]
+    self.administrative_criteria.add(*criteria)
+
+
+def _get_iae_not_certifiable_criteria(self, create, extracted, **kwargs):
+    if not create:
+        # Simple build, do nothing.
+        return
+
+    # Pick random results.
+    criteria = models.AdministrativeCriteria.objects.not_certifiable().order_by("?")[: random.randint(2, 5)]
+    self.administrative_criteria.add(*criteria)
+
+
 class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
     """Generate an EligibilityDiagnosis() object whose author is an authorized prescriber organization."""
 
@@ -73,3 +93,5 @@ class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
             author=factory.LazyAttribute(lambda obj: obj.author_siae.members.first()),
         )
         with_criteria = factory.Trait(romes=factory.PostGeneration(_get_iae_administrative_criteria))
+        with_certifiable_criteria = factory.Trait(romes=factory.PostGeneration(_get_iae_certifiable_criteria))
+        with_not_certifiable_criteria = factory.Trait(romes=factory.PostGeneration(_get_iae_not_certifiable_criteria))

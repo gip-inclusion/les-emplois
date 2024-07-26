@@ -376,6 +376,13 @@ class TestEligibilityDiagnosisModel:
         ApprovalFactory(user=diagnosis.job_seeker)
         assert diagnosis.is_considered_valid
 
+    def test_criteria_certification_required(self):
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, with_certifiable_criteria=True)
+        assert diagnosis.criteria_certification_required
+
+        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, with_not_certifiable_criteria=True)
+        assert not diagnosis.criteria_certification_required
+
 
 class TestAdministrativeCriteriaModel:
     def test_levels_queryset(self):
@@ -432,3 +439,17 @@ class TestAdministrativeCriteriaModel:
 
         criterion_level_2 = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()
         assert criterion_level_2.key == f"level_{criterion_level_2.level}_{criterion_level_2.pk}"
+
+
+class AdministrativeCriteriaQuerysetTest(TestCase):
+    # TODO(cms): move some AdministrativeCriteriaModelTest here.
+    def test_certifiable(self):
+        expected = AdministrativeCriteria.objects.filter(certifiable=True).first()
+        not_expected = AdministrativeCriteria.objects.exclude(certifiable=True).first()
+        assert expected in AdministrativeCriteria.objects.certifiable()
+        assert not_expected not in AdministrativeCriteria.objects.certifiable()
+
+        expected = AdministrativeCriteria.objects.exclude(certifiable=True).first()
+        not_expected = AdministrativeCriteria.objects.filter(certifiable=True).first()
+        assert expected in AdministrativeCriteria.objects.not_certifiable()
+        assert not_expected not in AdministrativeCriteria.objects.not_certifiable()
