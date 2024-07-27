@@ -297,13 +297,7 @@ def edit_job_description_details(request, template_name="companies/edit_job_desc
 
     job_description = _get_job_description(session_data)
 
-    if job_appellation_code := session_data.get("job_appellation_code"):
-        # TODO(xfernandez): Legacy code, remove me in a few days (time for session to expire)
-        rome = get_object_or_404(Appellation.objects.select_related("rome"), pk=job_appellation_code).rome.code
-    else:
-        rome = get_object_or_404(
-            Appellation.objects.select_related("rome"), pk=session_data.get("appellation")
-        ).rome.code
+    rome = get_object_or_404(Appellation.objects.select_related("rome"), pk=session_data.get("appellation")).rome.code
 
     form = companies_forms.EditJobDescriptionDetailsForm(
         company, instance=job_description, data=request.POST or None, initial=session_data
@@ -354,19 +348,12 @@ def edit_job_description_preview(request, template_name="companies/edit_job_desc
 
     job_description.__dict__.update(**session_data)
 
-    if location_code := session_data.get("location_code"):
-        # TODO(xfernandez): Legacy code, remove me in a few days (time for session to expire)
-        job_description.location = City.objects.get(slug=location_code)
-    elif location_pk := session_data.get("location"):
+    if location_pk := session_data.get("location"):
         job_description.location = City.objects.get(pk=location_pk)
     else:
         job_description.location = None
 
-    if job_appellation_code := session_data.get("job_appellation_code"):
-        # TODO(xfernandez): Legacy code, remove me in a few days (time for session to expire)
-        appellation = Appellation.objects.get(pk=job_appellation_code)
-    else:
-        appellation = Appellation.objects.get(pk=session_data.get("appellation"))
+    appellation = Appellation.objects.get(pk=session_data.get("appellation"))
     job_description.appellation = appellation
     job_description.company = company
 
