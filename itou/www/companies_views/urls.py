@@ -22,11 +22,6 @@ urlpatterns = [
     path("edit-company", views.edit_company_step_contact_infos, name="edit_company_step_contact_infos"),
     path("edit-company-description", views.edit_company_step_description, name="edit_company_step_description"),
     path("edit-company-preview", views.edit_company_step_preview, name="edit_company_step_preview"),
-    # FIXME temporary backward compatibility, remove after a few days
-    path("create_siae", views.create_company, name="create_siae"),
-    path("edit_siae", views.edit_company_step_contact_infos, name="edit_siae_step_contact_infos"),
-    path("edit_siae_description", views.edit_company_step_description, name="edit_siae_step_description"),
-    path("edit_siae_preview", views.edit_company_step_preview, name="edit_siae_step_preview"),
     path("colleagues", views.members, name="members"),
     path("deactivate_member/<int:user_id>", views.deactivate_member, name="deactivate_member"),
     # Tricky: when using `re_path` you CAN'T mix re parts with non re ones
