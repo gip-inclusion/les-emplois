@@ -226,11 +226,6 @@ class ModelTest(TestCase):
         assert user.has_sso_provider
 
     def test_update_external_data_source_history_field(self):
-        # TODO: (celine-m-s) I'm not very comfortable with this behaviour as we don't really
-        # keep a history of changes but only the last one.
-        # Field name don't reflect actual behaviour.
-        # Also, keeping a trace of old data is interesting in a debug purpose.
-        # Maybe split this test in smaller tests at the same time.
         user = PrescriberFactory()
         assert not user.external_data_source_history
 

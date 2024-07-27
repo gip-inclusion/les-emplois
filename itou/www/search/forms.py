@@ -102,7 +102,6 @@ class JobDescriptionSearchForm(SiaeSearchForm):
         [(k, v) for k, v in ContractType.choices if k not in (ContractType.OTHER, ContractType.BUSINESS_CREATION)],
         key=lambda d: d[1],
     ) + [
-        # FIXME(vperron): note that JS is used to add a "Nouveau" badge next to this entry until March 2023
         (ContractNature.PEC_OFFER, ContractNature.PEC_OFFER.label),
         (ContractType.BUSINESS_CREATION, ContractType.BUSINESS_CREATION.label),
         (ContractType.OTHER, ContractType.OTHER.label),
