@@ -343,7 +343,7 @@ class CreateProlongationRequestForm(CreateProlongationForm):
                 "hx-select": "#check_contact_details",
             }
         )
-        if self.data.get("require_phone_interview", False) in ("True", "true", "1", "on"):  # FIXME: Better way?
+        if forms.BooleanField().to_python(self.data.get("require_phone_interview", False)):
             self.fields["contact_email"].disabled = self.fields["contact_phone"].disabled = False
             self.fields["contact_email"].required = self.fields["contact_phone"].required = True
 
