@@ -71,7 +71,7 @@ django-htmx  # https://github.com/adamchainz/django-htmx
 # ------------------------------------------------------------------------------
 
 # Manipulate ASP CSV exports having 30+ (!) columns easily
-pandas==1.5.*  # https://github.com/pandas-dev/pandas
+pandas  # https://github.com/pandas-dev/pandas
 
 # Eye candy progress bar
 tqdm  # https://github.com/tqdm/tqdm
