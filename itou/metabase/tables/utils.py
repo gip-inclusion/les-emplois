@@ -85,15 +85,9 @@ def get_column_from_field(field, name):
 
 
 def get_choice(choices, key):
-    choices = dict(choices)
-    # Gettext fixes `can't adapt type '__proxy__'` error
-    # due to laxy_gettext and psycopg not going well together.
-    # See https://code.djangoproject.com/ticket/13965
-    if key in choices:
-        # FIXME: we dropped translations, this should be easier now.
-        # return gettext(choices[key])
-        return choices[key]
-    return None
+    if key is None:
+        return None
+    return dict(choices)[key]
 
 
 def get_first_membership_join_date(memberships):
