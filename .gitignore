@@ -71,8 +71,6 @@ coverage.xml
 .env
 # direnv
 /.envrc
-# TODO: delete me end of june 2024.
-/.envrc.local
 
 # virtualenv
 .venv*
