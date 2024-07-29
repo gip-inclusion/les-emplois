@@ -116,6 +116,7 @@ class AbstractEligibilityDiagnosisAdmin(ItouModelAdmin):
         "created_at",
         "is_valid",
         "expires_at",
+        "certifiable",
     )
     list_display_links = ("pk", "job_seeker")
     raw_id_fields = (
@@ -137,6 +138,10 @@ class AbstractEligibilityDiagnosisAdmin(ItouModelAdmin):
     @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):
         return obj.is_valid
+
+    @admin.display(boolean=True, description="vérifiable par l'API Particuliers")
+    def certifiable(self, obj):
+        return obj.certifiable
 
 
 @admin.register(models.EligibilityDiagnosis)
