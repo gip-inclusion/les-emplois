@@ -6,6 +6,7 @@ from django.utils import timezone
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.common import AdministrativeCriteriaQuerySet
+from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import (
@@ -376,12 +377,12 @@ class TestEligibilityDiagnosisModel:
         ApprovalFactory(user=diagnosis.job_seeker)
         assert diagnosis.is_considered_valid
 
-    def test_criteria_certification_required(self):
+    def test_criteria_certification_available(self):
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, with_certifiable_criteria=True)
-        assert diagnosis.criteria_certification_required
+        assert diagnosis.criteria_certification_available()
 
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, with_not_certifiable_criteria=True)
-        assert not diagnosis.criteria_certification_required
+        assert not diagnosis.criteria_certification_available()
 
 
 class TestAdministrativeCriteriaModel:
@@ -453,3 +454,14 @@ class AdministrativeCriteriaQuerysetTest(TestCase):
         not_expected = AdministrativeCriteria.objects.filter(certifiable=True).first()
         assert expected in AdministrativeCriteria.objects.not_certifiable()
         assert not_expected not in AdministrativeCriteria.objects.not_certifiable()
+
+    def test_geiq_certifiable(self):
+        expected = GEIQAdministrativeCriteria.objects.filter(certifiable=True).first()
+        not_expected = GEIQAdministrativeCriteria.objects.exclude(certifiable=True).first()
+        assert expected in GEIQAdministrativeCriteria.objects.certifiable()
+        assert not_expected not in GEIQAdministrativeCriteria.objects.certifiable()
+
+        expected = GEIQAdministrativeCriteria.objects.exclude(certifiable=True).first()
+        not_expected = GEIQAdministrativeCriteria.objects.filter(certifiable=True).first()
+        assert expected in GEIQAdministrativeCriteria.objects.not_certifiable()
+        assert not_expected not in GEIQAdministrativeCriteria.objects.not_certifiable()

@@ -10,7 +10,6 @@ from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.html import format_html
-from django.utils.text import format_lazy
 from django_select2.forms import Select2MultipleWidget, Select2Widget
 
 from itou.approvals.models import Approval
@@ -885,10 +884,11 @@ class CertifiedCriteriaInfoRequiredForm(forms.ModelForm):
     birth_place = forms.ModelChoiceField(
         queryset=asp_models.Commune.objects,
         label="Commune de naissance",
-        help_text="La commune de naissance ne doit être saisie que lorsque le salarié est né en France",
+        help_text="La commune de naissance est obligatoire lorsque le salarié est né en France. "
+        "Elle ne doit pas être renseignée s’il est né à l'étranger.",
         widget=RemoteAutocompleteSelect2Widget(
             attrs={
-                "data-ajax--url": format_lazy("{}?select2=", reverse_lazy("autocomplete:communes")),
+                "data-ajax--url": reverse_lazy("autocomplete:communes"),
                 "data-ajax--cache": "true",
                 "data-ajax--type": "GET",
                 "data-minimum-input-length": 2,

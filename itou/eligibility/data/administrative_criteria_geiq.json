@@ -15,7 +15,8 @@
 			"parent_id": 20,
 			"annex": "2",
 			"level": "1",
-			"slug": "beneficiaire-du-rsa"
+			"slug": "beneficiaire-du-rsa",
+			"certifiable": true
 		}
 	},
 	{
@@ -34,7 +35,8 @@
 			"parent_id": 20,
 			"annex": "2",
 			"level": "1",
-			"slug": "allocataire-ass"
+			"slug": "allocataire-ass",
+			"certifiable": false
 		}
 	},
 	{
@@ -53,7 +55,8 @@
 			"parent_id": 20,
 			"annex": "2",
 			"level": "1",
-			"slug": "allocataire-aah"
+			"slug": "allocataire-aah",
+			"certifiable": true
 		}
 	},
 	{
@@ -72,7 +75,8 @@
 			"parent_id": 31,
 			"annex": "2",
 			"level": "1",
-			"slug": "detld-24-mois"
+			"slug": "detld-24-mois",
+			"certifiable": false
 		}
 	},
 	{
@@ -91,7 +95,8 @@
 			"parent_id": null,
 			"annex": "2",
 			"level": "2",
-			"slug": "niveau-etude-3"
+			"slug": "niveau-etude-3",
+			"certifiable": false
 		}
 	},
 	{
@@ -110,7 +115,8 @@
 			"parent_id": null,
 			"annex": "2",
 			"level": "2",
-			"slug": "senior-50-ans"
+			"slug": "senior-50-ans",
+			"certifiable": false
 		}
 	},
 	{
@@ -129,7 +135,8 @@
 			"parent_id": null,
 			"annex": "2",
 			"level": "2",
-			"slug": "jeune-26-ans"
+			"slug": "jeune-26-ans",
+			"certifiable": false
 		}
 	},
 	{
@@ -148,7 +155,8 @@
 			"parent_id": null,
 			"annex": "2",
 			"level": "2",
-			"slug": "sortant-ase"
+			"slug": "sortant-ase",
+			"certifiable": false
 		}
 	},
 	{
@@ -167,7 +175,8 @@
 			"parent_id": 31,
 			"annex": "2",
 			"level": "2",
-			"slug": "deld-12-24-mois"
+			"slug": "deld-12-24-mois",
+			"certifiable": false
 		}
 	},
 	{
@@ -186,7 +195,8 @@
 			"parent_id": null,
 			"annex": "1+2",
 			"level": "2",
-			"slug": "travailleur-handicape"
+			"slug": "travailleur-handicape",
+			"certifiable": false
 		}
 	},
 	{
@@ -205,7 +215,8 @@
 			"parent_id": null,
 			"annex": "2",
 			"level": "2",
-			"slug": "parent-isole"
+			"slug": "parent-isole",
+			"certifiable": true
 		}
 	},
 	{
@@ -224,7 +235,8 @@
 			"parent_id": null,
 			"annex": "2",
 			"level": "2",
-			"slug": "personne-sans-hebergement"
+			"slug": "personne-sans-hebergement",
+			"certifiable": false
 		}
 	},
 	{
@@ -243,7 +255,8 @@
 			"parent_id": null,
 			"annex": "1+2",
 			"level": "2",
-			"slug": "refugie-statutaire"
+			"slug": "refugie-statutaire",
+			"certifiable": false
 		}
 	},
 	{
@@ -262,7 +275,8 @@
 			"parent_id": null,
 			"annex": "1+2",
 			"level": "2",
-			"slug": "resident-zrr"
+			"slug": "resident-zrr",
+			"certifiable": false
 		}
 	},
 	{
@@ -281,7 +295,8 @@
 			"parent_id": null,
 			"annex": "1+2",
 			"level": "2",
-			"slug": "resident-qpv"
+			"slug": "resident-qpv",
+			"certifiable": false
 		}
 	},
 	{
@@ -300,7 +315,8 @@
 			"parent_id": null,
 			"annex": "1+2",
 			"level": "2",
-			"slug": "sortant-de-detention-ou-personne-placee-sous-main-de-justice"
+			"slug": "sortant-de-detention-ou-personne-placee-sous-main-de-justice",
+			"certifiable": false
 		}
 	},
 	{
@@ -319,7 +335,8 @@
 			"parent_id": null,
 			"annex": "2",
 			"level": "2",
-			"slug": "maitrise-de-la-langue-francaise"
+			"slug": "maitrise-de-la-langue-francaise",
+			"certifiable": false
 		}
 	},
 	{
@@ -338,7 +355,8 @@
 			"parent_id": null,
 			"annex": "2",
 			"level": "2",
-			"slug": "mobilite"
+			"slug": "mobilite",
+			"certifiable": false
 		}
 	},
 	{
@@ -357,7 +375,8 @@
 			"parent_id": 7,
 			"annex": "1",
 			"level": null,
-			"slug": "jeune-de-moins-de-26-ans-sans-qualification"
+			"slug": "jeune-de-moins-de-26-ans-sans-qualification",
+			"certifiable": false
 		}
 	},
 	{
@@ -376,7 +395,8 @@
 			"parent_id": null,
 			"annex": "1",
 			"level": null,
-			"slug": "beneficiaire-des-minimas-sociaux"
+			"slug": "beneficiaire-des-minimas-sociaux",
+			"certifiable": false
 		}
 	},
 	{
@@ -395,7 +415,8 @@
 			"parent_id": null,
 			"annex": "1",
 			"level": null,
-			"slug": "personne-eloignee-du-marche-du-travail"
+			"slug": "personne-eloignee-du-marche-du-travail",
+			"certifiable": false
 		}
 	},
 	{
@@ -414,7 +435,8 @@
 			"parent_id": null,
 			"annex": "1",
 			"level": null,
-			"slug": "de-45-ans-et-plus"
+			"slug": "de-45-ans-et-plus",
+			"certifiable": false
 		}
 	},
 	{
@@ -433,7 +455,8 @@
 			"parent_id": null,
 			"annex": "1",
 			"level": null,
-			"slug": "personne-en-reconversion-professionnelle-contrainte"
+			"slug": "personne-en-reconversion-professionnelle-contrainte",
+			"certifiable": false
 		}
 	},
 	{
@@ -452,7 +475,8 @@
 			"parent_id": null,
 			"annex": "1",
 			"level": null,
-			"slug": "personne-en-dispositif-insertion"
+			"slug": "personne-en-dispositif-insertion",
+			"certifiable": false
 		}
 	},
 	{
@@ -471,7 +495,8 @@
 			"parent_id": null,
 			"annex": "2",
 			"level": "2",
-			"slug": "demandeur-asile"
+			"slug": "demandeur-asile",
+			"certifiable": false
 		}
 	},
 	{
@@ -490,7 +515,8 @@
 			"parent_id": 20,
 			"annex": "0",
 			"level": null,
-			"slug": "autre"
+			"slug": "autre",
+			"certifiable": false
 		}
 	},
 	{
@@ -509,7 +535,8 @@
 			"parent_id": null,
 			"annex": "0",
 			"level": null,
-			"slug": "personne-inscrite-a-pole-emploi"
+			"slug": "personne-inscrite-a-pole-emploi",
+			"certifiable": false
 		}
 	},
 	{
@@ -528,7 +555,8 @@
 			"parent_id": 31,
 			"annex": "0",
 			"level": null,
-			"slug": "de-inscrit-depuis-moins-de-12-mois"
+			"slug": "de-inscrit-depuis-moins-de-12-mois",
+			"certifiable": false
 		}
 	}
 ]

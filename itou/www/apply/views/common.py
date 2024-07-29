@@ -39,6 +39,13 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
     form_user_address = None
     form_certified_criteria = None
     creating = job_application is None
+    valid_diagnosis = None
+    if siae.is_subject_to_eligibility_rules:
+        valid_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker, for_siae=siae)
+    elif siae.kind == CompanyKind.GEIQ:
+        valid_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
+            job_seeker=job_seeker, for_geiq=siae
+        ).first()
 
     if siae.is_subject_to_eligibility_rules:
         # Info that will be used to search for an existing Pôle emploi approval.
@@ -52,12 +59,11 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
         form_user_address = JobSeekerAddressForm(instance=job_seeker, data=request.POST or None)
         forms.append(form_user_address)
 
-        diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker, for_siae=siae)
-        if diagnosis.criteria_certification_required:
-            form_certified_criteria = CertifiedCriteriaInfoRequiredForm(
-                instance=job_seeker.jobseeker_profile, data=request.POST or None
-            )
-            forms.append(form_certified_criteria)
+    if valid_diagnosis and valid_diagnosis.criteria_certification_available():
+        form_certified_criteria = CertifiedCriteriaInfoRequiredForm(
+            instance=job_seeker.jobseeker_profile, data=request.POST or None
+        )
+        forms.append(form_certified_criteria)
 
     form_accept = AcceptForm(instance=job_application, company=siae, data=request.POST or None)
     forms.append(form_accept)
@@ -163,10 +169,8 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
         elif job_application.to_company.kind == CompanyKind.GEIQ:
             # If job seeker has as valid GEIQ diagnosis issued by a GEIQ or a prescriber
             # link this diagnosis to the current job application
-            if geiq_eligibility_diagnosis := GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
-                job_application.job_seeker, job_application.to_company
-            ).first():
-                job_application.geiq_eligibility_diagnosis = geiq_eligibility_diagnosis
+            if valid_diagnosis:
+                job_application.geiq_eligibility_diagnosis = valid_diagnosis
                 job_application.save(update_fields=["geiq_eligibility_diagnosis"])
 
         if creating and siae.is_subject_to_eligibility_rules and job_application.approval:

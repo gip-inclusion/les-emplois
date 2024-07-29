@@ -27,7 +27,7 @@ from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.job_applications import enums as job_applications_enums
-from itou.job_applications.enums import JobApplicationState, SenderKind
+from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType, SenderKind
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.siae_evaluations.models import Sanctions
@@ -1713,7 +1713,16 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             "birth_country": extra_post_data.get("birth_country", CountryFranceFactory().pk),
             "birth_place": extra_post_data.get("birth_country", CommuneFactory().pk),
         }
-
+        # GEIQ-only mandatory fields
+        if job_application.to_company.kind == CompanyKind.GEIQ:
+            accept_default_fields |= {
+                "prehiring_guidance_days": 10,
+                "contract_type": ContractType.APPRENTICESHIP,
+                "nb_hours_per_week": 10,
+                "qualification_type": QualificationType.CQP,
+                "qualification_level": QualificationLevel.LEVEL_4,
+                "planned_training_hours": 20,
+            }
         return {
             **personal_data_default_fields,
             **address_default_fields,
@@ -1743,7 +1752,6 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert response.headers.get("HX-Trigger") is None
 
         post_data = self._accept_view_post_data(job_application=job_application, post_data=post_data)
-
         response = self.client.post(url_accept, headers={"hx-request": "true"}, data=post_data)
 
         if assert_successful:
@@ -2393,7 +2401,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert approval.start_at == job_application.hiring_start_at
         assert job_application.state.is_accepted
 
-    def test_accept__criteria_certification_required(self):
+    def test_accept_iae__criteria_certification_available(self):
         ######### Case 1: if BRSA is one the diagnosis criteria,
         ######### birth place and birth country are required.
         job_application = self.create_job_application(eligibility_diagnosis__with_certifiable_criteria=True)
@@ -2417,8 +2425,66 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
         jobseeker_profile.refresh_from_db()
-        assert jobseeker_profile.birth_country == birth_country
-        assert jobseeker_profile.birth_place == birth_place
+        assert jobseeker_profile.birth_country.code == birth_country.code
+        assert jobseeker_profile.birth_place.code == birth_place.code
+
+    def test_accept_geiq__criteria_certification_available(self):
+        self.company.kind = CompanyKind.GEIQ
+        self.company.save()
+        job_application = self.create_job_application(
+            with_geiq_eligibility_diagnosis=True, geiq_eligibility_diagnosis__with_certifiable_criteria=True
+        )
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
+
+        response = self.client.get(url_accept)
+        self.assertContains(response, "Pays de naissance")
+        self.assertContains(response, "Commune de naissance")
+
+        # CertifiedCriteriaForm
+        birth_country = CountryFranceFactory()
+        birth_place = CommuneFactory()
+        post_data = {
+            "birth_country": birth_country.pk,
+            "birth_place": birth_place.pk,
+        }
+        response, _ = self.accept_job_application(
+            job_application=job_application, post_data=post_data, assert_successful=True
+        )
+
+        jobseeker_profile = job_application.job_seeker.jobseeker_profile
+        jobseeker_profile.refresh_from_db()
+        assert jobseeker_profile.birth_country.code == birth_country.code
+        assert jobseeker_profile.birth_place.code == birth_place.code
+
+    def test_accept_no_siae__criteria_certification_available(self):
+        self.company.kind = CompanyKind.EATT
+        self.company.save()
+        job_application = self.create_job_application(eligibility_diagnosis__with_certifiable_criteria=True)
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
+
+        response = self.client.get(url_accept)
+        self.assertNotContains(response, "Pays de naissance")
+        self.assertNotContains(response, "Commune de naissance")
+
+        # CertifiedCriteriaForm
+        birth_country = CountryFranceFactory()
+        birth_place = CommuneFactory()
+        post_data = {
+            "birth_country": birth_country.pk,
+            "birth_place": birth_place.pk,
+        }
+        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
+
+        jobseeker_profile = job_application.job_seeker.jobseeker_profile
+        jobseeker_profile.refresh_from_db()
+        assert not jobseeker_profile.birth_country
+        assert not jobseeker_profile.birth_place
 
     def test_criteria__criteria_not_certificable(self):
         # ############################
