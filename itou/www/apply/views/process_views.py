@@ -1,5 +1,4 @@
 import datetime
-import json
 from urllib.parse import quote
 
 import httpx
@@ -1046,7 +1045,15 @@ def rdv_insertion_invite(request, job_application_id):
         return render(
             request,
             "apply/includes/buttons/rdv_insertion_invite.html",
-            {"state": "error"},
+            {"job_application": None, "state": "error"},
+        )
+
+    # Ensure company has RDV-I configured
+    if not job_application.to_company.rdv_insertion_id:
+        return render(
+            request,
+            "apply/includes/buttons/rdv_insertion_invite.html",
+            {"job_application": None, "state": "error"},
         )
 
     invitation_request = InvitationRequest.objects.filter(
@@ -1063,22 +1070,19 @@ def rdv_insertion_invite(request, job_application_id):
                     f"{job_application.to_company.rdv_insertion_id}/users/create_and_invite"
                 )
                 headers = {"Content-Type": "application/json; charset=utf-8", **get_api_credentials()}
-                data = json.dumps(
-                    {
-                        "first_name": job_application.job_seeker.first_name,  # Required
-                        "last_name": job_application.job_seeker.last_name,  # Required
-                        "title": "madame"
-                        if job_application.job_seeker.title == Title.MME
-                        else "monsieur",  # Required!
-                        "role": "demandeur",  # Required
-                        "email": job_application.job_seeker.email,
-                        # "phone_number": job_application.job_seeker.phone,
-                        "birth_date": formats.date_format(job_application.job_seeker.birthdate, "d/m/Y"),
-                        "nir": job_application.job_seeker.jobseeker_profile.nir,
-                        "france_travail_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
-                        "address": job_application.job_seeker.address_on_one_line,
-                    }
-                )
+
+                data = {
+                    "first_name": job_application.job_seeker.first_name,  # Required
+                    "last_name": job_application.job_seeker.last_name,  # Required
+                    "title": "madame" if job_application.job_seeker.title == Title.MME else "monsieur",  # Required!
+                    "role": "demandeur",  # Required
+                    "email": job_application.job_seeker.email,
+                    "phone_number": job_application.job_seeker.phone,
+                    "birth_date": formats.date_format(job_application.job_seeker.birthdate, "d/m/Y"),
+                    "nir": job_application.job_seeker.jobseeker_profile.nir,
+                    "france_travail_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
+                    "address": job_application.job_seeker.address_on_one_line,
+                }
 
                 response = httpx.post(url=url, headers=headers, json=data, timeout=10)
                 if response.status_code in (httpx.codes.UNAUTHORIZED, httpx.codes.FORBIDDEN):
@@ -1117,5 +1121,5 @@ def rdv_insertion_invite(request, job_application_id):
     return render(
         request,
         "apply/includes/buttons/rdv_insertion_invite.html",
-        {"job_application": job_application},
+        {"job_application": job_application, "state": "ok"},
     )
