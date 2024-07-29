@@ -131,7 +131,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
     job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
 
-    filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET or None)
+    filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET)
 
     # Add related data giving the criteria for adding the necessary annotations
     job_applications = job_applications.with_list_related_data(criteria=filters_form.data.getlist("criteria", []))
@@ -222,7 +222,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         state__in=JobApplicationWorkflow.PENDING_STATES
     ).count()
 
-    filters_form = CompanyFilterJobApplicationsForm(job_applications, company, request.GET or None)
+    filters_form = CompanyFilterJobApplicationsForm(job_applications, company, request.GET)
 
     # Add related data giving the criteria for adding the necessary annotations
     job_applications = job_applications.not_archived().with_list_related_data(

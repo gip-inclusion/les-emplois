@@ -576,6 +576,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
 
     state = xwf_models.StateField(JobApplicationWorkflow, verbose_name="état", db_index=True)
+    archived_at = models.DateTimeField(blank=True, null=True, verbose_name="archivée le", db_index=True)
 
     # Jobs in which the job seeker is interested (optional).
     selected_jobs = models.ManyToManyField("companies.JobDescription", verbose_name="métiers recherchés", blank=True)
@@ -770,6 +771,11 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     ~models.Q(state__in=JobApplicationWorkflow.JOB_APPLICATION_PROCESSED_STATES)
                     & models.Q(processed_at=None)
                 ),
+            ),
+            models.CheckConstraint(
+                name="archived_not_accepted",
+                violation_error_message="Impossible d’archiver une candidature acceptée.",
+                check=~models.Q(state=JobApplicationState.ACCEPTED, archived_at__isnull=False),
             ),
         ]
 

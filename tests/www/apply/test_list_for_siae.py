@@ -732,6 +732,26 @@ def test_list_for_siae_filter_for_different_kind(client, snapshot):
         assert str(filter_form) == snapshot(name=kind_snapshot[kind])
 
 
+def test_archived(client):
+    company = CompanyFactory(with_membership=True)
+    active = JobApplicationFactory(to_company=company)
+    archived = JobApplicationFactory(to_company=company, archived_at=timezone.now())
+    client.force_login(company.members.get())
+    url = reverse("apply:list_for_siae")
+    response = client.get(url)
+    assertContains(response, active.pk)
+    assertNotContains(response, archived.pk)
+    response = client.get(url, data={"archived": ""})
+    assertContains(response, active.pk)
+    assertNotContains(response, archived.pk)
+    response = client.get(url, data={"archived": "archived"})
+    assertNotContains(response, active.pk)
+    assertContains(response, archived.pk)
+    response = client.get(url, data={"archived": "all"})
+    assertContains(response, active.pk)
+    assertContains(response, archived.pk)
+
+
 def test_list_for_siae_htmx_filters(client):
     company = CompanyFactory(with_membership=True)
     JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED)

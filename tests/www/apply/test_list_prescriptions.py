@@ -2,6 +2,7 @@ from urllib.parse import unquote
 
 import factory
 from django.urls import reverse
+from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries
 
 from itou.job_applications.enums import JobApplicationState, SenderKind
@@ -163,6 +164,26 @@ def test_filters(client, snapshot):
     assert response.status_code == 200
     filter_form = parse_response_to_soup(response, "#offcanvasApplyFilters")
     assert str(filter_form) == snapshot()
+
+
+def test_archived(client):
+    prescriber = PrescriberFactory()
+    active = JobApplicationFactory(sender=prescriber)
+    archived = JobApplicationFactory(sender=prescriber, archived_at=timezone.now())
+    client.force_login(prescriber)
+    url = reverse("apply:list_prescriptions")
+    response = client.get(url)
+    assertContains(response, active.pk)
+    assertNotContains(response, archived.pk)
+    response = client.get(url, data={"archived": ""})
+    assertContains(response, active.pk)
+    assertNotContains(response, archived.pk)
+    response = client.get(url, data={"archived": "archived"})
+    assertNotContains(response, active.pk)
+    assertContains(response, archived.pk)
+    response = client.get(url, data={"archived": "all"})
+    assertContains(response, active.pk)
+    assertContains(response, archived.pk)
 
 
 def test_htmx_filters(client):

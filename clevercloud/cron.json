@@ -22,6 +22,7 @@
   "0 9 * * * $ROOT/clevercloud/run_management_command.sh send_check_authorized_members_email",
   "0 12 * * * $ROOT/clevercloud/run_management_command.sh evaluation_campaign_notify",
   "30 20 * * * $ROOT/clevercloud/crons/populate_metabase_emplois.sh --daily",
+  "0 23 * * * $ROOT/clevercloud/run_management_command.sh archive_job_applications",
   "5 23 * * * $ROOT/clevercloud/run_management_command.sh archive_employee_records --wet-run",
 
   "25 8-18/2 * * 1-5 $ROOT/clevercloud/transfer_employee_records.sh --download",
