@@ -1,5 +1,21 @@
 # Journal des modifications
 
+## 2024-07-29
+
+### Ajouté
+
+- [Permettre de stocker l’ID RDV-Solidarité d’une SIAE dans les emplois](https://github.com/gip-inclusion/les-emplois/pull/4355)
+- [Pilotage : Ajouter du texte dans la rubrique “Données personnalisées” des utilisateurs qui n’ont pas de TB privé](https://github.com/gip-inclusion/les-emplois/pull/4458) 🖼
+- [Système permettant de renouveler token d’API RDV-Solidarité](https://github.com/gip-inclusion/les-emplois/pull/4356)
+
+### Modifié
+
+- [Candidature: Faciliter la mise à jour du NIR à l'aide d'un texte d'aide](https://github.com/gip-inclusion/les-emplois/pull/4448)
+
+### Supprimé
+
+- [UX/UI : Retirer l'alerte du test Maze sur la liste des candidatures côté prescripteur](https://github.com/gip-inclusion/les-emplois/pull/4453)
+
 ## 2024-07-22
 
 ### Ajouté
