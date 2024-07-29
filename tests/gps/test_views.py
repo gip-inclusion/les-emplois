@@ -5,10 +5,11 @@ from django.urls import reverse
 from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
-from itou.users.enums import UserKind
 from itou.users.models import User
 from tests.gps.factories import FollowUpGroupFactory
+from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import (
+    EmployerFactory,
     JobSeekerFactory,
     JobSeekerWithAddressFactory,
     PrescriberFactory,
@@ -64,19 +65,17 @@ class GpsTest(TestCase):
         FollowUpGroupFactory(beneficiary=third_beneficiary, memberships=3, memberships__member=prescriber)
         FollowUpGroupFactory(beneficiary=second_beneficiary, memberships=2)
 
-        # Default to kind=UserKind.JOB_SEEKER
-        # We should get the 3 job seekers
-        users = User.objects.autocomplete("gps")
+        # Employers should get the 3 job seekers.
+        users = User.objects.autocomplete("gps", EmployerFactory())
         self.assertCountEqual(users, [first_beneficiary, second_beneficiary, third_beneficiary])
 
-        # We should not get the prescriber by default
-        assert User.objects.autocomplete("gps member").count() == 0
-
-        # Only when we specify his kind
-        assert User.objects.autocomplete("gps member", kind=UserKind.PRESCRIBER).count() == 1
+        # Authorized prescribers should get the 3 job seekers.
+        org = PrescriberOrganizationWithMembershipFactory(authorized=True)
+        users = User.objects.autocomplete("gps", org.members.get())
+        self.assertCountEqual(users, [first_beneficiary, second_beneficiary, third_beneficiary])
 
         # We should not get ourself nor the first and third user user because we are a member of their group
-        users = User.objects.autocomplete("gps", current_user=prescriber).all()
+        users = User.objects.autocomplete("gps", prescriber).all()
         self.assertCountEqual(users, [second_beneficiary])
 
         # Now, if we remove the first user from our group by setting the membership to is_active False
@@ -87,7 +86,7 @@ class GpsTest(TestCase):
 
         # We should not get ourself but we should get the first beneficiary (we are is_active=False)
         # and the second one (we are not part of his group)
-        users = User.objects.autocomplete("gps", current_user=prescriber)
+        users = User.objects.autocomplete("gps", prescriber)
 
         self.assertCountEqual(users, [first_beneficiary, second_beneficiary])
 
