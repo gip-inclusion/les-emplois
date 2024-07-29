@@ -141,7 +141,7 @@ def gps_users_autocomplete(request):
                 "text": user.get_full_name(),
                 "id": user.pk,
             }
-            for user in User.objects.autocomplete(term, limit=10, current_user=current_user)
+            for user in User.objects.autocomplete(term, current_user)
         ]
 
     return JsonResponse({"results": users})
