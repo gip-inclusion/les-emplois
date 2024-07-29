@@ -178,8 +178,8 @@ def django_loaddata_fixture(django_db_setup, django_db_blocker):
         )
 
 
-@pytest.fixture(autouse=True, scope="session")
-def django_test_environment_email_fixup(django_test_environment) -> None:
+@pytest.fixture(autouse=True)
+def django_test_environment_email_fixup(django_test_environment, settings) -> None:
     # Django forcefully sets the EMAIL_BACKEND to
     # "django.core.mail.backends.locmem.EmailBackend" in
     # django.test.utils.setup_test_environment.
