@@ -1490,9 +1490,9 @@ syrupy==4.6.1 \
     --hash=sha256:203e52f9cb9fa749cf683f29bd68f02c16c3bc7e7e5fe8f2fc59bdfe488ce133 \
     --hash=sha256:37a835c9ce7857eeef86d62145885e10b3cb9615bc6abeb4ce404b3f18e1bb36
     # via -r requirements/test.txt
-tenacity==8.5.0 \
-    --hash=sha256:8bc6c0c8a09b31e6cad13c47afbed1a567518250a9a171418582ed8d9c20ca78 \
-    --hash=sha256:b594c2a5945830c267ce6b79a166228323ed52718f30302c1359836112346687
+tenacity==9.0.0 \
+    --hash=sha256:807f37ca97d62aa361264d497b0e31e92b8027044942bfa756160d908320d73b \
+    --hash=sha256:93de0c98785b27fcf659856aa9f54bfbd399e29969b0621bc7f762bd441b4539
     # via -r requirements/test.txt
 tqdm==4.66.4 \
     --hash=sha256:b75ca56b413b030bc3f00af51fd2c1a1a5eac6a0c1cca83cbb37a5c52abce644 \
