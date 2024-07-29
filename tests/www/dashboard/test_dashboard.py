@@ -15,6 +15,7 @@ from unittest_parametrize import ParametrizedTestCase, param, parametrize
 from itou.companies.enums import CompanyKind
 from itou.employee_record.enums import Status
 from itou.institutions.enums import InstitutionKind
+from itou.job_applications.enums import JobApplicationState
 from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations import enums as evaluation_enums
@@ -203,6 +204,57 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         response = self.client.get(reverse("dashboard:index"))
 
         self.assertContains(response, geiq_url)
+
+    def test_dashboard_applications_count(self):
+        company = CompanyFactory(with_membership=True)
+        JobApplicationFactory(to_company=company)
+        JobApplicationFactory(to_company=company, archived_at=timezone.now())
+        JobApplicationFactory(to_company=company, state=JobApplicationState.POSTPONED)
+        JobApplicationFactory(to_company=company, state=JobApplicationState.POSTPONED, archived_at=timezone.now())
+        self.client.force_login(company.members.get())
+        response = self.client.get(reverse("dashboard:index"))
+        todo_url = reverse("apply:list_for_siae") + "?states=new&amp;states=processing"
+        postponed_url = reverse("apply:list_for_siae") + "?states=postponed"
+        self.assertContains(
+            response,
+            # Archived job application is ignored.
+            f"""
+            <li class="d-flex justify-content-between align-items-center mb-3">
+                <a href="{todo_url}"
+                   class="btn-link btn-ico"
+                   data-matomo-event="true"
+                   data-matomo-category="employeurs"
+                   data-matomo-action="clic"
+                   data-matomo-option="voir-liste-candidatures-À traiter">
+                    <i class="ri-notification-4-line ri-lg font-weight-normal"></i>
+                    <span>À traiter</span>
+                </a>
+                <span class="badge rounded-pill badge-xs bg-info-lighter text-info">1</span>
+            </li>
+            """,
+            html=True,
+            count=1,
+        )
+        self.assertContains(
+            response,
+            # Archived job application is ignored.
+            f"""
+            <li class="d-flex justify-content-between align-items-center mb-3">
+                <a href="{postponed_url}"
+                   class="btn-link btn-ico"
+                   data-matomo-event="true"
+                   data-matomo-category="employeurs"
+                   data-matomo-action="clic"
+                   data-matomo-option="voir-liste-candidatures-En attente">
+                    <i class="ri-time-line ri-lg font-weight-normal"></i>
+                    <span>En attente</span>
+                </a>
+                <span class="badge rounded-pill badge-xs bg-info-lighter text-info">1</span>
+            </li>
+            """,
+            html=True,
+            count=1,
+        )
 
     def test_dashboard_job_postings(self):
         for kind in [

@@ -1,3 +1,5 @@
+{% load django_bootstrap5 %}
+
 <div class="offcanvas-body" id="offcanvasApplyFiltersContent"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
     {% include "apply/includes/job_applications_filters/status.html" %}
     {% if job_applications_list_kind is JobApplicationsListKind.SENT or job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
@@ -25,6 +27,26 @@
         {% if filters_form.job_seeker.value %}
             <input type="hidden" name="{{ filters_form.job_seeker.name }}" value="{{ filters_form.job_seeker.value }}">
         {% endif %}
+        <hr>
+        {# TODO: Use "apply/includes/job_applications_filters/field_collapse.html" when getting rid of the help text. #}
+        <fieldset>
+            <legend>
+                <button class="btn btn-outline-transparent has-collapse-caret collapsed"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#collapse-{{ filters_form.archived.name }}"
+                        type="button"
+                        aria-expanded="false"
+                        aria-controls="collapse-{{ filters_form.archived.name }}">
+                    Type de candidature <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
+                </button>
+            </legend>
+            <div class="mt-3 collapse" id="collapse-{{ filters_form.archived.name }}">
+                <div class="mb-3">
+                    <i>En savoir plus sur les types de candidatures <a href="{{ ITOU_HELP_CENTER_URL }}/articles/27110481864593--Archiver-une-candidature" target="_blank" rel="noopener" aria-label="Documentation des types de candidatures">dans la documentation</a>.</i>
+                </div>
+                {% bootstrap_field filters_form.archived %}
+            </div>
+        </fieldset>
     {% endif %}
     {% include "apply/includes/job_applications_filters/dates.html" %}
 </div>

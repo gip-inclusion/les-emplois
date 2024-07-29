@@ -96,6 +96,9 @@
 </section>
 
 {% if request.htmx %}
+    {% if job_applications_list_kind is JobApplicationsListKind.RECEIVED or job_applications_list_kind is JobApplicationsListKind.SENT %}
+        {% include "apply/includes/list_job_applications_title.html" %}
+    {% endif %}
     {% include "apply/includes/list_reset_filters.html" with btn_dropdown_filter=True %}
     {% include "apply/includes/list_counter.html" %}
     {% include "apply/includes/job_applications_export_button.html" %}

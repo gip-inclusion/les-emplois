@@ -2,6 +2,7 @@ from urllib.parse import unquote
 
 import factory
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries
 
@@ -186,6 +187,53 @@ def test_filters(client, snapshot):
     assert response.status_code == 200
     filter_form = parse_response_to_soup(response, "#offcanvasApplyFilters")
     assert str(filter_form) == snapshot()
+
+
+def test_archived(client):
+    prescriber = PrescriberFactory()
+    active = JobApplicationFactory(sender=prescriber)
+    archived = JobApplicationFactory(sender=prescriber, archived_at=timezone.now())
+    archived_badge_html = """\
+    <span class="badge rounded-pill badge-sm mb-1 bg-light text-primary"
+          aria-label="candidature archivée"
+          data-bs-toggle="tooltip"
+          data-bs-placement="top"
+          data-bs-title="Candidature archivée">
+      <i class="ri-archive-line mx-0"></i>
+    </span>
+    """
+    client.force_login(prescriber)
+    url = reverse("apply:list_prescriptions")
+    response = client.get(url)
+    assertContains(response, active.pk)
+    assertNotContains(response, archived.pk)
+    assertNotContains(response, archived_badge_html, html=True)
+    response = client.get(url, data={"archived": ""})
+    assertContains(response, active.pk)
+    assertNotContains(response, archived.pk)
+    assertNotContains(response, archived_badge_html, html=True)
+    response = client.get(url, data={"archived": "archived"})
+    assertNotContains(response, active.pk)
+    assertContains(response, archived.pk)
+    assertContains(response, archived_badge_html, html=True, count=1)
+    response = client.get(url, data={"archived": "all"})
+    assertContains(response, active.pk)
+    assertContains(response, archived.pk)
+    assertContains(response, archived_badge_html, html=True, count=1)
+    response = client.get(url, data={"archived": "invalid"})
+    assertContains(response, active.pk)
+    assertContains(response, archived.pk)
+    assertContains(response, archived_badge_html, html=True, count=1)
+    assertContains(
+        response,
+        """
+        <div class="alert alert-danger" role="alert">
+            Sélectionnez un choix valide. invalid n’en fait pas partie.
+        </div>
+        """,
+        html=True,
+        count=1,
+    )
 
 
 def test_htmx_filters(client):

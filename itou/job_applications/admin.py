@@ -119,6 +119,8 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "created_at",
         "updated_at",
         "processed_at",
+        "archived_at",
+        "archived_by",
         "approval_number_sent_at",
         "approval_manually_delivered_by",
         "approval_manually_refused_by",
@@ -146,7 +148,6 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                     "answer_to_prescriber",
                     "hiring_start_at",
                     "hiring_end_at",
-                    "hidden_for_company",
                     "create_employee_record",
                 ]
             },

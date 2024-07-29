@@ -173,6 +173,8 @@
                  "job_applications_jobapplication"."sender_prescriber_organization_id",
                  "job_applications_jobapplication"."to_company_id",
                  "job_applications_jobapplication"."state",
+                 "job_applications_jobapplication"."archived_at",
+                 "job_applications_jobapplication"."archived_by_id",
                  "job_applications_jobapplication"."hired_job_id",
                  "job_applications_jobapplication"."message",
                  "job_applications_jobapplication"."answer",
@@ -190,7 +192,6 @@
                  "job_applications_jobapplication"."approval_manually_delivered_by_id",
                  "job_applications_jobapplication"."approval_manually_refused_by_id",
                  "job_applications_jobapplication"."approval_manually_refused_at",
-                 "job_applications_jobapplication"."hidden_for_company",
                  "job_applications_jobapplication"."transferred_at",
                  "job_applications_jobapplication"."transferred_by_id",
                  "job_applications_jobapplication"."transferred_from_id",
@@ -571,6 +572,38 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_insertion_id",
+                 T17."id",
+                 T17."password",
+                 T17."last_login",
+                 T17."is_superuser",
+                 T17."username",
+                 T17."first_name",
+                 T17."last_name",
+                 T17."is_staff",
+                 T17."is_active",
+                 T17."date_joined",
+                 T17."address_line_1",
+                 T17."address_line_2",
+                 T17."post_code",
+                 T17."city",
+                 T17."department",
+                 T17."coords",
+                 T17."geocoding_score",
+                 T17."geocoding_updated_at",
+                 T17."ban_api_resolved_address",
+                 T17."insee_city_id",
+                 T17."title",
+                 T17."email",
+                 T17."phone",
+                 T17."kind",
+                 T17."identity_provider",
+                 T17."has_completed_welcoming_tour",
+                 T17."created_by_id",
+                 T17."external_data_source_history",
+                 T17."last_checked_at",
+                 T17."public_id",
+                 T17."address_filled_at",
+                 T17."first_login",
                  "approvals_approval"."id",
                  "approvals_approval"."start_at",
                  "approvals_approval"."end_at",
@@ -605,10 +638,10 @@
           LEFT OUTER JOIN "users_user" T14 ON ("job_applications_jobapplication"."sender_id" = T14."id")
           LEFT OUTER JOIN "companies_company" T15 ON ("job_applications_jobapplication"."sender_company_id" = T15."id")
           LEFT OUTER JOIN "prescribers_prescriberorganization" T16 ON ("job_applications_jobapplication"."sender_prescriber_organization_id" = T16."id")
+          LEFT OUTER JOIN "users_user" T17 ON ("job_applications_jobapplication"."archived_by_id" = T17."id")
           LEFT OUTER JOIN "approvals_approval" ON ("job_applications_jobapplication"."approval_id" = "approvals_approval"."id")
           WHERE ("companies_companymembership"."user_id" = %s
                  AND "users_user"."is_active"
-                 AND NOT ("job_applications_jobapplication"."hidden_for_company")
                  AND "job_applications_jobapplication"."id" = %s)
           LIMIT 21
         ''',

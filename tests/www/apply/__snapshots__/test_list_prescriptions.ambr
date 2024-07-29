@@ -89,7 +89,9 @@
               </h4>
               <button aria-label="Fermer" class="btn-close" data-bs-dismiss="offcanvas" type="button"></button>
           </div>
-          <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
+          
+  
+  <div class="offcanvas-body" id="offcanvasApplyFiltersContent">
       
       <fieldset>
           <legend>
@@ -290,6 +292,47 @@
   
           
           
+          <hr/>
+          
+          <fieldset>
+              <legend>
+                  <button aria-controls="collapse-archived" aria-expanded="false" class="btn btn-outline-transparent has-collapse-caret collapsed" data-bs-target="#collapse-archived" data-bs-toggle="collapse" type="button">
+                      Type de candidature <span class="badge badge-sm rounded-pill bg-important">Nouveau</span>
+                  </button>
+              </legend>
+              <div class="mt-3 collapse" id="collapse-archived">
+                  <div class="mb-3">
+                      <i>En savoir plus sur les types de candidatures <a aria-label="Documentation des types de candidatures" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/27110481864593--Archiver-une-candidature" rel="noopener" target="_blank">dans la documentation</a>.</i>
+                  </div>
+                  <div class="form-group"><div class="" id="id_archived">
+      
+          
+          
+              <div class="form-check">
+                  <input checked="checked" class="form-check-input" id="id_archived_0" name="archived" type="radio" value=""/>
+                  <label class="form-check-label" for="id_archived_0">Candidatures actives (affichage par défaut)</label>
+              </div>
+          
+      
+          
+          
+              <div class="form-check">
+                  <input class="form-check-input" id="id_archived_1" name="archived" type="radio" value="archived"/>
+                  <label class="form-check-label" for="id_archived_1">Candidatures archivées</label>
+              </div>
+          
+      
+          
+          
+              <div class="form-check">
+                  <input class="form-check-input" id="id_archived_2" name="archived" type="radio" value="all"/>
+                  <label class="form-check-label" for="id_archived_2">Toutes les candidatures</label>
+              </div>
+          
+      
+  </div></div>
+              </div>
+          </fieldset>
       
       
   

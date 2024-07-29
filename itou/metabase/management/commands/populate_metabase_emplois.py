@@ -343,9 +343,9 @@ class Command(BaseCommand):
             .prefetch_related("logs")
             .only(
                 "pk",
-                "hidden_for_company",
                 "created_at",
                 "processed_at",
+                "archived_at",
                 "hiring_start_at",
                 "origin",
                 "sender_kind",

@@ -1,10 +1,17 @@
+from types import NoneType
+
+import pytest
 from dateutil.relativedelta import relativedelta
+from django.http.request import urlencode
 from django.urls import reverse
 from django.utils import dateformat, timezone
+from freezegun import freeze_time
+from pytest_django.asserts import assertRedirects
 
+from itou.job_applications.enums import ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL, JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.utils.widgets import DuetDatePickerWidget
-from tests.companies.factories import CompanyWithMembershipAndJobsFactory
+from tests.companies.factories import CompanyFactory, CompanyWithMembershipAndJobsFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.test import TestCase
 
@@ -243,3 +250,93 @@ class EditContractTest(TestCase):
 
         response = self.client.post(self.old_url, data=post_data)
         assert response.status_code == 200
+
+
+@pytest.mark.parametrize(
+    "archived_at_func,expected_func,viewname",
+    [
+        (timezone.now, NoneType, "apply:unarchive"),
+        (NoneType, timezone.now, "apply:archive"),
+    ],
+)
+@freeze_time()
+class TestArchiveView:
+    def test_access(self, client, archived_at_func, expected_func, viewname):
+        archived_at = archived_at_func()
+        other_company = CompanyFactory(with_membership=True)
+        job_app = JobApplicationFactory(archived_at=archived_at, state=JobApplicationState.REFUSED)
+        url = reverse(viewname, args=(job_app.pk,))
+
+        # Anonymous users cannot access.
+        response = client.post(url)
+        assertRedirects(response, f"{reverse('account_login')}?{urlencode({'next': url})}")
+        job_app.refresh_from_db()
+        assert job_app.archived_at == archived_at
+
+        def assert_post_fails_for_user(user):
+            client.force_login(user)
+            response = client.post(url)
+            assert response.status_code == 404
+            job_app.refresh_from_db()
+            assert job_app.archived_at == archived_at
+
+        assert_post_fails_for_user(job_app.job_seeker)
+        assert_post_fails_for_user(job_app.sender)
+        assert_post_fails_for_user(other_company.members.get())
+
+        client.force_login(job_app.to_company.members.get())
+        response = client.post(url)
+        assertRedirects(response, reverse("apply:details_for_company", args=(job_app.pk,)))
+        job_app.refresh_from_db()
+        assert job_app.archived_at == expected_func()
+
+    def test_already_in_target_state(self, client, archived_at_func, expected_func, viewname):
+        target_archived_at = expected_func()
+        company = CompanyWithMembershipAndJobsFactory()
+        employer = company.members.get()
+        job_app = JobApplicationFactory(
+            to_company=company,
+            archived_at=target_archived_at,
+            archived_by=employer if target_archived_at else None,
+            state=JobApplicationState.REFUSED,
+        )
+        client.force_login(employer)
+        response = client.post(reverse(viewname, args=(job_app.pk,)))
+        assertRedirects(response, reverse("apply:details_for_company", args=(job_app.pk,)))
+        job_app.refresh_from_db()
+        assert job_app.archived_at == target_archived_at
+
+    def test_only_selected_job_application(self, client, archived_at_func, expected_func, viewname):
+        archived_at = archived_at_func()
+        company = CompanyWithMembershipAndJobsFactory()
+        [job_app1, job_app2] = JobApplicationFactory.create_batch(
+            2,
+            to_company=company,
+            archived_at=archived_at,
+            state=JobApplicationState.REFUSED,
+        )
+        client.force_login(company.members.get())
+        response = client.post(reverse(viewname, args=(job_app2.pk,)))
+        assertRedirects(response, reverse("apply:details_for_company", args=(job_app2.pk,)))
+        job_app1.refresh_from_db()
+        job_app2.refresh_from_db()
+        assert job_app1.archived_at == archived_at
+        assert job_app2.archived_at == expected_func()
+
+
+@pytest.mark.parametrize("state", JobApplicationState.values)
+def test_archive_view_states(client, state):
+    job_app = JobApplicationFactory(state=state)
+    employer = job_app.to_company.members.get()
+    client.force_login(employer)
+    response = client.post(reverse("apply:archive", args=(job_app.pk,)))
+    if state in ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL:
+        assertRedirects(response, reverse("apply:details_for_company", args=(job_app.pk,)))
+        job_app.refresh_from_db()
+        assert job_app.archived_at is not None
+        assert job_app.archived_by == employer
+    else:
+        assert response.status_code == 404
+        job_app.refresh_from_db()
+        assert job_app.archived_at is None
+        assert job_app.archived_by is None

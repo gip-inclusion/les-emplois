@@ -197,7 +197,7 @@ class ProcessListSiaeTest(TestCase):
         total_applications = len(response.context["job_applications_page"].object_list)
 
         # Result page should contain all SIAE's job applications.
-        assert total_applications == self.hit_pit.job_applications_received.not_archived().count()
+        assert total_applications == self.hit_pit.job_applications_received.count()
 
         assert_previous_step(response, reverse("dashboard:index"))
 
@@ -395,7 +395,7 @@ class ProcessListSiaeTest(TestCase):
         """
         self.client.force_login(self.eddie_hit_pit)
         date_format = DuetDatePickerWidget.INPUT_DATE_FORMAT
-        job_applications = self.hit_pit.job_applications_received.not_archived().order_by("created_at")
+        job_applications = self.hit_pit.job_applications_received.order_by("created_at")
         jobs_in_range = job_applications[3:]
         start_date = jobs_in_range[0].created_at
 
@@ -424,7 +424,7 @@ class ProcessListSiaeTest(TestCase):
         response = self.client.get(add_url_params(reverse("apply:list_for_siae"), {"start_date": "", "end_date": ""}))
         total_applications = len(response.context["job_applications_page"].object_list)
 
-        assert total_applications == self.hit_pit.job_applications_received.not_archived().count()
+        assert total_applications == self.hit_pit.job_applications_received.count()
 
     def test_list_for_siae_filtered_by_sender_organization_name(self):
         """
@@ -725,6 +725,54 @@ def test_list_for_siae_filter_for_different_kind(client, snapshot):
         # GEIQ and non IAE kind do not have a filter on approval and eligibility.
         # Non IAE kind do not have prior action.
         assert str(filter_form) == snapshot(name=kind_snapshot[kind])
+
+
+def test_archived(client):
+    company = CompanyFactory(with_membership=True)
+    active = JobApplicationFactory(to_company=company)
+    archived = JobApplicationFactory(to_company=company, archived_at=timezone.now())
+    archived_badge_html = """\
+    <span class="badge rounded-pill badge-sm mb-1 bg-light text-primary"
+          aria-label="candidature archivée"
+          data-bs-toggle="tooltip"
+          data-bs-placement="top"
+          data-bs-title="Candidature archivée">
+      <i class="ri-archive-line mx-0"></i>
+    </span>
+    """
+
+    client.force_login(company.members.get())
+    url = reverse("apply:list_for_siae")
+    response = client.get(url)
+    assertContains(response, active.pk)
+    assertNotContains(response, archived.pk)
+    assertNotContains(response, archived_badge_html, html=True)
+    response = client.get(url, data={"archived": ""})
+    assertContains(response, active.pk)
+    assertNotContains(response, archived.pk)
+    assertNotContains(response, archived_badge_html, html=True)
+    response = client.get(url, data={"archived": "archived"})
+    assertNotContains(response, active.pk)
+    assertContains(response, archived.pk)
+    assertContains(response, archived_badge_html, html=True, count=1)
+    response = client.get(url, data={"archived": "all"})
+    assertContains(response, active.pk)
+    assertContains(response, archived.pk)
+    assertContains(response, archived_badge_html, html=True, count=1)
+    response = client.get(url, data={"archived": "invalid"})
+    assertContains(response, active.pk)
+    assertContains(response, archived.pk)
+    assertContains(response, archived_badge_html, html=True, count=1)
+    assertContains(
+        response,
+        """
+        <div class="alert alert-danger" role="alert">
+            Sélectionnez un choix valide. invalid n’en fait pas partie.
+        </div>
+        """,
+        html=True,
+        count=1,
+    )
 
 
 def test_list_for_siae_htmx_filters(client):

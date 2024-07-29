@@ -13,7 +13,7 @@
 
 {% block title_content %}
     <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
-        <h1 class="m-0">Candidatures envoyées</h1>
+        {% include "apply/includes/list_job_applications_title.html" %}
         <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur les candidatures">
             {% include "apply/includes/job_applications_export_button.html" %}
             <a href="{% url 'search:employers_home' %}" class="btn btn-lg btn-primary btn-ico">

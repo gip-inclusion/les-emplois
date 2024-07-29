@@ -15,6 +15,25 @@ class JobApplicationState(models.TextChoices):
     OBSOLETE = "obsolete", "Embauché ailleurs"
 
 
+ARCHIVABLE_JOB_APPLICATION_STATES = [
+    JobApplicationState.NEW,
+    JobApplicationState.PROCESSING,
+    JobApplicationState.POSTPONED,
+    JobApplicationState.REFUSED,
+    JobApplicationState.CANCELLED,
+    JobApplicationState.OBSOLETE,
+]
+
+# States in which an employer can manually archive an application.
+# Employers are encouraged to send an answer to job applicants before
+# they can archive their applications.
+ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL = [
+    JobApplicationState.REFUSED,
+    JobApplicationState.CANCELLED,
+    JobApplicationState.OBSOLETE,
+]
+
+
 class SenderKind(models.TextChoices):
     JOB_SEEKER = users_enums.KIND_JOB_SEEKER, "Demandeur d'emploi"
     PRESCRIBER = users_enums.KIND_PRESCRIBER, "Prescripteur"

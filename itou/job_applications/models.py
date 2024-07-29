@@ -21,6 +21,7 @@ from itou.employee_record import enums as employeerecord_enums
 from itou.employee_record.constants import get_availability_date_for_kind
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.enums import (
+    ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL,
     GEIQ_MAX_HOURS_PER_WEEK,
     GEIQ_MIN_HOURS_PER_WEEK,
     JobApplicationState,
@@ -144,12 +145,6 @@ class JobApplicationQuerySet(models.QuerySet):
 
     def accepted(self):
         return self.filter(state=JobApplicationState.ACCEPTED)
-
-    def not_archived(self):
-        """
-        Filters out the archived job_applications
-        """
-        return self.exclude(hidden_for_company=True)
 
     def created_on_given_year_and_month(self, year, month):
         return self.filter(created_at__year=year, created_at__month=month)
@@ -578,6 +573,15 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
 
     state = xwf_models.StateField(JobApplicationWorkflow, verbose_name="état", db_index=True)
+    archived_at = models.DateTimeField(blank=True, null=True, verbose_name="archivée le", db_index=True)
+    archived_by = models.ForeignKey(
+        "users.User",
+        blank=True,
+        null=True,
+        on_delete=models.RESTRICT,  # For traceability and accountability.
+        verbose_name="archivée par",
+        related_name="+",
+    )
 
     # Jobs in which the job seeker is interested (optional).
     selected_jobs = models.ManyToManyField("companies.JobDescription", verbose_name="métiers recherchés", blank=True)
@@ -648,8 +652,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     approval_manually_refused_at = models.DateTimeField(
         verbose_name="date de refus manuel du PASS IAE", blank=True, null=True
     )
-
-    hidden_for_company = models.BooleanField(default=False, verbose_name="masqué coté employeur")
 
     transferred_at = models.DateTimeField(verbose_name="date de transfert", null=True, blank=True)
     transferred_by = models.ForeignKey(
@@ -777,6 +779,21 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
                     & models.Q(processed_at=None)
                 ),
             ),
+            models.CheckConstraint(
+                name="archived_status",
+                violation_error_message=(
+                    "Impossible d’archiver une candidature acceptée ou en action préalable à l’embauche."
+                ),
+                check=~models.Q(
+                    state__in=[JobApplicationState.ACCEPTED, JobApplicationState.PRIOR_TO_HIRE],
+                    archived_at__isnull=False,
+                ),
+            ),
+            models.CheckConstraint(
+                name="archived_by__no_archived_at",
+                violation_error_message="Une candidature active ne peut pas avoir été archivée par un utilisateur.",
+                check=~models.Q(archived_at=None, archived_by__isnull=False),
+            ),
         ]
 
     def __str__(self):
@@ -868,11 +885,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
 
     @property
     def can_be_archived(self):
-        return self.state in [
-            JobApplicationState.REFUSED,
-            JobApplicationState.CANCELLED,
-            JobApplicationState.OBSOLETE,
-        ]
+        return not self.archived_at and self.state in ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL
 
     @property
     def can_have_prior_action(self):
@@ -970,6 +983,21 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     )
     def unset_processed_at(self, *args, **kwargs):
         self.processed_at = None
+
+    @before_transition(
+        JobApplicationWorkflow.TRANSITION_PROCESS,
+        JobApplicationWorkflow.TRANSITION_POSTPONE,
+        JobApplicationWorkflow.TRANSITION_MOVE_TO_PRIOR_TO_HIRE,
+        JobApplicationWorkflow.TRANSITION_CANCEL_PRIOR_TO_HIRE,
+        JobApplicationWorkflow.TRANSITION_REFUSE,
+        JobApplicationWorkflow.TRANSITION_CANCEL,
+        JobApplicationWorkflow.TRANSITION_RENDER_OBSOLETE,
+        JobApplicationWorkflow.TRANSITION_TRANSFER,
+        JobApplicationWorkflow.TRANSITION_RESET,
+    )
+    def unarchive(self, *args, **kwargs):
+        self.archived_at = None
+        self.archived_by = None
 
     @xwf_models.transition()
     def transfer(self, *, user, target_company):

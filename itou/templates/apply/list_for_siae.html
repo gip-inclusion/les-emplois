@@ -12,7 +12,7 @@
 
 {% block title_content %}
     <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-        <h1 class="m-0">Candidatures reçues</h1>
+        {% include "apply/includes/list_job_applications_title.html" %}
         <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur les candidatures">
             {% include "apply/includes/job_applications_export_button.html" %}
             <a href="{% url 'apply:start' company_pk=request.current_organization.pk %}" class="btn btn-lg btn-primary btn-ico" {% matomo_event "employeurs" "clic" "enregistrer-candidature" %}>
@@ -34,6 +34,35 @@
     {% include "apply/includes/job_applications_filters/offcanvas.html" %}
     <section class="s-section">
         <div class="s-section__container container">
+            <div id="archived-at-announcement" class="alert alert-important alert-dismissible-once d-none my-5" role="status">
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                <div class="row">
+                    <div class="d-none d-md-inline col-md-auto">
+                        <img src="{% static_theme_images 'ico-bicro-important.svg' %}" alt="" height="80">
+                    </div>
+                    <div class="col-12 col-md px-md-0">
+                        <p class="mb-2">
+                            <strong>NOUVEAUTÉ : Candidatures archivées</strong>
+                        </p>
+                        <p class="mb-1">
+                            Nous avons mis en place un archivage automatique pour toutes les candidatures dont le statut n’a pas changé au cours des 6 derniers mois (180 jours).
+                        </p>
+                        <p class="mb-0">
+                            Elles sont uniquement masquées par défaut. Pour les afficher, il vous suffit de cliquer sur le bouton « Tous les filtres » puis d’utiliser le filtre « Type de candidature ».
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                        <a class="btn btn-sm btn-primary btn-ico"
+                           href="{{ ITOU_HELP_CENTER_URL }}/articles/27110481864593--Archiver-une-candidature"
+                           target="_blank"
+                           rel="noopener"
+                           aria-label="En savoir plus sur l’archivage des candidatures (ouverture dans un nouvel onglet)">
+                            <span>En savoir plus</span>
+                            <i class="ri-external-link-line ri-lg"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
             {% include "apply/includes/job_applications_filters/top_filters.html" %}
             <div class="s-section__row row">
                 <div class="col-12">

@@ -48,10 +48,15 @@
             {% endif %}
         {% endif %}
 
-        {# Job application archival -------------------------------------------------------------------- #}
         {% if job_application.can_be_archived %}
             <div class="form-group col col-lg-auto">
-                {% include "apply/includes/buttons/archive.html" with job_application=job_application %}
+                <form method="post" action="{% url "apply:archive" job_application_id=job_application.pk %}">
+                    {% csrf_token %}
+                    <button class="btn btn-lg btn-outline-white btn-block btn-ico">
+                        <i class="ri-archive-line font-weight-medium"></i>
+                        <span>Archiver</span>
+                    </button>
+                </form>
             </div>
         {% endif %}
 
