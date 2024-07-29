@@ -3051,7 +3051,8 @@ def test_delete_prior_action(client, snapshot, with_geiq_diagnosis):
             author_kind=AuthorKind.GEIQ,
         )
     # Create transition logs
-    job_application.move_to_prior_to_hire(user=user)
+    with freeze_time(timezone.now() + datetime.timedelta(minutes=3)):
+        job_application.move_to_prior_to_hire(user=user)
     delete_prior_action1_url = reverse(
         "apply:delete_prior_action",
         kwargs={"job_application_id": job_application.pk, "prior_action_id": prior_action1.pk},
