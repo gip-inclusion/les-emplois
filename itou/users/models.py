@@ -10,8 +10,8 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinLengthValidator
 from django.db import models
-from django.db.models import CharField, Count, Q, Value
-from django.db.models.functions import Concat, Upper
+from django.db.models import Count, Exists, OuterRef, Q
+from django.db.models.functions import Upper
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
@@ -32,6 +32,7 @@ from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.address.format import compute_hexa_address
 from itou.common_apps.address.models import AddressMixin
 from itou.companies.enums import CompanyKind
+from itou.utils.db import or_queries
 from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
@@ -51,50 +52,26 @@ class ItouUserManager(UserManager):
         Then we tried TrigramSimilarity methods but it's too random for accurate searching.
         Fallback to unaccent / icontains for now
         """
+        from itou.gps.models import FollowUpGroup
 
+        search_terms = search_string.split(" ")
+        name_q = []
+        for term in search_terms:
+            name_q.append(Q(first_name__unaccent__istartswith=term))
+            name_q.append(Q(last_name__unaccent__istartswith=term))
         queryset = (
-            self.annotate(search=Concat("first_name", Value(" "), "last_name", output_field=CharField()))
-            .filter(search__unaccent__icontains=search_string)
+            self.filter(or_queries(name_q))
             .filter(kind=UserKind.JOB_SEEKER)
-        )
-
-        queryset = (
-            # Don't include the user doing the autocomplete
-            queryset.exclude(id=current_user.id)
-            # Generated SQL
-            # AND (
-            #   NOT (
-            #     EXISTS(
-            #       SELECT
-            #         1 AS "a"
-            #       FROM
-            #         "gps_followupgroupmembership" U2
-            #       WHERE
-            #         (
-            #           U2."member_id" = 1301
-            #           AND U2."follow_up_group_id" = ("gps_followupgroup"."id")
-            #         )
-            #       LIMIT
-            #         1
-            #     )
-            #   ) OR (
-            #     "gps_followupgroupmembership"."member_id" = 1301
-            #     AND NOT "gps_followupgroupmembership"."is_active"
-            #   )
-            # )
-            .filter(
-                (
-                    # Keep users when current_user is not part of their group
-                    ~Q(follow_up_group__memberships__member=current_user)
+            .exclude(
+                Exists(
+                    FollowUpGroup.objects.filter(
+                        beneficiary_id=OuterRef("pk"),
+                        memberships__member=current_user,
+                        memberships__is_active=True,
+                    )
                 )
-                # Or Keep users when current_user is part of their group,
-                # but is inactive
-                | Q(follow_up_group__memberships__member=current_user)
-                & Q(follow_up_group__memberships__is_active=False),
             )
-            .distinct()
         )
-
         return queryset[:10]
 
     def get_duplicated_pole_emploi_ids(self):
