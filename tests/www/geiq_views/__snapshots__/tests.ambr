@@ -3047,7 +3047,7 @@
               <i class="ri-upload-cloud-2-line ri-2x"></i>
           </p>
           <p class="mb-2">
-              Glissez vos fichiers ici ou <strong>rechercher</strong> dans vos fichiers
+              Glissez votre fichier ici ou <strong>rechercher</strong> dans vos fichiers
           </p>
           <label class="btn btn-link btn-sm btn-ico mb-2 stretched-link" for="id_activity_report_file">
               <i class="ri-folder-line ri-xl"></i>
