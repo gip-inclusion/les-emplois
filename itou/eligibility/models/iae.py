@@ -36,18 +36,6 @@ class EligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
         has_approval = Approval.objects.filter(user=OuterRef("job_seeker")).valid()
         return self.annotate(_has_approval=Exists(has_approval))
 
-    @property
-    def certified_lookup(self):
-        # TODO(cms): add a AdministrativeCriteria.`certified_by_api_particulier` field.
-        certified_criteria_pks = [1]
-        return models.Q(pk__in=certified_criteria_pks)
-
-    def certified(self):
-        return self.filter(self.certified_lookup)
-
-    def not_certified(self):
-        return self.exclude(self.certified_lookup)
-
 
 class EligibilityDiagnosisManager(models.Manager):
     def has_considered_valid(self, job_seeker, for_siae=None):
@@ -219,29 +207,13 @@ class EligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
         eligibility_diagnosis.save(update_fields=["expires_at"])
         return new_eligibility_diagnosis
 
-    @property
-    def criteria_certification_required(self):
-        return self.administrative_criteria.filter(certifiable=True).exists()
-
-
-class IAEAdministrativeCriteriaQueryset(AdministrativeCriteriaQuerySet):
-    @property
-    def certifiable_lookup(self):
-        return models.Q(certifiable=True)
-
-    def certifiable(self):
-        return self.filter(self.certifiable_lookup)
-
-    def not_certifiable(self):
-        return self.exclude(self.certifiable_lookup)
-
 
 class AdministrativeCriteria(AbstractAdministrativeCriteria):
     """
     List of administrative criteria.
     They can be created and updated using the admin.
 
-    The table is automatically populated on app load.
+    The table is automatically populated.
     See itou.eligibility.apps::create_administrative_criteria
 
     Warning : any change to the criteria must be notified to C2 members (names are used in Metabase)
@@ -265,7 +237,6 @@ class AdministrativeCriteria(AbstractAdministrativeCriteria):
     written_proof_validity = models.CharField(
         verbose_name="durée de validité du justificatif", max_length=255, blank=True, default=""
     )
-    certifiable = models.BooleanField(verbose_name="certifiable par l'API Particuliers", default=False)
     # Used to rank criteria in UI. Should be set by level (LEVEL_1: 1, 2, 3… LEVEL_2: 1, 2, 3…).
     # Default value is MAX_UI_RANK so that it's pushed at the end if `ui_rank` is forgotten.
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
@@ -274,7 +245,7 @@ class AdministrativeCriteria(AbstractAdministrativeCriteria):
         settings.AUTH_USER_MODEL, verbose_name="créé par", null=True, blank=True, on_delete=models.SET_NULL
     )
 
-    objects = IAEAdministrativeCriteriaQueryset.as_manager()
+    objects = AdministrativeCriteriaQuerySet.as_manager()
 
     class Meta:
         verbose_name = "critère administratif IAE"

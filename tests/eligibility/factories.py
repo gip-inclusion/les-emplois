@@ -12,6 +12,15 @@ from tests.prescribers.factories import PrescriberOrganizationWithMembershipFact
 from tests.users.factories import JobSeekerFactory
 
 
+def _add_administrative_criteria(self, create, extracted, qs, **kwargs):
+    if not create:
+        # Simple build, do nothing.
+        return
+    # Pick random results.
+    criteria = qs.order_by("?")[: random.randint(2, 5)]
+    self.administrative_criteria.add(*criteria)
+
+
 class AbstractEligibilityDiagnosisModelFactory(factory.django.DjangoModelFactory):
     class Meta:
         abstract = True
@@ -33,6 +42,24 @@ class AbstractEligibilityDiagnosisModelFactory(factory.django.DjangoModelFactory
     job_seeker = factory.SubFactory(JobSeekerFactory)
 
 
+def _get_geiq_administrative_criteria(self, create, extracted, **kwargs):
+    qs = models.GEIQAdministrativeCriteria.objects
+    _add_administrative_criteria(self, create, extracted, qs, **kwargs)
+
+
+def _get_geiq_certifiable_criteria(self, create, extracted, **kwargs):
+    qs = models.GEIQAdministrativeCriteria.objects.certifiable()
+    _add_administrative_criteria(self, create, extracted, qs, **kwargs)
+
+
+def _get_geiq_not_certifiable_criteria(self, create, extracted, **kwargs):
+    qs = models.GEIQAdministrativeCriteria.objects.not_certifiable()
+    _add_administrative_criteria(self, create, extracted, qs, **kwargs)
+    if not create:
+        # Simple build, do nothing.
+        return
+
+
 class GEIQEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
     """Same as factories below, but :
     - with all possible author types
@@ -40,6 +67,7 @@ class GEIQEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
 
     class Meta:
         model = models.GEIQEligibilityDiagnosis
+        skip_postgeneration_save = True
 
     class Params:
         from_geiq = factory.Trait(
@@ -47,36 +75,27 @@ class GEIQEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
             author_geiq=factory.SubFactory(CompanyWith2MembershipsFactory, kind=CompanyKind.GEIQ, with_jobs=True),
             author=factory.LazyAttribute(lambda obj: obj.author_geiq.members.first()),
         )
+        with_criteria = factory.Trait(romes=factory.PostGeneration(_get_geiq_administrative_criteria))
+        with_certifiable_criteria = factory.Trait(romes=factory.PostGeneration(_get_geiq_certifiable_criteria))
+        with_not_certifiable_criteria = factory.Trait(romes=factory.PostGeneration(_get_geiq_not_certifiable_criteria))
 
 
 def _get_iae_administrative_criteria(self, create, extracted, **kwargs):
-    if not create:
-        # Simple build, do nothing.
-        return
-
-    # Pick random results.
-    criteria = models.AdministrativeCriteria.objects.order_by("?")[: random.randint(2, 5)]
-    self.administrative_criteria.add(*criteria)
+    qs = models.AdministrativeCriteria.objects
+    _add_administrative_criteria(self, create, extracted, qs, **kwargs)
 
 
 def _get_iae_certifiable_criteria(self, create, extracted, **kwargs):
-    if not create:
-        # Simple build, do nothing.
-        return
-
-    # Pick random results.
-    criteria = models.AdministrativeCriteria.objects.certifiable().order_by("?")[: random.randint(2, 5)]
-    self.administrative_criteria.add(*criteria)
+    qs = models.AdministrativeCriteria.objects.certifiable()
+    _add_administrative_criteria(self, create, extracted, qs, **kwargs)
 
 
 def _get_iae_not_certifiable_criteria(self, create, extracted, **kwargs):
+    qs = models.AdministrativeCriteria.objects.not_certifiable()
+    _add_administrative_criteria(self, create, extracted, qs, **kwargs)
     if not create:
         # Simple build, do nothing.
         return
-
-    # Pick random results.
-    criteria = models.AdministrativeCriteria.objects.not_certifiable().order_by("?")[: random.randint(2, 5)]
-    self.administrative_criteria.add(*criteria)
 
 
 class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):

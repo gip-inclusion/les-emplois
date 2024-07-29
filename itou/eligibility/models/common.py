@@ -70,6 +70,9 @@ class AbstractEligibilityDiagnosisModel(models.Model):
     def is_valid(self):
         return bool(self.expires_at and self.expires_at > timezone.now())
 
+    def criteria_certification_available(self):
+        return self.administrative_criteria.certifiable().exists()
+
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):
     def level1(self):
@@ -80,6 +83,16 @@ class AdministrativeCriteriaQuerySet(models.QuerySet):
 
     def for_job_application(self, job_application):
         return self.filter(eligibilitydiagnosis__jobapplication=job_application)
+
+    @property
+    def certifiable_lookup(self):
+        return models.Q(certifiable=True)
+
+    def certifiable(self):
+        return self.filter(self.certifiable_lookup)
+
+    def not_certifiable(self):
+        return self.exclude(self.certifiable_lookup)
 
 
 class AbstractAdministrativeCriteria(models.Model):
@@ -100,6 +113,7 @@ class AbstractAdministrativeCriteria(models.Model):
     written_proof_validity = models.CharField(
         verbose_name="durée de validité du justificatif", max_length=255, blank=True, default=""
     )
+    certifiable = models.BooleanField(verbose_name="certifiable par l'API Particuliers", default=False)
     # Used to rank criteria in UI. Should be set by level (LEVEL_1: 1, 2, 3… LEVEL_2: 1, 2, 3…).
     # Default value is MAX_UI_RANK so that it's pushed at the end if `ui_rank` is forgotten.
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
