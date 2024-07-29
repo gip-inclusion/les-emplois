@@ -16,7 +16,6 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
-from django.utils.http import urlencode
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects, assertTemplateUsed
 from unittest_parametrize import ParametrizedTestCase, parametrize
@@ -33,7 +32,7 @@ from itou.job_applications.enums import JobApplicationState, QualificationLevel,
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.siae_evaluations.models import Sanctions
-from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, UserKind
+from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir, format_phone
@@ -182,20 +181,91 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.assertContains(response, resume_link)
         self.assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
 
-    def test_details_for_company_hidden(self, *args, **kwargs):
-        """A hidden job_application is not displayed."""
-
+    def test_details_archived(self):
+        UNARCHIVE = "Désarchiver"
         job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True,
-            job_seeker__kind=UserKind.JOB_SEEKER,
-            hidden_for_company=True,
+            archived_at=datetime.datetime(2024, 9, 2, 11, 11, 11, tzinfo=timezone.get_current_timezone()),
         )
-        employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
+        to_company = job_application.to_company
+        self.client.force_login(to_company.members.get())
+        response = self.client.get(
+            reverse(
+                "apply:details_for_company",
+                kwargs={"job_application_id": job_application.pk},
+            )
+        )
+        self.assertContains(response, UNARCHIVE)
+        self.assertContains(
+            response,
+            """
+            <p>
+                Cette candidature a été archivée automatiquement le 2 septembre 2024 à 11:11.
+                Elle n’est plus visible par défaut dans votre liste de candidatures.
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
 
-        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
-        response = self.client.get(url)
-        assert 404 == response.status_code
+        gilles = EmployerFactory(first_name="Gilles", last_name="Pardoux")
+        to_company.members.add(gilles)
+        job_application.archived_by = gilles
+        job_application.save(update_fields=["archived_by"])
+        response = self.client.get(
+            reverse(
+                "apply:details_for_company",
+                kwargs={"job_application_id": job_application.pk},
+            )
+        )
+        self.assertContains(response, UNARCHIVE)
+        self.assertContains(
+            response,
+            """
+            <p>
+                Cette candidature a été archivée par Gilles PARDOUX le 2 septembre 2024 à 11:11.
+                Elle n’est plus visible par défaut dans votre liste de candidatures.
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
+
+        self.client.force_login(job_application.sender)
+        response = self.client.get(
+            reverse(
+                "apply:details_for_prescriber",
+                kwargs={"job_application_id": job_application.pk},
+            )
+        )
+        self.assertNotContains(response, UNARCHIVE)
+        self.assertContains(
+            response,
+            """
+            <p>
+                Cette candidature a été archivée par Gilles PARDOUX le 2 septembre 2024 à 11:11.
+                Elle n’est plus visible par défaut dans votre liste de candidatures.
+            </p>
+            """,
+            html=True,
+            count=1,
+        )
+
+        self.client.force_login(job_application.job_seeker)
+        response = self.client.get(
+            reverse(
+                "apply:details_for_jobseeker",
+                kwargs={"job_application_id": job_application.pk},
+            )
+        )
+        self.assertNotContains(response, UNARCHIVE)
+        self.assertContains(
+            response,
+            """
+            <p>Cette candidature a été archivée par l’employeur le 2 septembre 2024 à 11:11.</p>
+            """,
+            html=True,
+            count=1,
+        )
 
     def test_details_for_company_as_prescriber(self, *args, **kwargs):
         """As a prescriber, I cannot access the job_applications details for companies."""
@@ -1308,34 +1378,6 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
 
         job_application.refresh_from_db()
         assert not job_application.state.is_cancelled
-
-    def test_archive(self, *args, **kwargs):
-        """Ensure that when a company archives a job_application, the hidden_for_company flag is updated."""
-
-        job_application = JobApplicationFactory(
-            sent_by_authorized_prescriber_organisation=True, state=job_applications_enums.JobApplicationState.CANCELLED
-        )
-        assert job_application.state.is_cancelled
-        employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
-
-        url = reverse("apply:archive", kwargs={"job_application_id": job_application.pk})
-
-        cancelled_states = [
-            job_applications_enums.JobApplicationState.REFUSED,
-            job_applications_enums.JobApplicationState.CANCELLED,
-            job_applications_enums.JobApplicationState.OBSOLETE,
-        ]
-
-        response = self.client.post(url)
-
-        qs = urlencode({"states": cancelled_states}, doseq=True)
-        url = reverse("apply:list_for_siae")
-        next_url = f"{url}?{qs}"
-        self.assertRedirects(response, next_url)
-
-        job_application.refresh_from_db()
-        assert job_application.hidden_for_company
 
     def test_diagoriente_section_as_job_seeker(self):
         job_application = JobApplicationFactory(with_approval=True, resume_link="")

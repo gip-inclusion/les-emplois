@@ -1,10 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils import timezone
+from django.views.decorators.http import require_POST
 
+from itou.job_applications.enums import ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL, JobApplicationState
 from itou.job_applications.models import JobApplication
 from itou.www.apply.forms import EditHiringDateForm
 
@@ -46,3 +49,30 @@ def edit_contract_start_date(request, job_application_id, template_name="apply/e
     }
 
     return render(request, template_name, context)
+
+
+@login_required
+@require_POST
+def archive_view(request, job_application_id, *, action):
+    extra_filters = {}
+    if action == "archive":
+        action = "archivée"
+        archived_at = timezone.now()
+        archived_by = request.user
+        extra_filters["state__in"] = ARCHIVABLE_JOB_APPLICATION_STATES_MANUAL
+    elif action == "unarchive":
+        action = "désarchivée"
+        archived_at = None
+        archived_by = None
+    else:
+        raise ValueError(action)
+    matched = (
+        JobApplication.objects.is_active_company_member(request.user)
+        .filter(pk=job_application_id, **extra_filters)
+        .exclude(state=JobApplicationState.ACCEPTED)
+        .update(archived_at=archived_at, archived_by=archived_by)
+    )
+    if not matched:
+        raise Http404
+    messages.success(request, f"La candidature a bien été {action}.", extra_tags="toast")
+    return HttpResponseRedirect(reverse("apply:details_for_company", args=(job_application_id,)))

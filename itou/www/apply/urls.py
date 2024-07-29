@@ -258,7 +258,6 @@ urlpatterns = [
     path("<uuid:job_application_id>/siae/postpone", process_views.postpone, name="postpone"),
     path("<uuid:job_application_id>/siae/accept", process_views.accept, name="accept"),
     path("<uuid:job_application_id>/siae/cancel", process_views.cancel, name="cancel"),
-    path("<uuid:job_application_id>/siae/archive", process_views.archive, name="archive"),
     path("<uuid:job_application_id>/siae/transfer", process_views.transfer, name="transfer"),
     path(
         "<uuid:job_application_id>/siae/external-transfer/1",
@@ -315,6 +314,18 @@ urlpatterns = [
         "<uuid:job_application_id>/siae/edit_contract_start_date",
         edit_views.edit_contract_start_date,
         name="edit_contract_start_date",
+    ),
+    path(
+        "<uuid:job_application_id>/siae/archive",
+        edit_views.archive_view,
+        name="archive",
+        kwargs={"action": "archive"},
+    ),
+    path(
+        "<uuid:job_application_id>/siae/unarchive",
+        edit_views.archive_view,
+        name="unarchive",
+        kwargs={"action": "unarchive"},
     ),
     # Diagoriente
     path(

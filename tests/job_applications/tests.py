@@ -138,30 +138,6 @@ class JobApplicationModelTest(TestCase):
                     else:
                         assert not job_application.is_refused_for_other_reason
 
-    def test_can_be_archived(self):
-        """
-        Only cancelled, refused and obsolete job_applications can be archived.
-        """
-        states_transition_not_possible = [
-            JobApplicationState.NEW,
-            JobApplicationState.PROCESSING,
-            JobApplicationState.POSTPONED,
-            JobApplicationState.ACCEPTED,
-        ]
-        states_transition_possible = [
-            JobApplicationState.CANCELLED,
-            JobApplicationState.REFUSED,
-            JobApplicationState.OBSOLETE,
-        ]
-
-        for state in states_transition_not_possible:
-            job_application = JobApplicationFactory(state=state)
-            assert not job_application.can_be_archived
-
-        for state in states_transition_possible:
-            job_application = JobApplicationFactory(state=state)
-            assert job_application.can_be_archived
-
     def test_get_sender_kind_display(self):
         non_siae_items = [
             (JobApplicationSentByCompanyFactory(to_company__kind=kind), "Employeur")
@@ -1712,6 +1688,39 @@ def test_job_application_transitions(transition, from_state):
     assert job_application.logs.get().transition == transition.name
 
 
+@pytest.mark.parametrize(
+    "transition,from_state",
+    [
+        pytest.param(transition, from_state, id=f"transition={transition.name} from_state={from_state}")
+        for transition in JobApplicationWorkflow.transitions
+        for from_state in transition.source
+        if not (
+            # Leads to a state that cannot be archived.
+            {
+                # Employment relationship between employer and job seeker, it is active.
+                JobApplicationState.ACCEPTED,
+                # Employer waits for a prior action before to establish an employment relationship.
+                JobApplicationState.PRIOR_TO_HIRE,
+            }
+            & {from_state.name, transition.target.name}
+            # Employer transfers to another structure, they likely won’t interact with this job application again.
+            or JobApplicationWorkflow.TRANSITION_EXTERNAL_TRANSFER == transition.name
+        )
+    ],
+)
+def test_job_application_transition_unarchives(transition, from_state):
+    job_application = JobApplicationFactory(state=from_state, archived_at=timezone.now())
+    user = job_application.to_company.members.first()
+    kwargs = {"user": user}
+    if transition.name in ["transfer", "external_transfer"]:
+        target_company = CompanyFactory(with_membership=True)
+        target_company.members.add(user)
+        kwargs["target_company"] = target_company
+    getattr(job_application, transition.name)(**kwargs)
+    job_application.refresh_from_db()
+    assert job_application.archived_at is None
+
+
 class JobApplicationXlsxExportTest(TestCase):
     def test_xlsx_export_contains_the_necessary_info(self, *args, **kwargs):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)
@@ -1929,6 +1938,8 @@ class JobApplicationAdminFormTest(TestCase):
             "sender_prescriber_organization",
             "to_company",
             "state",
+            "archived_at",
+            "archived_by",
             "selected_jobs",
             "hired_job",
             "message",
@@ -1947,7 +1958,6 @@ class JobApplicationAdminFormTest(TestCase):
             "approval_manually_delivered_by",
             "approval_manually_refused_by",
             "approval_manually_refused_at",
-            "hidden_for_company",
             "transferred_at",
             "transferred_by",
             "transferred_from",

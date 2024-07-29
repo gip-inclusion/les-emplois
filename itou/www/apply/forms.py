@@ -5,7 +5,7 @@ import sentry_sdk
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db.models import Q
+from django.db.models import Q, TextChoices
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse
 from django.utils import timezone
@@ -1028,6 +1028,12 @@ class FilterJobApplicationsForm(forms.Form):
         return sum(bool(self.cleaned_data.get(field.name)) for field in self)
 
 
+class ArchivedChoices(TextChoices):
+    ACTIVE = "", "Candidatures actives (affichage par défaut)"
+    ARCHIVED = "archived", "Candidatures archivées"
+    ALL = "all", "Toutes les candidatures"
+
+
 class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
     """
     Job applications filters common to companies and Prescribers.
@@ -1055,6 +1061,12 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
         required=False,
         label="Fiches de poste",
         widget=forms.CheckboxSelectMultiple(),
+    )
+    archived = forms.ChoiceField(
+        choices=ArchivedChoices,
+        widget=forms.RadioSelect,
+        label="",  # Labeled by the fieldset.
+        required=False,
     )
 
     @sentry_sdk.trace
@@ -1102,6 +1114,13 @@ class CompanyPrescriberFilterJobApplicationsForm(FilterJobApplicationsForm):
 
         if job_seeker := self.cleaned_data.get("job_seeker"):
             queryset = queryset.filter(job_seeker__id=job_seeker)
+
+        archived = self.cleaned_data["archived"]
+        if archived == ArchivedChoices.ACTIVE:
+            queryset = queryset.filter(archived_at=None)
+        elif archived == ArchivedChoices.ARCHIVED:
+            queryset = queryset.exclude(archived_at=None)
+
         return queryset
 
 

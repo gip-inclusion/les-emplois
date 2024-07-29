@@ -122,7 +122,7 @@ TABLE.add_columns(
             "name": "candidature_archivee",
             "type": "boolean",
             "comment": "Candidature archivée coté employeur",
-            "fn": lambda o: o.hidden_for_company,
+            "fn": lambda o: bool(o.archived_at),
         },
         {
             "name": "date_candidature",

@@ -15,6 +15,7 @@ from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
+    ArchivedChoices,
     CompanyFilterJobApplicationsForm,
     FilterJobApplicationsForm,
     PrescriberFilterJobApplicationsForm,
@@ -119,6 +120,18 @@ def list_for_job_seeker(request, template_name="apply/list_for_job_seeker.html")
     )
 
 
+def annotate_title(base_title, archived_choice):
+    match archived_choice:
+        case ArchivedChoices.ARCHIVED:
+            return f"{base_title} (archivées)"
+        case ArchivedChoices.ALL:
+            return f"{base_title} (toutes)"
+        case ArchivedChoices.ACTIVE:
+            return f"{base_title} (actives)"
+        case _:
+            raise ValueError(archived_choice)
+
+
 @login_required
 @user_passes_test(
     lambda u: u.is_prescriber or u.is_employer,
@@ -131,15 +144,17 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     """
     job_applications = JobApplication.objects.prescriptions_of(request.user, request.current_organization)
 
-    filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET or None)
+    filters_form = PrescriberFilterJobApplicationsForm(job_applications, request.GET)
 
     # Add related data giving the criteria for adding the necessary annotations
     job_applications = job_applications.with_list_related_data(criteria=filters_form.data.getlist("criteria", []))
 
+    title = "Candidatures envoyées"
     filters_counter = 0
     if filters_form.is_valid():
         job_applications = filters_form.filter(job_applications)
         filters_counter = filters_form.get_qs_filters_counter()
+        title = annotate_title(title, filters_form.cleaned_data["archived"])
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
     _add_pending_for_weeks(job_applications_page)
@@ -148,6 +163,7 @@ def list_prescriptions(request, template_name="apply/list_prescriptions.html"):
     _add_eligibility_diagnosis_required(job_applications_page)
 
     context = {
+        "title": title,
         "job_applications_page": job_applications_page,
         "job_applications_list_kind": JobApplicationsListKind.SENT,
         "JobApplicationsListKind": JobApplicationsListKind,
@@ -222,17 +238,17 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
         state__in=JobApplicationWorkflow.PENDING_STATES
     ).count()
 
-    filters_form = CompanyFilterJobApplicationsForm(job_applications, company, request.GET or None)
+    filters_form = CompanyFilterJobApplicationsForm(job_applications, company, request.GET)
 
     # Add related data giving the criteria for adding the necessary annotations
-    job_applications = job_applications.not_archived().with_list_related_data(
-        filters_form.data.getlist("criteria", [])
-    )
+    job_applications = job_applications.with_list_related_data(filters_form.data.getlist("criteria", []))
 
+    title = "Candidatures reçues"
     filters_counter = 0
     if filters_form.is_valid():
         job_applications = filters_form.filter(job_applications)
         filters_counter = filters_form.get_qs_filters_counter()
+        title = annotate_title(title, filters_form.cleaned_data["archived"])
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
     _add_pending_for_weeks(job_applications_page)
@@ -246,6 +262,7 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
     _add_eligibility_diagnosis_required(job_applications_page)
 
     context = {
+        "title": title,
         "siae": company,
         "job_applications_page": job_applications_page,
         "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
@@ -271,7 +288,7 @@ def list_for_siae_exports(request, template_name="apply/list_of_available_export
     """
 
     company = get_current_company_or_404(request)
-    job_applications = company.job_applications_received.not_archived()
+    job_applications = company.job_applications_received
     total_job_applications = job_applications.count()
     job_applications_by_month = job_applications.with_monthly_counts()
 
@@ -292,7 +309,7 @@ def list_for_siae_exports_download(request, month_identifier=None):
     exported as a CSV file with immediate download
     """
     company = get_current_company_or_404(request)
-    job_applications = company.job_applications_received.not_archived().with_list_related_data()
+    job_applications = company.job_applications_received.with_list_related_data()
     filename = f"candidatures-{slugify(company.display_name)}"
     if month_identifier:
         year, month = month_identifier.split("-")

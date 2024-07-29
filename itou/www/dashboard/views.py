@@ -66,7 +66,7 @@ def _employer_dashboard_context(request):
             "badge": "bg-info-lighter",
         },
     ]
-    job_applications = current_org.job_applications_received.values("state").all()
+    job_applications = current_org.job_applications_received.filter(archived_at=None).values("state").all()
     for category in job_applications_categories:
         category["counter"] = len([ja for ja in job_applications if ja["state"] in category["states"]])
         category["url"] = f"{reverse('apply:list_for_siae')}?{'&'.join([f'states={c}' for c in category['states']])}"
