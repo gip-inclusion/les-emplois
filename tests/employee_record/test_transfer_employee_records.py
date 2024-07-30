@@ -88,9 +88,7 @@ def test_preflight_with_error(snapshot, command):
         job_application__to_company__siret="17483349486512",
         job_application__to_company__convention__asp_id="21",
         job_application__approval__number="XXXXX3724456",
-        job_application__job_seeker__first_name="Jonathan",
-        job_application__job_seeker__last_name="Martinez",
-        job_application__job_seeker__email="email@example.com",
+        job_application__job_seeker__pk=4242,
     )
 
     command.handle(preflight=True, upload=False, download=False, wet_run=False)

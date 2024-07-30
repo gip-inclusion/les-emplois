@@ -218,8 +218,8 @@ class EmployeeRecord(ASPExchangeInformation):
 
     def __str__(self):
         return (
-            f"PK:{self.pk} PASS:{self.approval_number} SIRET:{self.siret} JA:{self.job_application} "
-            f"JOBSEEKER:{self.job_application.job_seeker} STATUS:{self.status}"
+            f"PK:{self.pk} PASS:{self.approval_number} SIRET:{self.siret} JA:{self.job_application_id} "
+            f"JOBSEEKER:{self.job_application.job_seeker_id} STATUS:{self.status}"
         )
 
     def _clean_job_application(self):
