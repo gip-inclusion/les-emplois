@@ -17,7 +17,6 @@ from tests.geiq.factories import (
 )
 
 
-@pytest.mark.no_django_db
 @pytest.mark.parametrize(
     "periods, year, expected",
     [

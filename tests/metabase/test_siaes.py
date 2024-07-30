@@ -1,11 +1,8 @@
-import pytest
-
 from itou.metabase.tables.companies import TABLE
 from tests.cities.factories import create_city_vannes
 from tests.companies.factories import CompanyFactory
 
 
-@pytest.mark.django_db
 def test_address_fields():
     vannes = create_city_vannes()
     parent = CompanyFactory(source="ASP", post_code=vannes.post_codes[0])
@@ -19,7 +16,6 @@ def test_address_fields():
     assert TABLE.get(column_name="département", input=antenna) == parent.department
 
 
-@pytest.mark.django_db
 def test_address_fields_of_antenna():
     vannes = create_city_vannes()
     parent = CompanyFactory(source="ASP")
