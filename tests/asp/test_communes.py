@@ -1,10 +1,10 @@
 import datetime
+from collections import Counter
 
 from itou.asp.models import Commune
-from tests.utils.test import TestCase
 
 
-class CommunesFixtureTest(TestCase):
+class TestCommunesFixture:
     # INSEE commune with a single entry (1 history entry)
     _CODES_WITHOUT_HISTORY = ["97108", "13200", "97801"]
     ## Total number of entries in the file
@@ -24,38 +24,27 @@ class CommunesFixtureTest(TestCase):
         codes_with_history = Commune.objects.exclude(code__in=self._CODES_WITHOUT_HISTORY).values_list(
             "code", flat=True
         )
+        # All code are there twice
+        commune_per_code = Counter(codes_with_history)
+        assert commune_per_code == {code: 2 for code in set(codes_with_history)}
 
-        for code in codes_with_history:
-            with self.subTest(code=code, msg="INSEE code without history"):
-                # 2 entries for a code with history:
-                communes = Commune.objects.filter(code=code)
-
-                assert 2 == communes.count()
-
-    def test_communes_without_history(self):
+    def test_communes_without_history(self, subtests):
         for code in self._CODES_WITHOUT_HISTORY:
-            with self.subTest(code=code):
+            with subtests.test(code=code):
                 # Will error if many entries
                 commune = Commune.objects.get(code=code)
-
                 assert commune.end_date is None
 
     def test_current_entries(self):
         communes = Commune.objects.filter(end_date__isnull=True)
-
         assert 28 == communes.count()
-
-        for commune in communes:
-            with self.subTest():
-                assert commune.end_date is None
 
     def test_lowest_period_date(self):
         communes = Commune.objects.filter(start_date__lt=self._PERIOD_MIN_DATE)
-
         assert 0 == communes.count()
 
 
-class CommuneModelTest(TestCase):
+class TestCommuneModel:
     def test_by_insee_code(self):
         old_commune = Commune(
             code=99999,

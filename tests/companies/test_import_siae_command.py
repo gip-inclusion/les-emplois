@@ -5,11 +5,11 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-from django.conf import settings
 from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
 from freezegun import freeze_time
+from pytest_django.asserts import assertNumQueries
 
 from itou.companies.enums import CompanyKind
 from itou.companies.management.commands._import_siae.convention import get_creatable_conventions
@@ -33,17 +33,12 @@ from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory, CompanyWith2MembershipsFactory, SiaeConventionFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.utils.test import TestCase
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class ImportSiaeManagementCommandsTest(TestCase):
-    def setUp(self):
-        super().setUp()
-
-        instance = override_settings(ASP_FLUX_IAE_DIR=self.tmp_path)
-        instance.enable()
-        self.addCleanup(instance.disable)
+class TestImportSiaeManagementCommands:
+    @pytest.fixture(autouse=True)
+    def setup(self, tmp_path, settings):
+        settings.ASP_FLUX_IAE_DIR = tmp_path
 
         # Beware : fluxIAE_Structure_22022022_112211.csv.gz ends with .gz but is compressed with pkzip.
         # Since it happened once, and the code now allows it, we also want to test it.
@@ -51,7 +46,7 @@ class ImportSiaeManagementCommandsTest(TestCase):
             x for x in Path(settings.APPS_DIR).joinpath("./companies/fixtures").glob("fluxIAE_*.csv.gz") if x.is_file()
         ]
         for file in files:
-            shutil.copy(file, self.tmp_path)
+            shutil.copy(file, tmp_path)
 
     @freeze_time("2024-07-09")
     def test_get_conventions_by_siae_key(self):
@@ -191,12 +186,12 @@ class ImportSiaeManagementCommandsTest(TestCase):
 
     def test_check_signup_possible_for_a_siae_without_members_but_with_auth_email(self):
         CompanyFactory(auth_email="tadaaa")
-        with self.assertNumQueries(1):
+        with assertNumQueries(1):
             assert check_whether_signup_is_possible_for_all_siaes() == 0
 
     def test_check_signup_possible_for_a_siae_without_members_nor_auth_email(self):
         CompanyFactory(auth_email="")
-        with self.assertNumQueries(1):
+        with assertNumQueries(1):
             assert check_whether_signup_is_possible_for_all_siaes() == 1
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_one(self):
@@ -205,7 +200,7 @@ class ImportSiaeManagementCommandsTest(TestCase):
             membership1__is_active=False,
             membership1__user__is_active=False,
         )
-        with self.assertNumQueries(1):
+        with assertNumQueries(1):
             assert check_whether_signup_is_possible_for_all_siaes() == 0
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_two(self):
@@ -216,16 +211,18 @@ class ImportSiaeManagementCommandsTest(TestCase):
             membership2__is_active=False,
             membership2__user__is_active=False,
         )
-        with self.assertNumQueries(1):
+        with assertNumQueries(1):
             assert check_whether_signup_is_possible_for_all_siaes() == 1
 
     def test_check_signup_possible_for_a_siae_with_members_but_no_auth_email_case_three(self):
         CompanyWith2MembershipsFactory(auth_email="")
-        with self.assertNumQueries(1):
+        with assertNumQueries(1):
             assert check_whether_signup_is_possible_for_all_siaes() == 0
 
-    def test_activate_your_account_email_for_a_siae_without_members_but_with_auth_email(self):
-        with freeze_time("2022-10-10"), self.captureOnCommitCallbacks(execute=True) as commit_callbacks:
+    def test_activate_your_account_email_for_a_siae_without_members_but_with_auth_email(
+        self, django_capture_on_commit_callbacks
+    ):
+        with freeze_time("2022-10-10"), django_capture_on_commit_callbacks(execute=True) as commit_callbacks:
             create_new_siaes(
                 get_siret_to_siae_row(get_vue_structure_df()),
                 get_conventions_by_siae_key(get_vue_af_df()),

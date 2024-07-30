@@ -1,11 +1,12 @@
 import datetime
 from io import StringIO
 
+import pytest
 from django.conf import settings
 from django.core import management
-from django.test import override_settings
 from django.utils import timezone
 from freezegun import freeze_time
+from pytest_django.asserts import assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
@@ -15,14 +16,14 @@ from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEElig
 from tests.gps.factories import FollowUpGroupFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import TestCase
 
 
-# To be able to use assertCountEqual
-@override_settings(GPS_GROUPS_CREATED_BY_EMAIL="rocking@developer.com")
-class GpsManagementCommandTest(TestCase):
-    def setUp(self):
-        ItouStaffFactory(email="rocking@developer.com")
+class TestGpsManagementCommand:
+    @pytest.fixture(autouse=True)
+    def setup(self, settings):
+        # To be able to use assertCountEqual
+        settings.GPS_GROUPS_CREATED_BY_EMAIL = "rocking@developer.com"
+        ItouStaffFactory(email=settings.GPS_GROUPS_CREATED_BY_EMAIL)
 
     def call_command(self, management_command_name=None, *args, **kwargs):
         """Redirect standard outputs from management command to StringIO objects for testing purposes."""
@@ -101,13 +102,14 @@ class GpsManagementCommandTest(TestCase):
         # assert FollowUpGroupMembership.objects.count() == 4
         assert FollowUpGroupMembership.objects.count() == should_be_created_memberships
 
-        self.assertCountEqual(
+        assertQuerySetEqual(
             job_application_with_approval.job_seeker.follow_up_group.members.all(),
             [
                 job_application_with_approval.sender,
                 job_application_with_approval.eligibility_diagnosis.author,
                 user_who_accepted,
             ],
+            ordered=False,
         )
 
         ## Jop Application with GEIQ approval
@@ -125,12 +127,13 @@ class GpsManagementCommandTest(TestCase):
         # One more
         assert FollowUpGroup.objects.count() == should_be_created_groups_counter
 
-        self.assertCountEqual(
+        assertQuerySetEqual(
             job_application_geiq_diagnosis.job_seeker.follow_up_group.members.all(),
             [
                 job_application_geiq_diagnosis.sender,
                 job_application_geiq_diagnosis.geiq_eligibility_diagnosis.author,
             ],
+            ordered=False,
         )
 
         ## Job application sent by job seeker.
@@ -173,8 +176,10 @@ class GpsManagementCommandTest(TestCase):
         # who accepted the job_application
         assert FollowUpGroupMembership.objects.count() == 3
 
-        self.assertCountEqual(
-            job_application_accepted.job_seeker.follow_up_group.members.all(), [user, job_application_accepted.sender]
+        assertQuerySetEqual(
+            job_application_accepted.job_seeker.follow_up_group.members.all(),
+            [user, job_application_accepted.sender],
+            ordered=False,
         )
 
     def test_job_application_sender_job_seeker(self):
@@ -224,11 +229,12 @@ class GpsManagementCommandTest(TestCase):
 
         assert FollowUpGroup.objects.count() == 1
 
-        self.assertCountEqual(
+        assertQuerySetEqual(
             FollowUpGroup.objects.filter(beneficiary=first_job_application.job_seeker)
             .filter(members=first_job_application.sender)
             .all(),
             [first_beneficiary_group],
+            ordered=False,
         )
 
         assert FollowUpGroupMembership.objects.count() == 4
@@ -276,18 +282,22 @@ class GpsManagementCommandTest(TestCase):
 
         # The members of the new group for the first application should only be composed of
         # the first_job_application sender
-        self.assertCountEqual(new_first_group.members.all(), [first_job_application.sender])
+        assertQuerySetEqual(new_first_group.members.all(), [first_job_application.sender])
 
         # Calling the command twice should be ok
         self.call_command("init_follow_up_groups", wet_run=True)
 
-        self.assertCountEqual(
-            FollowUpGroupMembership.objects.filter(member=first_job_application.sender).all(), memberships
+        assertQuerySetEqual(
+            FollowUpGroupMembership.objects.filter(member=first_job_application.sender).all(),
+            memberships,
+            ordered=False,
         )
 
         assert FollowUpGroupMembership.objects.count() == 6
-        self.assertCountEqual(
-            FollowUpGroup.objects.filter(members=first_job_application.sender).all(), first_sender_groups
+        assertQuerySetEqual(
+            FollowUpGroup.objects.filter(members=first_job_application.sender).all(),
+            first_sender_groups,
+            ordered=False,
         )
 
     def test_group_create_at_update(self):

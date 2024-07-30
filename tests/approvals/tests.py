@@ -2,7 +2,6 @@ import datetime
 import threading
 import time
 import uuid
-from unittest import mock
 
 import factory
 import pytest
@@ -10,16 +9,14 @@ from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import IntegrityError, ProgrammingError, connection, transaction
 from django.forms import model_to_dict
-from django.test import TransactionTestCase
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertQuerySetEqual
+from pytest_django.asserts import assertFormError, assertMessages, assertNumQueries, assertQuerySetEqual
 
 from itou.approvals.admin import JobApplicationInline
 from itou.approvals.admin_forms import ApprovalAdminForm
@@ -46,10 +43,9 @@ from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
 from tests.users.factories import ItouStaffFactory, JobSeekerFactory
-from tests.utils.test import TestCase
 
 
-class CommonApprovalQuerySetTest(TestCase):
+class TestCommonApprovalQuerySet:
     def test_valid_for_pole_emploi_approval_model(self):
         start_at = timezone.localdate() - datetime.timedelta(days=365)
         end_at = start_at + datetime.timedelta(days=365)
@@ -138,7 +134,7 @@ class CommonApprovalQuerySetTest(TestCase):
         assert [approval_future] == list(Approval.objects.starts_in_the_future())
 
 
-class CommonApprovalMixinTest(TestCase):
+class TestCommonApprovalMixin:
     def test_waiting_period_end(self):
         end_at = datetime.date(2000, 1, 1)
         start_at = datetime.date(1998, 1, 1)
@@ -192,7 +188,7 @@ class CommonApprovalMixinTest(TestCase):
         assert approval.is_pass_iae
 
 
-class ApprovalModelTest(TestCase):
+class TestApprovalModel:
     def test_clean(self):
         approval = ApprovalFactory()
         approval.start_at = timezone.localdate()
@@ -225,13 +221,14 @@ class ApprovalModelTest(TestCase):
         next_number = Approval.get_next_number()
         assert next_number == expected_number
 
-    def test_get_next_number_with_demo_prefix(self):
+    def test_get_next_number_with_demo_prefix(self, mocker):
         demo_prefix = "XXXXX"
-        with mock.patch.object(Approval, "ASP_ITOU_PREFIX", demo_prefix):
-            ApprovalFactory(number=f"{demo_prefix}0044440")
-            expected_number = f"{demo_prefix}0044441"
-            next_number = Approval.get_next_number()
-            assert next_number == expected_number
+        mocker.patch.object(Approval, "ASP_ITOU_PREFIX", demo_prefix)
+
+        ApprovalFactory(number=f"{demo_prefix}0044440")
+        expected_number = f"{demo_prefix}0044441"
+        next_number = Approval.get_next_number()
+        assert next_number == expected_number
 
     def test_get_next_number_last_possible_number(self):
         ApprovalFactory(number=f"{Approval.ASP_ITOU_PREFIX}9999999")
@@ -388,62 +385,62 @@ class ApprovalModelTest(TestCase):
         assert approval.last_in_progress_suspension is None
 
     @freeze_time("2022-09-17")
-    def test_unsuspend_valid(self):
+    @pytest.mark.parametrize(
+        "reason",
+        [
+            Suspension.Reason.BROKEN_CONTRACT.value,
+            Suspension.Reason.FINISHED_CONTRACT.value,
+            Suspension.Reason.APPROVAL_BETWEEN_CTA_MEMBERS.value,
+            Suspension.Reason.CONTRAT_PASSERELLE.value,
+            Suspension.Reason.SUSPENDED_CONTRACT.value,
+        ],
+    )
+    def test_unsuspend_valid(self, reason):
         today = timezone.localdate()
         approval_start_at = datetime.date(2022, 6, 17)
         suspension_start_date = datetime.date(2022, 7, 17)
         suspension_end_date = datetime.date(2022, 12, 17)
         suspension_expected_end_date = datetime.date(2022, 9, 16)
 
-        REASONS_ALLOWING_UNSUSPEND = [
-            Suspension.Reason.BROKEN_CONTRACT.value,
-            Suspension.Reason.FINISHED_CONTRACT.value,
-            Suspension.Reason.APPROVAL_BETWEEN_CTA_MEMBERS.value,
-            Suspension.Reason.CONTRAT_PASSERELLE.value,
-            Suspension.Reason.SUSPENDED_CONTRACT.value,
-        ]
-
-        for reason in REASONS_ALLOWING_UNSUSPEND:
-            with self.subTest(f"reason={reason} expects end_at={suspension_expected_end_date}"):
-                approval = ApprovalFactory(start_at=approval_start_at)
-                suspension = SuspensionFactory(
-                    approval=approval,
-                    reason=reason,
-                    start_at=suspension_start_date,
-                    end_at=suspension_end_date,
-                )
-                approval.unsuspend(hiring_start_at=today)
-                suspension.refresh_from_db()
-                assert suspension.end_at == suspension_expected_end_date
+        approval = ApprovalFactory(start_at=approval_start_at)
+        suspension = SuspensionFactory(
+            approval=approval,
+            reason=reason,
+            start_at=suspension_start_date,
+            end_at=suspension_end_date,
+        )
+        approval.unsuspend(hiring_start_at=today)
+        suspension.refresh_from_db()
+        assert suspension.end_at == suspension_expected_end_date
 
     @freeze_time("2022-09-17")
-    def test_unsuspend_invalid(self):
-        today = timezone.localdate()
-        approval_start_at = datetime.date(2022, 6, 17)
-        suspension_start_date = datetime.date(2022, 7, 17)
-        suspension_end_date = datetime.date(2022, 12, 17)
-
-        invalid_reason = (
+    @pytest.mark.parametrize(
+        "reason",
+        [
             Suspension.Reason.SICKNESS.value,
             Suspension.Reason.MATERNITY.value,
             Suspension.Reason.INCARCERATION.value,
             Suspension.Reason.TRIAL_OUTSIDE_IAE.value,
             Suspension.Reason.DETOXIFICATION.value,
             Suspension.Reason.FORCE_MAJEURE.value,
-        )
+        ],
+    )
+    def test_unsuspend_invalid(self, reason):
+        today = timezone.localdate()
+        approval_start_at = datetime.date(2022, 6, 17)
+        suspension_start_date = datetime.date(2022, 7, 17)
+        suspension_end_date = datetime.date(2022, 12, 17)
 
-        for reason in invalid_reason:
-            with self.subTest(f"reason={reason} expects end_at={suspension_end_date}"):
-                approval = ApprovalFactory(start_at=approval_start_at)
-                suspension = SuspensionFactory(
-                    approval=approval,
-                    reason=reason,
-                    start_at=suspension_start_date,
-                    end_at=suspension_end_date,
-                )
-                approval.unsuspend(hiring_start_at=today)
-                suspension.refresh_from_db()
-                assert suspension.end_at == suspension_end_date
+        approval = ApprovalFactory(start_at=approval_start_at)
+        suspension = SuspensionFactory(
+            approval=approval,
+            reason=reason,
+            start_at=suspension_start_date,
+            end_at=suspension_end_date,
+        )
+        approval.unsuspend(hiring_start_at=today)
+        suspension.refresh_from_db()
+        assert suspension.end_at == suspension_end_date
 
     def test_unsuspend_the_day_suspension_starts(self):
         today = timezone.localdate()
@@ -480,15 +477,15 @@ class ApprovalModelTest(TestCase):
             end_at=now + relativedelta(days=1),
         )
 
-        self.assertQuerySetEqual(Approval.objects.invalid(), [expired_approval])
+        assertQuerySetEqual(Approval.objects.invalid(), [expired_approval])
         assert expired_approval.state == ApprovalStatus.EXPIRED
         assert expired_approval.get_state_display() == "Expiré"
 
-        self.assertQuerySetEqual(Approval.objects.starts_in_the_future(), [future_approval])
+        assertQuerySetEqual(Approval.objects.starts_in_the_future(), [future_approval])
         assert future_approval.state == ApprovalStatus.FUTURE
         assert future_approval.get_state_display() == "Valide (non démarré)"
 
-        self.assertQuerySetEqual(
+        assertQuerySetEqual(
             Approval.objects.valid().starts_in_the_past(),
             [valid_approval, suspended_approval],
             ordered=False,
@@ -509,7 +506,7 @@ class ApprovalModelTest(TestCase):
         # No prefetch
         num_queries = 1  # fetch approvals
         num_queries += 2  # check suspensions for each approvals
-        with self.assertNumQueries(num_queries):
+        with assertNumQueries(num_queries):
             approvals = Approval.objects.all()
             for approval in approvals:
                 approval.state
@@ -517,7 +514,7 @@ class ApprovalModelTest(TestCase):
         # With prefetch
         num_queries = 1  # fetch approvals
         num_queries += 1  # check suspensions based on prefetched data
-        with self.assertNumQueries(num_queries):
+        with assertNumQueries(num_queries):
             approvals = Approval.objects.all().prefetch_related("suspension_set")
             for approval in approvals:
                 approval.state
@@ -711,7 +708,7 @@ class ApprovalModelTest(TestCase):
             approval.save()
 
 
-class PoleEmploiApprovalModelTest(TestCase):
+class TestPoleEmploiApprovalModel:
     def test_format_name_as_pole_emploi(self):
         assert PoleEmploiApproval.format_name_as_pole_emploi(" François") == "FRANCOIS"
         assert PoleEmploiApproval.format_name_as_pole_emploi("M'Hammed ") == "M'HAMMED"
@@ -728,28 +725,27 @@ class PoleEmploiApprovalModelTest(TestCase):
         expected = "40012 19 10144"
         assert pole_emploi_approval.number_with_spaces == expected
 
+    @freeze_time()
     def test_is_valid(self):
-        now_date = timezone.localdate() - relativedelta(months=1)
-        now = datetime.datetime(year=now_date.year, month=now_date.month, day=now_date.day)
+        now_date = timezone.localdate()
 
-        with mock.patch("django.utils.timezone.now", side_effect=lambda: now):
-            # Ends today.
-            end_at = now_date
-            start_at = end_at - relativedelta(years=2)
-            approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-            assert approval.is_valid()
+        # Ends today.
+        end_at = now_date
+        start_at = end_at - relativedelta(years=2)
+        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+        assert approval.is_valid()
 
-            # Ended yesterday.
-            end_at = now_date - relativedelta(days=1)
-            start_at = end_at - relativedelta(years=2)
-            approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-            assert not approval.is_valid()
+        # Ended yesterday.
+        end_at = now_date - relativedelta(days=1)
+        start_at = end_at - relativedelta(years=2)
+        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+        assert not approval.is_valid()
 
-            # Starts tomorrow.
-            start_at = now_date + relativedelta(days=1)
-            end_at = start_at + relativedelta(years=2)
-            approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
-            assert approval.is_valid()
+        # Starts tomorrow.
+        start_at = now_date + relativedelta(days=1)
+        end_at = start_at + relativedelta(years=2)
+        approval = PoleEmploiApprovalFactory(start_at=start_at, end_at=end_at)
+        assert approval.is_valid()
 
     @freeze_time("2022-11-22")
     def test_get_remainder_display(self):
@@ -760,15 +756,15 @@ class PoleEmploiApprovalModelTest(TestCase):
         assert pole_emploi_approval.get_remainder_display() == "123 jours (Environ 4 mois)"
 
 
-class PoleEmploiApprovalManagerTest(TestCase):
+class TestPoleEmploiApprovalManager:
     def test_find_for_no_queries(self):
         user = JobSeekerFactory(jobseeker_profile__pole_emploi_id="")
-        with self.assertNumQueries(0):
+        with assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
         assert search_results.count() == 0
 
         user = JobSeekerFactory(birthdate=None)
-        with self.assertNumQueries(0):
+        with assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
         assert search_results.count() == 0
 
@@ -783,7 +779,7 @@ class PoleEmploiApprovalManagerTest(TestCase):
         )
         # just another approval, to be sure we don't find the other one "by chance"
         PoleEmploiApprovalFactory()
-        with self.assertNumQueries(0):
+        with assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
         assert search_results.count() == 1
         assert search_results.first() == pe_approval
@@ -794,7 +790,7 @@ class PoleEmploiApprovalManagerTest(TestCase):
             birthdate=user.birthdate,
             start_at=today - datetime.timedelta(days=1),
         )
-        with self.assertNumQueries(0):
+        with assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
         assert search_results.count() == 2
         assert search_results[0] == pe_approval
@@ -805,7 +801,7 @@ class PoleEmploiApprovalManagerTest(TestCase):
             nir=user.jobseeker_profile.nir,
             start_at=today - datetime.timedelta(days=2),
         )
-        with self.assertNumQueries(0):
+        with assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
         assert search_results.count() == 3
         assert search_results[0] == pe_approval
@@ -817,7 +813,7 @@ class PoleEmploiApprovalManagerTest(TestCase):
             nir=user.jobseeker_profile.nir,
             start_at=today - datetime.timedelta(days=3),
         )
-        with self.assertNumQueries(0):
+        with assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
         assert search_results.count() == 4
         assert search_results[0] == pe_approval
@@ -830,7 +826,7 @@ class PoleEmploiApprovalManagerTest(TestCase):
         nir_approval.pole_emploi_id = user.jobseeker_profile.pole_emploi_id
         nir_approval.save()
 
-        with self.assertNumQueries(0):
+        with assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
         assert search_results.count() == 4
         assert search_results[0] == pe_approval
@@ -841,13 +837,13 @@ class PoleEmploiApprovalManagerTest(TestCase):
     def test_find_for_no_nir(self):
         user = JobSeekerFactory(jobseeker_profile__nir="")
         PoleEmploiApprovalFactory(nir=None)  # entirely unrelated
-        with self.assertNumQueries(0):
+        with assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
         assert search_results.count() == 0
 
 
-class AutomaticApprovalAdminViewsTest(TestCase):
-    def test_create_approval_with_a_wrong_number(self):
+class TestAutomaticApprovalAdminViews:
+    def test_create_approval_with_a_wrong_number(self, client):
         """
         We cannot create an approval starting with ASP_ITOu_PREFIX
         """
@@ -856,7 +852,7 @@ class AutomaticApprovalAdminViewsTest(TestCase):
         permission = Permission.objects.get(content_type=content_type, codename="add_approval")
         user.user_permissions.add(permission)
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         url = reverse("admin:approvals_approval_add")
 
@@ -869,15 +865,15 @@ class AutomaticApprovalAdminViewsTest(TestCase):
             "origin": Origin.DEFAULT,  # Will be overriden
             "number": "XXXXX1234567",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
-        self.assertFormError(
+        assertFormError(
             response.context["adminform"],
             "number",
             [ApprovalAdminForm.ERROR_NUMBER],
         )
 
-    def test_edit_approval_with_a_wrong_number(self):
+    def test_edit_approval_with_a_wrong_number(self, client):
         """
         Given an existing approval, when setting a different number,
         then the save is rejected.
@@ -887,14 +883,14 @@ class AutomaticApprovalAdminViewsTest(TestCase):
         permission = Permission.objects.get(content_type=content_type, codename="change_approval")
         user.user_permissions.add(permission)
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         job_app = JobApplicationFactory(with_approval=True)
         approval = job_app.approval
 
         url = reverse("admin:approvals_approval_change", args=[approval.pk])
 
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         post_data = {
@@ -903,15 +899,15 @@ class AutomaticApprovalAdminViewsTest(TestCase):
             "user": job_app.job_seeker.pk,
             "number": "XXXXX1234567",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
-        self.assertFormError(
+        assertFormError(
             response.context["adminform"],
             "number",
             [ApprovalAdminForm.ERROR_NUMBER_CANNOT_BE_CHANGED % approval.number],
         )
 
-    def test_edit_approval_with_an_existing_employee_record(self):
+    def test_edit_approval_with_an_existing_employee_record(self, client):
         user = ItouStaffFactory()
         user.user_permissions.add(
             Permission.objects.get(
@@ -919,12 +915,12 @@ class AutomaticApprovalAdminViewsTest(TestCase):
                 codename="change_approval",
             )
         )
-        self.client.force_login(user)
+        client.force_login(user)
 
         approval = ApprovalFactory()
         employee_record = EmployeeRecordFactory(approval_number=approval.number, status=Status.PROCESSED)
 
-        response = self.client.post(
+        response = client.post(
             reverse("admin:approvals_approval_change", args=[approval.pk]),
             data=model_to_dict(
                 approval,
@@ -946,12 +942,12 @@ class AutomaticApprovalAdminViewsTest(TestCase):
             f"pour la modification de ce PASS IAE ({approval.number})." == str(list(response.context["messages"])[0])
         )
 
-    def test_create_approval(self):
+    def test_create_approval(self, client):
         user = ItouStaffFactory()
         content_type = ContentType.objects.get_for_model(Approval)
         permission = Permission.objects.get(content_type=content_type, codename="add_approval")
         user.user_permissions.add(permission)
-        self.client.force_login(user)
+        client.force_login(user)
 
         diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
         other_job_seeker = JobSeekerFactory()
@@ -964,9 +960,9 @@ class AutomaticApprovalAdminViewsTest(TestCase):
             "eligibility_diagnosis": diagnosis.pk,
             "origin": Origin.DEFAULT,  # Will be overriden
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
-        self.assertFormError(
+        assertFormError(
             response.context["adminform"],
             "eligibility_diagnosis",
             ["Le diagnostic doit appartenir au même utilisateur que le PASS"],
@@ -980,18 +976,18 @@ class AutomaticApprovalAdminViewsTest(TestCase):
             "eligibility_diagnosis": diagnosis.pk,
             "origin": Origin.DEFAULT,  # Will be overriden
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert Approval.objects.count() == 1
         approval = Approval.objects.get()
         assert approval.eligibility_diagnosis == diagnosis
         assert approval.origin == Origin.ADMIN
 
-    def test_create_pe_approval_manually(self):
+    def test_create_pe_approval_manually(self, client):
         user = ItouStaffFactory()
         content_type = ContentType.objects.get_for_model(Approval)
         permission = Permission.objects.get(content_type=content_type, codename="add_approval")
         user.user_permissions.add(permission)
-        self.client.force_login(user)
+        client.force_login(user)
 
         other_job_seeker = JobSeekerFactory()
         url = reverse("admin:approvals_approval_add")
@@ -1003,15 +999,14 @@ class AutomaticApprovalAdminViewsTest(TestCase):
             "number": "123456789123",
             "origin": Origin.DEFAULT,  # Will be overriden
         }
-        self.client.post(url, data=post_data)
+        client.post(url, data=post_data)
         approval = Approval.objects.get()
         assert approval.origin == Origin.PE_APPROVAL
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
+class TestCustomApprovalAdminViews:
     @pytest.mark.ignore_unknown_variable_template_error("has_view_permission", "subtitle")
-    def test_manually_add_approval(self):
+    def test_manually_add_approval(self, client):
         # When a Pôle emploi ID has been forgotten and the user has no NIR, an approval must be delivered
         # with a manual verification.
         job_seeker = JobSeekerFactory(
@@ -1034,17 +1029,17 @@ class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
 
         # Not enough perms.
         user = JobSeekerFactory()
-        self.client.force_login(user)
-        response = self.client.get(url)
+        client.force_login(user)
+        response = client.get(url)
         assert response.status_code == 302
 
         # With good perms.
         user = ItouStaffFactory()
-        self.client.force_login(user)
+        client.force_login(user)
         content_type = ContentType.objects.get_for_model(Approval)
         permission = Permission.objects.get(content_type=content_type, codename="add_approval")
         user.user_permissions.add(permission)
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
         assert response.context["form"].initial == {
             "start_at": job_application.hiring_start_at,
@@ -1055,8 +1050,8 @@ class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
         eligibility_diagnosis = job_application.eligibility_diagnosis
         job_application.eligibility_diagnosis = None
         job_application.save()
-        response = self.client.get(url, follow=True)
-        self.assertMessages(
+        response = client.get(url, follow=True)
+        assertMessages(
             response,
             [
                 messages.Message(
@@ -1077,7 +1072,7 @@ class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
             "end_at": job_application.hiring_end_at.strftime("%d/%m/%Y"),
             "number": f"{Approval.ASP_ITOU_PREFIX}1234567",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
         assert "number" in response.context["form"].errors, ApprovalAdminForm.ERROR_NUMBER
 
@@ -1086,7 +1081,7 @@ class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
             "start_at": job_application.hiring_start_at.strftime("%d/%m/%Y"),
             "end_at": job_application.hiring_end_at.strftime("%d/%m/%Y"),
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         # An approval should have been created, attached to the job
@@ -1112,7 +1107,7 @@ class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
         email = mail.outbox[0]
         assert approval.number_with_spaces in email.body
 
-    def test_employee_record_status(self):
+    def test_employee_record_status(self, subtests):
         # When an employee record exists
         employee_record = EmployeeRecordFactory()
         url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.id])
@@ -1140,7 +1135,7 @@ class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
 
         # When employee records are allowed (or not) for the SIAE
         for kind in CompanyKind:
-            with self.subTest("SIAE doesn't use employee records", kind=kind):
+            with subtests.test("SIAE doesn't use employee records", kind=kind.name):
                 job_application = JobApplicationFactory(with_approval=True, to_company__kind=kind)
                 msg = JobApplicationInline.employee_record_status(job_application)
                 if not job_application.to_company.can_use_employee_record:
@@ -1158,7 +1153,7 @@ class CustomApprovalAdminViewsTest(MessagesTestMixin, TestCase):
         assert msg == "Une fiche salarié existe déjà pour ce candidat"
 
 
-class SuspensionQuerySetTest(TestCase):
+class TestSuspensionQuerySet:
     def test_in_progress(self):
         start_at = timezone.localdate()  # Starts today so it's in progress.
         expected_num = 5
@@ -1185,7 +1180,7 @@ class SuspensionQuerySetTest(TestCase):
         assert expected_num == Suspension.objects.old().count()
 
 
-class SuspensionModelTest(TestCase):
+class TestSuspensionModel:
     def test_clean(self):
         today = timezone.localdate()
         start_at = today - relativedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS * 2)
@@ -1308,7 +1303,7 @@ class SuspensionModelTest(TestCase):
             SuspensionFactory(approval=approval)
 
 
-class SuspensionModelTestTrigger(TestCase):
+class TestSuspensionModelTrigger:
     def test_save(self):
         """
         Test `trigger_update_approval_end_at` with SQL INSERT.
@@ -1387,7 +1382,7 @@ class SuspensionModelTestTrigger(TestCase):
         assert approval.updated_at != initial_updated_at
 
 
-class ProlongationQuerySetTest(TestCase):
+class TestProlongationQuerySet:
     def test_in_progress(self):
         start_at = timezone.localdate()  # Starts today so it's in progress.
         expected_num = 5
@@ -1402,7 +1397,7 @@ class ProlongationQuerySetTest(TestCase):
         assert expected_num == Prolongation.objects.not_in_progress().count()
 
 
-class ProlongationManagerTest(TestCase):
+class TestProlongationManager:
     def test_get_cumulative_duration_for(self):
         approval = ApprovalFactory()
 
@@ -1437,7 +1432,7 @@ class ProlongationManagerTest(TestCase):
         assert expected_duration == Prolongation.objects.get_cumulative_duration_for(approval)
 
 
-class ProlongationModelTestTrigger(TestCase):
+class TestProlongationModelTrigger:
     """
     Test `update_approval_end_at`.
     """
@@ -1523,7 +1518,7 @@ class ProlongationModelTestTrigger(TestCase):
         assert approval.updated_at != initial_updated_at
 
 
-class ProlongationModelTestConstraint(TestCase):
+class TestProlongationModelConstraint:
     def test_exclusion_constraint(self):
         approval = ApprovalFactory()
 
@@ -1541,8 +1536,7 @@ class ProlongationModelTestConstraint(TestCase):
             )
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class ProlongationModelTest(TestCase):
+class TestProlongationModel:
     def test_clean_with_wrong_start_at(self):
         """
         Given an existing prolongation, when setting a wrong `start_at`
@@ -1589,21 +1583,20 @@ class ProlongationModelTest(TestCase):
         prolongation.end_at = prolongation.start_at + datetime.timedelta(days=1)
         prolongation.clean()
 
-    def test_clean_too_long_reason_duration_error(self):
-        for reason, info in Prolongation.PROLONGATION_RULES.items():
-            with self.subTest(reason=reason):
-                prolongation = ProlongationFactory(
-                    reason=reason,
-                    end_at=factory.LazyAttribute(
-                        lambda obj: obj.start_at
-                        + (info["max_cumulative_duration"] or info["max_duration"])
-                        + datetime.timedelta(days=1)
-                    ),
-                    declared_by_siae__kind=CompanyKind.AI,
-                )
-                with pytest.raises(ValidationError) as error:
-                    prolongation.clean()
-                assert error.match("La durée totale est trop longue pour le motif")
+    @pytest.mark.parametrize("reason,info", Prolongation.PROLONGATION_RULES.items())
+    def test_clean_too_long_reason_duration_error(self, reason, info):
+        prolongation = ProlongationFactory(
+            reason=reason,
+            end_at=factory.LazyAttribute(
+                lambda obj: obj.start_at
+                + (info["max_cumulative_duration"] or info["max_duration"])
+                + datetime.timedelta(days=1)
+            ),
+            declared_by_siae__kind=CompanyKind.AI,
+        )
+        with pytest.raises(ValidationError) as error:
+            prolongation.clean()
+        assert error.match("La durée totale est trop longue pour le motif")
 
     def test_clean_end_at_do_not_block_edition(self):
         max_cumulative_duration = Prolongation.PROLONGATION_RULES[ProlongationReason.SENIOR]["max_cumulative_duration"]
@@ -1634,20 +1627,19 @@ class ProlongationModelTest(TestCase):
         )
         third_prolongation.clean()
 
-    def test_clean_limit_particular_difficulties_to_some_siaes_error(self):
+    @pytest.mark.parametrize("kind", CompanyKind)
+    def test_clean_limit_particular_difficulties_to_some_siaes_error(self, kind):
         prolongation = ProlongationFactory(
             reason=ProlongationReason.PARTICULAR_DIFFICULTIES,
         )
 
-        for kind in CompanyKind:
-            with self.subTest(kind=kind):
-                prolongation.declared_by_siae.kind = kind
-                if kind in [CompanyKind.AI, CompanyKind.ACI]:
-                    prolongation.clean()
-                else:
-                    with pytest.raises(ValidationError) as error:
-                        prolongation.clean()
-                    assert error.match(r"Le motif .* est réservé aux AI et ACI.")
+        prolongation.declared_by_siae.kind = kind
+        if kind in [CompanyKind.AI, CompanyKind.ACI]:
+            prolongation.clean()
+        else:
+            with pytest.raises(ValidationError) as error:
+                prolongation.clean()
+            assert error.match(r"Le motif .* est réservé aux AI et ACI.")
 
     def test_clean_not_authorized_prescriber_error(self):
         prolongation = ProlongationFactory()
@@ -1661,7 +1653,7 @@ class ProlongationModelTest(TestCase):
             prolongation.clean()
         assert error.match("Cet utilisateur n'est pas un prescripteur habilité.")
 
-    def test_get_max_end_at(self):
+    def test_get_max_end_at(self, subtests):
         start_at = datetime.date(2021, 2, 1)
         approval = ApprovalFactory()
         for reason, expected_max_end_at in [
@@ -1672,7 +1664,7 @@ class ProlongationModelTest(TestCase):
             (ProlongationReason.PARTICULAR_DIFFICULTIES, datetime.date(2024, 2, 1)),  # 1095 days (3 years).
             (ProlongationReason.HEALTH_CONTEXT, datetime.date(2022, 2, 1)),  # 365 days.
         ]:
-            with self.subTest(reason):
+            with subtests.test(reason.name):
                 assert Prolongation.get_max_end_at(approval.pk, start_at, reason) == expected_max_end_at
 
     @freeze_time("2023-08-21")
@@ -1752,10 +1744,10 @@ class ProlongationModelTest(TestCase):
         assert approval.duration == initial_approval_duration + prolongation1.duration + prolongation2.duration
 
 
-class ApprovalConcurrentModelTest(TransactionTestCase):
+@pytest.mark.django_db(transaction=True)
+class TestApprovalConcurrentModel:
     """
-    Uses TransactionTestCase that truncates all tables after every test, instead of TestCase
-    that uses transaction.
+    Uses transaction=True that truncates all tables after every test.
     This way we can appropriately test the select_for_update() behaviour.
     """
 
@@ -1837,7 +1829,7 @@ class ApprovalConcurrentModelTest(TransactionTestCase):
         assert approval2.number == "XXXXX0000003"
 
 
-class PENotificationMixinTestCase(TestCase):
+class TestPENotificationMixin:
     def test_base_values(self):
         approval = ApprovalFactory()
         assert approval.pe_notification_status == "notification_pending"

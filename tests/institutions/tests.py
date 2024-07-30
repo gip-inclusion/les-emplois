@@ -14,10 +14,9 @@ from tests.institutions.factories import (
     InstitutionWithMembershipFactory,
 )
 from tests.users.factories import LaborInspectorFactory, PrescriberFactory
-from tests.utils.test import TestCase
 
 
-class InstitutionModelTest(TestCase):
+class TestInstitutionModel:
     def test_active_admin_members(self):
         """
         Test that if a user is admin of org1 and regular user

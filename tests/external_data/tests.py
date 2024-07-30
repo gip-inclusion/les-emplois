@@ -1,9 +1,9 @@
 import json
 
 import httpx
+import pytest
 import respx
 from django.conf import settings
-from django.test import override_settings
 
 import itou.external_data.apis.pe_connect as pec
 from itou.external_data.apis.pe_connect import import_user_pe_data
@@ -11,7 +11,6 @@ from itou.external_data.models import ExternalDataImport, RejectedEmailEventData
 from itou.external_data.signals import store_rejected_email_event
 from itou.users.enums import IdentityProvider
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import TestCase
 
 
 # Test data import status (All ok, failed, partial)
@@ -102,10 +101,15 @@ def _mock_status_failed():
         respx.get(_url_for_key(api_k)).mock(httpx.Response(text="", status_code=500))
 
 
-@override_settings(
-    API_ESD={"BASE_URL": "https://some.auth.domain", "AUTH_BASE_URL": "https://some-authentication-domain.fr"}
-)
-class ExternalDataImportTest(TestCase):
+@pytest.fixture(autouse=True)
+def mock_api_esd(settings):
+    settings.API_ESD = {
+        "BASE_URL": "https://some.auth.domain",
+        "AUTH_BASE_URL": "https://some-authentication-domain.fr",
+    }
+
+
+class TestExternalDataImport:
     @respx.mock
     def test_status_ok(self):
         user = JobSeekerFactory()
@@ -154,10 +158,7 @@ class ExternalDataImportTest(TestCase):
         assert 0 == len(report.get("fields_failed"))
 
 
-@override_settings(
-    API_ESD={"BASE_URL": "https://some.auth.domain", "AUTH_BASE_URL": "https://some-authentication-domain.fr"}
-)
-class JobSeekerExternalDataTest(TestCase):
+class TestJobSeekerExternalData:
     @respx.mock
     def test_import_ok(self):
         _mock_status_ok()
@@ -251,7 +252,7 @@ class MockEmailWebhookEvent:
         self.reject_reason = reason
 
 
-class AnymailHookTests(TestCase):
+class TestAnymailHook:
     def test_rejected_event(self):
         """
         we store information about rejected events in order to be able to do some analytics about errors

@@ -14,10 +14,9 @@ from tests.eligibility.factories import (
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import TestCase
 
 
-class EligibilityDiagnosisQuerySetTest(TestCase):
+class TestEligibilityDiagnosisQuerySet:
     """
     Test EligibilityDiagnosisQuerySet.
     """
@@ -37,10 +36,9 @@ class EligibilityDiagnosisQuerySetTest(TestCase):
         assert expected_num == EligibilityDiagnosis.objects.expired().count()
 
 
-class EligibilityDiagnosisManagerTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.job_seeker = JobSeekerFactory(with_pole_emploi_id=True)
+class TestEligibilityDiagnosisManager:
+    def setup_method(self):
+        self.job_seeker = JobSeekerFactory(with_pole_emploi_id=True)
 
     def test_no_diagnosis(self):
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=self.job_seeker)
@@ -240,7 +238,7 @@ class EligibilityDiagnosisManagerTest(TestCase):
         assert last_expired == expired_diagnosis_last
 
 
-class EligibilityDiagnosisModelTest(TestCase):
+class TestEligibilityDiagnosisModel:
     def test_create_diagnosis(self):
         job_seeker = JobSeekerFactory()
         company = CompanyFactory(with_membership=True)
@@ -379,7 +377,7 @@ class EligibilityDiagnosisModelTest(TestCase):
         assert diagnosis.is_considered_valid
 
 
-class AdministrativeCriteriaModelTest(TestCase):
+class TestAdministrativeCriteriaModel:
     def test_levels_queryset(self):
         level1_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_1).first()
         level2_criterion = AdministrativeCriteria.objects.filter(level=AdministrativeCriteriaLevel.LEVEL_2).first()

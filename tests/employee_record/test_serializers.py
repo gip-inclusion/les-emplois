@@ -17,10 +17,9 @@ from itou.employee_record.serializers import (
 from tests.asp.factories import CommuneFactory
 from tests.employee_record.factories import EmployeeRecordUpdateNotificationFactory, EmployeeRecordWithProfileFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import TestCase
 
 
-class EmployeeRecordAddressSerializerTest(TestCase):
+class TestEmployeeRecordAddressSerializer:
     def test_hexa_additional_address(self):
         # If additional address contains special characters
         # or is more than 32 charactrs long
@@ -117,7 +116,7 @@ class TestEmployeeRecordSerializer:
         assert data["situationSalarie"]["salarieOETH"] is True
 
 
-class EmployeeRecordUpdateNotificationSerializerTest(TestCase):
+class TestEmployeeRecordUpdateNotificationSerializer:
     def test_notification_serializer(self):
         # High-level : just check basic information
         start_at = timezone.localdate()
@@ -144,7 +143,7 @@ class EmployeeRecordUpdateNotificationSerializerTest(TestCase):
         assert personnal_data.get("passDateDeb") == start_at.strftime("%d/%m/%Y")
         assert personnal_data.get("passDateFin") == end_at.strftime("%d/%m/%Y")
 
-    def test_batch_serializer(self):
+    def test_batch_serializer(self, subtests):
         # This is the same serializer used for employee record batches.
         # Previously not tested, killing 2 birds with 1 stone.
 
@@ -174,7 +173,7 @@ class EmployeeRecordUpdateNotificationSerializerTest(TestCase):
 
         assert len(new_notifications) == len(elements)
         for idx, element in enumerate(elements, 1):
-            with self.subTest(idx):
+            with subtests.test(idx):
                 assert element.get("numLigne") == idx
                 assert element.get("siret") is not None
                 assert element.get("typeMouvement") == EmployeeRecordUpdateNotification.ASP_MOVEMENT_TYPE
