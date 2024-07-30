@@ -1,5 +1,7 @@
 {% load static %}
 {% load theme_inclusion %}
+{% load redirection_fields %}
+{% load matomo %}
 
 <header role="banner" id="header">
     <section class="s-header">
@@ -12,27 +14,101 @@
                 </div>
                 <div class="s-header__col s-header__col--logo-service col-auto d-flex align-items-center px-0">
                     <a href="{% url 'home:hp' %}">
-                        <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" height="90" alt="Les emplois de l'inclusion">
+                        <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" alt="Les emplois de l'inclusion" height="90">
                     </a>
                 </div>
-                <div class="s-header__col s-header__col--nav col d-none d-xl-inline-flex d-xl-flex align-items-center justify-content-end">
-                    <nav role="navigation" id="nav-primary" aria-label="Menu de navigation principale">
-                        {% include 'layout/_header_nav_primary_items.html' with is_mobile=False %}
+                <div class="s-header__col s-header__col--nav col d-none d-lg-inline-flex d-lg-flex align-items-center justify-content-end pe-0 pe-xl-3">
+                    <nav role="navigation" id="nav-primary" aria-label="Navigation principale">
+                        <ul>
+                            <li class="d-none d-xl-inline-block dropdown">
+                                <button type="button" class="btn btn-link dropdown-toggle mh-auto p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="helpDropdown" aria-expanded="false">
+                                    Besoin d'aide ?
+                                </button>
+                                <div class="dropdown-menu" id="helpDropdown">
+                                    <ul class="list-unstyled">
+                                        <li>
+                                            <a href="{{ ITOU_HELP_CENTER_URL }}"
+                                               rel="noopener"
+                                               class="dropdown-item has-external-link"
+                                               target="_blank"
+                                               aria-label="Accéder à l'espace de documentation (nouvel onglet)"
+                                               {% matomo_event "help" "clic" "header_documentation" %}>Documentation</a>
+                                        </li>
+                                        <li>
+                                            <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14733403281937--Comprendre-l-IAE"
+                                               rel="noopener"
+                                               class="dropdown-item has-external-link"
+                                               target="_blank"
+                                               aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)"
+                                               {% matomo_event "help" "clic" "header_comprendre-liae" %}>Qui peut bénéficier des contrats d'IAE&nbsp;?</a>
+                                        </li>
+                                        {% if user.is_authenticated %}
+                                            {% if user.is_employer or user.is_prescriber_with_authorized_org %}
+                                                <li>
+                                                    <a href="https://travail-emploi.gouv.fr/actualites/l-actualite-du-ministere/article/guide-pratique-la-prescription-de-parcours-d-insertion-par-l-activite"
+                                                       rel="noopener"
+                                                       class="dropdown-item has-external-link"
+                                                       target="_blank"
+                                                       aria-label="Prescrire un parcours IAE (guide pratique) (ouverture dans un nouvel onglet)"
+                                                       {% matomo_event "help" "clic" "header_prescrire-parcours-iae-guide" %}>Prescrire un parcours IAE (guide pratique)</a>
+                                                </li>
+                                            {% endif %}
+                                        {% endif %}
+                                        <li>
+                                            <a href="{{ ITOU_HELP_CENTER_URL }}/categories/25225629682321--Nouveaut%C3%A9s"
+                                               rel="noopener"
+                                               class="dropdown-item has-external-link"
+                                               target="_blank"
+                                               aria-label="Les nouveautés du site des emplois de l'inclusion (ouverture dans un nouvel onglet)"
+                                               {% matomo_event "help" "clic" "header_nouveautes" %}>Nouveautés</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            <li>
+                                <a class="btn btn-ico btn-outline-primary" href="{% url "signup:choose_user_kind" %}">
+                                    <i class="ri-user-add-line" aria-hidden="true"></i>
+                                    <span>S'inscrire</span>
+                                </a>
+                            </li>
+                            <li class="dropdown">
+                                <button class="btn btn-ico btn-primary" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdown" aria-expanded="false">
+                                    <i class="ri-login-box-line" aria-hidden="true"></i>
+                                    <span>Se connecter</span>
+                                </button>
+                                <div class="dropdown-menu" id="loginUserDropdown">
+                                    <ul class="list-unstyled">
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'login:job_seeker' %}{% redirection_url value=redirect_field_value|default:"" %}">
+                                                Candidat
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'login:prescriber' %}{% redirection_url value=redirect_field_value|default:"" %}">
+                                                Prescripteur
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'login:employer' %}{% redirection_url value=redirect_field_value|default:"" %}">
+                                                Employeur inclusif
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'login:labor_inspector' %}{% redirection_url value=redirect_field_value|default:"" %}">
+                                                Institution partenaire
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
                     </nav>
                 </div>
-                <div class="s-header__col s-header__col--burger col d-flex align-items-center justify-content-end d-xl-none">
-                    <button type="button" data-bs-toggle="offcanvas" data-bs-target="#burgerNav" aria-controls="burgerNav" aria-label="Ouvrir la navigation principale pour mobile">
-                        <i class="ri-menu-line" aria-hidden="true"></i>
+                <div class="s-header__col s-header__col--burger col col-lg-auto d-flex align-items-center justify-content-end d-xl-none ps-0">
+                    <button type="button" class="btn btn-link btn-ico pe-0" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNav" aria-controls="offcanvasNav" aria-label="Ouvrir le menu de navigation principale pour mobile">
+                        <i class="ri-menu-line" id="open" aria-hidden="true"></i>
+                        <span>Menu</span>
                     </button>
-                </div>
-                <div id="burgerNav" class="offcanvas offcanvas-end" aria-label="Navigation principale pour mobile">
-                    <button type="button" data-bs-dismiss="offcanvas" aria-label="Fermer la navigation principale pour mobile">
-                        <i class="ri-close-line" id="close" aria-hidden="true"></i>
-                    </button>
-                    <nav role="navigation" aria-label="Menu de navigation principale pour mobile">
-                        {% include 'layout/_header_nav_primary_items.html' with is_mobile=True %}
-                        {% include 'layout/_header_nav_secondary_items.html' %}
-                    </nav>
                 </div>
             </div>
         </div>
@@ -42,10 +118,121 @@
             <div class="s-postheader__row row">
                 <div class="s-postheader__col col-12 d-flex align-items-center">
                     <nav role="navigation" aria-label="Navigation secondaire">
-                        {% include 'layout/_header_nav_secondary_items.html' %}
+                        <ul>
+                            <li>
+                                <a class="{% if '/search/employers' in request.path %}is-active{% endif %}" href="{% url 'search:employers_home' %}">Rechercher un emploi inclusif</a>
+                            </li>
+                            <li>
+                                <a class="{% if '/search/prescribers' in request.path %}is-active{% endif %}" href="{% url 'search:prescribers_home' %}">Rechercher des prescripteurs habilités</a>
+                            </li>
+                        </ul>
                     </nav>
                 </div>
             </div>
         </div>
     </section>
+    <div class="offcanvas" id="offcanvasNav" aria-label="Navigation principale pour mobile">
+        <div class="offcanvas-header">
+            <h4 class="h5 mb-0 btn-ico align-items-center" id="offcanvasApplyFiltersLabel">
+                <i class="ri-menu-line" aria-hidden="true"></i>
+                <span>Menu</span>
+            </h4>
+            <button type="button" class="btn-link px-2 me-n2" data-bs-dismiss="offcanvas" aria-label="Fermer">
+                <i class="ri-close-line" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="offcanvas-body">
+            <nav role="navigation" aria-label="Navigation secondaire pour mobile">
+                <ul class="nav nav-tabs flex-column">
+                    <li class="nav-item">
+                        <a href="{% url 'search:employers_home' %}" class="nav-link{% if '/search/employers' in request.path %} active{% endif %}">
+                            <i class="ri-search-line font-weight-medium" aria-hidden="true"></i>
+                            <span>Rechercher des emplois inclusifs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'search:prescribers_home' %}" class="nav-link{% if '/search/prescribers' in request.path %} active{% endif %}">
+                            <i class="ri-search-line font-weight-medium" aria-hidden="true"></i>
+                            <span>Rechercher des prescripteurs habilités</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="offcanvas-footer flex-column align-items-stretch">
+            <nav role="navigation" aria-label="Menu de navigation principale pour mobile">
+                <div class="dropdown-center">
+                    <button class="btn btn-block btn-ico btn-primary" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdownMobile" aria-expanded="false">
+                        <i class="ri-login-box-line" aria-hidden="true"></i>
+                        <span>Se connecter</span>
+                    </button>
+                    <div class="dropdown-menu" id="loginUserDropdownMobile">
+                        <ul class="list-unstyled">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'login:job_seeker' %}{% redirection_url value=redirect_field_value|default:"" %}">Candidat</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'login:prescriber' %}{% redirection_url value=redirect_field_value|default:"" %}">Prescripteur</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'login:employer' %}{% redirection_url value=redirect_field_value|default:"" %}">Employeur inclusif</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'login:labor_inspector' %}{% redirection_url value=redirect_field_value|default:"" %}">Institution partenaire</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <a class="btn btn-block btn-ico btn-outline-primary my-3" href="{% url "signup:choose_user_kind" %}">
+                    <i class="ri-user-add-line" aria-hidden="true"></i>
+                    <span>S'inscrire</span>
+                </a>
+                <div class="dropdown-center">
+                    <button type="button" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="helpDropdownMobile" aria-expanded="false">
+                        Besoin d'aide ?
+                    </button>
+                    <div class="dropdown-menu" id="helpDropdownMobile">
+                        <ul class="list-unstyled">
+                            <li>
+                                <a href="{{ ITOU_HELP_CENTER_URL }}"
+                                   rel="noopener"
+                                   class="dropdown-item has-external-link"
+                                   target="_blank"
+                                   aria-label="Accéder à l'espace de documentation (nouvel onglet)"
+                                   {% matomo_event "help" "clic" "header_documentation" %}>Documentation</a>
+                            </li>
+                            <li>
+                                <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14733403281937--Comprendre-l-IAE"
+                                   rel="noopener"
+                                   class="dropdown-item has-external-link"
+                                   target="_blank"
+                                   aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)"
+                                   {% matomo_event "help" "clic" "header_comprendre-liae" %}>Qui peut bénéficier des contrats d'IAE&nbsp;?</a>
+                            </li>
+                            {% if user.is_authenticated %}
+                                {% if user.is_employer or user.is_prescriber_with_authorized_org %}
+                                    <li>
+                                        <a href="https://travail-emploi.gouv.fr/actualites/l-actualite-du-ministere/article/guide-pratique-la-prescription-de-parcours-d-insertion-par-l-activite"
+                                           rel="noopener"
+                                           class="dropdown-item has-external-link"
+                                           target="_blank"
+                                           aria-label="Prescrire un parcours IAE (guide pratique) (ouverture dans un nouvel onglet)"
+                                           {% matomo_event "help" "clic" "header_prescrire-parcours-iae-guide" %}>Prescrire un parcours IAE (guide pratique)</a>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                            <li>
+                                <a href="{{ ITOU_HELP_CENTER_URL }}/categories/25225629682321--Nouveaut%C3%A9s"
+                                   rel="noopener"
+                                   class="dropdown-item has-external-link"
+                                   target="_blank"
+                                   aria-label="Les nouveautés du site des emplois de l'inclusion (ouverture dans un nouvel onglet)"
+                                   {% matomo_event "help" "clic" "header_nouveautes" %}>Nouveautés</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
 </header>
