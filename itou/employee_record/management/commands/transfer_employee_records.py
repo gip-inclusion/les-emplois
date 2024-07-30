@@ -86,25 +86,20 @@ class Command(EmployeeRecordTransferCommand):
                 )
                 # Do not count as an error
                 continue
+            if employee_record.status in [Status.PROCESSED, Status.REJECTED]:
+                self.stdout.write(f"Skipping, employee record is already {employee_record.status}")
+                continue
+            if employee_record.status != Status.SENT:
+                self.stdout.write(f"Skipping, incoherent status for {employee_record=}")
+                continue
 
             archived_json = JSONRenderer().render(raw_employee_record)
-            # Employee record successfully processed by ASP :
-            if processing_code == EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE:
+            if processing_code == EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE:  # Processed by ASP
                 if not dry_run:
-                    if employee_record.status != Status.PROCESSED:
-                        employee_record.update_as_processed(processing_code, processing_label, archived_json)
-                    else:
-                        self.stdout.write(f"Already accepted: {employee_record=}")
+                    employee_record.update_as_processed(processing_code, processing_label, archived_json)
                 else:
                     self.stdout.write(f"DRY-RUN: Accepted {employee_record=}, {processing_code=}, {processing_label=}")
-            else:
-                # Employee record has already been processed : SKIP, not an error
-                if employee_record.status == Status.PROCESSED:
-                    # Do not update, keep it clean
-                    self.stdout.write(f"Skipping, already accepted: {employee_record=}")
-                    continue
-
-                # Employee record has not been processed by ASP :
+            else:  # Rejected by ASP
                 if not dry_run:
                     # One special case added for support concerns:
                     # 3436 processing code are automatically converted as PROCESSED
@@ -131,12 +126,7 @@ class Command(EmployeeRecordTransferCommand):
 
                         continue
 
-                    # Fixes unexpected stop on multiple pass on the same file
-                    if employee_record.status != Status.REJECTED:
-                        # Standard error / rejection processing
-                        employee_record.update_as_rejected(processing_code, processing_label, archived_json)
-                    else:
-                        self.stdout.write(f"Already rejected: {employee_record=}")
+                    employee_record.update_as_rejected(processing_code, processing_label, archived_json)
                 else:
                     self.stdout.write(f"DRY-RUN: Rejected {employee_record=}, {processing_code=}, {processing_label=}")
 
