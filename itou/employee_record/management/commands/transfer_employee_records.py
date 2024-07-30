@@ -7,14 +7,13 @@ from rest_framework.renderers import JSONRenderer
 from sentry_sdk.crons import monitor
 
 from itou.approvals.models import Approval
+from itou.employee_record.common_management import EmployeeRecordTransferCommand, IgnoreFile
 from itou.employee_record.enums import MovementType, Status
 from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordBatchSerializer
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import EmployeeRecordBatchSerializer
 from itou.utils.iterators import chunks
-
-from ...common_management import EmployeeRecordTransferCommand
 
 
 class Command(EmployeeRecordTransferCommand):
@@ -60,53 +59,31 @@ class Command(EmployeeRecordTransferCommand):
                     remote_path, idx, renderer.render(batch_data["lignesTelechargement"][idx - 1])
                 )
 
-    def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> int:
+    def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> None:
         """
         - Parse ASP response file,
         - Update status of employee records,
         - Update metadata for processed employee records.
-
-        Returns the number of errors encountered
         """
         batch_filename = EmployeeRecordBatch.batch_filename_from_feedback(feedback_file)
-        record_errors = 0
-        records = batch.get("lignesTelechargement")
 
-        if not records:
-            self.stdout.write(f"Could not get any employee record from file: {feedback_file}")
-            return 1
+        for idx, raw_employee_record in enumerate(batch["lignesTelechargement"], 1):
+            # UPDATE notifications are sent in specific files and are not mixed
+            # with "standard" employee records (CREATION).
+            if raw_employee_record.get("typeMouvement") != MovementType.CREATION:
+                raise IgnoreFile(f"Received 'typeMouvement' is not {MovementType.CREATION}")
 
-        # Check for notification records :
-        # Notifications are not mixed with employee records
-        notification_number = 0
-
-        for record in records:
-            if record.get("typeMouvement") == MovementType.UPDATE:
-                notification_number += 1
-
-        if notification_number == len(records):
-            self.stdout.write(
-                f"File `{feedback_file}` is an update notifications file, passing.",
-            )
-            return 1
-
-        for idx, raw_employee_record in enumerate(records, 1):
-            line_number = raw_employee_record.get("numLigne")
-            processing_code = raw_employee_record.get("codeTraitement")
-            processing_label = raw_employee_record.get("libelleTraitement")
-
+            line_number = raw_employee_record["numLigne"]
+            processing_code = raw_employee_record["codeTraitement"]
+            processing_label = raw_employee_record["libelleTraitement"]
             self.stdout.write(f"Record: {line_number=}, {processing_code=}, {processing_label=}")
-
-            if not line_number:
-                self.stdout.write(f"No line number for employee record {idx=}, {feedback_file=}", idx, feedback_file)
-                record_errors += 1
-                continue
 
             # Now we must find the matching FS
             employee_record = EmployeeRecord.objects.find_by_batch(batch_filename, line_number).first()
-
             if not employee_record:
-                self.stdout.write(f"Could not get existing employee record data: {batch_filename=}, {line_number=}")
+                self.stdout.write(
+                    f"Skipping, could not get existing employee record: {batch_filename=}, {line_number=}"
+                )
                 # Do not count as an error
                 continue
 
@@ -114,15 +91,10 @@ class Command(EmployeeRecordTransferCommand):
             # Employee record successfully processed by ASP :
             if processing_code == EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE:
                 if not dry_run:
-                    try:
-                        if employee_record.status != Status.PROCESSED:
-                            employee_record.update_as_processed(processing_code, processing_label, archived_json)
-                        else:
-                            self.stdout.write(f"Already accepted: {employee_record=}")
-                    except Exception as ex:
-                        self.stdout.write(
-                            f"Can't update employee record : {employee_record=} {employee_record.status=} {ex=}"
-                        )
+                    if employee_record.status != Status.PROCESSED:
+                        employee_record.update_as_processed(processing_code, processing_label, archived_json)
+                    else:
+                        self.stdout.write(f"Already accepted: {employee_record=}")
                 else:
                     self.stdout.write(f"DRY-RUN: Accepted {employee_record=}, {processing_code=}, {processing_label=}")
             else:
@@ -167,8 +139,6 @@ class Command(EmployeeRecordTransferCommand):
                         self.stdout.write(f"Already rejected: {employee_record=}")
                 else:
                     self.stdout.write(f"DRY-RUN: Rejected {employee_record=}, {processing_code=}, {processing_label=}")
-
-        return record_errors
 
     @monitor(monitor_slug="transfer-employee-records-download")
     def download(self, sftp: paramiko.SFTPClient, dry_run: bool):
