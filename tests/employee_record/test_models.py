@@ -583,18 +583,6 @@ class TestEmployeeRecordJobApplicationConstraints:
 
 
 class TestEmployeeRecordQueryset:
-    def test_asp_duplicates(self):
-        # Filter REJECTED employee records with error code 3436
-        EmployeeRecordWithProfileFactory(status=Status.REJECTED)
-
-        assert EmployeeRecord.objects.asp_duplicates().count() == 0
-
-        EmployeeRecordWithProfileFactory(
-            status=Status.REJECTED, asp_processing_code=EmployeeRecord.ASP_DUPLICATE_ERROR_CODE
-        )
-
-        assert EmployeeRecord.objects.asp_duplicates().count() == 1
-
     def test_for_company(self):
         employee_record_1, employee_record_2 = EmployeeRecordFactory.create_batch(2)
 

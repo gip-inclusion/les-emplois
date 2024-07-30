@@ -28,30 +28,6 @@ class Command(BaseCommand):
 
     # Check and fix methods: add as many as needed.
 
-    def _check_3436_error_code(self, dry_run):
-        # Report all employee records with ASP error code 3436
-
-        err_3436 = EmployeeRecord.objects.asp_duplicates()
-        count_3436 = err_3436.count()
-
-        self.stdout.write("* Checking REJECTED employee records with error 3436 (duplicates):")
-
-        if count_3436 == 0:
-            self.stdout.write(" - none found (great!)")
-        else:
-            self.stdout.write(f" - found {count_3436} error(s)")
-
-            if dry_run:
-                return
-
-            self.stdout.write(" - fixing 3436 errors: forcing status to PROCESSED")
-
-            with transaction.atomic():
-                for to_fix in err_3436:
-                    to_fix.update_as_processed_as_duplicate(to_fix.archived_json)
-
-            self.stdout.write(" - done!")
-
     def _check_approvals(self, dry_run):
         # Report employee records with no approvals
         # (approvals can be deleted after processing)
@@ -128,7 +104,6 @@ class Command(BaseCommand):
             self.stdout.write(" - DRY-RUN mode: not fixing, just reporting")
 
         self._check_approvals(dry_run)
-        self._check_3436_error_code(dry_run)
         self._check_missed_notifications(dry_run)
 
         self.stdout.write("+ Employee records sanitizing done. Have a great day!")

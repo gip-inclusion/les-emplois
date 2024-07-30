@@ -16,7 +16,6 @@ def command_fixture():
 
 def test_handle_dry_run_option(mocker, command):
     mocker.patch.object(command, "_check_approvals")
-    mocker.patch.object(command, "_check_3436_error_code")
     mocker.patch.object(command, "_check_missed_notifications")
 
     command.handle(dry_run=True)
@@ -24,29 +23,6 @@ def test_handle_dry_run_option(mocker, command):
         "+ Checking employee records coherence before transferring to ASP",
         " - DRY-RUN mode: not fixing, just reporting",
         "+ Employee records sanitizing done. Have a great day!",
-        "",
-    ]
-
-
-def test_3436_errors_check(command):
-    # Check for 3436 errors fix (ASP duplicates)
-
-    employee_record = factories.EmployeeRecordWithProfileFactory(
-        status=models.Status.REJECTED,
-        asp_processing_code=models.EmployeeRecord.ASP_DUPLICATE_ERROR_CODE,
-    )
-
-    command._check_3436_error_code(dry_run=False)
-
-    # Exterminate 3436s
-    employee_record.refresh_from_db()
-    assert employee_record.status == models.Status.PROCESSED
-    assert employee_record.processed_as_duplicate is True
-    assert command.stdout.getvalue().split("\n") == [
-        "* Checking REJECTED employee records with error 3436 (duplicates):",
-        " - found 1 error(s)",
-        " - fixing 3436 errors: forcing status to PROCESSED",
-        " - done!",
         "",
     ]
 

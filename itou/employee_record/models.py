@@ -137,13 +137,6 @@ class EmployeeRecordQuerySet(models.QuerySet):
             )
         )
 
-    def asp_duplicates(self):
-        """
-        Return REJECTED employee records with error code '3436'.
-        These employee records are considered as duplicates by ASP.
-        """
-        return self.filter(status=Status.REJECTED).filter(asp_processing_code=EmployeeRecord.ASP_DUPLICATE_ERROR_CODE)
-
 
 class EmployeeRecord(ASPExchangeInformation):
     """
