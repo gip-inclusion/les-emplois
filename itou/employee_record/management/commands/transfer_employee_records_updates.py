@@ -5,14 +5,13 @@ from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from sentry_sdk.crons import monitor
 
+from itou.employee_record.common_management import EmployeeRecordTransferCommand, IgnoreFile
 from itou.employee_record.enums import MovementType, NotificationStatus, Status
 from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordUpdateNotificationBatchSerializer
 from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import EmployeeRecordUpdateNotificationBatchSerializer
 from itou.utils.iterators import chunks
-
-from ...common_management import EmployeeRecordTransferCommand
 
 
 class Command(EmployeeRecordTransferCommand):
@@ -66,43 +65,30 @@ class Command(EmployeeRecordTransferCommand):
                     remote_path, idx, renderer.render(batch_data["lignesTelechargement"][idx - 1])
                 )
 
-    def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> int:
+    def _parse_feedback_file(self, feedback_file: str, batch: dict, dry_run: bool) -> None:
         """
-        - parse ASP response file,
-        - update status of employee record notifications,
-        - return the number of errors encountered.
+        - Parse ASP response file,
+        - Update status of employee record notifications,
+        - Update metadata for processed employee record notifications.
         """
         batch_filename = EmployeeRecordBatch.batch_filename_from_feedback(feedback_file)
-        record_errors = 0
-        records = batch.get("lignesTelechargement")
 
-        if not records:
-            self.stdout.write(f"Could not get any employee record notification from file: {feedback_file=}")
-            return 0
-
-        for idx, employee_record in enumerate(records, 1):
+        for idx, employee_record in enumerate(batch["lignesTelechargement"], 1):
+            # UPDATE notifications are sent in specific files and are not mixed
+            # with "standard" employee records (CREATION).
             if employee_record.get("typeMouvement") != MovementType.UPDATE:
-                # Update notifications are sent in specific files and are not mixed
-                # with "standard" employee records (CREATE mode).
-                # If CREATE movements are found in this file, we must skip it.
-                self.stdout.write(f"This feedback file is not a notification update file: SKIPPING, {feedback_file=}")
-                # This will be marked as an error, stop loop and return
-                return 1
+                raise IgnoreFile(f"Received 'typeMouvement' is not {MovementType.UPDATE}")
 
-            line_number = employee_record.get("numLigne")
-            processing_code = employee_record.get("codeTraitement")
-            processing_label = employee_record.get("libelleTraitement")
-
-            if not line_number:
-                self.stdout.write(f"No line number for employee record ({idx=}, {feedback_file=})")
-                record_errors += 1
-                continue
+            line_number = employee_record["numLigne"]
+            processing_code = employee_record["codeTraitement"]
+            processing_label = employee_record["libelleTraitement"]
 
             # Pre-check done, now find notification by file name and line number
             notification = EmployeeRecordUpdateNotification.objects.find_by_batch(batch_filename, line_number).first()
-
             if not notification:
-                self.stdout.write(f"Could not get existing notification: {batch_filename=}, {line_number=}")
+                self.stdout.write(
+                    f"Skipping, could not get existing employee record notification: {batch_filename=}, {line_number=}"
+                )
                 # Do not count as an error
                 continue
 
@@ -112,11 +98,7 @@ class Command(EmployeeRecordTransferCommand):
                 if not dry_run:
                     # Not an important issue if notification was previously processed
                     if notification.status != Status.PROCESSED:
-                        try:
-                            notification.update_as_processed(processing_code, processing_label, archived_json)
-                        except Exception as ex:
-                            record_errors += 1
-                            self.stdout.write(f"Can't perform update: {notification=}, {ex=}")
+                        notification.update_as_processed(processing_code, processing_label, archived_json)
                 else:
                     self.stdout.write(f"DRY-RUN: Processed {notification}, {processing_code=}, {processing_label=}")
             else:
@@ -129,8 +111,6 @@ class Command(EmployeeRecordTransferCommand):
                         self.stdout.write(f"Already rejected: {notification=}")
                 else:
                     self.stdout.write(f"DRY-RUN: Rejected {notification}: {processing_code=}, {processing_label=}")
-
-        return record_errors
 
     @monitor(monitor_slug="transfer-employee-records-updates-download")
     def download(self, sftp: paramiko.SFTPClient, dry_run: bool):

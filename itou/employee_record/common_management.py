@@ -4,6 +4,7 @@ from io import BytesIO
 
 import paramiko
 from django.conf import settings
+from django.db import transaction
 from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
@@ -14,6 +15,14 @@ from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, Emp
 from itou.employee_record.serializers import EmployeeRecordSerializer, EmployeeRecordUpdateNotificationSerializer
 from itou.utils.command import BaseCommand
 from itou.utils.iterators import chunks
+
+
+class IgnoreFile(Exception):
+    def __init__(self, reason):
+        self.reason = reason
+
+    def __str__(self):
+        return self.reason
 
 
 class EmployeeRecordTransferCommand(BaseCommand):
@@ -129,22 +138,20 @@ class EmployeeRecordTransferCommand(BaseCommand):
         parser = JSONParser()
         successfully_parsed_files = 0
         for filename in result_files:
-            errors_in_file = 0  # Number of errors per file
             self.stdout.write(f"Fetching file: {filename}")
             try:
-                with sftp.file(filename, mode="r") as result_file:
+                with sftp.file(filename, mode="r") as result_file, transaction.atomic():
                     # Parse and update employee records with feedback
-                    errors_in_file = self._parse_feedback_file(filename, parser.parse(result_file), dry_run)
+                    self._parse_feedback_file(filename, parser.parse(result_file), dry_run)
+            except IgnoreFile as ex:
+                self.stdout.write(f"Ignoring {filename}: {ex}")
+                continue
             except Exception as ex:
-                errors_in_file += 1
                 self.stdout.write(f"Error while parsing file {filename}: {ex=}")
-            else:
-                successfully_parsed_files += 1
-
-            # There were errors, don't delete the file
-            if errors_in_file:
                 self.stdout.write(f"Will not delete file '{filename}' because of errors.")
                 continue
+            else:
+                successfully_parsed_files += 1
 
             # Everything was fine, we can delete feedback file from server
             self.stdout.write(f"Successfully processed '{filename}', it can be deleted.")
