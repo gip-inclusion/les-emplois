@@ -1206,7 +1206,6 @@ class JSONTest(TestCase):
             assert loads(s) == expected
 
 
-@pytest.mark.no_django_db
 class TestPaginator:
     def test_paginator_unique_page(self):
         object_list = range(10)
