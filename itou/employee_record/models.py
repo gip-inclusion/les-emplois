@@ -324,14 +324,19 @@ class EmployeeRecord(ASPExchangeInformation):
 
         self.save()
 
-    def update_as_processed(self, code, label, archive):
-        if not self.status == Status.SENT:
+    def update_as_processed(self, code, label, archive, *, as_duplicate=False):
+        if self.status != Status.SENT:
             raise InvalidStatusError(self.ERROR_EMPLOYEE_RECORD_INVALID_STATE)
+        if as_duplicate and code != self.ASP_DUPLICATE_ERROR_CODE:
+            raise ValueError(f"Code needs to be {self.ASP_DUPLICATE_ERROR_CODE} and not {code} when {as_duplicate=}")
 
         self.clean()
         self.status = Status.PROCESSED
         self.processed_at = timezone.now()
-        self.set_asp_processing_information(code, label, archive)
+        self.processed_as_duplicate = as_duplicate
+        self.set_asp_processing_information(
+            code, label if not as_duplicate else "Statut forcé suite à doublon ASP", archive
+        )
 
         self.save()
 
@@ -377,28 +382,6 @@ class EmployeeRecord(ASPExchangeInformation):
                     self.status = Status.REJECTED
 
         self.save(update_fields=["status"])
-
-    def update_as_processed_as_duplicate(self, archive):
-        """
-        Force status to `PROCESSED` if the employee record has been marked
-        as duplicate by ASP (error code 3436).
-
-        Can only be done when employee record is:
-            - in `REJECTED` state,
-            - with a `3436` error code.
-        """
-        if self.status != Status.REJECTED or self.asp_processing_code != self.ASP_DUPLICATE_ERROR_CODE:
-            raise InvalidStatusError(
-                f"{self.ERROR_EMPLOYEE_RECORD_INVALID_STATE} ({self.status}, {self.asp_processing_code})"
-            )
-
-        self.clean()
-        self.status = Status.PROCESSED
-        self.processed_at = timezone.now()
-        self.processed_as_duplicate = True
-        self.set_asp_processing_information(self.ASP_DUPLICATE_ERROR_CODE, "Statut forcé suite à doublon ASP", archive)
-
-        self.save()
 
     @property
     def can_be_disabled(self):

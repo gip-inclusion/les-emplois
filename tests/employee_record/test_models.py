@@ -536,31 +536,46 @@ class TestEmployeeRecordLifeCycle:
         # Check correct status when "manually" forcing status of an employee record
         # with a 3436 error code.
         employee_record_code_3436 = EmployeeRecordWithProfileFactory(
-            status=Status.REJECTED,
+            status=Status.SENT,
             asp_processing_code="3436",
             asp_processing_label="Meh",
         )
         employee_record_other_code = EmployeeRecordWithProfileFactory(
-            status=Status.REJECTED,
+            status=Status.SENT,
             asp_processing_code="3437",
             asp_processing_label="Meh Meh",
         )
         employee_record_other_status = EmployeeRecordWithProfileFactory(
             status=Status.PROCESSED,
-            asp_processing_code="3437",
+            asp_processing_code="3436",
             asp_processing_label="Meh Meh Meh",
         )
-        employee_record_code_3436.update_as_processed_as_duplicate('{"codeTraitement": "3436"}')
+        employee_record_code_3436.update_as_processed(
+            employee_record_code_3436.asp_processing_code,
+            employee_record_code_3436.asp_processing_label,
+            '{"codeTraitement": "3436"}',
+            as_duplicate=True,
+        )
         assert employee_record_code_3436.processed_as_duplicate
         assert Status.PROCESSED == employee_record_code_3436.status
         assert "Statut forcé suite à doublon ASP" == employee_record_code_3436.asp_processing_label
         assert employee_record_code_3436.archived_json == {"codeTraitement": "3436"}
 
-        with pytest.raises(InvalidStatusError):
-            employee_record_other_code.update_as_processed_as_duplicate(None)
+        with pytest.raises(ValueError, match="Code needs to be 3436 and not 3437 when as_duplicate=True"):
+            employee_record_other_code.update_as_processed(
+                employee_record_other_code.asp_processing_code,
+                employee_record_other_code.asp_processing_label,
+                None,
+                as_duplicate=True,
+            )
 
         with pytest.raises(InvalidStatusError):
-            employee_record_other_status.update_as_processed_as_duplicate(None)
+            employee_record_other_status.update_as_processed(
+                employee_record_other_status.asp_processing_code,
+                employee_record_other_status.asp_processing_label,
+                None,
+                as_duplicate=True,
+            )
 
 
 class TestEmployeeRecordJobApplicationConstraints:

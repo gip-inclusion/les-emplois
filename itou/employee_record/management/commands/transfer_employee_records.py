@@ -139,9 +139,9 @@ class Command(EmployeeRecordTransferCommand):
                     # One special case added for support concerns:
                     # 3436 processing code are automatically converted as PROCESSED
                     if processing_code == EmployeeRecord.ASP_DUPLICATE_ERROR_CODE:
-                        employee_record.status = Status.REJECTED
-                        employee_record.asp_processing_code = EmployeeRecord.ASP_DUPLICATE_ERROR_CODE
-                        employee_record.update_as_processed_as_duplicate(archived_json)
+                        employee_record.update_as_processed(
+                            processing_code, processing_label, archived_json, as_duplicate=True
+                        )
 
                         # If the ASP mark the employee record as duplicate,
                         # and there is a suspension or a prolongation for the associated approval,
