@@ -2,6 +2,8 @@
 
 {% block title %}Rechercher des prescripteurs habilités {{ block.super }}{% endblock %}
 
+{% block body_class %}p-home{% endblock %}
+
 {% block content %}
     {% include "search/includes/generic_search_home.html" with form=form title="Rechercher des prescripteurs habilités" url_search="search:prescribers_results" template_form_name="search/includes/prescribers_search_form.html" %}
 {% endblock %}

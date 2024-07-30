@@ -11,7 +11,7 @@ from itou.www.approvals_views.views import ApprovalListView
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import BASE_NUM_QUERIES, assert_previous_step, parse_response_to_soup
+from tests.utils.test import assert_previous_step, parse_response_to_soup
 
 
 class TestApprovalsListView:
@@ -93,17 +93,23 @@ class TestApprovalsListView:
         client.force_login(employer)
 
         url = reverse("approvals:list")
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # fetch django session
-            + 1  # fetch user
-            + 2  # fetch siae memberships & its active/grace_period (middleware)
-            + 1  # fetch job seekers (ApprovalForm._get_choices_for_job_seekers)
-            + 1  # count (from paginator)
-            + 1  # fetch approvals
-            + 1  # check if in progress suspensions exist for each approval (Approval.is_suspended)
-            + 3  # savepoint, update session, release savepoint
-        ):
+        # 1.  SELECT django_session
+        # 2.  SELECT users_user
+        # 3.  SELECT companies_companymembership
+        # 4.  SELECT companies_company
+        # END of middlewares
+        # 5.  SAVEPOINT
+        # 6.  SELECT users_user (job seekers with an accepted job app)
+        # 7.  SELECT COUNT approvals_approval (paginator)
+        # 8.  RELEASE SAVEPOINT
+        # 9.  SELECT companies_siaeconvention (menu check for financial annexes)
+        # 10. SELECT EXISTS users_user (menu check for active admin)
+        # 11. SELECT DISTINCT approvals_approval
+        # 12. SELECT approvals_suspension
+        # 13. SAVEPOINT
+        # 14. UPDATE django_session
+        # 15. RELEASE SAVEPOINT
+        with assertNumQueries(15):
             response = client.get(url)
         assertContains(response, "2 résultats")
         assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))

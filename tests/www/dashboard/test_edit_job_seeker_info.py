@@ -81,14 +81,21 @@ class EditJobSeekerInfo(TestCase):
         )
         url = f"{url}?back_url={back_url}&from_application={job_application.pk}"
 
-        with self.assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # session
-            + 3  # user, memberships, company (ItouCurrentOrganizationMiddleware)
-            + 1  # job seeker infos (get_object_or_404)
-            + 1  # account_emailaddress (can_edit_email/has_verified_email)
-            + 3  # update session with savepoint & release
-        ):
+        # 1.  SELECT django_session
+        # 2.  SELECT users_user
+        # 3.  SELECT companies_companymembership
+        # 4.  SELECT companies_company
+        # END of middlewares
+        # 5.  SAVEPOINT
+        # 6.  SELECT users_user
+        # 7.  SELECT EXISTS account_emailaddress (verified)
+        # 8.  SELECT companies_siaeconvention (menu checks for financial annexes)
+        # 9.  SELECT EXISTS users_user (menu checks for active admin)
+        # 10. RELEASE SAVEPOINT
+        # 11. SAVEPOINT
+        # 12. UPDATE django_session
+        # 13. RELEASE SAVEPOINT
+        with self.assertNumQueries(13):
             response = self.client.get(url)
         self.assertContains(
             response,

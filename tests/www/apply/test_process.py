@@ -143,17 +143,20 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         # 7. SELECT selected jobs (prefetch related)
         # 8. SELECT approval (last expired eligibility diagnosis)
         # 9. SELECT approval (last expired eligibility diagnosis, first valid approval)
+        ### Template menu
+        # 10. SELECT companies_siaeconvention (menu checks for financial annexes)
+        # 11. SELECT EXISTS users_user (menu checks for active admin)
         ### Template apply/includes/eligibility_diagnosis.html
-        # 10. SELECT eligibility diagnosis administrative criteria
-        # 11. SELECT approval (again, for considered_to_expire_at)
-        # 12. SELECT approval (again, for considered_to_expire_at, first valid approval)
-        # 13. SELECT transition logs
-        # 14. SELECT EXISTS employee_record
-        # 15. RELEASE SAVEPOINT
-        # 16. SAVEPOINT
-        # 17. UPDATE django session
-        # 18. RELEASE SAVEPOINT
-        with self.assertNumQueries(18):
+        # 12. SELECT eligibility diagnosis administrative criteria
+        # 13. SELECT approval (again, for considered_to_expire_at)
+        # 14. SELECT approval (again, for considered_to_expire_at, first valid approval)
+        # 15. SELECT transition logs
+        # 16. SELECT EXISTS employee_record
+        # 17. RELEASE SAVEPOINT
+        # 18. SAVEPOINT
+        # 19. UPDATE django session
+        # 20. RELEASE SAVEPOINT
+        with self.assertNumQueries(20):
             response = self.client.get(url)
         self.assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
         self.assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
@@ -2850,7 +2853,14 @@ class TestProcessTransferJobApplication:
         response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
         assertContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
         assert (
-            str(parse_response_to_soup(response, ".dropdown-structure", replace_in_attr=[job_application])) == snapshot
+            str(
+                parse_response_to_soup(
+                    response,
+                    ".c-box--action .dropdown-structure",
+                    replace_in_attr=[job_application],
+                )
+            )
+            == snapshot
         )
 
     def test_job_application_external_transfer_disabled_for_bad_state(self, client, snapshot):
@@ -2866,7 +2876,7 @@ class TestProcessTransferJobApplication:
         client.force_login(user)
         response = client.get(reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}))
         assertContains(response, self.TRANSFER_TO_OTHER_COMPANY_SENTENCE)
-        assert str(parse_response_to_soup(response, ".dropdown-structure")) == snapshot
+        assert str(parse_response_to_soup(response, ".c-box--action .dropdown-structure")) == snapshot
 
     def test_job_application_transfer_disabled_for_bad_state(self, client):
         # A user member of multiple companies must not be able to transfer

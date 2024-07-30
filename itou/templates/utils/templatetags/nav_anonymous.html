@@ -1,0 +1,24 @@
+{% if mobile %}
+    <nav role="navigation" aria-label="Navigation secondaire pour mobile">
+        <ul class="nav nav-tabs flex-column">
+            {% for item in menu_items %}
+                <li class="nav-item">
+                    <a href="{{ item.target }}" class="nav-link{% if item.active %} active{% endif %}">
+                        <i class="ri-search-line font-weight-medium" aria-hidden="true"></i>
+                        <span>{{ item.label }}</span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+{% else %}
+    <nav role="navigation" aria-label="Navigation secondaire">
+        <ul>
+            {% for item in menu_items %}
+                <li>
+                    <a {% if item.active %}class="is-active"{% endif %}href="{{ item.target }}">{{ item.label }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+{% endif %}

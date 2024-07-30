@@ -92,17 +92,24 @@ class JobDescriptionListViewTest(MessagesTestMixin, JobDescriptionAbstractTest):
 
     def test_job_application_list_response_content(self):
         self.client.force_login(self.user)
-        with self.assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # fetch django session
-            + 1  # fetch user
-            + 2  # fetch user memberships (and if company is active/in grace period)
-            + 1  # count job descriptions
-            + 1  # fetch job descriptions
-            + 2  # prefetch appelation, rome
-            + 1  # fetch company members count
-            + 3  # update session
-        ):
+        # 1.  SELECT django_session
+        # 2.  SELECT users_user
+        # 3.  SELECT companies_companymembership
+        # 4.  SELECT companies_company
+        # END of middlewares
+        # 5.  SAVEPOINT
+        # 6.  SELECT COUNT companies_jobdescription
+        # 7.  SELECT COUNT companies_companymembership
+        # 8.  SELECT companies_siaeconvention (menu checks for financial annexes)
+        # 9.  SELECT EXISTS users_user (menu checks for active admin)
+        # 10. SELECT companies_jobdescription
+        # 11. SELECT jobs_appellation
+        # 12. SELECT jobs_rome
+        # 13. RELEASE SAVEPOINT
+        # 14. SAVEPOINT
+        # 15. UPDATE django_session
+        # 16. RELEASE SAVEPOINT
+        with self.assertNumQueries(16):
             response = self.client.get(self.url)
 
         assert self.company.job_description_through.count() == 4

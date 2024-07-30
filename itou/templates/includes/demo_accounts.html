@@ -3,21 +3,14 @@
 {% load demo_accounts %}
 
 {% if SHOW_DEMO_ACCOUNTS_BANNER %}
-
-    <!-- Before you change the z-index, check if the BETA banner and a carousel are not overlaying. -->
-    <div class="sticky-top shadow bg-danger text-white text-center layout test-accounts-banner-overlay">
-        <div class="layout-content py-0">
-            <div class="d-flex align-items-center text-center p-1">
-                <p class="font-weight-bold flex-grow-1 mb-0 p-1 text-white h3">{{ ITOU_ENVIRONMENT }} - Données fictives</p>
-                {% if not user.is_authenticated %}
-                    <div>
-                        <button class="btn btn-sm btn-outline-primary bg-white" data-bs-toggle="modal" data-bs-target="#testAccountsModal">
-                            Voir les comptes de démonstration
-                        </button>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="status">
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+        <p class="mb-0">
+            <strong class="text-uppercase">{{ ITOU_ENVIRONMENT }} - Données fictives</strong>
+            {% if not user.is_authenticated %}
+                <i class="ri-arrow-right-line"></i> <a href="" role="button" data-bs-toggle="modal" data-bs-target="#testAccountsModal">Voir les comptes de démonstration</a>
+            {% endif %}
+        </p>
     </div>
 
     <div class="modal fade" id="testAccountsModal" tabindex=-1 role="dialog" aria-modal="true" aria-labelledby="testAccountsModalTitle">

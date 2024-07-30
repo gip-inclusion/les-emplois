@@ -21,7 +21,7 @@ from tests.employee_record import factories as employee_record_factories
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, assert_previous_step, parse_response_to_soup
+from tests.utils.test import TestCase, assert_previous_step, parse_response_to_soup
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
@@ -378,15 +378,20 @@ class ListEmployeeRecordsTest(MessagesTestMixin, TestCase):
         self._check_employee_record_order(self.URL + "?order=-name", job_applicationZ, job_applicationA)
 
         # Count queries
-        num_queries = BASE_NUM_QUERIES
-        num_queries += 1  # Get django session
-        num_queries += 3  # Get current user and siae
-        num_queries += 1  # Select job seeker for filters
-        num_queries += 1  # Select employee_records status count
-        num_queries += 1  # Lazy load of SIAE convention in `.eligible_as_employee_record()`
-        num_queries += 1  # Select ordered job applications
-        num_queries += 1  # Select EmployeeRecords
-        with self.assertNumQueries(num_queries):
+        # 1.  SELECT django_session
+        # 2.  SELECT users_user
+        # 3.  SELECT companies_companymembership
+        # 4.  SELECT companies_company
+        # END of middlewares
+        # 5.  SAVEPOINT
+        # 6.  SELECT DISTINCT job_applications_jobapplication.job_seeker_id
+        # 7.  SELECT employee_record_employeerecord.status counts
+        # 8.  SELECT companies_siaeconvention (`.eligible_as_employee_record()`)
+        # 9.  SELECT job_applications_jobapplication
+        # 10. SELECT employee_record_employeerecord
+        # 11. SELECT EXISTS users_user (menu checks for active admin)
+        # 12. RELEASE SAVEPOINT
+        with self.assertNumQueries(12):
             self.client.get(self.URL)
 
     def test_rejected_employee_records_sorted(self):

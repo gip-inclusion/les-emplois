@@ -32,7 +32,6 @@ from tests.prescribers.factories import (
 from tests.users.factories import JobSeekerFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import (
-    BASE_NUM_QUERIES,
     TestCase,
     assert_previous_step,
     get_rows_from_streaming_response,
@@ -143,64 +142,56 @@ class ProcessListSiaeTest(TestCase):
         diagnosis.administrative_criteria.add(level2_criterion)
 
         self.client.force_login(self.eddie_hit_pit)
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # fetch django session
-            + 1  # fetch user
-            + 2  # check for membership & infos
-            + 1  # count new + processing + postponed applications
-            #
-            # SiaeFilterJobApplicationsForm:
-            + 1  # get list of senders (distinct sender_id)
-            + 1  # get list of job seekers (distinct job_seeker_id)
-            + 1  # get list of administrative criteria
-            + 1  # get list of job application
-            + 1  # prefetch selected jobs
-            + 1  # prefetch jobs appellation
-            + 1  # select distinct sender_prescriber_organization
-            + 1  # select distinct sender_company
-            #
-            # Paginate the job applications queryset:
-            + 1  # has_suspended_approval subquery
-            + 1  # select job applications with annotations
-            + 1  # prefetch selected jobs
-            + 1  # prefetch jobs appellation
-            + 1  # prefetch jobs location
-            + 1  # prefetch jobs company
-            + 1  # prefetch approvals
-            + 1  # manually prefetch administrative_criteria
-            #
-            # Render template:
-            # 9 job applications (1 per state in JobApplicationWorkflow + 1 sent by prescriber)
-            # 22 requests, maggie has a diagnosis made by a prescriber in this test
-            + 1  # jobapp1: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp1: select last valid diagnosis made by prescriber or SIAE
-            # 24 requests
-            + 1  # jobapp2: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp2: select last valid diagnosis made by prescriber or SIAE
-            # 26 requests
-            + 1  # jobapp3: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp3: select last valid diagnosis made by prescriber or SIAE
-            # 28 requests
-            + 1  # jobapp4: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp4: select last valid diagnosis made by prescriber or SIAE
-            # 30 requests
-            + 1  # jobapp5: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp5: select last valid diagnosis made by prescriber or SIAE
-            # 32 requests
-            + 1  # jobapp6: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp6: select last valid diagnosis made by prescriber or SIAE
-            # 34 requests
-            + 1  # jobapp7: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp7: select last valid diagnosis made by prescriber or SIAE
-            # 36 requests
-            + 1  # jobapp8: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp8: select last valid diagnosis made by prescriber or SIAE
-            # 38 requests, maggie has a diagnosis made by a prescriber in this test
-            + 1  # jobapp9: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-            + 1  # jobapp8: select last valid diagnosis made by prescriber or SIAE
-            + 3  # update session
-        ):
+        # 1.  SELECT django_session
+        # 2.  SELECT users_user
+        # 3.  SELECT companies_companymembership
+        # 4.  SELECT companies_company
+        # END of middlewares
+        # 5.  SAVEPOINT
+        # 6.  SELECT COUNT job_applications_jobapplication
+        # 7.  SELECT DISTINCT job_applications_jobapplication.sender_id
+        # 8.  SELECT DISTINCT job_applications_jobapplication.job_seeker_id
+        # 9.  SELECT eligibility_administrativecriteria
+        # 10. SELECT job_applications_jobapplication
+        # 11. SELECT job_applications_jobapplication_selected_jobs (prefetch)
+        # 12. SELECT jobs_appellation (prefetch)
+        # 13. SELECT DISTINCT job_applications_jobapplication.sender_prescriber_organization_id
+        # 14. SELECT DISTINCT job_applications_jobapplication.sender_company_id
+        # 15. SELECT COUNT job_applications_jobapplication.eligibility_diagnosis_id (subquery)
+        # 16. SELECT job_applications_jobapplication (load results page)
+        # 17. SELECT job_applications_jobapplication_selected_jobs (prefetch)
+        # 18. SELECT jobs_appellation (prefetch)
+        # 19. SELECT cities_city (prefetch)
+        # 20. SELECT companies_company (prefetch)
+        # 21. SELECT approvals_approval (prefetch)
+        # 22. SELECT eligibility_administrativecriteria
+        # Render template:
+        # 9 job applications (1 per state in JobApplicationWorkflow + 1 sent by prescriber)
+        # 23. jobapp1: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
+        # 24. jobapp1: select last valid diagnosis made by prescriber or SIAE
+        # 25. jobapp2: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
+        # 26. jobapp2: select last valid diagnosis made by prescriber or SIAE
+        # 27. jobapp3: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
+        # 28. jobapp3: select last valid diagnosis made by prescriber or SIAE
+        # 29. jobapp4: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
+        # 30. jobapp4: select last valid diagnosis made by prescriber or SIAE
+        # 31. jobapp5: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
+        # 32. jobapp5: select last valid diagnosis made by prescriber or SIAE
+        # 33. jobapp6: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
+        # 34. jobapp6: select last valid diagnosis made by prescriber or SIAE
+        # 35. jobapp7: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
+        # 25. jobapp7: select last valid diagnosis made by prescriber or SIAE
+        # 37. jobapp8: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
+        # 38. jobapp8: select last valid diagnosis made by prescriber or SIAE
+        # 39. jobapp9: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
+        # 40. jobapp9: select last valid diagnosis made by prescriber or SIAE
+        # 41. SELECT companies_siaeconvention (menu checks for financial annexes)
+        # 42. SELECT EXISTS users_user (menu checks for active admin)
+        # 43. RELEASE SAVEPOINT
+        # 44. SAVEPOINT
+        # 45. UPDATE django_session
+        # 46. RELEASE SAVEPOINT
+        with assertNumQueries(46):
             response = self.client.get(reverse("apply:list_for_siae"))
 
         total_applications = len(response.context["job_applications_page"].object_list)
