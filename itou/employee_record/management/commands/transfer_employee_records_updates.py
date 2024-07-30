@@ -91,24 +91,22 @@ class Command(EmployeeRecordTransferCommand):
                 )
                 # Do not count as an error
                 continue
+            if notification.status in [Status.PROCESSED, Status.REJECTED]:
+                self.stdout.write(f"Skipping, employee record notification is already {notification.status}")
+                continue
+            if notification.status != Status.SENT:
+                self.stdout.write(f"Skipping, incoherent status for {notification=}")
+                continue
 
             archived_json = JSONRenderer().render(employee_record)
-            # Employee record notification successfully processed by ASP:
-            if processing_code == EmployeeRecordUpdateNotification.ASP_PROCESSING_SUCCESS_CODE:
+            if processing_code == EmployeeRecordUpdateNotification.ASP_PROCESSING_SUCCESS_CODE:  # Processed by ASP
                 if not dry_run:
-                    # Not an important issue if notification was previously processed
-                    if notification.status != Status.PROCESSED:
-                        notification.update_as_processed(processing_code, processing_label, archived_json)
+                    notification.update_as_processed(processing_code, processing_label, archived_json)
                 else:
                     self.stdout.write(f"DRY-RUN: Processed {notification}, {processing_code=}, {processing_label=}")
-            else:
-                # Employee record is REJECTED:
+            else:  # Rejected by ASP
                 if not dry_run:
-                    # Fix unexpected stop on multiple pass on the same file
-                    if notification.status != Status.REJECTED:
-                        notification.update_as_rejected(processing_code, processing_label, archived_json)
-                    else:
-                        self.stdout.write(f"Already rejected: {notification=}")
+                    notification.update_as_rejected(processing_code, processing_label, archived_json)
                 else:
                     self.stdout.write(f"DRY-RUN: Rejected {notification}: {processing_code=}, {processing_label=}")
 
