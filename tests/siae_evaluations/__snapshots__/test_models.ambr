@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: EvaluationCampaignManagerTest.test_close_accepted_but_not_reviewed[accepted email body]
+# name: TestEvaluationCampaignManager.test_close_accepted_but_not_reviewed[accepted email body]
   '''
   Bonjour,
   
@@ -15,7 +15,7 @@
   http://localhost:8000
   '''
 # ---
-# name: EvaluationCampaignManagerTest.test_close_no_response[no docs email body]
+# name: TestEvaluationCampaignManager.test_close_no_response[no docs email body]
   '''
   Bonjour,
   
@@ -35,7 +35,7 @@
   http://localhost:8000
   '''
 # ---
-# name: EvaluationCampaignManagerTest.test_close_no_response[sanction notification email body]
+# name: TestEvaluationCampaignManager.test_close_no_response[sanction notification email body]
   '''
   Bonjour,
   
@@ -53,7 +53,7 @@
   http://localhost:8000
   '''
 # ---
-# name: EvaluationCampaignManagerTest.test_close_refused_but_not_reviewed[refused email body]
+# name: TestEvaluationCampaignManager.test_close_refused_but_not_reviewed[refused email body]
   '''
   Bonjour,
   
@@ -71,7 +71,7 @@
   http://localhost:8000
   '''
 # ---
-# name: EvaluationCampaignManagerTest.test_close_refused_but_not_reviewed[sanction notification email body]
+# name: TestEvaluationCampaignManager.test_close_refused_but_not_reviewed[sanction notification email body]
   '''
   Bonjour,
   
@@ -89,7 +89,7 @@
   http://localhost:8000
   '''
 # ---
-# name: EvaluationCampaignManagerTest.test_transition_to_adversarial_phase[accepted review email body]
+# name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase[accepted review email body]
   '''
   Bonjour,
   
@@ -105,7 +105,7 @@
   http://localhost:8000
   '''
 # ---
-# name: EvaluationCampaignManagerTest.test_transition_to_adversarial_phase[force accepted email body]
+# name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase[force accepted email body]
   '''
   Bonjour,
   
@@ -123,7 +123,7 @@
   http://localhost:8000
   '''
 # ---
-# name: EvaluationCampaignManagerTest.test_transition_to_adversarial_phase[institution summary email body]
+# name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase[institution summary email body]
   '''
   Bonjour,
   
@@ -151,7 +151,7 @@
   http://localhost:8000
   '''
 # ---
-# name: EvaluationCampaignManagerTest.test_transition_to_adversarial_phase[no docs email body]
+# name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase[no docs email body]
   '''
   Bonjour,
   
@@ -173,7 +173,7 @@
   http://localhost:8000
   '''
 # ---
-# name: EvaluationCampaignManagerTest.test_transition_to_adversarial_phase[no response email body]
+# name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase[no response email body]
   '''
   Bonjour,
   
@@ -195,7 +195,7 @@
   http://localhost:8000
   '''
 # ---
-# name: EvaluationCampaignManagerTest.test_transition_to_adversarial_phase[refused review email body]
+# name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase[refused review email body]
   '''
   Bonjour,
   
@@ -219,7 +219,7 @@
   http://localhost:8000
   '''
 # ---
-# name: EvaluationCampaignManagerTest.test_transition_to_adversarial_phase_accepted_but_not_reviewed[positive review email body]
+# name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase_accepted_but_not_reviewed[positive review email body]
   '''
   Bonjour,
   
@@ -235,7 +235,7 @@
   http://localhost:8000
   '''
 # ---
-# name: EvaluationCampaignManagerTest.test_transition_to_adversarial_phase_force_accepted[force accepted email body]
+# name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase_force_accepted[force accepted email body]
   '''
   Bonjour,
   
@@ -253,7 +253,7 @@
   http://localhost:8000
   '''
 # ---
-# name: EvaluationCampaignManagerTest.test_transition_to_adversarial_phase_force_accepted[institution summary email body]
+# name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase_force_accepted[institution summary email body]
   '''
   Bonjour,
   
@@ -269,7 +269,7 @@
   http://localhost:8000
   '''
 # ---
-# name: EvaluationCampaignManagerTest.test_transition_to_adversarial_phase_forced_to_adversarial_stage[institution summary email body]
+# name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase_forced_to_adversarial_stage[institution summary email body]
   '''
   Bonjour,
   
@@ -289,7 +289,7 @@
   http://localhost:8000
   '''
 # ---
-# name: EvaluationCampaignManagerTest.test_transition_to_adversarial_phase_forced_to_adversarial_stage[no response email body]
+# name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase_forced_to_adversarial_stage[no response email body]
   '''
   Bonjour,
   
@@ -311,7 +311,7 @@
   http://localhost:8000
   '''
 # ---
-# name: EvaluationCampaignManagerTest.test_transition_to_adversarial_phase_refused_but_not_reviewed[negative review email body]
+# name: TestEvaluationCampaignManager.test_transition_to_adversarial_phase_refused_but_not_reviewed[negative review email body]
   '''
   Bonjour,
   

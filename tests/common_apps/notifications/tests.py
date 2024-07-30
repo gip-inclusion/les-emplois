@@ -3,14 +3,12 @@ from django.core import mail
 from itou.job_applications.notifications import NewSpontaneousJobAppEmployersNotification
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
-from tests.utils.test import TestCase
 
 
-class NotificationsBaseClassTest(TestCase):
+class TestNotificationsBaseClass:
     # Use a child class to test parent class. Maybe refactor that later.
 
-    def setUp(self):
-        super().setUp()
+    def setup_method(self):
         self.company = CompanyFactory(with_membership=True)
         self.job_application = JobApplicationFactory(to_company=self.company)
         self.notification = NewSpontaneousJobAppEmployersNotification(job_application=self.job_application)
@@ -74,15 +72,15 @@ class NotificationsBaseClassTest(TestCase):
         recipients = self.notification.get_recipients()
         assert len(recipients) == 0
 
-    def test_send(self):
-        with self.captureOnCommitCallbacks(execute=True):
+    def test_send(self, django_capture_on_commit_callbacks):
+        with django_capture_on_commit_callbacks(execute=True):
             self.notification.send()
 
         receivers = [receiver for message in mail.outbox for receiver in message.to]
         assert self.notification.email.to == receivers
 
 
-class NewSpontaneousJobAppEmployersNotificationTest(TestCase):
+class TestNewSpontaneousJobAppEmployersNotification:
     def test_mail_content_when_subject_to_eligibility_rules(self):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         notification = NewSpontaneousJobAppEmployersNotification(

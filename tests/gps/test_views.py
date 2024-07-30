@@ -2,7 +2,7 @@ import freezegun
 import pytest
 from django.test.utils import override_settings
 from django.urls import reverse
-from pytest_django.asserts import assertContains, assertRedirects
+from pytest_django.asserts import assertContains, assertQuerySetEqual, assertRedirects
 
 from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
 from itou.users.models import User
@@ -15,7 +15,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import TestCase, parse_response_to_soup
+from tests.utils.test import parse_response_to_soup
 
 
 def test_job_seeker_cannot_use_gps(client):
@@ -53,42 +53,40 @@ def test_orienter_cannot_use_gps(client):
     assert response.status_code == 403
 
 
-# To be able to use assertCountEqual
-class GpsTest(TestCase):
-    def test_user_autocomplete(self):
-        prescriber = PrescriberFactory(first_name="gps member Vince")
-        first_beneficiary = JobSeekerFactory(first_name="gps beneficiary Bob", last_name="Le Brico")
-        second_beneficiary = JobSeekerFactory(first_name="gps second beneficiary Martin", last_name="Pêcheur")
-        third_beneficiary = JobSeekerFactory(first_name="gps third beneficiary Foo", last_name="Bar")
+def test_user_autocomplete():
+    prescriber = PrescriberFactory(first_name="gps member Vince")
+    first_beneficiary = JobSeekerFactory(first_name="gps beneficiary Bob", last_name="Le Brico")
+    second_beneficiary = JobSeekerFactory(first_name="gps second beneficiary Martin", last_name="Pêcheur")
+    third_beneficiary = JobSeekerFactory(first_name="gps third beneficiary Foo", last_name="Bar")
 
-        my_group = FollowUpGroupFactory(beneficiary=first_beneficiary, memberships=4, memberships__member=prescriber)
-        FollowUpGroupFactory(beneficiary=third_beneficiary, memberships=3, memberships__member=prescriber)
-        FollowUpGroupFactory(beneficiary=second_beneficiary, memberships=2)
+    my_group = FollowUpGroupFactory(beneficiary=first_beneficiary, memberships=4, memberships__member=prescriber)
+    FollowUpGroupFactory(beneficiary=third_beneficiary, memberships=3, memberships__member=prescriber)
+    FollowUpGroupFactory(beneficiary=second_beneficiary, memberships=2)
 
-        # Employers should get the 3 job seekers.
-        users = User.objects.autocomplete("gps", EmployerFactory())
-        self.assertCountEqual(users, [first_beneficiary, second_beneficiary, third_beneficiary])
+    # Employers should get the 3 job seekers.
+    users = User.objects.autocomplete("gps", EmployerFactory())
+    assertQuerySetEqual(users, [first_beneficiary, second_beneficiary, third_beneficiary], ordered=False)
 
-        # Authorized prescribers should get the 3 job seekers.
-        org = PrescriberOrganizationWithMembershipFactory(authorized=True)
-        users = User.objects.autocomplete("gps", org.members.get())
-        self.assertCountEqual(users, [first_beneficiary, second_beneficiary, third_beneficiary])
+    # Authorized prescribers should get the 3 job seekers.
+    org = PrescriberOrganizationWithMembershipFactory(authorized=True)
+    users = User.objects.autocomplete("gps", org.members.get())
+    assertQuerySetEqual(users, [first_beneficiary, second_beneficiary, third_beneficiary], ordered=False)
 
-        # We should not get ourself nor the first and third user user because we are a member of their group
-        users = User.objects.autocomplete("gps", prescriber).all()
-        self.assertCountEqual(users, [second_beneficiary])
+    # We should not get ourself nor the first and third user user because we are a member of their group
+    users = User.objects.autocomplete("gps", prescriber).all()
+    assertQuerySetEqual(users, [second_beneficiary])
 
-        # Now, if we remove the first user from our group by setting the membership to is_active False
-        # The autocomplete should return it again
-        membership = FollowUpGroupMembership.objects.filter(member=prescriber).filter(follow_up_group=my_group).first()
-        membership.is_active = False
-        membership.save()
+    # Now, if we remove the first user from our group by setting the membership to is_active False
+    # The autocomplete should return it again
+    membership = FollowUpGroupMembership.objects.filter(member=prescriber).filter(follow_up_group=my_group).first()
+    membership.is_active = False
+    membership.save()
 
-        # We should not get ourself but we should get the first beneficiary (we are is_active=False)
-        # and the second one (we are not part of his group)
-        users = User.objects.autocomplete("gps", prescriber)
+    # We should not get ourself but we should get the first beneficiary (we are is_active=False)
+    # and the second one (we are not part of his group)
+    users = User.objects.autocomplete("gps", prescriber)
 
-        self.assertCountEqual(users, [first_beneficiary, second_beneficiary])
+    assertQuerySetEqual(users, [first_beneficiary, second_beneficiary], ordered=False)
 
 
 @pytest.mark.parametrize(

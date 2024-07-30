@@ -1,11 +1,10 @@
-from unittest import mock
+import pytest
 
 from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
 from itou.common_apps.address.format import compute_hexa_address
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK
 from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
-from tests.utils.test import TestCase
 
 
 def _users_with_mock_address(idx):
@@ -16,9 +15,14 @@ def _users_with_mock_address(idx):
     )
 
 
-@mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
-class FormatASPBadAdresses(TestCase):
-    def test_not_existing_address(self, _mock):
+@pytest.fixture(autouse=True)
+def mock_api(mocker):
+    mocker.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_NO_RESULT_MOCK)
+    mocker.patch("itou.common_apps.address.format.get_geocoding_data", side_effect=mock_get_geocoding_data)
+
+
+class TestFormatASPBadAdresses:
+    def test_not_existing_address(self):
         job_seeker = JobSeekerFactory(
             address_line_1="9, avenue de Huet", post_code="32531", city="MalletVille", department="32"
         )
@@ -27,22 +31,18 @@ class FormatASPBadAdresses(TestCase):
         assert "Erreur de geocoding, impossible d'obtenir un résultat" in error
 
 
-@mock.patch(
-    "itou.common_apps.address.format.get_geocoding_data",
-    side_effect=mock_get_geocoding_data,
-)
-class FormatASPAdresses(TestCase):
-    def test_empty(self, _mock):
+class TestFormatASPAdresses:
+    def test_empty(self):
         result, error = compute_hexa_address({})
         assert not result
         assert error == "Impossible de transformer cet objet en adresse HEXA"
 
-    def test_none(self, _mock):
+    def test_none(self):
         result, error = compute_hexa_address(None)
         assert not result
         assert error == "Impossible de transformer cet objet en adresse HEXA"
 
-    def test_sanity(self, _):
+    def test_sanity(self):
         """
         Sanity check:
         every mock entries must be parseable and result must be valid
@@ -53,7 +53,7 @@ class FormatASPAdresses(TestCase):
             assert error is None
             assert result is not None
 
-    def test_asp_addresses(self, _):
+    def test_asp_addresses(self):
         """
         Test some of the most common address format
         Complete if needed.
@@ -152,7 +152,7 @@ class FormatASPAdresses(TestCase):
         assert result.get("number") == "3"
 
 
-class LaneTypeTest(TestCase):
+class TestLaneType:
     def test_aliases(self):
         """
         Test some variants / alternatives used by api.geo.gouv.fr for lane types
@@ -167,12 +167,8 @@ class LaneTypeTest(TestCase):
         assert find_lane_type_aliases("XXX") is None
 
 
-@mock.patch(
-    "itou.common_apps.address.format.get_geocoding_data",
-    side_effect=mock_get_geocoding_data,
-)
-class LaneExtensionTest(TestCase):
-    def test_standard_extension(self, _):
+class TestLaneExtension:
+    def test_standard_extension(self):
         """
         Check if lane extension is included in ASP ref file
         """
@@ -184,7 +180,7 @@ class LaneExtensionTest(TestCase):
         result, _error = compute_hexa_address(user)
         assert result.get("std_extension") == LaneExtension.T.name
 
-    def test_non_standard_extension(self, _):
+    def test_non_standard_extension(self):
         """
         Non-standard extension, i.e. not in ASP ref file
         """

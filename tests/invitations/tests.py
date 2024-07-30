@@ -1,5 +1,4 @@
 import pytest
-from django.test import SimpleTestCase
 from django.utils import timezone
 
 from itou.invitations.models import EmployerInvitation, InvitationAbstract
@@ -13,10 +12,9 @@ from tests.invitations.factories import (
 )
 from tests.prescribers.factories import PrescriberMembershipFactory
 from tests.users.factories import EmployerFactory, PrescriberFactory
-from tests.utils.test import TestCase
 
 
-class EmployerInvitationQuerySetTest(TestCase):
+class TestEmployerInvitationQuerySet:
     def test_pending(self):
         # Create some non-expired invitations.
         invitation1 = SentEmployerInvitationFactory()
@@ -36,7 +34,7 @@ class EmployerInvitationQuerySetTest(TestCase):
         assert invitation4.pk not in pending_invitations.values_list("pk", flat=True)
 
 
-class InvitationModelTest(SimpleTestCase):
+class TestInvitationModel:
     def test_acceptance_link(self):
         invitation = SentEmployerInvitationFactory.build()
         assert str(invitation.pk) in invitation.acceptance_link
@@ -75,7 +73,7 @@ class InvitationModelTest(SimpleTestCase):
             InvitationAbstract.get_model_from_string(12)
 
 
-class InvitationEmailsTest(SimpleTestCase):
+class TestInvitationEmails:
     def test_send_invitation(self):
         invitation = SentEmployerInvitationFactory.build()
         email = invitation.email_invitation
@@ -99,7 +97,7 @@ class InvitationEmailsTest(SimpleTestCase):
 ################################################################
 
 
-class TestPrescriberWithOrgInvitation(TestCase):
+class TestPrescriberWithOrgInvitation:
     def test_add_or_activate_member_to_organization(self):
         invitation = PrescriberWithOrgSentInvitationFactory(email="hey@you.com")
         PrescriberFactory(email=invitation.email)
@@ -122,7 +120,7 @@ class TestPrescriberWithOrgInvitation(TestCase):
         assert org_active_members + 1 == org_active_members_after
 
 
-class TestPrescriberWithOrgInvitationEmails(SimpleTestCase):
+class TestPrescriberWithOrgInvitationEmails:
     def test_accepted_notif_sender(self):
         invitation = PrescriberWithOrgSentInvitationFactory.build()
         email = invitation.notifications_accepted_notif_sender.build()
@@ -157,7 +155,7 @@ class TestPrescriberWithOrgInvitationEmails(SimpleTestCase):
         assert invitation.email in email.to
 
 
-class TestCompanyInvitation(TestCase):
+class TestCompanyInvitation:
     def test_add_or_activate_member_to_company(self):
         invitation = SentEmployerInvitationFactory(email="hey@you.com")
         EmployerFactory(email=invitation.email)
@@ -178,7 +176,7 @@ class TestCompanyInvitation(TestCase):
         assert company_active_members + 1 == company_active_members_after
 
 
-class TestCompanyInvitationEmails(SimpleTestCase):
+class TestCompanyInvitationEmails:
     def test_accepted_notif_sender(self):
         invitation = SentEmployerInvitationFactory.build()
         email = invitation.notifications_accepted_notif_sender.build()

@@ -8,6 +8,7 @@ import pytest
 from dateutil.relativedelta import relativedelta
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from pytest_django.asserts import assertRaisesMessage
 
 from itou.approvals.models import Approval
 from itou.companies.models import Company
@@ -35,13 +36,10 @@ from tests.job_applications.factories import (
     JobApplicationWithCompleteJobSeekerProfileFactory,
     JobApplicationWithoutApprovalFactory,
 )
-from tests.utils.test import TestCase
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class EmployeeRecordModelTest(TestCase):
-    def setUp(self):
-        super().setUp()
+class TestEmployeeRecordModel:
+    def setup_method(self):
         self.employee_record = EmployeeRecordFactory()
 
     # Validation tests
@@ -58,17 +56,17 @@ class EmployeeRecordModelTest(TestCase):
         with pytest.raises(AssertionError):
             EmployeeRecord.from_job_application(None)
 
-    def test_creation_with_bad_job_application_status(self):
+    def test_creation_with_bad_job_application_status(self, subtests):
         for state in [
             state.name for state in list(JobApplicationWorkflow.states) if state.name != JobApplicationState.ACCEPTED
         ]:
-            with self.subTest(state):
-                with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED):
+            with subtests.test(state):
+                with assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_APPLICATION_MUST_BE_ACCEPTED):
                     job_application = JobApplicationFactory(with_approval=True, state=state)
                     EmployeeRecord.from_job_application(job_application)
 
     def test_creation_without_approval(self):
-        with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_APPLICATION_WITHOUT_APPROVAL):
+        with assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_JOB_APPLICATION_WITHOUT_APPROVAL):
             job_application = JobApplicationWithoutApprovalFactory()
             EmployeeRecord.from_job_application(job_application)
 
@@ -79,7 +77,7 @@ class EmployeeRecordModelTest(TestCase):
         # Must be ok
         EmployeeRecord.from_job_application(job_application).save()
 
-        with self.assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE):
+        with assertRaisesMessage(ValidationError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_IS_DUPLICATE):
             # Must not
             EmployeeRecord.from_job_application(job_application)
 
@@ -183,18 +181,18 @@ class EmployeeRecordModelTest(TestCase):
 
         assert result.id == employee_record.id
 
-    def test_archivable(self):
+    def test_archivable(self, faker):
         six_months_ago = timezone.now() - relativedelta(months=6)
         one_month_ago = timezone.now() - relativedelta(months=1)
         parameters = itertools.product(
             [True, False],
             [
-                self.faker.date_time_between(end_date=six_months_ago, tzinfo=datetime.UTC),
-                self.faker.date_time_between(start_date=six_months_ago, tzinfo=datetime.UTC),
+                faker.date_time_between(end_date=six_months_ago, tzinfo=datetime.UTC),
+                faker.date_time_between(start_date=six_months_ago, tzinfo=datetime.UTC),
             ],
             [
-                self.faker.date_time_between(end_date=one_month_ago, tzinfo=datetime.UTC),
-                self.faker.date_time_between(start_date=one_month_ago, tzinfo=datetime.UTC),
+                faker.date_time_between(end_date=one_month_ago, tzinfo=datetime.UTC),
+                faker.date_time_between(start_date=one_month_ago, tzinfo=datetime.UTC),
             ],
         )
         for expired, created_at, updated_at in parameters:
@@ -213,29 +211,29 @@ class EmployeeRecordModelTest(TestCase):
         )
         assert EmployeeRecord.objects.archivable().count() == 0
 
-    def test_unarchive_with_wrong_status(self):
+    def test_unarchive_with_wrong_status(self, subtests):
         for status in set(Status) - {Status.ARCHIVED}:
-            with self.subTest(status=status):
+            with subtests.test(status=status.name):
                 employee_record = BareEmployeeRecordFactory(status=status)
                 with pytest.raises(
                     InvalidStatusError, match="La fiche salarié n'est pas dans l'état requis pour cette action"
                 ):
                     employee_record.unarchive()
 
-    def test_unarchive(self):
+    def test_unarchive(self, faker, subtests):
         specs = {
             None: Status.NEW,
             "0000": Status.PROCESSED,
-            self.faker.numerify("31##"): Status.ARCHIVED,
-            self.faker.numerify("32##"): Status.REJECTED,
-            self.faker.numerify("33##"): Status.REJECTED,
-            self.faker.numerify("340#"): Status.REJECTED,
+            faker.numerify("31##"): Status.ARCHIVED,
+            faker.numerify("32##"): Status.REJECTED,
+            faker.numerify("33##"): Status.REJECTED,
+            faker.numerify("340#"): Status.REJECTED,
             "3436": Status.PROCESSED,
-            self.faker.numerify("35##"): Status.ARCHIVED,
+            faker.numerify("35##"): Status.ARCHIVED,
         }
 
         for code, expected_status in specs.items():
-            with self.subTest(code=code):
+            with subtests.test(code=code):
                 employee_record = BareEmployeeRecordFactory(status=Status.ARCHIVED, asp_processing_code=code)
                 employee_record.unarchive()
                 assert employee_record.status == expected_status
@@ -301,7 +299,7 @@ def test_asp_prescriber_type_for_authorized_organization(kind, expected):
     assert employee_record.asp_prescriber_type == expected
 
 
-class EmployeeRecordBatchTest(TestCase):
+class TestEmployeeRecordBatch:
     """
     Misc tests on batch wrapper level
     """
@@ -323,47 +321,36 @@ class EmployeeRecordBatchTest(TestCase):
         )
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class EmployeeRecordLifeCycleTest(TestCase):
+class TestEmployeeRecordLifeCycle:
     """
     Note: employee records status is never changed manually
     """
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def setUp(self, mock):
-        super().setUp()
+    @pytest.fixture(autouse=True)
+    def setup_method(self, mocker):
+        mocker.patch(
+            "itou.common_apps.address.format.get_geocoding_data",
+            side_effect=mock_get_geocoding_data,
+        )
         job_application = JobApplicationWithCompleteJobSeekerProfileFactory()
         employee_record = EmployeeRecord.from_job_application(job_application)
         self.employee_record = employee_record
         self.employee_record.update_as_ready()
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_state_ready(self, _mock):
+    def test_state_ready(
+        self,
+    ):
         assert self.employee_record.status == Status.READY
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_state_sent(self, _mock):
-        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 42, "{}")
+    def test_state_sent(self, faker):
+        self.employee_record.update_as_sent(faker.asp_batch_filename(), 42, "{}")
 
         assert self.employee_record.status == Status.SENT
         assert self.employee_record.asp_batch_line_number == 42
         assert self.employee_record.archived_json == {}
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_state_rejected(self, _mock):
-        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
+    def test_state_rejected(self, faker):
+        self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
 
         self.employee_record.update_as_rejected("12", "JSON Invalide", "{}")
         assert self.employee_record.status == Status.REJECTED
@@ -371,12 +358,8 @@ class EmployeeRecordLifeCycleTest(TestCase):
         assert self.employee_record.asp_processing_label == "JSON Invalide"
         assert self.employee_record.archived_json == {}
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_state_processed(self, _mock):
-        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
+    def test_state_processed(self, faker):
+        self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
@@ -389,12 +372,8 @@ class EmployeeRecordLifeCycleTest(TestCase):
         assert self.employee_record.asp_processing_label == process_message
         assert self.employee_record.archived_json == {}
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_state_processed_when_archive_is_none(self, _mock):
-        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
+    def test_state_processed_when_archive_is_none(self, faker):
+        self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
@@ -407,12 +386,8 @@ class EmployeeRecordLifeCycleTest(TestCase):
         assert self.employee_record.asp_processing_label == process_message
         assert self.employee_record.archived_json is None
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_state_processed_when_archive_is_empty(self, _mock):
-        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
+    def test_state_processed_when_archive_is_empty(self, faker):
+        self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
@@ -425,12 +400,8 @@ class EmployeeRecordLifeCycleTest(TestCase):
         assert self.employee_record.asp_processing_label == process_message
         assert self.employee_record.archived_json == ""
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_state_processed_when_archive_is_not_json(self, _mock):
-        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
+    def test_state_processed_when_archive_is_not_json(self, faker):
+        self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
 
         process_code, process_message = (
             EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE,
@@ -443,23 +414,19 @@ class EmployeeRecordLifeCycleTest(TestCase):
         assert self.employee_record.asp_processing_label == process_message
         assert self.employee_record.archived_json == "whatever"
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_state_disabled(self, _mock):
+    def test_state_disabled(self, faker):
         assert self.employee_record.job_application not in JobApplication.objects.eligible_as_employee_record(
             self.employee_record.job_application.to_company
         )
 
         # Employee record in READY state can't be disabled
-        with self.assertRaisesMessage(InvalidStatusError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
+        with assertRaisesMessage(InvalidStatusError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
             self.employee_record.update_as_disabled()
         assert self.employee_record.status == Status.READY
 
         # Employee record in SENT state can't be disabled
-        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
-        with self.assertRaisesMessage(InvalidStatusError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
+        self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
+        with assertRaisesMessage(InvalidStatusError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
             self.employee_record.update_as_disabled()
         assert self.employee_record.status == Status.SENT
 
@@ -482,12 +449,8 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.employee_record.update_as_disabled()
         assert self.employee_record.status == Status.DISABLED
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_state_disabled_with_reject(self, _mock):
-        self.employee_record.update_as_sent(self.faker.asp_batch_filename(), 1, None)
+    def test_state_disabled_with_reject(self, faker):
+        self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
 
         assert self.employee_record.job_application not in JobApplication.objects.eligible_as_employee_record(
             self.employee_record.job_application.to_company
@@ -497,12 +460,8 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.employee_record.update_as_disabled()
         assert self.employee_record.status == Status.DISABLED
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_reactivate(self, _mock):
-        self.employee_record.update_as_sent(self.faker.unique.asp_batch_filename(), 1, None)
+    def test_reactivate(self, faker):
+        self.employee_record.update_as_sent(faker.unique.asp_batch_filename(), 1, None)
         process_code = EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE
         process_message = "La ligne de la fiche salarié a été enregistrée avec succès."
         archive_first = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [1]."}'
@@ -518,7 +477,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         self.employee_record.update_as_ready()
         assert self.employee_record.status == Status.READY
 
-        filename_second = self.faker.unique.asp_batch_filename()
+        filename_second = faker.unique.asp_batch_filename()
         archive_second = '{"libelleTraitement":"La ligne de la fiche salarié a été enregistrée avec succès [2]."}'
         self.employee_record.update_as_sent(filename_second, 1, archive_second)
         assert self.employee_record.asp_batch_file == filename_second
@@ -533,18 +492,14 @@ class EmployeeRecordLifeCycleTest(TestCase):
         assert self.employee_record.asp_batch_file == filename_second
         assert self.employee_record.archived_json == json.loads(archive_third)
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_reactivate_when_the_siae_has_changed(self, _mock):
+    def test_reactivate_when_the_siae_has_changed(self, faker):
         new_company = CompanyFactory(use_employee_record=True)
         old_company = self.employee_record.job_application.to_company
 
         assert self.employee_record.siret == old_company.siret
         assert self.employee_record.asp_id == old_company.convention.asp_id
 
-        self.employee_record.update_as_sent(self.faker.unique.asp_batch_filename(), 1, None)
+        self.employee_record.update_as_sent(faker.unique.asp_batch_filename(), 1, None)
         self.employee_record.update_as_processed("", "", None)
         self.employee_record.update_as_disabled()
 
@@ -558,11 +513,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
         assert self.employee_record.siret == new_company.siret
         assert self.employee_record.asp_id == new_company.convention.asp_id
 
-    @mock.patch(
-        "itou.common_apps.address.format.get_geocoding_data",
-        side_effect=mock_get_geocoding_data,
-    )
-    def test_state_archived(self, _mock):
+    def test_state_archived(self):
         approval = self.employee_record.job_application.approval
 
         # Can't archive while the approval is valid
@@ -612,8 +563,7 @@ class EmployeeRecordLifeCycleTest(TestCase):
             employee_record_other_status.update_as_processed_as_duplicate(None)
 
 
-@pytest.mark.usefixtures("unittest_compatibility")
-class EmployeeRecordJobApplicationConstraintsTest(TestCase):
+class TestEmployeeRecordJobApplicationConstraints:
     """
     Check constraints between job applications and employee records
     """

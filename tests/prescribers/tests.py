@@ -10,7 +10,6 @@ from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.db import IntegrityError
-from django.test import override_settings
 from django.urls import reverse
 from django.utils.timezone import get_current_timezone
 from pytest_django.asserts import assertContains, assertRedirects
@@ -33,15 +32,8 @@ from tests.users.factories import EmployerFactory, ItouStaffFactory, PrescriberF
 from tests.utils.test import TestCase
 
 
-class PrescriberOrganizationManagerTest(TestCase):
-    """
-    Test PrescriberOrganizationManager.
-    """
-
+class TestPrescriberOrganizationManager:
     def test_get_accredited_orgs_for(self):
-        """
-        Test `get_accredited_orgs_for`.
-        """
         departmental_council_org = PrescriberOrganizationFactory(authorized=True, kind=PrescriberOrganizationKind.DEPT)
 
         # An org accredited by a departmental council:
@@ -68,11 +60,11 @@ class PrescriberOrganizationManagerTest(TestCase):
         accredited_orgs = PrescriberOrganization.objects.get_accredited_orgs_for(other_org)
         assert accredited_orgs.count() == 0
 
-    def test_create_organization(self):
+    def test_create_organization(self, django_capture_on_commit_callbacks):
         """
         Test `create_organization`.
         """
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             PrescriberOrganization.objects.create_organization(
                 {
                     "siret": "11122233300000",
@@ -83,7 +75,7 @@ class PrescriberOrganizationManagerTest(TestCase):
         assert 1 == PrescriberOrganization.objects.count()
         assert len(mail.outbox) == 0
 
-        with self.captureOnCommitCallbacks(execute=True):
+        with django_capture_on_commit_callbacks(execute=True):
             org = PrescriberOrganization.objects.create_organization(
                 {
                     "siret": "11122233300001",
@@ -96,7 +88,7 @@ class PrescriberOrganizationManagerTest(TestCase):
         assert str(org.pk) in mail.outbox[0].body
 
 
-class PrescriberOrganizationModelTest(TestCase):
+class TestPrescriberOrganizationModel:
     def test_accept_survey_url(self):
         org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.PE, department="57")
         url = org.accept_survey_url
@@ -225,13 +217,12 @@ class PrescriberOrganizationModelTest(TestCase):
         assert geiq_diagnosis.author_prescriber_organization_id == organization_2.pk
 
     @respx.mock
-    @override_settings(
-        API_INSEE_BASE_URL="https://insee.fake",
-        API_INSEE_SIRENE_BASE_URL="https://entreprise.fake",
-        API_INSEE_CONSUMER_KEY="foo",
-        API_INSEE_CONSUMER_SECRET="bar",
-    )
-    def test_update_prescriber_with_api_entreprise(self):
+    def test_update_prescriber_with_api_entreprise(self, settings):
+        settings.API_INSEE_BASE_URL = "https://insee.fake"
+        settings.API_INSEE_SIRENE_BASE_URL = "https://entreprise.fake"
+        settings.API_INSEE_CONSUMER_KEY = "foo"
+        settings.API_INSEE_CONSUMER_SECRET = "bar"
+
         siret = ETABLISSEMENT_API_RESULT_MOCK["etablissement"]["siret"]
         respx.post(f"{settings.API_INSEE_BASE_URL}/token").mock(
             return_value=httpx.Response(200, json=INSEE_API_RESULT_MOCK)
@@ -261,19 +252,20 @@ class PrescriberOrganizationAdminTest(TestCase):
     REFUSE_BUTTON_LABEL = "Refuser l'habilitation"
     ACCEPT_AFTER_REFUSAL_BUTTON_LABEL = "Annuler le refus et valider l'habilitation"
 
-    def setUp(self):
-        super().setUp()
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
         # super user
-        self.superuser = ItouStaffFactory(is_superuser=True)
+        cls.superuser = ItouStaffFactory(is_superuser=True)
 
         # staff user with permissions
-        self.user = ItouStaffFactory()
+        cls.user = ItouStaffFactory()
         content_type = ContentType.objects.get_for_model(PrescriberOrganization)
         permission = Permission.objects.get(content_type=content_type, codename="change_prescriberorganization")
-        self.user.user_permissions.add(permission)
+        cls.user.user_permissions.add(permission)
 
         # authorization status x is_authorizedis_authorized combinations
-        self.rights_list = [
+        cls.rights_list = [
             (authorization_status, authorization_status == PrescriberAuthorizationStatus.VALIDATED)
             for authorization_status in list(PrescriberAuthorizationStatus)
         ]
@@ -654,7 +646,7 @@ class PrescriberOrganizationAdminTest(TestCase):
         assert updated_prescriberorganization.is_brsa
 
 
-class UpdateRefusedPrescriberOrganizationKindManagementCommandsTest(TestCase):
+class TestUpdateRefusedPrescriberOrganizationKindManagementCommands:
     def test_update_kind(self):
         # Prescriber organization - one sample per authorization status
         # One refused prescriber organizations without duplicated siret which will be

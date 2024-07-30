@@ -1,11 +1,10 @@
-from django.test import override_settings
-
 from itou.metabase.tables.approvals import TABLE
 from tests.approvals.factories import ApprovalFactory
 
 
-@override_settings(METABASE_HASH_SALT="foobar2000")
-def test_hashed_approval_number():
+def test_hashed_approval_number(settings):
+    settings.METABASE_HASH_SALT = "foobar2000"
+
     approval = ApprovalFactory(number="XXXXX2012369")
 
     assert (

@@ -1,15 +1,16 @@
 from datetime import timedelta
 
+import pytest
 from django.utils import timezone
+from pytest_django.asserts import assertQuerySetEqual
 
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordUpdateNotification
 from tests.approvals.factories import ApprovalFactory, ProlongationFactory, SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory
-from tests.utils.test import TestCase
 
 
-class EmployeeRecordUpdateNotificationTest(TestCase):
+class TestEmployeeRecordUpdateNotification:
     def test_update_approval_start_date(self):
         # If a modification occurs on the `start_date` field of an approval linked to a processed employee record
         # then exactly *one* 'NEW' notification objects must be created.
@@ -85,19 +86,18 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
 
         assert 0 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
 
-    def test_update_on_non_processed_employee_record(self):
+    @pytest.mark.parametrize("status", [elt for elt in Status.values if elt != Status.PROCESSED])
+    def test_update_on_non_processed_employee_record(self, status):
         # If a date modification occurs on an approval linked to an employee record NOT in processed state,
         # then no notification object must be created.
-        for status in [elt for elt in Status.values if elt != Status.PROCESSED]:
-            with self.subTest(status):
-                employee_record = EmployeeRecordFactory(status=status)
-                approval = employee_record.job_application.approval
-                today = timezone.localtime()
+        employee_record = EmployeeRecordFactory(status=status)
+        approval = employee_record.job_application.approval
+        today = timezone.localtime()
 
-                approval.created_at = today + timedelta(days=2)
-                approval.save()
+        approval.created_at = today + timedelta(days=2)
+        approval.save()
 
-                assert 0 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
+        assert 0 == EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW).count()
 
     def test_update_on_multiple_employee_records(self):
         # If a date modification occurs on an approval linked to *N* processed employee record,
@@ -115,7 +115,7 @@ class EmployeeRecordUpdateNotificationTest(TestCase):
         approval.end_at = timezone.localdate() + timedelta(days=2)
         approval.save()
 
-        self.assertQuerySetEqual(
+        assertQuerySetEqual(
             EmployeeRecordUpdateNotification.objects.filter(status=NotificationStatus.NEW),
             [employee_record_1.pk, employee_record_2.pk],
             transform=lambda notif: notif.employee_record_id,
