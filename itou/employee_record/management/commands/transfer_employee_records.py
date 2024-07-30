@@ -113,10 +113,6 @@ class Command(EmployeeRecordTransferCommand):
             archived_json = JSONRenderer().render(raw_employee_record)
             # Employee record successfully processed by ASP :
             if processing_code == EmployeeRecord.ASP_PROCESSING_SUCCESS_CODE:
-                # Archive a JSON copy of employee record (with processing code and label)
-                employee_record.asp_processing_code = processing_code
-                employee_record.asp_processing_label = processing_label
-
                 if not dry_run:
                     try:
                         if employee_record.status != Status.PROCESSED:
