@@ -38,7 +38,7 @@
         <link rel="stylesheet" href="{% static "css/itou.css" %}">
         {% block extra_head %}{% endblock %}
     </head>
-    <body class="{% block body_class %}{% endblock %}">
+    <body class="{% if user.is_authenticated %}l-authenticated {% endif %}{% block body_class %}{% endblock %}">
         <noscript>
             <div class="alert alert-info">
                 <p class="mb-0">
@@ -59,10 +59,11 @@
             </ul>
         </nav>
         <div class="global-messages-container">
-            {% block global_messages %}{% endblock %}
+            {% block global_messages %}
+                {% include "includes/demo_accounts.html" %}
+            {% endblock %}
         </div>
 
-        {% include "includes/demo_accounts.html" %}
         {% include "layout/_header.html" %}
 
         <main id="main" role="main" class="s-main">
