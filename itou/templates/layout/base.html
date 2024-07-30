@@ -38,7 +38,7 @@
         <link rel="stylesheet" href="{% static "css/itou.css" %}">
         {% block extra_head %}{% endblock %}
     </head>
-    <body class="{% block body_class %}{% endblock %}">
+    <body class="{% if user.is_authenticated %}l-authenticated {% endif %}{% block body_class %}{% endblock %}">
         <noscript>
             <div class="alert alert-info">
                 <p class="mb-0">
@@ -48,6 +48,7 @@
                 </p>
             </div>
         </noscript>
+
         <nav role="navigation" aria-label="Accès rapide" tabindex="0" class="visually-hidden">
             <ul>
                 <li>
@@ -58,12 +59,18 @@
                 </li>
             </ul>
         </nav>
+
         <div class="global-messages-container">
-            {% block global_messages %}{% endblock %}
+            {% block global_messages %}
+                {% include "includes/demo_accounts.html" %}
+            {% endblock %}
         </div>
 
-        {% include "includes/demo_accounts.html" %}
-        {% include "layout/_header.html" %}
+        {% if user.is_authenticated %}
+            {% include "layout/_header_authenticated.html" %}
+        {% else %}
+            {% include "layout/_header.html" %}
+        {% endif %}
 
         <main id="main" role="main" class="s-main">
             <div class="toast-container" aria-live="polite" aria-atomic="true">{% include "utils/toasts.html" %}</div>
@@ -86,7 +93,9 @@
             {% block content %}{% endblock %}
         </main>
 
-        {% include "layout/_footer.html" %}
+        {% if not user.is_authenticated %}
+            {% include "layout/_footer.html" %}
+        {% endif %}
 
         <div class="visually-hidden">
             <a href="#header">Retour au début de la page</a>

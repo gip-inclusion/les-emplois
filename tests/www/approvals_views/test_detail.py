@@ -139,17 +139,19 @@ class TestApprovalDetailView:
         # 12. SELECT approvals_suspension
         # 13. RELEASE SAVEPOINT
         # END of view, template rendering
-        # 14. SELECT approvals_suspension
-        # 15. SELECT approvals_prolongation
-        # 16. SELECT approvals_prolongationrequest
-        # 17. SELECT job_applications_jobapplication
-        # 18. SELECT job_applications_jobapplication_selected_jobs (prefetch)
-        # 19. SELECT prescribers_prescriberorganization (get sender information)
+        # 14. SELECT companies_siaeconvention (menu checks for financial annexes)
+        # 15. SELECT EXISTS users_user (menu checks for active admin)
+        # 16. SELECT approvals_suspension
+        # 17. SELECT approvals_prolongation
+        # 18. SELECT approvals_prolongationrequest
+        # 19. SELECT job_applications_jobapplication
+        # 20. SELECT job_applications_jobapplication_selected_jobs (prefetch)
+        # 21. SELECT prescribers_prescriberorganization (get sender information)
         # END of template rendering
-        # CREATE SAVEPOINT (ATOMIC REQUEST TO UPDATE THE DJANGO SESSION)
-        # UPDATE django_session
-        # RELEASE SAVEPOINT
-        with assertNumQueries(22):
+        # 22. CREATE SAVEPOINT (ATOMIC REQUEST TO UPDATE THE DJANGO SESSION)
+        # 23. UPDATE django_session
+        # 24. RELEASE SAVEPOINT
+        with assertNumQueries(24):
             response = client.get(url)
         response = client.get(url)
         assertContains(response, format_approval_number(approval))
@@ -213,20 +215,22 @@ class TestApprovalDetailView:
         # 13. SELECT EXISTS job_applications_jobapplication
         # 14. RELEASE SAVEPOINT
         # END of view, template rendering
-        # 15. SELECT approvals_suspension
-        # 16. SELECT job_applications_jobapplication
-        # 17. SELECT approvals_prolongation
-        # 18. SELECT approvals_prolongationrequest
-        # 19. SELECT users_user
-        # 20. SELECT users_user
-        # 21. SELECT eligibility_administrativecriteria
-        # 22. SELECT approvals_approval (all)
-        # 23. SELECT approvals_approval (valid)
-        # 24. SELECT job_applications_jobapplication
-        # 25. SELECT job_applications_jobapplication_selected_jobs (prefetch)
-        # 26. SELECT prescribers_prescriberorganization (get sender information)
+        # 15. SELECT companies_siaeconvention (menu checks for financial annexes)
+        # 16. SELECT EXISTS users_user (menu checks for active admin)
+        # 17. SELECT approvals_suspension
+        # 18. SELECT job_applications_jobapplication
+        # 19. SELECT approvals_prolongation
+        # 20. SELECT approvals_prolongationrequest
+        # 21. SELECT users_user
+        # 22. SELECT users_user
+        # 23. SELECT eligibility_administrativecriteria
+        # 24. SELECT approvals_approval (all)
+        # 25. SELECT approvals_approval (valid)
+        # 26. SELECT job_applications_jobapplication
+        # 27. SELECT job_applications_jobapplication_selected_jobs (prefetch)
+        # 28. SELECT prescribers_prescriberorganization (get sender information)
         # END of template rendering
-        with assertNumQueries(26):
+        with assertNumQueries(28):
             response = client.get(url)
 
         suspensions_section = parse_response_to_soup(response, selector="#suspensions-list")
@@ -300,19 +304,21 @@ class TestApprovalDetailView:
         # 13. SELECT approvals_suspension
         # 14. RELEASE SAVEPOINT
         # END of view, template rendering
-        # 15. SELECT approvals_suspension
-        # 16. SELECT approvals_prolongation
-        # 17. SELECT approvals_prolongationrequest
-        # 18. SELECT users_user
-        # 19. SELECT users_user
-        # 20. SELECT eligibility_administrativecriteria
-        # 21. SELECT approvals_approval (all)
-        # 22. SELECT approvals_approval (valid)
-        # 23. SELECT job_applications_jobapplication
-        # 24. SELECT job_applications_jobapplication_selected_jobs (prefetch)
-        # 25. SELECT prescribers_prescriberorganization (get sender information)
+        # 15. SELECT companies_siaeconvention (menu checks for financial annexes)
+        # 16. SELECT EXISTS users_user (menu checks for active admin)
+        # 17. SELECT approvals_suspension
+        # 18. SELECT approvals_prolongation
+        # 19. SELECT approvals_prolongationrequest
+        # 20. SELECT users_user
+        # 21. SELECT users_user
+        # 22. SELECT eligibility_administrativecriteria
+        # 23. SELECT approvals_approval (all)
+        # 24. SELECT approvals_approval (valid)
+        # 25. SELECT job_applications_jobapplication
+        # 26. SELECT job_applications_jobapplication_selected_jobs (prefetch)
+        # 27. SELECT prescribers_prescriberorganization (get sender information)
         # END of template rendering
-        with assertNumQueries(25):
+        with assertNumQueries(27):
             response = client.get(url)
 
         prolongations_section = parse_response_to_soup(response, selector="#prolongations-list")

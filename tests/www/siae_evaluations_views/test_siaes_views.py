@@ -87,22 +87,27 @@ class TestSiaeJobApplicationListView:
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
 
         client.force_login(self.user)
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # fetch django session
-            + 1  # fetch user
-            + 1  # verify user is active (middleware)
-            + 1  # fetch siae membership
-            + 1  # fetch evaluated siae
-            + 2  # fetch evaluatedjobapplication and its prefetched evaluatedadministrativecriteria
-            # NOTE(vperron): the prefetch is necessary to check the SUBMITTABLE state of the evaluated siae
-            # We do those requests "two times" but at least it's now accurate information, and we get
-            # the EvaluatedJobApplication list another way so that we can select_related on them.
-            + 2  # prefetch evaluated job applications and criteria
-            + 1  # Create savepoint (atomic request to update the Django session)
-            + 1  # Update the Django session
-            + 1  # Release savepoint
-        ):
+        # 1.  SELECT django_session
+        # 2.  SELECT users_user
+        # 3.  SELECT companies_companymembership
+        # 4.  SELECT companies_company
+        # END of middleware
+        # 5.  SAVEPOINT
+        # 6.  SELECT siae_evaluations_evaluatedsiae
+        # 7.  SELECT siae_evaluations_evaluatedjobapplication
+        # 8.  SELECT siae_evaluations_evaluatedadministrativecriteria
+        # 9.  SELECT companies_siaeconvention (menu checks for financial annexes)
+        # 10. SELECT users_user (menu checks for active admin)
+        # NOTE(vperron): the prefetch is necessary to check the SUBMITTABLE state of the evaluated siae
+        # We do those requests "two times" but at least it's now accurate information, and we get
+        # the EvaluatedJobApplication list another way so that we can select_related on them.
+        # 11. SELECT siae_evaluations_evaluatedjobapplication
+        # 12. SELECT siae_evaluations_evaluatedadministrativecriteria (prefetch)
+        # 13. RELEASE SAVEPOINT
+        # 14. SAVEPOINT
+        # 15. UPDATE django_session
+        # 16. RELEASE SAVEPOINT
+        with assertNumQueries(16):
             response = client.get(self.url(evaluated_siae))
 
         assert evaluated_job_application == response.context["evaluated_job_applications"][0]

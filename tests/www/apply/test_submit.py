@@ -3076,6 +3076,11 @@ class UpdateJobSeekerBaseTestCase(TestCase):
             + (
                 1 if user.is_prescriber or self.STEP_1_VIEW_NAME.endswith("_for_hire") else 0
             )  # users_user/companies_companymembership (self.company.has_member())
+            + (
+                # SELECT companies_siaeconvention (menu check for financial annexes)
+                # SELECT EXISTS users_user (menu check for active admin)
+                2 if user.is_employer else 0
+            )
             + 3  # update session with savepoint & release
         ):
             response = self.client.get(self.step_1_url)
@@ -3126,6 +3131,11 @@ class UpdateJobSeekerBaseTestCase(TestCase):
             + (
                 1 if user.is_prescriber or self.STEP_1_VIEW_NAME.endswith("_for_hire") else 0
             )  # users_user/companies_companymembership (self.company.has_member())
+            + (
+                # SELECT companies_siaeconvention (menu check for financial annexes)
+                # SELECT EXISTS users_user (menu check for active admin)
+                2 if user.is_employer else 0
+            )
         ):
             response = self.client.get(self.step_2_url)
         self.assertContains(response, PROCESS_TITLE, html=True)
@@ -3171,6 +3181,11 @@ class UpdateJobSeekerBaseTestCase(TestCase):
             + (
                 1 if user.is_prescriber or self.STEP_1_VIEW_NAME.endswith("_for_hire") else 0
             )  # users_user/companies_companymembership (self.company.has_member())
+            + (
+                # SELECT companies_siaeconvention (menu check for financial annexes)
+                # SELECT EXISTS users_user (menu check for active admin)
+                2 if user.is_employer else 0
+            )
         ):
             response = self.client.get(self.step_3_url)
         self.assertContains(response, PROCESS_TITLE, html=True)
@@ -4601,21 +4616,28 @@ class HireConfirmationTestCase(TestCase):
         self.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
         IAEEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=self.job_seeker)
         self.client.force_login(self.company.members.first())
-        with self.assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # session
-            + 3  # user, memberships & companies information
-            + 1  # get company infos (get_object_or_404)
-            + 1  # get job seeker infos (get_object_or_404)
-            + 1  # get approvals (_check_job_seeker_approval -> has_valid_diagnosis)
-            + 1  # get approvals_poleemploiapproval (has_valid_common_approval)
-            + 1  # eligibility_eligibilitydiagnosis (_check_job_seeker_approval -> last_considered_valid)
-            + 1  # eligibility_eligibilitydiagnosis (EligibilityDiagnosis.objects.last_considered_valid)
-            + 1  # companies_jobdescription (AcceptForm.__init__)
-            + 1  # eligibility_administrativecriteria (/apply/includes/eligibility_diagnosis.html)
-            + 1  # asp_country: countries dropdown list.
-            + 3  # update session with savepoint & release
-        ):
+        # 1.  SELECT django_session
+        # 2.  SELECT users_user
+        # 3.  SELECT companies_companymembership
+        # 4.  SELECT companies_company
+        # END of middlewares
+        # 5.  SAVEPOINT
+        # 6.  SELECT companies_company
+        # 7.  SELECT users_user
+        # 8.  SELECT approvals_approval
+        # 9.  SELECT approvals_poleemploiapproval
+        # 10. SELECT eligibility_eligibilitydiagnosis (_check_job_seeker_approval -> last_considered_valid)
+        # 11. SELECT eligibility_eligibilitydiagnosis (EligibilityDiagnosis.objects.last_considered_valid)
+        # 12. SELECT eligibility_eligibilitydiagnosis (again)
+        # 13. SELECT companies_jobdescription
+        # 14. SELECT companies_siaeconvention (menu check for financial annexes)
+        # 15. SELECT EXISTS users_user (menu check for active admin)
+        # 16. SELECT eligibility_administrativecriteria
+        # 17. RELEASE SAVEPOINT
+        # 18. SAVEPOINT
+        # 19. UPDATE django_session
+        # 20. RELEASE SAVEPOINT
+        with self.assertNumQueries(20):
             response = self.client.get(self._reverse("apply:hire_confirmation"))
         self.assertContains(response, "Déclarer l’embauche de Clara SION")
         self.assertContains(response, "Éligible à l’IAE")

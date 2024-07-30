@@ -1,0 +1,187 @@
+{% load matomo %}
+{% load nav %}
+{% load redirection_fields %}
+{% load static %}
+{% load theme_inclusion %}
+
+<header role="banner" id="header">
+    <section class="s-header-authenticated">
+        <div class="s-header-authenticated__container container">
+            <div class="s-header-authenticated__row row">
+                <div class="s-header-authenticated__col s-header-authenticated__col--logo-service col-auto d-flex align-items-center pe-0">
+                    <a href="{% url 'home:hp' %}">
+                        <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" alt="Les emplois de l'inclusion" height="90">
+                    </a>
+                </div>
+                <div class="s-header-authenticated__col s-header-authenticated__col--nav col d-flex align-items-center justify-content-end pe-0">
+                    <nav role="navigation" id="nav-primary" aria-label="Navigation principale">
+                        <ul>
+                            <li class="dropdown">
+                                <button type="button" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="dashboardUserDropdown" aria-expanded="false">
+                                    <i class="ri-account-circle-line" aria-hidden="true"></i>
+                                    <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end" id="dashboardUserDropdown">
+                                    {% include "layout/_header_user_dropdown_menu.html" with request=request user=user mobile=False csrf_token=csrf_token only %}
+                                </div>
+                            </li>
+                            {% if request.organizations|length > 1 %}
+                                {# If the name of the organisation.display_name is longer than the .dropdown-structure width, it will be automatically truncated in css and it will be displayed in full in a tooltip. #}
+                                <li class="d-none d-lg-inline-block dropdown dropdown-structure">
+                                    <button type="button" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
+                                        {% if user.is_employer %}
+                                            <i class="ri-community-line" aria-hidden="true"></i>
+                                        {% elif user.is_prescriber %}
+                                            {% if request.current_organization.kind != PrescriberOrganizationKind.OTHER %}
+                                                <i class="ri-home-smile-line" aria-hidden="true"></i>
+                                            {% else %}
+                                                <i class="ri-group-line" aria-hidden="true"></i>
+                                            {% endif %}
+                                        {% else %}
+                                            <i class="ri-government-line" aria-hidden="true"></i>
+                                        {% endif %}
+                                        <span>{{ request.current_organization.kind }} - {{ request.current_organization.display_name }}</span>
+                                    </button>
+                                    <div class="dropdown-menu w-100" id="switchUserDropdown">
+                                        {% include "layout/_header_organization_dropdown_menu.html" with request=request csrf_token=csrf_token only %}
+                                    </div>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                <div class="s-header-authenticated__col s-header-authenticated__col--burger col-auto d-flex align-items-center ps-0">
+                    <button type="button" class="btn btn-link btn-ico pe-0" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNav" aria-controls="offcanvasNav" aria-label="Ouvrir le menu de navigation principale pour mobile">
+                        <i class="ri-menu-line" id="open" aria-hidden="true"></i>
+                        <span>Menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="offcanvas" id="offcanvasNav" aria-label="Barre de navigation principale">
+        <div class="offcanvas-header offcanvas-header--structure">
+            <div class="dropdown dropdown-structure flex-grow-1 py-4">
+                {% if request.organizations|length == 0 %}
+                    {% if user.is_job_seeker %}
+                        <div class="dropdown-toggle dropdown-toggle__summary">
+                            <i class="ri-user-line" aria-hidden="true"></i>
+                            <span>Candidat</span>
+                            <strong>{{ user.get_full_name }}</strong>
+                        </div>
+                    {% elif user.is_staff %}
+                        <div class="dropdown-toggle dropdown-toggle__summary">
+                            <i class="ri-admin-line" aria-hidden="true"></i>
+                            <span>Itou</span>
+                            <strong>Staff</strong>
+                        </div>
+                    {% elif user.is_employer %}
+                        <div class="dropdown-toggle dropdown-toggle__summary">
+                            <i class="ri-community-line" aria-hidden="true"></i>
+                            <span>Employeur</span>
+                            <strong>Compte inactif</strong>
+                        </div>
+                    {% elif user.is_labor_inspector %}
+                        <div class="dropdown-toggle dropdown-toggle__summary">
+                            <i class="ri-community-line" aria-hidden="true"></i>
+                            <span>Inspecteur du travail</span>
+                            <strong>Compte inactif</strong>
+                        </div>
+                    {% elif user.is_prescriber %}
+                        <div class="dropdown-toggle dropdown-toggle__summary">
+                            <i class="ri-user-line" aria-hidden="true"></i>
+                            <span>Orienteur seul</span>
+                            <strong>{{ user.get_full_name }}</strong>
+                        </div>
+                    {% endif %}
+                {% elif request.organizations|length == 1 %}
+                    <div class="dropdown-toggle dropdown-toggle__summary">
+                        {% if user.is_employer %}
+                            <i class="ri-community-line" aria-hidden="true"></i>
+                        {% elif user.is_prescriber %}
+                            {% if request.current_organization.kind != PrescriberOrganizationKind.OTHER %}
+                                <i class="ri-home-smile-line" aria-hidden="true"></i>
+                            {% else %}
+                                <i class="ri-group-line" aria-hidden="true"></i>
+                            {% endif %}
+                        {% else %}
+                            <i class="ri-government-line" aria-hidden="true"></i>
+                        {% endif %}
+                        <span>{{ request.current_organization.kind }}</span>
+                        <strong>{{ request.current_organization.display_name }}</strong>
+                    </div>
+                {% else %}
+                    <button type="button" class="dropdown-toggle dropdown-toggle__summary" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdownMobile" aria-expanded="false">
+                        {% if user.is_employer %}
+                            <i class="ri-community-line" aria-hidden="true"></i>
+                        {% elif user.is_prescriber %}
+                            {% if request.current_organization.kind != PrescriberOrganizationKind.OTHER %}
+                                <i class="ri-home-smile-line" aria-hidden="true"></i>
+                            {% else %}
+                                <i class="ri-group-line" aria-hidden="true"></i>
+                            {% endif %}
+                        {% else %}
+                            <i class="ri-government-line" aria-hidden="true"></i>
+                        {% endif %}
+                        <span>{{ request.current_organization.kind }}</span>
+                        <strong>{{ request.current_organization.display_name }}</strong>
+                    </button>
+                    <div class="dropdown-menu" id="switchUserDropdownMobile">
+                        {% include "layout/_header_organization_dropdown_menu.html" with request=request csrf_token=csrf_token only %}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="border-start border-nuance-08 d-xl-none">
+                <button type="button" class="btn-link ps-4 pt-5 pe-2 me-n2" data-bs-dismiss="offcanvas" aria-label="Fermer">
+                    <i class="ri-close-line" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+        <div class="offcanvas-body d-flex flex-column">
+            <nav class="flex-grow-1" role="navigation" aria-label="Navigation principale">
+                {% nav request %}
+            </nav>
+            <div class="dropdown">
+                <button type="button"
+                        class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3"
+                        data-bs-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-controls="dashboardUserDropdownMobile"
+                        aria-expanded="false">
+                    <i class="ri-account-circle-line" aria-hidden="true"></i>
+                    <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                </button>
+                <div class="dropdown-menu" id="dashboardUserDropdownMobile">
+                    {% include "layout/_header_user_dropdown_menu.html" with request=request user=user mobile=True csrf_token=csrf_token only %}
+                </div>
+            </div>
+            <div class="dropdown">
+                <button type="button" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="helpDropdownMobile" aria-expanded="false">
+                    Besoin d'aide ?
+                </button>
+                <div class="dropdown-menu" id="helpDropdownMobile">
+                    {% include "layout/_header_help_dropdown_content.html" with user=user ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
+                </div>
+            </div>
+        </div>
+        <div class="offcanvas-footer flex-column align-items-stretch">
+            <div class="offcanvas-footer__legal">
+                <div class="d-none d-xl-block">
+                    <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" alt="Les emplois de l'inclusion" height="50">
+                </div>
+                <ul>
+                    <li>
+                        <a href="{% url 'accessibility' %}">Accessibilité : partiellement conforme</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'legal-notice' %}">Mentions légales</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'legal-terms' %}">CGU</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>

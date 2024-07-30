@@ -1,5 +1,8 @@
 import pytest  # noqa
 from django.template import Context, Template
+from django.urls import reverse
+
+from itou.utils.templatetags.nav import NAV_ENTRIES
 
 
 def test_matomo_event():
@@ -79,3 +82,10 @@ class TestButtonsForm:
     def test_save_and_quit_modal_content(self, snapshot):
         template = Template("{% load buttons_form %}{% itou_buttons_form modal_content_save_and_quit=True %}")
         assert template.render(Context({})) == snapshot(name="save_and_quit_modal_content")
+
+
+class TestNav:
+    def test_active_view_names(self):
+        for entry in NAV_ENTRIES.values():
+            for view_name in entry.active_view_names:
+                reverse(view_name)

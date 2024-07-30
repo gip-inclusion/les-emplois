@@ -48,7 +48,7 @@ from tests.users.factories import (
     JobSeekerWithAddressFactory,
     PrescriberFactory,
 )
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
+from tests.utils.test import TestCase, parse_response_to_soup
 
 
 DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
@@ -141,7 +141,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
 
         url = reverse("dashboard:index")
         response = self.client.get(url)
-        self.assertContains(response, "Gérer les fiches salarié")
+        self.assertContains(response, "Fiches salariés ASP")
         self.assertNotContains(response, self.DANGER_CLASS)
         assert response.context["num_rejected_employee_records"] == 0
 
@@ -442,23 +442,29 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         )
 
         self.client.force_login(membership.user)
-        num_queries = BASE_NUM_QUERIES
-        num_queries += 1  #  get django session
-        num_queries += 1  #  get user (middleware)
-        num_queries += 2  #  get company memberships (middleware)
-        num_queries += 1  #  OrganizationAbstract.has_admin()
-        num_queries += 1  #  select job applications states
-        num_queries += 1  #  count employee records
-        num_queries += 1  #  check if evaluations sanctions exists
-        num_queries += 1  #  check siae conventions
-        num_queries += 1  #  OrganizationAbstract.has_member()
-        num_queries += 1  #  select job_appelation
-        num_queries += 1  #  select siae_evaluations + evaluation campaigns
-        num_queries += 1  #  prefetch evaluated job application
-        num_queries += 1  #  prefetch evaluated administrative criterias
-        num_queries += 1  #  select siae_evaluations for evaluated_siae_notifications
-        num_queries += 3  #  update session + savepoints
-        with self.assertNumQueries(num_queries):
+        # 1.  SELECT django_session
+        # 2.  SELECT users_user
+        # 3.  SELECT companies_companymembership
+        # 4.  SELECT companies_company
+        # END of middlewares
+        # 5.  SAVEPOINT
+        # 6.  SELECT companies_siaeconvention
+        # 7.  SELECT job_applications_jobapplication
+        # 8.  SELECT EXISTS users_user (admin membership)
+        # 9.  SELECT EXISTS users_user (admin membership)
+        # 10. SELECT COUNT employee_record_employeerecord
+        # 11. SELECT siae_evaluations_sanction
+        # 12. SELECT EXISTS users_user (admin membership)
+        # 13. SELECT EXISTS jobs_appellation
+        # 14. SELECT siae_evaluations_evaluatedsiae
+        # 15. SELECT siae_evaluations_evaluatedjobapplication
+        # 16. SELECT siae_evaluations_evaluatedadministrativecriteria
+        # 17. SELECT siae_evaluations_evaluatedsiae
+        # 18. RELEASE SAVEPOINT
+        # 19. SAVEPOINT
+        # 20. UPDATE session
+        # 21. RELEASE SAVEPOINT
+        with self.assertNumQueries(21):
             response = self.client.get(reverse("dashboard:index"))
         self.assertContains(
             response,

@@ -15,7 +15,7 @@ from tests.approvals.factories import SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, parse_response_to_soup
+from tests.utils.test import TestCase, parse_response_to_soup
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
@@ -168,17 +168,23 @@ class ApprovalSuspendViewTest(TestCase):
         url = reverse("approvals:suspension_update", kwargs={"suspension_id": suspension.pk})
         url = f"{url}?{params}"
 
-        with self.assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # get the session
-            + 3  # get the user, its memberships, and the SIAEs (middleware)
-            + 1  # get suspension (get_object_or_404)
-            + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_siae)
-            + 1  # get suspension (SuspensionForm -> Suspension.next_min_start_at)
-            # There's a dupplicated query here, but it's only in this form, so maybe not add a lru_cache
-            + 1  # get job applications (SuspensionForm -> Suspension.next_min_start_at -> last_hire_was_made_by_siae)
-            + 3  # update session in savepoints
-        ):
+        # 1.  SELECT django_session
+        # 2.  SELECT users_user
+        # 3.  SELECT companies_companymembership
+        # 4.  SELECT companies_company
+        # END of middlewares
+        # 5.  SAVEPOINT
+        # 6.  SELECT approvals_suspension
+        # 7.  SELECT job_applications_jobapplication
+        # 8.  SELECT job_applications_jobapplication (again)
+        # 9.  SELECT approvals_suspension
+        # 10. SELECT companies_siaeconvention (menu checks for financial annexes)
+        # 11. SELECT EXISTS users_users (menu checks for active admin)
+        # 12. RELEASE SAVEPOINT
+        # 13. SAVEPOINT
+        # 14. UPDATE django_session
+        # 15. RELEASE SAVEPOINT
+        with self.assertNumQueries(15):
             response = self.client.get(url)
         assert response.status_code == 200
 
@@ -228,14 +234,21 @@ class ApprovalSuspendViewTest(TestCase):
         url = reverse("approvals:suspension_delete", kwargs={"suspension_id": suspension.pk})
         url = f"{url}?{params}"
 
-        with self.assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # get the session
-            + 3  # get the user, its memberships, and the SIAEs (middleware)
-            + 1  # get suspension (get_object_or_404)
-            + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_siae)
-            + 3  # update session in savepoints
-        ):
+        # 1.  SELECT django_session
+        # 2.  SELECT users_user
+        # 3.  SELECT companies_companymembership
+        # 4.  SELECT companies_company
+        # END of middlewares
+        # 5.  SAVEPOINT
+        # 6.  SELECT approvals_suspension
+        # 7.  SELECT job_applications_jobapplication (can_be_handled_by_siae -> last_hire_was_made_by_siae)
+        # 8. SELECT companies_siaeconvention (menu checks for financial annexes)
+        # 9. SELECT EXISTS users_users (menu checks for active admin)
+        # 10. RELEASE SAVEPOINT
+        # 11. SAVEPOINT
+        # 12. UPDATE django_session
+        # 13. RELEASE SAVEPOINT
+        with self.assertNumQueries(13):
             response = self.client.get(url)
         assert response.status_code == 200
         form = parse_response_to_soup(
@@ -304,14 +317,21 @@ class ApprovalSuspendActionChoiceViewTest(TestCase):
     def test_context(self):
         self.client.force_login(self.employer)
 
-        with self.assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # get the session
-            + 3  # get the user, its memberships, and the SIAEs (middleware)
-            + 1  # get suspension (get_object_or_404)
-            + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_siae)
-            + 3  # update session in savepoints
-        ):
+        # 1.  SELECT django_session
+        # 2.  SELECT users_user
+        # 3.  SELECT companies_companymembership
+        # 4.  SELECT companies_company
+        # END of middlewares
+        # 5.  SAVEPOINT
+        # 6.  SELECT approvals_suspension
+        # 7.  SELECT job_applications_jobapplication (can_be_handled_by_siae -> last_hire_was_made_by_siae)
+        # 8. SELECT companies_siaeconvention (menu checks for financial annexes)
+        # 9. SELECT EXISTS users_users (menu checks for active admin)
+        # 10. RELEASE SAVEPOINT
+        # 11. SAVEPOINT
+        # 12. UPDATE django_session
+        # 13. RELEASE SAVEPOINT
+        with self.assertNumQueries(13):
             response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.context["suspension"] == self.suspension
@@ -398,14 +418,21 @@ class ApprovalSuspendUpdateEndDateViewTest(TestCase):
     def test_context(self):
         self.client.force_login(self.employer)
 
-        with self.assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # get the session
-            + 3  # get the user, its memberships, and the SIAEs (middleware)
-            + 1  # get suspension (get_object_or_404)
-            + 1  # get job applications (can_be_handled_by_siae -> last_hire_was_made_by_siae)
-            + 3  # update session in savepoints
-        ):
+        # 1.  SELECT django_session
+        # 2.  SELECT users_user
+        # 3.  SELECT companies_companymembership
+        # 4.  SELECT companies_company
+        # END of middlewares
+        # 5.  SAVEPOINT
+        # 6.  SELECT approvals_suspension
+        # 7.  SELECT job_applications_jobapplication (can_be_handled_by_siae -> last_hire_was_made_by_siae)
+        # 8. SELECT companies_siaeconvention (menu checks for financial annexes)
+        # 9. SELECT EXISTS users_users (menu checks for active admin)
+        # 10. RELEASE SAVEPOINT
+        # 11. SAVEPOINT
+        # 12. UPDATE django_session
+        # 13. RELEASE SAVEPOINT
+        with self.assertNumQueries(13):
             response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.context["suspension"] == self.suspension

@@ -1,3 +1,4 @@
+{% load nav %}
 {% load static %}
 {% load theme_inclusion %}
 
@@ -15,24 +16,40 @@
                         <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" height="90" alt="Les emplois de l'inclusion">
                     </a>
                 </div>
-                <div class="s-header__col s-header__col--nav col d-none d-xl-inline-flex d-xl-flex align-items-center justify-content-end">
-                    <nav role="navigation" id="nav-primary" aria-label="Menu de navigation principale">
-                        {% include 'layout/_header_nav_primary_items.html' with is_mobile=False %}
+                <div class="s-header__col s-header__col--nav col d-none d-lg-inline-flex d-lg-flex align-items-center justify-content-end pe-0 pe-xl-3">
+                    <nav role="navigation" id="nav-primary" aria-label="Navigation principale">
+                        <ul>
+                            <li class="d-none d-xl-inline-block dropdown">
+                                <button type="button" class="btn btn-link dropdown-toggle mh-auto p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="helpDropdown" aria-expanded="false">
+                                    Besoin d’aide ?
+                                </button>
+                                <div class="dropdown-menu" id="helpDropdown">
+                                    {% include "layout/_header_help_dropdown_content.html" with user=user ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
+                                </div>
+                            </li>
+                            <li>
+                                <a class="btn btn-ico btn-outline-primary" href="{% url "signup:choose_user_kind" %}">
+                                    <i class="ri-user-add-line" aria-hidden="true"></i>
+                                    <span>S’inscrire</span>
+                                </a>
+                            </li>
+                            <li class="dropdown dropdown-login">
+                                <button class="btn btn-ico btn-primary" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdown" aria-expanded="false">
+                                    <i class="ri-login-box-line" aria-hidden="true"></i>
+                                    <span>Se connecter</span>
+                                </button>
+                                <div class="dropdown-menu" id="loginUserDropdown">
+                                    {% include "layout/_header_login.html" with redirect_field_value=redirect_field_value|default:"" only %}
+                                </div>
+                            </li>
+                        </ul>
                     </nav>
                 </div>
-                <div class="s-header__col s-header__col--burger col d-flex align-items-center justify-content-end d-xl-none">
-                    <button type="button" data-bs-toggle="offcanvas" data-bs-target="#burgerNav" aria-controls="burgerNav" aria-label="Ouvrir la navigation principale pour mobile">
-                        <i class="ri-menu-line" aria-hidden="true"></i>
+                <div class="s-header__col s-header__col--burger col col-lg-auto d-flex align-items-center justify-content-end d-xl-none ps-0">
+                    <button type="button" class="btn btn-link btn-ico pe-0" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNav" aria-controls="offcanvasNav" aria-label="Ouvrir le menu de navigation principale pour mobile">
+                        <i class="ri-menu-line" id="open" aria-hidden="true"></i>
+                        <span>Menu</span>
                     </button>
-                </div>
-                <div id="burgerNav" class="offcanvas offcanvas-end" aria-label="Navigation principale pour mobile">
-                    <button type="button" data-bs-dismiss="offcanvas" aria-label="Fermer la navigation principale pour mobile">
-                        <i class="ri-close-line" id="close" aria-hidden="true"></i>
-                    </button>
-                    <nav role="navigation" aria-label="Menu de navigation principale pour mobile">
-                        {% include 'layout/_header_nav_primary_items.html' with is_mobile=True %}
-                        {% include 'layout/_header_nav_secondary_items.html' %}
-                    </nav>
                 </div>
             </div>
         </div>
@@ -40,12 +57,45 @@
     <section class="s-postheader d-none d-xl-block">
         <div class="s-postheader__container container">
             <div class="s-postheader__row row">
-                <div class="s-postheader__col col-12 d-flex align-items-center">
-                    <nav role="navigation" aria-label="Navigation secondaire">
-                        {% include 'layout/_header_nav_secondary_items.html' %}
-                    </nav>
-                </div>
+                <div class="s-postheader__col col-12 d-flex align-items-center">{% nav_anonymous request mobile=False %}</div>
             </div>
         </div>
     </section>
+    <div class="offcanvas" id="offcanvasNav" aria-label="Navigation principale pour mobile">
+        <div class="offcanvas-header">
+            <h4 class="h5 mb-0 btn-ico align-items-center" id="offcanvasApplyFiltersLabel">
+                <i class="ri-menu-line" aria-hidden="true"></i>
+                <span>Menu</span>
+            </h4>
+            <button type="button" class="btn-link px-2 me-n2" data-bs-dismiss="offcanvas" aria-label="Fermer">
+                <i class="ri-close-line" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="offcanvas-body">{% nav_anonymous request mobile=True %}</div>
+        <div class="offcanvas-footer flex-column align-items-stretch">
+            <nav role="navigation" aria-label="Menu de navigation principale pour mobile">
+                <div class="dropup-center dropdown-login">
+                    <button class="btn btn-block btn-ico btn-primary" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="loginUserDropdownMobile" aria-expanded="false">
+                        <i class="ri-login-box-line" aria-hidden="true"></i>
+                        <span>Se connecter</span>
+                    </button>
+                    <div class="dropdown-menu" id="loginUserDropdownMobile">
+                        {% include "layout/_header_login.html" with redirect_field_value=redirect_field_value|default:"" only %}
+                    </div>
+                </div>
+                <a class="btn btn-block btn-ico btn-outline-primary my-3" href="{% url "signup:choose_user_kind" %}">
+                    <i class="ri-user-add-line" aria-hidden="true"></i>
+                    <span>S’inscrire</span>
+                </a>
+                <div class="dropdown">
+                    <button type="button" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="helpDropdownMobile" aria-expanded="false">
+                        Besoin d’aide ?
+                    </button>
+                    <div class="dropdown-menu" id="helpDropdownMobile">
+                        {% include "layout/_header_help_dropdown_content.html" with user=user ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
 </header>

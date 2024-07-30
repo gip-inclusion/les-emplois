@@ -37,15 +37,20 @@ class EditUserNotificationsTest(TestCase):
         url = reverse("dashboard:edit_user_notifications")
         # prewarm ContentType cache if needed to avoid extra query
         ContentType.objects.get_for_model(Company)
-        with self.assertNumQueries(
-            1  # Load django session
-            + 1  # Load current user
-            + 1  # Load company membership
-            + 1  # Load company
-            + 2  # Savepoint and release
-            + 1  # Load employer notification settings (form init)
-            + 3  # Savepoint, update session and release
-        ):
+        # 1.  SELECT django_session
+        # 2.  SELECT users_user
+        # 3.  SELECT companies_companymembership
+        # 4.  SELECT companies_company
+        # END of middlewares
+        # 5.  SAVEPOINT
+        # 6.  SELECT communications_notificationsettings
+        # 7.  SELECT companies_siaeconvention (menu checks for financial annexes)
+        # 8.  SELECT EXISTS users_user (menu checks for active admin)
+        # 9.  RELEASE SAVEPOINT
+        # 10. SAVEPOINT
+        # 11. UPDATE django_session
+        # 12. RELEASE SAVEPOINT
+        with self.assertNumQueries(12):
             response = self.client.get(url)
         assert response.status_code == 200
 
