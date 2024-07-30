@@ -66,7 +66,11 @@
             {% endblock %}
         </div>
 
-        {% include "layout/_header.html" %}
+        {% if user.is_authenticated %}
+            {% include "layout/_header_authenticated.html" %}
+        {% else %}
+            {% include "layout/_header.html" %}
+        {% endif %}
 
         <main id="main" role="main" class="s-main">
             <div class="toast-container" aria-live="polite" aria-atomic="true">{% include "utils/toasts.html" %}</div>

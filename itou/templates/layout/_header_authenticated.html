@@ -1,0 +1,426 @@
+{% load static %}
+{% load theme_inclusion %}
+{% load matomo %}
+
+<header role="banner" id="header">
+    <section class="s-header-authenticated">
+        <div class="s-header-authenticated__container container">
+            <div class="s-header-authenticated__row row">
+                <div class="s-header-authenticated__col s-header-authenticated__col--logo-service col-auto d-flex align-items-center pe-0">
+                    <a href="{% url 'home:hp' %}">
+                        <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" alt="Les emplois de l'inclusion" height="90">
+                    </a>
+                </div>
+                <div class="s-header-authenticated__col s-header-authenticated__col--nav col d-flex align-items-center justify-content-end pe-0">
+                    <nav role="navigation" id="nav-primary" aria-label="Navigation principale">
+                        <ul>
+                            <li class="dropdown">
+                                <button type="button" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="dashboardUserDropdown" aria-expanded="false">
+                                    <i class="ri-account-circle-line" aria-hidden="true"></i>
+                                    <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-end" id="dashboardUserDropdown">
+                                    <ul class="list-unstyled">
+                                        <li class="dropdown-item">
+                                            <div class="d-flex align-items-center">
+                                                <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+                                                <div class="flex-grow-1 ms-2 lh-sm">
+                                                    {% if user.get_full_name %}
+                                                        <span>{{ user.get_full_name }}</span>
+                                                        <br>
+                                                    {% endif %}
+                                                    <span class="fs-sm lh-sm text-muted">{{ user.email }}</span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="dropdown-divider"></div>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'dashboard:index' %}">Tableau de bord</a>
+                                        </li>
+                                        {% if not user.is_staff and not user.is_labor_inspector %}
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'dashboard:edit_user_notifications' %}">Mes notifications</a>
+                                            </li>
+                                        {% endif %}
+                                        <li class="dropdown-divider"></li>
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'dashboard:edit_user_info' %}">Modifier mon profil</a>
+                                        </li>
+                                        {% if not user.has_sso_provider %}
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'account_change_password' %}">Modifier mon mot de passe</a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{% url 'dashboard:edit_user_email' %}">Modifier mon adresse e-mail</a>
+                                            </li>
+                                        {% endif %}
+                                        <li class="dropdown-divider"></li>
+                                        {% if user.is_employer and request.is_current_organization_admin %}
+                                            <li>
+                                                <a class="dropdown-item text-primary" href="{% url 'dashboard:api_token' %}">Accès aux APIs</a>
+                                            </li>
+                                            <li class="dropdown-divider"></li>
+                                        {% endif %}
+                                        <li class="dropdown-item">
+                                            <form method="post" action="{% url 'account_logout' %}">
+                                                {% csrf_token %}
+                                                <button class="text-danger">Déconnexion</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                            {% if request.organizations|length > 1 %}
+                                {# If the name of the organisation.display_name is longer than the .dropdown-structure width, it will be automatically truncated in css and it will be displayed in full in a tooltip. #}
+                                <li class="d-none d-lg-inline-block dropdown dropdown-structure">
+                                    <button type="button" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
+                                        {% if user.is_employer %}
+                                            <i class="ri-community-line" aria-hidden="true"></i>
+                                        {% elif user.is_prescriber %}
+                                            <i class="ri-home-smile-line" aria-hidden="true"></i>
+                                        {% endif %}
+                                        <span>{{ request.current_organization.kind }} - {{ request.current_organization.display_name }}</span>
+                                    </button>
+                                    <div class="dropdown-menu w-100" id="switchUserDropdown">
+                                        <form action="{% url 'dashboard:switch_organization' %}" method="post">
+                                            {% csrf_token %}
+                                            <ul class="list-unstyled">
+                                                {% for org in request.organizations %}
+                                                    <li>
+                                                        <button class="dropdown-item dropdown-item__summary{% if org.pk == request.current_organization.pk %} active{% endif %}" name="organization_id" value="{{ org.pk }}">
+                                                            {% if user.is_employer %}
+                                                                <i class="ri-community-line" aria-hidden="true"></i>
+                                                            {% elif user.is_prescriber %}
+                                                                <i class="ri-home-smile-line" aria-hidden="true"></i>
+                                                            {% endif %}
+                                                            <span>{{ org.kind }}</span>
+                                                            {% if not is_mobile and org.display_name|length > 18 %}
+                                                                <strong data-bs-toggle="tooltip" data-bs-title="{{ org.display_name }}">{{ org.display_name }}</strong>
+                                                            {% else %}
+                                                                <strong>{{ org.display_name }}</strong>
+                                                            {% endif %}
+                                                        </button>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+                                        </form>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                <div class="s-header-authenticated__col s-header-authenticated__col--burger col-auto d-flex align-items-center ps-0">
+                    <button type="button" class="btn btn-link btn-ico pe-0" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNav" aria-controls="offcanvasNav" aria-label="Ouvrir le menu de navigation principale pour mobile">
+                        <i class="ri-menu-line" id="open" aria-hidden="true"></i>
+                        <span>Menu</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="offcanvas" id="offcanvasNav" aria-label="Navigation principale pour mobile">
+        <div class="offcanvas-header offcanvas-header--structure">
+            <div class="dropdown dropdown-structure flex-grow-1 py-4">
+                {% if request.organizations|length > 1 %}
+                    <button type="button" class="dropdown-toggle dropdown-toggle__summary" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
+                        {% if user.is_employer %}
+                            <i class="ri-community-line" aria-hidden="true"></i>
+                        {% elif user.is_prescriber %}
+                            <i class="ri-home-smile-line" aria-hidden="true"></i>
+                        {% endif %}
+                        <span>{{ request.current_organization.kind }}</span>
+                        <strong>{{ request.current_organization.display_name }}</strong>
+                    </button>
+                    <div class="dropdown-menu" id="switchUserDropdown">
+                        <form action="{% url 'dashboard:switch_organization' %}" method="post">
+                            {% csrf_token %}
+                            <ul class="list-unstyled">
+                                {% for org in request.organizations %}
+                                    <li>
+                                        <button class="dropdown-item dropdown-item__summary{% if org.pk == request.current_organization.pk %} active{% endif %}" name="organization_id" value="{{ org.pk }}">
+                                            {% if user.is_employer %}
+                                                <i class="ri-community-line" aria-hidden="true"></i>
+                                            {% elif user.is_prescriber %}
+                                                <i class="ri-home-smile-line" aria-hidden="true"></i>
+                                            {% endif %}
+                                            <span>{{ org.kind }}</span>
+                                            {% if org.display_name|length > 18 %}
+                                                <strong data-bs-toggle="tooltip" data-bs-title="{{ org.display_name }}">{{ org.display_name }}</strong>
+                                            {% else %}
+                                                <strong>{{ org.display_name }}</strong>
+                                            {% endif %}
+                                        </button>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="dropdown-toggle dropdown-toggle__summary">
+                        {% if user.is_employer %}
+                            <i class="ri-community-line" aria-hidden="true"></i>
+                        {% elif user.is_prescriber %}
+                            <i class="ri-home-smile-line" aria-hidden="true"></i>
+                        {% endif %}
+                        <span>{{ request.current_organization.kind }}</span>
+                        <strong>{{ request.current_organization.display_name }}</strong>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="border-start border-nuance-08 d-xl-none">
+                <button type="button" class="btn-link ps-4 pt-5 pe-2 me-n2" data-bs-dismiss="offcanvas" aria-label="Fermer">
+                    <i class="ri-close-line" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+        <div class="offcanvas-body d-flex flex-column">
+            <nav class="flex-grow-1" role="navigation" aria-label="Navigation principale pour mobile">
+                <ul class="nav nav-tabs flex-column">
+                    <li class="nav-item">
+                        <a href="{% url 'home:hp' %}" class="nav-link{% if '/dashboard' in request.path %} active{% endif %}">
+                            <i class="ri-home-line font-weight-medium" aria-hidden="true"></i>
+                            <span>Accueil</span>
+                        </a>
+                    </li>
+                    {% if user.is_job_seeker %}
+                        <li class="nav-item">
+                            <a href="{% url 'apply:list_for_job_seeker' %}" class="nav-link {% if '/apply/job_seeker/list' in request.path %}active{% endif %}" {% matomo_event "offcanvasNav" "clic" "mes-candidatures" %}>
+                                <i class="ri-draft-line font-weight-medium" aria-hidden="true"></i>
+                                <span>Mes candidatures</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if user.is_prescriber %}
+                        <li class="nav-item">
+                            <a href="{% url 'apply:list_prescriptions' %}" class="nav-link {% if '/apply/prescriptions/list' in request.path %}active{% endif %}" {% matomo_event "offcanvasNav" "clic" "candidatures" %}>
+                                <i class="ri-draft-line font-weight-medium" aria-hidden="true"></i>
+                                <span>Candidatures</span>
+                            </a>
+                        </li>
+                        {% if request.current_organization %}
+                            <li class="nav-item">
+                                <a href="#"
+                                   role="button"
+                                   class="nav-link has-collapse-caret {% if '/prescribers/colleagues' in request.path %}active{% endif %}"
+                                   data-bs-toggle="collapse"
+                                   data-bs-target="#collapseNavOrganisation"
+                                   type="button"
+                                   aria-expanded="{% if '/prescribers/colleagues' in request.path %}true{% else %}false{% endif %}"
+                                   aria-controls="collapseNavOrganisation">
+                                    <i class="ri-team-line font-weight-medium" aria-hidden="true"></i>
+                                    <span>Organisation</span>
+                                </a>
+                                <div class="collapse{% if '/prescribers/colleagues' in request.path %} show{% endif %}" id="collapseNavOrganisation">
+                                    <ul>
+
+                                        <li>
+                                            <a href="{% url 'prescribers_views:members' %}" class="{% if '/prescribers/colleagues' in request.path %}active{% endif %}" {% matomo_event "offcanvasNav" "clic" "collaborateurs" %}>Collaborateurs</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                    {% if user.is_employer %}
+                        <li class="nav-item">
+                            <a href="{% url 'apply:list_for_siae' %}" class="nav-link {% if '/apply/siae/list' in request.path %}active{% endif %}" {% matomo_event "offcanvasNav" "clic" "candidatures" %}>
+                                <i class="ri-draft-line font-weight-medium" aria-hidden="true"></i>
+                                <span>Candidatures</span>
+                            </a>
+                        </li>
+                        {% if request.current_organization.is_subject_to_eligibility_rules %}
+                            <li class="nav-item">
+                                <a href="#"
+                                   role="button"
+                                   class="nav-link has-collapse-caret{% if '/approvals/list' in request.path or '/employee_record/list' in request.path %} active{% endif %}"
+                                   data-bs-toggle="collapse"
+                                   data-bs-target="#collapseNavSalaries"
+                                   type="button"
+                                   aria-expanded="{% if '/approvals/list' in request.path or '/employee_record/list' in request.path %}true{% else %}false{% endif %}"
+                                   aria-controls="collapseNavSalaries">
+                                    <i class="ri-team-line font-weight-medium" aria-hidden="true"></i>
+                                    <span>Salariés</span>
+                                </a>
+                                <div class="collapse{% if '/approvals/list' in request.path or '/employee_record/list' in request.path %} show{% endif %}" id="collapseNavSalaries">
+                                    <ul>
+                                        <li>
+                                            <a href="{% url 'approvals:list' %}" class="{% if '/approvals/list' in request.path %}active{% endif %}" {% matomo_event "offcanvasNav" "clic" "salaries-passe-iae" %}>Salariés et PASS IAE</a>
+                                        </li>
+                                        {% if can_show_employee_records %}
+                                            <li>
+                                                <a href="{% url 'employee_record_views:list' %}?status=NEW" class="{% if '/employee_record/list' in request.path %}active{% endif %}" {% matomo_event "offcanvasNav" "clic" "fiches-salaries-asp" %}>Fiches salariés ASP</a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#"
+                                   role="button"
+                                   class="nav-link has-collapse-caret{% if '/company/job_description_list' in request.path or '/company/colleagues' in request.path or '/company/show_financial_annexes' in request.path %} active{% endif %}"
+                                   data-bs-toggle="collapse"
+                                   data-bs-target="#collapseNavStructure"
+                                   type="button"
+                                   aria-expanded="{% if '/company/job_description_list' in request.path or '/company/colleagues' in request.path or '/company/show_financial_annexes' in request.path %}true{% else %}false{% endif %}"
+                                   aria-controls="collapseNavStructure">
+                                    <i class="ri-community-line font-weight-medium" aria-hidden="true"></i>
+                                    <span>Structure</span>
+                                </a>
+                                <div class="collapse{% if '/company/job_description_list' in request.path or '/company/colleagues' in request.path or '/company/show_financial_annexes' in request.path %} show{% endif %}"
+                                     id="collapseNavStructure">
+                                    <ul>
+                                        <li>
+                                            <a href="{% url 'companies_views:job_description_list' %}"
+                                               class="{% if '/company/job_description_list' in request.path %}active{% endif %}"
+                                               {% matomo_event "offcanvasNav" "clic" "metiers-recrutements" %}>Métiers et recrutements</a>
+                                        </li>
+                                        {% if request.current_organization.is_active %}
+                                            <li>
+                                                <a href="{% url 'companies_views:members' %}" class="{% if '/company/colleagues' in request.path %}active{% endif %}" {% matomo_event "offcanvasNav" "clic" "collaborateurs" %}>Collaborateurs</a>
+                                            </li>
+                                        {% endif %}
+                                        {% if can_show_financial_annexes %}
+                                            <li>
+                                                <a href="{% url 'companies_views:show_financial_annexes' %}"
+                                                   class="{% if '/company/show_financial_annexes' in request.path %}active{% endif %}"
+                                                   {% matomo_event "offcanvasNav" "clic" "annexes-financieres" %}>Annexes financières</a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+            </nav>
+            <div class="dropdown">
+                <button type="button"
+                        class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3"
+                        data-bs-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-controls="dashboardUserDropdownMobile"
+                        aria-expanded="false">
+                    <i class="ri-account-circle-line" aria-hidden="true"></i>
+                    <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                </button>
+                <div class="dropdown-menu" id="dashboardUserDropdownMobile">
+                    <ul class="list-unstyled">
+                        <li class="dropdown-item">
+                            <div class="d-flex align-items-center">
+                                <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+                                <div class="flex-grow-1 ms-2 lh-sm">
+                                    {% if user.get_full_name %}
+                                        <span>{{ user.get_full_name }}</span>
+                                        <br>
+                                    {% endif %}
+                                    <span class="fs-sm lh-sm text-muted">{{ user.email }}</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="dropdown-divider"></div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'dashboard:index' %}">Tableau de bord</a>
+                        </li>
+                        {% if not user.is_staff and not user.is_labor_inspector %}
+                            <li>
+                                <a class="dropdown-item" href="{% url 'dashboard:edit_user_notifications' %}">Mes notifications</a>
+                            </li>
+                        {% endif %}
+                        <li class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="{% url 'dashboard:edit_user_info' %}">Modifier mon profil</a>
+                        </li>
+                        {% if not user.has_sso_provider %}
+                            <li>
+                                <a class="dropdown-item" href="{% url 'account_change_password' %}">Modifier mon mot de passe</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'dashboard:edit_user_email' %}">Modifier mon adresse e-mail</a>
+                            </li>
+                        {% endif %}
+                        <li class="dropdown-divider"></li>
+                        {% if user.is_employer and request.is_current_organization_admin %}
+                            <li>
+                                <a class="dropdown-item text-primary" href="{% url 'dashboard:api_token' %}">Accès aux APIs</a>
+                            </li>
+                            <li class="dropdown-divider"></li>
+                        {% endif %}
+                        <li class="dropdown-item">
+                            <form method="post" action="{% url 'account_logout' %}">
+                                {% csrf_token %}
+                                <button class="text-danger">Déconnexion</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="dropdown">
+                <button type="button" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="helpDropdownMobile" aria-expanded="false">
+                    Besoin d'aide ?
+                </button>
+                <div class="dropdown-menu" id="helpDropdownMobile">
+                    <ul class="list-unstyled">
+                        <li>
+                            <a href="{{ ITOU_HELP_CENTER_URL }}"
+                               rel="noopener"
+                               class="dropdown-item has-external-link"
+                               target="_blank"
+                               aria-label="Accéder à l'espace de documentation (nouvel onglet)"
+                               {% matomo_event "help" "clic" "header_documentation" %}>Documentation</a>
+                        </li>
+                        <li>
+                            <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14733403281937--Comprendre-l-IAE"
+                               rel="noopener"
+                               class="dropdown-item has-external-link"
+                               target="_blank"
+                               aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)"
+                               {% matomo_event "help" "clic" "header_comprendre-liae" %}>Qui peut bénéficier des contrats d'IAE&nbsp;?</a>
+                        </li>
+                        {% if user.is_employer or user.is_prescriber_with_authorized_org %}
+                            <li>
+                                <a href="https://travail-emploi.gouv.fr/actualites/l-actualite-du-ministere/article/guide-pratique-la-prescription-de-parcours-d-insertion-par-l-activite"
+                                   rel="noopener"
+                                   class="dropdown-item has-external-link"
+                                   target="_blank"
+                                   aria-label="Prescrire un parcours IAE (guide pratique) (ouverture dans un nouvel onglet)"
+                                   {% matomo_event "help" "clic" "header_prescrire-parcours-iae-guide" %}>Prescrire un parcours IAE (guide pratique)</a>
+                            </li>
+                        {% endif %}
+                        <li>
+                            <a href="{{ ITOU_HELP_CENTER_URL }}/categories/25225629682321--Nouveaut%C3%A9s"
+                               rel="noopener"
+                               class="dropdown-item has-external-link"
+                               target="_blank"
+                               aria-label="Les nouveautés du site des emplois de l'inclusion (ouverture dans un nouvel onglet)"
+                               {% matomo_event "help" "clic" "header_nouveautes" %}>Nouveautés</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="offcanvas-footer flex-column align-items-stretch">
+            <div class="offcanvas-footer__legal">
+                <div class="d-none d-xl-block">
+                    <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" alt="Les emplois de l'inclusion" height="50">
+                </div>
+                <ul>
+                    <li>
+                        <a href="{% url 'accessibility' %}">Accessibilité : partiellement conforme</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'legal-notice' %}">Mentions légales</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'legal-terms' %}">CGU</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
