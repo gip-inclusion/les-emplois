@@ -1,5 +1,7 @@
 import paramiko
 from django.conf import settings
+from django.db import transaction
+from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from sentry_sdk.crons import monitor
 
@@ -152,10 +154,15 @@ class Command(EmployeeRecordTransferCommand):
         ):
             self._upload_batch_file(sftp, batch, dry_run)
 
-    def handle(self, *, upload, download, preflight, wet_run, asp_test=False, debug=False, **options):
+    def handle(self, *, upload, download, parse_file=None, preflight, wet_run, asp_test=False, debug=False, **options):
         if preflight:
             self.stdout.write("Preflight activated, checking for possible serialization errors...")
             self.preflight(EmployeeRecordUpdateNotification)
+        elif parse_file:
+            # If we need to manually parse a feedback file then we probably have some kind of unexpected state,
+            # so use an atomic block to avoid creating more incoherence when something breaks.
+            with transaction.atomic():
+                self._parse_feedback_file(parse_file.name, JSONParser().parse(parse_file), dry_run=not wet_run)
         elif upload or download:
             if not settings.ASP_FS_SFTP_HOST:
                 self.stdout.write("Your environment is missing ASP_FS_SFTP_HOST to run this command.")
