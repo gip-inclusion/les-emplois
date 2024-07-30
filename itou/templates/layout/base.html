@@ -89,7 +89,9 @@
             {% block content %}{% endblock %}
         </main>
 
-        {% include "layout/_footer.html" %}
+        {% if not user.is_authenticated %}
+            {% include "layout/_footer.html" %}
+        {% endif %}
 
         <div class="visually-hidden">
             <a href="#header">Retour au début de la page</a>
