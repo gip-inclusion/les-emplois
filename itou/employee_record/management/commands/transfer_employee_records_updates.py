@@ -109,9 +109,6 @@ class Command(EmployeeRecordTransferCommand):
             archived_json = JSONRenderer().render(employee_record)
             # Employee record notification successfully processed by ASP:
             if processing_code == EmployeeRecordUpdateNotification.ASP_PROCESSING_SUCCESS_CODE:
-                notification.asp_processing_code = processing_code
-                notification.asp_processing_label = processing_label
-
                 if not dry_run:
                     # Not an important issue if notification was previously processed
                     if notification.status != Status.PROCESSED:
