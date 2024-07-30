@@ -1,3 +1,4 @@
+import argparse
 import logging
 from io import BytesIO
 
@@ -27,6 +28,12 @@ class EmployeeRecordTransferCommand(BaseCommand):
         )
         parser.add_argument(
             "--upload", dest="upload", action="store_true", help="Upload employee records ready for processing"
+        )
+        parser.add_argument(
+            "--parse-file",
+            dest="parse_file",
+            type=argparse.FileType(mode="rb"),
+            help="Parse an employee records feedback file",
         )
         parser.add_argument(
             "--wet-run", dest="wet_run", action="store_true", help="Perform *real* SFTP transfer operations"
