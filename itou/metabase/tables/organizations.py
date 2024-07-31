@@ -21,7 +21,7 @@ from itou.users.models import User
 # contribution.
 # Of course this organization is *never* actually saved in itou's db.
 ORG_OF_PRESCRIBERS_WITHOUT_ORG = PrescriberOrganization(
-    id=-1, name="Regroupement des prescripteurs sans organisation", kind="SANS-ORGANISATION", is_authorized=False
+    id=-1, name="Regroupement des prescripteurs sans organisation", kind=None, is_authorized=False
 )
 
 
