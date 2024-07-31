@@ -893,12 +893,18 @@ class CertifiedCriteriaInfoRequiredForm(forms.ModelForm):
                 "data-ajax--type": "GET",
                 "data-minimum-input-length": 2,
                 "data-placeholder": "Nom de la commune",
+                "data-disable-target": "#id_birth_country",
+                "data-target-value": "91",  # France
             },
         ),
         required=False,
     )
 
-    birth_country = forms.ModelChoiceField(asp_models.Country.objects, label="Pays de naissance")
+    birth_country = forms.ModelChoiceField(
+        asp_models.Country.objects,
+        label="Pays de naissance",
+        required=False,
+    )
 
     class Meta:
         model = JobSeekerProfile
@@ -911,18 +917,30 @@ class CertifiedCriteriaInfoRequiredForm(forms.ModelForm):
     def clean(self):
         super().clean()
 
-        birth_place = self.cleaned_data.get("birth_place")
         birthdate = self.birthdate
+        birth_place = self.cleaned_data.get("birth_place")
+        birth_country = self.cleaned_data.get("birth_country")
+        if not birth_country:
+            # Selecting a birth place sets the birth country field to France and disables it.
+            # However, disabled fields are ignored by Django.
+            # That's also why we can't make it mandatory.
+            # See utils.js > toggleDisableAndSetValue
+            if birth_place:
+                self.cleaned_data["birth_country"] = asp_models.Country.objects.get(
+                    code=asp_models.Country._CODE_FRANCE
+                )
+            else:
+                # Display the error above the field instead of top of page.
+                self.add_error("birth_country", "Le pays de naissance est obligatoire.")
 
         if birth_place and birthdate:
             try:
                 self.cleaned_data["birth_place"] = asp_models.Commune.objects.by_insee_code_and_period(
                     birth_place.code, birthdate
                 )
-            except asp_models.Commune.DoesNotExist as ex:
-                raise forms.ValidationError(
-                    f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {birthdate:%d/%m/%Y}"
-                ) from ex
+            except asp_models.Commune.DoesNotExist:
+                msg = f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {birthdate:%d/%m/%Y}"
+                self.add_error("birth_place", msg)
 
     def _post_clean(self):
         super()._post_clean()

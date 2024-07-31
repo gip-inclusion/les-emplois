@@ -2419,10 +2419,37 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         self.assertContains(response, self.BIRTH_PLACE_LABEL)
 
         # CertifiedCriteriaForm
+        # Birth country is mandatory.
+        post_data = self._accept_view_post_data(job_application=job_application)
+        post_data = {
+            "birth_country": "",
+            "birth_place": "",
+        }
+        response, _ = self.accept_job_application(
+            job_application=job_application, post_data=post_data, assert_successful=False
+        )
+
+        # Wrong birth country and birth place.
+        post_data["birth_country"] = "0012345"
+        post_data["birth_place"] = "008765"
+        response, _ = self.accept_job_application(
+            job_application=job_application, post_data=post_data, assert_successful=False
+        )
+        assert response.context["form_certified_criteria"].errors == {
+            "birth_place": ["Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles."],
+            "birth_country": [
+                "Sélectionnez un choix valide. Ce choix ne fait pas partie de ceux disponibles.",
+                "Le pays de naissance est obligatoire.",
+            ],
+        }
+
         birth_country = CountryFranceFactory()
         birth_place = Commune.objects.by_insee_code_and_period("07141", job_application.job_seeker.birthdate)
+        # Field is disabled with Javascript on birth country input.
+        # Elements with the disabled attribute are not submitted thus are not part of POST data.
+        # See https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#constructing-the-form-data-set
         post_data = {
-            "birth_country": birth_country.pk,
+            "birth_country": "",
             "birth_place": birth_place.pk,
         }
         self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
@@ -2448,10 +2475,21 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         self.assertContains(response, self.BIRTH_PLACE_LABEL)
 
         # CertifiedCriteriaForm
+        # Birth country is mandatory.
+        post_data = self._accept_view_post_data(job_application=job_application)
+        post_data = {
+            "birth_country": "",
+            "birth_place": "",
+        }
+        response, _ = self.accept_job_application(
+            job_application=job_application, post_data=post_data, assert_successful=False
+        )
+
+        # Then set it.
         birth_country = CountryFranceFactory()
         birth_place = Commune.objects.by_insee_code_and_period("07141", job_application.job_seeker.birthdate)
         post_data = {
-            "birth_country": birth_country.pk,
+            "birth_country": "",
             "birth_place": birth_place.pk,
         }
         response, _ = self.accept_job_application(

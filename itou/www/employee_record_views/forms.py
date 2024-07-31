@@ -129,6 +129,8 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
                 "data-ajax--type": "GET",
                 "data-minimum-input-length": 2,
                 "data-placeholder": "Nom de la commune",
+                "data-disable-target": "#id_birth_country",
+                "data-target-value": "91",  # France
             },
         ),
         required=False,
