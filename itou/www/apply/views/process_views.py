@@ -423,7 +423,9 @@ def accept(request, job_application_id, template_name="apply/process_accept.html
     """
     Trigger the `accept` transition.
     """
-    queryset = JobApplication.objects.is_active_company_member(request.user)
+    queryset = JobApplication.objects.is_active_company_member(request.user).select_related(
+        "job_seeker", "job_seeker__jobseeker_profile"
+    )
     job_application = get_object_or_404(queryset, id=job_application_id)
     check_waiting_period(job_application)
     next_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
