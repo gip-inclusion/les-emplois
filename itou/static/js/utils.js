@@ -1,7 +1,7 @@
 htmx.onLoad((target) => {
-    $(".js-prevent-default", target).on("click", (event) => {
-        event.preventDefault();
-    });
+  $(".js-prevent-default", target).on("click", (event) => {
+    event.preventDefault();
+  });
 
   /**
    * Force select2 initialization after htmx swaps
@@ -34,7 +34,7 @@ htmx.onLoad((target) => {
   $("[data-shroud-input]", target).prop("disabled", true)
   $(".js-shroud", target).find("[data-shroud-input]").prop("disabled", false)
   $("[data-shroud-clear]", target).each(function () {
-    $(this).click(function() {
+    $(this).click(function () {
       $(".js-shroud").removeClass("js-shroud")
       $("[data-shroud-input]").prop("disabled", true)
     })
@@ -43,10 +43,26 @@ htmx.onLoad((target) => {
   /**
     * JS to disable/enable targeted field
     **/
-  $('input[type="checkbox"][data-disable-target]', target).change(function(e) {
+  $('input[type="checkbox"][data-disable-target]', target).change(function (e) {
     const target = this.getAttribute("data-disable-target")
     $(target).attr("disabled", this.checked)
   })
+
+  /**
+  * JS to disable/enable and set another select field value.
+  **/
+  function toggleDisableAndSetValue() {
+    const targetId = this.getAttribute("data-disable-target");
+    const isSet = $(this).val().length > 0;
+    if (isSet) {
+      $(targetId).val(this.getAttribute("data-target-value"));
+    }
+    $(targetId).attr("disabled", isSet);
+  }
+  target.querySelectorAll('select[data-disable-target]').forEach(function (selectFieldWithDisable) {
+    toggleDisableAndSetValue.call(selectFieldWithDisable);
+    $(selectFieldWithDisable).change(toggleDisableAndSetValue);
+  });
 
   /**
     * JS to allow to disable buttons (elements with "btn" class)
@@ -54,7 +70,7 @@ htmx.onLoad((target) => {
     * Typically useful when forms are available and you don't want the user
     * to be confused in which button to use or to forget to validate the editing form.
   **/
-  $('[data-disable-btn-if]', target).each(function() {
+  $('[data-disable-btn-if]', target).each(function () {
     const selector = this.getAttribute("data-disable-btn-if")
     $('.btn', this).toggleClass("disabled", $(selector).length !== 0)
     // null value removes the attribute altogether instead of having aria-disabled="false"
