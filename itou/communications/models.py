@@ -134,7 +134,7 @@ class AnnouncementCampaign(models.Model):
 
     class Meta:
         verbose_name = "campagne d'annonce"
-        ordering = ["start_date"]
+        ordering = ["-start_date"]
         constraints = [
             models.UniqueConstraint(
                 fields=["start_date"],
@@ -198,7 +198,7 @@ class AnnouncementItem(models.Model):
 
     class Meta:
         verbose_name = "article d'annonce"
-        ordering = ["campaign__start_date", "priority", "pk"]
+        ordering = ["-campaign__start_date", "priority", "pk"]
 
     def __str__(self):
         return self.title

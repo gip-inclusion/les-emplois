@@ -40,7 +40,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "verbose_name": "campagne d'annonce",
-                "ordering": ["start_date"],
+                "ordering": ["-start_date"],
             },
         ),
         migrations.CreateModel(
@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 "verbose_name": "article d'annonce",
-                "ordering": ["campaign__start_date", "priority", "pk"],
+                "ordering": ["-campaign__start_date", "priority", "pk"],
             },
         ),
         migrations.AddConstraint(
