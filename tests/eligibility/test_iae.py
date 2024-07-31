@@ -1,5 +1,6 @@
 import datetime
 
+import pytest
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
@@ -442,26 +443,19 @@ class TestAdministrativeCriteriaModel:
         assert criterion_level_2.key == f"level_{criterion_level_2.level}_{criterion_level_2.pk}"
 
 
-class AdministrativeCriteriaQuerysetTest(TestCase):
-    # TODO(cms): move some AdministrativeCriteriaModelTest here.
-    def test_certifiable(self):
-        expected = AdministrativeCriteria.objects.filter(certifiable=True).first()
-        not_expected = AdministrativeCriteria.objects.exclude(certifiable=True).first()
-        assert expected in AdministrativeCriteria.objects.certifiable()
-        assert not_expected not in AdministrativeCriteria.objects.certifiable()
+@pytest.mark.parametrize(
+    "AdministrativeCriteriaClass",
+    [
+        pytest.param(AdministrativeCriteria, id="test_certifiable_iae"),
+        pytest.param(GEIQAdministrativeCriteria, id="test_certifiable_geiq"),
+    ],
+)
+def test_certifiable(AdministrativeCriteriaClass):
+    certifiable_criteria = AdministrativeCriteriaClass.objects.filter(certifiable=True).order_by("?").first()
+    not_certifiable_criteria = AdministrativeCriteriaClass.objects.exclude(certifiable=True).order_by("?").first()
 
-        expected = AdministrativeCriteria.objects.exclude(certifiable=True).first()
-        not_expected = AdministrativeCriteria.objects.filter(certifiable=True).first()
-        assert expected in AdministrativeCriteria.objects.not_certifiable()
-        assert not_expected not in AdministrativeCriteria.objects.not_certifiable()
+    assert certifiable_criteria in AdministrativeCriteriaClass.objects.certifiable()
+    assert not_certifiable_criteria not in AdministrativeCriteriaClass.objects.certifiable()
 
-    def test_geiq_certifiable(self):
-        expected = GEIQAdministrativeCriteria.objects.filter(certifiable=True).first()
-        not_expected = GEIQAdministrativeCriteria.objects.exclude(certifiable=True).first()
-        assert expected in GEIQAdministrativeCriteria.objects.certifiable()
-        assert not_expected not in GEIQAdministrativeCriteria.objects.certifiable()
-
-        expected = GEIQAdministrativeCriteria.objects.exclude(certifiable=True).first()
-        not_expected = GEIQAdministrativeCriteria.objects.filter(certifiable=True).first()
-        assert expected in GEIQAdministrativeCriteria.objects.not_certifiable()
-        assert not_expected not in GEIQAdministrativeCriteria.objects.not_certifiable()
+    assert not_certifiable_criteria in AdministrativeCriteriaClass.objects.not_certifiable()
+    assert certifiable_criteria not in AdministrativeCriteriaClass.objects.not_certifiable()

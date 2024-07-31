@@ -21,6 +21,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 from unittest_parametrize import ParametrizedTestCase, parametrize
 
 from itou.approvals.models import Approval, Suspension
+from itou.asp.models import Commune
 from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
 from itou.eligibility.enums import AuthorKind
@@ -74,7 +75,7 @@ REFUSED_JOB_APPLICATION_PRESCRIBER_SECTION_BODY = (
 
 @pytest.mark.ignore_unknown_variable_template_error("has_form_error", "with_matomo_event")
 @pytest.mark.usefixtures("unittest_compatibility")
-class ProcessViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
+class ProcessViewsTest(MessagesTestMixin, TestCase):
     DIAGORIENTE_INVITE_TITLE = "Ce candidat n’a pas de CV ?"
     DIAGORIENTE_INVITE_PRESCRIBER_MESSAGE = "Invitez le prescripteur à en créer un via notre partenaire Diagoriente."
     DIAGORIENTE_INVITE_JOB_SEEKER_MESSAGE = "Invitez-le à en créer un via notre partenaire Diagoriente."
@@ -1660,6 +1661,9 @@ class ProcessViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
 @override_settings(API_BAN_BASE_URL="http://ban-api", TALLY_URL="https://tally.so")
 class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
+    BIRTH_COUNTRY_LABEL = "Pays de naissance"
+    BIRTH_PLACE_LABEL = "Commune de naissance"
+
     @classmethod
     def setUpTestData(cls):
         cls.company = CompanyFactory(with_membership=True, with_jobs=True, name="La brigade - entreprise par défaut")
@@ -2411,12 +2415,12 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         self.client.force_login(employer)
 
         response = self.client.get(url_accept)
-        self.assertContains(response, "Pays de naissance")
-        self.assertContains(response, "Commune de naissance")
+        self.assertContains(response, self.BIRTH_COUNTRY_LABEL)
+        self.assertContains(response, self.BIRTH_PLACE_LABEL)
 
         # CertifiedCriteriaForm
         birth_country = CountryFranceFactory()
-        birth_place = CommuneFactory()
+        birth_place = Commune.objects.by_insee_code_and_period("07141", job_application.job_seeker.birthdate)
         post_data = {
             "birth_country": birth_country.pk,
             "birth_place": birth_place.pk,
@@ -2425,8 +2429,8 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
         jobseeker_profile.refresh_from_db()
-        assert jobseeker_profile.birth_country.code == birth_country.code
-        assert jobseeker_profile.birth_place.code == birth_place.code
+        assert jobseeker_profile.birth_country == birth_country
+        assert jobseeker_profile.birth_place == birth_place
 
     def test_accept_geiq__criteria_certification_available(self):
         self.company.kind = CompanyKind.GEIQ
@@ -2440,12 +2444,12 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         self.client.force_login(employer)
 
         response = self.client.get(url_accept)
-        self.assertContains(response, "Pays de naissance")
-        self.assertContains(response, "Commune de naissance")
+        self.assertContains(response, self.BIRTH_COUNTRY_LABEL)
+        self.assertContains(response, self.BIRTH_PLACE_LABEL)
 
         # CertifiedCriteriaForm
         birth_country = CountryFranceFactory()
-        birth_place = CommuneFactory()
+        birth_place = Commune.objects.by_insee_code_and_period("07141", job_application.job_seeker.birthdate)
         post_data = {
             "birth_country": birth_country.pk,
             "birth_place": birth_place.pk,
@@ -2456,61 +2460,10 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
         jobseeker_profile.refresh_from_db()
-        assert jobseeker_profile.birth_country.code == birth_country.code
-        assert jobseeker_profile.birth_place.code == birth_place.code
+        assert jobseeker_profile.birth_country == birth_country
+        assert jobseeker_profile.birth_place == birth_place
 
     def test_accept_no_siae__criteria_certification_available(self):
-        self.company.kind = CompanyKind.EATT
-        self.company.save()
-        job_application = self.create_job_application(eligibility_diagnosis__with_certifiable_criteria=True)
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-
-        employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
-
-        response = self.client.get(url_accept)
-        self.assertNotContains(response, "Pays de naissance")
-        self.assertNotContains(response, "Commune de naissance")
-
-        # CertifiedCriteriaForm
-        birth_country = CountryFranceFactory()
-        birth_place = CommuneFactory()
-        post_data = {
-            "birth_country": birth_country.pk,
-            "birth_place": birth_place.pk,
-        }
-        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
-
-        jobseeker_profile = job_application.job_seeker.jobseeker_profile
-        jobseeker_profile.refresh_from_db()
-        assert not jobseeker_profile.birth_country
-        assert not jobseeker_profile.birth_place
-
-    def test_criteria__criteria_not_certificable(self):
-        # ############################
-        # No criteria to be certified: the form should not appear
-        # and it should be valid.
-        ##############################
-        job_application = self.create_job_application(eligibility_diagnosis__with_not_certifiable_criteria=True)
-        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
-
-        employer = job_application.to_company.members.first()
-        self.client.force_login(employer)
-
-        response = self.client.get(url_accept)
-        self.assertNotContains(response, "Pays de naissance")
-        self.assertNotContains(response, "Commune de naissance")
-
-        # CertifiedCriteriaForm
-        post_data = self._accept_view_post_data(job_application=job_application)
-        del post_data["birth_country"]
-        del post_data["birth_place"]
-        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
-
-    def test_criteria__company_not_siae(self):
-        # ############################
-        # Company is not subject to eligibility rules: hide the form.
-        ##############################
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True, with_jobs=True)
         job_application = self.create_job_application(
             eligibility_diagnosis__with_certifiable_criteria=True,
@@ -2523,8 +2476,33 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         self.client.force_login(employer)
 
         response = self.client.get(url_accept)
-        self.assertNotContains(response, "Pays de naissance")
-        self.assertNotContains(response, "Commune de naissance")
+        self.assertNotContains(response, self.BIRTH_COUNTRY_LABEL)
+        self.assertNotContains(response, self.BIRTH_PLACE_LABEL)
+
+        post_data = self._accept_view_post_data(job_application=job_application)
+        del post_data["birth_country"]
+        del post_data["birth_place"]
+        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
+
+        jobseeker_profile = job_application.job_seeker.jobseeker_profile
+        jobseeker_profile.refresh_from_db()
+        assert not jobseeker_profile.birth_country
+        assert not jobseeker_profile.birth_place
+
+    def test_criteria__criteria_not_certificable(self):
+        # ############################
+        # No criteria to be certified: the form should not appear
+        # and it should not be valided.
+        ##############################
+        job_application = self.create_job_application(eligibility_diagnosis__with_not_certifiable_criteria=True)
+        url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
+
+        employer = job_application.to_company.members.first()
+        self.client.force_login(employer)
+
+        response = self.client.get(url_accept)
+        self.assertNotContains(response, self.BIRTH_COUNTRY_LABEL)
+        self.assertNotContains(response, self.BIRTH_PLACE_LABEL)
 
         # CertifiedCriteriaForm
         post_data = self._accept_view_post_data(job_application=job_application)

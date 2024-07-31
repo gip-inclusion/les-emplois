@@ -40,14 +40,10 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
     form_certified_criteria = None
     creating = job_application is None
     valid_diagnosis = None
-    if siae.is_subject_to_eligibility_rules:
-        valid_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker, for_siae=siae)
-    elif siae.kind == CompanyKind.GEIQ:
-        valid_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
-            job_seeker=job_seeker, for_geiq=siae
-        ).first()
+    birthdate = job_seeker.birthdate
 
     if siae.is_subject_to_eligibility_rules:
+        valid_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker, for_siae=siae)
         # Info that will be used to search for an existing Pôle emploi approval.
         form_personal_data = JobSeekerPersonalDataForm(
             instance=job_seeker,
@@ -55,13 +51,18 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
             tally_form_query=f"jobapplication={job_application.pk}" if job_application else None,
         )
         forms.append(form_personal_data)
+        birthdate = form_personal_data.data.get("birthdate")
 
         form_user_address = JobSeekerAddressForm(instance=job_seeker, data=request.POST or None)
         forms.append(form_user_address)
+    elif siae.kind == CompanyKind.GEIQ:
+        valid_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
+            job_seeker=job_seeker, for_geiq=siae
+        ).first()
 
     if valid_diagnosis and valid_diagnosis.criteria_certification_available():
         form_certified_criteria = CertifiedCriteriaInfoRequiredForm(
-            instance=job_seeker.jobseeker_profile, data=request.POST or None
+            instance=job_seeker.jobseeker_profile, birthdate=birthdate, data=request.POST or None
         )
         forms.append(form_certified_criteria)
 
