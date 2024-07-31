@@ -32,7 +32,11 @@ from tests.gps.factories import FollowUpGroupFactory, FollowUpGroupMembershipFac
 from tests.institutions.factories import InstitutionFactory, InstitutionMembershipFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.prescribers.factories import PrescriberMembershipFactory
+from tests.prescribers.factories import (
+    PrescriberMembershipFactory,
+    PrescriberOrganizationFactory,
+    PrescriberOrganizationWith2MembershipFactory,
+)
 from tests.siae_evaluations.factories import (
     EvaluatedAdministrativeCriteriaFactory,
     EvaluatedJobApplicationFactory,
@@ -1304,6 +1308,132 @@ def test_populate_gps_memberships():
                 membership.member.pk,
                 ["13", "63", "75"],
                 int(membership.created_in_bulk),
+                datetime.date(2023, 2, 1),
+            ),
+        ]
+
+
+@freeze_time("2023-02-02")
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_organizations():
+    first_organisation = PrescriberOrganizationWith2MembershipFactory(
+        authorized=True,
+        post_code="59473",
+    )
+    second_organisation = PrescriberOrganizationFactory(
+        authorized=True,
+        post_code="63020",
+    )
+
+    num_queries = 1  # Select get_active_companies_pks()
+    num_queries += 1  # Count organization
+    num_queries += 1  # COMMIT Queryset counts (autocommit mode)
+    num_queries += 1  # COMMIT get_active_companies_pks (autocommit mode)
+    num_queries += 1  # Select cities
+    num_queries += 1  # Count memberships
+    num_queries += 2  # Select members/prescribermembership_set for ORG_OF_PRESCRIBERS_WITHOUT_ORG
+    num_queries += 1  # COMMIT Create table
+
+    num_queries += 1  # Select organization IDs
+    num_queries += 1  # Select one chunk of organization IDs
+    num_queries += 1  # Select organization with columns
+    num_queries += 1  # Select prefetch organizations memberships
+    num_queries += 1  # Select prefetch organizations members
+    num_queries += 1  # COMMIT (inject_chunk)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
+    num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
+    with assertNumQueries(num_queries):
+        management.call_command("populate_metabase_emplois", mode="organizations")
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM organisations_v0 ORDER BY id")
+        rows = cursor.fetchall()
+        print(rows)
+        assert rows == [
+            (
+                -1,
+                None,
+                "Regroupement des prescripteurs sans organisation",
+                None,
+                None,
+                0,
+                "",
+                "",
+                "",
+                None,
+                "",
+                None,
+                None,
+                "",
+                None,
+                None,
+                None,
+                None,
+                0,
+                0,
+                0,
+                None,
+                None,
+                0,
+                0,
+                datetime.date(2023, 2, 1),
+            ),
+            (
+                first_organisation.pk,
+                first_organisation.siret,
+                first_organisation.name,
+                "PE",
+                "France Travail",
+                1,
+                "",
+                "",
+                "59473",
+                None,
+                "",
+                None,
+                None,
+                "59",
+                "59 - Nord",
+                "Hauts-de-France",
+                datetime.date(2023, 2, 2),
+                None,
+                2,
+                0,
+                0,
+                None,
+                None,
+                0,
+                0,
+                datetime.date(2023, 2, 1),
+            ),
+            (
+                second_organisation.pk,
+                second_organisation.siret,
+                second_organisation.name,
+                "PE",
+                "France Travail",
+                1,
+                "",
+                "",
+                "63020",
+                None,
+                "",
+                None,
+                None,
+                "63",
+                "63 - Puy-de-Dôme",
+                "Auvergne-Rhône-Alpes",
+                None,
+                None,
+                0,
+                0,
+                0,
+                None,
+                None,
+                0,
+                0,
                 datetime.date(2023, 2, 1),
             ),
         ]
