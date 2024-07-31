@@ -1,3 +1,6 @@
+from django.conf import settings
+
+from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
 from itou.metabase.tables.utils import (
     MetabaseTable,
@@ -52,6 +55,12 @@ TABLE.add_columns(
         get_column_from_field(get_field("naf"), name="code_naf"),
         get_column_from_field(get_field("email"), name="email_public"),
         get_column_from_field(get_field("auth_email"), name="email_authentification"),
+        {
+            "name": "convergence_france",
+            "type": "boolean",
+            "comment": "Convergence France (contrats PHC et CVG)",
+            "fn": lambda o: o.kind == CompanyKind.ACI and o.siret in settings.ACI_CONVERGENCE_SIRET_WHITELIST,
+        },
     ]
 )
 

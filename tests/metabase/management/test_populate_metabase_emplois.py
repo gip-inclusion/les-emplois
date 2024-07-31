@@ -10,7 +10,7 @@ from pytest_django.asserts import assertNumQueries
 
 from itou.approvals.enums import Origin
 from itou.common_apps.address.departments import DEPARTMENTS
-from itou.companies.enums import ContractType
+from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import JobDescription
 from itou.eligibility.models import AdministrativeCriteria
 from itou.geo.utils import coords_to_geometry
@@ -1168,6 +1168,7 @@ def test_populate_companies():
                 "1071A",
                 "contact@garaje_el_martinet.es",
                 "secret.ceo@garaje_el_martinet.es",
+                False,
                 # Address columns " de la structure mère"
                 "112 rue de la Croix-Nivert",
                 "",
@@ -1209,6 +1210,24 @@ def test_populate_companies():
                 0,
                 datetime.date(2023, 2, 1),
             ),
+        ]
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.usefixtures("metabase")
+def test_populate_companies_convergence(settings):
+    convergence_company = CompanyFactory(kind=CompanyKind.ACI)
+    settings.ACI_CONVERGENCE_SIRET_WHITELIST = [convergence_company.siret]
+    aci_non_convergence_company = CompanyFactory(kind=CompanyKind.ACI)
+    non_convergence_company = CompanyFactory()
+
+    management.call_command("populate_metabase_emplois", mode="siaes")
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT siret, convergence_france FROM structures_v0 ORDER BY id")
+        assert cursor.fetchall() == [
+            (convergence_company.siret, True),
+            (aci_non_convergence_company.siret, False),
+            (non_convergence_company.siret, False),
         ]
 
 
