@@ -904,20 +904,24 @@ class CertifiedCriteriaInfoRequiredForm(forms.ModelForm):
         model = JobSeekerProfile
         fields = ("birth_place", "birth_country")
 
+    def __init__(self, birthdate, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.birthdate = birthdate
+
     def clean(self):
         super().clean()
 
         birth_place = self.cleaned_data.get("birth_place")
-        birth_date = self.instance.user.birthdate
+        birthdate = self.birthdate
 
-        if birth_place and birth_date:
+        if birth_place and birthdate:
             try:
                 self.cleaned_data["birth_place"] = asp_models.Commune.objects.by_insee_code_and_period(
-                    birth_place.code, birth_date
+                    birth_place.code, birthdate
                 )
             except asp_models.Commune.DoesNotExist as ex:
                 raise forms.ValidationError(
-                    f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {birth_date:%d/%m/%Y}"
+                    f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {birthdate:%d/%m/%Y}"
                 ) from ex
 
     def _post_clean(self):
