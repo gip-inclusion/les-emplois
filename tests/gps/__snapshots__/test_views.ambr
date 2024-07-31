@@ -254,7 +254,7 @@
                                   </a>
   
                               
-                              <a aria-label="Consulter la fiche de Jane DOE" class="btn btn-outline-primary btn-block btn-ico w-100 w-md-auto" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                              <a aria-label="Consulter la fiche de Jane DOE" class="btn btn-outline-primary btn-block btn-ico w-100 w-md-auto" data-matomo-action="clic" data-matomo-category="GPS_liste_groupes" data-matomo-event="true" data-matomo-option="consulter_fiche_candidat" href="/users/details/7614fc4b-aef9-4694-ab17-12324300180a">
                                   <i aria-hidden="true" class="ri-eye-line ri-xl font-weight-medium"></i>
                                   <span>Consulter la fiche</span>
                               </a>

@@ -1,4 +1,5 @@
 {% load str_filters %}
+{% load matomo %}
 
 <section aria-labelledby="results" id="follow-up-groups-section">
     {% if not memberships_page %}
@@ -109,7 +110,8 @@
                             {% endif %}
                             <a href="{% url 'users:details' public_id=membership.follow_up_group.beneficiary.public_id %}"
                                class="btn btn-outline-primary btn-block btn-ico w-100 w-md-auto"
-                               aria-label="Consulter la fiche de {{ membership.follow_up_group.beneficiary.get_full_name }}">
+                               aria-label="Consulter la fiche de {{ membership.follow_up_group.beneficiary.get_full_name }}"
+                               {% matomo_event "GPS_liste_groupes" "clic" "consulter_fiche_candidat" %}>
                                 <i class="ri-eye-line ri-xl font-weight-medium" aria-hidden="true"></i>
                                 <span>Consulter la fiche</span>
                             </a>
