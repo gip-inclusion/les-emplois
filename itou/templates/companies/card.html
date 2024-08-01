@@ -23,7 +23,7 @@
                     <div class="form-group col col-lg-auto">
                         <a href="{% url 'apply:job_application_external_transfer_step_2' job_application_id=job_app_to_transfer.pk company_pk=siae.pk %}?back_url={{ request.get_full_path|urlencode }}"
                            class="btn btn-lg btn-white btn-block btn-ico"
-                           {% matomo_event "candidature" "clic" "job_app_transfer" %}
+                           {% matomo_event "candidature" "clic" "start_job_app_transfer" %}
                            aria-label="Transférer la candidature à l'employeur inclusif {{ siae.display_name }}">
                             <i class="ri-draft-line font-weight-medium" aria-hidden="true"></i>
                             <span>Transférer la candidature</span>
@@ -182,7 +182,7 @@
                                 <div class="d-flex justify-content-end mt-3">
                                     <a class="btn btn-primary btn-ico flex-grow-1 flex-lg-grow-0"
                                        href="{% url 'apply:job_application_external_transfer_step_2' job_application_id=job_app_to_transfer.pk company_pk=siae.pk %}?back_url={{ request.get_full_path|urlencode }}"
-                                       {% matomo_event "candidature" "clic" "job_app_transfer" %}
+                                       {% matomo_event "candidature" "clic" "start_job_app_transfer" %}
                                        aria-label="Transférer la candidature à l'employeur inclusif {{ siae.display_name }}">
                                         <i class="ri-draft-line"></i>
                                         <span>Transférer la candidature</span>

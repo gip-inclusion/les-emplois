@@ -66,7 +66,7 @@
                     <p class="mb-3 mb-md-0">Cette structure vous intéresse ?</p>
                     <a class="btn btn-ico btn-primary"
                        href="{% url 'apply:job_application_external_transfer_step_2' job_application_id=job_app_to_transfer.pk company_pk=siae.pk %}?back_url={{ request.get_full_path|urlencode }}"
-                       {% matomo_event "candidature" "clic" "job_app_transfer" %}
+                       {% matomo_event "candidature" "clic" "start_job_app_transfer" %}
                        aria-label="Transférer la candidature à l'employeur inclusif {{ siae.display_name }}">
                         <i class="ri ri-draft-line" aria-hidden="true"></i>
                         <span>Transférer la candidature</span>
@@ -142,7 +142,7 @@
                     <p class="mb-3 mb-md-0">Cette structure vous intéresse ?</p>
                     <a class="btn btn-ico btn-primary"
                        href="{% url 'apply:job_application_external_transfer_step_2' job_application_id=job_app_to_transfer.pk company_pk=siae.pk %}?back_url={{ request.get_full_path|urlencode }}"
-                       {% matomo_event "candidature" "clic" "job_app_transfer" %}
+                       {% matomo_event "candidature" "clic" "start_job_app_transfer" %}
                        aria-label="Transférer la candidature à l'employeur inclusif {{ siae.display_name }}">
                         <i class="ri ri-draft-line" aria-hidden="true"></i>
                         <span>Transférer la candidature</span>
