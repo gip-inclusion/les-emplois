@@ -199,6 +199,7 @@ class AnnouncementItem(models.Model):
     class Meta:
         verbose_name = "article d'annonce"
         ordering = ["-campaign__start_date", "priority", "pk"]
+        unique_together = [('campaign', 'priority')]
 
     def __str__(self):
         return self.title

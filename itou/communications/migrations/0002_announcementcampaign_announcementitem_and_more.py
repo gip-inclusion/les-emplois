@@ -93,4 +93,8 @@ class Migration(migrations.Migration):
                 verbose_name="campagne",
             ),
         ),
+        migrations.AlterUniqueTogether(
+            name='announcementitem',
+            unique_together={('campaign', 'priority')},
+        ),
     ]
