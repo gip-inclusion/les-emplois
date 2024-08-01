@@ -1,5 +1,4 @@
 from allauth.account.views import PasswordChangeView
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
@@ -29,7 +28,6 @@ from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.job_applications.enums import JobApplicationState
 from itou.openid_connect.inclusion_connect import constants as ic_constants
-from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
 from itou.users.enums import MATOMO_ACCOUNT_TYPE, IdentityProvider, UserKind
@@ -46,14 +44,6 @@ from itou.www.dashboard.forms import (
 )
 from itou.www.search.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
-
-
-MOBILEMPLOI_DEPARTMENTS = (
-    "69",
-    "75",
-    "91",
-    "94",
-)
 
 
 def _employer_dashboard_context(request):
@@ -152,8 +142,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "num_rejected_employee_records": 0,
         "pending_prolongation_requests": None,
         "evaluated_siae_notifications": EvaluatedSiae.objects.none(),
-        "show_mobilemploi_banner": False,
-        "show_mobilemploi_prescriber_banner": False,
         "siae_suspension_text_with_dates": None,
         "siae_search_form": SiaeSearchForm(),
     }
@@ -171,15 +159,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
                     prescriber_organization=current_org,
                     status=ProlongationRequestStatus.PENDING,
                 ).count()
-            context["show_mobilemploi_prescriber_banner"] = (
-                current_org.department in MOBILEMPLOI_DEPARTMENTS
-                and current_org.kind
-                not in (
-                    PrescriberOrganizationKind.CAP_EMPLOI,
-                    PrescriberOrganizationKind.PE,
-                    PrescriberOrganizationKind.ML,
-                )
-            )
         elif request.user.email.endswith("pole-emploi.fr"):
             messages.info(
                 request,
@@ -221,16 +200,6 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         for attr in required_attributes:
             if not getattr(request.user, attr):
                 return HttpResponseRedirect(reverse("dashboard:edit_user_info"))
-        active_user_job_applications_interval = [
-            timezone.now() - relativedelta(months=6),
-            timezone.now() - relativedelta(months=1),
-        ]
-        context["show_mobilemploi_banner"] = (
-            request.user.department in MOBILEMPLOI_DEPARTMENTS
-            and request.user.job_applications.filter(created_at__range=active_user_job_applications_interval)
-            .exclude(state__in=[JobApplicationState.ACCEPTED, JobApplicationState.OBSOLETE])
-            .exists()
-        )
 
     return render(request, template_name, context)
 
