@@ -36,6 +36,12 @@
                         {% endif %}
                     {% endwith %}
                 {% endif %}
+                {% if job_application.next_appointment %}
+                    <span>
+                        <i class="ri-calendar-line font-weight-normal me-1" aria-hidden="true"></i>
+                        Prochain rdv le {{ job_application.next_appointment|date:"d/m/Y" }}
+                    </span>
+                {% endif %}
             </div>
         </div>
     </div>
