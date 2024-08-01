@@ -53,8 +53,8 @@ class JobsInline(ItouTabularInline):
 
 class FinancialAnnexesInline(ItouTabularInline):
     model = models.SiaeFinancialAnnex
-    fields = ("number", "state", "start_at", "end_at", "is_active")
-    readonly_fields = ("number", "state", "start_at", "end_at", "is_active")
+    fields = ("number", "is_active", "state", "start_at", "end_at", "created_at")
+    readonly_fields = ("number", "is_active", "state", "start_at", "end_at", "created_at")
     can_delete = False
 
     ordering = (
