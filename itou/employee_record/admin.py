@@ -63,7 +63,7 @@ class ASPExchangeInformationAdminMixin:
     @admin.display(description="données SIAE envoyées")
     def company_data_sent(self, obj):
         if not obj.archived_json:
-            return "-"
+            return self.get_empty_value_display()
 
         # Handle older data serialized from the JSON as string
         if not isinstance(obj.archived_json, dict):
@@ -76,7 +76,7 @@ class ASPExchangeInformationAdminMixin:
     @admin.display(description="données candidat envoyées")
     def user_data_sent(self, obj):
         if not obj.archived_json:
-            return "-"
+            return self.get_empty_value_display()
 
         # Handle older data serialized from the JSON as string
         if not isinstance(obj.archived_json, dict):
@@ -90,7 +90,7 @@ class ASPExchangeInformationAdminMixin:
     @admin.display(description="données PASS IAE envoyées")
     def approval_data_sent(self, obj):
         if not obj.archived_json:
-            return "-"
+            return self.get_empty_value_display()
 
         # Handle older data serialized from the JSON as string
         if not isinstance(obj.archived_json, dict):
@@ -234,7 +234,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
         if job_seeker := obj.job_application.job_seeker:
             return get_admin_view_link(job_seeker, content=job_seeker)
 
-        return "-"
+        return self.get_empty_value_display()
 
     @admin.display(description="profil du salarié")
     def job_seeker_profile_link(self, obj):
@@ -247,7 +247,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
             return "Intégrée par les emplois suite à une erreur 3436 (doublon PASS IAE/SIRET)"
         if obj.asp_processing_code == obj.ASP_PROCESSING_SUCCESS_CODE:
             return "Intégrée par l'ASP"
-        return "-"
+        return self.get_empty_value_display()
 
     def has_add_permission(self, request):
         return False

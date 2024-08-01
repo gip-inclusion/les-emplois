@@ -105,7 +105,7 @@ class JobApplicationInline(ItouStackedInline):
         if obj.hiring_start_at and obj.hiring_start_at < get_availability_date_for_kind(obj.to_company.kind).date():
             return "Date de début du contrat avant l'interopérabilité"
 
-        return "-"
+        return self.get_empty_value_display()
 
 
 class SuspensionInline(ItouTabularInline):
@@ -388,7 +388,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                 get_admin_view_link(company, content=company.display_name),
                 company.siret,
             )
-        return "-"
+        return self.get_empty_value_display()
 
 
 class IsInProgressFilter(admin.SimpleListFilter):
@@ -562,7 +562,7 @@ class ProlongationRequestAdmin(ProlongationCommonAdmin):
     @admin.display(description="actions envisagées")
     def denied_proposed_actions(self, obj):
         if obj.deny_information.proposed_actions is None:
-            return "-"
+            return self.get_empty_value_display()
         return "\n".join(obj.deny_information.get_proposed_actions_display())
 
     @admin.display(description="explications des actions envisagées")
