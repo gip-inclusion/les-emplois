@@ -155,32 +155,28 @@
                             {% endif %}
                             Précisez également dans le message, vos motivations, vos compétences ainsi que vos disponibilités.
                         </p>
-                    {% elif is_subject_to_eligibility_rules %}
+                    {% elif is_subject_to_eligibility_rules or is_subject_to_geiq_eligibility_rules %}
                         <p class="mb-0">
                             Pour retenir l’attention du recruteur, décrivez la situation actuelle du candidat,
                             son parcours, ses compétences et expliquez les freins socio-professionnels rencontrés.
                             <br />
-                            Vous pouvez vous appuyer sur le document
-                            <a class="text-important"
-                               href="https://communaute.inclusion.beta.gouv.fr/surveys/dsp/create/"
-                               target="_blank"
-                               rel="noreferrer noopener"
-                               aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
-                            <br />
+                            {% if is_subject_to_eligibility_rules %}
+                                Vous pouvez vous appuyer sur le document
+                                <a class="text-important"
+                                   href="https://communaute.inclusion.beta.gouv.fr/surveys/dsp/create/"
+                                   target="_blank"
+                                   rel="noreferrer noopener"
+                                   aria-label="Diagnostic socio-professionnel des candidats (ouverture dans un nouvel onglet)">diagnostic socio-professionnel de référence</a>.
+                                <br />
+                            {% elif is_subject_to_geiq_eligibility_rules %}
+                                Vous pouvez également vous appuyer sur les conseils donnés sur
+                                <a href="https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire"
+                                   target="_blank"
+                                   rel="noreferrer noopener"
+                                   aria-label="Orienter un candidat vers un Geiq de votre territoire (ouverture dans un nouvel onglet)">https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire</a>.
+                                <br />
+                            {% endif %}
                             Précisez également dans le message, ses motivations, ses compétences, ainsi que ses disponibilités.
-                        </p>
-                    {% elif is_subject_to_geiq_eligibility_rules %}
-                        <p class="mb-0">
-                            Pour retenir l’attention du recruteur, décrivez la situation actuelle du candidat,
-                            son parcours, ses compétences et expliquez les freins socio-professionnels rencontrés.
-                            <br />
-                            Vous pouvez également vous appuyer sur les conseils donnés sur
-                            <a href="https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire"
-                               target="_blank"
-                               rel="noreferrer noopener"
-                               aria-label="Orienter un candidat vers un Geiq de votre territoire (ouverture dans un nouvel onglet)">https://www.lesgeiq.fr/orienter-un-candidat-vers-un-geiq-de-votre-territoire</a>.
-                            <br />
-                            Précisez également dans le message, ses motivations, ses compétences ainsi que ses disponibilités.
                         </p>
                     {% endif %}
                 </div>
