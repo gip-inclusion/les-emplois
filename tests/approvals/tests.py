@@ -7,6 +7,7 @@ import factory
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
+from django.contrib.admin import AdminSite
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.core import mail
@@ -1108,10 +1109,11 @@ class TestCustomApprovalAdminViews:
         assert approval.number_with_spaces in email.body
 
     def test_employee_record_status(self, subtests):
+        inline = JobApplicationInline(JobApplication, AdminSite())
         # When an employee record exists
         employee_record = EmployeeRecordFactory()
         url = reverse("admin:employee_record_employeerecord_change", args=[employee_record.id])
-        msg = JobApplicationInline.employee_record_status(employee_record.job_application)
+        msg = inline.employee_record_status(employee_record.job_application)
         assert msg == f'<a href="{url}"><b>Nouvelle (ID: {employee_record.pk})</b></a>'
 
         # When the job application will lead to a duplicate employee record but is still proposed
@@ -1120,24 +1122,24 @@ class TestCustomApprovalAdminViews:
             to_company=employee_record.job_application.to_company,
             approval=employee_record.job_application.approval,
         )
-        msg = JobApplicationInline.employee_record_status(job_application)
+        msg = inline.employee_record_status(job_application)
         assert msg == "En attente de création (doublon)"
 
         # When employee record creation is disabled for that job application
         job_application = JobApplicationFactory(create_employee_record=False)
-        msg = JobApplicationInline.employee_record_status(job_application)
+        msg = inline.employee_record_status(job_application)
         assert msg == "Non proposé à la création"
 
         # When hiring start date is before employee record availability date
         job_application = JobApplicationFactory(hiring_start_at="2021-09-26")
-        msg = JobApplicationInline.employee_record_status(job_application)
+        msg = inline.employee_record_status(job_application)
         assert msg == "Date de début du contrat avant l'interopérabilité"
 
         # When employee records are allowed (or not) for the SIAE
         for kind in CompanyKind:
             with subtests.test("SIAE doesn't use employee records", kind=kind.name):
                 job_application = JobApplicationFactory(with_approval=True, to_company__kind=kind)
-                msg = JobApplicationInline.employee_record_status(job_application)
+                msg = inline.employee_record_status(job_application)
                 if not job_application.to_company.can_use_employee_record:
                     assert msg == "La SIAE ne peut pas utiliser la gestion des fiches salarié"
                 else:
@@ -1149,7 +1151,7 @@ class TestCustomApprovalAdminViews:
             to_company=employee_record.job_application.to_company,
             approval=employee_record.job_application.approval,
         )
-        msg = JobApplicationInline.employee_record_status(job_application)
+        msg = inline.employee_record_status(job_application)
         assert msg == "Une fiche salarié existe déjà pour ce candidat"
 
 
