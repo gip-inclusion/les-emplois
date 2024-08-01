@@ -4,7 +4,6 @@ from datetime import date
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
@@ -128,8 +127,13 @@ class AnnouncementCampaign(models.Model):
     )
     start_date = models.DateField(
         null=False,
-        verbose_name="date de début",
-        help_text="la date de lancement des articles sur le site. La date de fin est toujours le dernier jour du mois",
+        verbose_name="mois concerné",
+        help_text="le mois des nouveautés. Automatiquement fixé au premier du mois saisi",
+    )
+    live = models.BooleanField(
+        default=True,
+        verbose_name="prêt",
+        help_text="les modifications sont toujours possible",
     )
 
     class Meta:
@@ -160,18 +164,23 @@ class AnnouncementCampaign(models.Model):
         return f"Campagne d'annonce du { self.start_date.strftime('%m/%Y') }"
 
     def clean(self):
-        # prevent campaigns from sharing start_date
-        queryset = AnnouncementCampaign.objects.annotate(
-            year=models.functions.ExtractYear("start_date"), month=models.functions.ExtractMonth("start_date")
-        ).filter(year=self.start_date.year, month=self.start_date.month)
-
-        if self.pk:
-            queryset = queryset.exclude(pk=self.pk)
-
-        if queryset.exists():
-            raise ValidationError("Maximum 1 campagne par mois")
-
+        self.start_date = self.start_date.replace(day=1)
         return super().clean()
+
+    def _update_cached_active_announcement(self):
+        from itou.communications.cache import get_cached_active_announcement, update_active_announcement_cache
+
+        campaign = get_cached_active_announcement()
+        if campaign is None or self.pk == campaign.pk:
+            update_active_announcement_cache()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self._update_cached_active_announcement()
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        self._update_cached_active_announcement()
 
     def items_for_template(self):
         return self.items.all()[: self.max_items]
@@ -199,7 +208,22 @@ class AnnouncementItem(models.Model):
     class Meta:
         verbose_name = "article d'annonce"
         ordering = ["-campaign__start_date", "priority", "pk"]
-        unique_together = [('campaign', 'priority')]
+        unique_together = [("campaign", "priority")]
 
     def __str__(self):
         return self.title
+
+    def _update_cached_active_announcement(self):
+        from itou.communications.cache import get_cached_active_announcement, update_active_announcement_cache
+
+        campaign = get_cached_active_announcement()
+        if campaign is None or self.campaign == campaign:
+            update_active_announcement_cache()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self._update_cached_active_announcement()
+
+    def delete(self, *args, **kwargs):
+        super().delete(*args, **kwargs)
+        self._update_cached_active_announcement()

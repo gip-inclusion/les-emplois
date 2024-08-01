@@ -30,11 +30,14 @@ class Migration(migrations.Migration):
                 (
                     "start_date",
                     models.DateField(
-                        help_text=(
-                            "la date de lancement des articles sur le site. "
-                            "La date de fin est toujours le dernier jour du mois"
-                        ),
-                        verbose_name="date de début",
+                        help_text="le mois des nouveautés. Automatiquement fixé au premier du mois saisi",
+                        verbose_name="mois concerné",
+                    ),
+                ),
+                (
+                    "live",
+                    models.BooleanField(
+                        default=True, help_text="les modifications sont toujours possible", verbose_name="prêt"
                     ),
                 ),
             ],
@@ -94,7 +97,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.AlterUniqueTogether(
-            name='announcementitem',
-            unique_together={('campaign', 'priority')},
+            name="announcementitem",
+            unique_together={("campaign", "priority")},
         ),
     ]

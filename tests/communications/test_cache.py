@@ -22,11 +22,11 @@ class AnnouncementCampaignCacheTest(TestCase):
             active_announcement_campaign(None)["active_campaign_announce"] == campaign
 
         # test cached value is kept up-to-date
-        campaign.start_date = campaign.start_date - timedelta(days=1)
+        campaign.max_items += 1
         campaign.save()
 
         with assertNumQueries(0):
-            assert active_announcement_campaign(None)["active_campaign_announce"].start_date == campaign.start_date
+            assert active_announcement_campaign(None)["active_campaign_announce"].max_items == campaign.max_items
 
         item = AnnouncementItemFactory(campaign=campaign)
         with assertNumQueries(0):
@@ -37,7 +37,9 @@ class AnnouncementCampaignCacheTest(TestCase):
             assert active_announcement_campaign(None)["active_campaign_announce"].items.count() == 1
 
         # test cache does not become invalidated when saving a new campaign
-        new_campaign = AnnouncementCampaignFactory(with_item=True)
+        new_campaign = AnnouncementCampaignFactory(
+            with_item=True, start_date=(campaign.start_date + timedelta(days=40))
+        )
         with assertNumQueries(0):
             active_announcement_campaign(None)["active_campaign_announce"] == campaign
 

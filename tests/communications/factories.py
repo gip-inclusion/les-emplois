@@ -10,7 +10,7 @@ class AnnouncementCampaignFactory(factory.django.DjangoModelFactory):
         model = AnnouncementCampaign
         skip_postgeneration_save = True
 
-    start_date = factory.LazyFunction(date.today)
+    start_date = factory.LazyFunction(lambda: date.today().replace(day=1))
 
     @factory.post_generation
     def with_item(obj, create, extracted, **kwargs):
@@ -25,3 +25,4 @@ class AnnouncementItemFactory(factory.django.DjangoModelFactory):
     campaign = factory.SubFactory(AnnouncementCampaignFactory)
     title = factory.Faker("sentence", locale="fr_FR")
     description = factory.Faker("paragraph", locale="fr_FR")
+    priority = factory.Sequence(lambda n: n + 1)

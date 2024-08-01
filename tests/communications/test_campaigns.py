@@ -18,7 +18,7 @@ class AnnouncementCampaignValidatorTest(TestCase):
             fields = "__all__"
 
     def test_valid_campaign(self):
-        expected_form_fields = ["max_items", "start_date"]
+        expected_form_fields = ["max_items", "start_date", "live"]
         assert list(self.TestForm().fields.keys()) == expected_form_fields
 
         form = self.TestForm(model_to_dict(AnnouncementCampaignFactory.build()))
@@ -29,7 +29,7 @@ class AnnouncementCampaignValidatorTest(TestCase):
         campaign = AnnouncementCampaignFactory.build(start_date=date(2024, 1, 20))
         form = self.TestForm(model_to_dict(campaign))
 
-        expected_form_errors = ["Maximum 1 campagne par mois"]
+        expected_form_errors = ["La contrainte « unique_announcement_campaign_month_year » n’est pas respectée."]
         assert form.errors["__all__"] == expected_form_errors
 
         campaign.start_date = date(2024, 2, 1)
@@ -75,7 +75,17 @@ class TestRenderAnnouncementCampaign:
         assert "Item D" not in str(content)
 
     def test_campaign_not_rendered_without_items(self, client):
+        cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
         AnnouncementCampaignFactory()
+
+        response = client.get(reverse("search:employers_home"))
+        assert response.status_code == 200
+        content = parse_response_to_soup(response)
+        assert len(content.select("#news-modal")) == 0
+
+    def test_campaign_not_rendered_draft(self, client):
+        cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
+        AnnouncementCampaignFactory(live=False, with_item=True)
 
         response = client.get(reverse("search:employers_home"))
         assert response.status_code == 200

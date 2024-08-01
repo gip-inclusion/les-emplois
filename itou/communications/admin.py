@@ -12,6 +12,6 @@ class AnnouncementItemInline(ItouTabularInline):
 
 @admin.register(models.AnnouncementCampaign)
 class AnnouncementCampaignAdmin(ItouModelAdmin):
-    list_display = ("start_date", "end_date")
-    fields = ("max_items", "start_date")
+    list_display = ("start_date", "end_date", "live")
+    fields = ("max_items", "start_date", "live")
     inlines = (AnnouncementItemInline,)
