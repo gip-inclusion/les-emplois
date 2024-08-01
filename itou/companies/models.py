@@ -817,7 +817,7 @@ class SiaeConvention(models.Model):
     )
     # Grace period starts from this date.
     deactivated_at = models.DateTimeField(
-        verbose_name="date de  désactivation et début de délai de grâce",
+        verbose_name="date de désactivation et début de délai de grâce",
         blank=True,
         null=True,
         db_index=True,
