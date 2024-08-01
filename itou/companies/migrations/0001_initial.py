@@ -498,7 +498,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         db_index=True,
                         null=True,
-                        verbose_name="date de  désactivation et début de délai de grâce",
+                        verbose_name="date de désactivation et début de délai de grâce",
                     ),
                 ),
                 (
