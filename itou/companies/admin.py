@@ -366,7 +366,7 @@ class SiaeConventionAdmin(ItouModelAdmin):
     @admin.display(description="fin de délai de grâce")
     def grace_period_end_at(self, obj):
         if not obj.deactivated_at:
-            return None
+            return "-"
         return display_for_value(
             obj.deactivated_at + timezone.timedelta(days=models.SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS),
             empty_value_display="-",
