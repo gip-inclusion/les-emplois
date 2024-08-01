@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.contrib.admin.utils import display_for_value
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
@@ -301,6 +302,7 @@ class SiaeConventionAdmin(ItouModelAdmin):
         "kind",
         "siret_signature",
         "deactivated_at",
+        "grace_period_end_at",
         "reactivated_by",
         "reactivated_at",
         "created_at",
@@ -323,6 +325,7 @@ class SiaeConventionAdmin(ItouModelAdmin):
                 "fields": (
                     "is_active",
                     "deactivated_at",
+                    "grace_period_end_at",
                     "reactivated_by",
                     "reactivated_at",
                 )
@@ -359,6 +362,15 @@ class SiaeConventionAdmin(ItouModelAdmin):
                 # Start grace period.
                 obj.deactivated_at = timezone.now()
         super().save_model(request, obj, form, change)
+
+    @admin.display(description="fin de délai de grâce")
+    def grace_period_end_at(self, obj):
+        if not obj.deactivated_at:
+            return None
+        return display_for_value(
+            obj.deactivated_at + timezone.timedelta(days=models.SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS),
+            empty_value_display="-",
+        )
 
 
 @admin.register(models.SiaeFinancialAnnex)
