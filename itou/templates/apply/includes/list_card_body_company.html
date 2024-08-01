@@ -1,3 +1,4 @@
+{% load i18n %}
 {% load str_filters %}
 
 <div class="c-box--results__header">
@@ -41,6 +42,12 @@
                             {% endif %}
                         {% endif %}
                     {% endwith %}
+                {% endif %}
+                {% if job_application.next_appointment_start_at %}
+                    <span {% if job_application.other_appointments_count %} data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="{% blocktrans count other_appointments_count=job_application.other_appointments_count %}{{ other_appointments_count }} autre rendez-vous prévu, rendez-vous dans le détail de candidature pour le consulter"{% plural %}{{ other_appointments_count }} autres rendez-vous prévus, rendez-vous dans le détail de candidature pour les consulter{% endblocktrans%}"{% endif %}>
+                        <i class="ri-calendar-line font-weight-normal me-1" aria-hidden="true"></i>
+                        Prochain rdv le {{ job_application.next_appointment_start_at|date:"d/m/Y" }}
+                    </span>
                 {% endif %}
             </div>
         </div>

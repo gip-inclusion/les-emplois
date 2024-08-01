@@ -71,6 +71,7 @@ RDV_INSERTION_CREATE_AND_INVITE_SUCCESS_BODY = {
             "rdv_with_referents": False,
             "created_at": "1970-01-01T00:00:00",
             "motif_category": {"id": 1, "short_name": "siae_interview", "name": "Entretien SIAE"},
+            "delivery_status": "delivered",
         }
     ],
 }

@@ -1,0 +1,91 @@
+{% load datetime_filters %}
+
+{% include "apply/includes/invitation_requests.html" with job_application=job_application invitation_requests=invitation_requests %}
+{% if participations %}
+    <div>
+        <h3>Rendez-vous</h3>
+        <table id="rdvi-appointments" class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Statut</th>
+                    <th scope="col">Date et heure</th>
+                    <th scope="col">Motif</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for participation in participations %}
+                    <tr>
+                        <td>
+                            <span class="badge badge-sm rounded-pill {{ participation.get_status_class_name }}">{{ participation.get_status_display }}</span>
+                        </td>
+                        <td>{{ participation.appointment.start_at }}</td>
+                        <td>{{ participation.appointment.reason }}</td>
+                        <td id="participation-{{ participation.pk }}-row">
+                            <button type="button" class="btn btn-link px-0" data-bs-toggle="modal" data-bs-target="#participation-{{ participation.pk }}-modal">
+                                Détails
+                            </button>
+                            <div class="modal modal--mini fade" id="participation-{{ participation.pk }}-modal" tabindex="-1" aria-labelledby="participation-{{ participation.pk }}-modal-title" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h3 class="modal-title" id="participation-{{ participation.pk }}-modal-title">Détails du rendez-vous</h3>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>
+                                                <span class="badge badge-sm rounded-pill {{ participation.get_status_class_name }}">{{ participation.get_status_display }}</span>
+                                            </p>
+                                            <p>
+                                                Date et heure : <strong>{{ participation.appointment.start_at|date:"d/m/Y \à H\hi" }}</strong>
+                                                <br>
+                                                Durée : <strong>{{ participation.appointment.duration|duration }}</strong>
+                                            </p>
+                                            <p>
+                                                Type de rendez-vous :
+                                                {% if participation.appointment.is_collective %}
+                                                    <strong>Collectif</strong>
+                                                {% else %}
+                                                    <strong>Individuel</strong>
+                                                {% endif %}
+                                                <br>
+                                                Catégorie de motif : <strong>{{ participation.appointment.get_reason_category_display }}</strong>
+                                                <br>
+                                                Motif : <strong>{{ participation.appointment.reason }}</strong>
+                                            </p>
+                                            {% if participation.appointment.location %}
+                                                <p>
+                                                    Lieu : <strong>{{ participation.appointment.location.name }}</strong>
+                                                    <br>
+                                                    Adresse : <strong>{{ participation.appointment.location.address }}</strong>
+                                                    {% if participation.appointment.location.phone_number %}
+                                                        <br>
+                                                        Téléphone : <strong>{{ participation.appointment.location.phone_number }}</strong>
+                                                    {% endif %}
+                                                </p>
+                                            {% elif participation.appointment.address %}
+                                                <p>
+                                                    Lieu : <strong>{{ participation.appointment.address }}</strong>
+                                                </p>
+                                            {% endif %}
+                                            {% if participation.appointment.total_participants %}
+                                                <p>
+                                                    Nombre d'inscrits : <strong>{{ participation.appointment.total_participants }}</strong>
+                                                </p>
+                                            {% endif %}
+                                            {% if participation.appointment.max_participants %}
+                                                <p>
+                                                    Nombre maximum : <strong>{{ participation.appointment.max_participants }}</strong>
+                                                </p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}

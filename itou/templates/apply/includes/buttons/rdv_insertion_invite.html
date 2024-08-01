@@ -1,13 +1,15 @@
 {% load matomo %}
 
-{% with state=state|default:"ok" %}
+{% with state=state|default:"ok" for_detail=for_detail|default:False %}
     {% if state == "error" %}
         {% if job_application %}
-            <form hx-post="{% url "apply:rdv_insertion_invite" job_application.pk %}" hx-swap="outerHTML" class="d-inline-flex has-btn-with-spinner-loading-text">
+            <form {% if for_detail %} hx-target="#rdvi-invitation-requests" hx-post="{% url "apply:rdv_insertion_invite_for_detail" job_application.pk %}" {% else %} hx-post="{% url "apply:rdv_insertion_invite" job_application.pk %}" {% endif %}
+                  hx-swap="outerHTML"
+                  class="d-inline-flex has-btn-with-spinner-loading-text">
                 {% csrf_token %}
                 <button class="btn btn-danger btn-ico"
                         data-bs-toggle="tooltip"
-                        data-bs-placement="bottom"
+                        data-bs-placement="left"
                         data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti."
                         aria-label="Proposer un rendez-vous à {{ job_application.job_seeker.get_full_name }}"
                         {% matomo_event "candidature" "clic" "proposer-rdv" %}>
@@ -22,20 +24,22 @@
                 </button>
             </form>
         {% else %}
-            <button class="btn btn-danger btn-ico" type="button" disabled data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti.">
+            <button class="btn btn-danger btn-ico" type="button" disabled data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti.">
                 <i class="ri-alert-line font-weight-medium" aria-hidden="true"></i>
                 <span>Une erreur est survenue</span>
             </button>
         {% endif %}
     {% elif job_application.has_pending_rdv_insertion_invitation_request %}
-        <button class="btn btn-success btn-ico" type="button" disabled data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true" data-bs-title="Une relance automatique sera envoyée trois jours après l'envoi de l'invitation.
+        <button class="btn btn-success btn-ico" type="button" disabled data-bs-toggle="tooltip" data-bs-placement="left" data-bs-html="true" data-bs-title="Une relance sera envoyée 3 jours après.
             <br>
-            Vous pourrez envoyer une nouvelle invitation après un délai de dix jours.">
+            Vous pourrez renvoyer une invitation sous 10J.">
             <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
             <span>Invitation envoyée</span>
         </button>
     {% else %}
-        <form hx-post="{% url "apply:rdv_insertion_invite" job_application.pk %}" hx-swap="outerHTML" class="d-inline-flex has-btn-with-spinner-loading-text">
+        <form {% if for_detail %} hx-target="#rdvi-invitation-requests" hx-post="{% url "apply:rdv_insertion_invite_for_detail" job_application.pk %}" {% else %} hx-post="{% url "apply:rdv_insertion_invite" job_application.pk %}" {% endif %}
+              hx-swap="outerHTML"
+              class="d-inline-flex has-btn-with-spinner-loading-text">
             {% csrf_token %}
             <button class="btn btn-secondary btn-ico" aria-label="Proposer un rendez-vous à {{ job_application.job_seeker.get_full_name }}" {% matomo_event "candidature" "clic" "proposer-rdv" %}>
                 <div class="stable-text">
