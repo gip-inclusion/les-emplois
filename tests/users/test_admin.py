@@ -97,6 +97,8 @@ def test_get_fields_to_transfer_for_job_seekers():
         "user_permissions",  # django.contrib.auth.models.Permission
         "notification_settings",  # NotificationSettings.user
         "rdvi_invitation_requests",  # InvitationRequest.job_seeker
+        "rdvi_participations",  # Participation.job_seeker
+        "rdvi_appointments",  # Appointment.company
     }
     fields_to_transfer = {f.name for f in admin.get_fields_to_transfer_for_job_seekers()}
     # Check that all fields have been accounted for

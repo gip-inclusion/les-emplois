@@ -79,7 +79,7 @@
                         {% elif job_applications_list_kind is JobApplicationsListKind.RECEIVED %}
                             <span>
                                 {% if request.current_organization.rdv_solidarites_id %}
-                                    {% include "apply/includes/buttons/rdv_insertion_invite.html" with job_application=job_application %}
+                                    {% include "apply/includes/buttons/rdv_insertion_invite.html" with job_application=job_application for_detail=False %}
                                 {% endif %}
                                 <a class="btn btn-outline-primary{% if job_application.pending_for_weeks >= job_application.WEEKS_BEFORE_CONSIDERED_OLD %} btn-block w-100 w-md-auto{% endif %}"
                                    href="{% url 'apply:details_for_company' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"

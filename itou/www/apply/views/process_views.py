@@ -1,4 +1,5 @@
 import datetime
+import logging
 from urllib.parse import quote, urljoin
 
 import httpx
@@ -9,7 +10,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.db.models import Count, Exists, OuterRef, Q
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.urls import reverse, reverse_lazy
@@ -25,8 +27,8 @@ from itou.eligibility.models import EligibilityDiagnosis
 from itou.eligibility.models.geiq import GEIQEligibilityDiagnosis
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow, PriorAction
-from itou.rdv_insertion.api import get_api_credentials
-from itou.rdv_insertion.models import Invitation, InvitationRequest
+from itou.rdv_insertion.api import get_api_credentials, get_invitation_status
+from itou.rdv_insertion.models import Invitation, InvitationRequest, Participation
 from itou.users.enums import Title
 from itou.utils.urls import get_safe_url
 from itou.www.apply.forms import (
@@ -42,6 +44,9 @@ from itou.www.apply.views import common as common_views, constants as apply_view
 from itou.www.apply.views.submit_views import ApplicationEndView, ApplicationJobsView, ApplicationResumeView
 from itou.www.companies_views.views import CompanyCardView, JobDescriptionCardView
 from itou.www.search.views import EmployerSearchView
+
+
+logger = logging.getLogger(__name__)
 
 
 def check_waiting_period(job_application):
@@ -128,6 +133,9 @@ def details_for_company(request, job_application_id, template_name="apply/proces
     - to update start date of a contract (provided given date is in the future),
     - to give an answer.
     """
+    if not request.user.is_employer:
+        raise Http404()
+
     queryset = (
         JobApplication.objects.is_active_company_member(request.user)
         .select_related(
@@ -145,8 +153,35 @@ def details_for_company(request, job_application_id, template_name="apply/proces
             "archived_by",
         )
         .prefetch_related("selected_jobs__appellation")
+        .annotate(
+            has_pending_rdv_insertion_invitation_request=Exists(
+                InvitationRequest.objects.filter(
+                    company=OuterRef("to_company"),
+                    job_seeker=OuterRef("job_seeker"),
+                    created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
+                )
+            ),
+            upcoming_participations_count=Count(
+                "job_seeker__rdvi_participations",
+                filter=Q(
+                    job_seeker__rdvi_participations__appointment__company=request.current_organization,
+                    job_seeker__rdvi_participations__status=Participation.Status.UNKNOWN,
+                    job_seeker__rdvi_participations__appointment__start_at__gt=timezone.now(),
+                ),
+            ),
+        )
     )
     job_application = get_object_or_404(queryset, id=job_application_id)
+    invitation_requests = InvitationRequest.objects.filter(
+        company=job_application.to_company,
+        job_seeker=job_application.job_seeker,
+        created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
+    ).prefetch_related("invitations")
+    participations = (
+        job_application.job_seeker.rdvi_participations.filter(appointment__company=job_application.to_company)
+        .select_related("appointment", "appointment__location")
+        .order_by("-appointment__start_at")
+    )
 
     transition_logs = job_application.logs.select_related("user").all()
 
@@ -170,6 +205,8 @@ def details_for_company(request, job_application_id, template_name="apply/proces
         "expired_eligibility_diagnosis": expired_eligibility_diagnosis,
         "geiq_eligibility_diagnosis": geiq_eligibility_diagnosis,
         "job_application": job_application,
+        "invitation_requests": invitation_requests,
+        "participations": participations,
         "transition_logs": transition_logs,
         "back_url": back_url,
         "add_prior_action_form": (
@@ -992,35 +1029,55 @@ def add_or_modify_prior_action(request, job_application_id, prior_action_id=None
 
 @login_required
 @require_POST
-def rdv_insertion_invite(request, job_application_id):
+def rdv_insertion_invite(request, job_application_id, for_detail=False):
+    if not request.user.is_employer:
+        raise Http404()
+
+    if for_detail:
+        template_name = "apply/includes/invitation_requests.html"
+    else:
+        template_name = "apply/includes/buttons/rdv_insertion_invite.html"
+
     try:
         job_application = (
             JobApplication.objects.is_active_company_member(request.user)
             .select_related("job_seeker__jobseeker_profile", "to_company")
+            .annotate(
+                has_pending_rdv_insertion_invitation_request=Exists(
+                    InvitationRequest.objects.filter(
+                        company=OuterRef("to_company"),
+                        job_seeker=OuterRef("job_seeker"),
+                        created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
+                    )
+                )
+            )
             .get(id=job_application_id)
         )
     except JobApplication.DoesNotExist:
         return render(
             request,
-            "apply/includes/buttons/rdv_insertion_invite.html",
-            {"job_application": None, "state": "error"},
+            template_name,
+            {"job_application": None, "invitation_requests": None, "state": "error"},
         )
 
     # Ensure company has RDV-I configured
     if not job_application.to_company.rdv_solidarites_id:
         return render(
             request,
-            "apply/includes/buttons/rdv_insertion_invite.html",
-            {"job_application": None, "state": "error"},
+            template_name,
+            {"job_application": None, "invitation_requests": None, "state": "error"},
         )
 
-    invitation_request = InvitationRequest.objects.filter(
-        job_seeker=job_application.job_seeker,
-        company=job_application.to_company,
-        created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
-    ).first()
+    if for_detail:
+        invitation_requests = InvitationRequest.objects.filter(
+            job_seeker=job_application.job_seeker,
+            company=job_application.to_company,
+            created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
+        )
+    else:
+        invitation_requests = None
 
-    if not invitation_request:
+    if not job_application.has_pending_rdv_insertion_invitation_request:
         try:
             with transaction.atomic():
                 url = urljoin(
@@ -1041,7 +1098,6 @@ def rdv_insertion_invite(request, job_application_id):
                         if job_application.job_seeker.jobseeker_profile.birthdate
                         else None
                     ),
-                    "france_travail_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
                     "address": job_application.job_seeker.address_on_one_line,
                 }
 
@@ -1049,7 +1105,6 @@ def rdv_insertion_invite(request, job_application_id):
                 if response.status_code in (httpx.codes.UNAUTHORIZED, httpx.codes.FORBIDDEN):
                     headers = get_api_credentials(refresh=True)
                     response = httpx.post(url=url, headers=headers, json=data, timeout=10)
-
                 response.raise_for_status()
                 response_data = response.json()
 
@@ -1057,30 +1112,50 @@ def rdv_insertion_invite(request, job_application_id):
                     job_seeker=job_application.job_seeker,
                     company=job_application.to_company,
                     api_response=response_data,
+                    reason_category=InvitationRequest.ReasonCategory.SIAE_INTERVIEW,
                     rdv_insertion_user_id=response_data["user"]["id"],
                 )
                 invitations = []
                 for invitation in response_data["invitations"]:
+                    extra_kwargs = {}
+                    if invitation_status := get_invitation_status(invitation):
+                        extra_kwargs["status"] = invitation_status
+                    if delivered_at_str := invitation.get("delivered_at"):
+                        try:
+                            extra_kwargs["delivered_at"] = datetime.datetime.fromisoformat(delivered_at_str)
+                        except Exception as e:
+                            # RDV-I API date formats are not consistent:
+                            # Let us know if anything has changed without causing failure
+                            logger.exception(e)
                     invitations.append(
                         Invitation(
                             type=Invitation.Type(invitation["format"]),
                             invitation_request=invitation_request,
-                            rdv_insertion_invitation_id=invitation["id"],
+                            rdv_insertion_id=invitation["id"],
+                            **extra_kwargs,
                         )
                     )
                 Invitation.objects.bulk_create(invitations)
+
+                if for_detail:
+                    # Refresh invitation requests
+                    invitation_requests = InvitationRequest.objects.filter(
+                        job_seeker=job_application.job_seeker,
+                        company=job_application.to_company,
+                        created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
+                    )
         except Exception as e:
             sentry_sdk.capture_exception(e)
             return render(
                 request,
-                "apply/includes/buttons/rdv_insertion_invite.html",
-                {"job_application": job_application, "state": "error"},
+                template_name,
+                {"job_application": job_application, "invitation_requests": invitation_requests, "state": "error"},
             )
 
     job_application.has_pending_rdv_insertion_invitation_request = True
 
     return render(
         request,
-        "apply/includes/buttons/rdv_insertion_invite.html",
-        {"job_application": job_application, "state": "ok"},
+        template_name,
+        {"job_application": job_application, "invitation_requests": invitation_requests, "state": "ok"},
     )

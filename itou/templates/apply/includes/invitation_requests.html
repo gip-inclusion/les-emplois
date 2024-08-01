@@ -1,0 +1,30 @@
+<div id="rdvi-invitation-requests" class="mb-6">
+    <div class="d-flex justify-content-between mb-4">
+        <h3>Invitations envoyées</h3>
+        {% include "apply/includes/buttons/rdv_insertion_invite.html" with job_application=job_application for_detail=True %}
+    </div>
+    {% if invitation_requests %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Date d'envoi</th>
+                    <th scope="col">Motif</th>
+                    <th scope="col">Invitation SMS</th>
+                    <th scope="col">Invitation mail</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for invitation_request in invitation_requests %}
+                    <tr>
+                        <td>{{ invitation_request.created_at }}</td>
+                        <td>{{ invitation_request.get_reason_category_display }}</td>
+                        <td>{{ invitation_request.sms_invitation.get_status_display|default:"-" }}</td>
+                        <td>{{ invitation_request.email_invitation.get_status_display|default:"-" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Aucune invitation en attente de réponse actuellement</p>
+    {% endif %}
+</div>
