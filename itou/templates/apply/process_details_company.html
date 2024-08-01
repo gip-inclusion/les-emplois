@@ -20,6 +20,23 @@
                aria-selected="true"
                {% matomo_event "candidature" "clic-onglet" "informations-generales" %}>Informations générales</a>
         </li>
+        {% if job_application.upcoming_appointments or request.current_organization.rdv_solidarites_id %}
+            <li class="nav-item" role="presentation">
+                <a class="nav-link"
+                   id="appointments-tab"
+                   data-bs-toggle="tab"
+                   href="#appointments"
+                   role="tab"
+                   aria-controls="appointments"
+                   aria-selected="false"
+                   {% matomo_event "candidature" "clic-onglet" "appointments" %}>
+                    <span>Rendez-vous</span>
+                    {% if job_application.upcoming_participations_count %}
+                        <span id="upcoming-appointments-count" class="badge badge-sm rounded-pill ms-2">{{ job_application.upcoming_participations_count }}</span>
+                    {% endif %}
+                </a>
+            </li>
+        {% endif %}
         <li class="nav-item" role="presentation">
             <a class="nav-link" id="historique-tab" data-bs-toggle="tab" href="#historique" role="tab" aria-controls="historique" aria-selected="false" {% matomo_event "candidature" "clic-onglet" "historique" %}>Historique</a>
         </li>
@@ -77,6 +94,13 @@
             {% include "apply/includes/job_application_answers.html" with job_application=job_application %}
         </div>
 
+        {% if job_application.upcoming_participations_count or request.current_organization.rdv_solidarites_id %}
+            <div class="tab-pane fade" id="appointments" role="tabpanel" aria-labelledby="appointments-tab">
+                {# Appointments ------------------------------------------------- #}
+                {% include "apply/includes/appointments.html" with job_application=job_application %}
+            </div>
+        {% endif %}
+
         <div class="tab-pane fade" id="historique" role="tabpanel" aria-labelledby="historique-tab">
             <h2>Historique des modifications</h2>
             {# History ------------------------------------------------------ #}
@@ -121,6 +145,7 @@
 {% block script %}
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js'%}"></script>
+    <script src='{% static "js/htmx_compat.js" %}'></script>
 {% endblock %}
 
 {% block modals %}

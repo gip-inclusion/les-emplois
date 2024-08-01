@@ -1,57 +1,57 @@
 # serializer version: 1
-# name: TestRDVInsertionView.test_rdv_insertion_configured_and_valid_rdv_insertion_exchange_with_no_pending_request
+# name: TestRdvInsertionView.test_rdv_insertion_configured_and_valid_rdv_insertion_exchange_with_no_pending_request
   '''
-  <button class="btn btn-success btn-ico" data-bs-html="true" data-bs-placement="bottom" data-bs-title="Une relance automatique sera envoyée trois jours après l'envoi de l'invitation.
+  <button class="btn btn-success btn-ico" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après.
               &lt;br&gt;
-              Vous pourrez envoyer une nouvelle invitation après un délai de dix jours." data-bs-toggle="tooltip" disabled="" type="button">
+              Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" disabled="" type="button">
               <i aria-hidden="true" class="ri-check-line font-weight-medium"></i>
               <span>Invitation envoyée</span>
           </button>
   '''
 # ---
-# name: TestRDVInsertionView.test_rdv_insertion_configured_and_valid_rdv_insertion_exchange_with_pending_request[invitation_request_created]
+# name: TestRdvInsertionView.test_rdv_insertion_configured_and_valid_rdv_insertion_exchange_with_pending_request[invitation_request_created]
   '''
-  <button class="btn btn-success btn-ico" data-bs-html="true" data-bs-placement="bottom" data-bs-title="Une relance automatique sera envoyée trois jours après l'envoi de l'invitation.
+  <button class="btn btn-success btn-ico" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après.
               &lt;br&gt;
-              Vous pourrez envoyer une nouvelle invitation après un délai de dix jours." data-bs-toggle="tooltip" disabled="" type="button">
+              Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" disabled="" type="button">
               <i aria-hidden="true" class="ri-check-line font-weight-medium"></i>
               <span>Invitation envoyée</span>
           </button>
   '''
 # ---
-# name: TestRDVInsertionView.test_rdv_insertion_configured_and_valid_rdv_insertion_exchange_with_pending_request[pending_invitation_request_still_too_recent]
+# name: TestRdvInsertionView.test_rdv_insertion_configured_and_valid_rdv_insertion_exchange_with_pending_request[pending_invitation_request_still_too_recent]
   '''
-  <button class="btn btn-success btn-ico" data-bs-html="true" data-bs-placement="bottom" data-bs-title="Une relance automatique sera envoyée trois jours après l'envoi de l'invitation.
+  <button class="btn btn-success btn-ico" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après.
               &lt;br&gt;
-              Vous pourrez envoyer une nouvelle invitation après un délai de dix jours." data-bs-toggle="tooltip" disabled="" type="button">
+              Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" disabled="" type="button">
               <i aria-hidden="true" class="ri-check-line font-weight-medium"></i>
               <span>Invitation envoyée</span>
           </button>
   '''
 # ---
-# name: TestRDVInsertionView.test_rdv_insertion_configured_and_valid_rdv_insertion_exchange_with_pending_request[pending_invitation_request_too_recent]
+# name: TestRdvInsertionView.test_rdv_insertion_configured_and_valid_rdv_insertion_exchange_with_pending_request[pending_invitation_request_too_recent]
   '''
-  <button class="btn btn-success btn-ico" data-bs-html="true" data-bs-placement="bottom" data-bs-title="Une relance automatique sera envoyée trois jours après l'envoi de l'invitation.
+  <button class="btn btn-success btn-ico" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après.
               &lt;br&gt;
-              Vous pourrez envoyer une nouvelle invitation après un délai de dix jours." data-bs-toggle="tooltip" disabled="" type="button">
+              Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" disabled="" type="button">
               <i aria-hidden="true" class="ri-check-line font-weight-medium"></i>
               <span>Invitation envoyée</span>
           </button>
   '''
 # ---
-# name: TestRDVInsertionView.test_rdv_insertion_configured_invalid_job_application
+# name: TestRdvInsertionView.test_rdv_insertion_configured_invalid_job_application
   '''
-  <button class="btn btn-danger btn-ico" data-bs-placement="bottom" data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti." data-bs-toggle="tooltip" disabled="" type="button">
+  <button class="btn btn-danger btn-ico" data-bs-placement="left" data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti." data-bs-toggle="tooltip" disabled="" type="button">
                   <i aria-hidden="true" class="ri-alert-line font-weight-medium"></i>
                   <span>Une erreur est survenue</span>
               </button>
   '''
 # ---
-# name: TestRDVInsertionView.test_rdv_insertion_configured_with_failed_rdv_insertion_exchange
+# name: TestRdvInsertionView.test_rdv_insertion_configured_with_failed_rdv_insertion_exchange
   '''
   <form class="d-inline-flex has-btn-with-spinner-loading-text" hx-post="/apply/11111111-1111-1111-1111-111111111111/rdv-insertion-invite" hx-swap="outerHTML">
                   <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
-                  <button aria-label="Proposer un rendez-vous à Jacques HENRY" class="btn btn-danger btn-ico" data-bs-placement="bottom" data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti." data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
+                  <button aria-label="Proposer un rendez-vous à Jacques HENRY" class="btn btn-danger btn-ico" data-bs-placement="left" data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti." data-bs-toggle="tooltip" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
                       <div class="stable-text">
                           <i aria-hidden="true" class="ri-alert-line font-weight-medium"></i>
                           <span>Réessayer un envoi</span>
@@ -64,9 +64,9 @@
               </form>
   '''
 # ---
-# name: TestRDVInsertionView.test_rdv_insertion_not_configured
+# name: TestRdvInsertionView.test_rdv_insertion_not_configured
   '''
-  <button class="btn btn-danger btn-ico" data-bs-placement="bottom" data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti." data-bs-toggle="tooltip" disabled="" type="button">
+  <button class="btn btn-danger btn-ico" data-bs-placement="left" data-bs-title="Une erreur s’est produite, l’envoi n’a pas abouti." data-bs-toggle="tooltip" disabled="" type="button">
                   <i aria-hidden="true" class="ri-alert-line font-weight-medium"></i>
                   <span>Une erreur est survenue</span>
               </button>

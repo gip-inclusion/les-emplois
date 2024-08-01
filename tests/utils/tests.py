@@ -50,6 +50,7 @@ from itou.utils.password_validation import CnilCompositionPasswordValidator
 from itou.utils.perms.middleware import ItouCurrentOrganizationMiddleware
 from itou.utils.sync import DiffItem, DiffItemKind, yield_sync_diff
 from itou.utils.templatetags import dict_filters, format_filters, job_applications, job_seekers
+from itou.utils.templatetags.datetime_filters import duration
 from itou.utils.tokens import COMPANY_SIGNUP_MAGIC_LINK_TIMEOUT, CompanySignupTokenGenerator
 from itou.utils.urls import (
     add_url_params,
@@ -1586,3 +1587,22 @@ def test_create_fake_postcode():
     with mock.patch.dict(DEPARTMENTS, {"80": "80 - Somme"}):
         postcode = create_fake_postcode()
         assert department_from_postcode(postcode)
+
+
+@pytest.mark.parametrize(
+    "timedelta, expected",
+    [
+        (datetime.timedelta(seconds=0), "N/A"),
+        (datetime.timedelta(seconds=30), "N/A"),
+        (datetime.timedelta(minutes=1), "1 min"),
+        (datetime.timedelta(minutes=30), "30 min"),
+        (datetime.timedelta(hours=1), "1h"),
+        (datetime.timedelta(hours=1, minutes=30), "1h30"),
+        (datetime.timedelta(hours=12), "12h"),
+        (datetime.timedelta(hours=12, minutes=30), "12h30"),
+        (datetime.timedelta(days=1), "24h"),
+        (datetime.timedelta(days=1, hours=1, minutes=30), "25h30"),
+    ],
+)
+def test_duration(timedelta, expected):
+    assert duration(timedelta) == expected

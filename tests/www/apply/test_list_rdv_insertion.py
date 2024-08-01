@@ -1,4 +1,4 @@
-from datetime import timedelta
+import datetime
 from urllib.parse import urljoin
 
 import httpx
@@ -9,7 +9,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertTemplateNotUsed, assertTemplateUsed
 
-from itou.rdv_insertion.models import Invitation, InvitationRequest
+from itou.rdv_insertion.models import Appointment, Invitation, InvitationRequest, Participation
 from itou.utils.mocks.rdv_insertion import (
     RDV_INSERTION_AUTH_SUCCESS_HEADERS,
     RDV_INSERTION_CREATE_AND_INVITE_FAILURE_BODY,
@@ -17,7 +17,7 @@ from itou.utils.mocks.rdv_insertion import (
 )
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.rdv_insertion.factories import InvitationRequestFactory
+from tests.rdv_insertion.factories import InvitationRequestFactory, ParticipationFactory
 from tests.utils.test import parse_response_to_soup
 
 
@@ -27,7 +27,7 @@ def mock_rdvs_api(settings):
     settings.RDV_SOLIDARITES_EMAIL = "tech@inclusion.beta.gouv.fr"
     settings.RDV_SOLIDARITES_PASSWORD = "password"
     settings.RDV_INSERTION_API_BASE_URL = "https://rdv-insertion.fake/api/v1/"
-    settings.RDV_INSERTION_INVITE_HOLD_DURATION = timedelta(days=2)
+    settings.RDV_INSERTION_INVITE_HOLD_DURATION = datetime.timedelta(days=2)
 
     respx.post(
         urljoin(
@@ -43,11 +43,18 @@ def mock_rdvs_api(settings):
     )
 
 
-class TestRDVInsertionDisplay:
+class TestRdvInsertionDisplay:
     SEE_JOB_APPLICATION_LABEL = "Voir sa candidature"
     INVITE_LABEL = "Proposer un rendez-vous"
     ONGOING_INVITE_LABEL = "Envoi en cours"
     INVITE_SENT_LABEL = "Invitation envoyée"
+    NEXT_APPOINTMENT_LABEL = "Prochain rdv le 01/09/2024"
+    OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL = (
+        "1 autre rendez-vous prévu, rendez-vous dans le détail de candidature pour le consulter"
+    )
+    OTHER_APPOINTMENTS_TWO_TOOLTIP_LABEL = (
+        "2 autres rendez-vous prévus, rendez-vous dans le détail de candidature pour les consulter"
+    )
 
     def setup_method(self):
         org = PrescriberOrganizationWithMembershipFactory(
@@ -61,6 +68,12 @@ class TestRDVInsertionDisplay:
             job_seeker__first_name="Jacques",
             job_seeker__last_name="Henry",
             sender=org.active_members.get(),
+            for_snapshot=True,
+        )
+        self.participation = ParticipationFactory(
+            job_seeker=self.job_application.job_seeker,
+            appointment__company=self.job_application.to_company,
+            appointment__start_at=datetime.datetime(2024, 9, 1, 8, 0, tzinfo=datetime.UTC),
             for_snapshot=True,
         )
 
@@ -98,8 +111,57 @@ class TestRDVInsertionDisplay:
         assertNotContains(response, self.ONGOING_INVITE_LABEL)
         assertContains(response, self.INVITE_SENT_LABEL)
 
+    @freeze_time("2024-08-01")
+    def test_list_no_upcoming_appointments(self, client):
+        self.participation.appointment.delete()
+        client.force_login(self.job_application.to_company.members.get())
+        response = client.get(reverse("apply:list_for_siae"))
+        assertTemplateUsed(response, "apply/includes/list_card_body_company.html")
+        assertNotContains(response, self.NEXT_APPOINTMENT_LABEL)
+        assertNotContains(response, self.OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL)
+        assertNotContains(response, self.OTHER_APPOINTMENTS_TWO_TOOLTIP_LABEL)
 
-class TestRDVInsertionView:
+    @freeze_time("2024-08-01")
+    def test_list_with_one_upcoming_appointment(self, client):
+        client.force_login(self.job_application.to_company.members.get())
+        response = client.get(reverse("apply:list_for_siae"))
+        assertTemplateUsed(response, "apply/includes/list_card_body_company.html")
+        assertContains(response, self.NEXT_APPOINTMENT_LABEL)
+        assertNotContains(response, self.OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL)
+        assertNotContains(response, self.OTHER_APPOINTMENTS_TWO_TOOLTIP_LABEL)
+
+    @freeze_time("2024-08-01")
+    def test_list_with_many_upcoming_appointments(self, client):
+        client.force_login(self.job_application.to_company.members.get())
+
+        ParticipationFactory(
+            job_seeker=self.job_application.job_seeker,
+            status=Participation.Status.UNKNOWN,
+            appointment__company=self.job_application.to_company,
+            appointment__status=Appointment.Status.UNKNOWN,
+            appointment__start_at=datetime.datetime(2024, 9, 2, 8, 0, tzinfo=datetime.UTC),
+        )
+        response = client.get(reverse("apply:list_for_siae"))
+        assertTemplateUsed(response, "apply/includes/list_card_body_company.html")
+        assertContains(response, self.NEXT_APPOINTMENT_LABEL)
+        assertContains(response, self.OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL)
+        assertNotContains(response, self.OTHER_APPOINTMENTS_TWO_TOOLTIP_LABEL)
+
+        ParticipationFactory(
+            job_seeker=self.job_application.job_seeker,
+            status=Participation.Status.UNKNOWN,
+            appointment__company=self.job_application.to_company,
+            appointment__status=Appointment.Status.UNKNOWN,
+            appointment__start_at=datetime.datetime(2024, 9, 3, 8, 0, tzinfo=datetime.UTC),
+        )
+        response = client.get(reverse("apply:list_for_siae"))
+        assertTemplateUsed(response, "apply/includes/list_card_body_company.html")
+        assertContains(response, self.NEXT_APPOINTMENT_LABEL)
+        assertNotContains(response, self.OTHER_APPOINTMENTS_ONE_TOOLTIP_LABEL)
+        assertContains(response, self.OTHER_APPOINTMENTS_TWO_TOOLTIP_LABEL)
+
+
+class TestRdvInsertionView:
     def setup_method(self):
         org = PrescriberOrganizationWithMembershipFactory(
             membership__user__first_name="Max",
@@ -189,7 +251,7 @@ class TestRDVInsertionView:
         assert invitation_request.company == self.job_application.to_company
         invitation = Invitation.objects.get()
         assert invitation.type == invitation.Type.EMAIL
-        assert invitation.status == invitation.Status.SENT
+        assert invitation.status == invitation.Status.DELIVERED
         assert invitation.invitation_request == invitation_request
         assert response.context["job_application"] == self.job_application
 

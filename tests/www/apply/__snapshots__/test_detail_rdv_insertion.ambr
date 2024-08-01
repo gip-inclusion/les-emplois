@@ -1,0 +1,660 @@
+# serializer version: 1
+# name: TestRdvInsertionAppointmentsList.test_appointments_listing_display
+  '''
+  <table class="table" id="rdvi-appointments">
+              <thead>
+                  <tr>
+                      <th scope="col">Statut</th>
+                      <th scope="col">Date et heure</th>
+                      <th scope="col">Motif</th>
+                      <th scope="col"></th>
+                  </tr>
+              </thead>
+              <tbody>
+                  
+                      <tr>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-important-lightest text-important">RDV à venir</span>
+                          </td>
+                          <td>1 septembre 2024 10:00</td>
+                          <td>Entretien d'embauche</td>
+                          <td id="participation-11111111-1111-1111-1111-111111111111-row">
+                              <button class="btn btn-link px-0" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" type="button">
+                                  Détails
+                              </button>
+                              <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
+                                  <div class="modal-dialog modal-dialog-centered">
+                                      <div class="modal-content">
+                                          <div class="modal-header">
+                                              <h3 class="modal-title" id="participation-11111111-1111-1111-1111-111111111111-modal-title">Détails du rendez-vous</h3>
+                                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                          </div>
+                                          <div class="modal-body">
+                                              <p>
+                                                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">RDV à venir</span>
+                                              </p>
+                                              <p>
+                                                  Date et heure : <strong>01/09/2024 à 10h00</strong>
+                                                  <br/>
+                                                  Durée : <strong>15 min</strong>
+                                              </p>
+                                              <p>
+                                                  Type de rendez-vous :
+                                                  
+                                                      <strong>Individuel</strong>
+                                                  
+                                                  <br/>
+                                                  Catégorie de motif : <strong>Entretien SIAE</strong>
+                                                  <br/>
+                                                  Motif : <strong>Entretien d'embauche</strong>
+                                              </p>
+                                              
+                                                  <p>
+                                                      Lieu : <strong>Salle de réunion</strong>
+                                                      <br/>
+                                                      Adresse : <strong>112 Quai de Jemmapes, 75010 Paris</strong>
+                                                      
+                                                          <br/>
+                                                          Téléphone : <strong>06 00 00 00 00</strong>
+                                                      
+                                                  </p>
+                                              
+                                              
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </td>
+                      </tr>
+                  
+              </tbody>
+          </table>
+  '''
+# ---
+# name: TestRdvInsertionAppointmentsList.test_appointments_listing_display_previous_appointments
+  '''
+  <table class="table" id="rdvi-appointments">
+              <thead>
+                  <tr>
+                      <th scope="col">Statut</th>
+                      <th scope="col">Date et heure</th>
+                      <th scope="col">Motif</th>
+                      <th scope="col"></th>
+                  </tr>
+              </thead>
+              <tbody>
+                  
+                      <tr>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-important-lightest text-important">RDV à venir</span>
+                          </td>
+                          <td>1 septembre 2024 10:00</td>
+                          <td>Entretien d'embauche</td>
+                          <td id="participation-11111111-1111-1111-1111-111111111111-row">
+                              <button class="btn btn-link px-0" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" type="button">
+                                  Détails
+                              </button>
+                              <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
+                                  <div class="modal-dialog modal-dialog-centered">
+                                      <div class="modal-content">
+                                          <div class="modal-header">
+                                              <h3 class="modal-title" id="participation-11111111-1111-1111-1111-111111111111-modal-title">Détails du rendez-vous</h3>
+                                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                          </div>
+                                          <div class="modal-body">
+                                              <p>
+                                                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">RDV à venir</span>
+                                              </p>
+                                              <p>
+                                                  Date et heure : <strong>01/09/2024 à 10h00</strong>
+                                                  <br/>
+                                                  Durée : <strong>15 min</strong>
+                                              </p>
+                                              <p>
+                                                  Type de rendez-vous :
+                                                  
+                                                      <strong>Individuel</strong>
+                                                  
+                                                  <br/>
+                                                  Catégorie de motif : <strong>Entretien SIAE</strong>
+                                                  <br/>
+                                                  Motif : <strong>Entretien d'embauche</strong>
+                                              </p>
+                                              
+                                                  <p>
+                                                      Lieu : <strong>Salle de réunion</strong>
+                                                      <br/>
+                                                      Adresse : <strong>112 Quai de Jemmapes, 75010 Paris</strong>
+                                                      
+                                                          <br/>
+                                                          Téléphone : <strong>06 00 00 00 00</strong>
+                                                      
+                                                  </p>
+                                              
+                                              
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </td>
+                      </tr>
+                  
+                      <tr>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-important-lightest text-important">Statut du RDV à préciser</span>
+                          </td>
+                          <td>1 juin 2024 10:00</td>
+                          <td>Entretien d'embauche</td>
+                          <td id="participation-22222222-2222-2222-2222-222222222222-row">
+                              <button class="btn btn-link px-0" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" type="button">
+                                  Détails
+                              </button>
+                              <div aria-hidden="true" aria-labelledby="participation-22222222-2222-2222-2222-222222222222-modal-title" class="modal modal--mini fade" id="participation-22222222-2222-2222-2222-222222222222-modal" tabindex="-1">
+                                  <div class="modal-dialog modal-dialog-centered">
+                                      <div class="modal-content">
+                                          <div class="modal-header">
+                                              <h3 class="modal-title" id="participation-22222222-2222-2222-2222-222222222222-modal-title">Détails du rendez-vous</h3>
+                                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                          </div>
+                                          <div class="modal-body">
+                                              <p>
+                                                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">Statut du RDV à préciser</span>
+                                              </p>
+                                              <p>
+                                                  Date et heure : <strong>01/06/2024 à 10h00</strong>
+                                                  <br/>
+                                                  Durée : <strong>15 min</strong>
+                                              </p>
+                                              <p>
+                                                  Type de rendez-vous :
+                                                  
+                                                      <strong>Individuel</strong>
+                                                  
+                                                  <br/>
+                                                  Catégorie de motif : <strong>Entretien SIAE</strong>
+                                                  <br/>
+                                                  Motif : <strong>Entretien d'embauche</strong>
+                                              </p>
+                                              
+                                                  <p>
+                                                      Lieu : <strong>Salle de réunion</strong>
+                                                      <br/>
+                                                      Adresse : <strong>112 Quai de Jemmapes, 75010 Paris</strong>
+                                                      
+                                                          <br/>
+                                                          Téléphone : <strong>06 00 00 00 00</strong>
+                                                      
+                                                  </p>
+                                              
+                                              
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </td>
+                      </tr>
+                  
+              </tbody>
+          </table>
+  '''
+# ---
+# name: TestRdvInsertionAppointmentsList.test_appointments_listing_status_badges
+  '''
+  <table class="table" id="rdvi-appointments">
+              <thead>
+                  <tr>
+                      <th scope="col">Statut</th>
+                      <th scope="col">Date et heure</th>
+                      <th scope="col">Motif</th>
+                      <th scope="col"></th>
+                  </tr>
+              </thead>
+              <tbody>
+                  
+                      <tr>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-important-lightest text-important">RDV à venir</span>
+                          </td>
+                          <td>1 septembre 2024 10:00</td>
+                          <td>Entretien d'embauche</td>
+                          <td id="participation-11111111-1111-1111-1111-111111111111-row">
+                              <button class="btn btn-link px-0" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" type="button">
+                                  Détails
+                              </button>
+                              <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
+                                  <div class="modal-dialog modal-dialog-centered">
+                                      <div class="modal-content">
+                                          <div class="modal-header">
+                                              <h3 class="modal-title" id="participation-11111111-1111-1111-1111-111111111111-modal-title">Détails du rendez-vous</h3>
+                                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                          </div>
+                                          <div class="modal-body">
+                                              <p>
+                                                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">RDV à venir</span>
+                                              </p>
+                                              <p>
+                                                  Date et heure : <strong>01/09/2024 à 10h00</strong>
+                                                  <br/>
+                                                  Durée : <strong>15 min</strong>
+                                              </p>
+                                              <p>
+                                                  Type de rendez-vous :
+                                                  
+                                                      <strong>Individuel</strong>
+                                                  
+                                                  <br/>
+                                                  Catégorie de motif : <strong>Entretien SIAE</strong>
+                                                  <br/>
+                                                  Motif : <strong>Entretien d'embauche</strong>
+                                              </p>
+                                              
+                                                  <p>
+                                                      Lieu : <strong>Salle de réunion</strong>
+                                                      <br/>
+                                                      Adresse : <strong>112 Quai de Jemmapes, 75010 Paris</strong>
+                                                      
+                                                          <br/>
+                                                          Téléphone : <strong>06 00 00 00 00</strong>
+                                                      
+                                                  </p>
+                                              
+                                              
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </td>
+                      </tr>
+                  
+                      <tr>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-success-lighter text-success">RDV honoré</span>
+                          </td>
+                          <td>4 janvier 2024 09:00</td>
+                          <td>Entretien d'embauche</td>
+                          <td id="participation-22222222-2222-2222-2222-222222222222-row">
+                              <button class="btn btn-link px-0" data-bs-target="#participation-22222222-2222-2222-2222-222222222222-modal" data-bs-toggle="modal" type="button">
+                                  Détails
+                              </button>
+                              <div aria-hidden="true" aria-labelledby="participation-22222222-2222-2222-2222-222222222222-modal-title" class="modal modal--mini fade" id="participation-22222222-2222-2222-2222-222222222222-modal" tabindex="-1">
+                                  <div class="modal-dialog modal-dialog-centered">
+                                      <div class="modal-content">
+                                          <div class="modal-header">
+                                              <h3 class="modal-title" id="participation-22222222-2222-2222-2222-222222222222-modal-title">Détails du rendez-vous</h3>
+                                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                          </div>
+                                          <div class="modal-body">
+                                              <p>
+                                                  <span class="badge badge-sm rounded-pill bg-success-lighter text-success">RDV honoré</span>
+                                              </p>
+                                              <p>
+                                                  Date et heure : <strong>04/01/2024 à 09h00</strong>
+                                                  <br/>
+                                                  Durée : <strong>15 min</strong>
+                                              </p>
+                                              <p>
+                                                  Type de rendez-vous :
+                                                  
+                                                      <strong>Individuel</strong>
+                                                  
+                                                  <br/>
+                                                  Catégorie de motif : <strong>Entretien SIAE</strong>
+                                                  <br/>
+                                                  Motif : <strong>Entretien d'embauche</strong>
+                                              </p>
+                                              
+                                                  <p>
+                                                      Lieu : <strong>Salle de réunion</strong>
+                                                      <br/>
+                                                      Adresse : <strong>112 Quai de Jemmapes, 75010 Paris</strong>
+                                                      
+                                                          <br/>
+                                                          Téléphone : <strong>06 00 00 00 00</strong>
+                                                      
+                                                  </p>
+                                              
+                                              
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </td>
+                      </tr>
+                  
+                      <tr>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">RDV annulé à l’initiative du service</span>
+                          </td>
+                          <td>3 janvier 2024 09:00</td>
+                          <td>Entretien d'embauche</td>
+                          <td id="participation-33333333-3333-3333-3333-333333333333-row">
+                              <button class="btn btn-link px-0" data-bs-target="#participation-33333333-3333-3333-3333-333333333333-modal" data-bs-toggle="modal" type="button">
+                                  Détails
+                              </button>
+                              <div aria-hidden="true" aria-labelledby="participation-33333333-3333-3333-3333-333333333333-modal-title" class="modal modal--mini fade" id="participation-33333333-3333-3333-3333-333333333333-modal" tabindex="-1">
+                                  <div class="modal-dialog modal-dialog-centered">
+                                      <div class="modal-content">
+                                          <div class="modal-header">
+                                              <h3 class="modal-title" id="participation-33333333-3333-3333-3333-333333333333-modal-title">Détails du rendez-vous</h3>
+                                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                          </div>
+                                          <div class="modal-body">
+                                              <p>
+                                                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">RDV annulé à l’initiative du service</span>
+                                              </p>
+                                              <p>
+                                                  Date et heure : <strong>03/01/2024 à 09h00</strong>
+                                                  <br/>
+                                                  Durée : <strong>15 min</strong>
+                                              </p>
+                                              <p>
+                                                  Type de rendez-vous :
+                                                  
+                                                      <strong>Individuel</strong>
+                                                  
+                                                  <br/>
+                                                  Catégorie de motif : <strong>Entretien SIAE</strong>
+                                                  <br/>
+                                                  Motif : <strong>Entretien d'embauche</strong>
+                                              </p>
+                                              
+                                                  <p>
+                                                      Lieu : <strong>Salle de réunion</strong>
+                                                      <br/>
+                                                      Adresse : <strong>112 Quai de Jemmapes, 75010 Paris</strong>
+                                                      
+                                                          <br/>
+                                                          Téléphone : <strong>06 00 00 00 00</strong>
+                                                      
+                                                  </p>
+                                              
+                                              
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </td>
+                      </tr>
+                  
+                      <tr>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">RDV annulé à l’initiative de l’usager</span>
+                          </td>
+                          <td>2 janvier 2024 09:00</td>
+                          <td>Entretien d'embauche</td>
+                          <td id="participation-44444444-4444-4444-4444-444444444444-row">
+                              <button class="btn btn-link px-0" data-bs-target="#participation-44444444-4444-4444-4444-444444444444-modal" data-bs-toggle="modal" type="button">
+                                  Détails
+                              </button>
+                              <div aria-hidden="true" aria-labelledby="participation-44444444-4444-4444-4444-444444444444-modal-title" class="modal modal--mini fade" id="participation-44444444-4444-4444-4444-444444444444-modal" tabindex="-1">
+                                  <div class="modal-dialog modal-dialog-centered">
+                                      <div class="modal-content">
+                                          <div class="modal-header">
+                                              <h3 class="modal-title" id="participation-44444444-4444-4444-4444-444444444444-modal-title">Détails du rendez-vous</h3>
+                                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                          </div>
+                                          <div class="modal-body">
+                                              <p>
+                                                  <span class="badge badge-sm rounded-pill bg-warning-lighter text-warning">RDV annulé à l’initiative de l’usager</span>
+                                              </p>
+                                              <p>
+                                                  Date et heure : <strong>02/01/2024 à 09h00</strong>
+                                                  <br/>
+                                                  Durée : <strong>15 min</strong>
+                                              </p>
+                                              <p>
+                                                  Type de rendez-vous :
+                                                  
+                                                      <strong>Individuel</strong>
+                                                  
+                                                  <br/>
+                                                  Catégorie de motif : <strong>Entretien SIAE</strong>
+                                                  <br/>
+                                                  Motif : <strong>Entretien d'embauche</strong>
+                                              </p>
+                                              
+                                                  <p>
+                                                      Lieu : <strong>Salle de réunion</strong>
+                                                      <br/>
+                                                      Adresse : <strong>112 Quai de Jemmapes, 75010 Paris</strong>
+                                                      
+                                                          <br/>
+                                                          Téléphone : <strong>06 00 00 00 00</strong>
+                                                      
+                                                  </p>
+                                              
+                                              
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </td>
+                      </tr>
+                  
+                      <tr>
+                          <td>
+                              <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger">Absence non excusée au RDV</span>
+                          </td>
+                          <td>1 janvier 2024 09:00</td>
+                          <td>Entretien d'embauche</td>
+                          <td id="participation-55555555-5555-5555-5555-555555555555-row">
+                              <button class="btn btn-link px-0" data-bs-target="#participation-55555555-5555-5555-5555-555555555555-modal" data-bs-toggle="modal" type="button">
+                                  Détails
+                              </button>
+                              <div aria-hidden="true" aria-labelledby="participation-55555555-5555-5555-5555-555555555555-modal-title" class="modal modal--mini fade" id="participation-55555555-5555-5555-5555-555555555555-modal" tabindex="-1">
+                                  <div class="modal-dialog modal-dialog-centered">
+                                      <div class="modal-content">
+                                          <div class="modal-header">
+                                              <h3 class="modal-title" id="participation-55555555-5555-5555-5555-555555555555-modal-title">Détails du rendez-vous</h3>
+                                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                          </div>
+                                          <div class="modal-body">
+                                              <p>
+                                                  <span class="badge badge-sm rounded-pill bg-danger-lighter text-danger">Absence non excusée au RDV</span>
+                                              </p>
+                                              <p>
+                                                  Date et heure : <strong>01/01/2024 à 09h00</strong>
+                                                  <br/>
+                                                  Durée : <strong>15 min</strong>
+                                              </p>
+                                              <p>
+                                                  Type de rendez-vous :
+                                                  
+                                                      <strong>Individuel</strong>
+                                                  
+                                                  <br/>
+                                                  Catégorie de motif : <strong>Entretien SIAE</strong>
+                                                  <br/>
+                                                  Motif : <strong>Entretien d'embauche</strong>
+                                              </p>
+                                              
+                                                  <p>
+                                                      Lieu : <strong>Salle de réunion</strong>
+                                                      <br/>
+                                                      Adresse : <strong>112 Quai de Jemmapes, 75010 Paris</strong>
+                                                      
+                                                          <br/>
+                                                          Téléphone : <strong>06 00 00 00 00</strong>
+                                                      
+                                                  </p>
+                                              
+                                              
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </td>
+                      </tr>
+                  
+              </tbody>
+          </table>
+  '''
+# ---
+# name: TestRdvInsertionAppointmentsList.test_appointments_tooltips
+  '''
+  <td id="participation-11111111-1111-1111-1111-111111111111-row">
+                              <button class="btn btn-link px-0" data-bs-target="#participation-11111111-1111-1111-1111-111111111111-modal" data-bs-toggle="modal" type="button">
+                                  Détails
+                              </button>
+                              <div aria-hidden="true" aria-labelledby="participation-11111111-1111-1111-1111-111111111111-modal-title" class="modal modal--mini fade" id="participation-11111111-1111-1111-1111-111111111111-modal" tabindex="-1">
+                                  <div class="modal-dialog modal-dialog-centered">
+                                      <div class="modal-content">
+                                          <div class="modal-header">
+                                              <h3 class="modal-title" id="participation-11111111-1111-1111-1111-111111111111-modal-title">Détails du rendez-vous</h3>
+                                              <button aria-label="Fermer" class="btn-close" data-bs-dismiss="modal" type="button"></button>
+                                          </div>
+                                          <div class="modal-body">
+                                              <p>
+                                                  <span class="badge badge-sm rounded-pill bg-important-lightest text-important">RDV à venir</span>
+                                              </p>
+                                              <p>
+                                                  Date et heure : <strong>01/09/2024 à 10h00</strong>
+                                                  <br/>
+                                                  Durée : <strong>15 min</strong>
+                                              </p>
+                                              <p>
+                                                  Type de rendez-vous :
+                                                  
+                                                      <strong>Individuel</strong>
+                                                  
+                                                  <br/>
+                                                  Catégorie de motif : <strong>Entretien SIAE</strong>
+                                                  <br/>
+                                                  Motif : <strong>Entretien d'embauche</strong>
+                                              </p>
+                                              
+                                                  <p>
+                                                      Lieu : <strong>Salle de réunion</strong>
+                                                      <br/>
+                                                      Adresse : <strong>112 Quai de Jemmapes, 75010 Paris</strong>
+                                                      
+                                                          <br/>
+                                                          Téléphone : <strong>06 00 00 00 00</strong>
+                                                      
+                                                  </p>
+                                              
+                                              
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </td>
+  '''
+# ---
+# name: TestRdvInsertionInvitationRequestsList.test_invitations_requests_listing
+  '''
+  <div class="mb-6" id="rdvi-invitation-requests">
+      <div class="d-flex justify-content-between mb-4">
+          <h3>Invitations envoyées</h3>
+          
+  
+  
+      
+          <form class="d-inline-flex has-btn-with-spinner-loading-text" hx-post="/apply/11111111-1111-1111-1111-111111111111/rdv_insertion_invite_for_detail" hx-swap="outerHTML" hx-target="#rdvi-invitation-requests">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <button aria-label="Proposer un rendez-vous à Jacques HENRY" class="btn btn-secondary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
+                  <div class="stable-text">
+                      <i aria-hidden="true" class="ri-mail-send-line font-weight-medium"></i>
+                      <span>Proposer un rendez-vous</span>
+                  </div>
+                  <div class="loading-text">
+                      <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+                      <span>Envoi en cours</span>
+                  </div>
+              </button>
+          </form>
+      
+  
+  
+      </div>
+      
+          <p>Aucune invitation en attente de réponse actuellement</p>
+      
+  </div>
+  '''
+# ---
+# name: TestRdvInsertionInvitationRequestsList.test_invite_response_includes_updated_invitation_requests_listing[existing_invitation_requests]
+  '''
+  <div class="mb-6" id="rdvi-invitation-requests">
+      <div class="d-flex justify-content-between mb-4">
+          <h3>Invitations envoyées</h3>
+          
+  
+  
+      
+          <form class="d-inline-flex has-btn-with-spinner-loading-text" hx-post="/apply/11111111-1111-1111-1111-111111111111/rdv_insertion_invite_for_detail" hx-swap="outerHTML" hx-target="#rdvi-invitation-requests">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <button aria-label="Proposer un rendez-vous à Jacques HENRY" class="btn btn-secondary btn-ico" data-matomo-action="clic" data-matomo-category="candidature" data-matomo-event="true" data-matomo-option="proposer-rdv">
+                  <div class="stable-text">
+                      <i aria-hidden="true" class="ri-mail-send-line font-weight-medium"></i>
+                      <span>Proposer un rendez-vous</span>
+                  </div>
+                  <div class="loading-text">
+                      <span aria-hidden="true" class="spinner-border spinner-border-sm" role="status"></span>
+                      <span>Envoi en cours</span>
+                  </div>
+              </button>
+          </form>
+      
+  
+  
+      </div>
+      
+          <p>Aucune invitation en attente de réponse actuellement</p>
+      
+  </div>
+  '''
+# ---
+# name: TestRdvInsertionInvitationRequestsList.test_invite_response_includes_updated_invitation_requests_listing[updated_invitation_requests]
+  '''
+  <div class="mb-6" id="rdvi-invitation-requests">
+      <div class="d-flex justify-content-between mb-4">
+          <h3>Invitations envoyées</h3>
+          
+  
+  
+      
+          <button class="btn btn-success btn-ico" data-bs-html="true" data-bs-placement="left" data-bs-title="Une relance sera envoyée 3 jours après.
+              &lt;br&gt;
+              Vous pourrez renvoyer une invitation sous 10J." data-bs-toggle="tooltip" disabled="" type="button">
+              <i aria-hidden="true" class="ri-check-line font-weight-medium"></i>
+              <span>Invitation envoyée</span>
+          </button>
+      
+  
+  
+      </div>
+      
+          <table class="table">
+              <thead>
+                  <tr>
+                      <th scope="col">Date d'envoi</th>
+                      <th scope="col">Motif</th>
+                      <th scope="col">Invitation SMS</th>
+                      <th scope="col">Invitation mail</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  
+                      <tr>
+                          <td>1 août 2024 02:00</td>
+                          <td>Entretien SIAE</td>
+                          <td>-</td>
+                          <td>Délivrée</td>
+                      </tr>
+                  
+              </tbody>
+          </table>
+      
+  </div>
+  '''
+# ---

@@ -3,7 +3,8 @@ from collections import defaultdict
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.db.models import Exists, OuterRef
+from django.db import models
+from django.db.models import Count, Exists, OuterRef, Q, Subquery
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
 from django.utils import timezone
@@ -13,7 +14,7 @@ from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
 from itou.eligibility.models import SelectedAdministrativeCriteria
 from itou.job_applications.export import stream_xlsx_export
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
-from itou.rdv_insertion.models import InvitationRequest
+from itou.rdv_insertion.models import InvitationRequest, Participation
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.urls import get_safe_url
@@ -260,7 +261,27 @@ def list_for_siae(request, template_name="apply/list_for_siae.html"):
                 company=OuterRef("to_company"),
                 created_at__gt=timezone.now() - settings.RDV_INSERTION_INVITE_HOLD_DURATION,
             )
+        ),
+        next_appointment_start_at=Subquery(
+            Participation.objects.filter(
+                appointment__company=OuterRef("to_company"),
+                job_seeker=OuterRef("job_seeker"),
+                status=Participation.Status.UNKNOWN,
+                appointment__start_at__gt=timezone.now(),
+            )
+            .order_by("appointment__start_at")
+            .values("appointment__start_at")[:1],
+            output_field=models.DateTimeField(),
+        ),
+        other_appointments_count=Count(
+            "job_seeker__rdvi_participations",
+            filter=Q(
+                job_seeker__rdvi_participations__appointment__company=request.current_organization,
+                job_seeker__rdvi_participations__status=Participation.Status.UNKNOWN,
+                job_seeker__rdvi_participations__appointment__start_at__gt=timezone.now(),
+            ),
         )
+        - 1,  # Exclude the next appointment
     )
 
     job_applications_page = pager(job_applications, request.GET.get("page"), items_per_page=10)
