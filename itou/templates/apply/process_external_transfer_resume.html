@@ -59,3 +59,7 @@
         });
     </script>
 {% endblock %}
+
+{% block form_submit_button %}
+    {% itou_buttons_form primary_label="Envoyer la candidature" secondary_url=back_url matomo_category="candidature" matomo_action="submit" matomo_name="job_app_transfer" %}
+{% endblock %}
