@@ -72,11 +72,8 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="announcementcampaign",
             constraint=models.UniqueConstraint(
-                condition=models.Q(
-                    ("start_date__month", django.db.models.functions.datetime.ExtractMonth("start_date")),
-                    ("start_date__year", django.db.models.functions.datetime.ExtractYear("start_date")),
-                ),
-                fields=("start_date",),
+                django.db.models.functions.datetime.ExtractYear("start_date"),
+                django.db.models.functions.datetime.ExtractMonth("start_date"),
                 name="unique_announcement_campaign_month_year",
             ),
         ),

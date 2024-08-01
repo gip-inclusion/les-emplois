@@ -39,7 +39,7 @@ from itou.approvals.models import Suspension
 from itou.asp.models import Commune
 from itou.cities.models import City
 from itou.common_apps.address.departments import DEPARTMENTS, department_from_postcode
-from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENT_CAMPAIGN_KEY
+from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership
 from itou.job_applications.enums import JobApplicationState

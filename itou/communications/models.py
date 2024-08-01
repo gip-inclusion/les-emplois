@@ -141,12 +141,9 @@ class AnnouncementCampaign(models.Model):
         ordering = ["-start_date"]
         constraints = [
             models.UniqueConstraint(
-                fields=["start_date"],
+                models.functions.ExtractYear("start_date"),
+                models.functions.ExtractMonth("start_date"),
                 name="unique_announcement_campaign_month_year",
-                condition=Q(
-                    start_date__year=models.functions.ExtractYear("start_date"),
-                    start_date__month=models.functions.ExtractMonth("start_date"),
-                ),
             ),
             models.CheckConstraint(name="max_items_range", check=Q(max_items__gte=1, max_items__lte=10)),
         ]
