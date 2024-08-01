@@ -252,7 +252,7 @@ class CompanyAdmin(ItouGISMixin, OrganizationAdmin):
     @admin.display(description="Liste des PASS IAE pour cette entreprise")
     def approvals_list(self, obj):
         if obj.pk is None:
-            return "-"
+            return self.get_empty_value_display()
         url = add_url_params(reverse("admin:approvals_approval_changelist"), {"assigned_company": obj.id, "o": -6})
         count = Approval.objects.is_assigned_to(obj.id).count()
         valid_count = Approval.objects.is_assigned_to(obj.id).valid().count()
@@ -366,10 +366,10 @@ class SiaeConventionAdmin(ItouModelAdmin):
     @admin.display(description="fin de délai de grâce")
     def grace_period_end_at(self, obj):
         if not obj.deactivated_at:
-            return "-"
+            return self.get_empty_value_display()
         return display_for_value(
             obj.deactivated_at + timezone.timedelta(days=models.SiaeConvention.DEACTIVATION_GRACE_PERIOD_IN_DAYS),
-            empty_value_display="-",
+            empty_value_display=self.get_empty_value_display(),
         )
 
 

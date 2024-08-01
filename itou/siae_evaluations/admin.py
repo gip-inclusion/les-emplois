@@ -56,12 +56,12 @@ class EvaluatedJobApplicationsInline(ItouTabularInline):
     def approval(self, obj):
         if obj.job_application.approval:
             return obj.job_application.approval.number
-        return "-"
+        return self.get_empty_value_display()
 
     def job_seeker(self, obj):
         if obj.job_application.job_seeker:
             return obj.job_application.job_seeker
-        return "-"
+        return self.get_empty_value_display()
 
 
 class EvaluatedAdministrativeCriteriaInline(ItouTabularInline):
@@ -268,12 +268,12 @@ class EvaluatedJobApplicationAdmin(ItouModelAdmin):
     def approval(self, obj):
         if obj.job_application.approval:
             return obj.job_application.approval.number
-        return "-"
+        return self.get_empty_value_display()
 
     def job_seeker(self, obj):
         if obj.job_application.job_seeker:
             return obj.job_application.job_seeker
-        return "-"
+        return self.get_empty_value_display()
 
 
 @admin.register(models.EvaluatedAdministrativeCriteria)
