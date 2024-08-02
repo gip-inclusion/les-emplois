@@ -43,11 +43,23 @@
                             <li class="py-1">
                                 <i class="ri-calendar-line font-weight-normal me-1" aria-hidden="true"></i>Suivi depuis le <strong>{{ membership.created_at|date:"d/m/Y" }}</strong>
                             </li>
-                            {% if membership.is_referent %}
-                                <li class="py-1">
-                                    <i class="ri-map-pin-user-line font-weight-normal me-1" aria-hidden="true"></i><strong>Référent</strong>
-                                </li>
-                            {% endif %}
+                            <li class="py-1 js-swap-elements">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-primary {{ forloop.counter }}-js-hide-on-click"
+                                        {% matomo_event "gps" "clic" "show_is_referent" %}
+                                        data-swap-element-with="#{{ forloop.counter }}-js-show-on-click"
+                                        data-swap-element=".{{ forloop.counter }}-js-hide-on-click">
+                                    Afficher le statut référent
+                                </button>
+                                <div id="{{ forloop.counter }}-js-show-on-click" class="d-none">
+                                    <i class="ri-map-pin-user-line font-weight-normal me-1" aria-hidden="true"></i>
+                                    {% if membership.is_referent %}
+                                        <strong>Référent</strong>
+                                    {% else %}
+                                        <span>Non référent</span>
+                                    {% endif %}
+                                </div>
+                            </li>
                         </ul>
                     </div>
                 </div>

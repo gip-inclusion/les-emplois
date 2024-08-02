@@ -139,11 +139,17 @@
                               <li class="py-1">
                                   <i aria-hidden="true" class="ri-calendar-line font-weight-normal me-1"></i>Suivi depuis le <strong>21/06/2024</strong>
                               </li>
-                              
-                                  <li class="py-1">
-                                      <i aria-hidden="true" class="ri-map-pin-user-line font-weight-normal me-1"></i><strong>Référent</strong>
-                                  </li>
-                              
+                              <li class="py-1 js-swap-elements">
+                                  <button class="btn btn-sm btn-outline-primary 1-js-hide-on-click" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="show_is_referent" data-swap-element=".1-js-hide-on-click" data-swap-element-with="#1-js-show-on-click" type="button">
+                                      Afficher le statut référent
+                                  </button>
+                                  <div class="d-none" id="1-js-show-on-click">
+                                      <i aria-hidden="true" class="ri-map-pin-user-line font-weight-normal me-1"></i>
+                                      
+                                          <strong>Référent</strong>
+                                      
+                                  </div>
+                              </li>
                           </ul>
                       </div>
                   </div>
