@@ -9,22 +9,8 @@ class CommunicationsConfig(AppConfig):
     name = "itou.communications"
 
     def ready(self):
-        from django.db.models.signals import post_delete, post_save
-
-        from itou.communications.models import AnnouncementCampaign, AnnouncementItem
-        from itou.communications.signals import (
-            update_cached_announcement_on_campaign_changes,
-            update_cached_announcement_on_item_changes,
-        )
-
         self.module.autodiscover()
         post_migrate.connect(post_communications_migrate_handler, sender=self)
-
-        post_save.connect(update_cached_announcement_on_campaign_changes, sender=AnnouncementCampaign)
-        post_delete.connect(update_cached_announcement_on_campaign_changes, sender=AnnouncementCampaign)
-
-        post_save.connect(update_cached_announcement_on_item_changes, sender=AnnouncementItem)
-        post_delete.connect(update_cached_announcement_on_item_changes, sender=AnnouncementItem)
 
 
 def post_communications_migrate_handler(sender, app_config, **kwargs):
