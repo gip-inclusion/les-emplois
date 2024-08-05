@@ -7,16 +7,22 @@
 
 {% block content %}
     <section class="s-section">
-        <div class="s-section__container container">
+        <div class="s-section__container container" id="news">
             {# NOTE: news is paginated by year #}
             {% for month_news in news %}
             <div class="row mb-4">
-                <div class="col-12">
-                    <h4>
-                        {{ month_news.start_date|date:"F Y"|capfirst }}
-                        <span class="badge badge-base bg-emploi-light text-info fs-sm mb-1 mx-1 rounded-pill" aria-label="nombre des articles">{{ month_news.items.count }}</span>
-                    </h4>
+                <div class="row" data-bs-toggle="collapse" data-bs-target="#news-{{ month_news.id }}" role="button" aria-expanded="{% if forloop.counter > 1 %}false{% else %}true{% endif %}" aria-controls="news-{{ month_news.id }}">
+                    <div class="col-11">
+                        <h4>
+                            {{ month_news.start_date|date:"F Y"|capfirst }}
+                            <span class="badge badge-base bg-emploi-light text-info fs-sm mb-1 mx-1 rounded-pill" aria-label="nombre des articles">{{ month_news.items.count }}</span>
+                        </h4>
+                    </div>
+                    <div class="col-1">
+                        <i class="ri-arrow-drop-down-line ri-xl" aria-ignore="true"></i>
+                    </div>
                 </div>
+                <div class="{% if forloop.counter > 1 %}collapse{% endif %}" id="news-{{ month_news.id }}" aria-controls="news-{{ month_news.id }}">
                 {% for news_item in month_news.items.all %}
                     <div class="row mb-4">
                         <div class="col-12 col-md-4 border border-muted rounded text-center" aria-hidden="true">
@@ -42,6 +48,7 @@
                         </div>
                     </div>
                 {% endfor %}
+                </div>
             </div>
             {% endfor %}
         </div>
