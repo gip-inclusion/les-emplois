@@ -9,6 +9,7 @@ from itou.eligibility import models as eligibility_models
 from itou.employee_record.models import EmployeeRecord
 from itou.invitations import models as invitations_models
 from itou.job_applications import models as job_applications_models
+from itou.siae_evaluations.models import EvaluatedSiae
 from itou.users import models as users_models
 from itou.utils.command import BaseCommand
 
@@ -58,6 +59,12 @@ class Command(BaseCommand):
             required=True,
         )
         parser.add_argument(
+            "--ignore-siae-evaluations",
+            action=argparse.BooleanOptionalAction,
+            default=False,
+            help="Set to True to move company data despite the <FROM> company having an SIAE evaluation.",
+        )
+        parser.add_argument(
             "--preserve-to-company-data",
             action=argparse.BooleanOptionalAction,
             default=False,
@@ -71,7 +78,17 @@ class Command(BaseCommand):
         )
         parser.add_argument("--wet-run", action=argparse.BooleanOptionalAction, default=False)
 
-    def handle(self, from_id, to_id, *, wet_run, only_job_applications, preserve_to_company_data, **options):
+    def handle(
+        self,
+        from_id,
+        to_id,
+        *,
+        wet_run,
+        ignore_siae_evaluations,
+        only_job_applications,
+        preserve_to_company_data,
+        **options,
+    ):
         if from_id == to_id:
             self.stderr.write(f"Unable to use the same company as source and destination (ID {from_id})\n")
             return
@@ -81,6 +98,12 @@ class Command(BaseCommand):
             from_company = from_company_qs.get()
         except companies_models.Company.DoesNotExist:
             self.stderr.write(f"Unable to find the company ID {from_id}\n")
+            return
+        if not ignore_siae_evaluations and EvaluatedSiae.objects.filter(siae=from_company).exists():
+            self.stderr.write(
+                f"Cannot move data for company ID {from_id}, it has an SIAE evaluation object. "
+                "Double check the procedure with the support team."
+            )
             return
 
         to_company_qs = companies_models.Company.objects.filter(pk=to_id)
