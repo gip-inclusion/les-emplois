@@ -554,6 +554,19 @@ class InclusionConnectCallbackViewTest(MessagesTestMixin, InclusionConnectBaseTe
             ],
         )
 
+    @respx.mock
+    def test_callback_update_FT_organization(self):
+        user = PrescriberFactory(**dataclasses.asdict(InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)))
+        org = PrescriberPoleEmploiFactory(code_safir_pole_emploi=OIDC_USERINFO_WITH_ORG["structure_pe"])
+        assert not org.members.exists()
+
+        mock_oauth_dance(
+            self.client,
+            UserKind.PRESCRIBER,
+            oidc_userinfo=OIDC_USERINFO_WITH_ORG.copy(),
+        )
+        self.assertQuerySetEqual(org.members.all(), [user])
+
 
 class InclusionConnectAccountActivationTest(InclusionConnectBaseTestCase):
     def test_new_user(self):
