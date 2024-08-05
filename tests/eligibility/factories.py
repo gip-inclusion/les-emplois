@@ -13,9 +13,6 @@ from tests.users.factories import JobSeekerFactory
 
 
 def _add_administrative_criteria(self, create, extracted, qs, **kwargs):
-    if not create:
-        # Simple build, do nothing.
-        return
     # Pick random results.
     criteria = qs.order_by("?")[: random.randint(2, 5)]
     self.administrative_criteria.add(*criteria)
@@ -55,9 +52,6 @@ def _get_geiq_certifiable_criteria(self, create, extracted, **kwargs):
 def _get_geiq_not_certifiable_criteria(self, create, extracted, **kwargs):
     qs = models.GEIQAdministrativeCriteria.objects.not_certifiable()
     _add_administrative_criteria(self, create, extracted, qs, **kwargs)
-    if not create:
-        # Simple build, do nothing.
-        return
 
 
 class GEIQEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
@@ -93,9 +87,6 @@ def _get_iae_certifiable_criteria(self, create, extracted, **kwargs):
 def _get_iae_not_certifiable_criteria(self, create, extracted, **kwargs):
     qs = models.AdministrativeCriteria.objects.not_certifiable()
     _add_administrative_criteria(self, create, extracted, qs, **kwargs)
-    if not create:
-        # Simple build, do nothing.
-        return
 
 
 class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
