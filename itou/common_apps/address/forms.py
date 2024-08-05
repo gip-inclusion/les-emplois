@@ -46,7 +46,7 @@ class JobSeekerAddressForm(forms.ModelForm):
             initial_data = kwargs["initial"]
 
         self.fields["address_for_autocomplete"] = forms.CharField(
-            label="Adresse",
+            label="Adresse actuelle",
             required=True,
             widget=JobSeekerAddressAutocompleteWidget(initial_data=initial_data, job_seeker=self.instance),
             initial=0,
