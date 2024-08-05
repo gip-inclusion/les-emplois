@@ -1,7 +1,7 @@
+{% load matomo %}
+{% load redirection_fields %}
 {% load static %}
 {% load theme_inclusion %}
-{% load redirection_fields %}
-{% load matomo %}
 
 <header role="banner" id="header">
     <section class="s-header-authenticated">
@@ -366,42 +366,7 @@
                     Besoin d'aide ?
                 </button>
                 <div class="dropdown-menu" id="helpDropdownMobile">
-                    <ul class="list-unstyled">
-                        <li>
-                            <a href="{{ ITOU_HELP_CENTER_URL }}"
-                               rel="noopener"
-                               class="dropdown-item has-external-link"
-                               target="_blank"
-                               aria-label="Accéder à l'espace de documentation (nouvel onglet)"
-                               {% matomo_event "help" "clic" "header_documentation" %}>Documentation</a>
-                        </li>
-                        <li>
-                            <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14733403281937--Comprendre-l-IAE"
-                               rel="noopener"
-                               class="dropdown-item has-external-link"
-                               target="_blank"
-                               aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)"
-                               {% matomo_event "help" "clic" "header_comprendre-liae" %}>Qui peut bénéficier des contrats d'IAE&nbsp;?</a>
-                        </li>
-                        {% if user.is_employer or user.is_prescriber_with_authorized_org %}
-                            <li>
-                                <a href="https://travail-emploi.gouv.fr/actualites/l-actualite-du-ministere/article/guide-pratique-la-prescription-de-parcours-d-insertion-par-l-activite"
-                                   rel="noopener"
-                                   class="dropdown-item has-external-link"
-                                   target="_blank"
-                                   aria-label="Prescrire un parcours IAE (guide pratique) (ouverture dans un nouvel onglet)"
-                                   {% matomo_event "help" "clic" "header_prescrire-parcours-iae-guide" %}>Prescrire un parcours IAE (guide pratique)</a>
-                            </li>
-                        {% endif %}
-                        <li>
-                            <a href="{{ ITOU_HELP_CENTER_URL }}/categories/25225629682321--Nouveaut%C3%A9s"
-                               rel="noopener"
-                               class="dropdown-item has-external-link"
-                               target="_blank"
-                               aria-label="Les nouveautés du site des emplois de l'inclusion (ouverture dans un nouvel onglet)"
-                               {% matomo_event "help" "clic" "header_nouveautes" %}>Nouveautés</a>
-                        </li>
-                    </ul>
+                    {% include "layout/_header_help_dropdown_content.html" with user=user ITOU_HELP_CENTER_URL=ITOU_HELP_CENTER_URL only %}
                 </div>
             </div>
         </div>
