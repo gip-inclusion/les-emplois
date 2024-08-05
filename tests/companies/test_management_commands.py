@@ -10,6 +10,7 @@ from freezegun import freeze_time
 from itou.companies.enums import CompanyKind
 from tests.companies import factories as companies_factories
 from tests.job_applications.factories import JobApplicationFactory
+from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 
 
 class TestMoveCompanyData:
@@ -75,6 +76,26 @@ class TestMoveCompanyData:
         company_1.refresh_from_db()
         assert company_1.coords is None
         assert company_1.geocoding_score is None
+
+    def test_prevent_move_with_siae_evaluations(self, capsys):
+        company1 = EvaluatedSiaeFactory().siae
+        company2 = companies_factories.CompanyFactory()
+
+        management.call_command("move_company_data", from_id=company1.pk, to_id=company2.pk, wet_run=True)
+        stdout, stderr = capsys.readouterr()
+        assert stderr == (
+            f"Cannot move data for company ID {company1.pk}, it has an SIAE evaluation object. "
+            "Double check the procedure with the support team.\n"
+        )
+        assert stdout == ""
+
+        management.call_command(
+            "move_company_data", from_id=company1.pk, to_id=company2.pk, wet_run=True, ignore_siae_evaluations=True
+        )
+        stdout, stderr = capsys.readouterr()
+        assert stderr == ""
+        assert f"MOVE DATA OF company.id={company1.pk}" in stdout
+        assert f"INTO company.id={company2.pk}" in stdout
 
 
 def test_update_companies_job_app_score():
