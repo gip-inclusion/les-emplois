@@ -289,9 +289,9 @@ django-datadog-logger==0.7.1 \
     --hash=sha256:1ee7d705ff8370cf9123240446738766925347407daadbab1cfbdbde3fe613e1 \
     --hash=sha256:2e7304059ee6d0fe6ede090d8e9b95620f52a8d7b0d69f54d78a9a38c9976e8e
     # via -r requirements/base.in
-django-filter==24.2 \
-    --hash=sha256:48e5fc1da3ccd6ca0d5f9bb550973518ce977a4edde9d2a8a154a7f4f0b9f96e \
-    --hash=sha256:df2ee9857e18d38bed203c8745f62a803fa0f31688c9fe6f8e868120b1848e48
+django-filter==24.3 \
+    --hash=sha256:c4852822928ce17fb699bcfccd644b3574f1a2d80aeb2b4ff4f16b02dd49dc64 \
+    --hash=sha256:d8ccaf6732afd21ca0542f6733b11591030fa98669f8d15599b358e24a2cd9c3
     # via -r requirements/base.in
 django-formtools==2.5.1 \
     --hash=sha256:47cb34552c6efca088863d693284d04fc36eaaf350eb21e1a1d935e0df523c93 \
@@ -712,7 +712,7 @@ paramiko==3.4.0 \
     --hash=sha256:43f0b51115a896f9c00f59618023484cb3a14b98bbceab43394a39c6739b7ee7 \
     --hash=sha256:aac08f26a31dc4dffd92821527d1682d99d52f9ef6851968114a8728f3c274d3
     # via -r requirements/base.in
-psycopg==3.1.10 \
+psycopg[binary]==3.1.10 \
     --hash=sha256:15b25741494344c24066dc2479b0f383dd1b82fa5e75612fa4fa5bb30726e9b6 \
     --hash=sha256:8bbeddae5075c7890b2fa3e3553440376d3c5e28418335dee3c3656b06fa2b52
     # via
