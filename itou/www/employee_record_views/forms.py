@@ -127,7 +127,7 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
                 "data-ajax--url": reverse_lazy("autocomplete:communes"),
                 "data-ajax--cache": "true",
                 "data-ajax--type": "GET",
-                "data-minimum-input-length": 2,
+                "data-minimum-input-length": 1,
                 "data-placeholder": "Nom de la commune",
                 "data-disable-target": "#id_birth_country",
                 "data-target-value": "91",  # France

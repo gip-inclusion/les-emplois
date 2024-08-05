@@ -245,7 +245,7 @@ class JobAppellationAndLocationMixin(forms.Form):
                 "data-ajax--url": reverse_lazy("autocomplete:cities"),
                 "data-ajax--cache": "true",
                 "data-ajax--type": "GET",
-                "data-minimum-input-length": 2,
+                "data-minimum-input-length": 1,
                 "data-placeholder": "Ex. Poitiers",
             },
         ),
