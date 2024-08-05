@@ -824,7 +824,7 @@ pluggy==1.2.0 \
     --hash=sha256:c2fd55a7d7a3863cba1a013e4e2414658b1d07b6bc57b3919e0c63c9abb99849 \
     --hash=sha256:d12f0c4b579b15f5e054301bb226ee85eeeba08ffec228092f8defbaa3a4c4b3
     # via pytest
-psycopg==3.1.10 \
+psycopg[binary]==3.1.10 \
     --hash=sha256:15b25741494344c24066dc2479b0f383dd1b82fa5e75612fa4fa5bb30726e9b6 \
     --hash=sha256:8bbeddae5075c7890b2fa3e3553440376d3c5e28418335dee3c3656b06fa2b52
     # via
@@ -885,7 +885,9 @@ psycopg-binary==3.1.10 \
     --hash=sha256:fa92661f99351765673835a4d936d79bd24dfbb358b29b084d83be38229a90e4 \
     --hash=sha256:ff72576061c774bcce5f5440b93e63d4c430032dd056d30f6cb1988e549dd92c \
     --hash=sha256:ffc8c796194f23b9b07f6d25f927ec4df84a194bbc7a1f9e73316734eef512f9
-    # via -r requirements/base.txt
+    # via
+    #   -r requirements/base.txt
+    #   psycopg
 pycparser==2.21 \
     --hash=sha256:8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9 \
     --hash=sha256:e644fdec12f7872f86c58ff790da456218b10f863970249516d60a5eaca77206
@@ -1049,9 +1051,9 @@ pyzipper==0.3.6 \
     --hash=sha256:0adca90a00c36a93fbe49bfa8c5add452bfe4ef85a1b8e3638739dd1c7b26bfc \
     --hash=sha256:6d097f465bfa47796b1494e12ea65d1478107d38e13bc56f6e58eedc4f6c1a87
     # via -r requirements/base.txt
-redis==5.0.7 \
-    --hash=sha256:0e479e24da960c690be5d9b96d21f7b918a98c0cf49af3b6fafaa0753f93a0db \
-    --hash=sha256:8f611490b93c8109b50adc317b31bfd84fff31def3475b92e7e80bf39f48175b
+redis==5.0.8 \
+    --hash=sha256:0c5b10d387568dfe0698c6fad6615750c24170e548ca2deac10c649d463e9870 \
+    --hash=sha256:56134ee08ea909106090934adc36f65c9bcbbaecea5b21ba704ba6fb561f8eb4
     # via
     #   -r requirements/base.txt
     #   django-redis
