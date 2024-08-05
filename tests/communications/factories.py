@@ -22,13 +22,22 @@ class AnnouncementCampaignFactory(factory.django.DjangoModelFactory):
         model = AnnouncementCampaign
         skip_postgeneration_save = True
 
-    class Params:
-        for_snapshot = factory.Trait(start_date=date(2024, 1, 1))
-
     @factory.post_generation
     def with_item(obj, create, extracted, **kwargs):
         if create and extracted is True:
             AnnouncementItemFactory(campaign=obj)
+
+    @factory.post_generation
+    def for_snapshot(obj, create, extracted, **kwargs):
+        if extracted is True:
+            obj.start_date = date(2024, 1, 1)
+            for user_kind in UserKind.values:
+                assert (
+                    AnnouncementItemFactory(campaign=obj, for_snapshot=True, user_kind_tags=[user_kind]).user_kind_tags
+                    == [user_kind]
+                )
+            AnnouncementItemFactory(campaign=obj, for_snapshot=True, user_kind_tags=[])
+            obj.save()
 
     start_date = factory.LazyFunction(lambda: date.today().replace(day=1))
 

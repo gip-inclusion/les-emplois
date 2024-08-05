@@ -35,7 +35,7 @@ class ItouAdminImageInput(forms.FileInput):
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
-        if value is not None:
+        if value and value.url:
             context["selected_img_src"] = value.url
         return context
 

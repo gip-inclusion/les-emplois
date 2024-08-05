@@ -658,3 +658,207 @@
   </body></html>
   '''
 # ---
+# name: TestNewsRender.test_campaign_rendered_dashboard_prescripteur
+  '''
+  <div class="s-section__container container" id="news">
+              
+              
+              <div class="row mb-4">
+                  <div class="col-12">
+                      <h4>
+                          Janvier 2024
+                          <span aria-label="nombre des articles" class="badge badge-base bg-emploi-light text-info fs-sm mb-1 mx-1 rounded-pill">6</span>
+                      </h4>
+                  </div>
+                  
+                      <div class="row mb-4">
+                          <div aria-hidden="true" class="col-12 col-md-4 border border-muted rounded text-center">
+                              
+                              <img class="w-100" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg" style="filter: grayscale(100%); opacity: 0.3"/>
+                              
+                          </div>
+                          <div class="col-12 col-md-8">
+                              <p aria-label="groupes d'utilisateurs concernées">
+                                  
+                                  <span class="badge badge-base bg-emploi-light text-info fs-sm">
+                                      CANDIDAT
+                                  </span>
+                                  
+                              </p>
+                              <h4>Nouveau fonctionnalité sur notre site</h4>
+                              <p>C'est désormais possible de faire des nouveaux actions avec votre compte</p>
+                              
+                              <a aria-label="Plus d'infos" class="font-weight-bold text-decoration-none" href="https://emplois.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">En savoir plus <i class="ri-external-link-line ri-lg"></i></a>
+                              
+                          </div>
+                      </div>
+                  
+                      <div class="row mb-4">
+                          <div aria-hidden="true" class="col-12 col-md-4 border border-muted rounded text-center">
+                              
+                              <img class="w-100" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg" style="filter: grayscale(100%); opacity: 0.3"/>
+                              
+                          </div>
+                          <div class="col-12 col-md-8">
+                              <p aria-label="groupes d'utilisateurs concernées">
+                                  
+                                  <span class="badge badge-base bg-emploi-light text-info fs-sm">
+                                      PRESCRIPTEUR
+                                  </span>
+                                  
+                              </p>
+                              <h4>Nouveau fonctionnalité sur notre site</h4>
+                              <p>C'est désormais possible de faire des nouveaux actions avec votre compte</p>
+                              
+                              <a aria-label="Plus d'infos" class="font-weight-bold text-decoration-none" href="https://emplois.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">En savoir plus <i class="ri-external-link-line ri-lg"></i></a>
+                              
+                          </div>
+                      </div>
+                  
+                      <div class="row mb-4">
+                          <div aria-hidden="true" class="col-12 col-md-4 border border-muted rounded text-center">
+                              
+                              <img class="w-100" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg" style="filter: grayscale(100%); opacity: 0.3"/>
+                              
+                          </div>
+                          <div class="col-12 col-md-8">
+                              <p aria-label="groupes d'utilisateurs concernées">
+                                  
+                                  <span class="badge badge-base bg-emploi-light text-info fs-sm">
+                                      EMPLOYEUR
+                                  </span>
+                                  
+                              </p>
+                              <h4>Nouveau fonctionnalité sur notre site</h4>
+                              <p>C'est désormais possible de faire des nouveaux actions avec votre compte</p>
+                              
+                              <a aria-label="Plus d'infos" class="font-weight-bold text-decoration-none" href="https://emplois.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">En savoir plus <i class="ri-external-link-line ri-lg"></i></a>
+                              
+                          </div>
+                      </div>
+                  
+                      <div class="row mb-4">
+                          <div aria-hidden="true" class="col-12 col-md-4 border border-muted rounded text-center">
+                              
+                              <img class="w-100" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg" style="filter: grayscale(100%); opacity: 0.3"/>
+                              
+                          </div>
+                          <div class="col-12 col-md-8">
+                              <p aria-label="groupes d'utilisateurs concernées">
+                                  
+                                  <span class="badge badge-base bg-emploi-light text-info fs-sm">
+                                      INSPECTEUR DU TRAVAIL
+                                  </span>
+                                  
+                              </p>
+                              <h4>Nouveau fonctionnalité sur notre site</h4>
+                              <p>C'est désormais possible de faire des nouveaux actions avec votre compte</p>
+                              
+                              <a aria-label="Plus d'infos" class="font-weight-bold text-decoration-none" href="https://emplois.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">En savoir plus <i class="ri-external-link-line ri-lg"></i></a>
+                              
+                          </div>
+                      </div>
+                  
+                      <div class="row mb-4">
+                          <div aria-hidden="true" class="col-12 col-md-4 border border-muted rounded text-center">
+                              
+                              <img class="w-100" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg" style="filter: grayscale(100%); opacity: 0.3"/>
+                              
+                          </div>
+                          <div class="col-12 col-md-8">
+                              <p aria-label="groupes d'utilisateurs concernées">
+                                  
+                                  <span class="badge badge-base bg-emploi-light text-info fs-sm">
+                                      ADMINISTRATEUR
+                                  </span>
+                                  
+                              </p>
+                              <h4>Nouveau fonctionnalité sur notre site</h4>
+                              <p>C'est désormais possible de faire des nouveaux actions avec votre compte</p>
+                              
+                              <a aria-label="Plus d'infos" class="font-weight-bold text-decoration-none" href="https://emplois.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">En savoir plus <i class="ri-external-link-line ri-lg"></i></a>
+                              
+                          </div>
+                      </div>
+                  
+                      <div class="row mb-4">
+                          <div aria-hidden="true" class="col-12 col-md-4 border border-muted rounded text-center">
+                              
+                              <img class="w-100" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg" style="filter: grayscale(100%); opacity: 0.3"/>
+                              
+                          </div>
+                          <div class="col-12 col-md-8">
+                              <p aria-label="groupes d'utilisateurs concernées">
+                                  
+                              </p>
+                              <h4>Nouveau fonctionnalité sur notre site</h4>
+                              <p>C'est désormais possible de faire des nouveaux actions avec votre compte</p>
+                              
+                              <a aria-label="Plus d'infos" class="font-weight-bold text-decoration-none" href="https://emplois.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">En savoir plus <i class="ri-external-link-line ri-lg"></i></a>
+                              
+                          </div>
+                      </div>
+                  
+              </div>
+              
+          </div>
+  '''
+# ---
+# name: TestNewsRender.test_campaign_rendered_for_job_seeker
+  '''
+  <div class="s-section__container container" id="news">
+              
+              
+              <div class="row mb-4">
+                  <div class="col-12">
+                      <h4>
+                          Janvier 2024
+                          <span aria-label="nombre des articles" class="badge badge-base bg-emploi-light text-info fs-sm mb-1 mx-1 rounded-pill">2</span>
+                      </h4>
+                  </div>
+                  
+                      <div class="row mb-4">
+                          <div aria-hidden="true" class="col-12 col-md-4 border border-muted rounded text-center">
+                              
+                              <img class="w-100" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg" style="filter: grayscale(100%); opacity: 0.3"/>
+                              
+                          </div>
+                          <div class="col-12 col-md-8">
+                              <p aria-label="groupes d'utilisateurs concernées">
+                                  
+                                  <span class="badge badge-base bg-emploi-light text-info fs-sm">
+                                      CANDIDAT
+                                  </span>
+                                  
+                              </p>
+                              <h4>Nouveau fonctionnalité sur notre site</h4>
+                              <p>C'est désormais possible de faire des nouveaux actions avec votre compte</p>
+                              
+                              <a aria-label="Plus d'infos" class="font-weight-bold text-decoration-none" href="https://emplois.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">En savoir plus <i class="ri-external-link-line ri-lg"></i></a>
+                              
+                          </div>
+                      </div>
+                  
+                      <div class="row mb-4">
+                          <div aria-hidden="true" class="col-12 col-md-4 border border-muted rounded text-center">
+                              
+                              <img class="w-100" src="/static/vendor/theme-inclusion/images/ico-bicro-important.svg" style="filter: grayscale(100%); opacity: 0.3"/>
+                              
+                          </div>
+                          <div class="col-12 col-md-8">
+                              <p aria-label="groupes d'utilisateurs concernées">
+                                  
+                              </p>
+                              <h4>Nouveau fonctionnalité sur notre site</h4>
+                              <p>C'est désormais possible de faire des nouveaux actions avec votre compte</p>
+                              
+                              <a aria-label="Plus d'infos" class="font-weight-bold text-decoration-none" href="https://emplois.inclusion.beta.gouv.fr/" rel="noopener" target="_blank">En savoir plus <i class="ri-external-link-line ri-lg"></i></a>
+                              
+                          </div>
+                      </div>
+                  
+              </div>
+              
+          </div>
+  '''
+# ---
