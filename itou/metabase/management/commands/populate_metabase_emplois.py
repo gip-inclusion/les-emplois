@@ -26,7 +26,6 @@ import tenacity
 from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models import Count, F, Max, Min, Prefetch, Q
 from django.utils import timezone
-from sentry_sdk.crons import monitor
 
 from itou.analytics.models import Datum, StatsDashboardVisit
 from itou.approvals.models import Approval, PoleEmploiApproval, Prolongation, ProlongationRequest
@@ -550,7 +549,6 @@ class Command(BaseCommand):
         build_dbt_daily()
 
     @timeit
-    @monitor(monitor_slug="populate-metabase-emplois")
     @tenacity.retry(
         retry=tenacity.retry_if_not_exception_type(RuntimeError),
         stop=tenacity.stop_after_attempt(3),
