@@ -1,0 +1,17 @@
+{% load redirection_fields %}
+
+{% redirection_url value=redirect_field_value as next_url %}
+<ul class="list-unstyled">
+    <li>
+        <a class="dropdown-item" href="{% url 'login:job_seeker' %}{{ next_url }}">Candidat</a>
+    </li>
+    <li>
+        <a class="dropdown-item" href="{% url 'login:prescriber' %}{{ next_url }}">Prescripteur</a>
+    </li>
+    <li>
+        <a class="dropdown-item" href="{% url 'login:employer' %}{{ next_url }}">Employeur inclusif</a>
+    </li>
+    <li>
+        <a class="dropdown-item" href="{% url 'login:labor_inspector' %}{{ next_url }}">Institution partenaire</a>
+    </li>
+</ul>

@@ -1,5 +1,4 @@
 {% load matomo %}
-{% load redirection_fields %}
 {% load static %}
 {% load theme_inclusion %}
 
@@ -77,28 +76,7 @@
                                     <span>Se connecter</span>
                                 </button>
                                 <div class="dropdown-menu" id="loginUserDropdown">
-                                    <ul class="list-unstyled">
-                                        <li>
-                                            <a class="dropdown-item" href="{% url 'login:job_seeker' %}{% redirection_url value=redirect_field_value|default:"" %}">
-                                                Candidat
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="{% url 'login:prescriber' %}{% redirection_url value=redirect_field_value|default:"" %}">
-                                                Prescripteur
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="{% url 'login:employer' %}{% redirection_url value=redirect_field_value|default:"" %}">
-                                                Employeur inclusif
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="{% url 'login:labor_inspector' %}{% redirection_url value=redirect_field_value|default:"" %}">
-                                                Institution partenaire
-                                            </a>
-                                        </li>
-                                    </ul>
+                                    {% include "layout/_header_login.html" with redirect_field_value=redirect_field_value|default:"" only %}
                                 </div>
                             </li>
                         </ul>
@@ -167,20 +145,7 @@
                         <span>Se connecter</span>
                     </button>
                     <div class="dropdown-menu" id="loginUserDropdownMobile">
-                        <ul class="list-unstyled">
-                            <li>
-                                <a class="dropdown-item" href="{% url 'login:job_seeker' %}{% redirection_url value=redirect_field_value|default:"" %}">Candidat</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'login:prescriber' %}{% redirection_url value=redirect_field_value|default:"" %}">Prescripteur</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'login:employer' %}{% redirection_url value=redirect_field_value|default:"" %}">Employeur inclusif</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{% url 'login:labor_inspector' %}{% redirection_url value=redirect_field_value|default:"" %}">Institution partenaire</a>
-                            </li>
-                        </ul>
+                        {% include "layout/_header_login.html" with redirect_field_value=redirect_field_value|default:"" only %}
                     </div>
                 </div>
                 <a class="btn btn-block btn-ico btn-outline-primary my-3" href="{% url "signup:choose_user_kind" %}">
