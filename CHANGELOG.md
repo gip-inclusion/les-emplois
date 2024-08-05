@@ -1,5 +1,24 @@
 # Journal des modifications
 
+## 2024-08-05
+
+### Ajouté
+
+- [Admin : Ajout de la date de fin du délai de grâce ainsi que la date de création des AF dans la page des conventions](https://github.com/gip-inclusion/les-emplois/pull/4494) 🖼
+- [Candidatures: Permettre aux employeurs de transférer une candidature refusée à une autre SIAE](https://github.com/gip-inclusion/les-emplois/pull/4348)
+- [Pilotage : Ajout d'un champ pour identifier les entreprises dîtes "Convergence"](https://github.com/gip-inclusion/les-emplois/pull/4491)
+
+### Modifié
+
+- [Admin : Permettre l’édition du champ `website` pour les organisations prescriptrices](https://github.com/gip-inclusion/les-emplois/pull/4482) 🖼
+- [France Travail : Migrer les informations des organisations prescriptrices Pôle emploi vers France Travail](https://github.com/gip-inclusion/les-emplois/pull/4484)
+- [GEIQ: Afficher le diagnostic GEIQ d'une candidature acceptée dans le passé](https://github.com/gip-inclusion/les-emplois/pull/4456)
+- [GPS : Amélioration des performances de la recherche de bénéficiaires](https://github.com/gip-inclusion/les-emplois/pull/4475)
+- [Pilotage : Lever des restrictions pour certain tableaux de bord actuellement en test](https://github.com/gip-inclusion/les-emplois/pull/4457)
+- [Sécurité : Déléguer le security.txt au GIP de l’inclusion](https://github.com/gip-inclusion/les-emplois/pull/4464)
+- [UX/UI - Wording : Clarification du help text + Ajout d'une majuscule à "Pays"](https://github.com/gip-inclusion/les-emplois/pull/4408)
+- [UX/UI: Mise a jour des liens nos reseaux sociaux](https://github.com/gip-inclusion/les-emplois/pull/4489)
+
 ## 2024-07-29
 
 ### Ajouté
