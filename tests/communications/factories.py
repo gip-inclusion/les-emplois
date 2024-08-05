@@ -38,10 +38,8 @@ class AnnouncementItemFactory(factory.django.DjangoModelFactory):
         model = AnnouncementItem
 
     class Params:
-        with_image = factory.Trait(
-            image=factory.django.ImageField(width=1, height=1, format="JPEG")
-        )
-        for_snapshot=factory.Trait(
+        with_image = factory.Trait(image=factory.django.ImageField(width=1, height=1, format="JPEG"))
+        for_snapshot = factory.Trait(
             title="Nouveau fonctionnalité sur notre site",
             description="C'est désormais possible de faire des nouveaux actions avec votre compte",
             user_kind_tags=[UserKind.JOB_SEEKER, UserKind.PRESCRIBER],
