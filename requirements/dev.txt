@@ -1018,7 +1018,6 @@ psycopg==3.1.10 \
     # via
     #   -r requirements/test.txt
     #   django-citext
-    #   psycopg
 psycopg-binary==3.1.10 \
     --hash=sha256:0471869e658d0c6b8c3ed53153794739c18d7dad2dd5b8e6ff023a364c20f7df \
     --hash=sha256:0f062f20256708929a58c41d44f350efced4c00a603323d1413f6dc0b84d95a5 \
