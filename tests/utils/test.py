@@ -5,6 +5,8 @@ import re
 
 import openpyxl
 from bs4 import BeautifulSoup
+from django.conf import Path
+from django.template import Template
 from django.template.loader import render_to_string
 from django.test import Client, TestCase as BaseTestCase
 from django.test.utils import TestContextDecorator
@@ -160,3 +162,7 @@ def create_fake_postcode():
     # Corsica and some DROM-COM department being 3 digits long,
     # return value may be longer than 5. Cut it.
     return f"{department}{int(random.randint(0, 999)):03}"[:5]
+
+
+def load_template(path):
+    return Template((Path("itou/templates") / path).read_text())

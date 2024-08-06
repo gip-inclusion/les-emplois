@@ -1,6 +1,5 @@
 import pytest
-from django.conf import Path
-from django.template import Context, Template
+from django.template import Context
 from django.test.client import RequestFactory
 from django.utils.html import escape
 from pytest_django.asserts import assertInHTML
@@ -11,10 +10,7 @@ from itou.utils.context_processors import expose_enums
 from tests.job_applications.factories import JobApplicationSentByCompanyFactory, JobApplicationSentByJobSeekerFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerWithAddressFactory
-
-
-def load_template(path):
-    return Template((Path("itou/templates") / path).read_text())
+from tests.utils.test import load_template
 
 
 def get_request(path="/"):
