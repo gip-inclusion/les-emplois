@@ -313,12 +313,12 @@
                         <li class="dropdown-item">
                             <div class="d-flex align-items-center">
                                 <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
-                                <div class="flex-grow-1 ms-2 lh-sm">
+                                <div class="flex-grow-1 ms-2 lh-sm w-75">
                                     {% if user.get_full_name %}
                                         <span>{{ user.get_full_name }}</span>
                                         <br>
                                     {% endif %}
-                                    <span class="fs-sm lh-sm text-muted">{{ user.email }}</span>
+                                    <span class="fs-sm lh-sm text-muted has-ellipsis d-inline-block w-100">{{ user.email }}</span>
                                 </div>
                             </div>
                         </li>
