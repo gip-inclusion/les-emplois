@@ -1684,6 +1684,8 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             "hiring_end_at": None,
             "eligibility_diagnosis__with_certifiable_criteria": True,
         } | kwargs
+        if "with_geiq_eligibility_diagnosis" not in kwargs:
+            kwargs.setdefault("with_iae_eligibility_diagnosis", True)
         return JobApplicationSentByJobSeekerFactory(**kwargs)
 
     def _accept_view_post_data(self, job_application, post_data=None):

@@ -1020,6 +1020,7 @@ class TestCustomApprovalAdminViews:
             state=JobApplicationState.PROCESSING,
             approval=None,
             approval_number_sent_by_email=False,
+            with_iae_eligibility_diagnosis=True,
         )
         job_application.accept(user=job_application.to_company.members.first())
 

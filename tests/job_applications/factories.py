@@ -169,6 +169,16 @@ class JobApplicationSentByJobSeekerFactory(JobApplicationFactory):
 
     sender = factory.SelfAttribute("job_seeker")
     sender_kind = SenderKind.JOB_SEEKER
+    eligibility_diagnosis = None
+
+    class Params:
+        with_iae_eligibility_diagnosis = factory.Trait(
+            eligibility_diagnosis=factory.SubFactory(
+                IAEEligibilityDiagnosisFactory,
+                from_prescriber=True,
+                job_seeker=factory.SelfAttribute("..job_seeker"),
+            )
+        )
 
 
 class JobApplicationSentByCompanyFactory(JobApplicationFactory):
