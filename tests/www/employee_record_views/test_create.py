@@ -192,11 +192,6 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         self.client.get(self.url)
 
         data = _get_user_form_data(self.job_seeker)
-        data.pop("birth_country")
-
-        # Missing birth country
-        response = self.client.post(self.url, data=data)
-        assert 200 == response.status_code
 
         # France as birth country without commune
         data["birth_country"] = CountryFranceFactory().pk
@@ -208,9 +203,12 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
     def test_birthplace_in_france(self):
         self.client.force_login(self.user)
         self.client.get(self.url)
-
         data = _get_user_form_data(self.job_seeker)
-        data["birth_place"] = CommuneFactory().pk
+        birth_place = Commune.objects.by_insee_code_and_period("07141", self.job_seeker.birthdate)
+        data["birth_place"] = birth_place.pk
+        # Birth country field is automatically set with Javascript and disabled.
+        # Disabled fields are not sent with POST data.
+        del data["birth_country"]
         response = self.client.post(self.url, data=data)
 
         # Redirects must go to step 2
