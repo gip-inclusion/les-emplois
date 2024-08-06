@@ -15,6 +15,7 @@ from itou.users.models import User
 from .common import (
     AbstractAdministrativeCriteria,
     AbstractEligibilityDiagnosisModel,
+    AbstractSelectedAdministrativeCriteria,
     CommonEligibilityDiagnosisQuerySet,
 )
 
@@ -288,7 +289,7 @@ class GEIQAdministrativeCriteria(AbstractAdministrativeCriteria):
         return self.slug.replace("-", "_") if self.slug else ""
 
 
-class GEIQSelectedAdministrativeCriteria(models.Model):
+class GEIQSelectedAdministrativeCriteria(AbstractSelectedAdministrativeCriteria):
     eligibility_diagnosis = models.ForeignKey(
         GEIQEligibilityDiagnosis,
         on_delete=models.CASCADE,

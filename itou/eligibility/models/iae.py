@@ -12,6 +12,7 @@ from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from .common import (
     AbstractAdministrativeCriteria,
     AbstractEligibilityDiagnosisModel,
+    AbstractSelectedAdministrativeCriteria,
     AdministrativeCriteriaQuerySet,
     CommonEligibilityDiagnosisQuerySet,
 )
@@ -261,7 +262,7 @@ class AdministrativeCriteria(AbstractAdministrativeCriteria):
         return f"level_{self.level}_{self.pk}"
 
 
-class SelectedAdministrativeCriteria(models.Model):
+class SelectedAdministrativeCriteria(AbstractSelectedAdministrativeCriteria):
     """
     Selected administrative criteria of an eligibility diagnosis.
     Intermediary model between `EligibilityDiagnosis` and `AdministrativeCriteria`.
