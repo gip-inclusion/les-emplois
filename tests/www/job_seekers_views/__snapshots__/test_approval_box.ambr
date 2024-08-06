@@ -1,0 +1,216 @@
+# serializer version: 1
+# name: test_expired_approval
+  '''
+  
+  
+  
+  <div class="c-box c-box--pass bg-danger-lightest border-danger mb-3 mb-md-4">
+      <div class="mb-3 mb-md-4">
+          <span class="badge badge-base rounded-pill bg-danger text-white">
+              <i class="ri-pass-expired-line" aria-hidden="true"></i>
+              PASS IAE expiré
+          </span>
+      </div>
+      <ul class="list-data">
+          <li>
+              <small>Numéro de PASS IAE</small>
+              <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
+          </li>
+          
+              <li>
+                  <small>A expiré le</small>
+                  <strong class="text-danger">31/12/2023</strong>
+              </li>
+          
+      </ul>
+      
+  </div>
+  
+  '''
+# ---
+# name: test_future_approval
+  '''
+  
+  
+  
+  <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
+      <div class="mb-3 mb-md-4">
+          <span class="badge badge-base rounded-pill bg-success text-white">
+              <i class="ri-pass-valid-line" aria-hidden="true"></i>
+              PASS IAE valide (non démarré)
+          </span>
+      </div>
+      <ul class="list-data">
+          <li>
+              <small>Numéro de PASS IAE</small>
+              <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
+          </li>
+          
+              <li>
+                  <small>Date de début</small>
+                  <strong>01/01/2025</strong>
+              </li>
+              <li>
+                  <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i></small>
+                  <strong>05/08/2026</strong>
+              </li>
+              <li>
+                  <small>Durée de validité <i class="ri-information-line ri-xl text-info"
+      data-bs-toggle="tooltip"
+      data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
+                  <strong class="text-success">730 jours (Environ 1 an et 11 mois)</strong>
+              </li>
+          
+      </ul>
+      
+  </div>
+  
+  '''
+# ---
+# name: test_suspended_approval
+  '''
+  
+  
+  
+  <div class="c-box c-box--pass bg-info-lightest border-info mb-3 mb-md-4">
+      <div class="mb-3 mb-md-4">
+          <span class="badge badge-base rounded-pill bg-info text-white">
+              <i class="ri-pass-pending-line" aria-hidden="true"></i>
+              PASS IAE valide (suspendu)
+          </span>
+      </div>
+      <ul class="list-data">
+          <li>
+              <small>Numéro de PASS IAE</small>
+              <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
+          </li>
+          
+              <li>
+                  <small>Date de début</small>
+                  <strong>01/01/2024</strong>
+              </li>
+              <li>
+                  <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i></small>
+                  <strong>04/12/2025</strong>
+              </li>
+              <li>
+                  <small>Durée de validité <i class="ri-information-line ri-xl text-info"
+      data-bs-toggle="tooltip"
+      data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
+                  <strong >486 jours (Environ 1 an et 3 mois)</strong>
+              </li>
+          
+      </ul>
+      
+          
+              
+                  <hr class="my-3 my-md-4">
+                  <ul class="list-data">
+                      <li>
+                          <small>Suspension en cours</small>
+                          <strong class="text-info">du 01/08/2024 au 31/08/2024</strong>
+                      </li>
+                  </ul>
+              
+          
+      
+  </div>
+  
+  '''
+# ---
+# name: test_valid_approval
+  '''
+  
+  
+  
+  <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
+      <div class="mb-3 mb-md-4">
+          <span class="badge badge-base rounded-pill bg-success text-white">
+              <i class="ri-pass-valid-line" aria-hidden="true"></i>
+              PASS IAE valide
+          </span>
+      </div>
+      <ul class="list-data">
+          <li>
+              <small>Numéro de PASS IAE</small>
+              <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
+          </li>
+          
+              <li>
+                  <small>Date de début</small>
+                  <strong>01/01/2024</strong>
+              </li>
+              <li>
+                  <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i></small>
+                  <strong>30/12/2025</strong>
+              </li>
+              <li>
+                  <small>Durée de validité <i class="ri-information-line ri-xl text-info"
+      data-bs-toggle="tooltip"
+      data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
+                  <strong class="text-success">512 jours (Environ 1 an et 4 mois)</strong>
+              </li>
+          
+      </ul>
+      
+          
+              
+          
+      
+  </div>
+  
+  '''
+# ---
+# name: test_valid_approval_with_pending_prolongation_request
+  '''
+  
+  
+  
+  <div class="c-box c-box--pass bg-success-lightest border-success mb-3 mb-md-4">
+      <div class="mb-3 mb-md-4">
+          <span class="badge badge-base rounded-pill bg-success text-white">
+              <i class="ri-pass-valid-line" aria-hidden="true"></i>
+              PASS IAE valide
+          </span>
+      </div>
+      <ul class="list-data">
+          <li>
+              <small>Numéro de PASS IAE</small>
+              <strong><span>XXXXX</span><span class="ms-1">12</span><span class="ms-1">34567</span></strong>
+          </li>
+          
+              <li>
+                  <small>Date de début</small>
+                  <strong>01/01/2024</strong>
+              </li>
+              <li>
+                  <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i></small>
+                  <strong>30/12/2025</strong>
+              </li>
+              <li>
+                  <small>Durée de validité <i class="ri-information-line ri-xl text-info"
+      data-bs-toggle="tooltip"
+      data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
+                  <strong class="text-success">512 jours (Environ 1 an et 4 mois)</strong>
+              </li>
+          
+      </ul>
+      
+          
+              
+                  <hr class="my-3 my-md-4">
+                  <ul class="list-data">
+                      <li>
+                          <small>Demande de prolongation (en attente)</small>
+                          <strong>
+                              du 30/12/2025 au 29/01/2026
+                          </strong>
+                      </li>
+                  </ul>
+              
+          
+      
+  </div>
+  
+  '''
+# ---
