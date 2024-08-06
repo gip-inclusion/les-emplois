@@ -176,16 +176,12 @@ def test_model_fields():
     ContentType.objects.get_for_model(target_company)
     with assertNumQueries(
         2  # Check user is in both origin and dest siae
-        + 1  # Check if approvals are linked to diagnosis because of on_delete=set_null
-        + 1  # Check if job applications are linked because of on_delete=set_null
-        + 2  # Delete diagnosis and criteria made by the SIAE
+        + 4  # Delete (+ SET_NULL) diagnosis and criteria made by the SIAE
         + 1  # Select user for email
         + 1  # Select employer notification settings
         + 1  # Insert employer email in emails table
         + 1  # Select job seeker notification settings
         + 1  # Insert job seeker email in emails table
-        + 6  # Caused by `full_clean()` : `clean_fields()`
-        + 4  # Integrity constraints check (full clean)
         + 1  # Update job application
         + 1  # Add job application transition log
     ):

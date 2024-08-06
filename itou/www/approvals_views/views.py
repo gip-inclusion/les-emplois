@@ -850,6 +850,7 @@ def pe_approval_create(request, pe_approval_id):
 
     # Link both and save the application
     job_application.approval = approval_from_pe
+    job_application.full_clean()  # Manual call because we don't use a form
     job_application.save()
 
     messages.success(

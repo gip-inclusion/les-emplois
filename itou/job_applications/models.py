@@ -799,10 +799,6 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
             if self.inverted_vae_contract is not None:
                 raise ValidationError("Un contrat associé à une VAE inversée n'est possible que pour les GEIQ")
 
-    def save(self, *args, **kwargs):
-        self.full_clean()
-        return super().save(*args, **kwargs)
-
     @property
     def is_pending(self):
         return self.state in JobApplicationWorkflow.PENDING_STATES
