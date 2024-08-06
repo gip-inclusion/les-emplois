@@ -325,6 +325,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
     raw_id_fields = ("created_by",)
     readonly_fields = (
         "pk",
+        "public_id",
         "identity_provider",
         "address_in_qpv",
         "is_staff",
@@ -506,6 +507,10 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
                 },
             ),
         )
+
+        assert fieldsets[0] == (None, {"fields": ("username", "password")})
+        fieldsets[0] = (None, {"fields": ("username", "public_id", "password")})
+
         # Add last_checked_at in "Important dates" section, alongside last_login & date_joined
         assert "last_login" in fieldsets[-2][1]["fields"]
         fieldsets[-2] = ("Dates importantes", {"fields": ("last_login", "date_joined", "last_checked_at")})
