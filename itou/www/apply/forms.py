@@ -7,13 +7,14 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.db.models.fields import BLANK_CHOICE_DASH
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.html import format_html
 from django_select2.forms import Select2MultipleWidget, Select2Widget
 
 from itou.approvals.models import Approval
 from itou.asp import models as asp_models
+from itou.asp.forms import formfield_for_birth_place
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
@@ -30,7 +31,7 @@ from itou.utils import constants as global_constants
 from itou.utils.emails import redact_email_address
 from itou.utils.types import InclusiveDateRange
 from itou.utils.validators import validate_nir
-from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Widget
+from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.companies_views.forms import JobAppellationAndLocationMixin
 
 
@@ -881,25 +882,6 @@ class CertifiedCriteriaInfoRequiredForm(forms.ModelForm):
     https://github.com/etalab/siade_staging_data/blob/develop/payloads/api_particulier_v2_cnav_allocation_adulte_handicape/200_beneficiaire.yaml
     """
 
-    birth_place = forms.ModelChoiceField(
-        queryset=asp_models.Commune.objects,
-        label="Commune de naissance",
-        help_text="La commune de naissance est obligatoire lorsque le salarié est né en France. "
-        "Elle ne doit pas être renseignée s’il est né à l'étranger.",
-        widget=RemoteAutocompleteSelect2Widget(
-            attrs={
-                "data-ajax--url": reverse_lazy("autocomplete:communes"),
-                "data-ajax--cache": "true",
-                "data-ajax--type": "GET",
-                "data-minimum-input-length": 1,
-                "data-placeholder": "Nom de la commune",
-                "data-disable-target": "#id_birth_country",
-                "data-target-value": "91",  # France
-            },
-        ),
-        required=False,
-    )
-
     birth_country = forms.ModelChoiceField(
         asp_models.Country.objects,
         label="Pays de naissance",
@@ -912,6 +894,7 @@ class CertifiedCriteriaInfoRequiredForm(forms.ModelForm):
 
     def __init__(self, birthdate, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["birth_place"] = formfield_for_birth_place()
         self.birthdate = birthdate
 
     def clean(self):

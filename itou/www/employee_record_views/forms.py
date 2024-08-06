@@ -5,6 +5,7 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django_select2.forms import Select2Widget
 
+from itou.asp.forms import formfield_for_birth_place
 from itou.asp.models import Commune, Country, RSAAllocation
 from itou.companies.models import SiaeFinancialAnnex
 from itou.employee_record.enums import Status
@@ -114,27 +115,6 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         "birthdate",
     ]
 
-    birth_place = forms.ModelChoiceField(
-        queryset=Commune.objects,
-        label="Commune de naissance",
-        help_text=(
-            "La commune de naissance est obligatoire lorsque le salarié est né en France. "
-            "Elle ne doit pas être renseignée s’il est né à l'étranger."
-        ),
-        widget=RemoteAutocompleteSelect2Widget(
-            attrs={
-                "data-ajax--url": reverse_lazy("autocomplete:communes"),
-                "data-ajax--cache": "true",
-                "data-ajax--type": "GET",
-                "data-minimum-input-length": 1,
-                "data-placeholder": "Nom de la commune",
-                "data-disable-target": "#id_birth_country",
-                "data-target-value": "91",  # France
-            },
-        ),
-        required=False,
-    )
-
     # This is a JobSeekerProfile field
     birth_country = forms.ModelChoiceField(Country.objects, label="Pays de naissance", required=False)
 
@@ -149,6 +129,8 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.fields["birth_place"] = formfield_for_birth_place()
 
         for field_name in self.REQUIRED_FIELDS:
             self.fields[field_name].required = True
