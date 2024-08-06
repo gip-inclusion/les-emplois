@@ -56,7 +56,6 @@ services:
       - PGPASSWORD=password
       - PYTHONPATH=.
       - ITOU_LOG_LEVEL=DEBUG
-      - ITOU_CACHE=/app/.cache
       - CELLAR_ADDON_HOST=minio:${MINIO_PORT_ON_DOCKER_HOST:-9000}
       - VIRTUAL_ENV=/app/.venv-docker
       - REDIS_URL=redis://redis:6379
