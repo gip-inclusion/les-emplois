@@ -1,8 +1,14 @@
+import datetime
+
 import httpx
 import pytest
 import tenacity
+from django.db.models import F
 
+from itou.users.models import User
 from itou.utils.apis.api_particulier import APIParticulierClient
+from tests.asp.factories import CommuneFactory
+from tests.users.factories import JobSeekerFactory
 
 
 def test_token_scope(settings, respx_mock):
@@ -79,4 +85,50 @@ def test_gateway_timeout(settings, respx_mock, mocker, caplog):
     assert reason in caplog.text
 
 
+# TODO: update that.
+def get_job_seeker_qs():
+    birth_place = CommuneFactory(code="07141")
+    job_seeker = JobSeekerFactory(born_in_france=True, for_snapshot=True, jobseeker_profile__birth_place=birth_place)
+    return (
+        User.objects.values(
+            "first_name",
+            "last_name",
+            "birthdate",
+            "title",
+        )
+        .annotate(birth_country_code=F("jobseeker_profile__birth_country__code"))
+        .annotate(birth_place_code=F("jobseeker_profile__birth_place__code"))
+        .get(pk=job_seeker.pk)
+    )
+
+
+def test_build_params_from(snapshot):
+    assert APIParticulierClient._build_params_from(get_job_seeker_qs()) == snapshot(
+        name="api_particulier_build_params"
+    )
+
+
 # BRSA
+def test_certify_brsa(settings, respx_mock):
+    settings.API_PARTICULIER_BASE_URL = "https://fake-api-particulier.com/api/"
+    mocked_data = {"status": "beneficiaire", "majoration": "true", "dateDebut": "1992-11-20", "dateFin": "1993-02-20"}
+    respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
+        200,
+        json=mocked_data,
+    )
+
+    client = APIParticulierClient(job_seeker=get_job_seeker_qs())
+    received_data, is_certified, certification_period = client.revenu_solidarite_active()
+    assert received_data == mocked_data
+    assert is_certified
+    assert certification_period == (datetime.datetime(1992, 11, 20), datetime.datetime(1993, 2, 20))
+
+    mocked_data = {"status": "non_beneficiaire", "majoration": "null", "dateDebut": "null", "dateFin": "null"}
+    respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
+        200,
+        json=mocked_data,
+    )
+    received_data, is_certified, certification_period = client.revenu_solidarite_active()
+    assert received_data == mocked_data
+    assert not is_certified
+    assert certification_period == ""

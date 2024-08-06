@@ -1,3 +1,4 @@
+import datetime
 import logging
 
 import httpx
@@ -6,24 +7,47 @@ from django.conf import settings
 
 
 class APIParticulierClient:
-    def __init__(self):
+    def __init__(self, job_seeker=None):
         self.client = httpx.Client(
             headers={"X-Api-Key": settings.API_PARTICULIER_TOKEN}, base_url=settings.API_PARTICULIER_BASE_URL
         )
+        self.job_seeker = job_seeker
         self.logger = logging.getLogger("APIParticulierClient")
 
-    # @property
-    # def default_params(self, data):
-    #     return {
-    #             "nomNaissance": data.get("last_name"),
-    #             "prenoms[]": data.get("first_name").split(" "),
-    #             "anneeDateDeNaissance": data.get("birth_year"),
-    #             "moisDateDeNaissance": data.get("birth_month"),
-    #             "jourDateDeNaissance": data.get("birth_day"),
-    #             "codeInseeLieuDeNaissance": data.get("birth_place_code"),
-    #             "codePaysLieuDeNaissance": data.get("birth_country_code"),
-    #             "sexe": data.get("gender"),
-    #         }
+    @classmethod
+    def _build_params_from(cls, job_seeker):
+        # TODO: transform into a Dataclass
+        """
+        users = (
+            User.objects.filter(pk__in=users_pk)
+            .values(
+                "first_name",
+                "last_name",
+                "birthdate",
+                "title",
+            )
+            .annotate(birth_country_code=F("jobseeker_profile__birth_country__code"))
+            .annotate(birth_place_code=F("jobseeker_profile__birth_place__code"))
+        )
+        """
+        gender = None
+        match job_seeker["title"]:
+            case "MME":
+                gender = "F"
+            case "M":
+                gender = "M"
+            case _:
+                pass
+        return {
+            "nomNaissance": job_seeker["last_name"],
+            "prenoms[]": job_seeker["first_name"].split(" "),
+            "anneeDateDeNaissance": job_seeker["birthdate"].year,
+            "moisDateDeNaissance": job_seeker["birthdate"].month,
+            "jourDateDeNaissance": job_seeker["birthdate"].day,
+            "codeInseeLieuDeNaissance": job_seeker["birth_place_code"],
+            "codePaysLieuDeNaissance": f"99{job_seeker['birth_country_code']}",
+            "sexe": gender,
+        }
 
     @tenacity.retry(
         wait=tenacity.wait_fixed(2),
@@ -34,7 +58,7 @@ class APIParticulierClient:
         response = self.client.get(endpoint, params=params)
         if response.status_code in [503, 504]:
             reason = response.json().get("reason")
-            message = f"{response.url=} reason:{reason}"
+            message = f"{response.url=} {reason=}"
             self.logger.error(message)
             raise httpx.RequestError(message=message)
         else:
@@ -52,3 +76,16 @@ class APIParticulierClient:
                 "allocation_soutien_familial",
             ]
         )
+
+    def revenu_solidarite_active(self):
+        params = self._build_params_from(job_seeker=self.job_seeker)
+        response = self._request("/v2/revenu-solidarite-active", params=params)
+        data = response.json()
+        is_certified = data["status"] == "beneficiaire"
+        try:
+            start = datetime.datetime.strptime(data["dateDebut"], "%Y-%m-%d")
+            end = datetime.datetime.strptime(data["dateFin"], "%Y-%m-%d")
+            certification_period = (start, end)
+        except ValueError:
+            certification_period = ""
+        return data, is_certified, certification_period
