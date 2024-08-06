@@ -1,0 +1,71 @@
+{% load format_filters %}
+{% comment %}
+
+Arguments:
+
+    approval
+
+{% endcomment %}
+
+<div class="c-box c-box--pass {% if approval.state == 'EXPIRED' %}bg-danger-lightest border-danger{% elif approval.state == 'SUSPENDED' %}bg-info-lightest border-info{% else %}bg-success-lightest border-success{% endif %} mb-3 mb-md-4">
+    <div class="mb-3 mb-md-4">
+        <span class="badge badge-base rounded-pill {% if approval.state == 'EXPIRED' %}bg-danger{% elif approval.state == 'SUSPENDED' %}bg-info{% else %}bg-success{% endif %} text-white">
+            <i class="{% if approval.state == 'EXPIRED' %}ri-pass-expired-line{% elif approval.state == 'SUSPENDED' %}ri-pass-pending-line{% else %}ri-pass-valid-line{% endif %}" aria-hidden="true"></i>
+            PASS IAE {{ approval.get_state_display.lower }}
+        </span>
+    </div>
+    <ul class="list-data">
+        <li>
+            <small>Numéro de PASS IAE</small>
+            <strong>{{ approval.number|format_approval_number }}</strong>
+        </li>
+        {% if approval.state == "EXPIRED" %}
+            <li>
+                <small>A expiré le</small>
+                <strong class="text-danger">{{ approval.end_at|date:"d/m/Y" }}</strong>
+            </li>
+        {% else %}
+            <li>
+                <small>Date de début</small>
+                <strong>{{ approval.start_at|date:"d/m/Y" }}</strong>
+            </li>
+            <li>
+                <small>Date de fin prévisionnelle <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" data-bs-title="Cette date de fin est susceptible d’évoluer avec les éventuelles suspensions et prolongations du PASS IAE."></i></small>
+                <strong>{{ approval.remainder_as_date|date:"d/m/Y" }}</strong>
+            </li>
+            <li>
+                <small>Durée de validité <i class="ri-information-line ri-xl text-info"
+    data-bs-toggle="tooltip"
+    data-bs-title="Le reliquat est calculé sur la base d’un nombre de jours calendaires. Si le PASS IAE n’est pas suspendu, il décroît donc tous les jours (samedi, dimanche et jours fériés compris)."></i></small>
+                <strong {% if approval.state == "VALID" or approval.state == "FUTURE" %}class="text-success"{% endif %}>{{ approval.get_remainder_display }}</strong>
+            </li>
+        {% endif %}
+    </ul>
+    {% if approval.state == "VALID" %}
+        {% with approval.pending_prolongation_request as pending_prolongation_request %}
+            {% if pending_prolongation_request %}
+                <hr class="my-3 my-md-4">
+                <ul class="list-data">
+                    <li>
+                        <small>Demande de prolongation (en attente)</small>
+                        <strong>
+                            du {{ pending_prolongation_request.start_at|date:"d/m/Y" }} au {{ pending_prolongation_request.end_at|date:"d/m/Y" }}
+                        </strong>
+                    </li>
+                </ul>
+            {% endif %}
+        {% endwith %}
+    {% elif approval.state == "SUSPENDED" %}
+        {% with approval.suspension_set.in_progress.first as suspension %}
+            {% if suspension %}
+                <hr class="my-3 my-md-4">
+                <ul class="list-data">
+                    <li>
+                        <small>Suspension en cours</small>
+                        <strong class="text-info">du {{ suspension.start_at|date:"d/m/Y" }} au {{ suspension.end_at|date:"d/m/Y" }}</strong>
+                    </li>
+                </ul>
+            {% endif %}
+        {% endwith %}
+    {% endif %}
+</div>

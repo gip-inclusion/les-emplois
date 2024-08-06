@@ -10,9 +10,10 @@ from contextlib import contextmanager
 import openpyxl
 import sqlparse
 from bs4 import BeautifulSoup
-from django.conf import settings
+from django.conf import Path, settings
 from django.db import DEFAULT_DB_ALIAS, connections
 from django.db.backends.utils import CursorDebugWrapper
+from django.template import Template
 from django.template.base import Node
 from django.template.loader import render_to_string
 from django.test import Client, TestCase as BaseTestCase
@@ -322,3 +323,7 @@ def debug_sql(self, sql=None, params=None, use_last_executed_query=False, many=F
 
 
 CursorDebugWrapper.debug_sql = debug_sql
+
+
+def load_template(path):
+    return Template((Path("itou/templates") / path).read_text())
