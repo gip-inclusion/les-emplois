@@ -132,3 +132,13 @@ class AbstractAdministrativeCriteria(models.Model):
         if level_display := self.get_level_display():
             name += f" - {level_display}"
         return name
+
+
+class AbstractSelectedAdministrativeCriteria(models.Model):
+    certified = models.BooleanField(null=True, verbose_name="certifié par l'API Particulier")
+    certified_at = models.DateTimeField(null=True, verbose_name="certifié le")
+    certification_period = models.DurationField(null=True, verbose_name="période de certification")
+    data_returned_by_api = models.JSONField(null=True, verbose_name="résultat renvoyé par l'API Particulier")
+
+    class Meta:
+        abstract = True
