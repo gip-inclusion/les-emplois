@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
+from django.forms import ValidationError
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
 from django.template.response import TemplateResponse
@@ -51,7 +52,12 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
             tally_form_query=f"jobapplication={job_application.pk}" if job_application else None,
         )
         forms.append(form_personal_data)
-        birthdate = form_personal_data.data.get("birthdate")
+        try:
+            birthdate = JobSeekerPersonalDataForm.base_fields["birthdate"].clean(
+                form_personal_data.data.get("birthdate")
+            )
+        except ValidationError:
+            pass  # will be presented to user later
 
         form_user_address = JobSeekerAddressForm(instance=job_seeker, data=request.POST or None)
         forms.append(form_user_address)

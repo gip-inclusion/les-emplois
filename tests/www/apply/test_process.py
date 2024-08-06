@@ -2567,6 +2567,52 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         del post_data["birth_place"]
         self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
 
+    def test_accept_updated_birthdate_invalidating_birth_place(self):
+        # tests for a rare case where the birthdate will be cleaned for sharing between forms during the accept process
+        job_application = self.create_job_application()
+
+        # required assumptions for the test case
+        assert self.company.is_subject_to_eligibility_rules
+        ed = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=self.job_seeker, for_siae=self.company)
+        assert ed and ed.criteria_certification_available()
+
+        employer = self.company.members.first()
+        self.client.force_login(employer)
+
+        birth_place = Commune.objects.filter(start_date__gt=datetime.date(1901, 12, 1)).first()
+        assert birth_place is not None  # required by test
+
+        early_date = birth_place.start_date - datetime.timedelta(days=1)
+        post_data = {
+            "birth_place": birth_place.pk,
+            "birthdate": early_date,  # invalidates birth_place lookup, triggering error
+        }
+
+        response, _ = self.accept_job_application(
+            job_application=job_application, post_data=post_data, assert_successful=False
+        )
+        expected_msg = (
+            f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {early_date:%d/%m/%Y}"
+        )
+
+        assert response.context.get("form_personal_data").errors == {}
+        assert response.context.get("form_certified_criteria").errors["birth_place"] == [expected_msg]
+
+        # assert malformed birthdate does not crash view
+        post_data["birthdate"] = "20240-001-001"
+        response, _ = self.accept_job_application(
+            job_application=job_application, post_data=post_data, assert_successful=False
+        )
+
+        assert response.context.get("form_personal_data").errors == {"birthdate": ["Saisissez une date valide."]}
+        assert response.context.get("form_certified_criteria").errors == {}
+
+        # test that fixing the birthdate fixes the form submission
+        post_data["birthdate"] = birth_place.start_date + datetime.timedelta(days=1)
+        response, _ = self.accept_job_application(
+            job_application=job_application, post_data=post_data, assert_successful=True
+        )
+
 
 class ProcessTemplatesTest(TestCase):
     """

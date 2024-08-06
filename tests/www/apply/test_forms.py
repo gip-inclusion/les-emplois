@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pytest
 from django.urls import reverse
@@ -13,7 +13,12 @@ from tests.cities.factories import create_test_cities
 from tests.companies.factories import JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory
+from tests.users.factories import (
+    JobSeekerFactory,
+    JobSeekerProfileFactory,
+    JobSeekerWithAddressFactory,
+    PrescriberFactory,
+)
 from tests.utils.test import TestCase
 
 
@@ -399,3 +404,51 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
         for kind in (CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS):
             assertNotContains(_response(kind), self.HELP_START_AT)
             assertNotContains(_response(kind), self.HELP_END_AT)
+
+
+class CertifiedCriteriaInfoRequiredFormTest(TestCase):
+    def test_submit_valid(self):
+        job_seeker = JobSeekerWithAddressFactory(
+            with_ban_api_mocked_address=True,
+            born_in_france=True,
+        )
+
+        birth_place = job_seeker.jobseeker_profile.birth_place
+        valid_birthdate = birth_place.start_date + timedelta(days=1)
+
+        form_data = {
+            "address_line_1": job_seeker.address_line_1,
+            "address_line_2": job_seeker.address_line_2,
+            "post_code": job_seeker.post_code,
+            "city": job_seeker.city,
+            "insee_code": job_seeker.insee_code,
+            "ban_api_resolved_address": job_seeker.geocoding_address,
+            "birth_country": job_seeker.jobseeker_profile.birth_country.id,
+            "birth_place": job_seeker.jobseeker_profile.birth_place.id,
+        }
+        form = apply_forms.CertifiedCriteriaInfoRequiredForm(data=form_data, birthdate=valid_birthdate)
+        assert form.is_valid()
+
+    def test_submit_commune_invalid_commune_lookup(self):
+        job_seeker = JobSeekerWithAddressFactory(with_ban_api_mocked_address=True, born_in_france=True)
+
+        birth_place = job_seeker.jobseeker_profile.birth_place
+        early_date = birth_place.start_date - timedelta(days=1)
+
+        form_data = {
+            "address_line_1": job_seeker.address_line_1,
+            "address_line_2": job_seeker.address_line_2,
+            "post_code": job_seeker.post_code,
+            "city": job_seeker.city,
+            "insee_code": job_seeker.insee_code,
+            "ban_api_resolved_address": job_seeker.geocoding_address,
+            "birth_country": job_seeker.jobseeker_profile.birth_country.id,
+            "birth_place": birth_place.id,
+        }
+        form = apply_forms.CertifiedCriteriaInfoRequiredForm(data=form_data, birthdate=early_date)
+        assert not form.is_valid()
+
+        expected_msg = (
+            f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {early_date:%d/%m/%Y}"
+        )
+        assert form.errors["birth_place"] == [expected_msg]
