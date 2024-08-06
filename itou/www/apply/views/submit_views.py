@@ -169,8 +169,7 @@ class ApplicationBaseView(ApplyStepBaseView):
             self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
                 self.job_seeker, self.company
             ).first()
-        else:
-            # General IAE eligibility case
+        elif self.company.is_subject_to_eligibility_rules:
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
                 self.job_seeker, for_siae=self.company
             )
