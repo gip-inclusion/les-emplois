@@ -1,4 +1,5 @@
 import datetime
+import functools
 import itertools
 import json
 from datetime import date, timedelta
@@ -242,7 +243,11 @@ class TestEmployeeRecordModel:
 @pytest.mark.parametrize(
     "factory,expected",
     [
-        (JobApplicationSentByJobSeekerFactory, "07"),
+        pytest.param(
+            functools.partial(JobApplicationSentByJobSeekerFactory, with_iae_eligibility_diagnosis=True),
+            "07",
+            id="JobApplicationSentByJobSeekerFactory-07",
+        ),
         (JobApplicationSentByCompanyFactory, "07"),
         (JobApplicationSentByPrescriberFactory, "08"),
         (JobApplicationSentByPrescriberOrganizationFactory, "08"),

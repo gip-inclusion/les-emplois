@@ -89,7 +89,7 @@ class TestGpsManagementCommand:
         # Empty group!
         # One processing job application sent by a job seeker.
         # A group should not be created.
-        JobApplicationSentByJobSeekerFactory(state=JobApplicationState.PROCESSING, eligibility_diagnosis=None)
+        JobApplicationSentByJobSeekerFactory(state=JobApplicationState.PROCESSING)
 
         self.call_command("init_follow_up_groups", wet_run=True)
 
@@ -141,6 +141,7 @@ class TestGpsManagementCommand:
         job_application_sent_by_job_seeker = JobApplicationSentByJobSeekerFactory(
             job_seeker__first_name="Dave",
             state=JobApplicationState.PROCESSING,
+            with_iae_eligibility_diagnosis=True,
             eligibility_diagnosis__author=prescriber,
         )
         should_be_created_groups_counter += 1
@@ -183,9 +184,7 @@ class TestGpsManagementCommand:
         )
 
     def test_job_application_sender_job_seeker(self):
-        JobApplicationSentByJobSeekerFactory(
-            state=JobApplicationState.NEW, to_company__kind=CompanyKind.GEIQ, eligibility_diagnosis=None
-        )
+        JobApplicationSentByJobSeekerFactory(state=JobApplicationState.NEW, to_company__kind=CompanyKind.GEIQ)
 
         assert FollowUpGroup.objects.count() == 0
         assert FollowUpGroupMembership.objects.count() == 0

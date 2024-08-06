@@ -194,7 +194,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
 
         # Create `user2` through a job application sent by him.
         job_app2 = JobApplicationSentByJobSeekerFactory(
-            with_approval=True, job_seeker__jobseeker_profile__nir="", **kwargs
+            with_approval=True, job_seeker__jobseeker_profile__nir="", with_iae_eligibility_diagnosis=True, **kwargs
         )
         user2 = job_app2.job_seeker
 
