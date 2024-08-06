@@ -917,7 +917,7 @@ class CertifiedCriteriaInfoRequiredForm(forms.ModelForm):
     def clean(self):
         super().clean()
 
-        birthdate = self.birthdate
+        birthdate = self.cleaned_data.get("birthdate")
         birth_place = self.cleaned_data.get("birth_place")
         birth_country = self.cleaned_data.get("birth_country")
         if not birth_country:
