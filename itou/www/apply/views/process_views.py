@@ -545,7 +545,7 @@ def archive(request, job_application_id):
             siae_name = job_application.to_company.display_name
 
             job_application.hidden_for_company = True
-            job_application.save()
+            job_application.save(update_fields={"hidden_for_company"})
 
             success_message = f"La candidature de {username} chez {siae_name} a bien été supprimée."
             messages.success(request, success_message, extra_tags="toast")
@@ -736,7 +736,7 @@ class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, Applicat
         self.job_application.external_transfer(target_company=self.company, user=self.request.user)
         if self.form.cleaned_data.get("keep_original_resume"):
             new_job_application.resume_link = self.job_application.resume_link
-            new_job_application.save()
+            new_job_application.save(update_fields={"resume_link"})
         return new_job_application
 
     def get_next_url(self, job_application):

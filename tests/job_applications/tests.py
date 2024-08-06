@@ -22,8 +22,6 @@ from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.employee_record.enums import Status
 from itou.job_applications.admin_forms import JobApplicationAdminForm
 from itou.job_applications.enums import (
-    GEIQ_MAX_HOURS_PER_WEEK,
-    GEIQ_MIN_HOURS_PER_WEEK,
     JobApplicationState,
     Origin,
     QualificationLevel,
@@ -180,99 +178,21 @@ class JobApplicationModelTest(TestCase):
             with self.subTest(sender_kind_display):
                 assert job_application.get_sender_kind_display() == sender_kind_display
 
-    def test_geiq_fields_validation(self):
-        # Full clean
-        with self.assertRaisesRegex(
-            ValidationError, "Le nombre d'heures par semaine ne peut être saisi que pour un GEIQ"
-        ):
-            JobApplicationFactory(to_company__kind=CompanyKind.EI, nb_hours_per_week=20)
-
-        with self.assertRaisesRegex(
-            ValidationError, "Les précisions sur le type de contrat ne peuvent être saisies que pour un GEIQ"
-        ):
-            JobApplicationFactory(to_company__kind=CompanyKind.EI, contract_type_details="foo")
-
-        with self.assertRaisesRegex(ValidationError, "Le type de contrat ne peut être saisi que pour un GEIQ"):
-            JobApplicationFactory(to_company__kind=CompanyKind.EI, contract_type=ContractType.OTHER)
-
-        # Constraints
-        with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
-            JobApplicationFactory(
-                to_company__kind=CompanyKind.GEIQ,
-                contract_type=ContractType.PROFESSIONAL_TRAINING,
-                contract_type_details="foo",
-            )
-
-        with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
-            JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, nb_hours_per_week=1)
-
-        with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
-            JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, contract_type=ContractType.OTHER)
-
-        with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
-            JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, contract_type_details="foo")
-
-        with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
-            JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, contract_type_details="foo", nb_hours_per_week=1)
-
-        with self.assertRaisesRegex(ValidationError, "Incohérence dans les champs concernant le contrat GEIQ"):
-            JobApplicationFactory(
-                to_company__kind=CompanyKind.GEIQ, contract_type=ContractType.OTHER, nb_hours_per_week=1
-            )
-
-        # Mind the parens in RE...
-        with self.assertRaisesRegex(
-            ValidationError, "Une candidature ne peut avoir les deux types de diagnostics \\(IAE et GEIQ\\)"
-        ):
-            JobApplicationFactory(
-                with_geiq_eligibility_diagnosis=True,
-                eligibility_diagnosis=IAEEligibilityDiagnosisFactory(from_prescriber=True),
-            )
-
-        # Validators
-        with self.assertRaisesRegex(
-            ValidationError,
-            f"Assurez-vous que cette valeur est supérieure ou égale à {GEIQ_MIN_HOURS_PER_WEEK}.",
-        ):
-            JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, nb_hours_per_week=0)
-
-        with self.assertRaisesRegex(
-            ValidationError,
-            f"Assurez-vous que cette valeur est inférieure ou égale à {GEIQ_MAX_HOURS_PER_WEEK}.",
-        ):
-            JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, nb_hours_per_week=49)
-
-        # Should pass: normal cases
-        JobApplicationFactory()
-
-        for contract_type in [ContractType.APPRENTICESHIP, ContractType.PROFESSIONAL_TRAINING]:
-            with self.subTest(contract_type):
-                JobApplicationFactory(
-                    to_company__kind=CompanyKind.GEIQ, contract_type=contract_type, nb_hours_per_week=35
-                )
-
-        JobApplicationFactory(
-            to_company__kind=CompanyKind.GEIQ,
-            contract_type=ContractType.OTHER,
-            nb_hours_per_week=30,
-            contract_type_details="foo",
-        )
-
     def test_application_on_non_job_seeker(self):
         with self.assertRaisesRegex(
             ValidationError,
             "Impossible de candidater pour cet utilisateur, celui-ci n'est pas un compte candidat",
         ):
-            JobApplicationFactory(job_seeker=PrescriberFactory())
+            JobApplicationFactory(job_seeker=PrescriberFactory()).clean()
 
     def test_inverted_vae_contract(self):
-        JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, inverted_vae_contract=True)
-        JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, inverted_vae_contract=False)
-        JobApplicationFactory(to_company__kind=CompanyKind.EI, inverted_vae_contract=None)
+        JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, inverted_vae_contract=True).clean()
+        JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, inverted_vae_contract=False).clean()
+        JobApplicationFactory(to_company__kind=CompanyKind.EI, inverted_vae_contract=None).clean()
         with self.assertRaisesRegex(
             ValidationError, "Un contrat associé à une VAE inversée n'est possible que pour les GEIQ"
         ):
-            JobApplicationFactory(to_company__kind=CompanyKind.AI, inverted_vae_contract=True)
+            JobApplicationFactory(to_company__kind=CompanyKind.AI, inverted_vae_contract=True).clean()
 
 
 def test_can_be_cancelled():
@@ -283,15 +203,81 @@ def test_can_be_cancelled_when_origin_is_ai_stock():
     assert JobApplicationFactory(origin=Origin.AI_STOCK).can_be_cancelled is False
 
 
+def test_diagnoses_coherence_contraint():
+    job_application = JobApplicationFactory(with_geiq_eligibility_diagnosis=True)
+    job_application.eligibility_diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True)
+
+    # Mind the parens in RE...
+    with pytest.raises(
+        ValidationError, match="Une candidature ne peut avoir les deux types de diagnostics \\(IAE et GEIQ\\)"
+    ):
+        job_application.validate_constraints()
+
+
+@pytest.mark.parametrize(
+    "data,error",
+    [
+        ({"nb_hours_per_week": 20}, "Le nombre d'heures par semaine ne peut être saisi que pour un GEIQ"),
+        (
+            {"contract_type_details": "foo"},
+            "Les précisions sur le type de contrat ne peuvent être saisies que pour un GEIQ",
+        ),
+        ({"contract_type": ContractType.OTHER}, "Le type de contrat ne peut être saisi que pour un GEIQ"),
+    ],
+    ids=repr,
+)
+def test_geiq_fields_validation_error(data, error):
+    job_application = JobApplicationFactory(to_company__kind=CompanyKind.EI)
+    for name, value in data.items():
+        setattr(job_application, name, value)
+
+    with pytest.raises(ValidationError, match=error):
+        job_application.clean()
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        {"contract_type": ContractType.APPRENTICESHIP, "nb_hours_per_week": 35},
+        {"contract_type": ContractType.PROFESSIONAL_TRAINING, "nb_hours_per_week": 35},
+        {"contract_type": ContractType.OTHER, "nb_hours_per_week": 30, "contract_type_details": "foo"},
+    ],
+    ids=repr,
+)
+def test_geiq_fields_validation_success(data):
+    JobApplicationFactory(to_company__kind=CompanyKind.GEIQ, **data)
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        {"contract_type": ContractType.PROFESSIONAL_TRAINING, "contract_type_details": "foo"},
+        {"contract_type": ContractType.OTHER},
+        {"contract_type_details": "foo"},
+        {"nb_hours_per_week": 1},
+        {"nb_hours_per_week": 1, "contract_type_details": "foo"},
+        {"nb_hours_per_week": 1, "contract_type": ContractType.OTHER},
+    ],
+    ids=repr,
+)
+def test_geiq_contract_fields_contraint(data):
+    job_application = JobApplicationFactory(to_company__kind=CompanyKind.GEIQ)
+    for name, value in data.items():
+        setattr(job_application, name, value)
+
+    with pytest.raises(ValidationError, match="Incohérence dans les champs concernant le contrat GEIQ"):
+        job_application.validate_constraints()
+
+
 def test_geiq_qualification_fields_contraint():
     with pytest.raises(
         Exception, match="Incohérence dans les champs concernant la qualification pour le contrat GEIQ"
     ):
-        JobApplicationFactory(
+        JobApplicationFactory.build(
             to_company__kind=CompanyKind.GEIQ,
             qualification_type=QualificationType.STATE_DIPLOMA,
             qualification_level=QualificationLevel.NOT_RELEVANT,
-        )
+        ).validate_constraints()
 
     for qualification_type in [QualificationType.CQP, QualificationType.CCN]:
         JobApplicationFactory(
