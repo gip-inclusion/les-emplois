@@ -8,9 +8,13 @@ from itou.utils.admin import ItouModelAdmin, ItouTabularInline, PkSupportRemarkI
 
 
 class AbstractAdministrativeCriteriaInline(ItouTabularInline):
-    extra = 1
+    extra = 0
     raw_id_fields = ("administrative_criteria",)
-    readonly_fields = ("created_at",)
+    readonly_fields = ("created_at", "certifiable")
+
+    @admin.display(boolean=True, description="vérifiable par l'API Particuliers")
+    def certifiable(self, obj):
+        return obj.administrative_criteria.certifiable
 
 
 class AdministrativeCriteriaInline(AbstractAdministrativeCriteriaInline):
@@ -116,7 +120,6 @@ class AbstractEligibilityDiagnosisAdmin(ItouModelAdmin):
         "created_at",
         "is_valid",
         "expires_at",
-        "certifiable",
     )
     list_display_links = ("pk", "job_seeker")
     raw_id_fields = (
@@ -138,10 +141,6 @@ class AbstractEligibilityDiagnosisAdmin(ItouModelAdmin):
     @admin.display(boolean=True, description="en cours de validité")
     def is_valid(self, obj):
         return obj.is_valid
-
-    @admin.display(boolean=True, description="vérifiable par l'API Particuliers")
-    def certifiable(self, obj):
-        return obj.certifiable
 
 
 @admin.register(models.EligibilityDiagnosis)
@@ -226,6 +225,7 @@ class AdministrativeCriteriaAdmin(AbstractAdministrativeCriteriaAdmin):
         "name",
         "level",
         "ui_rank",
+        "certifiable",
         "created_at",
     )
 
@@ -237,6 +237,7 @@ class GEIQAdministrativeCriteriaAdmin(AbstractAdministrativeCriteriaAdmin):
         "name",
         "annex",
         "level",
+        "certifiable",
         "created_at",
     )
     raw_id_fields = AbstractAdministrativeCriteriaAdmin.raw_id_fields + ("parent",)
