@@ -112,7 +112,6 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         "first_name",
         "last_name",
         "birthdate",
-        "birth_country",
     ]
 
     birth_place = forms.ModelChoiceField(
@@ -137,7 +136,7 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
     )
 
     # This is a JobSeekerProfile field
-    birth_country = forms.ModelChoiceField(Country.objects, label="Pays de naissance")
+    birth_country = forms.ModelChoiceField(Country.objects, label="Pays de naissance", required=False)
 
     class Meta:
         model = User
@@ -174,21 +173,33 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
         super().clean()
 
         birth_place = self.cleaned_data.get("birth_place")
+        birth_country = self.cleaned_data.get("birth_country")
         birth_date = self.cleaned_data.get("birthdate")
+
+        if not birth_country:
+            # Selecting a birth place sets the birth country field to France and disables it.
+            # However, disabled fields are ignored by Django.
+            # That's also why we can't make it mandatory.
+            # See utils.js > toggleDisableAndSetValue
+            if birth_place:
+                self.cleaned_data["birth_country"] = Country.objects.get(code=Country._CODE_FRANCE)
+            else:
+                # Display the error above the field instead of top of page.
+                self.add_error("birth_country", "Le pays de naissance est obligatoire.")
 
         # Country coherence is done at model level (users.User)
         # Here we must add coherence between birthdate and communes
         # existing at this period (not a simple check of existence)
-
         if birth_place and birth_date:
             try:
                 self.cleaned_data["birth_place"] = Commune.objects.by_insee_code_and_period(
                     birth_place.code, birth_date
                 )
-            except Commune.DoesNotExist as ex:
-                raise forms.ValidationError(
+            except Commune.DoesNotExist:
+                msg = (
                     f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {birth_date:%d/%m/%Y}"
-                ) from ex
+                )
+                self.add_error("birth_place", msg)
 
     def _post_clean(self):
         super()._post_clean()
