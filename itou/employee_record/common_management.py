@@ -7,10 +7,10 @@ from django.utils import timezone
 from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 
-from itou.employee_record import constants
 from itou.employee_record.enums import NotificationStatus
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, EmployeeRecordUpdateNotification, Status
 from itou.employee_record.serializers import EmployeeRecordSerializer, EmployeeRecordUpdateNotificationSerializer
+from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from itou.utils.command import BaseCommand
 from itou.utils.iterators import chunks
 
@@ -88,7 +88,7 @@ class EmployeeRecordTransferCommand(BaseCommand):
         try:
             sftp.putfo(
                 json_stream,
-                f"{constants.ASP_FS_REMOTE_UPLOAD_DIR}/{remote_path}",
+                f"{REMOTE_UPLOAD_DIR}/{remote_path}",
                 file_size=len(json_bytes),
                 confirm=False,
             )
@@ -106,7 +106,7 @@ class EmployeeRecordTransferCommand(BaseCommand):
         self.stdout.write("Starting DOWNLOAD of feedback files")
 
         # Get into the download folder
-        sftp.chdir(constants.ASP_FS_REMOTE_DOWNLOAD_DIR)
+        sftp.chdir(REMOTE_DOWNLOAD_DIR)
 
         # Get the available feedback files
         result_files = sftp.listdir()
