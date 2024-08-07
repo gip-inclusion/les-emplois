@@ -10,6 +10,7 @@ from django.utils import timezone
 from itou.employee_record.enums import NotificationStatus, Status
 from itou.employee_record.management.commands import transfer_employee_records
 from itou.employee_record.models import EmployeeRecordBatch
+from itou.utils.asp import REMOTE_DOWNLOAD_DIR, REMOTE_UPLOAD_DIR
 from tests.approvals.factories import ProlongationFactory, SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecordUpdateNotificationFactory
 
@@ -21,8 +22,8 @@ def command_fixture(mocker, settings, sftp_directory, sftp_client_factory):
     settings.ASP_FS_SFTP_USER = "django_tests"
 
     # Setup directory
-    sftp_directory.joinpath("depot").mkdir()
-    sftp_directory.joinpath("retrait").mkdir()
+    sftp_directory.joinpath(REMOTE_UPLOAD_DIR).mkdir()
+    sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR).mkdir()
 
     # Create the management command and mock the SFTP connection
     command = transfer_employee_records.Command(stdout=io.StringIO(), stderr=io.StringIO())
@@ -32,14 +33,14 @@ def command_fixture(mocker, settings, sftp_directory, sftp_client_factory):
 
 
 def process_incoming_file(sftp_directory, code, message):
-    for file in sftp_directory.joinpath("depot").iterdir():
+    for file in sftp_directory.joinpath(REMOTE_UPLOAD_DIR).iterdir():
         batch = json.loads(file.read_text())
 
         for employee_record in batch.get("lignesTelechargement", []):
             employee_record["codeTraitement"] = code
             employee_record["libelleTraitement"] = message
 
-        feedback_file = sftp_directory.joinpath("retrait", EmployeeRecordBatch.feedback_filename(file.name))
+        feedback_file = sftp_directory.joinpath(REMOTE_DOWNLOAD_DIR, EmployeeRecordBatch.feedback_filename(file.name))
         feedback_file.write_text(json.dumps(batch))
 
 
@@ -99,7 +100,7 @@ def test_preflight_with_error(snapshot, command):
 @freezegun.freeze_time("2021-09-27")
 def test_upload_file_error(faker, snapshot, sftp_directory, command):
     employee_record = EmployeeRecordFactory(ready_for_transfer=True)
-    sftp_directory.joinpath("depot").rmdir()
+    sftp_directory.joinpath(REMOTE_UPLOAD_DIR).rmdir()
 
     command.handle(upload=True, download=False, preflight=False, wet_run=True)
 
@@ -114,7 +115,7 @@ def test_upload_only_create_a_limited_number_of_files(mocker, snapshot, sftp_dir
     EmployeeRecordFactory.create_batch(2, ready_for_transfer=True)
 
     command.handle(upload=True, download=False, preflight=False, wet_run=True)
-    assert len(list(sftp_directory.joinpath("depot").iterdir())) == command.MAX_UPLOADED_FILES
+    assert len(list(sftp_directory.joinpath(REMOTE_UPLOAD_DIR).iterdir())) == command.MAX_UPLOADED_FILES
 
     assert command.stdout.getvalue() == snapshot
 
@@ -125,7 +126,7 @@ def test_upload_only_send_a_limited_number_of_rows(mocker, snapshot, sftp_direct
     EmployeeRecordFactory.create_batch(2, ready_for_transfer=True)
 
     command.handle(upload=True, download=False, preflight=False, wet_run=True)
-    for file in sftp_directory.joinpath("depot").iterdir():
+    for file in sftp_directory.joinpath(REMOTE_UPLOAD_DIR).iterdir():
         assert len(file.read_text().splitlines()) == 1
 
 
