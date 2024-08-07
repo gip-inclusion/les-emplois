@@ -31,7 +31,13 @@
                                         {% if user.is_employer %}
                                             <i class="ri-community-line" aria-hidden="true"></i>
                                         {% elif user.is_prescriber %}
-                                            <i class="ri-home-smile-line" aria-hidden="true"></i>
+                                            {% if request.current_organization.kind != PrescriberOrganizationKind.OTHER %}
+                                                <i class="ri-home-smile-line" aria-hidden="true"></i>
+                                            {% else %}
+                                                <i class="ri-group-line" aria-hidden="true"></i>
+                                            {% endif %}
+                                        {% else %}
+                                            <i class="ri-government-line" aria-hidden="true"></i>
                                         {% endif %}
                                         <span>{{ request.current_organization.kind }} - {{ request.current_organization.display_name }}</span>
                                     </button>
@@ -56,28 +62,60 @@
     <div class="offcanvas" id="offcanvasNav" aria-label="Navigation principale pour mobile">
         <div class="offcanvas-header offcanvas-header--structure">
             <div class="dropdown dropdown-structure flex-grow-1 py-4">
-                {% if request.organizations|length > 1 %}
+                {% if request.organizations|length == 0 %}
+                    {% if user.is_job_seeker %}
+                        <div class="dropdown-toggle dropdown-toggle__summary">
+                            <i class="ri-user-line" aria-hidden="true"></i>
+                            <span>Candidat</span>
+                            <strong>{{ user.get_full_name }}</strong>
+                        </div>
+                    {% elif user.is_staff %}
+                        <div class="dropdown-toggle dropdown-toggle__summary">
+                            <i class="ri-admin-line" aria-hidden="true"></i>
+                            <span>Itou</span>
+                            <strong>Staff</strong>
+                        </div>
+                    {% else %}
+                        <div class="dropdown-toggle dropdown-toggle__summary">
+                            <i class="ri-user-line" aria-hidden="true"></i>
+                            <span>Orienteur seul</span>
+                            <strong>{{ user.get_full_name }}</strong>
+                        </div>
+                    {% endif %}
+                {% elif request.organizations|length == 1 %}
+                    <div class="dropdown-toggle dropdown-toggle__summary">
+                        {% if user.is_employer %}
+                            <i class="ri-community-line" aria-hidden="true"></i>
+                        {% elif user.is_prescriber %}
+                            {% if request.current_organization.kind != PrescriberOrganizationKind.OTHER %}
+                                <i class="ri-home-smile-line" aria-hidden="true"></i>
+                            {% else %}
+                                <i class="ri-group-line" aria-hidden="true"></i>
+                            {% endif %}
+                        {% else %}
+                            <i class="ri-government-line" aria-hidden="true"></i>
+                        {% endif %}
+                        <span>{{ request.current_organization.kind }}</span>
+                        <strong>{{ request.current_organization.display_name }}</strong>
+                    </div>
+                {% else %}
                     <button type="button" class="dropdown-toggle dropdown-toggle__summary" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdownMobile" aria-expanded="false">
                         {% if user.is_employer %}
                             <i class="ri-community-line" aria-hidden="true"></i>
                         {% elif user.is_prescriber %}
-                            <i class="ri-home-smile-line" aria-hidden="true"></i>
+                            {% if request.current_organization.kind != PrescriberOrganizationKind.OTHER %}
+                                <i class="ri-home-smile-line" aria-hidden="true"></i>
+                            {% else %}
+                                <i class="ri-group-line" aria-hidden="true"></i>
+                            {% endif %}
+                        {% else %}
+                            <i class="ri-government-line" aria-hidden="true"></i>
                         {% endif %}
                         <span>{{ request.current_organization.kind }}</span>
                         <strong>{{ request.current_organization.display_name }}</strong>
                     </button>
                     <div class="dropdown-menu" id="switchUserDropdownMobile">
                         {% include "layout/_header_organization_dropdown_menu.html" with request=request csrf_token=csrf_token only %}
-                    </div>
-                {% else %}
-                    <div class="dropdown-toggle dropdown-toggle__summary">
-                        {% if user.is_employer %}
-                            <i class="ri-community-line" aria-hidden="true"></i>
-                        {% elif user.is_prescriber %}
-                            <i class="ri-home-smile-line" aria-hidden="true"></i>
-                        {% endif %}
-                        <span>{{ request.current_organization.kind }}</span>
-                        <strong>{{ request.current_organization.display_name }}</strong>
                     </div>
                 {% endif %}
             </div>
