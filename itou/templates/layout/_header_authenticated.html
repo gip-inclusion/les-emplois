@@ -78,7 +78,7 @@
         <div class="offcanvas-header offcanvas-header--structure">
             <div class="dropdown dropdown-structure flex-grow-1 py-4">
                 {% if request.organizations|length > 1 %}
-                    <button type="button" class="dropdown-toggle dropdown-toggle__summary" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdown" aria-expanded="false">
+                    <button type="button" class="dropdown-toggle dropdown-toggle__summary" data-bs-toggle="dropdown" aria-haspopup="true" aria-controls="switchUserDropdownMobile" aria-expanded="false">
                         {% if user.is_employer %}
                             <i class="ri-community-line" aria-hidden="true"></i>
                         {% elif user.is_prescriber %}
@@ -87,7 +87,7 @@
                         <span>{{ request.current_organization.kind }}</span>
                         <strong>{{ request.current_organization.display_name }}</strong>
                     </button>
-                    <div class="dropdown-menu" id="switchUserDropdown">
+                    <div class="dropdown-menu" id="switchUserDropdownMobile">
                         <form action="{% url 'dashboard:switch_organization' %}" method="post">
                             {% csrf_token %}
                             <ul class="list-unstyled">
