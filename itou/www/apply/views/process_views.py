@@ -1079,7 +1079,6 @@ def rdv_insertion_invite(request, job_application_id):
                     "email": job_application.job_seeker.email,
                     "phone_number": job_application.job_seeker.phone,
                     "birth_date": formats.date_format(job_application.job_seeker.birthdate, "d/m/Y"),
-                    "nir": job_application.job_seeker.jobseeker_profile.nir,
                     "france_travail_id": job_application.job_seeker.jobseeker_profile.pole_emploi_id,
                     "address": job_application.job_seeker.address_on_one_line,
                 }

@@ -34,7 +34,6 @@ def set_api_response(obj, create, extracted, **kwargs):
             "rights_opening_date": fake.date_this_year().isoformat(),
             "birth_name": None,
             "rdv_solidarites_user_id": obj.job_seeker.pk + 2000,
-            "nir": obj.job_seeker.jobseeker_profile.nir,
             "carnet_de_bord_carnet_id": None,
             "france_travail_id": obj.job_seeker.jobseeker_profile.pole_emploi_id,
             "referents": [],
