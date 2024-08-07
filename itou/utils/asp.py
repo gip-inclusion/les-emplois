@@ -2,6 +2,10 @@ import paramiko
 from django.conf import settings
 
 
+REMOTE_UPLOAD_DIR = "depot"
+REMOTE_DOWNLOAD_DIR = "retrait"
+
+
 def get_sftp_connection() -> paramiko.SFTPClient:
     client = paramiko.SSHClient()
     if settings.ASP_FS_KNOWN_HOSTS:
