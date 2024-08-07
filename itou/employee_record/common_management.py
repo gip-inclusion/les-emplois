@@ -138,6 +138,10 @@ class EmployeeRecordTransferCommand(BaseCommand):
         parser = JSONParser()
         successfully_parsed_files = 0
         for filename in result_files:
+            if not filename.startswith("RIAE_FS_"):
+                # Remote is shared, so only try to process files related to our management command
+                continue
+
             self.stdout.write(f"Fetching file: {filename}")
             try:
                 with sftp.file(filename, mode="r") as result_file, transaction.atomic():
