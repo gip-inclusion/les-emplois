@@ -1,13 +1,16 @@
 <ul>
-    {% if user.is_authenticated %}
+    {% with view_name=request.resolver_match.view_name|default:None %}
+        {% if user.is_authenticated %}
+            <li>
+                <a class="{% if view_name == 'dashboard:index' %}is-active{% endif %}" href="{% url 'dashboard:index' %}">Tableau de bord</a>
+            </li>
+        {% endif %}
         <li>
-            <a class="{% if request.path == '/dashboard/' %}is-active{% endif %}" href="{% url 'dashboard:index' %}">Tableau de bord</a>
+            <a {% if view_name == "search:employers_home" or view_name == "search:employers_results" or view_name == "search:job_descriptions_results" %}class="is-active"{% endif %}
+               href="{% url 'search:employers_home' %}">Rechercher un emploi inclusif</a>
         </li>
-    {% endif %}
-    <li>
-        <a class="{% if '/search/employers' in request.path %}is-active{% endif %}" href="{% url 'search:employers_home' %}">Rechercher un emploi inclusif</a>
-    </li>
-    <li>
-        <a class="{% if '/search/prescribers' in request.path %}is-active{% endif %}" href="{% url 'search:prescribers_home' %}">Rechercher des prescripteurs habilités</a>
-    </li>
+        <li>
+            <a {% if view_name == "search:prescribers_home" or view_name == "search:prescribers_results" %}class="is-active" {% endif %}href="{% url 'search:prescribers_home' %}">Rechercher des prescripteurs habilités</a>
+        </li>
+    {% endwith %}
 </ul>
