@@ -1,9 +1,7 @@
 import argparse
-import logging
 from io import BytesIO
 
 import paramiko
-from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 from rest_framework.parsers import JSONParser
@@ -60,28 +58,6 @@ class EmployeeRecordTransferCommand(BaseCommand):
             help="Check JSON serialisation of employee records or notifications ready for processing",
         )
         parser.add_argument("--debug", dest="debug", action="store_true")
-
-    def get_sftp_connection(self, debug=False) -> paramiko.SFTPClient:
-        if debug:
-            logging.basicConfig(level=logging.DEBUG)
-
-        client = paramiko.SSHClient()
-        if settings.ASP_FS_KNOWN_HOSTS:
-            client.load_host_keys(settings.ASP_FS_KNOWN_HOSTS)
-
-        client.connect(
-            hostname=settings.ASP_FS_SFTP_HOST,
-            port=settings.ASP_FS_SFTP_PORT,
-            username=settings.ASP_FS_SFTP_USER,
-            key_filename=settings.ASP_FS_SFTP_PRIVATE_KEY_PATH,
-            disabled_algorithms={
-                "pubkeys": ["rsa-sha2-512", "rsa-sha2-256"],  # We want ssh-rsa
-            },
-            allow_agent=False,  # No need to try other keys if the one we have failed
-            look_for_keys=False,  # No need to try other keys if the one we have failed
-            timeout=10,
-        )
-        return client.open_sftp()
 
     def upload_json_file(self, json_data, sftp: paramiko.SFTPClient, dry_run=False) -> str | None:
         """
