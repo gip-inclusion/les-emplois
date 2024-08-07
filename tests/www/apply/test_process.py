@@ -35,6 +35,7 @@ from itou.jobs.models import Appellation
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId, UserKind
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
+from itou.utils.mocks.api_particulier import rsa_certified_mocker
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir, format_phone
 from itou.utils.urls import add_url_params
@@ -1741,7 +1742,11 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         "itou.utils.apis.geocoding.get_geocoding_data",
         side_effect=mock_get_geocoding_data_by_ban_api_resolved,
     )
-    def accept_job_application(self, _mock, job_application, post_data=None, assert_successful=True):
+    # @mock.patch(
+    #     "itou.utils.apis.api_particulier.APIParticulierClient.revenu_solidarite_active",
+    #     return_value=rsa_certified_mocker(),
+    # )
+    def accept_job_application(self, geocoding_mock, job_application, post_data=None, assert_successful=True):
         """
         This is not a test. It's a shortcut to process "apply:accept" view steps:
         - GET
@@ -1787,7 +1792,10 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         # I guess it's normal as it's an AJAX response.
         # See https://django-htmx.readthedocs.io/en/latest/http.html#django_htmx.http.HttpResponseClientRedirect # noqa
         if assert_successful:
+            # rsa_certified_mock.assert_called_once()
             self.assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
+        # else:
+        # rsa_certified_mock.assert_not_called()
 
         return response, next_url
 
@@ -1841,7 +1849,11 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         "itou.utils.apis.geocoding.get_geocoding_data",
         side_effect=mock_get_geocoding_data_by_ban_api_resolved,
     )
-    def test_select_other_job_description_for_job_application(self, _mock):
+    @mock.patch(
+        "itou.utils.apis.api_particulier.APIParticulierClient.revenu_solidarite_active",
+        return_value=rsa_certified_mocker(),
+    )
+    def test_select_other_job_description_for_job_application(self, rsa_certified_mock, geocoding_mock):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
         job_application = self.create_job_application()
         employer = self.company.members.first()
@@ -1867,15 +1879,21 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         city = City.objects.order_by("?").first()
         appellation = Appellation.objects.get(rome_id="M1805")
         post_data |= {"location": city.pk, "appellation": appellation.pk}
-        response = self.client.post(url, data=post_data)
+        response = self.client.post(
+            url,
+            data=post_data,
+            headers={"hx-request": "true"},
+        )
+        assertTemplateUsed(response, "apply/includes/job_application_accept_form.html")
         assert response.status_code == 200
 
         # Modal window
         post_data |= {"confirmed": True}
-        response = self.client.post(url, data=post_data, follow=False)
+        response = self.client.post(url, data=post_data, follow=False, headers={"hx-request": "true"})
         # Caution: should redirect after that point, but done via HTMX we get a 200 status code
         assert response.status_code == 200
         assert response.url == reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        rsa_certified_mock.assert_called_once()
 
         # Perform some checks on job description now attached to job application
         job_application.refresh_from_db()
@@ -2417,7 +2435,9 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert approval.start_at == job_application.hiring_start_at
         assert job_application.state.is_accepted
 
-    def test_accept_iae__criteria_certification_available(self):
+    def test_accept_iae__criteria_certification_available(
+        self,
+    ):
         ######### Case 1: if BRSA is one the diagnosis criteria,
         ######### birth place and birth country are required.
         birthdate = datetime.date(1995, 12, 27)
@@ -2468,7 +2488,12 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             "birth_country": "",
             "birth_place": birth_place.pk,
         }
-        self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
+        with mock.patch(
+            "itou.utils.apis.api_particulier.APIParticulierClient.revenu_solidarite_active",
+            return_value=rsa_certified_mocker(),
+        ) as certify_rsa_mocker:
+            self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
+            certify_rsa_mocker.assert_called_once()
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
         jobseeker_profile.refresh_from_db()

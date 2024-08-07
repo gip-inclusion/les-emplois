@@ -6,6 +6,7 @@ from django.db import models
 from django.utils import timezone
 
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
+from itou.utils.apis.api_particulier import APIParticulierClient
 
 
 class CommonEligibilityDiagnosisQuerySet(models.QuerySet):
@@ -72,6 +73,15 @@ class AbstractEligibilityDiagnosisModel(models.Model):
 
     def criteria_certification_available(self):
         return self.administrative_criteria.certifiable().exists()
+
+    def certify_criteria(self):
+        # TODO: add api_code in aie administrative criteria.
+        # TODO: delete certifiable field and replace it by a method.
+        # TODO: replace api_code by an enum.
+        criteria = self.selected_administrative_criteria.filter(administrative_criteria__api_code__in=["BRSA"])
+        for criterion in criteria:
+            criterion.certify()
+        criteria.update_bulk(fields=["data", "is_certified", "certification_period"])
 
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):
@@ -142,3 +152,13 @@ class AbstractSelectedAdministrativeCriteria(models.Model):
 
     class Meta:
         abstract = True
+
+    def certify(self):
+        client = APIParticulierClient(job_seeker=self.eligibility_diagnosis.job_seeker)
+        # Better use a case / match?
+        if self.administrative_criteria.kind == "BRSA":
+            data, is_certified, certification_period = client.revenu_solidarite_active()
+        self.data = data
+        self.is_certified = is_certified
+        self.certification_period = certification_period
+        return is_certified
