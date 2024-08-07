@@ -19,7 +19,7 @@ def get_api_credentials(refresh=False):
         with cache.lock("rdv-solidarites-credentials-lock", blocking_timeout=10):
             if refresh or not (api_credentials := cache.get(RDV_S_CREDENTIALS_CACHE_KEY)):
                 response = httpx.post(
-                    urljoin(settings.RDV_SOLIDARITES_API_BASE_URL, "/auth/sign_in"),
+                    urljoin(settings.RDV_SOLIDARITES_API_BASE_URL, "auth/sign_in"),
                     data={
                         "email": settings.RDV_SOLIDARITES_EMAIL,
                         "password": settings.RDV_SOLIDARITES_PASSWORD,
