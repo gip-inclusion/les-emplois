@@ -23,7 +23,7 @@ def command_fixture(mocker, settings, sftp_directory, sftp_client_factory):
 
     # Create the management command and mock the SFTP connection
     command = transfer_employee_records_updates.Command(stdout=io.StringIO(), stderr=io.StringIO())
-    mocker.patch.object(command, "get_sftp_connection", sftp_client_factory)
+    mocker.patch("itou.utils.asp.get_sftp_connection", sftp_client_factory)
 
     return command
 
@@ -52,7 +52,7 @@ def test_option_asp_test(snapshot, command):
 
 
 def test_connection_error(mocker, command):
-    mocker.patch.object(command, "get_sftp_connection", side_effect=Exception)
+    mocker.patch("itou.utils.asp.get_sftp_connection", side_effect=Exception)
     notification = EmployeeRecordUpdateNotificationFactory(ready_for_transfer=True)
 
     with pytest.raises(Exception):

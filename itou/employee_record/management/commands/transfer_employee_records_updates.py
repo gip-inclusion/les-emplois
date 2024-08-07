@@ -11,6 +11,7 @@ from itou.employee_record.exceptions import SerializationError
 from itou.employee_record.mocks.fake_serializers import TestEmployeeRecordUpdateNotificationBatchSerializer
 from itou.employee_record.models import EmployeeRecordBatch, EmployeeRecordUpdateNotification
 from itou.employee_record.serializers import EmployeeRecordUpdateNotificationBatchSerializer
+from itou.utils import asp as asp_utils
 from itou.utils.iterators import chunks
 
 
@@ -147,7 +148,7 @@ class Command(EmployeeRecordTransferCommand):
             if asp_test:
                 self.stdout.write("Using *TEST* JSON serializers (SIRET number mapping)")
 
-            with self.get_sftp_connection(debug=debug) as sftp:
+            with asp_utils.get_sftp_connection() as sftp:
                 self.stdout.write(f'Connected to "{settings.ASP_FS_SFTP_HOST}" as "{settings.ASP_FS_SFTP_USER}"')
                 self.stdout.write(f'''Current remote dir is "{sftp.normalize('.')}"''')
 
