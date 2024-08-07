@@ -1,22 +1,27 @@
+import argparse
 import datetime
+import functools
+import io
 import warnings
+import zipfile
 
-import numpy as np
 import pandas as pd
+from django.conf import settings
+from django.db import transaction
+from django.utils import timezone
 
+from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
 from itou.companies.enums import CompanyKind
 from itou.companies.management.commands._import_siae.utils import (
-    clean_string,
     geocode_siae,
-    get_filename,
     remap_columns,
     sync_structures,
 )
 from itou.companies.models import Company
+from itou.utils import asp as asp_utils
+from itou.utils.asp import REMOTE_DOWNLOAD_DIR
 from itou.utils.command import BaseCommand
-from itou.utils.python import timeit
-from itou.utils.validators import validate_siret
 
 
 def convert_kind(raw_kind):
@@ -27,107 +32,9 @@ def convert_kind(raw_kind):
     raise ValueError(f"Unexpected raw_kind value: {raw_kind}")
 
 
-@timeit
-def get_ea_eatt_df():
-    info_stats = {}
-    filename = get_filename(
-        filename_prefix="Liste_Contact_EA", filename_extension=".xlsx", description="Export EA/EATT"
-    )
-
-    siret_field_name = "Siret_Signataire"
-    post_code_field_name = "CODE_POST_Signataire"
-    phone_field_name = "TEL_CONT_Signataire"
-    convention_end_date_field_name = "Date_Fin_App_Etab_Membre"
-
-    df = pd.read_excel(
-        filename,
-        converters={
-            siret_field_name: str,
-            post_code_field_name: str,
-            phone_field_name: str,
-            convention_end_date_field_name: datetime.date.fromisoformat,
-        },
-    )
-    info_stats["rows_in_file"] = len(df)
-
-    column_mapping = {
-        "Denomination_Sociale_Signataire": "name",
-        "LIB_TYPE_EA": "kind",
-        "NUM_ENTREE_Signataire": "address_part1",
-        "NUM_VOIE_Signataire": "address_part2",
-        "CODE_VOIE_Signataire": "address_part3",
-        "LIB_VOIE_Signataire": "address_part4",
-        post_code_field_name: "post_code",
-        "LIB_COM_Signataire": "city",
-        siret_field_name: "siret",
-        "CRL_CONT_Signataire": "auth_email",
-        phone_field_name: "phone",
-        convention_end_date_field_name: "convention_end_date",
-    }
-    df = remap_columns(df, column_mapping=column_mapping)
-
-    # Replace NaN elements with None.
-    df = df.replace({np.nan: None})
-
-    df = df[df.kind != "Entreprise Adaptée en Milieu Pénitentiaire"]
-
-    # note (fv): apparently, EA / EATT XLS source file can also contain the following field value
-    # (which is the same as the line above, on a business POV)
-    df = df[df.kind != "Entreprise Adaptée en Etablissement Pénitentiaire"]
-
-    df["kind"] = df.kind.apply(convert_kind)
-
-    # Drop rows without siret.
-    df = df[~df.siret.isnull()]
-    info_stats["rows_with_a_siret"] = len(df)
-
-    df.drop_duplicates(
-        subset=["siret"],
-        keep="first",
-        inplace=True,
-    )
-    info_stats["rows_after_deduplication"] = len(df)
-
-    # Drop the rows with an expired convention
-    df = df[df["convention_end_date"] > datetime.date.today()]
-    info_stats["rows_with_a_valid_convention"] = len(df)
-
-    df["address_line_1"] = ""
-
-    for _, row in df.iterrows():
-        validate_siret(row.siret)
-        address_line_1 = ""
-        if row.address_part1:
-            address_line_1 += row.address_part1
-        if row.address_part2:
-            address_line_1 += f" {int(row.address_part2)}"
-        if row.address_part3:
-            address_line_1 += f" {row.address_part3}"
-        if row.address_part4:
-            address_line_1 += f" {row.address_part4}"
-        row["address_line_1"] = address_line_1
-
-    # Clean string fields.
-    df["name"] = df.name.apply(clean_string)
-    df["kind"] = df.kind.apply(clean_string)
-    df["address_line_1"] = df.address_line_1.apply(clean_string)
-    df["post_code"] = df.post_code.apply(clean_string)
-    df["city"] = df.city.apply(clean_string)
-    df["siret"] = df.siret.apply(clean_string)
-    df["auth_email"] = df.auth_email.apply(clean_string)
-    df["phone"] = df.phone.apply(clean_string)
-
-    # "EA LOU JAS" becomes "Ea Lou Jas".
-    df["name"] = df.name.apply(str.title)
-
-    df["department"] = df.post_code.apply(department_from_postcode)
-
-    info_stats["rows_with_empty_email"] = len(df[df.auth_email.isnull()])
-
-    assert df.siret.is_unique
-    assert len(df) >= 600, f"Export usually has 700+ EA/EATT structures (only {len(df)})."
-
-    return df, info_stats
+@functools.lru_cache
+def get_insee_city(code_insee):
+    return City.objects.filter(code_insee=code_insee).first()
 
 
 def build_ea_eatt(row):
@@ -142,45 +49,119 @@ def build_ea_eatt(row):
 
     company.email = ""  # Do not make the authentification email public!
     company.auth_email = row.auth_email
-
-    company.phone = row.phone.replace(" ", "").replace(".", "") if row.phone else ""
-    phone_is_valid = company.phone and len(company.phone) == 10
-    if not phone_is_valid:
-        company.phone = ""  # company.phone cannot be null in db
-
     company.address_line_1 = row.address_line_1
-    company.address_line_2 = ""
+    company.address_line_2 = row.address_line_2
     company.post_code = row.post_code
-    company.city = row.city
-    company.department = row.department
+    if row.insee_city:
+        company.insee_city = row.insee_city
+        company.city = company.insee_city.name
+        company.department = company.insee_city.department
+    else:
+        company.department = department_from_postcode(company.post_code)
 
     geocode_siae(company)
     return company
 
 
+def monday_of_this_week():
+    today = timezone.localdate()
+    return today - datetime.timedelta(days=today.weekday())
+
+
 class Command(BaseCommand):
     """
-    Import EA and EATT data into the database.
-    This command is meant to be used before any fixture is available.
+    Import EA and EATT data into the database using the "flux EA2"
 
     EA = "Entreprise adaptée".
     EATT = "Entreprise adaptée de travail temporaire".
-
-    To debug:
-        django-admin import_ea_eatt --dry-run
-
-    To populate the database:
-        django-admin import_ea_eatt
     """
 
-    help = "Import the content of the EA+EATT csv file into the database."
+    help = 'Import EA and EATT data into the database using the "flux EA2"'
 
     def add_arguments(self, parser):
+        parser.add_argument("--archive", type=argparse.FileType(mode="rb"), help="The ZIP file")
         parser.add_argument("--wet-run", dest="wet_run", action="store_true")
 
-    @timeit
-    def handle(self, *, wet_run, **options):
-        ea_eatt_df, info_stats = get_ea_eatt_df()
+    def retrieve_archive_of_the_week(self):
+        with asp_utils.get_sftp_connection() as sftp:
+            self.stdout.write(f'Connected to "{settings.ASP_FS_SFTP_HOST}" as "{settings.ASP_FS_SFTP_USER}"')
+            self.stdout.write(f'''Current remote dir is "{sftp.normalize('.')}"''')
+
+            filename_cutoff = f"FLUX_EA2_ITOU_{monday_of_this_week():%Y%m%d}"
+            sftp.chdir(REMOTE_DOWNLOAD_DIR)  # Get into the download folder
+            file_of_the_week = [filename for filename in sftp.listdir() if filename > filename_cutoff]
+            if not file_of_the_week:
+                raise RuntimeError("No file for this week: %s", filename_cutoff)
+            if len(file_of_the_week) > 1:
+                raise RuntimeError("Too many files for this week: %r", file_of_the_week)
+
+            file = io.BytesIO()
+            sftp.getfo(file_of_the_week[0], file)
+            return file
+
+    def process_file(self, file, *, wet_run=False):
+        header = next(file)
+        if not header.startswith("L|ASP|EA|"):  # Start of file header
+            raise RuntimeError("File doesn't conform to the expected format: %s", "L|ASP|EA|")
+
+        columns = next(file).rstrip("\n|").split("|")[1:]
+        rows = []
+        for line in file:
+            if line.startswith("Z|ASP|EA|"):  # End of file header
+                # TODO: Check number of lines matches?
+                break
+            rows.append(dict(zip(columns, line.rstrip("\n|").split("|")[1:])))
+        else:
+            raise RuntimeError("File doesn't conform to the expected format: %s", "Z|ASP|EA|")
+
+        info_stats = {}
+
+        ea_eatt_df = pd.DataFrame(rows)
+        column_mapping = {
+            # Company identifiers
+            "Type d'entreprise adaptée": "kind",
+            "Siret de l'établissement membre": "siret",
+            "Dénomination / raison sociale": "name",
+            # Company owner
+            "Courriel du contact étab signataire": "auth_email",
+            # Company location
+            "Numéro de voie": "address_line_1_part1",
+            "Extension de voie": "address_line_1_part2",
+            "Code voie": "address_line_1_part3",
+            "Libelle de la voie": "address_line_1_part4",
+            "Numéro entrée ou batiment": "address_line_2",
+            "Code Postal": "post_code",
+            "Code INSEE commune": "insee_city",
+        }
+        ea_eatt_df = remap_columns(ea_eatt_df, column_mapping=column_mapping)
+
+        # Remove "MP" kind as they don't need a PASS and aren't available to the public
+        # /!\ The extra space at the end is important to correctly match the field value given to us. /!\
+        ea_eatt_df = ea_eatt_df[ea_eatt_df.kind != "Entreprise Adaptée en Milieu Pénitentiaire "]
+
+        # Convert the data
+        ea_eatt_df["kind"] = ea_eatt_df.kind.apply(convert_kind)
+        ea_eatt_df["name"] = ea_eatt_df.name.apply(str.title)  # "EA LOU JAS" becomes "Ea Lou Jas".
+        ea_eatt_df["address_line_1"] = ea_eatt_df.apply(
+            lambda row: " ".join(
+                filter(
+                    None,
+                    [
+                        row.address_line_1_part1,
+                        row.address_line_1_part2,
+                        row.address_line_1_part3,
+                        row.address_line_1_part4,
+                    ],
+                )
+            ),
+            axis="columns",
+        )
+        ea_eatt_df["insee_city"] = ea_eatt_df.insee_city.apply(get_insee_city)
+        # Remove columns that have no purposes anymore
+        ea_eatt_df = ea_eatt_df.drop(
+            columns=["address_line_1_part1", "address_line_1_part2", "address_line_1_part3", "address_line_1_part4"]
+        )
+
         info_stats |= sync_structures(
             df=ea_eatt_df,
             source=Company.SOURCE_EA_EATT,
@@ -218,3 +199,15 @@ class Command(BaseCommand):
                 f"Structure(s) not created because of a missing email: "
                 f"{info_stats['not_created_because_of_missing_email']}"
             )
+
+    @transaction.atomic
+    def handle(self, *, archive=None, wet_run=False, **options):
+        if not archive:
+            archive = self.retrieve_archive_of_the_week()
+
+        with zipfile.ZipFile(archive).open("EA2_ITOU.txt", pwd=settings.ASP_EA2_UNZIP_PASSWORD.encode()) as file:
+            self.process_file(io.TextIOWrapper(file, encoding="utf-8", newline="\n"), wet_run=wet_run)
+
+        # TODO: Clean files on the SFTP
+
+        # raise Exception()

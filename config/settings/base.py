@@ -583,6 +583,9 @@ ASP_FS_SFTP_USER = os.getenv("ASP_FS_SFTP_USER")
 ASP_FS_SFTP_PRIVATE_KEY_PATH = os.getenv("ASP_FS_SFTP_PRIVATE_KEY_PATH")
 ASP_FS_KNOWN_HOSTS = os.getenv("ASP_FS_KNOWN_HOSTS")
 
+# ASP data archive passwords
+ASP_EA2_UNZIP_PASSWORD = os.getenv("ASP_EA2_UNZIP_PASSWORD")
+
 # S3 uploads
 # ------------------------------------------------------------------------------
 # django-storages
