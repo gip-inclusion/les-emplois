@@ -290,9 +290,9 @@ distlib==0.3.7 \
     --hash=sha256:2e24928bc811348f0feb63014e97aaae3037f2cf48712d51ae61df7fd6075057 \
     --hash=sha256:9dafe54b34a028eafd95039d5e5d4851a13734540f1331060d31c9916e7147a8
     # via virtualenv
-django==5.0.7 \
-    --hash=sha256:bd4505cae0b9bd642313e8fb71810893df5dc2ffcacaa67a33af2d5cd61888f2 \
-    --hash=sha256:f216510ace3de5de01329463a315a629f33480e893a9024fc93d8c32c22913da
+django==5.0.8 \
+    --hash=sha256:333a7988f7ca4bc14d360d3d8f6b793704517761ae3813b95432043daec22a45 \
+    --hash=sha256:ebe859c9da6fead9c9ee6dbfa4943b04f41342f4cea2c4d8c978ef0d10694f2b
     # via
     #   -r requirements/test.txt
     #   django-allauth
@@ -930,7 +930,7 @@ prompt-toolkit==3.0.43 \
     --hash=sha256:3527b7af26106cbc65a040bcc84839a3566ec1b051bb0bfe953631e704b0ff7d \
     --hash=sha256:a11a29cb3bf0a28a387fe5122cdb649816a957cd9261dcedf8c9f1fef33eacf6
     # via ipython
-psycopg[binary]==3.1.10 \
+psycopg==3.1.10 \
     --hash=sha256:15b25741494344c24066dc2479b0f383dd1b82fa5e75612fa4fa5bb30726e9b6 \
     --hash=sha256:8bbeddae5075c7890b2fa3e3553440376d3c5e28418335dee3c3656b06fa2b52
     # via
@@ -991,9 +991,7 @@ psycopg-binary==3.1.10 \
     --hash=sha256:fa92661f99351765673835a4d936d79bd24dfbb358b29b084d83be38229a90e4 \
     --hash=sha256:ff72576061c774bcce5f5440b93e63d4c430032dd056d30f6cb1988e549dd92c \
     --hash=sha256:ffc8c796194f23b9b07f6d25f927ec4df84a194bbc7a1f9e73316734eef512f9
-    # via
-    #   -r requirements/test.txt
-    #   psycopg
+    # via -r requirements/test.txt
 ptyprocess==0.7.0 \
     --hash=sha256:4b41f3967fce3af57cc7e94b888626c18bf37a083e3651ca8feeb66d492fef35 \
     --hash=sha256:5c5d0a3b48ceee0b48485e0c26037c0acd7d29765ca3fbb5cb3831d347423220
@@ -1422,6 +1420,10 @@ sentry-sdk==2.12.0 \
     --hash=sha256:7a8d5163d2ba5c5f4464628c6b68f85e86972f7c636acc78aed45c61b98b7a5e \
     --hash=sha256:8763840497b817d44c49b3fe3f5f7388d083f2337ffedf008b2cdb63b5c86dc6
     # via -r requirements/test.txt
+setuptools==72.1.0 \
+    --hash=sha256:5a03e1860cf56bb6ef48ce186b0e557fdba433237481a9a625176c2831be15d1 \
+    --hash=sha256:8d243eff56d095e5817f796ede6ae32941278f542e0f941867cc05ae52b162ec
+    # via nodeenv
 shellcheck-py==0.10.0.1 \
     --hash=sha256:390826b340b8c19173922b0da5ef7b66ef34d4d087dc48aad3e01f7e77e164d9 \
     --hash=sha256:48f08965cafbb3363b265c4ef40628ffced19cb6fc7c4bb5ce72d32cbcfb4bb9 \
