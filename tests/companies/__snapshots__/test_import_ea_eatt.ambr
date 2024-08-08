@@ -1,0 +1,67 @@
+# serializer version: 1
+# name: test_process_file_from_archive[data]
+  list([
+    tuple(
+      'EA',
+      '00000000000001',
+      'EA_EATT',
+      'Dumas Sa',
+      '',
+      'legerdenise@example.org',
+      '1 Rue DE LA MOTTE',
+      '',
+      '77550',
+      None,
+      '',
+      '77',
+      None,
+    ),
+    tuple(
+      'EATT',
+      '00000000000001',
+      'EA_EATT',
+      'Collet Sarl',
+      '',
+      'legerdenise@example.org',
+      '1 Rue DE LA MOTTE',
+      '',
+      '77550',
+      None,
+      '',
+      '77',
+      None,
+    ),
+  ])
+# ---
+# name: test_process_file_from_archive[output]
+  '''
+  Loaded 2 EA_EATT from export.
+  1 EA_EATT will be created.
+  0 EA_EATT will be updated when needed.
+  0 EA_EATT will be deleted when possible.
+  EA_EATT siret=00000000000001 will be created.
+  EA_EATT siret=00000000000001 has been created with siae.id=[ID].
+  EA_EATT siret=00000000000001 will be created.
+  EA_EATT siret=00000000000001 has been created with siae.id=[ID].
+  0 EA_EATT can and will be deleted.
+  0 EA_EATT cannot be deleted as they have data.
+  --------------------------------------------------------------------------------
+  Rows in file: 4
+  Rows after kind filter: 3
+  Rows after deduplication: 2
+  Rows used: 2
+   > With a SIRET: 2
+   > With an empty email: 0
+   > Creatable: 1
+   >> Created: 2
+   > Updatable: 0
+   >> Updated: 0
+   > Deletable: 0
+   >> Deleted: 0
+   >> Undeletable: 0
+   >> Skipped: 0
+  --------------------------------------------------------------------------------
+  Done.
+  
+  '''
+# ---

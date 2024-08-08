@@ -47,7 +47,7 @@ Vous pouvez maintenant:
  - ✈️ Aller sur la machine:
     clever ssh --alias "$APP_NAME"
  - 🔨 Jouer les scripts d’import, par exemple:
-    cd ~/app_* && scripts/import-iae.sh && scripts/import-ea-eatt.sh
+    cd ~/app_* && scripts/import-iae.sh
  - 🍺 Supprimer la machine:
     clever delete --alias $APP_NAME --yes && git remote remove "$APP_NAME"
 EOF
