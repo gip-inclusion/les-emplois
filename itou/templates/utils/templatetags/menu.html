@@ -4,16 +4,15 @@
     {% for menu_group_or_item in menu_items %}
         {% if menu_group_or_item.items %}
             <li class="nav-item">
-                <a href="#"
-                   role="button"
-                   class="nav-link has-collapse-caret{% if menu_group_or_item.active %} active{% endif %}"
-                   data-bs-toggle="collapse"
-                   data-bs-target="#collapse-nav-{{ menu_group_or_item.slug }}"
-                   aria-expanded="{{ menu_group_or_item.active|yesno:"true,false" }}"
-                   aria-controls="collapse-nav-{{ menu_group_or_item.slug }}">
+                <button class="nav-link has-collapse-caret w-100 text-start{% if menu_group_or_item.active %} active{% endif %}"
+                        type="button"
+                        data-bs-target="#collapse-nav-{{ menu_group_or_item.slug }}"
+                        data-bs-toggle="collapse"
+                        aria-expanded="{{ menu_group_or_item.active|yesno:"true,false" }}"
+                        aria-controls="collapse-nav-{{ menu_group_or_item.slug }}">
                     <i class="{{ menu_group_or_item.icon }} font-weight-medium" aria-hidden="true"></i>
                     <span>{{ menu_group_or_item.label }}</span>
-                </a>
+                </button>
                 <div class="collapse{% if menu_group_or_item.active %} show{% endif %}" id="collapse-nav-{{ menu_group_or_item.slug }}">
                     <ul>
                         {% for menu_item in menu_group_or_item.items %}
