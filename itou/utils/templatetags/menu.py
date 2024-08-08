@@ -134,6 +134,15 @@ MENU_ENTRIES = {
         matomo_event_name="clic",
         matomo_event_option="annexes-financieres",
     ),
+    # Labor inspectors.
+    "labor-inspector-members": MenuItem(
+        label="Collaborateurs",
+        target=reverse("institutions_views:members"),
+        active_view_names=["institutions_views:members"],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="annexes-financieres",
+    ),
 }
 
 
@@ -167,6 +176,14 @@ def menu(request):
             if request.current_organization.convention_can_be_accessed_by(request.user):
                 company_group_items.append(MENU_ENTRIES["employer-financial-annexes"])
             menu_items.append(MenuGroup(label="Organisation", icon="ri-community-line", items=company_group_items))
+        elif request.user.is_labor_inspector:
+            menu_items.append(
+                MenuGroup(
+                    label="Organisation",
+                    icon="ri-community-line",
+                    items=[MENU_ENTRIES["labor-inspector-members"]],
+                )
+            )
 
         view_name = request.resolver_match.view_name
         if view_name:
