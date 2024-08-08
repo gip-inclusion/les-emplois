@@ -73,6 +73,29 @@
                         {% endif %}
                     </div>
 
+                    {# Immersion Facilitée proposal on expiring passes #}
+                    {% if link_immersion_facile %}
+                        <div id="immersion-facile-opportunity-alert" class="alert alert-important alert-dismissible fade show" role="status">
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                            <div class="row">
+                                <div class="col-auto pe-0">
+                                    <i class="ri-information-line ri-xl text-important" aria-hidden="true"></i>
+                                </div>
+                                <div class="col">
+                                    <div class="row">
+                                        <p class="mb-2 font-weight-bold">Avez-vous pensé à proposer une immersion ?</p>
+                                        <p class="mb-2">
+                                            Le pass de ce candidat arrive à expiration. Des employeurs de votre territoire proposent des immersions.
+                                        </p>
+                                    </div>
+                                    <div class="row">
+                                        <a href="{{ link_immersion_facile }}" class="font-weight-bold text-decoration-none" rel="noopener" target="_blank" aria-label="Rechercher une Immersion Facilitée">Faire une recherche</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
                     {# Job seeker info ------------------------------------------------------------------------- #}
                     <div class="c-box mb-3 mb-lg-5">
                         <h2>Informations du salarié</h2>

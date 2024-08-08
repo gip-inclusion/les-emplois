@@ -440,3 +440,35 @@ class TestApprovalDetailView:
 
         delete_button = parse_response_to_soup(response, selector="#approval-deletion-link")
         assert str(delete_button) == self.snapshot(name="bouton de suppression d'un PASS IAE")
+
+    @pytest.mark.usefixtures("unittest_compatibility")
+    @override_settings(TALLY_URL="https://tally.so")
+    def test_link_immersion_facile(self, client):
+        today = datetime.date.today()
+        approval = ApprovalFactory(
+            with_jobapplication=True,
+            start_at=(today - datetime.timedelta(days=90)),
+            end_at=(today + datetime.timedelta(days=10)),
+        )
+        job_application = approval.jobapplication_set.get()
+        employer = job_application.to_company.members.first()
+        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        client.force_login(employer)
+
+        response = client.get(url)
+        assert response.context["link_immersion_facile"] == approval.immersion_facile_search_url
+        alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
+        assert str(alert) == self.snapshot(name="alerte à l'opportunité immersion facile")
+
+        # TODO: these tests will be faster if you avoid completing the whole request - just the context
+
+        approval.end_at = today - datetime.timedelta(days=10)
+        approval.save()
+        response = client.get(url)
+        assert response.context["link_immersion_facile"] == approval.immersion_facile_search_url
+
+        approval.end_at = today + datetime.timedelta(days=120)
+        approval.save()
+        response = client.get(url)
+        assert response.status_code == 200
+        assert response.context["link_immersion_facile"] is None

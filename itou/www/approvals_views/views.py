@@ -125,6 +125,7 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
         context["eligibility_diagnosis"] = job_application and job_application.get_eligibility_diagnosis()
         context["approval_deletion_form_url"] = None
         context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("approvals:list"))
+        context["link_immersion_facile"] = None
 
         if approval.is_in_progress:
             for suspension in approval.suspensions_by_start_date_asc:
@@ -155,6 +156,9 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
                         }
                     )
                     break
+
+        if approval.remainder.days < 90 and self.request.user.is_employer:
+            context["link_immersion_facile"] = approval.immersion_facile_search_url
 
         context["all_job_applications"] = (
             JobApplication.objects.filter(
