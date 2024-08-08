@@ -34,6 +34,7 @@ from itou.job_applications.enums import JobApplicationState, Origin, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.users.models import User
 from itou.utils import constants as global_constants
+from itou.utils.immersion_facile import immersion_search_url
 from itou.utils.pagination import ItouPaginator, pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -125,6 +126,7 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
         context["eligibility_diagnosis"] = job_application and job_application.get_eligibility_diagnosis()
         context["approval_deletion_form_url"] = None
         context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("approvals:list"))
+        context["link_immersion_facile"] = None
 
         if approval.is_in_progress:
             for suspension in approval.suspensions_by_start_date_asc:
@@ -155,6 +157,10 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
                         }
                     )
                     break
+
+        if approval.remainder.days < 90 and self.request.user.is_employer:
+            context["link_immersion_facile"] = immersion_search_url(approval.user)
+            context["approval_expired"] = not approval.is_in_progress
 
         context["all_job_applications"] = (
             JobApplication.objects.filter(

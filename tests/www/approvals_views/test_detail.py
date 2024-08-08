@@ -10,6 +10,7 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertRedirects
 
 from itou.job_applications.enums import JobApplicationState, SenderKind
+from itou.utils.immersion_facile import immersion_search_url
 from itou.utils.templatetags.format_filters import format_approval_number
 from itou.utils.urls import add_url_params
 from tests.approvals.factories import (
@@ -464,3 +465,34 @@ class TestApprovalDetailView:
 
         delete_button = parse_response_to_soup(response, selector="#approval-deletion-link")
         assert str(delete_button) == self.snapshot(name="bouton de suppression d'un PASS IAE")
+
+    @override_settings(TALLY_URL="https://tally.so")
+    def test_link_immersion_facile(self, client, snapshot):
+        today = datetime.date.today()
+        approval = ApprovalFactory(
+            with_jobapplication=True,
+            start_at=(today - datetime.timedelta(days=90)),
+            end_at=today,
+        )
+        job_application = approval.jobapplication_set.get()
+        employer = job_application.to_company.members.first()
+        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        client.force_login(employer)
+
+        response = client.get(url)
+        assert response.context["link_immersion_facile"] == immersion_search_url(approval.user)
+        alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
+        assert str(alert) == snapshot(name="alerte à l'opportunité immersion facile")
+
+        approval.end_at = today - datetime.timedelta(days=1)
+        approval.save()
+        response = client.get(url)
+        assert response.context["link_immersion_facile"] == immersion_search_url(approval.user)
+        alert = parse_response_to_soup(response, selector="#immersion-facile-opportunity-alert")
+        assert str(alert) == snapshot(name="alerte à l'opportunité immersion facile PASS expiré")
+
+        approval.end_at = today + datetime.timedelta(days=90)
+        approval.save()
+        response = client.get(url)
+        assert response.status_code == 200
+        assert response.context["link_immersion_facile"] is None
