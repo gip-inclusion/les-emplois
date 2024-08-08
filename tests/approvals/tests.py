@@ -32,6 +32,7 @@ from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.users.enums import LackOfPoleEmploiId
 from itou.utils.apis import enums as api_enums
+from itou.utils.constants import IF_SITE_URL
 from tests.approvals.factories import (
     ApprovalFactory,
     PoleEmploiApprovalFactory,
@@ -43,7 +44,7 @@ from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
-from tests.users.factories import ItouStaffFactory, JobSeekerFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory, JobSeekerWithAddressFactory
 
 
 class TestCommonApprovalQuerySet:
@@ -707,6 +708,34 @@ class TestApprovalModel:
         approval.pe_notification_status = api_enums.PEApiNotificationStatus.SHOULD_RETRY
         with pytest.raises(ProgrammingError):
             approval.save()
+
+    def test_immersion_facile_search_url(self):
+        # test various addresses to confirm that the URL is generated correctly
+        approval = ApprovalFactory(user=JobSeekerWithAddressFactory(with_address_in_qpv=True))
+        expected_url = (
+            f"{IF_SITE_URL}/recherche?"
+            f"distanceKm=20"
+            f"&latitude=48.917735&longitude=2.387311"
+            f"&place=Aubervilliers%2C%20%C3%8Ele-de-France%2C%20France"
+            f"&sortedBy=distance"
+            f"&mtm_campaign=les-emplois-recherche-immersion"
+            f"&mtm_kwd=les-emplois-recherche-immersion"
+        )
+        assert approval.immersion_facile_search_url == expected_url
+
+        approval = ApprovalFactory(user=JobSeekerWithAddressFactory(coords=None))
+        # missing lat/lng, so missing place as well
+        expected_url = (
+            f"{IF_SITE_URL}/recherche?"
+            f"distanceKm=20"
+            f"&sortedBy=distance"
+            f"&mtm_campaign=les-emplois-recherche-immersion"
+            f"&mtm_kwd=les-emplois-recherche-immersion"
+        )
+        assert approval.immersion_facile_search_url == expected_url
+
+        approval = ApprovalFactory()
+        assert approval.immersion_facile_search_url == expected_url
 
 
 class TestPoleEmploiApprovalModel:

@@ -1,5 +1,6 @@
 import datetime
 import logging
+from urllib.parse import quote
 
 import pgtrigger
 from dateutil.relativedelta import relativedelta
@@ -26,6 +27,7 @@ from itou.job_applications import enums as job_application_enums
 from itou.prescribers import enums as prescribers_enums
 from itou.utils.apis import enums as api_enums, pole_emploi_api_client
 from itou.utils.apis.pole_emploi import DATE_FORMAT, PoleEmploiAPIBadResponse, PoleEmploiAPIException
+from itou.utils.constants import IF_SITE_URL
 from itou.utils.db import or_queries
 from itou.utils.models import DateRange
 from itou.utils.templatetags.str_filters import pluralizefr
@@ -999,6 +1001,37 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             sender_kind=sender_kind,
             prescriber_kind=prescriber_organization_kind,
             at=now,
+        )
+
+    @property
+    def immersion_facile_search_url(self):
+        """
+        :return: a search URL on Immersion Facilitée's site using user parameters from the pass holder
+        """
+
+        def get_address_param():
+            composant_parts = [self.user.city, self.user.region, "France"]
+
+            if not all(composant_parts):
+                return ""
+
+            # NOTE: spaces are unsafe in URL parameters
+            return f"&place={quote(', '.join(composant_parts))}"
+
+        def get_lat_lng_params():
+            return f"&latitude={self.user.latitude}&longitude={self.user.longitude}"
+
+        # in testing, there are some differences between how addresses are validated between
+        # IF's service and ours, so only we can only consider the geolocation reliable if
+        # lat/lng is present
+        geo_coords = (get_lat_lng_params() + get_address_param()) if self.user.coords else ""
+
+        return (
+            f"{IF_SITE_URL}/recherche?"
+            f"distanceKm=20"
+            f"{geo_coords}"
+            f"&sortedBy=distance"
+            f"&mtm_campaign=les-emplois-recherche-immersion&mtm_kwd=les-emplois-recherche-immersion"
         )
 
 
