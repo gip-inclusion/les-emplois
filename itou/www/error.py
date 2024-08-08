@@ -1,9 +1,7 @@
 import logging
 
-from django.conf import settings
 from django.http import HttpResponseServerError
-from django.template import TemplateDoesNotExist, loader
-from django.utils.module_loading import import_string
+from django.template import TemplateDoesNotExist, engines, loader
 from django.views.decorators.csrf import requires_csrf_token
 from django.views.defaults import ERROR_500_TEMPLATE_NAME, ERROR_PAGE_TEMPLATE
 
@@ -19,12 +17,10 @@ def server_error(request, template_name=ERROR_500_TEMPLATE_NAME):
         return HttpResponseServerError(
             ERROR_PAGE_TEMPLATE % {"title": "Server Error (500)", "details": ""},
         )
-    [template_settings] = settings.TEMPLATES
-    context_processors_path = template_settings["OPTIONS"]["context_processors"]
-    context_processors = [import_string(processor_path) for processor_path in context_processors_path]
+    [template_backend] = engines.all()
     context = {}
     try:
-        for context_processor in context_processors:
+        for context_processor in template_backend.engine.template_context_processors:
             context |= context_processor(request)
     except Exception:
         # This shouldn't happen, but we really don't want the error page to also crash
