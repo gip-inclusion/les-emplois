@@ -1,4 +1,5 @@
 {% load matomo %}
+{% load menu %}
 {% load redirection_fields %}
 {% load static %}
 {% load theme_inclusion %}
@@ -127,123 +128,7 @@
         </div>
         <div class="offcanvas-body d-flex flex-column">
             <nav class="flex-grow-1" role="navigation" aria-label="Navigation principale pour mobile">
-                <ul class="nav nav-tabs flex-column">
-                    <li class="nav-item">
-                        <a href="{% url 'home:hp' %}" class="nav-link{% if '/dashboard' in request.path %} active{% endif %}">
-                            <i class="ri-home-line font-weight-medium" aria-hidden="true"></i>
-                            <span>Accueil</span>
-                        </a>
-                    </li>
-                    {% if user.is_job_seeker %}
-                        <li class="nav-item">
-                            <a href="{% url 'apply:list_for_job_seeker' %}" class="nav-link {% if '/apply/job_seeker/list' in request.path %}active{% endif %}" {% matomo_event "offcanvasNav" "clic" "mes-candidatures" %}>
-                                <i class="ri-draft-line font-weight-medium" aria-hidden="true"></i>
-                                <span>Mes candidatures</span>
-                            </a>
-                        </li>
-                    {% endif %}
-                    {% if user.is_prescriber %}
-                        <li class="nav-item">
-                            <a href="{% url 'apply:list_prescriptions' %}" class="nav-link {% if '/apply/prescriptions/list' in request.path %}active{% endif %}" {% matomo_event "offcanvasNav" "clic" "candidatures" %}>
-                                <i class="ri-draft-line font-weight-medium" aria-hidden="true"></i>
-                                <span>Candidatures</span>
-                            </a>
-                        </li>
-                        {% if request.current_organization %}
-                            <li class="nav-item">
-                                <a href="#"
-                                   role="button"
-                                   class="nav-link has-collapse-caret {% if '/prescribers/colleagues' in request.path %}active{% endif %}"
-                                   data-bs-toggle="collapse"
-                                   data-bs-target="#collapseNavOrganisation"
-                                   type="button"
-                                   aria-expanded="{% if '/prescribers/colleagues' in request.path %}true{% else %}false{% endif %}"
-                                   aria-controls="collapseNavOrganisation">
-                                    <i class="ri-team-line font-weight-medium" aria-hidden="true"></i>
-                                    <span>Organisation</span>
-                                </a>
-                                <div class="collapse{% if '/prescribers/colleagues' in request.path %} show{% endif %}" id="collapseNavOrganisation">
-                                    <ul>
-
-                                        <li>
-                                            <a href="{% url 'prescribers_views:members' %}" class="{% if '/prescribers/colleagues' in request.path %}active{% endif %}" {% matomo_event "offcanvasNav" "clic" "collaborateurs" %}>Collaborateurs</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </li>
-                        {% endif %}
-                    {% endif %}
-                    {% if user.is_employer %}
-                        <li class="nav-item">
-                            <a href="{% url 'apply:list_for_siae' %}" class="nav-link {% if '/apply/siae/list' in request.path %}active{% endif %}" {% matomo_event "offcanvasNav" "clic" "candidatures" %}>
-                                <i class="ri-draft-line font-weight-medium" aria-hidden="true"></i>
-                                <span>Candidatures</span>
-                            </a>
-                        </li>
-                        {% if request.current_organization.is_subject_to_eligibility_rules %}
-                            <li class="nav-item">
-                                <a href="#"
-                                   role="button"
-                                   class="nav-link has-collapse-caret{% if '/approvals/list' in request.path or '/employee_record/list' in request.path %} active{% endif %}"
-                                   data-bs-toggle="collapse"
-                                   data-bs-target="#collapseNavSalaries"
-                                   type="button"
-                                   aria-expanded="{% if '/approvals/list' in request.path or '/employee_record/list' in request.path %}true{% else %}false{% endif %}"
-                                   aria-controls="collapseNavSalaries">
-                                    <i class="ri-team-line font-weight-medium" aria-hidden="true"></i>
-                                    <span>Salariés</span>
-                                </a>
-                                <div class="collapse{% if '/approvals/list' in request.path or '/employee_record/list' in request.path %} show{% endif %}" id="collapseNavSalaries">
-                                    <ul>
-                                        <li>
-                                            <a href="{% url 'approvals:list' %}" class="{% if '/approvals/list' in request.path %}active{% endif %}" {% matomo_event "offcanvasNav" "clic" "salaries-passe-iae" %}>Salariés et PASS IAE</a>
-                                        </li>
-                                        {% if can_show_employee_records %}
-                                            <li>
-                                                <a href="{% url 'employee_record_views:list' %}?status=NEW" class="{% if '/employee_record/list' in request.path %}active{% endif %}" {% matomo_event "offcanvasNav" "clic" "fiches-salaries-asp" %}>Fiches salariés ASP</a>
-                                            </li>
-                                        {% endif %}
-                                    </ul>
-                                </div>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#"
-                                   role="button"
-                                   class="nav-link has-collapse-caret{% if '/company/job_description_list' in request.path or '/company/colleagues' in request.path or '/company/show_financial_annexes' in request.path %} active{% endif %}"
-                                   data-bs-toggle="collapse"
-                                   data-bs-target="#collapseNavStructure"
-                                   type="button"
-                                   aria-expanded="{% if '/company/job_description_list' in request.path or '/company/colleagues' in request.path or '/company/show_financial_annexes' in request.path %}true{% else %}false{% endif %}"
-                                   aria-controls="collapseNavStructure">
-                                    <i class="ri-community-line font-weight-medium" aria-hidden="true"></i>
-                                    <span>Structure</span>
-                                </a>
-                                <div class="collapse{% if '/company/job_description_list' in request.path or '/company/colleagues' in request.path or '/company/show_financial_annexes' in request.path %} show{% endif %}"
-                                     id="collapseNavStructure">
-                                    <ul>
-                                        <li>
-                                            <a href="{% url 'companies_views:job_description_list' %}"
-                                               class="{% if '/company/job_description_list' in request.path %}active{% endif %}"
-                                               {% matomo_event "offcanvasNav" "clic" "metiers-recrutements" %}>Métiers et recrutements</a>
-                                        </li>
-                                        {% if request.current_organization.is_active %}
-                                            <li>
-                                                <a href="{% url 'companies_views:members' %}" class="{% if '/company/colleagues' in request.path %}active{% endif %}" {% matomo_event "offcanvasNav" "clic" "collaborateurs" %}>Collaborateurs</a>
-                                            </li>
-                                        {% endif %}
-                                        {% if can_show_financial_annexes %}
-                                            <li>
-                                                <a href="{% url 'companies_views:show_financial_annexes' %}"
-                                                   class="{% if '/company/show_financial_annexes' in request.path %}active{% endif %}"
-                                                   {% matomo_event "offcanvasNav" "clic" "annexes-financieres" %}>Annexes financières</a>
-                                            </li>
-                                        {% endif %}
-                                    </ul>
-                                </div>
-                            </li>
-                        {% endif %}
-                    {% endif %}
-                </ul>
+                {% menu request %}
             </nav>
             <div class="dropdown">
                 <button type="button"
