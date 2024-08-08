@@ -93,10 +93,52 @@
               </div>
   '''
 # ---
+# name: TestApprovalDetailView.test_link_immersion_facile[alerte à l'opportunité immersion facile PASS expiré]
+  '''
+  <div class="alert alert-important alert-dismissible" id="immersion-facile-opportunity-alert">
+                              <div class="row">
+                                  <div class="col-auto pe-0">
+                                      <i aria-hidden="true" class="ri-information-line ri-xl text-important"></i>
+                                  </div>
+                                  <div class="col">
+                                      <p class="mb-2 font-weight-bold">Avez-vous pensé à proposer une immersion ?</p>
+                                      <p>
+                                          
+                                              Le pass de ce candidat est expiré.
+                                          
+                                          Des employeurs de votre territoire proposent des immersions.
+                                      </p>
+                                      <a aria-label="Rechercher une Immersion Facilitée (ouverture dans un nouvel onglet)" class="btn-link" href="https://immersion-facile.beta.gouv.fr/recherche?mtm_campaign=les-emplois-recherche-immersion&amp;mtm_kwd=les-emplois-recherche-immersion" rel="noopener" target="_blank">Faire une recherche</a>
+                                  </div>
+                              </div>
+                          </div>
+  '''
+# ---
+# name: TestApprovalDetailView.test_link_immersion_facile[alerte à l'opportunité immersion facile]
+  '''
+  <div class="alert alert-important alert-dismissible" id="immersion-facile-opportunity-alert">
+                              <div class="row">
+                                  <div class="col-auto pe-0">
+                                      <i aria-hidden="true" class="ri-information-line ri-xl text-important"></i>
+                                  </div>
+                                  <div class="col">
+                                      <p class="mb-2 font-weight-bold">Avez-vous pensé à proposer une immersion ?</p>
+                                      <p>
+                                          
+                                              Le pass de ce candidat arrive à expiration.
+                                          
+                                          Des employeurs de votre territoire proposent des immersions.
+                                      </p>
+                                      <a aria-label="Rechercher une Immersion Facilitée (ouverture dans un nouvel onglet)" class="btn-link" href="https://immersion-facile.beta.gouv.fr/recherche?mtm_campaign=les-emplois-recherche-immersion&amp;mtm_kwd=les-emplois-recherche-immersion" rel="noopener" target="_blank">Faire une recherche</a>
+                                  </div>
+                              </div>
+                          </div>
+  '''
+# ---
 # name: TestApprovalDetailView.test_remove_approval_button[bouton de suppression d'un PASS IAE]
   '''
-  <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-block btn-outline-warning" href="https://tally.so/r/3je84Q?siaeID=999999&amp;nomSIAE=Aci+de+la+rochelle&amp;prenomemployeur=Milady&amp;nomemployeur=de+Winter&amp;emailemployeur=oph%40dewinter.com&amp;userID=123456&amp;numPASS=XXXXX+12+34568&amp;prenomsalarie=Doe&amp;nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
-                                              Clôturer
-                                          </a>
+  <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-block btn-outline-warning mt-3" href="https://tally.so/r/3je84Q?siaeID=999999&amp;nomSIAE=Aci+de+la+rochelle&amp;prenomemployeur=Milady&amp;nomemployeur=de+Winter&amp;emailemployeur=oph%40dewinter.com&amp;userID=123456&amp;numPASS=XXXXX+12+34568&amp;prenomsalarie=Doe&amp;nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
+                                      Clôturer
+                                  </a>
   '''
 # ---

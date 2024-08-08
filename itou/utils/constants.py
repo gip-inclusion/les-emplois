@@ -4,6 +4,7 @@ ITOU_EMAIL_PROLONGATION = "prolongation@inclusion.beta.gouv.fr"
 PILOTAGE_HELP_CENTER_URL = "https://aide.pilotage.inclusion.beta.gouv.fr/hc/fr"
 PILOTAGE_SITE_URL = "https://pilotage.inclusion.beta.gouv.fr"
 EMPLOIS_SITE_URL = "https://emplois.inclusion.beta.gouv.fr"
+IMMERSION_FACILE_SITE_URL = "https://immersion-facile.beta.gouv.fr"
 POLE_EMPLOI_EMAIL_SUFFIX = "@pole-emploi.fr"
 FRANCE_TRAVAIL_EMAIL_SUFFIX = "@francetravail.fr"
 
