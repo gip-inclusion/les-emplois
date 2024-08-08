@@ -1,6 +1,6 @@
 "use strict";
 
-htmx.onLoad(function () {
+htmx.onLoad(function (target) {
   function showEvent(e) {
     /**
       * Select2 events are jQuery events [1][2] and not standard JavaScript
@@ -13,10 +13,18 @@ htmx.onLoad(function () {
       * [2] https://select2.org/programmatic-control/events#listening-for-events
       * [3] https://developer.mozilla.org/en-US/docs/Web/API/Event/Event
       */
-    e.target.dispatchEvent(new Event("change", {bubbles: true}));
+    e.target.dispatchEvent(new Event("change", { bubbles: true }));
   }
   // Selection events from https://select2.org/programmatic-control/events
   $(".django-select2").on("select2:select", showEvent);
   $(".django-select2").on("select2:unselect", showEvent);
   $(".django-select2").on("select2:clear", showEvent);
+
+  // Init target tooltips
+  var tooltipTriggerList = [].slice.call(
+    target.parentNode.querySelectorAll('[data-bs-toggle="tooltip"]')
+  );
+  tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
 });

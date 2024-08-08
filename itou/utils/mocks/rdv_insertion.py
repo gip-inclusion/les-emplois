@@ -38,3 +38,46 @@ RDV_INSERTION_AUTH_FAILURE_BODY = {
         "Mot de passe ou identifiant invalide.",
     ],
 }
+
+RDV_INSERTION_CREATE_AND_INVITE_SUCCESS_BODY = {
+    "success": True,
+    "user": {
+        "id": 1,
+        "uid": None,
+        "affiliation_number": None,
+        "role": "demandeur",
+        "created_at": "1970-01-01T00:00:00",
+        "department_internal_id": None,
+        "first_name": "Jean",
+        "last_name": "Teste",
+        "title": "monsieur",
+        "address": "112 Quai de Jemmapes, 75010 Paris",
+        "phone_number": None,
+        "email": "tech@inclusion.beta.gouv.fr",
+        "birth_date": "1970-01-01",
+        "rights_opening_date": "2024-06-22",
+        "birth_name": None,
+        "rdv_solidarites_user_id": 1234,
+        "nir": None,
+        "carnet_de_bord_carnet_id": None,
+        "france_travail_id": "FT ID",
+        "referents": [],
+    },
+    "invitations": [
+        {
+            "id": 4321,
+            "format": "email",
+            "clicked": False,
+            "rdv_with_referents": False,
+            "created_at": "1970-01-01T00:00:00",
+            "motif_category": {"id": 1, "short_name": "siae_interview", "name": "Entretien SIAE"},
+        }
+    ],
+}
+
+RDV_INSERTION_CREATE_AND_INVITE_FAILURE_BODY = {
+    "success": False,
+    "errors": [
+        "Erreur inconnue",
+    ],
+}

@@ -22,6 +22,7 @@ from tests.utils.test import TestCase
     RDV_SOLIDARITES_EMAIL="tech@inclusion.beta.gouv.fr",
     RDV_SOLIDARITES_PASSWORD="password",
     RDV_SOLIDARITES_TOKEN_EXPIRY=86000,
+    RDV_INSERTION_API_BASE_URL="https://rdv-insertion.fake/api/v1/",
     CACHES={
         "default": {
             "BACKEND": "itou.utils.cache.UnclearableCache",
@@ -35,7 +36,7 @@ class RDVInsertionTokenRenewalTest(TestCase):
     def setUpClass(cls):
         super().setUpClass()
         respx.post(
-            urljoin(settings.RDV_SOLIDARITES_API_BASE_URL, "/auth/sign_in"), name="rdv_solidarites_sign_in"
+            urljoin(settings.RDV_SOLIDARITES_API_BASE_URL, "auth/sign_in"), name="rdv_solidarites_sign_in"
         ).mock(
             return_value=httpx.Response(
                 200, json=RDV_INSERTION_AUTH_SUCCESS_BODY, headers=RDV_INSERTION_AUTH_SUCCESS_HEADERS
