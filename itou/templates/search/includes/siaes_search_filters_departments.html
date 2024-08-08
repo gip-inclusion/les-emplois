@@ -1,16 +1,14 @@
 {% load django_bootstrap5 %}
 
-<div class="d-flex flex-column flex-md-row gap-1">
-    {% if form.departments %}
-        {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.departments only %}
-    {% endif %}
-    {% if form.districts_13 %}
-        {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.districts_13 only %}
-    {% endif %}
-    {% if form.districts_69 %}
-        {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.districts_69 only %}
-    {% endif %}
-    {% if form.districts_75 %}
-        {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.districts_75 only %}
-    {% endif %}
-</div>
+{% if form.departments %}
+    {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.departments only %}
+{% endif %}
+{% if form.districts_13 %}
+    {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.districts_13 only %}
+{% endif %}
+{% if form.districts_69 %}
+    {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.districts_69 only %}
+{% endif %}
+{% if form.districts_75 %}
+    {% include "includes/btn_dropdown_filter/checkboxes.html" with field=form.districts_75 only %}
+{% endif %}
