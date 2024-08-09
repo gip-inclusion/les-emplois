@@ -398,9 +398,9 @@ class TestEligibilityDiagnosisModel(ParametrizedTestCase):
             param({"from_employer": True, "with_certifiable_criteria": True}, True, id="employer_certified_criteria"),
         ],
     )
-    def test_criteria_certification_available(self, factory_params, expected):
+    def test_criteria_can_be_certified(self, factory_params, expected):
         diagnosis = IAEEligibilityDiagnosisFactory(**factory_params)
-        assert diagnosis.criteria_certification_available() == expected
+        assert diagnosis.criteria_can_be_certified() == expected
 
 
 class TestAdministrativeCriteriaModel:

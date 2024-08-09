@@ -2419,7 +2419,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert approval.start_at == job_application.hiring_start_at
         assert job_application.state.is_accepted
 
-    def test_accept_iae__criteria_certification_available(self):
+    def test_accept_iae__criteria_can_be_certified(self):
         ######### Case 1: if BRSA is one the diagnosis criteria,
         ######### birth place and birth country are required.
         birthdate = datetime.date(1995, 12, 27)
@@ -2477,7 +2477,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert jobseeker_profile.birth_country == birth_country
         assert jobseeker_profile.birth_place == birth_place
 
-    def test_accept_geiq__criteria_certification_available(self):
+    def test_accept_geiq__criteria_can_be_certified(self):
         birthdate = datetime.date(1995, 12, 27)
         self.company.kind = CompanyKind.GEIQ
         self.company.save()
@@ -2522,7 +2522,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert jobseeker_profile.birth_country == birth_country
         assert jobseeker_profile.birth_place == birth_place
 
-    def test_accept_no_siae__criteria_certification_available(self):
+    def test_accept_no_siae__criteria_can_be_certified(self):
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True, with_jobs=True)
         job_application = self.create_job_application(
             eligibility_diagnosis__with_certifiable_criteria=True,
@@ -2576,7 +2576,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         # required assumptions for the test case
         assert self.company.is_subject_to_eligibility_rules
         ed = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=self.job_seeker, for_siae=self.company)
-        assert ed and ed.criteria_certification_available()
+        assert ed and ed.criteria_can_be_certified()
 
         employer = self.company.members.first()
         self.client.force_login(employer)
