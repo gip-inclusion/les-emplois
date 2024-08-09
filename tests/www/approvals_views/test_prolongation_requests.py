@@ -19,6 +19,7 @@ from itou.files.models import File
 from tests.approvals import factories as approvals_factories
 from tests.prescribers import factories as prescribers_factories
 from tests.users import factories as users_factories
+from tests.users.factories import EmployerFactory
 from tests.utils.test import BASE_NUM_QUERIES, assert_previous_step, parse_response_to_soup
 
 
@@ -76,8 +77,9 @@ def test_list_view(snapshot, client):
 
 
 def test_list_view_no_siae(snapshot, client):
-    prolongation_request = approvals_factories.ProlongationRequestFactory(for_snapshot=True)
-    prolongation_request.declared_by_siae.delete()
+    prolongation_request = approvals_factories.ProlongationRequestFactory(
+        for_snapshot=True, declared_by_siae=None, declared_by=EmployerFactory()
+    )
     client.force_login(prolongation_request.validated_by)
 
     response = client.get(reverse("approvals:prolongation_requests_list"))
@@ -145,8 +147,9 @@ def test_show_view(snapshot, client):
 
 
 def test_show_view_no_siae(client):
-    prolongation_request = approvals_factories.ProlongationRequestFactory()
-    prolongation_request.declared_by_siae.delete()
+    prolongation_request = approvals_factories.ProlongationRequestFactory(
+        declared_by_siae=None, declared_by=EmployerFactory()
+    )
     client.force_login(prolongation_request.validated_by)
 
     default_storage.location = "snapshot"
