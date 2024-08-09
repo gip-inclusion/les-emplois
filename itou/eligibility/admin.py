@@ -10,11 +10,7 @@ from itou.utils.admin import ItouModelAdmin, ItouTabularInline, PkSupportRemarkI
 class AbstractAdministrativeCriteriaInline(ItouTabularInline):
     extra = 0
     raw_id_fields = ("administrative_criteria",)
-    readonly_fields = ("created_at", "certifiable")
-
-    @admin.display(boolean=True, description="vérifiable par l'API Particuliers")
-    def certifiable(self, obj):
-        return obj.administrative_criteria.certifiable
+    readonly_fields = ("created_at",)
 
 
 class AdministrativeCriteriaInline(AbstractAdministrativeCriteriaInline):
@@ -225,9 +221,13 @@ class AdministrativeCriteriaAdmin(AbstractAdministrativeCriteriaAdmin):
         "name",
         "level",
         "ui_rank",
-        "certifiable",
+        "is_certifiable",
         "created_at",
     )
+
+    @admin.display(boolean=True, description="vérifiable par l'API Particuliers")
+    def is_certifiable(self, obj):
+        return obj.is_certifiable
 
 
 @admin.register(models.GEIQAdministrativeCriteria)
@@ -237,7 +237,7 @@ class GEIQAdministrativeCriteriaAdmin(AbstractAdministrativeCriteriaAdmin):
         "name",
         "annex",
         "level",
-        "certifiable",
+        "is_certifiable",
         "created_at",
     )
     raw_id_fields = AbstractAdministrativeCriteriaAdmin.raw_id_fields + ("parent",)
@@ -248,3 +248,7 @@ class GEIQAdministrativeCriteriaAdmin(AbstractAdministrativeCriteriaAdmin):
         "ui_rank",
         "pk",
     )
+
+    @admin.display(boolean=True, description="vérifiable par l'API Particuliers")
+    def is_certifiable(self, obj):
+        return obj.is_certifiable
