@@ -567,6 +567,98 @@ class InclusionConnectCallbackViewTest(MessagesTestMixin, InclusionConnectBaseTe
         )
         self.assertQuerySetEqual(org.members.all(), [user])
 
+    @respx.mock
+    def test_callback_ft_users_with_no_org(self):
+        PrescriberFactory(**dataclasses.asdict(InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)))
+
+        oidc_userinfo = OIDC_USERINFO.copy()
+        oidc_userinfo["email"] = "prenom.nom@francetravail.fr"
+        response = mock_oauth_dance(
+            self.client,
+            UserKind.PRESCRIBER,
+            oidc_userinfo=oidc_userinfo,
+            expected_redirect_url=add_url_params(
+                reverse("inclusion_connect:logout"), {"redirect_url": reverse("search:employers_home")}
+            ),
+        )
+        # without membership, user is forbiden access
+        assert get_user(self.client).is_authenticated is False
+        self.assertMessages(
+            response,
+            [
+                Message(
+                    messages.ERROR,
+                    "En tant qu'agent France Travail vous devez appartenir à une agence pour vous connecter à la "
+                    "plateforme des emplois. Veuillez vous faire inviter par l'administrateur d'une agence afin "
+                    "d'accéder au service.",
+                )
+            ],
+        )
+
+    @respx.mock
+    def test_callback_ft_users_unknown_safir(self):
+        PrescriberFactory(**dataclasses.asdict(InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)))
+
+        oidc_userinfo = OIDC_USERINFO_WITH_ORG.copy()
+        oidc_userinfo["email"] = "prenom.nom@francetravail.fr"
+        response = mock_oauth_dance(
+            self.client,
+            UserKind.PRESCRIBER,
+            oidc_userinfo=oidc_userinfo,
+            expected_redirect_url=add_url_params(
+                reverse("inclusion_connect:logout"), {"redirect_url": reverse("search:employers_home")}
+            ),
+        )
+        # without membership, user is forbiden access
+        assert get_user(self.client).is_authenticated is False
+        self.assertMessages(
+            response,
+            [
+                Message(
+                    messages.ERROR,
+                    "En tant qu'agent France Travail vous devez appartenir à une agence pour vous connecter à la "
+                    "plateforme des emplois.<br>"
+                    "Malheureusement l'agence indiquée par NEPTUNE (code SAFIR 95021) n'est pas référencée dans "
+                    "notre service. "
+                    "Cela arrive quand vous appartenez à un Point Relais mais que vous êtes rattaché à une agence "
+                    "mère sur la plateforme des emplois.<br>"
+                    "Vous pouvez vous faire inviter par l'administrateur de votre agence. "
+                    "Si vous pensez qu'il y a une erreur, vérifiez que le code SAFIR est le bon "
+                    f"puis <a href='{global_constants.ITOU_HELP_CENTER_URL}'>contactez le support</a> en indiquant "
+                    "le code SAFIR.",
+                )
+            ],
+        )
+
+    @respx.mock
+    def test_callback_ft_users_unknown_safir_already_in_org(self):
+        user = PrescriberFactory(**dataclasses.asdict(InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)))
+        org = PrescriberPoleEmploiFactory(code_safir_pole_emploi="00000")
+        org.add_or_activate_member(user)
+
+        oidc_userinfo = OIDC_USERINFO_WITH_ORG.copy()
+        oidc_userinfo["email"] = "prenom.nom@francetravail.fr"
+        response = mock_oauth_dance(
+            self.client,
+            UserKind.PRESCRIBER,
+            oidc_userinfo=oidc_userinfo,
+        )
+        assert get_user(self.client).is_authenticated is True
+        self.assertMessages(
+            response,
+            [
+                Message(
+                    messages.WARNING,
+                    "L'agence indiquée par NEPTUNE (code SAFIR 95021) n'est pas référencée dans notre service. "
+                    "Cela arrive quand vous appartenez à un Point Relais mais que vous êtes rattaché à une agence "
+                    "mère sur la plateforme des emplois. "
+                    "Si vous pensez qu'il y a une erreur, vérifiez que le code SAFIR est le bon "
+                    f"puis <a href='{global_constants.ITOU_HELP_CENTER_URL}'>contactez le support</a> en indiquant "
+                    "le code SAFIR.",
+                )
+            ],
+        )
+
 
 class InclusionConnectAccountActivationTest(InclusionConnectBaseTestCase):
     def test_new_user(self):
@@ -902,10 +994,16 @@ class InclusionConnectmapChannelTest(MessagesTestMixin, InclusionConnectBaseTest
             [
                 Message(
                     messages.ERROR,
-                    "Nous sommes au regret de vous informer que votre agence n'est pas référencée dans notre service. "
-                    f"Nous vous invitons à <a href='{global_constants.ITOU_HELP_CENTER_URL}'>contacter le support</a> "
-                    f"en indiquant votre code SAFIR ({oid_userinfo['structure_pe']}) pour de plus "
-                    "amples informations.",
+                    "En tant qu'agent France Travail vous devez appartenir à une agence pour vous connecter à la "
+                    "plateforme des emplois.<br>"
+                    "Malheureusement l'agence indiquée par NEPTUNE (code SAFIR 12345) n'est pas référencée dans "
+                    "notre service. "
+                    "Cela arrive quand vous appartenez à un Point Relais mais que vous êtes rattaché à une agence "
+                    "mère sur la plateforme des emplois.<br>"
+                    "Vous pouvez vous faire inviter par l'administrateur de votre agence. "
+                    "Si vous pensez qu'il y a une erreur, vérifiez que le code SAFIR est le bon "
+                    f"puis <a href='{global_constants.ITOU_HELP_CENTER_URL}'>contactez le support</a> en indiquant "
+                    "le code SAFIR.",
                 )
             ],
         )
