@@ -11,7 +11,7 @@
       "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 1,
       "created_at": "2020-03-23T20:00:00.000Z",
-      "certifiable": true
+      "kind": "RSA"
     }
   },
   {
@@ -26,7 +26,7 @@
       "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 2,
       "created_at": "2020-03-23T20:00:00.000Z",
-      "certifiable": false
+      "kind": "ASS"
     }
   },
   {
@@ -41,7 +41,7 @@
       "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 3,
       "created_at": "2020-03-23T20:00:00.000Z",
-      "certifiable": true
+      "kind": "AAH"
     }
   },
   {
@@ -56,7 +56,7 @@
       "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 4,
       "created_at": "2020-03-23T20:00:00.000Z",
-      "certifiable": false
+      "kind": "DETLD"
     }
   },
   {
@@ -71,7 +71,7 @@
       "written_proof_validity": "Attestation sur l'honneur datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 1,
       "created_at": "2020-03-23T20:00:00.000Z",
-      "certifiable": false
+      "kind": "CAP_BEP"
     }
   },
   {
@@ -86,7 +86,7 @@
       "written_proof_validity": "",
       "ui_rank": 2,
       "created_at": "2020-03-23T20:00:00.000Z",
-      "certifiable": false
+      "kind": "SENIOR"
     }
   },
   {
@@ -101,7 +101,7 @@
       "written_proof_validity": "",
       "ui_rank": 3,
       "created_at": "2020-03-23T20:00:00.000Z",
-      "certifiable": false
+      "kind": "JEUNE"
     }
   },
   {
@@ -116,7 +116,7 @@
       "written_proof_validity": "Datant de moins de 12 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 4,
       "created_at": "2020-03-23T20:00:00.000Z",
-      "certifiable": false
+      "kind": "ASE"
     }
   },
   {
@@ -131,7 +131,7 @@
       "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 5,
       "created_at": "2020-03-23T20:00:00.000Z",
-      "certifiable": false
+      "kind": "DELD"
     }
   },
   {
@@ -146,7 +146,7 @@
       "written_proof_validity": "Décision valide au moment du recrutement",
       "ui_rank": 6,
       "created_at": "2020-03-23T20:00:00.000Z",
-      "certifiable": false
+      "kind": "TH"
     }
   },
   {
@@ -161,7 +161,7 @@
       "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 7,
       "created_at": "2020-03-23T20:00:00.000Z",
-      "certifiable": true
+      "kind": "PI"
     }
   },
   {
@@ -176,7 +176,7 @@
       "written_proof_validity": "Datant de moins de 3 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 8,
       "created_at": "2020-03-23T20:00:00.000Z",
-      "certifiable": false
+      "kind": "PSH_PR"
     }
   },
   {
@@ -191,7 +191,7 @@
       "written_proof_validity": "Titre valide au moment de la délivrance du PASS IAE",
       "ui_rank": 9,
       "created_at": "2020-03-23T20:00:00.000Z",
-      "certifiable": false
+      "kind": "REF_DA"
     }
   },
   {
@@ -206,7 +206,7 @@
       "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 10,
       "created_at": "2020-03-23T20:00:00.000Z",
-      "certifiable": false
+      "kind": "ZRR"
     }
   },
   {
@@ -221,7 +221,7 @@
       "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 11,
       "created_at": "2020-03-23T20:00:00.000Z",
-      "certifiable": false
+      "kind": "QPV"
     }
   },
   {
@@ -236,7 +236,7 @@
       "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 12,
       "created_at": "2021-09-03T20:00:00.000Z",
-      "certifiable": false
+      "kind": "DETENTION_MJ"
     }
   },
   {
@@ -251,7 +251,7 @@
       "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 13,
       "created_at": "2021-09-03T20:00:00.000Z",
-      "certifiable": false
+      "kind": "FLE"
     }
   },
   {
@@ -266,7 +266,7 @@
       "written_proof_validity": "Datant de moins de 6 mois avant la date de délivrance du PASS IAE",
       "ui_rank": 14,
       "created_at": "2021-09-03T20:00:00.000Z",
-      "certifiable": false
+      "kind": "PM"
     }
   }
 ]

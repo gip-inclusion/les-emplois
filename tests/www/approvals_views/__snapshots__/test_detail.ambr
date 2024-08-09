@@ -979,7 +979,7 @@
         ]),
         'sql': '''
           SELECT "eligibility_administrativecriteria"."id",
-                 "eligibility_administrativecriteria"."certifiable",
+                 "eligibility_administrativecriteria"."kind",
                  "eligibility_administrativecriteria"."level",
                  "eligibility_administrativecriteria"."name",
                  "eligibility_administrativecriteria"."desc",
@@ -2422,7 +2422,7 @@
         ]),
         'sql': '''
           SELECT "eligibility_administrativecriteria"."id",
-                 "eligibility_administrativecriteria"."certifiable",
+                 "eligibility_administrativecriteria"."kind",
                  "eligibility_administrativecriteria"."level",
                  "eligibility_administrativecriteria"."name",
                  "eligibility_administrativecriteria"."desc",

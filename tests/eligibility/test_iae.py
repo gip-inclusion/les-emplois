@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 from unittest_parametrize import ParametrizedTestCase, param, parametrize
 
-from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
+from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
 from itou.eligibility.models.common import AdministrativeCriteriaQuerySet
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
@@ -467,11 +467,15 @@ class TestAdministrativeCriteriaModel:
     ],
 )
 def test_certifiable(AdministrativeCriteriaClass):
-    certifiable_criteria = AdministrativeCriteriaClass.objects.filter(certifiable=True).order_by("?").first()
-    not_certifiable_criteria = AdministrativeCriteriaClass.objects.exclude(certifiable=True).order_by("?").first()
+    for criterion in AdministrativeCriteriaClass.objects.all():
+        assert AdministrativeCriteriaKind(criterion.kind)
 
-    assert certifiable_criteria in AdministrativeCriteriaClass.objects.certifiable()
-    assert not_certifiable_criteria not in AdministrativeCriteriaClass.objects.certifiable()
+    certifiable_criterion = AdministrativeCriteriaClass.objects.get(kind=AdministrativeCriteriaKind.RSA)
+    not_certifiable_criteria = AdministrativeCriteriaClass.objects.exclude(kind=AdministrativeCriteriaKind.RSA).all()
 
-    assert not_certifiable_criteria in AdministrativeCriteriaClass.objects.not_certifiable()
-    assert certifiable_criteria not in AdministrativeCriteriaClass.objects.not_certifiable()
+    assert certifiable_criterion in AdministrativeCriteriaClass.objects.certifiable()
+    assert certifiable_criterion.is_certifiable
+
+    for criterion in not_certifiable_criteria:
+        assert criterion in not_certifiable_criteria
+        assert not criterion.is_certifiable

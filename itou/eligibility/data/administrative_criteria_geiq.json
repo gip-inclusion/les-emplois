@@ -16,7 +16,7 @@
 			"annex": "2",
 			"level": "1",
 			"slug": "beneficiaire-du-rsa",
-			"certifiable": true
+			"kind": "RSA"
 		}
 	},
 	{
@@ -36,7 +36,7 @@
 			"annex": "2",
 			"level": "1",
 			"slug": "allocataire-ass",
-			"certifiable": false
+			"kind": "ASS"
 		}
 	},
 	{
@@ -56,7 +56,7 @@
 			"annex": "2",
 			"level": "1",
 			"slug": "allocataire-aah",
-			"certifiable": true
+			"kind": "AAH"
 		}
 	},
 	{
@@ -76,7 +76,7 @@
 			"annex": "2",
 			"level": "1",
 			"slug": "detld-24-mois",
-			"certifiable": false
+			"kind": "DETLD"
 		}
 	},
 	{
@@ -96,7 +96,7 @@
 			"annex": "2",
 			"level": "2",
 			"slug": "niveau-etude-3",
-			"certifiable": false
+			"kind": "CAP_BEP"
 		}
 	},
 	{
@@ -116,7 +116,7 @@
 			"annex": "2",
 			"level": "2",
 			"slug": "senior-50-ans",
-			"certifiable": false
+			"kind": "SENIOR"
 		}
 	},
 	{
@@ -136,7 +136,7 @@
 			"annex": "2",
 			"level": "2",
 			"slug": "jeune-26-ans",
-			"certifiable": false
+			"kind": "JEUNE"
 		}
 	},
 	{
@@ -156,7 +156,7 @@
 			"annex": "2",
 			"level": "2",
 			"slug": "sortant-ase",
-			"certifiable": false
+			"kind": "ASE"
 		}
 	},
 	{
@@ -176,7 +176,7 @@
 			"annex": "2",
 			"level": "2",
 			"slug": "deld-12-24-mois",
-			"certifiable": false
+			"kind": "DELD"
 		}
 	},
 	{
@@ -196,7 +196,7 @@
 			"annex": "1+2",
 			"level": "2",
 			"slug": "travailleur-handicape",
-			"certifiable": false
+			"kind": "TH"
 		}
 	},
 	{
@@ -216,7 +216,7 @@
 			"annex": "2",
 			"level": "2",
 			"slug": "parent-isole",
-			"certifiable": true
+			"kind": "PI"
 		}
 	},
 	{
@@ -236,7 +236,7 @@
 			"annex": "2",
 			"level": "2",
 			"slug": "personne-sans-hebergement",
-			"certifiable": false
+			"kind": "PSH_PR"
 		}
 	},
 	{
@@ -256,7 +256,7 @@
 			"annex": "1+2",
 			"level": "2",
 			"slug": "refugie-statutaire",
-			"certifiable": false
+			"kind": "REF_DA"
 		}
 	},
 	{
@@ -276,7 +276,7 @@
 			"annex": "1+2",
 			"level": "2",
 			"slug": "resident-zrr",
-			"certifiable": false
+			"kind": "ZRR"
 		}
 	},
 	{
@@ -296,7 +296,7 @@
 			"annex": "1+2",
 			"level": "2",
 			"slug": "resident-qpv",
-			"certifiable": false
+			"kind": "QPV"
 		}
 	},
 	{
@@ -316,7 +316,7 @@
 			"annex": "1+2",
 			"level": "2",
 			"slug": "sortant-de-detention-ou-personne-placee-sous-main-de-justice",
-			"certifiable": false
+			"kind": "DETENTION_MJ"
 		}
 	},
 	{
@@ -336,7 +336,7 @@
 			"annex": "2",
 			"level": "2",
 			"slug": "maitrise-de-la-langue-francaise",
-			"certifiable": false
+			"kind": "FLE"
 		}
 	},
 	{
@@ -356,7 +356,7 @@
 			"annex": "2",
 			"level": "2",
 			"slug": "mobilite",
-			"certifiable": false
+			"kind": "PM"
 		}
 	},
 	{
@@ -376,14 +376,14 @@
 			"annex": "1",
 			"level": null,
 			"slug": "jeune-de-moins-de-26-ans-sans-qualification",
-			"certifiable": false
+			"kind": "JEUNE_SQ"
 		}
 	},
 	{
 		"model": "eligibility.geiqadministrativecriteria",
 		"pk": 20,
 		"fields": {
-			"name": "Bénéficiaire des minimas sociaux",
+			"name": "Bénéficiaire des minima sociaux",
 			"desc": "",
 			"api_code": "MINSOC",
 			"written_proof": "Attestation de bénéficiaire",
@@ -396,7 +396,7 @@
 			"annex": "1",
 			"level": null,
 			"slug": "beneficiaire-des-minimas-sociaux",
-			"certifiable": false
+			"kind": "MINIMA"
 		}
 	},
 	{
@@ -416,7 +416,7 @@
 			"annex": "1",
 			"level": null,
 			"slug": "personne-eloignee-du-marche-du-travail",
-			"certifiable": false
+			"kind": "SANS_TRAVAIL_12"
 		}
 	},
 	{
@@ -436,7 +436,7 @@
 			"annex": "1",
 			"level": null,
 			"slug": "de-45-ans-et-plus",
-			"certifiable": false
+			"kind": "DE_45"
 		}
 	},
 	{
@@ -456,7 +456,7 @@
 			"annex": "1",
 			"level": null,
 			"slug": "personne-en-reconversion-professionnelle-contrainte",
-			"certifiable": false
+			"kind": "RECONVERSION"
 		}
 	},
 	{
@@ -476,7 +476,7 @@
 			"annex": "1",
 			"level": null,
 			"slug": "personne-en-dispositif-insertion",
-			"certifiable": false
+			"kind": "SIAE_CUI"
 		}
 	},
 	{
@@ -496,7 +496,7 @@
 			"annex": "2",
 			"level": "2",
 			"slug": "demandeur-asile",
-			"certifiable": false
+			"kind": "RS_PS_DA"
 		}
 	},
 	{
@@ -516,7 +516,7 @@
 			"annex": "0",
 			"level": null,
 			"slug": "autre",
-			"certifiable": false
+			"kind": "AUTRE_MINIMA"
 		}
 	},
 	{
@@ -536,7 +536,7 @@
 			"annex": "0",
 			"level": null,
 			"slug": "personne-inscrite-a-pole-emploi",
-			"certifiable": false
+			"kind": "FT"
 		}
 	},
 	{
@@ -556,7 +556,7 @@
 			"annex": "0",
 			"level": null,
 			"slug": "de-inscrit-depuis-moins-de-12-mois",
-			"certifiable": false
+			"kind": "DELD_12"
 		}
 	}
 ]

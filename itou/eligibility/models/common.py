@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
-from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
+from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel, AuthorKind
 from itou.job_applications.enums import SenderKind
 
 
@@ -98,7 +98,7 @@ class AdministrativeCriteriaQuerySet(models.QuerySet):
 
     @property
     def certifiable_lookup(self):
-        return models.Q(certifiable=True)
+        return models.Q(kind__in=AbstractAdministrativeCriteria.CAN_BE_CERTIFIED_KINDS)
 
     def certifiable(self):
         return self.filter(self.certifiable_lookup)
@@ -109,6 +109,10 @@ class AdministrativeCriteriaQuerySet(models.QuerySet):
 
 class AbstractAdministrativeCriteria(models.Model):
     MAX_UI_RANK = 32767
+    # RSA only for the moment. AAH and PI to come.
+    CAN_BE_CERTIFIED_KINDS = [
+        AdministrativeCriteriaKind.RSA,
+    ]
 
     level = models.CharField(
         verbose_name="niveau",
@@ -125,7 +129,11 @@ class AbstractAdministrativeCriteria(models.Model):
     written_proof_validity = models.CharField(
         verbose_name="durée de validité du justificatif", max_length=255, blank=True, default=""
     )
-    certifiable = models.BooleanField(verbose_name="certifiable par l'API Particuliers", default=False)
+    kind = models.CharField(
+        verbose_name="type",
+        choices=AdministrativeCriteriaKind.choices,
+        default="",
+    )
     # Used to rank criteria in UI. Should be set by level (LEVEL_1: 1, 2, 3… LEVEL_2: 1, 2, 3…).
     # Default value is MAX_UI_RANK so that it's pushed at the end if `ui_rank` is forgotten.
     ui_rank = models.PositiveSmallIntegerField(default=MAX_UI_RANK)
@@ -148,3 +156,7 @@ class AbstractAdministrativeCriteria(models.Model):
         if level_display := self.get_level_display():
             name += f" - {level_display}"
         return name
+
+    @property
+    def is_certifiable(self):
+        return self.kind in self.CAN_BE_CERTIFIED_KINDS
