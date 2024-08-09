@@ -53,11 +53,17 @@ htmx.onLoad((target) => {
   **/
   function toggleDisableAndSetValue() {
     const targetId = this.getAttribute("data-disable-target");
+    const unlessValue = this.getAttribute("data-disable-target-unless-value");
     const isSet = $(this).val().length > 0;
     if (isSet) {
       $(targetId).val(this.getAttribute("data-target-value"));
     }
-    $(targetId).attr("disabled", isSet);
+    if (unlessValue) {
+      $(targetId).attr("disabled", $(this).val() != unlessValue);
+    }
+    else {
+      $(targetId).attr("disabled", isSet);
+    }
   }
   target.querySelectorAll('select[data-disable-target]').forEach(function (selectFieldWithDisable) {
     toggleDisableAndSetValue.call(selectFieldWithDisable);
