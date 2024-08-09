@@ -1,0 +1,111 @@
+{% extends "layout/base.html" %}
+{% load matomo %}
+{% load static %}
+{% load str_filters %}
+{% load format_filters %}
+
+{% block title %}
+    Profil de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+{% endblock %}
+
+{% block title_content %}
+    <h1>Candidat : {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}</h1>
+{% endblock %}
+
+{% block title_extra %}
+    <ul class="s-tabs-01__nav nav nav-tabs mb-0" role="tablist" data-it-sliding-tabs="true">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active"
+               id="informations-tab"
+               data-bs-toggle="tab"
+               href="#informations"
+               role="tab"
+               aria-controls="informations"
+               aria-selected="true"
+               {% matomo_event "candidat" "clic-onglet" "informations candidat" %}>Informations générales</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link"
+               id="job-applications-tab"
+               data-bs-toggle="tab"
+               href="#candidatures"
+               role="tab"
+               aria-controls="candidatures"
+               aria-selected="false"
+               {% matomo_event "candidat" "clic-onglet" "candidatures" %}>Candidatures</a>
+        </li>
+    </ul>
+{% endblock %}
+{% block title_prevstep %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col">
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="informations" role="tabpanel" aria-labelledby="informations-tab">
+                            <div class="row">
+                                <div class="col-12 {% if approval %}col-lg-8 order-2 order-lg-1{% endif %}">
+                                    <h2>Informations</h2>
+                                    <div class="c-box mb-3 mb-lg-5">
+                                        {% include "apply/includes/job_seeker_info.html" with job_seeker=job_seeker job_application=None with_matomo_event=True can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request csrf_token=csrf_token SenderKind=SenderKind only %}
+                                    </div>
+                                    {% if iae_eligibility_diagnosis %}
+                                        {% include "job_seekers_views/includes/eligibility_diagnosis.html" with eligibility_diagnosis=iae_eligibility_diagnosis kind="IAE" request=request only %}
+                                    {% endif %}
+                                    {% if geiq_eligibility_diagnosis %}
+                                        {% include "job_seekers_views/includes/eligibility_diagnosis.html" with eligibility_diagnosis=geiq_eligibility_diagnosis kind="GEIQ" with_allowance=request.user.is_employer request=request only %}
+                                    {% endif %}
+                                </div>
+                                {% if approval %}
+                                    <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
+                                        {% include "approvals/includes/box.html" with approval=approval only %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="candidatures" role="tabpanel" aria-labelledby="job-applications-tab">
+                            <h2>Candidatures envoyées</h2>
+                            <hr>
+                            {% for job_application in sent_job_applications %}
+                                <div class="c-box c-box--results has-links-inside my-3 my-md-4">
+                                    <div class="c-box--results__header">
+                                        {% include "approvals/includes/job_description_creation.html" with job_application=job_application %}
+                                    </div>
+                                    <hr class="m-0">
+                                    <div class="c-box--results__body">
+                                        <div class="c-box--results__list-data">
+                                            {% include "approvals/includes/job_description_list.html" with job_application=job_application %}
+                                        </div>
+                                    </div>
+                                    <div class="c-box--results__footer">
+                                        <div class="d-flex justify-content-end">
+                                            <a href="{% url 'apply:details_for_prescriber' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
+                                               class="btn btn-outline-primary btn-block w-100 w-md-auto"
+                                               {% matomo_event "candidat" "clic" "detail-candidature" %}
+                                               aria-label="Voir la candidature de {{ job_application.sender.get_full_name|mask_unless:can_view_personal_information }}">Voir sa candidature</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <div class="c-box c-box--results my-3 my-md-4">
+                                    <div class="c-box--results__body">
+                                        <p class="mb-0">Aucune candidature envoyée.</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script src="{% static 'js/sliding_tabs.js'%}"></script>
+{% endblock %}

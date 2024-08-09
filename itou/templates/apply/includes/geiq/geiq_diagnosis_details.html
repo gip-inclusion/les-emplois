@@ -31,26 +31,7 @@
             <b>Durée de validité du diagnostic :</b> du {{ diagnosis.created_at|date:"d/m/Y" }} au {{ diagnosis.expires_at|date:"d/m/Y" }}.
         </p>
         {% if request.user.is_employer %}
-            <div class="alert alert-info" role="status">
-                <div class="row">
-                    <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl text-info"></i>
-                    </div>
-                    <div class="col">
-                        <p>
-                            <b>Aide à l'accompagement GEIQ</b>
-                        </p>
-                        <p>
-                            {% if diagnosis.author_prescriber_organization %}
-                                Ce diagnostic émis par un prescripteur habilité vous donnera droit en cas d’embauche,
-                            {% else %}
-                                Les critères que vous avez sélectionnés vous donnent droit en cas d’embauche,
-                            {% endif %}
-                            à une aide financière de l’État s’élevant à <b>{{ diagnosis.allowance_amount }} €</b> (sous réserve de la contractualisation initialement prévue et de l’enveloppe disponible).
-                        </p>
-                    </div>
-                </div>
-            </div>
+            {% include "apply/includes/geiq/geiq_diagnosis_allowance_alert.html" with diagnosis=diagnosis request=request only %}
         {% endif %}
     {% elif request.user.is_employer %}
         {# Existing GEIQ, diagnosis but no allowance #}
@@ -85,7 +66,7 @@
         {% if request.user.is_employer %}
             <div class="col-12 col-md-auto">
                 {% with back_and_next_url=request.get_full_path|urlencode %}
-                    <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}" class="btn btn-secondary">
+                    <a href="{% url 'apply:geiq_eligibility' job_application_id=job_application.pk %}?back_url={{ back_and_next_url }}&next_url={{ back_and_next_url }}" class="btn btn-outline-primary">
                         Vérifier
                     </a>
                 {% endwith %}
