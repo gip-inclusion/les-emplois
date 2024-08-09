@@ -249,5 +249,9 @@
         {% endif %}
 
         {% block script %}{% endblock %}
+
+        {% if active_campaign_announce %}
+            {% include "layout/_news_modal.html" %}
+        {% endif %}
     </body>
 </html>
