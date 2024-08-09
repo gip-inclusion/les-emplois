@@ -1,0 +1,40 @@
+{% load matomo %}
+
+<ul class="nav nav-tabs flex-column">
+    {% for menu_group_or_item in menu_items %}
+        {% if menu_group_or_item.items %}
+            <li class="nav-item">
+                <button class="nav-link has-collapse-caret w-100 text-start{% if menu_group_or_item.active %} active{% endif %}"
+                        type="button"
+                        data-bs-target="#collapse-nav-{{ menu_group_or_item.slug }}"
+                        data-bs-toggle="collapse"
+                        aria-expanded="{{ menu_group_or_item.active|yesno:"true,false" }}"
+                        aria-controls="collapse-nav-{{ menu_group_or_item.slug }}">
+                    <i class="{{ menu_group_or_item.icon }} font-weight-medium" aria-hidden="true"></i>
+                    <span>{{ menu_group_or_item.label }}</span>
+                </button>
+                <div class="collapse{% if menu_group_or_item.active %} show{% endif %}" id="collapse-nav-{{ menu_group_or_item.slug }}">
+                    <ul>
+                        {% for menu_item in menu_group_or_item.items %}
+                            <li>
+                                <a href="{{ menu_item.target }}"
+                                   {% if menu_item.active %}class="active"{% endif %}
+                                   {% if menu_item.matomo_event_category %}{% matomo_event menu_item.matomo_event_category menu_item.matomo_event_name menu_item.matomo_event_option %}{% endif %}>
+                                {{ menu_item.label }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </li>
+        {% else %}
+            <li class="nav-item">
+                <a href="{{ menu_group_or_item.target }}"
+                   class="nav-link{% if menu_group_or_item.active %} active{% endif %}"
+                   {% if menu_group_or_item.matomo_event_category %}{% matomo_event menu_group_or_item.matomo_event_category menu_group_or_item.matomo_event_name menu_group_or_item.matomo_event_option %}{% endif %}>
+                    <i class="{{ menu_group_or_item.icon }} font-weight-medium" aria-hidden="true"></i>
+                    <span>{{ menu_group_or_item.label }}</span>
+                </a>
+            </li>
+        {% endif %}
+    {% endfor %}
+</ul>

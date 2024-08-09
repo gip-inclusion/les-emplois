@@ -1,0 +1,29 @@
+{% load redirection_fields %}
+
+{% redirection_url value=redirect_field_value as next_url %}
+<ul class="list-unstyled">
+    <li>
+        <a class="dropdown-item dropdown-item__summary" href="{% url 'login:job_seeker' %}{{ next_url }}">
+            <i class="ri-user-line" aria-hidden="true"></i>
+            <strong>Candidat</strong>
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item dropdown-item__summary" href="{% url 'login:prescriber' %}{{ next_url }}">
+            <i class="ri-home-smile-2-line" aria-hidden="true"></i>
+            <strong>Prescripteur</strong>
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item dropdown-item__summary" href="{% url 'login:employer' %}{{ next_url }}">
+            <i class="ri-community-line" aria-hidden="true"></i>
+            <strong>Employeur inclusif</strong>
+        </a>
+    </li>
+    <li>
+        <a class="dropdown-item dropdown-item__summary" href="{% url 'login:labor_inspector' %}{{ next_url }}">
+            <i class="ri-government-line" aria-hidden="true"></i>
+            <strong>Institution partenaire</strong>
+        </a>
+    </li>
+</ul>

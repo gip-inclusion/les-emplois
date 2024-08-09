@@ -10,11 +10,6 @@
                 <div class="s-footer-quick__col col-12 col-md-6 col-lg-auto">
                     <strong>Accès rapides</strong>
                     <ul>
-                        {% if user.is_authenticated %}
-                            <li>
-                                <a href="{% url 'dashboard:index' %}">Tableau de bord</a>
-                            </li>
-                        {% endif %}
                         <li>
                             <a href="{% url 'search:employers_home' %}">Rechercher un emploi inclusif</a>
                         </li>

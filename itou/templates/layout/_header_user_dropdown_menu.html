@@ -1,0 +1,50 @@
+<ul class="list-unstyled">
+    <li class="dropdown-item">
+        <div class="d-flex align-items-center">
+            <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+            <div class="flex-grow-1 ms-2 lh-sm{% if mobile %} w-75{% endif %}">
+                {% if user.get_full_name %}
+                    <span>{{ user.get_full_name }}</span>
+                    <br>
+                {% endif %}
+                <span class="fs-sm lh-sm text-muted{% if mobile %} has-ellipsis d-inline-block w-100{% endif %}">{{ user.email }}</span>
+            </div>
+        </div>
+    </li>
+    <li>
+        <div class="dropdown-divider"></div>
+    </li>
+    <li>
+        <a class="dropdown-item" href="{% url 'dashboard:index' %}">Tableau de bord</a>
+    </li>
+    {% if not user.is_staff and not user.is_labor_inspector %}
+        <li>
+            <a class="dropdown-item" href="{% url 'dashboard:edit_user_notifications' %}">Mes notifications</a>
+        </li>
+    {% endif %}
+    <li class="dropdown-divider"></li>
+    <li>
+        <a class="dropdown-item" href="{% url 'dashboard:edit_user_info' %}">Modifier mon profil</a>
+    </li>
+    {% if not user.has_sso_provider %}
+        <li>
+            <a class="dropdown-item" href="{% url 'account_change_password' %}">Modifier mon mot de passe</a>
+        </li>
+        <li>
+            <a class="dropdown-item" href="{% url 'dashboard:edit_user_email' %}">Modifier mon adresse e-mail</a>
+        </li>
+    {% endif %}
+    <li class="dropdown-divider"></li>
+    {% if user.is_employer and request.is_current_organization_admin %}
+        <li>
+            <a class="dropdown-item text-primary" href="{% url 'dashboard:api_token' %}">Accès aux APIs</a>
+        </li>
+        <li class="dropdown-divider"></li>
+    {% endif %}
+    <li class="dropdown-item">
+        <form method="post" action="{% url 'account_logout' %}">
+            {% csrf_token %}
+            <button class="text-danger">Déconnexion</button>
+        </form>
+    </li>
+</ul>
