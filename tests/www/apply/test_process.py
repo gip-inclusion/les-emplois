@@ -1682,10 +1682,16 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             "job_seeker": self.job_seeker,
             "to_company": self.company,
             "hiring_end_at": None,
-            "eligibility_diagnosis__with_certifiable_criteria": True,
         } | kwargs
         if "with_geiq_eligibility_diagnosis" not in kwargs:
             kwargs.setdefault("with_iae_eligibility_diagnosis", True)
+        if kwargs.get("with_certifiable_criteria"):
+            del kwargs["with_certifiable_criteria"]
+            kwargs = {
+                "eligibility_diagnosis__with_certifiable_criteria": True,
+                "eligibility_diagnosis__author_siae": self.company,
+                "eligibility_diagnosis__author_kind": AuthorKind.EMPLOYER,
+            } | kwargs
         return JobApplicationSentByJobSeekerFactory(**kwargs)
 
     def _accept_view_post_data(self, job_application, post_data=None):
@@ -2424,7 +2430,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         ######### birth place and birth country are required.
         birthdate = datetime.date(1995, 12, 27)
         job_application = self.create_job_application(
-            eligibility_diagnosis__with_certifiable_criteria=True,
+            with_certifiable_criteria=True,
             job_seeker__birthdate=birthdate,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
@@ -2525,7 +2531,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
     def test_accept_no_siae__criteria_can_be_certified(self):
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True, with_jobs=True)
         job_application = self.create_job_application(
-            eligibility_diagnosis__with_certifiable_criteria=True,
+            with_certifiable_criteria=True,
             selected_jobs=company.jobs.all(),
             to_company=company,
         )
@@ -2553,7 +2559,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         # No criteria to be certified: the form should not appear
         # and it should not be valided.
         ##############################
-        job_application = self.create_job_application(eligibility_diagnosis__with_not_certifiable_criteria=True)
+        job_application = self.create_job_application()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         employer = job_application.to_company.members.first()
@@ -2571,7 +2577,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
     def test_accept_updated_birthdate_invalidating_birth_place(self):
         # tests for a rare case where the birthdate will be cleaned for sharing between forms during the accept process
-        job_application = self.create_job_application()
+        job_application = self.create_job_application(with_certifiable_criteria=True)
 
         # required assumptions for the test case
         assert self.company.is_subject_to_eligibility_rules
