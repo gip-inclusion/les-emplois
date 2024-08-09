@@ -3,6 +3,7 @@ import datetime
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
+from unittest_parametrize import ParametrizedTestCase, param, parametrize
 
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
@@ -240,7 +241,7 @@ class TestEligibilityDiagnosisManager:
         assert last_expired == expired_diagnosis_last
 
 
-class TestEligibilityDiagnosisModel:
+class TestEligibilityDiagnosisModel(ParametrizedTestCase):
     def test_create_diagnosis(self):
         job_seeker = JobSeekerFactory()
         company = CompanyFactory(with_membership=True)
@@ -378,12 +379,28 @@ class TestEligibilityDiagnosisModel:
         ApprovalFactory(user=diagnosis.job_seeker)
         assert diagnosis.is_considered_valid
 
-    def test_criteria_certification_available(self):
-        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, with_certifiable_criteria=True)
-        assert diagnosis.criteria_certification_available()
-
-        diagnosis = IAEEligibilityDiagnosisFactory(from_prescriber=True, with_not_certifiable_criteria=True)
-        assert not diagnosis.criteria_certification_available()
+    @parametrize(
+        "factory_params,expected",
+        [
+            param(
+                {"from_prescriber": True, "with_certifiable_criteria": True}, False, id="prescriber_certified_criteria"
+            ),
+            param(
+                {"from_prescriber": True, "with_not_certifiable_criteria": True},
+                False,
+                id="prescriber_no_certified_criteria",
+            ),
+            param(
+                {"from_employer": True, "with_not_certifiable_criteria": True},
+                False,
+                id="employer_no_certified_criteria",
+            ),
+            param({"from_employer": True, "with_certifiable_criteria": True}, True, id="employer_certified_criteria"),
+        ],
+    )
+    def test_criteria_certification_available(self, factory_params, expected):
+        diagnosis = IAEEligibilityDiagnosisFactory(**factory_params)
+        assert diagnosis.criteria_certification_available() == expected
 
 
 class TestAdministrativeCriteriaModel:
