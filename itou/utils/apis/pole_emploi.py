@@ -55,6 +55,8 @@ AUTHORIZED_SCOPES = [
     "o2dsoffre",
     "passIAE",
     "rechercherIndividuCertifie",
+    "api_referentielagencesv1",
+    "organisationpe",
 ]
 API_MAJ_PASS_SUCCESS = "S000"
 API_RECH_INDIVIDU_SUCCESS = "S001"
@@ -210,3 +212,9 @@ class PoleEmploiApiClient:
 
     def appellations(self):
         return self._request(f"{self.base_url}/rome/v1/appellation?champs=code,libelle,metier(code)", method="GET")
+
+    def agences(self, safir=None):
+        agences = self._request(f"{self.base_url}/referentielagences/v1/agences", method="GET")
+        if safir:
+            return next((agence for agence in agences if agence["codeSafir"] == str(safir)), None)
+        return agences
