@@ -442,3 +442,27 @@ def test_administrativecriteria_level_annex_consistency():
                 level=AdministrativeCriteriaLevel.LEVEL_2,
                 annex=AdministrativeCriteriaAnnex.NO_ANNEX,
             )
+
+
+@pytest.mark.parametrize(
+    "factory_params,expected",
+    [
+        pytest.param(
+            {"from_prescriber": True, "with_certifiable_criteria": True}, False, id="prescriber_certified_criteria"
+        ),
+        pytest.param(
+            {"from_prescriber": True, "with_not_certifiable_criteria": True},
+            False,
+            id="prescriber_no_certified_criteria",
+        ),
+        pytest.param(
+            {"from_geiq": True, "with_not_certifiable_criteria": True},
+            False,
+            id="employer_no_certified_criteria",
+        ),
+        pytest.param({"from_geiq": True, "with_certifiable_criteria": True}, True, id="employer_certified_criteria"),
+    ],
+)
+def test_criteria_can_be_certified(factory_params, expected):
+    diagnosis = GEIQEligibilityDiagnosisFactory(**factory_params)
+    assert diagnosis.criteria_can_be_certified() == expected
