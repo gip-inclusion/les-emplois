@@ -208,7 +208,7 @@ class CommonApprovalQuerySet(models.QuerySet):
     @property
     def valid_lookup(self):
         now = timezone.now().date()
-        return Q(start_at__lte=now, end_at__gte=now) | Q(start_at__gte=now)
+        return Q(end_at__gte=now)
 
     def valid(self):
         return self.filter(self.valid_lookup)
