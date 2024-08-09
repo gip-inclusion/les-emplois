@@ -71,7 +71,10 @@ class AbstractEligibilityDiagnosisModel(models.Model):
         return bool(self.expires_at and self.expires_at > timezone.now())
 
     def criteria_can_be_certified(self):
-        return self.author_kind != AuthorKind.PRESCRIBER and self.administrative_criteria.certifiable().exists()
+        return (
+            self.author_kind in (AuthorKind.GEIQ, AuthorKind.EMPLOYER)
+            and self.administrative_criteria.certifiable().exists()
+        )
 
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):
