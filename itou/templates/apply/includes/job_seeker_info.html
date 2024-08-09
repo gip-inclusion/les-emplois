@@ -2,15 +2,69 @@
 {% load str_filters %}
 {% load matomo %}
 
+<div class="row mb-3">
+    <div class="col-12 col-sm">
+        <h3 class="mb-0">Informations personnelles</h3>
+    </div>
+    <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+        <a href="{% if can_edit_personal_information %}{% url 'dashboard:edit_job_seeker_info' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}{% if job_application %}&from_application={{ job_application.pk }}{% endif %}{% endif %}"
+           class="btn btn-ico btn-outline-primary{% if not can_edit_personal_information %} disabled{% endif %}"
+           {% if with_matomo_event %}{% matomo_event "salaries" "clic" "edit_jobseeker_infos" %}{% endif %}
+           aria-label="Modifier les informations personnelles de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}">
+            <i class="ri-pencil-line font-weight-medium" aria-hidden="true"></i>
+            <span>Modifier</span>
+        </a>
+        {% if not can_edit_personal_information %}
+            <i class="ri-information-line ri-xl text-info ms-1"
+               data-bs-toggle="tooltip"
+               data-bs-placement="top"
+               title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
+        {% endif %}
+    </div>
+</div>
+
+
 <ul class="list-data list-data__two-column-md mb-3">
     <li>
         <small>Prénom</small>
         <strong>{{ job_seeker.first_name|mask_unless:can_view_personal_information }}</strong>
     </li>
+    {% if can_view_personal_information %}
+        <li>
+            <small>Téléphone</small>
+            {% if job_seeker.phone %}
+                <strong>{{ job_seeker.phone|format_phone }}</strong>
+                {% matomo_event "candidature" "clic" "copied_sender_phone" as matomo_event_attrs %}
+                {% include 'includes/copy_to_clipboard.html' with content=job_seeker.phone|cut:" " css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
+            {% else %}
+                <i class="text-disabled">Non renseigné</i>
+            {% endif %}
+        </li>
+    {% endif %}
     <li>
         <small>Nom</small>
         <strong>{{ job_seeker.last_name|upper|mask_unless:can_view_personal_information }}</strong>
     </li>
+    {% if can_view_personal_information %}
+        <li>
+            <small>Adresse e-mail</small>
+            <strong>{{ job_seeker.email }}</strong>
+            {% matomo_event "candidature" "clic" "copied_jobseeker_email" as matomo_event_attrs %}
+            {% include 'includes/copy_to_clipboard.html' with content=job_seeker.email css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
+        </li>
+        <li>
+            <small>Date de naissance</small>
+            <strong>{{ job_seeker.birthdate|date:"d/m/Y" }}</strong>
+        </li>
+        <li>
+            <small>Adresse</small>
+            {% if job_seeker.address_on_one_line %}
+                <address>{{ job_seeker.address_on_one_line }}</address>
+            {% else %}
+                <i class="text-disabled">Non renseignée</i>
+            {% endif %}
+        </li>
+    {% endif %}
     <li>
         <small>Numéro de sécurité sociale</small>
         {% if job_seeker.jobseeker_profile.nir %}
@@ -25,34 +79,6 @@
     </li>
     {% if can_view_personal_information %}
         <li>
-            <small>Date de naissance</small>
-            <strong>{{ job_seeker.birthdate|date:"d/m/Y" }}</strong>
-        </li>
-        <li>
-            <small>Adresse e-mail</small>
-            <strong>{{ job_seeker.email }}</strong>
-            {% matomo_event "candidature" "clic" "copied_jobseeker_email" as matomo_event_attrs %}
-            {% include 'includes/copy_to_clipboard.html' with content=job_seeker.email css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
-        </li>
-        <li>
-            <small>Téléphone</small>
-            {% if job_seeker.phone %}
-                <strong>{{ job_seeker.phone|format_phone }}</strong>
-                {% matomo_event "candidature" "clic" "copied_sender_phone" as matomo_event_attrs %}
-                {% include 'includes/copy_to_clipboard.html' with content=job_seeker.phone|cut:" " css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
-            {% else %}
-                <i class="text-disabled">Non renseigné</i>
-            {% endif %}
-        </li>
-        <li>
-            <small>Adresse</small>
-            {% if job_seeker.address_on_one_line %}
-                <address>{{ job_seeker.address_on_one_line }}</address>
-            {% else %}
-                <i class="text-disabled">Non renseignée</i>
-            {% endif %}
-        </li>
-        <li>
             <small>Identifiant France Travail</small>
             {% if job_seeker.jobseeker_profile.pole_emploi_id %}
                 <strong>{{ job_seeker.jobseeker_profile.pole_emploi_id }}</strong>
@@ -61,39 +87,25 @@
                 <i class="text-disabled">Non renseigné</i>
             {% endif %}
         </li>
-        <li>
-            <small>Curriculum vitae</small>
-            {% if job_application.resume_link %}
-                <a href="{{ job_application.resume_link }}" class="btn-link btn-ico" target="_blank" rel="noreferrer noopener">
-                    <span>Télécharger le CV</span>
-                    <i class="ri-download-2-line"></i>
-                </a>
-            {% else %}
-                {% if job_application.diagoriente_invite_sent_at %}
-                    <i class="text-disabled">Non renseigné</i>
-                    <small>Vous avez invité l'émetteur de cette candidature à créer un CV sur Diagoriente le {{ job_application.diagoriente_invite_sent_at|date:"d/m/Y" }}</small>
+        {% if job_application %}
+            <li>
+                <small>Curriculum vitae</small>
+                {% if job_application.resume_link %}
+                    <a href="{{ job_application.resume_link }}" class="btn-link btn-ico" target="_blank" rel="noreferrer noopener">
+                        <span>Télécharger le CV</span>
+                        <i class="ri-download-2-line"></i>
+                    </a>
                 {% else %}
                     <i class="text-disabled">Non renseigné</i>
-                {% endif %}
+                    {% if job_application.diagoriente_invite_sent_at %}
+                        <small>Vous avez invité l'émetteur de cette candidature à créer un CV sur Diagoriente le {{ job_application.diagoriente_invite_sent_at|date:"d/m/Y" }}</small>
+                    {% endif %}
+                </li>
             {% endif %}
-        </li>
+        {% endif %}
     {% endif %}
 </ul>
 {# Diagoriente invite #}
 {% if request.user.is_employer and job_application and not job_application.resume_link and job_application.sender_kind == SenderKind.PRESCRIBER %}
     {% include "apply/includes/job_application_diagoriente_invite.html" with job_application=job_application %}
-{% endif %}
-
-<a href="{% if can_edit_personal_information %}{% url 'dashboard:edit_job_seeker_info' job_seeker_public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}{% if job_application %}&from_application={{ job_application.pk }}{% endif %}{% endif %}"
-   class="btn btn-ico btn-secondary{% if not can_edit_personal_information %} disabled{% endif %}"
-   {% if with_matomo_event %}{% matomo_event "salaries" "clic" "edit_jobseeker_infos" %}{% endif %}
-   aria-label="Modifier les informations personnelles de {{ job_seeker.get_full_name|mask_unless:can_view_personal_information }}">
-    <i class="ri-pencil-line font-weight-medium" aria-hidden="true"></i>
-    <span>Modifier les informations personnelles</span>
-</a>
-{% if not can_edit_personal_information %}
-    <i class="ri-information-line ri-xl text-info ms-1"
-       data-bs-toggle="tooltip"
-       data-bs-placement="top"
-       title="Ce candidat a pris le contrôle de son compte utilisateur. Vous ne pouvez pas modifier ses informations."></i>
 {% endif %}

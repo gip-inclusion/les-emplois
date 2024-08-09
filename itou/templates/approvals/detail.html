@@ -18,7 +18,6 @@
                     <div class="c-box mb-3 mb-lg-5">
                         <h2>Informations du salarié</h2>
                         <hr>
-                        <h3>Informations personnelles</h3>
                         {% include "apply/includes/job_seeker_info.html" with job_seeker=approval.user job_application=job_application with_matomo_event=True can_view_personal_information=can_view_personal_information can_edit_personal_information=can_edit_personal_information request=request csrf_token=csrf_token SenderKind=SenderKind only %}
                         {# Eligibility ------------------------------------------------------------------------- #}
                         {% if eligibility_diagnosis %}
