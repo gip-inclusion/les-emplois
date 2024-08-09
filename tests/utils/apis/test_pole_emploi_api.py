@@ -179,3 +179,56 @@ class PoleEmploiAPIClientTest(TestCase):
             json=pole_emploi_api_mocks.API_APPELLATIONS,
         )
         assert self.api_client.appellations() == pole_emploi_api_mocks.API_APPELLATIONS
+
+    @respx.mock
+    def test_agences(self):
+        expected_agence = {
+            "code": "OCC0043",
+            "codeSafir": "82001",
+            "libelle": "MONTAUBAN ALBASUD",
+            "libelleEtendu": "Agence France Travail MONTAUBAN ALBASUD",
+            "type": "APE",
+            "typeAccueil": "3",
+            "codeRegionINSEE": "76",
+            "dispositifADEDA": True,
+            "contact": {"telephonePublic": "39-49", "email": "ape.82001@francetravail.fr"},
+            "adressePrincipale": {
+                "ligne3": "Zone d'activités Albasud",
+                "ligne4": "205 AV de l'Europe",
+                "ligne5": "",
+                "ligne6": "82000 MONTAUBAN",
+                "gpsLon": 1.33531,
+                "gpsLat": 43.996864,
+                "communeImplantation": "82121",
+                "bureauDistributeur": "82000",
+            },
+            "siret": "13000548121305",
+        }
+        other_agence = {
+            "code": "NAQ0146",
+            "codeSafir": "33041",
+            "libelle": "LIBOURNE",
+            "libelleEtendu": "Agence France Travail LIBOURNE",
+            "type": "APE",
+            "typeAccueil": "3",
+            "codeRegionINSEE": "75",
+            "dispositifADEDA": True,
+            "contact": {"telephonePublic": "39-49", "email": "ape.33041@francetravail.fr"},
+            "adressePrincipale": {
+                "ligne4": "33 CHEMIN DU CASSE",
+                "ligne5": "",
+                "ligne6": "33500 LIBOURNE",
+                "gpsLon": -0.22241,
+                "gpsLat": 44.918006,
+                "communeImplantation": "33243",
+                "bureauDistributeur": "33500",
+            },
+            "siret": "13000548122147",
+        }
+
+        respx.get("https://pe.fake/referentielagences/v1/agences").respond(
+            200,
+            json=[expected_agence, other_agence],
+        )
+        assert self.api_client.agences() == [expected_agence, other_agence]
+        assert self.api_client.agences(safir=82001) == expected_agence
