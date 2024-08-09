@@ -70,7 +70,7 @@ class AbstractEligibilityDiagnosisModel(models.Model):
     def is_valid(self):
         return bool(self.expires_at and self.expires_at > timezone.now())
 
-    def criteria_certification_available(self):
+    def criteria_can_be_certified(self):
         return self.author_kind != AuthorKind.PRESCRIBER and self.administrative_criteria.certifiable().exists()
 
 

@@ -66,7 +66,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
             job_seeker=job_seeker, for_geiq=siae
         ).first()
 
-    if valid_diagnosis and valid_diagnosis.criteria_certification_available():
+    if valid_diagnosis and valid_diagnosis.criteria_can_be_certified():
         form_certified_criteria = CertifiedCriteriaInfoRequiredForm(
             instance=job_seeker.jobseeker_profile, birthdate=birthdate, data=request.POST or None
         )
