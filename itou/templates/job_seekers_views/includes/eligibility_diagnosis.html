@@ -1,0 +1,56 @@
+
+<div class="c-box mb-3 mb-lg-5">
+    <div class="d-flex justify-content-between">
+        <div class="mb-3">
+            {% if kind == "IAE" %}
+                <h3 class="mb-0">Diagnostic IAE</h3>
+            {% else %}
+                <h3 class="mb-0">Diagnostic public prioritaire GEIQ</h3>
+            {% endif %}
+            <span class="text-success">Valide du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</span>
+        </div>
+        <div>
+            <span class="badge badge-base rounded-pill bg-success-lighter text-success">
+                <i class="ri-check-line" aria-hidden="true"></i>
+                {% if kind == "IAE" %}
+                    Éligible à l’IAE
+                {% else %}
+                    Éligible public prioritaire GEIQ
+                {% endif %}
+            </span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <p>
+                <small>Confirmé par</small>
+                <br>
+                <strong>{{ eligibility_diagnosis.author.get_full_name }}
+                    {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
+                    {% if eligibility_diagnosis.author_prescriber_organization %}
+                        ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
+                    {% endif %}
+                </strong>
+            </p>
+            <p>
+                <small>Type</small>
+                <br>
+                <strong>{{ eligibility_diagnosis.get_author_kind_display }}</strong>
+            </p>
+        </div>
+        <div class="col-6">
+            <small>Critère administratifs selectionés</small>
+            <br>
+            {# Keep ordering from manager (level then ui_rank) #}
+            {% for criteria in eligibility_diagnosis.administrative_criteria.all %}
+                <strong>{{ criteria.name }}</strong>
+                <br>
+            {% endfor %}
+        </div>
+    </div>
+    {% if kind == "GEIQ" %}
+        {% if with_details %}
+            {% include "apply/includes/geiq/geiq_diagnosis_allowance_alert.html" with diagnosis=eligibility_diagnosis only %}
+        {% endif %}
+    {% endif %}
+</div>
