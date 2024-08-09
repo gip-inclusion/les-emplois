@@ -1,0 +1,57 @@
+<div class="c-box mb-3 mb-lg-5">
+    <div class="row mb-3">
+        <div class="col-12 col-sm">
+            {% if kind == "IAE" %}
+                <h3 class="mb-0">Diagnostic IAE</h3>
+            {% elif kind == "GEIQ" %}
+                <h3 class="mb-0">Diagnostic public prioritaire GEIQ</h3>
+            {% endif %}
+            <span class="text-success fs-sm">Valide du {{ eligibility_diagnosis.created_at|date:"d/m/Y" }} au {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</span>
+        </div>
+        <div class="col-12 col-sm-auto mt-2 mt-sm-0 d-flex align-items-center">
+            {% if kind == "IAE" %}
+                <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                    <i class="ri-check-line" aria-hidden="true"></i>Éligible à l’IAE
+                </span>
+            {% elif kind == "GEIQ" %}
+                {% if eligibility_diagnosis.allowance_amount %}
+                    <span class="badge badge-sm rounded-pill bg-success-lighter text-success">
+                        <i class="ri-check-line" aria-hidden="true"></i>Éligible public prioritaire GEIQ
+                    </span>
+                {% else %}
+                    <span class="badge badge-sm rounded-pill bg-accent-02-lighter text-primary">
+                        <i class="ri-check-line" aria-hidden="true"></i>Éligibilité GEIQ non confirmée
+                    </span>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    <ul class="list-data list-data__two-column-md mb-3">
+        <li>
+            <small>Confirmé par</small>
+            <strong>{{ eligibility_diagnosis.author.get_full_name }}
+                {% if eligibility_diagnosis.author_siae %}({{ eligibility_diagnosis.author_siae.display_name }}){% endif %}
+                {% if eligibility_diagnosis.author_prescriber_organization %}
+                    ({{ eligibility_diagnosis.author_prescriber_organization.display_name }})
+                {% endif %}
+            </strong>
+        </li>
+        <li>
+            <small>Critères administratifs sélectionnés</small>
+            {# Keep ordering from manager (level then ui_rank) #}
+            {% for criteria in eligibility_diagnosis.administrative_criteria.all %}
+                <strong>{{ criteria.name }}</strong>
+                <br>
+            {% empty %}
+                <i class="text-disabled">Non renseigné</i>
+            {% endfor %}
+        </li>
+        <li>
+            <small>Type</small>
+            <strong>{{ eligibility_diagnosis.get_author_kind_display }}</strong>
+        </li>
+    </ul>
+    {% if kind == "GEIQ" and with_allowance %}
+        {% include "apply/includes/geiq/geiq_diagnosis_allowance_alert.html" with diagnosis=eligibility_diagnosis request=request only %}
+    {% endif %}
+</div>

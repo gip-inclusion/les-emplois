@@ -6,6 +6,7 @@ from django.db import models
 from django.utils import timezone
 
 from itou.eligibility.enums import AdministrativeCriteriaLevel, AuthorKind
+from itou.job_applications.enums import SenderKind
 
 
 class CommonEligibilityDiagnosisQuerySet(models.QuerySet):
@@ -75,6 +76,14 @@ class AbstractEligibilityDiagnosisModel(models.Model):
             self.author_kind in (AuthorKind.GEIQ, AuthorKind.EMPLOYER)
             and self.administrative_criteria.certifiable().exists()
         )
+
+    def get_author_kind_display(self):
+        if self.sender_kind == SenderKind.PRESCRIBER and (
+            not self.sender_prescriber_organization or not self.sender_prescriber_organization.is_authorized
+        ):
+            return "Orienteur"
+        else:
+            return SenderKind(self.sender_kind).label
 
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):
