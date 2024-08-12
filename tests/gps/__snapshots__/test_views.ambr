@@ -30,7 +30,7 @@
                                           
                                           <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="jane.doe@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_email">
       <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
-      
+      <span class="visually-hidden">Copier</span>
   </button>
   
                                       </li>
@@ -41,7 +41,7 @@
                                               
                                               <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
       <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
-      
+      <span class="visually-hidden">Copier</span>
   </button>
   
                                           
@@ -120,7 +120,7 @@
                                   
                                   <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="pierre.dupont@test.local" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_member_email">
       <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
-      
+      <span class="visually-hidden">Copier</span>
   </button>
   
                               </li>
@@ -131,7 +131,7 @@
                                       
                                       <button class="btn-link" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="0612345678" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_member_phone">
       <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
-      
+      <span class="visually-hidden">Copier</span>
   </button>
   
                                   
