@@ -122,23 +122,26 @@ class TestApprovalDetailView:
             + 1  # fetch authenticated user
             + 2  # fetch siae membership and siae infos (middleware)
             + 1  # place savepoint right after the middlewares
-            + 1  # job_seeker.approval
-            + 1  # job_application.with_accepted_at annotation coming from next query
-            + 1  # approval.suspension active today
-            + 1  # Suspension.can_be_handled_by_siae >> get_user_last_accepted_siae_job_application()
+            + 1  # get approval infos (get_object)
+            + 1  # prefetch suspensions
+            + 1  # prefetch prolongation_requests (with select_related)
+            + 1  # select job application (get_job_application)
+            + 1  # select last accepted job application (can_be_handled_by_siae)
             + 1  # select latest approval for user (can_be_prolonged)
             + 1  # approval.get_remainder_display fetches approval suspensions to compute remaining days.
             + 1  # release savepoint before the template rendering
+            # template: approvals/includes/status.html
             + 1  # template: approval.suspensions_for_status_card lists approval suspensions
             + 1  # template: approval prolongations list.
             + 1  # template: approval.prolongation_requests_for_status_card lists not accepted prolongation requests
+            # template: approvals/detail.html
             + 1  # get job_application details (view queryset)
             + 1  # get prefetch job_application selected_jobs
             + 1  # get sender information (prescriber organization details)
+            # Django middlewares.
             + 1  # Create savepoint (atomic request to update the Django session)
             + 1  # Update the Django session
             + 1  # Release savepoint
-            + 1  # Prefetch prolongationrequest_set and the associated FKs
         )
 
         # Employer version
@@ -197,36 +200,34 @@ class TestApprovalDetailView:
         expected_num_queries = (
             1  # fetch django session
             + 1  # fetch authenticated user
-            + 1  # fetch siae membership and siae infos (middleware)
+            + 2  # fetch siae membership and siae infos (middleware)
             + 1  # place savepoint right after the middlewares
             + 1  # get approval infos (get_object)
-            # get_context_data
-            + 1  # for every *active* suspension, check if there is an accepted job application after it
-            + 1  # approval.suspension_set.end_at >= today >= approval.suspension_set.start_at (.can_be_suspended)
-            + 1  # last_hire_was_made_by_siae() >> get_user_last_accepted_siae_job_application()
-            + 1  # user approvals (.is_last_for_user)
-            + 1  # siae infos (job_application.get_eligibility_diagnosis())
-            + 1  # approval.suspensions_for_status_card lists approval suspensions
-            + 1  # EXISTS accepted job application starting after today
+            + 1  # prefetch suspensions
+            + 1  # prefetch prolongation_requests (with select_related)
+            + 1  # select job application (get_job_application)
+            + 1  # select latest approval for user (can_be_prolonged)
+            + 1  # select company from job application (missing to_company in get_job_application select_related)
+            + 1  # select suspensions (suspensions_by_start_date_asc)
+            + 1  # select EXISTS accepted job application starting after today
             + 1  # release savepoint before the template rendering
-            # context processors
-            + 1  # siae membership (get_context_siae)
             # template: approvals/includes/status.html
-            + 1  # template: approval.get_remainder_display fetches approval suspensions to compute remaining days
-            + 1  # template: approval.prolongations_for_status_card
-            + 1  # template: approval.prolongation_requests_for_status_card lists not accepted prolongation requests
+            + 1  # approval.suspensions_for_status_card lists approval suspensions
+            + 1  # suspension in progress can_be_handled_by_siae: select last accepted job application
+            + 1  # approval.prolongations_for_status_card
+            + 1  # approval.prolongation_requests_for_status_card lists not accepted prolongation requests
             # template: eligibility_diagnosis.html
-            + 1  # prescribers_prescriberorganization (job_application.is_sent_by_authorized_prescriber)
+            + 1  # select job_seeker (job_application.job_seeker, should use approval.user)
             + 1  # get user infos (eligibility_diagnosis.author.get_full_name)
             + 1  # eligibility_diagnosis.administrative_criteria.all
-            + 3  # approval: eligibility_diagnosis.considered_to_expire_at/has_valid_common_approval
-            # template: approvals/detail.html
-            + 2  # all_job_applications with prefetch selected_jobs
+            + 1  # select approvals for user (eligibility_diagnosis.considered_to_expire_at)
+            + 1  # select exists valid approvals for user (eligibility_diagnosis.considered_to_expire_at)
+            + 1  # select valid approvals for user (eligibility_diagnosis.considered_to_expire_at)
             # template: approvals/includes/job_description_list.html
-            + 1  # prescriberorganization: job_application.sender_prescriber_organization
-            + 1  # Prefetch prolongationrequest_set and the associated FKs
+            + 1  # select all_job_applications
+            + 1  # select selected_jobs (prefetch_related from all_job_applications)
+            + 1  # select prescriber_prescriberorganization (prefetch_related from all_job_applications)
         )
-
         with assertNumQueries(expected_num_queries):
             response = client.get(url)
 
