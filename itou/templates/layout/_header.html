@@ -2,6 +2,19 @@
 {% load theme_inclusion %}
 
 <header role="banner" id="header">
+    <section class="s-header-print">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-auto d-flex align-items-center py-2">
+                    <img src="{% static_theme_images 'logo-republique-francaise.svg' %}" height="60" alt="Rébublique Française">
+                </div>
+                <div class="col d-flex align-items-center">
+                    <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" height="50" alt="Les emplois de l'inclusion">
+                </div>
+                <div class="col-auto d-flex align-items-center">imprimé le xx/xx/xxxx</div>
+            </div>
+        </div>
+    </section>
     <section class="s-header">
         <div class="s-header__container container">
             <div class="s-header__row row">

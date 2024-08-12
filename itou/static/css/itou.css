@@ -466,3 +466,65 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
 .w-lg-400px .select2-selection__rendered {
     white-space: nowrap !important;
 }
+
+
+/* Global print rules */
+.s-header-print {
+    display: none;
+}
+
+@media print {
+    body {
+        color: #000 !important;
+        background: #fff !important;
+        width: 100%;
+        filter: grayscale(1);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        page-break-after:avoid;
+        page-break-inside:avoid
+    }
+
+    blockquote,
+    table,
+    pre {
+        page-break-inside:avoid
+    }
+
+    ul,
+    ol,
+    dl {
+        page-break-before:avoid
+    }
+
+    header > *:not(.s-header-print),
+    footer,
+    .c-prevstep,
+    .global-messages-container,
+    .s-tabs-01__nav,
+    .tns-outer
+    .c-box,
+    .btn,
+    button {
+        display: none !important;
+    }
+
+    .s-header-print,
+    .tab-pane {
+        display: block !important;
+    }
+
+    .fade {
+        opacity: 1 !important;
+    }
+
+    main {
+        padding-top: 0 !important;
+    }
+}
