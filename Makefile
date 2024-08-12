@@ -32,7 +32,7 @@ venv: $(VIRTUAL_ENV)
 buckets: $(VENV_REQUIREMENT)
 	python manage.py configure_bucket
 
-PIP_COMPILE_FLAGS := --generate-hashes $(PIP_COMPILE_OPTIONS)
+PIP_COMPILE_FLAGS := --no-strip-extras --generate-hashes $(PIP_COMPILE_OPTIONS)
 compile-deps: $(VENV_REQUIREMENT)
 	uv pip compile $(PIP_COMPILE_FLAGS) -o requirements/base.txt requirements/base.in
 	uv pip compile $(PIP_COMPILE_FLAGS) -o requirements/test.txt requirements/test.in
