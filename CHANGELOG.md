@@ -13,10 +13,9 @@
 - [Candidature : Bon à savoir vide dans le parcours de dépôt de candidature EA](https://github.com/gip-inclusion/les-emplois/pull/4496) 🖼
 - [Candidature : certification des critères sélectionnés pour les diags d'origine employeur ou GEIQ uniquement](https://github.com/gip-inclusion/les-emplois/pull/4538)
 - [Candidature: correction d'une erreur d'acceptation dans de rares conditions](https://github.com/gip-inclusion/les-emplois/pull/4522)
-- [Connexion: modifier les règles de connexion pour les agents FranceTravail](https://github.com/gip-inclusion/les-emplois/pull/4536) 🖼
-- [GPS: nettoyage](https://github.com/gip-inclusion/les-emplois/pull/4513)
-- [openid_connect: Add FT users to their new workplace at every connection](https://github.com/gip-inclusion/les-emplois/pull/4502)
-- [UX/UI : Privilégier l’ouverture d’onglet [ GEN-1872 ]](https://github.com/gip-inclusion/les-emplois/pull/4450)
+- [Connexion: modifier les règles de connexion pour les agents France Travail](https://github.com/gip-inclusion/les-emplois/pull/4536) 🖼
+- [openid_connect: Rattacher les utilisateurs France Travail à leur agence à la connexion au site](https://github.com/gip-inclusion/les-emplois/pull/4502)
+- [UX/UI : Privilégier l’ouverture d’onglets pour les pages employeurs et de fiches de poste](https://github.com/gip-inclusion/les-emplois/pull/4450)
 - [UX/UI: Correction de l'affichage responsif des filtres départements et arrondissements](https://github.com/gip-inclusion/les-emplois/pull/4528) 🖼
 
 ### Supprimé
