@@ -16,16 +16,8 @@
             <strong>Non communiquée</strong>
         {% else %}
             <strong>{{ job_application.sender.email }}</strong>
-            <button class="btn-link"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    data-bs-trigger="manual"
-                    data-bs-title="Copié!"
-                    data-it-clipboard-button="copy"
-                    data-it-copy-to-clipboard="{{ job_application.sender.email }}"
-                    {% matomo_event "candidature" "clic" "copied_sender_email" %}>
-                <i class="ri-file-copy-line"></i>
-            </button>
+            {% matomo_event "candidature" "clic" "copied_sender_email" as matomo_event_attrs %}
+            {% include 'includes/copy_to_clipboard.html' with content=job_application.sender.email css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
         {% endif %}
     </li>
 
@@ -50,16 +42,8 @@
         <li>
             <small>Téléphone</small>
             <strong>{{ job_application.sender.phone|format_phone }}</strong>
-            <button class="btn-link"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    data-bs-trigger="manual"
-                    data-bs-title="Copié!"
-                    data-it-clipboard-button="copy"
-                    data-it-copy-to-clipboard="{{ job_application.sender.phone|cut:" " }}"
-                    {% matomo_event "candidature" "clic" "copied_sender_phone" %}>
-                <i class="ri-file-copy-line"></i>
-            </button>
+            {% matomo_event "candidature" "clic" "copied_sender_phone" as matomo_event_attrs %}
+            {% include 'includes/copy_to_clipboard.html' with content=job_application.sender.phone|cut:" " css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
         </li>
     {% endif %}
 </ul>
