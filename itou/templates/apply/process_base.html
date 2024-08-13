@@ -13,7 +13,12 @@
 {% block title_content %}
     <div class="d-md-flex align-items-center">
         <h1 class="mb-1 mb-md-0 me-3">
-            Candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+            Candidature de
+            {% if with_job_seeker_detail_url|default:False %}
+                <a href="{% url "job_seekers_views:details" public_id=job_application.job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link">{{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}</a>
+            {% else %}
+                {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+            {% endif %}
         </h1>
         {% state_badge job_application extra_class="badge-base" %}
     </div>

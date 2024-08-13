@@ -7,6 +7,7 @@ from pytest_django.asserts import assertInHTML
 from itou.job_applications.enums import Origin
 from itou.jobs.models import Appellation
 from itou.utils.context_processors import expose_enums
+from itou.www.apply.views.list_views import JobApplicationsListKind
 from tests.job_applications.factories import JobApplicationSentByCompanyFactory, JobApplicationSentByJobSeekerFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import EmployerFactory, JobSeekerWithAddressFactory
@@ -36,6 +37,8 @@ def test_job_application_multiple_jobs():
         Context(
             {
                 "job_application": job_application,
+                "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
+                "JobApplicationsListKind": JobApplicationsListKind,
                 "request": get_request(),
                 **expose_enums(),
             }
@@ -66,6 +69,8 @@ def test_job_application_auto_prescription_badge_in_list():
         Context(
             {
                 "job_application": job_application,
+                "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
+                "JobApplicationsListKind": JobApplicationsListKind,
                 "request": get_request(),
                 **expose_enums(),
             }
@@ -83,6 +88,8 @@ def test_job_application_imported_from_pe_in_list():
         Context(
             {
                 "job_application": job_application,
+                "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
+                "JobApplicationsListKind": JobApplicationsListKind,
                 "request": get_request(),
                 **expose_enums(),
             }
@@ -100,6 +107,8 @@ def test_job_application_job_seeker_in_list():
         Context(
             {
                 "job_application": job_application,
+                "job_applications_list_kind": JobApplicationsListKind.RECEIVED,
+                "JobApplicationsListKind": JobApplicationsListKind,
                 "request": get_request(),
                 **expose_enums(),
             }
