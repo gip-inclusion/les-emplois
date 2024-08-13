@@ -15,26 +15,10 @@
         <small>Numéro de sécurité sociale</small>
         {% if job_seeker.jobseeker_profile.nir %}
             <strong>{{ job_seeker.jobseeker_profile.nir|format_nir }}</strong>
-            <button class="btn-link"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    data-bs-trigger="manual"
-                    data-bs-title="Copié!"
-                    data-it-clipboard-button="copy"
-                    data-it-copy-to-clipboard="{{ job_seeker.jobseeker_profile.nir }}">
-                <i class="ri-file-copy-line"></i>
-            </button>
+            {% include 'includes/copy_to_clipboard.html' with content=job_seeker.jobseeker_profile.nir css_classes="btn-link" only_icon=True %}
         {% elif job_seeker.jobseeker_profile.lack_of_nir_reason %}
             <strong>{{ job_seeker.jobseeker_profile.get_lack_of_nir_reason_display }}</strong>
-            <button class="btn-link"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    data-bs-trigger="manual"
-                    data-bs-title="Copié!"
-                    data-it-clipboard-button="copy"
-                    data-it-copy-to-clipboard="{{ job_seeker.jobseeker_profile.get_lack_of_nir_reason_display }}">
-                <i class="ri-file-copy-line"></i>
-            </button>
+            {% include 'includes/copy_to_clipboard.html' with content=job_seeker.jobseeker_profile.get_lack_of_nir_reason_display css_classes="btn-link" only_icon=True %}
         {% else %}
             <i class="text-disabled">Non renseigné</i>
         {% endif %}
@@ -47,31 +31,15 @@
         <li>
             <small>Adresse e-mail</small>
             <strong>{{ job_seeker.email }}</strong>
-            <button class="btn-link"
-                    data-bs-toggle="tooltip"
-                    data-bs-placement="top"
-                    data-bs-trigger="manual"
-                    data-bs-title="Copié!"
-                    data-it-clipboard-button="copy"
-                    data-it-copy-to-clipboard="{{ job_seeker.email }}"
-                    {% matomo_event "candidature" "clic" "copied_jobseeker_email" %}>
-                <i class="ri-file-copy-line"></i>
-            </button>
+            {% matomo_event "candidature" "clic" "copied_jobseeker_email" as matomo_event_attrs %}
+            {% include 'includes/copy_to_clipboard.html' with content=job_seeker.email css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
         </li>
         <li>
             <small>Téléphone</small>
             {% if job_seeker.phone %}
                 <strong>{{ job_seeker.phone|format_phone }}</strong>
-                <button class="btn-link"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        data-bs-trigger="manual"
-                        data-bs-title="Copié!"
-                        data-it-clipboard-button="copy"
-                        data-it-copy-to-clipboard="{{ job_seeker.phone|cut:" " }}"
-                        {% matomo_event "candidature" "clic" "copied_sender_phone" %}>
-                    <i class="ri-file-copy-line"></i>
-                </button>
+                {% matomo_event "candidature" "clic" "copied_sender_phone" as matomo_event_attrs %}
+                {% include 'includes/copy_to_clipboard.html' with content=job_seeker.phone|cut:" " css_classes="btn-link" matomo_event_attrs=matomo_event_attrs only_icon=True %}
             {% else %}
                 <i class="text-disabled">Non renseigné</i>
             {% endif %}
@@ -88,15 +56,7 @@
             <small>Identifiant France Travail (ex pôle emploi)</small>
             {% if job_seeker.jobseeker_profile.pole_emploi_id %}
                 <strong>{{ job_seeker.jobseeker_profile.pole_emploi_id }}</strong>
-                <button class="btn-link"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        data-bs-trigger="manual"
-                        data-bs-title="Copié!"
-                        data-it-clipboard-button="copy"
-                        data-it-copy-to-clipboard="{{ job_seeker.jobseeker_profile.pole_emploi_id }}">
-                    <i class="ri-file-copy-line"></i>
-                </button>
+                {% include 'includes/copy_to_clipboard.html' with content=job_seeker.jobseeker_profile.pole_emploi_id css_classes="btn-link" only_icon=True %}
             {% else %}
                 <i class="text-disabled">Non renseigné</i>
             {% endif %}

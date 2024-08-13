@@ -122,15 +122,7 @@
             <li>
                 <small>Numéro de PASS IAE</small>
                 <strong>{{ item.approval.number|format_approval_number }}</strong>
-                <button class="btn-link"
-                        data-bs-toggle="tooltip"
-                        data-bs-placement="top"
-                        data-bs-trigger="manual"
-                        data-bs-title="Copié!"
-                        data-it-clipboard-button="copy"
-                        data-it-copy-to-clipboard="{{ item.approval.number }}">
-                    <i class="ri-file-copy-line"></i>
-                </button>
+                {% include 'includes/copy_to_clipboard.html' with content=item.approval.number css_classes="btn-link" only_icon=True %}
             </li>
             <li>
                 <small>Date de début</small>
