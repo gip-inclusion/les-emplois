@@ -254,6 +254,10 @@ class ProcessListSiaeTest(TestCase):
             html=True,
             count=1,
         )
+        assertContains(response, job_app.job_seeker.get_full_name())
+        assertNotContains(
+            response, reverse("job_seekers_views:details", kwargs={"public_id": job_app.job_seeker.public_id})
+        )
 
     def test_list_for_siae_show_criteria(self):
         # Add a diagnosis present on 2 applications

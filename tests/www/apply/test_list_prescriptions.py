@@ -61,10 +61,15 @@ def test_get(client):
     # Count job applications used by the template
     assert len(response.context["job_applications_page"].object_list) == organization.jobapplication_set.count()
 
+    assertContains(response, job_application.job_seeker.get_full_name())
+    assertContains(
+        response, reverse("job_seekers_views:details", kwargs={"public_id": job_application.job_seeker.public_id})
+    )
+
 
 def test_as_unauthorized_prescriber(client):
     prescriber = PrescriberFactory()
-    JobApplicationFactory(
+    job_application = JobApplicationFactory(
         job_seeker_with_address=True,
         job_seeker__first_name="Supersecretname",
         job_seeker__last_name="Unknown",
@@ -74,6 +79,7 @@ def test_as_unauthorized_prescriber(client):
     )
     client.force_login(prescriber)
 
+    list_url = reverse("apply:list_prescriptions")
     with assertNumQueries(
         BASE_NUM_QUERIES
         + 1  # fetch django session
@@ -90,9 +96,12 @@ def test_as_unauthorized_prescriber(client):
         + 3  # get job seekers administrative criteria
         + 3  # update session
     ):
-        response = client.get(reverse("apply:list_prescriptions"))
+        response = client.get(list_url)
 
-    assertContains(response, "<h3>S… U…</h3>", html=True)
+    job_seeker_detail_url = reverse(
+        "job_seekers_views:details", kwargs={"public_id": job_application.job_seeker.public_id}
+    )
+    assertContains(response, f'<a href="{job_seeker_detail_url}?back_url={list_url}" class="btn-link">S… U…</a>')
     # Unfortunately, the job seeker's name is available in the filters
     # assertNotContains(response, "Supersecretname")
 
