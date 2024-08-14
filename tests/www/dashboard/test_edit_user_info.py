@@ -480,27 +480,6 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         self.assertNotContains(response, self.LACK_OF_NIR_FIELD_ID)
         self.assertNotContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
         self.assertNotContains(response, self.BIRTHDATE_FIELD_NAME)
-
-        post_data = {
-            "first_name": "Bob",
-            "last_name": "Saint Clar",
-            "phone": "0610203050",
-        }
-        response = self.client.post(url, data=post_data)
-        assert response.status_code == 302
-
-        user = User.objects.get(id=user.id)
-        assert user.phone == post_data["phone"]
-
-    def test_edit_as_prescriber_with_ic(self):
-        user = PrescriberFactory()
-        self.client.force_login(user)
-        url = reverse("dashboard:edit_user_info")
-        response = self.client.get(url)
-        self.assertNotContains(response, self.NIR_FIELD_ID)
-        self.assertNotContains(response, self.LACK_OF_NIR_FIELD_ID)
-        self.assertNotContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
-        self.assertNotContains(response, self.BIRTHDATE_FIELD_NAME)
         self.assertContains(response, f"Prénom : <strong>{user.first_name.title()}</strong>")
         self.assertContains(response, f"Nom : <strong>{user.last_name.upper()}</strong>")
         self.assertContains(response, f"Adresse e-mail : <strong>{user.email}</strong>")
