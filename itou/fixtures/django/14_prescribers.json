@@ -1684,7 +1684,7 @@
   },
   {
     "fields": {
-      "address_line_1": "23, rue Marc l'Escarbot",
+      "address_line_1": "23 rue Marc l'Escarbot",
       "address_line_2": "",
       "authorization_status": "VALIDATED",
       "authorization_updated_at": null,
@@ -10066,7 +10066,7 @@
   },
   {
     "fields": {
-      "address_line_1": "1025, avenue Henri Becquerel",
+      "address_line_1": "1025 avenue Henri Becquerel",
       "address_line_2": "",
       "authorization_status": "VALIDATED",
       "authorization_updated_at": null,
@@ -10594,7 +10594,7 @@
   },
   {
     "fields": {
-      "address_line_1": "2 bis, avenue des Pays-Bas",
+      "address_line_1": "2 bis avenue des Pays-Bas",
       "address_line_2": "",
       "authorization_status": "VALIDATED",
       "authorization_updated_at": null,
@@ -15478,7 +15478,7 @@
   },
   {
     "fields": {
-      "address_line_1": "2, rue Alice Coléno",
+      "address_line_1": "2 rue Alice Coléno",
       "address_line_2": "",
       "authorization_status": "VALIDATED",
       "authorization_updated_at": null,
@@ -18844,7 +18844,7 @@
   },
   {
     "fields": {
-      "address_line_1": "2 Bis, rue de la Symphorine",
+      "address_line_1": "2 Bis rue de la Symphorine",
       "address_line_2": "",
       "authorization_status": "VALIDATED",
       "authorization_updated_at": null,
@@ -22177,7 +22177,7 @@
   },
   {
     "fields": {
-      "address_line_1": "20, rue de corse",
+      "address_line_1": "20 rue de corse",
       "address_line_2": "",
       "authorization_status": "VALIDATED",
       "authorization_updated_at": null,
@@ -23629,7 +23629,7 @@
   },
   {
     "fields": {
-      "address_line_1": "91, rue de NEUFCHATEL",
+      "address_line_1": "91 rue de NEUFCHATEL",
       "address_line_2": "",
       "authorization_status": "VALIDATED",
       "authorization_updated_at": null,
@@ -24685,7 +24685,7 @@
   },
   {
     "fields": {
-      "address_line_1": "160, avenue Paul Raoult",
+      "address_line_1": "160 avenue Paul Raoult",
       "address_line_2": "",
       "authorization_status": "VALIDATED",
       "authorization_updated_at": null,
@@ -28084,7 +28084,7 @@
   },
   {
     "fields": {
-      "address_line_1": "3, avenue Eugène Vernholes",
+      "address_line_1": "3 avenue Eugène Vernholes",
       "address_line_2": "",
       "authorization_status": "VALIDATED",
       "authorization_updated_at": null,

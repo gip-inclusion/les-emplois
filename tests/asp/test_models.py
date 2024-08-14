@@ -24,7 +24,7 @@ def mock_api(mocker):
 class TestFormatASPBadAdresses:
     def test_not_existing_address(self):
         job_seeker = JobSeekerFactory(
-            address_line_1="9, avenue de Huet", post_code="32531", city="MalletVille", department="32"
+            address_line_1="9 avenue de Huet", post_code="32531", city="MalletVille", department="32"
         )
         result, error = compute_hexa_address(job_seeker)
         assert not result

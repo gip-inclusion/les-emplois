@@ -282,7 +282,7 @@
   {
     "fields": {
       "address_filled_at": null,
-      "address_line_1": "5, rue Nicolas Poussin",
+      "address_line_1": "5 rue Nicolas Poussin",
       "address_line_2": "",
       "ban_api_resolved_address": null,
       "birthdate": "1978-07-14",
@@ -642,7 +642,7 @@
   {
     "fields": {
       "address_filled_at": null,
-      "address_line_1": "19, rue du tuyau percé",
+      "address_line_1": "19 rue du tuyau percé",
       "address_line_2": "",
       "ban_api_resolved_address": null,
       "birthdate": "1970-01-01",
@@ -682,7 +682,7 @@
   {
     "fields": {
       "address_filled_at": null,
-      "address_line_1": "5, rue du Bassin",
+      "address_line_1": "5 rue du Bassin",
       "address_line_2": "",
       "ban_api_resolved_address": null,
       "birthdate": "1950-01-01",
@@ -722,7 +722,7 @@
   {
     "fields": {
       "address_filled_at": null,
-      "address_line_1": "5, rue du Bassin",
+      "address_line_1": "5 rue du Bassin",
       "address_line_2": "",
       "ban_api_resolved_address": null,
       "birthdate": "1970-01-01",
@@ -762,7 +762,7 @@
   {
     "fields": {
       "address_filled_at": null,
-      "address_line_1": "5, rue du Bassin",
+      "address_line_1": "5 rue du Bassin",
       "address_line_2": "",
       "ban_api_resolved_address": null,
       "birthdate": "1970-01-01",
@@ -802,7 +802,7 @@
   {
     "fields": {
       "address_filled_at": null,
-      "address_line_1": "5, rue du Bassin",
+      "address_line_1": "5 rue du Bassin",
       "address_line_2": "",
       "ban_api_resolved_address": null,
       "birthdate": "1970-01-01",
