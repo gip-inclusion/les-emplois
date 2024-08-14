@@ -493,7 +493,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         assert user.phone == post_data["phone"]
 
     def test_edit_as_prescriber_with_ic(self):
-        user = PrescriberFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
+        user = PrescriberFactory()
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)

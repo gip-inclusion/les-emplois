@@ -251,7 +251,7 @@ class FranceConnectTest(TestCase):
         then raise an error.
         """
         fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
-        user = PrescriberFactory(email=fc_user_data.email, identity_provider=IdentityProvider.INCLUSION_CONNECT)
+        user = PrescriberFactory(email=fc_user_data.email)
         with pytest.raises(InvalidKindException):
             fc_user_data.create_or_update_user()
         assert user.last_name != FC_USERINFO["family_name"]

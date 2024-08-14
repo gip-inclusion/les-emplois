@@ -83,7 +83,7 @@ class ChangeEmailViewTest(TestCase):
         response = self.client.get(url)
         assert response.status_code == 403
 
-        prescriber = PrescriberFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
+        prescriber = PrescriberFactory()
         self.client.force_login(prescriber)
         response = self.client.get(url)
         assert response.status_code == 403

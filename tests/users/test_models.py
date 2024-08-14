@@ -219,6 +219,9 @@ class ModelTest(TestCase):
         user = JobSeekerFactory(identity_provider=IdentityProvider.FRANCE_CONNECT)
         assert user.has_sso_provider
 
+        user = PrescriberFactory()
+        assert user.has_sso_provider
+
         user = PrescriberFactory(identity_provider=IdentityProvider.INCLUSION_CONNECT)
         assert user.has_sso_provider
 
