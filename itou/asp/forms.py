@@ -28,18 +28,3 @@ def formfield_for_birth_place(**kwargs):
         ),
         **kwargs,
     )
-
-
-def formfield_for_birth_country(**kwargs):
-    france = Country.objects.get(code=Country._CODE_FRANCE)
-    return forms.ModelChoiceField(
-        Country.objects,
-        label="Pays de naissance",
-        required=False,
-        widget=forms.Select(
-            attrs={
-                "data-disable-target": "#id_birth_place",
-                "data-disable-target-unless-value": f"{france.pk}",
-            },
-        ),
-    )
