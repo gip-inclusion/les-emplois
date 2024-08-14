@@ -1978,7 +1978,7 @@ class JobApplicationAdminFormTest(TestCase):
             "state": [{"message": "Ce champ est obligatoire.", "code": "required"}],
             "origin": [{"message": "Ce champ est obligatoire.", "code": "required"}],
             "created_at": [{"message": "Ce champ est obligatoire.", "code": "required"}],
-            "__all__": [{"message": "Emetteur prescripteur manquant.", "code": ""}],
+            "__all__": [{"message": "Émetteur prescripteur manquant.", "code": ""}],
         }
 
         data = {"sender_kind": SenderKind.PRESCRIBER}
@@ -1994,13 +1994,13 @@ class JobApplicationAdminFormTest(TestCase):
         job_application.sender = None
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Emetteur candidat manquant."] == form.errors["__all__"]
+        assert ["Émetteur candidat manquant."] == form.errors["__all__"]
         job_application.sender = sender
 
         job_application.sender_kind = SenderKind.PRESCRIBER
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Emetteur du mauvais type."] == form.errors["__all__"]
+        assert ["Émetteur du mauvais type."] == form.errors["__all__"]
         job_application.sender_kind = sender_kind
 
         job_application.sender_company = JobApplicationSentByCompanyFactory().sender_company
@@ -2034,12 +2034,12 @@ class JobApplicationAdminFormTest(TestCase):
         job_application.sender = JobSeekerFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Emetteur du mauvais type."] == form.errors["__all__"]
+        assert ["Émetteur du mauvais type."] == form.errors["__all__"]
 
         job_application.sender = None
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Emetteur SIAE manquant."] == form.errors["__all__"]
+        assert ["Émetteur SIAE manquant."] == form.errors["__all__"]
         job_application.sender = sender
 
         job_application.sender_prescriber_organization = (
@@ -2061,12 +2061,12 @@ class JobApplicationAdminFormTest(TestCase):
         job_application.sender = JobSeekerFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Emetteur du mauvais type."] == form.errors["__all__"]
+        assert ["Émetteur du mauvais type."] == form.errors["__all__"]
 
         job_application.sender = None
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Emetteur prescripteur manquant."] == form.errors["__all__"]
+        assert ["Émetteur prescripteur manquant."] == form.errors["__all__"]
         job_application.sender = sender
 
         job_application.sender_prescriber_organization = None
@@ -2091,12 +2091,12 @@ class JobApplicationAdminFormTest(TestCase):
         job_application.sender = JobSeekerFactory()
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Emetteur du mauvais type."] == form.errors["__all__"]
+        assert ["Émetteur du mauvais type."] == form.errors["__all__"]
 
         job_application.sender = None
         form = JobApplicationAdminForm(model_to_dict(job_application))
         assert not form.is_valid()
-        assert ["Emetteur prescripteur manquant."] == form.errors["__all__"]
+        assert ["Émetteur prescripteur manquant."] == form.errors["__all__"]
         job_application.sender = sender
 
         form = JobApplicationAdminForm(model_to_dict(job_application))

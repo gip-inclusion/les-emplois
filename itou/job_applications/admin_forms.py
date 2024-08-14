@@ -30,19 +30,19 @@ class JobApplicationAdminForm(forms.ModelForm):
 
         if sender_kind == SenderKind.JOB_SEEKER:
             if sender is None:
-                raise ValidationError("Emetteur candidat manquant.")
+                raise ValidationError("Émetteur candidat manquant.")
             if not sender.is_job_seeker:
-                raise ValidationError("Emetteur du mauvais type.")
+                raise ValidationError("Émetteur du mauvais type.")
 
         if sender_kind == SenderKind.EMPLOYER:
             if sender_company is None:
                 raise ValidationError("SIAE émettrice manquante.")
             if sender is None:
-                raise ValidationError("Emetteur SIAE manquant.")
+                raise ValidationError("Émetteur SIAE manquant.")
             else:
                 # Sender is optional, but if it exists, check its role.
                 if not sender.is_employer:
-                    raise ValidationError("Emetteur du mauvais type.")
+                    raise ValidationError("Émetteur du mauvais type.")
 
         elif sender_company is not None:
             raise ValidationError("SIAE émettrice inattendue.")
@@ -51,7 +51,7 @@ class JobApplicationAdminForm(forms.ModelForm):
             if sender:
                 # Sender is optional, but if it exists, check its role.
                 if not sender.is_prescriber:
-                    raise ValidationError("Emetteur du mauvais type.")
+                    raise ValidationError("Émetteur du mauvais type.")
                 # Request organization only if prescriber is actively linked to an organization
                 if (
                     sender_prescriber_organization is None
@@ -59,7 +59,7 @@ class JobApplicationAdminForm(forms.ModelForm):
                 ):
                     raise ValidationError("Organisation du prescripteur émettrice manquante.")
             else:
-                raise ValidationError("Emetteur prescripteur manquant.")
+                raise ValidationError("Émetteur prescripteur manquant.")
         elif sender_prescriber_organization is not None:
             raise ValidationError("Organisation du prescripteur émettrice inattendue.")
 
