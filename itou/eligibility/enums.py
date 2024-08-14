@@ -21,6 +21,6 @@ class AdministrativeCriteriaLevelPrefix(models.TextChoices):
 
 
 class AuthorKind(models.TextChoices):
-    PRESCRIBER = KIND_PRESCRIBER, "Prescripteur"
+    PRESCRIBER = KIND_PRESCRIBER, "Prescripteur habilité"
     EMPLOYER = KIND_EMPLOYER, "Employeur"
     GEIQ = "geiq", "GEIQ"
