@@ -75,7 +75,7 @@ def test_create_job_application_does_not_crash(admin_client):
         },
     )
     assertContains(response, "Corrigez les erreurs ci-dessous")
-    assertContains(response, "Emetteur prescripteur manquant")
+    assertContains(response, "Émetteur prescripteur manquant")
 
 
 def test_check_inconsistency_check(admin_client):
