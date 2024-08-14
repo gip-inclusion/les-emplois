@@ -8,7 +8,6 @@ from dataclasses import dataclass
 
 import httpx
 import tenacity
-from dateutil.rrule import MO, WEEKLY, rrule
 from django.conf import settings
 from psycopg import sql
 from sentry_sdk.crons import monitor
@@ -16,6 +15,7 @@ from sentry_sdk.crons import monitor
 from itou.metabase.db import MetabaseDatabaseCursor, create_table
 from itou.utils import constants
 from itou.utils.command import BaseCommand
+from itou.utils.date import monday_of_the_week
 
 
 lock = threading.Lock()
@@ -186,31 +186,27 @@ class Command(BaseCommand):
 
     @monitor(monitor_slug="populate-metabase-matomo")
     def handle(self, *, wet_run, **options):
-        today = datetime.date.today()
-        max_date = datetime.date.today() - datetime.timedelta(days=today.weekday() + 1)
-        # NOTE(vperron): if you need to initiate this table, just run the following line with
-        # dtstart=datetime.date(2022,1,1)
-        for monday in rrule(WEEKLY, byweekday=MO, dtstart=max_date - datetime.timedelta(days=7), until=max_date):
-            monday_date = monday.date()
-            api_call_options = []
-            for url_path, dashboard_name in PUBLIC_DASHBOARDS.items():
-                api_call_options.append(
-                    MatomoFetchOptions(
-                        dashboard_name,
-                        {
-                            "idSite": constants.MATOMO_SITE_PILOTAGE_ID,
-                            "segment": f"pageUrl=={constants.PILOTAGE_SITE_URL}/tableaux-de-bord/{url_path}/",
-                        },
-                        {},
-                    )
-                )
+        last_week_monday = monday_of_the_week() - datetime.timedelta(days=7)
 
-            threadsafe_print(f"> about to fetch count={len(api_call_options)} public dashboards from Matomo.")
-            column_names, all_rows = multiget_matomo_dashboards(monday_date, api_call_options)
-            if wet_run and column_names:
-                update_table_at_date(
-                    METABASE_PUBLIC_DASHBOARDS_TABLE_NAME,
-                    column_names,
-                    monday_date,
-                    sorted(all_rows, key=lambda r: r[-1]),  # sort by dashboard name
+        api_call_options = []
+        for url_path, dashboard_name in PUBLIC_DASHBOARDS.items():
+            api_call_options.append(
+                MatomoFetchOptions(
+                    dashboard_name,
+                    {
+                        "idSite": constants.MATOMO_SITE_PILOTAGE_ID,
+                        "segment": f"pageUrl=={constants.PILOTAGE_SITE_URL}/tableaux-de-bord/{url_path}/",
+                    },
+                    {},
                 )
+            )
+
+        threadsafe_print(f"> about to fetch count={len(api_call_options)} public dashboards from Matomo.")
+        column_names, all_rows = multiget_matomo_dashboards(last_week_monday, api_call_options)
+        if wet_run and column_names:
+            update_table_at_date(
+                METABASE_PUBLIC_DASHBOARDS_TABLE_NAME,
+                column_names,
+                last_week_monday,
+                sorted(all_rows, key=lambda r: r[-1]),  # sort by dashboard name
+            )
