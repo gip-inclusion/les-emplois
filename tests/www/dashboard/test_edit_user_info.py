@@ -472,29 +472,32 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         )
 
     def test_edit_as_prescriber(self):
-        user = PrescriberFactory()
-        self.client.force_login(user)
+        original_user = PrescriberFactory(
+            email="bob@saintclair.tld", first_name="Not Bob", last_name="Not Saint Clair", phone="0600000000"
+        )
+        self.client.force_login(original_user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
         self.assertNotContains(response, self.NIR_FIELD_ID)
         self.assertNotContains(response, self.LACK_OF_NIR_FIELD_ID)
         self.assertNotContains(response, self.LACK_OF_NIR_REASON_FIELD_ID)
         self.assertNotContains(response, self.BIRTHDATE_FIELD_NAME)
-        self.assertContains(response, f"Prénom : <strong>{user.first_name.title()}</strong>")
-        self.assertContains(response, f"Nom : <strong>{user.last_name.upper()}</strong>")
-        self.assertContains(response, f"Adresse e-mail : <strong>{user.email}</strong>")
+        self.assertContains(response, f"Prénom : <strong>{original_user.first_name.title()}</strong>")
+        self.assertContains(response, f"Nom : <strong>{original_user.last_name.upper()}</strong>")
+        self.assertContains(response, f"Adresse e-mail : <strong>{original_user.email}</strong>")
         self.assertContains(response, "Modifier ces informations")
 
         post_data = {
-            "email": "aaa",
+            "email": "notbob@notsaintclair.com",
             "first_name": "Bob",
-            "last_name": "Saint Clar",
+            "last_name": "Saint Clair",
             "phone": "0610203050",
         }
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
 
-        user = User.objects.get(id=user.id)
-        assert user.first_name != "Bob"
-        assert user.first_name != "Saint Clair"
-        assert user.phone == post_data["phone"]
+        updated_user = User.objects.get(pk=original_user.pk)
+        assert updated_user.email == original_user.email
+        assert updated_user.first_name == original_user.first_name
+        assert updated_user.last_name == original_user.last_name
+        assert updated_user.phone == post_data["phone"]
