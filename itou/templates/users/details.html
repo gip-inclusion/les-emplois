@@ -21,8 +21,8 @@
                         <h2>Données administratives</h2>
                         <hr>
                         <div class="row">
-                            <div class="col-6">
-                                <ul class="list-data mb-3">
+                            <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                <ul class="list-data">
                                     <li>
                                         <small>Prénom</small>
                                         <strong>{{ beneficiary.first_name }}</strong>
@@ -31,7 +31,6 @@
                                         <small>Nom</small>
                                         <strong>{{ beneficiary.last_name }}</strong>
                                     </li>
-
                                     <li>
                                         <small>Date de naissance</small>
                                         {% if beneficiary.birthdate %}
@@ -64,7 +63,6 @@
                                             <i class="text-disabled">Non renseignée</i>
                                         {% endif %}
                                     </li>
-
                                     <li>
                                         <small>Numéro de sécurité sociale</small>
                                         {% if profile.nir %}
@@ -74,10 +72,9 @@
                                         {% endif %}
                                     </li>
                                 </ul>
-
                             </div>
-                            <div class="col-6">
-                                <ul class="list-data mb-3">
+                            <div class="col-12 col-md-6">
+                                <ul class="list-data">
                                     <li>
                                         <small>Niveau de formation</small>
                                         {% if profile.get_education_level_display %}
@@ -150,12 +147,39 @@
                                             <i class="text-disabled">Non renseigné</i>
                                         {% endif %}
                                     </li>
-
+                                    {% if profile.advisor_information %}
+                                        <li>
+                                            <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
+                                                <button class="c-info__summary collapsed" data-bs-toggle="collapse" data-bs-target="#collapseAdvisorInfoDetails" aria-expanded="false" aria-controls="collapseAdvisorInfoDetails" {% matomo_event "gps" "clic" "coordonnees-conseiller-{{ render_advisor_matomo_option|default:'ailleurs' }}" %}>
+                                                    <span>Voir les coordonnées du
+                                                        <br class="d-none d-md-inline">
+                                                    conseiller emploi France Travail</span>
+                                                </button>
+                                                <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
+                                                    {% if render_advisor_matomo_option %}
+                                                        <ul class="list-unstyled">
+                                                            <li>
+                                                                <i class="ri-user-line font-weight-normal me-1" aria-hidden="true"></i>{{ profile.advisor_information.name }}
+                                                            </li>
+                                                            <li>
+                                                                <i class="ri-mail-line font-weight-normal me-1" aria-hidden="true"></i>
+                                                                <a href="mailto:{{ profile.advisor_information.email }}" class="text-break text-decoration-none" aria-label="Contacter {{ profile.advisor_information.name }} par e-mail">{{ profile.advisor_information.email }}</a>
+                                                                {% include 'includes/copy_to_clipboard.html' with content=profile.advisor_information.email only_icon=True css_classes="btn-link font-weight-medium ms-1" %}
+                                                            </li>
+                                                        </ul>
+                                                    {% else %}
+                                                        <p class="mb-0">
+                                                            La fonctionnalité est en test dans deux départements et sera bientôt disponible pour votre territoire
+                                                        </p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {% endif %}
                                 </ul>
                             </div>
                         </div>
                     </div>
-
                     {% include "users/includes/gps_group.html" with gps_memberships=gps_memberships %}
                 </div>
             </div>

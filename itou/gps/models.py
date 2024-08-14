@@ -2,7 +2,7 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.db import models, transaction
 from django.utils import timezone
 
-from itou.users.models import User
+from itou.users.models import JobSeekerProfile, User
 
 
 class BulkCreatedAtQuerysetProxy:
@@ -35,6 +35,10 @@ class FollowUpGroupQueryset(BulkCreatedAtQuerysetProxy, models.QuerySet):
 
 
 class FollowUpGroup(models.Model):
+    """
+    A group of stakeholders supporting the beneficiary
+    """
+
     created_at = models.DateTimeField(verbose_name="date de création", default=timezone.now)
     created_in_bulk = models.BooleanField(verbose_name="créé massivement", default=False, db_index=True)
 
@@ -131,3 +135,28 @@ class FollowUpGroupMembership(models.Model):
     @property
     def organization_name(self):
         return next((name for name in (*self.prescriber_org_names, *self.companies_names) if name), None)
+
+
+class FranceTravailContact(models.Model):
+    """
+    The 'Conseiller' from France Travail who is the point of contact on a group's beneficiary
+
+    NOTE: this is an interim model and in future will be replaced by group membership
+    """
+
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+
+    jobseeker_profile = models.OneToOneField(
+        JobSeekerProfile,
+        verbose_name="profil",
+        on_delete=models.CASCADE,
+        related_name="advisor_information",
+    )
+
+    class Meta:
+        verbose_name = "conseiller France Travail"
+        verbose_name_plural = "conseillers FT"
+
+    def __str__(self):
+        return f"{self.name} ({self.jobseeker_profile})"

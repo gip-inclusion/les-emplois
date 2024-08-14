@@ -4,8 +4,8 @@ import factory.fuzzy
 from django.conf import settings
 from django.utils import timezone
 
-from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
-from tests.users.factories import JobSeekerFactory, PrescriberFactory
+from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
+from tests.users.factories import JobSeekerFactory, JobSeekerProfileFactory, PrescriberFactory
 
 
 class FollowUpGroupFactory(factory.django.DjangoModelFactory):
@@ -66,3 +66,12 @@ class FollowUpGroupMembershipFactory(factory.django.DjangoModelFactory):
     follow_up_group = factory.SubFactory(FollowUpGroupFactory)
     member = factory.SubFactory(PrescriberFactory)
     creator = factory.SubFactory(PrescriberFactory)
+
+
+class FranceTravailContactFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = FranceTravailContact
+
+    jobseeker_profile = factory.SubFactory(JobSeekerProfileFactory)
+    name = factory.Faker("name", locale="fr_FR")
+    email = factory.Faker("email", locale="fr_FR")

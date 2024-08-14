@@ -17,6 +17,7 @@ from itou.communications.models import NotificationSettings
 from itou.companies.models import CompanyMembership
 from itou.eligibility.models import EligibilityDiagnosis, GEIQEligibilityDiagnosis
 from itou.geo.models import QPV
+from itou.gps.models import FranceTravailContact
 from itou.institutions.models import InstitutionMembership
 from itou.job_applications.models import JobApplication
 from itou.prescribers.models import PrescriberMembership
@@ -716,6 +717,12 @@ class IsPECertifiedFilter(admin.SimpleListFilter):
         return queryset
 
 
+class FranceTravailContactInline(ItouTabularInline):
+    model = FranceTravailContact
+    extra = 0
+    fields = ("name", "email")
+
+
 @admin.register(models.JobSeekerProfile)
 class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin, ItouModelAdmin):
     """
@@ -813,7 +820,10 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
         ),
     )
 
-    inlines = (PkSupportRemarkInline,)
+    inlines = (
+        PkSupportRemarkInline,
+        FranceTravailContactInline,
+    )
 
     INCONSISTENCY_CHECKS = [
         (

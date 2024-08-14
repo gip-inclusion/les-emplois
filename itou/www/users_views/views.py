@@ -23,6 +23,13 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
             raise PermissionDenied("Votre utilisateur n'est pas autorisé à accéder à ces informations.")
         super().setup(request, *args, **kwargs)
 
+    def get_live_department_codes(self):
+        """For the initial release only some departments have the feature"""
+        return [
+            "30",  # Le Gard
+            "55",  # La Meuse
+        ]
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         gps_memberships = (
@@ -40,11 +47,16 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
             ),
         }
 
+        org_department = self.request.current_organization.department
+
         context = context | {
             "breadcrumbs": breadcrumbs,
             "gps_memberships": gps_memberships,
             "matomo_custom_title": "Profil GPS",
             "profile": self.object.jobseeker_profile,
+            "render_advisor_matomo_option": org_department
+            if org_department in self.get_live_department_codes()
+            else None,
         }
 
         return context
