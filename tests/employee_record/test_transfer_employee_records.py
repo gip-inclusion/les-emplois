@@ -1,5 +1,6 @@
 import io
 import json
+import uuid
 
 import freezegun
 import pytest
@@ -84,7 +85,7 @@ def test_preflight_with_error(snapshot, command):
         job_application__approval=None,
         # Data used by the snapshot
         pk=42,
-        job_application__pk="49536a29-88b5-49c3-8c46-333bbbc36308",
+        job_application__pk=uuid.UUID("49536a29-88b5-49c3-8c46-333bbbc36308"),
         job_application__to_company__siret="17483349486512",
         job_application__to_company__convention__asp_id="21",
         job_application__approval__number="XXXXX3724456",

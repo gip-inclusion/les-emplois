@@ -1,3 +1,5 @@
+import uuid
+
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
@@ -21,7 +23,7 @@ def test_list_warns_about_long_awaiting_applications(client, snapshot):
     sender = org.active_members.get()
     job_seeker = JobSeekerFactory(first_name="Jacques", last_name="Henry")
     JobApplicationFactory(
-        id="11111111-1111-1111-1111-111111111111",
+        id=uuid.UUID("11111111-1111-1111-1111-111111111111"),
         to_company=hit_pit,
         job_seeker=job_seeker,
         sender=sender,
@@ -29,7 +31,7 @@ def test_list_warns_about_long_awaiting_applications(client, snapshot):
         created_at=now - relativedelta(weeks=2),
     )
     JobApplicationFactory(
-        id="22222222-2222-2222-2222-222222222222",
+        id=uuid.UUID("22222222-2222-2222-2222-222222222222"),
         to_company=hit_pit,
         job_seeker=job_seeker,
         sender=sender,
@@ -37,7 +39,7 @@ def test_list_warns_about_long_awaiting_applications(client, snapshot):
         created_at=now - relativedelta(weeks=3, days=5),
     )
     JobApplicationFactory(
-        id="33333333-3333-3333-3333-333333333333",
+        id=uuid.UUID("33333333-3333-3333-3333-333333333333"),
         to_company=hit_pit,
         job_seeker=job_seeker,
         sender=sender,
