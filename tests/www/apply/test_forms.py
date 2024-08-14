@@ -9,7 +9,6 @@ from itou.cities.models import City
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS, CompanyKind, ContractType
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType
 from itou.www.apply import forms as apply_forms
-from tests.asp.factories import CountryFranceFactory, CountryOutsideEuropeFactory
 from tests.cities.factories import create_test_cities
 from tests.companies.factories import JobDescriptionFactory
 from tests.job_applications.factories import JobApplicationFactory
@@ -408,51 +407,27 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
 
 
 class CertifiedCriteriaInfoRequiredFormTest(TestCase):
-    def test_submit_valid__born_in_france(self):
+    def test_submit_valid(self):
         job_seeker = JobSeekerWithAddressFactory(
             with_ban_api_mocked_address=True,
             born_in_france=True,
         )
-        jobseeker_profile = job_seeker.jobseeker_profile
 
         birth_place = job_seeker.jobseeker_profile.birth_place
         valid_birthdate = birth_place.start_date + timedelta(days=1)
-        country_france = CountryFranceFactory()
 
         form_data = {
-            # Disabled in JS if birth place is set.
-            "birth_country": "",
+            "address_line_1": job_seeker.address_line_1,
+            "address_line_2": job_seeker.address_line_2,
+            "post_code": job_seeker.post_code,
+            "city": job_seeker.city,
+            "insee_code": job_seeker.insee_code,
+            "ban_api_resolved_address": job_seeker.geocoding_address,
+            "birth_country": job_seeker.jobseeker_profile.birth_country.id,
             "birth_place": job_seeker.jobseeker_profile.birth_place.id,
         }
-        form = apply_forms.CertifiedCriteriaInfoRequiredForm(
-            data=form_data, birthdate=valid_birthdate, instance=jobseeker_profile
-        )
+        form = apply_forms.CertifiedCriteriaInfoRequiredForm(data=form_data, birthdate=valid_birthdate)
         assert form.is_valid()
-        form.save()
-        jobseeker_profile.refresh_from_db()
-        assert jobseeker_profile.birth_country == country_france
-        assert jobseeker_profile.birth_place == birth_place
-
-    def test_submit_valid__born_outsite_of_france(self):
-        job_seeker = JobSeekerWithAddressFactory(
-            with_ban_api_mocked_address=True,
-        )
-        jobseeker_profile = job_seeker.jobseeker_profile
-
-        country_outsite_france = CountryOutsideEuropeFactory()
-        form_data = {
-            "birth_country": country_outsite_france.pk,
-            # Disabled in JS if birth country is not France.
-            "birth_place": "",
-        }
-        form = apply_forms.CertifiedCriteriaInfoRequiredForm(
-            data=form_data, birthdate=job_seeker.birthdate, instance=jobseeker_profile
-        )
-        assert form.is_valid()
-        form.save()
-        jobseeker_profile.refresh_from_db()
-        assert jobseeker_profile.birth_country == country_outsite_france
-        assert not jobseeker_profile.birth_place
 
     def test_submit_commune_invalid_commune_lookup(self):
         job_seeker = JobSeekerWithAddressFactory(with_ban_api_mocked_address=True, born_in_france=True)
@@ -461,7 +436,13 @@ class CertifiedCriteriaInfoRequiredFormTest(TestCase):
         early_date = birth_place.start_date - timedelta(days=1)
 
         form_data = {
-            "birth_country": "",
+            "address_line_1": job_seeker.address_line_1,
+            "address_line_2": job_seeker.address_line_2,
+            "post_code": job_seeker.post_code,
+            "city": job_seeker.city,
+            "insee_code": job_seeker.insee_code,
+            "ban_api_resolved_address": job_seeker.geocoding_address,
+            "birth_country": job_seeker.jobseeker_profile.birth_country.id,
             "birth_place": birth_place.id,
         }
         form = apply_forms.CertifiedCriteriaInfoRequiredForm(data=form_data, birthdate=early_date)
