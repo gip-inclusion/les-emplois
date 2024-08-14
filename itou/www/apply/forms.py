@@ -14,7 +14,7 @@ from django_select2.forms import Select2MultipleWidget, Select2Widget
 
 from itou.approvals.models import Approval
 from itou.asp import models as asp_models
-from itou.asp.forms import formfield_for_birth_country, formfield_for_birth_place
+from itou.asp.forms import formfield_for_birth_place
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
@@ -882,13 +882,18 @@ class CertifiedCriteriaInfoRequiredForm(forms.ModelForm):
     https://github.com/etalab/siade_staging_data/blob/develop/payloads/api_particulier_v2_cnav_allocation_adulte_handicape/200_beneficiaire.yaml
     """
 
+    birth_country = forms.ModelChoiceField(
+        asp_models.Country.objects,
+        label="Pays de naissance",
+        required=False,
+    )
+
     class Meta:
         model = JobSeekerProfile
-        fields = ("birth_country", "birth_place")
+        fields = ("birth_place", "birth_country")
 
     def __init__(self, birthdate, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["birth_country"] = formfield_for_birth_country()
         self.fields["birth_place"] = formfield_for_birth_place()
         self.birthdate = birthdate
 
