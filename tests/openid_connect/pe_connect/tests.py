@@ -218,7 +218,7 @@ class TestPoleEmploiConnect:
         then raise an error.
         """
         peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
-        user = PrescriberFactory(email=peamu_user_data.email, identity_provider=IdentityProvider.INCLUSION_CONNECT)
+        user = PrescriberFactory(email=peamu_user_data.email)
         with pytest.raises(InvalidKindException):
             peamu_user_data.create_or_update_user()
         user.refresh_from_db()

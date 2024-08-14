@@ -541,14 +541,12 @@ class TestCommandNewUsersToMailJet:
             first_name="Alice",
             last_name="Aamar",
             email="alice.aamar@mailinator.com",
-            identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
         PrescriberMembershipFactory(user=alice, organization=pe)
         justin = PrescriberFactory(
             first_name="Justin",
             last_name="Wood",
             email="justin.wood@mailinator.com",
-            identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
         PrescriberMembershipFactory(user=justin, organization=other_org)
 
@@ -690,13 +688,11 @@ class TestCommandNewUsersToMailJet:
             first_name="Billy",
             last_name="Boo",
             email="billy.boo@mailinator.com",
-            identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
         sonny = PrescriberFactory(
             first_name="Sonny",
             last_name="Sunder",
             email="sonny.sunder@mailinator.com",
-            identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
         # Inactive memberships are considered orienteur.
         PrescriberMembershipFactory(user=sonny, is_active=False)
@@ -705,7 +701,6 @@ class TestCommandNewUsersToMailJet:
             first_name="Timmy",
             last_name="Timber",
             email="timmy.timber@mailinator.com",
-            identity_provider=IdentityProvider.INCLUSION_CONNECT,
         )
         PrescriberMembershipFactory(user=timmy, organization__kind=PrescriberOrganizationKind.OTHER)
         # Past users are ignored.
