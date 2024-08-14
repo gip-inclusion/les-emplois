@@ -1,5 +1,6 @@
 import io
 import logging
+import uuid
 from unittest.mock import patch
 
 import pytest
@@ -105,7 +106,7 @@ def test_candidatures_geiq_nominal(snapshot):
     job_seeker = JobSeekerWithAddressFactory(for_snapshot=True, jobseeker_profile__education_level="51")
 
     job_application = JobApplicationFactory(
-        pk="bf657b69-3245-430c-b461-09c6792b9504",
+        pk=uuid.UUID("bf657b69-3245-430c-b461-09c6792b9504"),
         sent_by_authorized_prescriber_organisation=True,
         with_geiq_eligibility_diagnosis=True,
         was_hired=True,
@@ -125,7 +126,7 @@ def test_candidatures_geiq_nominal(snapshot):
     )
 
     JobApplicationFactory(
-        pk="bf657b69-3245-430c-b461-09c6792b9505",
+        pk=uuid.UUID("bf657b69-3245-430c-b461-09c6792b9505"),
         sent_by_authorized_prescriber_organisation=True,
         with_geiq_eligibility_diagnosis_from_prescriber=True,
         was_hired=True,

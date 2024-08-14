@@ -1,3 +1,4 @@
+import uuid
 from datetime import UTC, datetime
 
 import factory
@@ -97,7 +98,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
             hired_job=factory.SubFactory(JobDescriptionFactory, company=factory.SelfAttribute("..to_company")),
         )
         for_snapshot = factory.Trait(
-            pk="11111111-1111-1111-1111-111111111111",
+            pk=uuid.UUID("11111111-1111-1111-1111-111111111111"),
             to_company__for_snapshot=True,
             sender__for_snapshot=True,
             job_seeker__for_snapshot=True,
