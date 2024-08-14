@@ -1,6 +1,8 @@
 import datetime
 from io import StringIO
+from unittest.mock import patch
 
+import pandas as pd
 import pytest
 from django.conf import settings
 from django.core import management
@@ -9,13 +11,20 @@ from freezegun import freeze_time
 from pytest_django.asserts import assertQuerySetEqual
 
 from itou.companies.enums import CompanyKind
-from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
 from itou.job_applications.enums import JobApplicationState
+from itou.users.models import JobSeekerProfile
 from tests.companies.factories import CompanyWith4MembershipsFactory
 from tests.eligibility.factories import GEIQEligibilityDiagnosisFactory, IAEEligibilityDiagnosisFactory
 from tests.gps.factories import FollowUpGroupFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByJobSeekerFactory
-from tests.users.factories import EmployerFactory, ItouStaffFactory, JobSeekerFactory, PrescriberFactory
+from tests.users.factories import (
+    EmployerFactory,
+    ItouStaffFactory,
+    JobSeekerFactory,
+    JobSeekerProfileFactory,
+    PrescriberFactory,
+)
 
 
 class TestGpsManagementCommand:
@@ -377,3 +386,60 @@ class TestGpsManagementCommand:
             (prescriber.pk, prescriber_membership_date, True, update_script_launched_at),
             (employer.pk, employer_membership_date, True, update_script_launched_at),
         ]
+
+    def test_import_advisor_information(self):
+        contacted_profile = JobSeekerProfileFactory(with_contact=True)
+        contactless_profile = JobSeekerProfileFactory()
+
+        # dataset contains a the existing groups
+        mocked_pandas_dataset = pd.DataFrame(
+            {
+                "nir": [
+                    contacted_profile.nir,
+                    contactless_profile.nir,
+                    "123456789010101",  # non-existent in the database,
+                    contacted_profile.nir,  # duplicate - ignored with a log
+                ],
+                "prescriber_name": ["Test MacTest", "Test Testson", "Test Ignored", "Test Ignored"],
+                "prescriber_email": [
+                    "test.mactest@francetravail.fr",
+                    "test.testson@francetravail.fr",
+                    "testignored@francetravail.fr",
+                    "testignored@francetravail.fr",
+                ],
+            }
+        )
+
+        with patch("pandas.read_excel", return_value=mocked_pandas_dataset):
+            self.call_command("import_advisor_information", "example.xlsx", wet_run=True)
+
+        assert FranceTravailContact.objects.count() == 2
+        assert JobSeekerProfile.objects.filter(advisor_information__isnull=True).count() == 0
+
+        contacted_profile.refresh_from_db()
+        assert contacted_profile.advisor_information.name == "Test MacTest"
+        assert contacted_profile.advisor_information.email == "test.mactest@francetravail.fr"
+
+        contactless_profile.refresh_from_db()
+        assert contactless_profile.advisor_information.name == "Test Testson"
+        assert contactless_profile.advisor_information.email == "test.testson@francetravail.fr"
+
+    def test_import_advisor_information_recover_keyless_nir(self):
+        # test asserts that the command can recover from missing a key in the NIR value
+        profile = JobSeekerProfileFactory(with_contact=True)
+
+        mocked_pandas_dataset = pd.DataFrame(
+            {
+                "nir": [profile.nir[:13]],
+                "prescriber_name": ["Test MacTest"],
+                "prescriber_email": ["test.mactest@francetravail.fr"],
+            }
+        )
+        print(str(profile.nir[:13]))
+
+        with patch("pandas.read_excel", return_value=mocked_pandas_dataset):
+            self.call_command("import_advisor_information", "example.xlsx", wet_run=True)
+
+        profile.refresh_from_db()
+        assert profile.advisor_information.name == "Test MacTest"
+        assert profile.advisor_information.email == "test.mactest@francetravail.fr"

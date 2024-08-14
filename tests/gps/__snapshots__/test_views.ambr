@@ -7,8 +7,8 @@
                           <h2>Données administratives</h2>
                           <hr/>
                           <div class="row">
-                              <div class="col-6">
-                                  <ul class="list-data mb-3">
+                              <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                  <ul class="list-data">
                                       <li>
                                           <small>Prénom</small>
                                           <strong>Jane</strong>
@@ -17,7 +17,6 @@
                                           <small>Nom</small>
                                           <strong>Doe</strong>
                                       </li>
-  
                                       <li>
                                           <small>Date de naissance</small>
                                           
@@ -52,7 +51,6 @@
                                               <address>12 rue Georges Bizet, 35000 Rennes</address>
                                           
                                       </li>
-  
                                       <li>
                                           <small>Numéro de sécurité sociale</small>
                                           
@@ -60,10 +58,9 @@
                                           
                                       </li>
                                   </ul>
-  
                               </div>
-                              <div class="col-6">
-                                  <ul class="list-data mb-3">
+                              <div class="col-12 col-md-6">
+                                  <ul class="list-data">
                                       <li>
                                           <small>Niveau de formation</small>
                                           
@@ -85,12 +82,11 @@
                                               <i class="text-disabled">Non renseigné</i>
                                           
                                       </li>
-  
+                                      
                                   </ul>
                               </div>
                           </div>
                       </div>
-  
                       
   
   
@@ -153,6 +149,53 @@
   </div>
   
                   </div>
+  '''
+# ---
+# name: test_contact_information_display[info_displayed]
+  '''
+  <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
+                                                  <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-{{ render_advisor_matomo_option|default:'ailleurs' }}">
+                                                      <span>Voir les coordonnées du
+                                                          <br class="d-none d-md-inline"/>
+                                                      conseiller emploi France Travail</span>
+                                                  </button>
+                                                  <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
+                                                      
+                                                          <ul class="list-unstyled">
+                                                              <li>
+                                                                  <i aria-hidden="true" class="ri-user-line font-weight-normal me-1"></i>Test MacTest
+                                                              </li>
+                                                              <li>
+                                                                  <i aria-hidden="true" class="ri-mail-line font-weight-normal me-1"></i>
+                                                                  <a aria-label="Contacter Test MacTest par e-mail" class="text-break text-decoration-none" href="mailto:test.mactest@francetravail.fr">test.mactest@francetravail.fr</a>
+                                                                  <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="test.mactest@francetravail.fr" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
+      <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
+      <span class="visually-hidden">Copier</span>
+  </button>
+  
+                                                              </li>
+                                                          </ul>
+                                                      
+                                                  </div>
+                                              </div>
+  '''
+# ---
+# name: test_contact_information_display_not_live[preview_displayed]
+  '''
+  <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
+                                                  <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-{{ render_advisor_matomo_option|default:'ailleurs' }}">
+                                                      <span>Voir les coordonnées du
+                                                          <br class="d-none d-md-inline"/>
+                                                      conseiller emploi France Travail</span>
+                                                  </button>
+                                                  <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
+                                                      
+                                                          <p class="mb-0">
+                                                              La fonctionnalité est en test dans deux départements et sera bientôt disponible pour votre territoire
+                                                          </p>
+                                                      
+                                                  </div>
+                                              </div>
   '''
 # ---
 # name: test_dashboard_card

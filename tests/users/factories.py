@@ -339,6 +339,7 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
 class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.JobSeekerProfile
+        skip_postgeneration_save = True
 
     class Params:
         with_education_level = factory.Trait(education_level=factory.fuzzy.FuzzyChoice(EducationLevel.values))
@@ -355,6 +356,9 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
         )
 
     user = factory.SubFactory(JobSeekerFactory, jobseeker_profile=None)
+    advisor_information = factory.Maybe(
+        "with_contact", factory.RelatedFactory("tests.gps.factories.FranceTravailContactFactory", "jobseeker_profile")
+    )
 
     education_level = factory.fuzzy.FuzzyChoice(EducationLevel.values + [""])
 
@@ -376,3 +380,10 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
         nir = f"{incomplete_nir}{control_key}"
         validate_nir(nir)
         return nir
+
+    @factory.post_generation
+    def with_contact(self, create, extracted, **kwargs):
+        from tests.gps.factories import FranceTravailContactFactory
+
+        if extracted:
+            FranceTravailContactFactory(jobseeker_profile=self)

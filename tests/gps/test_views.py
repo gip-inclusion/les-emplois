@@ -4,7 +4,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertQuerySetEqual, assertRedirects
 
-from itou.gps.models import FollowUpGroup, FollowUpGroupMembership
+from itou.gps.models import FollowUpGroup, FollowUpGroupMembership, FranceTravailContact
 from itou.users.models import User
 from tests.gps.factories import FollowUpGroupFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
@@ -398,3 +398,64 @@ def test_groups_pagination_and_name_filter(client):
     )
     fresh_results = parse_response_to_soup(response, selector="#follow-up-groups-section")
     assertSoupEqual(results, fresh_results)
+
+
+def test_contact_information_display(client, snapshot):
+    prescriber = PrescriberFactory(
+        membership=True,
+        for_snapshot=True,
+        membership__organization__address_line_1="14 Rue Saint-Agricol",
+        membership__organization__post_code="30000",
+        membership__organization__city="Nîmes",
+        membership__organization__name="Les Olivades",
+        membership__organization__authorized=True,
+    )
+
+    beneficiary = JobSeekerFactory(for_snapshot=True)
+    FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
+    user_details_url = reverse("users:details", kwargs={"public_id": beneficiary.public_id})
+    client.force_login(prescriber)
+
+    # no contact information to display
+    response = client.get(user_details_url)
+    assert response.status_code == 200
+    assert response.context["render_advisor_matomo_option"] == "30"
+    assert len(parse_response_to_soup(response).select("#advisor-info-details-collapsable")) == 0
+
+    # contact information to display
+    FranceTravailContact.objects.create(
+        name="Test MacTest", email="test.mactest@francetravail.fr", jobseeker_profile=beneficiary.jobseeker_profile
+    )
+
+    response = client.get(user_details_url)
+
+    assert str(parse_response_to_soup(response, selector="#advisor-info-details-collapsable")) == snapshot(
+        name="info_displayed"
+    )
+
+
+def test_contact_information_display_not_live(client, snapshot):
+    # NOTE: this can be removed when the service goes live for everyone
+    prescriber = PrescriberFactory(
+        membership=True,
+        for_snapshot=True,
+        membership__organization__address_line_1="12 Rue de Rivoli",
+        membership__organization__post_code="75004",
+        membership__organization__city="Paris",
+        membership__organization__name="Enterprise Test",
+        membership__organization__authorized=True,
+    )
+
+    beneficiary = JobSeekerFactory(for_snapshot=True)
+    FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
+    FranceTravailContact.objects.create(
+        name="Test MacTest", email="test.mactest@francetravail.fr", jobseeker_profile=beneficiary.jobseeker_profile
+    )
+
+    client.force_login(prescriber)
+    response = client.get(reverse("users:details", kwargs={"public_id": beneficiary.public_id}))
+    assert response.status_code == 200
+    assert not response.context["render_advisor_matomo_option"]
+    assert str(parse_response_to_soup(response, selector="#advisor-info-details-collapsable")) == snapshot(
+        name="preview_displayed"
+    )
