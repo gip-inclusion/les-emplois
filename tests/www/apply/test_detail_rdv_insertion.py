@@ -177,7 +177,7 @@ class TestRdvInsertionAppointmentsList:
             appointment__status=Appointment.Status.UNKNOWN,
             appointment__start_at=datetime.datetime(2024, 6, 1, 8, 0, tzinfo=datetime.UTC),
             appointment__rdv_insertion_id=4321,
-            appointment__location__rdv_insertion_id=4321,
+            appointment__location__rdv_solidarites_id=4321,
             status=Participation.Status.UNKNOWN,
             rdv_insertion_id=4321,
         )
@@ -200,7 +200,7 @@ class TestRdvInsertionAppointmentsList:
             appointment__status=Appointment.Status.SEEN,
             appointment__start_at=datetime.datetime(2024, 1, 4, 8, 0, tzinfo=datetime.UTC),
             appointment__rdv_insertion_id=4321,
-            appointment__location__rdv_insertion_id=4321,
+            appointment__location__rdv_solidarites_id=4321,
         )
         ParticipationFactory(
             id="33333333-3333-3333-3333-333333333333",
@@ -212,7 +212,7 @@ class TestRdvInsertionAppointmentsList:
             appointment__status=Appointment.Status.REVOKED,
             appointment__start_at=datetime.datetime(2024, 1, 3, 8, 0, tzinfo=datetime.UTC),
             appointment__rdv_insertion_id=5432,
-            appointment__location__rdv_insertion_id=5432,
+            appointment__location__rdv_solidarites_id=5432,
         )
         ParticipationFactory(
             id="44444444-4444-4444-4444-444444444444",
@@ -224,7 +224,7 @@ class TestRdvInsertionAppointmentsList:
             appointment__status=Appointment.Status.EXCUSED,
             appointment__start_at=datetime.datetime(2024, 1, 2, 8, 0, tzinfo=datetime.UTC),
             appointment__rdv_insertion_id=6543,
-            appointment__location__rdv_insertion_id=6543,
+            appointment__location__rdv_solidarites_id=6543,
         )
         ParticipationFactory(
             id="55555555-5555-5555-5555-555555555555",
@@ -236,7 +236,7 @@ class TestRdvInsertionAppointmentsList:
             appointment__status=Appointment.Status.NOSHOW,
             appointment__start_at=datetime.datetime(2024, 1, 1, 8, 0, tzinfo=datetime.UTC),
             appointment__rdv_insertion_id=7654,
-            appointment__location__rdv_insertion_id=7654,
+            appointment__location__rdv_solidarites_id=7654,
         )
 
         client.force_login(self.job_application.to_company.members.get())
