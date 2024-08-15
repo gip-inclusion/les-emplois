@@ -88,6 +88,7 @@ urlpatterns = [
     path("legal/terms/", TemplateView.as_view(template_name="static/legal/terms.html"), name="legal-terms"),
     path("", include("itou.www.security.urls")),
     path("gps/", include("itou.www.gps.urls")),
+    path("rdvi/", include("itou.www.rdv_insertion.urls")),
     path("staff/", include("itou.www.itou_staff_views.urls")),
 ]
 
