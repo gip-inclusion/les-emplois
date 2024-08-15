@@ -25,7 +25,12 @@ from itou.utils.mocks.rdv_insertion import (
 )
 from tests.job_applications.factories import JobApplicationFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.rdv_insertion.factories import InvitationFactory, InvitationRequestFactory, ParticipationFactory
+from tests.rdv_insertion.factories import (
+    InvitationFactory,
+    InvitationRequestFactory,
+    ParticipationFactory,
+    WebhookEventFactory,
+)
 from tests.utils.test import TestCase
 
 
@@ -271,3 +276,17 @@ class TestParticipationModel:
 
         self.participation.status = Participation.Status.NOSHOW
         assert self.participation.get_status_class_name() == "bg-danger-lighter text-danger"
+
+
+class TestWebhookEventModel:
+    def setup_method(self, **kwargs):
+        self.webhook_event_invitation = WebhookEventFactory()
+        self.webhook_event_appointment = WebhookEventFactory(for_appointment=True)
+
+    def test_for_invitation_property(self):
+        assert self.webhook_event_invitation.for_invitation
+        assert not self.webhook_event_appointment.for_invitation
+
+    def test_for_appointment_property(self):
+        assert not self.webhook_event_invitation.for_appointment
+        assert self.webhook_event_appointment.for_appointment

@@ -150,7 +150,8 @@ class Participation(models.Model):
         editable=False,
     )
     status = models.CharField("état", default=Status.UNKNOWN, choices=Status.choices, editable=False)
-    rdv_insertion_id = models.IntegerField(unique=True, editable=False)
+    rdv_insertion_user_id = models.IntegerField(db_index=True, editable=False)
+    rdv_insertion_id = models.IntegerField(unique=True, null=True, editable=False)
 
     class Meta:
         verbose_name = "participation à un événement RDV-I"
@@ -179,7 +180,7 @@ class Location(models.Model):
     name = models.CharField("nom", editable=False)
     address = models.CharField("adresse", editable=False)
     phone_number = models.CharField("téléphone", null=True, editable=False)
-    rdv_insertion_id = models.IntegerField(unique=True, editable=False)
+    rdv_solidarites_id = models.IntegerField(unique=True, editable=False)
 
     class Meta:
         verbose_name = "lieu d'un événement RDV-I"
@@ -190,7 +191,20 @@ class WebhookEvent(models.Model):
     created_at = models.DateTimeField("créée le", auto_now_add=True)
     body = models.JSONField(editable=False)
     headers = models.JSONField(editable=False)
+    is_processed = models.BooleanField(default=False, editable=False)
 
     class Meta:
         verbose_name = "événement du webhook RDV-I"
         verbose_name_plural = "événements du webhook RDV-I"
+        indexes = [
+            models.Index(models.F("body__data__id"), name="webhookevent_rdvi_id_idx"),
+            models.Index(models.F("body__meta__model"), name="webhookevent_rdvi_type_idx"),
+        ]
+
+    @property
+    def for_appointment(self):
+        return self.body["meta"]["model"].lower() == "rdv"
+
+    @property
+    def for_invitation(self):
+        return self.body["meta"]["model"].lower() == "invitation"

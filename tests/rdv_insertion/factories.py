@@ -3,8 +3,9 @@ import datetime
 import factory
 from faker import Faker
 
-from itou.rdv_insertion.models import Appointment, Invitation, InvitationRequest, Location, Participation
+from itou.rdv_insertion.models import Appointment, Invitation, InvitationRequest, Location, Participation, WebhookEvent
 from itou.users.enums import Title
+from itou.utils.mocks import rdv_insertion as rdvi_mocks
 from tests.companies.factories import CompanyFactory
 from tests.users.factories import JobSeekerFactory
 
@@ -131,13 +132,13 @@ class LocationFactory(factory.django.DjangoModelFactory):
             name="Salle de réunion",
             address="112 Quai de Jemmapes, 75010 Paris",
             phone_number="06 00 00 00 00",
-            rdv_insertion_id=1234,
+            rdv_solidarites_id=1234,
         )
 
     name = factory.Faker("sentence")
     address = factory.Faker("address")
     phone_number = factory.Faker("phone_number")
-    rdv_insertion_id = factory.Sequence(lambda n: n)
+    rdv_solidarites_id = factory.Sequence(lambda n: n)
 
 
 class AppointmentFactory(factory.django.DjangoModelFactory):
@@ -190,6 +191,7 @@ class ParticipationFactory(factory.django.DjangoModelFactory):
         for_snapshot = factory.Trait(
             id="11111111-1111-1111-1111-111111111111",
             status=Participation.Status.UNKNOWN,
+            rdv_insertion_user_id=1234,
             rdv_insertion_id=1234,
             appointment__for_snapshot=True,
             job_seeker__for_snapshot=True,
@@ -198,4 +200,20 @@ class ParticipationFactory(factory.django.DjangoModelFactory):
     job_seeker = factory.SubFactory(JobSeekerFactory)
     appointment = factory.SubFactory(AppointmentFactory)
     status = factory.Faker("random_element", elements=Participation.Status.values)
+    rdv_insertion_user_id = factory.Sequence(lambda n: n)
     rdv_insertion_id = factory.Sequence(lambda n: n)
+
+
+class WebhookEventFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = WebhookEvent
+
+    class Params:
+        for_appointment = factory.Trait(
+            body=rdvi_mocks.RDV_INSERTION_WEBHOOK_APPOINTMENT_BODY,
+            headers=rdvi_mocks.RDV_INSERTION_WEBHOOK_APPOINTMENT_HEADERS,
+        )
+
+    body = rdvi_mocks.RDV_INSERTION_WEBHOOK_INVITATION_BODY
+    headers = rdvi_mocks.RDV_INSERTION_WEBHOOK_INVITATION_HEADERS
+    is_processed = factory.Faker("boolean", chance_of_getting_true=30)
