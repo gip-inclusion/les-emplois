@@ -10,7 +10,7 @@ from django.utils.http import urlencode
 from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 from itou.prescribers.enums import (
-    DGPE_SAFIR_CODE,
+    DGFT_SAFIR_CODE,
     DRFT_SAFIR_CODES,
     DTFT_SAFIR_CODE_TO_DEPARTMENTS,
     PrescriberAuthorizationStatus,
@@ -310,11 +310,11 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         return get_email_message(to, context, subject, body)
 
     @property
-    def is_dgpe(self):
+    def is_dgft(self):
         """
-        DGPE, as in "Direction Générale Pôle emploi" is a special PE agency which oversees the whole country.
+        DGFT, as in "Direction Générale France Travail" is a special FT agency which oversees the whole country.
         """
-        return self.kind == PrescriberOrganizationKind.PE and self.code_safir_pole_emploi == DGPE_SAFIR_CODE
+        return self.kind == PrescriberOrganizationKind.PE and self.code_safir_pole_emploi == DGFT_SAFIR_CODE
 
     @property
     def is_drft(self):

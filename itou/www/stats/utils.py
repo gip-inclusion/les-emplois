@@ -221,7 +221,7 @@ def can_view_stats_iae_network(request):
 def get_stats_pe_departments(request):
     if not can_view_stats_pe(request):
         raise PermissionDenied
-    if request.current_organization.is_dgpe:
+    if request.current_organization.is_dgft:
         return DEPARTMENTS.keys()
     if request.current_organization.is_drft:
         return REGIONS[request.current_organization.region]
