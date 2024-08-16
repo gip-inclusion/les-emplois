@@ -19,7 +19,7 @@ from itou.www.apply.forms import (
     FilterJobApplicationsForm,
     PrescriberFilterJobApplicationsForm,
 )
-from itou.www.stats.utils import can_view_stats_pe
+from itou.www.stats.utils import can_view_stats_ft
 
 
 class JobApplicationsListKind(enum.Enum):
@@ -182,7 +182,7 @@ def list_prescriptions_exports(request, template_name="apply/list_of_available_e
         "job_applications_by_month": job_applications_by_month,
         "total_job_applications": total_job_applications,
         "export_for": "prescriptions",
-        "can_view_stats_pe": can_view_stats_pe(request),
+        "can_view_stats_ft": can_view_stats_ft(request),
         "back_url": get_safe_url(request, "back_url", reverse("dashboard:index")),
     }
     return render(request, template_name, context)

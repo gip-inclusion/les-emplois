@@ -129,7 +129,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_view_stats_cd": stats_utils.can_view_stats_cd(request),
         "can_view_stats_cd_whitelist": stats_utils.can_view_stats_cd_whitelist(request),
         "can_view_stats_cd_aci": stats_utils.can_view_stats_cd_aci(request),
-        "can_view_stats_pe": stats_utils.can_view_stats_pe(request),
+        "can_view_stats_ft": stats_utils.can_view_stats_ft(request),
         "can_view_stats_ph": stats_utils.can_view_stats_ph(request),
         "can_view_stats_ddets_iae": stats_utils.can_view_stats_ddets_iae(request),
         "can_view_stats_ddets_iae_aci": stats_utils.can_view_stats_ddets_iae_aci(request),

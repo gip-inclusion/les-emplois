@@ -84,33 +84,33 @@ METABASE_DASHBOARDS = {
         "dashboard_id": 327,
     },
     #
-    # Prescriber stats - PE.
+    # Prescriber stats - FT.
     #
-    "stats_pe_delay_main": {
+    "stats_ft_delay_main": {
         "dashboard_id": 168,
         "tally_popup_form_id": "3lb9XW",
         "tally_embed_form_id": "meM7DE",
     },
-    "stats_pe_delay_raw": {
+    "stats_ft_delay_raw": {
         "dashboard_id": 180,
     },
-    "stats_pe_conversion_main": {
+    "stats_ft_conversion_main": {
         "dashboard_id": 169,
         "tally_popup_form_id": "mODeK8",
         "tally_embed_form_id": "3xrPjJ",
     },
-    "stats_pe_conversion_raw": {
+    "stats_ft_conversion_raw": {
         "dashboard_id": 182,
     },
-    "stats_pe_state_main": {
+    "stats_ft_state_main": {
         "dashboard_id": 149,
         "tally_popup_form_id": "mRG61J",
         "tally_embed_form_id": "3qLKad",
     },
-    "stats_pe_state_raw": {
+    "stats_ft_state_raw": {
         "dashboard_id": 183,
     },
-    "stats_pe_tension": {
+    "stats_ft_tension": {
         "dashboard_id": 162,
         "tally_popup_form_id": "wobaYV",
         "tally_embed_form_id": "3EKJ5q",
