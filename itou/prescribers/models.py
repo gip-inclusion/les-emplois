@@ -12,7 +12,7 @@ from itou.common_apps.organizations.models import MembershipAbstract, Organizati
 from itou.prescribers.enums import (
     DGPE_SAFIR_CODE,
     DRPE_SAFIR_CODES,
-    DTPE_SAFIR_CODE_TO_DEPARTMENTS,
+    DTFT_SAFIR_CODE_TO_DEPARTMENTS,
     PrescriberAuthorizationStatus,
     PrescriberOrganizationKind,
 )
@@ -324,14 +324,14 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         return self.kind == PrescriberOrganizationKind.PE and self.code_safir_pole_emploi in DRPE_SAFIR_CODES
 
     @property
-    def is_dtpe(self):
+    def is_dtft(self):
         """
-        DTPE, as in "Direction Territoriale Pôle emploi", are special PE agencies which generally oversee
+        DTFT, as in "Direction Territoriale France Travail", are special FT agencies which generally oversee
         their whole department and sometimes more than one department.
         """
         return (
             self.kind == PrescriberOrganizationKind.PE
-            and self.code_safir_pole_emploi in DTPE_SAFIR_CODE_TO_DEPARTMENTS
+            and self.code_safir_pole_emploi in DTFT_SAFIR_CODE_TO_DEPARTMENTS
         )
 
 

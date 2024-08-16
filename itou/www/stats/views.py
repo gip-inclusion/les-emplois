@@ -398,7 +398,7 @@ def render_stats_pe(request, page_title, extra_params=None):
             "matomo_custom_url_suffix": f"{format_region_for_matomo(current_org.region)}/drpe",
             "region": current_org.region,
         }
-    elif current_org.is_dtpe:
+    elif current_org.is_dtft:
         context |= {
             "matomo_custom_url_suffix": f"{format_region_and_department_for_matomo(current_org.department)}/dtpe",
             "department": current_org.department,

@@ -111,11 +111,11 @@ DRPE_SAFIR_CODES = [
     "97600",  # Mayotte
 ]
 
-# DTPE, as in "Direction Territoriale Pôle emploi", are special PE agencies which generally oversee
+# DTFT, as in "Direction Territoriale France Travail", are special FT agencies which generally oversee
 # their whole department and sometimes more than one department.
 # We keep it simple by hardcoding their list here to avoid the complexity of adding a field or a kind.
-# By default (`None`) a DTPE oversees its own department unless a list of several departments is specified below.
-DTPE_SAFIR_CODE_TO_DEPARTMENTS = {
+# By default (`None`) a DTFT oversees its own department unless a list of several departments is specified below.
+DTFT_SAFIR_CODE_TO_DEPARTMENTS = {
     # Note that the first two digits of the SAFIR code usually indicate the department.
     "04016": ["04", "05"],
     "10038": None,
