@@ -11,7 +11,7 @@ from itou.common_apps.address.models import AddressMixin
 from itou.common_apps.organizations.models import MembershipAbstract, OrganizationAbstract, OrganizationQuerySet
 from itou.prescribers.enums import (
     DGPE_SAFIR_CODE,
-    DRPE_SAFIR_CODES,
+    DRFT_SAFIR_CODES,
     DTFT_SAFIR_CODE_TO_DEPARTMENTS,
     PrescriberAuthorizationStatus,
     PrescriberOrganizationKind,
@@ -317,11 +317,11 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
         return self.kind == PrescriberOrganizationKind.PE and self.code_safir_pole_emploi == DGPE_SAFIR_CODE
 
     @property
-    def is_drpe(self):
+    def is_drft(self):
         """
-        DRPE, as in "Direction Régionale Pôle emploi", are special PE agencies which oversee their whole region.
+        DRFT, as in "Direction Régionale France Travail", are special FT agencies which oversee their whole region.
         """
-        return self.kind == PrescriberOrganizationKind.PE and self.code_safir_pole_emploi in DRPE_SAFIR_CODES
+        return self.kind == PrescriberOrganizationKind.PE and self.code_safir_pole_emploi in DRFT_SAFIR_CODES
 
     @property
     def is_dtft(self):

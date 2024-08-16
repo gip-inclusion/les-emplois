@@ -393,7 +393,7 @@ def render_stats_pe(request, page_title, extra_params=None):
         context |= {
             "matomo_custom_url_suffix": "dgpe",
         }
-    elif current_org.is_drpe:
+    elif current_org.is_drft:
         context |= {
             "matomo_custom_url_suffix": f"{format_region_for_matomo(current_org.region)}/drpe",
             "region": current_org.region,
