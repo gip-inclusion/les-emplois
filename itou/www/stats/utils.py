@@ -7,7 +7,7 @@ from itou.companies.models import Company
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.prescribers.enums import (
-    DTPE_SAFIR_CODE_TO_DEPARTMENTS,
+    DTFT_SAFIR_CODE_TO_DEPARTMENTS,
     PrescriberAuthorizationStatus,
     PrescriberOrganizationKind,
 )
@@ -225,7 +225,7 @@ def get_stats_pe_departments(request):
         return DEPARTMENTS.keys()
     if request.current_organization.is_drpe:
         return REGIONS[request.current_organization.region]
-    if request.current_organization.is_dtpe:
-        departments = DTPE_SAFIR_CODE_TO_DEPARTMENTS[request.current_organization.code_safir_pole_emploi]
+    if request.current_organization.is_dtft:
+        departments = DTFT_SAFIR_CODE_TO_DEPARTMENTS[request.current_organization.code_safir_pole_emploi]
         return [request.current_organization.department] if departments is None else departments
     return [request.current_organization.department]
