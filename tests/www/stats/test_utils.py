@@ -176,7 +176,7 @@ def test_can_view_stats_cd_aci(settings):
     assert utils.can_view_stats_dashboard_widget(request)
 
 
-def test_can_view_stats_pe_as_regular_pe_agency():
+def test_can_view_stats_ft_as_regular_pe_agency():
     regular_pe_agency = PrescriberOrganizationWithMembershipFactory(
         authorized=True, kind=PrescriberOrganizationKind.PE, department="93"
     )
@@ -185,11 +185,11 @@ def test_can_view_stats_pe_as_regular_pe_agency():
     assert not regular_pe_agency.is_drft
     assert not regular_pe_agency.is_dgft
     request = get_request(user)
-    assert utils.can_view_stats_pe(request)
-    assert utils.get_stats_pe_departments(request) == ["93"]
+    assert utils.can_view_stats_ft(request)
+    assert utils.get_stats_ft_departments(request) == ["93"]
 
 
-def test_can_view_stats_pe_as_dtft_with_single_department():
+def test_can_view_stats_ft_as_dtft_with_single_department():
     dtft_with_single_department = PrescriberOrganizationWithMembershipFactory(
         authorized=True,
         kind=PrescriberOrganizationKind.PE,
@@ -201,11 +201,11 @@ def test_can_view_stats_pe_as_dtft_with_single_department():
     assert not dtft_with_single_department.is_drft
     assert not dtft_with_single_department.is_dgft
     request = get_request(user)
-    assert utils.can_view_stats_pe(request)
-    assert utils.get_stats_pe_departments(request) == ["49"]
+    assert utils.can_view_stats_ft(request)
+    assert utils.get_stats_ft_departments(request) == ["49"]
 
 
-def test_can_view_stats_pe_as_dtft_with_multiple_departments():
+def test_can_view_stats_ft_as_dtft_with_multiple_departments():
     dtft_with_multiple_departments = PrescriberOrganizationWithMembershipFactory(
         authorized=True,
         kind=PrescriberOrganizationKind.PE,
@@ -217,11 +217,11 @@ def test_can_view_stats_pe_as_dtft_with_multiple_departments():
     assert not dtft_with_multiple_departments.is_drft
     assert not dtft_with_multiple_departments.is_dgft
     request = get_request(user)
-    assert utils.can_view_stats_pe(request)
-    assert utils.get_stats_pe_departments(request) == ["72", "53"]
+    assert utils.can_view_stats_ft(request)
+    assert utils.get_stats_ft_departments(request) == ["72", "53"]
 
 
-def test_can_view_stats_pe_as_drft():
+def test_can_view_stats_ft_as_drft():
     drft = PrescriberOrganizationWithMembershipFactory(
         authorized=True,
         kind=PrescriberOrganizationKind.PE,
@@ -233,8 +233,8 @@ def test_can_view_stats_pe_as_drft():
     assert not drft.is_dgft
     assert not drft.is_dtft
     request = get_request(user)
-    assert utils.can_view_stats_pe(request)
-    assert utils.get_stats_pe_departments(request) == [
+    assert utils.can_view_stats_ft(request)
+    assert utils.get_stats_ft_departments(request) == [
         "75",
         "77",
         "78",
@@ -246,7 +246,7 @@ def test_can_view_stats_pe_as_drft():
     ]
 
 
-def test_can_view_stats_pe_as_dgft():
+def test_can_view_stats_ft_as_dgft():
     dgft = PrescriberOrganizationWithMembershipFactory(
         authorized=True,
         kind=PrescriberOrganizationKind.PE,
@@ -258,8 +258,8 @@ def test_can_view_stats_pe_as_dgft():
     assert not dgft.is_dtft
     assert dgft.is_dgft
     request = get_request(user)
-    assert utils.can_view_stats_pe(request)
-    assert utils.get_stats_pe_departments(request)
+    assert utils.can_view_stats_ft(request)
+    assert utils.get_stats_ft_departments(request)
 
 
 @pytest.mark.parametrize(

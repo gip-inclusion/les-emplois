@@ -77,9 +77,9 @@ def assert_stats_dashboard_equal(values):
 @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
 @pytest.mark.parametrize(
     "view_name",
-    [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_pe_")],
+    [p.name for p in stats_urls.urlpatterns if p.name.startswith("stats_ft_")],
 )
-def test_stats_pe_log_visit(client, view_name):
+def test_stats_ft_log_visit(client, view_name):
     prescriber_org = PrescriberOrganizationWithMembershipFactory(kind="PE", authorized=True)
     user = prescriber_org.members.get()
     client.force_login(user)

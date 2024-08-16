@@ -99,7 +99,7 @@
                             </a>
                         </li>
                     {% endif %}
-                    {% if can_view_stats_pe %}
+                    {% if can_view_stats_ft %}
                         <li class="d-flex justify-content-between align-items-center mb-3">
                             <a href="https://plateforme-inclusion.notion.site/Guide-d-utilisation-et-d-analyse-des-tableaux-de-bord-France-Travail-dad8530e64af47bd99787a6d4e81f6b9"
                                rel="noopener"
@@ -111,25 +111,25 @@
                             </a>
                         </li>
                         <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_pe_state_main' %}" class="btn-link btn-ico">
+                            <a href="{% url 'stats:stats_ft_state_main' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                                 <span>Traitement et résultat des candidatures orientées par mes agences</span>
                             </a>
                         </li>
                         <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_pe_conversion_main' %}" class="btn-link btn-ico">
+                            <a href="{% url 'stats:stats_ft_conversion_main' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                                 <span>Taux de transformation de mes agences</span>
                             </a>
                         </li>
                         <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_pe_tension' %}" class="btn-link btn-ico">
+                            <a href="{% url 'stats:stats_ft_tension' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                                 <span>Fiches de poste en tension de mon territoire</span>
                             </a>
                         </li>
                         <li class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="{% url 'stats:stats_pe_delay_main' %}" class="btn-link btn-ico">
+                            <a href="{% url 'stats:stats_ft_delay_main' %}" class="btn-link btn-ico">
                                 <i class="ri-bar-chart-line ri-lg font-weight-normal align-self-start"></i>
                                 <span>Délai d'entrée en IAE pour mon territoire</span>
                             </a>

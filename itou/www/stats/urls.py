@@ -28,14 +28,15 @@ urlpatterns = [
     path("cd/hiring", views.stats_cd_hiring, name="stats_cd_hiring"),
     path("cd/brsa", views.stats_cd_brsa, name="stats_cd_brsa"),
     path("cd/aci", views.stats_cd_aci, name="stats_cd_aci"),
-    # Prescriber stats - PE.
-    path("pe/delay/main", views.stats_pe_delay_main, name="stats_pe_delay_main"),
-    path("pe/delay/raw", views.stats_pe_delay_raw, name="stats_pe_delay_raw"),
-    path("pe/conversion/main", views.stats_pe_conversion_main, name="stats_pe_conversion_main"),
-    path("pe/conversion/raw", views.stats_pe_conversion_raw, name="stats_pe_conversion_raw"),
-    path("pe/state/main", views.stats_pe_state_main, name="stats_pe_state_main"),
-    path("pe/state/raw", views.stats_pe_state_raw, name="stats_pe_state_raw"),
-    path("pe/tension", views.stats_pe_tension, name="stats_pe_tension"),
+    # Prescriber stats - FT.
+    # Legacy `pe` term is used in URLs for retroactivity in Matomo stats but in fact it means `ft`.
+    path("pe/delay/main", views.stats_ft_delay_main, name="stats_ft_delay_main"),
+    path("pe/delay/raw", views.stats_ft_delay_raw, name="stats_ft_delay_raw"),
+    path("pe/conversion/main", views.stats_ft_conversion_main, name="stats_ft_conversion_main"),
+    path("pe/conversion/raw", views.stats_ft_conversion_raw, name="stats_ft_conversion_raw"),
+    path("pe/state/main", views.stats_ft_state_main, name="stats_ft_state_main"),
+    path("pe/state/raw", views.stats_ft_state_raw, name="stats_ft_state_raw"),
+    path("pe/tension", views.stats_ft_tension, name="stats_ft_tension"),
     # Authorized prescribers' stats
     path("ph/state/main", views.stats_ph_state_main, name="stats_ph_state_main"),
     # Institution stats - DDETS IAE - department level.

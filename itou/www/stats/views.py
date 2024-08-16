@@ -365,9 +365,9 @@ def stats_cd_aci(request):
     )
 
 
-def render_stats_pe(request, page_title, extra_params=None):
+def render_stats_ft(request, page_title, extra_params=None):
     """
-    PE ("Pôle emploi") stats shown to relevant members.
+    FT ("France Travail") stats shown to relevant members.
     They can view data for their whole departement, not only their agency.
     They cannot view data for other departments than their own.
 
@@ -375,9 +375,9 @@ def render_stats_pe(request, page_title, extra_params=None):
     `*_raw` views are not directly visible on the C1 dashboard but are linked from within their `*_main` counterpart.
     """
     current_org = get_current_org_or_404(request)
-    if not utils.can_view_stats_pe(request):
+    if not utils.can_view_stats_ft(request):
         raise PermissionDenied
-    departments = utils.get_stats_pe_departments(request)
+    departments = utils.get_stats_ft_departments(request)
     params = {
         mb.DEPARTMENT_FILTER_KEY: [DEPARTMENTS[d] for d in departments],
     }
@@ -412,8 +412,8 @@ def render_stats_pe(request, page_title, extra_params=None):
 
 
 @login_required
-def stats_pe_delay_main(request):
-    return render_stats_pe(
+def stats_ft_delay_main(request):
+    return render_stats_ft(
         request=request,
         page_title="Délai d'entrée en IAE",
         extra_params={
@@ -423,8 +423,8 @@ def stats_pe_delay_main(request):
 
 
 @login_required
-def stats_pe_delay_raw(request):
-    return render_stats_pe(
+def stats_ft_delay_raw(request):
+    return render_stats_ft(
         request=request,
         page_title="Données brutes de délai d'entrée en IAE",
         # No additional locked filter is needed for these PE stats.
@@ -432,8 +432,8 @@ def stats_pe_delay_raw(request):
 
 
 @login_required
-def stats_pe_conversion_main(request):
-    return render_stats_pe(
+def stats_ft_conversion_main(request):
+    return render_stats_ft(
         request=request,
         page_title="Taux de transformation",
         extra_params={
@@ -443,8 +443,8 @@ def stats_pe_conversion_main(request):
 
 
 @login_required
-def stats_pe_conversion_raw(request):
-    return render_stats_pe(
+def stats_ft_conversion_raw(request):
+    return render_stats_ft(
         request=request,
         page_title="Données brutes du taux de transformation",
         extra_params={
@@ -454,8 +454,8 @@ def stats_pe_conversion_raw(request):
 
 
 @login_required
-def stats_pe_state_main(request):
-    return render_stats_pe(
+def stats_ft_state_main(request):
+    return render_stats_ft(
         request=request,
         page_title="Etat des candidatures orientées",
         extra_params={
@@ -465,8 +465,8 @@ def stats_pe_state_main(request):
 
 
 @login_required
-def stats_pe_state_raw(request):
-    return render_stats_pe(
+def stats_ft_state_raw(request):
+    return render_stats_ft(
         request=request,
         page_title="Données brutes de l’état des candidatures orientées",
         extra_params={
@@ -476,8 +476,8 @@ def stats_pe_state_raw(request):
 
 
 @login_required
-def stats_pe_tension(request):
-    return render_stats_pe(
+def stats_ft_tension(request):
+    return render_stats_ft(
         request=request,
         page_title="Fiches de poste en tension",
         # No additional locked filter is needed for these PE stats.

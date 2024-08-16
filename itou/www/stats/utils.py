@@ -106,7 +106,7 @@ def can_view_stats_cd_aci(request):
     )
 
 
-def can_view_stats_pe(request):
+def can_view_stats_ft(request):
     return (
         request.user.is_prescriber
         and isinstance(request.current_organization, PrescriberOrganization)
@@ -218,8 +218,8 @@ def can_view_stats_iae_network(request):
     )
 
 
-def get_stats_pe_departments(request):
-    if not can_view_stats_pe(request):
+def get_stats_ft_departments(request):
+    if not can_view_stats_ft(request):
         raise PermissionDenied
     if request.current_organization.is_dgft:
         return DEPARTMENTS.keys()
