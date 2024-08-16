@@ -223,7 +223,7 @@ def get_stats_pe_departments(request):
         raise PermissionDenied
     if request.current_organization.is_dgpe:
         return DEPARTMENTS.keys()
-    if request.current_organization.is_drpe:
+    if request.current_organization.is_drft:
         return REGIONS[request.current_organization.region]
     if request.current_organization.is_dtft:
         departments = DTFT_SAFIR_CODE_TO_DEPARTMENTS[request.current_organization.code_safir_pole_emploi]

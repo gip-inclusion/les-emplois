@@ -88,9 +88,9 @@ class PrescriberAuthorizationStatus(models.TextChoices):
 # DGPE, as in "Direction Générale Pôle emploi" is a special PE agency which oversees the whole country.
 DGPE_SAFIR_CODE = "00162"
 
-# DRPE, as in "Direction Régionale Pôle emploi", are special PE agencies which oversee their whole region.
+# DRFT, as in "Direction Régionale France Travail", are special FT agencies which oversee their whole region.
 # We keep it simple by hardcoding their (short) list here to avoid the complexity of adding a field or a kind.
-DRPE_SAFIR_CODES = [
+DRFT_SAFIR_CODES = [
     "13992",  # Provence-Alpes-Côte d'Azur
     "20010",  # Corse
     "21069",  # Bourgogne-Franche-Comté
