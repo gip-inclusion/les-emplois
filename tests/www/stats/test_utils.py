@@ -183,7 +183,7 @@ def test_can_view_stats_pe_as_regular_pe_agency():
     user = regular_pe_agency.members.get()
     assert not regular_pe_agency.is_dtft
     assert not regular_pe_agency.is_drft
-    assert not regular_pe_agency.is_dgpe
+    assert not regular_pe_agency.is_dgft
     request = get_request(user)
     assert utils.can_view_stats_pe(request)
     assert utils.get_stats_pe_departments(request) == ["93"]
@@ -199,7 +199,7 @@ def test_can_view_stats_pe_as_dtft_with_single_department():
     user = dtft_with_single_department.members.get()
     assert dtft_with_single_department.is_dtft
     assert not dtft_with_single_department.is_drft
-    assert not dtft_with_single_department.is_dgpe
+    assert not dtft_with_single_department.is_dgft
     request = get_request(user)
     assert utils.can_view_stats_pe(request)
     assert utils.get_stats_pe_departments(request) == ["49"]
@@ -215,7 +215,7 @@ def test_can_view_stats_pe_as_dtft_with_multiple_departments():
     user = dtft_with_multiple_departments.members.get()
     assert dtft_with_multiple_departments.is_dtft
     assert not dtft_with_multiple_departments.is_drft
-    assert not dtft_with_multiple_departments.is_dgpe
+    assert not dtft_with_multiple_departments.is_dgft
     request = get_request(user)
     assert utils.can_view_stats_pe(request)
     assert utils.get_stats_pe_departments(request) == ["72", "53"]
@@ -230,7 +230,7 @@ def test_can_view_stats_pe_as_drft():
     )
     user = drft.members.get()
     assert drft.is_drft
-    assert not drft.is_dgpe
+    assert not drft.is_dgft
     assert not drft.is_dtft
     request = get_request(user)
     assert utils.can_view_stats_pe(request)
@@ -246,17 +246,17 @@ def test_can_view_stats_pe_as_drft():
     ]
 
 
-def test_can_view_stats_pe_as_dgpe():
-    dgpe = PrescriberOrganizationWithMembershipFactory(
+def test_can_view_stats_pe_as_dgft():
+    dgft = PrescriberOrganizationWithMembershipFactory(
         authorized=True,
         kind=PrescriberOrganizationKind.PE,
         department="93",
         code_safir_pole_emploi="00162",
     )
-    user = dgpe.members.get()
-    assert not dgpe.is_drft
-    assert not dgpe.is_dtft
-    assert dgpe.is_dgpe
+    user = dgft.members.get()
+    assert not dgft.is_drft
+    assert not dgft.is_dtft
+    assert dgft.is_dgft
     request = get_request(user)
     assert utils.can_view_stats_pe(request)
     assert utils.get_stats_pe_departments(request)

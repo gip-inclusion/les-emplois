@@ -389,7 +389,7 @@ def render_stats_pe(request, page_title, extra_params=None):
     context = {
         "page_title": page_title,
     }
-    if current_org.is_dgpe:
+    if current_org.is_dgft:
         context |= {
             "matomo_custom_url_suffix": "dgpe",
         }

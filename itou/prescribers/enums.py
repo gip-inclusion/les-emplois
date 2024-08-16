@@ -85,8 +85,8 @@ class PrescriberAuthorizationStatus(models.TextChoices):
     NOT_REQUIRED = "NOT_REQUIRED", "Pas d'habilitation nécessaire"
 
 
-# DGPE, as in "Direction Générale Pôle emploi" is a special PE agency which oversees the whole country.
-DGPE_SAFIR_CODE = "00162"
+# DGFT, as in "Direction Générale France Travail" is a special FT agency which oversees the whole country.
+DGFT_SAFIR_CODE = "00162"
 
 # DRFT, as in "Direction Régionale France Travail", are special FT agencies which oversee their whole region.
 # We keep it simple by hardcoding their (short) list here to avoid the complexity of adding a field or a kind.
