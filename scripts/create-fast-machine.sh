@@ -26,6 +26,8 @@ clever link "$APP_NAME" --org Itou
 clever scale --flavor XL --alias "$APP_NAME"
 
 clever env set ITOU_ENVIRONMENT "FAST-MACHINE" --alias "$APP_NAME"
+# By default Clever creates a python app with CC_PYTHON_VERSION set to "3"
+clever env rm CC_PYTHON_VERSION --alias "$APP_NAME"
 
 clever service link-addon c1-bucket-config --alias "$APP_NAME"
 clever service link-addon c1-deployment-config --alias "$APP_NAME"
