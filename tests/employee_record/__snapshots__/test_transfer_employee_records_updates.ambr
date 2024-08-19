@@ -12,9 +12,9 @@
   
   '''
 # ---
-# name: test_missing_environment_asp_fs_sftp_host
+# name: test_missing_environment_asp_sftp_host
   '''
-  Your environment is missing ASP_FS_SFTP_HOST to run this command.
+  Your environment is missing ASP_SFTP_HOST to run this command.
   
   '''
 # ---

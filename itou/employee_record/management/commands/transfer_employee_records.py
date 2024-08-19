@@ -158,8 +158,8 @@ class Command(EmployeeRecordTransferCommand):
             with transaction.atomic():
                 self._parse_feedback_file(parse_file.name, JSONParser().parse(parse_file), dry_run=not wet_run)
         elif upload or download:
-            if not settings.ASP_FS_SFTP_HOST:
-                self.stdout.write("Your environment is missing ASP_FS_SFTP_HOST to run this command.")
+            if not settings.ASP_SFTP_HOST:
+                self.stdout.write("Your environment is missing ASP_SFTP_HOST to run this command.")
                 return
 
             self.asp_test = asp_test
@@ -167,7 +167,7 @@ class Command(EmployeeRecordTransferCommand):
                 self.stdout.write("Using *TEST* JSON serializers (SIRET number mapping)")
 
             with asp_utils.get_sftp_connection() as sftp:
-                self.stdout.write(f'Connected to "{settings.ASP_FS_SFTP_HOST}" as "{settings.ASP_FS_SFTP_USER}"')
+                self.stdout.write(f'Connected to "{settings.ASP_SFTP_HOST}" as "{settings.ASP_SFTP_USER}"')
                 self.stdout.write(f'''Current remote dir is "{sftp.normalize('.')}"''')
 
                 # Send files to ASP
