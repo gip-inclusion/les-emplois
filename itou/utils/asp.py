@@ -8,14 +8,14 @@ REMOTE_DOWNLOAD_DIR = "retrait"
 
 def get_sftp_connection() -> paramiko.SFTPClient:
     client = paramiko.SSHClient()
-    if settings.ASP_FS_KNOWN_HOSTS:
-        client.load_host_keys(settings.ASP_FS_KNOWN_HOSTS)
+    if settings.ASP_SFTP_KNOWN_HOSTS:
+        client.load_host_keys(settings.ASP_SFTP_KNOWN_HOSTS)
 
     client.connect(
-        hostname=settings.ASP_FS_SFTP_HOST,
-        port=settings.ASP_FS_SFTP_PORT,
-        username=settings.ASP_FS_SFTP_USER,
-        key_filename=settings.ASP_FS_SFTP_PRIVATE_KEY_PATH,
+        hostname=settings.ASP_SFTP_HOST,
+        port=settings.ASP_SFTP_PORT,
+        username=settings.ASP_SFTP_USER,
+        key_filename=settings.ASP_SFTP_PRIVATE_KEY_PATH,
         disabled_algorithms={
             "pubkeys": ["rsa-sha2-512", "rsa-sha2-256"],  # We want ssh-rsa
         },

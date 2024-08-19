@@ -577,12 +577,12 @@ REQUESTS_TIMEOUT = 5  # in seconds
 
 # ASP SFTP connection
 # ------------------------------------------------------------------------------
-ASP_FS_SFTP_HOST = os.getenv("ASP_FS_SFTP_HOST")
-ASP_FS_SFTP_PORT = int(os.getenv("ASP_FS_SFTP_PORT", "22"))
-ASP_FS_SFTP_USER = os.getenv("ASP_FS_SFTP_USER")
+ASP_SFTP_HOST = os.getenv("ASP_SFTP_HOST")
+ASP_SFTP_PORT = int(os.getenv("ASP_SFTP_PORT", "22"))
+ASP_SFTP_USER = os.getenv("ASP_SFTP_USER")
 # Path to SSH keypair for SFTP connection
-ASP_FS_SFTP_PRIVATE_KEY_PATH = os.getenv("ASP_FS_SFTP_PRIVATE_KEY_PATH")
-ASP_FS_KNOWN_HOSTS = os.getenv("ASP_FS_KNOWN_HOSTS")
+ASP_SFTP_PRIVATE_KEY_PATH = os.getenv("ASP_SFTP_PRIVATE_KEY_PATH")
+ASP_SFTP_KNOWN_HOSTS = os.getenv("ASP_SFTP_KNOWN_HOSTS")
 
 # S3 uploads
 # ------------------------------------------------------------------------------

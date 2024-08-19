@@ -18,8 +18,8 @@ from tests.employee_record.factories import EmployeeRecordFactory, EmployeeRecor
 @pytest.fixture(name="command")
 def command_fixture(mocker, settings, sftp_directory, sftp_client_factory):
     # Set required settings
-    settings.ASP_FS_SFTP_HOST = "0.0.0.0"  # non-routable IP, just in case :)
-    settings.ASP_FS_SFTP_USER = "django_tests"
+    settings.ASP_SFTP_HOST = "0.0.0.0"  # non-routable IP, just in case :)
+    settings.ASP_SFTP_USER = "django_tests"
 
     # Setup directory
     sftp_directory.joinpath(REMOTE_UPLOAD_DIR).mkdir()
@@ -44,8 +44,8 @@ def process_incoming_file(sftp_directory, code, message):
         feedback_file.write_text(json.dumps(batch))
 
 
-@override_settings(ASP_FS_SFTP_HOST="")
-def test_missing_environment_asp_fs_sftp_host(snapshot, command):
+@override_settings(ASP_SFTP_HOST="")
+def test_missing_environment_asp_sftp_host(snapshot, command):
     command.handle(upload=False, download=True, preflight=False, wet_run=False)
     assert command.stdout.getvalue() == snapshot
 
