@@ -142,18 +142,18 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         # 6. SELECT job application
         # 7. SELECT selected jobs (prefetch related)
         # 8. SELECT approval (last expired eligibility diagnosis)
-        # 9. SELECT poleemploi_approval (last expired eligibility diagnosis)
-        # 10. SELECT eligibility diagnosis (last expired eligibility diagnosis)
+        # 9. SELECT approval (last expired eligibility diagnosis, first valid approval)
         ### Template apply/includes/eligibility_diagnosis.html
-        # 11. SELECT eligibility diagnosis administrative criteria
-        # 12. SELECT approval (again, for considered_to_expire_at)
-        # 13. SELECT poleemploi_approval (again, for considered_to_expire_at)
-        # 14. SELECT transition logs
+        # 10. SELECT eligibility diagnosis administrative criteria
+        # 11. SELECT approval (again, for considered_to_expire_at)
+        # 12. SELECT approval (again, for considered_to_expire_at, first valid approval)
+        # 13. SELECT transition logs
+        # 14. SELECT EXISTS employee_record
         # 15. RELEASE SAVEPOINT
         # 16. SAVEPOINT
         # 17. UPDATE django session
         # 18. RELEASE SAVEPOINT
-        with self.assertNumQueries(20):
+        with self.assertNumQueries(18):
             response = self.client.get(url)
         self.assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
         self.assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))

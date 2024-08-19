@@ -219,14 +219,13 @@ class TestApprovalDetailView:
         # 19. SELECT users_user
         # 20. SELECT users_user
         # 21. SELECT eligibility_administrativecriteria
-        # 22. SELECT approvals_approval
-        # 23. SELECT EXISTS approvals_approval
-        # 24. SELECT approvals_approval
-        # 25. SELECT job_applications_jobapplication
-        # 26. SELECT job_applications_jobapplication_selected_jobs (prefetch)
-        # 27. SELECT prescribers_prescriberorganization (get sender information)
+        # 22. SELECT approvals_approval (all)
+        # 23. SELECT approvals_approval (valid)
+        # 24. SELECT job_applications_jobapplication
+        # 25. SELECT job_applications_jobapplication_selected_jobs (prefetch)
+        # 26. SELECT prescribers_prescriberorganization (get sender information)
         # END of template rendering
-        with assertNumQueries(27):
+        with assertNumQueries(26):
             response = client.get(url)
 
         suspensions_section = parse_response_to_soup(response, selector="#suspensions-list")
@@ -306,14 +305,13 @@ class TestApprovalDetailView:
         # 18. SELECT users_user
         # 19. SELECT users_user
         # 20. SELECT eligibility_administrativecriteria
-        # 21. SELECT approvals_approval
-        # 22. SELECT EXISTS approvals_approval
-        # 23. SELECT approvals_approval
-        # 24. SELECT job_applications_jobapplication
-        # 25. SELECT job_applications_jobapplication_selected_jobs (prefetch)
-        # 26. SELECT prescribers_prescriberorganization (get sender information)
+        # 21. SELECT approvals_approval (all)
+        # 22. SELECT approvals_approval (valid)
+        # 23. SELECT job_applications_jobapplication
+        # 24. SELECT job_applications_jobapplication_selected_jobs (prefetch)
+        # 25. SELECT prescribers_prescriberorganization (get sender information)
         # END of template rendering
-        with assertNumQueries(26):
+        with assertNumQueries(25):
             response = client.get(url)
 
         prolongations_section = parse_response_to_soup(response, selector="#prolongations-list")
