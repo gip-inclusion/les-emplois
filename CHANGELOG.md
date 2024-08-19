@@ -1,5 +1,16 @@
 # Journal des modifications
 
+## 2024-08-19
+
+### Ajouté
+
+- [Page d’accueil : modale nouveautés](https://github.com/gip-inclusion/les-emplois/pull/4446)
+
+### Modifié
+
+- [Accessibilité: toujours inclure un texte pour les boutons copier-coller](https://github.com/gip-inclusion/les-emplois/pull/4550)
+- [Règles plus restrictives pour la suppression de certain objets afin de ne pas créer d'incohérences de données](https://github.com/gip-inclusion/les-emplois/pull/3150)
+
 ## 2024-08-12
 
 ### Ajouté
