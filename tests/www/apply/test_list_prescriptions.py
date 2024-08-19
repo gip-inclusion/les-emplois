@@ -2,6 +2,7 @@ from urllib.parse import unquote
 
 import factory
 from django.urls import reverse
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries
 
 from itou.job_applications.enums import JobApplicationState, SenderKind
@@ -14,7 +15,12 @@ from tests.prescribers.factories import (
 )
 from tests.users.factories import JobSeekerFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import BASE_NUM_QUERIES, assert_previous_step, parse_response_to_soup
+from tests.utils.test import (
+    BASE_NUM_QUERIES,
+    assert_previous_step,
+    get_rows_from_streaming_response,
+    parse_response_to_soup,
+)
 
 
 BESOIN_DUN_CHIFFRE = "besoin-dun-chiffre"
@@ -250,13 +256,16 @@ def test_exports_back_to_list(client):
     assertNotContains(response, BESOIN_DUN_CHIFFRE)
 
 
-def test_exports_download(client):
-    job_application = JobApplicationFactory()
+@freeze_time("2024-08-18")
+def test_exports_download(client, snapshot):
+    job_application = JobApplicationFactory(for_snapshot=True)
     client.force_login(job_application.sender)
 
     response = client.get(reverse("apply:list_prescriptions_exports_download"))
     assert 200 == response.status_code
     assert "spreadsheetml" in response.get("Content-Type")
+    rows = get_rows_from_streaming_response(response)
+    assert rows == snapshot
 
 
 def test_exports_download_as_employer(client):

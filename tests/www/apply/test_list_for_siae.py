@@ -4,13 +4,13 @@ from urllib.parse import unquote
 import pytest
 from django.urls import reverse
 from django.utils import timezone
+from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria
 from itou.job_applications.enums import JobApplicationState
-from itou.job_applications.export import JOB_APPLICATION_CSV_HEADERS
 from itou.job_applications.models import JobApplication, JobApplicationWorkflow
 from itou.jobs.models import Appellation
 from itou.utils.urls import add_url_params
@@ -784,8 +784,9 @@ def test_list_for_siae_exports_back_to_list(client):
     assert_previous_step(response, reverse("apply:list_for_siae"), back_to_list=True)
 
 
-def test_list_for_siae_exports_download(client):
-    job_application = JobApplicationFactory()
+@freeze_time("2024-08-18")
+def test_list_for_siae_exports_download(client, snapshot):
+    job_application = JobApplicationFactory(for_snapshot=True)
     client.force_login(job_application.to_company.members.get())
 
     # Download all job applications
@@ -793,8 +794,7 @@ def test_list_for_siae_exports_download(client):
     assert 200 == response.status_code
     assert "spreadsheetml" in response.get("Content-Type")
     rows = get_rows_from_streaming_response(response)
-    assert rows[0] == JOB_APPLICATION_CSV_HEADERS
-    assert len(rows) == 2
+    assert rows == snapshot
 
 
 def test_list_for_siae_exports_download_as_prescriber(client):
