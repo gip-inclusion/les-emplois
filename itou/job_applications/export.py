@@ -53,7 +53,7 @@ def _get_prescriber_username(job_application):
 
 def _get_selected_jobs(job_application):
     selected_jobs = "Candidature spontanée"
-    if job_application.selected_jobs.exists:
+    if job_application.selected_jobs.all():
         selected_jobs = " ".join(map(lambda j: j.display_name, job_application.selected_jobs.all()))
     return selected_jobs
 
