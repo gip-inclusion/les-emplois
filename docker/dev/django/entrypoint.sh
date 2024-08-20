@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-while ! pg_isready; do
+until pg_isready; do
     >&2 echo "Postgres is unavailable - sleeping"
     sleep 1
 done
