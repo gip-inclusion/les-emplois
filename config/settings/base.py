@@ -190,8 +190,8 @@ DATABASES = {
         "NAME": os.getenv("POSTGRESQL_ADDON_DB"),
         # The custom iptables rules forces us to use the direct host and port in production, the
         # usual one is unreachable.
-        "HOST": os.getenv("POSTGRESQL_ADDON_DIRECT_HOST") or os.getenv("POSTGRESQL_ADDON_HOST"),
-        "PORT": os.getenv("POSTGRESQL_ADDON_DIRECT_PORT") or os.getenv("POSTGRESQL_ADDON_PORT"),
+        "HOST": os.getenv("POSTGRESQL_ADDON_DIRECT_HOST"),
+        "PORT": os.getenv("POSTGRESQL_ADDON_DIRECT_PORT"),
         "USER": os.getenv("POSTGRESQL_ADDON_USER"),
         "PASSWORD": os.getenv("POSTGRESQL_ADDON_PASSWORD"),
         "OPTIONS": {
