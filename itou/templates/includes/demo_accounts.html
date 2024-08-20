@@ -44,7 +44,7 @@
                                 <div class="col">
                                     <div class="c-card card has-links-inside w-100 h-100">
                                         <div class="card-body mb-auto py-0">
-                                            <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" class="card-img-top p-2 test-accounts-image-menu" alt="">
+                                            <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" loading="lazy" width="400" class="card-img-top p-2 test-accounts-image-menu" alt="">
                                             <h5 class="h5 card-title font-weight-bold text-center">{{ account.title }}</h5>
                                         </div>
                                         <div class="p-3 text-center">
@@ -72,7 +72,7 @@
                             {% for account in prescribers_accounts %}
                                 <div class="col">
                                     <div class="c-card card has-links-inside w-100 h-100">
-                                        <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" class="card-img-top p-2 test-accounts-image-menu" alt="">
+                                        <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" loading="lazy" width="400" class="card-img-top p-2 test-accounts-image-menu" alt="">
                                         <div class="card-body">
                                             <h5 class="h5 card-title h6 font-weight-bold text-center">{{ account.title|safe }}</h5>
                                             <p class="card-text">{{ account.description }}</p>
@@ -95,7 +95,7 @@
                             {% for account in job_seekers_accounts %}
                                 <div class="col">
                                     <div class="c-card card has-links-inside w-100 h-100">
-                                        <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" class="card-img-top p-2 test-accounts-image-menu" alt="">
+                                        <img src="{% static '/img/demo_accounts/' %}{{ account.image }}" loading="lazy" width="400" class="card-img-top p-2 test-accounts-image-menu" alt="">
                                         <div class="card-body">
                                             <h5 class="h5 card-title font-weight-bold text-center mb-0">{{ account.title }}</h5>
                                             <p class="card-text">{{ account.description }}</p>
