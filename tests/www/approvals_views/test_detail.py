@@ -117,39 +117,38 @@ class TestApprovalDetailView:
             sent_by_authorized_prescriber_organisation=True,
         )
         approval = job_application.approval
-        expected_num_queries = (
-            1  # fetch django session
-            + 1  # fetch authenticated user
-            + 2  # fetch siae membership and siae infos (middleware)
-            + 1  # place savepoint right after the middlewares
-            + 1  # get approval infos (get_object)
-            + 1  # prefetch suspensions
-            + 1  # prefetch prolongation_requests (with select_related)
-            + 1  # select job application (get_job_application)
-            + 1  # select last accepted job application (can_be_handled_by_siae)
-            + 1  # select latest approval for user (can_be_prolonged)
-            + 1  # approval.get_remainder_display fetches approval suspensions to compute remaining days.
-            + 1  # release savepoint before the template rendering
-            # template: approvals/includes/status.html
-            + 1  # template: approval.suspensions_for_status_card lists approval suspensions
-            + 1  # template: approval prolongations list.
-            + 1  # template: approval.prolongation_requests_for_status_card lists not accepted prolongation requests
-            # template: approvals/detail.html
-            + 1  # get job_application details (view queryset)
-            + 1  # get prefetch job_application selected_jobs
-            + 1  # get sender information (prescriber organization details)
-            # Django middlewares.
-            + 1  # Create savepoint (atomic request to update the Django session)
-            + 1  # Update the Django session
-            + 1  # Release savepoint
-        )
 
         # Employer version
         user = job_application.to_company.members.first()
         client.force_login(user)
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
-        with assertNumQueries(expected_num_queries):
+        # 1.  SELECT django_session
+        # 2.  SELECT users_user
+        # 3.  SELECT company_membership
+        # 4.  SELECT company_company
+        # END of middleware
+        # 5.  SAVEPOINT
+        # 6.  SELECT approvals_approval (get_object)
+        # 7.  SELECT approvals_suspension (prefetch)
+        # 8.  SELECT approvals_prolongationrequest (prefetch)
+        # 9.  SELECT job_applications_jobapplication (get_job_application)
+        # 10. SELECT job_applications_jobapplication (last accepted job application, can_be_handled_by_siae)
+        # 11. SELECT approvals_approval (latest approval for user, can_be_prolonged)
+        # 12. SELECT approvals_suspension
+        # 13. RELEASE SAVEPOINT
+        # END of view, template rendering
+        # 14. SELECT approvals_suspension
+        # 15. SELECT approvals_prolongation
+        # 16. SELECT approvals_prolongationrequest
+        # 17. SELECT job_applications_jobapplication
+        # 18. SELECT job_applications_jobapplication_selected_jobs (prefetch)
+        # 19. SELECT prescribers_prescriberorganization (get sender information)
+        # END of template rendering
+        # CREATE SAVEPOINT (ATOMIC REQUEST TO UPDATE THE DJANGO SESSION)
+        # UPDATE django_session
+        # RELEASE SAVEPOINT
+        with assertNumQueries(22):
             response = client.get(url)
         response = client.get(url)
         assertContains(response, format_approval_number(approval))
@@ -197,38 +196,37 @@ class TestApprovalDetailView:
         )
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
-        expected_num_queries = (
-            1  # fetch django session
-            + 1  # fetch authenticated user
-            + 2  # fetch siae membership and siae infos (middleware)
-            + 1  # place savepoint right after the middlewares
-            + 1  # get approval infos (get_object)
-            + 1  # prefetch suspensions
-            + 1  # prefetch prolongation_requests (with select_related)
-            + 1  # select job application (get_job_application)
-            + 1  # select latest approval for user (can_be_prolonged)
-            + 1  # select company from job application (missing to_company in get_job_application select_related)
-            + 1  # select suspensions (suspensions_by_start_date_asc)
-            + 1  # select EXISTS accepted job application starting after today
-            + 1  # release savepoint before the template rendering
-            # template: approvals/includes/status.html
-            + 1  # approval.suspensions_for_status_card lists approval suspensions
-            + 1  # suspension in progress can_be_handled_by_siae: select last accepted job application
-            + 1  # approval.prolongations_for_status_card
-            + 1  # approval.prolongation_requests_for_status_card lists not accepted prolongation requests
-            # template: eligibility_diagnosis.html
-            + 1  # select job_seeker (job_application.job_seeker, should use approval.user)
-            + 1  # get user infos (eligibility_diagnosis.author.get_full_name)
-            + 1  # eligibility_diagnosis.administrative_criteria.all
-            + 1  # select approvals for user (eligibility_diagnosis.considered_to_expire_at)
-            + 1  # select exists valid approvals for user (eligibility_diagnosis.considered_to_expire_at)
-            + 1  # select valid approvals for user (eligibility_diagnosis.considered_to_expire_at)
-            # template: approvals/includes/job_description_list.html
-            + 1  # select all_job_applications
-            + 1  # select selected_jobs (prefetch_related from all_job_applications)
-            + 1  # select prescriber_prescriberorganization (prefetch_related from all_job_applications)
-        )
-        with assertNumQueries(expected_num_queries):
+        # 1.  SELECT django_session
+        # 2.  SELECT users_user
+        # 3.  SELECT company_membership
+        # 4.  SELECT company_company
+        # END of middleware
+        # 5.  SAVEPOINT
+        # 6.  SELECT approvals_approval (get_object)
+        # 7.  SELECT approvals_suspension (prefetch)
+        # 8.  SELECT approvals_prolongationrequest (prefetch)
+        # 9.  SELECT job_applications_jobapplication (get_job_application)
+        # 10. SELECT approvals_approval
+        # 11. SELECT companies_company
+        # 12. SELECT approvals_suspension
+        # 13. SELECT EXISTS job_applications_jobapplication
+        # 14. RELEASE SAVEPOINT
+        # END of view, template rendering
+        # 15. SELECT approvals_suspension
+        # 16. SELECT job_applications_jobapplication
+        # 17. SELECT approvals_prolongation
+        # 18. SELECT approvals_prolongationrequest
+        # 19. SELECT users_user
+        # 20. SELECT users_user
+        # 21. SELECT eligibility_administrativecriteria
+        # 22. SELECT approvals_approval
+        # 23. SELECT EXISTS approvals_approval
+        # 24. SELECT approvals_approval
+        # 25. SELECT job_applications_jobapplication
+        # 26. SELECT job_applications_jobapplication_selected_jobs (prefetch)
+        # 27. SELECT prescribers_prescriberorganization (get sender information)
+        # END of template rendering
+        with assertNumQueries(27):
             response = client.get(url)
 
         suspensions_section = parse_response_to_soup(response, selector="#suspensions-list")
@@ -286,9 +284,36 @@ class TestApprovalDetailView:
         )
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
-        # 1 query less to be executed: no more suspensions so no more need to check if there
-        # is an accepted job application
-        with assertNumQueries(expected_num_queries - 1):
+        # 1.  SELECT django_session
+        # 2.  SELECT users_user
+        # 3.  SELECT company_membership
+        # 4.  SELECT company_company
+        # END of middleware
+        # 5.  SAVEPOINT
+        # 6.  SELECT approvals_approval (get_object)
+        # 7.  SELECT approvals_suspension (prefetch)
+        # 8.  SELECT approvals_prolongationrequest (prefetch)
+        # 9.  SELECT job_applications_jobapplication (get_job_application)
+        # 10. SELECT job_applications_jobapplication (can_be_handled_by_siae)
+        # 11. SELECT approvals_approval
+        # 12. SELECT companies_company
+        # 13. SELECT approvals_suspension
+        # 14. RELEASE SAVEPOINT
+        # END of view, template rendering
+        # 15. SELECT approvals_suspension
+        # 16. SELECT approvals_prolongation
+        # 17. SELECT approvals_prolongationrequest
+        # 18. SELECT users_user
+        # 19. SELECT users_user
+        # 20. SELECT eligibility_administrativecriteria
+        # 21. SELECT approvals_approval
+        # 22. SELECT EXISTS approvals_approval
+        # 23. SELECT approvals_approval
+        # 24. SELECT job_applications_jobapplication
+        # 25. SELECT job_applications_jobapplication_selected_jobs (prefetch)
+        # 26. SELECT prescribers_prescriberorganization (get sender information)
+        # END of template rendering
+        with assertNumQueries(26):
             response = client.get(url)
 
         prolongations_section = parse_response_to_soup(response, selector="#prolongations-list")
