@@ -5,7 +5,6 @@ from itou.common_apps.notifications.base_class import BaseNotification
 from itou.communications import NotificationCategory, registry as notifications_registry
 from itou.communications.dispatch import EmailNotification, EmployerNotification, JobSeekerNotification
 from itou.companies.enums import SIAE_WITH_CONVENTION_KINDS
-from itou.job_applications.utils import show_afpa_ad
 from itou.prescribers.models import PrescriberMembership
 from itou.utils.emails import get_email_message
 from itou.utils.urls import get_absolute_url
@@ -95,12 +94,8 @@ class ProlongationRequestDeniedJobSeeker(BaseNotification):
 
     @property
     def email(self):
-        user = self.prolongation_request.approval.user
-        to = [user.email]
-        context = {
-            "prolongation_request": self.prolongation_request,
-            "show_afpa_ad": show_afpa_ad(user),
-        }
+        to = [self.prolongation_request.approval.user.email]
+        context = {"prolongation_request": self.prolongation_request}
         subject = "approvals/email/prolongation_request/denied/jobseeker_subject.txt"
         body = "approvals/email/prolongation_request/denied/jobseeker_body.txt"
         return get_email_message(to, context, subject, body)

@@ -764,8 +764,6 @@ class JobApplicationQuerySetTest(TestCase):
 
 
 class JobApplicationNotificationsTest(TestCase):
-    AFPA = "Afpa"
-
     @classmethod
     def setUpTestData(cls):
         # Set up data for the whole TestCase.
@@ -956,7 +954,6 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.to_company.display_name in email.body
         assert job_application.answer in email.body
         assert job_application.answer_to_prescriber in email.body
-        assert self.AFPA not in email.body
 
         # When sent by jobseeker.
         job_application = JobApplicationSentByJobSeekerFactory(
@@ -972,7 +969,6 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.to_company.display_name in email.body
         assert job_application.answer in email.body
         assert job_application.answer_to_prescriber not in email.body
-        assert self.AFPA not in email.body
 
     def test_refuse_without_sender(self):
         # When sent by authorized prescriber.
@@ -989,20 +985,6 @@ class JobApplicationNotificationsTest(TestCase):
             job_application.refuse(user=job_application.to_company.members.first())
         [email] = mail.outbox
         assert email.to == [job_application.job_seeker.email]
-        assert self.AFPA not in email.body
-
-    def test_refuse_afpa_message(self):
-        job_application = JobApplicationSentByJobSeekerFactory(
-            job_seeker__jobseeker_profile__hexa_post_code="59284",
-            refusal_reason=RefusalReason.DID_NOT_COME,
-            answer_to_prescriber="Le candidat n'est pas venu.",
-        )
-        email = job_application.notifications_refuse_for_job_seeker.build()
-        assert [job_application.job_seeker.email] == email.to
-        assert job_application.to_company.display_name in email.body
-        assert job_application.answer in email.body
-        assert job_application.answer_to_prescriber not in email.body
-        assert self.AFPA in email.body
 
     def test_notifications_deliver_approval(self):
         job_seeker = JobSeekerFactory()
