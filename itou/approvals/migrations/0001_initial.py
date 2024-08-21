@@ -332,7 +332,7 @@ class Migration(migrations.Migration):
                 ("number", models.CharField(max_length=12, unique=True, verbose_name="numéro")),
                 (
                     "pole_emploi_id",
-                    models.CharField(max_length=8, verbose_name="identifiant France Travail (ex pôle emploi)"),
+                    models.CharField(max_length=8, verbose_name="identifiant France Travail"),
                 ),
                 ("first_name", models.CharField(max_length=150, verbose_name="prénom")),
                 ("last_name", models.CharField(max_length=150, verbose_name="nom")),
@@ -921,7 +921,7 @@ class Migration(migrations.Migration):
                 ("number", models.CharField(max_length=15, unique=True, verbose_name="numéro")),
                 (
                     "pole_emploi_id",
-                    models.CharField(max_length=8, verbose_name="identifiant France Travail (ex pôle emploi)"),
+                    models.CharField(max_length=8, verbose_name="identifiant France Travail"),
                 ),
                 ("first_name", models.CharField(max_length=150, verbose_name="prénom")),
                 ("last_name", models.CharField(max_length=150, verbose_name="nom")),

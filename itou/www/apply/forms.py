@@ -285,7 +285,7 @@ class CreateOrUpdateJobSeekerStep3Form(forms.ModelForm):
                 # also don't stack a 'missing field' error if an error already exists ('wrong format' in this case)
                 self.add_error(
                     "pole_emploi_id",
-                    forms.ValidationError("L'identifiant France Travail (ex pôle emploi) est obligatoire"),
+                    forms.ValidationError("L'identifiant France Travail est obligatoire"),
                 )
         else:
             self.cleaned_data["pole_emploi_id_forgotten"] = ""

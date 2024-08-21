@@ -53,7 +53,7 @@
             {% endif %}
         </li>
         <li>
-            <small>Identifiant France Travail (ex pôle emploi)</small>
+            <small>Identifiant France Travail</small>
             {% if job_seeker.jobseeker_profile.pole_emploi_id %}
                 <strong>{{ job_seeker.jobseeker_profile.pole_emploi_id }}</strong>
                 {% include 'includes/copy_to_clipboard.html' with content=job_seeker.jobseeker_profile.pole_emploi_id css_classes="btn-link" only_icon=True %}

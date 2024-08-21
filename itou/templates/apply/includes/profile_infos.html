@@ -54,7 +54,7 @@
     {% endif %}
     {% if profile.user.jobseeker_profile.pole_emploi_id or profile.user.jobseeker_profile.lack_of_pole_emploi_id_reason %}
         <li class="mb-3">
-            Identifiant France Travail (ex pôle emploi) :
+            Identifiant France Travail :
             <b>
                 {% if profile.user.jobseeker_profile.pole_emploi_id %}
                     {{ profile.user.jobseeker_profile.pole_emploi_id }}

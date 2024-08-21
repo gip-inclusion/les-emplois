@@ -457,7 +457,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         self.assertFormError(
             response.context["form"],
             None,
-            "Renseignez soit un identifiant France Travail (ex pôle emploi), soit la raison de son absence.",
+            "Renseignez soit un identifiant France Travail, soit la raison de son absence.",
         )
         post_data["pole_emploi_id"] = "invalide"  # No length issue but validate_pole_emploi_id shouldn't be happy
         response = self.client.post(url, data=post_data)
@@ -466,7 +466,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             response.context["form"],
             "pole_emploi_id",
             (
-                "L'identifiant France Travail (ex pôle emploi) doit être composé de 8 caractères : "
+                "L'identifiant France Travail doit être composé de 8 caractères : "
                 "7 chiffres suivis d'une 1 lettre ou d'un chiffre."
             ),
         )

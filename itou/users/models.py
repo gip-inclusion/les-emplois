@@ -841,14 +841,14 @@ class JobSeekerProfile(models.Model):
     # It looks like it pre-dates the national merger and may be unique
     # by user and by region…
     pole_emploi_id = models.CharField(
-        verbose_name="identifiant France Travail (ex pôle emploi)",
+        verbose_name="identifiant France Travail",
         help_text="7 chiffres suivis d'une 1 lettre ou d'un chiffre.",
         max_length=8,
         validators=[validate_pole_emploi_id, MinLengthValidator(8)],
         blank=True,
     )
     lack_of_pole_emploi_id_reason = models.CharField(
-        verbose_name="pas d'identifiant France Travail (ex pôle emploi) ?",
+        verbose_name="pas d'identifiant France Travail ?",
         help_text=mark_safe(
             "Indiquez la raison de l'absence d'identifiant France Travail.<br>"
             "Renseigner l'identifiant France Travail des candidats inscrits "
@@ -975,7 +975,7 @@ class JobSeekerProfile(models.Model):
     )
 
     pe_obfuscated_nir = models.CharField(
-        verbose_name="identifiant France Travail (ex pôle emploi) chiffré",
+        verbose_name="identifiant France Travail chiffré",
         null=True,
         blank=True,
         max_length=48,
@@ -1058,9 +1058,7 @@ class JobSeekerProfile(models.Model):
         lack_of_pole_emploi_id_reason = cleaned_data.get("lack_of_pole_emploi_id_reason")
         # One or the other must be filled.
         if not pole_emploi_id and not lack_of_pole_emploi_id_reason:
-            raise ValidationError(
-                "Renseignez soit un identifiant France Travail (ex pôle emploi), soit la raison de son absence."
-            )
+            raise ValidationError("Renseignez soit un identifiant France Travail, soit la raison de son absence.")
         # If both are filled, `pole_emploi_id` takes precedence (Trello #1724).
         if pole_emploi_id and lack_of_pole_emploi_id_reason:
             # Take advantage of the fact that `cleaned_data` is passed by sharing:

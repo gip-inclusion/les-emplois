@@ -36,7 +36,7 @@
     {% endif %}
     {% if job_seeker.jobseeker_profile.pole_emploi_id %}
         <li>
-            <b>Identifiant France Travail (ex pôle emploi) : </b>
+            <b>Identifiant France Travail : </b>
             {{ job_seeker.jobseeker_profile.pole_emploi_id }}
             <small>
                 (<a href="{% url "admin:approvals_poleemploiapproval_changelist" %}?q={{ job_seeker.jobseeker_profile.pole_emploi_id|urlencode }}" target="_blank">
