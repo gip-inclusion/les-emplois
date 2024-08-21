@@ -34,6 +34,7 @@
                   /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
                   window._paq.push(['setCustomDimension', 1, "employer"]);
                   window._paq.push(['setCustomDimension', 3, "EI"]);
+                  window._paq.push(['setCustomDimension', 4, "59"]);
   
                   window._paq.push(['setUserId', '99999']);
   
@@ -57,6 +58,7 @@
                   /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
                   window._paq.push(['setCustomDimension', 1, "employer"]);
                   window._paq.push(['setCustomDimension', 3, "EI"]);
+                  window._paq.push(['setCustomDimension', 4, "59"]);
   
                   window._paq.push(['setUserId', '99999']);
   
