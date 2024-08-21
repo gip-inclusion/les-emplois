@@ -1411,7 +1411,7 @@ def test_matomo_context_processor(client, settings, snapshot):
     Also ensure the user ID is correctly set.
     """
     settings.MATOMO_BASE_URL = "https://fake.matomo.url"
-    company = CompanyFactory(with_membership=True, membership__user__pk=99999)
+    company = CompanyFactory(with_membership=True, membership__user__pk=99999, department="59")
     user = company.members.first()
     client.force_login(user)
 
