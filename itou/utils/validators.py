@@ -38,7 +38,7 @@ def validate_pole_emploi_id(pole_emploi_id):
     is_valid = len(pole_emploi_id) == 8 and pole_emploi_id[:7].isdigit() and pole_emploi_id[7:].isalnum()
     if not is_valid:
         raise ValidationError(
-            "L'identifiant France Travail (ex pôle emploi) doit être composé de 8 caractères : "
+            "L'identifiant France Travail doit être composé de 8 caractères : "
             "7 chiffres suivis d'une 1 lettre ou d'un chiffre."
         )
 

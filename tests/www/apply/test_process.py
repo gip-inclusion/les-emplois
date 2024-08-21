@@ -180,7 +180,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         )
         self.assertContains(
             response,
-            '<small>Identifiant France Travail (ex pôle emploi)</small><i class="text-disabled">Non renseigné</i>',
+            '<small>Identifiant France Travail</small><i class="text-disabled">Non renseigné</i>',
             html=True,
         )
         self.assertContains(
