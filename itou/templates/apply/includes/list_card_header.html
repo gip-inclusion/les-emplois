@@ -9,7 +9,7 @@
         </b>
         {% if job_application.to_company.grace_period_has_expired %}
             <span class="badge badge-sm rounded-pill bg-danger">
-                Structure déconventionnée depuis le
+                Organisation déconventionnée depuis le
                 {{ job_application.to_company.grace_period_end_date|date:"d F Y" }}
             </span>
         {% endif %}

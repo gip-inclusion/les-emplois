@@ -4,7 +4,7 @@
 
 Merci de votre inscription. L'habilitation de votre organisation est maintenant vérifiée. Nous vous souhaitons bienvenue sur les emplois de l'inclusion !
 
-*Structure* :
+*Organisation* :
 
 - Nom : {{ organization.display_name }}
 - SIRET : {{ organization.siret }}

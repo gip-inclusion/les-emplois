@@ -4,7 +4,7 @@
 
 Un administrateur vous a retiré d'une structure sur les emplois de l'inclusion
 
-Structure :
+Organisation :
 
 - Nom : {{ structure.display_name }}
 - Type : {{ structure.kind }}

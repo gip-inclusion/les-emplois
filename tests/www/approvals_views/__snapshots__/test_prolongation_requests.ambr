@@ -774,7 +774,7 @@
                                           <tr>
                                               <th scope="col">Salarié</th>
                                               <th scope="col">Numéro de PASS IAE</th>
-                                              <th scope="col">Structure</th>
+                                              <th scope="col">Organisation</th>
                                               <th scope="col">Demandée le</th>
                                               <th scope="col">
                                                   Adressée à
@@ -841,7 +841,7 @@
                                           <tr>
                                               <th scope="col">Salarié</th>
                                               <th scope="col">Numéro de PASS IAE</th>
-                                              <th scope="col">Structure</th>
+                                              <th scope="col">Organisation</th>
                                               <th scope="col">Demandée le</th>
                                               <th scope="col">
                                                   Adressée à

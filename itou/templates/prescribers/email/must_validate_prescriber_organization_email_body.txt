@@ -4,7 +4,7 @@
 
 Une nouvelle organisation de prescripteur a été créée. L'habilitation de cette structure est à vérifier.
 
-*Structure* :
+*Organisation* :
 
 - Nom : {{ organization.display_name }}
 - ID : {{ organization.id }}
