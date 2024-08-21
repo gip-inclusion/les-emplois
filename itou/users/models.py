@@ -374,6 +374,14 @@ class User(AbstractUser, AddressMixin):
     def is_labor_inspector(self):
         return self.kind == UserKind.LABOR_INSPECTOR
 
+    @property
+    def job_seeker_department(self):
+        if self.department:
+            return self.department
+        if self.is_job_seeker:
+            return department_from_postcode(self.jobseeker_profile.hexa_post_code)
+        return ""
+
     def can_edit_email(self, user):
         return user.is_handled_by_proxy and user.is_created_by(self) and not user.has_verified_email
 
