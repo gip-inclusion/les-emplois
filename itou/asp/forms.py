@@ -24,6 +24,7 @@ def formfield_for_birth_place(**kwargs):
                 "data-placeholder": "Nom de la commune",
                 "data-disable-target": "#id_birth_country",
                 "data-target-value": f"{france.pk}",
+                "data-select2-link-with-birthdate": "id_birthdate",
             },
         ),
         **kwargs,
