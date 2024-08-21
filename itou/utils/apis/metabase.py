@@ -276,6 +276,15 @@ METABASE_DASHBOARDS = {
     "stats_iae_network_hiring": {
         "dashboard_id": 301,
     },
+    #
+    # Institution stats - Convergence France - nation level.
+    #
+    "stats_convergence_prescription": {
+        "dashboard_id": 446,
+    },
+    "stats_convergence_job_application": {
+        "dashboard_id": 469,
+    },
 }
 
 
