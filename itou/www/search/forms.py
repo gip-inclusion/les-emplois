@@ -17,8 +17,7 @@ from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
 
 class SiaeSearchForm(forms.Form):
-    DISTANCES = [5, 10, 15, 25, 50, 75, 100]
-    DISTANCE_CHOICES = [(i, (f"{i} km")) for i in DISTANCES]
+    DISTANCE_CHOICES = [(i, (f"{i} km")) for i in [2, 5, 10, 15, 25, 50, 100]]
     DISTANCE_DEFAULT = 25
 
     KIND_CHOICES = [(k, f"{k} - {v}") for k, v in CompanyKind.choices]
@@ -124,8 +123,7 @@ class JobDescriptionSearchForm(SiaeSearchForm):
 
 
 class PrescriberSearchForm(forms.Form):
-    DISTANCES = [5, 10, 15, 25, 50, 75, 100]
-    DISTANCE_CHOICES = [(i, (f"{i} km")) for i in DISTANCES]
+    DISTANCE_CHOICES = [(i, (f"{i} km")) for i in [2, 5, 10, 15, 25, 50, 100]]
     DISTANCE_DEFAULT = 5
 
     distance = forms.ChoiceField(
