@@ -47,25 +47,3 @@
         </div>
     </section>
 {% endblock %}
-
-{% block script %}
-    {{ block.super }}
-    {% if step == 1 %}
-        {# It is only useful there #}
-        <script nonce="{{ CSP_NONCE }}">
-            const birthdatePicker = document.querySelector('duet-date-picker[name="birthdate"]')
-            $(document).ready(function() {
-                $('#id_birth_place').select2({
-                    ajax: {
-                        data: function(params) {
-                            return {
-                                term: params.term,
-                                date: birthdatePicker.getAttribute("value"),
-                            }
-                        }
-                    }
-                })
-            })
-        </script>
-    {% endif %}
-{% endblock %}

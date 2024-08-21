@@ -131,4 +131,23 @@ htmx.onLoad((target) => {
     container.querySelector(".file-dropzone-clear").addEventListener("click", handleFileClear);
   }
   target.querySelectorAll(".file-dropzone").forEach(initDropZone);
+
+  /**
+   * JS to add the birthdate parameter when querying Commune for birthplace
+   **/
+  $('select[data-select2-link-with-birthdate]', target).each(function () {
+    const identifier = this.getAttribute("data-select2-link-with-birthdate")
+    const birthdatePicker = document.querySelector('duet-date-picker[identifier="' + identifier + '"]')
+
+    $(this).select2({
+      ajax: {
+        data: function(params) {
+          return {
+            term: params.term,
+            date: birthdatePicker.getAttribute("value"),
+          }
+        }
+      }
+    })
+  })
 });
