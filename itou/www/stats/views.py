@@ -828,3 +828,29 @@ def stats_iae_network_hiring(request):
         context=context,
         params={mb.IAE_NETWORK_FILTER_KEY: current_org.id},
     )
+
+
+@login_required
+def stats_convergence_prescription(request):
+    get_current_institution_or_404(request)
+    if not utils.can_view_stats_convergence(request):
+        raise PermissionDenied
+    return render_stats(
+        request=request,
+        context={
+            "page_title": "Prescriptions et parcours",
+        },
+    )
+
+
+@login_required
+def stats_convergence_job_application(request):
+    get_current_institution_or_404(request)
+    if not utils.can_view_stats_convergence(request):
+        raise PermissionDenied
+    return render_stats(
+        request=request,
+        context={
+            "page_title": "Traitement et résultats des candidatures",
+        },
+    )

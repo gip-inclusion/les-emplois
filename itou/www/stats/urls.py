@@ -135,4 +135,11 @@ urlpatterns = [
     path("drihl/state", views.stats_drihl_state, name="stats_drihl_state"),
     # Institution stats - IAE Network - nation level.
     path("iae_network/hiring", views.stats_iae_network_hiring, name="stats_iae_network_hiring"),
+    # Institution stats - Convergence France - nation level.
+    path("convergence/prescription", views.stats_convergence_prescription, name="stats_convergence_prescription"),
+    path(
+        "convergence/job_application",
+        views.stats_convergence_job_application,
+        name="stats_convergence_job_application",
+    ),
 ]

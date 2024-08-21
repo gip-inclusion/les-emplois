@@ -218,6 +218,14 @@ def can_view_stats_iae_network(request):
     )
 
 
+def can_view_stats_convergence(request):
+    return (
+        request.user.is_labor_inspector
+        and isinstance(request.current_organization, Institution)
+        and request.current_organization.kind == InstitutionKind.CONVERGENCE
+    )
+
+
 def get_stats_ft_departments(request):
     if not can_view_stats_ft(request):
         raise PermissionDenied

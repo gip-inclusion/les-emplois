@@ -37,5 +37,6 @@ class InstitutionKind(models.TextChoices):
     DGEFP_IAE = ("DGEFP IAE", "Délégation générale à l'emploi et à la formation professionnelle, division IAE")
     DIHAL = ("DIHAL", "Délégation interministérielle à l'hébergement et à l'accès au logement")
     IAE_NETWORK = ("Réseau IAE", "Réseau employeur de l'insertion par l'activité économique")
+    CONVERGENCE = ("CONVERGENCE", "Convergence France")
 
     OTHER = ("Autre", "Autre")
