@@ -19,4 +19,4 @@ updates:
     open-pull-requests-limit: 20
     allow:
       # Allow both direct and indirect updates for all packages
-      dependency-type: all
+      - dependency-type: all
