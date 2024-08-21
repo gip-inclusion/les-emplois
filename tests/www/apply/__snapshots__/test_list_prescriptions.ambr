@@ -173,11 +173,11 @@
       <fieldset>
           <legend>
               <button aria-controls="collapseToCompanies" aria-expanded="false" class="btn has-collapse-caret collapsed" data-bs-target="#collapseToCompanies" data-bs-toggle="collapse" type="button">
-                  Structure destinataire
+                  Organisation destinataire
               </button>
           </legend>
           <div class="mt-3 collapse" id="collapseToCompanies">
-              <div class="form-group"><label class="visually-hidden" for="id_to_companies">Structure</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_to_companies" lang="fr" multiple="" name="to_companies">
+              <div class="form-group"><label class="visually-hidden" for="id_to_companies">Organisation</label><select class="form-select django-select2" data-allow-clear="true" data-minimum-input-length="0" data-placeholder="" data-theme="bootstrap-5" id="id_to_companies" lang="fr" multiple="" name="to_companies">
   </select></div>
           </div>
       </fieldset>

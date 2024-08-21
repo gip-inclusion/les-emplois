@@ -81,7 +81,7 @@ class PrescriberOrganizationAdmin(ItouGISMixin, OrganizationAdmin):
     change_form_template = "admin/prescribers/change_form.html"
     fieldsets = (
         (
-            "Structure",
+            "Organisation",
             {
                 "fields": (
                     "pk",

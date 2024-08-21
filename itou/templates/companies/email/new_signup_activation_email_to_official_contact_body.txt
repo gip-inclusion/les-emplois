@@ -4,7 +4,7 @@
 
 Un nouvel utilisateur souhaite rejoindre votre structure sur les emplois de l'inclusion !
 
-Structure :
+Organisation :
 
 - Nom : {{ siae.display_name }}
 - SIRET : {{ siae.siret }}

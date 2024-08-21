@@ -23,7 +23,7 @@
 
     {% if job_application.sender_prescriber_organization %}
         <li>
-            <small>Structure</small>
+            <small>Organisation</small>
             <strong>{{ job_application.sender_prescriber_organization.display_name }}</strong>
             {% if job_application.is_sent_by_authorized_prescriber %}
                 <span class="badge badge-xs rounded-pill bg-warning">Prescripteur habilité</span>
@@ -33,7 +33,7 @@
 
     {% if job_application.sender_company %}
         <li>
-            <small>Structure</small>
+            <small>Organisation</small>
             <strong>{{ job_application.sender_company.display_name }}</strong>
         </li>
     {% endif %}

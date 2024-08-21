@@ -1163,7 +1163,7 @@ class PrescriberFilterJobApplicationsForm(CompanyPrescriberFilterJobApplications
     Job applications filters for Prescribers only.
     """
 
-    to_companies = forms.MultipleChoiceField(required=False, label="Structure", widget=Select2MultipleWidget)
+    to_companies = forms.MultipleChoiceField(required=False, label="Organisation", widget=Select2MultipleWidget)
 
     def __init__(self, job_applications_qs, *args, **kwargs):
         super().__init__(job_applications_qs, *args, **kwargs)

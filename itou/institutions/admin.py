@@ -16,7 +16,7 @@ class InstitutionAdmin(ItouGISMixin, OrganizationAdmin):
     form = InstitutionAdminForm
     fieldsets = (
         (
-            "Structure",
+            "Organisation",
             {
                 "fields": (
                     "pk",
