@@ -7,7 +7,6 @@ from itou.communications.dispatch import (
     PrescriberNotification,
     PrescriberOrEmployerNotification,
 )
-from itou.job_applications.utils import show_afpa_ad
 from itou.utils.emails import get_email_message
 
 
@@ -122,11 +121,6 @@ class JobApplicationRefusedForJobSeekerNotification(JobSeekerNotification, Email
     category = NotificationCategory.JOB_APPLICATION
     subject_template = "apply/email/refuse_subject.txt"
     body_template = "apply/email/refuse_body_for_job_seeker.txt"
-
-    def get_context(self):
-        context = super().get_context()
-        context["show_afpa_ad"] = show_afpa_ad(self.user)
-        return context
 
 
 @notifications_registry.register
