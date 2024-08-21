@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import Exists, OuterRef, Q, TextChoices
 from django.shortcuts import reverse
 from django.utils import timezone
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django_select2.forms import Select2Widget
 
@@ -358,8 +359,13 @@ class CreateProlongationRequestForm(CreateProlongationForm):
                 # Either does not exist or is not an authorized prescriber
                 self.add_error(
                     "email",
-                    "Ce prescripteur n'a pas de compte sur les emplois de l'inclusion. "
-                    "Merci de renseigner l'e-mail d'un conseiller inscrit sur le service.",
+                    format_html(
+                        "Cet utilisateur n’est pas inscrit en tant que prescripteur habilité sur les "
+                        'emplois de l’inclusion, vous pouvez <a href="{}" rel="noopener" target="_blank" '
+                        'aria-label="Rechercher des prescripteurs (ouverture dans une nouvelle fenêtre)">retrouver ici'
+                        "</a> des prescripteurs habilités autour de chez vous.",
+                        reverse("search:prescribers_home"),
+                    ),
                 )
 
 

@@ -1,6 +1,6 @@
 # serializer version: 1
 # name: ApprovalProlongationTest.test_check_invalid_prescriber[unknown authorized prescriber]
-  '<div class="invalid-feedback">Ce prescripteur n\'a pas de compte sur les emplois de l\'inclusion. Merci de renseigner l\'e-mail d\'un conseiller inscrit sur le service.</div>'
+  '<div class="invalid-feedback">Cet utilisateur n’est pas inscrit en tant que prescripteur habilité sur les emplois de l’inclusion, vous pouvez <a aria-label="Rechercher des prescripteurs (ouverture dans une nouvelle fenêtre)" href="/search/prescribers" rel="noopener" target="_blank">retrouver ici</a> des prescripteurs habilités autour de chez vous.</div>'
 # ---
 # name: ApprovalProlongationTest.test_check_multiple_prescriber_organization[prescriber is member of many organizations]
   '<div class="invalid-feedback">Ce champ est obligatoire.</div>'
