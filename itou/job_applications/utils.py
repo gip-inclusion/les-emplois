@@ -1,6 +1,5 @@
 def show_afpa_ad(user):
-    postcode = user.jobseeker_profile.hexa_post_code or user.post_code
-    return postcode[:2] in [
+    return user.job_seeker_department in [
         # Hauts-de-france
         "02",
         "59",
