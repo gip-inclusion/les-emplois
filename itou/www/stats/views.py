@@ -14,12 +14,15 @@ make sure that the correct filters are "Verrouillé".
 
 """
 
+import datetime
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_exempt
 
 from itou.analytics.models import StatsDashboardVisit
@@ -130,6 +133,18 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
 
     # Key value pairs in context override preexisting pairs in base_context.
     base_context.update(context)
+    if "pilotage_webinar_banners" not in base_context:
+        base_context["pilotage_webinar_banners"] = [
+            {
+                "title": "Des questions sur l’utilisation de vos tableaux de bord ?",
+                "description": "Nous y répondons lors d’un webinaire questions / réponses animé chaque mois. Inscrivez-vous à la prochaine session prévu jeudi 29 août de 14h à 14h45.",  # noqa: E501
+                "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-professionnels-de-liae-questions-reponses-sur-les-tableaux-de-bord-1?s=67c316de-9dc5-4ec7-a469-6698507fa312",  # noqa: E501
+                "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 8, 29),
+            }
+        ]
+    base_context["pilotage_webinar_banners"] = [
+        banner for banner in base_context["pilotage_webinar_banners"] if banner["is_displayable"]()
+    ]
 
     matomo_custom_url = request.resolver_match.route  # e.g. "stats/pe/delay/main"
     if suffix := base_context.pop("matomo_custom_url_suffix", None):
@@ -315,7 +330,7 @@ def stats_siae_hiring_report(request):
     return render_stats_siae(request=request, page_title="Déclaration d’embauche")
 
 
-def render_stats_cd(request, page_title, params=None):
+def render_stats_cd(request, page_title, *, params=None, extra_context=None):
     """
     CD ("Conseil Départemental") stats shown to relevant members.
     They can only view data for their own departement.
@@ -330,6 +345,8 @@ def render_stats_cd(request, page_title, params=None):
         "department": department,
         "matomo_custom_url_suffix": format_region_and_department_for_matomo(department),
     }
+    if extra_context:
+        context.update(extra_context)
     return render_stats(request=request, context=context, params=params)
 
 
@@ -342,14 +359,38 @@ def stats_cd_iae(request):
 def stats_cd_hiring(request):
     if not utils.can_view_stats_cd_whitelist(request):
         raise PermissionDenied
-    return render_stats_cd(request=request, page_title="Facilitation des embauches en IAE")
+    context = {
+        "pilotage_webinar_banners": [
+            {
+                "title": "Des questions sur la prise en main de ce nouveau tableau de bord ?",
+                "description": "Nous y répondons en direct lors d’un webinaire de questions / réponses, dédiés aux Conseils départementaux, organisés le mardi 17 septembre à 14h",  # noqa: E501
+                "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-webinaire-questions-and-reponses-pour-les-conseils-departementaux?s=f83e62e2-42a3-4cc1-9772-c963d2be2c00",  # noqa: E501
+                "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 9, 17),
+            }
+        ]
+    }
+    return render_stats_cd(request=request, page_title="Facilitation des embauches en IAE", extra_context=context)
 
 
 @login_required
 def stats_cd_brsa(request):
     if not utils.can_view_stats_cd_whitelist(request):
         raise PermissionDenied
-    return render_stats_cd(request=request, page_title="Suivi des prescriptions des accompagnateurs des publics bRSA")
+    context = {
+        "pilotage_webinar_banners": [
+            {
+                "title": "Des questions sur la prise en main de ce nouveau tableau de bord ?",
+                "description": "Nous y répondons en direct lors d’un webinaire de questions / réponses, dédiés aux Conseils départementaux, organisés le mardi 17 septembre à 14h",  # noqa: E501
+                "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-webinaire-questions-and-reponses-pour-les-conseils-departementaux?s=f83e62e2-42a3-4cc1-9772-c963d2be2c00",  # noqa: E501
+                "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 9, 17),
+            }
+        ]
+    }
+    return render_stats_cd(
+        request=request,
+        page_title="Suivi des prescriptions des accompagnateurs des publics bRSA",
+        extra_context=context,
+    )
 
 
 @login_required
@@ -484,7 +525,7 @@ def stats_ft_tension(request):
     )
 
 
-def render_stats_ph(request, page_title, extra_params=None):
+def render_stats_ph(request, page_title, *, extra_params=None, extra_context=None):
     if not utils.can_view_stats_ph(request):
         raise PermissionDenied
 
@@ -500,17 +541,30 @@ def render_stats_ph(request, page_title, extra_params=None):
         "matomo_custom_url_suffix": f"{format_region_and_department_for_matomo(department)}/agence",
         "department": department,
     }
+    if extra_context:
+        context.update(extra_context)
     return render_stats(request=request, context=context, params=params)
 
 
 @login_required
 def stats_ph_state_main(request):
+    context = {}
+    if request.current_organization.kind in [PrescriberOrganizationKind.ML, PrescriberOrganizationKind.CAP_EMPLOI]:
+        context["pilotage_webinar_banners"] = [
+            {
+                "title": "Besoin d’être accompagné dans la prise en main de ce tableau de bord ?",
+                "description": "Participez à l’une de nos deux sessions de présentation de vos statistiques dédiées le jeudi 12 septembre ou le mardi 24 septembre.",  # noqa: E501
+                "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-missions-locales-et-cap-emploi-decouvrez-votre-nouveau-tableau-de-bord-personnalise-et-faites-le-point-sur-vos-prescriptions-vers-liae?type=detailed",  # noqa: E501
+                "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 9, 24),
+            }
+        ]
     return render_stats_ph(
         request=request,
         page_title="Etat des candidatures orientées",
         extra_params={
             mb.PRESCRIBER_FILTER_KEY: PrescriberOrganizationKind(request.current_organization.kind).label,
         },
+        extra_context=context,
     )
 
 
@@ -558,7 +612,19 @@ def stats_ddets_iae_auto_prescription(request):
 
 @login_required
 def stats_ddets_iae_ph_prescription(request):
-    return render_stats_ddets_iae(request=request, page_title="Suivi des prescriptions des prescripteurs habilités")
+    context = {
+        "pilotage_webinar_banners": [
+            {
+                "title": "Découvrez votre nouveau tableau de bord",
+                "description": "Inscrivez-vous au webinaire de présentation de ce nouveau tableau de bord qui vous permet de suivre les réalisations de chaque organisation prescriptrice habilitée sur votre territoire",  # noqa: E501
+                "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-services-de-letat-decouvrez-votre-nouveau-tableau-de-bord-personnalise-et-faites-le-point-sur-les-prescriptions-realisees-sur-votre-territoire?s=55c2160a-b91f-4f2b-b30c-45d6939c5922",  # noqa: E501
+                "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 9, 26),
+            },
+        ]
+    }
+    return render_stats_ddets_iae(
+        request=request, page_title="Suivi des prescriptions des prescripteurs habilités", extra_context=context
+    )
 
 
 @login_required
@@ -643,7 +709,7 @@ def stats_ddets_log_state(request):
     )
 
 
-def render_stats_dreets_iae(request, page_title):
+def render_stats_dreets_iae(request, page_title, *, extra_context=None):
     region = get_stats_dreets_iae_region(request)
     params = get_params_for_region(region)
     context = {
@@ -651,6 +717,7 @@ def render_stats_dreets_iae(request, page_title):
         "matomo_custom_url_suffix": format_region_for_matomo(region),
         "region": region,
     }
+    context.update(extra_context or {})
     return render_stats(request=request, context=context, params=params)
 
 
@@ -661,7 +728,19 @@ def stats_dreets_iae_auto_prescription(request):
 
 @login_required
 def stats_dreets_iae_ph_prescription(request):
-    return render_stats_dreets_iae(request=request, page_title="Suivi des prescriptions des prescripteurs habilités")
+    context = {
+        "pilotage_webinar_banners": [
+            {
+                "title": "Découvrez votre nouveau tableau de bord",
+                "description": "Inscrivez-vous au webinaire de présentation de ce nouveau tableau de bord qui vous permet de suivre les réalisations de chaque organisation prescriptrice habilitée sur votre territoire",  # noqa: E501
+                "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-services-de-letat-decouvrez-votre-nouveau-tableau-de-bord-personnalise-et-faites-le-point-sur-les-prescriptions-realisees-sur-votre-territoire?s=55c2160a-b91f-4f2b-b30c-45d6939c5922",  # noqa: E501
+                "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 9, 26),
+            },
+        ]
+    }
+    return render_stats_dreets_iae(
+        request=request, extra_context=context, page_title="Suivi des prescriptions des prescripteurs habilités"
+    )
 
 
 @login_required
@@ -771,10 +850,21 @@ def stats_dgefp_iae_iae(request):
 
 @login_required
 def stats_dgefp_iae_ph_prescription(request):
+    context = {
+        "pilotage_webinar_banners": [
+            {
+                "title": "Découvrez votre nouveau tableau de bord",
+                "description": "Inscrivez-vous au webinaire de présentation de ce nouveau tableau de bord qui vous permet de suivre les réalisations de chaque organisation prescriptrice habilitée sur votre territoire",  # noqa: E501
+                "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-services-de-letat-decouvrez-votre-nouveau-tableau-de-bord-personnalise-et-faites-le-point-sur-les-prescriptions-realisees-sur-votre-territoire?s=55c2160a-b91f-4f2b-b30c-45d6939c5922",  # noqa: E501
+                "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 9, 26),
+            },
+        ]
+    }
     return render_stats_dgefp_iae(
         request=request,
         page_title="Suivi des prescriptions des prescripteurs habilités",
         extra_params=get_params_for_whole_country(),
+        extra_context=context,
     )
 
 

@@ -20,6 +20,29 @@
     {% endif %}
 {% endblock %}
 
+{% block title_messages %}
+    {{ block.super }}
+    {% for banner in pilotage_webinar_banners %}
+        <div class="alert alert-info alert-dismissible fade show" role="status">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            <div class="row">
+                <div class="col-auto pe-0">
+                    <i class="ri-information-line ri-xl text-important" aria-hidden="true"></i>
+                </div>
+                <div class="col">
+                    <p class="mb-2">
+                        <strong>{{ banner.title }}</strong>
+                    </p>
+                    <p class="mb-0">{{ banner.description }}</p>
+                </div>
+                <div class="col-12 col-md-auto mt-3 mt-md-0 d-flex align-items-center justify-content-center">
+                    <a class="btn btn-sm btn-primary btn-block btn-ico" href="{{ banner.url }}" target="_blank" rel="noopener"><span>Je m’inscris</span> <i class="ri-external-link-line font-weight-medium" aria-hidden="true"></i></a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
+
 {% block content %}
     <section class="s-section">
         <div class="s-section__container container">
