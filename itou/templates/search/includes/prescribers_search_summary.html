@@ -1,4 +1,4 @@
 {% load str_filters %}
 <p class="mb-3 mb-md-4" id="prescribers-search-summary"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
-    <strong>{{ prescriber_orgs_page.paginator.count }} résultat{{ prescriber_orgs_page.paginator.count|pluralizefr }}</strong>
+    {{ prescriber_orgs_page.paginator.count }} résultat{{ prescriber_orgs_page.paginator.count|pluralizefr }}
 </p>

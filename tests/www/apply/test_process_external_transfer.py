@@ -90,7 +90,7 @@ def test_step_1(client, snapshot):
     # search is centered on job app company city : only vannes companies should be displayed
     assertContains(
         response,
-        '<p class="mb-0"><strong>2 résultats</strong></p>',
+        '<p class="mb-0">2 résultats</p>',
         html=True,
         count=1,
     )
