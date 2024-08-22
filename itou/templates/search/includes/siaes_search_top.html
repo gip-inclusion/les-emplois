@@ -4,9 +4,7 @@
 <div id="job-search-top"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
     {% if request.resolver_match.view_name == "search:employers_results" or job_app_to_transfer|default:False %}
         <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-between mb-3 mb-md-4">
-            <p class="mb-0">
-                <strong>{{ siaes_count }} résultat{{ siaes_count|pluralizefr }}</strong>
-            </p>
+            <p class="mb-0">{{ siaes_count }} résultat{{ siaes_count|pluralizefr }}</p>
             <div class="d-lg-flex">
                 {% if siaes_count %}
                     <div>
@@ -52,9 +50,7 @@
         </div>
     {% else %}
         <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-md-between mb-3 mb-md-4">
-            <p class="mb-0">
-                <strong>{{ job_descriptions_count }} résultat{{ job_descriptions_count|pluralizefr }}</strong>
-            </p>
+            <p class="mb-0">{{ job_descriptions_count }} résultat{{ job_descriptions_count|pluralizefr }}</p>
             {% if job_descriptions_count %}
                 <button class="btn btn-ico btn-link text-nowrap" data-bs-toggle="modal" data-bs-target="#jobDescriptionsSortingTipModal">
                     <i class="ri-information-line font-weight-medium" aria-hidden="true"></i>
