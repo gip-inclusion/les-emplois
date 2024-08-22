@@ -36,18 +36,16 @@
                                             <strong>Informations manquantes</strong>
                                         </p>
                                         <p>Une ou plusieurs informations de votre profil sont nécessaires pour utiliser votre espace candidat.</p>
-                                        <p class="mb-0">
-                                            Les champs suivants ne sont pas renseignés :
-                                            <ul>
-                                                {% for field in form %}
-                                                    {% if field.field.required and not field.value or field.name == 'phone' and not field.value %}
-                                                        <li>
-                                                            <strong>{{ field.label }}</strong>
-                                                        </li>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            </ul>
-                                        </p>
+                                        <p class="mb-0">Les champs suivants ne sont pas renseignés :</p>
+                                        <ul>
+                                            {% for field in form %}
+                                                {% if field.field.required and not field.value or field.name == 'phone' and not field.value %}
+                                                    <li>
+                                                        <strong>{{ field.label }}</strong>
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </ul>
                                     </div>
                                 </div>
                             </div>
@@ -58,15 +56,20 @@
                             <form method="post" class="js-prevent-multiple-submit">
                                 {% csrf_token %}
                                 {% if ic_account_url %}
-                                    <div>
-                                        Prénom : <strong>{{ user.first_name|title }}</strong>
-                                        <br>
-                                        Nom : <strong>{{ user.last_name|upper }}</strong>
-                                        <br>
-                                        Adresse e-mail : <strong>{{ user.email }}</strong>
-                                    </div>
-                                    <a class="btn btn-outline-primary btn-ico btn-sm mt-2" href="{{ ic_account_url }}">
-                                        <i class="ri-pencil-line me-2"></i>Modifier ces informations
+                                    <ul class="list-unstyled">
+                                        <li>
+                                            Prénom : <strong>{{ user.first_name|title }}</strong>
+                                        </li>
+                                        <li>
+                                            Nom : <strong>{{ user.last_name|upper }}</strong>
+                                        </li>
+                                        <li>
+                                            Adresse e-mail : <strong>{{ user.email }}</strong>
+                                        </li>
+                                    </ul>
+                                    <a class="btn btn-outline-primary btn-ico" href="{{ ic_account_url }}">
+                                        <i class="ri-pencil-line me-2" aria-hidden="true"></i>
+                                        <span>Modifier ces informations</span>
                                     </a>
                                     <hr class="my-4">
                                     {% bootstrap_form_errors form type="all" %}
