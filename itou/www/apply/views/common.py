@@ -187,6 +187,9 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
 
         return HttpResponseClientRedirect(final_url)
 
+    if request.htmx:
+        template_name = "apply/includes/job_application_accept_form.html"
+
     return render(request, template_name, {**context, "has_form_error": any(form.errors for form in forms)})
 
 
