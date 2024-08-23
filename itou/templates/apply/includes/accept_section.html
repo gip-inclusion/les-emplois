@@ -16,7 +16,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal">Retour</button>
-                <button class="btn btn-sm btn-primary" hx-post={{ request.path }} hx-vals='{"confirmed": "True"}' hx-include="#acceptForm" {% matomo_event "candidature" "submit" "accept_application_confirmation" %}>Confirmer
+                <button class="btn btn-sm btn-primary" hx-post={{ request.path }} hx-target="#acceptFormDiv" hx-swap="outerHTML" hx-vals='{"confirmed": "True"}' hx-include="#acceptForm" {% matomo_event "candidature" "submit" "accept_application_confirmation" %} data-bs-dismiss="modal">Confirmer
                 </button>
             </div>
         </div>
