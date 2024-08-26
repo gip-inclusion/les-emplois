@@ -62,7 +62,6 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         "par conséquent vous ne pouvez pas bénéficier du statut de prescripteur habilité."
     )
     DANGER_CLASS = "bg-danger"
-    PROLONG_SUSPEND = "Prolonger/suspendre un agrément émis par Pôle emploi"
     SUSPEND_TEXT = "Suspendre un PASS IAE"
     HIRE_LINK_LABEL = "Déclarer une embauche"
     DORA_LABEL = "DORA"
@@ -197,7 +196,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
 
         self.assertContains(response, geiq_url)
 
-    def test_dashboard_agreements_and_job_postings(self):
+    def test_dashboard_job_postings(self):
         for kind in [
             CompanyKind.AI,
             CompanyKind.EI,
@@ -211,7 +210,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
                 self.client.force_login(user)
 
                 response = self.client.get(reverse("dashboard:index"))
-                self.assertContains(response, self.PROLONG_SUSPEND)
+                self.assertContains(response, self.HIRE_LINK_LABEL)
 
         for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS]:
             with self.subTest(f"should not display when company_kind={kind}"):
@@ -220,9 +219,8 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
                 self.client.force_login(user)
 
                 response = self.client.get(reverse("dashboard:index"))
-                self.assertNotContains(response, self.PROLONG_SUSPEND)
-                if kind != CompanyKind.GEIQ:
-                    self.assertNotContains(response, self.HIRE_LINK_LABEL)
+                assertion = self.assertContains if kind == CompanyKind.GEIQ else self.assertNotContains
+                assertion(response, self.HIRE_LINK_LABEL)
 
     def test_dashboard_job_applications(self):
         APPLICATION_SAVE_LABEL = "Enregistrer une candidature"
@@ -268,7 +266,6 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         self.client.force_login(user)
 
         response = self.client.get(reverse("dashboard:index"))
-        self.assertContains(response, self.PROLONG_SUSPEND)
         # Check that "Déclarer une embauche" is here, but not its matching link
         self.assertContains(response, self.HIRE_LINK_LABEL)
         self.assertNotContains(response, self.apply_start_url(company))
