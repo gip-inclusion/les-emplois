@@ -386,7 +386,7 @@ class TestApprovalDetailView:
 
     @override_settings(TALLY_URL="https://tally.so")
     def test_link_immersion_facile(self, client, snapshot):
-        today = datetime.date.today()
+        today = timezone.localdate()
         approval = ApprovalFactory(
             with_jobapplication=True,
             start_at=(today - datetime.timedelta(days=90)),

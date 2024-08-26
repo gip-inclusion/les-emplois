@@ -903,7 +903,7 @@ class JobApplicationNotificationsTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             state=JobApplicationState.ACCEPTED,
-            hiring_start_at=datetime.date.today(),
+            hiring_start_at=timezone.localdate(),
         )
         accepted_by = job_application.to_company.members.first()
         email = job_application.email_manual_approval_delivery_required_notification(accepted_by)
@@ -930,7 +930,7 @@ class JobApplicationNotificationsTest(TestCase):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             state=JobApplicationState.ACCEPTED,
-            hiring_start_at=datetime.date.today(),
+            hiring_start_at=timezone.localdate(),
             hiring_end_at=None,
         )
         accepted_by = job_application.to_company.members.first()
@@ -1451,7 +1451,7 @@ class JobApplicationWorkflowTest(TestCase):
         """
         user = JobSeekerFactory(with_pole_emploi_id=True)
         # Ended 1 year ago.
-        end_at = datetime.date.today() - relativedelta(years=1)
+        end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
         approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
@@ -1494,7 +1494,7 @@ class JobApplicationWorkflowTest(TestCase):
         """
         user = JobSeekerFactory()
         # Ended 1 year ago.
-        end_at = datetime.date.today() - relativedelta(years=1)
+        end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
         approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
@@ -1518,7 +1518,7 @@ class JobApplicationWorkflowTest(TestCase):
         """
         user = JobSeekerFactory()
         # Ended 1 year ago.
-        end_at = datetime.date.today() - relativedelta(years=1)
+        end_at = timezone.localdate() - relativedelta(years=1)
         start_at = end_at - relativedelta(years=2)
         approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
@@ -1671,7 +1671,7 @@ class JobApplicationWorkflowTest(TestCase):
         assert job_application.approval
 
     def test_cancellation_not_allowed(self, *args, **kwargs):
-        today = datetime.date.today()
+        today = timezone.localdate()
 
         # Linked employee record with blocking status
         job_application = JobApplicationFactory(with_approval=True, hiring_start_at=(today - relativedelta(days=365)))

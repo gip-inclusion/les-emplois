@@ -1,5 +1,3 @@
-import datetime
-
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
@@ -72,7 +70,7 @@ class TestEligibilityDiagnosisManager:
         assert last_expired is None
 
     def test_expired_pole_emploi_diagnosis(self):
-        end_at = datetime.date.today() - relativedelta(years=2)
+        end_at = timezone.localdate() - relativedelta(years=2)
         start_at = end_at - relativedelta(years=2)
         PoleEmploiApprovalFactory(
             pole_emploi_id=self.job_seeker.jobseeker_profile.pole_emploi_id,

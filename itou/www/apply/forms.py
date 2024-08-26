@@ -523,11 +523,11 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             # "parcours IAE" and the payment of the "aide au poste".
             "hiring_start_at": (
                 "Au format JJ/MM/AAAA, par exemple {}. Il n'est pas possible d'antidater un contrat.".format(
-                    datetime.date.today().strftime("%d/%m/%Y")
+                    timezone.localdate().strftime("%d/%m/%Y")
                 )
             ),
             "hiring_end_at": "Au format JJ/MM/AAAA, par exemple {}.".format(
-                (datetime.date.today() + datetime.timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)).strftime("%d/%m/%Y")
+                (timezone.localdate() + datetime.timedelta(days=Approval.DEFAULT_APPROVAL_DAYS)).strftime("%d/%m/%Y")
             ),
             "prehiring_guidance_days": """Laissez "0" si vous n'avez pas accompagné le candidat avant son embauche""",
             "contract_type_details": (
@@ -575,7 +575,7 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             self.initial["prehiring_guidance_days"] = 0
             self.initial["planned_training_hours"] = 0
             self.fields["hiring_start_at"].help_text = "Au format JJ/MM/AAAA, par exemple {}.".format(
-                datetime.date.today().strftime("%d/%m/%Y"),
+                timezone.localdate().strftime("%d/%m/%Y"),
             )
             # Dynamic selection of qualification level
             self.fields["qualification_type"].widget.attrs.update(
@@ -671,9 +671,9 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
 
         # Hiring in the past is *temporarily* possible for GEIQ
-        if hiring_start_at and hiring_start_at < datetime.date.today() and not self.is_geiq:
+        if hiring_start_at and hiring_start_at < timezone.localdate() and not self.is_geiq:
             self.add_error("hiring_start_at", forms.ValidationError(JobApplication.ERROR_START_IN_PAST))
-        elif hiring_start_at and hiring_start_at > datetime.date.today() + relativedelta(months=6):
+        elif hiring_start_at and hiring_start_at > timezone.localdate() + relativedelta(months=6):
             self.add_error("hiring_start_at", forms.ValidationError(JobApplication.ERROR_START_IN_FAR_FUTURE))
         else:
             return hiring_start_at
@@ -824,10 +824,10 @@ class EditHiringDateForm(forms.ModelForm):
     def clean_hiring_start_at(self):
         hiring_start_at = self.cleaned_data["hiring_start_at"]
 
-        if hiring_start_at < datetime.date.today():
+        if hiring_start_at < timezone.localdate():
             raise forms.ValidationError(JobApplication.ERROR_START_IN_PAST)
 
-        if hiring_start_at > datetime.date.today() + relativedelta(days=JobApplication.MAX_CONTRACT_POSTPONE_IN_DAYS):
+        if hiring_start_at > timezone.localdate() + relativedelta(days=JobApplication.MAX_CONTRACT_POSTPONE_IN_DAYS):
             raise forms.ValidationError(JobApplication.ERROR_POSTPONE_TOO_FAR)
 
         return hiring_start_at

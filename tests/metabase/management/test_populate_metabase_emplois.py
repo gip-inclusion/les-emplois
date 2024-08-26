@@ -50,7 +50,7 @@ from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberF
 @pytest.mark.django_db(transaction=True)
 @pytest.mark.usefixtures("metabase")
 def test_populate_analytics():
-    date_maj = datetime.date.today() + datetime.timedelta(days=-1)
+    date_maj = timezone.localdate() + datetime.timedelta(days=-1)
     data0 = DatumFactory(code="ER-101", bucket="2021-12-31")
     data1 = DatumFactory(code="ER-102", bucket="2020-10-17")
     data2 = DatumFactory(code="ER-102-3436", bucket="2022-08-16")
@@ -238,12 +238,12 @@ def test_populate_job_seekers():
             79,
             3,
             get_user_age_in_years(user_1),
-            datetime.date.today(),
+            timezone.localdate(),
             "par prescripteur",
             1,
             0,
-            datetime.date.today(),
-            datetime.date.today(),
+            timezone.localdate(),
+            timezone.localdate(),
             1,
             "33360",
             "33",
@@ -281,7 +281,7 @@ def test_populate_job_seekers():
             None,
             None,
             0,
-            datetime.date.today() - datetime.timedelta(days=1),
+            timezone.localdate() - datetime.timedelta(days=1),
         ),
         (
             user_2.pk,
@@ -290,7 +290,7 @@ def test_populate_job_seekers():
             71,
             4,
             get_user_age_in_years(user_2),
-            datetime.date.today(),
+            timezone.localdate(),
             "par employeur",
             0,
             1,
@@ -333,7 +333,7 @@ def test_populate_job_seekers():
             1,
             1,
             1,
-            datetime.date.today() - datetime.timedelta(days=1),
+            timezone.localdate() - datetime.timedelta(days=1),
         ),
         (
             user_3.pk,
@@ -342,7 +342,7 @@ def test_populate_job_seekers():
             97,
             1,
             get_user_age_in_years(user_3),
-            datetime.date.today(),
+            timezone.localdate(),
             "autonome",
             0,
             1,
@@ -385,7 +385,7 @@ def test_populate_job_seekers():
             0,
             0,
             0,
-            datetime.date.today() - datetime.timedelta(days=1),
+            timezone.localdate() - datetime.timedelta(days=1),
         ),
     ]
 

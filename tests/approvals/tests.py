@@ -772,7 +772,7 @@ class TestPoleEmploiApprovalManager:
     def test_find_for_user(self):
         # given a User, ensure we can find a PE approval using its pole_emploi_id and not the others.
         user = JobSeekerFactory(with_pole_emploi_id=True)
-        today = datetime.date.today()
+        today = timezone.localdate()
         pe_approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
             birthdate=user.birthdate,
