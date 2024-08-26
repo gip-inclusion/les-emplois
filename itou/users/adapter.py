@@ -1,5 +1,6 @@
 from allauth.account.adapter import DefaultAccountAdapter
 from django.conf import settings
+from django.contrib import messages
 from django.urls import reverse
 from django.utils.http import urlencode
 
@@ -19,6 +20,20 @@ class UserAdapter(DefaultAccountAdapter):
     Activation of this adapter is done in project settings with:
         ACCOUNT_ADAPTER = "name_of_class"
     """
+
+    def add_message(self, request, level, message_template=None, message_context=None, extra_tags="", message=None):
+        if level == messages.SUCCESS:
+            extra_tags = extra_tags.split()
+            extra_tags.append("toast")
+            extra_tags = " ".join(extra_tags)
+        super().add_message(
+            request,
+            level,
+            message_template=message_template,
+            message_context=message_context,
+            extra_tags=extra_tags,
+            message=message,
+        )
 
     def save_user(self, request, user, form):
         user.kind = form.user_kind
