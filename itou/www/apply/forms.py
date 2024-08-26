@@ -539,10 +539,15 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.company = company
         self.is_geiq = company.kind == CompanyKind.GEIQ
-
+        attrs_min = {}
+        attrs_max = {}
+        if not self.is_geiq:
+            today = timezone.localdate()
+            attrs_min["min"] = today.isoformat()
+            attrs_max["max"] = (today + relativedelta(months=6)).isoformat()
         self.fields["hiring_start_at"].required = True
-        for field in ["hiring_start_at", "hiring_end_at"]:
-            self.fields[field].widget = DuetDatePickerWidget()
+        self.fields["hiring_start_at"].widget = DuetDatePickerWidget(attrs=attrs_min | attrs_max)
+        self.fields["hiring_end_at"].widget = DuetDatePickerWidget(attrs=attrs_min)
         # Job applications can be accepted twice if they have been cancelled.
         # They also can be accepted after a refusal.
         # That's why some fields are already filled in with obsolete data.
