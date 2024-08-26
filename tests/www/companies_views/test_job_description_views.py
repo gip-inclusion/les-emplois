@@ -100,16 +100,17 @@ class JobDescriptionListViewTest(MessagesTestMixin, JobDescriptionAbstractTest):
         # 5.  SAVEPOINT
         # 6.  SELECT COUNT companies_jobdescription
         # 7.  SELECT COUNT companies_companymembership
-        # 8.  SELECT companies_siaeconvention (menu checks for financial annexes)
-        # 9.  SELECT EXISTS users_user (menu checks for active admin)
-        # 10. SELECT companies_jobdescription
-        # 11. SELECT jobs_appellation
-        # 12. SELECT jobs_rome
-        # 13. RELEASE SAVEPOINT
-        # 14. SAVEPOINT
-        # 15. UPDATE django_session
-        # 16. RELEASE SAVEPOINT
-        with self.assertNumQueries(16):
+        # 8.  SELECT EXISTS users_user (convention_can_be_accessed_by())
+        # 9.  SELECT companies_siaeconvention (menu checks for financial annexes)
+        # 10. SELECT EXISTS users_user (menu checks for active admin)
+        # 11. SELECT companies_jobdescription
+        # 12. SELECT jobs_appellation
+        # 13. SELECT jobs_rome
+        # 14. RELEASE SAVEPOINT
+        # 15. SAVEPOINT
+        # 16. UPDATE django_session
+        # 17. RELEASE SAVEPOINT
+        with self.assertNumQueries(17):
             response = self.client.get(self.url)
 
         assert self.company.job_description_through.count() == 4

@@ -242,6 +242,7 @@ def job_description_list(request, template_name="companies/job_description_list.
         "page": page,
         "breadcrumbs": breadcrumbs,
         "members_count": CompanyMembership.objects.filter(company_id=company.pk).active().count(),
+        "can_show_financial_annexes": company.convention_can_be_accessed_by(request.user),
         "back_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
@@ -681,6 +682,7 @@ def members(request, template_name="companies/members.html"):
         "members_stats": active_company_members_stats,
         "pending_invitations": pending_invitations,
         "jobs_count": JobDescription.objects.filter(company_id=company.pk).count(),
+        "can_show_financial_annexes": company.convention_can_be_accessed_by(request.user),
         "back_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
