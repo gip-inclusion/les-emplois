@@ -31,9 +31,11 @@
                 <span class="badge badge-sm rounded-pill ms-2">{{ siae.active_members.count }}</span>
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'companies_views:show_financial_annexes' %}">Annexes financières</a>
-        </li>
+        {% if can_show_financial_annexes %}
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'companies_views:show_financial_annexes' %}">Annexes financières</a>
+            </li>
+        {% endif %}
     </ul>
 {% endblock %}
 
