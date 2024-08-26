@@ -57,14 +57,24 @@
                 <br>
                 Cela peut affecter sa position dans les résultats de recherche.
                 <br>
-                {% if request.is_current_organization_admin %}
-                    <a href="{% url 'prescribers_views:edit_organization' %}">Indiquez une autre adresse</a>
+                {% if request.current_organization.kind == PrescriberOrganizationKind.PE %}
+                    Afin de modifier l’adresse postale,
+                    <a href="{{ ITOU_HELP_CENTER_URL }}/requests/new"
+                       target="_blank"
+                       rel="noopener"
+                       aria-label="contactez-nous pour modifier l’adresse postale de votre agence France Travail (ouverture dans un nouvel onglet)">
+                        contactez nous
+                    </a>.
                 {% else %}
-                    {% with request.current_organization.active_admin_members.first as admin %}
-                        Veuillez contacter un de vos administrateurs (par exemple {{ admin.get_full_name }}) pour qu'il ou elle indique une autre adresse
-                    {% endwith %}
+                    {% if request.is_current_organization_admin %}
+                        <a href="{% url 'prescribers_views:edit_organization' %}">Indiquez une autre adresse</a>
+                    {% else %}
+                        {% with request.current_organization.active_admin_members.first as admin %}
+                            Veuillez contacter un de vos administrateurs (par exemple {{ admin.get_full_name }}) pour qu'il ou elle indique une autre adresse
+                        {% endwith %}
+                    {% endif %}
+                    ou <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
                 {% endif %}
-                ou <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
             </p>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
