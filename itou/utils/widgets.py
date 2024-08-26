@@ -21,7 +21,7 @@ class DuetDatePickerWidget(forms.DateInput):
 
     Dates can be passed as date objects or as strings (YYYY-MM-DD).
     E.g.:
-        my_date = forms.DateField(initial=datetime.date.today())
+        my_date = forms.DateField(initial=datetime.date(2020, 1, 1))
         my_date = forms.DateField(initial="2021-07-18")
 
     See:

@@ -1,7 +1,7 @@
 import logging
 import pathlib
 import urllib.parse
-from datetime import date, timedelta
+from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -126,7 +126,7 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
         if approval.is_in_progress:
             for suspension in approval.suspensions_by_start_date_asc:
                 if suspension.is_in_progress:
-                    suspension_duration = date.today() - suspension.start_at
+                    suspension_duration = timezone.localdate() - suspension.start_at
                     has_hirings_after_suspension = False
                 else:
                     suspension_duration = suspension.duration

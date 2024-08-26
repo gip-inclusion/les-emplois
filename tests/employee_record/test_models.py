@@ -2,7 +2,7 @@ import datetime
 import functools
 import itertools
 import json
-from datetime import date, timedelta
+from datetime import timedelta
 from unittest import mock
 
 import pytest
@@ -595,7 +595,7 @@ class TestEmployeeRecordJobApplicationConstraints:
     def setUp(self, _mock):
         super().setUp()
         # Make job application cancellable
-        hiring_date = date.today() + timedelta(days=7)
+        hiring_date = timezone.localdate() + timedelta(days=7)
 
         self.job_application = JobApplicationWithCompleteJobSeekerProfileFactory(hiring_start_at=hiring_date)
         self.employee_record = EmployeeRecord.from_job_application(self.job_application)

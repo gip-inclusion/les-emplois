@@ -1,6 +1,5 @@
-from datetime import date
-
 import factory
+from django.utils import timezone
 
 from itou.communications.models import AnnouncementCampaign, AnnouncementItem
 
@@ -10,7 +9,7 @@ class AnnouncementCampaignFactory(factory.django.DjangoModelFactory):
         model = AnnouncementCampaign
         skip_postgeneration_save = True
 
-    start_date = factory.LazyFunction(lambda: date.today().replace(day=1))
+    start_date = factory.LazyFunction(lambda: timezone.localdate().replace(day=1))
 
     @factory.post_generation
     def with_item(obj, create, extracted, **kwargs):

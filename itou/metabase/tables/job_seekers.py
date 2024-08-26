@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import timedelta
 from functools import partial
 
 from django.utils import timezone
@@ -28,7 +28,7 @@ AUTHOR_KIND_CHOICES = (
 
 def get_user_age_in_years(user):
     if user.birthdate:
-        return date.today().year - user.birthdate.year
+        return timezone.localdate().year - user.birthdate.year
     return None
 
 

@@ -1292,7 +1292,7 @@ class Suspension(models.Model):
         Returns the minimum date on which a suspension can begin.
         """
         if referent_date is None:
-            referent_date = datetime.date.today()
+            referent_date = timezone.localdate()
 
         start_at = None
         last_accepted_job_application = get_user_last_accepted_siae_job_application(approval.user)

@@ -1,6 +1,7 @@
-from datetime import date, datetime
+from datetime import datetime
 
 from django.core.cache import cache
+from django.utils import timezone
 
 from itou.communications.models import AnnouncementCampaign
 
@@ -11,7 +12,7 @@ SENTINEL_ACTIVE_ANNOUNCEMENT = object()
 
 def update_active_announcement_cache():
     campaign = (
-        AnnouncementCampaign.objects.filter(start_date=date.today().replace(day=1), live=True)
+        AnnouncementCampaign.objects.filter(start_date=timezone.localdate().replace(day=1), live=True)
         .prefetch_related("items")
         .first()
     )

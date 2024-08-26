@@ -1,4 +1,3 @@
-import datetime
 import uuid
 
 from django.conf import settings
@@ -894,7 +893,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @property
     def hiring_starts_in_future(self):
         if self.hiring_start_at:
-            return datetime.date.today() < self.hiring_start_at
+            return timezone.localdate() < self.hiring_start_at
         return False
 
     @property
