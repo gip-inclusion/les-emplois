@@ -31,6 +31,10 @@
                             {% csrf_token %}
                             {{ wizard.management_form }}
 
+                            <p>
+                                Dans le menu déroulant ci-dessous, vous trouverez la liste de vos salariés.
+                                Cette liste se base sur les embauches que vous avez déclarées sur le site des emplois de l’inclusion.
+                            </p>
                             {% bootstrap_form form alert_error_type="non_fields" %}
 
                             {% if not wizard.steps.next %}
