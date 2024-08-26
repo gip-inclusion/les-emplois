@@ -693,20 +693,6 @@ class User(AbstractUser, AddressMixin):
         return user
 
     @classmethod
-    def create_job_seeker_from_pole_emploi_approval(cls, proxy_user, email, pole_emploi_approval):
-        """Uses the data from a PoleEmploiApproval to create a job seeker"""
-        job_seeker_data = {
-            "email": email,
-            "first_name": pole_emploi_approval.first_name,
-            "last_name": pole_emploi_approval.last_name,
-            "birthdate": pole_emploi_approval.birthdate,
-        }
-        user = cls.create_job_seeker_by_proxy(proxy_user, **job_seeker_data)
-        user.jobseeker_profile.pole_emploi_id = pole_emploi_approval.pole_emploi_id
-        user.jobseeker_profile.save(update_fields=("pole_emploi_id",))
-        return user
-
-    @classmethod
     def generate_unique_username(cls):
         """
         `AbstractUser.username` is a required field. It is not used in Itou but

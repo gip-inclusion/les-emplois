@@ -66,14 +66,4 @@ urlpatterns = [
         name="suspension_update_enddate",
     ),
     path("suspension/<int:suspension_id>/action/delete/", views.suspension_delete, name="suspension_delete"),
-    # PE Approvals
-    path("pe-approval/search", views.pe_approval_search, name="pe_approval_search"),
-    path(
-        "pe-approval/<int:pe_approval_id>/search-user", views.pe_approval_search_user, name="pe_approval_search_user"
-    ),
-    path(
-        "pe-approval/<int:pe_approval_id>/create",
-        views.pe_approval_create,
-        name="pe_approval_create",
-    ),
 ]

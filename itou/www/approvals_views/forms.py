@@ -569,24 +569,3 @@ class SuspensionEndDateForm(forms.Form):
                 "Vous ne pouvez pas saisir une date de réintégration postérieure à la fin de la suspension."
             )
         return first_day_back_to_work
-
-
-class PoleEmploiApprovalSearchForm(forms.Form):
-    number = forms.CharField(
-        label="Numéro",
-        required=True,
-        min_length=12,
-        max_length=12,
-        strip=True,
-        help_text=("Le numéro d'agrément est composé de 12 chiffres (ex. 123456789012)."),
-    )
-
-    def clean_number(self):
-        number = self.cleaned_data.get("number", "").replace(" ", "")
-        if len(number) != 12:
-            raise ValidationError(
-                "Merci d'indiquer les 12 premiers caractères du numéro d'agrément. "
-                "Exemple : 123456789012 si le numéro d'origine est 123456789012P01."
-            )
-
-        return number
