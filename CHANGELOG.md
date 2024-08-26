@@ -1,5 +1,26 @@
 # Journal des modifications
 
+## 2024-08-26
+
+### Ajouté
+
+- [Demandeur d’emploi: coordonnées importées des conseillers de France Travail](https://github.com/gip-inclusion/les-emplois/pull/4573)
+- [Profil salarié: Accès à Immersion Facilitée depuis la page de salarié](https://github.com/gip-inclusion/les-emplois/pull/4532)
+
+### Modifié
+
+- [Candidature : Correction de l'acception quand la ville de naissance n'est pas référencée pour la date de naissance renseignée](https://github.com/gip-inclusion/les-emplois/pull/4590)
+- [Candidatures: Correction du libellé des candidatures spontanées dans l’export](https://github.com/gip-inclusion/les-emplois/pull/4575)
+- [Statistiques : Suivi du département de l’utilisateur avec ses actions](https://github.com/gip-inclusion/les-emplois/pull/4587)
+- [UX/UI : Harmonisation des “x résultats” au dessus d’une liste de résultats](https://github.com/gip-inclusion/les-emplois/pull/4593)
+- [UX/UI : Optimisation des images d'illustration au chargement](https://github.com/gip-inclusion/les-emplois/pull/4578)
+- [UX/UI : Optimisation des performances étranges sur les images d'illustration de la homepage](https://github.com/gip-inclusion/les-emplois/pull/4580)
+- [UX/UI: Taille du bouton "Modifier ces infos"](https://github.com/gip-inclusion/les-emplois/pull/4594)
+
+### Supprimé
+
+- [UX/UI: Suppression de la mention "ex pôle emploi" pour France Travail](https://github.com/gip-inclusion/les-emplois/pull/4586)
+
 ## 2024-08-19
 
 ### Ajouté
