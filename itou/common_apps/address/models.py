@@ -32,7 +32,7 @@ class ArrayLength(models.Func):
 
 def lat_lon_to_coords(lat, lon):
     if lat is not None and lon is not None:
-        return GEOSGeometry(f"POINT({lon} {lat})")
+        return GEOSGeometry(f"POINT({lon} {lat})", srid=4326)
     return None
 
 

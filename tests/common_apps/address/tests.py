@@ -83,4 +83,4 @@ class TestUtilsMisc:
         assert lat_lon_to_coords(None, None) is None
         assert lat_lon_to_coords(1, None) is None
         assert lat_lon_to_coords(None, 1) is None
-        assert lat_lon_to_coords(13, 42) == Point(42, 13)
+        assert lat_lon_to_coords(13, 42) == Point(42, 13, srid=4326)
