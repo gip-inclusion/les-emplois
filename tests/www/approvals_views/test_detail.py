@@ -24,7 +24,7 @@ from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
 from tests.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import assert_previous_step, parse_response_to_soup
+from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup
 
 
 class TestApprovalDetailView:
@@ -124,34 +124,7 @@ class TestApprovalDetailView:
         client.force_login(user)
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
-        # 1.  SELECT django_session
-        # 2.  SELECT users_user
-        # 3.  SELECT company_membership
-        # 4.  SELECT company_company
-        # END of middleware
-        # 5.  SAVEPOINT
-        # 6.  SELECT approvals_approval (get_object)
-        # 7.  SELECT approvals_suspension (prefetch)
-        # 8.  SELECT approvals_prolongationrequest (prefetch)
-        # 9.  SELECT job_applications_jobapplication (get_job_application)
-        # 10. SELECT job_applications_jobapplication (last accepted job application, can_be_handled_by_siae)
-        # 11. SELECT approvals_approval (latest approval for user, can_be_prolonged)
-        # 12. SELECT approvals_suspension
-        # 13. RELEASE SAVEPOINT
-        # END of view, template rendering
-        # 14. SELECT companies_siaeconvention (menu checks for financial annexes)
-        # 15. SELECT EXISTS users_user (menu checks for active admin)
-        # 16. SELECT approvals_suspension
-        # 17. SELECT approvals_prolongation
-        # 18. SELECT approvals_prolongationrequest
-        # 19. SELECT job_applications_jobapplication
-        # 20. SELECT job_applications_jobapplication_selected_jobs (prefetch)
-        # 21. SELECT prescribers_prescriberorganization (get sender information)
-        # END of template rendering
-        # 22. CREATE SAVEPOINT (ATOMIC REQUEST TO UPDATE THE DJANGO SESSION)
-        # 23. UPDATE django_session
-        # 24. RELEASE SAVEPOINT
-        with assertNumQueries(24):
+        with assertSnapshotQueries(snapshot(name="detail view SQL queries")):
             response = client.get(url)
         response = client.get(url)
         assertContains(response, format_approval_number(approval))
