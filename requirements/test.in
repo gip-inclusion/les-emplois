@@ -24,4 +24,5 @@ unittest-parametrize  # https://github.com/adamchainz/unittest-parametrize
 # Mock Anymail requests.
 requests-mock  # https://github.com/jamielennox/requests-mock
 respx  # https://lundberg.github.io/respx/
+sqlparse  # https://github.com/andialbrecht/sqlparse
 syrupy  # https://github.com/tophat/syrupy
