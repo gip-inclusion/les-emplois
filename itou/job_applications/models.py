@@ -952,11 +952,23 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
         return EligibilityDiagnosis.objects.last_considered_valid(self.job_seeker, for_siae=self.to_company)
 
     # Workflow transitions.
-    @before_transition("accept", "refuse", "cancel", "render_obsolete")
+    @before_transition(
+        JobApplicationWorkflow.TRANSITION_ACCEPT,
+        JobApplicationWorkflow.TRANSITION_REFUSE,
+        JobApplicationWorkflow.TRANSITION_CANCEL,
+        JobApplicationWorkflow.TRANSITION_RENDER_OBSOLETE,
+    )
     def set_processed_at(self, *args, **kwargs):
         self.processed_at = timezone.now()
 
-    @before_transition("process", "postpone", "move_to_prior_to_hire", "cancel_prior_to_hire", "transfer", "reset")
+    @before_transition(
+        JobApplicationWorkflow.TRANSITION_PROCESS,
+        JobApplicationWorkflow.TRANSITION_POSTPONE,
+        JobApplicationWorkflow.TRANSITION_MOVE_TO_PRIOR_TO_HIRE,
+        JobApplicationWorkflow.TRANSITION_CANCEL_PRIOR_TO_HIRE,
+        JobApplicationWorkflow.TRANSITION_TRANSFER,
+        JobApplicationWorkflow.TRANSITION_RESET,
+    )
     def unset_processed_at(self, *args, **kwargs):
         self.processed_at = None
 
