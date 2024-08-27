@@ -1381,6 +1381,7 @@ sqlparse==0.5.1 \
     --hash=sha256:bb6b4df465655ef332548e24f08e205afc81b9ab86cb1c45657a7ff173a3a00e
     # via
     #   -r requirements/base.txt
+    #   -r requirements/test.in
     #   django
 syrupy==4.7.1 \
     --hash=sha256:be002267a512a4bedddfae2e026c93df1ea928ae10baadc09640516923376d41 \
