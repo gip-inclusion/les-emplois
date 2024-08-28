@@ -1,0 +1,47 @@
+{% load static %}
+{% load str_filters %}
+
+<section aria-labelledby="job-seekers-list-count" id="job-seekers-section">
+    {% if not page_obj %}
+        <div class="text-center my-3 my-md-4">
+            <img class="img-fluid" src="{% static 'img/illustration-siae-card-no-result.svg' %}" alt="" loading="lazy">
+            <p class="mb-1 mt-3">
+                <strong>Aucun candidat pour le moment</strong>
+            </p>
+        </div>
+    {% else %}
+        <div class="mt-3 mt-md-4">
+            <table class="table">
+                <caption class="visually-hidden">Liste des candidats</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Prénom NOM</th>
+                        <th scope="col">Statut du PASS IAE</th>
+                        <th scope="col">Nombre de candidatures</th>
+                        <th scope="col">Dernière mise à jour de candidature</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for job_seeker in page_obj %}
+                        <tr>
+                            <td>
+                                <a href="{% url "job_seekers_views:details" public_id=job_seeker.public_id %}?back_url={{ request.get_full_path|urlencode }}" class="btn-link">{{ job_seeker.get_full_name|mask_unless:job_seeker.user_can_view_personal_information }}</a>
+                            </td>
+                            <td>
+                                {% include "apply/includes/eligibility_badge.html" with job_seeker=job_seeker is_subject_to_eligibility_rules=True eligibility_diagnosis=job_seeker.valid_eligibility_diagnosis only %}
+                            </td>
+                            <td>{{ job_seeker.job_applications_nb }}</td>
+                            <td>{{ job_seeker.last_updated_at|date:"d/m/Y" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% include "includes/pagination.html" with page=page_obj boost=True boost_target="#job-seekers-section" boost_indicator="#job-seekers-section" %}
+    {% endif %}
+</section>
+
+{% if request.htmx %}
+    {% include "job_seekers_views/includes/list_counter.html" with paginator=paginator request=request only %}
+{% endif %}

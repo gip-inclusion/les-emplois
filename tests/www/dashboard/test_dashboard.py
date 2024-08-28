@@ -126,6 +126,14 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         response = self.client.get(reverse("dashboard:index"))
         self.assertContains(response, format_siret(prescriber_organization.siret))
 
+    def test_dashboard_for_authorized_prescriber(self):
+        prescriber_organization = prescribers_factories.PrescriberOrganizationWithMembershipFactory(authorized=True)
+        self.client.force_login(prescriber_organization.members.first())
+
+        response = self.client.get(reverse("dashboard:index"))
+        self.assertContains(response, format_siret(prescriber_organization.siret))
+        self.assertContains(response, "Liste de mes candidats")
+
     def test_dashboard_displays_asp_badge(self):
         company = CompanyFactory(kind=CompanyKind.EI, with_membership=True)
         other_company = CompanyFactory(kind=CompanyKind.ETTI, with_membership=True)

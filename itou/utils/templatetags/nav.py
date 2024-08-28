@@ -95,6 +95,15 @@ NAV_ENTRIES = {
         matomo_event_option="mes-candidatures",
     ),
     # Prescribers.
+    "prescriber-jobseekers": NavItem(
+        label="Candidats",
+        icon="ri-user-line",
+        target=reverse("job_seekers_views:list"),
+        active_view_names=["job_seekers_views:list"],
+        matomo_event_category="offcanvasNav",
+        matomo_event_name="clic",
+        matomo_event_option="candidats",
+    ),
     "prescriber-job-apps": NavItem(
         label="Candidatures",
         icon="ri-draft-line",
@@ -187,6 +196,7 @@ def nav(request):
             menu_items.append(NAV_ENTRIES["job-seeker-job-apps"])
         elif request.user.is_prescriber:
             menu_items.append(NAV_ENTRIES["prescriber-job-apps"])
+            menu_items.append(NAV_ENTRIES["prescriber-jobseekers"])
             if request.current_organization:
                 menu_items.append(
                     NavGroup(
