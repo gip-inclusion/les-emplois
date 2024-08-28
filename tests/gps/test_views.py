@@ -420,7 +420,9 @@ def test_contact_information_display(client, snapshot):
     response = client.get(user_details_url)
     assert response.status_code == 200
     assert response.context["render_advisor_matomo_option"] == "30"
-    assert len(parse_response_to_soup(response).select("#advisor-info-details-collapsable")) == 0
+    assert str(parse_response_to_soup(response, selector="#advisor-info-details-collapsable")) == snapshot(
+        name="info_not_available"
+    )
 
     # contact information to display
     FranceTravailContact.objects.create(
