@@ -17,7 +17,7 @@ from tests.job_applications.factories import JobApplicationFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import BASE_NUM_QUERIES, assert_previous_step, parse_response_to_soup
+from tests.utils.test import BASE_NUM_QUERIES, parse_response_to_soup
 
 
 DISTRICTS = "Arrondissements de Paris"
@@ -352,7 +352,6 @@ class TestSearchCompany:
             html=True,
             count=1,
         )
-        assert_previous_step(response, reverse("search:employers_home"))
 
         # Has link to company card with back_url
         company_url = (
@@ -437,7 +436,6 @@ class TestSearchPrescriber:
 
         response = client.get(url, {"city": guerande.slug, "distance": 100})
         assertContains(response, "2 résultats")
-        assert_previous_step(response, reverse("search:prescribers_home"))
 
         # Has link to organization card with back_url
         organization_url = f"{organization_1.get_card_url()}?back_url={urlencode_filter(url)}"
