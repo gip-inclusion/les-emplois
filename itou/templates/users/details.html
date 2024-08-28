@@ -147,35 +147,40 @@
                                             <i class="text-disabled">Non renseigné</i>
                                         {% endif %}
                                     </li>
-                                    {% if profile.advisor_information %}
-                                        <li>
-                                            <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
-                                                <button class="c-info__summary collapsed" data-bs-toggle="collapse" data-bs-target="#collapseAdvisorInfoDetails" aria-expanded="false" aria-controls="collapseAdvisorInfoDetails" {% matomo_event "gps" "clic" "coordonnees-conseiller-{{ render_advisor_matomo_option|default:'ailleurs' }}" %}>
-                                                    <span>Voir les coordonnées du
-                                                        <br class="d-none d-md-inline">
-                                                    conseiller emploi France Travail</span>
-                                                </button>
-                                                <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
-                                                    {% if render_advisor_matomo_option %}
-                                                        <ul class="list-unstyled">
-                                                            <li>
-                                                                <i class="ri-user-line font-weight-normal me-1" aria-hidden="true"></i>{{ profile.advisor_information.name }}
-                                                            </li>
-                                                            <li>
-                                                                <i class="ri-mail-line font-weight-normal me-1" aria-hidden="true"></i>
-                                                                <a href="mailto:{{ profile.advisor_information.email }}" class="text-break text-decoration-none" aria-label="Contacter {{ profile.advisor_information.name }} par e-mail">{{ profile.advisor_information.email }}</a>
-                                                                {% include 'includes/copy_to_clipboard.html' with content=profile.advisor_information.email only_icon=True css_classes="btn-link font-weight-medium ms-1" %}
-                                                            </li>
-                                                        </ul>
-                                                    {% else %}
-                                                        <p class="mb-0">
-                                                            La fonctionnalité est en test dans deux départements et sera bientôt disponible pour votre territoire
-                                                        </p>
-                                                    {% endif %}
-                                                </div>
+                                    <li>
+                                        <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
+                                            <button class="c-info__summary collapsed"
+                                                    data-bs-toggle="collapse"
+                                                    data-bs-target="#collapseAdvisorInfoDetails"
+                                                    aria-expanded="false"
+                                                    aria-controls="collapseAdvisorInfoDetails"
+                                                    {% matomo_event "gps" "clic" matomo_option %}>
+                                                <span>Voir les coordonnées du
+                                                    <br class="d-none d-md-inline">
+                                                conseiller emploi France Travail</span>
+                                            </button>
+                                            <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
+                                                {% if profile.advisor_information and render_advisor_matomo_option %}
+                                                    <ul class="list-unstyled">
+                                                        <li>
+                                                            <i class="ri-user-line font-weight-normal me-1" aria-hidden="true"></i>{{ profile.advisor_information.name }}
+                                                        </li>
+                                                        <li>
+                                                            <i class="ri-mail-line font-weight-normal me-1" aria-hidden="true"></i>
+                                                            <a href="mailto:{{ profile.advisor_information.email }}" class="text-break text-decoration-none" aria-label="Contacter {{ profile.advisor_information.name }} par e-mail">{{ profile.advisor_information.email }}</a>
+                                                            {% include 'includes/copy_to_clipboard.html' with content=profile.advisor_information.email only_icon=True css_classes="btn-link font-weight-medium ms-1" %}
+                                                        </li>
+                                                    </ul>
+                                                {% elif render_advisor_matomo_option %}
+                                                    <p class="mb-0">Le conseiller emploi France Travail de ce bénéficiaire n’est pas connu.</p>
+                                                {% else %}
+                                                    <p class="mb-0">
+                                                        La fonctionnalité est en test dans deux départements et sera bientôt disponible pour votre territoire.
+                                                    </p>
+                                                {% endif %}
                                             </div>
-                                        </li>
-                                    {% endif %}
+                                        </div>
+                                    </li>
                                 </ul>
                             </div>
                         </div>

@@ -48,15 +48,15 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
         }
 
         org_department = self.request.current_organization.department
+        matomo_option = org_department if org_department in self.get_live_department_codes() else None
 
         context = context | {
             "breadcrumbs": breadcrumbs,
             "gps_memberships": gps_memberships,
             "matomo_custom_title": "Profil GPS",
             "profile": self.object.jobseeker_profile,
-            "render_advisor_matomo_option": org_department
-            if org_department in self.get_live_department_codes()
-            else None,
+            "render_advisor_matomo_option": matomo_option,
+            "matomo_option": "coordonnees-conseiller-" + (matomo_option if matomo_option else "ailleurs"),
         }
 
         return context

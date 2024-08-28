@@ -82,7 +82,22 @@
                                               <i class="text-disabled">Non renseigné</i>
                                           
                                       </li>
-                                      
+                                      <li>
+                                          <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
+                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-ailleurs">
+                                                  <span>Voir les coordonnées du
+                                                      <br class="d-none d-md-inline"/>
+                                                  conseiller emploi France Travail</span>
+                                              </button>
+                                              <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
+                                                  
+                                                      <p class="mb-0">
+                                                          La fonctionnalité est en test dans deux départements et sera bientôt disponible pour votre territoire.
+                                                      </p>
+                                                  
+                                              </div>
+                                          </div>
+                                      </li>
                                   </ul>
                               </div>
                           </div>
@@ -154,48 +169,64 @@
 # name: test_contact_information_display[info_displayed]
   '''
   <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
-                                                  <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-{{ render_advisor_matomo_option|default:'ailleurs' }}">
-                                                      <span>Voir les coordonnées du
-                                                          <br class="d-none d-md-inline"/>
-                                                      conseiller emploi France Travail</span>
-                                                  </button>
-                                                  <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
-                                                      
-                                                          <ul class="list-unstyled">
-                                                              <li>
-                                                                  <i aria-hidden="true" class="ri-user-line font-weight-normal me-1"></i>Test MacTest
-                                                              </li>
-                                                              <li>
-                                                                  <i aria-hidden="true" class="ri-mail-line font-weight-normal me-1"></i>
-                                                                  <a aria-label="Contacter Test MacTest par e-mail" class="text-break text-decoration-none" href="mailto:test.mactest@francetravail.fr">test.mactest@francetravail.fr</a>
-                                                                  <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="test.mactest@francetravail.fr" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
+                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-30">
+                                                  <span>Voir les coordonnées du
+                                                      <br class="d-none d-md-inline"/>
+                                                  conseiller emploi France Travail</span>
+                                              </button>
+                                              <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
+                                                  
+                                                      <ul class="list-unstyled">
+                                                          <li>
+                                                              <i aria-hidden="true" class="ri-user-line font-weight-normal me-1"></i>Test MacTest
+                                                          </li>
+                                                          <li>
+                                                              <i aria-hidden="true" class="ri-mail-line font-weight-normal me-1"></i>
+                                                              <a aria-label="Contacter Test MacTest par e-mail" class="text-break text-decoration-none" href="mailto:test.mactest@francetravail.fr">test.mactest@francetravail.fr</a>
+                                                              <button class="btn-link font-weight-medium ms-1" data-bs-placement="top" data-bs-title="Copié !" data-bs-toggle="tooltip" data-bs-trigger="manual" data-it-clipboard-button="copy" data-it-copy-to-clipboard="test.mactest@francetravail.fr" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="copied_user_phone">
       <i aria-hidden="true" class="ri-file-copy-line ri-lg font-weight-normal"></i>
       <span class="visually-hidden">Copier</span>
   </button>
   
-                                                              </li>
-                                                          </ul>
-                                                      
-                                                  </div>
+                                                          </li>
+                                                      </ul>
+                                                  
                                               </div>
+                                          </div>
+  '''
+# ---
+# name: test_contact_information_display[info_not_available]
+  '''
+  <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
+                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-30">
+                                                  <span>Voir les coordonnées du
+                                                      <br class="d-none d-md-inline"/>
+                                                  conseiller emploi France Travail</span>
+                                              </button>
+                                              <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
+                                                  
+                                                      <p class="mb-0">Le conseiller emploi France Travail de ce bénéficiaire n’est pas connu.</p>
+                                                  
+                                              </div>
+                                          </div>
   '''
 # ---
 # name: test_contact_information_display_not_live[preview_displayed]
   '''
   <div class="c-info c-info--secondary" id="advisor-info-details-collapsable">
-                                                  <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-{{ render_advisor_matomo_option|default:'ailleurs' }}">
-                                                      <span>Voir les coordonnées du
-                                                          <br class="d-none d-md-inline"/>
-                                                      conseiller emploi France Travail</span>
-                                                  </button>
-                                                  <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
-                                                      
-                                                          <p class="mb-0">
-                                                              La fonctionnalité est en test dans deux départements et sera bientôt disponible pour votre territoire
-                                                          </p>
-                                                      
-                                                  </div>
+                                              <button aria-controls="collapseAdvisorInfoDetails" aria-expanded="false" class="c-info__summary collapsed" data-bs-target="#collapseAdvisorInfoDetails" data-bs-toggle="collapse" data-matomo-action="clic" data-matomo-category="gps" data-matomo-event="true" data-matomo-option="coordonnees-conseiller-ailleurs">
+                                                  <span>Voir les coordonnées du
+                                                      <br class="d-none d-md-inline"/>
+                                                  conseiller emploi France Travail</span>
+                                              </button>
+                                              <div class="c-info__detail collapse" id="collapseAdvisorInfoDetails">
+                                                  
+                                                      <p class="mb-0">
+                                                          La fonctionnalité est en test dans deux départements et sera bientôt disponible pour votre territoire.
+                                                      </p>
+                                                  
                                               </div>
+                                          </div>
   '''
 # ---
 # name: test_dashboard_card
