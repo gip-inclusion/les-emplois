@@ -31,9 +31,10 @@ from tests.users.factories import (
     JobSeekerFactory,
     PrescriberFactory,
 )
+from tests.utils.factory_boy import AutoNowOverrideMixin
 
 
-class JobApplicationFactory(factory.django.DjangoModelFactory):
+class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFactory):
     class Meta:
         model = models.JobApplication
         skip_postgeneration_save = True

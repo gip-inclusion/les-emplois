@@ -1,0 +1,5 @@
+{% load str_filters %}
+
+<p class="mb-0" id="job-seekers-list-count"{% if request.htmx %} hx-swap-oob="true"{% endif %}>
+    {% with paginator.count as counter %}{{ counter }} résultat{{ counter|pluralizefr }}{% endwith %}
+</p>
