@@ -70,6 +70,20 @@ NAV_ENTRIES = {
         target=reverse("home:hp"),
         active_view_names=["dashboard:index"],
     ),
+    "employers-search": NavItem(
+        label="Un emploi inclusif",
+        target=reverse("search:employers_results"),
+        active_view_names=[
+            "search:employers_home",
+            "search:employers_results",
+            "search:job_descriptions_results",
+        ],
+    ),
+    "prescribers-search": NavItem(
+        label="Un prescripteur habilité",
+        target=reverse("search:prescribers_results"),
+        active_view_names=["search:prescribers_home", "search:prescribers_results"],
+    ),
     # Job seekers.
     "job-seeker-job-apps": NavItem(
         label="Mes candidatures",
@@ -202,6 +216,16 @@ def nav(request):
                     items=[NAV_ENTRIES["labor-inspector-members"]],
                 )
             )
+        menu_items.append(
+            NavGroup(
+                label="Rechercher",
+                icon="ri-search-line",
+                items=[
+                    NAV_ENTRIES["employers-search"],
+                    NAV_ENTRIES["prescribers-search"],
+                ],
+            )
+        )
 
         if request.resolver_match:
             for group_or_item in menu_items:
