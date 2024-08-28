@@ -54,5 +54,19 @@
     },
     "model": "institutions.institutionmembership",
     "pk": 8
+  },
+  {
+    "fields": {
+      "created_at": "2024-06-10T09:49:57.908Z",
+      "institution": 5,
+      "is_active": true,
+      "is_admin": false,
+      "joined_at": "2024-06-10T09:49:57.908Z",
+      "updated_at": "2024-06-10T09:49:57.938Z",
+      "updated_by": null,
+      "user": 29
+    },
+    "model": "institutions.institutionmembership",
+    "pk": 9
   }
 ]

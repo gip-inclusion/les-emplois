@@ -1,22 +1,5 @@
 from django.db import migrations, models
 
-from itou.institutions.enums import InstitutionKind
-
-
-def forwards(apps, schema_editor):
-    Institution = apps.get_model("institutions", "Institution")
-
-    Institution(
-        kind=InstitutionKind.CONVERGENCE,
-        name="Convergence France",
-    ).save()
-
-
-def backwards(apps, schema_editor):
-    Institution = apps.get_model("institutions", "Institution")
-
-    Institution.objects.filter(kind=InstitutionKind.CONVERGENCE).delete()
-
 
 class Migration(migrations.Migration):
     dependencies = [
@@ -59,6 +42,5 @@ class Migration(migrations.Migration):
                 max_length=20,
                 verbose_name="type",
             ),
-        ),
-        migrations.RunPython(code=forwards, reverse_code=backwards),
+        )
     ]

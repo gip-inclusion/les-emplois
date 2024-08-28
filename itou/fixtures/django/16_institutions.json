@@ -82,5 +82,27 @@
     },
     "model": "institutions.institution",
     "pk": 4
+  },
+  {
+    "fields": {
+      "active_members_email_reminder_last_sent_at": null,
+      "address_line_1": "",
+      "address_line_2": "",
+      "ban_api_resolved_address": null,
+      "city": "",
+      "coords": null,
+      "created_at": "2024-08-28T08:33:12.988Z",
+      "department": "",
+      "geocoding_score": null,
+      "geocoding_updated_at": null,
+      "insee_city": null,
+      "kind": "CONVERGENCE",
+      "name": "Convergence France",
+      "post_code": "",
+      "uid": "0e7c4a44-af0d-4c7f-a34d-2ea0f8215cc1",
+      "updated_at": "2024-08-28T08:33:13.130Z"
+    },
+    "model": "institutions.institution",
+    "pk": 5
   }
 ]

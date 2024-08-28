@@ -208,5 +208,15 @@
     },
     "model": "account.emailaddress",
     "pk": 21
+  },
+  {
+    "fields": {
+      "email": "test+institution@inclusion.beta.gouv.fr",
+      "primary": true,
+      "user": 29,
+      "verified": true
+    },
+    "model": "account.emailaddress",
+    "pk": 22
   }
 ]
