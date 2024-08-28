@@ -471,7 +471,7 @@ class TestSearchPrescriber:
         PrescriberOrganizationFactory(authorized=True, coords=guerande.coords)
         PrescriberOrganizationFactory(authorized=True, coords=vannes.coords)
 
-        response = client.get(url, {"city": guerande.slug, "distance": 10})
+        response = client.get(url, {"city": guerande.slug, "distance": 50})
         simulated_page = parse_response_to_soup(response)
 
         def distance_radio(distance):
@@ -479,7 +479,7 @@ class TestSearchPrescriber:
             return elt
 
         distance_radio(100)["checked"] = ""
-        del distance_radio(10)["checked"]
+        del distance_radio(50)["checked"]
         response = client.get(url, {"city": guerande.slug, "distance": 100}, headers={"HX-Request": "true"})
         update_page_with_htmx(simulated_page, f"form[hx-get='{url}']", response)
         response = client.get(url, {"city": guerande.slug, "distance": 100})

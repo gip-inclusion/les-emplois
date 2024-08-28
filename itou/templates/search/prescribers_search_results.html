@@ -1,5 +1,6 @@
 {% extends "layout/base.html" %}
 {% load static %}
+{% load str_filters %}
 
 {% block title %}
     {% include "search/includes/prescribers_search_title.html" with city=city distance=distance only %}
@@ -29,7 +30,7 @@
         <div class="s-section__container container">
             <div class="s-section__row row">
                 <div class="col-12">
-                    <h2 class="mb-3 mb-md-4">Prescripteurs</h2>
+                    <h2 class="mb-3 mb-md-4">Prescripteur{{ prescriber_orgs_page.paginator.count|pluralizefr }}</h2>
                     <div class="d-block w-100">
                         <form hx-get="{% url 'search:prescribers_results' %}"
                               hx-trigger="change delay:.5s"
