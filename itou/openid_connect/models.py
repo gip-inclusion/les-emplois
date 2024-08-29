@@ -11,6 +11,12 @@ from itou.users.models import User
 from .constants import OIDC_STATE_CLEANUP, OIDC_STATE_EXPIRATION
 
 
+class EmailInUseException(Exception):
+    def __init__(self, user, *args):
+        self.user = user
+        super().__init__(*args)
+
+
 class InvalidKindException(Exception):
     def __init__(self, user, *args):
         self.user = user
@@ -109,8 +115,9 @@ class OIDConnectUserData:
         Create or update a user managed by another identity provider.
          - If there is already a user with this username (user_info_dict["sub"])
            and from the same identity provider, we update and return it.
-         - If there is already a user with the email, we return this user.
-         - otherwise, we create a new user based on the data we received.
+         - If there is already a user with the email, we return this user, provided
+           the email is not in use by another account of the same provider (some providers allow email overloading).
+         - Otherwise, we create a new user based on the data we received.
         """
         user_data_dict = dataclasses.asdict(self)
         user_data_dict = {key: value for key, value in user_data_dict.items() if value}
@@ -130,6 +137,8 @@ class OIDConnectUserData:
                     self.check_valid_kind(user, user_data_dict, is_login)
                     # Don't update a user handled by another SSO provider.
                     return user, created
+                if user.identity_provider == self.identity_provider:
+                    raise EmailInUseException(user)
             except User.DoesNotExist:
                 # User.objects.create_user does the following:
                 # - set User.is_active to true,

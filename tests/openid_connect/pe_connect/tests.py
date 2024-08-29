@@ -15,7 +15,7 @@ from pytest_django.asserts import assertContains, assertRedirects
 from itou.external_data.apis import pe_connect
 from itou.external_data.models import ExternalDataImport
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
-from itou.openid_connect.models import InvalidKindException
+from itou.openid_connect.models import EmailInUseException, InvalidKindException
 from itou.openid_connect.pe_connect import constants
 from itou.openid_connect.pe_connect.models import PoleEmploiConnectState, PoleEmploiConnectUserData
 from itou.users.enums import IdentityProvider, UserKind
@@ -179,6 +179,23 @@ class TestPoleEmploiConnect:
             email="random@email.com",
         )
         with pytest.raises(ValidationError):
+            peamu_user_data.create_or_update_user()
+
+    def test_create_user_with_already_existing_peamu_email(self):
+        """
+        If there already is an existing user from PE Connect with this email,
+        but under another username, we raise an error.
+
+        We do this because France Travail allows users to overload the same email
+        across multiple accounts, where we only allow one.
+        """
+        peamu_user_data = PoleEmploiConnectUserData.from_user_info(PEAMU_USERINFO)
+        JobSeekerFactory(
+            username="another_username",
+            email=peamu_user_data.email,
+            identity_provider=IdentityProvider.PE_CONNECT,
+        )
+        with pytest.raises(EmailInUseException):
             peamu_user_data.create_or_update_user()
 
     def test_create_django_user_with_already_existing_peamu_email_django(self):

@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import crypto
+from django.utils.html import format_html
 from django.utils.http import urlencode
 
 from itou.external_data.models import ExternalDataImport
@@ -17,7 +18,7 @@ from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
 from itou.utils.urls import add_url_params, get_absolute_url
 
-from ..models import InvalidKindException, MultipleUsersFoundException
+from ..models import EmailInUseException, InvalidKindException, MultipleUsersFoundException
 from . import constants
 from .models import PoleEmploiConnectState, PoleEmploiConnectUserData
 
@@ -25,9 +26,9 @@ from .models import PoleEmploiConnectState, PoleEmploiConnectUserData
 logger = logging.getLogger(__name__)
 
 
-def _redirect_to_job_seeker_login_on_error(error_msg, request=None):
+def _redirect_to_job_seeker_login_on_error(error_msg, request=None, extra_tags=""):
     if request:
-        messages.error(request, error_msg)
+        messages.error(request, error_msg, extra_tags)
     return HttpResponseRedirect(reverse("login:job_seeker"))
 
 
@@ -139,11 +140,31 @@ def pe_connect_callback(request):
         return HttpResponseRedirect(url)
     except MultipleUsersFoundException as e:
         return _redirect_to_job_seeker_login_on_error(
-            "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : "
-            f"{e.users[0].email} et {e.users[1].email}. "
-            "Veuillez vous rapprocher du support pour débloquer la situation en suivant "
-            f"<a href='{global_constants.ITOU_HELP_CENTER_URL}'>ce lien</a>.",
+            format_html(
+                "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : "
+                "{} et {}. "
+                "Veuillez vous rapprocher du support pour débloquer la situation en suivant "
+                "<a href='{}'>ce lien</a>.",
+                e.users[0].email,
+                e.users[1].email,
+                global_constants.ITOU_HELP_CENTER_URL,
+            ),
             request=request,
+        )
+    except EmailInUseException as e:
+        redacted_name = e.user.get_redacted_full_name()
+        msg_who = f" au nom de <strong>{redacted_name}</strong>" if redacted_name else ""
+
+        return _redirect_to_job_seeker_login_on_error(
+            format_html(
+                "Vous avez essayé de vous connecter avec un compte France Travail, mais un compte"
+                "{} a déjà été créé avec cette adresse e-mail. Vous pouvez néanmoins"
+                " vous inscrire en utilisant une autre adresse e-mail et un mot de passe"
+                ' en cliquant sur <strong>"Inscription"</strong>.',
+                msg_who,
+            ),
+            request=request,
+            extra_tags="modal france_travail_registration_failure",
         )
 
     nir = request.session.get(global_constants.ITOU_SESSION_NIR_KEY)

@@ -661,6 +661,29 @@ class ModelTest(TestCase):
 
         assert len(JobSeekerFactory(first_name=too_long_name, last_name="maréchal").get_full_name()) == 70
 
+    def test_get_redacted_full_name(self):
+        user = JobSeekerFactory(first_name="", last_name="Bach")
+
+        def override_full_name(full_name):
+            names = full_name.split(" ")
+            user.first_name = " ".join(names[:-1]) if len(names) > 1 else names[0]
+            user.last_name = names[-1] if len(names) > 1 else ""
+
+        test_names = [
+            ("Johan Sebastian Bach", "J***n S*******n B**h"),
+            ("Max Weber", "M** W***r"),
+            ("Charlemagne", "C*********e"),
+            ("Salvador Felipe Jacinto Dalí y Domenech", "S******r F****e J*****o D**í Y D******h"),
+            ("Harald Blue-tooth", "H****d B********h"),
+            ("Llanfairpwllgwyngyllgogerychwyrndrobwllllantysiliogogogoch", "L**********h"),
+            ("Max", "M**"),
+            ("", ""),
+        ]
+
+        for name, expected_output in test_names:
+            override_full_name(name)
+            assert user.get_redacted_full_name() == expected_output
+
 
 class JobSeekerProfileModelTest(TestCase):
     def setUp(self):

@@ -127,7 +127,9 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
         company = CompanyFactory(kind=CompanyKind.ETTI)
         assert 0 == company.members.count()
 
-        user = EmployerFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
+        user = EmployerFactory(
+            username=OIDC_USERINFO["sub"], email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True
+        )
         CompanyMembershipFactory(user=user)
         assert 1 == user.company_set.count()
 
@@ -170,7 +172,9 @@ class CompanySignupTest(MessagesTestMixin, InclusionConnectBaseTestCase):
         """
         company = CompanyFactory(kind=CompanyKind.ETTI)
 
-        user = EmployerFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
+        user = EmployerFactory(
+            username=OIDC_USERINFO["sub"], email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True
+        )
         CompanyMembershipFactory(user=user)
 
         magic_link = company.signup_magic_link
