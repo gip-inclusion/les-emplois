@@ -7,7 +7,7 @@ from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.utils.immersion_facile import immersion_search_url
@@ -172,38 +172,7 @@ class TestApprovalDetailView:
         )
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
-        # 1.  SELECT django_session
-        # 2.  SELECT users_user
-        # 3.  SELECT company_membership
-        # 4.  SELECT company_company
-        # END of middleware
-        # 5.  SAVEPOINT
-        # 6.  SELECT approvals_approval (get_object)
-        # 7.  SELECT approvals_suspension (prefetch)
-        # 8.  SELECT approvals_prolongationrequest (prefetch)
-        # 9.  SELECT job_applications_jobapplication (get_job_application)
-        # 10. SELECT approvals_approval
-        # 11. SELECT companies_company
-        # 12. SELECT approvals_suspension
-        # 13. SELECT EXISTS job_applications_jobapplication
-        # 14. RELEASE SAVEPOINT
-        # END of view, template rendering
-        # 15. SELECT companies_siaeconvention (menu checks for financial annexes)
-        # 16. SELECT EXISTS users_user (menu checks for active admin)
-        # 17. SELECT approvals_suspension
-        # 18. SELECT job_applications_jobapplication
-        # 19. SELECT approvals_prolongation
-        # 20. SELECT approvals_prolongationrequest
-        # 21. SELECT users_user
-        # 22. SELECT users_user
-        # 23. SELECT eligibility_administrativecriteria
-        # 24. SELECT approvals_approval (all)
-        # 25. SELECT approvals_approval (valid)
-        # 26. SELECT job_applications_jobapplication
-        # 27. SELECT job_applications_jobapplication_selected_jobs (prefetch)
-        # 28. SELECT prescribers_prescriberorganization (get sender information)
-        # END of template rendering
-        with assertNumQueries(28):
+        with assertSnapshotQueries(snapshot(name="Approval detail view with suspensions")):
             response = client.get(url)
 
         suspensions_section = parse_response_to_soup(response, selector="#suspensions-list")
@@ -261,37 +230,7 @@ class TestApprovalDetailView:
         )
 
         url = reverse("approvals:detail", kwargs={"pk": approval.pk})
-        # 1.  SELECT django_session
-        # 2.  SELECT users_user
-        # 3.  SELECT company_membership
-        # 4.  SELECT company_company
-        # END of middleware
-        # 5.  SAVEPOINT
-        # 6.  SELECT approvals_approval (get_object)
-        # 7.  SELECT approvals_suspension (prefetch)
-        # 8.  SELECT approvals_prolongationrequest (prefetch)
-        # 9.  SELECT job_applications_jobapplication (get_job_application)
-        # 10. SELECT job_applications_jobapplication (can_be_handled_by_siae)
-        # 11. SELECT approvals_approval
-        # 12. SELECT companies_company
-        # 13. SELECT approvals_suspension
-        # 14. RELEASE SAVEPOINT
-        # END of view, template rendering
-        # 15. SELECT companies_siaeconvention (menu checks for financial annexes)
-        # 16. SELECT EXISTS users_user (menu checks for active admin)
-        # 17. SELECT approvals_suspension
-        # 18. SELECT approvals_prolongation
-        # 19. SELECT approvals_prolongationrequest
-        # 20. SELECT users_user
-        # 21. SELECT users_user
-        # 22. SELECT eligibility_administrativecriteria
-        # 23. SELECT approvals_approval (all)
-        # 24. SELECT approvals_approval (valid)
-        # 25. SELECT job_applications_jobapplication
-        # 26. SELECT job_applications_jobapplication_selected_jobs (prefetch)
-        # 27. SELECT prescribers_prescriberorganization (get sender information)
-        # END of template rendering
-        with assertNumQueries(27):
+        with assertSnapshotQueries(snapshot(name="Approval detail view with prolongations")):
             response = client.get(url)
 
         prolongations_section = parse_response_to_soup(response, selector="#prolongations-list")
