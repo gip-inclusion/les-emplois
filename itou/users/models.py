@@ -439,9 +439,9 @@ class User(AbstractUser, AddressMixin):
 
         if not approvals:
             return None
-        valid_approval = approvals.valid().first()
-        if valid_approval:
-            return valid_approval
+        valid_approvals = [approval for approval in approvals if approval.is_valid()]
+        if valid_approvals:
+            return valid_approvals[0]
 
         approval = sorted(
             approvals,

@@ -1041,47 +1041,6 @@
     }),
     dict({
       'origin': list([
-        'ApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
-        'User.latest_approval[users/models.py]',
-        'User.has_valid_common_approval[users/models.py]',
-        'EligibilityDiagnosis.considered_to_expire_at[eligibility/models/iae.py]',
-        'VariableNode[apply/includes/eligibility_diagnosis.html]',
-        'IfNode[apply/includes/eligibility_diagnosis.html]',
-        'IfNode[apply/includes/eligibility_diagnosis.html]',
-        'IfNode[apply/includes/eligibility_diagnosis.html]',
-        'IncludeNode[approvals/detail.html]',
-        'IfNode[approvals/detail.html]',
-        'BlockNode[layout/base.html]',
-        'ExtendsNode[approvals/detail.html]',
-      ]),
-      'sql': '''
-        SELECT "approvals_approval"."id",
-               "approvals_approval"."start_at",
-               "approvals_approval"."end_at",
-               "approvals_approval"."created_at",
-               "approvals_approval"."number",
-               "approvals_approval"."pe_notification_status",
-               "approvals_approval"."pe_notification_time",
-               "approvals_approval"."pe_notification_endpoint",
-               "approvals_approval"."pe_notification_exit_code",
-               "approvals_approval"."user_id",
-               "approvals_approval"."created_by_id",
-               "approvals_approval"."origin",
-               "approvals_approval"."eligibility_diagnosis_id",
-               "approvals_approval"."updated_at",
-               "approvals_approval"."origin_siae_siret",
-               "approvals_approval"."origin_siae_kind",
-               "approvals_approval"."origin_sender_kind",
-               "approvals_approval"."origin_prescriber_organization_kind"
-        FROM "approvals_approval"
-        WHERE ("approvals_approval"."user_id" = %s
-               AND "approvals_approval"."end_at" >= %s)
-        ORDER BY "approvals_approval"."created_at" DESC
-        LIMIT 1
-      ''',
-    }),
-    dict({
-      'origin': list([
         'ForNode[approvals/detail.html]',
         'BlockNode[layout/base.html]',
         'ExtendsNode[approvals/detail.html]',
@@ -2530,47 +2489,6 @@
         FROM "approvals_approval"
         WHERE "approvals_approval"."user_id" = %s
         ORDER BY "approvals_approval"."created_at" DESC
-      ''',
-    }),
-    dict({
-      'origin': list([
-        'ApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
-        'User.latest_approval[users/models.py]',
-        'User.has_valid_common_approval[users/models.py]',
-        'EligibilityDiagnosis.considered_to_expire_at[eligibility/models/iae.py]',
-        'VariableNode[apply/includes/eligibility_diagnosis.html]',
-        'IfNode[apply/includes/eligibility_diagnosis.html]',
-        'IfNode[apply/includes/eligibility_diagnosis.html]',
-        'IfNode[apply/includes/eligibility_diagnosis.html]',
-        'IncludeNode[approvals/detail.html]',
-        'IfNode[approvals/detail.html]',
-        'BlockNode[layout/base.html]',
-        'ExtendsNode[approvals/detail.html]',
-      ]),
-      'sql': '''
-        SELECT "approvals_approval"."id",
-               "approvals_approval"."start_at",
-               "approvals_approval"."end_at",
-               "approvals_approval"."created_at",
-               "approvals_approval"."number",
-               "approvals_approval"."pe_notification_status",
-               "approvals_approval"."pe_notification_time",
-               "approvals_approval"."pe_notification_endpoint",
-               "approvals_approval"."pe_notification_exit_code",
-               "approvals_approval"."user_id",
-               "approvals_approval"."created_by_id",
-               "approvals_approval"."origin",
-               "approvals_approval"."eligibility_diagnosis_id",
-               "approvals_approval"."updated_at",
-               "approvals_approval"."origin_siae_siret",
-               "approvals_approval"."origin_siae_kind",
-               "approvals_approval"."origin_sender_kind",
-               "approvals_approval"."origin_prescriber_organization_kind"
-        FROM "approvals_approval"
-        WHERE ("approvals_approval"."user_id" = %s
-               AND "approvals_approval"."end_at" >= %s)
-        ORDER BY "approvals_approval"."created_at" DESC
-        LIMIT 1
       ''',
     }),
     dict({
