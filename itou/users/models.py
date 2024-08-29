@@ -461,17 +461,13 @@ class User(AbstractUser, AddressMixin):
 
         approval_numbers = self.approvals.all().values_list("number", flat=True)
 
-        pe_approvals = PoleEmploiApproval.objects.find_for(self).exclude(number__in=approval_numbers)
-        if not pe_approvals:
-            return None
-        pe_approval = sorted(
-            pe_approvals,
-            key=lambda x: (
-                -time.mktime(x.end_at.timetuple()),
-                time.mktime(x.start_at.timetuple()),
-            ),
-        )[0]
-        if pe_approval.waiting_period_has_elapsed:
+        pe_approval = (
+            PoleEmploiApproval.objects.find_for(self)
+            .exclude(number__in=approval_numbers)
+            .order_by("-end_at", "start_at")
+            .first()
+        )
+        if pe_approval and pe_approval.waiting_period_has_elapsed:
             return None
         return pe_approval
 

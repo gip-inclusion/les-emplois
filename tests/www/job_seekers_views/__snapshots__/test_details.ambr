@@ -1329,6 +1329,7 @@
     }),
     dict({
       'origin': list([
+        'CommonApprovalQuerySet.first[<site-packages>/django/db/models/query.py]',
         'User.latest_pe_approval[users/models.py]',
         'User.has_valid_common_approval[users/models.py]',
         'EligibilityDiagnosisManagerFromEligibilityDiagnosisQuerySet.last_considered_valid[eligibility/models/iae.py]',
@@ -1360,8 +1361,9 @@
                           (SELECT U0."number"
                            FROM "approvals_approval" U0
                            WHERE U0."user_id" = %s)))
-        ORDER BY "approvals_poleemploiapproval"."start_at" DESC,
-                 "approvals_poleemploiapproval"."number" DESC
+        ORDER BY "approvals_poleemploiapproval"."end_at" DESC,
+                 "approvals_poleemploiapproval"."start_at" ASC
+        LIMIT 1
       ''',
     }),
     dict({
