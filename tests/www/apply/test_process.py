@@ -62,7 +62,7 @@ from tests.users.factories import (
     PrescriberFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import TestCase, assert_previous_step, parse_response_to_soup
+from tests.utils.test import TestCase, assert_previous_step, assertSnapshotQueries, parse_response_to_soup
 
 
 logger = logging.getLogger(__name__)
@@ -133,30 +133,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             {"back_url": back_url},
         )
-        # 1. SELECT django session
-        # 2. SELECT current user
-        # 3. SELECT company membership
-        # 4. SELECT companies
-        # 5. SAVEPOINT
-        ### View starts
-        # 6. SELECT job application
-        # 7. SELECT selected jobs (prefetch related)
-        # 8. SELECT approval (last expired eligibility diagnosis)
-        # 9. SELECT approval (last expired eligibility diagnosis, first valid approval)
-        ### Template menu
-        # 10. SELECT companies_siaeconvention (menu checks for financial annexes)
-        # 11. SELECT EXISTS users_user (menu checks for active admin)
-        ### Template apply/includes/eligibility_diagnosis.html
-        # 12. SELECT eligibility diagnosis administrative criteria
-        # 13. SELECT approval (again, for considered_to_expire_at)
-        # 14. SELECT approval (again, for considered_to_expire_at, first valid approval)
-        # 15. SELECT transition logs
-        # 16. SELECT EXISTS employee_record
-        # 17. RELEASE SAVEPOINT
-        # 18. SAVEPOINT
-        # 19. UPDATE django session
-        # 20. RELEASE SAVEPOINT
-        with self.assertNumQueries(20):
+        with assertSnapshotQueries(self.snapshot(name="job application detail for company")):
             response = self.client.get(url)
         self.assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
         self.assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
