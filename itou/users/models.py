@@ -34,6 +34,7 @@ from itou.common_apps.address.models import AddressMixin
 from itou.companies.enums import CompanyKind
 from itou.utils.db import or_queries
 from itou.utils.models import UniqueConstraintWithErrorCode
+from itou.utils.templatetags.str_filters import mask_unless
 from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
 
 from .enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
@@ -355,6 +356,19 @@ class User(AbstractUser, AddressMixin):
         """
         full_name = f"{self.first_name.strip().title()} {self.last_name.upper()}"
         return full_name.strip()[:70]
+
+    def get_redacted_full_name(self):
+        """
+        Return full name in redacted form for privacy, e.g. J** H***h
+        """
+
+        def get_mask_for_part(part):
+            visible_chars = 1 if len(part) <= 3 else 2
+            last_char = part[-1] if visible_chars > 1 else ""
+            return part[0] + "*" * (min(len(part) - visible_chars, 10)) + last_char
+
+        # we don't use get_full_name here to limit the transformations applied to the user's names in this context
+        return mask_unless(f"{self.first_name.title()} {self.last_name.title()}", False, get_mask_for_part)
 
     @property
     def is_job_seeker(self):

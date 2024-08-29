@@ -32,8 +32,8 @@ def pluralizefr(value, arg="s"):
 
 @register.filter(is_safe=True)
 @defaultfilters.stringfilter
-def mask_unless(value, predicate):
+def mask_unless(value, predicate, mask_function=(lambda x: x[0] + "…")):
     if predicate:
         return value
 
-    return " ".join(part[0] + "…" for part in re.split(f"[{re.escape(string.whitespace)}]+", value) if part)
+    return " ".join(mask_function(part) for part in re.split(f"[{re.escape(string.whitespace)}]+", value) if part)

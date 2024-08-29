@@ -1,0 +1,19 @@
+{% load static %}
+{% load theme_inclusion %}
+{% load django_bootstrap5 %}
+
+{% for message in messages %}
+    {% if "modal" in message.extra_tags %}
+        <div class="modal fade" id="message-modal-{{ forloop.counter }}" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="message-modal-{{ forloop.counter }}-label" aria-modal="true">
+            {% if "france_travail_registration_failure" in message.extra_tags %}
+                {% include "utils/modal_includes/france_travail_registration_failure.html" %}
+            {% endif %}
+        </div>
+
+        <script nonce="{{ CSP_NONCE }}">
+            window.onload = function() {
+                new bootstrap.Modal(document.getElementById("message-modal-{{ forloop.counter }}")).show();
+            };
+        </script>
+    {% endif %}
+{% endfor %}

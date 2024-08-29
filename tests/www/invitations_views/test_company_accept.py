@@ -169,7 +169,11 @@ class TestAcceptInvitation(MessagesTestMixin, InclusionConnectBaseTestCase):
     @respx.mock
     def test_accept_existing_user_not_logged_in_using_IC(self):
         invitation = SentEmployerInvitationFactory(email=OIDC_USERINFO["email"])
-        user = EmployerFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
+        user = EmployerFactory(
+            username=OIDC_USERINFO["sub"],
+            email=OIDC_USERINFO["email"],
+            has_completed_welcoming_tour=True,
+        )
         response = self.client.get(invitation.acceptance_link, follow=True)
         assert reverse("login:employer") in response.wsgi_request.get_full_path()
         assert not invitation.accepted

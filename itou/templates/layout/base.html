@@ -264,6 +264,8 @@
             {% include "layout/_news_modal.html" %}
         {% endif %}
 
-        {% block modals %}{% endblock %}
+        {% block modals %}
+            {% include "utils/modals.html" %}
+        {% endblock %}
     </body>
 </html>

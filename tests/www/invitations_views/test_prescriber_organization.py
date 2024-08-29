@@ -409,7 +409,11 @@ class TestAcceptPrescriberWithOrgInvitation(MessagesTestMixin, InclusionConnectB
     @respx.mock
     def test_accept_existing_user_not_logged_in_using_IC(self):
         invitation = PrescriberWithOrgSentInvitationFactory(sender=self.sender, organization=self.organization)
-        user = PrescriberFactory(email=OIDC_USERINFO["email"], has_completed_welcoming_tour=True)
+        user = PrescriberFactory(
+            username=OIDC_USERINFO["sub"],
+            email=OIDC_USERINFO["email"],
+            has_completed_welcoming_tour=True,
+        )
         # The user verified its email
         EmailAddress(user_id=user.pk, email=user.email, verified=True, primary=True).save()
         invitation = PrescriberWithOrgSentInvitationFactory(

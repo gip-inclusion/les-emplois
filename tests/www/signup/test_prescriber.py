@@ -737,7 +737,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         He will be logged in instead as if he just used the login through IC button
         """
         #### User is a prescriber. Update it and connect. ####
-        PrescriberFactory(email=OIDC_USERINFO["email"])
+        PrescriberFactory(email=OIDC_USERINFO["email"], username=OIDC_USERINFO["sub"])
         self.client.get(reverse("signup:prescriber_check_already_exists"))
 
         # Step 2: register as a simple prescriber (orienteur).
@@ -772,7 +772,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         We should update his account and make him join this new organization.
         """
         org = PrescriberOrganizationFactory.build(kind=PrescriberOrganizationKind.OTHER)
-        user = PrescriberFactory(email=OIDC_USERINFO["email"])
+        user = PrescriberFactory(email=OIDC_USERINFO["email"], username=OIDC_USERINFO["sub"])
 
         self.client.get(reverse("signup:prescriber_check_already_exists"))
 
@@ -886,7 +886,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(MessagesTestMixin, Inclusio
         The user is still created and can try again.
         """
         org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.OTHER)
-        user = PrescriberFactory(email=OIDC_USERINFO["email"])
+        user = PrescriberFactory(email=OIDC_USERINFO["email"], username=OIDC_USERINFO["sub"])
 
         self.client.get(reverse("signup:prescriber_check_already_exists"))
 
@@ -958,7 +958,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(MessagesTestMixin, Inclusio
         The user is still created and can try again.
         """
         org = PrescriberOrganizationFactory(kind=PrescriberOrganizationKind.OTHER)
-        EmployerFactory(email=OIDC_USERINFO["email"], with_company=True)
+        EmployerFactory(email=OIDC_USERINFO["email"], username=OIDC_USERINFO["sub"], with_company=True)
 
         response = self.client.get(reverse("signup:prescriber_check_already_exists"))
         assert response.status_code == 200
@@ -1034,7 +1034,7 @@ class InclusionConnectPrescribersViewsExceptionsTest(MessagesTestMixin, Inclusio
         Raise an exception.
         """
         org = PrescriberOrganizationFactory.build(kind=PrescriberOrganizationKind.OTHER)
-        user = EmployerFactory(email=OIDC_USERINFO["email"])
+        user = EmployerFactory(email=OIDC_USERINFO["email"], username=OIDC_USERINFO["sub"])
         self.client.get(reverse("signup:prescriber_check_already_exists"))
 
         session_signup_data = self.client.session.get(global_constants.ITOU_SESSION_PRESCRIBER_SIGNUP_KEY)
