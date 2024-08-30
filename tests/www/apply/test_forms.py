@@ -426,7 +426,9 @@ class CertifiedCriteriaInfoRequiredFormTest(TestCase):
             "birth_country": job_seeker.jobseeker_profile.birth_country.id,
             "birth_place": job_seeker.jobseeker_profile.birth_place.id,
         }
-        form = apply_forms.CertifiedCriteriaInfoRequiredForm(data=form_data, birthdate=valid_birthdate)
+        form = apply_forms.CertifiedCriteriaInfoRequiredForm(
+            data=form_data, birthdate=valid_birthdate, with_birthdate_field=False
+        )
         assert form.is_valid()
 
     def test_submit_commune_invalid_commune_lookup(self):
@@ -445,7 +447,9 @@ class CertifiedCriteriaInfoRequiredFormTest(TestCase):
             "birth_country": job_seeker.jobseeker_profile.birth_country.id,
             "birth_place": birth_place.id,
         }
-        form = apply_forms.CertifiedCriteriaInfoRequiredForm(data=form_data, birthdate=early_date)
+        form = apply_forms.CertifiedCriteriaInfoRequiredForm(
+            data=form_data, birthdate=early_date, with_birthdate_field=False
+        )
         assert not form.is_valid()
 
         expected_msg = (

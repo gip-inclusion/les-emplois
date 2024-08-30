@@ -130,7 +130,7 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields["birth_place"] = formfield_for_birth_place()
+        self.fields["birth_place"] = formfield_for_birth_place(with_birthdate_field=True)
 
         for field_name in self.REQUIRED_FIELDS:
             self.fields[field_name].required = True
