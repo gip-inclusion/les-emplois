@@ -5,7 +5,8 @@ from itou.asp.models import Commune, Country
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
 
-def formfield_for_birth_place(**kwargs):
+def formfield_for_birth_place(*, with_birthdate_field, **kwargs):
+    with_birthdate_attr = {"data-select2-link-with-birthdate": "id_birthdate"} if with_birthdate_field else {}
     france = Country.objects.get(code=Country._CODE_FRANCE)
     return forms.ModelChoiceField(
         queryset=Commune.objects,
@@ -24,8 +25,8 @@ def formfield_for_birth_place(**kwargs):
                 "data-placeholder": "Nom de la commune",
                 "data-disable-target": "#id_birth_country",
                 "data-target-value": f"{france.pk}",
-                "data-select2-link-with-birthdate": "id_birthdate",
-            },
+                **with_birthdate_attr,
+            }
         ),
         **kwargs,
     )

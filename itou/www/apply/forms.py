@@ -897,9 +897,10 @@ class CertifiedCriteriaInfoRequiredForm(forms.ModelForm):
         model = JobSeekerProfile
         fields = ("birth_place", "birth_country")
 
-    def __init__(self, birthdate, *args, **kwargs):
+    def __init__(self, birthdate, *args, with_birthdate_field, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["birth_place"] = formfield_for_birth_place()
+        # with_birthdate_field indicates if JS is needed to link birthdate & birth_place fields
+        self.fields["birth_place"] = formfield_for_birth_place(with_birthdate_field=with_birthdate_field)
         self.birthdate = birthdate
 
     def clean(self):
