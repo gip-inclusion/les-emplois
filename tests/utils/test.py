@@ -193,7 +193,16 @@ class _AssertSnapshotQueriesContext(CaptureQueriesContext):
         )
 
     def build_snapshot(self, queries):
-        return [{"sql": self.normalize_sql(query["raw_sql"]), "origin": query["origin"]} for query in queries]
+        return {
+            "num_queries": len(queries),
+            "queries": [
+                {
+                    "sql": self.normalize_sql(query["raw_sql"]),
+                    "origin": query["origin"],
+                }
+                for query in queries
+            ],
+        }
 
     def __exit__(self, exc_type, exc_value, traceback):
         super().__exit__(exc_type, exc_value, traceback)
@@ -201,7 +210,7 @@ class _AssertSnapshotQueriesContext(CaptureQueriesContext):
             return
         new_snapshot = self.build_snapshot(self.captured_queries)
         assert new_snapshot == self.snapshot
-        for item in new_snapshot:
+        for item in new_snapshot["queries"]:
             assert item["origin"], f"origin is mandatory and missing for {item}"
 
 
