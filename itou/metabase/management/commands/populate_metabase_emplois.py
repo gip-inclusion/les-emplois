@@ -24,7 +24,7 @@ from collections import OrderedDict
 
 import tenacity
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models import Count, F, Max, Min, Prefetch, Q
+from django.db.models import Count, F, Max, Prefetch, Q
 from django.utils import timezone
 
 from itou.analytics.models import Datum, StatsDashboardVisit
@@ -131,14 +131,21 @@ class Command(BaseCommand):
         queryset = (
             Company.objects.active()
             .select_related("convention")
-            .prefetch_related("convention__siaes", "job_description_through", "members")
+            .prefetch_related(
+                "convention__siaes",
+                "job_description_through",
+                "members",
+                Prefetch(
+                    "companymembership_set",
+                    queryset=CompanyMembership.objects.active(),
+                    to_attr="active_memberships",
+                ),
+                "companymembership_set",
+            )
             .annotate(
                 last_job_application_transition_date=Max(
                     "job_applications_received__logs__timestamp",
                     filter=~Q(job_applications_received__logs__to_state=JobApplicationState.OBSOLETE),
-                ),
-                first_membership_join_date=Min(
-                    "companymembership__joined_at",
                 ),
                 total_candidatures=Count(
                     "job_applications_received",
@@ -247,7 +254,15 @@ class Command(BaseCommand):
             filter=active_user_created_job_applications_filter,
         )
         queryset = (
-            PrescriberOrganization.objects.prefetch_related("prescribermembership_set", "members")
+            PrescriberOrganization.objects.prefetch_related(
+                Prefetch(
+                    "prescribermembership_set",
+                    queryset=PrescriberMembership.objects.active(),
+                    to_attr="active_memberships",
+                ),
+                "members",
+                "prescribermembership_set",
+            )
             .annotate(
                 job_applications_count=job_applications_count,
                 accepted_job_applications_count=accepted_job_applications_count,

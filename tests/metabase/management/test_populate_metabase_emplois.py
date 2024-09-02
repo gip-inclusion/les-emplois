@@ -1135,6 +1135,10 @@ def test_populate_companies():
         with_jobs=True,
         coords="POINT (5.43567 12.123876)",
     )
+    # Add an inactive membership, and a active membership on an inactive user
+    # both should be ignored in total_members agregation
+    CompanyMembershipFactory(company=company, is_active=False)
+    CompanyMembershipFactory(company=company, user__is_active=False)
 
     num_queries = 1  # Count Siaes
     num_queries += 1  # COMMIT Queryset counts (autocommit mode)
@@ -1144,7 +1148,9 @@ def test_populate_companies():
     num_queries += 1  # Select siaes with annotations and columns
     num_queries += 1  # Select other siaes with the same convention
     num_queries += 1  # Prefetch siae job descriptions
-    num_queries += 1  # Prefecth siae memberships
+    num_queries += 1  # Prefecth siae active memberships (for total_membres)
+    num_queries += 1  # Prefecth siae memberships (for first_membership_join_date)
+    num_queries += 1  # Prefecth siae members (for members last_login)
     num_queries += 1  # Prefetch cities
     num_queries += 1  # COMMIT (inject_chunk)
     num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
@@ -1320,6 +1326,10 @@ def test_populate_organizations():
         authorized=True,
         post_code="63020",
     )
+    # Add an inactive membership, and a active membership on an inactive user
+    # both should be ignored in total_members agregation
+    PrescriberMembershipFactory(organization=first_organisation, is_active=False)
+    PrescriberMembershipFactory(organization=first_organisation, user__is_active=False)
 
     num_queries = 1  # Select get_active_companies_pks()
     num_queries += 1  # Count organization
@@ -1333,8 +1343,9 @@ def test_populate_organizations():
     num_queries += 1  # Select organization IDs
     num_queries += 1  # Select one chunk of organization IDs
     num_queries += 1  # Select organization with columns
-    num_queries += 1  # Select prefetch organizations memberships
-    num_queries += 1  # Select prefetch organizations members
+    num_queries += 1  # Select prefetch organizations active memberships (for total_membres)
+    num_queries += 1  # Select prefetch organizations memberships (for first_membership_join_date)
+    num_queries += 1  # Select prefetch organizations members (for members last_login)
     num_queries += 1  # COMMIT (inject_chunk)
     num_queries += 1  # COMMIT (rename_table_atomically DROP TABLE)
     num_queries += 1  # COMMIT (rename_table_atomically RENAME TABLE)
