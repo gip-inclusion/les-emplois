@@ -150,7 +150,8 @@ class EvaluationCampaignAdmin(ItouModelAdmin):
         messages.success(
             request,
             (
-                "Les Siaes qui n'avaient pas encore transmis leurs justificatifs, "
+                "Les SIAE qui n'avaient pas encore transmis leurs justificatifs "
+                "ou dont le contrôle a été refusé en phase amiable "
                 "sont passées en phase contradictoire pour les campagnes sélectionnées."
             ),
         )
