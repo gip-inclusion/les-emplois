@@ -28,3 +28,16 @@ preserve_blank_lines=true
 extend_exclude = "itou/templates/utils/widgets/duet_date_picker_widget.html"
 format_css = true
 format_js = true
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings.test"
+FAIL_INVALID_TEMPLATE_VARS = true
+python_files = ["tests*.py", "test_*.py"]
+filterwarnings = ["error"]
+addopts = [
+    "--reuse-db",
+    "--strict-markers",
+]
+markers = [
+    "no_django_db: mark tests that should not be marked with django_db."
+]
