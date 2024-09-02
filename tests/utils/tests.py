@@ -159,7 +159,7 @@ class TestItouCurrentOrganizationMiddleware:
         with assertNumQueries(1):  # Retrieve user memberships
             response = ItouCurrentOrganizationMiddleware(get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
-        assertRedirects(response, reverse("account_logout"), fetch_redirect_response=False)
+        assertRedirects(response, reverse("search:employers_home"), fetch_redirect_response=False)
         assert list(messages.get_messages(request)) == [
             messages.Message(
                 messages.WARNING,
@@ -237,7 +237,7 @@ class TestItouCurrentOrganizationMiddleware:
         ):
             response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
-        assertRedirects(response, reverse("account_logout"), fetch_redirect_response=False)
+        assertRedirects(response, reverse("search:employers_home"), fetch_redirect_response=False)
         assert list(messages.get_messages(request)) == [
             messages.Message(
                 messages.WARNING,
@@ -433,7 +433,7 @@ class TestItouCurrentOrganizationMiddleware:
         with assertNumQueries(1):  # retrieve user memberships
             response = ItouCurrentOrganizationMiddleware(mocked_get_response_for_middlewaremixin)(request)
         assert mocked_get_response_for_middlewaremixin.call_count == 0
-        assertRedirects(response, reverse("account_logout"), fetch_redirect_response=False)
+        assertRedirects(response, reverse("search:employers_home"), fetch_redirect_response=False)
         assert list(messages.get_messages(request)) == [
             messages.Message(
                 messages.WARNING,

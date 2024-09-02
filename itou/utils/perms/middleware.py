@@ -1,7 +1,7 @@
+from allauth.account.adapter import get_adapter
 from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
@@ -165,6 +165,9 @@ class ItouCurrentOrganizationMiddleware:
 
         if redirect_message is not None:
             messages.warning(request, redirect_message)
-            return redirect("account_logout")
+            adapter = get_adapter(request)
+            redirect_url = adapter.get_logout_redirect_url(request)
+            adapter.logout(request)
+            return HttpResponseRedirect(redirect_url)
 
         return self.get_response(request)

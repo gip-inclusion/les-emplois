@@ -4,6 +4,7 @@ from functools import partial
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
+from django.contrib.auth import get_user
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
@@ -103,10 +104,10 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
 
         url = reverse("dashboard:index")
         response = self.client.get(url, follow=True)
+        # Should be redirected to home page and logged out
+        self.assertRedirects(response, reverse("search:employers_home"))
         assert response.status_code == 200
-        last_url = response.redirect_chain[-1][0]
-        assert last_url == reverse("account_logout")
-
+        assert not get_user(self.client).is_authenticated
         expected_message = "votre compte n&#x27;est malheureusement plus actif"
         self.assertContains(response, expected_message)
 
