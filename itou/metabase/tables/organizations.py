@@ -35,7 +35,7 @@ def get_org_members_count(org):
     if org == ORG_OF_PRESCRIBERS_WITHOUT_ORG:
         # Number of prescriber users without org.
         return User.objects.filter(kind=UserKind.PRESCRIBER, prescribermembership=None).count()
-    return org.members.count()
+    return len(org.active_memberships)
 
 
 def _get_ja_sent_by_prescribers_without_org():

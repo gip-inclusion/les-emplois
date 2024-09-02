@@ -9,6 +9,7 @@ from itou.metabase.tables.utils import (
     get_column_from_field,
     get_establishment_is_active_column,
     get_establishment_last_login_date_column,
+    get_first_membership_join_date,
 )
 
 
@@ -83,13 +84,13 @@ TABLE.add_columns(
             "name": "date_inscription",
             "type": "date",
             "comment": "Date inscription du premier compte employeur",
-            "fn": lambda o: o.first_membership_join_date,
+            "fn": lambda o: get_first_membership_join_date(o.companymembership_set),
         },
         {
             "name": "total_membres",
             "type": "integer",
             "comment": "Nombre de comptes employeur rattachés à la structure",
-            "fn": lambda o: o.members.count(),
+            "fn": lambda o: len(o.active_memberships),
         },
         {
             "name": "total_candidatures",

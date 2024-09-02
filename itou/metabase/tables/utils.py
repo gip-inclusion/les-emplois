@@ -94,9 +94,7 @@ def get_first_membership_join_date(memberships):
     memberships = list(memberships.all())
     # We have to do all this in python to benefit from prefetch_related.
     if len(memberships) >= 1:
-        memberships.sort(key=lambda o: o.joined_at)
-        first_membership = memberships[0]
-        return first_membership.joined_at
+        return min(m.joined_at for m in memberships)
     return None
 
 
