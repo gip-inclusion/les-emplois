@@ -350,9 +350,9 @@ django-bootstrap5==24.2 \
     --hash=sha256:6a5d83e9ff1952f7c07c54cebcb76c85f09787b8b57eeb4ec07554cd583acc64 \
     --hash=sha256:a3cee2b3d45745210c5b898af2917f310f44df746269fe09a93be28a0adc2a4b
     # via -r requirements/test.txt
-django-citext==1.0.0 \
-    --hash=sha256:4a53e780a7519a2129a5b30043dea05a3d99cfd5fa5493e0b09ee1b8a1cc1576 \
-    --hash=sha256:61f7ddcb9bbbb09bd405ae865f5fea453dff67780bbf99f4ff024f1f874c4219
+django-citext==1.0.2 \
+    --hash=sha256:375a2d6a06133ad9e375f0db62d4d606fa43428de14751d03856b9c702c0000f \
+    --hash=sha256:6ae71eb36442a61f1b2df5355c8ead9722b283a7b726cdfabcf0ff873a6b7613
     # via -r requirements/test.txt
 django-csp==3.8 \
     --hash=sha256:19b2978b03fcd73517d7d67acbc04fbbcaec0facc3e83baa502965892d1e0719 \
