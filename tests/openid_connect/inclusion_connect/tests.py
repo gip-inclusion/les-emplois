@@ -2,11 +2,12 @@ import dataclasses
 import json
 from operator import itemgetter
 from unittest import mock
-from urllib.parse import quote, urlencode
+from urllib.parse import parse_qs, quote, urlencode, urlparse
 
 import httpx
 import pytest
 import respx
+from django.conf import settings
 from django.contrib import auth, messages
 from django.contrib.auth import get_user
 from django.contrib.messages import Message
@@ -97,9 +98,6 @@ def mock_oauth_dance(
     else:
         assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_AUTHORIZE)
 
-    # User is logged out from IC when an error happens during the oauth dance.
-    respx.get(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT).respond(200)
-
     token_json = {"access_token": "access_token", "token_type": "Bearer", "expires_in": 60, "id_token": "123456"}
     respx.post(constants.INCLUSION_CONNECT_ENDPOINT_TOKEN).mock(return_value=httpx.Response(200, json=token_json))
 
@@ -116,6 +114,17 @@ def mock_oauth_dance(
     # If not, the default redirection is next_url if provided, or welcoming_tour for new users
     expected = expected_redirect_url or next_url or reverse("welcoming_tour:index")
     assertRedirects(response, expected, fetch_redirect_response=False)
+    return response
+
+
+def assert_and_mock_forced_logout(client, response, expected_redirect_url=reverse("search:employers_home")):
+    response = client.get(response.url)
+    assertRedirects(response, reverse("inclusion_connect:logout") + "?token=123456", fetch_redirect_response=False)
+    response = client.get(response.url)
+    assert response.url.startswith(constants.INCLUSION_CONNECT_ENDPOINT_LOGOUT)
+    post_logout_redirect_uri = parse_qs(urlparse(response.url).query)["post_logout_redirect_uri"][0]
+    local_url = post_logout_redirect_uri.split(settings.ITOU_FQDN)[1]
+    assert local_url == expected_redirect_url
     return response
 
 

@@ -1,4 +1,5 @@
 import pytest
+from django.contrib.auth import get_user
 from django.core import mail
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
@@ -159,9 +160,10 @@ class UserMembershipDeactivationTest(TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
 
-        # should be redirected to logout
+        # should be redirected to home page and logged out
         assert response.status_code == 302
-        assert response.url == reverse("account_logout")
+        assert response.url == reverse("search:employers_home")
+        assert not get_user(self.client).is_authenticated
 
     def test_structure_selector(self):
         """

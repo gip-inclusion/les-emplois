@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 import respx
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth import get_user
 from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.shortcuts import reverse
@@ -16,7 +17,7 @@ from itou.utils.urls import add_url_params
 from tests.companies.factories import CompanyFactory
 from tests.invitations.factories import ExpiredEmployerInvitationFactory, SentEmployerInvitationFactory
 from tests.openid_connect.inclusion_connect.test import InclusionConnectBaseTestCase
-from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, mock_oauth_dance
+from tests.openid_connect.inclusion_connect.tests import OIDC_USERINFO, assert_and_mock_forced_logout, mock_oauth_dance
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import EmployerFactory
 from tests.utils.test import ItouClient
@@ -337,9 +338,22 @@ class TestAcceptInvitation(MessagesTestMixin, InclusionConnectBaseTestCase):
             previous_url=previous_url,
             next_url=next_url,
         )
-        # Follow the redirection.
-        response = self.client.get(response.url, follow=True)
-        self.assertContains(response, escape("Cette structure n'est plus active."))
+        # response redirects to /invitation/uid/join-company
+        response = self.client.get(response.url)
+        # company is inactive so the user will be logged out
+        response = assert_and_mock_forced_logout(self.client, response)
+        assert not get_user(self.client).is_authenticated
+        self.assertMessages(
+            response,
+            [
+                messages.Message(messages.ERROR, "Cette structure n'est plus active."),
+                messages.Message(
+                    messages.WARNING,
+                    "Nous sommes désolés, votre compte n'est actuellement rattaché à aucune structure."
+                    "<br>Nous espérons cependant avoir l'occasion de vous accueillir de nouveau.",
+                ),
+            ],
+        )
         user = User.objects.get(email=invitation.email)
         assert user.company_set.count() == 0
 
