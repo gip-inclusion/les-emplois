@@ -789,6 +789,12 @@ class JobSeekerProfile(models.Model):
         related_name="jobseeker_profile",
     )
 
+    birthdate = models.DateField(
+        verbose_name="date de naissance",
+        null=True,
+        blank=True,
+        validators=[validate_birthdate],
+    )
     birth_place = models.ForeignKey(
         "asp.Commune",
         verbose_name="commune de naissance",
