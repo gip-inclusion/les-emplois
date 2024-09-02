@@ -200,6 +200,7 @@ def set_pe_data_import_from_user_data(pe_data_import, user, status, user_data):
 
     # Record changes on model objects:
     initial_job_seekeer_data = model_to_dict(job_seeker_data)
+    initial_job_seeker_profile = model_to_dict(user.jobseeker_profile)
     initial_user = model_to_dict(user)
 
     for k in fields_fetched:
@@ -208,8 +209,8 @@ def set_pe_data_import_from_user_data(pe_data_import, user, status, user_data):
 
         # User part:
         if k == "dateDeNaissance":
-            new_value = user.birthdate or parse_datetime(v)
-            user.birthdate = new_value
+            new_value = user.jobseeker_profile.birthdate or parse_datetime(v)
+            user.jobseeker_profile.birthdate = new_value
             user.update_external_data_source_history_field(pe_connect_provider, "birthdate", new_value)
         elif k == "adresse4":
             new_value = "" or user.address_line_1 or v
@@ -239,12 +240,15 @@ def set_pe_data_import_from_user_data(pe_data_import, user, status, user_data):
 
     # Check updated fields
     # To be done before saving objects:
-    fields_updated = _model_fields_changed(initial_user, user) + _model_fields_changed(
-        initial_job_seekeer_data, job_seeker_data
+    fields_updated = (
+        _model_fields_changed(initial_user, user)
+        + _model_fields_changed(initial_job_seekeer_data, job_seeker_data)
+        + _model_fields_changed(initial_job_seeker_profile, user.jobseeker_profile)
     )
 
     # Atomicity in outer call
     user.save()
+    user.jobseeker_profile.save(update_fields={"birthdate"})
     job_seeker_data.save()
 
     report = {"fields_fetched": fields_fetched, "fields_failed": fields_failed, "fields_updated": fields_updated}

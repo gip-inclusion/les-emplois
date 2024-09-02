@@ -2166,7 +2166,8 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
         # Create a "PE Approval" that will be converted to a PASS IAE when accepting the process
         pole_emploi_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id, birthdate=job_seeker.birthdate
+            pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
+            birthdate=job_seeker.jobseeker_profile.birthdate,
         )
 
         # Accept the job application for the first job seeker.
@@ -2187,7 +2188,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             with_pole_emploi_id=True,
             with_ban_api_mocked_address=True,
             jobseeker_profile__pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
-            birthdate=job_seeker.birthdate,
+            jobseeker_profile__birthdate=job_seeker.jobseeker_profile.birthdate,
         )
         another_job_application = self.create_job_application(job_seeker=almost_same_job_seeker)
 
@@ -2325,7 +2326,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
         post_data["lack_of_nir_reason"] = LackOfNIRReason.NO_NIR
         self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
-        job_application.job_seeker.refresh_from_db()
+        job_application.job_seeker.jobseeker_profile.refresh_from_db()
         assert job_application.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NO_NIR
 
     def test_lack_of_nir_reason_update(self):
@@ -2408,7 +2409,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         birthdate = datetime.date(1995, 12, 27)
         job_application = self.create_job_application(
             with_certifiable_criteria=True,
-            job_seeker__birthdate=birthdate,
+            job_seeker__jobseeker_profile__birthdate=birthdate,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -2445,7 +2446,9 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         }
 
         birth_country = CountryFranceFactory()
-        birth_place = Commune.objects.by_insee_code_and_period("07141", job_application.job_seeker.birthdate)
+        birth_place = Commune.objects.by_insee_code_and_period(
+            "07141", job_application.job_seeker.jobseeker_profile.birthdate
+        )
         # Field is disabled with Javascript on birth country input.
         # Elements with the disabled attribute are not submitted thus are not part of POST data.
         # See https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#constructing-the-form-data-set
@@ -2467,7 +2470,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         job_application = self.create_job_application(
             with_geiq_eligibility_diagnosis=True,
             geiq_eligibility_diagnosis__with_certifiable_criteria=True,
-            job_seeker__birthdate=birthdate,
+            job_seeker__jobseeker_profile__birthdate=birthdate,
         )
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
@@ -2491,7 +2494,9 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
         # Then set it.
         birth_country = CountryFranceFactory()
-        birth_place = Commune.objects.by_insee_code_and_period("07141", job_application.job_seeker.birthdate)
+        birth_place = Commune.objects.by_insee_code_and_period(
+            "07141", job_application.job_seeker.jobseeker_profile.birthdate
+        )
         post_data = {
             "birth_country": "",
             "birth_place": birth_place.pk,

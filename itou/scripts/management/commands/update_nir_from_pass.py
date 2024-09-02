@@ -152,11 +152,11 @@ class Command(DeprecatedLoggerMixin, BaseCommand):
 
             assert isinstance(row[BIRTHDATE_COL], datetime.datetime)
 
-            if row[BIRTHDATE_COL].date() != job_seeker.birthdate:
+            if row[BIRTHDATE_COL].date() != job_seeker.jobseeker_profile.birthdate:
                 not_same_personal_info.append(
                     not_same_personal_info_dict
                     | {
-                        "Date de naissance plateforme": job_seeker.birthdate,
+                        "Date de naissance plateforme": job_seeker.jobseeker_profile.birthdate,
                         "Date de naissance ASP": row[BIRTHDATE_COL].date(),
                         "PASS IAE": row[APPROVAL_COL],
                         "NIR": row[NIR_COL],

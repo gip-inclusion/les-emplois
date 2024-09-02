@@ -113,11 +113,12 @@ def test_create_job_seeker(_mock, client):
         "title": dummy_job_seeker.title,
         "first_name": dummy_job_seeker.first_name,
         "last_name": dummy_job_seeker.last_name,
-        "birthdate": dummy_job_seeker.birthdate,
+        "birthdate": dummy_job_seeker.jobseeker_profile.birthdate,
         "lack_of_nir": False,
         "lack_of_nir_reason": "",
     }
     response = client.post(next_url, data=post_data)
+    expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
     expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
     expected_job_seeker_session["user"] |= post_data
     assert client.session[job_seeker_session_name] == expected_job_seeker_session

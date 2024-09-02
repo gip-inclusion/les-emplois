@@ -10,7 +10,7 @@ Nombre de jours restants sur le PASS IAE débutant le {{ job_application.approva
 Délivré pour l'embauche de :
 Nom : {{ job_application.approval.user.last_name|upper }}
 Prénom : {{ job_application.approval.user.first_name|title }}
-Date de naissance : {{ job_application.approval.user.birthdate|date:"d/m/Y" }}
+Date de naissance : {{ job_application.approval.user.jobseeker_profile.birthdate|date:"d/m/Y" }}
 
 Pour un contrat d'insertion :
 Débutant le : {{ job_application.hiring_start_at|date:"d/m/Y" }}

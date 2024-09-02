@@ -117,7 +117,7 @@ class FranceConnectTest(TestCase):
         assert user.last_name == FC_USERINFO["family_name"]
         assert user.first_name == FC_USERINFO["given_name"]
         assert user.phone == FC_USERINFO["phone_number"]
-        assert user.birthdate == datetime.date.fromisoformat(FC_USERINFO["birthdate"])
+        assert user.jobseeker_profile.birthdate == datetime.date.fromisoformat(FC_USERINFO["birthdate"])
         assert user.address_line_1 == FC_USERINFO["address"]["street_address"]
         assert user.post_code == FC_USERINFO["address"]["postal_code"]
         assert user.city == FC_USERINFO["address"]["locality"]
@@ -152,7 +152,7 @@ class FranceConnectTest(TestCase):
         assert created
         assert not user.first_name
         assert not user.post_code
-        assert not user.birthdate
+        assert not user.jobseeker_profile.birthdate
         assert not user.phone
         assert not user.address_line_1
         assert not user.post_code

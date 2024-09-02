@@ -117,7 +117,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         assert user.first_name == post_data["first_name"]
         assert user.last_name == post_data["last_name"]
         assert user.phone == post_data["phone"]
-        assert user.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
+        assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
         self._test_address_autocomplete(user=user, post_data=post_data)
 
         # Ensure that the job seeker cannot edit email here.
@@ -362,7 +362,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             identity_provider=IdentityProvider.FRANCE_CONNECT,
             first_name="Not Bob",
             last_name="Not Saint Clar",
-            birthdate=date(1970, 1, 1),
+            jobseeker_profile__birthdate=date(1970, 1, 1),
         )
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
@@ -389,7 +389,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         # Ensure that the job seeker cannot update data retreived from the SSO here.
         assert user.first_name != post_data["first_name"]
         assert user.last_name != post_data["last_name"]
-        assert user.birthdate.strftime("%d/%m/%Y") != post_data["birthdate"]
+        assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") != post_data["birthdate"]
         assert user.email != post_data["email"]
 
     def test_edit_without_title(self):
@@ -406,14 +406,14 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         # Phone but no title and no birthdate
         user.phone = "0123456789"
         user.address_line_1 = "123 rue de"
-        user.birthdate = None
         user.save(
             update_fields=(
                 "address_line_1",
-                "birthdate",
                 "phone",
             )
         )
+        user.jobseeker_profile.birthdate = None
+        user.jobseeker_profile.save(update_fields={"birthdate"})
         response = self.client.get(url)
         warning_text = parse_response_to_soup(response, selector=f"#{MISSING_INFOS_WARNING_ID}")
         assert str(warning_text) == self.snapshot(name="missing title warning without phone and with birthdate")

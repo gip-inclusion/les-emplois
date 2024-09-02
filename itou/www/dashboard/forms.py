@@ -27,14 +27,16 @@ class SSOReadonlyMixin:
                     self.fields[name].disabled = True
 
 
+# SSOReadonlyMixin needs to be before JobSeekerProfileFieldsMixin here
+# since it disables the birthdate field that is added by JobSeekerProfileFieldsMixin
 class EditJobSeekerInfoForm(
-    JobSeekerNIRUpdateMixin, JobSeekerProfileFieldsMixin, JobSeekerAddressForm, SSOReadonlyMixin, forms.ModelForm
+    JobSeekerNIRUpdateMixin, SSOReadonlyMixin, JobSeekerProfileFieldsMixin, JobSeekerAddressForm, forms.ModelForm
 ):
     """
     Edit a job seeker profile.
     """
 
-    PROFILE_FIELDS = ["pole_emploi_id", "lack_of_pole_emploi_id_reason", "nir", "lack_of_nir_reason"]
+    PROFILE_FIELDS = ["birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason", "nir", "lack_of_nir_reason"]
 
     email = forms.EmailField(
         label="Adresse électronique personnelle",
@@ -49,7 +51,6 @@ class EditJobSeekerInfoForm(
             "title",
             "first_name",
             "last_name",
-            "birthdate",
             "phone",
         ] + JobSeekerAddressForm.Meta.fields
 

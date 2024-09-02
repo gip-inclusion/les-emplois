@@ -135,12 +135,11 @@ class CheckJobSeekerNirForm(forms.Form):
 
 
 class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):
-    PROFILE_FIELDS = ["pole_emploi_id", "lack_of_pole_emploi_id_reason"]
+    PROFILE_FIELDS = ["birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason"]
 
     class Meta:
         model = User
         fields = [
-            "birthdate",
             "phone",
         ]
         help_texts = {
@@ -170,7 +169,7 @@ class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, JobSeekerProfile
         "birthdate",
     ]
 
-    PROFILE_FIELDS = ["nir", "lack_of_nir_reason"]
+    PROFILE_FIELDS = ["birthdate", "nir", "lack_of_nir_reason"]
 
     class Meta:
         model = User
@@ -178,7 +177,6 @@ class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, JobSeekerProfile
             "title",
             "first_name",
             "last_name",
-            "birthdate",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -854,18 +852,14 @@ class EditHiringDateForm(forms.ModelForm):
         return cleaned_data
 
 
-class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileFieldsMixin, forms.ModelForm):
+class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, forms.ModelForm):
     """
     Info that will be used to search for an existing Pôle emploi approval.
     """
 
-    # TODO(xfernandez): switch this form to a JobSeekerProfile ModelForm
-    PROFILE_FIELDS = ["pole_emploi_id", "lack_of_pole_emploi_id_reason", "nir", "lack_of_nir_reason"]
-
     class Meta:
-        model = User
-        # TODO(celinems): birthdate should be on JobSeekerProfile.
-        fields = ["birthdate"]
+        model = JobSeekerProfile
+        fields = ["birthdate", "pole_emploi_id", "lack_of_pole_emploi_id_reason", "nir", "lack_of_nir_reason"]
         help_texts = {"birthdate": "Au format JJ/MM/AAAA, par exemple 20/12/1978."}
 
     def __init__(self, *args, **kwargs):
@@ -876,6 +870,9 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, JobSeekerProfileFieldsM
                 "max": DuetDatePickerWidget.max_birthdate(),
             }
         )
+
+    def get_user_instance(self):
+        return self.instance.user
 
     def clean(self):
         super().clean()

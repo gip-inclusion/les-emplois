@@ -75,7 +75,9 @@ class _API_PersonSerializer(serializers.Serializer):
     nomUsage = serializers.SerializerMethodField()
     nomNaissance = NullField()
     prenom = serializers.SerializerMethodField()
-    dateNaissance = serializers.DateField(format="%d/%m/%Y", source="job_application.job_seeker.birthdate")
+    dateNaissance = serializers.DateField(
+        format="%d/%m/%Y", source="job_application.job_seeker.jobseeker_profile.birthdate"
+    )
 
     codeDpt = serializers.CharField(source="job_application.job_seeker.birth_place.department_code", required=False)
     codeInseePays = serializers.CharField(

@@ -62,7 +62,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         # Deduplication is based on these values.
         kwargs = {
             "job_seeker__jobseeker_profile__pole_emploi_id": "6666666B",
-            "job_seeker__birthdate": datetime.date(2002, 12, 12),
+            "job_seeker__jobseeker_profile__birthdate": datetime.date(2002, 12, 12),
         }
 
         # Create `user1`.
@@ -124,7 +124,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         # Deduplication is based on these values.
         kwargs = {
             "job_seeker__jobseeker_profile__pole_emploi_id": "6666666B",
-            "job_seeker__birthdate": datetime.date(2002, 12, 12),
+            "job_seeker__jobseeker_profile__birthdate": datetime.date(2002, 12, 12),
         }
 
         # Create `user1` through a job application sent by him.
@@ -185,7 +185,7 @@ class DeduplicateJobSeekersManagementCommandsTest(TestCase):
         # Deduplication is based on these values.
         kwargs = {
             "job_seeker__jobseeker_profile__pole_emploi_id": "6666666B",
-            "job_seeker__birthdate": datetime.date(2002, 12, 12),
+            "job_seeker__jobseeker_profile__birthdate": datetime.date(2002, 12, 12),
         }
 
         # Create `user1`.
@@ -1059,7 +1059,7 @@ def test_pe_certify_users(settings, respx_mock, capsys, snapshot):
         pk=424242,
         first_name="Yoder",
         last_name="Olson",
-        birthdate=datetime.date(1994, 2, 22),
+        jobseeker_profile__birthdate=datetime.date(1994, 2, 22),
         jobseeker_profile__nir="194022734304328",
     )
     settings.API_ESD = {
@@ -1113,7 +1113,7 @@ def test_pe_certify_users_with_swap(settings, respx_mock, capsys, snapshot):
         pk=424243,
         first_name="Balthazar",
         last_name="Durand",
-        birthdate=datetime.date(1987, 6, 21),
+        jobseeker_profile__birthdate=datetime.date(1987, 6, 21),
         jobseeker_profile__nir="187062112345678",
     )
     settings.API_ESD = {
@@ -1179,7 +1179,7 @@ def test_pe_certify_users_retry(capsys, snapshot):
         return mock.call(
             user.first_name if not swap else user.last_name,
             user.last_name if not swap else user.first_name,
-            user.birthdate,
+            user.jobseeker_profile.birthdate,
             user.jobseeker_profile.nir,
         )
 

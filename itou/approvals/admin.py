@@ -203,7 +203,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         "is_valid",
         "created_at",
     )
-    list_select_related = ("user",)
+    list_select_related = ("user__jobseeker_profile",)
     search_fields = (
         "pk",
         "number",
@@ -377,7 +377,7 @@ class ApprovalAdmin(InconsistencyCheckMixin, ItouModelAdmin):
         User birthdate as custom value in display
 
         """
-        return obj.user.birthdate
+        return obj.user.jobseeker_profile.birthdate
 
     @admin.display(description="Entreprise gérant le PASS")
     def assigned_company(self, obj):

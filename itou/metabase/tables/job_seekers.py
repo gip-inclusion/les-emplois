@@ -27,8 +27,8 @@ AUTHOR_KIND_CHOICES = (
 
 
 def get_user_age_in_years(user):
-    if user.birthdate:
-        return timezone.localdate().year - user.birthdate.year
+    if user.jobseeker_profile.birthdate:
+        return timezone.localdate().year - user.jobseeker_profile.birthdate.year
     return None
 
 

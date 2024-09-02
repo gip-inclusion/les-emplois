@@ -9,6 +9,7 @@ from itou.asp.forms import formfield_for_birth_place
 from itou.asp.models import Commune, Country, RSAAllocation
 from itou.companies.models import SiaeFinancialAnnex
 from itou.employee_record.enums import Status
+from itou.users.forms import JobSeekerProfileFieldsMixin
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.validators import validate_pole_emploi_id
 from itou.utils.widgets import DuetDatePickerWidget, RemoteAutocompleteSelect2Widget
@@ -100,13 +101,14 @@ class EmployeeRecordFilterForm(forms.Form):
         )
 
 
-class NewEmployeeRecordStep1Form(forms.ModelForm):
+class NewEmployeeRecordStep1Form(JobSeekerProfileFieldsMixin, forms.ModelForm):
     """
     New employee record step 1:
     - main details (just check)
     - birth place and birth country of the employee
     """
 
+    PROFILE_FIELDS = ["birthdate"]
     READ_ONLY_FIELDS = []
     REQUIRED_FIELDS = [
         "title",
@@ -124,7 +126,6 @@ class NewEmployeeRecordStep1Form(forms.ModelForm):
             "title",
             "first_name",
             "last_name",
-            "birthdate",
         ]
 
     def __init__(self, *args, **kwargs):

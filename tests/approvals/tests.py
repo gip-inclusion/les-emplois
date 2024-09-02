@@ -181,7 +181,7 @@ class TestCommonApprovalMixin:
         # PoleEmploiApproval.
         user = JobSeekerFactory()
         approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.birthdate
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.jobseeker_profile.birthdate
         )
         assert not approval.is_pass_iae
         # Approval.
@@ -325,7 +325,7 @@ class TestApprovalModel:
         job_application = JobApplicationFactory(job_seeker=user)
         valid_pe_approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.birthdate,
+            birthdate=user.jobseeker_profile.birthdate,
             number="625741810182",
         )
         approval = user.get_or_create_approval(origin_job_application=job_application)
@@ -764,7 +764,7 @@ class TestPoleEmploiApprovalManager:
             search_results = PoleEmploiApproval.objects.find_for(user)
         assert search_results.count() == 0
 
-        user = JobSeekerFactory(birthdate=None)
+        user = JobSeekerFactory(jobseeker_profile__birthdate=None)
         with assertNumQueries(0):
             search_results = PoleEmploiApproval.objects.find_for(user)
         assert search_results.count() == 0
@@ -775,7 +775,7 @@ class TestPoleEmploiApprovalManager:
         today = timezone.localdate()
         pe_approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.birthdate,
+            birthdate=user.jobseeker_profile.birthdate,
             start_at=today,
         )
         # just another approval, to be sure we don't find the other one "by chance"
@@ -788,7 +788,7 @@ class TestPoleEmploiApprovalManager:
         # ensure we can find **all** PE approvals using their pole_emploi_id and not the others.
         other_valid_approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.birthdate,
+            birthdate=user.jobseeker_profile.birthdate,
             start_at=today - datetime.timedelta(days=1),
         )
         with assertNumQueries(0):
@@ -823,7 +823,7 @@ class TestPoleEmploiApprovalManager:
         assert search_results[3] == other_nir_approval
 
         # ensure it's not an issue if the PE approval matches both NIR, pole_emploi_id and birthdate.
-        nir_approval.birthdate = user.birthdate
+        nir_approval.birthdate = user.jobseeker_profile.birthdate
         nir_approval.pole_emploi_id = user.jobseeker_profile.pole_emploi_id
         nir_approval.save()
 

@@ -69,7 +69,7 @@ def _format_pass_worksheet(wb):
     start_counter = time.perf_counter()
 
     job_applications = JobApplication.objects.exclude(approval=None).select_related(
-        "job_seeker", "approval", "to_company"
+        "job_seeker__jobseeker_profile", "approval", "to_company"
     )
 
     # Write header row
@@ -82,7 +82,7 @@ def _format_pass_worksheet(wb):
             ja.job_seeker.jobseeker_profile.pole_emploi_id,
             ja.job_seeker.first_name,
             ja.job_seeker.last_name,
-            _format_date(ja.job_seeker.birthdate),
+            _format_date(ja.job_seeker.jobseeker_profile.birthdate),
             ja.approval.number,
             _format_date(ja.approval.start_at),
             _format_date(ja.approval.end_at),

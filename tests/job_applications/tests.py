@@ -783,7 +783,7 @@ class JobApplicationNotificationsTest(TestCase):
         # Body.
         assert job_application.job_seeker.first_name.title() in email.body
         assert job_application.job_seeker.last_name.upper() in email.body
-        assert job_application.job_seeker.birthdate.strftime("%d/%m/%Y") in email.body
+        assert job_application.job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y") in email.body
         assert job_application.job_seeker.email in email.body
         assert format_filters.format_phone(job_application.job_seeker.phone) in email.body
         assert job_application.message in email.body
@@ -813,7 +813,7 @@ class JobApplicationNotificationsTest(TestCase):
         # Body.
         assert job_application.job_seeker.first_name.title() in email.body
         assert job_application.job_seeker.last_name.upper() in email.body
-        assert job_application.job_seeker.birthdate.strftime("%d/%m/%Y") in email.body
+        assert job_application.job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y") in email.body
         assert job_application.job_seeker.email in email.body
         assert format_filters.format_phone(job_application.job_seeker.phone) in email.body
         assert job_application.message in email.body
@@ -848,7 +848,7 @@ class JobApplicationNotificationsTest(TestCase):
         # Body.
         assert job_application.job_seeker.first_name.title() in email.body
         assert job_application.job_seeker.last_name.upper() in email.body
-        assert job_application.job_seeker.birthdate.strftime("%d/%m/%Y") in email.body
+        assert job_application.job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y") in email.body
         assert job_application.job_seeker.email in email.body
         assert format_filters.format_phone(job_application.job_seeker.phone) in email.body
         assert job_application.message in email.body
@@ -914,7 +914,7 @@ class JobApplicationNotificationsTest(TestCase):
         assert job_application.job_seeker.first_name.title() in email.body
         assert job_application.job_seeker.last_name.upper() in email.body
         assert job_application.job_seeker.email in email.body
-        assert job_application.job_seeker.birthdate.strftime("%d/%m/%Y") in email.body
+        assert job_application.job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y") in email.body
         assert job_application.to_company.siret in email.body
         assert job_application.to_company.kind in email.body
         assert job_application.to_company.get_kind_display() in email.body
@@ -1007,7 +1007,7 @@ class JobApplicationNotificationsTest(TestCase):
         assert approval.get_remainder_display() in email.body
         assert approval.user.last_name.upper() in email.body
         assert approval.user.first_name.title() in email.body
-        assert approval.user.birthdate.strftime("%d/%m/%Y") in email.body
+        assert approval.user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") in email.body
         assert job_application.hiring_start_at.strftime("%d/%m/%Y") in email.body
         assert job_application.hiring_end_at.strftime("%d/%m/%Y") in email.body
         assert job_application.to_company.display_name in email.body
@@ -1243,7 +1243,8 @@ class JobApplicationWorkflowTest(TestCase):
         """
         job_seeker = JobSeekerFactory(with_pole_emploi_id=True)
         pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id, birthdate=job_seeker.birthdate
+            pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
+            birthdate=job_seeker.jobseeker_profile.birthdate,
         )
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationState.PROCESSING
@@ -1267,7 +1268,7 @@ class JobApplicationWorkflowTest(TestCase):
         assert self.ACCEPT_EMAIL_SUBJECT_JOB_SEEKER in mail.outbox[1].subject
 
     def test_accept_job_application_sent_by_job_seeker_with_already_existing_valid_approval_with_nir(self):
-        job_seeker = JobSeekerFactory(jobseeker_profile__pole_emploi_id="", birthdate=None)
+        job_seeker = JobSeekerFactory(jobseeker_profile__pole_emploi_id="", jobseeker_profile__birthdate=None)
         pe_approval = PoleEmploiApprovalFactory(nir=job_seeker.jobseeker_profile.nir)
         job_application = JobApplicationSentByJobSeekerFactory(
             job_seeker=job_seeker, state=JobApplicationState.PROCESSING
@@ -1455,7 +1456,7 @@ class JobApplicationWorkflowTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.birthdate,
+            birthdate=user.jobseeker_profile.birthdate,
             start_at=start_at,
             end_at=end_at,
         )
@@ -1498,7 +1499,7 @@ class JobApplicationWorkflowTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.birthdate,
+            birthdate=user.jobseeker_profile.birthdate,
             start_at=start_at,
             end_at=end_at,
         )
@@ -1522,7 +1523,7 @@ class JobApplicationWorkflowTest(TestCase):
         start_at = end_at - relativedelta(years=2)
         approval = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.birthdate,
+            birthdate=user.jobseeker_profile.birthdate,
             start_at=start_at,
             end_at=end_at,
         )
@@ -1740,7 +1741,7 @@ class JobApplicationXlsxExportTest(TestCase):
                 job_seeker.first_name,
                 job_seeker.email,
                 job_seeker.phone,
-                job_seeker.birthdate.strftime("%d/%m/%Y"),
+                job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y"),
                 job_seeker.city,
                 job_seeker.post_code,
                 job_application.to_company.display_name,
@@ -1786,7 +1787,7 @@ class JobApplicationXlsxExportTest(TestCase):
                 job_seeker.first_name,
                 job_seeker.email,
                 job_seeker.phone,
-                job_seeker.birthdate.strftime("%d/%m/%Y"),
+                job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y"),
                 job_seeker.city,
                 job_seeker.post_code,
                 job_application.to_company.display_name,
@@ -1829,7 +1830,7 @@ class JobApplicationXlsxExportTest(TestCase):
                 job_seeker.first_name,
                 job_seeker.email,
                 job_seeker.phone,
-                job_seeker.birthdate.strftime("%d/%m/%Y"),
+                job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y"),
                 job_seeker.city,
                 job_seeker.post_code,
                 job_application.to_company.display_name,

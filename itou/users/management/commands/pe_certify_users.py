@@ -47,7 +47,7 @@ class Command(BaseCommand):
             return pe_client.recherche_individu_certifie(
                 user.first_name if not swap else user.last_name,
                 user.last_name if not swap else user.first_name,
-                user.birthdate,
+                user.jobseeker_profile.birthdate,
                 user.jobseeker_profile.nir,
             )
 
@@ -63,7 +63,7 @@ class Command(BaseCommand):
         self.stdout.write(f"> about to resolve first_name and last_name for count={active_job_seekers.count()} users.")
 
         eligible_users = active_job_seekers.exclude(
-            Q(jobseeker_profile__nir="") | Q(birthdate=None) | Q(first_name="") | Q(last_name="")
+            Q(jobseeker_profile__nir="") | Q(jobseeker_profile__birthdate=None) | Q(first_name="") | Q(last_name="")
         )
         self.stdout.write(f"> only count={eligible_users.count()} users have the necessary data to be resolved.")
 

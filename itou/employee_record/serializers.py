@@ -19,7 +19,9 @@ class _PersonSerializer(serializers.Serializer):
     nomUsage = serializers.SerializerMethodField()  # Required
     nomNaissance = NullField()  # Optional
     prenom = serializers.SerializerMethodField()  # Required
-    dateNaissance = serializers.DateField(format="%d/%m/%Y", source="job_application.job_seeker.birthdate")  # Required
+    dateNaissance = serializers.DateField(
+        format="%d/%m/%Y", source="job_application.job_seeker.jobseeker_profile.birthdate"
+    )  # Required
 
     codeComInsee = serializers.SerializerMethodField()  # Required if the birth country is France
     codeInseePays = serializers.CharField(

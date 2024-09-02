@@ -41,13 +41,13 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
     form_certified_criteria = None
     creating = job_application is None
     valid_diagnosis = None
-    birthdate = job_seeker.birthdate
+    birthdate = job_seeker.jobseeker_profile.birthdate
 
     if siae.is_subject_to_eligibility_rules:
         valid_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker, for_siae=siae)
         # Info that will be used to search for an existing Pôle emploi approval.
         form_personal_data = JobSeekerPersonalDataForm(
-            instance=job_seeker,
+            instance=job_seeker.jobseeker_profile,
             data=request.POST or None,
             tally_form_query=f"jobapplication={job_application.pk}" if job_application else None,
         )

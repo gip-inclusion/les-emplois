@@ -42,7 +42,7 @@ class Command(BaseCommand):
             jobapplication__state=JobApplicationState.ACCEPTED,
         ).exclude(
             Q(user__jobseeker_profile__nir="")
-            | Q(user__birthdate=None)
+            | Q(user__jobseeker_profile__birthdate=None)
             | Q(user__first_name="")
             | Q(user__last_name="")
         ).update(pe_notification_status=api_enums.PEApiNotificationStatus.READY)

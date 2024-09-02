@@ -309,7 +309,6 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
         "email",
         "first_name",
         "last_name",
-        "birthdate",
         "kind",
         "identity_provider",
         "is_created_by_a_proxy",
@@ -491,7 +490,6 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
                     "fields": (
                         "pk",
                         "title",
-                        "birthdate",
                         "phone",
                         "address_line_1",
                         "address_line_2",
@@ -772,6 +770,7 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
                 "fields": (
                     "user",
                     "asp_uid",
+                    "birthdate",
                     "birth_place",
                     "birth_country",
                     "education_level",
@@ -831,10 +830,6 @@ class JobSeekerProfileAdmin(DisabledNotificationsMixin, InconsistencyCheckMixin,
             lambda q: q.exclude(user__kind=UserKind.JOB_SEEKER),
         ),
     ]
-
-    @admin.display(description="date de naissance")
-    def birthdate(self, obj):
-        return obj.user.birthdate
 
     @admin.display(description="nom complet")
     def username(self, obj):

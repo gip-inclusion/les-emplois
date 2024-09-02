@@ -273,7 +273,7 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
     company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
     user = JobSeekerFactory(
-        birthdate=None,
+        jobseeker_profile__birthdate=None,
         jobseeker_profile__nir="",
         jobseeker_profile__lack_of_nir_reason=LackOfNIRReason.TEMPORARY_NUMBER,
     )
@@ -325,7 +325,7 @@ class ApplyAsJobSeekerTest(TestCase):
             suspension_dates=InclusiveDateRange(timezone.localdate() - relativedelta(days=1)),
         )
 
-        user = JobSeekerFactory(birthdate=None, jobseeker_profile__nir="")
+        user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
         self.client.force_login(user)
 
         response = self.client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
@@ -339,7 +339,7 @@ class ApplyAsJobSeekerTest(TestCase):
 
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
 
-        user = JobSeekerFactory(birthdate=None, jobseeker_profile__nir="")
+        user = JobSeekerFactory(jobseeker_profile__birthdate=None, jobseeker_profile__nir="")
         self.client.force_login(user)
 
         # Entry point.
@@ -390,7 +390,7 @@ class ApplyAsJobSeekerTest(TestCase):
         assert response.status_code == 302
 
         user = User.objects.get(pk=user.pk)
-        assert user.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
+        assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
         assert user.phone == post_data["phone"]
 
         assert user.jobseeker_profile.pole_emploi_id == post_data["pole_emploi_id"]
@@ -551,7 +551,7 @@ class ApplyAsJobSeekerTest(TestCase):
         job_seeker = JobSeekerFactory(
             jobseeker_profile__nir="141068078200557",
             with_pole_emploi_id=True,
-            birthdate=datetime.date(1941, 6, 12),
+            jobseeker_profile__birthdate=datetime.date(1941, 6, 12),
         )
         self.client.force_login(job_seeker)
 
@@ -887,12 +887,13 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
             "last_name": dummy_job_seeker.last_name,
-            "birthdate": dummy_job_seeker.birthdate,
+            "birthdate": dummy_job_seeker.jobseeker_profile.birthdate,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
+        expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["user"] |= post_data
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
@@ -1152,13 +1153,14 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
             "last_name": dummy_job_seeker.last_name,
-            "birthdate": dummy_job_seeker.birthdate,
+            "birthdate": dummy_job_seeker.jobseeker_profile.birthdate,
             "nir": dummy_job_seeker.jobseeker_profile.nir,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
+        expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         post_data.pop("nir")
         expected_job_seeker_session["user"] |= post_data
@@ -1513,12 +1515,13 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
             "last_name": dummy_job_seeker.last_name,
-            "birthdate": dummy_job_seeker.birthdate,
+            "birthdate": dummy_job_seeker.jobseeker_profile.birthdate,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
+        expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["user"] |= post_data
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
@@ -1745,7 +1748,8 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         job_seeker = JobSeekerFactory(jobseeker_profile__nir="", with_pole_emploi_id=True)
         # Create an approval to bypass the eligibility diagnosis step.
         PoleEmploiApprovalFactory(
-            birthdate=job_seeker.birthdate, pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id
+            birthdate=job_seeker.jobseeker_profile.birthdate,
+            pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
         )
         company, user = self.create_test_data()
         self.client.force_login(user)
@@ -1817,7 +1821,8 @@ class ApplyAsPrescriberNirExceptionsTest(TestCase):
         )
         # Create an approval to bypass the eligibility diagnosis step.
         PoleEmploiApprovalFactory(
-            birthdate=job_seeker.birthdate, pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id
+            birthdate=job_seeker.jobseeker_profile.birthdate,
+            pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
         )
         siae, user = self.create_test_data()
         self.client.force_login(user)
@@ -1991,12 +1996,13 @@ class ApplyAsCompanyTest(TestCase):
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
             "last_name": dummy_job_seeker.last_name,
-            "birthdate": dummy_job_seeker.birthdate,
+            "birthdate": dummy_job_seeker.jobseeker_profile.birthdate,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
+        expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["user"] |= post_data
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
@@ -2348,12 +2354,13 @@ class DirectHireFullProcessTest(TestCase):
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
             "last_name": dummy_job_seeker.last_name,
-            "birthdate": dummy_job_seeker.birthdate,
+            "birthdate": dummy_job_seeker.jobseeker_profile.birthdate,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
+        expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
         expected_job_seeker_session["user"] |= post_data
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
@@ -3093,7 +3100,7 @@ class UpdateJobSeekerBaseTestCase(TestCase):
             "title": "M",
             "first_name": NEW_FIRST_NAME,
             "last_name": "New last name",
-            "birthdate": self.job_seeker.birthdate,
+            "birthdate": self.job_seeker.jobseeker_profile.birthdate,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
         }
@@ -3106,9 +3113,14 @@ class UpdateJobSeekerBaseTestCase(TestCase):
         # (nir value is retrieved from the job_seeker and stored in the session)
         lack_of_nir_reason = post_data.pop("lack_of_nir_reason")
         nir = post_data.pop("nir", None)
+        birthdate = post_data.pop("birthdate", None)
         expected_job_seeker_session = {
             "user": post_data,
-            "profile": {"nir": nir or self.job_seeker.jobseeker_profile.nir, "lack_of_nir_reason": lack_of_nir_reason},
+            "profile": {
+                "birthdate": birthdate or self.job_seeker.jobseeker_profile.birthdate,
+                "nir": nir or self.job_seeker.jobseeker_profile.nir,
+                "lack_of_nir_reason": lack_of_nir_reason,
+            },
         }
         assert self.client.session[self.job_seeker_session_key] == expected_job_seeker_session
         self.job_seeker.refresh_from_db()
@@ -3718,7 +3730,7 @@ def test_detect_existing_job_seeker(client):
         "title": job_seeker.title,
         "first_name": "JEREMY",  # Try without the accent and in uppercase
         "last_name": job_seeker.last_name,
-        "birthdate": job_seeker.birthdate,
+        "birthdate": job_seeker.jobseeker_profile.birthdate,
         "lack_of_nir_reason": "",
         "lack_of_nir": False,
     }
@@ -3749,7 +3761,10 @@ def test_detect_existing_job_seeker(client):
     response = client.post(next_url, data=post_data | {"confirm": 1})
 
     # session data is updated and we are correctly redirected to step 2
-    expected_job_seeker_session["profile"] |= {"lack_of_nir_reason": post_data.pop("lack_of_nir_reason", "")}
+    expected_job_seeker_session["profile"] |= {
+        "lack_of_nir_reason": post_data.pop("lack_of_nir_reason", ""),
+        "birthdate": post_data.pop("birthdate"),
+    }
     expected_job_seeker_session["user"] |= post_data
     assert client.session[job_seeker_session_name] == expected_job_seeker_session
 

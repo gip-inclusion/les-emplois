@@ -660,7 +660,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
             user_last_name=self.user.last_name,
             user_first_name=self.user.first_name,
             user_nir=self.user.jobseeker_profile.nir,
-            user_birthdate=self.user.birthdate,
+            user_birthdate=self.user.jobseeker_profile.birthdate,
             user_id_national_pe=self.user.jobseeker_profile.pe_obfuscated_nir,
             origin_siae_siret=siae_siret,
             origin_siae_kind=siae_kind,
@@ -960,7 +960,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 self.user.first_name,
                 self.user.last_name,
                 self.user.jobseeker_profile.nir,
-                self.user.birthdate,
+                self.user.jobseeker_profile.birthdate,
             ]
         ):
             self.pe_log_err("had an invalid user={} nir={}", self.user, self.user.jobseeker_profile.nir)
@@ -977,7 +977,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
                 self.user.first_name,
                 self.user.last_name,
                 self.user.jobseeker_profile.nir,
-                self.user.birthdate,
+                self.user.jobseeker_profile.birthdate,
                 now,
             )
             if not id_national:
@@ -1853,8 +1853,10 @@ class PoleEmploiApprovalManager(models.Manager):
             # Allow duplicated NIR within PE approvals, but that will most probably change with the
             # ApprovalsWrapper code revamp later on. For now there is no unicity constraint on this column.
             filters.append(Q(nir=user.jobseeker_profile.nir))
-        if user.jobseeker_profile.pole_emploi_id and user.birthdate:
-            filters.append(Q(pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.birthdate))
+        if user.jobseeker_profile.pole_emploi_id and user.jobseeker_profile.birthdate:
+            filters.append(
+                Q(pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.jobseeker_profile.birthdate)
+            )
         if not filters:
             return self.none()
         return self.filter(or_queries(filters)).order_by("-start_at", "-number")

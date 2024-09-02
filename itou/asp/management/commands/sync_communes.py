@@ -147,19 +147,19 @@ class Command(BaseCommand):
                             try:
                                 new_commune = guess_commune(
                                     *old_commune_info,
-                                    profile.user.birthdate,
+                                    profile.birthdate,
                                 )
                                 self.stdout.write(
                                     f"> REALIGN birth_place for code={old_commune_info[0]} "
                                     f"name={old_commune_info[1]} "
-                                    f"at={profile.user.birthdate} "
+                                    f"at={profile.birthdate} "
                                     f"found with new_name={new_commune.name} "
                                     f"and start_date={new_commune.start_date}"
                                 )
                             except Commune.DoesNotExist:
                                 self.stdout.write(
                                     f"! new commune for code={old_commune_info[0]} "
-                                    f"at={profile.user.birthdate} "
+                                    f"at={profile.birthdate} "
                                     f"name={old_commune_info[1]} not found ! Resolve manually."
                                 )
                                 has_raised = True

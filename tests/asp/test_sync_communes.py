@@ -23,7 +23,7 @@ def test_sync_commune(snapshot, capsys):
 
     assert billy_v1.start_date == datetime.date(1900, 1, 1)
 
-    js = JobSeekerFactory(birthdate=datetime.date(1990, 1, 1))
+    js = JobSeekerFactory(jobseeker_profile__birthdate=datetime.date(1990, 1, 1))
     js.jobseeker_profile.hexa_commune = billy_v1
     js.jobseeker_profile.birth_place = billy_v1
     js.jobseeker_profile.save()
