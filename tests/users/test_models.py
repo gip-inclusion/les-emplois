@@ -37,7 +37,6 @@ from tests.users.factories import (
     ItouStaffFactory,
     JobSeekerFactory,
     JobSeekerProfileFactory,
-    JobSeekerWithAddressFactory,
     LaborInspectorFactory,
     PrescriberFactory,
     UserFactory,
@@ -652,7 +651,8 @@ class ModelTest(TestCase):
 class JobSeekerProfileModelTest(TestCase):
     def setUp(self):
         super().setUp()
-        self.user = JobSeekerWithAddressFactory(
+        self.user = JobSeekerFactory(
+            with_address=True,
             address_line_1=BAN_GEOCODING_API_RESULTS_MOCK[0]["address_line_1"],
             jobseeker_profile__education_level=random.choice(EducationLevel.values),
             jobseeker_profile__pole_emploi_since=AllocationDuration.MORE_THAN_24_MONTHS,

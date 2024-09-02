@@ -17,7 +17,6 @@ from tests.openid_connect.inclusion_connect.test import (
 )
 from tests.users.factories import (
     JobSeekerFactory,
-    JobSeekerWithAddressFactory,
     PrescriberFactory,
 )
 from tests.utils.test import BASE_NUM_QUERIES, parse_response_to_soup
@@ -146,7 +145,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         assert response.context["form"].errors.get("title") == ["Ce champ est obligatoire."]
 
     def test_required_address_fields_are_present(self):
-        user = JobSeekerWithAddressFactory()
+        user = JobSeekerFactory(with_address=True)
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
@@ -169,7 +168,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         side_effect=mock_get_geocoding_data_by_ban_api_resolved,
     )
     def test_update_address(self, _mock):
-        user = JobSeekerWithAddressFactory()
+        user = JobSeekerFactory(with_address=True)
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
@@ -395,7 +394,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
 
     def test_edit_without_title(self):
         MISSING_INFOS_WARNING_ID = "missing-infos-warning"
-        user = JobSeekerWithAddressFactory(title="", phone="", address_line_1="")
+        user = JobSeekerFactory(with_address=True, title="", phone="", address_line_1="")
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
 

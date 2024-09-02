@@ -50,7 +50,6 @@ from tests.users.factories import (
     ItouStaffFactory,
     JobSeekerFactory,
     JobSeekerProfileFactory,
-    JobSeekerWithAddressFactory,
     PrescriberFactory,
 )
 from tests.users.test_models import user_with_approval_in_waiting_period
@@ -795,7 +794,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         user = prescriber_organization.members.first()
         self.client.force_login(user)
 
-        dummy_job_seeker = JobSeekerWithAddressFactory.build(
+        dummy_job_seeker = JobSeekerFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
@@ -1076,7 +1075,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         user = prescriber_organization.members.first()
         self.client.force_login(user)
 
-        dummy_job_seeker = JobSeekerWithAddressFactory.build(
+        dummy_job_seeker = JobSeekerFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
@@ -1431,7 +1430,7 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
         user = PrescriberFactory()
         self.client.force_login(user)
 
-        dummy_job_seeker = JobSeekerWithAddressFactory.build(
+        dummy_job_seeker = JobSeekerFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
@@ -2171,7 +2170,7 @@ class ApplyAsCompanyTest(TestCase):
         employer = company.members.first()
         self.client.force_login(employer)
 
-        dummy_job_seeker = JobSeekerWithAddressFactory.build(
+        dummy_job_seeker = JobSeekerFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
@@ -2186,7 +2185,7 @@ class ApplyAsCompanyTest(TestCase):
         employer = EmployerFactory(with_company=True)
         self.client.force_login(employer)
 
-        dummy_job_seeker = JobSeekerWithAddressFactory.build(
+        dummy_job_seeker = JobSeekerFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
@@ -2279,7 +2278,7 @@ class DirectHireFullProcessTest(TestCase):
         user = company.members.first()
         self.client.force_login(user)
 
-        dummy_job_seeker = JobSeekerWithAddressFactory.build(
+        dummy_job_seeker = JobSeekerFactory.build(
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
@@ -3644,8 +3643,10 @@ def test_detect_existing_job_seeker(client):
     user = prescriber_organization.members.first()
     client.force_login(user)
 
-    job_seeker = JobSeekerWithAddressFactory(
-        jobseeker_profile__nir="", first_name="Jérémy", email="jeremy@example.com"
+    job_seeker = JobSeekerFactory(
+        jobseeker_profile__nir="",
+        first_name="Jérémy",
+        email="jeremy@example.com",
     )
 
     default_session_data = {
@@ -4300,7 +4301,8 @@ class FindJobSeekerForHireViewTestCase(TestCase):
         user = self.company.members.first()
         self.client.force_login(user)
 
-        dummy_job_seeker = JobSeekerWithAddressFactory.build(
+        dummy_job_seeker = JobSeekerFactory.build(
+            with_address=True,
             jobseeker_profile__with_hexa_address=True,
         )
 
@@ -4596,7 +4598,7 @@ class GEIQEligibilityForHireTestCase(TestCase):
 class HireConfirmationTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.job_seeker = JobSeekerWithAddressFactory(
+        cls.job_seeker = JobSeekerFactory(
             first_name="Clara", last_name="Sion", with_pole_emploi_id=True, with_ban_geoloc_address=True
         )
         # This is the city matching with_ban_geoloc_address trait

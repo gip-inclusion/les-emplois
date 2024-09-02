@@ -16,7 +16,6 @@ from tests.jobs.factories import create_test_romes_and_appellations
 from tests.users.factories import (
     JobSeekerFactory,
     JobSeekerProfileFactory,
-    JobSeekerWithAddressFactory,
     PrescriberFactory,
 )
 from tests.utils.test import TestCase
@@ -408,7 +407,7 @@ class JobApplicationAcceptFormWithGEIQFieldsTest(TestCase):
 
 class CertifiedCriteriaInfoRequiredFormTest(TestCase):
     def test_submit_valid(self):
-        job_seeker = JobSeekerWithAddressFactory(
+        job_seeker = JobSeekerFactory(
             with_ban_api_mocked_address=True,
             born_in_france=True,
         )
@@ -432,7 +431,7 @@ class CertifiedCriteriaInfoRequiredFormTest(TestCase):
         assert form.is_valid()
 
     def test_submit_commune_invalid_commune_lookup(self):
-        job_seeker = JobSeekerWithAddressFactory(with_ban_api_mocked_address=True, born_in_france=True)
+        job_seeker = JobSeekerFactory(with_ban_api_mocked_address=True, born_in_france=True)
 
         birth_place = job_seeker.jobseeker_profile.birth_place
         early_date = birth_place.start_date - timedelta(days=1)

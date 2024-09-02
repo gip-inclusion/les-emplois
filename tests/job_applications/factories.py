@@ -29,7 +29,6 @@ from tests.prescribers.factories import (
 )
 from tests.users.factories import (
     JobSeekerFactory,
-    JobSeekerWithAddressFactory,
     PrescriberFactory,
 )
 
@@ -41,7 +40,7 @@ class JobApplicationFactory(factory.django.DjangoModelFactory):
 
     class Params:
         job_seeker_with_address = factory.Trait(
-            job_seeker=factory.SubFactory(JobSeekerWithAddressFactory, with_mocked_address=True)
+            job_seeker=factory.SubFactory(JobSeekerFactory, with_mocked_address=True)
         )
         with_approval = factory.Trait(
             state=models.JobApplicationState.ACCEPTED,
@@ -234,7 +233,7 @@ class JobApplicationWithCompleteJobSeekerProfileFactory(JobApplicationWithApprov
     """
 
     job_seeker = factory.SubFactory(
-        JobSeekerWithAddressFactory,
+        JobSeekerFactory,
         with_mocked_address=True,
         jobseeker_profile__with_hexa_address=True,
         jobseeker_profile__with_education_level=True,

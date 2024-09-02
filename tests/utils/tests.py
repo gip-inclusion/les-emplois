@@ -88,7 +88,6 @@ from tests.users.factories import (
     EmployerFactory,
     ItouStaffFactory,
     JobSeekerFactory,
-    JobSeekerWithAddressFactory,
     LaborInspectorFactory,
     PrescriberFactory,
 )
@@ -1504,7 +1503,7 @@ def test_all_admin(admin_client, model):
 
 
 def test_profile_city_display():
-    user = JobSeekerWithAddressFactory.build()
+    user = JobSeekerFactory.build(with_address=True)
     profile = user.jobseeker_profile
 
     # Tests with hexa_commune

@@ -45,7 +45,6 @@ from tests.siae_evaluations.factories import (
 from tests.users.factories import (
     EmployerFactory,
     JobSeekerFactory,
-    JobSeekerWithAddressFactory,
     PrescriberFactory,
 )
 from tests.utils.test import TestCase, parse_response_to_soup
@@ -553,7 +552,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         self.assertNotContains(response, TODO_BADGE, html=True)
 
     def test_dora_card_is_not_shown_for_job_seeker(self):
-        user = JobSeekerWithAddressFactory()
+        user = JobSeekerFactory(with_address=True)
         self.client.force_login(user)
 
         response = self.client.get(reverse("dashboard:index"))
@@ -580,7 +579,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         self.assertContains(response, "Suggérer un service partenaire")
 
     def test_diagoriente_info_is_shown_in_sidebar_for_job_seeker(self):
-        user = JobSeekerWithAddressFactory()
+        user = JobSeekerFactory(with_address=True)
         self.client.force_login(user)
 
         response = self.client.get(reverse("dashboard:index"))
@@ -655,7 +654,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         self.assertNotContains(response, self.NO_PRESCRIBER_ORG_MSG)
 
     def test_dashboard_prescriber_suspend_link(self):
-        user = JobSeekerWithAddressFactory()
+        user = JobSeekerFactory(with_address=True)
         self.client.force_login(user)
         response = self.client.get(reverse("dashboard:index"))
         self.assertNotContains(response, self.SUSPEND_TEXT)
@@ -690,7 +689,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
 
     @freeze_time("2022-09-15")
     def test_dashboard_access_by_a_jobseeker(self):
-        user = JobSeekerWithAddressFactory()
+        user = JobSeekerFactory(with_address=True)
         approval = ApprovalFactory(user=user, start_at=datetime(2022, 6, 21), end_at=datetime(2022, 12, 6))
         self.client.force_login(user)
         url = reverse("dashboard:index")
@@ -733,7 +732,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
     )
     def test_job_seeker_without_required_field_redirected(self, field, data):
         empty_field = {field: ""}
-        user = JobSeekerWithAddressFactory(**empty_field)
+        user = JobSeekerFactory(with_address=True, **empty_field)
         self.client.force_login(user)
 
         response = self.client.get(reverse("dashboard:index"))
@@ -834,7 +833,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
 @pytest.mark.parametrize(
     "factory,expected",
     [
-        pytest.param(JobSeekerWithAddressFactory, assertNotContains, id="JobSeeker"),
+        pytest.param(partial(JobSeekerFactory, with_address=True), assertNotContains, id="JobSeeker"),
         pytest.param(partial(EmployerFactory, with_company=True), assertNotContains, id="Employer"),
         pytest.param(partial(LaborInspectorFactory, membership=True), assertNotContains, id="LaborInspector"),
         pytest.param(PrescriberFactory, assertNotContains, id="PrescriberWithoutOrganization"),

@@ -41,7 +41,7 @@ from tests.prescribers.factories import (
     PrescriberOrganizationFactory,
     PrescriberPoleEmploiFactory,
 )
-from tests.users.factories import EmployerFactory, JobSeekerFactory, JobSeekerWithAddressFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory
 from tests.utils.test import TestCase
 
 
@@ -1010,10 +1010,14 @@ class TestCommandNewUsersToMailJet:
 
 @freeze_time("2023-05-01")
 def test_update_job_seeker_coords(settings, capsys, respx_mock):
-    js1 = JobSeekerWithAddressFactory(coords="POINT (2.387311 48.917735)", geocoding_score=0.65)  # score too low
-    js2 = JobSeekerWithAddressFactory(coords=None, geocoding_score=0.9)  # no coords
-    js3 = JobSeekerWithAddressFactory(coords="POINT (5.43567 12.123876)", geocoding_score=0.76)  # score too low
-    JobSeekerWithAddressFactory(with_address_in_qpv=True)
+    js1 = JobSeekerFactory(
+        with_address=True, coords="POINT (2.387311 48.917735)", geocoding_score=0.65
+    )  # score too low
+    js2 = JobSeekerFactory(with_address=True, coords=None, geocoding_score=0.9)  # no coords
+    js3 = JobSeekerFactory(
+        with_address=True, coords="POINT (5.43567 12.123876)", geocoding_score=0.76
+    )  # score too low
+    JobSeekerFactory(with_address_in_qpv=True)
 
     settings.API_BAN_BASE_URL = "https://geo.foo"
     respx_mock.post("https://geo.foo/search/csv/").respond(

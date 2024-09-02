@@ -4,12 +4,13 @@ from itou.asp.models import LaneExtension, LaneType, find_lane_type_aliases
 from itou.common_apps.address.format import compute_hexa_address
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
 from itou.utils.mocks.geocoding import BAN_GEOCODING_API_NO_RESULT_MOCK
-from tests.users.factories import JobSeekerFactory, JobSeekerWithAddressFactory
+from tests.users.factories import JobSeekerFactory
 
 
 def _users_with_mock_address(idx):
     address = BAN_GEOCODING_API_RESULTS_MOCK[idx]
-    return JobSeekerWithAddressFactory(
+    return JobSeekerFactory(
+        with_address=True,
         address_line_1=address.get("address_line_1"),
         post_code=address.get("post_code"),
     )

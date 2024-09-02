@@ -10,7 +10,7 @@ from itou.utils.context_processors import expose_enums
 from itou.www.apply.views.list_views import JobApplicationsListKind
 from tests.job_applications.factories import JobApplicationSentByCompanyFactory, JobApplicationSentByJobSeekerFactory
 from tests.jobs.factories import create_test_romes_and_appellations
-from tests.users.factories import EmployerFactory, JobSeekerWithAddressFactory
+from tests.users.factories import EmployerFactory, JobSeekerFactory
 from tests.utils.test import load_template
 
 
@@ -124,7 +124,7 @@ def test_job_application_job_seeker_in_list():
 @pytest.mark.ignore_unknown_variable_template_error("request")
 def test_known_criteria_template_with_no_criterion():
     tmpl = load_template("apply/includes/known_criteria.html")
-    rendered = tmpl.render(Context({"job_seeker": JobSeekerWithAddressFactory()}))
+    rendered = tmpl.render(Context({"job_seeker": JobSeekerFactory(with_address=True)}))
 
     assert "est en QPV" not in rendered
     assert "est classée en ZRR" not in rendered
@@ -134,7 +134,7 @@ def test_known_criteria_template_with_no_criterion():
 @pytest.mark.ignore_unknown_variable_template_error("request")
 def test_known_criteria_template_with_qpv_criterion():
     tmpl = load_template("apply/includes/known_criteria.html")
-    job_seeker = JobSeekerWithAddressFactory(with_address_in_qpv=True)
+    job_seeker = JobSeekerFactory(with_address_in_qpv=True)
     rendered = tmpl.render(Context({"job_seeker": job_seeker}))
 
     assert "est en QPV" in rendered
@@ -146,7 +146,7 @@ def test_known_criteria_template_with_qpv_criterion():
 @pytest.mark.ignore_unknown_variable_template_error("request")
 def test_known_criteria_template_with_zrr_criterion():
     tmpl = load_template("apply/includes/known_criteria.html")
-    job_seeker = JobSeekerWithAddressFactory(with_city_in_zrr=True)
+    job_seeker = JobSeekerFactory(with_city_in_zrr=True)
     rendered = tmpl.render(Context({"job_seeker": job_seeker}))
 
     assert "est en QPV" not in rendered
@@ -158,7 +158,7 @@ def test_known_criteria_template_with_zrr_criterion():
 @pytest.mark.ignore_unknown_variable_template_error("request")
 def test_known_criteria_template_with_partial_zrr_criterion():
     tmpl = load_template("apply/includes/known_criteria.html")
-    job_seeker = JobSeekerWithAddressFactory(with_city_partially_in_zrr=True)
+    job_seeker = JobSeekerFactory(with_city_partially_in_zrr=True)
     rendered = tmpl.render(Context({"job_seeker": job_seeker}))
 
     assert "est en QPV" not in rendered

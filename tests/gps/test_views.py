@@ -11,7 +11,6 @@ from tests.prescribers.factories import PrescriberOrganizationWithMembershipFact
 from tests.users.factories import (
     EmployerFactory,
     JobSeekerFactory,
-    JobSeekerWithAddressFactory,
     PrescriberFactory,
 )
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
@@ -216,7 +215,7 @@ def test_my_groups(snapshot, client):
 
 
 def test_access_as_jobseeker(client):
-    user = JobSeekerWithAddressFactory()
+    user = JobSeekerFactory(with_address=True)
     client.force_login(user)
 
     response = client.get(reverse("gps:my_groups"))

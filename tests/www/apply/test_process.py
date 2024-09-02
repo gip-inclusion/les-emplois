@@ -57,7 +57,6 @@ from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import (
     EmployerFactory,
     JobSeekerFactory,
-    JobSeekerWithAddressFactory,
     LaborInspectorFactory,
     PrescriberFactory,
 )
@@ -1122,7 +1121,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         """Test eligibility."""
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker=JobSeekerWithAddressFactory(with_address_in_qpv=True),
+            job_seeker=JobSeekerFactory(with_address_in_qpv=True),
             eligibility_diagnosis=None,
         )
 
@@ -1200,7 +1199,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
 
         job_application = JobApplicationSentByPrescriberOrganizationFactory(
             state=job_applications_enums.JobApplicationState.PROCESSING,
-            job_seeker=JobSeekerWithAddressFactory(),
+            job_seeker=JobSeekerFactory(with_address=True),
         )
         Sanctions.objects.create(
             evaluated_siae=EvaluatedSiaeFactory(siae=job_application.to_company),
@@ -1222,7 +1221,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         company = CompanyFactory(with_membership=True)
         employer = company.members.first()
         job_application = JobApplicationSentByJobSeekerFactory(
-            to_company=company, job_seeker=JobSeekerWithAddressFactory()
+            to_company=company, job_seeker=JobSeekerFactory(with_address=True)
         )
 
         # Right states
@@ -1650,7 +1649,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.company = CompanyFactory(with_membership=True, with_jobs=True, name="La brigade - entreprise par défaut")
-        cls.job_seeker = JobSeekerWithAddressFactory(
+        cls.job_seeker = JobSeekerFactory(
             with_pole_emploi_id=True,
             with_ban_api_mocked_address=True,
         )
@@ -2184,7 +2183,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert approval.user == job_seeker
 
         # Now generate a job seeker that is "almost the same"
-        almost_same_job_seeker = JobSeekerWithAddressFactory(
+        almost_same_job_seeker = JobSeekerFactory(
             with_pole_emploi_id=True,
             with_ban_api_mocked_address=True,
             jobseeker_profile__pole_emploi_id=job_seeker.jobseeker_profile.pole_emploi_id,
@@ -2277,7 +2276,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         jobseeker_profile.nir = ""
         jobseeker_profile.save()
         job_application = self.create_job_application()
-        other_job_seeker = JobSeekerWithAddressFactory(
+        other_job_seeker = JobSeekerFactory(
             with_pole_emploi_id=True,
             with_ban_api_mocked_address=True,
         )

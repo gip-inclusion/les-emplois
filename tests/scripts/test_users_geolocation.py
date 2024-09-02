@@ -9,7 +9,7 @@ from django.conf import settings as django_settings
 from django.core import management
 from httpx import Response
 
-from tests.users.factories import JobSeekerWithAddressFactory
+from tests.users.factories import JobSeekerFactory
 
 
 def mock_ban_api(user_id):
@@ -37,7 +37,7 @@ def run_command(*args, **kwargs):
 
 
 def test_update_dry_run():
-    JobSeekerWithAddressFactory(is_active=True, without_geoloc=True)
+    JobSeekerFactory(is_active=True, with_address=True, without_geoloc=True)
 
     out, _ = run_command("update")
 
@@ -48,7 +48,7 @@ def test_update_dry_run():
 
 @respx.mock
 def test_update_wet_run():
-    user = JobSeekerWithAddressFactory(
+    user = JobSeekerFactory(
         is_active=True,
         without_geoloc=True,
         address_line_1="10 rue du Moulin du Gue",
@@ -81,7 +81,8 @@ def test_export_dry_run():
 def test_export_wet_run():
     coords = "SRID=4326;POINT (-1.963752 48.658983)"
     score = 0.97
-    JobSeekerWithAddressFactory(
+    JobSeekerFactory(
+        with_address=True,
         is_active=True,
         coords=coords,
         geocoding_score=score,
@@ -109,7 +110,7 @@ def test_import_dry_run():
 
 
 def test_import_wet_run():
-    user = JobSeekerWithAddressFactory(is_active=True)
+    user = JobSeekerFactory(is_active=True, with_address=True)
     path = os.path.join(django_settings.IMPORT_DIR, "sample_user_geoloc.csv")
 
     with open(path, "w") as f:
