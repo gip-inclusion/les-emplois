@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Verify changelog label
-        uses: mheap/github-action-required-labels@v5.4.1
+        uses: mheap/github-action-required-labels@v5.4.2
         with:
           mode: exactly
           count: 1
