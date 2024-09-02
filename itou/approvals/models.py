@@ -75,8 +75,7 @@ class CommonApprovalMixin(models.Model):
         ]
 
     def is_valid(self):
-        now = timezone.now().date()
-        return now <= self.end_at
+        return timezone.localdate() <= self.end_at
 
     @classmethod
     def last_number(cls):
@@ -96,7 +95,7 @@ class CommonApprovalMixin(models.Model):
 
     @property
     def is_in_progress(self):
-        return self.start_at <= timezone.now().date() <= self.end_at
+        return self.start_at <= timezone.localdate() <= self.end_at
 
     @property
     def waiting_period_end(self):
@@ -104,13 +103,11 @@ class CommonApprovalMixin(models.Model):
 
     @property
     def is_in_waiting_period(self):
-        now = timezone.now().date()
-        return self.end_at < now <= self.waiting_period_end
+        return self.end_at < timezone.localdate() <= self.waiting_period_end
 
     @property
     def waiting_period_has_elapsed(self):
-        now = timezone.now().date()
-        return now > self.waiting_period_end
+        return timezone.localdate() > self.waiting_period_end
 
     @property
     def is_pass_iae(self):
@@ -207,8 +204,7 @@ class CommonApprovalQuerySet(models.QuerySet):
 
     @property
     def valid_lookup(self):
-        now = timezone.now().date()
-        return Q(end_at__gte=now)
+        return Q(end_at__gte=timezone.localdate())
 
     def valid(self):
         return self.filter(self.valid_lookup)
@@ -217,16 +213,13 @@ class CommonApprovalQuerySet(models.QuerySet):
         return self.exclude(self.valid_lookup)
 
     def starts_in_the_past(self):
-        now = timezone.now().date()
-        return self.filter(Q(start_at__lt=now))
+        return self.filter(Q(start_at__lt=timezone.localdate()))
 
     def starts_today(self):
-        now = timezone.now().date()
-        return self.filter(start_at=now)
+        return self.filter(start_at=timezone.localdate())
 
     def starts_in_the_future(self):
-        now = timezone.now().date()
-        return self.filter(Q(start_at__gt=now))
+        return self.filter(Q(start_at__gt=timezone.localdate()))
 
 
 class ApprovalQuerySet(CommonApprovalQuerySet):
@@ -785,7 +778,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
     @property
     def can_postpone_start_date(self):
-        return self.start_at > timezone.now().date()
+        return self.start_at > timezone.localdate()
 
     def update_start_date(self, new_start_date):
         """
@@ -1006,8 +999,8 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 class SuspensionQuerySet(models.QuerySet):
     @property
     def in_progress_lookup(self):
-        now = timezone.now().date()
-        return models.Q(start_at__lte=now, end_at__gte=now)
+        today = timezone.localdate()
+        return models.Q(start_at__lte=today, end_at__gte=today)
 
     def in_progress(self):
         return self.filter(self.in_progress_lookup)
@@ -1016,8 +1009,7 @@ class SuspensionQuerySet(models.QuerySet):
         return self.exclude(self.in_progress_lookup)
 
     def old(self):
-        now = timezone.now().date()
-        return self.filter(end_at__lt=now)
+        return self.filter(end_at__lt=timezone.localdate())
 
 
 class Suspension(models.Model):
@@ -1256,7 +1248,7 @@ class Suspension(models.Model):
 
     @property
     def is_in_progress(self):
-        return self.start_at <= timezone.now().date() <= self.end_at
+        return self.start_at <= timezone.localdate() <= self.end_at
 
     @property
     def start_in_approval_boundaries(self):
@@ -1550,7 +1542,7 @@ class CommonProlongation(models.Model):
 
     @property
     def is_in_progress(self):
-        return self.start_at <= timezone.now().date() <= self.end_at
+        return self.start_at <= timezone.localdate() <= self.end_at
 
     @staticmethod
     def get_max_end_at(approval_id, start_at, reason, ignore=None):
@@ -1689,8 +1681,8 @@ class ProlongationQuerySet(models.QuerySet):
     @property
     def in_progress_lookup(self):
         # This logic was duplicated in Approval.is_suspended for performance issues
-        now = timezone.now().date()
-        return models.Q(start_at__lte=now, end_at__gte=now)
+        today = timezone.localdate()
+        return models.Q(start_at__lte=today, end_at__gte=today)
 
     def in_progress(self):
         return self.filter(self.in_progress_lookup)

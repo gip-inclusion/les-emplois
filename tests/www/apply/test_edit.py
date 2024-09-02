@@ -27,7 +27,7 @@ class EditContractTest(TestCase):
         self.user2 = company_2.members.get(first_name="Roscoe")
 
         # JA with creation of a new approval
-        tomorrow = (timezone.now() + relativedelta(days=1)).date()
+        tomorrow = timezone.localdate() + relativedelta(days=1)
         self.job_application_1 = JobApplicationFactory(
             with_approval=True, to_company=company_1, hiring_start_at=tomorrow, approval__start_at=tomorrow
         )
@@ -66,8 +66,8 @@ class EditContractTest(TestCase):
 
         assert response.status_code == 200
 
-        future_start_date = (timezone.now() + relativedelta(days=10)).date()
-        future_end_date = (timezone.now() + relativedelta(days=15)).date()
+        future_start_date = timezone.localdate() + relativedelta(days=10)
+        future_end_date = timezone.localdate() + relativedelta(days=15)
 
         post_data = {
             "hiring_start_at": future_start_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -99,7 +99,7 @@ class EditContractTest(TestCase):
 
         assert response.status_code == 200
 
-        future_start_date = (timezone.now() + relativedelta(days=11)).date()
+        future_start_date = timezone.localdate() + relativedelta(days=11)
         future_end_date = None
 
         # empty "hiring_end_at"
@@ -145,7 +145,7 @@ class EditContractTest(TestCase):
 
         assert response.status_code == 200
 
-        future_start_date = (timezone.now() - relativedelta(days=10)).date()
+        future_start_date = timezone.localdate() - relativedelta(days=10)
 
         post_data = {
             "hiring_start_at": future_start_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -185,8 +185,8 @@ class EditContractTest(TestCase):
         self.client.force_login(self.user1)
         response = self.client.get(self.url)
 
-        future_start_date = (timezone.now() + relativedelta(days=20)).date()
-        future_end_date = (timezone.now() + relativedelta(days=60)).date()
+        future_start_date = timezone.localdate() + relativedelta(days=20)
+        future_end_date = timezone.localdate() + relativedelta(days=60)
 
         post_data = {
             "hiring_start_at": future_start_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
@@ -210,8 +210,8 @@ class EditContractTest(TestCase):
         self.client.force_login(self.user2)
         response = self.client.get(self.old_url)
 
-        future_start_date = (timezone.now() + relativedelta(days=5)).date()
-        future_end_date = (timezone.now() + relativedelta(days=60)).date()
+        future_start_date = timezone.localdate() + relativedelta(days=5)
+        future_end_date = timezone.localdate() + relativedelta(days=60)
 
         post_data = {
             "hiring_start_at": future_start_date.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
