@@ -290,7 +290,7 @@ def test_beneficiary_details(client, snapshot):
         membership__organization__name="Les Olivades",
         membership__organization__authorized=True,
     )
-    beneficiary = JobSeekerFactory(for_snapshot=True)
+    beneficiary = JobSeekerFactory(for_snapshot=True, department="24")
     FollowUpGroupFactory(beneficiary=beneficiary, memberships=1, memberships__member=prescriber)
 
     client.force_login(prescriber)
