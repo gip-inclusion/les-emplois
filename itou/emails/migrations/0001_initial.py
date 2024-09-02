@@ -20,6 +20,7 @@ class Migration(migrations.Migration):
                     "to",
                     django.contrib.postgres.fields.ArrayField(
                         base_field=citext.CIEmailField(max_length=254),
+                        blank=True,
                         size=None,
                         verbose_name="à",
                     ),
@@ -28,6 +29,7 @@ class Migration(migrations.Migration):
                     "cc",
                     django.contrib.postgres.fields.ArrayField(
                         base_field=citext.CIEmailField(max_length=254),
+                        blank=True,
                         default=list,
                         size=None,
                         verbose_name="cc",
@@ -37,18 +39,20 @@ class Migration(migrations.Migration):
                     "bcc",
                     django.contrib.postgres.fields.ArrayField(
                         base_field=citext.CIEmailField(max_length=254),
+                        blank=True,
                         default=list,
                         size=None,
                         verbose_name="cci",
                     ),
                 ),
-                ("subject", models.TextField(verbose_name="sujet")),
-                ("body_text", models.TextField(verbose_name="message")),
+                ("subject", models.TextField(blank=True, verbose_name="sujet")),
+                ("body_text", models.TextField(blank=True, verbose_name="message")),
                 ("from_email", citext.CIEmailField(max_length=254, verbose_name="de")),
                 (
                     "reply_to",
                     django.contrib.postgres.fields.ArrayField(
                         base_field=citext.CIEmailField(max_length=254),
+                        blank=True,
                         default=list,
                         size=None,
                         verbose_name="répondre à",
