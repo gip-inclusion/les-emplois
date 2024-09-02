@@ -15,7 +15,7 @@ from tests.asp.factories import CommuneFactory, CountryFranceFactory, CountryOut
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationWithApprovalNotCancellableFactory
-from tests.users.factories import JobSeekerWithAddressFactory
+from tests.users.factories import JobSeekerFactory
 from tests.utils.test import TestCase, parse_response_to_soup
 
 
@@ -154,7 +154,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
 
     def setUp(self):
         super().setUp()
-        self.job_seeker = JobSeekerWithAddressFactory.build(born_in_france=True)
+        self.job_seeker = JobSeekerFactory.build(with_address=True, born_in_france=True)
 
         self.url = reverse("employee_record_views:create", args=(self.job_application.pk,))
         self.target_url = reverse("employee_record_views:create_step_2", args=(self.job_application.pk,))
@@ -241,7 +241,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         # No geoloc mock used, basic factory with:
         # - simple / fake address
         # - birth place and country
-        data = _get_user_form_data(JobSeekerWithAddressFactory.build(born_in_france=True))
+        data = _get_user_form_data(JobSeekerFactory.build(with_address=True, born_in_france=True))
         response = self.client.post(self.url, data=data)
 
         # Redirects must go to step 2
@@ -282,7 +282,7 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         side_effect=mock_get_geocoding_data,
     )
     def test_job_seeker_address_geolocated(self, _mock):
-        job_seeker = JobSeekerWithAddressFactory(
+        job_seeker = JobSeekerFactory(
             for_snapshot=True,
             with_mocked_address=BAN_GEOCODING_API_RESULTS_FOR_SNAPSHOT_MOCK,
         )
@@ -324,7 +324,7 @@ class CreateEmployeeRecordStep2Test(AbstractCreateEmployeeRecordTest):
         # Job seeker has an address filled but can't be geolocated
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
-            job_seeker=JobSeekerWithAddressFactory(),
+            job_seeker=JobSeekerFactory(with_address=True),
         )
         self.job_seeker = self.job_application.job_seeker
 
@@ -453,9 +453,7 @@ class CreateEmployeeRecordStep3Test(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
-            job_seeker=JobSeekerWithAddressFactory(
-                born_in_france=True, with_pole_emploi_id=True, with_mocked_address=True
-            ),
+            job_seeker=JobSeekerFactory(born_in_france=True, with_pole_emploi_id=True, with_mocked_address=True),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_3", args=(self.job_application.id,))
@@ -624,7 +622,7 @@ class CreateEmployeeRecordStep4Test(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
-            job_seeker=JobSeekerWithAddressFactory(born_in_france=True, with_mocked_address=True),
+            job_seeker=JobSeekerFactory(born_in_france=True, with_mocked_address=True),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_4", args=(self.job_application.id,))
@@ -654,7 +652,7 @@ class CreateEmployeeRecordStep5Test(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
-            job_seeker=JobSeekerWithAddressFactory(born_in_france=True, with_mocked_address=True),
+            job_seeker=JobSeekerFactory(born_in_france=True, with_mocked_address=True),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_5", args=(self.job_application.id,))
@@ -702,7 +700,7 @@ class UpdateRejectedEmployeeRecordTest(AbstractCreateEmployeeRecordTest):
         super().setUp()
         self.job_application = JobApplicationWithApprovalNotCancellableFactory(
             to_company=self.company,
-            job_seeker=JobSeekerWithAddressFactory(born_in_france=True, with_mocked_address=True),
+            job_seeker=JobSeekerFactory(born_in_france=True, with_mocked_address=True),
         )
         self.job_seeker = self.job_application.job_seeker
         self.url = reverse("employee_record_views:create_step_5", args=(self.job_application.id,))

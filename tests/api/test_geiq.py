@@ -18,7 +18,7 @@ from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
 from itou.users.enums import UserKind
 from tests.companies.factories import CompanyFactory
 from tests.job_applications.factories import JobApplicationFactory, PriorActionFactory
-from tests.users.factories import ItouStaffFactory, JobSeekerWithAddressFactory
+from tests.users.factories import ItouStaffFactory, JobSeekerFactory
 
 
 def _api_client():
@@ -103,7 +103,7 @@ def test_candidatures_geiq_nominal(snapshot):
     assert response.status_code == 200
     assert response.json() == snapshot(name="empty")
 
-    job_seeker = JobSeekerWithAddressFactory(for_snapshot=True, jobseeker_profile__education_level="51")
+    job_seeker = JobSeekerFactory(for_snapshot=True, jobseeker_profile__education_level="51")
 
     job_application = JobApplicationFactory(
         pk=uuid.UUID("bf657b69-3245-430c-b461-09c6792b9504"),

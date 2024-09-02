@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from pytest_django.asserts import assertRedirects
 
-from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory, JobSeekerWithAddressFactory
+from tests.users.factories import DEFAULT_PASSWORD, JobSeekerFactory
 
 
 class TestPasswordReset:
@@ -71,7 +71,7 @@ class TestPasswordChange:
         and redirects to the right place.
         """
 
-        user = JobSeekerWithAddressFactory()
+        user = JobSeekerFactory(with_address=True)
         client.force_login(user)
 
         # Change password.

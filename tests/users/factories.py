@@ -191,6 +191,40 @@ class JobSeekerFactory(UserFactory):
             coords="POINT (7.644817 48.515883)",
             geocoding_score=0.8745736363636364,
         )
+
+        with_address = factory.Trait(
+            address_line_1=factory.Faker("street_address", locale="fr_FR"),
+            department=factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys()),
+            post_code=factory.Faker("postalcode"),
+            city=factory.Faker("city", locale="fr_FR"),
+            with_geoloc=True,
+        )
+        with_address_in_qpv = factory.Trait(
+            address_line_1="Rue du turfu",
+            post_code="93300",
+            city="Aubervilliers",
+            coords="POINT (2.387311 48.917735)",
+            geocoding_score=0.99,
+        )
+        with_city_in_zrr = factory.Trait(
+            address_line_1="Rue paumée",
+            post_code="12260",
+            city="Balaguier d'Olt",
+        )
+        with_city_partially_in_zrr = factory.Trait(
+            address_line_1="Rue exotique",
+            post_code="97429",
+            city="Petite-Île",
+        )
+        with_geoloc = factory.Trait(
+            coords="POINT(0 0)",
+            geocoding_score=0.5,
+        )
+        without_geoloc = factory.Trait(
+            coords=None,
+            geocoding_score=None,
+        )
+
         for_snapshot = factory.Trait(
             public_id="7614fc4b-aef9-4694-ab17-12324300180a",
             title="MME",
@@ -211,56 +245,7 @@ class JobSeekerFactory(UserFactory):
         # Deactivate automatic creation of JobSeekerProfile in User.save
         # since the RelatedFactory will take care of it
         kwargs["_auto_create_job_seeker_profile"] = False
-        return kwargs
 
-
-class JobSeekerWithAddressFactory(JobSeekerFactory):
-    class Params:
-        with_address_in_qpv = factory.Trait(
-            address_line_1="Rue du turfu",
-            post_code="93300",
-            city="Aubervilliers",
-            coords="POINT (2.387311 48.917735)",
-            geocoding_score=0.99,
-        )
-        with_city_in_zrr = factory.Trait(
-            address_line_1="Rue paumée",
-            post_code="12260",
-            city="Balaguier d'Olt",
-        )
-        with_city_partially_in_zrr = factory.Trait(
-            address_line_1="Rue exotique",
-            post_code="97429",
-            city="Petite-Île",
-        )
-        without_geoloc = factory.Trait(
-            coords=None,
-            geocoding_score=None,
-        )
-
-        for_snapshot = factory.Trait(
-            public_id="7614fc4b-aef9-4694-ab17-12324300180a",
-            title="MME",
-            first_name="Sacha",
-            last_name="Dupont",
-            birthdate=datetime.date(1990, 1, 1),
-            jobseeker_profile__for_snapshot=True,
-            address_line_1="42 Rue du clos de la Grange",
-            post_code="58160",
-            city="Sauvigny-les-Bois",
-        )
-
-    address_line_1 = factory.Faker("street_address", locale="fr_FR")
-    department = factory.fuzzy.FuzzyChoice(DEPARTMENTS.keys())
-    post_code = factory.Faker("postalcode")
-    city = factory.Faker("city", locale="fr_FR")
-
-    coords = "POINT(0 0)"
-    geocoding_score = 0.5
-
-    @classmethod
-    def _adjust_kwargs(cls, **kwargs):
-        kwargs = super()._adjust_kwargs(**kwargs)
         # Using ZRR or QPV means that we must have some factories / data ready beforehand
         # Did not find a better way to do Traits additional setup...
         if kwargs.get("with_address_in_qpv"):
@@ -273,7 +258,6 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
         if kwargs.get("with_city_partially_in_zrr"):
             ZRRFactory(insee_code="97405")
             create_city_partially_in_zrr()
-
         return kwargs
 
     @factory.post_generation

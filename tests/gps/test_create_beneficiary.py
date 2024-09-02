@@ -22,7 +22,6 @@ from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import (
     EmployerFactory,
     JobSeekerFactory,
-    JobSeekerWithAddressFactory,
     PrescriberFactory,
 )
 
@@ -43,7 +42,7 @@ def test_create_job_seeker(_mock, client):
     user = prescriber_organization.members.first()
     client.force_login(user)
 
-    dummy_job_seeker = JobSeekerWithAddressFactory.build(
+    dummy_job_seeker = JobSeekerFactory.build(
         jobseeker_profile__with_hexa_address=True,
         jobseeker_profile__with_education_level=True,
         with_ban_geoloc_address=True,
