@@ -1,6 +1,8 @@
+import datetime
 import uuid
 
 from django.urls import reverse
+from django.utils import timezone
 from freezegun import freeze_time
 from pytest_django.asserts import assertRedirects
 
@@ -197,6 +199,7 @@ def test_job_application_tab(client, snapshot):
         sent_by_authorized_prescriber_organisation=True,
         sender_prescriber_organization=prescriber_membership.organization,
         sender=prescriber_membership.user,
+        created_at=timezone.now() + datetime.timedelta(seconds=10),  # Most recent, stabilize ordering.
     )
     job_application_2 = JobApplicationFactory(
         pk=uuid.UUID("11111111-1111-1111-1111-222222222222"),
