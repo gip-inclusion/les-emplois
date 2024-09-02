@@ -522,6 +522,9 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        session_birthdate = self.job_seeker_session.get("profile", {}).get(
+            "birthdate", self.job_seeker_session.get("user", {}).get("birthdate")
+        )  # TODO(xfernandez): drop fallback on self.job_seeker_session["user"] in a week
         session_nir = self.job_seeker_session.get("profile", {}).get("nir")
         session_lack_of_nir_reason = self.job_seeker_session.get("profile", {}).get("lack_of_nir_reason")
 
@@ -529,6 +532,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
             data=request.POST or None,
             initial=self.job_seeker_session.get("user", {})
             | {
+                "birthdate": session_birthdate if session_birthdate is not None else None,
                 "nir": session_nir if session_nir is not None else None,
                 "lack_of_nir_reason": session_lack_of_nir_reason if session_lack_of_nir_reason is not None else None,
             },
@@ -540,7 +544,7 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
         if self.form.is_valid():
             existing_job_seeker = User.objects.filter(
                 kind=UserKind.JOB_SEEKER,
-                birthdate=self.form.cleaned_data["birthdate"],
+                jobseeker_profile__birthdate=self.form.cleaned_data["birthdate"],
                 first_name__unaccent__iexact=self.form.cleaned_data["first_name"],
                 last_name__unaccent__iexact=self.form.cleaned_data["last_name"],
             ).first()
@@ -660,6 +664,8 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
                 "fill_mode",
                 "address_for_autocomplete",
                 "insee_code",
+                # TODO(xfernandez): remove birthdate in a week
+                "birthdate",
             ]
         }
 
@@ -674,7 +680,14 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             "aah_allocation",
             "lack_of_nir",
         ]
-        return {k: v for k, v in self.job_seeker_session.get("profile").items() if k not in fields_to_exclude}
+        # TODO(xfernandez): remove user session birthdate handling in a week
+        if birthdate_from_user_session := self.job_seeker_session.get("user", {}).get("birthdate"):
+            user_data = {"birthdate": birthdate_from_user_session}
+        else:
+            user_data = {}
+        return user_data | {
+            k: v for k, v in self.job_seeker_session.get("profile").items() if k not in fields_to_exclude
+        }
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -754,7 +767,7 @@ class CheckJobSeekerInformations(ApplicationBaseView):
 
     def get(self, request, *args, **kwargs):
         # Check required info that will allow us to find a pre-existing approval.
-        has_required_info = self.job_seeker.birthdate and (
+        has_required_info = self.job_seeker.jobseeker_profile.birthdate and (
             self.job_seeker.jobseeker_profile.pole_emploi_id
             or self.job_seeker.jobseeker_profile.lack_of_pole_emploi_id_reason
         )

@@ -131,7 +131,9 @@ class ItouUserManager(UserManager):
         pe_id_to_remove = []
 
         for pe_id, duplicates in result.items():
-            same_birthdate = all(user.birthdate == duplicates[0].birthdate for user in duplicates)
+            same_birthdate = all(
+                user.jobseeker_profile.birthdate == duplicates[0].jobseeker_profile.birthdate for user in duplicates
+            )
 
             if not same_birthdate:
                 # Two users with the same `pole_emploi_id` but a different
@@ -141,11 +143,13 @@ class ItouUserManager(UserManager):
                     continue
 
                 # Keep only users with the same most common birthdate.
-                list_of_birthdates = [u.birthdate for u in duplicates]
+                list_of_birthdates = [u.jobseeker_profile.birthdate for u in duplicates]
                 c = Counter(list_of_birthdates)
                 most_common_birthdate = c.most_common(1)[0][0]
 
-                duplicates_with_same_birthdate = [u for u in duplicates if u.birthdate == most_common_birthdate]
+                duplicates_with_same_birthdate = [
+                    u for u in duplicates if u.jobseeker_profile.birthdate == most_common_birthdate
+                ]
 
                 if len(duplicates_with_same_birthdate) == 1:
                     # We stop if there is only one user left.
@@ -196,12 +200,6 @@ class User(AbstractUser, AddressMixin):
         choices=Title.choices,
     )
 
-    birthdate = models.DateField(
-        verbose_name="date de naissance",
-        null=True,
-        blank=True,
-        validators=[validate_birthdate],
-    )
     email = CIEmailField(
         "adresse e-mail",
         db_index=True,
@@ -346,7 +344,7 @@ class User(AbstractUser, AddressMixin):
             if must_create_profile:
                 JobSeekerProfile.objects.create(user=self)
 
-            if self.has_data_changed(["birthdate", "last_name", "first_name"]):
+            if self.has_data_changed(["last_name", "first_name"]):
                 self.jobseeker_profile.pe_obfuscated_nir = None
                 self.jobseeker_profile.pe_last_certification_attempt_at = None
                 self.jobseeker_profile.save(update_fields=["pe_obfuscated_nir", "pe_last_certification_attempt_at"])
@@ -1036,7 +1034,7 @@ class JobSeekerProfile(models.Model):
             self.asp_uid = self._default_asp_uid()
             if update_fields is not None:
                 update_fields = set(update_fields) | {"asp_uid"}
-        if self.has_data_changed(["nir"]):
+        if self.has_data_changed(["birthdate", "nir"]):
             self.pe_obfuscated_nir = None
             self.pe_last_certification_attempt_at = None
             if update_fields is not None:

@@ -267,17 +267,17 @@ class TestPoleEmploiConnect:
         assert user.has_sso_provider
         assert user.identity_provider == IdentityProvider.PE_CONNECT
         assert user.jobseeker_profile.nir == ""
-        assert user.birthdate == datetime.date(2000, 1, 1)
+        assert user.jobseeker_profile.birthdate == datetime.date(2000, 1, 1)
         assert user.externaldataimport_set.pe_sources().get().status == ExternalDataImport.STATUS_OK
 
-        user.birthdate = datetime.date(2001, 1, 1)
-        user.save()
+        user.jobseeker_profile.birthdate = datetime.date(2001, 1, 1)
+        user.jobseeker_profile.save()
 
         # Don't call import_user_pe_data on second login (and don't update user data)
         mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
         assert user.externaldataimport_set.pe_sources().count() == 1
-        user.refresh_from_db()
-        assert user.birthdate == datetime.date(2001, 1, 1)
+        user.jobseeker_profile.refresh_from_db()
+        assert user.jobseeker_profile.birthdate == datetime.date(2001, 1, 1)
 
     @respx.mock
     def test_callback_no_email(self, client):

@@ -114,7 +114,7 @@ def _serialize_job_application(job_application):
         job_seeker.first_name,
         job_seeker.email,
         job_seeker.phone,
-        _format_date(job_seeker.birthdate),
+        _format_date(job_seeker.jobseeker_profile.birthdate),
         job_seeker.city,
         job_seeker.post_code,
         company.display_name,

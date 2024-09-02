@@ -223,7 +223,7 @@ class GeiqJobApplicationSerializer(serializers.ModelSerializer):
     siret_employeur = serializers.CharField(source="to_company.siret")
     nom = serializers.CharField(source="job_seeker.last_name")
     prenom = serializers.CharField(source="job_seeker.first_name")
-    date_naissance = serializers.DateField(source="job_seeker.birthdate")
+    date_naissance = serializers.DateField(source="job_seeker.jobseeker_profile.birthdate")
     civilite = serializers.SerializerMethodField()
     adresse_ligne_1 = serializers.CharField(source="job_seeker.address_line_1")
     adresse_ligne_2 = serializers.CharField(source="job_seeker.address_line_2")

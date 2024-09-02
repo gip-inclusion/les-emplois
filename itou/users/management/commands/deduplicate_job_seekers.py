@@ -130,7 +130,7 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
                 len(duplicates),
                 duplicate.email,
                 duplicate.jobseeker_profile.nir,
-                duplicate.birthdate,
+                duplicate.jobseeker_profile.birthdate,
                 approval.number if approval else "",
                 approval.start_at.strftime("%d/%m/%Y") if approval else "",
                 approval.end_at.strftime("%d/%m/%Y") if approval else "",
@@ -188,7 +188,9 @@ class Command(XlsxExportMixin, DeprecatedLoggerMixin, BaseCommand):
             users_with_approval = [u for u in duplicates if u.approvals.exists()]
 
             # Ensure all users have the same birthdate.
-            assert all(user.birthdate == duplicates[0].birthdate for user in duplicates)
+            assert all(
+                user.jobseeker_profile.birthdate == duplicates[0].jobseeker_profile.birthdate for user in duplicates
+            )
 
             nirs = [u.jobseeker_profile.nir for u in duplicates if u.jobseeker_profile.nir]
             if len(nirs) > 1:

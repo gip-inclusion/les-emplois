@@ -40,7 +40,7 @@ job_app_export_spec = {
     "job_seeker_france_travail_id": lambda job_app: job_app.job_seeker.jobseeker_profile.pole_emploi_id,
     "job_seeker_ft_obfuscated_nir": lambda job_app: job_app.job_seeker.jobseeker_profile.pe_obfuscated_nir,
     "job_seeker_date_joined": lambda job_app: job_app.job_seeker.date_joined.isoformat(),
-    "job_seeker_birth_date": lambda job_app: job_app.job_seeker.birthdate,
+    "job_seeker_birth_date": lambda job_app: job_app.job_seeker.jobseeker_profile.birthdate,
     "job_seeker_birth_municipality": lambda job_app: _getattrs(job_app.job_seeker.jobseeker_profile, "birth_place"),
     "job_seeker_birth_country": lambda job_app: _getattrs(job_app.job_seeker.jobseeker_profile, "birth_country"),
     "job_seeker_email": lambda job_app: job_app.job_seeker.email,

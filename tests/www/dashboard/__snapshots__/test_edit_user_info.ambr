@@ -27,8 +27,6 @@
                                                   
                                               
                                                   
-                                              
-                                                  
                                                       <li>
                                                           <strong>Téléphone</strong>
                                                       </li>
@@ -52,6 +50,8 @@
                                                       <li>
                                                           <strong>Adresse actuelle</strong>
                                                       </li>
+                                                  
+                                              
                                                   
                                               
                                                   
@@ -98,12 +98,6 @@
                                                   
                                               
                                                   
-                                                      <li>
-                                                          <strong>Date de naissance</strong>
-                                                      </li>
-                                                  
-                                              
-                                                  
                                               
                                                   
                                               
@@ -122,6 +116,12 @@
                                                   
                                                       <li>
                                                           <strong>Adresse actuelle</strong>
+                                                      </li>
+                                                  
+                                              
+                                                  
+                                                      <li>
+                                                          <strong>Date de naissance</strong>
                                                       </li>
                                                   
                                               

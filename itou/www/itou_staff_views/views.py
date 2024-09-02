@@ -141,7 +141,7 @@ def export_ft_api_rejections(request):
                 approval.user.jobseeker_profile.pole_emploi_id,
                 approval.user.last_name,
                 approval.user.first_name,
-                approval.user.birthdate.isoformat(),
+                approval.user.jobseeker_profile.birthdate.isoformat(),
                 approval.origin_siae_kind,
                 approval.origin_siae_siret,
             ]

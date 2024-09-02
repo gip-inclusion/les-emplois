@@ -108,7 +108,7 @@ class CancelledApprovalFactory(factory.django.DjangoModelFactory):
 
     @factory.lazy_attribute
     def user_nir(self):
-        return JobSeekerProfileFactory.build(user__birthdate=self.user_birthdate).nir
+        return JobSeekerProfileFactory.build(birthdate=self.user_birthdate).nir
 
 
 class SuspensionFactory(factory.django.DjangoModelFactory):

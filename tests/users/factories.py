@@ -62,7 +62,6 @@ class UserFactory(factory.django.DjangoModelFactory):
             first_name="John",
             last_name="Doe",
             email="john.doe@test.local",
-            birthdate=datetime.date(2000, 1, 1),
             phone="0606060606",
         )
 
@@ -71,7 +70,6 @@ class UserFactory(factory.django.DjangoModelFactory):
     last_name = factory.Faker("last_name")
     email = factory.Sequence("email{}@domain.com".format)
     password = factory.LazyFunction(default_password)
-    birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
     phone = factory.Faker("phone_number", locale="fr_FR")
 
     @factory.post_generation
@@ -232,7 +230,6 @@ class JobSeekerFactory(UserFactory):
             last_name="Doe",
             email="jane.doe@test.local",
             phone="0612345678",
-            birthdate=datetime.date(1990, 1, 1),
             address_line_1="12 rue Georges Bizet",
             post_code="35000",
             city="Rennes",
@@ -330,6 +327,7 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
             hexa_commune=factory.SubFactory(CommuneFactory),
         )
         for_snapshot = factory.Trait(
+            birthdate=datetime.date(1990, 1, 1),
             nir="290010101010125",
             asp_uid="a08dbdb523633cfc59dfdb297307a1",
             education_level=EducationLevel.BAC_LEVEL,
@@ -343,15 +341,16 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
     advisor_information = factory.Maybe(
         "with_contact", factory.RelatedFactory("tests.gps.factories.FranceTravailContactFactory", "jobseeker_profile")
     )
+    birthdate = factory.fuzzy.FuzzyDate(datetime.date(1968, 1, 1), datetime.date(2000, 1, 1))
 
     education_level = factory.fuzzy.FuzzyChoice(EducationLevel.values + [""])
 
     @factory.lazy_attribute
     def nir(self):
         gender = random.choice([1, 2])
-        if self.user.birthdate:
-            year = self.user.birthdate.strftime("%y")
-            month = self.user.birthdate.strftime("%m")
+        if self.birthdate:
+            year = self.birthdate.strftime("%y")
+            month = self.birthdate.strftime("%m")
         else:
             year = "87"
             month = "06"

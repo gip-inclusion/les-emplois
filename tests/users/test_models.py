@@ -65,19 +65,35 @@ class ManagerTest(TestCase):
 
     def test_get_duplicates_by_pole_emploi_id(self):
         # 2 users using the same `pole_emploi_id` and different birthdates.
-        JobSeekerFactory(jobseeker_profile__pole_emploi_id="6666666B", birthdate=datetime.date(1988, 2, 2))
-        JobSeekerFactory(jobseeker_profile__pole_emploi_id="6666666B", birthdate=datetime.date(2001, 12, 12))
+        JobSeekerFactory(
+            jobseeker_profile__pole_emploi_id="6666666B", jobseeker_profile__birthdate=datetime.date(1988, 2, 2)
+        )
+        JobSeekerFactory(
+            jobseeker_profile__pole_emploi_id="6666666B", jobseeker_profile__birthdate=datetime.date(2001, 12, 12)
+        )
 
         # 2 users using the same `pole_emploi_id` and the same birthdates.
-        user1 = JobSeekerFactory(jobseeker_profile__pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
-        user2 = JobSeekerFactory(jobseeker_profile__pole_emploi_id="7777777B", birthdate=datetime.date(1988, 2, 2))
+        user1 = JobSeekerFactory(
+            jobseeker_profile__pole_emploi_id="7777777B", jobseeker_profile__birthdate=datetime.date(1988, 2, 2)
+        )
+        user2 = JobSeekerFactory(
+            jobseeker_profile__pole_emploi_id="7777777B", jobseeker_profile__birthdate=datetime.date(1988, 2, 2)
+        )
 
         # 3 users using the same `pole_emploi_id` and the same birthdates.
-        user3 = JobSeekerFactory(jobseeker_profile__pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
-        user4 = JobSeekerFactory(jobseeker_profile__pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
-        user5 = JobSeekerFactory(jobseeker_profile__pole_emploi_id="8888888C", birthdate=datetime.date(2002, 12, 12))
+        user3 = JobSeekerFactory(
+            jobseeker_profile__pole_emploi_id="8888888C", jobseeker_profile__birthdate=datetime.date(2002, 12, 12)
+        )
+        user4 = JobSeekerFactory(
+            jobseeker_profile__pole_emploi_id="8888888C", jobseeker_profile__birthdate=datetime.date(2002, 12, 12)
+        )
+        user5 = JobSeekerFactory(
+            jobseeker_profile__pole_emploi_id="8888888C", jobseeker_profile__birthdate=datetime.date(2002, 12, 12)
+        )
         # + 1 user using the same `pole_emploi_id` but a different birthdate.
-        JobSeekerFactory(jobseeker_profile__pole_emploi_id="8888888C", birthdate=datetime.date(1978, 12, 20))
+        JobSeekerFactory(
+            jobseeker_profile__pole_emploi_id="8888888C", jobseeker_profile__birthdate=datetime.date(1978, 12, 20)
+        )
 
         duplicated_users = User.objects.get_duplicates_by_pole_emploi_id()
 
@@ -100,7 +116,6 @@ class ModelTest(TestCase):
             "email": "john@doe.com",
             "first_name": "John",
             "last_name": "Doe",
-            "birthdate": "1978-12-20",
             "phone": "0610101010",
         }
         user = User.create_job_seeker_by_proxy(proxy_user, **user_data)
@@ -113,7 +128,6 @@ class ModelTest(TestCase):
         assert user.email == user_data["email"]
         assert user.first_name == user_data["first_name"]
         assert user.last_name == user_data["last_name"]
-        assert user.birthdate == user_data["birthdate"]
         assert user.phone == user_data["phone"]
         assert user.created_by == proxy_user
         assert user.last_login is None
@@ -877,7 +891,7 @@ class LatestApprovalTestCase(TestCase):
         # PoleEmploiApproval 1.
         pe_approval_1 = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.birthdate,
+            birthdate=user.jobseeker_profile.birthdate,
             start_at=datetime.date(2018, 12, 20),
             end_at=datetime.date(2020, 12, 20),
         )
@@ -887,7 +901,7 @@ class LatestApprovalTestCase(TestCase):
         # But `end_at` earlier than PoleEmploiApproval 1.
         PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.birthdate,
+            birthdate=user.jobseeker_profile.birthdate,
             start_at=datetime.date(2018, 12, 20),
             end_at=datetime.date(2019, 12, 19),
         )
@@ -904,7 +918,7 @@ class LatestApprovalTestCase(TestCase):
         # PoleEmploiApproval 1.
         PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.birthdate,
+            birthdate=user.jobseeker_profile.birthdate,
             start_at=datetime.date(2020, 3, 17),
             end_at=datetime.date(2020, 6, 16),
         )
@@ -914,7 +928,7 @@ class LatestApprovalTestCase(TestCase):
         # `end_at` after PoleEmploiApproval 1.
         pe_approval_2 = PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.birthdate,
+            birthdate=user.jobseeker_profile.birthdate,
             start_at=datetime.date(2020, 3, 2),
             end_at=datetime.date(2022, 3, 2),
         )
@@ -939,14 +953,14 @@ class LatestApprovalTestCase(TestCase):
         # PoleEmploiApproval
         PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.birthdate,
+            birthdate=user.jobseeker_profile.birthdate,
             start_at=start_at,
             end_at=end_at + relativedelta(days=1),
         )
 
         PoleEmploiApprovalFactory(
             pole_emploi_id=user.jobseeker_profile.pole_emploi_id,
-            birthdate=user.birthdate,
+            birthdate=user.jobseeker_profile.birthdate,
             start_at=start_at,
             end_at=end_at + relativedelta(days=2),
         )
@@ -988,7 +1002,7 @@ class LatestApprovalTestCase(TestCase):
     def test_status_with_valid_pole_emploi_approval(self):
         user = JobSeekerFactory(with_pole_emploi_id=True)
         pe_approval = PoleEmploiApprovalFactory(
-            pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.birthdate
+            pole_emploi_id=user.jobseeker_profile.pole_emploi_id, birthdate=user.jobseeker_profile.birthdate
         )
         assert not user.has_no_common_approval
         assert user.has_valid_common_approval
@@ -1204,8 +1218,8 @@ def test_save_erases_pe_obfuscated_nir_if_details_change():
 
     reset_profile()
     user = User.objects.get(email="foobar@truc.com")
-    user.birthdate = datetime.date(2018, 8, 22)
-    user.save()
+    user.jobseeker_profile.birthdate = datetime.date(2018, 8, 22)
+    user.jobseeker_profile.save()
     user.jobseeker_profile.refresh_from_db()
     assert user.jobseeker_profile.pe_obfuscated_nir is None
     assert user.jobseeker_profile.pe_last_certification_attempt_at is None
@@ -1231,9 +1245,9 @@ def test_save_erases_pe_obfuscated_nir_if_details_change():
     user = User.objects.get(email="foobar@truc.com")
     user.first_name = "Wazzzzaaaa"
     user.last_name = "Heyyyyyyyyy"
-    user.birthdate = datetime.date(2018, 8, 22)
     user.email = "brutal@toto.at"  # change the email though
     user.save()
+    user.jobseeker_profile.birthdate = datetime.date(2018, 8, 22)
     user.jobseeker_profile.nir = "1234567890123"
     user.jobseeker_profile.save()
     assert user.jobseeker_profile.pe_obfuscated_nir == "XXX_1234567890123_YYY"

@@ -25,7 +25,7 @@ def _get_user_form_data(user):
         "title": "M",
         "first_name": user.first_name,
         "last_name": user.last_name,
-        "birthdate": user.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
+        "birthdate": user.jobseeker_profile.birthdate.strftime(DuetDatePickerWidget.INPUT_DATE_FORMAT),
     }
     if user.jobseeker_profile.birth_country:
         form_data["birth_country"] = user.jobseeker_profile.birth_country_id
@@ -204,7 +204,7 @@ class CreateEmployeeRecordStep1Test(AbstractCreateEmployeeRecordTest):
         self.client.force_login(self.user)
         self.client.get(self.url)
         data = _get_user_form_data(self.job_seeker)
-        birth_place = Commune.objects.by_insee_code_and_period("07141", self.job_seeker.birthdate)
+        birth_place = Commune.objects.by_insee_code_and_period("07141", self.job_seeker.jobseeker_profile.birthdate)
         data["birth_place"] = birth_place.pk
         # Birth country field is automatically set with Javascript and disabled.
         # Disabled fields are not sent with POST data.

@@ -15,7 +15,7 @@ class ApplicantSerializer(serializers.ModelSerializer):
     complement_adresse = serializers.CharField(source="address_line_2")
     code_postal = serializers.CharField(source="post_code")
     ville = serializers.CharField(source="city")
-    date_naissance = serializers.DateField(source="birthdate")
+    date_naissance = serializers.DateField(source="jobseeker_profile.birthdate")
     lieu_naissance = serializers.CharField(source="jobseeker_profile.birth_place")
     pays_naissance = serializers.CharField(source="jobseeker_profile.birth_country")
     lien_cv = serializers.CharField(default=None)  # Deprecated field

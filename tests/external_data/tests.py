@@ -163,11 +163,8 @@ class TestJobSeekerExternalData:
     def test_import_ok(self):
         _mock_status_ok()
 
-        user = JobSeekerFactory()
-
         # Check override of birthdate / of a field
-        user.birthdate = None
-        user.save()
+        user = JobSeekerFactory(jobseeker_profile__birthdate=None)
 
         result = import_user_pe_data(user, FOO_TOKEN)
         user.refresh_from_db()
@@ -180,23 +177,23 @@ class TestJobSeekerExternalData:
 
         assert user.address_line_1 == "4, Privet Drive"
         assert user.address_line_2 == "The cupboard under the stairs"
-        assert str(user.birthdate) == "1970-01-01"
+        assert str(user.jobseeker_profile.birthdate) == "1970-01-01"
 
         report = result.report
-        assert f"User/{user.pk}/birthdate" in report.get("fields_updated")
+        assert f"JobSeekerProfile/{user.pk}/birthdate" in report.get("fields_updated")
         assert 7 + 1 == len(report.get("fields_updated"))  # fields + history
         assert 12 == len(report.get("fields_fetched"))
 
         # Just checking birthdate is not overriden
         user = JobSeekerFactory()
-        birthdate = user.birthdate
+        birthdate = user.jobseeker_profile.birthdate
 
         report = import_user_pe_data(user, FOO_TOKEN).report
 
         user.refresh_from_db()
 
-        assert f"User/{user.pk}/birthdate" not in report.get("fields_updated")
-        assert birthdate == user.birthdate
+        assert f"JobSeekerProfile/{user.pk}/birthdate" not in report.get("fields_updated")
+        assert birthdate == user.jobseeker_profile.birthdate
         assert user.external_data_source_history[0]["source"] == IdentityProvider.PE_CONNECT.value
 
     @respx.mock
@@ -215,7 +212,7 @@ class TestJobSeekerExternalData:
 
         assert user.address_line_1 == "4, Privet Drive"
         assert user.address_line_2 == "The cupboard under the stairs"
-        assert str(user.birthdate) != "1970-01-01"
+        assert str(user.jobseeker_profile.birthdate) != "1970-01-01"
         assert user.external_data_source_history[0]["source"] == IdentityProvider.PE_CONNECT.value
 
     @respx.mock

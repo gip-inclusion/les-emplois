@@ -60,7 +60,8 @@ class TestEligibilityDiagnosisManager:
 
     def test_pole_emploi_diagnosis(self):
         PoleEmploiApprovalFactory(
-            pole_emploi_id=self.job_seeker.jobseeker_profile.pole_emploi_id, birthdate=self.job_seeker.birthdate
+            pole_emploi_id=self.job_seeker.jobseeker_profile.pole_emploi_id,
+            birthdate=self.job_seeker.jobseeker_profile.birthdate,
         )
         has_considered_valid = EligibilityDiagnosis.objects.has_considered_valid(job_seeker=self.job_seeker)
         last_considered_valid = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=self.job_seeker)
@@ -74,7 +75,7 @@ class TestEligibilityDiagnosisManager:
         start_at = end_at - relativedelta(years=2)
         PoleEmploiApprovalFactory(
             pole_emploi_id=self.job_seeker.jobseeker_profile.pole_emploi_id,
-            birthdate=self.job_seeker.birthdate,
+            birthdate=self.job_seeker.jobseeker_profile.birthdate,
             start_at=start_at,
             end_at=end_at,
         )

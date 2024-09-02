@@ -123,7 +123,7 @@ class EditJobSeekerInfo(TestCase):
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
         assert job_seeker.first_name == post_data["first_name"]
         assert job_seeker.last_name == post_data["last_name"]
-        assert job_seeker.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
+        assert job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
         self._test_address_autocomplete(user=job_seeker, post_data=post_data)
 
         # Optional fields
@@ -495,7 +495,7 @@ class EditJobSeekerInfo(TestCase):
         job_seeker = User.objects.get(id=job_application.job_seeker.id)
         # The email is not changed, but other fields are taken into account
         assert job_seeker.email != new_email
-        assert job_seeker.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
+        assert job_seeker.jobseeker_profile.birthdate.strftime("%d/%m/%Y") == post_data["birthdate"]
         assert job_seeker.address_line_1 == post_data["address_line_1"]
         assert job_seeker.post_code == post_data["post_code"]
         assert job_seeker.city == self.city.name

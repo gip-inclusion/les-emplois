@@ -9,7 +9,7 @@ Informations pour l'obtention d'un PASS IAE suite à l'embauche de votre candida
 - Nom : {{ job_application.job_seeker.last_name|upper }}
 - Prénom : {{ job_application.job_seeker.first_name|title }}{% if job_application.job_seeker.email %}
 - Email : {{ job_application.job_seeker.email }}{% endif %}
-- Date de naissance : {{ job_application.job_seeker.birthdate|date:"d/m/Y" }}
+- Date de naissance : {{ job_application.job_seeker.jobseeker_profile.birthdate|date:"d/m/Y" }}
 
 *Employeur inclusif* :
 
