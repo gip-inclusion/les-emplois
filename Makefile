@@ -48,6 +48,8 @@ quality: $(VENV_REQUIREMENT)
 	find * -type f -name '*.sh' -exec shellcheck --external-sources {} +
 	python manage.py makemigrations --check --dry-run --noinput || (echo "⚠ Missing migration ⚠"; exit 1)
 	python manage.py collectstatic --no-input
+	# Make sure pytest help is still accessible.
+	pytest --help >/dev/null
 
 fast_fix: $(VENV_REQUIREMENT)
 	ruff format $(LINTER_CHECKED_DIRS)

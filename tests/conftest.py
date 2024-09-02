@@ -26,16 +26,13 @@ from factory import Faker
 from paramiko import ServerInterface
 from pytest_django.lazy_django import django_settings_is_configured
 from pytest_django.plugin import INVALID_TEMPLATE_VARS_ENV
-from rest_framework.test import APIClient
 
 
 # Rewrite before importing itou code.
 pytest.register_assert_rewrite("tests.utils.test", "tests.utils.htmx.test")
 
-from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY  # noqa: E402
 from itou.utils import faker_providers  # noqa: E402
 from itou.utils.storage.s3 import s3_client  # noqa: E402
-from tests.users.factories import ItouStaffFactory  # noqa: E402
 from tests.utils.htmx.test import HtmxClient  # noqa: E402
 from tests.utils.test import ItouClient  # noqa: E402
 
@@ -70,6 +67,8 @@ def pytest_configure(config) -> None:
 
 @pytest.fixture
 def admin_client():
+    from tests.users.factories import ItouStaffFactory
+
     client = ItouClient()
     client.force_login(ItouStaffFactory(is_superuser=True))
     return client
@@ -82,6 +81,8 @@ def client():
 
 @pytest.fixture
 def api_client():
+    from rest_framework.test import APIClient
+
     return APIClient()
 
 
@@ -160,6 +161,8 @@ def cached_announce_campaign():
     """
     Populates cache for AnnouncementCampaign to avoid an extra database hit in many tests
     """
+    from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY
+
     cache.set(CACHE_ACTIVE_ANNOUNCEMENTS_KEY, None, None)
     yield
     cache.delete(CACHE_ACTIVE_ANNOUNCEMENTS_KEY)
