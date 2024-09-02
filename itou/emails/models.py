@@ -6,13 +6,13 @@ from django.utils import timezone
 
 
 class Email(models.Model):
-    to = ArrayField(CIEmailField(), verbose_name="à")
-    cc = ArrayField(CIEmailField(), default=list, verbose_name="cc")
-    bcc = ArrayField(CIEmailField(), default=list, verbose_name="cci")
-    subject = models.TextField(verbose_name="sujet")
-    body_text = models.TextField(verbose_name="message")
+    to = ArrayField(CIEmailField(), blank=True, verbose_name="à")
+    cc = ArrayField(CIEmailField(), blank=True, default=list, verbose_name="cc")
+    bcc = ArrayField(CIEmailField(), blank=True, default=list, verbose_name="cci")
+    subject = models.TextField(verbose_name="sujet", blank=True)
+    body_text = models.TextField(verbose_name="message", blank=True)
     from_email = CIEmailField(verbose_name="de")
-    reply_to = ArrayField(CIEmailField(), default=list, verbose_name="répondre à")
+    reply_to = ArrayField(CIEmailField(), blank=True, default=list, verbose_name="répondre à")
     created_at = models.DateTimeField(default=timezone.now, db_index=True, verbose_name="demande d’envoi à")
     esp_response = models.JSONField(null=True, verbose_name="réponse du fournisseur d’e-mail")
 
