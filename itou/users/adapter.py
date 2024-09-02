@@ -39,6 +39,9 @@ class UserAdapter(DefaultAccountAdapter):
         user.kind = form.user_kind
         return super().save_user(request, user, form)
 
+    def get_signup_redirect_url(self, request):
+        return self.get_login_redirect_url(request)
+
     def get_login_redirect_url(self, request):
         url = reverse("dashboard:index")
         if not request.user.has_completed_welcoming_tour:

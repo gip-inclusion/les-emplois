@@ -61,11 +61,8 @@ class ChangeEmailViewTest(TestCase):
         confirm_email_url = reverse("account_confirm_email", kwargs={"key": confirmation_token})
         response = self.client.post(confirm_email_url)
         assert response.status_code == 302
-        assert response.url == reverse("account_login")
-
-        post_data = {"login": user.email, "password": DEFAULT_PASSWORD}
-        url = reverse("account_login")
-        response = self.client.post(url, data=post_data)
+        assert response.url == reverse("welcoming_tour:index")
+        response = self.client.get(response.url)
         assert response.context.get("user").is_authenticated
 
         user.refresh_from_db()
