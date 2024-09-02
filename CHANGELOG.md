@@ -1,5 +1,28 @@
 # Journal des modifications
 
+## 2024-09-02
+
+### Ajouté
+
+- [Candidat: Création d'un espace candidats](https://github.com/gip-inclusion/les-emplois/pull/4535)
+- [Fiches salariés : Préciser comment la liste des salariés est construite à la création](https://github.com/gip-inclusion/les-emplois/pull/4609) 🖼
+- [Pilotage : Ajouter des encarts pour les prochains webinaires](https://github.com/gip-inclusion/les-emplois/pull/4592)
+- [Pilotage : Création de l'institution "Convergence France" et ouverture des TB446 et TB469 pour celle-ci](https://github.com/gip-inclusion/les-emplois/pull/4588) 🖼
+- [UX/UI : Refonte des layouts](https://github.com/gip-inclusion/les-emplois/pull/4483)
+
+### Modifié
+
+- [Candidatures : Indiquer la date minimale pour les champs début et fin de contrat](https://github.com/gip-inclusion/les-emplois/pull/4597) 🖼
+- [Import des EA/EATT depuis les données de l'ASP](https://github.com/gip-inclusion/les-emplois/pull/4577)
+- [Tableau de bord - Organisation : N'afficher le sous-menu des annexes financières que s’il est utilisable](https://github.com/gip-inclusion/les-emplois/pull/4610) 🖼
+- [Tableau de bord : Indiquer aux collaborateurs France Travail de contacter le support si l’adresse de leur agence est incorrecte](https://github.com/gip-inclusion/les-emplois/pull/4607) 🖼
+- [UX/UI : Affichage des messages de succès liés à l’authentification en toast](https://github.com/gip-inclusion/les-emplois/pull/4606) 🖼
+- [UX/UI : Rajouter l’entrée « Rechercher » dans le menu en mode connecté](https://github.com/gip-inclusion/les-emplois/pull/4614) 🖼
+
+### Supprimé
+
+- [PASS IAE : Suppression de l’import des agréments Pôle Emploi](https://github.com/gip-inclusion/les-emplois/pull/4608) 🖼
+
 ## 2024-08-26
 
 ### Ajouté
