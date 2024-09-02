@@ -138,7 +138,7 @@ class Convention:
 
     @property
     def is_active(self):
-        return self.has_active_state and timezone.now().date() <= self.end_at
+        return self.has_active_state and timezone.localdate() <= self.end_at
 
 
 def get_conventions_by_siae_key(vue_af_df):

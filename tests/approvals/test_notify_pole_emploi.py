@@ -477,13 +477,13 @@ class TestCancelledApprovalNotifyPoleEmploiIntegration:
             200, json=API_RECHERCHE_RESULT_KNOWN
         )
         respx.post("https://pe.fake/maj-pass-iae/v1/passIAE/miseAjour").respond(200, json=API_MAJPASS_RESULT_OK)
-        tomorrow = (timezone.now() + datetime.timedelta(days=1)).date()
+        tomorrow = timezone.localdate() + datetime.timedelta(days=1)
         cancelled_approval = CancelledApprovalFactory(start_at=tomorrow)
         cancelled_approval.notify_pole_emploi()
         assert (
             f"! notify_pole_emploi cancelledapproval={cancelled_approval} "
             f"start_at={cancelled_approval.start_at} "
-            f"starts after today={timezone.now().date()}" == caplog.messages[0]
+            f"starts after today={timezone.localdate()}" == caplog.messages[0]
         )
         cancelled_approval.refresh_from_db()
         assert cancelled_approval.pe_notification_status == "notification_pending"
