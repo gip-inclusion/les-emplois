@@ -21,6 +21,13 @@
             {% endif %}
         </h1>
         {% state_badge job_application extra_class="badge-base" %}
+        <button class="btn btn-lg btn-ico-only btn-link"
+                type="button"
+                data-it-action="print"
+                {% matomo_event "candidature" "click" "impression-fiche-candidature" %}
+                aria-label="Imprimer la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}">
+            <i class="ri-printer-line font-weight-normal" aria-hidden="true"></i>
+        </button>
     </div>
     {% block actions %}{% endblock %}
 {% endblock %}

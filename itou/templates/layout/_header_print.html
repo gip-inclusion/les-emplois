@@ -1,0 +1,15 @@
+{% load theme_inclusion %}
+
+<section class="s-header-print">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-auto d-flex align-items-center py-2">
+                <img src="{% static_theme_images 'logo-republique-francaise.svg' %}" height="70" alt="République Française">
+            </div>
+            <div class="col d-flex align-items-center">
+                <img src="{% static_theme_images 'logo-emploi-inclusion.svg' %}" height="60" alt="Les emplois de l'inclusion">
+            </div>
+            <div class="col-auto d-flex align-items-center fs-sm d-none d-print-inline-flex">Imprimé le {% now "d F Y" %}</div>
+        </div>
+    </div>
+</section>

@@ -14,22 +14,20 @@
         <link rel="stylesheet" href="{% static "vendor/theme-inclusion/stylesheets/app.css" %}">
         <link rel="stylesheet" href="{% static 'css/itou.css' %}">
         <style>
-            html {
-                background: transparent !important;
-            }
-
-            @page {
-                margin: 0mm;
-                /* hides title and date */
-                size: A4;
+            .s-header-print {
+                display: block !important;
             }
         </style>
         {% block extra_head %}{% endblock %}
     </head>
     <body>
+        <header>
+            {% include "layout/_header_print.html" %}
+        </header>
         <main>
             {% block content %}{% endblock %}
-            {% block script %}{% endblock %}
         </main>
+        <script src="{% static "vendor/theme-inclusion/javascripts/app.js" %}"></script>
+        {% block script %}{% endblock %}
     </body>
 </html>

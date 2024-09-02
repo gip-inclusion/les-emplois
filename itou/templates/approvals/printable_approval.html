@@ -9,12 +9,6 @@
 
 {% block content %}
     <div class="container py-4 px-5">
-        <div class="row">
-            <div class="col-sm-3 offset-sm-3 text-end">
-                <img src="{% static 'img/pdf/logoMinTravail.png' %}" class="w-75" alt="Logo du Ministère du travail, de l'emploi et de l'insertion">
-            </div>
-        </div>
-
         <section class="mt-5">
             <span class="d-block font-weight-bold">Votre contact en direct :</span>
             <a target="_blank" href="{{ itou_help_center_url }}" class="d-block text-decoration">{{ itou_help_center_url }}</a>
@@ -36,7 +30,6 @@
                             {{ siae.post_code }} - {{ siae.city }}
                         </address>
                     {% endif %}
-                    <p class="my-4 text-justify">Paris, le {% now "d F Y" %}</p>
                 </div>
             </div>
         </section>
@@ -54,25 +47,19 @@
         </section>
 
         <section class="mt-5">
-            <h1 class="ff-base fs-base">
+            <p>
                 Objet : <b>Décision d'agrément pour un parcours d'insertion par l'activité économique</b>
-            </h1>
+            </p>
         </section>
         <section class="mt-5">
             <p class="text-justify">
                 {% if diagnosis_author %}
                     Au vu du diagnostic individuel réalisé par {{ diagnosis_author|title }}
-
                     {% if diagnosis_author_org_name %}({{ diagnosis_author_org_name|title }}){% endif %}
-
                     portant sur
-
                 {% else %}
-
                     Au vu de
-
                 {% endif %}
-
                 la situation sociale et professionnelle de {{ approval.user.get_full_name }}
                 et de votre promesse d'embauche, les emplois de l'inclusion vous délivrent
                 un PASS IAE pour un parcours d'insertion par l'activité économique,
@@ -87,20 +74,11 @@
 
         <div class="row justify-content-center d-print-none">
             <div class="mt-5 mb-2">
-                <button id="printButton" class="btn btn-primary btn-primary-lg btn-ico" aria-label="Imprimer le PASS IAE de {{ approval.user.get_full_name }}">
-                    <i class="ri-printer-line ri-xl" aria-hidden="true"></i>
+                <button class="btn btn-primary btn-ico" type="button" data-it-action="print" aria-label="Imprimer le PASS IAE de {{ approval.user.get_full_name }}">
+                    <i class="ri-printer-line" aria-hidden="true"></i>
                     <span>Imprimer ce PASS IAE</span>
                 </button>
             </div>
         </div>
     </div>
 {% endblock %}
-
-{% block script %}
-    {{ block.super }}
-    <script nonce="{{ CSP_NONCE }}">
-        document.getElementById("printButton").addEventListener("click", function print() {
-            window.print();
-        });
-    </script>
-{% endblock script %}
