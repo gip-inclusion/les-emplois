@@ -26,6 +26,7 @@
 
   "25 8-18/2 * * 1-5 $ROOT/clevercloud/transfer_employee_records.sh --download",
   "55 8-18/2 * * 1-5 $ROOT/clevercloud/transfer_employee_records.sh --upload",
+  "*/15 6-16 * * 1-5 $ROOT/clevercloud/run_management_command.sh import_advisor_information shared_bucket/imports-gps/export_gps.xlsx --wet-run",
 
   "0 0 * * 1 $ROOT/clevercloud/run_management_command.sh shorten_active_sessions",
   "0 2 * * 1 $ROOT/clevercloud/crons/populate_metabase_matomo.sh",
