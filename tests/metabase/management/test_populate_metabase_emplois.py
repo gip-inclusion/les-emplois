@@ -452,7 +452,6 @@ def test_populate_job_applications():
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM candidatures ORDER BY id")
         rows = cursor.fetchall()
-        assert len(rows) == 1
         assert rows == [
             (
                 ja.pk,
@@ -505,7 +504,6 @@ def test_populate_job_applications():
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM fiches_de_poste_par_candidature ORDER BY id_candidature")
         rows = cursor.fetchall()
-        assert len(rows) == 1
         assert rows == [
             (
                 job.pk,
@@ -1158,7 +1156,6 @@ def test_populate_companies():
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM structures_v0 ORDER BY id")
         rows = cursor.fetchall()
-        assert len(rows) == 1
         assert rows == [
             (
                 company.pk,
@@ -1257,7 +1254,6 @@ def test_populate_gps_groups():
     with connection.cursor() as cursor:
         cursor.execute(f"SELECT * FROM {gps.GroupsTable.name} ORDER BY id")
         rows = cursor.fetchall()
-        assert len(rows) == 1
         assert rows == [
             (
                 group.pk,
@@ -1296,7 +1292,6 @@ def test_populate_gps_memberships():
     with connection.cursor() as cursor:
         cursor.execute(f"SELECT * FROM {gps.MembershipsTable.name} ORDER BY id")
         rows = cursor.fetchall()
-        assert len(rows) == 1
         assert rows == [
             (
                 membership.pk,
