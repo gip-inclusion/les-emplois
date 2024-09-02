@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 
+from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.users.enums import IdentityProvider, UserKind
 from itou.utils import constants as global_constants
 from itou.www.login import urls as login_urls
@@ -101,14 +102,25 @@ class ItouCurrentOrganizationMiddleware:
                         )
 
             elif user.is_prescriber:
+                active_memberships = list(
+                    user.prescribermembership_set.filter(is_active=True)
+                    .order_by("created_at")
+                    .select_related("organization")
+                )
+                if user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX) and not any(
+                    m.organization.kind == PrescriberOrganizationKind.PE for m in active_memberships
+                ):
+                    redirect_message = (
+                        "En tant qu'agent France Travail vous devez appartenir à une agence pour vous connecter à la "
+                        "plateforme des emplois. Veuillez vous faire inviter par l'administrateur d'une agence afin "
+                        "d'accéder au service."
+                    )
                 (
                     request.organizations,
                     request.current_organization,
                     request.is_current_organization_admin,
                 ) = extract_membership_infos_and_update_session(
-                    user.prescribermembership_set.filter(is_active=True)
-                    .order_by("created_at")
-                    .select_related("organization"),
+                    active_memberships,
                     "organization",
                     request.session,
                 )
@@ -144,6 +156,7 @@ class ItouCurrentOrganizationMiddleware:
             request.path.startswith("/invitations/") and not request.path.startswith("/invitations/invite"),
             request.path.startswith("/signup/siae/join"),  # employer about to join a company
             request.path.startswith("/signup/facilitator/join"),  # facilitator about to join a company
+            request.path.startswith("/signup/prescriber/join"),  # prescriber about to join a organization
             request.path == reverse("account_logout"),
             request.path.startswith("/hijack/release"),  # Allow to release hijack
             request.path.startswith("/api"),  # APIs should handle those errors

@@ -11,7 +11,6 @@ from django.utils import crypto
 from django.utils.html import format_html
 from django.utils.http import urlencode
 
-from itou.prescribers.enums import PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import KIND_EMPLOYER, KIND_PRESCRIBER, IdentityProvider, UserKind
 from itou.users.models import User
@@ -299,52 +298,18 @@ def inclusion_connect_callback(request):
         try:
             ic_user_data.join_org(user=user, safir=code_safir_pole_emploi)
         except PrescriberOrganization.DoesNotExist:
-            if user.prescriberorganization_set.filter(kind=PrescriberOrganizationKind.PE).exists():
-                messages.warning(
-                    request,
-                    format_html(
-                        "L'agence indiquée par NEPTUNE (code SAFIR {}) n'est pas référencée dans notre service. "
-                        "Cela arrive quand vous appartenez à un Point Relais mais que vous êtes rattaché à une agence "
-                        "mère sur la plateforme des emplois. "
-                        "Si vous pensez qu'il y a une erreur, vérifiez que le code SAFIR est le bon "
-                        "puis <a href='{}'>contactez le support</a> en indiquant le code SAFIR.",
-                        code_safir_pole_emploi,
-                        global_constants.ITOU_HELP_CENTER_URL,
-                    ),
-                )
-            else:
-                messages.error(
-                    request,
-                    format_html(
-                        "En tant qu'agent France Travail vous devez appartenir à une agence pour vous connecter à la "
-                        "plateforme des emplois.<br>"
-                        "Malheureusement l'agence indiquée par NEPTUNE (code SAFIR {}) n'est pas référencée dans "
-                        "notre service. "
-                        "Cela arrive quand vous appartenez à un Point Relais mais que vous êtes rattaché à une agence "
-                        "mère sur la plateforme des emplois.<br>"
-                        "Vous pouvez vous faire inviter par l'administrateur de votre agence. "
-                        "Si vous pensez qu'il y a une erreur, vérifiez que le code SAFIR est le bon "
-                        "puis <a href='{}'>contactez le support</a> en indiquant le code SAFIR.",
-                        code_safir_pole_emploi,
-                        global_constants.ITOU_HELP_CENTER_URL,
-                    ),
-                )
-                is_successful = False
-
-    # NEPTUNE does not always return a safir code
-    if (
-        is_successful
-        and user.email.endswith(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX)
-        and not user.prescriberorganization_set.filter(kind=PrescriberOrganizationKind.PE).exists()
-        and not ic_state.data["next_url"] == reverse("signup:prescriber_join_org")
-    ):
-        messages.error(
-            request,
-            "En tant qu'agent France Travail vous devez appartenir à une agence pour vous connecter à la "
-            "plateforme des emplois. Veuillez vous faire inviter par l'administrateur d'une agence afin "
-            "d'accéder au service.",
-        )
-        is_successful = False
+            messages.warning(
+                request,
+                format_html(
+                    "L'agence indiquée par NEPTUNE (code SAFIR {}) n'est pas référencée dans notre service. "
+                    "Cela arrive quand vous appartenez à un Point Relais mais que vous êtes rattaché à une agence "
+                    "mère sur la plateforme des emplois. "
+                    "Si vous pensez qu'il y a une erreur, vérifiez que le code SAFIR est le bon "
+                    "puis <a href='{}'>contactez le support</a> en indiquant le code SAFIR.",
+                    code_safir_pole_emploi,
+                    global_constants.ITOU_HELP_CENTER_URL,
+                ),
+            )
 
     if not is_successful:
         logout_url_params = {

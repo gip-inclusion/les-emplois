@@ -58,7 +58,8 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         response = self.client.post(url, data={"kind": UserKind.PRESCRIBER})
         self.assertRedirects(response, reverse("signup:prescriber_check_already_exists"))
 
-    def _test_create_user_prescriber_member_of(self, suffix):
+    @respx.mock
+    def test_create_user_prescriber_member_of_france_travail(self):
         organization = PrescriberPoleEmploiFactory()
 
         # Go through each step to ensure session data is recorded properly.
@@ -81,7 +82,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         assert response.status_code == 200
         assert response.context["form"].errors.get("email")
 
-        email = f"athos{suffix}"
+        email = f"athos{global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX}"
         post_data = {"email": email}
         response = self.client.post(url, data=post_data)
         self.assertRedirects(response, reverse("signup:prescriber_pole_emploi_user"))
@@ -103,7 +104,7 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         url = escape(f"{reverse('inclusion_connect:authorize')}?{urlencode(params)}")
         self.assertContains(response, url + '"')
 
-        # Connect with Inclusion Connect.
+        # Connect with Inclusion Connect but no safir code is returned
         response = mock_oauth_dance(
             self.client,
             KIND_PRESCRIBER,
@@ -140,17 +141,6 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
 
         # No email has been sent to support (validation/refusal of authorisation not needed).
         assert len(mail.outbox) == 0
-
-    @respx.mock
-    def test_create_user_prescriber_member_of_france_travail(self):
-        self._test_create_user_prescriber_member_of(global_constants.FRANCE_TRAVAIL_EMAIL_SUFFIX)
-
-    @respx.mock
-    def test_create_user_prescriber_member_of_pole_emploi(self):
-        """
-        Test the creation of a user of type prescriber and his joining to a Pole emploi agency.
-        """
-        self._test_create_user_prescriber_member_of(global_constants.POLE_EMPLOI_EMAIL_SUFFIX)
 
     @respx.mock
     @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
