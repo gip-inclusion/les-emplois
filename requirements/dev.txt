@@ -60,9 +60,9 @@ beautifulsoup4==4.12.3 \
     --hash=sha256:74e3d1928edc070d21748185c46e3fb33490f22f52a3addee9aee0f4f7781051 \
     --hash=sha256:b80878c9f40111313e55da8ba20bdba06d8fa3969fc68304167741bbf9e082ed
     # via -r requirements/test.txt
-boto3==1.35.2 \
-    --hash=sha256:c2f0837a259002489e59d1c30008791e3b3bb59e30e48c64e1d2d270147a4549 \
-    --hash=sha256:cbf197ce28f04bc1ffa1db0aa26a1903d9bfa57a490f70537932e84367cdd15b
+boto3==1.35.5 \
+    --hash=sha256:2cef3aa476181395c260f4b6e6c5565e5a3022a874fb6b579d8e6b169f94e0b3 \
+    --hash=sha256:5724ddeda8e18c7614c20a09c20159ed87ff7439755cf5e250a1a3feaf9afb7e
     # via -r requirements/test.txt
 botocore==1.35.5 \
     --hash=sha256:3a0086c7124cb3b0d9f98563d00ffd14a942c3f9e731d8d1ccf0d3a1ac7ed884 \
