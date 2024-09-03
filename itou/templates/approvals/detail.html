@@ -82,23 +82,24 @@
                     </div>
                     {% if link_immersion_facile %}
                         {# Immersion Facilitée proposal on expiring passes #}
-                        <div id="immersion-facile-opportunity-alert" class="alert alert-important alert-dismissible">
-                            <div class="row">
-                                <div class="col-auto pe-0">
-                                    <i class="ri-information-line ri-xl text-important" aria-hidden="true"></i>
-                                </div>
-                                <div class="col">
-                                    <p class="mb-2 font-weight-bold">Avez-vous pensé à proposer une immersion ?</p>
-                                    <p>
-                                        {% if approval_expired %}
-                                            Le pass de ce candidat est expiré.
-                                        {% else %}
-                                            Le pass de ce candidat arrive à expiration.
-                                        {% endif %}
-                                        Des employeurs de votre territoire proposent des immersions.
-                                    </p>
-                                    <a href="{{ link_immersion_facile }}" class="btn-link" rel="noopener" target="_blank" aria-label="Rechercher une Immersion Facilitée (ouverture dans un nouvel onglet)">Faire une recherche</a>
-                                </div>
+                        <div class="c-box p-0 mb-4" id="immersion-facile-opportunity-alert">
+                            <div class="c-box__header--immersion-facile p-3 p-lg-4">
+                                <span class="h4 m-0">Trouver une immersion</span>
+                            </div>
+                            <div class="p-3 p-lg-4">
+                                <p>
+                                    {% if approval_expired %}
+                                        Le pass de ce candidat est expiré.
+                                        <br />
+                                    {% else %}
+                                        Le pass IAE de ce candidat arrive bientôt à expiration.
+                                        <br />
+                                    {% endif %}
+                                    <strong>Immersion Facilitée</strong> vous aide à lui trouver une immersion professionnelle sur son territoire.
+                                </p>
+                                <a href="{{ link_immersion_facile }}" class="btn-link has-external-link" rel="noopener" target="_blank" aria-label="Rechercher une immersion (ouverture dans un nouvel onglet)">
+                                    Rechercher une immersion
+                                </a>
                             </div>
                         </div>
                     {% endif %}
