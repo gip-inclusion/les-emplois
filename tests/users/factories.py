@@ -203,10 +203,6 @@ class JobSeekerFactory(UserFactory):
             post_code="35000",
             city="Rennes",
             department="35",
-            jobseeker_profile__hexa_lane_number=12,
-            jobseeker_profile__hexa_lane_type=LaneType.RUE,
-            jobseeker_profile__hexa_lane_name="Georges Bizet",
-            jobseeker_profile__hexa_post_code="35000",
             jobseeker_profile__for_snapshot=True,
         )
 
@@ -353,6 +349,10 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
             nir="290010101010125",
             asp_uid="a08dbdb523633cfc59dfdb297307a1",
             education_level=EducationLevel.BAC_LEVEL,
+            hexa_lane_number=12,
+            hexa_lane_type=LaneType.RUE,
+            hexa_lane_name="Georges Bizet",
+            hexa_post_code="35000",
         )
 
     user = factory.SubFactory(JobSeekerFactory, jobseeker_profile=None)
