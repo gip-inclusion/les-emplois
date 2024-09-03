@@ -243,7 +243,7 @@ class JobSeekerWithAddressFactory(JobSeekerFactory):
             title="MME",
             first_name="Sacha",
             last_name="Dupont",
-            birthdate="1990-05-01",
+            birthdate=datetime.date(1990, 1, 1),
             jobseeker_profile__for_snapshot=True,
             address_line_1="42 Rue du clos de la Grange",
             post_code="58160",
