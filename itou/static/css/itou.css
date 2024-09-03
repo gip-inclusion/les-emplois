@@ -356,15 +356,6 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     border-top-right-radius: 0.5rem;
 }
 
-.c-box__header--pilotage {
-    background-image: url("../img/dashboard/card-header-bg-pilotage.png");
-    background-repeat: no-repeat;
-    background-position: center right;
-    background-size: 100% auto;
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
-}
-
 .c-box__header--diagoriente {
     background-image: url("../img/dashboard/card-header-bg-diagoriente.png");
     background-repeat: no-repeat;
@@ -386,6 +377,16 @@ an input field being invalid, generating an uncontrolled red box-shadow. */
     background-repeat: no-repeat;
     background-position: center right;
     background-size: 100% auto;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+}
+
+/* Fiche salarié */
+.c-box__header--immersion-facile {
+    background-image: url("../img/dashboard/card-header-bg-immersion-facile.png");
+    background-repeat: no-repeat;
+    background-position: center right;
+    background-size: cover;
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
 }
