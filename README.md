@@ -91,7 +91,7 @@ Dans un `virtualenv`, vous pouvez utiliser les commandes Django habituelles
 Par défaut l'environment sera stocké dans le répertoire `.venv`. En bash/zsh c'est activé
 avec la commande `source .venv/bin/activate` ([doc](https://docs.python.org/3/library/venv.html#how-venvs-work)).
 
-Il est recommandé d'utiliser [direnv](./docs/developing.md) qui permet l'activation de l'environment automatique.
+Il est recommandé d'utiliser [direnv](./docs/developing.md#direnv) qui permet l'activation de l'environment automatique.
 
 ### Création des *buckets S3*
 
