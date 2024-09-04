@@ -18,36 +18,12 @@ from itou.www.stats.views import get_params_aci_asp_ids_for_department
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
-from tests.users.factories import PrescriberFactory
 
 
 class TestStatsView:
     @override_settings(METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar")
     def test_stats_public(self, client):
         url = reverse("stats:stats_public")
-        response = client.get(url)
-        assert response.status_code == 200
-
-    def test_stats_pilotage_unauthorized_dashboard_id(self, client):
-        url = reverse("stats:stats_pilotage", kwargs={"dashboard_id": 123})
-        response = client.get(url)
-        assert response.status_code == 403
-
-    @override_settings(
-        PILOTAGE_DASHBOARDS_WHITELIST=[123], METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar"
-    )
-    def test_stats_pilotage_authorized_dashboard_id(self, client):
-        url = reverse("stats:stats_pilotage", kwargs={"dashboard_id": 123})
-        response = client.get(url)
-        assert response.status_code == 200
-
-    @override_settings(
-        PILOTAGE_DASHBOARDS_WHITELIST=[123], METABASE_SITE_URL="http://metabase.fake", METABASE_SECRET_KEY="foobar"
-    )
-    def test_stats_pilotage_authorized_dashboard_id_while_authenticated(self, client):
-        user = PrescriberFactory()
-        client.force_login(user)
-        url = reverse("stats:stats_pilotage", kwargs={"dashboard_id": 123})
         response = client.get(url)
         assert response.status_code == 200
 

@@ -23,7 +23,6 @@ from django.http import HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
-from django.views.decorators.clickjacking import xframe_options_exempt
 
 from itou.analytics.models import StatsDashboardVisit
 from itou.common_apps.address.departments import (
@@ -184,22 +183,6 @@ def stats_public(request):
         "is_stats_public": True,
     }
     return render_stats(request=request, context=context)
-
-
-@xframe_options_exempt
-def stats_pilotage(request, dashboard_id):
-    """
-    All these dashboard are publicly available on `PILOTAGE_SITE_URL`.
-    We do it because we want to allow users to download chart data which
-    is only possible via embedded dashboards and not via regular public dashboards.
-    """
-    if dashboard_id not in settings.PILOTAGE_DASHBOARDS_WHITELIST:
-        raise PermissionDenied
-
-    context = {
-        "iframeurl": mb.metabase_embedded_url(dashboard_id=dashboard_id, with_title=True),
-    }
-    return render_stats(request=request, context=context, template_name="stats/stats_pilotage.html")
 
 
 @login_required
