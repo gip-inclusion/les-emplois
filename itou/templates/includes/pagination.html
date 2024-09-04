@@ -9,10 +9,12 @@
     {% with request.get_full_path as url %}
         <nav role="navigation"
             aria-label="Pagination"
-            {% if boost|default:False %}hx-boost="true"{% endif %}
-            {# Don’t specify a default for boost_target and boost_indicator, keeping them required when boost. #}
-            {% if boost|default:False or boost_target %}hx-target="{{ boost_target }}"{% endif %}
-            {% if boost|default:False or boost_indicator %}hx-indicator="{{ boost_indicator }}"{% endif %}>
+            {% if boost|default:False %}
+                hx-boost="true"
+                {# Don’t specify a default for boost_target and boost_indicator, keeping them required when boost. #}
+                {% if boost_target %}hx-target="{{ boost_target }}"{% endif %}
+                {% if boost_indicator %}hx-indicator="{{ boost_indicator }}"{% endif %}
+            {% endif %}>
             {# Pagination is not responsive by default https://github.com/twbs/bootstrap/issues/23504 #}
             <ul class="pagination flex-wrap justify-content-center">
                 {# First page. #}
