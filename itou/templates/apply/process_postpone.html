@@ -3,6 +3,12 @@
 {% load str_filters %}
 {% load buttons_form %}
 
+{% block title_content %}
+    <div class="d-md-flex align-items-center mb-3">
+        <h1 class="mb-1 mb-md-0 me-3">Mettre en attente la candidature de {{ job_application.job_seeker.get_full_name }}</h1>
+    </div>
+{% endblock %}
+
 {% block content_extend %}
     <div class="c-form mb-4">
         <form method="post" class="js-prevent-multiple-submit">

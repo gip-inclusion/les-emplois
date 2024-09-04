@@ -5,9 +5,7 @@
 
 {% block title_content %}
     <div class="d-md-flex align-items-center mb-3">
-        <h1 class="mb-1 mb-md-0 me-3">
-            Refuser la candidature de <span class="text-muted">{{ job_application.job_seeker.get_full_name }}</span>
-        </h1>
+        <h1 class="mb-1 mb-md-0 me-3">Décliner la candidature de {{ job_application.job_seeker.get_full_name }}</h1>
     </div>
 {% endblock %}
 
