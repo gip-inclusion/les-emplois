@@ -106,21 +106,6 @@ ASSET_INFOS = {
             ],
         },
     },
-    "iframe-resizer": {
-        "download": {
-            "url": "https://registry.npmjs.org/iframe-resizer/-/iframe-resizer-4.3.2.tgz",
-            "sha256": "3dfa6c0986ba0ad5f74d0724480cc71620420f2658be5a17e586ee4ab988335e",
-        },
-        "extract": {
-            "origin": "package",
-            "destination": "vendor/iframe-resizer",
-            "files": [
-                "LICENSE",
-                ("js/iframeResizer.contentWindow.map", "iframeResizer.contentWindow.map"),
-                ("js/iframeResizer.contentWindow.min.js", "iframeResizer.contentWindow.min.js"),
-            ],
-        },
-    },
     "jquery": {
         "download": {
             "url": "https://registry.npmjs.org/jquery/-/jquery-3.7.1.tgz",
