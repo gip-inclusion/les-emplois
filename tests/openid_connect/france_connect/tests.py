@@ -128,9 +128,11 @@ class FranceConnectTest(TestCase):
 
         # Update user
         fc_user_data.last_name = "DUPUIS"
+        fc_user_data.birthdate = datetime.date(1926, 7, 9)
         user, created = fc_user_data.create_or_update_user()
         assert not created
         assert user.last_name == "DUPUIS"
+        assert user.jobseeker_profile.birthdate == datetime.date(1926, 7, 9)
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
 
     def test_create_django_user_optional_fields(self):
