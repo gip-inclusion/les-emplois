@@ -48,7 +48,6 @@
         <div class="s-section__container container">
             <div class="row">
                 <div class="col-12">
-                    <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
                     <iframe id="stats-iframe" src="{{ iframeurl }}">
                     </iframe>
 
@@ -82,10 +81,11 @@
 {% block script %}
     {{ block.super }}
 
+    <script src="{{ stats_base_url }}/app/iframeResizer.js"></script>
     <script nonce="{{ CSP_NONCE }}">
-        document.getElementById("stats-iframe").addEventListener("load", function() {
-            iFrameResize({}, this)
-        });
+        iFrameResize({
+            waitForLoad: true
+        }, "#stats-iframe")
     </script>
 
     {% if tally_popup_form_id or tally_embed_form_id %}
