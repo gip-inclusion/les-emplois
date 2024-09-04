@@ -1,7 +1,17 @@
 {% extends "apply/process_base.html" %}
 {% load django_bootstrap5 %}
+{% load job_applications %}
 {% load static %}
 {% load str_filters %}
+
+{% block title_content %}
+    <div class="d-md-flex align-items-center">
+        <h1 class="mb-1 mb-md-0 me-3">
+            Accepter la candidature de {{ job_application.job_seeker.get_full_name|mask_unless:can_view_personal_information }}
+        </h1>
+        {% state_badge job_application extra_class="badge-base" %}
+    </div>
+{% endblock %}
 
 {% block content_extend %}
     {% include "apply/includes/accept_section.html" %}
