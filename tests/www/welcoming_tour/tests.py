@@ -25,13 +25,12 @@ def get_confirm_email_url(request, email):
 def verify_email(client, email, request):
     # User verifies its email clicking on the email he received
     confirm_email_url = get_confirm_email_url(request, email)
-    response = client.post(confirm_email_url, follow=True)
+    response = client.get(confirm_email_url, follow=True)
     assert response.status_code == 200
     return response
 
 
 class TestWelcomingTour:
-    @override_inclusion_connect_settings
     def test_new_job_seeker_sees_welcoming_tour_test(self, client):
         job_seeker = JobSeekerFactory.build()
 
