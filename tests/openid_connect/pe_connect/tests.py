@@ -276,6 +276,7 @@ class TestPoleEmploiConnect:
         # Don't call import_user_pe_data on second login (and don't update user data)
         mock_oauth_dance(client, expected_route="dashboard:edit_user_info")
         assert user.externaldataimport_set.pe_sources().count() == 1
+        user.refresh_from_db()
         assert user.birthdate == datetime.date(2001, 1, 1)
 
     @respx.mock
