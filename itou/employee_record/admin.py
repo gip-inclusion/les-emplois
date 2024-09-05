@@ -7,12 +7,12 @@ from django.utils import timezone
 import itou.employee_record.models as models
 from itou.companies import models as companies_models
 
-from ..utils.admin import ItouModelAdmin, ItouTabularInline, get_admin_view_link
+from ..utils.admin import ItouModelAdmin, ItouTabularInline, ReadonlyMixin, get_admin_view_link
 from ..utils.templatetags.str_filters import pluralizefr
 from .enums import Status
 
 
-class EmployeeRecordUpdateNotificationInline(ItouTabularInline):
+class EmployeeRecordUpdateNotificationInline(ReadonlyMixin, ItouTabularInline):
     model = models.EmployeeRecordUpdateNotification
 
     fields = (
@@ -25,7 +25,6 @@ class EmployeeRecordUpdateNotificationInline(ItouTabularInline):
     readonly_fields = fields
     fk_name = "employee_record"
 
-    can_delete = False
     show_change_link = True
     extra = 0
 
@@ -254,7 +253,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
 
 
 @admin.register(models.EmployeeRecordUpdateNotification)
-class EmployeeRecordUpdateNotificationAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
+class EmployeeRecordUpdateNotificationAdmin(ReadonlyMixin, ASPExchangeInformationAdminMixin, ItouModelAdmin):
     list_display = (
         "pk",
         "created_at",

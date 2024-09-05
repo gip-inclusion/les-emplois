@@ -149,3 +149,14 @@ def add_support_remark_to_obj(obj, text):
     else:
         remark.remark += "\n" + text
         remark.save(update_fields=("remark",))
+
+
+class ReadonlyMixin:
+    def has_add_permission(self, *args, **kwargs):
+        return False
+
+    def has_change_permission(self, *args, **kwargs):
+        return False
+
+    def has_delete_permission(self, *args, **kwargs):
+        return False
