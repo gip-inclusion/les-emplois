@@ -1137,6 +1137,7 @@ class Suspension(models.Model):
             ExclusionConstraint(
                 name="exclude_overlapping_suspensions",
                 expressions=(
+                    ("approval", RangeOperators.EQUAL),
                     (
                         DateRange(
                             "start_at",
@@ -1145,7 +1146,6 @@ class Suspension(models.Model):
                         ),
                         RangeOperators.OVERLAPS,
                     ),
-                    ("approval", RangeOperators.EQUAL),
                 ),
                 violation_error_message="La période chevauche une suspension existante pour ce PASS IAE.",
             ),
@@ -1721,6 +1721,7 @@ class Prolongation(CommonProlongation):
             ExclusionConstraint(
                 name="exclude_%(class)s_overlapping_dates",
                 expressions=(
+                    ("approval", RangeOperators.EQUAL),
                     (
                         # [start_at, end_at) (inclusive start, exclusive end).
                         # For prolongations: upper bound of preceding interval is the lower bound of the next.
@@ -1731,7 +1732,6 @@ class Prolongation(CommonProlongation):
                         ),
                         RangeOperators.OVERLAPS,
                     ),
-                    ("approval", RangeOperators.EQUAL),
                 ),
                 violation_error_message="La période chevauche une prolongation existante pour ce PASS IAE.",
             ),
