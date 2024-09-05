@@ -96,7 +96,7 @@ class Command(BaseCommand):
             Q(code_safir_pole_emploi="") | Q(code_safir_pole_emploi=None)
         )
         mapping = [
-            ("siret", "siret"),
+            (lambda d: d.get("siret"), "siret"),  # Don't break if the "required" siret is missing
             (name_from_api_data, "name"),
             (phone_from_api_data, "phone"),
             (email_from_api_data, "email"),
@@ -106,9 +106,7 @@ class Command(BaseCommand):
             (coordinates_from_api_data, "coords"),
             (insee_city_from_api_data, "insee_city"),
         ]
-        for item in yield_sync_diff(
-            [datum for datum in data if datum.get("siret")], "codeSafir", qs, "code_safir_pole_emploi", mapping
-        ):
+        for item in yield_sync_diff(data, "codeSafir", qs, "code_safir_pole_emploi", mapping):
             if item.kind == DiffItemKind.DELETION:  # Ignore DELETION completely
                 continue
             self.stdout.write(item.label)
@@ -116,7 +114,7 @@ class Command(BaseCommand):
                 continue
 
             safir = item.raw["codeSafir"]
-            siret = item.raw["siret"]
+            siret = item.raw.get("siret")
             # Some agencies (with different location) share the same siret, this trigger the (siret, kind) unique
             # constraint, as we don't really care about siret for France Travail organization we circumvent that by
             # clearing the siret for the current one if it doesn't already exist or if is not the first one we see.
