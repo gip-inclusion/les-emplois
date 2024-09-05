@@ -146,6 +146,7 @@ class ItouCurrentOrganizationMiddleware:
             request.path.startswith("/signup/facilitator/join"),  # facilitator about to join a company
             request.path == reverse("account_logout"),
             request.path.startswith("/hijack/release"),  # Allow to release hijack
+            request.path.startswith("/api"),  # APIs should handle those errors
         ]
         if any(skip_middleware_conditions):
             return self.get_response(request)

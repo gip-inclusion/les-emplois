@@ -1,7 +1,7 @@
 from dateutil.relativedelta import relativedelta
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertNumQueries, assertRedirects
+from pytest_django.asserts import assertContains, assertNumQueries
 
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
@@ -73,7 +73,7 @@ class TestEmployeeRecordAPIPermissions:
         api_client.force_login(self.unauthorized_user)
 
         response = api_client.get(ENDPOINT_URL, format="json")
-        assertRedirects(response, reverse("account_logout"), status_code=302, target_status_code=200)
+        assert response.status_code == 403
 
 
 class TestEmployeeRecordAPIFetchList:
