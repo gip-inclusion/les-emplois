@@ -217,6 +217,7 @@ class AbstractPeriod(models.Model):
             ExclusionConstraint(
                 name="exclude_%(class)s_overlapping_dates",
                 expressions=(
+                    ("code", RangeOperators.EQUAL),
                     (
                         DateRange(
                             "start_date",
@@ -225,7 +226,6 @@ class AbstractPeriod(models.Model):
                         ),
                         RangeOperators.OVERLAPS,
                     ),
-                    ("code", RangeOperators.EQUAL),
                 ),
                 violation_error_message="La période chevauche une autre période existante pour ce même code INSEE.",
             ),
