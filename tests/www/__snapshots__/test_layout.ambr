@@ -25,15 +25,12 @@
       <li>
           <div class="dropdown-divider"></div>
       </li>
-      <li>
-          <a class="dropdown-item" href="/dashboard/">Tableau de bord</a>
-      </li>
       
           <li>
               <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
           </li>
+          <li class="dropdown-divider"></li>
       
-      <li class="dropdown-divider"></li>
       <li>
           <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
       </li>
@@ -81,15 +78,12 @@
       <li>
           <div class="dropdown-divider"></div>
       </li>
-      <li>
-          <a class="dropdown-item" href="/dashboard/">Tableau de bord</a>
-      </li>
       
           <li>
               <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
           </li>
+          <li class="dropdown-divider"></li>
       
-      <li class="dropdown-divider"></li>
       <li>
           <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
       </li>
@@ -142,15 +136,12 @@
       <li>
           <div class="dropdown-divider"></div>
       </li>
-      <li>
-          <a class="dropdown-item" href="/dashboard/">Tableau de bord</a>
-      </li>
       
           <li>
               <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
           </li>
+          <li class="dropdown-divider"></li>
       
-      <li class="dropdown-divider"></li>
       <li>
           <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
       </li>
@@ -205,11 +196,7 @@
       <li>
           <div class="dropdown-divider"></div>
       </li>
-      <li>
-          <a class="dropdown-item" href="/dashboard/">Tableau de bord</a>
-      </li>
       
-      <li class="dropdown-divider"></li>
       <li>
           <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
       </li>
@@ -264,15 +251,12 @@
       <li>
           <div class="dropdown-divider"></div>
       </li>
-      <li>
-          <a class="dropdown-item" href="/dashboard/">Tableau de bord</a>
-      </li>
       
           <li>
               <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
           </li>
+          <li class="dropdown-divider"></li>
       
-      <li class="dropdown-divider"></li>
       <li>
           <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
       </li>
@@ -320,15 +304,12 @@
       <li>
           <div class="dropdown-divider"></div>
       </li>
-      <li>
-          <a class="dropdown-item" href="/dashboard/">Tableau de bord</a>
-      </li>
       
           <li>
               <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
           </li>
+          <li class="dropdown-divider"></li>
       
-      <li class="dropdown-divider"></li>
       <li>
           <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
       </li>
