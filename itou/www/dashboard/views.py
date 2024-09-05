@@ -361,7 +361,7 @@ def edit_user_notifications(request, template_name="dashboard/edit_user_notifica
 
     if request.method == "POST" and notification_form.is_valid():
         notification_form.save()
-        messages.success(request, "Vos préférences ont été modifiées.")
+        messages.success(request, "Vos préférences de notifications ont été modifiées.", extra_tags="toast")
         success_url = get_safe_url(request, "success_url", fallback_url=dashboard_url)
         return HttpResponseRedirect(success_url)
 

@@ -20,37 +20,37 @@
                         <h2>Gestion des notifications</h2>
                         <form method="post" class="js-prevent-multiple-submit">
                             {% csrf_token %}
-
                             <div class="form-group">
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" id="id_notifications-all">
                                     <label class="form-check-label font-weight-bold" for="id_notifications-all">Activer toutes les notifications</label>
                                 </div>
                             </div>
-
-                            <div class="mx-3">
+                            <ul class="list-group list-group-flush list-group-collapse">
                                 {% for category_slug, category in notification_form.layout.items %}
-                                    <div class="notification-collapse">
-                                        <a class="d-flex justify-content-between font-weight-bold text-decoration-none has-collapse-caret py-3" role="button" aria-expanded="false" aria-controls="collapse-{{ category_slug }}">
+                                    <li class="list-group-item list-group-item-action notification-collapse">
+                                        <a class="font-weight-bold" role="button" data-bs-toggle="collapse" href="#collapse-{{ category_slug }}" aria-expanded="false" aria-controls="collapse-{{ category_slug }}">
                                             {{ category.name }}
                                         </a>
-                                        <div class="collapse">
+                                        <div class="collapse" id="collapse-{{ category_slug }}">
                                             {% if category.notifications|length > 1 %}
-                                                {% get_form_field notification_form "category-"|add:category_slug|add:"-all" as field %}
-                                                {% bootstrap_field field %}
+                                                <div class="mb-n3 mt-3">
+                                                    {% get_form_field notification_form "category-"|add:category_slug|add:"-all" as field %}
+                                                    {% bootstrap_field field %}
+                                                </div>
                                             {% endif %}
-
-                                            <div class="px-3 category-notifications">
+                                            <ul class="category-notifications">
                                                 {% for field_name in category.notifications %}
-                                                    {% get_form_field notification_form field_name as field %}
-                                                    {% bootstrap_field field field_class="custom-checkbox notification-checkbox" %}
+                                                    <li>
+                                                        {% get_form_field notification_form field_name as field %}
+                                                        {% bootstrap_field field field_class="mb-n3 notification-checkbox" %}
+                                                    </li>
                                                 {% endfor %}
-                                            </div>
+                                            </ul>
                                         </div>
-                                        <hr class="mb-0">
-                                    </div>
+                                    </li>
                                 {% endfor %}
-                            </div>
+                            </ul>
 
                             {% comment "back_url may be not useful anymore, remove it from the view" %}{% endcomment %}
                             {% itou_buttons_form primary_label="Enregistrer" reset_url=back_url show_mandatory_fields_mention=False %}
