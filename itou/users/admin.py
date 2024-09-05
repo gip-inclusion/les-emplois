@@ -309,6 +309,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
         "email",
         "first_name",
         "last_name",
+        "birthdate",
         "kind",
         "identity_provider",
         "is_created_by_a_proxy",
@@ -328,6 +329,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
         "public_id",
         "identity_provider",
         "address_in_qpv",
+        "birthdate",
         "is_staff",
         "jobseeker_profile_link",
         "disabled_notifications",
@@ -373,6 +375,10 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
             lambda q: Approval.objects.filter(user__in=q).inconsistent_eligibility_diagnosis_job_seeker(),
         ),
     ]
+
+    @admin.display(description="date de naissance")
+    def birthdate(self, obj):
+        return obj.jobseeker_profile.birthdate if obj.is_job_seeker else None
 
     @admin.display(boolean=True, description="email validé", ordering="_has_verified_email")
     def has_verified_email(self, obj):
@@ -452,7 +458,7 @@ class ItouUserAdmin(InconsistencyCheckMixin, UserAdmin):
         Exclude superusers. The purpose is to prevent staff users
         to change the password of a superuser.
         """
-        qs = super().get_queryset(request)
+        qs = super().get_queryset(request).select_related("jobseeker_profile")
         if not request.user.is_superuser:
             qs = qs.exclude(is_superuser=True)
         if request.resolver_match.view_name.endswith("changelist"):
