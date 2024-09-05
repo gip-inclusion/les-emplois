@@ -4,24 +4,19 @@ from django.contrib import admin, messages
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.html import format_html
 
-from itou.utils.admin import ItouModelAdmin, ItouTabularInline, PkSupportRemarkInline, get_admin_view_link
+from itou.utils.admin import (
+    ItouModelAdmin,
+    ItouTabularInline,
+    PkSupportRemarkInline,
+    ReadonlyMixin,
+    get_admin_view_link,
+)
 from itou.utils.apis import geiq_label
 
 from . import models, sync
 
 
 logger = logging.getLogger(__name__)
-
-
-class ReadonlyMixin:
-    def has_add_permission(self, request):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
 
 
 class ImplementationAssessmentInline(ItouTabularInline):
