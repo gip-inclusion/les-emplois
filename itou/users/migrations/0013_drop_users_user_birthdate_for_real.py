@@ -8,7 +8,4 @@ class Migration(migrations.Migration):
         ("users", "0012_remove_user_birthdate"),
     ]
 
-    operations = [
-        # TODO(xfernandez): merge this with 0012_remove_user_birthdate once run in production
-        migrations.RunSQL('ALTER TABLE "users_user" DROP COLUMN birthdate;', elidable=True),
-    ]
+    operations = []
