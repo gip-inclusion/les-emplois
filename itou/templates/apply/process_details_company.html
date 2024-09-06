@@ -131,11 +131,11 @@
     {% if job_application.is_in_transferable_state %}
         {% for siae in request.organizations %}
             {% if siae != request.current_organization %}
-                <div id="transfer_confirmation_modal_{{ siae.pk }}" class="modal" tabindex="-1" aria-labelledby="modal_title" aria-hidden="true">
+                <div id="transfer_confirmation_modal_{{ siae.pk }}" class="modal" tabindex="-1" aria-labelledby="modal_title_{{ siae.pk }}" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="modal_title">Confirmation du transfert</h5>
+                                <h5 class="modal-title" id="modal_title_{{ siae.pk }}">Confirmation du transfert</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                             </div>
                             <div class="modal-body">
