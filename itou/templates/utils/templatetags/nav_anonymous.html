@@ -16,7 +16,7 @@
         <ul>
             {% for item in menu_items %}
                 <li>
-                    <a {% if item.active %}class="is-active"{% endif %}href="{{ item.target }}">{{ item.label }}</a>
+                    <a {% if item.active %}class="is-active"{% endif %} href="{{ item.target }}">{{ item.label }}</a>
                 </li>
             {% endfor %}
         </ul>
