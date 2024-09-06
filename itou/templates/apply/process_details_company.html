@@ -122,3 +122,41 @@
     {{ block.super }}
     <script src="{% static 'js/sliding_tabs.js'%}"></script>
 {% endblock %}
+
+{% block modals %}
+    {{ block.super }}
+    {% comment %}
+    Job application transfer modals triggered by apply/includes/transfer_job_application.html
+    {% endcomment %}
+    {% if job_application.is_in_transferable_state %}
+        {% for siae in request.organizations %}
+            {% if siae != request.current_organization %}
+                <div id="transfer_confirmation_modal_{{ siae.pk }}" class="modal" tabindex="-1" aria-labelledby="modal_title" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="modal_title">Confirmation du transfert</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>
+                                    Êtes-vous sûr de vouloir transférer la candidature de <b>{{ job_application.job_seeker.get_full_name }}</b> dans la structure suivante ?
+                                </p>
+                                {% include "companies/includes/_company_info.html" with company=siae extra_box_class="mb-3 mb-lg-5" open_in_tab=True only %}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Retour</button>
+                                <form method="post" action="{% url 'apply:transfer' job_application_id=job_application.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="target_company_id" value="{{ siae.pk }}" />
+                                    <input type="hidden" name="back_url" value="{{ back_url }}" />
+                                    <button class="btn btn-sm btn-primary">Confirmer</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endblock %}
