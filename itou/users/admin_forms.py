@@ -92,9 +92,6 @@ class ToUserRawIdWidget(widgets.ForeignKeyRawIdWidget):
 
 
 class SelectTargetUserForm(forms.Form):
-    # Needed to avoid RemovedInDjango50Warning
-    template_name = forms.Form.template_name_div
-
     to_user = forms.ModelChoiceField(
         User.objects.filter(kind=UserKind.JOB_SEEKER), required=True, label="Choisissez l'utilisateur cible"
     )
@@ -112,9 +109,6 @@ class SelectTargetUserForm(forms.Form):
 
 
 class ChooseFieldsToTransfer(forms.Form):
-    # Needed to avoid RemovedInDjango50Warning
-    template_name = forms.Form.template_name_div
-
     fields_to_transfer = forms.MultipleChoiceField(
         choices=[],
         required=True,
