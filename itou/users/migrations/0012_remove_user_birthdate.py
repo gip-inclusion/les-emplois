@@ -9,17 +9,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.SeparateDatabaseAndState(
-            state_operations=[
-                migrations.RemoveField(
-                    model_name="user",
-                    name="birthdate",
-                ),
-            ],
-            # Don't drop anything yet, since the previous will still be running
-            # when this migration will be run.
-            # Keeping this field around should be an issue since it is NULLABLE.
-            # It will be dropped in a following migration.
-            database_operations=[],
+        migrations.RemoveField(
+            model_name="user",
+            name="birthdate",
         ),
     ]
