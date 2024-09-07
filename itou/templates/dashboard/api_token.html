@@ -3,6 +3,10 @@
 
 {% block title %}Accès aux APIs {{ block.super }}{% endblock %}
 
+{% block title_prevstep %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
 {% block title_content %}<h1>Accès aux APIs</h1>{% endblock %}
 
 {% block content %}

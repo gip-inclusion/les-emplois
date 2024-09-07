@@ -384,6 +384,7 @@ def api_token(request, template_name="dashboard/api_token.html"):
         token = Token.objects.filter(user=request.user).first()  # May be None if no token
 
     context = {
+        "back_url": reverse("dashboard:index"),
         "login_string": TOKEN_ID_STR,
         "token": token,
         "companies": request.user.companymembership_set.active_admin().values(
