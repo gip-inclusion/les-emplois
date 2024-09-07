@@ -1,10 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.urls import reverse
+from django.urls import reverse_lazy
 from django.views.generic import DetailView
 
 from itou.gps.models import FollowUpGroupMembership
 from itou.users.models import User
+from itou.utils.urls import get_safe_url
 from itou.www.gps.views import is_allowed_to_use_gps
 
 
@@ -40,18 +41,12 @@ class UserDetailsView(LoginRequiredMixin, DetailView):
             .select_related("follow_up_group", "member")
         )
 
-        breadcrumbs = {
-            "Mes bénéficiaires": reverse("gps:my_groups"),
-            f"Fiche de {self.object.get_full_name()}": reverse(
-                "users:details", kwargs={"public_id": self.object.public_id}
-            ),
-        }
-
         org_department = self.request.current_organization.department
         matomo_option = org_department if org_department in self.get_live_department_codes() else None
+        back_url = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("gps:my_groups"))
 
         context = context | {
-            "breadcrumbs": breadcrumbs,
+            "back_url": back_url,
             "gps_memberships": gps_memberships,
             "matomo_custom_title": "Profil GPS",
             "profile": self.object.jobseeker_profile,
