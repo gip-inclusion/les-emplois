@@ -108,7 +108,7 @@
                                 </a>
 
                             {% endif %}
-                            <a href="{% url 'users:details' public_id=membership.follow_up_group.beneficiary.public_id %}"
+                            <a href="{% url 'users:details' public_id=membership.follow_up_group.beneficiary.public_id %}?back_url={{ request.get_full_path|urlencode }}"
                                class="btn btn-outline-primary btn-block btn-ico w-100 w-md-auto"
                                aria-label="Consulter la fiche de {{ membership.follow_up_group.beneficiary.get_full_name }}"
                                {% matomo_event "GPS_liste_groupes" "clic" "consulter_fiche_candidat" %}>

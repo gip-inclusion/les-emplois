@@ -8,7 +8,7 @@
 {% block title_content %}<h1>{{ beneficiary.get_full_name }}</h1>{% endblock %}
 
 {% block title_prevstep %}
-    {% include "layout/breadcrumbs_from_dashboard.html" %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
 {% endblock %}
 
 {% block content %}

@@ -35,12 +35,9 @@ def my_groups(request, template_name="gps/my_groups.html"):
         memberships = filters_form.filter()
 
     memberships_page = pager(memberships, request.GET.get("page"), items_per_page=10)
-    breadcrumbs = {
-        "Mes bénéficiaires": reverse("gps:my_groups"),
-    }
 
     context = {
-        "breadcrumbs": breadcrumbs,
+        "back_url": reverse("dashboard:index"),
         "filters_form": filters_form,
         "memberships_page": memberships_page,
     }
@@ -68,12 +65,10 @@ def join_group(request, template_name="gps/join_group.html"):
 
         return HttpResponseRedirect(my_groups_url)
 
-    breadcrumbs = {
-        "Mes bénéficiaires": my_groups_url,
-        "Ajouter un bénéficiaire": reverse("gps:join_group"),
+    context = {
+        "form": form,
+        "reset_url": back_url,
     }
-
-    context = {"breadcrumbs": breadcrumbs, "form": form, "reset_url": back_url}
 
     return render(request, template_name, context)
 
