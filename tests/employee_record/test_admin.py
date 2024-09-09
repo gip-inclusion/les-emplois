@@ -4,6 +4,7 @@ from django.contrib.admin import helpers
 from django.urls import reverse
 from pytest_django.asserts import assertContains, assertMessages
 
+from itou.approvals.models import Approval
 from itou.employee_record import models
 from tests.employee_record import factories
 
@@ -68,3 +69,12 @@ def test_job_seeker_profile_from_employee_record(admin_client):
     response = admin_client.get(employee_record_view_url)
     assertContains(response, "Profil salarié")
     assertContains(response, job_seeker.jobseeker_profile.pk)
+
+
+def test_approval_number_from_employee_record(admin_client):
+    er = factories.EmployeeRecordFactory()
+    approval_number = Approval.objects.get(number=er.approval_number)
+    employee_record_view_url = reverse("admin:employee_record_employeerecord_change", args=[er.pk])
+    approval_number_url = reverse("admin:approvals_approval_change", args=[approval_number.pk])
+    response = admin_client.get(employee_record_view_url)
+    assertContains(response, f'<a href="{approval_number_url}">{approval_number.number}</a>')
