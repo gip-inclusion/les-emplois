@@ -2908,6 +2908,12 @@
                   
               
           
+          
+              <a class="btn btn-outline-primary btn-block btn-ico bg-white mt-3" href="/approvals/details/[PK of Approval]?back_url=/job-seekers/details/7614fc4b-aef9-4694-ab17-12324300180a">
+                  <i aria-hidden="true" class="ri-eye-line font-weight-medium"></i>
+                  <span>Afficher le PASS IAE</span>
+              </a>
+          
       
   </div>
   
