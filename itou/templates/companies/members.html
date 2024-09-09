@@ -12,9 +12,6 @@
 {% block title_content %}
     <h1>Organisation</h1>
     <h2>{{ siae.kind }} {{ siae.display_name }}</h2>
-    <p>
-        Vous êtes connecté(e) en tant que <b>{{ user.get_full_name }}</b> ({{ user.email }})
-    </p>
 {% endblock %}
 
 {% block title_extra %}
@@ -54,6 +51,9 @@
                                 </a>
                             </div>
                         </div>
+                        <p>
+                            Vous êtes connecté(e) en tant que <b>{{ user.get_full_name }}</b> ({{ user.email }})
+                        </p>
                         <p class="mb-0">
                             {{ siae.active_members.count }} collaborateur{{ siae.active_members.count|pluralizefr }} (dont {{ siae.active_admin_members.count }} administrateur{{ siae.active_admin_members.count|pluralizefr }})
                         </p>
