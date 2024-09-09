@@ -67,7 +67,7 @@ NAV_ENTRIES = {
     "home": NavItem(
         label="Accueil",
         icon="ri-home-line",
-        target=reverse("home:hp"),
+        target=reverse("dashboard:index"),
         active_view_names=["dashboard:index"],
     ),
     "employers-search": NavItem(
