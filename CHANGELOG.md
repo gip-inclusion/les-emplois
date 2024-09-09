@@ -1,5 +1,22 @@
 # Journal des modifications
 
+## 2024-09-09
+
+### Ajouté
+
+- [Prescripteur : Synchronisation des informations pour les agences France Travail depuis leur API](https://github.com/gip-inclusion/les-emplois/pull/4612)
+- [Prescripteur: ajout de la liste des candidats](https://github.com/gip-inclusion/les-emplois/pull/4618)
+
+### Modifié
+
+- [Admin : Clarifier le message de confirmation du passage en phase contradictoire du contrôle a posteriori des auto-prescriptions](https://github.com/gip-inclusion/les-emplois/pull/4625)
+- [Admin : Permettre la modification des champs des e-mails](https://github.com/gip-inclusion/les-emplois/pull/4623)
+- [Diagnostic d'éligibilité : ajouter un type et supprimer `certifiable`](https://github.com/gip-inclusion/les-emplois/pull/4540)
+- [Employeur: Forcer la déconnexion d'un employeur sans entreprise](https://github.com/gip-inclusion/les-emplois/pull/4629)
+- [Prescripteur: Permettre aux agents France Travail de rejoindre une agence même si l'agence indiquée par NEPTUNE n'existe pas sur les emplois.](https://github.com/gip-inclusion/les-emplois/pull/4654)
+- [Statistiques: Correction du nombre de membres dans les exports](https://github.com/gip-inclusion/les-emplois/pull/4622)
+- [UX/UI : Changer les titres sur le parcours de traitement d’une candidature](https://github.com/gip-inclusion/les-emplois/pull/4665)
+
 ## 2024-09-02
 
 ### Ajouté
