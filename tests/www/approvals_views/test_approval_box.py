@@ -9,40 +9,40 @@ from tests.utils.test import load_template
 
 @freeze_time("2024-08-06")
 def test_expired_approval(snapshot):
-    approval = ApprovalFactory(start_at=datetime.date(2022, 1, 1), number="XXXXX1234567")
+    approval = ApprovalFactory(pk=1, start_at=datetime.date(2022, 1, 1), number="XXXXX1234567")
 
     template = load_template("approvals/includes/box.html")
-    assert template.render(Context({"approval": approval})) == snapshot
+    assert template.render(Context({"approval": approval, "link_from_current_url": "/"})) == snapshot
 
 
 @freeze_time("2024-08-06")
 def test_future_approval(snapshot):
-    approval = ApprovalFactory(start_at=datetime.date(2025, 1, 1), number="XXXXX1234567")
+    approval = ApprovalFactory(pk=1, start_at=datetime.date(2025, 1, 1), number="XXXXX1234567")
 
     template = load_template("approvals/includes/box.html")
-    assert template.render(Context({"approval": approval})) == snapshot
+    assert template.render(Context({"approval": approval, "link_from_current_url": "/"})) == snapshot
 
 
 @freeze_time("2024-08-06")
 def test_valid_approval(snapshot):
-    approval = ApprovalFactory(start_at=datetime.date(2024, 1, 1), number="XXXXX1234567")
+    approval = ApprovalFactory(pk=1, start_at=datetime.date(2024, 1, 1), number="XXXXX1234567")
 
     template = load_template("approvals/includes/box.html")
-    assert template.render(Context({"approval": approval})) == snapshot
+    assert template.render(Context({"approval": approval, "link_from_current_url": ""})) == snapshot
 
 
 @freeze_time("2024-08-06")
 def test_valid_approval_with_pending_prolongation_request(snapshot):
-    approval = ApprovalFactory(start_at=datetime.date(2024, 1, 1), number="XXXXX1234567")
+    approval = ApprovalFactory(pk=1, start_at=datetime.date(2024, 1, 1), number="XXXXX1234567")
     ProlongationRequestFactory(approval=approval, start_at=approval.end_at)
 
     template = load_template("approvals/includes/box.html")
-    assert template.render(Context({"approval": approval})) == snapshot
+    assert template.render(Context({"approval": approval, "link_from_current_url": "/"})) == snapshot
 
 
 @freeze_time("2024-08-06")
 def test_suspended_approval(snapshot):
-    approval = ApprovalFactory(start_at=datetime.date(2024, 1, 1), number="XXXXX1234567")
+    approval = ApprovalFactory(pk=1, start_at=datetime.date(2024, 1, 1), number="XXXXX1234567")
     SuspensionFactory(
         approval=approval,
         start_at=datetime.date(2024, 8, 1),
@@ -50,4 +50,4 @@ def test_suspended_approval(snapshot):
     )
 
     template = load_template("approvals/includes/box.html")
-    assert template.render(Context({"approval": approval})) == snapshot
+    assert template.render(Context({"approval": approval, "link_from_current_url": "/"})) == snapshot

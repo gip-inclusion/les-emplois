@@ -62,7 +62,7 @@
                                 </div>
                                 {% if approval %}
                                     <div class="col-12 col-lg-4 order-1 order-lg-2 mt-lg-6">
-                                        {% include "approvals/includes/box.html" with approval=approval only %}
+                                        {% include "approvals/includes/box.html" with approval=approval link_from_current_url=request.get_full_path only %}
                                     </div>
                                 {% endif %}
                             </div>

@@ -69,7 +69,7 @@ def test_single_iae_diag_from_prescriber(client, snapshot):
 def test_with_approval(client, snapshot):
     job_seeker = JobSeekerFactory(for_snapshot=True)
     url = reverse("job_seekers_views:details", kwargs={"public_id": job_seeker.public_id})
-    ApprovalFactory(user=job_seeker, for_snapshot=True)
+    approval = ApprovalFactory(user=job_seeker, for_snapshot=True)
 
     authorized_prescriber = PrescriberMembershipFactory(
         user__for_snapshot=True, organization__for_snapshot=True, organization__authorized=True
@@ -77,7 +77,13 @@ def test_with_approval(client, snapshot):
     client.force_login(authorized_prescriber)
     with assertSnapshotQueries(snapshot(name="SQL queries")):
         response = client.get(url)
-    soup = parse_response_to_soup(response, selector="#main")
+    soup = parse_response_to_soup(
+        response,
+        selector="#main",
+        replace_in_attr=[
+            ("href", f"/approvals/details/{approval.pk}", "/approvals/details/[PK of Approval]"),
+        ],
+    )
     assert str(soup) == snapshot(name="HTML page")
 
 

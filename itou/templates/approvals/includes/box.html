@@ -5,6 +5,7 @@ Arguments:
 
     approval
     detail_view_version (defaults to False)
+    link_from_current_url (defauts to None - hence no link to detail view)
 
 {% endcomment %}
 
@@ -73,6 +74,12 @@ Arguments:
                     </ul>
                 {% endif %}
             {% endwith %}
+        {% endif %}
+        {% if link_from_current_url|default:None %}
+            <a href="{% url 'approvals:details' pk=approval.pk %}?back_url={{ link_from_current_url|urlencode }}" class="btn btn-outline-primary btn-block btn-ico bg-white mt-3">
+                <i class="ri-eye-line font-weight-medium" aria-hidden="true"></i>
+                <span>Afficher le PASS IAE</span>
+            </a>
         {% endif %}
     {% endif %}
 </div>

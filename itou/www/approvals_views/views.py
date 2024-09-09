@@ -1,28 +1,37 @@
 import logging
 import pathlib
+import urllib.parse
 from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
 from django.db import IntegrityError
+from django.db.models import Prefetch
 from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.views import View
 from django.views.decorators.http import require_safe
-from django.views.generic import ListView, TemplateView
+from django.views.generic import DetailView, ListView, TemplateView
 from formtools.wizard.views import NamedUrlSessionWizardView
 
 from itou.approvals import enums as approvals_enums
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
-from itou.approvals.models import Approval, ProlongationRequest, ProlongationRequestDenyInformation, Suspension
+from itou.approvals.models import (
+    SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE,
+    Approval,
+    ProlongationRequest,
+    ProlongationRequestDenyInformation,
+    Suspension,
+)
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.files.models import File
+from itou.job_applications.enums import JobApplicationState
 from itou.utils import constants as global_constants
 from itou.utils.pagination import ItouPaginator, pager
 from itou.utils.perms.company import get_current_company_or_404
@@ -114,6 +123,150 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
         context["num_rejected_employee_records"] = (
             EmployeeRecord.objects.for_company(self.siae).filter(status=Status.REJECTED).count()
         )
+        return context
+
+
+class ApprovalDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    model = Approval
+    queryset = Approval.objects.select_related("user__jobseeker_profile").prefetch_related(
+        # Useful for get_suspensions method and the approval remainder field
+        Prefetch(
+            "suspension_set",
+            queryset=Suspension.objects.select_related("siae"),
+        ),
+    )
+    template_name = "approvals/details.html"
+
+    def test_func(self):
+        return self.request.user.is_authenticated and (
+            # More checks are performed in get_context_data method
+            self.request.user.is_prescriber or self.request.user.is_employer
+        )
+
+    def get_prolongation_and_requests(self, approval):
+        def _format_for_template(user, org):
+            parts = []
+            if user:
+                parts.append(user.get_full_name())
+            if org:
+                parts.append(org.display_name)
+            return " - ".join(parts)
+
+        prolongations = []
+        select_related = ("declared_by", "declared_by_siae", "validated_by")
+        for prolongation in approval.prolongation_set.select_related("prescriber_organization", *select_related):
+            prolongation.declared_by_for_template = _format_for_template(
+                prolongation.declared_by, prolongation.declared_by_siae
+            )
+            prolongation.validated_by_for_template = _format_for_template(
+                prolongation.validated_by, prolongation.prescriber_organization
+            )
+            prolongations.append(prolongation)
+
+        for prolongation_request in approval.prolongationrequest_set.select_related(*select_related).filter(
+            prolongation__isnull=True
+        ):
+            prolongation_request.declared_by_for_template = _format_for_template(
+                prolongation_request.declared_by, prolongation_request.declared_by_siae
+            )
+            prolongation_request.validated_by_for_template = None  # Not validated yet
+            prolongations.append(prolongation_request)
+        return sorted(prolongations, key=lambda p: p.start_at, reverse=True)
+
+    def get_suspensions(self, approval):
+        suspensions = sorted(approval.suspension_set.all(), key=lambda s: s.start_at, reverse=True)
+        for suspension in suspensions:
+            if self.request.user.is_employer:
+                suspension.can_be_handled_by_current_user = suspension.can_be_handled_by_siae(
+                    self.request.current_organization
+                )
+            else:
+                suspension.can_be_handled_by_current_user = False
+        return suspensions
+
+    def get_context_data(self, **kwargs):
+        is_employer_with_accepted_application = False
+        if self.request.user.is_employer:
+            if application_states := self.object.user.job_applications.filter(
+                to_company=self.request.current_organization,
+            ).values_list("state", flat=True):
+                # The employer has received an application and can access the approval detail
+                if any(state == JobApplicationState.ACCEPTED for state in application_states):
+                    # The employer has even accepted an application: the action buttons are visible
+                    is_employer_with_accepted_application = True
+            elif not self.object.user.job_applications.prescriptions_of(
+                self.request.user, self.request.current_organization
+            ).exists():
+                # No received or sent applications: no reason to access this page
+                raise PermissionDenied
+        elif self.request.user.is_prescriber:
+            if not self.object.user.job_applications.prescriptions_of(
+                self.request.user, self.request.current_organization
+            ).exists():
+                raise PermissionDenied
+        else:
+            # test_func should prevent this case from happening but let's be safe
+            logger.exception("This should never happen")
+            raise PermissionDenied
+
+        context = super().get_context_data(**kwargs)
+        approval = self.object
+
+        context["is_employer_with_accepted_application"] = is_employer_with_accepted_application
+        context["can_view_personal_information"] = self.request.user.can_view_personal_information(approval.user)
+        context["matomo_custom_title"] = "Détail PASS IAE"
+        context["approval_deletion_form_url"] = None
+        context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse("dashboard:index"))
+        context["suspensions"] = self.get_suspensions(approval)
+        context["prolongations"] = self.get_prolongation_and_requests(approval)
+        context["prolongation_request_pending"] = any(
+            getattr(prolongation, "status", None) == approvals_enums.ProlongationRequestStatus.PENDING
+            for prolongation in context["prolongations"]
+        )
+        context["can_be_suspended_by_current_user"] = (
+            self.request.user.is_employer and approval.can_be_suspended_by_siae(self.request.current_organization)
+        )
+        context["can_be_prolonged_by_current_user"] = (
+            self.request.user.is_employer
+            and self.request.current_organization.is_subject_to_eligibility_rules
+            and approval.can_be_prolonged
+        )
+
+        if self.request.user.is_employer and approval.is_in_progress:
+            approval_can_be_deleted = False
+
+            long_suspensions = [
+                suspension
+                for suspension in approval.suspension_set.all()
+                if (timezone.localdate() - suspension.start_at if suspension.is_in_progress else suspension.duration)
+                > SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE
+            ]
+
+            if any(suspension.is_in_progress for suspension in long_suspensions):
+                approval_can_be_deleted = True
+            elif long_suspensions:
+                last_hiring = approval.jobapplication_set.accepted().order_by("hiring_start_at").last()
+                if last_hiring is None or any(
+                    suspension.end_at > last_hiring.hiring_start_at for suspension in long_suspensions
+                ):
+                    approval_can_be_deleted = True
+
+            if approval_can_be_deleted:
+                # ... and no hiring after this suspension: this approval is eligible for deletion
+                context["approval_deletion_form_url"] = "https://tally.so/r/3je84Q?" + urllib.parse.urlencode(
+                    {
+                        "siaeID": self.request.current_organization.pk,
+                        "nomSIAE": self.request.current_organization.display_name,
+                        "prenomemployeur": self.request.user.first_name,
+                        "nomemployeur": self.request.user.last_name,
+                        "emailemployeur": self.request.user.email,
+                        "userID": self.request.user.pk,
+                        "numPASS": approval.number_with_spaces,
+                        "prenomsalarie": approval.user.first_name,
+                        "nomsalarie": approval.user.last_name,
+                    }
+                )
+
         return context
 
 

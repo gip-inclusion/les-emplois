@@ -1,0 +1,260 @@
+{% extends "layout/base.html" %}
+{% load format_filters %}
+{% load matomo %}
+{% load static %}
+{% load str_filters %}
+
+{% block title %}
+    PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }} {{ block.super }}
+{% endblock %}
+
+{% block title_prevstep %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
+
+{% block title_content %}
+    <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
+        <h1 class="m-0">PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}</h1>
+        <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le PASS IAE">
+            {% if approval_deletion_form_url %}
+                <a href="{{ approval_deletion_form_url }}"
+                   id="approval-deletion-link"
+                   class="btn btn-lg btn-outline-warning btn-ico"
+                   target="_blank"
+                   rel="noopener"
+                   aria-label="Mettre fin au PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}">
+                    <i class="ri-pass-expired-line fw-medium" aria-hidden="true"></i>
+                    <span>Clôturer ce PASS IAE</span>
+                </a>
+            {% endif %}
+            {% if is_employer_with_accepted_application %}
+                <a href="{% url 'approvals:display_printable_approval' approval_id=approval.pk %}" class="btn btn-lg btn-primary btn-ico" rel="noopener" target="_blank">
+                    <i class="ri-eye-line fw-medium" aria-hidden="true"></i>
+                    <span>Afficher l’attestation</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <section class="s-section">
+        <div class="s-section__container container">
+            <div class="row">
+                <div class="col-12">{% include "approvals/includes/box.html" with detail_view_version=True %}</div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="c-box mb-3 mb-lg-5">
+                        <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
+                            <h2>Suspensions</h2>
+                            {% if is_employer_with_accepted_application %}
+                                <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le PASS IAE">
+                                    {% if can_be_suspended_by_current_user %}
+                                        <a href="{% url 'approvals:suspend' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
+                                           class="btn btn-block btn-outline-primary btn-ico mt-3"
+                                           aria-label="Suspendre le PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}">
+                                            <i class="ri-pause-circle-line fw-medium" aria-hidden="true"></i>
+                                            <span>Suspendre</span>
+                                        </a>
+                                    {% else %}
+                                        <button type="button"
+                                                class="btn btn-block btn-outline-primary btn-ico"
+                                                disabled
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                {% if approval.is_suspended %}title="La suspension n’est pas possible car une suspension est déjà en cours."{% elif not approval.is_valid %}title="Il est impossible de faire une suspension de PASS IAE expiré."{% elif not approval.is_in_progress %}title="La suspension n’est pas possible car le PASS IAE n’a pas encore démarré."{% else %}title="La suspension n’est pas possible car un autre employeur a embauché le candidat."{% endif %}>
+                                            <i class="ri-pause-circle-line fw-medium" aria-hidden="true"></i>
+                                            <span>Suspendre</span>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% if suspensions %}
+                            <div class="table-responsive mt-3 mt-md-4">
+                                <table class="table table-hover">
+                                    <caption class="visually-hidden">Liste des suspensions</caption>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Statut</th>
+                                            <th scope="col">Du</th>
+                                            <th scope="col">Jusqu’au</th>
+                                            <th scope="col">Motif</th>
+                                            <th scope="col">Émetteur</th>
+                                            <th scope="col" />
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for suspension in suspensions %}
+                                            <tr>
+                                                <td>
+                                                    {% if suspension.is_in_progress %}
+                                                        <span class="badge badge-base rounded-pill bg-info">En cours</span>
+                                                    {% else %}
+                                                        <span class="badge badge-base rounded-pill bg-light text-primary">Passée</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td {% if suspension.is_in_progress %}class="text-info fw-bold"{% endif %}>{{ suspension.start_at|date:"d/m/Y" }}</td>
+                                                <td {% if suspension.is_in_progress %}class="text-info fw-bold"{% endif %}>{{ suspension.end_at|date:"d/m/Y" }}</td>
+                                                <td>{{ suspension.get_reason_display }}</td>
+                                                <td>
+                                                    {% if suspension.siae %}
+                                                        {{ suspension.siae.display_name }}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if suspension.can_be_handled_by_current_user %}
+
+                                                        <a href="{% url 'approvals:suspension_update' suspension_id=suspension.pk %}?back_url={{ request.get_full_path|urlencode }}" class="btn btn-ico-only">
+                                                            <i class="ri-pencil-line fw-medium" aria-hidden="true" data-bs-toggle="tooltip" data-bs-title="Modifier la suspension"></i>
+                                                            <span class="visually-hidden">Modifier la suspension</span>
+                                                        </a>
+
+                                                        <button id="dropdown_{{ forloop.counter }}_action_menu" class="btn btn-link btn-ico-only btn-sm" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Plus d'actions">
+                                                            <i class="ri-more-2-fill" aria-hidden="true"></i>
+                                                        </button>
+                                                        <div class="dropdown-menu" aria-labelledby="dropdown_{{ forloop.counter }}_action_menu">
+                                                            <a class="dropdown-item" href="{% url 'approvals:suspension_action_choice' suspension_id=suspension.pk %}?back_url={{ request.get_full_path|urlencode }}">Supprimer la suspension</a>
+                                                        </div>
+
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="fs-sm fst-italic">Aucune suspension enregistrée pour l’instant.</p>
+                        {% endif %}
+                        {% if is_employer_with_accepted_application %}
+                            <div class="c-info">
+                                <button class="c-info__summary collapsed" data-bs-toggle="collapse" data-bs-target="#collapseSuspensionInfo" aria-expanded="false" aria-controls="collapseSuspensionInfo">
+                                    <span>Comment gérer mes suspensions ?</span>
+                                </button>
+                                <div class="c-info__detail collapse" id="collapseSuspensionInfo">
+                                    <p>
+                                        Retrouvez toutes les informations sur le fonctionnement des suspensions dans notre
+                                        <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14739233143953--Suspendre-un-PASS-IAE"
+                                           aria-label="Documentation sur le fonctionnement des suspensions (nouvel onglet)"
+                                           class="has-external-link"
+                                           rel="noopener"
+                                           target="_blank">documentation</a>.
+                                    </p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="c-box mb-3 mb-lg-5">
+                        <div class="d-flex flex-column flex-md-row gap-3 justify-content-md-between">
+                            <h2>Prolongations</h2>
+                            {% if is_employer_with_accepted_application %}
+                                <div class="d-flex flex-column flex-md-row gap-3" role="group" aria-label="Actions sur le PASS IAE">
+                                    {% if can_be_prolonged_by_current_user %}
+                                        <a href="{% url 'approvals:declare_prolongation' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
+                                           class="btn btn-block btn-outline-primary btn-ico mt-3"
+                                           aria-label="Prolonger le PASS IAE de {{ approval.user.get_full_name|mask_unless:can_view_personal_information }}">
+                                            <i class="ri-refresh-line fw-medium" aria-hidden="true"></i>
+                                            <span>Prolonger</span>
+                                        </a>
+                                    {% else %}
+                                        <button type="button"
+                                                class="btn btn-block btn-outline-primary btn-ico"
+                                                disabled
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                {% if not approval.is_valid %} title="Il est impossible de faire une prolongation de PASS IAE expiré." {% elif prolongation_request_pending %} title="Il ne peut y avoir qu’une seule demande de prolongation en attente à la fois." {% else %} title="Les prolongations ne sont possibles qu’entre le {{ approval.IS_OPEN_TO_PROLONGATION_BOUNDARIES_MONTHS_BEFORE_END }}ème mois avant la fin d’un PASS IAE et jusqu’à son dernier jour de validité." {% endif %}>
+                                            <i class="ri-refresh-line fw-medium" aria-hidden="true"></i>
+                                            <span>Prolonger</span>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% if prolongations %}
+                            <div class="table-responsive mt-3 mt-md-4">
+                                <table class="table table-hover">
+                                    <caption class="visually-hidden">Liste des prolongations</caption>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Statut</th>
+                                            <th scope="col">Du</th>
+                                            <th scope="col">Jusqu’au</th>
+                                            <th scope="col">Motif</th>
+                                            <th scope="col">Émise par</th>
+                                            <th scope="col">Validée par</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for prolongation in prolongations %}
+                                            <tr>
+                                                <td>
+                                                    {% if prolongation.status %}
+                                                        {# Prolongation request #}
+                                                        {% if prolongation.status == "DENIED" %}
+                                                            <span class="badge badge-base rounded-pill bg-danger-lighter text-danger">Refusée</span>
+                                                        {% elif prolongation.status == "PENDING" %}
+                                                            <span class="badge badge-base rounded-pill bg-accent-03-lighter text-primary">En attente</span>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <span class="badge badge-base rounded-pill bg-success-lighter text-success">Acceptée</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ prolongation.start_at|date:"d/m/Y" }}</td>
+                                                <td>{{ prolongation.end_at|date:"d/m/Y" }}</td>
+                                                <td>{{ prolongation.get_reason_display }}</td>
+                                                <td>
+                                                    {% if prolongation.declared_by_for_template %}
+                                                        {{ prolongation.declared_by_for_template }}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if prolongation.validated_by_for_template %}
+                                                        {{ prolongation.validated_by_for_template }}
+                                                    {% elif prolongation.reason in prolongation.REASONS_NOT_NEED_PRESCRIBER_OPINION %}
+                                                        <i class="text-disabled">Non applicable</i>
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="fs-sm fst-italic">Aucune prolongation enregistrée pour l’instant.</p>
+                        {% endif %}
+                        {% if is_employer_with_accepted_application %}
+                            <div class="c-info">
+                                <button class="c-info__summary collapsed" data-bs-toggle="collapse" data-bs-target="#collapseProlongationInfo" aria-expanded="false" aria-controls="collapseProlongationInfo">
+                                    <span>Comment gérer mes prolongations ?</span>
+                                </button>
+                                <div class="c-info__detail collapse" id="collapseProlongationInfo">
+                                    <p>
+                                        Retrouvez toutes les informations sur le fonctionnement des prolongations dans notre
+                                        <a href="{{ ITOU_HELP_CENTER_URL }}/articles/14738994643217--Prolonger-un-PASS-IAE"
+                                           aria-label="Documentation sur le fonctionnement des prolongations (nouvel onglet)"
+                                           class="has-external-link"
+                                           rel="noopener"
+                                           target="_blank">documentation</a>.
+                                    </p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
