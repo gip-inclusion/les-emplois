@@ -2,7 +2,9 @@ import itertools
 
 from django import forms
 from django.contrib import admin, messages
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import format_html
 
 import itou.employee_record.models as models
 from itou.companies import models as companies_models
@@ -159,7 +161,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
         "created_at",
         "updated_at",
         "processed_at",
-        "approval_number",
+        "approval_number_link",
         "job_application",
         "job_seeker_link",
         "job_seeker_profile_link",
@@ -197,7 +199,7 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
                     "pk",
                     "status",
                     "job_application",
-                    "approval_number",
+                    "approval_number_link",
                     "job_seeker_link",
                     "job_seeker_profile_link",
                     "siret",
@@ -227,6 +229,12 @@ class EmployeeRecordAdmin(ASPExchangeInformationAdminMixin, ItouModelAdmin):
             },
         ),
     )
+
+    @admin.display(description="numéro d'agrément")
+    def approval_number_link(self, obj):
+        if approval_number := obj.approval_number:
+            url = reverse("admin:approvals_approval_change", args=(obj.job_application.approval_id,))
+            return format_html('<a href="{}">{}</a>', url, approval_number)
 
     @admin.display(description="salarié")
     def job_seeker_link(self, obj):
