@@ -307,21 +307,6 @@ def _fail_for_invalid_template_variable_improved(_fail_for_invalid_template_vari
             """,
         )
 
-        # By default, Django uses "" as string_if_invalid
-        # when fail is set to False, try to mimic Django
-        patchy.patch(
-            invalid_var_exception.__class__.__mod__,
-            """\
-            @@ -7,4 +7,5 @@
-                 if self.fail:
-                     pytest.fail(msg)
-                 else:
-            -        return msg
-            +        # If self.fail is desactivated, try to be discreet
-            +        return ""
-            """,
-        )
-
 
 @pytest.fixture(autouse=True, scope="function")
 def unknown_variable_template_error(monkeypatch, request):
