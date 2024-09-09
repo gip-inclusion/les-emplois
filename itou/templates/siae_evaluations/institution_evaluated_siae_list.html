@@ -5,16 +5,9 @@
 
 {% block title %}Contrôler les pièces justificatives {{ block.super }}{% endblock %}
 
-{% if back_url %}
-    {% block title_prevstep %}
-        <div class="c-prevstep">
-            <a href="{{ back_url }}" class="btn btn-ico btn-link ps-0">
-                <i class="ri-arrow-drop-left-line ri-xl font-weight-medium" aria-hidden="true"></i>
-                <span>Retour</span>
-            </a>
-        </div>
-    {% endblock %}
-{% endif %}
+{% block title_prevstep %}
+    {% include "layout/previous_step.html" with back_url=back_url only %}
+{% endblock %}
 
 {% block title_content %}
     <h1>Contrôler les pièces justificatives</h1>

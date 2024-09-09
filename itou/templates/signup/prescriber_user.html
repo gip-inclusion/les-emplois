@@ -5,12 +5,7 @@
 {% block title %}Prescripteur/Orienteur - Inscription {{ block.super }}{% endblock %}
 
 {% block title_prevstep %}
-    <div class="c-prevstep">
-        <a href="{{ prev_url }}" class="btn btn-ico btn-link ps-0">
-            <i class="ri-arrow-drop-left-line ri-xl font-weight-medium" aria-hidden="true"></i>
-            <span>Retour</span>
-        </a>
-    </div>
+    {% include "layout/previous_step.html" with back_url=prev_url only %}
 {% endblock %}
 
 {% block title_content %}
