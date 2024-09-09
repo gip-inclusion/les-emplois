@@ -78,23 +78,8 @@ def campaign_calendar(request, evaluation_campaign_pk, template_name="siae_evalu
         pk=evaluation_campaign_pk,
     )
 
-    if request.user.is_employer:
-        evaluated_siae = get_object_or_404(
-            EvaluatedSiae,
-            evaluation_campaign=evaluation_campaign,
-            siae=request.current_organization,
-        )
-        evaluation_url = reverse("siae_evaluations_views:siae_job_applications_list", args=[evaluated_siae.pk])
-    else:
-        evaluation_url = reverse(
-            "siae_evaluations_views:institution_evaluated_siae_list", args=[evaluation_campaign.pk]
-        )
-    breadcrumbs = {
-        "Contrôle a posteriori": evaluation_url,
-        "Calendrier": request.path,
-    }
     context = {
-        "breadcrumbs": breadcrumbs,
+        "back_url": reverse("dashboard:index"),
         "campaign_calendar_html": evaluation_campaign.calendar.html,
     }
     return render(request, template_name, context)
