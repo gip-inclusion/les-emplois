@@ -1691,17 +1691,12 @@ class JobApplicationWorkflowTest(TestCase):
             job_application.cancel(user=cancellation_user)
 
 
-_transitions_for_parametrize = [
-    [transition, from_state] for transition in JobApplicationWorkflow.transitions for from_state in transition.source
-]
-
-
 @pytest.mark.parametrize(
     "transition,from_state",
-    _transitions_for_parametrize,
-    ids=[
-        f"transition={transition.name} from_state={from_state}"
-        for transition, from_state in _transitions_for_parametrize
+    [
+        pytest.param(transition, from_state, id=f"transition={transition.name} from_state={from_state}")
+        for transition in JobApplicationWorkflow.transitions
+        for from_state in transition.source
     ],
 )
 def test_job_application_transitions(transition, from_state):
