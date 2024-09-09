@@ -6,6 +6,7 @@ from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
+from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils import dateformat, timezone
 from freezegun import freeze_time
@@ -21,6 +22,7 @@ from itou.siae_evaluations.models import (
 )
 from itou.utils.templatetags.format_filters import format_approval_number, format_phone
 from itou.utils.types import InclusiveDateRange
+from itou.utils.urls import add_url_params
 from itou.www.siae_evaluations_views.forms import LaborExplanationForm, SetChosenPercentForm
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
 from tests.files.factories import FileFactory
@@ -239,20 +241,20 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             evaluation_campaign__institution=self.institution,
         )
         self.client.force_login(self.user)
-        response = self.client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
-            )
-        )
         url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_list",
+            kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
+        )
+        response = self.client.get(url)
+        detail_url = reverse(
             "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
+        detail_url_with_back_url = f"{detail_url}?back_url={urlencode(url)}"
         self.assertContains(
             response,
             f"""
-            <a href="{url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
+            <a href="{detail_url_with_back_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
               Voir le résultat
             </a>
             """,
@@ -272,12 +274,11 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             evaluation_campaign__institution=self.institution,
         )
         self.client.force_login(self.user)
-        response = self.client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
-            )
+        url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_list",
+            kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
         )
+        response = self.client.get(url)
         self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
         assert str(state_div) == self.snapshot(name="notification pending state")
@@ -295,14 +296,17 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             html=True,
             count=1,
         )
-        url = reverse(
+
+        detail_url = reverse(
             "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
+        detail_url_with_back_url = f"{detail_url}?back_url={urlencode(url)}"
+
         self.assertContains(
             response,
             f"""
-            <a href="{url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
+            <a href="{detail_url_with_back_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
               Voir le résultat
             </a>
             """,
@@ -319,12 +323,11 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             evaluation_campaign__ended_at=timezone.now(),
         )
         self.client.force_login(self.user)
-        response = self.client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
-            )
+        url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_list",
+            kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
         )
+        response = self.client.get(url)
         self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
         assert str(state_div) == self.snapshot(name="notification pending state")
@@ -342,13 +345,15 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             html=True,
             count=1,
         )
-        url = reverse(
+        detail_url = reverse(
             "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
+        detail_url_with_back_url = f"{detail_url}?back_url={url}"
         self.assertContains(
             response,
-            f'<a href="{url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">Voir le résultat</a>',
+            f'<a href="{detail_url_with_back_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">'
+            "Voir le résultat</a>",
             html=True,
             count=1,
         )
@@ -365,12 +370,11 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
         evaluated_job_app = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
         EvaluatedAdministrativeCriteriaFactory.create(evaluated_job_application=evaluated_job_app)
         self.client.force_login(self.user)
-        response = self.client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
-            )
+        url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_list",
+            kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
         )
+        response = self.client.get(url)
         self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
         assert str(state_div) == self.snapshot(name="notification pending state")
@@ -388,14 +392,16 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             html=True,
             count=1,
         )
-        url = reverse(
+        detail_url = reverse(
             "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
+        detail_url_with_back_url = f"{detail_url}?back_url={urlencode(url)}"
+
         self.assertContains(
             response,
             f"""
-            <a href="{url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
+            <a href="{detail_url_with_back_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
               Voir le résultat
             </a>
             """,
@@ -415,12 +421,11 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             notification_text="A envoyé une photo de son chat.",
         )
         self.client.force_login(self.user)
-        response = self.client.get(
-            reverse(
-                "siae_evaluations_views:institution_evaluated_siae_list",
-                kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
-            )
+        url = reverse(
+            "siae_evaluations_views:institution_evaluated_siae_list",
+            kwargs={"evaluation_campaign_pk": evaluated_siae.evaluation_campaign_id},
         )
+        response = self.client.get(url)
         self.assertContains(response, "Liste des Siae contrôlées", html=True, count=1)
         state_div = parse_response_to_soup(response, selector=f"#state_of_evaluated_siae-{evaluated_siae.pk}")
         assert str(state_div) == self.snapshot(name="final refused state")
@@ -428,17 +433,18 @@ class InstitutionEvaluatedSiaeListViewTest(TestCase):
             "siae_evaluations_views:institution_evaluated_siae_sanction",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
-        url = reverse(
+        detail_url = reverse(
             "siae_evaluations_views:evaluated_siae_detail",
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
+        detail_url_with_back_url = f"{detail_url}?back_url={urlencode(url)}"
         self.assertContains(
             response,
             f"""
             <a class="btn btn-outline-primary btn-block w-100 w-md-auto" href="{sanction_url}">
                 Voir la notification de sanction
             </a>
-            <a href="{url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
+            <a href="{detail_url_with_back_url}" class="btn btn-outline-primary btn-block w-100 w-md-auto">
                 Voir le résultat
             </a>
             """,
@@ -989,17 +995,14 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
         # EvaluatedAdministrativeCriteria not yet submitted
         pending_status = "En attente"
-        response = self.client.get(url)
+        response = self.client.get(add_url_params(url, {"back_url": back_url}))
         self.assertContains(response, evaluated_siae)
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
         self.assertContains(response, formatted_number, html=True, count=1)
         self.assertContains(response, evaluated_job_application.job_application.job_seeker.get_full_name())
         self.assertContains(response, format_phone(evaluated_siae.siae.phone))
 
-        assert response.context["back_url"] == reverse(
-            "siae_evaluations_views:institution_evaluated_siae_list",
-            kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
-        )
+        assert response.context["back_url"] == back_url
         self.assertNotContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertContains(response, validation_url)
@@ -1028,7 +1031,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria.proof = FileFactory()
         evaluated_administrative_criteria.save(update_fields=["proof"])
         response = self.client.get(url)
-        self.assertContains(response, back_url)
+        self.assertNotContains(response, back_url)
         self.assertContains(response, uploaded_status)
         self.assertContains(response, validation_button_disabled, html=True, count=1)
         self.assertContains(response, self.control_text)
@@ -1040,7 +1043,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
         response = self.client.get(url)
         self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, back_url)
         self.assertNotContains(response, uploaded_status)
         self.assertNotContains(response, pending_status)
         self.assertNotContains(response, adversarial_submitted_status)
@@ -1064,7 +1066,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
         response = self.client.get(url)
         self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, back_url)
         self.assertContains(response, validation_button, html=True, count=2)
         self.assertContains(response, self.control_text)
         self.assertContains(
@@ -1085,7 +1086,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
         response = self.client.get(url)
         self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, back_url)
         self.assertNotContains(response, self.submit_text)
         self.assertNotContains(response, self.control_text)
         self.assertContains(
@@ -1109,7 +1109,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
         response = self.client.get(url)
         self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, back_url)
         self.assertContains(response, validation_button, html=True, count=2)
         self.assertContains(response, self.control_text)
         self.assertContains(
@@ -1129,7 +1128,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
         response = self.client.get(url)
         self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, back_url)
         self.assertContains(response, validation_button_disabled, html=True, count=1)
         self.assertContains(response, self.control_text)
         self.assertContains(
@@ -1155,7 +1153,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria.save(update_fields=["proof", "review_state", "submitted_at", "uploaded_at"])
         response = self.client.get(url)
         self.assertContains(response, validation_button_disabled, html=True, count=1)
-        self.assertContains(response, back_url)
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, uploaded_status)
         self.assertContains(response, self.control_text)
@@ -1165,7 +1162,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
         response = self.client.get(url)
         self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, back_url)
         self.assertNotContains(response, uploaded_status)
         self.assertNotContains(response, pending_status)
         self.assertNotContains(response, refused_status)
@@ -1179,7 +1175,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
         response = self.client.get(url)
         self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, back_url)
         self.assertContains(response, validation_button, html=True, count=2)
         self.assertContains(response, self.control_text)
         self.assertContains(
@@ -1201,7 +1196,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
         response = self.client.get(url)
         self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, back_url)
         self.assertNotContains(response, self.submit_text)
         self.assertNotContains(response, self.control_text)
         self.assertContains(
@@ -1226,7 +1220,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
         response = self.client.get(url)
         self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, back_url)
         self.assertContains(response, validation_button, html=True, count=2)
         self.assertContains(response, self.control_text)
         self.assertContains(
@@ -1246,7 +1239,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
         response = self.client.get(url)
         self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, back_url)
         self.assertNotContains(response, self.submit_text)
         self.assertNotContains(response, self.control_text)
         self.assertContains(
@@ -1292,15 +1284,12 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
 
         # EvaluatedAdministrativeCriteria not yet submitted
         not_transmitted_status = "Justificatifs non transmis"
-        response = self.client.get(url)
+        response = self.client.get(add_url_params(url, {"back_url": back_url}))
         self.assertContains(response, evaluated_siae)
         formatted_number = format_approval_number(evaluated_job_application.job_application.approval.number)
         self.assertContains(response, formatted_number, html=True, count=1)
         self.assertContains(response, evaluated_job_application.job_application.job_seeker.get_full_name())
-        assert response.context["back_url"] == reverse(
-            "siae_evaluations_views:institution_evaluated_siae_list",
-            kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
-        )
+        assert response.context["back_url"] == back_url
         self.assertNotContains(response, evaluated_job_application_url)
         self.assertContains(response, back_url)
         self.assertContains(response, validation_url)
@@ -1321,7 +1310,7 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria.proof = FileFactory()
         evaluated_administrative_criteria.save(update_fields=["proof"])
         response = self.client.get(url)
-        self.assertContains(response, back_url)
+        self.assertNotContains(response, back_url)
         self.assertContains(
             response,
             f"""
@@ -1342,7 +1331,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
         response = self.client.get(url)
         self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, back_url)
         self.assertNotContains(response, not_transmitted_status)
         self.assertNotContains(response, adversarial_submitted_status)
         self.assertContains(response, validation_button_disabled, html=True, count=1)
@@ -1370,7 +1358,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria.save(update_fields=["proof", "review_state", "submitted_at", "uploaded_at"])
         response = self.client.get(url)
         self.assertContains(response, validation_button_disabled, html=True, count=1)
-        self.assertContains(response, back_url)
         self.assertContains(response, evaluated_job_application_url)
         self.assertContains(response, not_transmitted_status)
         self.assertContains(response, self.control_text)
@@ -1380,7 +1367,6 @@ class InstitutionEvaluatedSiaeDetailViewTest(TestCase):
         evaluated_administrative_criteria.save(update_fields=["submitted_at"])
         response = self.client.get(url)
         self.assertContains(response, evaluated_job_application_url)
-        self.assertContains(response, back_url)
         self.assertNotContains(response, not_transmitted_status)
         self.assertContains(response, adversarial_submitted_status)
         self.assertContains(response, validation_button_disabled, html=True, count=1)

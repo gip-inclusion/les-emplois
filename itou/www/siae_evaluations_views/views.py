@@ -160,17 +160,9 @@ def evaluated_siae_detail(request, evaluated_siae_pk, template_name="siae_evalua
     if request.user.is_employer and not evaluation_campaign.ended_at:
         raise Http404("Campagne non terminée")
 
-    back_url = get_safe_url(
-        request,
-        "back_url",
-        fallback_url=reverse(
-            "siae_evaluations_views:institution_evaluated_siae_list",
-            kwargs={"evaluation_campaign_pk": evaluation_campaign.pk},
-        ),
-    )
     context = {
         "evaluated_siae": evaluated_siae,
-        "back_url": back_url,
+        "back_url": get_safe_url(request, "back_url"),
         "campaign_closed_before_final_evaluation": (
             evaluation_campaign.ended_at and not evaluated_siae.final_reviewed_at
         ),
