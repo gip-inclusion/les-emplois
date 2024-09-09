@@ -231,16 +231,12 @@ def job_description_list(request, template_name="companies/job_description_list.
         return HttpResponseRedirect(f"{reverse('companies_views:job_description_list')}?page={page}")
 
     job_pager = pager(job_descriptions, page, items_per_page=NB_ITEMS_PER_PAGE)
-    breadcrumbs = {
-        "Métiers et recrutements": reverse("companies_views:job_description_list"),
-    }
 
     context = {
         "siae": company,
         "form": form,
         "job_pager": job_pager,
         "page": page,
-        "breadcrumbs": breadcrumbs,
         "members_count": CompanyMembership.objects.filter(company_id=company.pk).active().count(),
         "can_show_financial_annexes": company.convention_can_be_accessed_by(request.user),
         "back_url": reverse("dashboard:index"),
@@ -275,26 +271,7 @@ def edit_job_description(request, template_name="companies/edit_job_description.
         request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {**session_data, **form.cleaned_data}
         return HttpResponseRedirect(reverse("companies_views:edit_job_description_details"))
 
-    breadcrumbs = {
-        "Métiers et recrutements": reverse("companies_views:job_description_list"),
-    }
-    if job_description and job_description.pk:
-        kwargs = {"job_description_id": job_description.pk}
-        breadcrumbs.update(
-            {
-                "Détails du poste": reverse("companies_views:job_description_card", kwargs=kwargs),
-                "Modifier une fiche de poste": reverse("companies_views:update_job_description", kwargs=kwargs),
-            }
-        )
-    else:
-        breadcrumbs["Créer une fiche de poste"] = reverse("companies_views:edit_job_description")
-
-    context = {
-        "form": form,
-        "breadcrumbs": breadcrumbs,
-    }
-
-    return render(request, template_name, context)
+    return render(request, template_name, {"form": form})
 
 
 @login_required
@@ -321,26 +298,10 @@ def edit_job_description_details(request, template_name="companies/edit_job_desc
         request.session[ITOU_SESSION_JOB_DESCRIPTION_KEY] = {**session_data, **form.cleaned_data}
         return HttpResponseRedirect(reverse("companies_views:edit_job_description_preview"))
 
-    breadcrumbs = {
-        "Métiers et recrutements": reverse("companies_views:job_description_list"),
-    }
-
-    if job_description and job_description.pk:
-        kwargs = {"job_description_id": job_description.pk}
-        breadcrumbs.update(
-            {
-                "Détails du poste": reverse("companies_views:job_description_card", kwargs=kwargs),
-                "Modifier une fiche de poste": reverse("companies_views:update_job_description", kwargs=kwargs),
-            }
-        )
-    else:
-        breadcrumbs["Créer une fiche de poste"] = reverse("companies_views:edit_job_description")
-
     context = {
         "form": form,
         "rome": rome,
         "is_opcs": company.is_opcs,
-        "breadcrumbs": breadcrumbs,
     }
 
     return render(request, template_name, context)
@@ -379,25 +340,9 @@ def edit_job_description_preview(request, template_name="companies/edit_job_desc
             request.session.pop(ITOU_SESSION_JOB_DESCRIPTION_KEY)
             return HttpResponseRedirect(reverse("companies_views:job_description_list"))
 
-    breadcrumbs = {
-        "Métiers et recrutements": reverse("companies_views:job_description_list"),
-    }
-
-    if job_description and job_description.pk:
-        kwargs = {"job_description_id": job_description.pk}
-        breadcrumbs.update(
-            {
-                "Détails du poste": reverse("companies_views:job_description_card", kwargs=kwargs),
-                "Modifier une fiche de poste": reverse("companies_views:update_job_description", kwargs=kwargs),
-            }
-        )
-    else:
-        breadcrumbs["Créer une fiche de poste"] = reverse("companies_views:edit_job_description")
-
     context = {
         "siae": company,
         "job": job_description,
-        "breadcrumbs": breadcrumbs,
     }
 
     return render(request, template_name, context)
