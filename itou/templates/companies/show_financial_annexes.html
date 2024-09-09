@@ -34,11 +34,6 @@
 {% block title_content %}
     <h1>Organisation</h1>
     <h2>{{ siae.kind }} {{ siae.display_name }}</h2>
-    <p>
-        Cette interface vous permet de vous assurer que votre structure est associée aux bonnes annexes financières.
-        <br>
-        La gestion de vos annexes financières continue de se faire dans l'extranet 2.0 de l'ASP.
-    </p>
 {% endblock %}
 
 {% block title_extra %}
@@ -78,6 +73,11 @@
                                 </div>
                             {% endif %}
                         </div>
+                        <p>
+                            Cette interface vous permet de vous assurer que votre structure est associée aux bonnes annexes financières.
+                            <br>
+                            La gestion de vos annexes financières continue de se faire dans l'extranet 2.0 de l'ASP.
+                        </p>
                         {% if financial_annexes %}
                             <div class="table-responsive-lg mt-3 mt-md-4">
                                 <table class="table">
