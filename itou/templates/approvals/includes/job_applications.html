@@ -13,7 +13,7 @@
         <div class="d-flex justify-content-end">
             <a href="{% url 'apply:details_for_company' job_application_id=job_application.id %}?back_url={{ request.get_full_path|urlencode }}"
                class="btn btn-outline-primary btn-block w-100 w-md-auto"
-               {% matomo_event "salaries" "clic" "detail-candidature" %}
+               {% matomo_event "salaries" "clic" "voir-candidature-employeur" %}
                aria-label="Voir la candidature de {{ job_application.sender.get_full_name }}">Voir sa candidature</a>
         </div>
     </div>
