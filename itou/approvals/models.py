@@ -721,10 +721,6 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
 
         return self.suspension_set.in_progress().exists()
 
-    @cached_property
-    def suspensions_by_start_date_asc(self):
-        return self.suspension_set.all().order_by("start_at")
-
     @property
     def suspensions_for_status_card(self):
         suspensions = self.suspension_set.all().order_by("-start_at")
@@ -740,7 +736,7 @@ class Approval(PENotificationMixin, CommonApprovalMixin):
         return {"last_in_progress": last_in_progress_suspension, "older": older_suspensions}
 
     def last_old_suspension(self, exclude_pk=None):
-        return self.suspensions_by_start_date_asc.exclude(pk=exclude_pk).old().last()
+        return self.suspension_set.old().exclude(pk=exclude_pk).order_by("start_at").last()
 
     @cached_property
     def can_be_suspended(self):
@@ -1292,8 +1288,8 @@ class Suspension(models.Model):
             start_at = last_accepted_job_application.hiring_start_at
 
         # Start at overrides to handle edge cases.
-        if approval.last_old_suspension(pk_suspension):
-            start_at = approval.last_old_suspension(pk_suspension).end_at + relativedelta(days=1)
+        if last_old_suspension := approval.last_old_suspension(pk_suspension):
+            start_at = last_old_suspension.end_at + relativedelta(days=1)
 
         if with_retroactivity_limitation:
             start_at_threshold = referent_date - datetime.timedelta(days=Suspension.MAX_RETROACTIVITY_DURATION_DAYS)
