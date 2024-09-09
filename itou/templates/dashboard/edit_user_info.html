@@ -81,7 +81,7 @@
                                 {% bootstrap_field form.phone %}
 
                                 {% comment "prev_url may be not useful anymore, remove it from the view" %}{% endcomment %}
-                                {% itou_buttons_form primary_label="Enregistrer et quitter" secondary_url=prev_url %}
+                                {% itou_buttons_form primary_label="Enregistrer et quitter" reset_url=prev_url %}
                             </form>
                         {% endif %}
                     </div>
