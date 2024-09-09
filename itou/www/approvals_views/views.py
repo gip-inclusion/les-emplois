@@ -124,7 +124,8 @@ class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
         context["link_immersion_facile"] = None
 
         if approval.is_in_progress:
-            for suspension in approval.suspensions_by_start_date_asc:
+            # suspension_set has already been loaded via prefetch_related for the remainder computation
+            for suspension in sorted(approval.suspension_set.all(), key=lambda s: s.start_at):
                 if suspension.is_in_progress:
                     suspension_duration = timezone.localdate() - suspension.start_at
                     has_hirings_after_suspension = False

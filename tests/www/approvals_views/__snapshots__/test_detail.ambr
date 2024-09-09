@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestApprovalDetailView.test_approval_status_includes[Approval detail view with prolongations]
   dict({
-    'num_queries': 26,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -794,27 +794,6 @@
       }),
       dict({
         'origin': list([
-          'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_suspension"."id",
-                 "approvals_suspension"."approval_id",
-                 "approvals_suspension"."start_at",
-                 "approvals_suspension"."end_at",
-                 "approvals_suspension"."siae_id",
-                 "approvals_suspension"."reason",
-                 "approvals_suspension"."reason_explanation",
-                 "approvals_suspension"."created_at",
-                 "approvals_suspension"."created_by_id",
-                 "approvals_suspension"."updated_at",
-                 "approvals_suspension"."updated_by_id"
-          FROM "approvals_suspension"
-          WHERE "approvals_suspension"."approval_id" = %s
-          ORDER BY "approvals_suspension"."start_at" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
@@ -1517,7 +1496,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_status_includes[Approval detail view with suspensions]
   dict({
-    'num_queries': 27,
+    'num_queries': 26,
     'queries': list([
       dict({
         'origin': list([
@@ -2220,27 +2199,6 @@
           FROM "companies_company"
           WHERE "companies_company"."id" = %s
           LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_suspension"."id",
-                 "approvals_suspension"."approval_id",
-                 "approvals_suspension"."start_at",
-                 "approvals_suspension"."end_at",
-                 "approvals_suspension"."siae_id",
-                 "approvals_suspension"."reason",
-                 "approvals_suspension"."reason_explanation",
-                 "approvals_suspension"."created_at",
-                 "approvals_suspension"."created_by_id",
-                 "approvals_suspension"."updated_at",
-                 "approvals_suspension"."updated_by_id"
-          FROM "approvals_suspension"
-          WHERE "approvals_suspension"."approval_id" = %s
-          ORDER BY "approvals_suspension"."start_at" ASC
         ''',
       }),
       dict({
@@ -3148,7 +3106,7 @@
 # ---
 # name: TestApprovalDetailView.test_approval_status_includes[detail view SQL queries]
   dict({
-    'num_queries': 24,
+    'num_queries': 23,
     'queries': list([
       dict({
         'origin': list([
@@ -3893,27 +3851,6 @@
           WHERE "approvals_approval"."user_id" = %s
           ORDER BY "approvals_approval"."start_at" DESC
           LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'ApprovalDetailView.get_context_data[www/approvals_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_suspension"."id",
-                 "approvals_suspension"."approval_id",
-                 "approvals_suspension"."start_at",
-                 "approvals_suspension"."end_at",
-                 "approvals_suspension"."siae_id",
-                 "approvals_suspension"."reason",
-                 "approvals_suspension"."reason_explanation",
-                 "approvals_suspension"."created_at",
-                 "approvals_suspension"."created_by_id",
-                 "approvals_suspension"."updated_at",
-                 "approvals_suspension"."updated_by_id"
-          FROM "approvals_suspension"
-          WHERE "approvals_suspension"."approval_id" = %s
-          ORDER BY "approvals_suspension"."start_at" ASC
         ''',
       }),
       dict({
