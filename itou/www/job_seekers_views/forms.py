@@ -8,7 +8,7 @@ class FilterForm(forms.Form):
         label="Nom",
         widget=Select2Widget(
             attrs={
-                "data-placeholder": "Nom du salarié",
+                "data-placeholder": "Nom du candidat",
             }
         ),
     )
