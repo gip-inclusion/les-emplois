@@ -68,7 +68,7 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
             self.siae = get_current_company_or_404(request)
 
             if not self.siae.is_subject_to_eligibility_rules:
-                return self.handle_no_permission()
+                raise PermissionDenied
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
