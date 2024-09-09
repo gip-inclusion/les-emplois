@@ -75,6 +75,20 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
         context["siae"] = self.siae
         return context
 
+
+class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
+    model = Approval
+    queryset = Approval.objects.select_related("user__jobseeker_profile").prefetch_related(
+        "suspension_set",
+        Prefetch(
+            "prolongationrequest_set",
+            queryset=ProlongationRequest.objects.select_related(
+                "declared_by", "validated_by", "processed_by", "prescriber_organization"
+            ),
+        ),
+    )
+    template_name = "approvals/detail.html"
+
     def get_job_application(self, approval):
         return (
             JobApplication.objects.filter(
@@ -92,20 +106,6 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
             )
             .first()
         )
-
-
-class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
-    model = Approval
-    queryset = Approval.objects.select_related("user__jobseeker_profile").prefetch_related(
-        "suspension_set",
-        Prefetch(
-            "prolongationrequest_set",
-            queryset=ProlongationRequest.objects.select_related(
-                "declared_by", "validated_by", "processed_by", "prescriber_organization"
-            ),
-        ),
-    )
-    template_name = "approvals/detail.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
