@@ -11,6 +11,14 @@ LINTER_CHECKED_DIRS := config itou scripts tests
 PGDATABASE ?= itou
 REQUIREMENTS_PATH ?= requirements/dev.txt
 
+ifdef $(XDG_CACHE_HOME)
+	CACHEDIR := $(XDG_CACHE_HOME)
+else
+	CACHEDIR := $(HOME)/.cache
+endif
+CACHEDIR := $(CACHEDIR)/itou
+DBDUMP ?= $(CACHEDIR)/development_db.dump
+
 VIRTUAL_ENV ?= .venv
 export PATH := $(VIRTUAL_ENV)/bin:$(PATH)
 
@@ -105,7 +113,31 @@ shell_on_postgres_container:
 # Database.
 # =============================================================================
 
-.PHONY: restore_latest_backup
+.PHONY: dumpcreate dumprestore resetdb restore_latest_backup
+
+dumpcreate: $(VIRTUALENV)
+	dropdb --if-exists $(PGDATABASE)
+	createdb $(PGDATABASE)
+	python manage.py migrate
+	$(MAKE) populate_db
+	mkdir --parents $(CACHEDIR)
+	pg_dump --format=c --dbname=$(PGDATABASE) --file=$(DBDUMP)
+
+# There are no dependencies on fixtures, allowing developers to manage their DB dump manually.
+dumprestore: $(VIRTUALENV)
+	dropdb --if-exists $(PGDATABASE)
+	createdb $(PGDATABASE)
+	pg_restore --dbname=$(PGDATABASE) $(DBDUMP)
+	python manage.py migrate
+
+DBREADY := 0
+$(DBDUMP): itou/fixtures/*/*.sql itou/fixtures/*/*.json itou/siae_evaluations/fixtures.py
+	$(MAKE) dumpcreate
+	$(eval DBREADY := 1)
+
+# Recreate the database when fixtures change.
+resetdb: $(DBDUMP)
+	if (( $(DBREADY) == 0 )); then $(MAKE) dumprestore; fi
 
 restore_latest_backup:
 	./scripts/restore_latest_backup.sh $(PGDATABASE)

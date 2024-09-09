@@ -117,16 +117,10 @@ $ make runserver
 
 Vous pouvez y accéder à l'adresse http://localhost:8000/.
 
-## Créer le schéma de base de données
+## Obtenir une base de données de développement
 
 ```sh
-$ python manage.py migrate
-```
-
-## Peupler la base de données
-
-```sh
-$ make populate_db
+$ make resetdb
 ```
 
 ## Charger une base de données de production
