@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: TestApprovalDetailView.test_approval_status_includes[Approval detail view with prolongations]
+# name: TestEmployeeDetailView.test_approval_status_includes[Approval detail view with prolongations]
   dict({
     'num_queries': 25,
     'queries': list([
@@ -840,7 +840,7 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "companies_siaeconvention"."id",
@@ -866,7 +866,7 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -887,10 +887,10 @@
       }),
       dict({
         'origin': list([
-          'IncludeNode[approvals/detail.html]',
-          'IfNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -936,10 +936,10 @@
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IncludeNode[approvals/detail.html]',
-          'IfNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -986,10 +986,10 @@
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IncludeNode[approvals/detail.html]',
-          'IfNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "eligibility_administrativecriteria"."id",
@@ -1019,10 +1019,10 @@
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IncludeNode[approvals/detail.html]',
-          'IfNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -1050,9 +1050,9 @@
       }),
       dict({
         'origin': list([
-          'ForNode[approvals/detail.html]',
+          'ForNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -1175,9 +1175,9 @@
       }),
       dict({
         'origin': list([
-          'ForNode[approvals/detail.html]',
+          'ForNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
@@ -1218,10 +1218,10 @@
           'IfNode[approvals/includes/job_description_creation.html]',
           'IfNode[approvals/includes/job_description_creation.html]',
           'IncludeNode[approvals/includes/job_applications.html]',
-          'IncludeNode[approvals/detail.html]',
-          'ForNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
+          'ForNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "prescribers_prescriberorganization"."id",
@@ -1264,9 +1264,9 @@
           'Approval.suspensions_for_status_card[approvals/models.py]',
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
-          'IncludeNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -1290,9 +1290,9 @@
           'Approval.prolongations_for_status_card[approvals/models.py]',
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
-          'IncludeNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
@@ -1363,9 +1363,9 @@
           'IfNode[approvals/includes/status.html]',
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
-          'IncludeNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id",
@@ -1529,7 +1529,7 @@
     ]),
   })
 # ---
-# name: TestApprovalDetailView.test_approval_status_includes[Approval detail view with suspensions]
+# name: TestEmployeeDetailView.test_approval_status_includes[Approval detail view with suspensions]
   dict({
     'num_queries': 26,
     'queries': list([
@@ -2297,7 +2297,7 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "companies_siaeconvention"."id",
@@ -2323,7 +2323,7 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -2344,10 +2344,10 @@
       }),
       dict({
         'origin': list([
-          'IncludeNode[approvals/detail.html]',
-          'IfNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2393,10 +2393,10 @@
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IncludeNode[approvals/detail.html]',
-          'IfNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "users_user"."id",
@@ -2443,10 +2443,10 @@
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IncludeNode[approvals/detail.html]',
-          'IfNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "eligibility_administrativecriteria"."id",
@@ -2476,10 +2476,10 @@
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',
           'IfNode[apply/includes/eligibility_diagnosis.html]',
-          'IncludeNode[approvals/detail.html]',
-          'IfNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "approvals_approval"."id",
@@ -2507,9 +2507,9 @@
       }),
       dict({
         'origin': list([
-          'ForNode[approvals/detail.html]',
+          'ForNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -2632,9 +2632,9 @@
       }),
       dict({
         'origin': list([
-          'ForNode[approvals/detail.html]',
+          'ForNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
@@ -2675,10 +2675,10 @@
           'IfNode[approvals/includes/job_description_creation.html]',
           'IfNode[approvals/includes/job_description_creation.html]',
           'IncludeNode[approvals/includes/job_applications.html]',
-          'IncludeNode[approvals/detail.html]',
-          'ForNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
+          'ForNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "prescribers_prescriberorganization"."id",
@@ -2721,9 +2721,9 @@
           'Approval.suspensions_for_status_card[approvals/models.py]',
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
-          'IncludeNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -2755,9 +2755,9 @@
           'IfNode[approvals/includes/status.html]',
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
-          'IncludeNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -2842,9 +2842,9 @@
           'Approval.prolongations_for_status_card[approvals/models.py]',
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
-          'IncludeNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
@@ -2914,9 +2914,9 @@
           'IfNode[approvals/includes/status.html]',
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
-          'IncludeNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id",
@@ -3080,7 +3080,7 @@
     ]),
   })
 # ---
-# name: TestApprovalDetailView.test_approval_status_includes[Approval prolongations list]
+# name: TestEmployeeDetailView.test_approval_status_includes[Approval prolongations list]
   '''
   <div class="ps-3 border-start approval-left-border" id="prolongations-list">
                   
@@ -3142,7 +3142,7 @@
               </div>
   '''
 # ---
-# name: TestApprovalDetailView.test_approval_status_includes[Approval suspensions list]
+# name: TestEmployeeDetailView.test_approval_status_includes[Approval suspensions list]
   '''
   <div class="ps-3 border-start approval-left-border" id="suspensions-list">
                   
@@ -3174,7 +3174,7 @@
               </div>
   '''
 # ---
-# name: TestApprovalDetailView.test_approval_status_includes[detail view SQL queries]
+# name: TestEmployeeDetailView.test_approval_status_includes[detail view SQL queries]
   dict({
     'num_queries': 26,
     'queries': list([
@@ -3875,7 +3875,7 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "companies_siaeconvention"."id",
@@ -3901,7 +3901,7 @@
           'InclusionNode[layout/_header_authenticated.html]',
           'IncludeNode[layout/base.html]',
           'IfNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT %s AS "a"
@@ -3924,9 +3924,9 @@
         'origin': list([
           'VariableNode[apply/includes/job_seeker_info.html]',
           'IfNode[apply/includes/job_seeker_info.html]',
-          'IncludeNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "users_jobseekerprofile"."user_id",
@@ -3966,9 +3966,9 @@
       }),
       dict({
         'origin': list([
-          'ForNode[approvals/detail.html]',
+          'ForNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "job_applications_jobapplication"."id",
@@ -4091,9 +4091,9 @@
       }),
       dict({
         'origin': list([
-          'ForNode[approvals/detail.html]',
+          'ForNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT ("job_applications_jobapplication_selected_jobs"."jobapplication_id") AS "_prefetch_related_val_jobapplication_id",
@@ -4134,10 +4134,10 @@
           'IfNode[approvals/includes/job_description_creation.html]',
           'IfNode[approvals/includes/job_description_creation.html]',
           'IncludeNode[approvals/includes/job_applications.html]',
-          'IncludeNode[approvals/detail.html]',
-          'ForNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
+          'ForNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "prescribers_prescriberorganization"."id",
@@ -4180,9 +4180,9 @@
           'Approval.suspensions_for_status_card[approvals/models.py]',
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
-          'IncludeNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "approvals_suspension"."id",
@@ -4206,9 +4206,9 @@
           'Approval.prolongations_for_status_card[approvals/models.py]',
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
-          'IncludeNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "approvals_prolongation"."id",
@@ -4278,9 +4278,9 @@
           'IfNode[approvals/includes/status.html]',
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
-          'IncludeNode[approvals/detail.html]',
+          'IncludeNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
-          'ExtendsNode[approvals/detail.html]',
+          'ExtendsNode[employees/detail.html]',
         ]),
         'sql': '''
           SELECT "approvals_prolongationrequest"."id",
@@ -4339,7 +4339,7 @@
     ]),
   })
 # ---
-# name: TestApprovalDetailView.test_link_immersion_facile[alerte à l'opportunité immersion facile PASS expiré]
+# name: TestEmployeeDetailView.test_link_immersion_facile[alerte à l'opportunité immersion facile PASS expiré]
   '''
   <div class="c-box p-0 mb-4" id="immersion-facile-opportunity-alert">
                               <div class="c-box__header--immersion-facile p-3 p-lg-4">
@@ -4360,7 +4360,7 @@
                           </div>
   '''
 # ---
-# name: TestApprovalDetailView.test_link_immersion_facile[alerte à l'opportunité immersion facile]
+# name: TestEmployeeDetailView.test_link_immersion_facile[alerte à l'opportunité immersion facile]
   '''
   <div class="c-box p-0 mb-4" id="immersion-facile-opportunity-alert">
                               <div class="c-box__header--immersion-facile p-3 p-lg-4">
@@ -4381,7 +4381,7 @@
                           </div>
   '''
 # ---
-# name: TestApprovalDetailView.test_remove_approval_button[bouton de suppression d'un PASS IAE]
+# name: TestEmployeeDetailView.test_remove_approval_button[bouton de suppression d'un PASS IAE]
   '''
   <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-block btn-outline-warning mt-3" href="https://tally.so/r/3je84Q?siaeID=999999&amp;nomSIAE=Aci+de+la+rochelle&amp;prenomemployeur=Milady&amp;nomemployeur=de+Winter&amp;emailemployeur=oph%40dewinter.com&amp;userID=123456&amp;numPASS=XXXXX+12+34568&amp;prenomsalarie=Doe&amp;nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
                                       Clôturer
