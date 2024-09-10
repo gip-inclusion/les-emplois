@@ -1856,12 +1856,24 @@ class JobApplicationXlsxExportTest(TestCase):
         job_seeker = JobSeekerFactory(for_snapshot=True)
         company = CompanyFactory(for_snapshot=True, with_membership=True)
         employer = company.members.get()
+        start = datetime.date(2024, 7, 5)
+        diag = IAEEligibilityDiagnosisFactory(
+            from_employer=True,
+            job_seeker=job_seeker,
+            author_siae=company,
+            author=employer,
+        )
+        approval = ApprovalFactory(start_at=start, user=job_seeker, eligibility_diagnosis=diag)
         JobApplicationFactory(
             job_seeker=job_seeker,
             to_company=company,
             sender_company=company,
             sender_kind=SenderKind.EMPLOYER,
             sender=employer,
+            eligibility_diagnosis=diag,
+            approval=approval,
+            hiring_start_at=start,
+            state=JobApplicationState.ACCEPTED,
         )
         response = stream_xlsx_export(JobApplication.objects.all(), "filename")
         assert get_rows_from_streaming_response(response) == [
@@ -1882,15 +1894,15 @@ class JobApplicationXlsxExportTest(TestCase):
                 "",
                 "John DOE",
                 "05/07/2024",
-                "Nouvelle candidature",
+                "Candidature acceptée",
                 "05/07/2024",
                 "05/07/2026",
                 "",
                 "oui",
-                "",
-                "",
-                "",
-                "",
+                approval.number,
+                "05/07/2024",
+                "04/07/2026",
+                "Valide",
             ],
         ]
 
