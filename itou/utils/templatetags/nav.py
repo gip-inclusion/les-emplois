@@ -217,7 +217,7 @@ def nav(request):
                 company_group_items.append(NAV_ENTRIES["employer-members"])
             if request.current_organization.convention_can_be_accessed_by(request.user):
                 company_group_items.append(NAV_ENTRIES["employer-financial-annexes"])
-            menu_items.append(NavGroup(label="Organisation", icon="ri-community-line", items=company_group_items))
+            menu_items.append(NavGroup(label="Structure", icon="ri-community-line", items=company_group_items))
         elif request.user.is_labor_inspector:
             menu_items.append(
                 NavGroup(
