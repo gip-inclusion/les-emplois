@@ -211,6 +211,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
             CompanyKind.EITI,
             CompanyKind.ACI,
             CompanyKind.ETTI,
+            CompanyKind.GEIQ,
         ]:
             with self.subTest(f"should display when company_kind={kind}"):
                 company = CompanyFactory(kind=kind, with_membership=True)
@@ -220,15 +221,14 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
                 response = self.client.get(reverse("dashboard:index"))
                 self.assertContains(response, self.HIRE_LINK_LABEL)
 
-        for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.GEIQ, CompanyKind.OPCS]:
+        for kind in [CompanyKind.EA, CompanyKind.EATT, CompanyKind.OPCS]:
             with self.subTest(f"should not display when company_kind={kind}"):
                 company = CompanyFactory(kind=kind, with_membership=True)
                 user = company.members.first()
                 self.client.force_login(user)
 
                 response = self.client.get(reverse("dashboard:index"))
-                assertion = self.assertContains if kind == CompanyKind.GEIQ else self.assertNotContains
-                assertion(response, self.HIRE_LINK_LABEL)
+                self.assertNotContains(response, self.HIRE_LINK_LABEL)
 
     def test_dashboard_job_applications(self):
         APPLICATION_SAVE_LABEL = "Enregistrer une candidature"
