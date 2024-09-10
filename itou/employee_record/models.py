@@ -167,7 +167,7 @@ class EmployeeRecord(ASPExchangeInformation):
     # - Employee
     # - Approval
     job_application = models.ForeignKey(
-        "job_applications.jobapplication",
+        "job_applications.JobApplication",
         on_delete=models.RESTRICT,
         verbose_name="candidature / embauche",
         related_name="employee_record",
