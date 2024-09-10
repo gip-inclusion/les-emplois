@@ -7,6 +7,5 @@ class InclusionConnectChannel(str, enum.Enum):
     """
 
     INVITATION = "invitation"
-    POLE_EMPLOI = "pole_emploi"
     ACTIVATION = "activation"
     MAP_CONSEILLER = "map_conseiller"
