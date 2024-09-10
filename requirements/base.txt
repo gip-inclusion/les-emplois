@@ -256,9 +256,9 @@ cryptography==43.0.1 \
     --hash=sha256:f98bf604c82c416bc829e490c700ca1553eafdf2912a91e23a79d97d9801372a \
     --hash=sha256:fba1007b3ef89946dbbb515aeeb41e30203b004f0b4b00e5e16078b518563289
     # via paramiko
-django==5.0.8 \
-    --hash=sha256:333a7988f7ca4bc14d360d3d8f6b793704517761ae3813b95432043daec22a45 \
-    --hash=sha256:ebe859c9da6fead9c9ee6dbfa4943b04f41342f4cea2c4d8c978ef0d10694f2b
+django==5.0.9 \
+    --hash=sha256:6333870d342329b60174da3a60dbd302e533f3b0bb0971516750e974a99b5a39 \
+    --hash=sha256:f219576ba53be4e83f485130a7283f0efde06a9f2e3a7c3c5180327549f078fa
     # via
     #   -r requirements/base.in
     #   django-allauth
