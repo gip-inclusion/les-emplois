@@ -1841,7 +1841,7 @@ class JobApplicationXlsxExportTest(TestCase):
                 job_application.hiring_start_at.strftime("%d/%m/%Y"),
                 job_application.hiring_end_at.strftime("%d/%m/%Y"),
                 "Candidat non joignable",
-                "oui",
+                "oui",  # Eligibility status.
                 "non",  # Eligible to SIAE evaluations.
                 "",
                 "",
@@ -1897,7 +1897,7 @@ class JobApplicationXlsxExportTest(TestCase):
                 "05/07/2024",
                 "05/07/2026",
                 "",
-                "oui",
+                "oui",  # Eligibility status.
                 "oui",  # Eligible to SIAE evaluations.
                 approval.number,
                 "05/07/2024",
