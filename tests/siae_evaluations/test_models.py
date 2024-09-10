@@ -16,6 +16,7 @@ from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import AdministrativeCriteria
 from itou.institutions.enums import InstitutionKind
 from itou.job_applications.enums import JobApplicationState
+from itou.job_applications.export import _eligible_to_siae_evaluations
 from itou.job_applications.models import JobApplication, JobApplicationQuerySet
 from itou.siae_evaluations import enums as evaluation_enums
 from itou.siae_evaluations.models import (
@@ -191,6 +192,7 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         evaluation_campaign = EvaluationCampaignFactory()
         job_app = campaign_eligible_job_app_objects["job_app"]
         assert [job_app] == list(evaluation_campaign.eligible_job_applications())
+        assert _eligible_to_siae_evaluations(job_app) == "oui"
 
     def test_no_approval(self, campaign_eligible_job_app_objects):
         evaluation_campaign = EvaluationCampaignFactory()
@@ -198,6 +200,7 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         job_app.approval = None
         job_app.save()
         assert [] == list(evaluation_campaign.eligible_job_applications())
+        assert _eligible_to_siae_evaluations(job_app) == "non"
 
     def test_outside_institution_department(self, campaign_eligible_job_app_objects):
         evaluation_campaign = EvaluationCampaignFactory()
@@ -215,6 +218,8 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         siae.kind = kind
         siae.save()
         assert [] == list(evaluation_campaign.eligible_job_applications())
+        for job_app in JobApplication.objects.all():
+            assert _eligible_to_siae_evaluations(job_app) == "non"
 
     def test_job_application_not_accepted(self, campaign_eligible_job_app_objects):
         evaluation_campaign = EvaluationCampaignFactory()
@@ -222,6 +227,7 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         job_app.state = JobApplicationState.REFUSED
         job_app.save()
         assert [] == list(evaluation_campaign.eligible_job_applications())
+        assert _eligible_to_siae_evaluations(job_app) == "non"
 
     def test_job_application_not_in_period(self, campaign_eligible_job_app_objects):
         evaluation_campaign = EvaluationCampaignFactory()
@@ -232,6 +238,8 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         job_app.approval.start_at = new_start
         job_app.approval.save(update_fields=["start_at"])
         assert [] == list(evaluation_campaign.eligible_job_applications())
+        # Eligibility assessment disregards dates, as the calendar can be a mess.
+        assert _eligible_to_siae_evaluations(job_app) == "oui"
 
     def test_eligibility_diag_not_made_by_employer(self, campaign_eligible_job_app_objects):
         evaluation_campaign = EvaluationCampaignFactory()
@@ -239,6 +247,7 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         diag.author_kind = AuthorKind.PRESCRIBER
         diag.save()
         assert [] == list(evaluation_campaign.eligible_job_applications())
+        assert _eligible_to_siae_evaluations(campaign_eligible_job_app_objects["job_app"]) == "non"
 
     def test_eligibility_diag_made_by_another_siae(self, campaign_eligible_job_app_objects):
         evaluation_campaign = EvaluationCampaignFactory()
@@ -246,6 +255,7 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         diag.author_siae = CompanyFactory()
         diag.save()
         assert [] == list(evaluation_campaign.eligible_job_applications())
+        assert _eligible_to_siae_evaluations(campaign_eligible_job_app_objects["job_app"]) == "non"
 
     def test_approval_does_not_start_with_itou_prefix(self, campaign_eligible_job_app_objects):
         evaluation_campaign = EvaluationCampaignFactory()
@@ -255,6 +265,7 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
         approval.eligibility_diagnosis = None
         approval.save()
         assert [] == list(evaluation_campaign.eligible_job_applications())
+        assert _eligible_to_siae_evaluations(campaign_eligible_job_app_objects["job_app"]) == "non"
 
 
 class TestEvaluationCampaignManager:
