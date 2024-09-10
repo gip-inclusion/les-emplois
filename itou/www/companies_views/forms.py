@@ -9,7 +9,6 @@ from itou.common_apps.address.departments import DEPARTMENTS, department_from_po
 from itou.companies.enums import CompanyKind, ContractType
 from itou.companies.models import Company, CompanyMembership, JobDescription
 from itou.jobs.models import Appellation
-from itou.utils import constants as global_constants
 from itou.utils.urls import get_external_link_markup
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
@@ -62,20 +61,16 @@ class CreateCompanyForm(forms.ModelForm):
         existing_siae_query = Company.objects.filter(siret=siret, kind=kind)
 
         if existing_siae_query.exists():
-            error_message = """
-                La structure à laquelle vous souhaitez vous rattacher est déjà
-                connue de nos services. Merci de nous contacter à l'adresse
-                """
+            error_message = (
+                "Le numéro de SIRET que vous avez renseigné est déjà utilisé par une structure ou une antenne, "
+                "nous vous invitons à réessayer avec un autre numéro. "
+                "Si besoin vous pouvez consulter "
+            )
             external_link = get_external_link_markup(
-                url=global_constants.ITOU_HELP_CENTER_URL,
-                text=global_constants.ITOU_HELP_CENTER_URL,
+                url="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14738422932625--Cr%C3%A9er-une-nouvelle-structure-Ajouter-une-antenne",
+                text="notre documentation",
             )
-            error_message_siret = (
-                "en précisant votre numéro de SIRET (si existant),"
-                " le type et l’adresse de cette structure, ainsi que votre numéro de téléphone"
-                " pour être contacté(e) si nécessaire."
-            )
-            error_message = mark_safe(f"{error_message} {external_link} {error_message_siret}")
+            error_message = mark_safe(f"{error_message} {external_link}.")
             raise forms.ValidationError(error_message)
 
         if not siret.startswith(self.current_company.siren):

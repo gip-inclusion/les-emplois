@@ -14,7 +14,9 @@ from tests.utils.test import TestCase
 
 
 class CreateCompanyViewTest(TestCase):
-    STRUCTURE_ALREADY_EXISTS_MSG = escape("La structure à laquelle vous souhaitez vous rattacher est déjà")
+    STRUCTURE_ALREADY_EXISTS_MSG = escape(
+        "Le numéro de SIRET que vous avez renseigné est déjà utilisé par une structure ou une antenne,"
+    )
 
     @staticmethod
     def siret_siren_error_msg(company):
