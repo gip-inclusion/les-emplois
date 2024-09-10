@@ -8,7 +8,7 @@ app_name = "approvals"
 
 urlpatterns = [
     # PASS IAE
-    path("detail/<int:pk>", views.ApprovalDetailView.as_view(), name="detail"),
+    path("detail/<int:pk>", views.approval_detail_redirect_to_employee_view, name="redirect_to_employee"),
     path("display/<int:approval_id>", views.ApprovalPrintableDisplay.as_view(), name="display_printable_approval"),
     path("list", views.ApprovalListView.as_view(), name="list"),
     path("declare_prolongation/<int:approval_id>", views.declare_prolongation, name="declare_prolongation"),

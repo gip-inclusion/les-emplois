@@ -184,7 +184,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
                 job_application.save(update_fields=["geiq_eligibility_diagnosis"])
 
         if creating and siae.is_subject_to_eligibility_rules and job_application.approval:
-            final_url = reverse("approvals:detail", kwargs={"pk": job_application.approval.pk})
+            final_url = reverse("employees:detail", kwargs={"public_id": job_seeker.public_id})
         else:
             final_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
 

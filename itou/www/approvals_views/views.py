@@ -1,6 +1,5 @@
 import logging
 import pathlib
-import urllib.parse
 from datetime import timedelta
 
 from django.contrib import messages
@@ -9,14 +8,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import default_storage
 from django.db import IntegrityError
-from django.db.models import Prefetch
 from django.http import Http404, HttpResponseBadRequest, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse, reverse_lazy
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.views import View
 from django.views.decorators.http import require_safe
-from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic import ListView, TemplateView
 from formtools.wizard.views import NamedUrlSessionWizardView
 
 from itou.approvals import enums as approvals_enums
@@ -28,10 +26,7 @@ from itou.approvals.models import (
     Suspension,
 )
 from itou.files.models import File
-from itou.job_applications.enums import JobApplicationState
-from itou.job_applications.models import JobApplication
 from itou.utils import constants as global_constants
-from itou.utils.immersion_facile import immersion_search_url
 from itou.utils.pagination import ItouPaginator, pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.prescriber import get_current_org_or_404
@@ -50,9 +45,6 @@ from itou.www.approvals_views.forms import (
 
 
 logger = logging.getLogger(__name__)
-
-
-SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE = timedelta(days=365)
 
 
 class ApprovalBaseViewMixin(LoginRequiredMixin):
@@ -76,97 +68,16 @@ class ApprovalBaseViewMixin(LoginRequiredMixin):
         return context
 
 
-class ApprovalDetailView(ApprovalBaseViewMixin, DetailView):
-    model = Approval
-    queryset = Approval.objects.select_related("user__jobseeker_profile").prefetch_related(
-        "suspension_set",
-        Prefetch(
-            "prolongationrequest_set",
-            queryset=ProlongationRequest.objects.select_related(
-                "declared_by", "validated_by", "processed_by", "prescriber_organization"
-            ),
-        ),
-    )
-    template_name = "approvals/detail.html"
+# TODO(xfernandez): remove this redirect view in a few weeks
+@login_required
+def approval_detail_redirect_to_employee_view(request, pk):
+    siae = get_current_company_or_404(request)
 
-    def get_job_application(self, approval):
-        return (
-            JobApplication.objects.filter(
-                job_seeker=approval.user,
-                state=JobApplicationState.ACCEPTED,
-                to_company=self.siae,
-                approval=approval,
-            )
-            .select_related(
-                "eligibility_diagnosis",
-                "eligibility_diagnosis__author_siae",
-                "eligibility_diagnosis__author_prescriber_organization",
-                "eligibility_diagnosis__job_seeker",
-                "sender_prescriber_organization",
-            )
-            .first()
-        )
+    if not siae.is_subject_to_eligibility_rules:
+        raise PermissionDenied
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        approval = self.object
-        job_application = self.get_job_application(self.object)
-
-        context["can_view_personal_information"] = True  # SIAE members have access to personal info
-        context["can_edit_personal_information"] = self.request.user.can_edit_personal_information(approval.user)
-        context["approval_can_be_suspended_by_siae"] = approval.can_be_suspended_by_siae(self.siae)
-        context["approval_can_be_prolonged"] = approval.can_be_prolonged
-        context["job_application"] = job_application
-        context["matomo_custom_title"] = "Profil salarié"
-        context["eligibility_diagnosis"] = job_application and job_application.get_eligibility_diagnosis()
-        context["approval_deletion_form_url"] = None
-        context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("approvals:list"))
-        context["link_immersion_facile"] = None
-
-        if approval.is_in_progress:
-            # suspension_set has already been loaded via prefetch_related for the remainder computation
-            for suspension in sorted(approval.suspension_set.all(), key=lambda s: s.start_at):
-                if suspension.is_in_progress:
-                    suspension_duration = timezone.localdate() - suspension.start_at
-                    has_hirings_after_suspension = False
-                else:
-                    suspension_duration = suspension.duration
-                    has_hirings_after_suspension = (
-                        approval.jobapplication_set.accepted().filter(hiring_start_at__gte=suspension.end_at).exists()
-                    )
-
-                if (
-                    suspension_duration > SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE
-                    and not has_hirings_after_suspension
-                ):
-                    context["approval_deletion_form_url"] = "https://tally.so/r/3je84Q?" + urllib.parse.urlencode(
-                        {
-                            "siaeID": self.siae.pk,
-                            "nomSIAE": self.siae.display_name,
-                            "prenomemployeur": self.request.user.first_name,
-                            "nomemployeur": self.request.user.last_name,
-                            "emailemployeur": self.request.user.email,
-                            "userID": self.request.user.pk,
-                            "numPASS": approval.number_with_spaces,
-                            "prenomsalarie": approval.user.first_name,
-                            "nomsalarie": approval.user.last_name,
-                        }
-                    )
-                    break
-
-        if approval.remainder.days < 90 and self.request.user.is_employer:
-            context["link_immersion_facile"] = immersion_search_url(approval.user)
-            context["approval_expired"] = not approval.is_in_progress
-
-        context["all_job_applications"] = (
-            JobApplication.objects.filter(
-                job_seeker=approval.user,
-                to_company=self.siae,
-            )
-            .select_related("sender", "to_company")
-            .prefetch_related("selected_jobs")
-        )
-        return context
+    approval = get_object_or_404(Approval.objects.select_related("user"), pk=pk)
+    return redirect("employees:detail", public_id=approval.user.public_id)
 
 
 class ApprovalListView(ApprovalBaseViewMixin, ListView):
@@ -583,7 +494,9 @@ def suspension_action_choice(request, suspension_id, template_name="approvals/su
         return HttpResponseBadRequest('invalid "action" parameter')
 
     back_url = get_safe_url(
-        request, "back_url", fallback_url=reverse("approvals:detail", kwargs={"pk": suspension.approval_id})
+        request,
+        "back_url",
+        fallback_url=reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id}),
     )
     context = {
         "suspension": suspension,
@@ -654,12 +567,14 @@ def suspension_update_enddate(request, suspension_id, template_name="approvals/s
         suspension.updated_by = request.user
         suspension.save()
         messages.success(request, "Modification de suspension effectuée.", extra_tags="toast")
-        return HttpResponseRedirect(reverse("approvals:detail", kwargs={"pk": suspension.approval_id}))
+        return HttpResponseRedirect(
+            reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id})
+        )
 
     context = {
         "suspension": suspension,
         "back_url": back_url,
-        "reset_url": reverse("approvals:detail", kwargs={"pk": suspension.approval_id}),
+        "reset_url": reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id}),
         "form": form,
     }
     return render(request, template_name, context)
@@ -690,12 +605,14 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
             f"La suspension de {suspension.approval.user.get_full_name()} a bien été supprimée.",
             extra_tags="toast",
         )
-        return HttpResponseRedirect(reverse("approvals:detail", kwargs={"pk": suspension.approval_id}))
+        return HttpResponseRedirect(
+            reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id})
+        )
 
     context = {
         "suspension": suspension,
         "back_url": back_url,
-        "reset_url": reverse("approvals:detail", kwargs={"pk": suspension.approval_id}),
+        "reset_url": reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id}),
         "lost_days": (timezone.localdate() - suspension.start_at).days + 1,
     }
     return render(request, template_name, context)
