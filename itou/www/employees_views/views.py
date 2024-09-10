@@ -30,7 +30,7 @@ SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE = datetime.timedelta(days=365)
 class EmployeeDetailView(LoginRequiredMixin, DetailView):
     model = User
     queryset = User.objects.filter(kind=UserKind.JOB_SEEKER)
-    template_name = "approvals/detail.html"
+    template_name = "employees/detail.html"
     slug_field = "public_id"
     slug_url_kwarg = "public_id"
 
