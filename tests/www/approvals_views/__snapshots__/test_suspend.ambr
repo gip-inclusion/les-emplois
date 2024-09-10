@@ -73,7 +73,7 @@
                   </div>
                   <div class="modal-footer">
                       <button class="btn btn-sm btn-outline-primary" data-bs-dismiss="modal" type="button">Retour</button>
-                      <a class="btn btn-sm btn-danger" href="/approvals/detail/[PK of Approval]">Confirmer l'annulation</a>
+                      <a class="btn btn-sm btn-danger" href="/approvals/detail/[public_id of User]">Confirmer l'annulation</a>
                   </div>
               
           </div>

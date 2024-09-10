@@ -94,6 +94,7 @@ INSTALLED_APPS = [
     "itou.www.autocomplete",
     "itou.www.dashboard",
     "itou.www.eligibility_views",
+    "itou.www.employees_views",
     "itou.www.home",
     "itou.www.prescribers_views",
     "itou.www.search",

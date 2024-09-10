@@ -127,7 +127,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         employer = company.members.first()
         self.client.force_login(employer)
 
-        back_url = reverse("approvals:detail", kwargs={"pk": job_application.approval.pk})
+        back_url = reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id})
         url = add_url_params(
             reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
             {"back_url": back_url},

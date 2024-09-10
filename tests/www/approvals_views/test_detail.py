@@ -27,10 +27,25 @@ from tests.users.factories import JobSeekerFactory
 from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup
 
 
+class RedirectToEmployeeView:
+    def test_anonymous_user(self, client):
+        approval = ApprovalFactory()
+        url = reverse("approvals:redirect_to_employee", kwargs={"pk": approval.pk})
+        response = client.get(url)
+        assertRedirects(response, reverse("account_login") + f"?next={url}")
+
+    def test_redirect(self, client):
+        membership = CompanyMembershipFactory()
+        client.force_login(membership.user)
+        approval = ApprovalFactory()
+        response = client.get(reverse("approvals:redirect_to_employee", kwargs={"pk": approval.pk}))
+        assertRedirects(response, reverse("employees:detail", kwargs={"public_id": approval.user.public_id}))
+
+
 class TestApprovalDetailView:
     def test_anonymous_user(self, client):
         approval = ApprovalFactory()
-        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
         response = client.get(url)
         assertRedirects(response, reverse("account_login") + f"?next={url}")
 
@@ -63,7 +78,8 @@ class TestApprovalDetailView:
         client.force_login(employer)
 
         url = add_url_params(
-            reverse("approvals:detail", kwargs={"pk": approval.pk}), {"back_url": reverse("approvals:list")}
+            reverse("employees:detail", kwargs={"public_id": approval.user.public_id}),
+            {"back_url": reverse("approvals:list")},
         )
         response = client.get(url)
         assertContains(response, "Numéro de PASS IAE")
@@ -96,7 +112,7 @@ class TestApprovalDetailView:
 
         client.force_login(employer)
 
-        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
         response = client.get(url)
         # Check that the page didn't crash
         assertContains(response, "Numéro de PASS IAE")
@@ -112,6 +128,7 @@ class TestApprovalDetailView:
         Test its content only once.
         """
         job_application = JobApplicationFactory(
+            job_seeker__public_id="11111111-9999-2222-8888-555555555555",
             state=JobApplicationState.PROCESSING,
             with_approval=True,
             approval__id=1,
@@ -123,7 +140,7 @@ class TestApprovalDetailView:
         user = job_application.to_company.members.first()
         client.force_login(user)
 
-        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
         with assertSnapshotQueries(snapshot(name="detail view SQL queries")):
             response = client.get(url)
         response = client.get(url)
@@ -171,7 +188,7 @@ class TestApprovalDetailView:
             end_at=timezone.localdate() - relativedelta(days=20),
         )
 
-        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
         with assertSnapshotQueries(snapshot(name="Approval detail view with suspensions")):
             response = client.get(url)
 
@@ -229,7 +246,7 @@ class TestApprovalDetailView:
             **default_kwargs,
         )
 
-        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
         with assertSnapshotQueries(snapshot(name="Approval detail view with prolongations")):
             response = client.get(url)
 
@@ -262,7 +279,7 @@ class TestApprovalDetailView:
         employer = siae.members.first()
         client.force_login(employer)
 
-        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
         assert approval.can_be_suspended_by_siae(siae)
         response = client.get(url)
         assertContains(response, reverse("approvals:suspend", kwargs={"approval_id": approval.id}))
@@ -291,7 +308,7 @@ class TestApprovalDetailView:
         employer = siae.members.first()
         client.force_login(employer)
 
-        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
         assert approval.can_be_prolonged
         response = client.get(url)
         assertContains(
@@ -316,7 +333,7 @@ class TestApprovalDetailView:
         job_application = approval.jobapplication_set.get()
         employer = job_application.to_company.members.first()
         client.force_login(employer)
-        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
 
         user_info_edit_url = reverse(
             "dashboard:edit_job_seeker_info",
@@ -371,7 +388,7 @@ class TestApprovalDetailView:
 
         # suspension still active, more than 1 year old, starting after the accepted job application
         suspension = SuspensionFactory(approval=job_application.approval, start_at=datetime.date(2022, 4, 8))
-        response = client.get(reverse("approvals:detail", kwargs={"pk": job_application.approval.pk}))
+        response = client.get(reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id}))
 
         delete_button = parse_response_to_soup(response, selector="#approval-deletion-link")
         assert str(delete_button) == self.snapshot(name="bouton de suppression d'un PASS IAE")
@@ -379,7 +396,7 @@ class TestApprovalDetailView:
         # suspension now is inactive
         suspension.end_at = datetime.date(2023, 4, 10)  # more than 12 months but ended
         suspension.save(update_fields=["end_at"])
-        response = client.get(reverse("approvals:detail", kwargs={"pk": job_application.approval.pk}))
+        response = client.get(reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id}))
 
         delete_button = parse_response_to_soup(response, selector="#approval-deletion-link")
         assert str(delete_button) == self.snapshot(name="bouton de suppression d'un PASS IAE")
@@ -394,7 +411,7 @@ class TestApprovalDetailView:
         )
         job_application = approval.jobapplication_set.get()
         employer = job_application.to_company.members.first()
-        url = reverse("approvals:detail", kwargs={"pk": approval.pk})
+        url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
         client.force_login(employer)
 
         response = client.get(url)

@@ -36,8 +36,8 @@ class TestApprovalsListView:
 
         assert_previous_step(response, reverse("dashboard:index"))
 
-        approval_base_url = reverse("approvals:detail", kwargs={"pk": approval.pk})
-        assertContains(response, f"{approval_base_url}?back_url={urlencode(url)}")
+        employee_base_url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
+        assertContains(response, f"{employee_base_url}?back_url={urlencode(url)}")
 
     def test_multiple_approvals_for_the_same_user(self, client):
         approval = ApprovalFactory(with_jobapplication=True)
@@ -55,8 +55,8 @@ class TestApprovalsListView:
 
         assertContains(response, "2 résultats")
         assertContains(response, f"<h3>{approval.user.get_full_name()}</h3>", html=True, count=1)
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": another_approval.pk}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": approval.user.public_id}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": another_approval.user.public_id}))
 
     def test_multiple_job_application(self, client):
         approval = ApprovalFactory(with_jobapplication=True)
@@ -111,9 +111,13 @@ class TestApprovalsListView:
         with assertNumQueries(15):
             response = client.get(url)
         assertContains(response, "2 résultats")
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_same_company.pk}))
-        assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_company.pk}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": approval.user.public_id}))
+        assertContains(
+            response, reverse("employees:detail", kwargs={"public_id": approval_same_company.user.public_id})
+        )
+        assertNotContains(
+            response, reverse("employees:detail", kwargs={"public_id": approval_other_company.user.public_id})
+        )
 
         form = response.context["filters_form"]
         assert form.fields["job_seeker"].choices == [
@@ -124,9 +128,13 @@ class TestApprovalsListView:
         url = f"{reverse('approvals:list')}?job_seeker={approval.user_id}&expiry="
         response = client.get(url)
         assertContains(response, "1 résultat")
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval.pk}))
-        assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_same_company.pk}))
-        assertNotContains(response, reverse("approvals:detail", kwargs={"pk": approval_other_company.pk}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": approval.user.public_id}))
+        assertNotContains(
+            response, reverse("employees:detail", kwargs={"public_id": approval_same_company.user.public_id})
+        )
+        assertNotContains(
+            response, reverse("employees:detail", kwargs={"public_id": approval_other_company.user.public_id})
+        )
 
     def test_approval_state_filters(self, client):
         now = timezone.localdate()
@@ -179,30 +187,30 @@ class TestApprovalsListView:
         response = client.get(url)
         print(response.content.decode())
         assertContains(response, "1 résultat")
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": valid_approval.pk}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": valid_approval.user.public_id}))
 
         url = f"{list_url}?status_suspended=on&expiry="
         response = client.get(url)
         assertContains(response, "1 résultat")
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": suspended_approval.pk}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": suspended_approval.user.public_id}))
 
         url = f"{list_url}?status_future=on&expiry="
         response = client.get(url)
         assertContains(response, "1 résultat")
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": future_approval.pk}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": future_approval.user.public_id}))
 
         url = f"{list_url}?status_expired=on&expiry="
         response = client.get(url)
         assertContains(response, "1 résultat")
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": expired_approval.pk}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": expired_approval.user.public_id}))
 
         url = f"{list_url}?status_expired=on&status_suspended=on&status_future=on&status_valid=on&expiry="
         response = client.get(url)
         assertContains(response, "4 résultats")
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": valid_approval.pk}))
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": suspended_approval.pk}))
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": future_approval.pk}))
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": expired_approval.pk}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": valid_approval.user.public_id}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": suspended_approval.user.public_id}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": future_approval.user.public_id}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": expired_approval.user.public_id}))
 
         assertContains(
             response,
@@ -282,20 +290,20 @@ class TestApprovalsListView:
         url = f"{reverse('approvals:list')}?expiry=7"
         response = client.get(url)
         assertContains(response, "3 résultats")
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_7.pk}))
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_3.pk}))
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_1.pk}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": approval_7.user.public_id}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": approval_3.user.public_id}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": approval_1.user.public_id}))
 
         url = f"{reverse('approvals:list')}?expiry=3"
         response = client.get(url)
         assertContains(response, "2 résultats")
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_3.pk}))
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_1.pk}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": approval_3.user.public_id}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": approval_1.user.public_id}))
 
         url = f"{reverse('approvals:list')}?expiry=1"
         response = client.get(url)
         assertContains(response, "1 résultat")
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_1.pk}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": approval_1.user.public_id}))
 
         url = f"{reverse('approvals:list')}?expiry=7&status_expired=on"
         response = client.get(url)
@@ -346,8 +354,8 @@ class TestApprovalsListView:
         url = f"{reverse('approvals:list')}"
         response = client.get(url, {"expiry": "3"})
         assertContains(response, "2 résultats")
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_3.pk}))
-        assertContains(response, reverse("approvals:detail", kwargs={"pk": approval_1.pk}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": approval_3.user.public_id}))
+        assertContains(response, reverse("employees:detail", kwargs={"public_id": approval_1.user.public_id}))
         simulated_page = parse_response_to_soup(response)
 
         [less_than_3_months] = simulated_page.find_all("input", attrs={"name": "expiry", "value": "3"})
