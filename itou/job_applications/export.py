@@ -1,5 +1,7 @@
-from itou.job_applications.enums import SenderKind
-from itou.users.enums import Title
+from itou.approvals.models import Approval
+from itou.job_applications.enums import JobApplicationState, SenderKind
+from itou.siae_evaluations import enums as evaluation_enums
+from itou.users.enums import Title, UserKind
 from itou.utils.export import to_streaming_response
 
 
@@ -24,6 +26,7 @@ JOB_APPLICATION_CSV_HEADERS = [
     "Dates de fin d’embauche",
     "Motifs de refus",
     "Éligibilité IAE validée",
+    "Eligible au contrôle",
     "Numéro PASS IAE",
     "Début PASS IAE",
     "Fin PASS IAE",
@@ -65,6 +68,20 @@ def _get_eligibility_status(job_application):
         eligibility = "oui"
 
     return eligibility
+
+
+def _eligible_to_siae_evaluations(job_application):
+    # See EvaluationCampaign.eligible_job_applications
+    eligible = (
+        job_application.approval_id is not None
+        and job_application.to_company.kind in evaluation_enums.EvaluationSiaesKind.Evaluable
+        and job_application.state == JobApplicationState.ACCEPTED
+        and job_application.eligibility_diagnosis.author_kind == UserKind.EMPLOYER
+        and job_application.eligibility_diagnosis.author_siae_id == job_application.to_company_id
+        and job_application.approval.start_at == job_application.hiring_start_at
+        and job_application.approval.number.startswith(Approval.ASP_ITOU_PREFIX)
+    )
+    return "oui" if eligible else "non"
 
 
 def _get_readable_sender_kind(job_application):
@@ -129,6 +146,7 @@ def _serialize_job_application(job_application):
         _format_date(job_application.hiring_end_at),
         job_application.get_refusal_reason_display(),
         _get_eligibility_status(job_application),
+        _eligible_to_siae_evaluations(job_application),
         numero_pass_iae,
         _format_date(approval_start_date),
         _format_date(approval_end_date),

@@ -1755,6 +1755,7 @@ class JobApplicationXlsxExportTest(TestCase):
                 job_application.hiring_end_at.strftime("%d/%m/%Y"),
                 "",  # no reafusal reason
                 "oui",  # Eligibility status.
+                "non",  # Eligible to SIAE evaluations.
                 job_application.approval.number,
                 job_application.approval.start_at.strftime("%d/%m/%Y"),
                 job_application.approval.end_at.strftime("%d/%m/%Y"),
@@ -1801,6 +1802,7 @@ class JobApplicationXlsxExportTest(TestCase):
                 job_application.hiring_end_at.strftime("%d/%m/%Y"),
                 "",  # no reafusal reason
                 "non",  # Eligibility status.
+                "non",  # Eligible to SIAE evaluations.
                 job_application.approval.number,
                 job_application.approval.start_at.strftime("%d/%m/%Y"),
                 job_application.approval.end_at.strftime("%d/%m/%Y"),
@@ -1844,6 +1846,7 @@ class JobApplicationXlsxExportTest(TestCase):
                 job_application.hiring_end_at.strftime("%d/%m/%Y"),
                 "Candidat non joignable",
                 "oui",
+                "non",  # Eligible to SIAE evaluations.
                 "",
                 "",
                 "",
@@ -1899,6 +1902,7 @@ class JobApplicationXlsxExportTest(TestCase):
                 "05/07/2026",
                 "",
                 "oui",
+                "oui",  # Eligible to SIAE evaluations.
                 approval.number,
                 "05/07/2024",
                 "04/07/2026",
