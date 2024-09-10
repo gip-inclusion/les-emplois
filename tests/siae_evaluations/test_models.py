@@ -226,8 +226,11 @@ class TestEvaluationCampaignManagerEligibleJobApplication:
     def test_job_application_not_in_period(self, campaign_eligible_job_app_objects):
         evaluation_campaign = EvaluationCampaignFactory()
         job_app = campaign_eligible_job_app_objects["job_app"]
-        job_app.hiring_start_at = timezone.now() - relativedelta(months=10)
-        job_app.save()
+        new_start = timezone.now() - relativedelta(months=10)
+        job_app.hiring_start_at = new_start
+        job_app.save(update_fields=["hiring_start_at"])
+        job_app.approval.start_at = new_start
+        job_app.approval.save(update_fields=["start_at"])
         assert [] == list(evaluation_campaign.eligible_job_applications())
 
     def test_eligibility_diag_not_made_by_employer(self, campaign_eligible_job_app_objects):
