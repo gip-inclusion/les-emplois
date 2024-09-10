@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestApprovalsListView.test_job_seeker_filters[approvals list]
   dict({
-    'num_queries': 15,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -246,6 +246,18 @@
                          AND U0."state" = %s
                          AND U0."to_company_id" = %s)
                   LIMIT 1)) subquery
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'ApprovalListView.get_context_data[www/approvals_views/views.py]',
+        ]),
+        'sql': '''
+          SELECT COUNT(*) AS "__count"
+          FROM "employee_record_employeerecord"
+          INNER JOIN "job_applications_jobapplication" ON ("employee_record_employeerecord"."job_application_id" = "job_applications_jobapplication"."id")
+          WHERE ("job_applications_jobapplication"."to_company_id" = %s
+                 AND "employee_record_employeerecord"."status" = %s)
         ''',
       }),
       dict({

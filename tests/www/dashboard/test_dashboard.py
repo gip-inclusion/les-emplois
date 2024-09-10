@@ -44,11 +44,7 @@ from tests.siae_evaluations.factories import (
     EvaluatedSiaeFactory,
     EvaluationCampaignFactory,
 )
-from tests.users.factories import (
-    EmployerFactory,
-    JobSeekerFactory,
-    PrescriberFactory,
-)
+from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
 from tests.utils.test import TestCase, parse_response_to_soup
 
 

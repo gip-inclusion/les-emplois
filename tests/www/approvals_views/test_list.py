@@ -6,14 +6,19 @@ from django.urls import reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
+from itou.companies.models import Company
+from itou.job_applications.enums import JobApplicationState
 from itou.www.approvals_views.views import ApprovalListView
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory
+from tests.job_applications.factories import JobApplicationFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup
 
 
 class TestApprovalsListView:
+    TABS_CLASS = "s-tabs-01__nav nav nav-tabs"
+
     def test_anonymous_user(self, client):
         url = reverse("approvals:list")
         response = client.get(url)
@@ -38,6 +43,7 @@ class TestApprovalsListView:
 
         employee_base_url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
         assertContains(response, f"{employee_base_url}?back_url={urlencode(url)}")
+        assertContains(response, self.TABS_CLASS)
 
     def test_multiple_approvals_for_the_same_user(self, client):
         approval = ApprovalFactory(with_jobapplication=True)
@@ -352,3 +358,23 @@ class TestApprovalsListView:
         response = client.get(url, {"expiry": "1"})
         fresh_page = parse_response_to_soup(response)
         assertSoupEqual(simulated_page, fresh_page)
+
+    def test_no_tabs_when_siae_does_not_have_access_to_employee_records(self, client):
+        company = CompanyFactory(
+            convention=None,
+            use_employee_record=True,
+            with_membership=True,
+            source=Company.SOURCE_STAFF_CREATED,
+        )
+        approval = ApprovalFactory()
+        JobApplicationFactory(
+            state=JobApplicationState.ACCEPTED,
+            to_company=company,
+            approval=approval,
+            job_seeker=approval.user,
+            eligibility_diagnosis=approval.eligibility_diagnosis,
+        )
+        client.force_login(company.members.get())
+        response = client.get(reverse("approvals:list"))
+        assertContains(response, "1 résultat")
+        assertNotContains(response, self.TABS_CLASS)

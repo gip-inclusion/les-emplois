@@ -259,6 +259,9 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         "ordered_by_label": order_by.label,
         "matomo_custom_title": "Fiches salarié ASP",
         "back_url": reverse("dashboard:index"),
+        "num_rejected_employee_records": EmployeeRecord.objects.for_company(siae)
+        .filter(status=Status.REJECTED)
+        .count(),
     }
 
     return render(request, "employee_record/includes/list_results.html" if request.htmx else template_name, context)

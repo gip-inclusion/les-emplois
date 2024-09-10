@@ -1,6 +1,7 @@
 {% extends "layout/base.html" %}
 {% load django_bootstrap5 %}
 {% load static %}
+{% load matomo %}
 
 {% block title %}Fiches salarié ASP - {{ request.current_organization.display_name }} {{ block.super }}{% endblock %}
 
@@ -29,20 +30,26 @@
     {% endif %}
 {% endblock %}
 
-{% block title_content %}
-    <h1>Fiches salarié ASP - {{ request.current_organization.display_name }}</h1>
-    <h2 class="h3">Nous transférons vos fiches salarié à l'ASP afin de vous faire gagner du temps</h2>
-    <p>Une fois envoyées et validées, vous retrouverez directement vos données sur l'extranet de l'ASP.</p>
-    <ul>
-        <li>
-            Ne sont présentes dans cette liste que les candidatures acceptées (embauches) à partir du <b>{{ feature_availability_date|date }}</b>.
-        </li>
-        <li>
-            Vous devez avoir une annexe financière valide dans l'extranet de l'ASP pour pouvoir déclarer une fiche salarié dans les emplois.
-        </li>
-        <li>La visualisation dans l’Extranet IAE 2.0 interviendra dans les 2 heures suivant l’envoi.</li>
-    </ul>
-    {% include "employee_record/includes/list_status_help.html" with request=request status=form.status.value only %}
+{% block title_content %}<h1>Salariés</h1>{% endblock %}
+
+{% block title_extra %}
+    {% if request.current_organization.can_use_employee_record %}
+        <ul class="s-tabs-01__nav nav nav-tabs" data-it-sliding-tabs="true">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'approvals:list' %}" {% matomo_event "employeurs" "clic" "onglet-salaries-pass-iae" %}>
+                    Salariés et PASS IAE
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{% url 'employee_record_views:list' %}?status=NEW" {% matomo_event "employeurs" "clic" "onglet-fiches-salaries" %}>
+                    <span>Fiches salariés ASP</span>
+                    {% if num_rejected_employee_records %}
+                        <span class="badge badge-sm rounded-pill bg-warning text-white ms-2">{{ num_rejected_employee_records }}</span>
+                    {% endif %}
+                </a>
+            </li>
+        </ul>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -50,46 +57,63 @@
         <div class="s-section__container container">
             <div class="row my-3 my-md-5">
                 <div class="col-12">
-                    <div class="c-box p-3 p-md-4 d-flex align-items-center">
-                        <div class="p-0 flex-grow-1 h5 m-0">Vous ne trouvez pas la fiche salarié d’un de vos salariés ?</div>
-                        <a class="btn btn-primary" href="{% url "employee_record_views:add" %}">Créer une fiche salarié</a>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <form hx-get="{% url 'employee_record_views:list' %}"
-                          hx-trigger="change delay:.5s, change from:#id_job_seeker"
-                          hx-indicator="#employee-records-container"
-                          hx-target="#employee-records-container"
-                          hx-swap="outerHTML"
-                          hx-push-url="true"
-                          hx-include="#id_job_seeker">
-                        <div class="btn-dropdown-filter-group mb-3 mb-md-4">
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                    Statut
-                                </button>
-                                <ul class="dropdown-menu">
-                                    {% include "employee_record/includes/employee_record_filters/status.html" %}
+                    <div class="tab-content">
+                        <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-lg-between mb-3">
+                            <h2 class="mb-0">Fiches salarié ASP</h2>
+                            <div class="d-flex flex-column flex-md-row gap-2 justify-content-md-end" role="group" aria-label="Actions sur les collaborateurs">
+                                <a class="btn btn-primary btn-ico" href="{% url "employee_record_views:add" %}">
+                                    <i class="ri-user-add-line ri-lg" aria-hidden="true"></i>
+                                    <span>Créer une fiche salarié</span>
+                                </a>
+                            </div>
+                        </div>
+                        {% include "employee_record/includes/list_status_help.html" with request=request status=form.status.value only %}
+                        <div class="c-info mb-3 mb-md-4">
+                            <button class="c-info__summary collapsed" data-bs-toggle="collapse" data-bs-target="#collapseInfoASP" aria-expanded="false" aria-controls="collapseInfoASP">
+                                <span>Nous transférons vos fiches salarié à l'ASP afin de vous faire gagner du temps</span>
+                            </button>
+                            <div class="c-info__detail collapse" id="collapseInfoASP">
+                                <p>Une fois envoyées et validées, vous retrouverez directement vos données sur l'extranet de l'ASP.</p>
+                                <ul>
+                                    <li>
+                                        Ne sont présentes dans cette liste que les candidatures acceptées (embauches) à partir du <b>{{ feature_availability_date|date }}</b>.
+                                    </li>
+                                    <li>
+                                        Vous devez avoir une annexe financière valide dans l'extranet de l'ASP pour pouvoir déclarer une fiche salarié dans les emplois.
+                                    </li>
+                                    <li>La visualisation dans l’Extranet IAE 2.0 interviendra dans les 2 heures suivant l’envoi.</li>
                                 </ul>
                             </div>
                         </div>
-                        {# Filled via jQuery. Does not need reloading with HTMX, its content is static. #}
-                        {{ form.order.as_hidden }}
-                    </form>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
-                        {% include "employee_record/includes/list_counter.html" %}
-                        {% include "employee_record/includes/list_order.html" %}
-                        <div class="flex-column flex-md-row mt-3 mt-md-0 ms-md-3">
-                            {% bootstrap_field filters_form.job_seeker layout="inline" %}
+                        <form hx-get="{% url 'employee_record_views:list' %}"
+                              hx-trigger="change delay:.5s, change from:#id_job_seeker"
+                              hx-indicator="#employee-records-container"
+                              hx-target="#employee-records-container"
+                              hx-swap="outerHTML"
+                              hx-push-url="true"
+                              hx-include="#id_job_seeker">
+                            <div class="btn-dropdown-filter-group mb-3 mb-md-4">
+                                <div class="dropdown">
+                                    <button type="button" class="btn btn-dropdown-filter dropdown-toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                        Statut
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        {% include "employee_record/includes/employee_record_filters/status.html" %}
+                                    </ul>
+                                </div>
+                            </div>
+                            {# Filled via jQuery. Does not need reloading with HTMX, its content is static. #}
+                            {{ form.order.as_hidden }}
+                        </form>
+                        <div class="d-flex flex-column flex-md-row align-items-md-center mb-3 mb-md-4">
+                            {% include "employee_record/includes/list_counter.html" %}
+                            {% include "employee_record/includes/list_order.html" %}
+                            <div class="flex-column flex-md-row mt-3 mt-md-0 ms-md-3">
+                                {% bootstrap_field filters_form.job_seeker layout="inline" %}
+                            </div>
                         </div>
+                        {% include "employee_record/includes/list_results.html" %}
                     </div>
-                    {% include "employee_record/includes/list_results.html" %}
                 </div>
             </div>
         </div>
@@ -98,6 +122,7 @@
 
 {% block script %}
     {{ block.super }}
+    <script src='{% static "js/sliding_tabs.js" %}'></script>
     <script src='{% static "js/htmx_compat.js" %}'></script>
     <script src='{% static "js/htmx_dropdown_filter.js" %}'></script>
     <!-- Needed to use Select2MultipleWidget. -->
