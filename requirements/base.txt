@@ -45,9 +45,9 @@ bcrypt==4.2.0 \
     --hash=sha256:cf69eaf5185fd58f268f805b505ce31f9b9fc2d64b376642164e9244540c1221 \
     --hash=sha256:f4f4acf526fcd1c34e7ce851147deedd4e26e6402369304220250598b26448db
     # via paramiko
-boto3==1.35.5 \
-    --hash=sha256:2cef3aa476181395c260f4b6e6c5565e5a3022a874fb6b579d8e6b169f94e0b3 \
-    --hash=sha256:5724ddeda8e18c7614c20a09c20159ed87ff7439755cf5e250a1a3feaf9afb7e
+boto3==1.35.14 \
+    --hash=sha256:7bc78d7140c353b10a637927fe4bc4c4d95a464d1b8f515d5844def2ee52cbd5 \
+    --hash=sha256:c3e138e9041d59cd34cdc28a587dfdc899dba02ea26ebc3e10fb4bc88e5cf31b
     # via -r requirements/base.in
 botocore==1.35.14 \
     --hash=sha256:24823135232f88266b66ae8e1d0f3d40872c14cd976781f7fe52b8f0d79035a0 \
