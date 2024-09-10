@@ -19,12 +19,9 @@ from formtools.wizard.views import NamedUrlSessionWizardView
 
 from itou.approvals import enums as approvals_enums
 from itou.approvals.constants import PROLONGATION_REPORT_FILE_REASONS
-from itou.approvals.models import (
-    Approval,
-    ProlongationRequest,
-    ProlongationRequestDenyInformation,
-    Suspension,
-)
+from itou.approvals.models import Approval, ProlongationRequest, ProlongationRequestDenyInformation, Suspension
+from itou.employee_record.enums import Status
+from itou.employee_record.models import EmployeeRecord
 from itou.files.models import File
 from itou.utils import constants as global_constants
 from itou.utils.pagination import ItouPaginator, pager
@@ -114,6 +111,9 @@ class ApprovalListView(ApprovalBaseViewMixin, ListView):
         context["filters_form"] = self.form
         context["filters_counter"] = self.form.get_filters_counter()
         context["back_url"] = reverse("dashboard:index")
+        context["num_rejected_employee_records"] = (
+            EmployeeRecord.objects.for_company(self.siae).filter(status=Status.REJECTED).count()
+        )
         return context
 
 
