@@ -96,7 +96,6 @@ class PrescriberSignupTest(InclusionConnectBaseTestCase):
         next_url = reverse("signup:prescriber_join_org")
         params = {
             "user_email": email,
-            "channel": "pole_emploi",
             "user_kind": KIND_PRESCRIBER,
             "previous_url": previous_url,
             "next_url": next_url,

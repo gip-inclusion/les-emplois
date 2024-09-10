@@ -23,7 +23,6 @@ from django.views.generic import FormView, TemplateView, View
 from itou.common_apps.address.models import lat_lon_to_coords
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company, CompanyMembership
-from itou.openid_connect.inclusion_connect.enums import InclusionConnectChannel
 from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberMembership, PrescriberOrganization
 from itou.users.adapter import UserAdapter
@@ -605,7 +604,6 @@ def prescriber_pole_emploi_user(request, template_name="signup/prescriber_pole_e
     )
     params = {
         "user_email": session_data["email"],
-        "channel": InclusionConnectChannel.POLE_EMPLOI.value,
         "user_kind": KIND_PRESCRIBER,
         "previous_url": request.get_full_path(),
         "next_url": reverse("signup:prescriber_join_org"),
