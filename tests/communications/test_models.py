@@ -120,7 +120,7 @@ class AnnouncementCampaignModelTest(TestCase):
             AnnouncementCampaignFactory(start_date=date(2024, 1, 2))
 
     def test_start_date_conflict_constraint(self):
-        existing_campaign = AnnouncementCampaignFactory()
+        existing_campaign = AnnouncementCampaignFactory(start_date=date(2023, 1, 1))
 
         # can modify existing value without triggering constraint
         existing_campaign = AnnouncementCampaignFactory(start_date=date(2024, 1, 1))
