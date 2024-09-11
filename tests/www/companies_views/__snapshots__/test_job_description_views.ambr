@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: JobDescriptionListViewTest.test_job_application_list_response_content[job applications list]
   dict({
-    'num_queries': 17,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -165,19 +165,6 @@
           SELECT COUNT(*) AS "__count"
           FROM "companies_jobdescription"
           WHERE "companies_jobdescription"."company_id" = %s
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'job_description_list[www/companies_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT COUNT(*) AS "__count"
-          FROM "companies_companymembership"
-          INNER JOIN "users_user" ON ("companies_companymembership"."user_id" = "users_user"."id")
-          WHERE ("companies_companymembership"."company_id" = %s
-                 AND "users_user"."is_active"
-                 AND "companies_companymembership"."is_active")
         ''',
       }),
       dict({
