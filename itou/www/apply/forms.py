@@ -14,7 +14,7 @@ from django_select2.forms import Select2MultipleWidget, Select2Widget
 
 from itou.approvals.models import Approval
 from itou.asp import models as asp_models
-from itou.asp.forms import formfield_for_birth_place
+from itou.asp.forms import BirthPlaceAndCountryMixin
 from itou.common_apps.address.departments import DEPARTMENTS
 from itou.common_apps.address.forms import JobSeekerAddressForm
 from itou.common_apps.nir.forms import JobSeekerNIRUpdateMixin
@@ -192,6 +192,12 @@ class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, JobSeekerProfile
                 "class": "js-period-date-input",
             }
         )
+
+
+class CreateOrUpdateJobSeekerWithBirthPlaceAndCountryStep1Form(
+    BirthPlaceAndCountryMixin, CreateOrUpdateJobSeekerStep1Form
+):
+    pass
 
 
 class CreateOrUpdateJobSeekerStep2Form(JobSeekerAddressForm, forms.ModelForm):
@@ -878,63 +884,19 @@ class JobSeekerPersonalDataForm(JobSeekerNIRUpdateMixin, forms.ModelForm):
         JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
 
 
-class CertifiedCriteriaInfoRequiredForm(forms.ModelForm):
+class CertifiedCriteriaInfoRequiredForm(BirthPlaceAndCountryMixin, forms.ModelForm):
     """API Particulier required information.
     https://github.com/etalab/siade_staging_data/blob/develop/payloads/api_particulier_v2_cnav_allocation_adulte_handicape/200_beneficiaire.yaml
     """
-
-    birth_country = forms.ModelChoiceField(
-        asp_models.Country.objects,
-        label="Pays de naissance",
-        required=False,
-    )
 
     class Meta:
         model = JobSeekerProfile
         fields = ("birth_place", "birth_country")
 
     def __init__(self, birthdate, *args, with_birthdate_field, **kwargs):
-        super().__init__(*args, **kwargs)
-        # with_birthdate_field indicates if JS is needed to link birthdate & birth_place fields
-        self.fields["birth_place"] = formfield_for_birth_place(with_birthdate_field=with_birthdate_field)
+        self.with_birthdate_field = with_birthdate_field
         self.birthdate = birthdate
-
-    def clean(self):
-        super().clean()
-
-        birthdate = self.birthdate
-        birth_place = self.cleaned_data.get("birth_place")
-        birth_country = self.cleaned_data.get("birth_country")
-        if not birth_country:
-            # Selecting a birth place sets the birth country field to France and disables it.
-            # However, disabled fields are ignored by Django.
-            # That's also why we can't make it mandatory.
-            # See utils.js > toggleDisableAndSetValue
-            if birth_place:
-                self.cleaned_data["birth_country"] = asp_models.Country.objects.get(
-                    code=asp_models.Country._CODE_FRANCE
-                )
-            else:
-                # Display the error above the field instead of top of page.
-                self.add_error("birth_country", "Le pays de naissance est obligatoire.")
-
-        if birth_place and birthdate:
-            try:
-                self.cleaned_data["birth_place"] = asp_models.Commune.objects.by_insee_code_and_period(
-                    birth_place.code, birthdate
-                )
-            except asp_models.Commune.DoesNotExist:
-                msg = f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {birthdate:%d/%m/%Y}"
-                self.add_error("birth_place", msg)
-
-    def _post_clean(self):
-        super()._post_clean()
-        try:
-            self.instance.birth_place = self.cleaned_data.get("birth_place")
-            self.instance.birth_country = self.cleaned_data.get("birth_country")
-            self.instance._clean_birth_fields()
-        except ValidationError as e:
-            self._update_errors(e)
+        super().__init__(*args, **kwargs)
 
 
 class FilterJobApplicationsForm(forms.Form):
