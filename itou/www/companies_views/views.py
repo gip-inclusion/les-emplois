@@ -17,7 +17,7 @@ from django.views.generic.base import TemplateView
 from itou.cities.models import City
 from itou.common_apps.address.departments import department_from_postcode
 from itou.common_apps.organizations.views import deactivate_org_member, update_org_admin_role
-from itou.companies.models import Company, CompanyMembership, JobDescription, SiaeFinancialAnnex
+from itou.companies.models import Company, JobDescription, SiaeFinancialAnnex
 from itou.jobs.models import Appellation
 from itou.users.models import User
 from itou.utils import constants as global_constants
@@ -237,7 +237,6 @@ def job_description_list(request, template_name="companies/job_description_list.
         "form": form,
         "job_pager": job_pager,
         "page": page,
-        "members_count": CompanyMembership.objects.filter(company_id=company.pk).active().count(),
         "can_show_financial_annexes": company.convention_can_be_accessed_by(request.user),
         "back_url": reverse("dashboard:index"),
     }
@@ -397,8 +396,6 @@ def show_financial_annexes(request, template_name="companies/show_financial_anne
         "can_select_af": current_siae.convention_can_be_changed_by(request.user),
         "siae_is_asp": current_siae.source == Company.SOURCE_ASP,
         "siae_is_user_created": current_siae.source == Company.SOURCE_USER_CREATED,
-        "jobs_count": JobDescription.objects.filter(company_id=current_siae.pk).count(),
-        "members_count": CompanyMembership.objects.filter(company_id=current_siae.pk).active().count(),
         "back_url": reverse("dashboard:index"),
     }
     return render(request, template_name, context)
@@ -626,7 +623,6 @@ def members(request, template_name="companies/members.html"):
         "members": active_company_members,
         "members_stats": active_company_members_stats,
         "pending_invitations": pending_invitations,
-        "jobs_count": JobDescription.objects.filter(company_id=company.pk).count(),
         "can_show_financial_annexes": company.convention_can_be_accessed_by(request.user),
         "back_url": reverse("dashboard:index"),
     }
