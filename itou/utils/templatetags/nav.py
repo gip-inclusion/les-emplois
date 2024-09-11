@@ -189,61 +189,59 @@ def is_active(request, menu_item):
 
 @register.inclusion_tag("utils/templatetags/nav.html")
 def nav(request):
-    menu_items: list[NavItem | NavGroup] = []
-    if request.user.is_authenticated:
-        menu_items.append(NAV_ENTRIES["home"])
-        if request.user.is_job_seeker:
-            menu_items.append(NAV_ENTRIES["job-seeker-job-apps"])
-        elif request.user.is_prescriber:
-            menu_items.append(NAV_ENTRIES["prescriber-job-apps"])
-            menu_items.append(NAV_ENTRIES["prescriber-jobseekers"])
-            if request.current_organization:
-                menu_items.append(
-                    NavGroup(
-                        label="Organisation",
-                        icon="ri-team-line",
-                        items=[NAV_ENTRIES["prescriber-members"]],
-                    )
-                )
-        elif request.user.is_employer and request.current_organization:
-            menu_items.append(NAV_ENTRIES["employer-job-apps"])
-            if request.current_organization.is_subject_to_eligibility_rules:
-                employee_group_items = [NAV_ENTRIES["employer-approvals"]]
-                if request.current_organization.can_use_employee_record:
-                    employee_group_items.append(NAV_ENTRIES["employer-employee-records"])
-                menu_items.append(NavGroup(label="Salariés", icon="ri-team-line", items=employee_group_items))
-            company_group_items = [NAV_ENTRIES["employer-jobs"]]
-            if request.current_organization.is_active:
-                company_group_items.append(NAV_ENTRIES["employer-members"])
-            if request.current_organization.convention_can_be_accessed_by(request.user):
-                company_group_items.append(NAV_ENTRIES["employer-financial-annexes"])
-            menu_items.append(NavGroup(label="Structure", icon="ri-community-line", items=company_group_items))
-        elif request.user.is_labor_inspector:
+    menu_items: list[NavItem | NavGroup] = [NAV_ENTRIES["home"]]
+    if request.user.is_job_seeker:
+        menu_items.append(NAV_ENTRIES["job-seeker-job-apps"])
+    elif request.user.is_prescriber:
+        menu_items.append(NAV_ENTRIES["prescriber-job-apps"])
+        menu_items.append(NAV_ENTRIES["prescriber-jobseekers"])
+        if request.current_organization:
             menu_items.append(
                 NavGroup(
                     label="Organisation",
-                    icon="ri-community-line",
-                    items=[NAV_ENTRIES["labor-inspector-members"]],
+                    icon="ri-team-line",
+                    items=[NAV_ENTRIES["prescriber-members"]],
                 )
             )
+    elif request.user.is_employer and request.current_organization:
+        menu_items.append(NAV_ENTRIES["employer-job-apps"])
+        if request.current_organization.is_subject_to_eligibility_rules:
+            employee_group_items = [NAV_ENTRIES["employer-approvals"]]
+            if request.current_organization.can_use_employee_record:
+                employee_group_items.append(NAV_ENTRIES["employer-employee-records"])
+            menu_items.append(NavGroup(label="Salariés", icon="ri-team-line", items=employee_group_items))
+        company_group_items = [NAV_ENTRIES["employer-jobs"]]
+        if request.current_organization.is_active:
+            company_group_items.append(NAV_ENTRIES["employer-members"])
+        if request.current_organization.convention_can_be_accessed_by(request.user):
+            company_group_items.append(NAV_ENTRIES["employer-financial-annexes"])
+        menu_items.append(NavGroup(label="Structure", icon="ri-community-line", items=company_group_items))
+    elif request.user.is_labor_inspector:
         menu_items.append(
             NavGroup(
-                label="Rechercher",
-                icon="ri-search-line",
-                items=[
-                    NAV_ENTRIES["employers-search"],
-                    NAV_ENTRIES["prescribers-search"],
-                ],
+                label="Organisation",
+                icon="ri-community-line",
+                items=[NAV_ENTRIES["labor-inspector-members"]],
             )
         )
+    menu_items.append(
+        NavGroup(
+            label="Rechercher",
+            icon="ri-search-line",
+            items=[
+                NAV_ENTRIES["employers-search"],
+                NAV_ENTRIES["prescribers-search"],
+            ],
+        )
+    )
 
-        if request.resolver_match:
-            for group_or_item in menu_items:
-                try:
-                    for item in group_or_item.items:
-                        item.active = is_active(request, item)
-                except AttributeError:
-                    group_or_item.active = is_active(request, group_or_item)
+    if request.resolver_match:
+        for group_or_item in menu_items:
+            try:
+                for item in group_or_item.items:
+                    item.active = is_active(request, item)
+            except AttributeError:
+                group_or_item.active = is_active(request, group_or_item)
     return {"menu_items": menu_items}
 
 
