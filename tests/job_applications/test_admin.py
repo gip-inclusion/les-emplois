@@ -20,7 +20,7 @@ from tests.utils.test import parse_response_to_soup
 
 def test_create_employee_record(admin_client):
     job_application = factories.JobApplicationFactory(
-        state=models.JobApplicationState.ACCEPTED,
+        state=JobApplicationState.ACCEPTED,
         with_approval=True,
     )
 

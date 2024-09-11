@@ -44,7 +44,7 @@ class JobApplicationFactory(AutoNowOverrideMixin, factory.django.DjangoModelFact
             job_seeker=factory.SubFactory(JobSeekerFactory, with_mocked_address=True)
         )
         with_approval = factory.Trait(
-            state=models.JobApplicationState.ACCEPTED,
+            state=JobApplicationState.ACCEPTED,
             approval=factory.SubFactory(
                 ApprovalFactory,
                 user=factory.SelfAttribute("..job_seeker"),
@@ -216,7 +216,7 @@ class JobApplicationSentByPrescriberPoleEmploiFactory(JobApplicationSentByPrescr
 class JobApplicationWithoutApprovalFactory(JobApplicationSentByPrescriberFactory):
     """Generates a JobApplication() object without an Approval() object."""
 
-    state = models.JobApplicationState.ACCEPTED
+    state = JobApplicationState.ACCEPTED
     hiring_without_approval = True
 
 
