@@ -1,3 +1,6 @@
+import types
+from unittest.mock import call
+
 import pytest
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.middleware.csrf import CsrfViewMiddleware
@@ -7,6 +10,7 @@ from pytest_django.asserts import assertContains
 
 from itou.utils import constants as global_constants
 from itou.www.error import server_error
+from tests.companies.factories import CompanyFactory
 from tests.utils.tests import get_response_for_middlewaremixin
 
 
@@ -25,6 +29,35 @@ def test_error_handling(client, mocker):
         # - it is simple
         # - we need to be able to patch something inside it to fail
         client.get(reverse("search:employers_home"))
+
+
+def make_employer():
+    company = CompanyFactory(with_membership=True)
+    return company.members.get()
+
+
+@pytest.mark.parametrize(
+    "user_factory,exc_count",
+    [
+        (
+            types.NoneType,
+            2,  # Anonymous navigation is included twice, for mobile and desktop.
+        ),
+        (make_employer, 1),
+    ],
+)
+def test_error_handling_ignores_nav_error(client, exc_count, mocker, user_factory):
+    sentry_mock = mocker.patch("itou.utils.templatetags.nav.sentry_sdk")
+    exc = Exception()
+    mocker.patch("itou.utils.templatetags.nav.is_active", side_effect=exc)
+
+    user = user_factory()
+    if user:
+        client.force_login(user)
+    # Any public page is fine.
+    response = client.get(reverse("accessibility"))
+    assertContains(response, '<li class="nav-item">')
+    sentry_mock.capture_exception.mock_calls == [call(exc)] * exc_count
 
 
 def test_handler500_view():
