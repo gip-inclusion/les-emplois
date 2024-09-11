@@ -1,5 +1,6 @@
 import copy
 import datetime
+import json
 
 import httpx
 import jwt
@@ -386,14 +387,14 @@ class Client:
         return transformed_results
 
     @staticmethod
-    def _build_metabase_field(field):
-        return ["field", field, {"base-type": "type/Text"}]
+    def _build_metabase_field(field, base_type="type/Text"):
+        return ["field", field, {"base-type": base_type}]
 
     @staticmethod
-    def _build_metabase_filter(field, values):
+    def _build_metabase_filter(field, values, base_type="type/Text"):
         return [
             "=",
-            Client._build_metabase_field(field),
+            Client._build_metabase_field(field, base_type),
             *values,
         ]
 
@@ -425,3 +426,35 @@ class Client:
 
         data = self.request("POST", "/dataset", data=card_query)
         return self.transform_metabase_results(data["data"], group_by=group_by, single_value=single_value)
+
+    def fetch_dataset_results(self, database, table, select=None, filters=None, limit=None):
+        dataset_query = {"database": database, "type": "query", "query": {"source-table": table}, "parameters": []}
+        if select:
+            dataset_query["query"]["fields"] = [
+                self._build_metabase_field(field, base_type="type/Integer") for field in select
+            ]
+        if filters:
+            dataset_query["query"]["filter"] = self._join_metabase_filters(
+                *[
+                    self._build_metabase_filter(field, values, base_type="type/Boolean")
+                    for field, values in filters.items()
+                ]
+            )
+        if limit:
+            dataset_query["query"]["limit"] = limit
+
+        print(dataset_query)
+
+        # /!\ MB (hardcoded) limit to the first 2000 rows when "viewing", "download" has a 1_000_000 rows limits
+        response = httpx.request(
+            "POST",
+            self.api_url + "/dataset/json",
+            params={"format_rows": False},
+            data={"query": json.dumps(dataset_query)},
+            headers={
+                "X-API-KEY": settings.METABASE_API_KEY,
+            },
+            timeout=60,  # Use a not-so-long but not not-so-short timeout
+        )
+
+        return response.json()

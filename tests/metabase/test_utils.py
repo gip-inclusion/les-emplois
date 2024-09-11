@@ -1,5 +1,6 @@
 from itou.geo.utils import coords_to_geometry
 from itou.metabase.tables.utils import get_qpv_job_seeker_pks, get_zrr_status_for_insee_code
+from itou.utils.apis.metabase import Client
 from tests.geo.factories import QPVFactory, ZRRFactory
 from tests.users.factories import JobSeekerFactory
 
@@ -34,3 +35,10 @@ def test_get_zrr_status_for_insee_code_not_in_zrr():
 def test_get_zrr_status_for_insee_code_partially_in_zrr():
     partially_in_zrr = ZRRFactory(partially_in_zrr=True)
     assert get_zrr_status_for_insee_code(partially_in_zrr.insee_code) == "Partiellement classée en ZRR"
+
+
+def test_fetch_dataset_results(settings):
+    client = Client(settings.METABASE_SITE_URL)
+    results = client.fetch_dataset_results(2, 1725, select={54509}, filters={54532: [True]})
+    print(len(results))
+    assert False
