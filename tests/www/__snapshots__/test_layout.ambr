@@ -1,5 +1,201 @@
 # serializer version: 1
-# name: test_navigation_authenticated[AuthorizedPrescriber]
+# name: test_navigation_authenticated[AuthorizedPrescriber][navigation]
+  '''
+  <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
+          <div class="offcanvas-header offcanvas-header--structure">
+              <div class="dropdown dropdown-structure flex-grow-1 py-4">
+                  
+                      <div class="dropdown-toggle dropdown-toggle__summary">
+                          
+                              
+                                  <i aria-hidden="true" class="ri-home-smile-line"></i>
+                              
+                          
+                          <span>PE</span>
+                          <strong>ACME Inc.</strong>
+                      </div>
+                  
+              </div>
+              <div class="border-start border-nuance-08 d-xl-none">
+                  <button aria-label="Fermer" class="btn-link ps-4 pt-5 pe-2 me-n2" data-bs-dismiss="offcanvas" type="button">
+                      <i aria-hidden="true" class="ri-close-line"></i>
+                  </button>
+              </div>
+          </div>
+          <div class="offcanvas-body d-flex flex-column">
+              <nav aria-label="Navigation principale" class="flex-grow-1" role="navigation">
+                  
+  
+  <ul class="nav nav-tabs flex-column">
+      
+          
+              <li class="nav-item">
+                  <a class="nav-link active" href="/dashboard/">
+                      <i aria-hidden="true" class="ri-home-line font-weight-medium"></i>
+                      <span>Accueil</span>
+                  </a>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
+                      <i aria-hidden="true" class="ri-draft-line font-weight-medium"></i>
+                      <span>Candidatures</span>
+                  </a>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats" href="/job-seekers/list">
+                      <i aria-hidden="true" class="ri-user-line font-weight-medium"></i>
+                      <span>Candidats</span>
+                  </a>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <button aria-controls="collapse-nav-organisation" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-organisation" data-bs-toggle="collapse" type="button">
+                      <i aria-hidden="true" class="ri-team-line font-weight-medium"></i>
+                      <span>Organisation</span>
+                  </button>
+                  <div class="collapse" id="collapse-nav-organisation">
+                      <ul>
+                          
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="collaborateurs" href="/prescribers/colleagues">
+                                  Collaborateurs</a>
+                              </li>
+                          
+                      </ul>
+                  </div>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <button aria-controls="collapse-nav-rechercher" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-rechercher" data-bs-toggle="collapse" type="button">
+                      <i aria-hidden="true" class="ri-search-line font-weight-medium"></i>
+                      <span>Rechercher</span>
+                  </button>
+                  <div class="collapse" id="collapse-nav-rechercher">
+                      <ul>
+                          
+                              <li>
+                                  <a href="/search/employers/results">
+                                  Un emploi inclusif</a>
+                              </li>
+                          
+                              <li>
+                                  <a href="/search/prescribers/results">
+                                  Un prescripteur habilité</a>
+                              </li>
+                          
+                      </ul>
+                  </div>
+              </li>
+          
+      
+  </ul>
+  
+              </nav>
+              <div class="dropdown">
+                  <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
+                      <i aria-hidden="true" class="ri-account-circle-line"></i>
+                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                  </button>
+                  <div class="dropdown-menu" id="dashboardUserDropdownMobile">
+                      <ul class="list-unstyled">
+      <li class="dropdown-item">
+          <div class="d-flex align-items-center">
+              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <div class="flex-grow-1 ms-2 lh-sm w-75">
+                  
+                      <span>John DOE</span>
+                      <br/>
+                  
+                  <span class="fs-sm lh-sm text-muted has-ellipsis d-inline-block w-100">john.doe@example.com</span>
+              </div>
+          </div>
+      </li>
+      <li>
+          <div class="dropdown-divider"></div>
+      </li>
+      
+          <li>
+              <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
+          </li>
+          <li class="dropdown-divider"></li>
+      
+      <li>
+          <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
+      </li>
+      
+      <li class="dropdown-divider"></li>
+      
+      <li class="dropdown-item">
+          <form action="/accounts/logout/" method="post">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <button class="text-danger">Déconnexion</button>
+          </form>
+      </li>
+  </ul>
+  
+                  </div>
+              </div>
+              <div class="dropdown">
+                  <button aria-controls="helpDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" type="button">
+                      Besoin d'aide ?
+                  </button>
+                  <div class="dropdown-menu" id="helpDropdownMobile">
+                      
+  
+  <ul class="list-unstyled">
+      <li>
+          <a aria-label="Accéder à l'espace de documentation (nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_documentation" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" rel="noopener" target="_blank">Documentation</a>
+      </li>
+      <li>
+          <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">Qui peut bénéficier des contrats d'IAE ?</a>
+      </li>
+      
+          
+              <li>
+                  <a aria-label="Prescrire un parcours IAE (guide pratique) (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_prescrire-parcours-iae-guide" href="https://travail-emploi.gouv.fr/actualites/l-actualite-du-ministere/article/guide-pratique-la-prescription-de-parcours-d-insertion-par-l-activite" rel="noopener" target="_blank">Prescrire un parcours IAE (guide pratique)</a>
+              </li>
+          
+      
+      <li>
+          <a aria-label="Les nouveautés du site des emplois de l'inclusion" class="dropdown-item" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_nouveautes" href="/announcements/news/">Nouveautés</a>
+      </li>
+  </ul>
+  
+                  </div>
+              </div>
+          </div>
+          <div class="offcanvas-footer flex-column align-items-stretch">
+              <div class="offcanvas-footer__legal">
+                  <div class="d-none d-xl-block">
+                      <img alt="Les emplois de l'inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion.svg"/>
+                  </div>
+                  <ul>
+                      <li>
+                          <a href="/accessibility/">Accessibilité : partiellement conforme</a>
+                      </li>
+                      <li>
+                          <a href="/legal/notice/">Mentions légales</a>
+                      </li>
+                      <li>
+                          <a href="/legal/terms/">CGU</a>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  '''
+# ---
+# name: test_navigation_authenticated[AuthorizedPrescriber][user menu]
   '''
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           <ul>
@@ -15,7 +211,7 @@
               <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
               <div class="flex-grow-1 ms-2 lh-sm">
                   
-                      <span>Pierre DUPONT</span>
+                      <span>John DOE</span>
                       <br/>
                   
                   <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
@@ -52,7 +248,231 @@
                       </nav>
   '''
 # ---
-# name: test_navigation_authenticated[Employer]
+# name: test_navigation_authenticated[Employer][navigation]
+  '''
+  <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
+          <div class="offcanvas-header offcanvas-header--structure">
+              <div class="dropdown dropdown-structure flex-grow-1 py-4">
+                  
+                      <div class="dropdown-toggle dropdown-toggle__summary">
+                          
+                              <i aria-hidden="true" class="ri-community-line"></i>
+                          
+                          <span>EI</span>
+                          <strong>Acme inc.</strong>
+                      </div>
+                  
+              </div>
+              <div class="border-start border-nuance-08 d-xl-none">
+                  <button aria-label="Fermer" class="btn-link ps-4 pt-5 pe-2 me-n2" data-bs-dismiss="offcanvas" type="button">
+                      <i aria-hidden="true" class="ri-close-line"></i>
+                  </button>
+              </div>
+          </div>
+          <div class="offcanvas-body d-flex flex-column">
+              <nav aria-label="Navigation principale" class="flex-grow-1" role="navigation">
+                  
+  
+  <ul class="nav nav-tabs flex-column">
+      
+          
+              <li class="nav-item">
+                  <a class="nav-link active" href="/dashboard/">
+                      <i aria-hidden="true" class="ri-home-line font-weight-medium"></i>
+                      <span>Accueil</span>
+                  </a>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/siae/list">
+                      <i aria-hidden="true" class="ri-draft-line font-weight-medium"></i>
+                      <span>Candidatures</span>
+                  </a>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <button aria-controls="collapse-nav-salaries" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-salaries" data-bs-toggle="collapse" type="button">
+                      <i aria-hidden="true" class="ri-team-line font-weight-medium"></i>
+                      <span>Salariés</span>
+                  </button>
+                  <div class="collapse" id="collapse-nav-salaries">
+                      <ul>
+                          
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="salaries-pass-iae" href="/approvals/list">
+                                  Salariés et PASS IAE</a>
+                              </li>
+                          
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="fiches-salaries-asp" href="/employee_record/list?status=NEW">
+                                  Fiches salariés ASP</a>
+                              </li>
+                          
+                      </ul>
+                  </div>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <button aria-controls="collapse-nav-structure" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-structure" data-bs-toggle="collapse" type="button">
+                      <i aria-hidden="true" class="ri-community-line font-weight-medium"></i>
+                      <span>Structure</span>
+                  </button>
+                  <div class="collapse" id="collapse-nav-structure">
+                      <ul>
+                          
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="metiers-recrutement" href="/company/job_description_list">
+                                  Métiers et recrutements</a>
+                              </li>
+                          
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="collaborateurs" href="/company/colleagues">
+                                  Collaborateurs</a>
+                              </li>
+                          
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="annexes-financieres" href="/company/show_financial_annexes">
+                                  Annexes financières</a>
+                              </li>
+                          
+                      </ul>
+                  </div>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <button aria-controls="collapse-nav-rechercher" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-rechercher" data-bs-toggle="collapse" type="button">
+                      <i aria-hidden="true" class="ri-search-line font-weight-medium"></i>
+                      <span>Rechercher</span>
+                  </button>
+                  <div class="collapse" id="collapse-nav-rechercher">
+                      <ul>
+                          
+                              <li>
+                                  <a href="/search/employers/results">
+                                  Un emploi inclusif</a>
+                              </li>
+                          
+                              <li>
+                                  <a href="/search/prescribers/results">
+                                  Un prescripteur habilité</a>
+                              </li>
+                          
+                      </ul>
+                  </div>
+              </li>
+          
+      
+  </ul>
+  
+              </nav>
+              <div class="dropdown">
+                  <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
+                      <i aria-hidden="true" class="ri-account-circle-line"></i>
+                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                  </button>
+                  <div class="dropdown-menu" id="dashboardUserDropdownMobile">
+                      <ul class="list-unstyled">
+      <li class="dropdown-item">
+          <div class="d-flex align-items-center">
+              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <div class="flex-grow-1 ms-2 lh-sm w-75">
+                  
+                      <span>John DOE</span>
+                      <br/>
+                  
+                  <span class="fs-sm lh-sm text-muted has-ellipsis d-inline-block w-100">john.doe@example.com</span>
+              </div>
+          </div>
+      </li>
+      <li>
+          <div class="dropdown-divider"></div>
+      </li>
+      
+          <li>
+              <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
+          </li>
+          <li class="dropdown-divider"></li>
+      
+      <li>
+          <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
+      </li>
+      
+      <li class="dropdown-divider"></li>
+      
+          <li>
+              <a class="dropdown-item text-primary" href="/dashboard/token_api">Accès aux APIs</a>
+          </li>
+          <li class="dropdown-divider"></li>
+      
+      <li class="dropdown-item">
+          <form action="/accounts/logout/" method="post">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <button class="text-danger">Déconnexion</button>
+          </form>
+      </li>
+  </ul>
+  
+                  </div>
+              </div>
+              <div class="dropdown">
+                  <button aria-controls="helpDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" type="button">
+                      Besoin d'aide ?
+                  </button>
+                  <div class="dropdown-menu" id="helpDropdownMobile">
+                      
+  
+  <ul class="list-unstyled">
+      <li>
+          <a aria-label="Accéder à l'espace de documentation (nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_documentation" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" rel="noopener" target="_blank">Documentation</a>
+      </li>
+      <li>
+          <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">Qui peut bénéficier des contrats d'IAE ?</a>
+      </li>
+      
+          
+              <li>
+                  <a aria-label="Prescrire un parcours IAE (guide pratique) (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_prescrire-parcours-iae-guide" href="https://travail-emploi.gouv.fr/actualites/l-actualite-du-ministere/article/guide-pratique-la-prescription-de-parcours-d-insertion-par-l-activite" rel="noopener" target="_blank">Prescrire un parcours IAE (guide pratique)</a>
+              </li>
+          
+      
+      <li>
+          <a aria-label="Les nouveautés du site des emplois de l'inclusion" class="dropdown-item" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_nouveautes" href="/announcements/news/">Nouveautés</a>
+      </li>
+  </ul>
+  
+                  </div>
+              </div>
+          </div>
+          <div class="offcanvas-footer flex-column align-items-stretch">
+              <div class="offcanvas-footer__legal">
+                  <div class="d-none d-xl-block">
+                      <img alt="Les emplois de l'inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion.svg"/>
+                  </div>
+                  <ul>
+                      <li>
+                          <a href="/accessibility/">Accessibilité : partiellement conforme</a>
+                      </li>
+                      <li>
+                          <a href="/legal/notice/">Mentions légales</a>
+                      </li>
+                      <li>
+                          <a href="/legal/terms/">CGU</a>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  '''
+# ---
+# name: test_navigation_authenticated[Employer][user menu]
   '''
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           <ul>
@@ -110,7 +530,176 @@
                       </nav>
   '''
 # ---
-# name: test_navigation_authenticated[JobSeeker]
+# name: test_navigation_authenticated[JobSeeker][navigation]
+  '''
+  <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
+          <div class="offcanvas-header offcanvas-header--structure">
+              <div class="dropdown dropdown-structure flex-grow-1 py-4">
+                  
+                      
+                          <div class="dropdown-toggle dropdown-toggle__summary">
+                              <i aria-hidden="true" class="ri-user-line"></i>
+                              <span>Candidat</span>
+                              <strong>John DOE</strong>
+                          </div>
+                      
+                  
+              </div>
+              <div class="border-start border-nuance-08 d-xl-none">
+                  <button aria-label="Fermer" class="btn-link ps-4 pt-5 pe-2 me-n2" data-bs-dismiss="offcanvas" type="button">
+                      <i aria-hidden="true" class="ri-close-line"></i>
+                  </button>
+              </div>
+          </div>
+          <div class="offcanvas-body d-flex flex-column">
+              <nav aria-label="Navigation principale" class="flex-grow-1" role="navigation">
+                  
+  
+  <ul class="nav nav-tabs flex-column">
+      
+          
+              <li class="nav-item">
+                  <a class="nav-link active" href="/dashboard/">
+                      <i aria-hidden="true" class="ri-home-line font-weight-medium"></i>
+                      <span>Accueil</span>
+                  </a>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="mes-candidatures" href="/apply/job_seeker/list">
+                      <i aria-hidden="true" class="ri-draft-line font-weight-medium"></i>
+                      <span>Mes candidatures</span>
+                  </a>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <button aria-controls="collapse-nav-rechercher" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-rechercher" data-bs-toggle="collapse" type="button">
+                      <i aria-hidden="true" class="ri-search-line font-weight-medium"></i>
+                      <span>Rechercher</span>
+                  </button>
+                  <div class="collapse" id="collapse-nav-rechercher">
+                      <ul>
+                          
+                              <li>
+                                  <a href="/search/employers/results">
+                                  Un emploi inclusif</a>
+                              </li>
+                          
+                              <li>
+                                  <a href="/search/prescribers/results">
+                                  Un prescripteur habilité</a>
+                              </li>
+                          
+                      </ul>
+                  </div>
+              </li>
+          
+      
+  </ul>
+  
+              </nav>
+              <div class="dropdown">
+                  <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
+                      <i aria-hidden="true" class="ri-account-circle-line"></i>
+                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                  </button>
+                  <div class="dropdown-menu" id="dashboardUserDropdownMobile">
+                      <ul class="list-unstyled">
+      <li class="dropdown-item">
+          <div class="d-flex align-items-center">
+              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <div class="flex-grow-1 ms-2 lh-sm w-75">
+                  
+                      <span>John DOE</span>
+                      <br/>
+                  
+                  <span class="fs-sm lh-sm text-muted has-ellipsis d-inline-block w-100">john.doe@example.com</span>
+              </div>
+          </div>
+      </li>
+      <li>
+          <div class="dropdown-divider"></div>
+      </li>
+      
+          <li>
+              <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
+          </li>
+          <li class="dropdown-divider"></li>
+      
+      <li>
+          <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
+      </li>
+      
+          <li>
+              <a class="dropdown-item" href="/accounts/password/change/">Modifier mon mot de passe</a>
+          </li>
+          <li>
+              <a class="dropdown-item" href="/dashboard/edit_user_email">Modifier mon adresse e-mail</a>
+          </li>
+      
+      <li class="dropdown-divider"></li>
+      
+      <li class="dropdown-item">
+          <form action="/accounts/logout/" method="post">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <button class="text-danger">Déconnexion</button>
+          </form>
+      </li>
+  </ul>
+  
+                  </div>
+              </div>
+              <div class="dropdown">
+                  <button aria-controls="helpDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" type="button">
+                      Besoin d'aide ?
+                  </button>
+                  <div class="dropdown-menu" id="helpDropdownMobile">
+                      
+  
+  <ul class="list-unstyled">
+      <li>
+          <a aria-label="Accéder à l'espace de documentation (nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_documentation" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" rel="noopener" target="_blank">Documentation</a>
+      </li>
+      <li>
+          <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">Qui peut bénéficier des contrats d'IAE ?</a>
+      </li>
+      
+          
+      
+      <li>
+          <a aria-label="Les nouveautés du site des emplois de l'inclusion" class="dropdown-item" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_nouveautes" href="/announcements/news/">Nouveautés</a>
+      </li>
+  </ul>
+  
+                  </div>
+              </div>
+          </div>
+          <div class="offcanvas-footer flex-column align-items-stretch">
+              <div class="offcanvas-footer__legal">
+                  <div class="d-none d-xl-block">
+                      <img alt="Les emplois de l'inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion.svg"/>
+                  </div>
+                  <ul>
+                      <li>
+                          <a href="/accessibility/">Accessibilité : partiellement conforme</a>
+                      </li>
+                      <li>
+                          <a href="/legal/notice/">Mentions légales</a>
+                      </li>
+                      <li>
+                          <a href="/legal/terms/">CGU</a>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  '''
+# ---
+# name: test_navigation_authenticated[JobSeeker][user menu]
   '''
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           <ul>
@@ -126,7 +715,7 @@
               <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
               <div class="flex-grow-1 ms-2 lh-sm">
                   
-                      <span>Jane DOE</span>
+                      <span>John DOE</span>
                       <br/>
                   
                   <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
@@ -170,7 +759,181 @@
                       </nav>
   '''
 # ---
-# name: test_navigation_authenticated[LaborInspector]
+# name: test_navigation_authenticated[LaborInspector][navigation]
+  '''
+  <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
+          <div class="offcanvas-header offcanvas-header--structure">
+              <div class="dropdown dropdown-structure flex-grow-1 py-4">
+                  
+                      <div class="dropdown-toggle dropdown-toggle__summary">
+                          
+                              <i aria-hidden="true" class="ri-government-line"></i>
+                          
+                          <span>DDETS IAE</span>
+                          <strong>ACME Inc.</strong>
+                      </div>
+                  
+              </div>
+              <div class="border-start border-nuance-08 d-xl-none">
+                  <button aria-label="Fermer" class="btn-link ps-4 pt-5 pe-2 me-n2" data-bs-dismiss="offcanvas" type="button">
+                      <i aria-hidden="true" class="ri-close-line"></i>
+                  </button>
+              </div>
+          </div>
+          <div class="offcanvas-body d-flex flex-column">
+              <nav aria-label="Navigation principale" class="flex-grow-1" role="navigation">
+                  
+  
+  <ul class="nav nav-tabs flex-column">
+      
+          
+              <li class="nav-item">
+                  <a class="nav-link active" href="/dashboard/">
+                      <i aria-hidden="true" class="ri-home-line font-weight-medium"></i>
+                      <span>Accueil</span>
+                  </a>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <button aria-controls="collapse-nav-organisation" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-organisation" data-bs-toggle="collapse" type="button">
+                      <i aria-hidden="true" class="ri-community-line font-weight-medium"></i>
+                      <span>Organisation</span>
+                  </button>
+                  <div class="collapse" id="collapse-nav-organisation">
+                      <ul>
+                          
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="annexes-financieres" href="/institutions/colleagues">
+                                  Collaborateurs</a>
+                              </li>
+                          
+                      </ul>
+                  </div>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <button aria-controls="collapse-nav-rechercher" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-rechercher" data-bs-toggle="collapse" type="button">
+                      <i aria-hidden="true" class="ri-search-line font-weight-medium"></i>
+                      <span>Rechercher</span>
+                  </button>
+                  <div class="collapse" id="collapse-nav-rechercher">
+                      <ul>
+                          
+                              <li>
+                                  <a href="/search/employers/results">
+                                  Un emploi inclusif</a>
+                              </li>
+                          
+                              <li>
+                                  <a href="/search/prescribers/results">
+                                  Un prescripteur habilité</a>
+                              </li>
+                          
+                      </ul>
+                  </div>
+              </li>
+          
+      
+  </ul>
+  
+              </nav>
+              <div class="dropdown">
+                  <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
+                      <i aria-hidden="true" class="ri-account-circle-line"></i>
+                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                  </button>
+                  <div class="dropdown-menu" id="dashboardUserDropdownMobile">
+                      <ul class="list-unstyled">
+      <li class="dropdown-item">
+          <div class="d-flex align-items-center">
+              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <div class="flex-grow-1 ms-2 lh-sm w-75">
+                  
+                      <span>John DOE</span>
+                      <br/>
+                  
+                  <span class="fs-sm lh-sm text-muted has-ellipsis d-inline-block w-100">john.doe@example.com</span>
+              </div>
+          </div>
+      </li>
+      <li>
+          <div class="dropdown-divider"></div>
+      </li>
+      
+      <li>
+          <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
+      </li>
+      
+          <li>
+              <a class="dropdown-item" href="/accounts/password/change/">Modifier mon mot de passe</a>
+          </li>
+          <li>
+              <a class="dropdown-item" href="/dashboard/edit_user_email">Modifier mon adresse e-mail</a>
+          </li>
+      
+      <li class="dropdown-divider"></li>
+      
+      <li class="dropdown-item">
+          <form action="/accounts/logout/" method="post">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <button class="text-danger">Déconnexion</button>
+          </form>
+      </li>
+  </ul>
+  
+                  </div>
+              </div>
+              <div class="dropdown">
+                  <button aria-controls="helpDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" type="button">
+                      Besoin d'aide ?
+                  </button>
+                  <div class="dropdown-menu" id="helpDropdownMobile">
+                      
+  
+  <ul class="list-unstyled">
+      <li>
+          <a aria-label="Accéder à l'espace de documentation (nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_documentation" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" rel="noopener" target="_blank">Documentation</a>
+      </li>
+      <li>
+          <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">Qui peut bénéficier des contrats d'IAE ?</a>
+      </li>
+      
+          
+      
+      <li>
+          <a aria-label="Les nouveautés du site des emplois de l'inclusion" class="dropdown-item" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_nouveautes" href="/announcements/news/">Nouveautés</a>
+      </li>
+  </ul>
+  
+                  </div>
+              </div>
+          </div>
+          <div class="offcanvas-footer flex-column align-items-stretch">
+              <div class="offcanvas-footer__legal">
+                  <div class="d-none d-xl-block">
+                      <img alt="Les emplois de l'inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion.svg"/>
+                  </div>
+                  <ul>
+                      <li>
+                          <a href="/accessibility/">Accessibilité : partiellement conforme</a>
+                      </li>
+                      <li>
+                          <a href="/legal/notice/">Mentions légales</a>
+                      </li>
+                      <li>
+                          <a href="/legal/terms/">CGU</a>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  '''
+# ---
+# name: test_navigation_authenticated[LaborInspector][user menu]
   '''
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           <ul>
@@ -225,7 +988,199 @@
                       </nav>
   '''
 # ---
-# name: test_navigation_authenticated[PrescriberWithOrganization]
+# name: test_navigation_authenticated[PrescriberWithOrganization][navigation]
+  '''
+  <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
+          <div class="offcanvas-header offcanvas-header--structure">
+              <div class="dropdown dropdown-structure flex-grow-1 py-4">
+                  
+                      <div class="dropdown-toggle dropdown-toggle__summary">
+                          
+                              
+                                  <i aria-hidden="true" class="ri-home-smile-line"></i>
+                              
+                          
+                          <span>PE</span>
+                          <strong>ACME Inc.</strong>
+                      </div>
+                  
+              </div>
+              <div class="border-start border-nuance-08 d-xl-none">
+                  <button aria-label="Fermer" class="btn-link ps-4 pt-5 pe-2 me-n2" data-bs-dismiss="offcanvas" type="button">
+                      <i aria-hidden="true" class="ri-close-line"></i>
+                  </button>
+              </div>
+          </div>
+          <div class="offcanvas-body d-flex flex-column">
+              <nav aria-label="Navigation principale" class="flex-grow-1" role="navigation">
+                  
+  
+  <ul class="nav nav-tabs flex-column">
+      
+          
+              <li class="nav-item">
+                  <a class="nav-link active" href="/dashboard/">
+                      <i aria-hidden="true" class="ri-home-line font-weight-medium"></i>
+                      <span>Accueil</span>
+                  </a>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
+                      <i aria-hidden="true" class="ri-draft-line font-weight-medium"></i>
+                      <span>Candidatures</span>
+                  </a>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats" href="/job-seekers/list">
+                      <i aria-hidden="true" class="ri-user-line font-weight-medium"></i>
+                      <span>Candidats</span>
+                  </a>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <button aria-controls="collapse-nav-organisation" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-organisation" data-bs-toggle="collapse" type="button">
+                      <i aria-hidden="true" class="ri-team-line font-weight-medium"></i>
+                      <span>Organisation</span>
+                  </button>
+                  <div class="collapse" id="collapse-nav-organisation">
+                      <ul>
+                          
+                              <li>
+                                  <a data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="collaborateurs" href="/prescribers/colleagues">
+                                  Collaborateurs</a>
+                              </li>
+                          
+                      </ul>
+                  </div>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <button aria-controls="collapse-nav-rechercher" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-rechercher" data-bs-toggle="collapse" type="button">
+                      <i aria-hidden="true" class="ri-search-line font-weight-medium"></i>
+                      <span>Rechercher</span>
+                  </button>
+                  <div class="collapse" id="collapse-nav-rechercher">
+                      <ul>
+                          
+                              <li>
+                                  <a href="/search/employers/results">
+                                  Un emploi inclusif</a>
+                              </li>
+                          
+                              <li>
+                                  <a href="/search/prescribers/results">
+                                  Un prescripteur habilité</a>
+                              </li>
+                          
+                      </ul>
+                  </div>
+              </li>
+          
+      
+  </ul>
+  
+              </nav>
+              <div class="dropdown">
+                  <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
+                      <i aria-hidden="true" class="ri-account-circle-line"></i>
+                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                  </button>
+                  <div class="dropdown-menu" id="dashboardUserDropdownMobile">
+                      <ul class="list-unstyled">
+      <li class="dropdown-item">
+          <div class="d-flex align-items-center">
+              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <div class="flex-grow-1 ms-2 lh-sm w-75">
+                  
+                      <span>John DOE</span>
+                      <br/>
+                  
+                  <span class="fs-sm lh-sm text-muted has-ellipsis d-inline-block w-100">john.doe@example.com</span>
+              </div>
+          </div>
+      </li>
+      <li>
+          <div class="dropdown-divider"></div>
+      </li>
+      
+          <li>
+              <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
+          </li>
+          <li class="dropdown-divider"></li>
+      
+      <li>
+          <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
+      </li>
+      
+      <li class="dropdown-divider"></li>
+      
+      <li class="dropdown-item">
+          <form action="/accounts/logout/" method="post">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <button class="text-danger">Déconnexion</button>
+          </form>
+      </li>
+  </ul>
+  
+                  </div>
+              </div>
+              <div class="dropdown">
+                  <button aria-controls="helpDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" type="button">
+                      Besoin d'aide ?
+                  </button>
+                  <div class="dropdown-menu" id="helpDropdownMobile">
+                      
+  
+  <ul class="list-unstyled">
+      <li>
+          <a aria-label="Accéder à l'espace de documentation (nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_documentation" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" rel="noopener" target="_blank">Documentation</a>
+      </li>
+      <li>
+          <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">Qui peut bénéficier des contrats d'IAE ?</a>
+      </li>
+      
+          
+      
+      <li>
+          <a aria-label="Les nouveautés du site des emplois de l'inclusion" class="dropdown-item" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_nouveautes" href="/announcements/news/">Nouveautés</a>
+      </li>
+  </ul>
+  
+                  </div>
+              </div>
+          </div>
+          <div class="offcanvas-footer flex-column align-items-stretch">
+              <div class="offcanvas-footer__legal">
+                  <div class="d-none d-xl-block">
+                      <img alt="Les emplois de l'inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion.svg"/>
+                  </div>
+                  <ul>
+                      <li>
+                          <a href="/accessibility/">Accessibilité : partiellement conforme</a>
+                      </li>
+                      <li>
+                          <a href="/legal/notice/">Mentions légales</a>
+                      </li>
+                      <li>
+                          <a href="/legal/terms/">CGU</a>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  '''
+# ---
+# name: test_navigation_authenticated[PrescriberWithOrganization][user menu]
   '''
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           <ul>
@@ -241,7 +1196,7 @@
               <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
               <div class="flex-grow-1 ms-2 lh-sm">
                   
-                      <span>Pierre DUPONT</span>
+                      <span>John DOE</span>
                       <br/>
                   
                   <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>
@@ -278,7 +1233,178 @@
                       </nav>
   '''
 # ---
-# name: test_navigation_authenticated[PrescriberWithoutOrganization]
+# name: test_navigation_authenticated[PrescriberWithoutOrganization][navigation]
+  '''
+  <div aria-label="Barre de navigation principale" class="offcanvas" id="offcanvasNav">
+          <div class="offcanvas-header offcanvas-header--structure">
+              <div class="dropdown dropdown-structure flex-grow-1 py-4">
+                  
+                      
+                          <div class="dropdown-toggle dropdown-toggle__summary">
+                              <i aria-hidden="true" class="ri-user-line"></i>
+                              <span>Orienteur seul</span>
+                              <strong>John DOE</strong>
+                          </div>
+                      
+                  
+              </div>
+              <div class="border-start border-nuance-08 d-xl-none">
+                  <button aria-label="Fermer" class="btn-link ps-4 pt-5 pe-2 me-n2" data-bs-dismiss="offcanvas" type="button">
+                      <i aria-hidden="true" class="ri-close-line"></i>
+                  </button>
+              </div>
+          </div>
+          <div class="offcanvas-body d-flex flex-column">
+              <nav aria-label="Navigation principale" class="flex-grow-1" role="navigation">
+                  
+  
+  <ul class="nav nav-tabs flex-column">
+      
+          
+              <li class="nav-item">
+                  <a class="nav-link active" href="/dashboard/">
+                      <i aria-hidden="true" class="ri-home-line font-weight-medium"></i>
+                      <span>Accueil</span>
+                  </a>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidatures" href="/apply/prescriptions/list">
+                      <i aria-hidden="true" class="ri-draft-line font-weight-medium"></i>
+                      <span>Candidatures</span>
+                  </a>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <a class="nav-link" data-matomo-action="clic" data-matomo-category="offcanvasNav" data-matomo-event="true" data-matomo-option="candidats" href="/job-seekers/list">
+                      <i aria-hidden="true" class="ri-user-line font-weight-medium"></i>
+                      <span>Candidats</span>
+                  </a>
+              </li>
+          
+      
+          
+              <li class="nav-item">
+                  <button aria-controls="collapse-nav-rechercher" aria-expanded="false" class="nav-link has-collapse-caret w-100 text-start" data-bs-target="#collapse-nav-rechercher" data-bs-toggle="collapse" type="button">
+                      <i aria-hidden="true" class="ri-search-line font-weight-medium"></i>
+                      <span>Rechercher</span>
+                  </button>
+                  <div class="collapse" id="collapse-nav-rechercher">
+                      <ul>
+                          
+                              <li>
+                                  <a href="/search/employers/results">
+                                  Un emploi inclusif</a>
+                              </li>
+                          
+                              <li>
+                                  <a href="/search/prescribers/results">
+                                  Un prescripteur habilité</a>
+                              </li>
+                          
+                      </ul>
+                  </div>
+              </li>
+          
+      
+  </ul>
+  
+              </nav>
+              <div class="dropdown">
+                  <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
+                      <i aria-hidden="true" class="ri-account-circle-line"></i>
+                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                  </button>
+                  <div class="dropdown-menu" id="dashboardUserDropdownMobile">
+                      <ul class="list-unstyled">
+      <li class="dropdown-item">
+          <div class="d-flex align-items-center">
+              <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
+              <div class="flex-grow-1 ms-2 lh-sm w-75">
+                  
+                      <span>John DOE</span>
+                      <br/>
+                  
+                  <span class="fs-sm lh-sm text-muted has-ellipsis d-inline-block w-100">john.doe@example.com</span>
+              </div>
+          </div>
+      </li>
+      <li>
+          <div class="dropdown-divider"></div>
+      </li>
+      
+          <li>
+              <a class="dropdown-item" href="/dashboard/edit_user_notifications">Mes notifications</a>
+          </li>
+          <li class="dropdown-divider"></li>
+      
+      <li>
+          <a class="dropdown-item" href="/dashboard/edit_user_info">Modifier mon profil</a>
+      </li>
+      
+      <li class="dropdown-divider"></li>
+      
+      <li class="dropdown-item">
+          <form action="/accounts/logout/" method="post">
+              <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
+              <button class="text-danger">Déconnexion</button>
+          </form>
+      </li>
+  </ul>
+  
+                  </div>
+              </div>
+              <div class="dropdown">
+                  <button aria-controls="helpDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-link btn-block dropdown-toggle p-0" data-bs-toggle="dropdown" type="button">
+                      Besoin d'aide ?
+                  </button>
+                  <div class="dropdown-menu" id="helpDropdownMobile">
+                      
+  
+  <ul class="list-unstyled">
+      <li>
+          <a aria-label="Accéder à l'espace de documentation (nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_documentation" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr" rel="noopener" target="_blank">Documentation</a>
+      </li>
+      <li>
+          <a aria-label="Qui peut bénéficier des contrats d'IAE ? (ouverture dans un nouvel onglet)" class="dropdown-item has-external-link" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_comprendre-liae" href="https://aide.emplois.inclusion.beta.gouv.fr/hc/fr/articles/14733403281937--Comprendre-l-IAE" rel="noopener" target="_blank">Qui peut bénéficier des contrats d'IAE ?</a>
+      </li>
+      
+          
+      
+      <li>
+          <a aria-label="Les nouveautés du site des emplois de l'inclusion" class="dropdown-item" data-matomo-action="clic" data-matomo-category="help" data-matomo-event="true" data-matomo-option="header_nouveautes" href="/announcements/news/">Nouveautés</a>
+      </li>
+  </ul>
+  
+                  </div>
+              </div>
+          </div>
+          <div class="offcanvas-footer flex-column align-items-stretch">
+              <div class="offcanvas-footer__legal">
+                  <div class="d-none d-xl-block">
+                      <img alt="Les emplois de l'inclusion" height="50" src="/static/vendor/theme-inclusion/images/logo-emploi-inclusion.svg"/>
+                  </div>
+                  <ul>
+                      <li>
+                          <a href="/accessibility/">Accessibilité : partiellement conforme</a>
+                      </li>
+                      <li>
+                          <a href="/legal/notice/">Mentions légales</a>
+                      </li>
+                      <li>
+                          <a href="/legal/terms/">CGU</a>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+  '''
+# ---
+# name: test_navigation_authenticated[PrescriberWithoutOrganization][user menu]
   '''
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           <ul>
@@ -294,7 +1420,7 @@
               <span class="flex-shrink-0"><i class="ri-user-line ri-2x"></i></span>
               <div class="flex-grow-1 ms-2 lh-sm">
                   
-                      <span>Pierre DUPONT</span>
+                      <span>John DOE</span>
                       <br/>
                   
                   <span class="fs-sm lh-sm text-muted">john.doe@example.com</span>

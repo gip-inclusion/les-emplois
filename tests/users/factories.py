@@ -125,7 +125,7 @@ class EmployerFactory(UserFactory):
         from tests.companies.factories import CompanyMembershipFactory
 
         if created and extracted is True:
-            CompanyMembershipFactory(user=self)
+            CompanyMembershipFactory(user=self, **kwargs)
 
     @factory.post_generation
     def with_disabled_notifications(obj, create, extracted, **kwargs):

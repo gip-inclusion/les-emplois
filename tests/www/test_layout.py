@@ -16,20 +16,50 @@ def test_navigation_not_authenticated(snapshot, client):
     "user_factory",
     [
         pytest.param(JobSeekerFactory, id="JobSeeker"),
-        pytest.param(partial(EmployerFactory, with_company=True), id="Employer"),
-        pytest.param(partial(LaborInspectorFactory, membership=True), id="LaborInspector"),
+        pytest.param(
+            partial(
+                EmployerFactory,
+                with_company=True,
+                with_company__company__name="ACME Inc.",
+            ),
+            id="Employer",
+        ),
+        pytest.param(
+            partial(
+                LaborInspectorFactory,
+                membership=True,
+                membership__institution__name="ACME Inc.",
+            ),
+            id="LaborInspector",
+        ),
         pytest.param(PrescriberFactory, id="PrescriberWithoutOrganization"),
         pytest.param(
-            partial(PrescriberFactory, membership__organization__authorized=False),
+            partial(
+                PrescriberFactory,
+                membership__organization__authorized=False,
+                membership__organization__name="ACME Inc.",
+            ),
             id="PrescriberWithOrganization",
         ),
         pytest.param(
-            partial(PrescriberFactory, membership__organization__authorized=True),
+            partial(
+                PrescriberFactory,
+                membership__organization__authorized=True,
+                membership__organization__name="ACME Inc.",
+            ),
             id="AuthorizedPrescriber",
         ),
     ],
 )
 def test_navigation_authenticated(snapshot, client, user_factory):
-    client.force_login(user_factory(for_snapshot=True, email="john.doe@example.com"))
+    client.force_login(
+        user_factory(
+            for_snapshot=True,
+            first_name="John",
+            last_name="Doe",
+            email="john.doe@example.com",
+        )
+    )
     response = client.get(reverse("home:hp"), follow=True)
-    assert str(parse_response_to_soup(response, "#nav-primary")) == snapshot
+    assert str(parse_response_to_soup(response, "#nav-primary")) == snapshot(name="user menu")
+    assert str(parse_response_to_soup(response, "#offcanvasNav")) == snapshot(name="navigation")
