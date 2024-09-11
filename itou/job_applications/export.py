@@ -76,6 +76,7 @@ def _eligible_to_siae_evaluations(job_application):
         job_application.approval_id is not None
         and job_application.to_company.kind in evaluation_enums.EvaluationSiaesKind.Evaluable
         and job_application.state == JobApplicationState.ACCEPTED
+        and job_application.eligibility_diagnosis
         and job_application.eligibility_diagnosis.author_kind == UserKind.EMPLOYER
         and job_application.eligibility_diagnosis.author_siae_id == job_application.to_company_id
         and job_application.approval.start_at == job_application.hiring_start_at

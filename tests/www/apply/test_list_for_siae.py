@@ -779,9 +779,16 @@ def test_list_for_siae_exports_back_to_list(client):
     assert_previous_step(response, reverse("apply:list_for_siae"), back_to_list=True)
 
 
+@pytest.mark.parametrize(
+    "job_app_kwargs",
+    [
+        pytest.param({"for_snapshot": True}, id="for_snapshot"),
+        pytest.param({"for_snapshot": True, "eligibility_diagnosis": None}, id="no_eligibility_diag"),
+    ],
+)
 @freeze_time("2024-08-18")
-def test_list_for_siae_exports_download(client, snapshot):
-    job_application = JobApplicationFactory(for_snapshot=True)
+def test_list_for_siae_exports_download(client, job_app_kwargs, snapshot):
+    job_application = JobApplicationFactory(**job_app_kwargs)
     client.force_login(job_application.to_company.members.get())
 
     # Download all job applications
