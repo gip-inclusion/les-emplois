@@ -23,6 +23,7 @@ from itou.eligibility.models import (
     GEIQAdministrativeCriteria,
     GEIQEligibilityDiagnosis,
 )
+from itou.eligibility.models.common import AbstractAdministrativeCriteria
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType, SenderKind
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
@@ -2578,10 +2579,14 @@ class DirectHireFullProcessTest(TestCase):
         response = self.client.get(next_url)
         self.assertTemplateNotUsed(response, "approvals/includes/status.html")
 
-        # TODO: convert to a Trait instead?
-        criterion1 = AdministrativeCriteria.objects.level1().get(pk=1)
-        criterion2 = AdministrativeCriteria.objects.level2().get(pk=5)
-        criterion3 = AdministrativeCriteria.objects.level2().get(pk=15)
+        criterion1 = (
+            AdministrativeCriteria.objects.level1()
+            .exclude(kind__in=AbstractAdministrativeCriteria.CAN_BE_CERTIFIED_KINDS)
+            .first()
+        )
+        [criterion2, criterion3] = AdministrativeCriteria.objects.level2().exclude(
+            kind__in=AbstractAdministrativeCriteria.CAN_BE_CERTIFIED_KINDS
+        )[:2]
         response = self.client.post(
             next_url,
             data={

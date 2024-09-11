@@ -69,7 +69,6 @@ class GEIQEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
             author_geiq=factory.SubFactory(CompanyWith2MembershipsFactory, kind=CompanyKind.GEIQ, with_jobs=True),
             author=factory.LazyAttribute(lambda obj: obj.author_geiq.members.first()),
         )
-        with_criteria = factory.Trait(romes=factory.PostGeneration(_get_geiq_administrative_criteria))
         with_certifiable_criteria = factory.Trait(romes=factory.PostGeneration(_get_geiq_certifiable_criteria))
         with_not_certifiable_criteria = factory.Trait(romes=factory.PostGeneration(_get_geiq_not_certifiable_criteria))
 
@@ -102,7 +101,5 @@ class IAEEligibilityDiagnosisFactory(AbstractEligibilityDiagnosisModelFactory):
             author_siae=factory.SubFactory(CompanyFactory, subject_to_eligibility=True, with_membership=True),
             author=factory.LazyAttribute(lambda obj: obj.author_siae.members.first()),
         )
-        # TODO(cms): maybe we should only select certifiable criteria, or not certifiable, to avoid flaky tests.
-        with_criteria = factory.Trait(romes=factory.PostGeneration(_get_iae_administrative_criteria))
         with_certifiable_criteria = factory.Trait(romes=factory.PostGeneration(_get_iae_certifiable_criteria))
         with_not_certifiable_criteria = factory.Trait(romes=factory.PostGeneration(_get_iae_not_certifiable_criteria))
