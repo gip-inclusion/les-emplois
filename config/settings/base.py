@@ -473,6 +473,14 @@ CACHES = {
             "CLIENT_CLASS": "itou.utils.cache.FailSafeRedisCacheClient",
         },
     },
+    "stats": {
+        **redis_common_django_settings,
+        "KEY_PREFIX": "stats",
+        "TIMEOUT": 42 * 24 * 3600,  # Use a long (but not infinite) timeout to not handle deprecated keys ourselves
+        "OPTIONS": {
+            "CLIENT_CLASS": "itou.utils.cache.FailSafeRedisCacheClient",
+        },
+    },
 }
 
 HUEY = {
