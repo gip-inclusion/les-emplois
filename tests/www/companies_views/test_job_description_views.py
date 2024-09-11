@@ -16,7 +16,7 @@ from tests.companies.factories import CompanyFactory, JobDescriptionFactory
 from tests.jobs.factories import create_test_romes_and_appellations
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import BASE_NUM_QUERIES, TestCase, assert_previous_step
+from tests.utils.test import BASE_NUM_QUERIES, TestCase, assert_previous_step, assertSnapshotQueries
 
 
 class JobDescriptionAbstractTest(TestCase):
@@ -90,27 +90,10 @@ class JobDescriptionListViewTest(MessagesTestMixin, JobDescriptionAbstractTest):
 
         self.url = self.list_url + "?page=1"
 
+    @pytest.mark.usefixtures("unittest_compatibility")
     def test_job_application_list_response_content(self):
         self.client.force_login(self.user)
-        # 1.  SELECT django_session
-        # 2.  SELECT users_user
-        # 3.  SELECT companies_companymembership
-        # 4.  SELECT companies_company
-        # END of middlewares
-        # 5.  SAVEPOINT
-        # 6.  SELECT COUNT companies_jobdescription
-        # 7.  SELECT COUNT companies_companymembership
-        # 8.  SELECT EXISTS users_user (convention_can_be_accessed_by())
-        # 9.  SELECT companies_siaeconvention (menu checks for financial annexes)
-        # 10. SELECT EXISTS users_user (menu checks for active admin)
-        # 11. SELECT companies_jobdescription
-        # 12. SELECT jobs_appellation
-        # 13. SELECT jobs_rome
-        # 14. RELEASE SAVEPOINT
-        # 15. SAVEPOINT
-        # 16. UPDATE django_session
-        # 17. RELEASE SAVEPOINT
-        with self.assertNumQueries(17):
+        with assertSnapshotQueries(self.snapshot(name="job applications list")):
             response = self.client.get(self.url)
 
         assert self.company.job_description_through.count() == 4
