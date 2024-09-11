@@ -36,6 +36,8 @@ from . import enums, notifications
 
 logger = logging.getLogger(__name__)
 
+SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE = datetime.timedelta(days=365)
+
 
 class CommonApprovalMixin(models.Model):
     """

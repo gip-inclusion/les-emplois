@@ -1,5 +1,4 @@
 import contextlib
-import datetime
 import logging
 import urllib.parse
 
@@ -11,6 +10,7 @@ from django.utils import timezone
 from django.views.generic import DetailView
 
 from itou.approvals.models import (
+    SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE,
     Approval,
     ProlongationRequest,
 )
@@ -24,9 +24,6 @@ from itou.utils.urls import get_safe_url
 
 
 logger = logging.getLogger(__name__)
-
-
-SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE = datetime.timedelta(days=365)
 
 
 class EmployeeDetailView(LoginRequiredMixin, DetailView):
