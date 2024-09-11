@@ -4,13 +4,13 @@ from dateutil.relativedelta import relativedelta
 from django.template.defaultfilters import urlencode
 from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries, assertRedirects
+from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.www.approvals_views.views import ApprovalListView
 from tests.approvals.factories import ApprovalFactory, SuspensionFactory
 from tests.companies.factories import CompanyFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
-from tests.utils.test import assert_previous_step, parse_response_to_soup
+from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup
 
 
 class TestApprovalsListView:
@@ -73,7 +73,7 @@ class TestApprovalsListView:
 
         assertContains(response, "1 résultat")
 
-    def test_job_seeker_filters(self, client):
+    def test_job_seeker_filters(self, client, snapshot):
         approval = ApprovalFactory(
             with_jobapplication=True,
             user__first_name="Jean",
@@ -92,23 +92,7 @@ class TestApprovalsListView:
         client.force_login(employer)
 
         url = reverse("approvals:list")
-        # 1.  SELECT django_session
-        # 2.  SELECT users_user
-        # 3.  SELECT companies_companymembership
-        # 4.  SELECT companies_company
-        # END of middlewares
-        # 5.  SAVEPOINT
-        # 6.  SELECT users_user (job seekers with an accepted job app)
-        # 7.  SELECT COUNT approvals_approval (paginator)
-        # 8.  RELEASE SAVEPOINT
-        # 9.  SELECT companies_siaeconvention (menu check for financial annexes)
-        # 10. SELECT EXISTS users_user (menu check for active admin)
-        # 11. SELECT DISTINCT approvals_approval
-        # 12. SELECT approvals_suspension
-        # 13. SAVEPOINT
-        # 14. UPDATE django_session
-        # 15. RELEASE SAVEPOINT
-        with assertNumQueries(15):
+        with assertSnapshotQueries(snapshot(name="approvals list")):
             response = client.get(url)
         assertContains(response, "2 résultats")
         assertContains(response, reverse("employees:detail", kwargs={"public_id": approval.user.public_id}))
