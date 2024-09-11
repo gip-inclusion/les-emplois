@@ -1,12 +1,11 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, RegexValidator
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django_select2.forms import Select2Widget
 
-from itou.asp.forms import formfield_for_birth_place
-from itou.asp.models import Commune, Country, RSAAllocation
+from itou.asp.forms import BirthPlaceAndCountryMixin
+from itou.asp.models import Commune, RSAAllocation
 from itou.companies.models import SiaeFinancialAnnex
 from itou.employee_record.enums import Status
 from itou.users.forms import JobSeekerProfileFieldsMixin
@@ -101,7 +100,7 @@ class EmployeeRecordFilterForm(forms.Form):
         )
 
 
-class NewEmployeeRecordStep1Form(JobSeekerProfileFieldsMixin, forms.ModelForm):
+class NewEmployeeRecordStep1Form(BirthPlaceAndCountryMixin, JobSeekerProfileFieldsMixin, forms.ModelForm):
     """
     New employee record step 1:
     - main details (just check)
@@ -117,9 +116,6 @@ class NewEmployeeRecordStep1Form(JobSeekerProfileFieldsMixin, forms.ModelForm):
         "birthdate",
     ]
 
-    # This is a JobSeekerProfile field
-    birth_country = forms.ModelChoiceField(Country.objects, label="Pays de naissance", required=False)
-
     class Meta:
         model = User
         fields = [
@@ -130,8 +126,6 @@ class NewEmployeeRecordStep1Form(JobSeekerProfileFieldsMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        self.fields["birth_place"] = formfield_for_birth_place(with_birthdate_field=True)
 
         for field_name in self.REQUIRED_FIELDS:
             self.fields[field_name].required = True
@@ -151,48 +145,6 @@ class NewEmployeeRecordStep1Form(JobSeekerProfileFieldsMixin, forms.ModelForm):
 
         if jobseeker_profile.birth_country:
             self.initial["birth_country"] = jobseeker_profile.birth_country_id
-
-    def clean(self):
-        super().clean()
-
-        birth_place = self.cleaned_data.get("birth_place")
-        birth_country = self.cleaned_data.get("birth_country")
-        birth_date = self.cleaned_data.get("birthdate")
-
-        if not birth_country:
-            # Selecting a birth place sets the birth country field to France and disables it.
-            # However, disabled fields are ignored by Django.
-            # That's also why we can't make it mandatory.
-            # See utils.js > toggleDisableAndSetValue
-            if birth_place:
-                self.cleaned_data["birth_country"] = Country.objects.get(code=Country._CODE_FRANCE)
-            else:
-                # Display the error above the field instead of top of page.
-                self.add_error("birth_country", "Le pays de naissance est obligatoire.")
-
-        # Country coherence is done at model level (users.User)
-        # Here we must add coherence between birthdate and communes
-        # existing at this period (not a simple check of existence)
-        if birth_place and birth_date:
-            try:
-                self.cleaned_data["birth_place"] = Commune.objects.by_insee_code_and_period(
-                    birth_place.code, birth_date
-                )
-            except Commune.DoesNotExist:
-                msg = (
-                    f"Le code INSEE {birth_place.code} n'est pas référencé par l'ASP en date du {birth_date:%d/%m/%Y}"
-                )
-                self.add_error("birth_place", msg)
-
-    def _post_clean(self):
-        super()._post_clean()
-        jobseeker_profile = self.instance.jobseeker_profile
-        try:
-            jobseeker_profile.birth_place = self.cleaned_data.get("birth_place")
-            jobseeker_profile.birth_country = self.cleaned_data.get("birth_country")
-            jobseeker_profile._clean_birth_fields()
-        except ValidationError as e:
-            self._update_errors(e)
 
     def save(self, commit=True):
         instance = super().save(commit=commit)
