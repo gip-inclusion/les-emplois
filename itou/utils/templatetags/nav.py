@@ -1,4 +1,6 @@
+import sentry_sdk
 from django import template
+from django.conf import settings
 from django.urls import reverse
 from django.utils.text import slugify
 
@@ -183,6 +185,14 @@ NAV_ENTRIES = {
 }
 
 
+def handle_nav_exception(e):
+    if settings.DEBUG:
+        # The django 500 page is used, it does not include this template tag.
+        raise
+    # Keep going, we may be rendering the 500 page.
+    sentry_sdk.capture_exception(e)
+
+
 def is_active(request, menu_item):
     return request.resolver_match.view_name in menu_item.active_view_names
 
@@ -190,58 +200,61 @@ def is_active(request, menu_item):
 @register.inclusion_tag("utils/templatetags/nav.html")
 def nav(request):
     menu_items: list[NavItem | NavGroup] = [NAV_ENTRIES["home"]]
-    if request.user.is_job_seeker:
-        menu_items.append(NAV_ENTRIES["job-seeker-job-apps"])
-    elif request.user.is_prescriber:
-        menu_items.append(NAV_ENTRIES["prescriber-job-apps"])
-        menu_items.append(NAV_ENTRIES["prescriber-jobseekers"])
-        if request.current_organization:
+    try:
+        if request.user.is_job_seeker:
+            menu_items.append(NAV_ENTRIES["job-seeker-job-apps"])
+        elif request.user.is_prescriber:
+            menu_items.append(NAV_ENTRIES["prescriber-job-apps"])
+            menu_items.append(NAV_ENTRIES["prescriber-jobseekers"])
+            if request.current_organization:
+                menu_items.append(
+                    NavGroup(
+                        label="Organisation",
+                        icon="ri-team-line",
+                        items=[NAV_ENTRIES["prescriber-members"]],
+                    )
+                )
+        elif request.user.is_employer and request.current_organization:
+            menu_items.append(NAV_ENTRIES["employer-job-apps"])
+            if request.current_organization.is_subject_to_eligibility_rules:
+                employee_group_items = [NAV_ENTRIES["employer-approvals"]]
+                if request.current_organization.can_use_employee_record:
+                    employee_group_items.append(NAV_ENTRIES["employer-employee-records"])
+                menu_items.append(NavGroup(label="Salariés", icon="ri-team-line", items=employee_group_items))
+            company_group_items = [NAV_ENTRIES["employer-jobs"]]
+            if request.current_organization.is_active:
+                company_group_items.append(NAV_ENTRIES["employer-members"])
+            if request.current_organization.convention_can_be_accessed_by(request.user):
+                company_group_items.append(NAV_ENTRIES["employer-financial-annexes"])
+            menu_items.append(NavGroup(label="Structure", icon="ri-community-line", items=company_group_items))
+        elif request.user.is_labor_inspector:
             menu_items.append(
                 NavGroup(
                     label="Organisation",
-                    icon="ri-team-line",
-                    items=[NAV_ENTRIES["prescriber-members"]],
+                    icon="ri-community-line",
+                    items=[NAV_ENTRIES["labor-inspector-members"]],
                 )
             )
-    elif request.user.is_employer and request.current_organization:
-        menu_items.append(NAV_ENTRIES["employer-job-apps"])
-        if request.current_organization.is_subject_to_eligibility_rules:
-            employee_group_items = [NAV_ENTRIES["employer-approvals"]]
-            if request.current_organization.can_use_employee_record:
-                employee_group_items.append(NAV_ENTRIES["employer-employee-records"])
-            menu_items.append(NavGroup(label="Salariés", icon="ri-team-line", items=employee_group_items))
-        company_group_items = [NAV_ENTRIES["employer-jobs"]]
-        if request.current_organization.is_active:
-            company_group_items.append(NAV_ENTRIES["employer-members"])
-        if request.current_organization.convention_can_be_accessed_by(request.user):
-            company_group_items.append(NAV_ENTRIES["employer-financial-annexes"])
-        menu_items.append(NavGroup(label="Structure", icon="ri-community-line", items=company_group_items))
-    elif request.user.is_labor_inspector:
         menu_items.append(
             NavGroup(
-                label="Organisation",
-                icon="ri-community-line",
-                items=[NAV_ENTRIES["labor-inspector-members"]],
+                label="Rechercher",
+                icon="ri-search-line",
+                items=[
+                    NAV_ENTRIES["employers-search"],
+                    NAV_ENTRIES["prescribers-search"],
+                ],
             )
         )
-    menu_items.append(
-        NavGroup(
-            label="Rechercher",
-            icon="ri-search-line",
-            items=[
-                NAV_ENTRIES["employers-search"],
-                NAV_ENTRIES["prescribers-search"],
-            ],
-        )
-    )
 
-    if request.resolver_match:
-        for group_or_item in menu_items:
-            try:
-                for item in group_or_item.items:
-                    item.active = is_active(request, item)
-            except AttributeError:
-                group_or_item.active = is_active(request, group_or_item)
+        if request.resolver_match:
+            for group_or_item in menu_items:
+                try:
+                    for item in group_or_item.items:
+                        item.active = is_active(request, item)
+                except AttributeError:
+                    group_or_item.active = is_active(request, group_or_item)
+    except Exception as e:
+        handle_nav_exception(e)
     return {"menu_items": menu_items}
 
 
@@ -251,9 +264,12 @@ def nav_anonymous(request, *, mobile):
         NAV_ENTRIES["anonymous-search-employers"],
         NAV_ENTRIES["anonymous-search-prescribers"],
     ]
-    if request.resolver_match:
-        for item in menu_items:
-            item.active = is_active(request, item)
+    try:
+        if request.resolver_match:
+            for item in menu_items:
+                item.active = is_active(request, item)
+    except Exception as e:
+        handle_nav_exception(e)
     return {
         "menu_items": menu_items,
         "mobile": mobile,
