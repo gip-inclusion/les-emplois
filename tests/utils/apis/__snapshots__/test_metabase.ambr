@@ -1,0 +1,13 @@
+# serializer version: 1
+# name: test_fetch_card_results_with_filters[with pre-existing]
+  b'query=%7B%22query%22%3A+%7B%22filter%22%3A+%5B%22and%22%2C+%5B%22and%22%2C+%5B%22%3D%22%2C+%5B%22field%22%2C+100%2C+%7B%22base-type%22%3A+%22type%2FText%22%7D%5D%2C+%22filter+value+1%22%2C+%22filter+value+2%22%5D%5D%2C+%5B%5B%22%3D%22%2C+%5B%22field%22%2C+21%2C+%7B%22base-type%22%3A+%22type%2FText%22%7D%5D%2C+%22baz%22%5D%5D%5D%7D%7D'
+# ---
+# name: test_fetch_card_results_with_filters[without pre-existing]
+  b'query=%7B%22query%22%3A+%7B%22foo%22%3A+%22bar%22%2C+%22filter%22%3A+%5B%22and%22%2C+%5B%5D%2C+%5B%5B%22%3D%22%2C+%5B%22field%22%2C+21%2C+%7B%22base-type%22%3A+%22type%2FText%22%7D%5D%2C+%22baz%22%5D%5D%5D%7D%7D'
+# ---
+# name: test_fetch_card_results_with_group_by[with pre-existing]
+  b'query=%7B%22query%22%3A+%7B%22breakout%22%3A+%5B%5B%22field%22%2C+100%2C+%7B%22base-type%22%3A+%22type%2FText%22%7D%5D%2C+%5B%22field%22%2C+2%2C+%7B%22base-type%22%3A+%22type%2FText%22%7D%5D%5D%7D%7D'
+# ---
+# name: test_fetch_card_results_with_group_by[without pre-existing]
+  b'query=%7B%22query%22%3A+%7B%22foo%22%3A+%22bar%22%2C+%22breakout%22%3A+%5B%5B%22field%22%2C+1%2C+%7B%22base-type%22%3A+%22type%2FText%22%7D%5D%5D%7D%7D'
+# ---
