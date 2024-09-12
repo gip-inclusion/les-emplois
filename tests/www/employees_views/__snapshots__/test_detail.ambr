@@ -201,6 +201,7 @@
       }),
       dict({
         'origin': list([
+          'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EmployeeDetailView.get_job_application[www/employees_views/views.py]',
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
         ]),
@@ -478,12 +479,13 @@
                  AND "job_applications_jobapplication"."job_seeker_id" = %s
                  AND "job_applications_jobapplication"."state" = %s
                  AND "job_applications_jobapplication"."to_company_id" = %s)
-          ORDER BY "job_applications_jobapplication"."created_at" ASC
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
           LIMIT 1
         ''',
       }),
       dict({
         'origin': list([
+          'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EmployeeDetailView.get_job_application[www/employees_views/views.py]',
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
         ]),
@@ -506,6 +508,7 @@
       }),
       dict({
         'origin': list([
+          'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EmployeeDetailView.get_job_application[www/employees_views/views.py]',
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
         ]),
@@ -1734,6 +1737,7 @@
       }),
       dict({
         'origin': list([
+          'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EmployeeDetailView.get_job_application[www/employees_views/views.py]',
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
         ]),
@@ -2011,12 +2015,13 @@
                  AND "job_applications_jobapplication"."job_seeker_id" = %s
                  AND "job_applications_jobapplication"."state" = %s
                  AND "job_applications_jobapplication"."to_company_id" = %s)
-          ORDER BY "job_applications_jobapplication"."created_at" ASC
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
           LIMIT 1
         ''',
       }),
       dict({
         'origin': list([
+          'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EmployeeDetailView.get_job_application[www/employees_views/views.py]',
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
         ]),
@@ -2039,6 +2044,7 @@
       }),
       dict({
         'origin': list([
+          'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EmployeeDetailView.get_job_application[www/employees_views/views.py]',
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
         ]),
@@ -3382,6 +3388,7 @@
       }),
       dict({
         'origin': list([
+          'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
           'EmployeeDetailView.get_job_application[www/employees_views/views.py]',
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
         ]),
@@ -3659,7 +3666,7 @@
                  AND "job_applications_jobapplication"."job_seeker_id" = %s
                  AND "job_applications_jobapplication"."state" = %s
                  AND "job_applications_jobapplication"."to_company_id" = %s)
-          ORDER BY "job_applications_jobapplication"."created_at" ASC
+          ORDER BY "job_applications_jobapplication"."created_at" DESC
           LIMIT 1
         ''',
       }),
