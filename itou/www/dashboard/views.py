@@ -116,38 +116,17 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "active_campaigns": [],
         "closed_campaigns": [],
         "job_applications_categories": [],
-        # FIXME(vperron): I think there's a rising need for a revamped permission system.
         "can_create_siae_antenna": False,
         "can_show_financial_annexes": False,
         "can_show_employee_records": False,
         "can_view_gps_card": False,
         "can_view_stats_dashboard_widget": stats_utils.can_view_stats_dashboard_widget(request),
-        "can_view_stats_siae": stats_utils.can_view_stats_siae(request),
-        "can_view_stats_siae_aci": stats_utils.can_view_stats_siae_aci(request),
-        "can_view_stats_siae_etp": stats_utils.can_view_stats_siae_etp(request),
-        "can_view_stats_siae_orga_etp": stats_utils.can_view_stats_siae_orga_etp(request),
-        "can_view_stats_cd": stats_utils.can_view_stats_cd(request),
-        "can_view_stats_cd_aci": stats_utils.can_view_stats_cd_aci(request),
-        "can_view_stats_ft": stats_utils.can_view_stats_ft(request),
-        "can_view_stats_ph": stats_utils.can_view_stats_ph(request),
-        "can_view_stats_ddets_iae": stats_utils.can_view_stats_ddets_iae(request),
-        "can_view_stats_ddets_iae_aci": stats_utils.can_view_stats_ddets_iae_aci(request),
-        "can_view_stats_ddets_log": stats_utils.can_view_stats_ddets_log(request),
-        "can_view_stats_dreets_iae": stats_utils.can_view_stats_dreets_iae(request),
-        "can_view_stats_dgefp_iae": stats_utils.can_view_stats_dgefp_iae(request),
-        "can_view_stats_dihal": stats_utils.can_view_stats_dihal(request),
-        "can_view_stats_drihl": stats_utils.can_view_stats_drihl(request),
-        "can_view_stats_iae_network": stats_utils.can_view_stats_iae_network(request),
-        "can_view_stats_convergence": stats_utils.can_view_stats_convergence(request),
         "num_rejected_employee_records": 0,
         "pending_prolongation_requests": None,
         "evaluated_siae_notifications": EvaluatedSiae.objects.none(),
         "siae_suspension_text_with_dates": None,
         "siae_search_form": SiaeSearchForm(),
     }
-    context["has_view_stats_items"] = any(
-        v for k, v in context.items() if k.startswith("can_view_stats_") and k != "can_view_stats_dashboard_widget"
-    )
 
     if request.user.is_employer:
         context.update(_employer_dashboard_context(request))
@@ -201,6 +180,42 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             if not getattr(request.user, attr):
                 return HttpResponseRedirect(reverse("dashboard:edit_user_info"))
 
+    return render(request, template_name, context)
+
+
+@login_required
+def dashboard_stats(request, template_name="dashboard/dashboard_stats.html"):
+    if not stats_utils.can_view_stats_dashboard_widget(request):
+        return HttpResponseForbidden()
+
+    context = {
+        # FIXME(vperron): I think there's a rising need for a revamped permission system.
+        "can_view_stats_siae": stats_utils.can_view_stats_siae(request),
+        "can_view_stats_siae_aci": stats_utils.can_view_stats_siae_aci(request),
+        "can_view_stats_siae_etp": stats_utils.can_view_stats_siae_etp(request),
+        "can_view_stats_siae_orga_etp": stats_utils.can_view_stats_siae_orga_etp(request),
+        "can_view_stats_cd": stats_utils.can_view_stats_cd(request),
+        "can_view_stats_cd_aci": stats_utils.can_view_stats_cd_aci(request),
+        "can_view_stats_ft": stats_utils.can_view_stats_ft(request),
+        "can_view_stats_ph": stats_utils.can_view_stats_ph(request),
+        "can_view_stats_ddets_iae": stats_utils.can_view_stats_ddets_iae(request),
+        "can_view_stats_ddets_iae_aci": stats_utils.can_view_stats_ddets_iae_aci(request),
+        "can_view_stats_ddets_log": stats_utils.can_view_stats_ddets_log(request),
+        "can_view_stats_dreets_iae": stats_utils.can_view_stats_dreets_iae(request),
+        "can_view_stats_dgefp_iae": stats_utils.can_view_stats_dgefp_iae(request),
+        "can_view_stats_dihal": stats_utils.can_view_stats_dihal(request),
+        "can_view_stats_drihl": stats_utils.can_view_stats_drihl(request),
+        "can_view_stats_iae_network": stats_utils.can_view_stats_iae_network(request),
+        "can_view_stats_convergence": stats_utils.can_view_stats_convergence(request),
+    }
+    context["has_view_stats_items"] = any(v for k, v in context.items() if k.startswith("can_view_stats_"))
+    if request.user.is_employer:
+        context["siae_suspension_text_with_dates"] = (
+            request.current_organization.get_active_suspension_text_with_dates()
+            # Otherwise they cannot be suspended
+            if request.current_organization.is_subject_to_eligibility_rules
+            else None
+        )
     return render(request, template_name, context)
 
 
