@@ -18,6 +18,16 @@
     <li class="mb-3">
         Date de naissance : <b>le {{ profile.birthdate }}</b>
     </li>
+    {% if profile.birth_place %}
+        <li class="mb-3">
+            Commune de naissance : <b>{{ profile.birth_place.name }} {{ profile.birth_place.department_code }}</b>
+        </li>
+    {% endif %}
+    {% if profile.birth_country %}
+        <li class="mb-3">
+            Pays de naissance : <b>{{ profile.birth_country.name }}</b>
+        </li>
+    {% endif %}
 </ul>
 <hr class="my-4">
 

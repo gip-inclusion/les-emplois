@@ -7,6 +7,8 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.utils import timezone
 
+from itou.asp.models import Country
+
 
 alphanumeric = RegexValidator(r"^[0-9a-zA-Z]*$", "Seuls les caractères alphanumériques sont autorisés.")
 
@@ -88,6 +90,16 @@ def validate_birthdate(birthdate):
         raise ValidationError("La date de naissance doit être postérieure à 1900.")
     if birthdate >= get_max_birthdate():
         raise ValidationError("La personne doit avoir plus de 16 ans.")
+
+
+def validate_birth_location(birth_country, birth_place):
+    # If birth country is France, then birth place must be provided
+    if birth_country and birth_country.code == Country.INSEE_CODE_FRANCE and not birth_place:
+        raise ValidationError("Il n'est pas possible de saisir une commune de naissance hors de France.")
+
+    # If birth country is not France, do not fill a birth place (no ref file)
+    if birth_country and birth_country.code != Country.INSEE_CODE_FRANCE and birth_place:
+        raise ValidationError("Si le pays de naissance est la France, la commune de naissance est obligatoire.")
 
 
 AF_NUMBER_PREFIX_REGEXPS = [

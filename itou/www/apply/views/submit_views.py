@@ -532,14 +532,18 @@ class CreateJobSeekerStep1ForSenderView(CreateJobSeekerForSenderBaseView):
         )  # TODO(xfernandez): drop fallback on self.job_seeker_session["user"] in a week
         session_nir = self.job_seeker_session.get("profile", {}).get("nir")
         session_lack_of_nir_reason = self.job_seeker_session.get("profile", {}).get("lack_of_nir_reason")
+        session_birth_place = self.job_seeker_session.get("profile", {}).get("birth_place")
+        session_birth_country = self.job_seeker_session.get("profile", {}).get("birth_country")
 
         self.form = CreateOrUpdateJobSeekerStep1Form(
             data=request.POST or None,
             initial=self.job_seeker_session.get("user", {})
             | {
-                "birthdate": session_birthdate if session_birthdate is not None else None,
-                "nir": session_nir if session_nir is not None else None,
-                "lack_of_nir_reason": session_lack_of_nir_reason if session_lack_of_nir_reason is not None else None,
+                "birthdate": session_birthdate,
+                "nir": session_nir,
+                "lack_of_nir_reason": session_lack_of_nir_reason,
+                "birth_place": session_birth_place,
+                "birth_country": session_birth_country,
             },
         )
 
@@ -675,8 +679,8 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
         }
 
     def _get_profile_data_from_session(self):
-        # Dummy fields used by CreateOrUpdateJobSeekerStep3Form()
         fields_to_exclude = [
+            # Dummy fields used by CreateOrUpdateJobSeekerStep3Form()
             "pole_emploi",
             "pole_emploi_id_forgotten",
             "rsa_allocation",
@@ -684,13 +688,21 @@ class CreateJobSeekerStepEndForSenderView(CreateJobSeekerForSenderBaseView):
             "ass_allocation",
             "aah_allocation",
             "lack_of_nir",
+            # ForeignKeys - the session value will be the ID serialization and not the instance
+            "birth_place",
+            "birth_country",
         ]
+
+        birth_data = {
+            "birth_place_id": self.job_seeker_session.get("profile", {}).get("birth_place"),
+            "birth_country_id": self.job_seeker_session.get("profile", {}).get("birth_country"),
+        }
+
         # TODO(xfernandez): remove user session birthdate handling in a week
         if birthdate_from_user_session := self.job_seeker_session.get("user", {}).get("birthdate"):
-            user_data = {"birthdate": birthdate_from_user_session}
-        else:
-            user_data = {}
-        return user_data | {
+            birth_data |= {"birthdate": birthdate_from_user_session}
+
+        return birth_data | {
             k: v for k, v in self.job_seeker_session.get("profile").items() if k not in fields_to_exclude
         }
 
@@ -1523,8 +1535,8 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
         self.updated_user_fields = []
 
     def _get_profile_data_from_session(self):
-        # Dummy fields used by CreateOrUpdateJobSeekerStep3Form()
         fields_to_exclude = [
+            # Dummy fields used by CreateOrUpdateJobSeekerStep3Form()
             "pole_emploi",
             "pole_emploi_id_forgotten",
             "rsa_allocation",
@@ -1532,8 +1544,19 @@ class UpdateJobSeekerStepEndView(UpdateJobSeekerBaseView):
             "ass_allocation",
             "aah_allocation",
             "lack_of_nir",
+            # ForeignKeys - the session value will be the ID serialization and not the instance
+            "birth_place",
+            "birth_country",
         ]
-        return {k: v for k, v in self.job_seeker_session.get("profile", {}).items() if k not in fields_to_exclude}
+
+        birth_data = {
+            "birth_place_id": self.job_seeker_session.get("profile", {}).get("birth_place"),
+            "birth_country_id": self.job_seeker_session.get("profile", {}).get("birth_country"),
+        }
+
+        return birth_data | {
+            k: v for k, v in self.job_seeker_session.get("profile", {}).items() if k not in fields_to_exclude
+        }
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)

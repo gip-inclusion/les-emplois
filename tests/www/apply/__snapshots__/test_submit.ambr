@@ -909,7 +909,7 @@
 # ---
 # name: UpdateJobSeekerForHireTestCase.test_as_company_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -1255,6 +1255,26 @@
                            AND U2."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CustomFieldRenderer.render[utils/custom_renderer.py]',
+          'SimpleNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'IfNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          ORDER BY "asp_country"."name" ASC
         ''',
       }),
       dict({
@@ -1962,7 +1982,7 @@
 # ---
 # name: UpdateJobSeekerForHireTestCase.test_with_job_seeker_without_nir[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 14,
     'queries': list([
       dict({
         'origin': list([
@@ -2308,6 +2328,26 @@
                            AND U2."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CustomFieldRenderer.render[utils/custom_renderer.py]',
+          'SimpleNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'IfNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          ORDER BY "asp_country"."name" ASC
         ''',
       }),
       dict({
@@ -3015,7 +3055,7 @@
 # ---
 # name: UpdateJobSeekerTestCase.test_as_authorized_prescriber_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 11,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -3283,6 +3323,26 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'CustomFieldRenderer.render[utils/custom_renderer.py]',
+          'SimpleNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'IfNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          ORDER BY "asp_country"."name" ASC
+        ''',
       }),
       dict({
         'origin': list([
@@ -3831,7 +3891,7 @@
 # ---
 # name: UpdateJobSeekerTestCase.test_as_company_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -4157,6 +4217,26 @@
                            AND U2."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CustomFieldRenderer.render[utils/custom_renderer.py]',
+          'SimpleNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'IfNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          ORDER BY "asp_country"."name" ASC
         ''',
       }),
       dict({
@@ -4824,7 +4904,7 @@
 # ---
 # name: UpdateJobSeekerTestCase.test_as_unauthorized_prescriber_that_created_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 11,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -5092,6 +5172,26 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
+      }),
+      dict({
+        'origin': list([
+          'CustomFieldRenderer.render[utils/custom_renderer.py]',
+          'SimpleNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'IfNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          ORDER BY "asp_country"."name" ASC
+        ''',
       }),
       dict({
         'origin': list([
@@ -5640,7 +5740,7 @@
 # ---
 # name: UpdateJobSeekerTestCase.test_with_job_seeker_without_nir[queries - step 1]
   dict({
-    'num_queries': 12,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -5966,6 +6066,26 @@
                            AND U2."is_active"))
                  AND "users_user"."id" = %s)
           LIMIT 1
+        ''',
+      }),
+      dict({
+        'origin': list([
+          'CustomFieldRenderer.render[utils/custom_renderer.py]',
+          'SimpleNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'IfNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+          'BlockNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'BlockNode[layout/base.html]',
+          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
+          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
+        ]),
+        'sql': '''
+          SELECT "asp_country"."id",
+                 "asp_country"."code",
+                 "asp_country"."name",
+                 "asp_country"."group",
+                 "asp_country"."department"
+          FROM "asp_country"
+          ORDER BY "asp_country"."name" ASC
         ''',
       }),
       dict({

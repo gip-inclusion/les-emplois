@@ -14,7 +14,7 @@ from django.urls import resolve, reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertRedirects
 
-from itou.asp.models import AllocationDuration, EducationLevel, RSAAllocation
+from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, RSAAllocation
 from itou.companies.enums import CompanyKind, ContractType
 from itou.eligibility.models import (
     AdministrativeCriteria,
@@ -860,18 +860,25 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             ),
         )
 
+        geispolsheim = create_city_geispolsheim()
+        birthdate = dummy_job_seeker.jobseeker_profile.birthdate
+
         post_data = {
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
             "last_name": dummy_job_seeker.last_name,
-            "birthdate": dummy_job_seeker.jobseeker_profile.birthdate,
+            "birthdate": birthdate,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
+            "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+            "birth_country": Country.france_id,
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
+        expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
+        expected_job_seeker_session["profile"]["birth_country"] = post_data.pop("birth_country")
         expected_job_seeker_session["user"] |= post_data
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1113,19 +1120,26 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             ),
         )
 
+        geispolsheim = create_city_geispolsheim()
+        birthdate = dummy_job_seeker.jobseeker_profile.birthdate
+
         post_data = {
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
             "last_name": dummy_job_seeker.last_name,
-            "birthdate": dummy_job_seeker.jobseeker_profile.birthdate,
+            "birthdate": birthdate,
             "nir": dummy_job_seeker.jobseeker_profile.nir,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
+            "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+            "birth_country": Country.france_id,
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
+        expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
+        expected_job_seeker_session["profile"]["birth_country"] = post_data.pop("birth_country")
         post_data.pop("nir")
         expected_job_seeker_session["user"] |= post_data
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
@@ -1456,18 +1470,25 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
             ),
         )
 
+        geispolsheim = create_city_geispolsheim()
+        birthdate = dummy_job_seeker.jobseeker_profile.birthdate
+
         post_data = {
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
             "last_name": dummy_job_seeker.last_name,
-            "birthdate": dummy_job_seeker.jobseeker_profile.birthdate,
+            "birthdate": birthdate,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
+            "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+            "birth_country": Country.france_id,
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
+        expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
+        expected_job_seeker_session["profile"]["birth_country"] = post_data.pop("birth_country")
         expected_job_seeker_session["user"] |= post_data
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -1919,18 +1940,25 @@ class ApplyAsCompanyTest(TestCase):
             ),
         )
 
+        geispolsheim = create_city_geispolsheim()
+        birthdate = dummy_job_seeker.jobseeker_profile.birthdate
+
         post_data = {
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
             "last_name": dummy_job_seeker.last_name,
-            "birthdate": dummy_job_seeker.jobseeker_profile.birthdate,
+            "birthdate": birthdate,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
+            "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+            "birth_country": Country.france_id,
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
+        expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
+        expected_job_seeker_session["profile"]["birth_country"] = post_data.pop("birth_country")
         expected_job_seeker_session["user"] |= post_data
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -2209,7 +2237,6 @@ class DirectHireFullProcessTest(TestCase):
             with_ban_geoloc_address=True,
         )
 
-        # This is the city matching with_ban_geoloc_address trait
         geispolsheim = create_city_geispolsheim()
 
         # Step determine the job seeker with a NIR.
@@ -2269,18 +2296,24 @@ class DirectHireFullProcessTest(TestCase):
             ),
         )
 
+        birthdate = dummy_job_seeker.jobseeker_profile.birthdate
+
         post_data = {
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
             "last_name": dummy_job_seeker.last_name,
-            "birthdate": dummy_job_seeker.jobseeker_profile.birthdate,
+            "birthdate": birthdate,
             "lack_of_nir": False,
             "lack_of_nir_reason": "",
+            "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+            "birth_country": Country.france_id,
         }
         response = self.client.post(next_url, data=post_data)
         assert response.status_code == 302
         expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
         expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
+        expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
+        expected_job_seeker_session["profile"]["birth_country"] = post_data.pop("birth_country")
         expected_job_seeker_session["user"] |= post_data
         assert self.client.session[job_seeker_session_name] == expected_job_seeker_session
 
@@ -3025,9 +3058,13 @@ class UpdateJobSeekerBaseTestCase(TestCase):
         lack_of_nir_reason = post_data.pop("lack_of_nir_reason")
         nir = post_data.pop("nir", None)
         birthdate = post_data.pop("birthdate", None)
+        birth_place = post_data.pop("birth_place", None)
+        birth_country = post_data.pop("birth_country", None)
         expected_job_seeker_session = {
             "user": post_data,
             "profile": {
+                "birth_place": birth_place or self.job_seeker.jobseeker_profile.birth_place,
+                "birth_country": birth_country or self.job_seeker.jobseeker_profile.birth_country,
                 "birthdate": birthdate or self.job_seeker.jobseeker_profile.birthdate,
                 "nir": nir or self.job_seeker.jobseeker_profile.nir,
                 "lack_of_nir_reason": lack_of_nir_reason,
@@ -3272,7 +3309,17 @@ class UpdateJobSeekerTestCase(UpdateJobSeekerBaseTestCase):
         self.job_seeker.created_by = prescriber
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
-        self._check_everything_allowed(prescriber)
+
+        geispolsheim = create_city_geispolsheim()
+        birthdate = self.job_seeker.jobseeker_profile.birthdate
+
+        self._check_everything_allowed(
+            prescriber,
+            extra_post_data_1={
+                "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+                "birth_country": Country.france_id,
+            },
+        )
 
     def test_as_unauthorized_prescriber_that_created_the_non_proxied_job_seeker(self):
         prescriber = PrescriberOrganizationWithMembershipFactory(authorized=False).members.first()
@@ -3293,7 +3340,17 @@ class UpdateJobSeekerTestCase(UpdateJobSeekerBaseTestCase):
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
         authorized_prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
-        self._check_everything_allowed(authorized_prescriber)
+
+        geispolsheim = create_city_geispolsheim()
+        birthdate = self.job_seeker.jobseeker_profile.birthdate
+
+        self._check_everything_allowed(
+            authorized_prescriber,
+            extra_post_data_1={
+                "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+                "birth_country": Country.france_id,
+            },
+        )
 
     def test_as_authorized_prescriber_with_non_proxied_job_seeker(self):
         # Make sure the job seeker does manage its own account
@@ -3312,7 +3369,17 @@ class UpdateJobSeekerTestCase(UpdateJobSeekerBaseTestCase):
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
-        self._check_everything_allowed(self.company.members.first())
+
+        geispolsheim = create_city_geispolsheim()
+        birthdate = self.job_seeker.jobseeker_profile.birthdate
+
+        self._check_everything_allowed(
+            self.company.members.first(),
+            extra_post_data_1={
+                "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+                "birth_country": Country.france_id,
+            },
+        )
 
     def test_as_company_with_non_proxied_job_seeker(self):
         # Make sure the job seeker does manage its own account
@@ -3344,12 +3411,18 @@ class UpdateJobSeekerTestCase(UpdateJobSeekerBaseTestCase):
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
+
+        geispolsheim = create_city_geispolsheim()
+        birthdate = self.job_seeker.jobseeker_profile.birthdate
+
         self._check_everything_allowed(
             self.company.members.first(),
             extra_post_data_1={
                 "nir": "",
                 "lack_of_nir": True,
                 "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER.value,
+                "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+                "birth_country": Country.france_id,
             },
         )
         # Check that we could update its NIR infos
@@ -3438,7 +3511,17 @@ class UpdateJobSeekerForHireTestCase(UpdateJobSeekerBaseTestCase):
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
-        self._check_everything_allowed(self.company.members.first())
+
+        geispolsheim = create_city_geispolsheim()
+        birthdate = self.job_seeker.jobseeker_profile.birthdate
+
+        self._check_everything_allowed(
+            self.company.members.first(),
+            extra_post_data_1={
+                "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+                "birth_country": Country.france_id,
+            },
+        )
 
     def test_as_company_with_non_proxied_job_seeker(self):
         # Make sure the job seeker does manage its own account
@@ -3470,12 +3553,18 @@ class UpdateJobSeekerForHireTestCase(UpdateJobSeekerBaseTestCase):
         self.job_seeker.created_by = EmployerFactory()
         self.job_seeker.last_login = None
         self.job_seeker.save(update_fields=["created_by", "last_login"])
+
+        geispolsheim = create_city_geispolsheim()
+        birthdate = self.job_seeker.jobseeker_profile.birthdate
+
         self._check_everything_allowed(
             self.company.members.first(),
             extra_post_data_1={
                 "nir": "",
                 "lack_of_nir": True,
                 "lack_of_nir_reason": LackOfNIRReason.TEMPORARY_NUMBER.value,
+                "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+                "birth_country": Country.france_id,
             },
         )
         # Check that we could update its NIR infos
@@ -3599,13 +3688,18 @@ def test_detect_existing_job_seeker(client):
     # Make sure the specified NIR is properly filled
     assertContains(response, NEW_NIR)
 
+    geispolsheim = create_city_geispolsheim()
+    birthdate = job_seeker.jobseeker_profile.birthdate
+
     post_data = {
         "title": job_seeker.title,
         "first_name": "JEREMY",  # Try without the accent and in uppercase
         "last_name": job_seeker.last_name,
-        "birthdate": job_seeker.jobseeker_profile.birthdate,
+        "birthdate": birthdate,
         "lack_of_nir_reason": "",
         "lack_of_nir": False,
+        "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+        "birth_country": Country.france_id,
     }
     response = client.post(next_url, data=post_data)
     assertContains(
@@ -3637,6 +3731,8 @@ def test_detect_existing_job_seeker(client):
     expected_job_seeker_session["profile"] |= {
         "lack_of_nir_reason": post_data.pop("lack_of_nir_reason", ""),
         "birthdate": post_data.pop("birthdate"),
+        "birth_country": post_data.pop("birth_country"),
+        "birth_place": post_data.pop("birth_place"),
     }
     expected_job_seeker_session["user"] |= post_data
     assert client.session[job_seeker_session_name] == expected_job_seeker_session

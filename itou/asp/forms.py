@@ -1,9 +1,10 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.urls import reverse
+from django.urls import reverse_lazy
 from django.utils.functional import SimpleLazyObject
 
 from itou.asp.models import Commune, Country
+from itou.utils.validators import validate_birth_location
 from itou.utils.widgets import RemoteAutocompleteSelect2Widget
 
 
@@ -21,13 +22,13 @@ class BirthPlaceAndCountryMixin(forms.ModelForm):
         required=False,
         widget=RemoteAutocompleteSelect2Widget(
             attrs={
-                "data-ajax--url": SimpleLazyObject(lambda: reverse("autocomplete:communes")),
+                "data-ajax--url": reverse_lazy("autocomplete:communes"),
                 "data-ajax--cache": "true",
                 "data-ajax--type": "GET",
                 "data-minimum-input-length": 1,
                 "data-placeholder": "Nom de la commune",
                 "data-disable-target": "#id_birth_country",
-                "data-target-value": SimpleLazyObject(lambda: f"{Country.objects.get(code=Country._CODE_FRANCE).pk}"),
+                "data-target-value": SimpleLazyObject(lambda: f"{Country.france_id}"),
             }
         ),
     )
@@ -58,7 +59,7 @@ class BirthPlaceAndCountryMixin(forms.ModelForm):
             # That's also why we can't make it mandatory.
             # See utils.js > toggleDisableAndSetValue
             if birth_place:
-                self.cleaned_data["birth_country"] = Country.objects.get(code=Country._CODE_FRANCE)
+                self.cleaned_data["birth_country"] = Country.objects.get(code=Country.INSEE_CODE_FRANCE)
             else:
                 # Display the error above the field instead of top of page.
                 self.add_error("birth_country", "Le pays de naissance est obligatoire.")
@@ -77,17 +78,9 @@ class BirthPlaceAndCountryMixin(forms.ModelForm):
                 )
                 self.add_error("birth_place", msg)
 
-    def treat_birth_fields(self):
-        # class targets User and JobSeekerProfile models
-        jobseeker_profile = self.instance.jobseeker_profile if hasattr(self.instance, "jobseeker_profile") else self.instance
-
-        try:
-            jobseeker_profile.birth_place = self.cleaned_data.get("birth_place")
-            jobseeker_profile.birth_country = self.cleaned_data.get("birth_country")
-            jobseeker_profile._clean_birth_fields()
-        except ValidationError as e:
-            self._update_errors(e)
-
     def _post_clean(self):
         super()._post_clean()
-        self.treat_birth_fields()
+        try:
+            validate_birth_location(self.cleaned_data.get("birth_country"), self.cleaned_data.get("birth_place"))
+        except ValidationError as e:
+            self._update_errors(e)
