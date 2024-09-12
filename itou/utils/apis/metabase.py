@@ -1,5 +1,7 @@
+import copy
 import datetime
 
+import httpx
 import jwt
 from django.conf import settings
 from django.utils import timezone
@@ -326,3 +328,100 @@ def metabase_embedded_url(request=None, dashboard_id=None, params=None, with_tit
     }
     is_titled = "true" if with_title else "false"
     return settings.METABASE_SITE_URL + "/embed/dashboard/" + _get_token(payload) + f"#titled={is_titled}"
+
+
+# Metabase API client
+# See: https://www.metabase.com/docs/latest/api/
+class Client:
+    def __init__(self, base_url):
+        self.api_url = base_url + "/api"
+
+    def request(self, method, path, data=None):
+        response = httpx.request(
+            method,
+            self.api_url + path,
+            json=data,
+            headers={
+                "X-API-KEY": settings.METABASE_API_KEY,
+            },
+            timeout=60,  # Use a not-so-long but not not-so-short timeout
+        )
+        response.raise_for_status()
+
+        return response.json()
+
+    @staticmethod
+    def _normalize_field_to_field_name(field_name_or_id, columns_metadata):
+        try:
+            field_id = int(field_name_or_id)
+        except ValueError:
+            return field_name_or_id
+
+        for metadata in columns_metadata:
+            if metadata["id"] == field_id:
+                return metadata["name"]
+
+    @staticmethod
+    def transform_metabase_results(results, group_by=None, *, single_value=False):
+        if not results["rows"]:
+            return []
+        if single_value and not group_by:
+            return results["rows"][0][0]
+        if single_value and len(group_by) == 1:
+            return dict(results["rows"])
+
+        column_names = [col["name"] for col in results["cols"]]
+        transformed_results = [dict(zip(column_names, row)) for row in results["rows"]]
+        if group_by:
+            make_result_key = tuple if len(group_by) > 1 else lambda v: tuple(v)[0]
+            key_field_names = [Client._normalize_field_to_field_name(field, results["cols"]) for field in group_by]
+            transformed_results = {
+                make_result_key(row[name] for name in key_field_names): row for row in transformed_results
+            }
+            if single_value:
+                transformed_results = {
+                    key: {k: v for k, v in row.items() if k not in key_field_names}.popitem()[1]
+                    for key, row in transformed_results.items()
+                }
+        return transformed_results
+
+    @staticmethod
+    def _build_metabase_field(field):
+        return ["field", field, {"base-type": "type/Text"}]
+
+    @staticmethod
+    def _build_metabase_filter(field, values):
+        return [
+            "=",
+            Client._build_metabase_field(field),
+            *values,
+        ]
+
+    @staticmethod
+    def _join_metabase_filters(*filters):
+        return [
+            "and",
+            *filters,
+        ]
+
+    def _get_card_dataset_query(self, card):
+        card_data = self.request("GET", f"/card/{card}")
+        return copy.deepcopy(card_data["dataset_query"])
+
+    def fetch_card_results(self, card, filters=None, group_by=None, *, single_value=False):
+        if not any([filters, group_by]):
+            data = self.request("POST", f"/card/{card}/query")
+            return self.transform_metabase_results(data["data"], single_value=single_value)
+
+        card_query = self._get_card_dataset_query(card)
+        if filters:
+            card_query["query"]["filter"] = self._join_metabase_filters(
+                card_query["query"].get("filter", []),
+                *[self._build_metabase_filter(field, values) for field, values in filters.items()],
+            )
+        if group_by:
+            card_query["query"].setdefault("breakout", [])
+            card_query["query"]["breakout"].extend([self._build_metabase_field(field) for field in group_by])
+
+        data = self.request("POST", "/dataset", data=card_query)
+        return self.transform_metabase_results(data["data"], group_by=group_by, single_value=single_value)

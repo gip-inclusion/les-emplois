@@ -4,6 +4,7 @@ from django.contrib import auth, messages
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.cache import caches
 from django.core.exceptions import PermissionDenied
 from django.db.models import F
 from django.http import Http404, HttpResponseForbidden, HttpResponseRedirect
@@ -27,6 +28,7 @@ from itou.geiq.models import ImplementationAssessmentCampaign
 from itou.institutions.enums import InstitutionKind
 from itou.institutions.models import Institution
 from itou.job_applications.enums import JobApplicationState
+from itou.metabase.models import DatumKey
 from itou.openid_connect.inclusion_connect import constants as ic_constants
 from itou.prescribers.models import PrescriberOrganization
 from itou.siae_evaluations.models import EvaluatedSiae, EvaluationCampaign
@@ -44,6 +46,7 @@ from itou.www.dashboard.forms import (
 )
 from itou.www.search.forms import SiaeSearchForm
 from itou.www.stats import utils as stats_utils
+from itou.www.stats.utils import get_stats_for_institution
 
 
 def _employer_dashboard_context(request):
@@ -140,6 +143,7 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
         "can_view_stats_drihl": stats_utils.can_view_stats_drihl(request),
         "can_view_stats_iae_network": stats_utils.can_view_stats_iae_network(request),
         "can_view_stats_convergence": stats_utils.can_view_stats_convergence(request),
+        "stats_kpi": False,
         "num_rejected_employee_records": 0,
         "pending_prolongation_requests": None,
         "evaluated_siae_notifications": EvaluatedSiae.objects.none(),
@@ -195,6 +199,22 @@ def dashboard(request, template_name="dashboard/dashboard.html"):
             if current_org.kind in (InstitutionKind.DDETS_GEIQ, InstitutionKind.DREETS_GEIQ)
             else None
         )
+        if current_org.kind in [InstitutionKind.DGEFP_IAE, InstitutionKind.DREETS_IAE, InstitutionKind.DDETS_IAE]:
+            context["stats_kpi"] = {
+                DatumKey.FLUX_IAE_DATA_UPDATED_AT: caches["stats"].get(DatumKey.FLUX_IAE_DATA_UPDATED_AT),
+                DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS: get_stats_for_institution(
+                    current_org, DatumKey.JOB_SEEKER_STILL_SEEKING_AFTER_30_DAYS
+                ),
+                DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY: get_stats_for_institution(
+                    current_org, DatumKey.JOB_APPLICATION_WITH_HIRING_DIFFICULTY
+                ),
+                DatumKey.JOB_APPLICATION_ACCEPTED_YEAR_TO_DATE: get_stats_for_institution(
+                    current_org, DatumKey.JOB_APPLICATION_ACCEPTED_YEAR_TO_DATE, is_percentage=True
+                ),
+                DatumKey.RATE_OF_ACCEPTED_JOB_APPLICATIONS_PRESCRIBED_BY_AHI: get_stats_for_institution(
+                    current_org, DatumKey.RATE_OF_ACCEPTED_JOB_APPLICATIONS_PRESCRIBED_BY_AHI, is_percentage=True
+                ),
+            }
     elif request.user.is_job_seeker:
         # Force job seekers to complete their profile.
         required_attributes = ["title", "first_name", "last_name", "address_line_1", "post_code", "city"]
