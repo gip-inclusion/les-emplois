@@ -1694,17 +1694,13 @@ def test_job_application_transitions(transition, from_state):
         pytest.param(transition, from_state, id=f"transition={transition.name} from_state={from_state}")
         for transition in JobApplicationWorkflow.transitions
         for from_state in transition.source
-        if not (
-            # Leads to a state that cannot be archived.
-            {
-                # Employment relationship between employer and job seeker, it is active.
-                JobApplicationState.ACCEPTED,
-                # Employer waits for a prior action before to establish an employment relationship.
-                JobApplicationState.PRIOR_TO_HIRE,
-            }
-            & {from_state.name, transition.target.name}
-            # Employer transfers to another structure, they likely won’t interact with this job application again.
-            or JobApplicationWorkflow.TRANSITION_EXTERNAL_TRANSFER == transition.name
+        if transition.name != JobApplicationWorkflow.TRANSITION_EXTERNAL_TRANSFER
+        and from_state.name
+        not in (
+            # Employment relationship between employer and job seeker, it is active.
+            JobApplicationState.ACCEPTED,
+            # Employer waits for a prior action before to establish an employment relationship.
+            JobApplicationState.PRIOR_TO_HIRE,
         )
     ],
 )
@@ -1717,21 +1713,6 @@ def test_job_application_transition_unarchives(transition, from_state):
         target_company.members.add(user)
         kwargs["target_company"] = target_company
     getattr(job_application, transition.name)(**kwargs)
-    job_application.refresh_from_db()
-    assert job_application.archived_at is None
-
-
-@pytest.mark.parametrize(
-    "transition_name",
-    [
-        JobApplicationWorkflow.TRANSITION_ACCEPT,
-        JobApplicationWorkflow.TRANSITION_MOVE_TO_PRIOR_TO_HIRE,
-    ],
-)
-def test_unarchive_job_application(transition_name):
-    job_application = JobApplicationFactory(state=JobApplicationState.PROCESSING, archived_at=timezone.now())
-    user = job_application.to_company.members.get()
-    getattr(job_application, transition_name)(user=user)
     job_application.refresh_from_db()
     assert job_application.archived_at is None
 
