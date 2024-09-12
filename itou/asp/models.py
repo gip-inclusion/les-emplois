@@ -6,7 +6,7 @@ from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
-from django.utils.functional import cached_property
+from django.utils.functional import cached_property, classproperty
 from unidecode import unidecode
 
 from itou.utils.models import DateRange
@@ -463,7 +463,8 @@ class Country(PrettyPrintMixin, models.Model):
     Imported from ASP reference file: ref_grp_pays_v1, ref_insee_pays_v4.csv
     """
 
-    _CODE_FRANCE = "100"
+    INSEE_CODE_FRANCE = "100"
+    _ID_FRANCE = None
 
     class Group(models.TextChoices):
         FRANCE = "1", "France"
@@ -484,6 +485,12 @@ class Country(PrettyPrintMixin, models.Model):
         verbose_name = "pays"
         verbose_name_plural = "pays"
         ordering = ["name"]
+
+    @classproperty
+    def france_id(cls):
+        if cls._ID_FRANCE is None:
+            cls._ID_FRANCE = Country.objects.get(code=Country.INSEE_CODE_FRANCE).pk
+        return cls._ID_FRANCE
 
 
 class SiaeMeasure(models.TextChoices):

@@ -161,7 +161,9 @@ class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):
         JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
 
 
-class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, JobSeekerProfileFieldsMixin, forms.ModelForm):
+class CreateOrUpdateJobSeekerStep1Form(
+    JobSeekerNIRUpdateMixin, JobSeekerProfileFieldsMixin, BirthPlaceAndCountryMixin, forms.ModelForm
+):
     REQUIRED_FIELDS = [
         "title",
         "first_name",
@@ -169,7 +171,7 @@ class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, JobSeekerProfile
         "birthdate",
     ]
 
-    PROFILE_FIELDS = ["birthdate", "nir", "lack_of_nir_reason"]
+    PROFILE_FIELDS = ["birth_country", "birthdate", "birth_place", "nir", "lack_of_nir_reason"]
 
     class Meta:
         model = User
@@ -192,12 +194,6 @@ class CreateOrUpdateJobSeekerStep1Form(JobSeekerNIRUpdateMixin, JobSeekerProfile
                 "class": "js-period-date-input",
             }
         )
-
-
-class CreateOrUpdateJobSeekerWithBirthPlaceAndCountryStep1Form(
-    BirthPlaceAndCountryMixin, CreateOrUpdateJobSeekerStep1Form
-):
-    pass
 
 
 class CreateOrUpdateJobSeekerStep2Form(JobSeekerAddressForm, forms.ModelForm):

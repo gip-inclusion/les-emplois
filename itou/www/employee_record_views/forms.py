@@ -107,7 +107,7 @@ class NewEmployeeRecordStep1Form(BirthPlaceAndCountryMixin, JobSeekerProfileFiel
     - birth place and birth country of the employee
     """
 
-    PROFILE_FIELDS = ["birthdate"]
+    PROFILE_FIELDS = ["birth_country", "birthdate", "birth_place"]
     READ_ONLY_FIELDS = []
     REQUIRED_FIELDS = [
         "title",

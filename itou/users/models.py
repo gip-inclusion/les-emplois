@@ -22,7 +22,6 @@ from itou.approvals.models import Approval, PoleEmploiApproval
 from itou.asp.models import (
     AllocationDuration,
     Commune,
-    Country,
     EducationLevel,
     LaneExtension,
     LaneType,
@@ -35,7 +34,7 @@ from itou.companies.enums import CompanyKind
 from itou.utils.db import or_queries
 from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.templatetags.str_filters import mask_unless
-from itou.utils.validators import validate_birthdate, validate_nir, validate_pole_emploi_id
+from itou.utils.validators import validate_birth_location, validate_birthdate, validate_nir, validate_pole_emploi_id
 
 from .enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 
@@ -772,16 +771,9 @@ class JobSeekerProfile(models.Model):
     with Hexa norms (but compliant enough to be accepted by ASP backend).
     """
 
-    # Used for validation of birth country / place
-    INSEE_CODE_FRANCE = Country._CODE_FRANCE
-
     ERROR_NOT_RESOURCELESS_IF_OETH_OR_RQTH = "La personne n'est pas considérée comme sans ressources si OETH ou RQTH"
     ERROR_UNEMPLOYED_BUT_RQTH_OR_OETH = (
         "La personne ne peut être considérée comme sans emploi si employée OETH ou RQTH"
-    )
-    ERROR_MUST_PROVIDE_BIRTH_PLACE = "Si le pays de naissance est la France, la commune de naissance est obligatoire"
-    ERROR_BIRTH_COMMUNE_WITH_FOREIGN_COUNTRY = (
-        "Il n'est pas possible de saisir une commune de naissance hors de France"
     )
 
     ERROR_HEXA_LANE_TYPE = "Le type de voie est obligatoire"
@@ -1121,13 +1113,7 @@ class JobSeekerProfile(models.Model):
         Mainly coherence checks for birth country / place.
         Must be non blocking if these fields are not provided.
         """
-        # If birth country is France, then birth place must be provided
-        if self.birth_country and self.birth_country.code == self.INSEE_CODE_FRANCE and not self.birth_place:
-            raise ValidationError(self.ERROR_MUST_PROVIDE_BIRTH_PLACE)
-
-        # If birth country is not France, do not fill a birth place (no ref file)
-        if self.birth_country and self.birth_country.code != self.INSEE_CODE_FRANCE and self.birth_place:
-            raise ValidationError(self.ERROR_BIRTH_COMMUNE_WITH_FOREIGN_COUNTRY)
+        validate_birth_location(self.birth_country, self.birth_place)
 
     #  This used to be the `clean` method for the global model validation
     #  when using forms.

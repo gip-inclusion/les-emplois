@@ -7,7 +7,7 @@ from django.urls import resolve, reverse
 from django.utils import timezone
 from pytest_django.asserts import assertContains, assertRedirects
 
-from itou.asp.models import RSAAllocation
+from itou.asp.models import Commune, Country, RSAAllocation
 from itou.companies import enums as companies_enums
 from itou.companies.models import Company
 from itou.siae_evaluations.models import Sanctions
@@ -15,7 +15,7 @@ from itou.users.enums import LackOfPoleEmploiId, UserKind
 from itou.users.models import User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
-from tests.cities.factories import create_test_cities
+from tests.cities.factories import create_city_geispolsheim, create_test_cities
 from tests.companies.factories import CompanyWithMembershipAndJobsFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
@@ -109,17 +109,24 @@ def test_create_job_seeker(_mock, client):
         ),
     )
 
+    geispolsheim = create_city_geispolsheim()
+    birthdate = dummy_job_seeker.jobseeker_profile.birthdate
+
     post_data = {
         "title": dummy_job_seeker.title,
         "first_name": dummy_job_seeker.first_name,
         "last_name": dummy_job_seeker.last_name,
-        "birthdate": dummy_job_seeker.jobseeker_profile.birthdate,
+        "birthdate": birthdate,
         "lack_of_nir": False,
         "lack_of_nir_reason": "",
+        "birth_place": Commune.objects.by_insee_code_and_period(geispolsheim.code_insee, birthdate).id,
+        "birth_country": Country.france_id,
     }
     response = client.post(next_url, data=post_data)
     expected_job_seeker_session["profile"]["birthdate"] = post_data.pop("birthdate")
     expected_job_seeker_session["profile"]["lack_of_nir_reason"] = post_data.pop("lack_of_nir_reason")
+    expected_job_seeker_session["profile"]["birth_place"] = post_data.pop("birth_place")
+    expected_job_seeker_session["profile"]["birth_country"] = post_data.pop("birth_country")
     expected_job_seeker_session["user"] |= post_data
     assert client.session[job_seeker_session_name] == expected_job_seeker_session
 
