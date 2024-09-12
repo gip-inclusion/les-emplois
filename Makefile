@@ -14,8 +14,6 @@ REQUIREMENTS_PATH ?= requirements/dev.txt
 VIRTUAL_ENV ?= .venv
 export PATH := $(VIRTUAL_ENV)/bin:$(PATH)
 
-VENV_REQUIREMENT := $(VIRTUAL_ENV)
-
 .PHONY: runserver venv buckets clean quality fix compile-deps
 
 runserver: $(VIRTUAL_ENV)
@@ -29,11 +27,11 @@ $(VIRTUAL_ENV): $(REQUIREMENTS_PATH)
 
 venv: $(VIRTUAL_ENV)
 
-buckets: $(VENV_REQUIREMENT)
+buckets: $(VIRTUAL_ENV)
 	python manage.py configure_bucket
 
 PIP_COMPILE_FLAGS := --no-strip-extras --generate-hashes $(PIP_COMPILE_OPTIONS)
-compile-deps: $(VENV_REQUIREMENT)
+compile-deps: $(VIRTUAL_ENV)
 	uv pip compile $(PIP_COMPILE_FLAGS) -o requirements/base.txt requirements/base.in
 	uv pip compile $(PIP_COMPILE_FLAGS) -o requirements/test.txt requirements/test.in
 	uv pip compile $(PIP_COMPILE_FLAGS) -o requirements/dev.txt requirements/dev.in
@@ -41,7 +39,7 @@ compile-deps: $(VENV_REQUIREMENT)
 clean:
 	find . -type d -name "__pycache__" -depth -exec rm -rf '{}' \;
 
-quality: $(VENV_REQUIREMENT)
+quality: $(VIRTUAL_ENV)
 	ruff format --check $(LINTER_CHECKED_DIRS)
 	ruff check $(LINTER_CHECKED_DIRS)
 	djlint --lint --check itou
@@ -51,7 +49,7 @@ quality: $(VENV_REQUIREMENT)
 	# Make sure pytest help is still accessible.
 	pytest --help >/dev/null
 
-fast_fix: $(VENV_REQUIREMENT)
+fast_fix: $(VIRTUAL_ENV)
 	ruff format $(LINTER_CHECKED_DIRS)
 	ruff check --fix $(LINTER_CHECKED_DIRS)
 	find * -type f -name '*.sh' -exec shellcheck --external-sources --format=diff {} + | git apply --allow-empty
@@ -65,7 +63,7 @@ fix: fast_fix
 .PHONY: populate_db populate_db_with_cities populate_db_minimal
 
 # After migrate
-populate_db_with_cities: $(VENV_REQUIREMENT)
+populate_db_with_cities: $(VIRTUAL_ENV)
 	python manage.py dbshell <itou/fixtures/postgres/cities.sql
 
 populate_db: populate_db_with_cities
@@ -85,7 +83,7 @@ populate_db_minimal: populate_db_with_cities
 
 .PHONY: test
 
-test: $(VENV_REQUIREMENT)
+test: $(VIRTUAL_ENV)
 	pytest --numprocesses=logical --create-db $(TARGET)
 
 # Docker shell.
