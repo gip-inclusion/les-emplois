@@ -8,7 +8,4 @@ class Migration(migrations.Migration):
         ("companies", "0009_remove_company_rdv_insertion_id"),
     ]
 
-    operations = [
-        # TODO(leo): merge this with 0009_remove_company_rdv_insertion_id once run in production
-        migrations.RunSQL('ALTER TABLE "companies_company" DROP COLUMN "rdv_insertion_id";', elidable=True),
-    ]
+    operations = []
