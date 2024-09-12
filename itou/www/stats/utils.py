@@ -92,13 +92,6 @@ def can_view_stats_cd(request):
     )
 
 
-def can_view_stats_cd_whitelist(request):
-    return (
-        can_view_stats_cd(request)
-        and request.current_organization.department in settings.STATS_CD_DEPARTMENT_WHITELIST
-    )
-
-
 def can_view_stats_cd_aci(request):
     return (
         can_view_stats_cd(request)
