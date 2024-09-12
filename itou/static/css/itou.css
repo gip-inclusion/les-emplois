@@ -90,6 +90,10 @@ duet-date-picker.is-invalid ~ .invalid-feedback {
     border: 2px dashed var(--bs-danger);
 }
 
+.form-group > .select2-container--bootstrap-5 {
+    width: 100% !important;
+}
+
 .file-dropzone {
     width: 100%;
     border: 2px dashed var(--bs-gray-700);
