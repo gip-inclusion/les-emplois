@@ -117,7 +117,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
-                 "companies_company"."rdv_insertion_id",
+                 "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
