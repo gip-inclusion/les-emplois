@@ -118,6 +118,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_insertion_id",
+                 "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -355,6 +356,7 @@
                  T8."convention_id",
                  T8."job_app_score",
                  T8."rdv_insertion_id",
+                 T8."rdv_solidarites_id",
                  T9."id",
                  T9."address_line_1",
                  T9."address_line_2",
@@ -823,7 +825,8 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
-                 "companies_company"."rdv_insertion_id"
+                 "companies_company"."rdv_insertion_id",
+                 "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE "companies_company"."id" = %s
           LIMIT 21
@@ -1167,7 +1170,8 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
-                 "companies_company"."rdv_insertion_id"
+                 "companies_company"."rdv_insertion_id",
+                 "companies_company"."rdv_solidarites_id"
           FROM "job_applications_jobapplication"
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
           LEFT OUTER JOIN "users_user" T4 ON ("job_applications_jobapplication"."sender_id" = T4."id")
@@ -1651,6 +1655,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_insertion_id",
+                 "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -1888,6 +1893,7 @@
                  T8."convention_id",
                  T8."job_app_score",
                  T8."rdv_insertion_id",
+                 T8."rdv_solidarites_id",
                  T9."id",
                  T9."address_line_1",
                  T9."address_line_2",
@@ -2269,7 +2275,8 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
-                 "companies_company"."rdv_insertion_id"
+                 "companies_company"."rdv_insertion_id",
+                 "companies_company"."rdv_solidarites_id"
           FROM "companies_company"
           WHERE "companies_company"."id" = %s
           LIMIT 21
@@ -2626,7 +2633,8 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
-                 "companies_company"."rdv_insertion_id"
+                 "companies_company"."rdv_insertion_id",
+                 "companies_company"."rdv_solidarites_id"
           FROM "job_applications_jobapplication"
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
           LEFT OUTER JOIN "users_user" T4 ON ("job_applications_jobapplication"."sender_id" = T4."id")
@@ -3299,6 +3307,7 @@
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
                  "companies_company"."rdv_insertion_id",
+                 "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -3536,6 +3545,7 @@
                  T8."convention_id",
                  T8."job_app_score",
                  T8."rdv_insertion_id",
+                 T8."rdv_solidarites_id",
                  T9."id",
                  T9."address_line_1",
                  T9."address_line_2",
@@ -4089,7 +4099,8 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
-                 "companies_company"."rdv_insertion_id"
+                 "companies_company"."rdv_insertion_id",
+                 "companies_company"."rdv_solidarites_id"
           FROM "job_applications_jobapplication"
           INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
           LEFT OUTER JOIN "users_user" T4 ON ("job_applications_jobapplication"."sender_id" = T4."id")

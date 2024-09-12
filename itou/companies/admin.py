@@ -160,7 +160,7 @@ class CompanyAdmin(ItouGISMixin, OrganizationAdmin):
                     "block_job_applications",
                     "job_applications_blocked_at",
                     "approvals_list",
-                    "rdv_insertion_id",
+                    "rdv_solidarites_id",
                 )
             },
         ),

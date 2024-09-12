@@ -276,6 +276,14 @@ class Company(AddressMixin, OrganizationAbstract):
         help_text="Permet d'initier la prise de RDV via RDV-I lorsque renseigné.",
         error_messages={"unique": "Une entreprise avec cet ID d'organisation RDV-I existe déjà."},
     )
+    rdv_solidarites_id = models.IntegerField(
+        verbose_name="identifiant d'organisation RDV-S",
+        blank=True,
+        null=True,
+        unique=True,
+        help_text="Permet d'initier la prise de RDV via RDV-I lorsque renseigné.",
+        error_messages={"unique": "Une entreprise avec cet ID d'organisation RDV-S existe déjà."},
+    )
 
     # Use the generic relation to let NotificationSettings being collected on deletion
     notification_settings = GenericRelation(
