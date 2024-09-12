@@ -268,14 +268,6 @@ class Company(AddressMixin, OrganizationAbstract):
         verbose_name="score de recommandation (ratio de candidatures récentes vs nombre d'offres d'emploi)", null=True
     )
 
-    rdv_insertion_id = models.IntegerField(
-        verbose_name="identifiant d'organisation RDV-I",
-        blank=True,
-        null=True,
-        unique=True,
-        help_text="Permet d'initier la prise de RDV via RDV-I lorsque renseigné.",
-        error_messages={"unique": "Une entreprise avec cet ID d'organisation RDV-I existe déjà."},
-    )
     rdv_solidarites_id = models.IntegerField(
         verbose_name="identifiant d'organisation RDV-S",
         blank=True,
