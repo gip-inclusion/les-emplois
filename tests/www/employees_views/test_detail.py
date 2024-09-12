@@ -29,6 +29,8 @@ from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_
 
 
 class TestEmployeeDetailView:
+    APPROVAL_NUMBER_LABEL = "Numéro de PASS IAE"
+
     def test_anonymous_user(self, client):
         approval = ApprovalFactory()
         url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
@@ -68,7 +70,7 @@ class TestEmployeeDetailView:
             {"back_url": reverse("approvals:list")},
         )
         response = client.get(url)
-        assertContains(response, "Numéro de PASS IAE")
+        assertContains(response, self.APPROVAL_NUMBER_LABEL)
         assertContains(response, "Informations du salarié")
         assertContains(response, "Éligibilité à l'IAE")
         assertContains(response, "Candidatures de ce salarié")
@@ -101,7 +103,21 @@ class TestEmployeeDetailView:
         url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
         response = client.get(url)
         # Check that the page didn't crash
-        assertContains(response, "Numéro de PASS IAE")
+        assertContains(response, self.APPROVAL_NUMBER_LABEL)
+        assertContains(response, "Informations du salarié")
+        assertContains(response, "Candidatures de ce salarié")
+
+    def test_detail_view_no_approval(self, client):
+        company = CompanyFactory(with_membership=True, subject_to_eligibility=True)
+        employer = company.members.first()
+
+        job_seeker = JobApplicationFactory(to_company=company, state=JobApplicationState.ACCEPTED).job_seeker
+
+        client.force_login(employer)
+        url = reverse("employees:detail", kwargs={"public_id": job_seeker.public_id})
+        response = client.get(url)
+        # Check that the page didn't crash
+        assertNotContains(response, self.APPROVAL_NUMBER_LABEL)
         assertContains(response, "Informations du salarié")
         assertContains(response, "Candidatures de ce salarié")
 
