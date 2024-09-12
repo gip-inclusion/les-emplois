@@ -117,7 +117,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
-                 "companies_company"."rdv_insertion_id",
+                 "companies_company"."rdv_solidarites_id",
                  EXISTS
             (SELECT %s AS "a"
              FROM "companies_siaeconvention" U0
@@ -434,7 +434,7 @@
                  T12."job_applications_blocked_at",
                  T12."convention_id",
                  T12."job_app_score",
-                 T12."rdv_insertion_id",
+                 T12."rdv_solidarites_id",
                  "eligibility_geiqeligibilitydiagnosis"."id",
                  "eligibility_geiqeligibilitydiagnosis"."author_id",
                  "eligibility_geiqeligibilitydiagnosis"."author_kind",
@@ -508,7 +508,7 @@
                  T15."job_applications_blocked_at",
                  T15."convention_id",
                  T15."job_app_score",
-                 T15."rdv_insertion_id",
+                 T15."rdv_solidarites_id",
                  T16."id",
                  T16."address_line_1",
                  T16."address_line_2",
@@ -571,7 +571,7 @@
                  "companies_company"."job_applications_blocked_at",
                  "companies_company"."convention_id",
                  "companies_company"."job_app_score",
-                 "companies_company"."rdv_insertion_id",
+                 "companies_company"."rdv_solidarites_id",
                  T17."id",
                  T17."password",
                  T17."last_login",
