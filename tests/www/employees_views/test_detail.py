@@ -131,10 +131,24 @@ class TestEmployeeDetailView:
         new_approval = JobApplicationFactory(
             job_seeker=expired_approval.user, to_company=company, with_approval=True
         ).approval
+        new_number = format_filters.format_approval_number(new_approval.number)
+        expired_number = format_filters.format_approval_number(expired_approval.number)
         client.force_login(employer)
         url = reverse("employees:detail", kwargs={"public_id": new_approval.user.public_id})
         response = client.get(url)
-        assertContains(response, format_filters.format_approval_number(new_approval.number))
+        assertContains(response, new_number)
+        assertNotContains(response, expired_number)
+
+        # Allow to show previous approvals
+        response = client.get(f"{url}?approval={expired_approval.pk}")
+        assertNotContains(response, new_number)
+        assertContains(response, expired_number)
+
+        # Handle invalid values
+        for invalid_value in [0, "not_a_number"]:
+            response = client.get(f"{url}?approval={invalid_value}")
+            assertContains(response, new_number)
+            assertNotContains(response, expired_number)
 
     @pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
     @freeze_time("2023-04-26")
