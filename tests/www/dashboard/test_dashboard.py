@@ -62,7 +62,6 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         "Votre compte utilisateur n’est rattaché à aucune agence France Travail, "
         "par conséquent vous ne pouvez pas bénéficier du statut de prescripteur habilité."
     )
-    DANGER_CLASS = "bg-danger"
     SUSPEND_TEXT = "Suspendre un PASS IAE"
     HIRE_LINK_LABEL = "Déclarer une embauche"
     DORA_LABEL = "DORA"
@@ -137,6 +136,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         self.assertContains(response, "Liste de mes candidats")
 
     def test_dashboard_displays_asp_badge(self):
+        WARNING_CLASS = "bg-warning"
         company = CompanyFactory(kind=CompanyKind.EI, with_membership=True)
         other_company = CompanyFactory(kind=CompanyKind.ETTI, with_membership=True)
         last_company = CompanyFactory(kind=CompanyKind.ETTI, with_membership=True)
@@ -150,7 +150,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         url = reverse("dashboard:index")
         response = self.client.get(url)
         self.assertContains(response, "Fiches salariés ASP")
-        self.assertNotContains(response, self.DANGER_CLASS)
+        self.assertNotContains(response, WARNING_CLASS)
         assert response.context["num_rejected_employee_records"] == 0
 
         # create rejected job applications
@@ -170,14 +170,14 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = company.pk
         session.save()
         response = self.client.get(url)
-        self.assertContains(response, self.DANGER_CLASS)
+        self.assertContains(response, WARNING_CLASS)
         assert response.context["num_rejected_employee_records"] == 2
 
         # select the second company's in the session
         session[global_constants.ITOU_SESSION_CURRENT_ORGANIZATION_KEY] = other_company.pk
         session.save()
         response = self.client.get(url)
-        self.assertContains(response, self.DANGER_CLASS)
+        self.assertContains(response, WARNING_CLASS)
         assert response.context["num_rejected_employee_records"] == 1
 
         # select the third company's in the session
