@@ -1,3 +1,4 @@
+import contextlib
 import datetime
 import logging
 import urllib.parse
@@ -10,6 +11,7 @@ from django.utils import timezone
 from django.views.generic import DetailView
 
 from itou.approvals.models import (
+    Approval,
     ProlongationRequest,
 )
 from itou.job_applications.enums import JobApplicationState
@@ -58,15 +60,19 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
             )
         )
 
-    def get_job_application(self, employee):
+    def get_job_application(self, employee, approval):
+        if approval:
+            approval_filter = {"approval": approval}
+        else:
+            # To be consistent with previous ApprovalDetailView
+            # an approval is needed
+            approval_filter = {"approval__isnull": False}
         return (
             JobApplication.objects.filter(
                 job_seeker=employee,
                 state=JobApplicationState.ACCEPTED,
                 to_company=self.siae,
-                # To be consistent with previous ApprovalDetailView
-                # an approval is needed
-                approval__isnull=False,
+                **approval_filter,
             )
             .select_related(
                 "approval__user__jobseeker_profile",
@@ -92,13 +98,16 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["siae"] = self.siae
-        job_application = self.get_job_application(self.object)
-        if job_application:
-            approval = job_application.approval
-        else:
-            # This shouldn't be possible except if the job application has been deleted
-            # in this case, use the last approval
-            approval = self.object.approvals.order_by("-end_at").first()
+        approval = None
+        if approval_pk := self.request.GET.get("approval"):
+            with contextlib.suppress(ValueError):  # Ignore invalid approval parameter value
+                approval = Approval.objects.filter(user=self.object, pk=int(approval_pk)).first()
+        job_application = self.get_job_application(self.object, approval)
+        if approval is None:
+            if job_application:
+                approval = job_application.approval
+            else:
+                approval = self.object.approvals.order_by("-end_at").first()
 
         context["can_view_personal_information"] = True  # SIAE members have access to personal info
         context["can_edit_personal_information"] = self.request.user.can_edit_personal_information(self.object)

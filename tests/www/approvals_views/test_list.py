@@ -42,7 +42,7 @@ class TestApprovalsListView:
         assert_previous_step(response, reverse("dashboard:index"))
 
         employee_base_url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
-        assertContains(response, f"{employee_base_url}?back_url={urlencode(url)}")
+        assertContains(response, f"{employee_base_url}?approval={approval.pk}&back_url={urlencode(url)}")
         assertContains(response, self.TABS_CLASS)
 
     def test_multiple_approvals_for_the_same_user(self, client):
