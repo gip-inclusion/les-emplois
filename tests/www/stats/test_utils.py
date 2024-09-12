@@ -2,7 +2,7 @@ import factory.fuzzy
 import pytest
 from django.contrib.messages.middleware import MessageMiddleware
 from django.contrib.sessions.middleware import SessionMiddleware
-from django.test import RequestFactory, override_settings
+from django.test import RequestFactory
 
 from itou.common_apps.address.departments import DEPARTMENTS, REGIONS
 from itou.companies.enums import CompanyKind
@@ -58,63 +58,6 @@ def test_can_view_stats_siae_aci():
     user.companymembership_set.update(is_admin=False)
     request = get_request(user)
     assert utils.can_view_stats_siae_aci(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-
-@override_settings(STATS_CD_DEPARTMENT_WHITELIST=["93"])
-def test_can_view_stats_cd_whitelist():
-    """
-    CD as in "Conseil Départemental".
-    """
-    # Department outside of the whitelist cannot access.
-    org = PrescriberOrganizationWithMembershipFactory(
-        authorized=True, kind=PrescriberOrganizationKind.DEPT, department="01"
-    )
-    request = get_request(org.members.get())
-    assert not utils.can_view_stats_cd_whitelist(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-    # Admin prescriber of authorized CD can access.
-    org = PrescriberOrganizationWithMembershipFactory(
-        authorized=True, kind=PrescriberOrganizationKind.DEPT, department="93"
-    )
-    request = get_request(org.members.get())
-    assert utils.can_view_stats_cd_whitelist(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-    # Non admin prescriber can access as well.
-    org = PrescriberOrganizationWithMembershipFactory(
-        authorized=True,
-        kind=PrescriberOrganizationKind.DEPT,
-        membership__is_admin=False,
-        department="93",
-    )
-    request = get_request(org.members.get())
-    assert utils.can_view_stats_cd_whitelist(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-    # Non authorized organization does not give access.
-    org = PrescriberOrganizationWithMembershipFactory(
-        kind=PrescriberOrganizationKind.DEPT,
-        department="93",
-    )
-    request = get_request(org.members.get())
-    assert not utils.can_view_stats_cd_whitelist(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-    # Non CD organization does not give access.
-    org = PrescriberOrganizationWithMembershipFactory(
-        authorized=True,
-        kind=PrescriberOrganizationKind.CHRS,
-        department="93",
-    )
-    request = get_request(org.members.get())
-    assert not utils.can_view_stats_cd_whitelist(request)
-    assert utils.can_view_stats_dashboard_widget(request)
-
-    # Prescriber without organization cannot access.
-    request = get_request(PrescriberFactory())
-    assert not utils.can_view_stats_cd_whitelist(request)
     assert utils.can_view_stats_dashboard_widget(request)
 
 

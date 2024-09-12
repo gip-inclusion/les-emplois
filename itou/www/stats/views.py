@@ -340,8 +340,6 @@ def stats_cd_iae(request):
 
 @login_required
 def stats_cd_hiring(request):
-    if not utils.can_view_stats_cd_whitelist(request):
-        raise PermissionDenied
     context = {
         "pilotage_webinar_banners": [
             {
@@ -357,8 +355,6 @@ def stats_cd_hiring(request):
 
 @login_required
 def stats_cd_brsa(request):
-    if not utils.can_view_stats_cd_whitelist(request):
-        raise PermissionDenied
     context = {
         "pilotage_webinar_banners": [
             {

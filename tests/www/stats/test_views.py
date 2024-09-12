@@ -91,7 +91,6 @@ def test_stats_cd_log_visit(client, settings, view_name):
     prescriber_org = PrescriberOrganizationWithMembershipFactory(kind="DEPT", authorized=True)
     user = prescriber_org.members.get()
 
-    settings.STATS_CD_DEPARTMENT_WHITELIST = [prescriber_org.department]
     settings.STATS_ACI_DEPARTMENT_WHITELIST = [prescriber_org.department]
 
     client.force_login(user)
