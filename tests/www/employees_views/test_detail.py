@@ -11,6 +11,7 @@ from pytest_django.asserts import assertContains, assertNotContains, assertRedir
 
 from itou.job_applications.enums import JobApplicationState, SenderKind
 from itou.utils.immersion_facile import immersion_search_url
+from itou.utils.templatetags import format_filters
 from itou.utils.templatetags.format_filters import format_approval_number
 from itou.utils.urls import add_url_params
 from tests.approvals.factories import (
@@ -103,6 +104,24 @@ class TestEmployeeDetailView:
         assertContains(response, "Numéro de PASS IAE")
         assertContains(response, "Informations du salarié")
         assertContains(response, "Candidatures de ce salarié")
+
+    def test_multiple_approvals(self, client):
+        company = CompanyFactory(with_membership=True)
+        employer = company.members.first()
+        expired_approval = ApprovalFactory(expired=True)
+        JobApplicationFactory(
+            approval=expired_approval,
+            job_seeker=expired_approval.user,
+            to_company=company,
+            state=JobApplicationState.ACCEPTED,
+        )
+        new_approval = JobApplicationFactory(
+            job_seeker=expired_approval.user, to_company=company, with_approval=True
+        ).approval
+        client.force_login(employer)
+        url = reverse("employees:detail", kwargs={"public_id": new_approval.user.public_id})
+        response = client.get(url)
+        assertContains(response, format_filters.format_approval_number(new_approval.number))
 
     @pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
     @freeze_time("2023-04-26")

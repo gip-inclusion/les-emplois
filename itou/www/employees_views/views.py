@@ -69,7 +69,8 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
                     ),
                 ),
             )
-            .last()
+            .order_by("-created_at")
+            .first()
         )
 
     def get_context_data(self, **kwargs):
