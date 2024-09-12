@@ -1,5 +1,4 @@
 {% extends "layout/base.html" %}
-{% load format_filters %}
 {% load static tally %}
 {% load matomo %}
 {% load theme_inclusion %}
@@ -142,59 +141,7 @@
 {% endblock %}
 
 {% block title_content %}
-    <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
-        <div>
-            <h1 class="mb-0">
-                {% if user.is_job_seeker and user.get_full_name %}Tableau de bord - {{ user.get_full_name }}{% endif %}
-                {% if request.current_organization %}{{ request.current_organization.display_name }}{% endif %}
-            </h1>
-            {% if request.current_organization %}
-                <p class="mb-0">
-                    {% if user.is_prescriber %}
-                        {% if request.current_organization.code_safir_pole_emploi %}
-                            {% if request.current_organization.is_authorized %}Prescripteur habilité -{% endif %}
-                            Code SAFIR {{ request.current_organization.code_safir_pole_emploi }}
-                        {% elif request.current_organization.siret %}
-                            {% if request.current_organization.is_authorized %}Prescripteur habilité -{% endif %}
-                            {% if request.current_organization.kind != PrescriberOrganizationKind.OTHER %}
-                                {{ request.current_organization.kind }} -
-                            {% endif %}
-                            SIRET {{ request.current_organization.siret|format_siret }}
-                        {% endif %}
-                    {% elif user.is_employer %}
-                        {{ request.current_organization.kind }} -
-                        SIRET {{ request.current_organization.siret|format_siret }}
-                    {% endif %}
-                </p>
-            {% endif %}
-        </div>
-        {% if user.is_employer %}
-            {% if request.current_organization.is_subject_to_eligibility_rules or request.current_organization.kind == CompanyKind.GEIQ %}
-                {% comment %}
-                NOTE(vperron):
-                We currently do not allow OPCS users to apply for an offer.
-                We will have to discuss this matter further with AVE, but it has been
-                decided that it probably did not make much sense initially.
-                {% endcomment %}
-                <div>
-                    {% if siae_suspension_text_with_dates %}
-                        <span class="btn btn-lg btn-primary btn-ico disabled"
-                              data-bs-toggle="tooltip"
-                              data-bs-placement="top"
-                              title="Vous ne pouvez pas déclarer d'embauche suite aux mesures prises dans le cadre du contrôle a posteriori. {{ siae_suspension_text_with_dates }}">
-                            <i class="ri-user-follow-line font-weight-medium"></i>
-                            <span>Déclarer une embauche</span>
-                        </span>
-                    {% else %}
-                        <a href="{% url 'apply:check_nir_for_hire' company_pk=request.current_organization.pk %}" class="btn btn-lg btn-primary btn-ico" {% matomo_event "employeurs" "clic" "declarer-embauche" %}>
-                            <i class="ri-user-follow-line font-weight-medium"></i>
-                            <span>Déclarer une embauche</span>
-                        </a>
-                    {% endif %}
-                </div>
-            {% endif %}
-        {% endif %}
-    </div>
+    {% include 'dashboard/includes/dashboard_title_content.html' %}
 {% endblock %}
 
 {% block title_extra %}
@@ -203,15 +150,8 @@
             <a class="nav-link active" id="ensemble-tab" data-bs-toggle="tab" href="#ensemble" role="tab" aria-controls="ensemble" aria-selected="true" {% matomo_event "dashboard" "clic-onglet" "vue-d-ensemble" %}>Vue d’ensemble</a>
         </li>
         {% if can_view_stats_dashboard_widget %}
-            <li class="nav-item" role="presentation">
-                <a class="nav-link"
-                   id="statistiques-tab"
-                   data-bs-toggle="tab"
-                   href="#statistiques"
-                   role="tab"
-                   aria-controls="statistiques"
-                   aria-selected="false"
-                   {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>Statistiques</a>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url "dashboard:index_stats" %}" {% matomo_event "dashboard" "clic-onglet" "statistiques" %}>Statistiques</a>
             </li>
         {% endif %}
         {% if user.is_employer or user.is_prescriber %}
@@ -281,12 +221,11 @@
                                     {% if request.current_organization.kind == InstitutionKind.DDETS_GEIQ or request.current_organization.kind == InstitutionKind.DREETS_GEIQ %}
                                         {% include "dashboard/includes/labor_inspector_geiq_assessment_card.html" %}
                                     {% endif %}
+                                    {% if active_campaigns or closed_campaigns %}
+                                        {% include "dashboard/includes/labor_inspector_evaluation_campains_card.html" %}
+                                    {% endif %}
                                 {% endif %}
                                 {# end of if user.is_labor_inspector #}
-
-                                {% if can_view_stats_ddets_iae and active_campaigns or can_view_stats_ddets_iae and closed_campaigns %}
-                                    {% include "dashboard/includes/labor_inspector_evaluation_campains_card.html" %}
-                                {% endif %}
                             </div>
                             {% if user.is_employer or user.is_prescriber %}
                                 <h2>Services partenaires</h2>
@@ -298,19 +237,6 @@
                                 </div>
                             {% endif %}
                         </div>
-                        {% if can_view_stats_dashboard_widget %}
-                            <div class="tab-pane fade" id="statistiques" role="tabpanel" aria-labelledby="statistiques-tab">
-                                <h2>Statistiques</h2>
-                                <div class="c-banner c-banner--pilotage rounded-3 p-3 py-md-5 mt-3 mt-md-4 mb-3 mb-md-5">
-                                    <img src="{% static_theme_images 'logo-pilotage-inclusion.svg' %}" height="80" alt="Le pilotage de l'inclusion">
-                                </div>
-                                <div class="row row-cols-1 row-cols-md-2 mt-3 mt-md-4">
-                                    {% if can_view_stats_dashboard_widget %}
-                                        {% include "dashboard/includes/stats.html" %}
-                                    {% endif %}
-                                </div>
-                            </div>
-                        {% endif %}
                         {% if user.is_employer or user.is_prescriber %}
                             <div class="tab-pane fade" id="evenements" role="tabpanel" aria-labelledby="evenements-tab">
                                 <h2>Événements à venir</h2>

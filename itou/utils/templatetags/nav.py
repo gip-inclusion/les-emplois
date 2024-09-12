@@ -70,7 +70,7 @@ NAV_ENTRIES = {
         label="Accueil",
         icon="ri-home-line",
         target=reverse("dashboard:index"),
-        active_view_names=["dashboard:index"],
+        active_view_names=["dashboard:index", "dashboard:index_stats"],
     ),
     "employers-search": NavItem(
         label="Un emploi inclusif",

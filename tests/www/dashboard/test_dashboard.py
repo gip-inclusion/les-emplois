@@ -345,7 +345,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
     def test_dashboard_siae_stats(self):
         membership = CompanyMembershipFactory()
         self.client.force_login(membership.user)
-        response = self.client.get(reverse("dashboard:index"))
+        response = self.client.get(reverse("dashboard:index_stats"))
         self.assertContains(response, "Traitement et résultats des candidatures reçues par ma ou mes structures")
         self.assertContains(response, reverse("stats:stats_siae_hiring"))
         self.assertContains(response, "Auto-prescription réalisées par ma ou mes structures")
@@ -361,28 +361,28 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
     def test_dashboard_ddets_log_institution_stats(self):
         membershipfactory = InstitutionMembershipFactory(institution__kind=InstitutionKind.DDETS_LOG)
         self.client.force_login(membershipfactory.user)
-        response = self.client.get(reverse("dashboard:index"))
+        response = self.client.get(reverse("dashboard:index_stats"))
         self.assertContains(response, "Prescriptions des acteurs AHI de ma région")
         self.assertContains(response, reverse("stats:stats_ddets_log_state"))
 
     def test_dashboard_dihal_institution_stats(self):
         membershipfactory = InstitutionMembershipFactory(institution__kind=InstitutionKind.DIHAL)
         self.client.force_login(membershipfactory.user)
-        response = self.client.get(reverse("dashboard:index"))
+        response = self.client.get(reverse("dashboard:index_stats"))
         self.assertContains(response, "Prescriptions des acteurs AHI")
         self.assertContains(response, reverse("stats:stats_dihal_state"))
 
     def test_dashboard_drihl_institution_stats(self):
         membershipfactory = InstitutionMembershipFactory(institution__kind=InstitutionKind.DRIHL)
         self.client.force_login(membershipfactory.user)
-        response = self.client.get(reverse("dashboard:index"))
+        response = self.client.get(reverse("dashboard:index_stats"))
         self.assertContains(response, "Prescriptions des acteurs AHI")
         self.assertContains(response, reverse("stats:stats_drihl_state"))
 
     def test_dashboard_iae_network_institution_stats(self):
         membershipfactory = InstitutionMembershipFactory(institution__kind=InstitutionKind.IAE_NETWORK)
         self.client.force_login(membershipfactory.user)
-        response = self.client.get(reverse("dashboard:index"))
+        response = self.client.get(reverse("dashboard:index_stats"))
         self.assertContains(response, "Traitement et résultats des candidatures orientées par mes adhérents")
         self.assertContains(response, reverse("stats:stats_iae_network_hiring"))
 
