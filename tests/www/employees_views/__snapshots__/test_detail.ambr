@@ -192,8 +192,39 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."ata_allocation_since",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."public_id" = %s)
           LIMIT 21
@@ -1271,6 +1302,7 @@
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
           'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[employees/detail.html]',
         ]),
@@ -1297,6 +1329,7 @@
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
           'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[employees/detail.html]',
         ]),
@@ -1370,6 +1403,7 @@
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
           'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[employees/detail.html]',
         ]),
@@ -1728,8 +1762,39 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."ata_allocation_since",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."public_id" = %s)
           LIMIT 21
@@ -2733,6 +2798,7 @@
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
           'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[employees/detail.html]',
         ]),
@@ -2767,6 +2833,7 @@
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
           'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[employees/detail.html]',
         ]),
@@ -2855,6 +2922,7 @@
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
           'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[employees/detail.html]',
         ]),
@@ -2927,6 +2995,7 @@
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
           'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[employees/detail.html]',
         ]),
@@ -3188,7 +3257,7 @@
 # ---
 # name: TestEmployeeDetailView.test_approval_status_includes[detail view SQL queries]
   dict({
-    'num_queries': 26,
+    'num_queries': 25,
     'queries': list([
       dict({
         'origin': list([
@@ -3379,8 +3448,39 @@
                  "users_user"."last_checked_at",
                  "users_user"."public_id",
                  "users_user"."address_filled_at",
-                 "users_user"."first_login"
+                 "users_user"."first_login",
+                 "users_jobseekerprofile"."user_id",
+                 "users_jobseekerprofile"."birthdate",
+                 "users_jobseekerprofile"."birth_place_id",
+                 "users_jobseekerprofile"."birth_country_id",
+                 "users_jobseekerprofile"."nir",
+                 "users_jobseekerprofile"."lack_of_nir_reason",
+                 "users_jobseekerprofile"."pole_emploi_id",
+                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
+                 "users_jobseekerprofile"."asp_uid",
+                 "users_jobseekerprofile"."education_level",
+                 "users_jobseekerprofile"."resourceless",
+                 "users_jobseekerprofile"."rqth_employee",
+                 "users_jobseekerprofile"."oeth_employee",
+                 "users_jobseekerprofile"."pole_emploi_since",
+                 "users_jobseekerprofile"."unemployed_since",
+                 "users_jobseekerprofile"."has_rsa_allocation",
+                 "users_jobseekerprofile"."rsa_allocation_since",
+                 "users_jobseekerprofile"."ass_allocation_since",
+                 "users_jobseekerprofile"."aah_allocation_since",
+                 "users_jobseekerprofile"."ata_allocation_since",
+                 "users_jobseekerprofile"."hexa_lane_number",
+                 "users_jobseekerprofile"."hexa_std_extension",
+                 "users_jobseekerprofile"."hexa_non_std_extension",
+                 "users_jobseekerprofile"."hexa_lane_type",
+                 "users_jobseekerprofile"."hexa_lane_name",
+                 "users_jobseekerprofile"."hexa_additional_address",
+                 "users_jobseekerprofile"."hexa_post_code",
+                 "users_jobseekerprofile"."hexa_commune_id",
+                 "users_jobseekerprofile"."pe_obfuscated_nir",
+                 "users_jobseekerprofile"."pe_last_certification_attempt_at"
           FROM "users_user"
+          LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
                  AND "users_user"."public_id" = %s)
           LIMIT 21
@@ -3937,50 +4037,6 @@
       }),
       dict({
         'origin': list([
-          'VariableNode[apply/includes/job_seeker_info.html]',
-          'IfNode[apply/includes/job_seeker_info.html]',
-          'IncludeNode[employees/detail.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[employees/detail.html]',
-        ]),
-        'sql': '''
-          SELECT "users_jobseekerprofile"."user_id",
-                 "users_jobseekerprofile"."birthdate",
-                 "users_jobseekerprofile"."birth_place_id",
-                 "users_jobseekerprofile"."birth_country_id",
-                 "users_jobseekerprofile"."nir",
-                 "users_jobseekerprofile"."lack_of_nir_reason",
-                 "users_jobseekerprofile"."pole_emploi_id",
-                 "users_jobseekerprofile"."lack_of_pole_emploi_id_reason",
-                 "users_jobseekerprofile"."asp_uid",
-                 "users_jobseekerprofile"."education_level",
-                 "users_jobseekerprofile"."resourceless",
-                 "users_jobseekerprofile"."rqth_employee",
-                 "users_jobseekerprofile"."oeth_employee",
-                 "users_jobseekerprofile"."pole_emploi_since",
-                 "users_jobseekerprofile"."unemployed_since",
-                 "users_jobseekerprofile"."has_rsa_allocation",
-                 "users_jobseekerprofile"."rsa_allocation_since",
-                 "users_jobseekerprofile"."ass_allocation_since",
-                 "users_jobseekerprofile"."aah_allocation_since",
-                 "users_jobseekerprofile"."ata_allocation_since",
-                 "users_jobseekerprofile"."hexa_lane_number",
-                 "users_jobseekerprofile"."hexa_std_extension",
-                 "users_jobseekerprofile"."hexa_non_std_extension",
-                 "users_jobseekerprofile"."hexa_lane_type",
-                 "users_jobseekerprofile"."hexa_lane_name",
-                 "users_jobseekerprofile"."hexa_additional_address",
-                 "users_jobseekerprofile"."hexa_post_code",
-                 "users_jobseekerprofile"."hexa_commune_id",
-                 "users_jobseekerprofile"."pe_obfuscated_nir",
-                 "users_jobseekerprofile"."pe_last_certification_attempt_at"
-          FROM "users_jobseekerprofile"
-          WHERE "users_jobseekerprofile"."user_id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'ForNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[employees/detail.html]',
@@ -4197,6 +4253,7 @@
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
           'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[employees/detail.html]',
         ]),
@@ -4223,6 +4280,7 @@
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
           'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[employees/detail.html]',
         ]),
@@ -4295,6 +4353,7 @@
           'WithNode[approvals/includes/status.html]',
           'IfNode[approvals/includes/status.html]',
           'IncludeNode[employees/detail.html]',
+          'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
           'ExtendsNode[employees/detail.html]',
         ]),
@@ -4398,9 +4457,5 @@
   '''
 # ---
 # name: TestEmployeeDetailView.test_remove_approval_button[bouton de suppression d'un PASS IAE]
-  '''
-  <a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-block btn-outline-warning mt-3" href="https://tally.so/r/3je84Q?siaeID=999999&amp;nomSIAE=Aci+de+la+rochelle&amp;prenomemployeur=Milady&amp;nomemployeur=de+Winter&amp;emailemployeur=oph%40dewinter.com&amp;userID=123456&amp;numPASS=XXXXX+12+34568&amp;prenomsalarie=Doe&amp;nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">
-                                      Clôturer
-                                  </a>
-  '''
+  '<a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-block btn-outline-warning mt-3" href="https://tally.so/r/3je84Q?siaeID=999999&amp;nomSIAE=Aci+de+la+rochelle&amp;prenomemployeur=Milady&amp;nomemployeur=de+Winter&amp;emailemployeur=oph%40dewinter.com&amp;userID=123456&amp;numPASS=XXXXX+12+34568&amp;prenomsalarie=Doe&amp;nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">Clôturer</a>'
 # ---

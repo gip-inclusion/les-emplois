@@ -29,10 +29,11 @@ SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE = datetime.timedelta(days=365)
 
 class EmployeeDetailView(LoginRequiredMixin, DetailView):
     model = User
-    queryset = User.objects.filter(kind=UserKind.JOB_SEEKER)
+    queryset = User.objects.filter(kind=UserKind.JOB_SEEKER).select_related("jobseeker_profile")
     template_name = "employees/detail.html"
     slug_field = "public_id"
     slug_url_kwarg = "public_id"
+    context_object_name = "job_seeker"
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
@@ -85,9 +86,9 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
             approval = self.object.approvals.order_by("-end_at").first()
 
         context["can_view_personal_information"] = True  # SIAE members have access to personal info
-        context["can_edit_personal_information"] = self.request.user.can_edit_personal_information(approval.user)
-        context["approval_can_be_suspended_by_siae"] = approval.can_be_suspended_by_siae(self.siae)
-        context["approval_can_be_prolonged"] = approval.can_be_prolonged
+        context["can_edit_personal_information"] = self.request.user.can_edit_personal_information(self.object)
+        context["approval_can_be_suspended_by_siae"] = approval and approval.can_be_suspended_by_siae(self.siae)
+        context["approval_can_be_prolonged"] = approval and approval.can_be_prolonged
         context["approval"] = approval
         context["job_application"] = job_application
         context["matomo_custom_title"] = "Profil salarié"
@@ -96,7 +97,7 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
         context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("approvals:list"))
         context["link_immersion_facile"] = None
 
-        if approval.is_in_progress:
+        if approval and approval.is_in_progress:
             # suspension_set has already been loaded via prefetch_related for the remainder computation
             for suspension in sorted(approval.suspension_set.all(), key=lambda s: s.start_at):
                 if suspension.is_in_progress:
@@ -127,13 +128,13 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
                     )
                     break
 
-        if approval.remainder.days < 90 and self.request.user.is_employer:
+        if approval and approval.remainder.days < 90 and self.request.user.is_employer:
             context["link_immersion_facile"] = immersion_search_url(approval.user)
             context["approval_expired"] = not approval.is_in_progress
 
         context["all_job_applications"] = (
             JobApplication.objects.filter(
-                job_seeker=approval.user,
+                job_seeker=self.object,
                 to_company=self.siae,
             )
             .select_related("sender", "to_company")
