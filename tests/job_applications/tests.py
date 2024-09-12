@@ -1721,6 +1721,21 @@ def test_job_application_transition_unarchives(transition, from_state):
     assert job_application.archived_at is None
 
 
+@pytest.mark.parametrize(
+    "transition_name",
+    [
+        JobApplicationWorkflow.TRANSITION_ACCEPT,
+        JobApplicationWorkflow.TRANSITION_MOVE_TO_PRIOR_TO_HIRE,
+    ],
+)
+def test_unarchive_job_application(transition_name):
+    job_application = JobApplicationFactory(state=JobApplicationState.PROCESSING, archived_at=timezone.now())
+    user = job_application.to_company.members.get()
+    getattr(job_application, transition_name)(user=user)
+    job_application.refresh_from_db()
+    assert job_application.archived_at is None
+
+
 class JobApplicationXlsxExportTest(TestCase):
     def test_xlsx_export_contains_the_necessary_info(self, *args, **kwargs):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=2)

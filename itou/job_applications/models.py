@@ -987,6 +987,7 @@ class JobApplication(xwf_models.WorkflowEnabled, models.Model):
     @before_transition(
         JobApplicationWorkflow.TRANSITION_PROCESS,
         JobApplicationWorkflow.TRANSITION_POSTPONE,
+        JobApplicationWorkflow.TRANSITION_ACCEPT,
         JobApplicationWorkflow.TRANSITION_MOVE_TO_PRIOR_TO_HIRE,
         JobApplicationWorkflow.TRANSITION_CANCEL_PRIOR_TO_HIRE,
         JobApplicationWorkflow.TRANSITION_REFUSE,
