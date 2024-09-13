@@ -102,10 +102,7 @@ class TestEmployeeDetailView:
 
         url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
         response = client.get(url)
-        # Check that the page didn't crash
-        assertContains(response, self.APPROVAL_NUMBER_LABEL)
-        assertContains(response, "Informations du salarié")
-        assertContains(response, "Candidatures de ce salarié")
+        assert response.status_code == 404
 
     def test_detail_view_no_approval(self, client):
         company = CompanyFactory(with_membership=True, subject_to_eligibility=True)
@@ -147,8 +144,14 @@ class TestEmployeeDetailView:
         This template is used in approval views but also in many other places.
         Test its content only once.
         """
-        job_application = JobApplicationFactory(
+        # This gives access to the employer
+        accepted_app = JobApplicationFactory(
             job_seeker__public_id="11111111-9999-2222-8888-555555555555",
+            state=JobApplicationState.ACCEPTED,
+        )
+        job_application = JobApplicationFactory(
+            job_seeker=accepted_app.job_seeker,
+            to_company=accepted_app.to_company,
             state=JobApplicationState.PROCESSING,
             with_approval=True,
             approval__id=1,
