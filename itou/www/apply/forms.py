@@ -349,12 +349,7 @@ class SubmitJobApplicationForm(forms.Form):
     def __init__(self, company, user, auto_prescription_process, *args, **kwargs):
         self.company = company
         super().__init__(*args, **kwargs)
-        self.fields.update(forms.fields_for_model(JobApplication, fields=["selected_jobs", "message"]))
-        selected_jobs = self.fields["selected_jobs"]
-        selected_jobs.queryset = company.job_description_through.filter(is_active=True)
-        selected_jobs.widgets = forms.CheckboxSelectMultiple()
-        selected_jobs.label = "Métiers recherchés"
-
+        self.fields.update(forms.fields_for_model(JobApplication, fields=["message"]))
         message = self.fields["message"]
         message.required = not auto_prescription_process
         message.widget.attrs["placeholder"] = ""
