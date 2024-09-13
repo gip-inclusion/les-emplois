@@ -1118,15 +1118,11 @@ class ApplicationResumeView(ApplicationBaseView):
 
         self.form = None
 
-    def get_initial(self):
-        return {"selected_jobs": self.apply_session.get("selected_jobs", [])}
-
     def get_form_kwargs(self):
         return {
             "company": self.company,
             "user": self.request.user,
             "auto_prescription_process": self.auto_prescription_process,
-            "initial": self.get_initial(),
             "data": self.request.POST or None,
             "files": self.request.FILES or None,
         }
@@ -1172,7 +1168,11 @@ class ApplicationResumeView(ApplicationBaseView):
 
         # Save the job application
         job_application.save()
-        job_application.selected_jobs.add(*self.form.cleaned_data["selected_jobs"])
+        selected_jobs = self.company.job_description_through.filter(
+            is_active=True,
+            pk__in=self.apply_session.get("selected_jobs", []),
+        )
+        job_application.selected_jobs.set(selected_jobs)
         # The job application is now saved in DB, delete the session early to avoid any problems
         self.apply_session.delete()
 

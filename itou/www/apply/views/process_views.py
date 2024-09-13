@@ -686,10 +686,15 @@ class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, Applicat
             f"Le {self.job_application.created_at.strftime('%d/%m/%Y à %Hh%M')}, {sender_display} a écrit :\n\n"
             + self.job_application.message
         )
-        return super().get_initial() | {"message": initial_message}
+        return {"message": initial_message}
 
     def get_form_kwargs(self):
-        return super().get_form_kwargs() | {"original_job_application": self.job_application}
+        kwargs = super().get_form_kwargs()
+        initial = kwargs.get("initial", {})
+        initial.update(self.get_initial())
+        kwargs["initial"] = initial
+        kwargs["original_job_application"] = self.job_application
+        return kwargs
 
     def form_valid(self):
         new_job_application = super().form_valid()

@@ -432,11 +432,12 @@ class ApplyAsJobSeekerTest(TestCase):
             count=1,
         )
 
-        response = self.client.post(next_url, data={"selected_jobs": [company.job_description_through.first().pk]})
+        selected_job = company.job_description_through.first()
+        response = self.client.post(next_url, data={"selected_jobs": [selected_job.pk]})
         assert response.status_code == 302
 
         assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data | {
-            "selected_jobs": [company.job_description_through.first().pk],
+            "selected_jobs": [selected_job.pk],
         }
 
         next_url = reverse(
@@ -466,7 +467,6 @@ class ApplyAsJobSeekerTest(TestCase):
             response = self.client.post(
                 next_url,
                 data={
-                    "selected_jobs": [company.job_description_through.first().pk],
                     "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                     "resume": self.pdf_file,
                 },
@@ -480,7 +480,7 @@ class ApplyAsJobSeekerTest(TestCase):
         assert job_application.sender_prescriber_organization is None
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-        assert list(job_application.selected_jobs.all()) == [company.job_description_through.first()]
+        assert job_application.selected_jobs.get() == selected_job
         assert job_application.resume_link == (
             f"{settings.AWS_S3_ENDPOINT_URL}tests/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
@@ -604,6 +604,10 @@ class ApplyAsJobSeekerTest(TestCase):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
         user = JobSeekerFactory()
         self.client.force_login(user)
+        session = self.client.session
+        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
+        session.save()
+        self.client.session.save()
         with io.BytesIO(b"Plain text") as text_file:
             text_file.name = "cv.txt"
             response = self.client.post(
@@ -615,7 +619,6 @@ class ApplyAsJobSeekerTest(TestCase):
                     },
                 ),
                 data={
-                    "selected_jobs": [company.job_description_through.first().pk],
                     "message": "Lorem ipsum dolor sit amet.",
                     "resume": text_file,
                 },
@@ -638,6 +641,9 @@ class ApplyAsJobSeekerTest(TestCase):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
         user = JobSeekerFactory()
         self.client.force_login(user)
+        session = self.client.session
+        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
+        session.save()
         with io.BytesIO(b"Plain text") as text_file:
             text_file.name = "cv.pdf"
             response = self.client.post(
@@ -649,7 +655,6 @@ class ApplyAsJobSeekerTest(TestCase):
                     },
                 ),
                 data={
-                    "selected_jobs": [company.job_description_through.first().pk],
                     "message": "Lorem ipsum dolor sit amet.",
                     "resume": text_file,
                 },
@@ -672,6 +677,9 @@ class ApplyAsJobSeekerTest(TestCase):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101"))
         user = JobSeekerFactory()
         self.client.force_login(user)
+        session = self.client.session
+        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
+        session.save()
         with io.BytesIO(b"A" * (5 * 1024 * 1024 + 1)) as text_file:
             text_file.name = "cv.pdf"
             response = self.client.post(
@@ -683,7 +691,6 @@ class ApplyAsJobSeekerTest(TestCase):
                     },
                 ),
                 data={
-                    "selected_jobs": [company.job_description_through.first().pk],
                     "message": "Lorem ipsum dolor sit amet.",
                     "resume": text_file,
                 },
@@ -986,11 +993,12 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(next_url)
         assert response.status_code == 200
 
-        response = self.client.post(next_url, data={"selected_jobs": [company.job_description_through.first().pk]})
+        selected_job = company.job_description_through.first()
+        response = self.client.post(next_url, data={"selected_jobs": [selected_job.pk]})
         assert response.status_code == 302
 
         assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data | {
-            "selected_jobs": [company.job_description_through.first().pk],
+            "selected_jobs": [selected_job.pk],
         }
 
         next_url = reverse(
@@ -1022,10 +1030,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             response = self.client.post(
                 next_url,
                 data={
-                    "selected_jobs": [
-                        company.job_description_through.first().pk,
-                        company.job_description_through.last().pk,
-                    ],
                     "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                     "resume": self.pdf_file,
                 },
@@ -1039,10 +1043,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         assert job_application.sender_prescriber_organization == prescriber_organization
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-        assert list(job_application.selected_jobs.all()) == [
-            company.job_description_through.first(),
-            company.job_description_through.last(),
-        ]
+        assert job_application.selected_jobs.get() == selected_job
         assert (
             job_application.resume_link == f"{settings.AWS_S3_ENDPOINT_URL}"
             f"tests/{storages['public'].location}/resume/11111111-1111-1111-1111-111111111111.pdf"
@@ -1266,11 +1267,12 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             count=1,
         )
 
-        response = self.client.post(next_url, data={"selected_jobs": [company.job_description_through.first().pk]})
+        selected_job = company.job_description_through.first()
+        response = self.client.post(next_url, data={"selected_jobs": [selected_job.pk]})
         assert response.status_code == 302
 
         assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data | {
-            "selected_jobs": [company.job_description_through.first().pk],
+            "selected_jobs": [selected_job.pk],
         }
 
         next_url = reverse(
@@ -1315,10 +1317,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
             response = self.client.post(
                 next_url,
                 data={
-                    "selected_jobs": [
-                        company.job_description_through.first().pk,
-                        company.job_description_through.last().pk,
-                    ],
                     "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                     "resume": self.pdf_file,
                 },
@@ -1332,10 +1330,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         assert job_application.sender_prescriber_organization == prescriber_organization
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-        assert list(job_application.selected_jobs.all()) == [
-            company.job_description_through.first(),
-            company.job_description_through.last(),
-        ]
+        assert job_application.selected_jobs.get() == selected_job
         assert job_application.resume_link == (
             f"{settings.AWS_S3_ENDPOINT_URL}tests/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
@@ -1631,11 +1626,12 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
         response = self.client.get(next_url)
         assert response.status_code == 200
 
-        response = self.client.post(next_url, data={"selected_jobs": [company.job_description_through.first().pk]})
+        selected_job = company.job_description_through.first()
+        response = self.client.post(next_url, data={"selected_jobs": [selected_job.pk]})
         assert response.status_code == 302
 
         assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data | {
-            "selected_jobs": [company.job_description_through.first().pk],
+            "selected_jobs": [selected_job.pk],
         }
 
         next_url = reverse(
@@ -1667,10 +1663,6 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
             response = self.client.post(
                 next_url,
                 data={
-                    "selected_jobs": [
-                        company.job_description_through.first().pk,
-                        company.job_description_through.last().pk,
-                    ],
                     "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                     "resume": self.pdf_file,
                 },
@@ -1684,10 +1676,8 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
         assert job_application.sender_prescriber_organization is None
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-        assert list(job_application.selected_jobs.all()) == [
-            company.job_description_through.first(),
-            company.job_description_through.last(),
-        ]
+        assert job_application.selected_jobs.get() == selected_job
+
         assert job_application.resume_link == (
             f"{settings.AWS_S3_ENDPOINT_URL}tests/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
@@ -2094,11 +2084,12 @@ class ApplyAsCompanyTest(TestCase):
         response = self.client.get(next_url)
         assert response.status_code == 200
 
-        response = self.client.post(next_url, data={"selected_jobs": [company.job_description_through.first().pk]})
+        selected_job = company.job_description_through.first()
+        response = self.client.post(next_url, data={"selected_jobs": [selected_job.pk]})
         assert response.status_code == 302
 
         assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data | {
-            "selected_jobs": [company.job_description_through.first().pk],
+            "selected_jobs": [selected_job.pk],
         }
 
         next_url = reverse(
@@ -2130,10 +2121,6 @@ class ApplyAsCompanyTest(TestCase):
             response = self.client.post(
                 next_url,
                 data={
-                    "selected_jobs": [
-                        company.job_description_through.first().pk,
-                        company.job_description_through.last().pk,
-                    ],
                     "message": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
                     "resume": self.pdf_file,
                 },
@@ -2147,10 +2134,8 @@ class ApplyAsCompanyTest(TestCase):
         assert job_application.sender_prescriber_organization is None
         assert job_application.state == JobApplicationState.NEW
         assert job_application.message == "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-        assert list(job_application.selected_jobs.all()) == [
-            company.job_description_through.first(),
-            company.job_description_through.last(),
-        ]
+        assert job_application.selected_jobs.get() == selected_job
+
         assert job_application.resume_link == (
             f"{settings.AWS_S3_ENDPOINT_URL}tests/{storages['public'].location}"
             "/resume/11111111-1111-1111-1111-111111111111.pdf"
@@ -2755,7 +2740,6 @@ class ApplicationViewTest(TestCase):
                 kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
             )
         )
-        self.assertContains(response, 'name="selected_jobs"')
         self.assertContains(response, 'name="resume"')
 
     def test_application_resume_diagoriente_shown_as_job_seeker(self):
