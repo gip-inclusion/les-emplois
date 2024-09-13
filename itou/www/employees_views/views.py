@@ -4,7 +4,7 @@ import urllib.parse
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.db.models import Prefetch
+from django.db.models import Exists, OuterRef, Prefetch
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import DetailView
@@ -42,6 +42,21 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
 
             if not self.siae.is_subject_to_eligibility_rules:
                 raise PermissionDenied
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .filter(
+                Exists(
+                    JobApplication.objects.filter(
+                        job_seeker_id=OuterRef("pk"),
+                        to_company_id=self.siae.pk,
+                        state=JobApplicationState.ACCEPTED,
+                    )
+                )
+            )
+        )
 
     def get_job_application(self, employee):
         return (

@@ -226,6 +226,13 @@
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "job_applications_jobapplication" U0
+                    WHERE (U0."job_seeker_id" = ("users_user"."id")
+                           AND U0."state" = %s
+                           AND U0."to_company_id" = %s)
+                    LIMIT 1)
                  AND "users_user"."public_id" = %s)
           LIMIT 21
         ''',
@@ -1245,7 +1252,8 @@
           FROM "companies_jobdescription"
           INNER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
-          WHERE "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s)
+          WHERE "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s,
+                                                                                        %s)
           ORDER BY "jobs_appellation"."name" ASC,
                    "companies_jobdescription"."ui_rank" ASC
         ''',
@@ -1796,6 +1804,13 @@
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "job_applications_jobapplication" U0
+                    WHERE (U0."job_seeker_id" = ("users_user"."id")
+                           AND U0."state" = %s
+                           AND U0."to_company_id" = %s)
+                    LIMIT 1)
                  AND "users_user"."public_id" = %s)
           LIMIT 21
         ''',
@@ -2741,7 +2756,8 @@
           FROM "companies_jobdescription"
           INNER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
-          WHERE "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s)
+          WHERE "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s,
+                                                                                        %s)
           ORDER BY "jobs_appellation"."name" ASC,
                    "companies_jobdescription"."ui_rank" ASC
         ''',
@@ -3482,6 +3498,13 @@
           FROM "users_user"
           LEFT OUTER JOIN "users_jobseekerprofile" ON ("users_user"."id" = "users_jobseekerprofile"."user_id")
           WHERE ("users_user"."kind" = %s
+                 AND EXISTS
+                   (SELECT %s AS "a"
+                    FROM "job_applications_jobapplication" U0
+                    WHERE (U0."job_seeker_id" = ("users_user"."id")
+                           AND U0."state" = %s
+                           AND U0."to_company_id" = %s)
+                    LIMIT 1)
                  AND "users_user"."public_id" = %s)
           LIMIT 21
         ''',
@@ -4196,7 +4219,8 @@
           FROM "companies_jobdescription"
           INNER JOIN "job_applications_jobapplication_selected_jobs" ON ("companies_jobdescription"."id" = "job_applications_jobapplication_selected_jobs"."jobdescription_id")
           INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
-          WHERE "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s)
+          WHERE "job_applications_jobapplication_selected_jobs"."jobapplication_id" IN (%s,
+                                                                                        %s)
           ORDER BY "jobs_appellation"."name" ASC,
                    "companies_jobdescription"."ui_rank" ASC
         ''',
