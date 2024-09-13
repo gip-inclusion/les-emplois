@@ -285,11 +285,6 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
     response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
     assert response.status_code == 302
 
-    session_data = client.session[f"job_application-{company.pk}"]
-    assert session_data == {
-        "selected_jobs": [],
-    }
-
     next_url = reverse("apply:check_nir_for_job_seeker", kwargs={"company_pk": company.pk})
     assert response.url == next_url
 
@@ -312,12 +307,6 @@ def test_check_nir_job_seeker_with_lack_of_nir_reason(client):
 
 @pytest.mark.usefixtures("unittest_compatibility")
 class ApplyAsJobSeekerTest(TestCase):
-    @property
-    def default_session_data(self):
-        return {
-            "selected_jobs": [],
-        }
-
     def test_apply_as_job_seeker_with_suspension_sanction(self):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
         Sanctions.objects.create(
@@ -348,9 +337,6 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
         assert response.status_code == 302
 
-        session_data = self.client.session[f"job_application-{company.pk}"]
-        assert session_data == self.default_session_data
-
         next_url = reverse("apply:check_nir_for_job_seeker", kwargs={"company_pk": company.pk})
         assert response.url == next_url
 
@@ -368,9 +354,6 @@ class ApplyAsJobSeekerTest(TestCase):
 
         user = User.objects.get(pk=user.pk)
         assert user.jobseeker_profile.nir == nir
-
-        session_data = self.client.session[f"job_application-{company.pk}"]
-        assert session_data == self.default_session_data
 
         next_url = reverse(
             "apply:step_check_job_seeker_info",
@@ -436,9 +419,7 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.post(next_url, data={"selected_jobs": [selected_job.pk]})
         assert response.status_code == 302
 
-        assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data | {
-            "selected_jobs": [selected_job.pk],
-        }
+        assert self.client.session[f"job_application-{company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
         next_url = reverse(
             "apply:application_eligibility", kwargs={"company_pk": company.pk, "job_seeker_public_id": user.public_id}
@@ -781,12 +762,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         super().setUp()
         [self.city] = create_test_cities(["67"], num_per_department=1)
 
-    @property
-    def default_session_data(self):
-        return {
-            "selected_jobs": [],
-        }
-
     @override_settings(API_BAN_BASE_URL="http://ban-api")
     @mock.patch(
         "itou.utils.apis.geocoding.get_geocoding_data",
@@ -813,10 +788,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
         assert response.status_code == 302
 
-        session = self.client.session
-        session_data = session[f"job_application-{company.pk}"]
-        assert session_data == self.default_session_data
-
         next_url = reverse("apply:pending_authorization_for_sender", kwargs={"company_pk": company.pk})
         assert response.url == next_url
 
@@ -836,7 +807,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         assert response.status_code == 200
 
         response = self.client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
-        assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data
         assert response.status_code == 302
 
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
@@ -979,7 +949,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         assert job_seeker_session_name not in self.client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
-        assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data
 
         next_url = reverse(
             "apply:application_jobs",
@@ -997,9 +966,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url, data={"selected_jobs": [selected_job.pk]})
         assert response.status_code == 302
 
-        assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data | {
-            "selected_jobs": [selected_job.pk],
-        }
+        assert self.client.session[f"job_application-{company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
         next_url = reverse(
             "apply:application_eligibility",
@@ -1089,9 +1056,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
         assert response.status_code == 302
 
-        session_data = self.client.session[f"job_application-{company.pk}"]
-        assert session_data == self.default_session_data
-
         next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk})
         assert response.url == next_url
 
@@ -1103,7 +1067,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         response = self.client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
         assert response.status_code == 302
-        assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data
 
         session_uuid = str(resolve(response.url).kwargs["session_uuid"])
         next_url = reverse(
@@ -1240,7 +1203,6 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
 
         assert job_seeker_session_name not in self.client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
-        assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data
 
         next_url = reverse(
             "apply:application_jobs",
@@ -1271,9 +1233,7 @@ class ApplyAsAuthorizedPrescriberTest(TestCase):
         response = self.client.post(next_url, data={"selected_jobs": [selected_job.pk]})
         assert response.status_code == 302
 
-        assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data | {
-            "selected_jobs": [selected_job.pk],
-        }
+        assert self.client.session[f"job_application-{company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
         next_url = reverse(
             "apply:application_eligibility",
@@ -1390,12 +1350,6 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
         cities = create_test_cities(["67"], num_per_department=10)
         self.city = cities[0]
 
-    @property
-    def default_session_data(self):
-        return {
-            "selected_jobs": [],
-        }
-
     @pytest.mark.ignore_unknown_variable_template_error
     def test_apply_as_prescriber_with_suspension_sanction(self):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
@@ -1439,9 +1393,6 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
         response = self.client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
         assert response.status_code == 302
 
-        session_data = self.client.session[f"job_application-{company.pk}"]
-        assert session_data == self.default_session_data
-
         next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk})
         assert response.url == next_url
 
@@ -1452,7 +1403,6 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
         assert response.status_code == 200
 
         response = self.client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
-        assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data
         assert response.status_code == 302
 
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
@@ -1612,7 +1562,6 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
 
         assert job_seeker_session_name not in self.client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
-        assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data
 
         next_url = reverse(
             "apply:application_jobs",
@@ -1630,9 +1579,7 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
         response = self.client.post(next_url, data={"selected_jobs": [selected_job.pk]})
         assert response.status_code == 302
 
-        assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data | {
-            "selected_jobs": [selected_job.pk],
-        }
+        assert self.client.session[f"job_application-{company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
         next_url = reverse(
             "apply:application_eligibility",
@@ -1868,12 +1815,6 @@ class ApplyAsCompanyTest(TestCase):
         super().setUp()
         [self.city] = create_test_cities(["67"], num_per_department=1)
 
-    @property
-    def default_session_data(self):
-        return {
-            "selected_jobs": [],
-        }
-
     def test_perms_for_company(self):
         """A company can postulate only for itself."""
         company_1 = CompanyFactory(with_membership=True)
@@ -1916,9 +1857,6 @@ class ApplyAsCompanyTest(TestCase):
         response = self.client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
         assert response.status_code == 302
 
-        session_data = self.client.session[f"job_application-{company.pk}"]
-        assert session_data == self.default_session_data
-
         next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk})
         assert response.url == next_url
 
@@ -1929,7 +1867,6 @@ class ApplyAsCompanyTest(TestCase):
         assert response.status_code == 200
 
         response = self.client.post(next_url, data={"nir": dummy_job_seeker.jobseeker_profile.nir, "confirm": 1})
-        assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data
         assert response.status_code == 302
 
         job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
@@ -2070,7 +2007,6 @@ class ApplyAsCompanyTest(TestCase):
 
         assert job_seeker_session_name not in self.client.session
         new_job_seeker = User.objects.get(email=dummy_job_seeker.email)
-        assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data
 
         next_url = reverse(
             "apply:application_jobs",
@@ -2088,9 +2024,7 @@ class ApplyAsCompanyTest(TestCase):
         response = self.client.post(next_url, data={"selected_jobs": [selected_job.pk]})
         assert response.status_code == 302
 
-        assert self.client.session[f"job_application-{company.pk}"] == self.default_session_data | {
-            "selected_jobs": [selected_job.pk],
-        }
+        assert self.client.session[f"job_application-{company.pk}"] == {"selected_jobs": [selected_job.pk]}
 
         next_url = reverse(
             "apply:application_eligibility",
@@ -2697,18 +2631,19 @@ class ApplicationViewTest(TestCase):
     )
     DIAGORIENTE_URL = "https://diagoriente.beta.gouv.fr/services/plateforme"
 
+    @staticmethod
+    def apply_session_key(company):
+        return f"job_application-{company.pk}"
+
     def test_application_jobs_use_previously_selected_jobs(self):
         company = CompanyFactory(subject_to_eligibility=True, with_membership=True, with_jobs=True)
 
         self.client.force_login(company.members.first())
+        selected_job = company.job_description_through.first()
         job_seeker = JobSeekerFactory()
-        apply_session = SessionNamespace(self.client.session, f"job_application-{company.pk}")
-        apply_session.init(
-            {
-                "selected_jobs": company.job_description_through.all(),
-            }
-        )
-        apply_session.save()
+        session = self.client.session
+        session[self.apply_session_key(company)] = {"selected_jobs": [selected_job.pk]}
+        session.save()
 
         response = self.client.get(
             reverse(
@@ -2717,9 +2652,16 @@ class ApplicationViewTest(TestCase):
             )
         )
         assert response.status_code == 200
-        assert response.context["form"].initial["selected_jobs"] == [
-            jd.pk for jd in company.job_description_through.all()
-        ]
+        assert response.context["form"].initial["selected_jobs"] == [selected_job.pk]
+
+    def test_application_start_with_invalid_job_description_id(self):
+        company = CompanyFactory(subject_to_eligibility=True, with_membership=True, with_jobs=True)
+        self.client.force_login(company.members.get())
+        response = self.client.get(
+            reverse("apply:start", kwargs={"company_pk": company.pk}), {"job_description_id": "invalid"}
+        )
+        self.assertRedirects(response, reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk}))
+        assert self.apply_session_key(company) not in self.client.session
 
     def test_application_resume_hidden_fields(self):
         company = CompanyFactory(with_membership=True, with_jobs=True)
@@ -3645,18 +3587,11 @@ def test_detect_existing_job_seeker(client):
         email="jeremy@example.com",
     )
 
-    default_session_data = {
-        "selected_jobs": [],
-    }
-
     # Entry point.
     # ----------------------------------------------------------------------
 
     response = client.get(reverse("apply:start", kwargs={"company_pk": company.pk}))
     assert response.status_code == 302
-
-    session_data = client.session[f"job_application-{company.pk}"]
-    assert session_data == default_session_data
 
     next_url = reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk})
     assert response.url == next_url
@@ -3669,7 +3604,6 @@ def test_detect_existing_job_seeker(client):
 
     NEW_NIR = "197013625838386"
     response = client.post(next_url, data={"nir": NEW_NIR, "confirm": 1})
-    assert client.session[f"job_application-{company.pk}"] == default_session_data
     assert response.status_code == 302
     job_seeker_session_name = str(resolve(response.url).kwargs["session_uuid"])
     next_url = reverse(

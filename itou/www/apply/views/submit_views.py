@@ -235,10 +235,15 @@ class StartView(ApplyStepBaseView):
             if self.company.block_job_applications and not self.company.has_member(request.user):
                 raise Http404("Cette organisation n'accepte plus de candidatures pour le moment.")
 
-        # Create a sub-session for this job application process
-        self.apply_session.init(
-            {"selected_jobs": [request.GET["job_description_id"]] if "job_description_id" in request.GET else []}
-        )
+        # Store away the selected job in the session to avoid passing it
+        # along the many views before ApplicationJobsView.
+        if job_description_id := request.GET.get("job_description_id"):
+            try:
+                job_description = self.company.job_description_through.active().get(pk=job_description_id)
+            except (JobDescription.DoesNotExist, ValueError):
+                pass
+            else:
+                self.apply_session.init({"selected_jobs": [job_description.pk]})
 
         # Warn message if prescriber's authorization is pending
         if (
