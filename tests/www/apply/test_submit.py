@@ -547,7 +547,7 @@ class ApplyAsJobSeekerTest(TestCase):
 
     def test_apply_as_job_seeker_from_job_description(self):
         company = CompanyWithMembershipAndJobsFactory(romes=("N1101", "N1105"))
-        job_description = company.jobs.first()
+        job_description = company.job_description_through.first()
         job_seeker = JobSeekerFactory(
             jobseeker_profile__nir="141068078200557",
             with_pole_emploi_id=True,
