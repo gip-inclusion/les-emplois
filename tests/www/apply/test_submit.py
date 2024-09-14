@@ -151,10 +151,33 @@ class ApplyTest(TestCase):
             response = self.client.get(url)
             assert response.status_code == 404
 
+    def test_access_without_session(self):
+        company = CompanyFactory(with_jobs=True, with_membership=True)
+        job_seeker = JobSeekerFactory()
+        self.client.force_login(job_seeker)
+        response = self.client.post(
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+            {"message": "Hire me?"},
+        )
+        assert JobApplication.objects.exists() is False
+        self.assertRedirects(
+            response,
+            reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+        )
+
     def test_resume_is_optional(self):
         company = CompanyFactory(with_jobs=True, with_membership=True)
         job_seeker = JobSeekerFactory()
         self.client.force_login(job_seeker)
+        session = self.client.session
+        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
+        session.save()
         response = self.client.post(
             reverse(
                 "apply:application_resume",
@@ -2869,6 +2892,25 @@ class ApplicationViewTest(TestCase):
         self.assertRedirects(response, reverse("apply:check_nir_for_sender", kwargs={"company_pk": company.pk}))
         assert self.apply_session_key(company) not in self.client.session
 
+    def test_access_without_session(self):
+        company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
+        job_seeker = JobSeekerFactory()
+        prescriber = PrescriberOrganizationWithMembershipFactory(authorized=True).members.first()
+        self.client.force_login(prescriber)
+        response = self.client.get(
+            reverse(
+                "apply:application_eligibility",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": company.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+        )
+
     def test_application_resume_hidden_fields(self):
         company = CompanyFactory(with_membership=True, with_jobs=True)
         job_seeker = JobSeekerFactory()
@@ -2894,6 +2936,9 @@ class ApplicationViewTest(TestCase):
         company = CompanyFactory(with_membership=True, with_jobs=True)
         job_seeker = JobSeekerFactory()
         self.client.force_login(job_seeker)
+        session = self.client.session
+        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
+        session.save()
 
         response = self.client.get(
             reverse(
@@ -2911,6 +2956,9 @@ class ApplicationViewTest(TestCase):
         company = CompanyFactory(with_membership=True, with_jobs=True)
         job_seeker = JobSeekerFactory()
         self.client.force_login(company.members.first())
+        session = self.client.session
+        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
+        session.save()
 
         response = self.client.get(
             reverse(
@@ -2929,6 +2977,9 @@ class ApplicationViewTest(TestCase):
         prescriber = PrescriberOrganizationWithMembershipFactory().members.first()
         job_seeker = JobSeekerFactory()
         self.client.force_login(prescriber)
+        session = self.client.session
+        session[f"job_application-{company.pk}"] = {"selected_jobs": []}
+        session.save()
 
         response = self.client.get(
             reverse(
@@ -4139,6 +4190,23 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         assert prescriber_diag.author_prescriber_organization == self.prescriber_org
         assert prescriber_diag.job_seeker == job_seeker
         assert prescriber_diag.author_geiq is None
+
+    def test_access_without_session(self):
+        job_seeker = JobSeekerFactory()
+        self.client.force_login(self.prescriber_org.members.first())
+        response = self.client.get(
+            reverse(
+                "apply:application_geiq_eligibility",
+                kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "apply:application_jobs",
+                kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+        )
 
     def test_geiq_eligibility_badge(self):
         self.client.force_login(self.prescriber_org.members.first())

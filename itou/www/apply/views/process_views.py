@@ -725,6 +725,16 @@ class JobApplicationExternalTransferStep3View(ApplicationOverrideMixin, Applicat
     template_name = "apply/process_external_transfer_resume.html"
     form_class = TransferJobApplicationForm
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and not self.apply_session.exists():
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:job_application_external_transfer_step_2",
+                    kwargs={"job_application_id": self.job_application.pk, "company_pk": self.company.pk},
+                )
+            )
+        return super().dispatch(request, *args, **kwargs)
+
     def get_initial(self):
         sender_display = self.job_application.sender.get_full_name()
         if self.job_application.sender_company:

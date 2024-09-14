@@ -287,6 +287,9 @@ def test_step_3(client, snapshot):
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
+    session = client.session
+    session[f"job_application-{other_company.pk}"] = {"selected_jobs": []}
+    session.save()
 
     transfer_step_2_url = reverse(
         "apply:job_application_external_transfer_step_2",
@@ -328,6 +331,9 @@ def test_step_3_no_previous_CV(client, mocker, pdf_file):
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
+    session = client.session
+    session[f"job_application-{other_company.pk}"] = {"selected_jobs": []}
+    session.save()
 
     transfer_step_2_url = reverse(
         "apply:job_application_external_transfer_step_2",
@@ -370,6 +376,9 @@ def test_step_3_remove_previous_CV(client):
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
+    session = client.session
+    session[f"job_application-{other_company.pk}"] = {"selected_jobs": []}
+    session.save()
 
     transfer_step_2_url = reverse(
         "apply:job_application_external_transfer_step_2",
@@ -408,6 +417,9 @@ def test_step_3_replace_previous_CV(client, mocker, pdf_file):
     employer = job_application.to_company.members.get()
     other_company = CompanyFactory(with_membership=True)
     client.force_login(employer)
+    session = client.session
+    session[f"job_application-{other_company.pk}"] = {"selected_jobs": []}
+    session.save()
 
     transfer_step_2_url = reverse(
         "apply:job_application_external_transfer_step_2",
@@ -444,6 +456,26 @@ def test_step_3_replace_previous_CV(client, mocker, pdf_file):
         f"/resume/11111111-1111-1111-1111-111111111111.pdf"
     )
     assert new_job_application.state == JobApplicationState.NEW
+
+
+def test_access_step_3_without_session(client):
+    job_application = JobApplicationFactory(state=JobApplicationState.REFUSED, for_snapshot=True, resume_link="")
+    employer = job_application.to_company.members.get()
+    other_company = CompanyFactory(with_membership=True)
+    client.force_login(employer)
+    response = client.get(
+        reverse(
+            "apply:job_application_external_transfer_step_3",
+            kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
+        )
+    )
+    assertRedirects(
+        response,
+        reverse(
+            "apply:job_application_external_transfer_step_2",
+            kwargs={"job_application_id": job_application.pk, "company_pk": other_company.pk},
+        ),
+    )
 
 
 def test_full_process(client):
