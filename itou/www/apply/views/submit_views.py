@@ -959,7 +959,22 @@ class ApplicationJobsView(ApplicationBaseView):
         return reverse("companies_views:job_description_card", kwargs={"job_description_id": job_description})
 
 
-class ApplicationEligibilityView(ApplicationBaseView):
+class RequireApplySessionMixin:
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and not self.apply_session.exists():
+            return HttpResponseRedirect(
+                reverse(
+                    "apply:application_jobs",
+                    kwargs={
+                        "company_pk": self.company.pk,
+                        "job_seeker_public_id": self.job_seeker.public_id,
+                    },
+                )
+            )
+        return super().dispatch(request, *args, **kwargs)
+
+
+class ApplicationEligibilityView(RequireApplySessionMixin, ApplicationBaseView):
     template_name = "apply/submit/application/eligibility.html"
 
     def __init__(self):
@@ -1044,7 +1059,7 @@ class ApplicationEligibilityView(ApplicationBaseView):
         }
 
 
-class ApplicationGEIQEligibilityView(ApplicationBaseView):
+class ApplicationGEIQEligibilityView(RequireApplySessionMixin, ApplicationBaseView):
     template_name = "apply/submit/application/geiq_eligibility.html"
 
     def __init__(self):
@@ -1126,7 +1141,7 @@ class ApplicationGEIQEligibilityView(ApplicationBaseView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
 
-class ApplicationResumeView(ApplicationBaseView):
+class ApplicationResumeView(RequireApplySessionMixin, ApplicationBaseView):
     template_name = "apply/submit/application/resume.html"
     form_class = SubmitJobApplicationForm
 
@@ -1150,9 +1165,6 @@ class ApplicationResumeView(ApplicationBaseView):
         if not request.user.is_authenticated:
             # Do nothing, LoginRequiredMixin will raise in dispatch()
             return
-
-        if not self.apply_session.exists():
-            self.apply_session.init({})
 
         self.form = self.form_class(**self.get_form_kwargs())
 
