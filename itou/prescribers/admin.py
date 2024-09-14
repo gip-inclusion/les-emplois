@@ -1,5 +1,6 @@
 from django.contrib import admin, messages
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect
 from django.utils.timezone import now
 
 from itou.common_apps.organizations.admin import HasMembersFilter, MembersInline, OrganizationAdmin
@@ -197,6 +198,13 @@ class PrescriberOrganizationAdmin(ItouGISMixin, OrganizationAdmin):
         if "_authorization_action_refuse" in request.POST:
             # Same checks in change_form template to display the button
             if request.user.is_superuser or obj.has_pending_authorization():
+                if self.get_queryset(request).filter(siret=obj.siret, kind=PrescriberOrganizationKind.OTHER).exists():
+                    msg = (
+                        "Impossible de refuser cette habilitation: cela changerait son type vers “Autre” "
+                        "et une autre organisation de type “Autre” a le même SIRET."
+                    )
+                    self.message_user(request, msg, messages.ERROR)
+                    return HttpResponseRedirect(request.get_full_path())
                 obj.is_authorized = False
                 obj.authorization_status = PrescriberAuthorizationStatus.REFUSED
                 obj.authorization_updated_at = now()

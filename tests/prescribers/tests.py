@@ -4,8 +4,10 @@ import httpx
 import pytest
 import respx
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.messages.test import MessagesTestMixin
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.core.management import call_command
@@ -247,7 +249,7 @@ class TestPrescriberOrganizationModel:
         assert organization.is_head_office is True
 
 
-class PrescriberOrganizationAdminTest(TestCase):
+class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
     ACCEPT_BUTTON_LABEL = "Valider l'habilitation"
     REFUSE_BUTTON_LABEL = "Refuser l'habilitation"
     ACCEPT_AFTER_REFUSAL_BUTTON_LABEL = "Annuler le refus et valider l'habilitation"
@@ -310,6 +312,58 @@ class PrescriberOrganizationAdminTest(TestCase):
                 assert updated_prescriberorganization.kind == PrescriberOrganizationKind.OTHER
                 assert updated_prescriberorganization.authorization_updated_by == self.superuser
                 assert updated_prescriberorganization.authorization_status == PrescriberAuthorizationStatus.REFUSED
+
+    def test_refuse_prescriber_habilitation_error(self):
+        self.client.force_login(self.superuser)
+
+        prescriberorganization = PrescriberOrganizationFactory(
+            authorized=True,
+            siret="83987278500010",
+            department="14",
+            post_code="14000",
+            authorization_updated_at=datetime.now(tz=get_current_timezone()),
+        )
+        PrescriberOrganizationFactory(
+            kind=PrescriberOrganizationKind.OTHER,
+            siret=prescriber_organization.siret,
+        )
+
+        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
+        response = self.client.get(url)
+        self.assertContains(response, self.REFUSE_BUTTON_LABEL)
+
+        post_data = {
+            "id": prescriberorganization.pk,
+            "siret": prescriberorganization.siret,
+            "post_code": prescriberorganization.post_code,
+            "department": prescriberorganization.department,
+            "kind": prescriberorganization.kind,
+            "name": prescriberorganization.name,
+            "prescribermembership_set-TOTAL_FORMS": 1,
+            "prescribermembership_set-INITIAL_FORMS": 0,
+            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
+            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
+            "_authorization_action_refuse": "Refuser+l'habilitation",
+        }
+
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 302
+        self.assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Impossible de refuser cette habilitation: cela changerait son type vers “Autre” "
+                    "et une autre organisation de type “Autre” a le même SIRET.",
+                )
+            ],
+        )
+
+        updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
+        assert updated_prescriberorganization.is_authorized
+        assert updated_prescriberorganization.kind == PrescriberOrganizationKind.PE
+        assert updated_prescriberorganization.authorization_updated_by is None
+        assert updated_prescriberorganization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
     def test_refuse_prescriber_habilitation_pending_status(self):
         self.client.force_login(self.user)
