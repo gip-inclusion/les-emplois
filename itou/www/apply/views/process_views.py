@@ -1099,6 +1099,11 @@ def rdv_insertion_invite(request, job_application_id, for_detail=False):
                         else None
                     ),
                     "address": job_application.job_seeker.address_on_one_line,
+                    "invitation": {
+                        "motif_category": {
+                            "name": "Entretien SIAE",
+                        },
+                    },
                 }
 
                 response = httpx.post(url=url, headers=headers, json=data, timeout=10)
