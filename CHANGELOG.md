@@ -1,5 +1,38 @@
 # Journal des modifications
 
+## 2024-09-16
+
+### Ajouté
+
+- [Admin : PASS IAE cliquable dans la fiche salarié](https://github.com/gip-inclusion/les-emplois/pull/4702)
+- [Contrôle a posteriori : Indiquer si une candidature est éligible lors de l’export des candidatures](https://github.com/gip-inclusion/les-emplois/pull/4716)
+- [En tant qu’employeur je peux inviter un candidat à prendre rdv depuis ma liste de candidatures](https://github.com/gip-inclusion/les-emplois/pull/4357)
+- [En tant qu’utilisateur je vois tous les rendez-vous d'un candidat depuis la page de détail d'une candidature](https://github.com/gip-inclusion/les-emplois/pull/4561)
+- [Gestion des événements remontés par RDV-I via un webhook](https://github.com/gip-inclusion/les-emplois/pull/4563)
+- [UX/UI: Ajout du bouton « Imprimer » sur la page de détail Candidat](https://github.com/gip-inclusion/les-emplois/pull/4647) 🖼
+- [UX/UI: page nouveautés](https://github.com/gip-inclusion/les-emplois/pull/4562)
+
+### Modifié
+
+- [Admin : Lecture seule pour les `EmployeeRecordUpdateNotification()`](https://github.com/gip-inclusion/les-emplois/pull/4672)
+- [Candidat : correction du paramètre fictif pour le filtre du nom de candidat dans la vue liste](https://github.com/gip-inclusion/les-emplois/pull/4682)
+- [Candidatures : Archiver les candidatures inactives depuis 180+ jours](https://github.com/gip-inclusion/les-emplois/pull/4649) 🖼
+- [Candidatures : Désarchiver lors de l’acceptation](https://github.com/gip-inclusion/les-emplois/pull/4726)
+- [Connexion : Suppression d'un paramètre inutilisé pour Inclusion Connect](https://github.com/gip-inclusion/les-emplois/pull/4710)
+- [Employeur : Modification du message d'erreur sur le SIRET lors de la création d'antenne](https://github.com/gip-inclusion/les-emplois/pull/4704)
+- [Pilotage : Ouverture des TB 346 et 330 à tous les conseils départementaux](https://github.com/gip-inclusion/les-emplois/pull/4725)
+- [Statistiques: Correction d'un nom d'événement Matomo](https://github.com/gip-inclusion/les-emplois/pull/4700)
+- [Tableau de bord : déplacer « déclarer une embauche » pour les GEIQ](https://github.com/gip-inclusion/les-emplois/pull/4708)
+- [Tableau de bord : le bouton Postuler pour un candidat envoie directement dans la page des résultats de recherche](https://github.com/gip-inclusion/les-emplois/pull/4734)
+- [UX/UI : Amélioration des performances d’accès au tableau de bord depuis le menu](https://github.com/gip-inclusion/les-emplois/pull/4699)
+- [UX/UI : Ajout d'un bouton de retour à la page d'accès aux APIs](https://github.com/gip-inclusion/les-emplois/pull/4678)
+- [UX/UI : Conversion d’une alerte en toast lorsque j’enregistre mes préférences de notifications](https://github.com/gip-inclusion/les-emplois/pull/4670)
+- [UX/UI : Déplacer le texte d’intro dans les 3 onglets “organisation”](https://github.com/gip-inclusion/les-emplois/pull/4683)
+- [UX/UI : Passer « Salariés et PASS IAE » et « Fiches salariés ASP » en onglets](https://github.com/gip-inclusion/les-emplois/pull/4715) 🖼
+- [UX/UI : Remplacer les derniers fils d’Ariane par des liens retours](https://github.com/gip-inclusion/les-emplois/pull/4679)
+- [UX/UI : Renommer « organisation » en « structure » pour les employeurs](https://github.com/gip-inclusion/les-emplois/pull/4711)
+- [UX/UI : Retirer l’élément « tableau de bord » du menu « Mon espace »](https://github.com/gip-inclusion/les-emplois/pull/4667)
+
 ## 2024-09-09
 
 ### Ajouté
