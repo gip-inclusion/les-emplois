@@ -63,20 +63,21 @@ fix: fast_fix
 .PHONY: populate_db populate_db_with_cities populate_db_minimal
 
 # After migrate
-populate_db_with_cities: $(VIRTUAL_ENV)
-	python manage.py dbshell <itou/fixtures/postgres/cities.sql
+populate_db_with_reference_data: $(VIRTUAL_ENV)
+	cat \
+		itou/fixtures/postgres/cities_city.sql \
+		itou/fixtures/postgres/asp_commune.sql \
+		itou/fixtures/postgres/asp_department.sql \
+		itou/fixtures/postgres/asp_country.sql \
+		itou/fixtures/postgres/jobs_rome.sql \
+		itou/fixtures/postgres/jobs_appellation.sql \
+	| python manage.py dbshell
 
-populate_db: populate_db_with_cities
-	# Split loaddata_bulk into parts to avoid OOM errors in review apps
-	python manage.py loaddata_bulk itou/fixtures/django/01_*.json
-	python manage.py loaddata_bulk itou/fixtures/django/0[2-9]_*.json
-	python manage.py loaddata_bulk itou/fixtures/django/1*.json
-	python manage.py loaddata_bulk itou/fixtures/django/2*.json
+populate_db: populate_db_with_reference_data
+	python manage.py loaddata_bulk itou/fixtures/django/*.json
 	python manage.py shell -c 'from itou.siae_evaluations import fixtures;fixtures.load_data()'
 
-populate_db_minimal: populate_db_with_cities
-	# Load reference data used by ASP-related code
-	python manage.py loaddata_bulk itou/fixtures/django/*asp_INSEE*.json
+populate_db_minimal: populate_db_with_reference_data
 
 # Tests.
 # =============================================================================

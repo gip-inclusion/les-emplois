@@ -3,7 +3,6 @@
 FIXTURES_DIRECTORY=$(dirname "$0")
 
 echo "Dump models data into $FIXTURES_DIRECTORY"
-./manage.py dumpdata asp.commune -o "$FIXTURES_DIRECTORY/01_asp_INSEE_communes.json"
 ./manage.py dumpdata asp.country -o "$FIXTURES_DIRECTORY/02_asp_INSEE_countries.json"
 ./manage.py dumpdata asp.department -o "$FIXTURES_DIRECTORY/03_asp_INSEE_departments.json"
 ./manage.py dumpdata jobs.appellation jobs.rome -o "$FIXTURES_DIRECTORY/04_jobs.json"
