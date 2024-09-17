@@ -641,7 +641,11 @@ class AcceptForm(JobAppellationAndLocationMixin, forms.ModelForm):
             )
 
         choices = [("", "Sélectionnez un poste")]
-        if jobs := company.job_description_through.all().order_by("custom_name", "is_active"):
+        if (
+            jobs := company.job_description_through.all()
+            .select_related("appellation", "location")
+            .order_by("custom_name", "is_active")
+        ):
             if active_jobs := sorted_jobs_for_display(job for job in jobs if job.is_active):
                 choices.append(("Postes ouverts au recrutement", active_jobs))
             if inactive_jobs := sorted_jobs_for_display(job for job in jobs if not job.is_active):

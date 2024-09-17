@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: ProcessAcceptViewsTest.test_select_job_description_for_job_application[accept view SQL queries]
   dict({
-    'num_queries': 24,
+    'num_queries': 16,
     'queries': list([
       dict({
         'origin': list([
@@ -826,177 +826,26 @@
                  "companies_jobdescription"."source_kind",
                  "companies_jobdescription"."source_url",
                  "companies_jobdescription"."field_history",
-                 "companies_jobdescription"."creation_source"
+                 "companies_jobdescription"."creation_source",
+                 "jobs_appellation"."updated_at",
+                 "jobs_appellation"."code",
+                 "jobs_appellation"."name",
+                 "jobs_appellation"."rome_id",
+                 "jobs_appellation"."full_text",
+                 "cities_city"."id",
+                 "cities_city"."name",
+                 "cities_city"."slug",
+                 "cities_city"."department",
+                 "cities_city"."post_codes",
+                 "cities_city"."code_insee",
+                 "cities_city"."coords",
+                 "cities_city"."edition_mode"
           FROM "companies_jobdescription"
+          INNER JOIN "jobs_appellation" ON ("companies_jobdescription"."appellation_id" = "jobs_appellation"."code")
+          LEFT OUTER JOIN "cities_city" ON ("companies_jobdescription"."location_id" = "cities_city"."id")
           WHERE "companies_jobdescription"."company_id" = %s
           ORDER BY "companies_jobdescription"."custom_name" ASC,
                    "companies_jobdescription"."is_active" ASC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobDescription.display_name[companies/models.py]',
-          '<listcomp>[www/apply/forms.py]',
-          'sorted_jobs_for_display[www/apply/forms.py]',
-          'AcceptForm.__init__[www/apply/forms.py]',
-          '_accept[www/apply/views/common.py]',
-          'accept[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT "jobs_appellation"."updated_at",
-                 "jobs_appellation"."code",
-                 "jobs_appellation"."name",
-                 "jobs_appellation"."rome_id",
-                 "jobs_appellation"."full_text"
-          FROM "jobs_appellation"
-          WHERE "jobs_appellation"."code" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobDescription.display_name[companies/models.py]',
-          '<listcomp>[www/apply/forms.py]',
-          'sorted_jobs_for_display[www/apply/forms.py]',
-          'AcceptForm.__init__[www/apply/forms.py]',
-          '_accept[www/apply/views/common.py]',
-          'accept[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT "jobs_appellation"."updated_at",
-                 "jobs_appellation"."code",
-                 "jobs_appellation"."name",
-                 "jobs_appellation"."rome_id",
-                 "jobs_appellation"."full_text"
-          FROM "jobs_appellation"
-          WHERE "jobs_appellation"."code" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobDescription.display_name[companies/models.py]',
-          '<listcomp>[www/apply/forms.py]',
-          'sorted_jobs_for_display[www/apply/forms.py]',
-          'AcceptForm.__init__[www/apply/forms.py]',
-          '_accept[www/apply/views/common.py]',
-          'accept[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT "jobs_appellation"."updated_at",
-                 "jobs_appellation"."code",
-                 "jobs_appellation"."name",
-                 "jobs_appellation"."rome_id",
-                 "jobs_appellation"."full_text"
-          FROM "jobs_appellation"
-          WHERE "jobs_appellation"."code" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobDescription.display_name[companies/models.py]',
-          '<listcomp>[www/apply/forms.py]',
-          'sorted_jobs_for_display[www/apply/forms.py]',
-          'AcceptForm.__init__[www/apply/forms.py]',
-          '_accept[www/apply/views/common.py]',
-          'accept[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT "jobs_appellation"."updated_at",
-                 "jobs_appellation"."code",
-                 "jobs_appellation"."name",
-                 "jobs_appellation"."rome_id",
-                 "jobs_appellation"."full_text"
-          FROM "jobs_appellation"
-          WHERE "jobs_appellation"."code" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobDescription.display_name[companies/models.py]',
-          '<listcomp>[www/apply/forms.py]',
-          'sorted_jobs_for_display[www/apply/forms.py]',
-          'AcceptForm.__init__[www/apply/forms.py]',
-          '_accept[www/apply/views/common.py]',
-          'accept[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT "jobs_appellation"."updated_at",
-                 "jobs_appellation"."code",
-                 "jobs_appellation"."name",
-                 "jobs_appellation"."rome_id",
-                 "jobs_appellation"."full_text"
-          FROM "jobs_appellation"
-          WHERE "jobs_appellation"."code" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobDescription.display_location[companies/models.py]',
-          '<listcomp>[www/apply/forms.py]',
-          'sorted_jobs_for_display[www/apply/forms.py]',
-          'AcceptForm.__init__[www/apply/forms.py]',
-          '_accept[www/apply/views/common.py]',
-          'accept[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT "cities_city"."id",
-                 "cities_city"."name",
-                 "cities_city"."slug",
-                 "cities_city"."department",
-                 "cities_city"."post_codes",
-                 "cities_city"."code_insee",
-                 "cities_city"."coords",
-                 "cities_city"."edition_mode"
-          FROM "cities_city"
-          WHERE "cities_city"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobDescription.display_name[companies/models.py]',
-          '<listcomp>[www/apply/forms.py]',
-          'sorted_jobs_for_display[www/apply/forms.py]',
-          'AcceptForm.__init__[www/apply/forms.py]',
-          '_accept[www/apply/views/common.py]',
-          'accept[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT "jobs_appellation"."updated_at",
-                 "jobs_appellation"."code",
-                 "jobs_appellation"."name",
-                 "jobs_appellation"."rome_id",
-                 "jobs_appellation"."full_text"
-          FROM "jobs_appellation"
-          WHERE "jobs_appellation"."code" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'JobDescription.display_location[companies/models.py]',
-          '<listcomp>[www/apply/forms.py]',
-          'sorted_jobs_for_display[www/apply/forms.py]',
-          'AcceptForm.__init__[www/apply/forms.py]',
-          '_accept[www/apply/views/common.py]',
-          'accept[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT "cities_city"."id",
-                 "cities_city"."name",
-                 "cities_city"."slug",
-                 "cities_city"."department",
-                 "cities_city"."post_codes",
-                 "cities_city"."code_insee",
-                 "cities_city"."coords",
-                 "cities_city"."edition_mode"
-          FROM "cities_city"
-          WHERE "cities_city"."id" = %s
-          LIMIT 21
         ''',
       }),
       dict({
