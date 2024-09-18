@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block title_content %}
-    <h1>Valider le bilan d’exécution - {{ assessment.company.display_name }} - {{ assessment.campaign.year }}</h1>
+    <h1>Valider le bilan d’exécution - {{ assessment.campaign.year }}</h1>
     {% include "geiq/includes/labor_inspector_assessment_state_badge.html" with assessment=assessment extra_class="" ReviewState=ReviewState only %}
 {% endblock %}
 
