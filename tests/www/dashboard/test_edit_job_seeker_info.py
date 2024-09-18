@@ -1,6 +1,7 @@
 import math
 from unittest import mock
 
+import pytest
 from allauth.account.models import EmailAddress
 from django.contrib.gis.geos import Point
 from django.test import override_settings
@@ -18,12 +19,13 @@ from tests.prescribers import factories as prescribers_factories
 from tests.users.factories import (
     PrescriberFactory,
 )
-from tests.utils.test import BASE_NUM_QUERIES, TestCase
+from tests.utils.test import TestCase, assertSnapshotQueries
 
 
 DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class EditJobSeekerInfo(TestCase):
     NIR_UPDATE_TALLY_LINK_LABEL = "Demander la correction du numéro de sécurité sociale"
     EMAIL_LABEL = "Adresse électronique"
@@ -81,21 +83,7 @@ class EditJobSeekerInfo(TestCase):
         )
         url = f"{url}?back_url={back_url}&from_application={job_application.pk}"
 
-        # 1.  SELECT django_session
-        # 2.  SELECT users_user
-        # 3.  SELECT companies_companymembership
-        # 4.  SELECT companies_company
-        # END of middlewares
-        # 5.  SAVEPOINT
-        # 6.  SELECT users_user
-        # 7.  SELECT EXISTS account_emailaddress (verified)
-        # 8.  SELECT companies_siaeconvention (menu checks for financial annexes)
-        # 9.  SELECT EXISTS users_user (menu checks for active admin)
-        # 10. RELEASE SAVEPOINT
-        # 11. SAVEPOINT
-        # 12. UPDATE django_session
-        # 13. RELEASE SAVEPOINT
-        with self.assertNumQueries(13):
+        with assertSnapshotQueries(self.snapshot(name="view queries")):
             response = self.client.get(url)
         self.assertContains(
             response,
@@ -293,15 +281,7 @@ class EditJobSeekerInfo(TestCase):
         url = reverse(
             "dashboard:edit_job_seeker_info", kwargs={"job_seeker_public_id": job_application.job_seeker.public_id}
         )
-        with self.assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # session
-            + 2  # user, memberships (ItouCurrentOrganizationMiddleware)
-            + 1  # job seeker infos (get_object_or_404)
-            + 1  # prescribers_prescribermembership (can_edit_personal_information/is_prescriber_with_authorized_org)
-            + 1  # account_emailaddress (can_edit_email/has_verified_email)
-            + 3  # update session with savepoint & release
-        ):
+        with assertSnapshotQueries(self.snapshot(name="view queries")):
             response = self.client.get(url)
         assert response.status_code == 200
 
