@@ -1684,6 +1684,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
 
 
 @override_settings(API_BAN_BASE_URL="http://ban-api", TALLY_URL="https://tally.so")
+@pytest.mark.usefixtures("unittest_compatibility")
 class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
     BIRTH_COUNTRY_LABEL = "Pays de naissance"
     BIRTH_PLACE_LABEL = "Commune de naissance"
@@ -1934,7 +1935,8 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
 
         # Inactive job description must also appear in select
         job_description = JobDescriptionFactory(company=job_application.to_company, is_active=False)
-        response = self.client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
+        with assertSnapshotQueries(self.snapshot(name="accept view SQL queries")):
+            response = self.client.get(reverse("apply:accept", kwargs={"job_application_id": job_application.pk}))
         assert response.status_code == 200
         assertContains(response, f"{job_description.display_name} - {job_description.display_location}", html=True)
         assertContains(response, "Postes ouverts au recrutement")
