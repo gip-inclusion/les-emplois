@@ -115,6 +115,15 @@ def preload_spatial_reference(django_db_setup, django_db_blocker):
 
 
 @pytest.fixture(autouse=True, scope="session")
+def preload_contenttype_cache(django_db_setup, django_db_blocker):
+    from django.apps import apps
+    from django.contrib.contenttypes.models import ContentType
+
+    with django_db_blocker.unblock():
+        ContentType.objects.get_for_models(*apps.get_models())
+
+
+@pytest.fixture(autouse=True, scope="session")
 def test_bucket():
     # TODO: Remove this code block once we stop using a models.URLField() to store a S3 link (ie. `resume_link`)
     from django.core.validators import URLValidator

@@ -305,8 +305,6 @@ def test_num_queries(admin_client):
         sender=prescriber,
         sender_kind=SenderKind.PRESCRIBER,
     )
-    # prewarm ContentType cache if needed to avoid extra query
-    ContentType.objects.get_for_model(prescriber)
     with assertNumQueries(
         BASE_NUM_QUERIES
         + 1  # Load Django session

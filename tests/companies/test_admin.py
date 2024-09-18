@@ -1,12 +1,10 @@
 import pytest
 from django.contrib.admin import helpers
-from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNumQueries, assertRedirects
 
 from itou.companies.enums import CompanyKind
-from itou.companies.models import Company
 from tests.common_apps.organizations.tests import assert_set_admin_role__creation, assert_set_admin_role__removal
 from tests.companies.factories import CompanyFactory
 from tests.users.factories import EmployerFactory, ItouStaffFactory
@@ -18,8 +16,6 @@ class TestCompanyAdmin:
     @pytest.mark.ignore_unknown_variable_template_error("show_change_form_export")
     def test_display_for_new_company(self, admin_client, snapshot):
         """Does not search approvals with company IS NULL"""
-        # prewarm ContentType cache if needed to avoid extra query
-        ContentType.objects.get_for_model(Company)
         with assertNumQueries(9):
             # 1. SELECT django session
             # 2. SELECT user
