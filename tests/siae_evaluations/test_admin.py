@@ -1,9 +1,11 @@
+from datetime import timedelta
+
 from dateutil.relativedelta import relativedelta
 from django.contrib import messages
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertMessages, assertNumQueries
+from pytest_django.asserts import assertContains, assertMessages, assertNumQueries
 
 from itou.siae_evaluations import enums as evaluation_enums
 from tests.companies.factories import CompanyMembershipFactory
@@ -237,3 +239,27 @@ class TestEvaluationCampaignAdmin:
         assert campaign1_siae.submission_freezed_at is not None
         campaign2_siae.refresh_from_db()
         assert campaign2_siae.submission_freezed_at is not None
+
+
+def test_evaluated_job_application_state_display(admin_client):
+    evaluated_job_app = EvaluatedJobApplicationFactory(
+        complete=True,
+        evaluated_siae__evaluation_campaign__evaluations_asked_at=timezone.now() - timedelta(days=60),
+    )
+    response = admin_client.get(
+        reverse(
+            "admin:siae_evaluations_evaluatedjobapplication_change",
+            kwargs={"object_id": evaluated_job_app.pk},
+        )
+    )
+    assertContains(
+        response,
+        """
+        <div class="flex-container">
+          <label>State :</label>
+          <div class="readonly">SUBMITTED</div>
+        </div>
+        """,
+        html=True,
+        count=1,
+    )
