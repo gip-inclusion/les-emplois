@@ -266,7 +266,7 @@ def stats_siae_orga_etp(request):
         request=request,
         context=context,
         params={
-            mb.ASP_SIAE_FILTER_KEY_FLAVOR3: [str(current_org.convention.asp_id)],
+            mb.ASP_SIAE_FILTER_KEY_FLAVOR3: [org.convention.asp_id for org in request.organizations],
         },
     )
 
