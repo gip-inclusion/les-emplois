@@ -5,7 +5,7 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertNotContains, assertNumQueries
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.companies.enums import CompanyKind
 from itou.eligibility.enums import AdministrativeCriteriaLevel
@@ -34,6 +34,7 @@ from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
 from tests.utils.test import (
     TestCase,
     assert_previous_step,
+    assertSnapshotQueries,
     get_rows_from_streaming_response,
     parse_response_to_soup,
 )
@@ -142,55 +143,7 @@ class ProcessListSiaeTest(TestCase):
         diagnosis.administrative_criteria.add(level2_criterion)
 
         self.client.force_login(self.eddie_hit_pit)
-        # 1.  SELECT django_session
-        # 2.  SELECT users_user
-        # 3.  SELECT companies_companymembership
-        # 4.  SELECT companies_company
-        # END of middlewares
-        # 5.  SAVEPOINT
-        # 6.  SELECT COUNT job_applications_jobapplication
-        # 7.  SELECT DISTINCT job_applications_jobapplication.sender_id
-        # 8.  SELECT DISTINCT job_applications_jobapplication.job_seeker_id
-        # 9.  SELECT eligibility_administrativecriteria
-        # 10. SELECT job_applications_jobapplication
-        # 11. SELECT job_applications_jobapplication_selected_jobs (prefetch)
-        # 12. SELECT jobs_appellation (prefetch)
-        # 13. SELECT DISTINCT job_applications_jobapplication.sender_prescriber_organization_id
-        # 14. SELECT DISTINCT job_applications_jobapplication.sender_company_id
-        # 15. SELECT COUNT job_applications_jobapplication.eligibility_diagnosis_id (subquery)
-        # 16. SELECT job_applications_jobapplication (load results page)
-        # 17. SELECT job_applications_jobapplication_selected_jobs (prefetch)
-        # 18. SELECT jobs_appellation (prefetch)
-        # 19. SELECT cities_city (prefetch)
-        # 20. SELECT companies_company (prefetch)
-        # 21. SELECT approvals_approval (prefetch)
-        # 22. SELECT eligibility_administrativecriteria
-        # Render template:
-        # 9 job applications (1 per state in JobApplicationWorkflow + 1 sent by prescriber)
-        # 23. jobapp1: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-        # 24. jobapp1: select last valid diagnosis made by prescriber or SIAE
-        # 25. jobapp2: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-        # 26. jobapp2: select last valid diagnosis made by prescriber or SIAE
-        # 27. jobapp3: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-        # 28. jobapp3: select last valid diagnosis made by prescriber or SIAE
-        # 29. jobapp4: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-        # 30. jobapp4: select last valid diagnosis made by prescriber or SIAE
-        # 31. jobapp5: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-        # 32. jobapp5: select last valid diagnosis made by prescriber or SIAE
-        # 33. jobapp6: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-        # 34. jobapp6: select last valid diagnosis made by prescriber or SIAE
-        # 35. jobapp7: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-        # 25. jobapp7: select last valid diagnosis made by prescriber or SIAE
-        # 37. jobapp8: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-        # 38. jobapp8: select last valid diagnosis made by prescriber or SIAE
-        # 39. jobapp9: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
-        # 40. jobapp9: select last valid diagnosis made by prescriber or SIAE
-        # 41. SELECT EXISTS users_user (menu checks for active admin)
-        # 42. RELEASE SAVEPOINT
-        # 43. SAVEPOINT
-        # 44. UPDATE django_session
-        # 45. RELEASE SAVEPOINT
-        with assertNumQueries(45):
+        with assertSnapshotQueries(self.snapshot(name="view queries")):
             response = self.client.get(reverse("apply:list_for_siae"))
 
         total_applications = len(response.context["job_applications_page"].object_list)
