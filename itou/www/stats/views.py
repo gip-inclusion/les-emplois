@@ -152,9 +152,13 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
     base_context["matomo_custom_url"] = matomo_custom_url
 
     if request.user.is_authenticated and metabase_dashboard:
-        company_id = request.current_organization.pk if request.user.is_employer else None
-        prescriber_org_pk = request.current_organization.pk if request.user.is_prescriber else None
-        institution_pk = request.current_organization.pk if request.user.is_labor_inspector else None
+        extra_data = {}
+        if request.user.is_employer:
+            extra_data["current_company_id"] = request.current_organization.pk
+        elif request.user.is_prescriber and request.current_organization:
+            extra_data["current_prescriber_organization_id"] = request.current_organization.pk
+        elif request.user.is_labor_inspector:
+            extra_data["current_institution_id"] = request.current_organization.pk
         user_kind = request.user.kind
         department = base_context.get("department")
         region = DEPARTMENT_TO_REGION[department] if department else base_context.get("region")
@@ -164,11 +168,9 @@ def render_stats(request, context, params=None, template_name="stats/stats.html"
             dashboard_name=view_name,
             department=department,
             region=region,
-            current_company_id=company_id,
-            current_prescriber_organization_id=prescriber_org_pk,
-            current_institution_id=institution_pk,
             user_kind=user_kind,
             user_id=request.user.pk,
+            **extra_data,
         )
 
     return render(request, template_name, base_context)
