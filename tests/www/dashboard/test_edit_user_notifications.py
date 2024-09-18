@@ -1,3 +1,4 @@
+import pytest
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count
 from django.urls import reverse
@@ -11,9 +12,10 @@ from tests.users.factories import (
     JobSeekerFactory,
     PrescriberFactory,
 )
-from tests.utils.test import TestCase
+from tests.utils.test import TestCase, assertSnapshotQueries
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class EditUserNotificationsTest(TestCase):
     def test_staff_user_not_allowed(self):
         staff_user = ItouStaffFactory()
@@ -33,20 +35,7 @@ class EditUserNotificationsTest(TestCase):
         employer = EmployerFactory(with_company=True)
         self.client.force_login(employer)
         url = reverse("dashboard:edit_user_notifications")
-        # 1.  SELECT django_session
-        # 2.  SELECT users_user
-        # 3.  SELECT companies_companymembership
-        # 4.  SELECT companies_company
-        # END of middlewares
-        # 5.  SAVEPOINT
-        # 6.  SELECT communications_notificationsettings
-        # 7.  SELECT companies_siaeconvention (menu checks for financial annexes)
-        # 8.  SELECT EXISTS users_user (menu checks for active admin)
-        # 9.  RELEASE SAVEPOINT
-        # 10. SAVEPOINT
-        # 11. UPDATE django_session
-        # 12. RELEASE SAVEPOINT
-        with self.assertNumQueries(12):
+        with assertSnapshotQueries(self.snapshot(name="view queries")):
             response = self.client.get(url)
         assert response.status_code == 200
 
@@ -54,15 +43,7 @@ class EditUserNotificationsTest(TestCase):
         prescriber = PrescriberFactory(membership=True)
         self.client.force_login(prescriber)
         url = reverse("dashboard:edit_user_notifications")
-        with self.assertNumQueries(
-            1  # Load django session
-            + 1  # Load current user
-            + 1  # Load prescriber membership
-            + 2  # Savepoint and release
-            + 1  # Load prescriber notification settings (form init)
-            + 1  # Check prescriber membership exists for this structure (form init)
-            + 3  # Savepoint, update session and release
-        ):
+        with assertSnapshotQueries(self.snapshot(name="view queries")):
             response = self.client.get(url)
         assert response.status_code == 200
 
@@ -70,15 +51,7 @@ class EditUserNotificationsTest(TestCase):
         solo_adviser = PrescriberFactory(membership=False)
         self.client.force_login(solo_adviser)
         url = reverse("dashboard:edit_user_notifications")
-        with self.assertNumQueries(
-            1  # Load django session
-            + 1  # Load current user
-            + 1  # Load prescriber membership
-            + 2  # Savepoint and release
-            + 1  # Load prescriber notification settings (form init)
-            + 1  # Check prescriber membership exists for this structure (form init)
-            + 3  # Savepoint, update session and release
-        ):
+        with assertSnapshotQueries(self.snapshot(name="view queries")):
             response = self.client.get(url)
         assert response.status_code == 200
 
@@ -86,13 +59,7 @@ class EditUserNotificationsTest(TestCase):
         job_seeker = JobSeekerFactory()
         self.client.force_login(job_seeker)
         url = reverse("dashboard:edit_user_notifications")
-        with self.assertNumQueries(
-            1  # Load django session
-            + 1  # Load current user
-            + 2  # Savepoint and release
-            + 1  # Load job seeker notification settings (form init)
-            + 3  # Savepoint, update session and release
-        ):
+        with assertSnapshotQueries(self.snapshot(name="view queries")):
             response = self.client.get(url)
         assert response.status_code == 200
 
@@ -113,18 +80,7 @@ class EditUserNotificationsTest(TestCase):
         assert not NotificationSettings.objects.exists()
         assert not DisabledNotification.objects.exists()
 
-        with self.assertNumQueries(
-            1  # Load django session
-            + 1  # Load current user
-            + 1  # Load company membership
-            + 1  # Load company
-            + 2  # Savepoint and release
-            + 1  # Load employer notification settings (form init)
-            + 1  # Load employer notification settings (form save)
-            + 3  # Savepoint, create notification settings and release (form save)
-            + 1  # Load notification records (form save)
-            + 3  # Savepoint, update session and release
-        ):
+        with assertSnapshotQueries(self.snapshot(name="view queries - enable all notifications")):
             response = self.client.post(
                 url, data={notification.__name__: "on" for notification in available_notifications}
             )
@@ -144,20 +100,7 @@ class EditUserNotificationsTest(TestCase):
         assert not DisabledNotification.objects.exists()
 
         # Update, disable all notifications
-        with self.assertNumQueries(
-            1  # Load django session
-            + 1  # Load current user
-            + 1  # Load company membership
-            + 1  # Load company
-            + 2  # Savepoint and release
-            + 1  # Load employer notification settings (form init)
-            + 1  # Load employer disabled notification (form init)
-            + 1  # Load employer notification settings (form save)
-            + len(available_notifications)  # Load disabled notification record (form save)
-            + 1  # Load notification records (form save)
-            + 1  # Load disabled notifications' notification records (form save)
-            + 1  # Bulk insert disabled notifications (form save)
-        ):
+        with assertSnapshotQueries(self.snapshot(name="view queries - disable all notifications")):
             # Send data to bind to the form, otherwise is_valid() returns False
             response = self.client.post(url, {"foo": "bar"})
         assert response.status_code == 302
@@ -192,17 +135,7 @@ class EditUserNotificationsTest(TestCase):
         assert not NotificationSettings.objects.exists()
         assert not DisabledNotification.objects.exists()
 
-        with self.assertNumQueries(
-            1  # Load django session
-            + 1  # Load current user
-            + 1  # Load organization membership
-            + 2  # Savepoint and release
-            + 1  # Load prescriber notification settings (form init)
-            + 1  # Load prescriber notification settings (form save)
-            + 3  # Savepoint, create notification settings and release (form save)
-            + 1  # Load notification records (form save)
-            + 3  # Savepoint, update session and release
-        ):
+        with assertSnapshotQueries(self.snapshot(name="view queries - enable all notifications")):
             response = self.client.post(
                 url, data={notification.__name__: "on" for notification in available_notifications}
             )
@@ -222,19 +155,7 @@ class EditUserNotificationsTest(TestCase):
         assert not DisabledNotification.objects.exists()
 
         # Update, disable all notifications
-        with self.assertNumQueries(
-            1  # Load django session
-            + 1  # Load current user
-            + 1  # Load organization membership
-            + 2  # Savepoint and release
-            + 1  # Load prescriber notification settings (form init)
-            + 1  # Load prescriber disabled notification (form init)
-            + 1  # Load prescriber notification settings (form save)
-            + len(available_notifications)  # Load disabled notification record (form save)
-            + 1  # Load notification records (form save)
-            + 1  # Load disabled notifications' notification records (form save)
-            + 1  # Bulk insert disabled notifications (form save)
-        ):
+        with assertSnapshotQueries(self.snapshot(name="view queries - disable all notifications")):
             # Send data to bind to the form, otherwise is_valid() returns False
             response = self.client.post(url, {"foo": "bar"})
         assert response.status_code == 302
@@ -268,16 +189,7 @@ class EditUserNotificationsTest(TestCase):
         assert not NotificationSettings.objects.exists()
         assert not DisabledNotification.objects.exists()
 
-        with self.assertNumQueries(
-            1  # Load django session
-            + 1  # Load current user
-            + 1  # Load organization membership
-            + 2  # Savepoint and release
-            + 1  # Load prescriber notification settings (form init)
-            + 1  # Load prescriber notification settings (form save)
-            + 3  # Savepoint, create notification settings and release (form save)
-            + 1  # Load notification records (form save)
-        ):
+        with assertSnapshotQueries(self.snapshot(name="view queries - enable all notifications")):
             response = self.client.post(
                 url, data={notification.__name__: "on" for notification in available_notifications}
             )
@@ -297,19 +209,7 @@ class EditUserNotificationsTest(TestCase):
         assert not DisabledNotification.objects.exists()
 
         # Update, disable all notifications
-        with self.assertNumQueries(
-            1  # Load django session
-            + 1  # Load current user
-            + 1  # Load organization membership
-            + 2  # Savepoint and release
-            + 1  # Load prescriber notification settings (form init)
-            + 1  # Load prescriber disabled notification (form init)
-            + 1  # Load prescriber notification settings (form save)
-            + len(available_notifications)  # Load disabled notification record (form save)
-            + 1  # Load notification records (form save)
-            + 1  # Load disabled notifications' notification records (form save)
-            + 1  # Bulk insert disabled notifications (form save)
-        ):
+        with assertSnapshotQueries(self.snapshot(name="view queries - disable all notifications")):
             # Send data to bind to the form, otherwise is_valid() returns False
             response = self.client.post(url, {"foo": "bar"})
         assert response.status_code == 302
@@ -341,15 +241,7 @@ class EditUserNotificationsTest(TestCase):
         assert not NotificationSettings.objects.exists()
         assert not DisabledNotification.objects.exists()
 
-        with self.assertNumQueries(
-            1  # Load django session
-            + 1  # Load current user
-            + 2  # Savepoint and release
-            + 1  # Load job seeker notification settings (form init)
-            + 1  # Load job seeker notification settings (form save)
-            + 3  # Savepoint, create notification settings and release (form save)
-            + 1  # Load notification records (form save)
-        ):
+        with assertSnapshotQueries(self.snapshot(name="view queries - enable all notifications")):
             response = self.client.post(
                 url, data={notification.__name__: "on" for notification in available_notifications}
             )
@@ -369,18 +261,7 @@ class EditUserNotificationsTest(TestCase):
         assert not DisabledNotification.objects.exists()
 
         # Update, disable all notifications
-        with self.assertNumQueries(
-            1  # Load django session
-            + 1  # Load current user
-            + 2  # Savepoint and release
-            + 1  # Load job seeker notification settings (form init)
-            + 1  # Load job seeker disabled notification (form init)
-            + 1  # Load job seeker notification settings (form save)
-            + len(available_notifications)  # Load disabled notification record (form save)
-            + 1  # Load notification records (form save)
-            + 1  # Load disabled notifications' notification records (form save)
-            + 1  # Bulk insert disabled notifications (form save)
-        ):
+        with assertSnapshotQueries(self.snapshot(name="view queries - disable all notifications")):
             # Send data to bind to the form, otherwise is_valid() returns False
             response = self.client.post(url, {"foo": "bar"})
         assert response.status_code == 302

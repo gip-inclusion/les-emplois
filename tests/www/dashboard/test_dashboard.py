@@ -45,7 +45,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import EmployerFactory, JobSeekerFactory, PrescriberFactory
-from tests.utils.test import TestCase, parse_response_to_soup
+from tests.utils.test import TestCase, assertSnapshotQueries, parse_response_to_soup
 
 
 DISABLED_NIR = 'disabled aria-describedby="id_nir_helptext" id="id_nir"'
@@ -495,29 +495,7 @@ class DashboardViewTest(ParametrizedTestCase, TestCase):
         )
 
         self.client.force_login(membership.user)
-        # 1.  SELECT django_session
-        # 2.  SELECT users_user
-        # 3.  SELECT companies_companymembership
-        # 4.  SELECT companies_company
-        # END of middlewares
-        # 5.  SAVEPOINT
-        # 6.  SELECT companies_siaeconvention
-        # 7.  SELECT job_applications_jobapplication
-        # 8.  SELECT EXISTS users_user (admin membership)
-        # 9.  SELECT EXISTS users_user (admin membership)
-        # 10. SELECT COUNT employee_record_employeerecord
-        # 11. SELECT siae_evaluations_sanction
-        # 12. SELECT EXISTS users_user (admin membership)
-        # 13. SELECT EXISTS jobs_appellation
-        # 14. SELECT siae_evaluations_evaluatedsiae
-        # 15. SELECT siae_evaluations_evaluatedjobapplication
-        # 16. SELECT siae_evaluations_evaluatedadministrativecriteria
-        # 17. SELECT siae_evaluations_evaluatedsiae
-        # 18. RELEASE SAVEPOINT
-        # 19. SAVEPOINT
-        # 20. UPDATE session
-        # 21. RELEASE SAVEPOINT
-        with self.assertNumQueries(21):
+        with assertSnapshotQueries(self.snapshot(name="view queries")):
             response = self.client.get(reverse("dashboard:index"))
         self.assertContains(
             response,
