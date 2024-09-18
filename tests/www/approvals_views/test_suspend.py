@@ -15,7 +15,7 @@ from tests.approvals.factories import SuspensionFactory
 from tests.employee_record.factories import EmployeeRecordFactory
 from tests.job_applications.factories import JobApplicationFactory
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import TestCase, parse_response_to_soup
+from tests.utils.test import TestCase, assertSnapshotQueries, parse_response_to_soup
 
 
 @pytest.mark.usefixtures("unittest_compatibility")
@@ -168,23 +168,7 @@ class ApprovalSuspendViewTest(TestCase):
         url = reverse("approvals:suspension_update", kwargs={"suspension_id": suspension.pk})
         url = f"{url}?{params}"
 
-        # 1.  SELECT django_session
-        # 2.  SELECT users_user
-        # 3.  SELECT companies_companymembership
-        # 4.  SELECT companies_company
-        # END of middlewares
-        # 5.  SAVEPOINT
-        # 6.  SELECT approvals_suspension
-        # 7.  SELECT job_applications_jobapplication
-        # 8.  SELECT job_applications_jobapplication (again)
-        # 9.  SELECT approvals_suspension
-        # 10. SELECT companies_siaeconvention (menu checks for financial annexes)
-        # 11. SELECT EXISTS users_users (menu checks for active admin)
-        # 12. RELEASE SAVEPOINT
-        # 13. SAVEPOINT
-        # 14. UPDATE django_session
-        # 15. RELEASE SAVEPOINT
-        with self.assertNumQueries(15):
+        with assertSnapshotQueries(self.snapshot(name="view queries")):
             response = self.client.get(url)
         assert response.status_code == 200
 
@@ -234,21 +218,7 @@ class ApprovalSuspendViewTest(TestCase):
         url = reverse("approvals:suspension_delete", kwargs={"suspension_id": suspension.pk})
         url = f"{url}?{params}"
 
-        # 1.  SELECT django_session
-        # 2.  SELECT users_user
-        # 3.  SELECT companies_companymembership
-        # 4.  SELECT companies_company
-        # END of middlewares
-        # 5.  SAVEPOINT
-        # 6.  SELECT approvals_suspension
-        # 7.  SELECT job_applications_jobapplication (can_be_handled_by_siae -> last_hire_was_made_by_siae)
-        # 8. SELECT companies_siaeconvention (menu checks for financial annexes)
-        # 9. SELECT EXISTS users_users (menu checks for active admin)
-        # 10. RELEASE SAVEPOINT
-        # 11. SAVEPOINT
-        # 12. UPDATE django_session
-        # 13. RELEASE SAVEPOINT
-        with self.assertNumQueries(13):
+        with assertSnapshotQueries(self.snapshot(name="view queries")):
             response = self.client.get(url)
         assert response.status_code == 200
         form = parse_response_to_soup(
@@ -278,6 +248,7 @@ class ApprovalSuspendViewTest(TestCase):
         assert 0 == approval.suspension_set.count()
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class ApprovalSuspendActionChoiceViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -317,21 +288,7 @@ class ApprovalSuspendActionChoiceViewTest(TestCase):
     def test_context(self):
         self.client.force_login(self.employer)
 
-        # 1.  SELECT django_session
-        # 2.  SELECT users_user
-        # 3.  SELECT companies_companymembership
-        # 4.  SELECT companies_company
-        # END of middlewares
-        # 5.  SAVEPOINT
-        # 6.  SELECT approvals_suspension
-        # 7.  SELECT job_applications_jobapplication (can_be_handled_by_siae -> last_hire_was_made_by_siae)
-        # 8. SELECT companies_siaeconvention (menu checks for financial annexes)
-        # 9. SELECT EXISTS users_users (menu checks for active admin)
-        # 10. RELEASE SAVEPOINT
-        # 11. SAVEPOINT
-        # 12. UPDATE django_session
-        # 13. RELEASE SAVEPOINT
-        with self.assertNumQueries(13):
+        with assertSnapshotQueries(self.snapshot(name="view queries")):
             response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.context["suspension"] == self.suspension
@@ -378,6 +335,7 @@ class ApprovalSuspendActionChoiceViewTest(TestCase):
         assert response.status_code == 400
 
 
+@pytest.mark.usefixtures("unittest_compatibility")
 class ApprovalSuspendUpdateEndDateViewTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -420,21 +378,7 @@ class ApprovalSuspendUpdateEndDateViewTest(TestCase):
     def test_context(self):
         self.client.force_login(self.employer)
 
-        # 1.  SELECT django_session
-        # 2.  SELECT users_user
-        # 3.  SELECT companies_companymembership
-        # 4.  SELECT companies_company
-        # END of middlewares
-        # 5.  SAVEPOINT
-        # 6.  SELECT approvals_suspension
-        # 7.  SELECT job_applications_jobapplication (can_be_handled_by_siae -> last_hire_was_made_by_siae)
-        # 8. SELECT companies_siaeconvention (menu checks for financial annexes)
-        # 9. SELECT EXISTS users_users (menu checks for active admin)
-        # 10. RELEASE SAVEPOINT
-        # 11. SAVEPOINT
-        # 12. UPDATE django_session
-        # 13. RELEASE SAVEPOINT
-        with self.assertNumQueries(13):
+        with assertSnapshotQueries(self.snapshot(name="view queries")):
             response = self.client.get(self.url)
         assert response.status_code == 200
         assert response.context["suspension"] == self.suspension
