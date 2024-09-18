@@ -81,7 +81,7 @@ jobs:
     - name: 🚀 Deploy to Clever Cloud
       run: |
         $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
-        $CLEVER_CLI deploy --branch $BRANCH --force
+        scripts/clever-deploy --clever-cli "$CLEVER_CLI" --branch "$BRANCH" --app-alias "$REVIEW_APP_NAME"
 
     - name: 🍻 Add link to pull request
       uses: thollander/actions-comment-pull-request@v2.5.0
@@ -121,4 +121,4 @@ jobs:
         $CLEVER_CLI env set SKIP_FIXTURES true
 
     - name: 🚀 Deploy to Clever Cloud
-      run: $CLEVER_CLI deploy --branch $BRANCH --force
+      run: scripts/clever-deploy --clever-cli "$CLEVER_CLI" --branch "$BRANCH" --app-alias "$REVIEW_APP_NAME"
