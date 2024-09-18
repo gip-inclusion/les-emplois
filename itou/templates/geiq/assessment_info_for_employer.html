@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block title_content %}
-    <h1>Bilan d’exécution - {{ assessment.company.display_name }} - {{ assessment.campaign.year }}</h1>
+    <h1>Bilan d’exécution - {{ assessment.campaign.year }}</h1>
     {% if not assessment.submitted_at %}
         <span class="badge badge-sm rounded-pill text-nowrap bg-warning">En attente du bilan d’exécution</span>
     {% elif not assessment.reviewed_at %}

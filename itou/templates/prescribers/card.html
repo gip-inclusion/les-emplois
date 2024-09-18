@@ -4,12 +4,8 @@
 {% block title %}{{ prescriber_org.display_name }} {{ block.super }}{% endblock %}
 
 {% block title_content %}
-    <p>
-        <b>Prescripteur habilité</b>
-        -
-        <i>{{ prescriber_org.get_kind_display }}</i>
-    </p>
-    <h1>{{ prescriber_org.name }}</h1>
+    <h1>Prescripteur habilité</h1>
+    <p>{{ prescriber_org.get_kind_display }} - {{ prescriber_org.name }}</p>
 {% endblock %}
 
 {% block title_prevstep %}
