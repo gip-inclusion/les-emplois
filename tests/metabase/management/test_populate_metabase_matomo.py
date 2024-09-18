@@ -70,6 +70,9 @@ def test_matomo_populate_public(respx_mock, snapshot):
         200,
         content=f"{MATOMO_HEADERS}\n{MATOMO_ONLINE_CONTENT}".encode("utf-16"),
     )
+    with connection.cursor() as cursor:
+        cursor.execute("DROP TABLE IF EXISTS suivi_visiteurs_tb_publics_v1")
+
     management.call_command("populate_metabase_matomo", wet_run=True)
     with connection.cursor() as cursor:
         cursor.execute("SELECT * FROM suivi_visiteurs_tb_publics_v1")
