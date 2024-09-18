@@ -264,7 +264,7 @@ class EvaluatedJobApplicationAdmin(ItouModelAdmin):
         return super().get_queryset(request).prefetch_related("evaluated_administrative_criteria")
 
     def state(self, obj):
-        return obj.state
+        return obj.compute_state()
 
     def approval(self, obj):
         if obj.job_application.approval:
