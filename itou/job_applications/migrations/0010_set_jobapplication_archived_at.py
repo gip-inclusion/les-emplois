@@ -56,12 +56,5 @@ class Migration(migrations.Migration):
             migrations.RunPython.noop,
             elidable=True,
         ),
-        migrations.SeparateDatabaseAndState(
-            state_operations=[migrations.RemoveField(model_name="jobapplication", name="hidden_for_company")],
-            database_operations=[
-                migrations.RunSQL(
-                    "ALTER TABLE job_applications_jobapplication ALTER COLUMN hidden_for_company SET DEFAULT false"
-                )
-            ],
-        ),
+        migrations.RemoveField(model_name="jobapplication", name="hidden_for_company"),
     ]
