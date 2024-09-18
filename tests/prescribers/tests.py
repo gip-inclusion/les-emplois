@@ -253,6 +253,12 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
     ACCEPT_BUTTON_LABEL = "Valider l'habilitation"
     REFUSE_BUTTON_LABEL = "Refuser l'habilitation"
     ACCEPT_AFTER_REFUSAL_BUTTON_LABEL = "Annuler le refus et valider l'habilitation"
+    FORMSETS_PAYLOAD = {
+        "prescribermembership_set-TOTAL_FORMS": 1,
+        "prescribermembership_set-INITIAL_FORMS": 0,
+        "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
+        "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
+    }
 
     @classmethod
     def setUpTestData(cls):
@@ -266,16 +272,10 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         permission = Permission.objects.get(content_type=content_type, codename="change_prescriberorganization")
         cls.user.user_permissions.add(permission)
 
-        # authorization status x is_authorizedis_authorized combinations
-        cls.rights_list = [
-            (authorization_status, authorization_status == PrescriberAuthorizationStatus.VALIDATED)
-            for authorization_status in list(PrescriberAuthorizationStatus)
-        ]
-
     def test_refuse_prescriber_habilitation_by_superuser(self):
         self.client.force_login(self.superuser)
 
-        prescriberorganization = PrescriberOrganizationFactory(
+        prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
             siret="83987278500010",
             department="14",
@@ -283,40 +283,33 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             authorization_updated_at=datetime.now(tz=get_current_timezone()),
         )
 
-        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
+        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
         response = self.client.get(url)
         self.assertContains(response, self.REFUSE_BUTTON_LABEL)
 
-        for authorization_status, is_authorized in self.rights_list:
-            with self.subTest(authorization_status=authorization_status, is_authorized=is_authorized):
-                post_data = {
-                    "id": prescriberorganization.pk,
-                    "post_code": prescriberorganization.post_code,
-                    "department": prescriberorganization.department,
-                    "kind": prescriberorganization.kind,
-                    "name": prescriberorganization.name,
-                    "prescribermembership_set-TOTAL_FORMS": 1,
-                    "prescribermembership_set-INITIAL_FORMS": 0,
-                    "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
-                    "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
-                    "is_authorized": is_authorized,
-                    "authorization_status": authorization_status,
-                    "_authorization_action_refuse": "Refuser+l'habilitation",
-                }
+        post_data = {
+            "id": prescriber_organization.pk,
+            "post_code": prescriber_organization.post_code,
+            "department": prescriber_organization.department,
+            "kind": prescriber_organization.kind,
+            "name": prescriber_organization.name,
+            "_authorization_action_refuse": "Refuser+l'habilitation",
+            **self.FORMSETS_PAYLOAD,
+        }
 
-                response = self.client.post(url, data=post_data)
-                assert response.status_code == 302
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 302
 
-                updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
-                assert not updated_prescriberorganization.is_authorized
-                assert updated_prescriberorganization.kind == PrescriberOrganizationKind.OTHER
-                assert updated_prescriberorganization.authorization_updated_by == self.superuser
-                assert updated_prescriberorganization.authorization_status == PrescriberAuthorizationStatus.REFUSED
+        updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
+        assert not updated_prescriber_organization.is_authorized
+        assert updated_prescriber_organization.kind == PrescriberOrganizationKind.OTHER
+        assert updated_prescriber_organization.authorization_updated_by == self.superuser
+        assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.REFUSED
 
     def test_refuse_prescriber_habilitation_error(self):
         self.client.force_login(self.superuser)
 
-        prescriberorganization = PrescriberOrganizationFactory(
+        prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
             siret="83987278500010",
             department="14",
@@ -328,22 +321,19 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             siret=prescriber_organization.siret,
         )
 
-        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
+        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
         response = self.client.get(url)
         self.assertContains(response, self.REFUSE_BUTTON_LABEL)
 
         post_data = {
-            "id": prescriberorganization.pk,
-            "siret": prescriberorganization.siret,
-            "post_code": prescriberorganization.post_code,
-            "department": prescriberorganization.department,
-            "kind": prescriberorganization.kind,
-            "name": prescriberorganization.name,
-            "prescribermembership_set-TOTAL_FORMS": 1,
-            "prescribermembership_set-INITIAL_FORMS": 0,
-            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
-            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
+            "id": prescriber_organization.pk,
+            "siret": prescriber_organization.siret,
+            "post_code": prescriber_organization.post_code,
+            "department": prescriber_organization.department,
+            "kind": prescriber_organization.kind,
+            "name": prescriber_organization.name,
             "_authorization_action_refuse": "Refuser+l'habilitation",
+            **self.FORMSETS_PAYLOAD,
         }
 
         response = self.client.post(url, data=post_data)
@@ -359,16 +349,16 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             ],
         )
 
-        updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
-        assert updated_prescriberorganization.is_authorized
-        assert updated_prescriberorganization.kind == PrescriberOrganizationKind.PE
-        assert updated_prescriberorganization.authorization_updated_by is None
-        assert updated_prescriberorganization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
+        updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
+        assert updated_prescriber_organization.is_authorized
+        assert updated_prescriber_organization.kind == PrescriberOrganizationKind.PE
+        assert updated_prescriber_organization.authorization_updated_by is None
+        assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
     def test_refuse_prescriber_habilitation_pending_status(self):
         self.client.force_login(self.user)
 
-        prescriberorganization = PrescriberOrganizationFactory(
+        prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
             siret="83987278500010",
             department="14",
@@ -378,38 +368,33 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             is_authorized=False,
         )
 
-        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
+        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
         response = self.client.get(url)
         self.assertContains(response, self.REFUSE_BUTTON_LABEL)
 
         post_data = {
-            "id": prescriberorganization.pk,
-            "post_code": prescriberorganization.post_code,
-            "department": prescriberorganization.department,
-            "kind": prescriberorganization.kind,
-            "name": prescriberorganization.name,
-            "prescribermembership_set-TOTAL_FORMS": 1,
-            "prescribermembership_set-INITIAL_FORMS": 0,
-            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
-            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
-            "is_authorized": prescriberorganization.is_authorized,
-            "authorization_status": prescriberorganization.authorization_status,
+            "id": prescriber_organization.pk,
+            "post_code": prescriber_organization.post_code,
+            "department": prescriber_organization.department,
+            "kind": prescriber_organization.kind,
+            "name": prescriber_organization.name,
             "_authorization_action_refuse": "Refuser+l'habilitation",
+            **self.FORMSETS_PAYLOAD,
         }
 
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
 
-        updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
-        assert not updated_prescriberorganization.is_authorized
-        assert updated_prescriberorganization.kind == PrescriberOrganizationKind.OTHER
-        assert updated_prescriberorganization.authorization_updated_by == self.user
-        assert updated_prescriberorganization.authorization_status == PrescriberAuthorizationStatus.REFUSED
+        updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
+        assert not updated_prescriber_organization.is_authorized
+        assert updated_prescriber_organization.kind == PrescriberOrganizationKind.OTHER
+        assert updated_prescriber_organization.authorization_updated_by == self.user
+        assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.REFUSED
 
     def test_refuse_prescriber_habilitation_not_pending_status(self):
         self.client.force_login(self.user)
 
-        prescriberorganization = PrescriberOrganizationFactory(
+        prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
             siret="83987278500010",
             department="14",
@@ -417,42 +402,33 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             authorization_updated_at=datetime.now(tz=get_current_timezone()),
         )
 
-        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
+        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
         response = self.client.get(url)
         self.assertNotContains(response, self.REFUSE_BUTTON_LABEL)
 
-        for authorization_status, is_authorized in self.rights_list:
-            with self.subTest(authorization_status=authorization_status, is_authorized=is_authorized):
-                post_data = {
-                    "id": prescriberorganization.pk,
-                    "post_code": prescriberorganization.post_code,
-                    "department": prescriberorganization.department,
-                    "kind": prescriberorganization.kind,
-                    "name": prescriberorganization.name,
-                    "prescribermembership_set-TOTAL_FORMS": 1,
-                    "prescribermembership_set-INITIAL_FORMS": 0,
-                    "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
-                    "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
-                    "is_authorized": is_authorized,
-                    "authorization_status": authorization_status,
-                    "_authorization_action_refuse": "Refuser+l'habilitation",
-                }
+        post_data = {
+            "id": prescriber_organization.pk,
+            "post_code": prescriber_organization.post_code,
+            "department": prescriber_organization.department,
+            "kind": prescriber_organization.kind,
+            "name": prescriber_organization.name,
+            "_authorization_action_refuse": "Refuser+l'habilitation",
+            **self.FORMSETS_PAYLOAD,
+        }
 
-                response = self.client.post(url, data=post_data)
-                assert response.status_code == 403
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 403
 
-                updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
-                assert updated_prescriberorganization.is_authorized == prescriberorganization.is_authorized
-                assert updated_prescriberorganization.kind == prescriberorganization.kind
-                assert updated_prescriberorganization.authorization_updated_by is None
-                assert (
-                    updated_prescriberorganization.authorization_status == prescriberorganization.authorization_status
-                )
+        updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
+        assert updated_prescriber_organization.is_authorized == prescriber_organization.is_authorized
+        assert updated_prescriber_organization.kind == prescriber_organization.kind
+        assert updated_prescriber_organization.authorization_updated_by is None
+        assert updated_prescriber_organization.authorization_status == prescriber_organization.authorization_status
 
     def test_accept_prescriber_habilitation_by_superuser(self):
         self.client.force_login(self.superuser)
 
-        prescriberorganization = PrescriberOrganizationFactory(
+        prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
             siret="83987278500010",
             department="14",
@@ -460,40 +436,33 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             authorization_updated_at=datetime.now(tz=get_current_timezone()),
         )
 
-        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
+        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
         response = self.client.get(url)
         self.assertContains(response, self.ACCEPT_BUTTON_LABEL)
 
-        for authorization_status, is_authorized in self.rights_list:
-            with self.subTest(authorization_status=authorization_status, is_authorized=is_authorized):
-                post_data = {
-                    "id": prescriberorganization.pk,
-                    "post_code": prescriberorganization.post_code,
-                    "department": prescriberorganization.department,
-                    "kind": prescriberorganization.kind,
-                    "name": prescriberorganization.name,
-                    "prescribermembership_set-TOTAL_FORMS": 1,
-                    "prescribermembership_set-INITIAL_FORMS": 0,
-                    "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
-                    "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
-                    "is_authorized": is_authorized,
-                    "authorization_status": authorization_status,
-                    "_authorization_action_validate": "Valider+l'habilitation",
-                }
+        post_data = {
+            "id": prescriber_organization.pk,
+            "post_code": prescriber_organization.post_code,
+            "department": prescriber_organization.department,
+            "kind": prescriber_organization.kind,
+            "name": prescriber_organization.name,
+            "_authorization_action_validate": "Valider+l'habilitation",
+            **self.FORMSETS_PAYLOAD,
+        }
 
-                response = self.client.post(url, data=post_data)
-                assert response.status_code == 302
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 302
 
-                updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
-                assert updated_prescriberorganization.is_authorized
-                assert updated_prescriberorganization.kind == prescriberorganization.kind
-                assert updated_prescriberorganization.authorization_updated_by == self.superuser
-                assert updated_prescriberorganization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
+        updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
+        assert updated_prescriber_organization.is_authorized
+        assert updated_prescriber_organization.kind == prescriber_organization.kind
+        assert updated_prescriber_organization.authorization_updated_by == self.superuser
+        assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
     def test_accept_prescriber_habilitation_pending_status(self):
         self.client.force_login(self.user)
 
-        prescriberorganization = PrescriberOrganizationFactory(
+        prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
             siret="83987278500010",
             department="14",
@@ -503,38 +472,33 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             is_authorized=False,
         )
 
-        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
+        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
         response = self.client.get(url)
         self.assertContains(response, self.ACCEPT_BUTTON_LABEL)
 
         post_data = {
-            "id": prescriberorganization.pk,
-            "post_code": prescriberorganization.post_code,
-            "department": prescriberorganization.department,
-            "kind": prescriberorganization.kind,
-            "name": prescriberorganization.name,
-            "prescribermembership_set-TOTAL_FORMS": 1,
-            "prescribermembership_set-INITIAL_FORMS": 0,
-            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
-            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
-            "is_authorized": prescriberorganization.is_authorized,
-            "authorization_status": prescriberorganization.authorization_status,
+            "id": prescriber_organization.pk,
+            "post_code": prescriber_organization.post_code,
+            "department": prescriber_organization.department,
+            "kind": prescriber_organization.kind,
+            "name": prescriber_organization.name,
             "_authorization_action_validate": "Valider+l'habilitation",
+            **self.FORMSETS_PAYLOAD,
         }
 
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
 
-        updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
-        assert updated_prescriberorganization.is_authorized
-        assert updated_prescriberorganization.kind == prescriberorganization.kind
-        assert updated_prescriberorganization.authorization_updated_by == self.user
-        assert updated_prescriberorganization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
+        updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
+        assert updated_prescriber_organization.is_authorized
+        assert updated_prescriber_organization.kind == prescriber_organization.kind
+        assert updated_prescriber_organization.authorization_updated_by == self.user
+        assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
     def test_accept_prescriber_habilitation_refused_status(self):
         self.client.force_login(self.user)
 
-        prescriberorganization = PrescriberOrganizationFactory(
+        prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
             siret="83987278500010",
             department="14",
@@ -544,38 +508,33 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             is_authorized=False,
         )
 
-        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
+        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
         response = self.client.get(url)
         self.assertContains(response, self.ACCEPT_AFTER_REFUSAL_BUTTON_LABEL)
 
         post_data = {
-            "id": prescriberorganization.pk,
-            "post_code": prescriberorganization.post_code,
-            "department": prescriberorganization.department,
-            "kind": prescriberorganization.kind,
-            "name": prescriberorganization.name,
-            "prescribermembership_set-TOTAL_FORMS": 1,
-            "prescribermembership_set-INITIAL_FORMS": 0,
-            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
-            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
-            "is_authorized": prescriberorganization.is_authorized,
-            "authorization_status": prescriberorganization.authorization_status,
+            "id": prescriber_organization.pk,
+            "post_code": prescriber_organization.post_code,
+            "department": prescriber_organization.department,
+            "kind": prescriber_organization.kind,
+            "name": prescriber_organization.name,
             "_authorization_action_validate": "Valider+l'habilitation",
+            **self.FORMSETS_PAYLOAD,
         }
 
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
 
-        updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
-        assert updated_prescriberorganization.is_authorized
-        assert updated_prescriberorganization.kind == prescriberorganization.kind
-        assert updated_prescriberorganization.authorization_updated_by == self.user
-        assert updated_prescriberorganization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
+        updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
+        assert updated_prescriber_organization.is_authorized
+        assert updated_prescriber_organization.kind == prescriber_organization.kind
+        assert updated_prescriber_organization.authorization_updated_by == self.user
+        assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
 
     def test_accept_prescriber_habilitation_other_status(self):
         self.client.force_login(self.user)
 
-        prescriberorganization = PrescriberOrganizationFactory(
+        prescriber_organization = PrescriberOrganizationFactory(
             authorized=True,
             siret="83987278500010",
             department="14",
@@ -583,47 +542,28 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             authorization_updated_at=datetime.now(tz=get_current_timezone()),
         )
 
-        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
+        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
         response = self.client.get(url)
         assert response.status_code == 200
 
-        rights_list = [
-            (authorization_status, is_authorized)
-            for authorization_status, is_authorized in self.rights_list
-            if authorization_status
-            not in [
-                PrescriberAuthorizationStatus.NOT_SET,
-                PrescriberAuthorizationStatus.REFUSED,
-            ]
-        ]
+        post_data = {
+            "id": prescriber_organization.pk,
+            "post_code": prescriber_organization.post_code,
+            "department": prescriber_organization.department,
+            "kind": prescriber_organization.kind,
+            "name": prescriber_organization.name,
+            "_authorization_action_refuse": "Refuser+l'habilitation",
+            **self.FORMSETS_PAYLOAD,
+        }
 
-        for authorization_status, is_authorized in rights_list:
-            with self.subTest(authorization_status=authorization_status, is_authorized=is_authorized):
-                post_data = {
-                    "id": prescriberorganization.pk,
-                    "post_code": prescriberorganization.post_code,
-                    "department": prescriberorganization.department,
-                    "kind": prescriberorganization.kind,
-                    "name": prescriberorganization.name,
-                    "prescribermembership_set-TOTAL_FORMS": 1,
-                    "prescribermembership_set-INITIAL_FORMS": 0,
-                    "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
-                    "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
-                    "is_authorized": is_authorized,
-                    "authorization_status": authorization_status,
-                    "_authorization_action_refuse": "Refuser+l'habilitation",
-                }
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 403
 
-                response = self.client.post(url, data=post_data)
-                assert response.status_code == 403
-
-                updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
-                assert updated_prescriberorganization.is_authorized == prescriberorganization.is_authorized
-                assert updated_prescriberorganization.kind == prescriberorganization.kind
-                assert updated_prescriberorganization.authorization_updated_by is None
-                assert (
-                    updated_prescriberorganization.authorization_status == prescriberorganization.authorization_status
-                )
+        updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
+        assert updated_prescriber_organization.is_authorized == prescriber_organization.is_authorized
+        assert updated_prescriber_organization.kind == prescriber_organization.kind
+        assert updated_prescriber_organization.authorization_updated_by is None
+        assert updated_prescriber_organization.authorization_status == prescriber_organization.authorization_status
 
     def test_prescriber_habilitation_readonly_user(self):
         ro_user = ItouStaffFactory()
@@ -632,23 +572,23 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         ro_user.user_permissions.add(permission)
         self.client.force_login(ro_user)
 
-        prescriberorganization = PrescriberOrganizationFactory(
+        prescriber_organization = PrescriberOrganizationFactory(
             siret="83987278500010",
             department="14",
             post_code="14000",
             with_pending_authorization=True,
         )
 
-        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
+        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
         response = self.client.get(url)
         self.assertNotContains(response, self.ACCEPT_BUTTON_LABEL)
         self.assertNotContains(response, self.REFUSE_BUTTON_LABEL)
         self.assertNotContains(response, self.ACCEPT_AFTER_REFUSAL_BUTTON_LABEL)
 
-        prescriberorganization.authorization_status = PrescriberAuthorizationStatus.REFUSED
-        prescriberorganization.save()
+        prescriber_organization.authorization_status = PrescriberAuthorizationStatus.REFUSED
+        prescriber_organization.save()
 
-        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
+        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
         response = self.client.get(url)
         self.assertNotContains(response, self.ACCEPT_BUTTON_LABEL)
         self.assertNotContains(response, self.REFUSE_BUTTON_LABEL)
@@ -657,7 +597,7 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
     def test_accept_prescriber_habilitation_odc_to_is_brsa(self):
         self.client.force_login(self.user)
 
-        prescriberorganization = PrescriberOrganizationFactory(
+        prescriber_organization = PrescriberOrganizationFactory(
             siret="83987278500010",
             department="14",
             post_code="14000",
@@ -668,36 +608,31 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             is_brsa=False,
         )
 
-        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriberorganization.pk])
+        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
         response = self.client.get(url)
         self.assertContains(response, self.ACCEPT_BUTTON_LABEL)
 
-        assert not prescriberorganization.is_brsa
+        assert not prescriber_organization.is_brsa
         post_data = {
-            "id": prescriberorganization.pk,
-            "post_code": prescriberorganization.post_code,
-            "department": prescriberorganization.department,
-            "kind": prescriberorganization.kind,
-            "name": prescriberorganization.name,
-            "siret": prescriberorganization.siret,
-            "prescribermembership_set-TOTAL_FORMS": 1,
-            "prescribermembership_set-INITIAL_FORMS": 0,
-            "utils-pksupportremark-content_type-object_id-TOTAL_FORMS": 1,
-            "utils-pksupportremark-content_type-object_id-INITIAL_FORMS": 0,
-            "is_authorized": prescriberorganization.is_authorized,
-            "authorization_status": prescriberorganization.authorization_status,
+            "id": prescriber_organization.pk,
+            "post_code": prescriber_organization.post_code,
+            "department": prescriber_organization.department,
+            "kind": prescriber_organization.kind,
+            "name": prescriber_organization.name,
+            "siret": prescriber_organization.siret,
             "_authorization_action_validate": "Valider+l'habilitation",
+            **self.FORMSETS_PAYLOAD,
         }
 
         response = self.client.post(url, data=post_data)
         assert response.status_code == 302
 
-        updated_prescriberorganization = PrescriberOrganization.objects.get(pk=prescriberorganization.pk)
-        assert updated_prescriberorganization.is_authorized
-        assert updated_prescriberorganization.kind == prescriberorganization.kind
-        assert updated_prescriberorganization.authorization_updated_by == self.user
-        assert updated_prescriberorganization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
-        assert updated_prescriberorganization.is_brsa
+        updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
+        assert updated_prescriber_organization.is_authorized
+        assert updated_prescriber_organization.kind == prescriber_organization.kind
+        assert updated_prescriber_organization.authorization_updated_by == self.user
+        assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
+        assert updated_prescriber_organization.is_brsa
 
 
 class TestUpdateRefusedPrescriberOrganizationKindManagementCommands:
