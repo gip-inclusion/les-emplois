@@ -6,7 +6,7 @@ from django.core.files.storage import default_storage
 from django.urls import reverse
 from django.utils import dateformat, html, timezone
 from freezegun import freeze_time
-from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertNumQueries, assertRedirects
+from pytest_django.asserts import assertContains, assertMessages, assertNotContains, assertRedirects
 
 from itou.eligibility.enums import AdministrativeCriteriaLevel
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
@@ -24,7 +24,7 @@ from tests.siae_evaluations.factories import (
     EvaluationCampaignFactory,
 )
 from tests.users.factories import JobSeekerFactory
-from tests.utils.test import BASE_NUM_QUERIES
+from tests.utils.test import assertSnapshotQueries
 
 
 # fixme vincentporte : convert this method into factory
@@ -81,33 +81,13 @@ class TestSiaeJobApplicationListView:
             "siae_evaluations_views:siae_job_applications_list", kwargs={"evaluated_siae_pk": evaluated_siae.pk}
         )
 
-    def test_access(self, client):
+    def test_access(self, snapshot, client):
         # siae with active campaign
         evaluated_siae = EvaluatedSiaeFactory(evaluation_campaign__evaluations_asked_at=timezone.now(), siae=self.siae)
         evaluated_job_application = EvaluatedJobApplicationFactory(evaluated_siae=evaluated_siae)
 
         client.force_login(self.user)
-        # 1.  SELECT django_session
-        # 2.  SELECT users_user
-        # 3.  SELECT companies_companymembership
-        # 4.  SELECT companies_company
-        # END of middleware
-        # 5.  SAVEPOINT
-        # 6.  SELECT siae_evaluations_evaluatedsiae
-        # 7.  SELECT siae_evaluations_evaluatedjobapplication
-        # 8.  SELECT siae_evaluations_evaluatedadministrativecriteria
-        # 9.  SELECT companies_siaeconvention (menu checks for financial annexes)
-        # 10. SELECT users_user (menu checks for active admin)
-        # NOTE(vperron): the prefetch is necessary to check the SUBMITTABLE state of the evaluated siae
-        # We do those requests "two times" but at least it's now accurate information, and we get
-        # the EvaluatedJobApplication list another way so that we can select_related on them.
-        # 11. SELECT siae_evaluations_evaluatedjobapplication
-        # 12. SELECT siae_evaluations_evaluatedadministrativecriteria (prefetch)
-        # 13. RELEASE SAVEPOINT
-        # 14. SAVEPOINT
-        # 15. UPDATE django_session
-        # 16. RELEASE SAVEPOINT
-        with assertNumQueries(16):
+        with assertSnapshotQueries(snapshot(name="view queries")):
             response = client.get(self.url(evaluated_siae))
 
         assert evaluated_job_application == response.context["evaluated_job_applications"][0]
@@ -935,32 +915,14 @@ class TestSiaeSubmitProofsView:
             kwargs={"evaluated_siae_pk": evaluated_siae.pk},
         )
 
-    def test_is_submittable(self, client):
+    def test_is_submittable(self, snapshot, client):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.company, self.user)
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application
         )
         client.force_login(self.user)
 
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # fetch django session
-            + 1  # fetch user
-            + 1  # fetch siae membership
-            + 1  # fetch siae infos
-            + 1  # view starts, savepoint (ATOMIC_REQUESTS)
-            + 3  # fetch evaluatedsiae, evaluatedjobapplication and evaluatedadministrativecriteria
-            + 1  # fetch evaluation campaign
-            + 1  # update evaluatedadministrativecriteria
-            + 1  # update evaluatedsiae submission_freezed_at
-            + 3  # fetch institution, siae and siae members for email notification
-            + 1  # insert emails to ddets into emails table
-            + 1  # email: _async_send_message task savepoint
-            + 1  # fetch email details (and lock it)
-            + 1  # update email status
-            + 1  # email: release savepoint
-            + 2  # update session, release savepoint
-        ):
+        with assertSnapshotQueries(snapshot(name="view queries")):
             response = client.post(self.url(evaluated_job_application.evaluated_siae))
 
         assert response.status_code == 302
@@ -1033,7 +995,7 @@ class TestSiaeSubmitProofsView:
         assert response.status_code == 302
         assert response.url == "/dashboard/"
 
-    def test_is_not_submittable_with_submission_freezed(self, client):
+    def test_is_not_submittable_with_submission_freezed(self, snapshot, client):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.company, self.user)
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteriaFactory(
             evaluated_job_application=evaluated_job_application
@@ -1043,15 +1005,7 @@ class TestSiaeSubmitProofsView:
 
         client.force_login(self.user)
 
-        with assertNumQueries(
-            BASE_NUM_QUERIES
-            + 1  # fetch django session
-            + 1  # fetch user
-            + 1  # fetch siae membership
-            + 1  # fetch siae infos
-            + 1  # fetch evaluatedsiae and see that submission is freezed, abort
-            + 3  # savepoint, update session, release savepoint
-        ):
+        with assertSnapshotQueries(snapshot(name="view queries")):
             response = client.post(self.url(evaluated_job_application.evaluated_siae))
 
         assertRedirects(
