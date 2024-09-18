@@ -141,7 +141,7 @@
 # ---
 # name: ListEmployeeRecordsTest.test_new_employee_records_sorted[employee records]
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -263,9 +263,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -398,28 +409,6 @@
           INNER JOIN "job_applications_jobapplication" ON ("employee_record_employeerecord"."job_application_id" = "job_applications_jobapplication"."id")
           WHERE "job_applications_jobapplication"."to_company_id" = %s
           GROUP BY "employee_record_employeerecord"."status"
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'EmployeeRecordQuerySet.for_asp_company[employee_record/models.py]',
-          'JobApplicationQuerySet.eligible_as_employee_record[job_applications/models.py]',
-          'list_employee_records[www/employee_record_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
         ''',
       }),
       dict({

@@ -59,7 +59,9 @@ class ItouCurrentOrganizationMiddleware:
                     company.pk: company
                     for company in user.company_set.filter(
                         pk__in=[membership.company_id for membership in active_memberships]
-                    ).active_or_in_grace_period()
+                    )
+                    .active_or_in_grace_period()
+                    .select_related("convention")
                 }
                 really_active_memberships = []
                 for membership in active_memberships:

@@ -31,7 +31,7 @@
 # ---
 # name: DashboardViewTest.test_dashboard_siae_evaluation_campaign_notifications[view queries]
   dict({
-    'num_queries': 21,
+    'num_queries': 20,
     'queries': list([
       dict({
         'origin': list([
@@ -153,9 +153,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -197,29 +208,6 @@
           WHERE ("job_applications_jobapplication"."to_company_id" = %s
                  AND "job_applications_jobapplication"."archived_at" IS NULL)
           ORDER BY "job_applications_jobapplication"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Company.is_active[companies/models.py]',
-          'User.can_create_siae_antenna[users/models.py]',
-          '_employer_dashboard_context[www/dashboard/views.py]',
-          'dashboard[www/dashboard/views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
         ''',
       }),
       dict({
