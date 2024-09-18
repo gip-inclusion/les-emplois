@@ -4,8 +4,6 @@ from django.urls import reverse
 
 from itou.communications import registry as notifications_registry
 from itou.communications.models import DisabledNotification, NotificationSettings
-from itou.companies.models import Company
-from itou.prescribers.models import PrescriberOrganization
 from tests.institutions.factories import LaborInspectorFactory
 from tests.users.factories import (
     EmployerFactory,
@@ -35,8 +33,6 @@ class EditUserNotificationsTest(TestCase):
         employer = EmployerFactory(with_company=True)
         self.client.force_login(employer)
         url = reverse("dashboard:edit_user_notifications")
-        # prewarm ContentType cache if needed to avoid extra query
-        ContentType.objects.get_for_model(Company)
         # 1.  SELECT django_session
         # 2.  SELECT users_user
         # 3.  SELECT companies_companymembership
@@ -58,8 +54,6 @@ class EditUserNotificationsTest(TestCase):
         prescriber = PrescriberFactory(membership=True)
         self.client.force_login(prescriber)
         url = reverse("dashboard:edit_user_notifications")
-        # prewarm ContentType cache if needed to avoid extra query
-        ContentType.objects.get_for_model(PrescriberOrganization)
         with self.assertNumQueries(
             1  # Load django session
             + 1  # Load current user
@@ -76,8 +70,6 @@ class EditUserNotificationsTest(TestCase):
         solo_adviser = PrescriberFactory(membership=False)
         self.client.force_login(solo_adviser)
         url = reverse("dashboard:edit_user_notifications")
-        # prewarm ContentType cache if needed to avoid extra query
-        ContentType.objects.get_for_model(PrescriberOrganization)
         with self.assertNumQueries(
             1  # Load django session
             + 1  # Load current user
@@ -116,9 +108,6 @@ class EditUserNotificationsTest(TestCase):
             for notification in notifications_registry
             if notification(employer, company).is_manageable_by_user()
         ]
-
-        # prewarm ContentType cache if needed to avoid extra query
-        ContentType.objects.get_for_model(Company)
 
         # No notification settings defined by default
         assert not NotificationSettings.objects.exists()
@@ -198,9 +187,6 @@ class EditUserNotificationsTest(TestCase):
             for notification in notifications_registry
             if notification(prescriber, organization).is_manageable_by_user()
         ]
-
-        # prewarm ContentType cache if needed to avoid extra query
-        ContentType.objects.get_for_model(PrescriberOrganization)
 
         # No notification settings defined by default
         assert not NotificationSettings.objects.exists()

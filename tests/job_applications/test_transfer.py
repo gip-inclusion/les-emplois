@@ -1,6 +1,5 @@
 import pytest
 import xworkflows
-from django.contrib.contenttypes.models import ContentType
 from django.core import mail
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -172,8 +171,6 @@ def test_model_fields():
     assert job_application.transferred_from is None
     assert job_application.transferred_at is None
 
-    # prewarm ContentType cache if needed to avoid extra query
-    ContentType.objects.get_for_model(target_company)
     with assertNumQueries(
         2  # Check user is in both origin and dest siae
         + 1  # Update job application to dereference eligibility diagnosis
