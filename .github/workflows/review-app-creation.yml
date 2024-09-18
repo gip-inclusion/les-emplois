@@ -79,6 +79,7 @@ jobs:
         $CLEVER_CLI env rm CC_PYTHON_VERSION
 
     - name: 🚀 Deploy to Clever Cloud
+      timeout-minutes: 15
       run: |
         $CLEVER_CLI link $REVIEW_APP_NAME --org itou_review_apps
         scripts/clever-deploy --clever-cli "$CLEVER_CLI" --branch "$BRANCH" --app-alias "$REVIEW_APP_NAME"
@@ -121,4 +122,5 @@ jobs:
         $CLEVER_CLI env set SKIP_FIXTURES true
 
     - name: 🚀 Deploy to Clever Cloud
+      timeout-minutes: 15
       run: scripts/clever-deploy --clever-cli "$CLEVER_CLI" --branch "$BRANCH" --app-alias "$REVIEW_APP_NAME"
