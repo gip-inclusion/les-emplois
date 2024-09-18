@@ -185,13 +185,12 @@ class ProcessListSiaeTest(TestCase):
         # 38. jobapp8: select last valid diagnosis made by prescriber or SIAE
         # 39. jobapp9: no approval (prefetched ⇒ no query), check PE approval (⇒ no PE approval)
         # 40. jobapp9: select last valid diagnosis made by prescriber or SIAE
-        # 41. SELECT companies_siaeconvention (menu checks for financial annexes)
-        # 42. SELECT EXISTS users_user (menu checks for active admin)
-        # 43. RELEASE SAVEPOINT
-        # 44. SAVEPOINT
-        # 45. UPDATE django_session
-        # 46. RELEASE SAVEPOINT
-        with assertNumQueries(46):
+        # 41. SELECT EXISTS users_user (menu checks for active admin)
+        # 42. RELEASE SAVEPOINT
+        # 43. SAVEPOINT
+        # 44. UPDATE django_session
+        # 45. RELEASE SAVEPOINT
+        with assertNumQueries(45):
             response = self.client.get(reverse("apply:list_for_siae"))
 
         total_applications = len(response.context["job_applications_page"].object_list)

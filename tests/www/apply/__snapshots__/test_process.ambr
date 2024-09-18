@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: ProcessAcceptViewsTest.test_select_job_description_for_job_application[accept view SQL queries]
   dict({
-    'num_queries': 16,
+    'num_queries': 15,
     'queries': list([
       dict({
         'origin': list([
@@ -123,9 +123,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -850,34 +861,6 @@
       }),
       dict({
         'origin': list([
-          'Company.is_active[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_accept.html]',
-          '_accept[www/apply/views/common.py]',
-          'accept[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -917,7 +900,7 @@
 # ---
 # name: ProcessViewsTest.test_details_for_company[job application detail for company]
   dict({
-    'num_queries': 18,
+    'num_queries': 17,
     'queries': list([
       dict({
         'origin': list([
@@ -1039,9 +1022,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -1659,33 +1653,6 @@
           FROM "approvals_approval"
           WHERE "approvals_approval"."user_id" = %s
           ORDER BY "approvals_approval"."created_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Company.is_active[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/process_base.html]',
-          'ExtendsNode[apply/process_details_company.html]',
-          'details_for_company[www/apply/views/process_views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
         ''',
       }),
       dict({

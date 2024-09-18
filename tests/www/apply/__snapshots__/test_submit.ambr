@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: HireConfirmationTestCase.test_as_company[view queries]
   dict({
-    'num_queries': 20,
+    'num_queries': 19,
     'queries': list([
       dict({
         'origin': list([
@@ -123,9 +123,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -799,34 +810,6 @@
       }),
       dict({
         'origin': list([
-          'Company.is_active[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit_base.html]',
-          'ExtendsNode[apply/submit/hire_confirmation.html]',
-          '_accept[www/apply/views/common.py]',
-          'hire_confirmation[www/apply/views/submit_views.py]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -926,7 +909,7 @@
 # ---
 # name: UpdateJobSeekerForHireTestCase.test_as_company_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -1048,9 +1031,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -1234,32 +1228,6 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Company.is_active[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -1319,7 +1287,7 @@
 # ---
 # name: UpdateJobSeekerForHireTestCase.test_as_company_with_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 11,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -1441,9 +1409,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -1599,32 +1578,6 @@
       }),
       dict({
         'origin': list([
-          'Company.is_active[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_2.html]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -1656,7 +1609,7 @@
 # ---
 # name: UpdateJobSeekerForHireTestCase.test_as_company_with_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 11,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -1778,9 +1731,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -1967,32 +1931,6 @@
       }),
       dict({
         'origin': list([
-          'Company.is_active[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_3.html]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -2024,7 +1962,7 @@
 # ---
 # name: UpdateJobSeekerForHireTestCase.test_with_job_seeker_without_nir[queries - step 1]
   dict({
-    'num_queries': 14,
+    'num_queries': 13,
     'queries': list([
       dict({
         'origin': list([
@@ -2146,9 +2084,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -2335,32 +2284,6 @@
       }),
       dict({
         'origin': list([
-          'Company.is_active[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -2417,7 +2340,7 @@
 # ---
 # name: UpdateJobSeekerForHireTestCase.test_with_job_seeker_without_nir[queries - step 2]
   dict({
-    'num_queries': 11,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -2539,9 +2462,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -2697,32 +2631,6 @@
       }),
       dict({
         'origin': list([
-          'Company.is_active[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_2.html]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -2754,7 +2662,7 @@
 # ---
 # name: UpdateJobSeekerForHireTestCase.test_with_job_seeker_without_nir[queries - step 3]
   dict({
-    'num_queries': 11,
+    'num_queries': 10,
     'queries': list([
       dict({
         'origin': list([
@@ -2876,9 +2784,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -3062,32 +2981,6 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Company.is_active[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_3.html]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -3938,7 +3831,7 @@
 # ---
 # name: UpdateJobSeekerTestCase.test_as_company_with_proxied_job_seeker[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -4060,9 +3953,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -4229,32 +4133,6 @@
       }),
       dict({
         'origin': list([
-          'Company.is_active[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -4311,7 +4189,7 @@
 # ---
 # name: UpdateJobSeekerTestCase.test_as_company_with_proxied_job_seeker[queries - step 2]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -4433,9 +4311,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -4571,32 +4460,6 @@
       }),
       dict({
         'origin': list([
-          'Company.is_active[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_2.html]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -4628,7 +4491,7 @@
 # ---
 # name: UpdateJobSeekerTestCase.test_as_company_with_proxied_job_seeker[queries - step 3]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -4750,9 +4613,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -4916,32 +4790,6 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Company.is_active[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_3.html]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
@@ -5792,7 +5640,7 @@
 # ---
 # name: UpdateJobSeekerTestCase.test_with_job_seeker_without_nir[queries - step 1]
   dict({
-    'num_queries': 13,
+    'num_queries': 12,
     'queries': list([
       dict({
         'origin': list([
@@ -5914,9 +5762,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -6083,32 +5942,6 @@
       }),
       dict({
         'origin': list([
-          'Company.is_active[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_1.html]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -6165,7 +5998,7 @@
 # ---
 # name: UpdateJobSeekerTestCase.test_with_job_seeker_without_nir[queries - step 2]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -6287,9 +6120,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -6425,32 +6269,6 @@
       }),
       dict({
         'origin': list([
-          'Company.is_active[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_2.html]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
-        ''',
-      }),
-      dict({
-        'origin': list([
           'Company.has_admin[common_apps/organizations/models.py]',
           'Company.convention_can_be_accessed_by[companies/models.py]',
           'nav[utils/templatetags/nav.py]',
@@ -6482,7 +6300,7 @@
 # ---
 # name: UpdateJobSeekerTestCase.test_with_job_seeker_without_nir[queries - step 3]
   dict({
-    'num_queries': 10,
+    'num_queries': 9,
     'queries': list([
       dict({
         'origin': list([
@@ -6604,9 +6422,20 @@
              FROM "companies_siaeconvention" U0
              WHERE (U0."deactivated_at" >= %s
                     AND U0."id" = ("companies_company"."convention_id"))
-             LIMIT 1) AS "has_convention_in_grace_period"
+             LIMIT 1) AS "has_convention_in_grace_period",
+                 "companies_siaeconvention"."id",
+                 "companies_siaeconvention"."kind",
+                 "companies_siaeconvention"."siret_signature",
+                 "companies_siaeconvention"."is_active",
+                 "companies_siaeconvention"."deactivated_at",
+                 "companies_siaeconvention"."reactivated_by_id",
+                 "companies_siaeconvention"."reactivated_at",
+                 "companies_siaeconvention"."asp_id",
+                 "companies_siaeconvention"."created_at",
+                 "companies_siaeconvention"."updated_at"
           FROM "companies_company"
           INNER JOIN "companies_companymembership" ON ("companies_company"."id" = "companies_companymembership"."company_id")
+          LEFT OUTER JOIN "companies_siaeconvention" ON ("companies_company"."convention_id" = "companies_siaeconvention"."id")
           WHERE (NOT ("companies_company"."siret" = %s)
                  AND "companies_companymembership"."user_id" = %s
                  AND "companies_company"."id" IN (%s)
@@ -6770,32 +6599,6 @@
           'Atomic.__exit__[<site-packages>/django/db/transaction.py]',
         ]),
         'sql': 'RELEASE SAVEPOINT "<snapshot>"',
-      }),
-      dict({
-        'origin': list([
-          'Company.is_active[companies/models.py]',
-          'nav[utils/templatetags/nav.py]',
-          'InclusionNode[layout/_header_authenticated.html]',
-          'IncludeNode[layout/base.html]',
-          'IfNode[layout/base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_base.html]',
-          'ExtendsNode[apply/submit/create_or_update_job_seeker/step_3.html]',
-        ]),
-        'sql': '''
-          SELECT "companies_siaeconvention"."id",
-                 "companies_siaeconvention"."kind",
-                 "companies_siaeconvention"."siret_signature",
-                 "companies_siaeconvention"."is_active",
-                 "companies_siaeconvention"."deactivated_at",
-                 "companies_siaeconvention"."reactivated_by_id",
-                 "companies_siaeconvention"."reactivated_at",
-                 "companies_siaeconvention"."asp_id",
-                 "companies_siaeconvention"."created_at",
-                 "companies_siaeconvention"."updated_at"
-          FROM "companies_siaeconvention"
-          WHERE "companies_siaeconvention"."id" = %s
-          LIMIT 21
-        ''',
       }),
       dict({
         'origin': list([
