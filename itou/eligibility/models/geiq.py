@@ -113,11 +113,9 @@ class GEIQEligibilityDiagnosis(AbstractEligibilityDiagnosisModel):
 
         # The following would have been nice in a unique constraint,
         # but infortunately functions.Now() is not immutable
-        if self.job_seeker and (
-            GEIQEligibilityDiagnosis.objects.valid()
-            .filter(job_seeker=self.job_seeker)
-            .filter(models.Q(author_geiq=self.author_geiq) | models.Q(author_prescriber_organization__isnull=False))
-            .exists()
+        if (
+            self.job_seeker
+            and GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(self.job_seeker, self.author_geiq).exists()
         ):
             raise ValidationError(f"Il existe déjà un diagnostic GEIQ valide pour cet utilisateur : {self.job_seeker}")
 
