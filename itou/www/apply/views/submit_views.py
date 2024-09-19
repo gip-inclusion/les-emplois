@@ -167,7 +167,7 @@ class ApplicationBaseView(ApplyStepBaseView):
         _check_job_seeker_approval(request, self.job_seeker, self.company)
         if self.company.kind == CompanyKind.GEIQ:
             self.geiq_eligibility_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
-                self.job_seeker, self.company
+                self.job_seeker, self.company if self.request.user.is_employer else None
             ).first()
         elif self.company.is_subject_to_eligibility_rules:
             self.eligibility_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(
