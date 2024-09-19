@@ -2,6 +2,8 @@ import time
 import uuid
 from collections import Counter
 
+from allauth.account.forms import default_token_generator
+from allauth.account.utils import user_pk_to_url_str
 from citext import CIEmailField
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, UserManager
@@ -12,6 +14,7 @@ from django.core.validators import MinLengthValidator
 from django.db import models
 from django.db.models import Count, Exists, OuterRef, Q
 from django.db.models.functions import Upper
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.crypto import salted_hmac
 from django.utils.functional import cached_property
@@ -34,9 +37,11 @@ from itou.companies.enums import CompanyKind
 from itou.utils.db import or_queries
 from itou.utils.models import UniqueConstraintWithErrorCode
 from itou.utils.templatetags.str_filters import mask_unless
+from itou.utils.urls import get_absolute_url
 from itou.utils.validators import validate_birth_location, validate_birthdate, validate_nir, validate_pole_emploi_id
 
 from .enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
+from .notifications import JobSeekerCreatedByProxyNotification
 
 
 class ApprovalAlreadyExistsError(Exception):
@@ -682,7 +687,7 @@ class User(AbstractUser, AddressMixin):
         return has_performed_update
 
     @classmethod
-    def create_job_seeker_by_proxy(cls, proxy_user, **fields):
+    def create_job_seeker_by_proxy(cls, proxy_user, acting_organization=None, **fields):
         """
         Used when a "prescriber" user creates another user of kind "job seeker".
 
@@ -692,11 +697,25 @@ class User(AbstractUser, AddressMixin):
                 "first_name": "Foo",
                 "last_name": "Foo",
             }
+
+        :param acting_organization: the organization on behalf of which the proxy_user is acting
         """
         username = cls.generate_unique_username()
         fields["kind"] = UserKind.JOB_SEEKER
         fields["created_by"] = proxy_user
         user = cls.objects.create_user(username, email=fields.pop("email"), **fields)
+        JobSeekerCreatedByProxyNotification(
+            user,
+            job_seeker=user,
+            creator=proxy_user,
+            creator_org=acting_organization,
+            account_activation_link=get_absolute_url(
+                reverse(
+                    "account_reset_password_from_key",
+                    kwargs={"uidb36": user_pk_to_url_str(user), "key": default_token_generator.make_token(user)},
+                )
+            ),
+        ).send()
         return user
 
     @classmethod

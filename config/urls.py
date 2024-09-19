@@ -39,6 +39,12 @@ urlpatterns = [
     # Avoid user enumeration via password reset page.
     re_path(r"^accounts/password/reset/$", signup_views.ItouPasswordResetView.as_view()),
     # --------------------------------------------------------------------------------------
+    # Override allauth `account_reset_password_from_key` URL.
+    re_path(
+        r"^accounts/password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
+        signup_views.ItouPasswordResetFromKeyView.as_view(),
+    ),
+    # --------------------------------------------------------------------------------------
     # Other allauth URLs.
     path("accounts/", include("allauth.urls")),
     # --------------------------------------------------------------------------------------

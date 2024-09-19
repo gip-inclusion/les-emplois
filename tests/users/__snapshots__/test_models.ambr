@@ -1,0 +1,18 @@
+# serializer version: 1
+# name: TestModel.test_create_job_seeker_by_proxy[email jobseeker created by proxy]
+  '''
+  Bonjour Monsieur John DOE,
+  
+  Votre compte candidat vient d’être créé sur les Emplois de l’inclusion par Pierre DUPONT de Pres. Org..
+  
+  Pour finaliser votre inscription, merci de cliquer sur le lien suivant : [RESET PASSWORD LINK REMOVED]. Ce lien expirera dans 14 jours.
+  Dès votre arrivée sur le site des Emplois de l’inclusion, vous serez invité à définir un mot de passe pour votre compte candidat.
+  
+  Cet e-mail a été généré et envoyé automatiquement, merci de ne pas y répondre.
+  
+  ---
+  [DEV] Cet email est envoyé depuis un environnement de démonstration, merci de ne pas en tenir compte [DEV]
+  Les emplois de l'inclusion
+  http://localhost:8000
+  '''
+# ---
