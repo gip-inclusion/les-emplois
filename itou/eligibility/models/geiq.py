@@ -37,9 +37,12 @@ from .common import (
 
 class GEIQEligibilityDiagnosisQuerySet(CommonEligibilityDiagnosisQuerySet):
     def authored_by_prescriber_or_geiq(self, geiq):
-        return self.filter(
-            models.Q(author_geiq=geiq) | models.Q(author_prescriber_organization__isnull=False)
-        ).order_by("-created_at")
+        return (
+            self.filter(models.Q(author_geiq=geiq) | models.Q(author_prescriber_organization__isnull=False))
+            # Ordering by created_at is sufficient, because GEIQ can’t create a GEIQEligibilityDiagnosis
+            # when there exists a valid GEIQEligibilityDiagnosis from an authorized prescriber.
+            .order_by("-created_at")
+        )
 
     def diagnoses_for(self, job_seeker, for_geiq=None):
         # Get *all* GEIQ diagnoses for given job seeker (even expired)
