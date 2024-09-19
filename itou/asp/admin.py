@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from itou.asp import models
-from itou.utils.admin import ItouModelAdmin, PkSupportRemarkInline
+from itou.utils.admin import ItouModelAdmin, ReadonlyMixin
 
 
 class PeriodFilter(admin.SimpleListFilter):
@@ -38,37 +38,20 @@ class CountryFilter(admin.SimpleListFilter):
         return queryset
 
 
-class ASPModelAdmin(ItouModelAdmin):
+class ASPModelAdmin(ReadonlyMixin, ItouModelAdmin):
     list_display = ("pk", "code", "name", "start_date", "end_date")
     list_filter = (PeriodFilter,)
-    readonly_fields = ("pk",)
     ordering = ("name",)
 
-    def has_add_permission(self, request):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
-
-@admin.register(models.Commune)
-class CommuneAdmin(ASPModelAdmin):
-    list_display = (
-        "pk",
-        "code",
-        "name",
-        "start_date",
-        "end_date",
-    )
     search_fields = [
         "name",
         "code",
     ]
-    readonly_fields = ("created_at",)
-    inlines = (PkSupportRemarkInline,)
+
+
+@admin.register(models.Commune)
+class CommuneAdmin(ASPModelAdmin):
+    pass
 
 
 @admin.register(models.Department)
@@ -77,8 +60,6 @@ class DepartmentAdmin(ASPModelAdmin):
 
 
 @admin.register(models.Country)
-class CountryAdmin(ItouModelAdmin):
-    list_display = ("pk", "code", "name")
-    readonly_fields = ("pk",)
-    ordering = ("name",)
+class CountryAdmin(ASPModelAdmin):
+    list_display = ("pk", "code", "name", "group")
     list_filter = (CountryFilter,)
