@@ -31,7 +31,7 @@ from itou.www.eligibility_views.forms import AdministrativeCriteriaForm
 from itou.www.geiq_eligibility_views.forms import GEIQAdministrativeCriteriaForGEIQForm
 
 
-def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra_context, job_application=None):
+def _accept(request, company, job_seeker, error_url, back_url, template_name, extra_context, job_application=None):
     forms = []
 
     # Ask the SIAE to verify the job seeker's Pôle emploi status.
@@ -43,8 +43,8 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
     valid_diagnosis = None
     birthdate = job_seeker.jobseeker_profile.birthdate
 
-    if siae.is_subject_to_eligibility_rules:
-        valid_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker, for_siae=siae)
+    if company.is_subject_to_eligibility_rules:
+        valid_diagnosis = EligibilityDiagnosis.objects.last_considered_valid(job_seeker=job_seeker, for_siae=company)
         # Info that will be used to search for an existing Pôle emploi approval.
         form_personal_data = JobSeekerPersonalDataForm(
             instance=job_seeker.jobseeker_profile,
@@ -61,9 +61,9 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
 
         form_user_address = JobSeekerAddressForm(instance=job_seeker, data=request.POST or None)
         forms.append(form_user_address)
-    elif siae.kind == CompanyKind.GEIQ:
+    elif company.kind == CompanyKind.GEIQ:
         valid_diagnosis = GEIQEligibilityDiagnosis.objects.valid_diagnoses_for(
-            job_seeker=job_seeker, for_geiq=siae
+            job_seeker=job_seeker, for_geiq=company
         ).first()
 
     if valid_diagnosis and valid_diagnosis.criteria_can_be_certified():
@@ -75,7 +75,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
         )
         forms.append(form_certified_criteria)
 
-    form_accept = AcceptForm(instance=job_application, company=siae, data=request.POST or None)
+    form_accept = AcceptForm(instance=job_application, company=company, data=request.POST or None)
     forms.append(form_accept)
 
     context = {
@@ -89,7 +89,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
         "matomo_custom_title": "Candidature acceptée",
         "job_application": job_application,
         "job_seeker": job_seeker,
-        "siae": siae,
+        "company": company,
         "back_url": back_url,
         "hire_process": job_application is None,
     } | extra_context
@@ -116,10 +116,10 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
                 job_application = form_accept.save(commit=False)
                 if creating:
                     job_application.job_seeker = job_seeker
-                    job_application.to_company = siae
+                    job_application.to_company = company
                     job_application.sender = request.user
                     job_application.sender_kind = UserKind.EMPLOYER
-                    job_application.sender_company = siae
+                    job_application.sender_company = company
                     job_application.process(user=request.user)
                 job_application.accept(user=request.user)
 
@@ -183,7 +183,7 @@ def _accept(request, siae, job_seeker, error_url, back_url, template_name, extra
                 job_application.geiq_eligibility_diagnosis = valid_diagnosis
                 job_application.save(update_fields=["geiq_eligibility_diagnosis"])
 
-        if creating and siae.is_subject_to_eligibility_rules and job_application.approval:
+        if creating and company.is_subject_to_eligibility_rules and job_application.approval:
             final_url = reverse("employees:detail", kwargs={"public_id": job_seeker.public_id})
         else:
             final_url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
