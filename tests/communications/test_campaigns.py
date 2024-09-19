@@ -12,63 +12,63 @@ from itou.communications.forms import AnnouncementItemForm
 from itou.communications.models import AnnouncementCampaign
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
 from tests.users.factories import ItouStaffFactory
-from tests.utils.test import TestCase, parse_response_to_soup
+from tests.utils.test import parse_response_to_soup
 
 
-class AnnouncementCampaignValidatorTest(TestCase):
-    class TestForm(ModelForm):
+class TestAnnouncementCampaignValidator:
+    class FakeForm(ModelForm):
         class Meta:
             model = AnnouncementCampaign
             fields = "__all__"
 
     def test_valid_campaign(self):
         expected_form_fields = ["max_items", "start_date", "live"]
-        assert list(self.TestForm().fields.keys()) == expected_form_fields
+        assert list(self.FakeForm().fields.keys()) == expected_form_fields
 
-        form = self.TestForm(model_to_dict(AnnouncementCampaignFactory.build()))
+        form = self.FakeForm(model_to_dict(AnnouncementCampaignFactory.build()))
         assert form.is_valid()
 
     def test_start_date_conflict(self):
         AnnouncementCampaignFactory(start_date=date(2024, 1, 1))
         campaign = AnnouncementCampaignFactory.build(start_date=date(2024, 1, 20))
-        form = self.TestForm(model_to_dict(campaign))
+        form = self.FakeForm(model_to_dict(campaign))
 
         expected_form_errors = ["Un objet Campagne d'annonce avec ce champ Mois concerné existe déjà."]
         assert form.errors["start_date"] == expected_form_errors
 
         campaign.start_date = date(2024, 2, 1)
-        form = self.TestForm(model_to_dict(campaign))
+        form = self.FakeForm(model_to_dict(campaign))
         assert form.is_valid()
 
     def test_modify_start_date(self):
         existing_campaign = AnnouncementCampaignFactory(start_date=date(2024, 1, 1))
         existing_campaign.start_date = date(2024, 1, 2)
 
-        form = self.TestForm(model_to_dict(existing_campaign), instance=existing_campaign)
+        form = self.FakeForm(model_to_dict(existing_campaign), instance=existing_campaign)
         assert form.is_valid()
 
     def test_max_items_range(self):
         campaign = AnnouncementCampaignFactory.build(max_items=0)
 
-        form = self.TestForm(model_to_dict(campaign))
+        form = self.FakeForm(model_to_dict(campaign))
         assert form.errors["max_items"] == ["Assurez-vous que cette valeur est supérieure ou égale à 1."]
 
         campaign.max_items = 11
-        form = self.TestForm(model_to_dict(campaign))
+        form = self.FakeForm(model_to_dict(campaign))
         assert form.errors["max_items"] == ["Assurez-vous que cette valeur est inférieure ou égale à 10."]
 
         campaign.max_items = 10
-        form = self.TestForm(model_to_dict(campaign))
+        form = self.FakeForm(model_to_dict(campaign))
         assert form.is_valid()
 
 
-class TestAnnouncementCampaignAdmin(TestCase):
-    def test_admin_form(self):
+class TestAnnouncementCampaignAdmin:
+    def test_admin_form(self, client):
         campaign = AnnouncementCampaignFactory(with_item=True)
 
         assert not campaign.items.first().image
-        self.client.force_login(ItouStaffFactory(is_superuser=True))
-        response = self.client.get(
+        client.force_login(ItouStaffFactory(is_superuser=True))
+        response = client.get(
             reverse("admin:communications_announcementcampaign_change", kwargs={"object_id": campaign.pk})
         )
         assert response.status_code == 200
@@ -110,7 +110,7 @@ class TestRenderAnnouncementCampaign:
         assert len(content.select("#news-modal")) == 0
 
 
-class TestAnnouncementItemForm(TestCase):
+class TestAnnouncementItemForm:
     @mock.patch("uuid.uuid4", return_value=uuid.UUID("6971c4bb-217f-4e84-b8a0-3f055ed19b72"))
     def test_form_image_upload(self, client):
         form = AnnouncementItemForm({}, instance=AnnouncementItemFactory())
