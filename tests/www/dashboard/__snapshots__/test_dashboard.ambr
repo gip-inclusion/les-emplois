@@ -1,5 +1,5 @@
 # serializer version: 1
-# name: DashboardViewTest.test_dashboard
+# name: TestDashboardView.test_dashboard
   '''
   <form action="/search/employers/results" class="mt-3 mt-md-4" method="get" role="search">
                                   
@@ -29,7 +29,7 @@
                               </form>
   '''
 # ---
-# name: DashboardViewTest.test_dashboard_siae_evaluation_campaign_notifications[view queries]
+# name: TestDashboardView.test_dashboard_siae_evaluation_campaign_notifications[view queries]
   dict({
     'num_queries': 20,
     'queries': list([

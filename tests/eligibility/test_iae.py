@@ -1,7 +1,6 @@
 import pytest
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
-from unittest_parametrize import ParametrizedTestCase, param, parametrize
 
 from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
@@ -240,7 +239,7 @@ class TestEligibilityDiagnosisManager:
         assert last_expired == expired_diagnosis_last
 
 
-class TestEligibilityDiagnosisModel(ParametrizedTestCase):
+class TestEligibilityDiagnosisModel:
     def test_create_diagnosis(self):
         job_seeker = JobSeekerFactory()
         company = CompanyFactory(with_membership=True)
@@ -378,23 +377,25 @@ class TestEligibilityDiagnosisModel(ParametrizedTestCase):
         ApprovalFactory(user=diagnosis.job_seeker)
         assert diagnosis.is_considered_valid
 
-    @parametrize(
+    @pytest.mark.parametrize(
         "factory_params,expected",
         [
-            param(
+            pytest.param(
                 {"from_prescriber": True, "with_certifiable_criteria": True}, False, id="prescriber_certified_criteria"
             ),
-            param(
+            pytest.param(
                 {"from_prescriber": True, "with_not_certifiable_criteria": True},
                 False,
                 id="prescriber_no_certified_criteria",
             ),
-            param(
+            pytest.param(
                 {"from_employer": True, "with_not_certifiable_criteria": True},
                 False,
                 id="employer_no_certified_criteria",
             ),
-            param({"from_employer": True, "with_certifiable_criteria": True}, True, id="employer_certified_criteria"),
+            pytest.param(
+                {"from_employer": True, "with_certifiable_criteria": True}, True, id="employer_certified_criteria"
+            ),
         ],
     )
     def test_criteria_can_be_certified(self, factory_params, expected):

@@ -2,6 +2,7 @@ import datetime
 import json
 import random
 import uuid
+from operator import attrgetter
 from unittest import mock
 
 import freezegun
@@ -13,6 +14,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.db import IntegrityError, transaction
 from django.test import override_settings
 from django.utils import timezone
+from pytest_django.asserts import assertQuerySetEqual
 
 import tests.asp.factories as asp
 from itou.approvals.models import Approval
@@ -41,10 +43,9 @@ from tests.users.factories import (
     PrescriberFactory,
     UserFactory,
 )
-from tests.utils.test import TestCase
 
 
-class ManagerTest(TestCase):
+class TestManager:
     def test_get_duplicated_pole_emploi_ids(self):
         # Unique user.
         JobSeekerFactory(jobseeker_profile__pole_emploi_id="5555555A")
@@ -61,7 +62,7 @@ class ManagerTest(TestCase):
         duplicated_pole_emploi_ids = User.objects.get_duplicated_pole_emploi_ids()
 
         expected_result = ["6666666B", "7777777C"]
-        self.assertCountEqual(duplicated_pole_emploi_ids, expected_result)
+        assertQuerySetEqual(duplicated_pole_emploi_ids, expected_result, ordered=False)
 
     def test_get_duplicates_by_pole_emploi_id(self):
         # 2 users using the same `pole_emploi_id` and different birthdates.
@@ -96,15 +97,18 @@ class ManagerTest(TestCase):
         )
 
         duplicated_users = User.objects.get_duplicates_by_pole_emploi_id()
+        # sort sub lists in result
+        for key in duplicated_users.keys():
+            duplicated_users[key] = sorted(duplicated_users[key], key=attrgetter("pk"))
 
         expected_result = {
             "7777777B": [user1, user2],
             "8888888C": [user3, user4, user5],
         }
-        self.assertCountEqual(duplicated_users, expected_result)
+        assert duplicated_users == expected_result
 
 
-class ModelTest(TestCase):
+class TestModel:
     def test_generate_unique_username(self):
         unique_username = User.generate_unique_username()
         assert unique_username == uuid.UUID(unique_username, version=4).hex
@@ -562,15 +566,14 @@ class ModelTest(TestCase):
         user = company.members.get()
         assert not user.can_create_siae_antenna(company)
 
-    def test_admin_ability_to_create_siae_antenna(self):
-        for kind in CompanyKind:
-            with self.subTest(kind=kind):
-                company = CompanyFactory(kind=kind, with_membership=True, membership__is_admin=True)
-                user = company.members.get()
-                if kind == CompanyKind.GEIQ:
-                    assert user.can_create_siae_antenna(company)
-                else:
-                    assert user.can_create_siae_antenna(company) == company.should_have_convention
+    @pytest.mark.parametrize("kind", CompanyKind)
+    def test_admin_ability_to_create_siae_antenna(self, kind):
+        company = CompanyFactory(kind=kind, with_membership=True, membership__is_admin=True)
+        user = company.members.get()
+        if kind == CompanyKind.GEIQ:
+            assert user.can_create_siae_antenna(company)
+        else:
+            assert user.can_create_siae_antenna(company) == company.should_have_convention
 
     def test_user_kind(self):
         non_staff_kinds = [
@@ -616,7 +619,7 @@ class ModelTest(TestCase):
         ):
             nir_profile.save()
 
-    def test_identity_provider_vs_kind(self):
+    def test_identity_provider_vs_kind(self, subtests):
         cases = [
             [JobSeekerFactory, IdentityProvider.DJANGO, False],
             [JobSeekerFactory, IdentityProvider.PE_CONNECT, False],
@@ -640,7 +643,7 @@ class ModelTest(TestCase):
             [ItouStaffFactory, IdentityProvider.INCLUSION_CONNECT, True],
         ]
         for factory, identity_provider, raises in cases:
-            with self.subTest(f"{factory} / {identity_provider}"):
+            with subtests.test(f"{factory} / {identity_provider}"):
                 if raises:
                     with pytest.raises(ValidationError):
                         factory(identity_provider=identity_provider)
@@ -685,9 +688,8 @@ class ModelTest(TestCase):
             assert user.get_redacted_full_name() == expected_output
 
 
-class JobSeekerProfileModelTest(TestCase):
-    def setUp(self):
-        super().setUp()
+class TestJobSeekerProfileModel:
+    def setup_method(self):
         self.user = JobSeekerFactory(
             with_address=True,
             address_line_1=BAN_GEOCODING_API_RESULTS_MOCK[0]["address_line_1"],
@@ -900,7 +902,7 @@ def user_with_approval_in_waiting_period():
     return user
 
 
-class LatestApprovalTestCase(TestCase):
+class TestLatestApproval:
     @freezegun.freeze_time("2022-08-10")
     def test_merge_approvals_timeline_case1(self):
         user = JobSeekerFactory(with_pole_emploi_id=True)

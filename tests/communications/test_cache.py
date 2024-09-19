@@ -8,10 +8,9 @@ from pytest_django.asserts import assertNumQueries
 from itou.communications.cache import CACHE_ACTIVE_ANNOUNCEMENTS_KEY
 from itou.utils.context_processors import active_announcement_campaign
 from tests.communications.factories import AnnouncementCampaignFactory, AnnouncementItemFactory
-from tests.utils.test import TestCase
 
 
-class AnnouncementCampaignCacheTest(TestCase):
+class TestAnnouncementCampaignCache:
     @pytest.fixture(autouse=True)
     def empty_announcements_cache(self, empty_active_announcements_cache):
         pass

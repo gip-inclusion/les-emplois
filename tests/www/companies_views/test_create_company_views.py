@@ -1,7 +1,6 @@
-from unittest import mock
-
 from django.urls import reverse
 from django.utils.html import escape
+from pytest_django.asserts import assertContains, assertNotContains
 
 from itou.companies.enums import CompanyKind
 from itou.companies.models import Company
@@ -10,10 +9,9 @@ from itou.utils.mocks.geocoding import BAN_GEOCODING_API_RESULT_MOCK
 from tests.companies.factories import (
     CompanyFactory,
 )
-from tests.utils.test import TestCase
 
 
-class CreateCompanyViewTest(TestCase):
+class TestCreateCompanyView:
     STRUCTURE_ALREADY_EXISTS_MSG = escape(
         "Le numéro de SIRET que vous avez renseigné est déjà utilisé par une structure ou une antenne,"
     )
@@ -22,14 +20,14 @@ class CreateCompanyViewTest(TestCase):
     def siret_siren_error_msg(company):
         return escape(f"Le SIRET doit commencer par le SIREN {company.siren}")
 
-    def test_create_non_preexisting_company_outside_of_siren_fails(self):
+    def test_create_non_preexisting_company_outside_of_siren_fails(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         url = reverse("companies_views:create_company")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         new_siren = "9876543210"
@@ -51,21 +49,21 @@ class CreateCompanyViewTest(TestCase):
             "website": "https://famous-company.com",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
 
-        self.assertContains(response, self.siret_siren_error_msg(company))
-        self.assertNotContains(response, self.STRUCTURE_ALREADY_EXISTS_MSG)
+        assertContains(response, self.siret_siren_error_msg(company))
+        assertNotContains(response, self.STRUCTURE_ALREADY_EXISTS_MSG)
 
         assert not Company.objects.filter(siret=post_data["siret"]).exists()
 
-    def test_create_preexisting_company_outside_of_siren_fails(self):
+    def test_create_preexisting_company_outside_of_siren_fails(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         url = reverse("companies_views:create_company")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         preexisting_company = CompanyFactory()
@@ -87,21 +85,21 @@ class CreateCompanyViewTest(TestCase):
             "website": "https://famous-company.com",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
 
-        self.assertNotContains(response, self.siret_siren_error_msg(company))
-        self.assertContains(response, self.STRUCTURE_ALREADY_EXISTS_MSG)
+        assertNotContains(response, self.siret_siren_error_msg(company))
+        assertContains(response, self.STRUCTURE_ALREADY_EXISTS_MSG)
 
         assert Company.objects.filter(siret=post_data["siret"]).count() == 1
 
-    def test_cannot_create_company_with_same_siret_and_same_kind(self):
+    def test_cannot_create_company_with_same_siret_and_same_kind(self, client):
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         url = reverse("companies_views:create_company")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         post_data = {
@@ -118,25 +116,26 @@ class CreateCompanyViewTest(TestCase):
             "website": "https://famous-company.com",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
 
-        self.assertNotContains(response, self.siret_siren_error_msg(company))
-        self.assertContains(response, self.STRUCTURE_ALREADY_EXISTS_MSG)
-        self.assertContains(response, escape(global_constants.ITOU_HELP_CENTER_URL))
+        assertNotContains(response, self.siret_siren_error_msg(company))
+        assertContains(response, self.STRUCTURE_ALREADY_EXISTS_MSG)
+        assertContains(response, escape(global_constants.ITOU_HELP_CENTER_URL))
 
         assert Company.objects.filter(siret=post_data["siret"]).count() == 1
 
-    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_cannot_create_company_with_same_siret_and_different_kind(self, _mock_call_ban_geocoding_api):
+    def test_cannot_create_company_with_same_siret_and_different_kind(self, client, mocker):
+        mocker.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+
         company = CompanyFactory(with_membership=True)
         company.kind = CompanyKind.ETTI
         company.save()
         user = company.members.first()
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         url = reverse("companies_views:create_company")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         post_data = {
@@ -153,13 +152,14 @@ class CreateCompanyViewTest(TestCase):
             "website": "https://famous-company.com",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
 
         assert Company.objects.filter(siret=post_data["siret"]).count() == 1
 
-    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_cannot_create_company_with_same_siren_and_different_kind(self, _mock_call_ban_geocoding_api):
+    def test_cannot_create_company_with_same_siren_and_different_kind(self, client, mocker):
+        mocker.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
+
         company = CompanyFactory(with_membership=True)
         company.kind = CompanyKind.ETTI
         company.save()
@@ -168,10 +168,10 @@ class CreateCompanyViewTest(TestCase):
         new_siret = company.siren + "12345"
         assert company.siret != new_siret
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         url = reverse("companies_views:create_company")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         post_data = {
@@ -188,21 +188,24 @@ class CreateCompanyViewTest(TestCase):
             "website": "https://famous-company.com",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 200
 
         assert Company.objects.filter(siret=company.siret).count() == 1
         assert Company.objects.filter(siret=new_siret).count() == 0
 
-    @mock.patch("itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK)
-    def test_create_company_with_same_siren_and_same_kind(self, mock_call_ban_geocoding_api):
+    def test_create_company_with_same_siren_and_same_kind(self, client, mocker):
+        mock_call_ban_geocoding_api = mocker.patch(
+            "itou.utils.apis.geocoding.call_ban_geocoding_api", return_value=BAN_GEOCODING_API_RESULT_MOCK
+        )
+
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
 
-        self.client.force_login(user)
+        client.force_login(user)
 
         url = reverse("companies_views:create_company")
-        response = self.client.get(url)
+        response = client.get(url)
         assert response.status_code == 200
 
         new_siret = company.siren + "12345"
@@ -222,7 +225,7 @@ class CreateCompanyViewTest(TestCase):
             "website": "https://famous-company.com",
             "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
         }
-        response = self.client.post(url, data=post_data)
+        response = client.post(url, data=post_data)
         assert response.status_code == 302
 
         mock_call_ban_geocoding_api.assert_called_once()
