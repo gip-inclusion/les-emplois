@@ -49,7 +49,7 @@
         {% bootstrap_form_errors form_accept type="non_fields" %}
 
         {# reloadable contract type and options for GEIQ #}
-        {% if siae.kind == CompanyKind.GEIQ %}
+        {% if company.kind == CompanyKind.GEIQ %}
             {% include "apply/includes/geiq/geiq_contract_type_and_options.html" %}
         {% endif %}
 
@@ -59,7 +59,7 @@
         {% bootstrap_field form_accept.hiring_start_at %}
 
         {# reloadable training and qualification for GEIQ #}
-        {% if siae.kind == CompanyKind.GEIQ %}
+        {% if company.kind == CompanyKind.GEIQ %}
             {% include "apply/includes/geiq/geiq_qualification_fields.html" %}
         {% endif %}
 
