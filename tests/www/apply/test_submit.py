@@ -16,6 +16,7 @@ from pytest_django.asserts import assertContains, assertRedirects
 
 from itou.asp.models import AllocationDuration, Commune, Country, EducationLevel, RSAAllocation
 from itou.companies.enums import CompanyKind, ContractType
+from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import (
     AdministrativeCriteria,
     EligibilityDiagnosis,
@@ -3960,6 +3961,9 @@ def test_detect_existing_job_seeker(client):
 
 
 class ApplicationGEIQEligibilityViewTest(TestCase):
+    DIAG_VALIDITY_TXT = "Date de fin de validité du diagnostic"
+    UPDATE_ELIGIBILITY = "Mettre à jour l’éligibilité"
+
     @classmethod
     def setUpTestData(cls):
         cls.geiq = CompanyFactory(with_membership=True, with_jobs=True, kind=CompanyKind.GEIQ)
@@ -4087,6 +4091,55 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
         )
         self.assertContains(response, geiq_eligibility_url)
 
+    def test_authorized_prescriber_can_see_other_authorized_prescriber_eligibility_diagnosis(self):
+        job_seeker = JobSeekerFactory()
+        GEIQEligibilityDiagnosisFactory(from_prescriber=True, job_seeker=job_seeker)
+
+        self.client.force_login(self.prescriber_org.members.get())
+        self._setup_session()
+        response = self.client.get(
+            reverse(
+                "apply:application_geiq_eligibility",
+                kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": job_seeker.public_id},
+            )
+        )
+        self.assertContains(response, "Éligibilité GEIQ confirmée")
+        self.assertContains(response, self.DIAG_VALIDITY_TXT)
+        self.assertContains(response, self.UPDATE_ELIGIBILITY)
+
+    def test_authorized_prescriber_do_not_see_company_eligibility_diagnosis(self):
+        job_seeker = JobSeekerFactory()
+        GEIQEligibilityDiagnosisFactory(from_geiq=True, author_geiq=self.geiq, job_seeker=job_seeker)
+        url = reverse(
+            "apply:application_geiq_eligibility",
+            kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": job_seeker.public_id},
+        )
+        prescriber = self.prescriber_org.members.get()
+
+        self.client.force_login(prescriber)
+        self._setup_session()
+        response = self.client.get(url)
+        self.assertContains(response, "Éligibilité GEIQ non confirmée")
+        self.assertNotContains(response, self.DIAG_VALIDITY_TXT)
+        self.assertNotContains(response, self.UPDATE_ELIGIBILITY)
+
+        response = self.client.post(url, {"not": "empty"})
+        assertRedirects(
+            response,
+            reverse(
+                "apply:application_resume",
+                kwargs={"company_pk": self.geiq.pk, "job_seeker_public_id": job_seeker.public_id},
+            ),
+        )
+        prescriber_diag, _company_diag = GEIQEligibilityDiagnosis.objects.filter(job_seeker=job_seeker).order_by(
+            "-created_at"
+        )
+        assert prescriber_diag.author_kind == AuthorKind.PRESCRIBER
+        assert prescriber_diag.author == prescriber
+        assert prescriber_diag.author_prescriber_organization == self.prescriber_org
+        assert prescriber_diag.job_seeker == job_seeker
+        assert prescriber_diag.author_geiq is None
+
     def test_geiq_eligibility_badge(self):
         self.client.force_login(self.prescriber_org.members.first())
 
@@ -4105,6 +4158,7 @@ class ApplicationGEIQEligibilityViewTest(TestCase):
 
         self.assertContains(response, "Éligibilité GEIQ confirmée")
         self.assertTemplateUsed(response, "apply/includes/geiq/geiq_administrative_criteria_form.html")
+        self.assertContains(response, self.DIAG_VALIDITY_TXT)
 
         # Badge KO if job seeker has no diagnosis
         job_seeker_without_diagnosis = JobSeekerFactory()
