@@ -116,8 +116,8 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         soup = BeautifulSoup(response.content, "html5lib", from_encoding=response.charset or "utf-8")
         return soup.find("ul", attrs={"id": "transition_logs_" + str(job_application.id)})
 
-    def test_details_for_company(self, *args, **kwargs):
-        """Display the details of a job application."""
+    def test_details_for_company_from_approval(self, *args, **kwargs):
+        """Display the details of a job application coming from the approval detail page."""
 
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True, resume_link="", with_approval=True
@@ -164,7 +164,71 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.assertContains(
             response, '<small>Numéro de sécurité sociale</small><i class="text-disabled">Non renseigné</i>', html=True
         )
-        assert_previous_step(response, reverse("apply:list_for_siae"), back_to_list=True)
+        assert_previous_step(response, back_url)  # Back_url is restored from session
+
+        job_application.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
+        job_application.job_seeker.jobseeker_profile.save()
+
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertContains(response, LackOfNIRReason.TEMPORARY_NUMBER.label)
+
+        # Test resume presence:
+        resume_link = "https://server.com/sylvester-stallone.pdf"
+        job_application = JobApplicationSentByJobSeekerFactory(to_company=company, resume_link=resume_link)
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertContains(response, resume_link)
+        self.assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)
+
+    def test_details_for_company_from_list(self, *args, **kwargs):
+        """Display the details of a job application coming from the job applications list."""
+
+        job_application = JobApplicationFactory(
+            sent_by_authorized_prescriber_organisation=True, resume_link="", with_approval=True
+        )
+        company = job_application.to_company
+        employer = company.members.first()
+        self.client.force_login(employer)
+
+        back_url = f"{reverse('apply:list_for_siae')}?job_seeker={job_application.job_seeker.id}"
+        url = add_url_params(
+            reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk}),
+            {"back_url": back_url},
+        )
+        with assertSnapshotQueries(self.snapshot(name="job application detail for company")):
+            response = self.client.get(url)
+        self.assertContains(response, "Ce candidat a pris le contrôle de son compte utilisateur.")
+        self.assertContains(response, format_nir(job_application.job_seeker.jobseeker_profile.nir))
+        self.assertContains(response, job_application.job_seeker.jobseeker_profile.pole_emploi_id)
+        self.assertContains(response, job_application.job_seeker.phone.replace(" ", ""))
+        self.assertNotContains(response, PRIOR_ACTION_SECTION_TITLE)  # the company is not a GEIQ
+        assert_previous_step(response, back_url, back_to_list=True)
+
+        job_application.job_seeker.created_by = employer
+        job_application.job_seeker.phone = ""
+        job_application.job_seeker.save()
+        job_application.job_seeker.jobseeker_profile.nir = ""
+        job_application.job_seeker.jobseeker_profile.pole_emploi_id = ""
+        job_application.job_seeker.jobseeker_profile.save()
+
+        url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        response = self.client.get(url)
+        self.assertContains(response, "Modifier les informations")
+        self.assertContains(response, '<small>Adresse</small><i class="text-disabled">Non renseignée</i>', html=True)
+        self.assertContains(response, '<small>Téléphone</small><i class="text-disabled">Non renseigné</i>', html=True)
+        self.assertContains(
+            response, '<small>Curriculum vitae</small><i class="text-disabled">Non renseigné</i>', html=True
+        )
+        self.assertContains(
+            response,
+            '<small>Identifiant France Travail</small><i class="text-disabled">Non renseigné</i>',
+            html=True,
+        )
+        self.assertContains(
+            response, '<small>Numéro de sécurité sociale</small><i class="text-disabled">Non renseigné</i>', html=True
+        )
+        assert_previous_step(response, back_url, back_to_list=True)  # Back_url is restored from session
 
         job_application.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.TEMPORARY_NUMBER
         job_application.job_seeker.jobseeker_profile.save()
@@ -1517,7 +1581,8 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         assert response.status_code == 404
         assert len(mail.outbox) == 0
 
-    def test_diagoriente_invite_as_employee_for_authorized_prescriber(self):
+    @freeze_time("2023-12-12 13:37:00", as_kwarg="frozen_time")
+    def test_diagoriente_invite_as_employee_for_authorized_prescriber(self, frozen_time):
         job_application = JobApplicationFactory(
             sent_by_authorized_prescriber_organisation=True,
             resume_link="https://myresume.com/me",
@@ -1545,11 +1610,12 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         # Unset resume, should now update the timestamp and send the mail
         job_application.resume_link = ""
         job_application.save(update_fields=["resume_link"])
-        with freeze_time("2023-12-12 13:37:00") as initial_invite_time:
-            response = self.client.post(
-                reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
-                follow=True,
-            )
+        frozen_time.tick()
+        initial_invite_time = frozen_time()
+        response = self.client.post(
+            reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
+            follow=True,
+        )
         self.assertMessages(
             response, [messages.Message(messages.SUCCESS, "L'invitation à utiliser Diagoriente a été envoyée.")]
         )
@@ -1560,7 +1626,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
         self.assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
         job_application.refresh_from_db()
-        assert job_application.diagoriente_invite_sent_at == initial_invite_time().replace(tzinfo=datetime.UTC)
+        assert job_application.diagoriente_invite_sent_at == initial_invite_time.replace(tzinfo=datetime.UTC)
         assert len(mail.outbox) == 1
         assert self.DIAGORIENTE_INVITE_EMAIL_SUBJECT in mail.outbox[0].subject
         assert (
@@ -1580,6 +1646,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         assert self.DIAGORIENTE_INVITE_EMAIL_JOB_SEEKER_BODY_HEADER_LINE_2 not in mail.outbox[0].body
 
         # Concurrent/subsequent calls should not perform any action
+        frozen_time.tick()
         response = self.client.post(
             reverse("apply:send_diagoriente_invite", kwargs={"job_application_id": job_application.pk}),
             follow=True,
@@ -1592,7 +1659,7 @@ class ProcessViewsTest(MessagesTestMixin, TestCase):
         self.assertNotContains(response, self.DIAGORIENTE_INVITE_BUTTON_TITLE)
         self.assertContains(response, self.DIAGORIENTE_INVITE_TOOLTIP)
         job_application.refresh_from_db()
-        assert job_application.diagoriente_invite_sent_at == initial_invite_time().replace(tzinfo=datetime.UTC)
+        assert job_application.diagoriente_invite_sent_at == initial_invite_time.replace(tzinfo=datetime.UTC)
         assert len(mail.outbox) == 1
 
     def test_diagoriente_invite_as_employee_for_unauthorized_prescriber(self):

@@ -189,7 +189,11 @@ def details_for_company(request, job_application_id, template_name="apply/proces
         job_seeker=job_application.job_seeker, for_siae=job_application.to_company
     )
 
-    back_url = get_safe_url(request, "back_url", fallback_url=reverse_lazy("apply:list_for_siae"))
+    # get back_url from GET params or session or fallback value
+    session_key = f"JOB_APP_DETAILS_FOR_COMPANY-BACK_URL-{job_application.pk}"
+    fallback_url = request.session.get(session_key, reverse_lazy("apply:list_for_siae"))
+    back_url = get_safe_url(request, "back_url", fallback_url=fallback_url)
+    request.session[session_key] = back_url
 
     geiq_eligibility_diagnosis = (
         job_application.to_company.kind == CompanyKind.GEIQ
