@@ -1,0 +1,23 @@
+{% extends "layout/base_email_text_body.txt" %}
+
+{#
+    Context
+
+    job_seeker (created account user)
+    creator (creator of the account - prescriber)
+    creator_org (the creating organization if one exists)
+    account_activation_link
+#}
+
+{% block body %}
+
+Bonjour {% if job_seeker.title %}{{ job_seeker.get_title_display }} {% endif %}{{ job_seeker.get_full_name }},
+
+Votre compte candidat vient d’être créé sur les Emplois de l’inclusion par {{ creator.get_full_name }}{% if creator_org %} de {{ creator_org.display_name }}{% endif %}.
+
+Pour finaliser votre inscription, merci de cliquer sur le lien suivant : {{ account_activation_link }}. Ce lien expirera dans 14 jours.
+Dès votre arrivée sur le site des Emplois de l’inclusion, vous serez invité à définir un mot de passe pour votre compte candidat.
+
+Cet e-mail a été généré et envoyé automatiquement, merci de ne pas y répondre.
+
+{% endblock body %}

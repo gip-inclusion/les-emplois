@@ -16,3 +16,12 @@ class OrganizationActiveMembersReminderNotification(
         context = super().get_context()
         context["structure"] = self.structure
         return context
+
+
+@notifications_registry.register
+class JobSeekerCreatedByProxyNotification(EmailNotification):
+    name = "Invitation à accéder au compte d'un nouvel utilisateur créé par un tiers"
+    category = NotificationCategory.REGISTRATION
+    subject_template = "account/email/email_jobseeker_created_by_third_party_subject.txt"
+    body_template = "account/email/email_jobseeker_created_by_third_party_body.txt"
+    can_be_disabled = False

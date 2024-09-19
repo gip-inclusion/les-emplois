@@ -10,6 +10,7 @@ class NotificationCategory(StrEnum):
     MEMBERS_MANAGEMENT = "Gestion des collaborateurs"
     JOB_APPLICATION = "Candidature"
     GEIQ_IMPLEMENTATION_ASSESSMENT = "Bilan d’exécution GEIQ"
+    REGISTRATION = "Inscription"
 
 
 class NotificationRegistry:

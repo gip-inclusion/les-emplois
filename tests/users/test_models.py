@@ -1,6 +1,7 @@
 import datetime
 import json
 import random
+import re
 import uuid
 from operator import attrgetter
 from unittest import mock
@@ -13,8 +14,9 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import IntegrityError, transaction
 from django.test import override_settings
+from django.urls import reverse
 from django.utils import timezone
-from pytest_django.asserts import assertQuerySetEqual
+from pytest_django.asserts import assertQuerySetEqual, assertRedirects
 
 import tests.asp.factories as asp
 from itou.approvals.models import Approval
@@ -24,6 +26,7 @@ from itou.companies.enums import CompanyKind
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title, UserKind
 from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import BAN_GEOCODING_API_RESULTS_MOCK, mock_get_geocoding_data
+from itou.utils.urls import get_absolute_url
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import (
@@ -113,16 +116,25 @@ class TestModel:
         unique_username = User.generate_unique_username()
         assert unique_username == uuid.UUID(unique_username, version=4).hex
 
-    def test_create_job_seeker_by_proxy(self):
-        proxy_user = PrescriberFactory()
+    def test_create_job_seeker_by_proxy(self, client, snapshot):
+        proxy_user = PrescriberFactory(for_snapshot=True)
+
+        sent_emails = []
+
+        def mock_send_email(self, **kwargs):
+            sent_emails.append(self)
 
         user_data = {
             "email": "john@doe.com",
+            "title": "M",
             "first_name": "John",
             "last_name": "Doe",
             "phone": "0610101010",
         }
-        user = User.create_job_seeker_by_proxy(proxy_user, **user_data)
+        with mock.patch("django.core.mail.EmailMessage.send", mock_send_email):
+            user = User.create_job_seeker_by_proxy(
+                proxy_user, acting_organization=PrescriberOrganizationFactory(for_snapshot=True), **user_data
+            )
 
         assert user.kind == UserKind.JOB_SEEKER
         assert user.password is not None
@@ -135,6 +147,35 @@ class TestModel:
         assert user.phone == user_data["phone"]
         assert user.created_by == proxy_user
         assert user.last_login is None
+
+        # An email is sent to the new user
+        assert len(sent_emails) == 1
+        assert sent_emails[0].to == [user.email]
+        assert sent_emails[0].subject == "[DEV] Création de votre compte candidat"
+
+        # Get the token from the email for testing
+        reset_url = get_absolute_url(
+            reverse(
+                "account_reset_password_from_key",
+                kwargs={"uidb36": "1", "key": "key"},
+            )
+        )
+        # http://localhost:8000/accounts/password/reset/key/([A-Za-z0-9]+(-[A-Za-z0-9]+)+)/
+        pattern = re.sub("1-key/", r"([A-Za-z0-9]+(-[A-Za-z0-9]+)+)/", reset_url)
+        password_change_url = re.search(pattern, sent_emails[0].body)[0]
+
+        # Test the email content is valid
+        assert re.sub(pattern, "[RESET PASSWORD LINK REMOVED]", sent_emails[0].body) == snapshot(
+            name="email jobseeker created by proxy"
+        )
+
+        # Test the link can be used to reset password and login directly
+        response = client.get(password_change_url)
+        password_change_url_with_hidden_key = response.url
+        post_data = {"password1": "newPassword1%", "password2": "newPassword1%"}
+        response = client.post(password_change_url_with_hidden_key, data=post_data)
+        assertRedirects(response, reverse("welcoming_tour:index"))
+        client.logout()
 
         # E-mail already exists, this should raise an error.
         with pytest.raises(ValidationError):
