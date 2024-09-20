@@ -448,7 +448,7 @@ def stats_ft_conversion_main(request):
         request=request,
         page_title="Taux de transformation",
         extra_params={
-            mb.PRESCRIBER_FILTER_KEY: mb.PE_FILTER_VALUE,
+            mb.PRESCRIBER_FILTER_KEY: mb.FT_FILTER_VALUE,
         },
     )
 
@@ -459,7 +459,7 @@ def stats_ft_conversion_raw(request):
         request=request,
         page_title="Données brutes du taux de transformation",
         extra_params={
-            mb.PRESCRIBER_FILTER_KEY: mb.PE_FILTER_VALUE,
+            mb.PRESCRIBER_FILTER_KEY: mb.FT_FILTER_VALUE,
         },
     )
 
