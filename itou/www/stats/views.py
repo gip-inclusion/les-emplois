@@ -508,7 +508,7 @@ def stats_ph_state_main(request):
         raise PermissionDenied
 
     context = {}
-    if request.current_organization.kind in [PrescriberOrganizationKind.ML, PrescriberOrganizationKind.CAP_EMPLOI]:
+    if request.current_organization.kind in utils.STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST:
         context["pilotage_webinar_banners"] = [
             {
                 "title": "Besoin d’être accompagné dans la prise en main de ce tableau de bord ?",
