@@ -34,6 +34,7 @@ from itou.common_apps.address.departments import (
 )
 from itou.companies import models as companies_models
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
 from itou.utils.apis import metabase as mb
@@ -508,7 +509,14 @@ def stats_ph_state_main(request):
         raise PermissionDenied
 
     context = {}
+    allowed_org_pks = [request.current_organization.pk]
     if request.current_organization.kind in utils.STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST:
+        allowed_org_pks = list(
+            PrescriberOrganization.objects.filter(
+                kind=request.current_organization.kind,
+                department=request.current_organization.department,
+            ).values_list("pk", flat=True)
+        )
         context["pilotage_webinar_banners"] = [
             {
                 "title": "Besoin d’être accompagné dans la prise en main de ce tableau de bord ?",
@@ -517,11 +525,13 @@ def stats_ph_state_main(request):
                 "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 9, 24),
             }
         ]
+
     return render_stats_ph(
         request=request,
         page_title="Etat des candidatures orientées",
         extra_params={
             mb.PRESCRIBER_FILTER_KEY: PrescriberOrganizationKind(request.current_organization.kind).label,
+            mb.C1_ORG_FILTER_KEY: allowed_org_pks,
         },
         extra_context=context,
     )
