@@ -15,7 +15,7 @@ REGION_FILTER_KEY = "r%C3%A9gion"
 PRESCRIBER_FILTER_KEY = "prescripteur"
 JOB_APPLICATION_ORIGIN_FILTER_KEY = "origine_candidature"
 FT_PRESCRIBER_FILTER_VALUE = "France Travail"
-PE_FILTER_VALUE = "France Travail"
+FT_FILTER_VALUE = "France Travail"
 
 METABASE_DASHBOARDS = {
     #
