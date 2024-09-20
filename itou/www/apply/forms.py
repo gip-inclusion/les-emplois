@@ -159,6 +159,9 @@ class CheckJobSeekerInfoForm(JobSeekerProfileFieldsMixin, forms.ModelForm):
     def clean(self):
         super().clean()
         JobSeekerProfile.clean_pole_emploi_fields(self.cleaned_data)
+        JobSeekerProfile.clean_nir_title_birthdate_fields(
+            self.cleaned_data | {"nir": self.instance.jobseeker_profile.nir}, remind_nir_in_error=True
+        )
 
 
 class CreateOrUpdateJobSeekerStep1Form(
@@ -194,6 +197,10 @@ class CreateOrUpdateJobSeekerStep1Form(
                 "class": "js-period-date-input",
             }
         )
+
+    def clean(self):
+        super().clean()
+        JobSeekerProfile.clean_nir_title_birthdate_fields(self.cleaned_data)
 
 
 class CreateOrUpdateJobSeekerStep2Form(JobSeekerAddressForm, forms.ModelForm):

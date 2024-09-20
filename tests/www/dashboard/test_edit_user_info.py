@@ -10,7 +10,7 @@ from freezegun import freeze_time
 
 from itou.cities.models import City
 from itou.users.enums import IdentityProvider, LackOfNIRReason, LackOfPoleEmploiId, Title
-from itou.users.models import User
+from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from tests.openid_connect.inclusion_connect.test import (
     InclusionConnectBaseTestCase,
@@ -73,7 +73,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         side_effect=mock_get_geocoding_data_by_ban_api_resolved,
     )
     def test_edit_with_nir(self, _mock):
-        user = JobSeekerFactory()
+        user = JobSeekerFactory(jobseeker_profile__nir="178122978200508")
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         with self.assertNumQueries(
@@ -144,6 +144,55 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         assert response.status_code == 200
         assert response.context["form"].errors.get("title") == ["Ce champ est obligatoire."]
 
+    def test_inconsistent_nir_title_birthdate(self):
+        user = JobSeekerFactory(
+            jobseeker_profile__nir="178122978200508",
+            title="M",
+            jobseeker_profile__birthdate=datetime(1978, 12, 20, tzinfo=UTC),
+        )
+        self.client.force_login(user)
+        url = reverse("dashboard:edit_user_info")
+
+        # Inconsistent title
+        post_data = {
+            "email": "bob@saintclar.net",
+            "title": "MME",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": "20/12/1978",
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            "lack_of_nir": False,
+        } | self.address_form_fields()
+        response = self.client.post(url, data=post_data)
+
+        assert response.status_code == 200
+        self.assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE % "")
+        user = User.objects.get(id=user.id)
+
+        # Ensure that the job seeker did not change the title.
+        assert user.title == "M"
+
+        # Inconsistent birthdate
+        post_data = {
+            "email": "bob@saintclar.net",
+            "title": "M",
+            "first_name": "Bob",
+            "last_name": "Saint Clar",
+            "birthdate": "20/11/1978",
+            "phone": "0610203050",
+            "lack_of_pole_emploi_id_reason": LackOfPoleEmploiId.REASON_NOT_REGISTERED,
+            "lack_of_nir": False,
+        } | self.address_form_fields()
+        response = self.client.post(url, data=post_data)
+
+        assert response.status_code == 200
+        self.assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
+        user = User.objects.get(id=user.id)
+
+        # Ensure that the job seeker did not change the birthdate.
+        assert user.jobseeker_profile.birthdate.strftime("%d/%m/%Y") != post_data["birthdate"]
+
     def test_required_address_fields_are_present(self):
         user = JobSeekerFactory(with_address=True)
         self.client.force_login(user)
@@ -168,7 +217,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         side_effect=mock_get_geocoding_data_by_ban_api_resolved,
     )
     def test_update_address(self, _mock):
-        user = JobSeekerFactory(with_address=True)
+        user = JobSeekerFactory(with_address=True, jobseeker_profile__nir="178122978200508")
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
@@ -224,7 +273,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         assert str(results_section) == self.snapshot(name="user address input")
 
     def test_update_address_unavailable_api(self):
-        user = JobSeekerFactory()
+        user = JobSeekerFactory(jobseeker_profile__nir="178122978200508")
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
         response = self.client.get(url)
@@ -268,7 +317,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
         self.assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
 
-        NEW_NIR = "1 970 13625838386"
+        NEW_NIR = "1 781 22978200508"
         post_data = {
             "email": "bob@saintclar.net",
             "title": "M",
@@ -300,7 +349,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
         assert not response.context["form"]["nir"].field.disabled
         self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
 
-        NEW_NIR = "1 970 13625838386"
+        NEW_NIR = "1 781 22978200508"
         post_data = {
             "email": "bob@saintclar.net",
             "title": "M",
@@ -363,6 +412,7 @@ class EditUserInfoViewTest(InclusionConnectBaseTestCase):
             first_name="Not Bob",
             last_name="Not Saint Clar",
             jobseeker_profile__birthdate=date(1970, 1, 1),
+            title="M",
         )
         self.client.force_login(user)
         url = reverse("dashboard:edit_user_info")
