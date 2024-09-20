@@ -414,7 +414,7 @@ def stats_ft_delay_main(request):
         request=request,
         page_title="Délai d'entrée en IAE",
         extra_params={
-            mb.JOB_APPLICATION_ORIGIN_FILTER_KEY: mb.PE_PRESCRIBER_FILTER_VALUE,
+            mb.JOB_APPLICATION_ORIGIN_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
         },
     )
 
@@ -456,7 +456,7 @@ def stats_ft_state_main(request):
         request=request,
         page_title="Etat des candidatures orientées",
         extra_params={
-            mb.PRESCRIBER_FILTER_KEY: mb.PE_PRESCRIBER_FILTER_VALUE,
+            mb.PRESCRIBER_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
         },
     )
 
@@ -467,7 +467,7 @@ def stats_ft_state_raw(request):
         request=request,
         page_title="Données brutes de l’état des candidatures orientées",
         extra_params={
-            mb.PRESCRIBER_FILTER_KEY: mb.PE_PRESCRIBER_FILTER_VALUE,
+            mb.PRESCRIBER_FILTER_KEY: mb.FT_PRESCRIBER_FILTER_VALUE,
         },
     )
 
