@@ -34,6 +34,7 @@ from itou.common_apps.address.departments import (
 )
 from itou.companies import models as companies_models
 from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.prescribers.models import PrescriberOrganization
 from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
 from itou.utils.apis import metabase as mb
@@ -521,11 +522,21 @@ def stats_ph_state_main(request):
     if not utils.can_view_stats_ph(request):
         raise PermissionDenied
 
+    allowed_org_pks = [request.current_organization.pk]
+    if request.current_organization.kind in utils.STATS_PH_FULL_ACCESS_ORGANISATION_KIND_WHITELIST:
+        allowed_org_pks = list(
+            PrescriberOrganization.objects.filter(
+                kind=request.current_organization.kind,
+                department=request.current_organization.department,
+            ).values_list("pk", flat=True)
+        )
+
     return render_stats_ph(
         request=request,
         page_title="Etat des candidatures orientées",
         extra_params={
             mb.PRESCRIBER_FILTER_KEY: PrescriberOrganizationKind(request.current_organization.kind).label,
+            mb.C1_ORG_FILTER_KEY: allowed_org_pks,
         },
     )
 
