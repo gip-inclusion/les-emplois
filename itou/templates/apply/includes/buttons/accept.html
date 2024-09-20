@@ -7,11 +7,9 @@
         <span>Accepter</span>
     </a>
 {% else %}
-    {# GEIQ SIAE without valid geiq_eligibility_diagnosis #}
+    {# GEIQ SIAE without valid geiq_eligibility_diagnosis, modal in apply/process_details_company.html #}
     <button class="btn btn-lg btn-white btn-block btn-ico" data-bs-toggle="modal" data-bs-target="#confirm_no_allowance_modal">
         <i class="ri-check-line font-weight-medium" aria-hidden="true"></i>
         <span>Accepter</span>
     </button>
-    {# Confirmation modal for hiring #}
-    {% include "apply/includes/geiq/no_allowance_modal.html" with next_url=accept_url %}
 {% endif %}
