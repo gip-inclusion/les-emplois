@@ -347,7 +347,7 @@ class JobSeekerProfileFactory(factory.django.DjangoModelFactory):
 
     @factory.lazy_attribute
     def nir(self):
-        gender = random.choice([1, 2])
+        gender = "1" if self.user.title == Title.M else "2"
         if self.birthdate:
             year = self.birthdate.strftime("%y")
             month = self.birthdate.strftime("%m")

@@ -26,7 +26,7 @@ from itou.job_applications.enums import JobApplicationState, QualificationLevel,
 from itou.job_applications.models import JobApplication
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
-from itou.users.models import User
+from itou.users.models import JobSeekerProfile, User
 from itou.utils.mocks.address_format import mock_get_first_geocoding_data, mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.models import InclusiveDateRange
 from itou.utils.session import SessionNamespace
@@ -346,7 +346,7 @@ class ApplyAsJobSeekerTest(TestCase):
         response = self.client.get(next_url)
         assert response.status_code == 200
 
-        nir = "141068078200557"
+        nir = "178122978200508"
         post_data = {"nir": nir, "confirm": 1}
 
         response = self.client.post(next_url, data=post_data)
@@ -1399,6 +1399,9 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
+            jobseeker_profile__nir="178122978200508",
+            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            title="M",
         )
 
         # Entry point.
@@ -1472,6 +1475,36 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
 
         geispolsheim = create_city_geispolsheim()
         birthdate = dummy_job_seeker.jobseeker_profile.birthdate
+
+        # Let's check for consistency between the NIR, the birthdate and the title.
+        # ----------------------------------------------------------------------
+
+        post_data = {
+            "title": "MME",  # inconsistent title
+            "first_name": dummy_job_seeker.first_name,
+            "last_name": dummy_job_seeker.last_name,
+            "birthdate": birthdate,
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
+        }
+        response = self.client.post(next_url, data=post_data)
+        assert response.status_code == 200
+        self.assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE % "")
+
+        post_data = {
+            "title": "M",
+            "first_name": dummy_job_seeker.first_name,
+            "last_name": dummy_job_seeker.last_name,
+            "birthdate": datetime.date(1978, 11, 20),  # inconsistent birthdate
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
+        }
+        response = self.client.post(next_url, data=post_data)
+        assert response.status_code == 200
+        self.assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
+
+        # Resume to valid data and proceed with "normal" flow.
+        # ----------------------------------------------------------------------
 
         post_data = {
             "title": dummy_job_seeker.title,
@@ -1672,6 +1705,41 @@ class ApplyAsPrescriberTest(MessagesTestMixin, TestCase):
         response = self.client.get(reverse("apply:check_nir_for_job_seeker", kwargs={"company_pk": company.pk}))
         self.assertRedirects(
             response, reverse("apply:start", kwargs={"company_pk": company.pk}), fetch_redirect_response=False
+        )
+
+    def test_check_info_as_prescriber_for_job_seeker_with_incomplete_info(self):
+        company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
+        user = PrescriberFactory()
+        self.client.force_login(user)
+
+        dummy_job_seeker = JobSeekerFactory(
+            jobseeker_profile__with_hexa_address=True,
+            jobseeker_profile__with_education_level=True,
+            with_ban_geoloc_address=True,
+            jobseeker_profile__nir="178122978200508",
+            jobseeker_profile__birthdate=None,
+            title="M",
+        )
+
+        next_url = reverse(
+            "apply:step_check_job_seeker_info",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": dummy_job_seeker.public_id},
+        )
+
+        post_data = {
+            "phone": "",
+            "birthdate": datetime.date(1978, 11, 20),  # inconsistent birthdate
+            "pole_emploi_id": "3454471C",
+        }
+        response = self.client.post(next_url, data=post_data)
+        assert response.status_code == 200
+        self.assertContains(
+            response,
+            (
+                "Une erreur a été détectée. "
+                "La date de naissance renseignée ne correspond pas au numéro de sécurité "
+                "sociale 178122978200508 enregistré."
+            ),
         )
 
 
@@ -1943,6 +2011,36 @@ class ApplyAsCompanyTest(TestCase):
         geispolsheim = create_city_geispolsheim()
         birthdate = dummy_job_seeker.jobseeker_profile.birthdate
 
+        # Let's check for consistency between the NIR, the birthdate and the title.
+        # ----------------------------------------------------------------------
+
+        post_data = {
+            "title": "M",  # inconsistent title
+            "first_name": dummy_job_seeker.first_name,
+            "last_name": dummy_job_seeker.last_name,
+            "birthdate": birthdate,
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
+        }
+        response = self.client.post(next_url, data=post_data)
+        assert response.status_code == 200
+        self.assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE % "")
+
+        post_data = {
+            "title": "MME",
+            "first_name": dummy_job_seeker.first_name,
+            "last_name": dummy_job_seeker.last_name,
+            "birthdate": datetime.date(1978, 11, 20),  # inconsistent birthdate
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
+        }
+        response = self.client.post(next_url, data=post_data)
+        assert response.status_code == 200
+        self.assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
+
+        # Resume to valid data and proceed with "normal" flow.
+        # ----------------------------------------------------------------------
+
         post_data = {
             "title": dummy_job_seeker.title,
             "first_name": dummy_job_seeker.first_name,
@@ -2127,6 +2225,9 @@ class ApplyAsCompanyTest(TestCase):
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
+            jobseeker_profile__nir="278122978200555",
+            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            title="MME",
         )
         self._test_apply_as_company(employer, company, dummy_job_seeker)
 
@@ -2142,8 +2243,46 @@ class ApplyAsCompanyTest(TestCase):
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
+            jobseeker_profile__nir="278122978200555",
+            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            title="MME",
         )
         self._test_apply_as_company(employer, company, dummy_job_seeker)
+
+    def test_check_info_as_employer_for_job_seeker_with_incomplete_info(self):
+        company = CompanyFactory(with_membership=True, with_jobs=True, romes=("N1101", "N1105"))
+        employer = EmployerFactory(with_company=True)
+        self.client.force_login(employer)
+
+        dummy_job_seeker = JobSeekerFactory(
+            jobseeker_profile__with_hexa_address=True,
+            jobseeker_profile__with_education_level=True,
+            with_ban_geoloc_address=True,
+            jobseeker_profile__nir="278122978200555",
+            jobseeker_profile__birthdate=None,
+            title="MME",
+        )
+
+        next_url = reverse(
+            "apply:step_check_job_seeker_info",
+            kwargs={"company_pk": company.pk, "job_seeker_public_id": dummy_job_seeker.public_id},
+        )
+
+        post_data = {
+            "phone": "",
+            "birthdate": datetime.date(1978, 11, 20),  # inconsistent birthdate
+            "pole_emploi_id": "3454471C",
+        }
+        response = self.client.post(next_url, data=post_data)
+        assert response.status_code == 200
+        self.assertContains(
+            response,
+            (
+                "Une erreur a été détectée. "
+                "La date de naissance renseignée ne correspond pas au numéro de sécurité "
+                "sociale 278122978200555 enregistré."
+            ),
+        )
 
     @pytest.mark.ignore_unknown_variable_template_error("job_seeker")
     def test_cannot_create_job_seeker_with_pole_emploi_email(self):
@@ -2235,6 +2374,9 @@ class DirectHireFullProcessTest(TestCase):
             jobseeker_profile__with_hexa_address=True,
             jobseeker_profile__with_education_level=True,
             with_ban_geoloc_address=True,
+            jobseeker_profile__nir="178122978200508",
+            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            title="M",
         )
 
         geispolsheim = create_city_geispolsheim()
@@ -2297,6 +2439,36 @@ class DirectHireFullProcessTest(TestCase):
         )
 
         birthdate = dummy_job_seeker.jobseeker_profile.birthdate
+
+        # Let's check for consistency between the NIR, the birthdate and the title.
+        # ----------------------------------------------------------------------
+
+        post_data = {
+            "title": "MME",  # inconsistent title
+            "first_name": dummy_job_seeker.first_name,
+            "last_name": dummy_job_seeker.last_name,
+            "birthdate": birthdate,
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
+        }
+        response = self.client.post(next_url, data=post_data)
+        assert response.status_code == 200
+        self.assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE % "")
+
+        post_data = {
+            "title": "M",
+            "first_name": dummy_job_seeker.first_name,
+            "last_name": dummy_job_seeker.last_name,
+            "birthdate": datetime.date(1978, 11, 20),  # inconsistent birthdate
+            "lack_of_nir": False,
+            "lack_of_nir_reason": "",
+        }
+        response = self.client.post(next_url, data=post_data)
+        assert response.status_code == 200
+        self.assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
+
+        # Resume to valid data and proceed with "normal" flow.
+        # ----------------------------------------------------------------------
 
         post_data = {
             "title": dummy_job_seeker.title,
@@ -2990,7 +3162,12 @@ class UpdateJobSeekerBaseTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.company = CompanyFactory(subject_to_eligibility=True, with_membership=True)
-        cls.job_seeker = JobSeekerFactory(with_ban_geoloc_address=True)
+        cls.job_seeker = JobSeekerFactory(
+            with_ban_geoloc_address=True,
+            jobseeker_profile__nir="178122978200508",
+            jobseeker_profile__birthdate=datetime.date(1978, 12, 20),
+            title="M",
+        )
         cls.step_1_url = reverse(
             cls.STEP_1_VIEW_NAME,
             kwargs={"company_pk": cls.company.pk, "job_seeker_public_id": cls.job_seeker.public_id},
@@ -3036,6 +3213,38 @@ class UpdateJobSeekerBaseTestCase(TestCase):
             response = self.client.get(self.step_1_url)
         self.assertContains(response, self.job_seeker.first_name)
         self.assertNotContains(response, self.INFO_MODIFIABLE_PAR_CANDIDAT_UNIQUEMENT)
+
+        # Let's check for consistency between the NIR, the birthdate and the title.
+        # (but do not check when there is no NIR)
+        # ----------------------------------------------------------------------
+
+        if self.job_seeker.jobseeker_profile.nir != "":
+            post_data = {
+                "title": "MME",  # Inconsistent title
+                "first_name": self.job_seeker.first_name,
+                "last_name": self.job_seeker.last_name,
+                "birthdate": self.job_seeker.jobseeker_profile.birthdate,
+                "lack_of_nir": False,
+                "lack_of_nir_reason": "",
+            }
+            response = self.client.post(self.step_1_url, data=post_data)
+            assert response.status_code == 200
+            self.assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE % "")
+
+            post_data = {
+                "title": "M",
+                "first_name": self.job_seeker.first_name,
+                "last_name": self.job_seeker.last_name,
+                "birthdate": datetime.date(1978, 11, 20),  # Inconsistent birthdate
+                "lack_of_nir": False,
+                "lack_of_nir_reason": "",
+            }
+            response = self.client.post(self.step_1_url, data=post_data)
+            assert response.status_code == 200
+            self.assertContains(response, JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE % "")
+
+        # Resume to valid data and proceed with "normal" flow.
+        # ----------------------------------------------------------------------
 
         NEW_FIRST_NAME = "New first name"
         PROCESS_TITLE = "Modification du compte candidat"
@@ -3627,6 +3836,8 @@ def test_detect_existing_job_seeker(client):
 
     job_seeker = JobSeekerFactory(
         jobseeker_profile__nir="",
+        jobseeker_profile__birthdate=datetime.date(1997, 1, 1),
+        title="M",
         first_name="Jérémy",
         email="jeremy@example.com",
     )

@@ -784,6 +784,14 @@ class JobSeekerProfile(models.Model):
     ERROR_JOBSEEKER_TITLE = "La civilité du demandeur d'emploi est obligatoire"
     ERROR_JOBSEEKER_EDUCATION_LEVEL = "Le niveau de formation du demandeur d'emploi est obligatoire"
     ERROR_JOBSEEKER_PE_FIELDS = "L'identifiant et la durée d'inscription à France Travail vont de pair"
+    ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE = (
+        "Une erreur a été détectée."
+        " La civilité renseignée ne correspond pas au numéro de sécurité sociale%s enregistré."
+    )
+    ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE = (
+        "Une erreur a été détectée."
+        " La date de naissance renseignée ne correspond pas au numéro de sécurité sociale%s enregistré."
+    )
 
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -1064,6 +1072,29 @@ class JobSeekerProfile(models.Model):
             # Take advantage of the fact that `cleaned_data` is passed by sharing:
             # the object is shared between the caller and the called routine.
             cleaned_data["lack_of_pole_emploi_id_reason"] = ""
+
+    @staticmethod
+    def clean_nir_title_birthdate_fields(cleaned_data, remind_nir_in_error=False):
+        """
+        Validate consistency between NIR, title and birthdate
+        """
+        if cleaned_nir := cleaned_data.get("nir"):
+            if cleaned_title := cleaned_data.get("title"):
+                if (cleaned_nir[0] == "1" and cleaned_title != Title.M) or (
+                    cleaned_nir[0] == "2" and cleaned_title != Title.MME
+                ):
+                    raise ValidationError(
+                        JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_TITLE
+                        % (f" {cleaned_nir}" if remind_nir_in_error else "")
+                    )
+            if cleaned_birthdate := cleaned_data.get("birthdate"):
+                nir_year_month = cleaned_nir[1:5]
+                birthdate_year_month = cleaned_birthdate.strftime("%y%m")
+                if nir_year_month != birthdate_year_month:
+                    raise ValidationError(
+                        JobSeekerProfile.ERROR_JOBSEEKER_INCONSISTENT_NIR_BIRTHDATE
+                        % (f" {cleaned_nir}" if remind_nir_in_error else "")
+                    )
 
     def _clean_job_seeker_details(self):
         # Title is not mandatory for User, but it is for ASP

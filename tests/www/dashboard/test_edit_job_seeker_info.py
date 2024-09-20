@@ -67,7 +67,7 @@ class EditJobSeekerInfo(TestCase):
         side_effect=mock_get_geocoding_data_by_ban_api_resolved,
     )
     def test_edit_by_company_with_nir(self, _mock):
-        job_application = JobApplicationSentByPrescriberFactory()
+        job_application = JobApplicationSentByPrescriberFactory(job_seeker__jobseeker_profile__nir="178122978200508")
         user = job_application.to_company.members.first()
 
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
@@ -158,7 +158,7 @@ class EditJobSeekerInfo(TestCase):
         self.assertNotContains(response, self.NIR_UPDATE_TALLY_LINK_LABEL, html=True)
         self.assertContains(response, "Pour ajouter le numéro de sécurité sociale, veuillez décocher la case")
 
-        NEW_NIR = "1 970 13625838386"
+        NEW_NIR = "1 781 22978200508"
         post_data = {
             "email": "bob@saintclar.net",
             "title": "M",
@@ -257,7 +257,7 @@ class EditJobSeekerInfo(TestCase):
             "Le numéro de sécurité sociale est trop court (15 caractères autorisés).",
         )
 
-        NEW_NIR = "1 970 13625838386"
+        NEW_NIR = "1 781 22978200508"
         post_data["nir"] = NEW_NIR
         response = self.client.post(url, data=post_data)
         self.assertRedirects(response, expected_url=back_url)
@@ -388,7 +388,9 @@ class EditJobSeekerInfo(TestCase):
         new_email = "bidou@yopmail.com"
         company = CompanyFactory(with_membership=True)
         user = company.members.first()
-        job_application = JobApplicationSentByPrescriberFactory(to_company=company, job_seeker__created_by=user)
+        job_application = JobApplicationSentByPrescriberFactory(
+            to_company=company, job_seeker__created_by=user, job_seeker__jobseeker_profile__nir="178122978200508"
+        )
 
         self.client.force_login(user)
 
@@ -435,7 +437,7 @@ class EditJobSeekerInfo(TestCase):
     )
     def test_edit_email_when_confirmed(self, _mock):
         new_email = "bidou@yopmail.com"
-        job_application = JobApplicationSentByPrescriberFactory()
+        job_application = JobApplicationSentByPrescriberFactory(job_seeker__jobseeker_profile__nir="178122978200508")
         user = job_application.to_company.members.first()
 
         # Ensure that the job seeker is not autonomous (i.e. he did not register by himself).
