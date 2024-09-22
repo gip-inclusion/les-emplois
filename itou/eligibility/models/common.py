@@ -7,6 +7,9 @@ from django.utils import timezone
 
 from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel, AuthorKind
 from itou.job_applications.enums import SenderKind
+from itou.utils.apis.api_particulier import APIParticulierClient
+from itou.utils.models import InclusiveDateRangeField
+from itou.utils.types import InclusiveDateRange
 
 
 class CommonEligibilityDiagnosisQuerySet(models.QuerySet):
@@ -84,6 +87,26 @@ class AbstractEligibilityDiagnosisModel(models.Model):
             return "Orienteur"
         else:
             return SenderKind(self.sender_kind).label
+
+    def certify_criteria(self):
+        SelectedAdministrativeCriteria = self.administrative_criteria.through
+        criteria = list(
+            SelectedAdministrativeCriteria.objects.filter(
+                administrative_criteria__kind__in=AbstractAdministrativeCriteria.CAN_BE_CERTIFIED_KINDS,
+                eligibility_diagnosis=self,
+            )
+        )
+        for criterion in criteria:
+            criterion.certify()
+        SelectedAdministrativeCriteria.objects.bulk_update(
+            criteria,
+            fields=[
+                "data_returned_by_api",
+                "certified",
+                "certification_period",
+                "certified_at",
+            ],
+        )
 
 
 class AdministrativeCriteriaQuerySet(models.QuerySet):
@@ -165,8 +188,29 @@ class AbstractAdministrativeCriteria(models.Model):
 class AbstractSelectedAdministrativeCriteria(models.Model):
     certified = models.BooleanField(null=True, verbose_name="certifié par l'API Particulier")
     certified_at = models.DateTimeField(null=True, verbose_name="certifié le")
-    certification_period = models.DurationField(null=True, verbose_name="période de certification")
+    certification_period = InclusiveDateRangeField(null=True, verbose_name="période de certification")
     data_returned_by_api = models.JSONField(null=True, verbose_name="résultat renvoyé par l'API Particulier")
 
     class Meta:
         abstract = True
+
+    def certify(self, save=False):
+        client = APIParticulierClient(job_seeker=self.eligibility_diagnosis.job_seeker)
+
+        # Call only if self.certified is None?
+        if self.administrative_criteria.is_certifiable:
+            # Only the RSA criterion is certifiable at the moment,
+            # but this may change soon with the addition of `parent isolé` and `allocation adulte handicapé`.
+            if self.administrative_criteria.kind == AdministrativeCriteriaKind.RSA:
+                data = client.revenu_solidarite_active()
+
+            self.certified_at = timezone.now()
+            self.data_returned_by_api = data["raw_response"]
+            self.certified = data["is_certified"]
+            self.certification_period = None
+            start_at, end_at = data["start_at"], data["end_at"]
+            if start_at and end_at:
+                self.certification_period = InclusiveDateRange(start_at, end_at)
+
+        if save:
+            self.save()
