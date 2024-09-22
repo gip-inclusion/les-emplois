@@ -45,6 +45,9 @@ AWS_STORAGE_BUCKET_NAME = "tests"
 API_DATADOG_API_KEY = "abcde"
 API_DATADOG_APPLICATION_KEY = "fghij"
 
+API_PARTICULIER_BASE_URL = "https://fake-api-particulier.com/api/"
+API_PARTICULIER_TOKEN = "test"
+
 if os.getenv("DEBUG_SQL_SNAPSHOT"):
     # Mandatory to have detailed stacktrace inside templates
     TEMPLATES[0]["OPTIONS"]["debug"] = True  # noqa: F405
