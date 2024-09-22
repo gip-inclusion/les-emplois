@@ -1,14 +1,25 @@
+import datetime
+
 import pytest
 from dateutil.relativedelta import relativedelta
+from django.conf import settings
 from django.utils import timezone
+from freezegun import freeze_time
 
 from itou.eligibility.enums import AdministrativeCriteriaKind, AdministrativeCriteriaLevel, AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
-from itou.eligibility.models.common import AdministrativeCriteriaQuerySet
+from itou.eligibility.models.common import AbstractAdministrativeCriteria, AdministrativeCriteriaQuerySet
 from itou.eligibility.models.geiq import GEIQAdministrativeCriteria
+from itou.utils.mocks.api_particulier import (
+    rsa_certified_mocker,
+    rsa_not_certified_mocker,
+    rsa_not_found_mocker,
+)
+from itou.utils.types import InclusiveDateRange
 from tests.approvals.factories import ApprovalFactory, PoleEmploiApprovalFactory
 from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import (
+    GEIQEligibilityDiagnosisFactory,
     IAEEligibilityDiagnosisFactory,
 )
 from tests.job_applications.factories import JobApplicationFactory
@@ -480,3 +491,92 @@ def test_certifiable(AdministrativeCriteriaClass):
     for criterion in not_certifiable_criteria:
         assert criterion in not_certifiable_criteria
         assert not criterion.is_certifiable
+
+
+@pytest.mark.parametrize(
+    "EligibilityDiagnosisFactory",
+    [
+        pytest.param(IAEEligibilityDiagnosisFactory, id="test_eligibility_diagnosis_certify_criteria_iae"),
+        pytest.param(GEIQEligibilityDiagnosisFactory, id="test_eligibility_diagnosis_certify_criteria_geiq"),
+    ],
+)
+@freeze_time("2024-09-12")
+def test_eligibility_diagnosis_certify_criteria(mocker, EligibilityDiagnosisFactory):
+    mocker.patch("itou.utils.apis.api_particulier.APIParticulierClient._request", return_value=rsa_certified_mocker())
+    job_seeker = JobSeekerFactory(with_address=True, born_in_france=True)
+    eligibility_diagnosis = EligibilityDiagnosisFactory(
+        with_certifiable_criteria=True, job_seeker=job_seeker, from_prescriber=True
+    )
+    eligibility_diagnosis.certify_criteria()
+
+    SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
+    criteria = SelectedAdministrativeCriteria.objects.filter(
+        administrative_criteria__kind__in=AbstractAdministrativeCriteria.CAN_BE_CERTIFIED_KINDS,
+        eligibility_diagnosis=eligibility_diagnosis,
+    )
+    for criterion in criteria:
+        assert criterion.certified
+        assert criterion.certified_at == timezone.now()
+        assert criterion.data_returned_by_api == rsa_certified_mocker()
+        assert criterion.certification_period == InclusiveDateRange(
+            datetime.date(2024, 8, 1), datetime.date(2024, 10, 31)
+        )
+
+
+@pytest.mark.parametrize(
+    "EligibilityDiagnosisFactory",
+    [
+        pytest.param(IAEEligibilityDiagnosisFactory, id="test_selected_administrative_criteria_certify_iae"),
+        pytest.param(GEIQEligibilityDiagnosisFactory, id="test_selected_administrative_criteria_certify_geiq"),
+    ],
+)
+@freeze_time("2024-09-12")
+def test_selected_administrative_criteria_certify(respx_mock, EligibilityDiagnosisFactory, mocker):
+    job_seeker = JobSeekerFactory(with_address=True, born_in_france=True)
+    eligibility_diagnosis = EligibilityDiagnosisFactory(
+        with_certifiable_criteria=True, job_seeker=job_seeker, from_prescriber=True
+    )
+    SelectedAdministrativeCriteria = eligibility_diagnosis.administrative_criteria.through
+    criterion = SelectedAdministrativeCriteria.objects.filter(
+        administrative_criteria__kind=AdministrativeCriteriaKind.RSA,
+        eligibility_diagnosis=eligibility_diagnosis,
+    ).get()
+
+    # Is certified.
+    certified_mocker = mocker.patch(
+        "itou.utils.apis.api_particulier.APIParticulierClient._request",
+        return_value=rsa_certified_mocker(),
+    )
+    criterion.certify(save=True)
+    criterion.refresh_from_db()
+    assert criterion.data_returned_by_api == rsa_certified_mocker()
+    assert criterion.certified
+    assert criterion.certification_period == InclusiveDateRange(datetime.date(2024, 8, 1), datetime.date(2024, 10, 31))
+    assert criterion.certified_at == timezone.now()
+    certified_mocker.assert_called_once()
+    mocker.stop(certified_mocker)
+
+    # Is not certified.
+    not_certified_mocker = mocker.patch(
+        "itou.utils.apis.api_particulier.APIParticulierClient._request",
+        return_value=rsa_not_certified_mocker(),
+    )
+    criterion.certify(save=True)
+    criterion.refresh_from_db()
+    assert criterion.data_returned_by_api == rsa_not_certified_mocker()
+    assert criterion.certified is False
+    assert criterion.certification_period is None
+    assert criterion.certified_at == timezone.now()
+    not_certified_mocker.assert_called_once()
+    mocker.stop(not_certified_mocker)
+
+    # Not found. Save API response only.
+    respx_mock.get(f"{settings.API_PARTICULIER_BASE_URL}v2/revenu-solidarite-active").respond(
+        404, json=rsa_not_found_mocker()
+    )
+    criterion.certify(save=True)
+    criterion.refresh_from_db()
+    assert criterion.data_returned_by_api == rsa_not_found_mocker()
+    assert criterion.certified is None
+    assert criterion.certification_period is None
+    assert criterion.certified_at == timezone.now()
