@@ -26,6 +26,9 @@ from itou.cities.models import City
 from itou.companies.enums import CompanyKind, ContractType, JobDescriptionSource
 from itou.eligibility.enums import AuthorKind
 from itou.eligibility.models import AdministrativeCriteria, EligibilityDiagnosis
+from itou.eligibility.models.common import AbstractAdministrativeCriteria
+from itou.eligibility.models.geiq import GEIQSelectedAdministrativeCriteria
+from itou.eligibility.models.iae import SelectedAdministrativeCriteria
 from itou.employee_record.enums import Status
 from itou.job_applications import enums as job_applications_enums
 from itou.job_applications.enums import JobApplicationState, QualificationLevel, QualificationType, SenderKind
@@ -34,6 +37,7 @@ from itou.jobs.models import Appellation
 from itou.siae_evaluations.models import Sanctions
 from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
+from itou.utils.mocks.api_particulier import rsa_certified_mocker
 from itou.utils.models import InclusiveDateRange
 from itou.utils.templatetags.format_filters import format_nir, format_phone
 from itou.utils.urls import add_url_params
@@ -1838,7 +1842,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         "itou.utils.apis.geocoding.get_geocoding_data",
         side_effect=mock_get_geocoding_data_by_ban_api_resolved,
     )
-    def accept_job_application(self, _mock, job_application, post_data=None, assert_successful=True):
+    def accept_job_application(self, geocoding_mock, job_application, post_data=None, assert_successful=True):
         """
         This is not a test. It's a shortcut to process "apply:accept" view steps:
         - GET
@@ -1885,7 +1889,6 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         # See https://django-htmx.readthedocs.io/en/latest/http.html#django_htmx.http.HttpResponseClientRedirect # noqa
         if assert_successful:
             self.assertRedirects(response, next_url, status_code=200, fetch_redirect_response=False)
-
         return response, next_url
 
     _nominal_cases = list(
@@ -1938,9 +1941,17 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         "itou.utils.apis.geocoding.get_geocoding_data",
         side_effect=mock_get_geocoding_data_by_ban_api_resolved,
     )
-    def test_select_other_job_description_for_job_application(self, _mock):
+    @mock.patch(
+        "itou.utils.apis.api_particulier.APIParticulierClient._request",
+        return_value=rsa_certified_mocker(),
+    )
+    @freeze_time("2024-09-11")
+    def test_select_other_job_description_for_job_application(self, rsa_certified_mock, geocoding_mock):
         create_test_romes_and_appellations(["M1805"], appellations_per_rome=1)
-        job_application = self.create_job_application()
+        # Not sure if it's relevant to test it here.
+        # I'd rather test job applications' edge cases alone, without certifiable criteria,
+        # but test certifiable criteria aside to separate concerns.
+        job_application = self.create_job_application(with_certifiable_criteria=True)
         employer = self.company.members.first()
         self.client.force_login(employer)
 
@@ -1964,15 +1975,21 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         city = City.objects.order_by("?").first()
         appellation = Appellation.objects.get(rome_id="M1805")
         post_data |= {"location": city.pk, "appellation": appellation.pk}
-        response = self.client.post(url, data=post_data)
+        response = self.client.post(
+            url,
+            data=post_data,
+            headers={"hx-request": "true"},
+        )
+        assertTemplateUsed(response, "apply/includes/job_application_accept_form.html")
         assert response.status_code == 200
 
         # Modal window
         post_data |= {"confirmed": True}
-        response = self.client.post(url, data=post_data, follow=False)
+        response = self.client.post(url, data=post_data, follow=False, headers={"hx-request": "true"})
         # Caution: should redirect after that point, but done via HTMX we get a 200 status code
         assert response.status_code == 200
         assert response.url == reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+        rsa_certified_mock.assert_called_once()
 
         # Perform some checks on job description now attached to job application
         job_application.refresh_from_db()
@@ -2514,7 +2531,12 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         assert approval.start_at == job_application.hiring_start_at
         assert job_application.state.is_accepted
 
-    def test_accept_iae__criteria_can_be_certified(self):
+    @mock.patch(
+        "itou.utils.apis.api_particulier.APIParticulierClient._request",
+        return_value=rsa_certified_mocker(),
+    )
+    @freeze_time("2024-09-11")
+    def test_accept_iae__criteria_can_be_certified(self, certify_rsa_mocker):
         ######### Case 1: if BRSA is one the diagnosis criteria,
         ######### birth place and birth country are required.
         birthdate = datetime.date(1995, 12, 27)
@@ -2522,6 +2544,10 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             with_certifiable_criteria=True,
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
+        to_be_certified_criteria = SelectedAdministrativeCriteria.objects.filter(
+            administrative_criteria__kind__in=AbstractAdministrativeCriteria.CAN_BE_CERTIFIED_KINDS,
+            eligibility_diagnosis=job_application.eligibility_diagnosis,
+        ).all()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         employer = job_application.to_company.members.first()
@@ -2568,13 +2594,29 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             "birth_place": birth_place.pk,
         }
         self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
+        certify_rsa_mocker.assert_called_once()
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
         jobseeker_profile.refresh_from_db()
         assert jobseeker_profile.birth_country == birth_country
         assert jobseeker_profile.birth_place == birth_place
 
-    def test_accept_geiq__criteria_can_be_certified(self):
+        # certification
+        for criterion in to_be_certified_criteria:
+            criterion.refresh_from_db()
+            assert criterion.certified
+            assert criterion.data_returned_by_api == rsa_certified_mocker()
+            assert criterion.certification_period == InclusiveDateRange(
+                datetime.date(2024, 8, 1), datetime.date(2024, 10, 31)
+            )
+            assert criterion.certified_at
+
+    @mock.patch(
+        "itou.utils.apis.api_particulier.APIParticulierClient._request",
+        return_value=rsa_certified_mocker(),
+    )
+    @freeze_time("2024-09-11")
+    def test_accept_geiq__criteria_can_be_certified(self, certify_rsa_mocker):
         birthdate = datetime.date(1995, 12, 27)
         self.company.kind = CompanyKind.GEIQ
         self.company.save()
@@ -2583,6 +2625,10 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
             geiq_eligibility_diagnosis__with_certifiable_criteria=True,
             job_seeker__jobseeker_profile__birthdate=birthdate,
         )
+        to_be_certified_criteria = GEIQSelectedAdministrativeCriteria.objects.filter(
+            administrative_criteria__kind__in=AbstractAdministrativeCriteria.CAN_BE_CERTIFIED_KINDS,
+            eligibility_diagnosis=job_application.geiq_eligibility_diagnosis,
+        ).all()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
 
         employer = job_application.to_company.members.first()
@@ -2615,13 +2661,29 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         response, _ = self.accept_job_application(
             job_application=job_application, post_data=post_data, assert_successful=True
         )
+        certify_rsa_mocker.assert_called_once()
 
         jobseeker_profile = job_application.job_seeker.jobseeker_profile
         jobseeker_profile.refresh_from_db()
         assert jobseeker_profile.birth_country == birth_country
         assert jobseeker_profile.birth_place == birth_place
 
-    def test_accept_no_siae__criteria_can_be_certified(self):
+        # certification
+        for criterion in to_be_certified_criteria:
+            criterion.refresh_from_db()
+            assert criterion.certified
+            assert criterion.data_returned_by_api == rsa_certified_mocker()
+            assert criterion.certification_period == InclusiveDateRange(
+                datetime.date(2024, 8, 1), datetime.date(2024, 10, 31)
+            )
+            assert criterion.certified_at
+
+    @mock.patch(
+        "itou.utils.apis.api_particulier.APIParticulierClient._request",
+        return_value=rsa_certified_mocker(),
+    )
+    @freeze_time("2024-09-11")
+    def test_accept_no_siae__criteria_can_be_certified(self, _rsa_certified_mocker):
         company = CompanyFactory(not_subject_to_eligibility=True, with_membership=True, with_jobs=True)
         job_application = self.create_job_application(
             with_certifiable_criteria=True,
@@ -2650,7 +2712,7 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
     def test_criteria__criteria_not_certificable(self):
         # ############################
         # No criteria to be certified: the form should not appear
-        # and it should not be valided.
+        # and it should not be valid.
         ##############################
         job_application = self.create_job_application()
         url_accept = reverse("apply:accept", kwargs={"job_application_id": job_application.pk})
@@ -2668,7 +2730,12 @@ class ProcessAcceptViewsTest(ParametrizedTestCase, MessagesTestMixin, TestCase):
         del post_data["birth_place"]
         self.accept_job_application(job_application=job_application, post_data=post_data, assert_successful=True)
 
-    def test_accept_updated_birthdate_invalidating_birth_place(self):
+    @mock.patch(
+        "itou.utils.apis.api_particulier.APIParticulierClient._request",
+        return_value=rsa_certified_mocker(),
+    )
+    @freeze_time("2024-09-11")
+    def test_accept_updated_birthdate_invalidating_birth_place(self, _rsa_certified_mocker):
         # tests for a rare case where the birthdate will be cleaned for sharing between forms during the accept process
         job_application = self.create_job_application(with_certifiable_criteria=True)
 

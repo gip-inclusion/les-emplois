@@ -111,6 +111,7 @@ def _accept(request, company, job_seeker, error_url, back_url, template_name, ex
                     form_user_address.save()
                 if form_certified_criteria:
                     form_certified_criteria.save()
+                    valid_diagnosis.certify_criteria()
                 # After each successful transition, a save() is performed by django-xworkflows,
                 # so use `commit=False` to avoid a double save.
                 job_application = form_accept.save(commit=False)
