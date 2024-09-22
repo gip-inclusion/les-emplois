@@ -1,4 +1,10 @@
 # Journal des changements techniques majeurs
+## 2024-09-22
+
+- Ajout de la variable d'environnement `API_PARTICULIER_TOKEN` pour appeler l'API en local.
+La valeur de recette est dans `itou-secrets` > REVIEW-APP.enc.env ou
+[sur le dépôt du projet](https://github.com/etalab/siade_staging_data/blob/develop/tokens/default).
+
 ## 2024-06-06
 
 - Utilisation de `.envrc`: retrait du hack `.envrc.local`, ce qui permettra de
