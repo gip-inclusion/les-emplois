@@ -307,8 +307,8 @@ django==5.0.9 \
     #   django-xworkflows
     #   djangorestframework
     #   drf-spectacular
-django-allauth==64.2.1 \
-    --hash=sha256:54bf0af8dc5c334254dd56f9069447c19b9b623110a095b2a0dcb82a414e1055
+django-allauth==65.0.0 \
+    --hash=sha256:5bc344c7caa610b4ef87f529831473cb0c17184696a5f3bcd4678c8ead983e61
     # via -r requirements/base.txt
 django-anymail==12.0 \
     --hash=sha256:65789c1b0f42915aa0450a4f173f77572d4c552979b748ddd8125af41972ad30 \
