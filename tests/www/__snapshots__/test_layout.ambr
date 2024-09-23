@@ -135,7 +135,7 @@
       
       <li class="dropdown-divider"></li>
       
-      <li class="dropdown-item">
+      <li class="dropdown-item position-relative">
           <form action="/accounts/logout/" method="post">
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <button class="text-danger stretched-link">Déconnexion</button>
@@ -233,7 +233,7 @@
       
       <li class="dropdown-divider"></li>
       
-      <li class="dropdown-item">
+      <li class="dropdown-item position-relative">
           <form action="/accounts/logout/" method="post">
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <button class="text-danger stretched-link">Déconnexion</button>
@@ -412,7 +412,7 @@
           </li>
           <li class="dropdown-divider"></li>
       
-      <li class="dropdown-item">
+      <li class="dropdown-item position-relative">
           <form action="/accounts/logout/" method="post">
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <button class="text-danger stretched-link">Déconnexion</button>
@@ -515,7 +515,7 @@
           </li>
           <li class="dropdown-divider"></li>
       
-      <li class="dropdown-item">
+      <li class="dropdown-item position-relative">
           <form action="/accounts/logout/" method="post">
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <button class="text-danger stretched-link">Déconnexion</button>
@@ -643,7 +643,7 @@
       
       <li class="dropdown-divider"></li>
       
-      <li class="dropdown-item">
+      <li class="dropdown-item position-relative">
           <form action="/accounts/logout/" method="post">
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <button class="text-danger stretched-link">Déconnexion</button>
@@ -744,7 +744,7 @@
       
       <li class="dropdown-divider"></li>
       
-      <li class="dropdown-item">
+      <li class="dropdown-item position-relative">
           <form action="/accounts/logout/" method="post">
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <button class="text-danger stretched-link">Déconnexion</button>
@@ -877,7 +877,7 @@
       
       <li class="dropdown-divider"></li>
       
-      <li class="dropdown-item">
+      <li class="dropdown-item position-relative">
           <form action="/accounts/logout/" method="post">
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <button class="text-danger stretched-link">Déconnexion</button>
@@ -973,7 +973,7 @@
       
       <li class="dropdown-divider"></li>
       
-      <li class="dropdown-item">
+      <li class="dropdown-item position-relative">
           <form action="/accounts/logout/" method="post">
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <button class="text-danger stretched-link">Déconnexion</button>
@@ -1124,7 +1124,7 @@
       
       <li class="dropdown-divider"></li>
       
-      <li class="dropdown-item">
+      <li class="dropdown-item position-relative">
           <form action="/accounts/logout/" method="post">
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <button class="text-danger stretched-link">Déconnexion</button>
@@ -1218,7 +1218,7 @@
       
       <li class="dropdown-divider"></li>
       
-      <li class="dropdown-item">
+      <li class="dropdown-item position-relative">
           <form action="/accounts/logout/" method="post">
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <button class="text-danger stretched-link">Déconnexion</button>
@@ -1348,7 +1348,7 @@
       
       <li class="dropdown-divider"></li>
       
-      <li class="dropdown-item">
+      <li class="dropdown-item position-relative">
           <form action="/accounts/logout/" method="post">
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <button class="text-danger stretched-link">Déconnexion</button>
@@ -1442,7 +1442,7 @@
       
       <li class="dropdown-divider"></li>
       
-      <li class="dropdown-item">
+      <li class="dropdown-item position-relative">
           <form action="/accounts/logout/" method="post">
               <input name="csrfmiddlewaretoken" type="hidden" value="NORMALIZED_CSRF_TOKEN"/>
               <button class="text-danger stretched-link">Déconnexion</button>
