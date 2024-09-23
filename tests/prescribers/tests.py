@@ -307,6 +307,8 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         assert updated_prescriber_organization.authorization_updated_by == self.superuser
         assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.REFUSED
 
+    # TODO(calummackervoy): this test can be removed once there are no longer approved organizations of type "Other"
+    #   approving such organizations is now blocked
     def test_refuse_prescriber_habilitation_kind_other(self):
         # An OTHER organization should not have an authorization, which means we sometime have to refuse it
 
@@ -672,6 +674,89 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
         assert updated_prescriber_organization.authorization_updated_by == self.user
         assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
         assert updated_prescriber_organization.is_brsa
+
+    def test_prevent_prescriber_habilitation_organization_type_other(self):
+        self.client.force_login(self.user)
+
+        prescriber_organization = PrescriberOrganizationFactory(
+            siret="83987278500010",
+            department="14",
+            post_code="14000",
+            authorization_updated_at=datetime.now(tz=get_current_timezone()),
+            authorization_status=PrescriberAuthorizationStatus.NOT_SET,
+            is_authorized=False,
+            kind=PrescriberOrganizationKind.OTHER,
+        )
+
+        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
+        response = self.client.get(url)
+        self.assertContains(response, self.ACCEPT_BUTTON_LABEL)
+
+        post_data = {
+            "id": prescriber_organization.pk,
+            "siret": prescriber_organization.siret,
+            "post_code": prescriber_organization.post_code,
+            "department": prescriber_organization.department,
+            "kind": prescriber_organization.kind,
+            "name": prescriber_organization.name,
+            "_authorization_action_validate": "Valider+l'habilitation",
+            **self.FORMSETS_PAYLOAD,
+        }
+
+        # cannot validate an organization typed "Other"
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 302
+        self.assertMessages(
+            response,
+            [
+                messages.Message(
+                    messages.ERROR,
+                    "Pour habiliter cette organisation, vous devez sélectionner un type différent de “Autre”",
+                )
+            ],
+        )
+
+        updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
+        assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.NOT_SET
+
+        # can validate it with changed type
+        post_data["kind"] = PrescriberOrganizationKind.PE
+        response = self.client.post(url, data=post_data)
+
+        assert response.status_code == 302
+        updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
+        assert updated_prescriber_organization.is_authorized
+        assert updated_prescriber_organization.kind == PrescriberOrganizationKind.PE
+        assert updated_prescriber_organization.authorization_updated_by == self.user
+        assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.VALIDATED
+
+    def test_prevent_setting_prescriber_organization_to_other_once_accepted(self):
+        self.client.force_login(self.user)
+
+        prescriber_organization = PrescriberOrganizationFactory(
+            authorized=True,
+            siret="83987278500010",
+            department="14",
+            post_code="14000",
+            authorization_updated_at=datetime.now(tz=get_current_timezone()),
+        )
+
+        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
+        post_data = {
+            "id": prescriber_organization.pk,
+            "siret": prescriber_organization.siret,
+            "post_code": prescriber_organization.post_code,
+            "department": prescriber_organization.department,
+            "kind": PrescriberOrganizationKind.OTHER,
+            "name": prescriber_organization.name,
+            **self.FORMSETS_PAYLOAD,
+        }
+
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 200
+        expected_msg = "Cette organisation a été habilitée. Vous devez sélectionner un type différent de “Autre”"
+        assert len(response.context["errors"]) == 1
+        assert response.context["errors"][0] == [expected_msg]
 
 
 class TestUpdateRefusedPrescriberOrganizationKindManagementCommands:
