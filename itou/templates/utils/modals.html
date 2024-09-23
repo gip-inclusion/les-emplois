@@ -5,8 +5,8 @@
 {% for message in messages %}
     {% if "modal" in message.extra_tags %}
         <div class="modal fade" id="message-modal-{{ forloop.counter }}" data-bs-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="message-modal-{{ forloop.counter }}-label" aria-modal="true">
-            {% if "france_travail_registration_failure" in message.extra_tags %}
-                {% include "utils/modal_includes/france_travail_registration_failure.html" %}
+            {% if "sso_email_conflict_registration_failure" in message.extra_tags %}
+                {% include "utils/modal_includes/sso_email_conflict_registration_failure.html" %}
             {% endif %}
         </div>
 

@@ -30,7 +30,7 @@ from itou.openid_connect.inclusion_connect.models import (
     InclusionConnectState,
 )
 from itou.openid_connect.inclusion_connect.views import InclusionConnectSession
-from itou.openid_connect.models import InvalidKindException
+from itou.openid_connect.models import EmailInUseException, InvalidKindException
 from itou.prescribers.models import PrescriberOrganization
 from itou.users import enums as users_enums
 from itou.users.enums import IdentityProvider, UserKind
@@ -260,6 +260,16 @@ class InclusionConnectModelTest(InclusionConnectBaseTestCase):
         assert user.first_name == OIDC_USERINFO["given_name"]
         assert user.username == OIDC_USERINFO["sub"]
         assert user.identity_provider == users_enums.IdentityProvider.INCLUSION_CONNECT
+
+    def test_get_existing_user_with_same_email_django_inclusion_connect(self):
+        ic_user_data = InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)
+        PrescriberFactory(
+            username="another_username",
+            email=ic_user_data.email,
+            identity_provider=IdentityProvider.INCLUSION_CONNECT,
+        )
+        with pytest.raises(EmailInUseException):
+            ic_user_data.create_or_update_user()
 
     def test_update_user_from_user_info(self):
         user = PrescriberFactory(**dataclasses.asdict(InclusionConnectPrescriberData.from_user_info(OIDC_USERINFO)))

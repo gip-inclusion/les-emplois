@@ -14,7 +14,7 @@ from pytest_django.asserts import assertRedirects
 from itou.openid_connect.constants import OIDC_STATE_CLEANUP
 from itou.openid_connect.france_connect import constants
 from itou.openid_connect.france_connect.models import FranceConnectState, FranceConnectUserData
-from itou.openid_connect.models import InvalidKindException
+from itou.openid_connect.models import EmailInUseException, InvalidKindException
 from itou.users.enums import IdentityProvider, UserKind
 from itou.users.models import User
 from tests.users.factories import JobSeekerFactory, PrescriberFactory, UserFactory
@@ -230,6 +230,16 @@ class FranceConnectTest(TestCase):
         assert user.username == FC_USERINFO["sub"]
         assert user.identity_provider == IdentityProvider.FRANCE_CONNECT
         assert user.external_data_source_history != {}
+
+    def test_create_django_user_with_already_existing_fc_email(self):
+        fc_user_data = FranceConnectUserData.from_user_info(FC_USERINFO)
+        JobSeekerFactory(
+            username="another_username",
+            email=fc_user_data.email,
+            identity_provider=IdentityProvider.FRANCE_CONNECT,
+        )
+        with pytest.raises(EmailInUseException):
+            fc_user_data.create_or_update_user()
 
     def test_create_django_user_with_already_existing_fc_email_other_sso_job_seeker(self):
         """
