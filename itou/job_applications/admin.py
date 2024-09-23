@@ -206,6 +206,7 @@ class JobApplicationAdmin(InconsistencyCheckMixin, ItouModelAdmin):
                     "created_at",
                     "updated_at",
                     "processed_at",
+                    "archived_at",
                 ]
             },
         ),
