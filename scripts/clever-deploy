@@ -48,7 +48,7 @@ esac
         f.close()
         os.chmod(f.name, stat.S_IRUSR | stat.S_IXUSR)
         subprocess.check_call(
-            ["git", "push", deploy_url, f"{branch}:master", "--force", "--progress"],
+            ["git", "push", deploy_url, f"{branch}:refs/heads/master", "--force", "--progress"],
             env={
                 "CLEVER_TOKEN": os.environ["CLEVER_TOKEN"],
                 "CLEVER_SECRET": os.environ["CLEVER_SECRET"],
