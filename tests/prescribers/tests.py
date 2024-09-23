@@ -293,6 +293,45 @@ class PrescriberOrganizationAdminTest(MessagesTestMixin, TestCase):
             "department": prescriber_organization.department,
             "kind": prescriber_organization.kind,
             "name": prescriber_organization.name,
+            "siret": prescriber_organization.siret,
+            "_authorization_action_refuse": "Refuser+l'habilitation",
+            **self.FORMSETS_PAYLOAD,
+        }
+
+        response = self.client.post(url, data=post_data)
+        assert response.status_code == 302
+
+        updated_prescriber_organization = PrescriberOrganization.objects.get(pk=prescriber_organization.pk)
+        assert not updated_prescriber_organization.is_authorized
+        assert updated_prescriber_organization.kind == PrescriberOrganizationKind.OTHER
+        assert updated_prescriber_organization.authorization_updated_by == self.superuser
+        assert updated_prescriber_organization.authorization_status == PrescriberAuthorizationStatus.REFUSED
+
+    def test_refuse_prescriber_habilitation_kind_other(self):
+        # An OTHER organization should not have an authorization, which means we sometime have to refuse it
+
+        self.client.force_login(self.superuser)
+
+        prescriber_organization = PrescriberOrganizationFactory(
+            authorized=True,
+            siret="83987278500010",
+            department="14",
+            post_code="14000",
+            authorization_updated_at=datetime.now(tz=get_current_timezone()),
+            kind=PrescriberOrganizationKind.OTHER,
+        )
+
+        url = reverse("admin:prescribers_prescriberorganization_change", args=[prescriber_organization.pk])
+        response = self.client.get(url)
+        self.assertContains(response, self.REFUSE_BUTTON_LABEL)
+
+        post_data = {
+            "id": prescriber_organization.pk,
+            "post_code": prescriber_organization.post_code,
+            "department": prescriber_organization.department,
+            "kind": prescriber_organization.kind,
+            "name": prescriber_organization.name,
+            "siret": prescriber_organization.siret,
             "_authorization_action_refuse": "Refuser+l'habilitation",
             **self.FORMSETS_PAYLOAD,
         }

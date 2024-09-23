@@ -198,7 +198,12 @@ class PrescriberOrganizationAdmin(ItouGISMixin, OrganizationAdmin):
         if "_authorization_action_refuse" in request.POST:
             # Same checks in change_form template to display the button
             if request.user.is_superuser or obj.has_pending_authorization():
-                if self.get_queryset(request).filter(siret=obj.siret, kind=PrescriberOrganizationKind.OTHER).exists():
+                if (
+                    self.get_queryset(request)
+                    .filter(siret=obj.siret, kind=PrescriberOrganizationKind.OTHER)
+                    .exclude(pk=obj.pk)
+                    .exists()
+                ):
                     msg = (
                         "Impossible de refuser cette habilitation: cela changerait son type vers “Autre” "
                         "et une autre organisation de type “Autre” a le même SIRET."
