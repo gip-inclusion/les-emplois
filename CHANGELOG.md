@@ -1,5 +1,14 @@
 # Journal des modifications
 
+## 2024-09-23
+
+### Modifié
+
+- [Admin : Correction de l’affichage de l’état des candidatures contrôlée a posteriori](https://github.com/gip-inclusion/les-emplois/pull/4768)
+- [Admin: Remplacer l’erreur 500 en cas de refus d'habilitation par un message plus explicite](https://github.com/gip-inclusion/les-emplois/pull/4747) 🖼
+- [Connexion: Empêcher l'écrasement des comptes France Travail (courriels dupliqués)](https://github.com/gip-inclusion/les-emplois/pull/4619)
+- [Employeur: conserver les filtres de la page de candidature après une action sur une candidature](https://github.com/gip-inclusion/les-emplois/pull/4712)
+
 ## 2024-09-16
 
 ### Ajouté
