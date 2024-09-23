@@ -639,7 +639,7 @@ def suspension_action_choice(request, suspension_id, template_name="approvals/su
     back_url = get_safe_url(
         request,
         "back_url",
-        fallback_url=reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id}),
+        fallback_url=reverse("approvals:details", kwargs={"pk": suspension.approval_id}),
     )
 
     if request.method == "POST":
@@ -728,7 +728,7 @@ def suspension_update_enddate(request, suspension_id, template_name="approvals/s
     back_url = get_safe_url(
         request,
         "back_url",
-        fallback_url=reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id}),
+        fallback_url=reverse("approvals:details", kwargs={"pk": suspension.approval_id}),
     )
 
     if request.method == "POST" and form.is_valid():
@@ -768,7 +768,7 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
     back_url = get_safe_url(
         request,
         "back_url",
-        fallback_url=reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id}),
+        fallback_url=reverse("approvals:details", kwargs={"pk": suspension.approval_id}),
     )
 
     if request.method == "POST" and request.POST.get("confirm") == "true":
@@ -778,9 +778,7 @@ def suspension_delete(request, suspension_id, template_name="approvals/suspensio
             f"La suspension de {suspension.approval.user.get_full_name()} a bien été supprimée.",
             extra_tags="toast",
         )
-        return HttpResponseRedirect(
-            reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id})
-        )
+        return HttpResponseRedirect(reverse("approvals:details", kwargs={"pk": suspension.approval_id}))
 
     context = {
         "suspension": suspension,

@@ -219,7 +219,7 @@ class TestApprovalSuspendView:
         client.force_login(employer)
 
         back_url = reverse("search:employers_home")
-        redirect_url = reverse("employees:detail", kwargs={"public_id": suspension.approval.user.public_id})
+        redirect_url = reverse("approvals:details", kwargs={"pk": suspension.approval_id})
         params = urlencode({"back_url": back_url})
         url = reverse("approvals:suspension_delete", kwargs={"suspension_id": suspension.pk})
         url = f"{url}?{params}"
@@ -231,7 +231,7 @@ class TestApprovalSuspendView:
             response,
             selector="div.c-form",
             replace_in_attr=[
-                ("href", f"/employees/detail/{approval.user.public_id}", "/approvals/detail/[public_id of User]"),
+                ("href", f"/approvals/details/{approval.pk}", "/approvals/detail/[pk of Approval]"),
                 (
                     "href",
                     f"/approvals/suspension/{suspension.pk}/action/",
@@ -297,9 +297,7 @@ class TestApprovalSuspendActionChoiceView:
             response = client.get(self.url)
         assert response.status_code == 200
         assert response.context["suspension"] == self.suspension
-        assert response.context["back_url"] == reverse(
-            "employees:detail", kwargs={"public_id": self.suspension.approval.user.public_id}
-        )
+        assert response.context["back_url"] == reverse("approvals:details", kwargs={"pk": self.suspension.approval_id})
 
     def test_input_action_names(self, client):
         client.force_login(self.employer)
@@ -327,11 +325,7 @@ class TestApprovalSuspendActionChoiceView:
             response,
             add_url_params(
                 reverse("approvals:suspension_delete", kwargs={"suspension_id": self.suspension.pk}),
-                {
-                    "back_url": reverse(
-                        "employees:detail", kwargs={"public_id": self.suspension.approval.user.public_id}
-                    )
-                },
+                {"back_url": reverse("approvals:details", kwargs={"pk": self.suspension.approval_id})},
             ),
         )
 
@@ -343,11 +337,7 @@ class TestApprovalSuspendActionChoiceView:
             response,
             add_url_params(
                 reverse("approvals:suspension_update_enddate", kwargs={"suspension_id": self.suspension.pk}),
-                {
-                    "back_url": reverse(
-                        "employees:detail", kwargs={"public_id": self.suspension.approval.user.public_id}
-                    )
-                },
+                {"back_url": reverse("approvals:details", kwargs={"pk": self.suspension.approval_id})},
             ),
         )
 
@@ -406,11 +396,11 @@ class TestApprovalSuspendUpdateEndDateView:
         assert response.context["suspension"] == self.suspension
         assert response.context["secondary_url"] == add_url_params(
             reverse("approvals:suspension_action_choice", kwargs={"suspension_id": self.suspension.id}),
-            {"back_url": reverse("employees:detail", kwargs={"public_id": self.suspension.approval.user.public_id})},
+            {"back_url": reverse("approvals:details", kwargs={"pk": self.suspension.approval_id})},
         )
 
         assert response.context["reset_url"] == reverse(
-            "employees:detail", kwargs={"public_id": self.suspension.approval.user.public_id}
+            "approvals:details", kwargs={"pk": self.suspension.approval_id}
         )
         assert "form" in response.context
 
@@ -440,9 +430,7 @@ class TestApprovalSuspendUpdateEndDateView:
         client.force_login(self.employer)
 
         response = client.post(self.url, data={"first_day_back_to_work": timezone.localdate()})
-        assert response.url == reverse(
-            "employees:detail", kwargs={"public_id": self.suspension.approval.user.public_id}
-        )
+        assert response.url == reverse("approvals:details", kwargs={"pk": self.suspension.approval_id})
         self.suspension.refresh_from_db()
         assert self.suspension.end_at == timezone.localdate() - relativedelta(days=1)
         assert self.suspension.updated_by == self.employer

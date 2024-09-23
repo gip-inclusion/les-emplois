@@ -1,7 +1,7 @@
 # serializer version: 1
 # name: TestEmployeeDetailView.test_detail_view[employee detail view]
   dict({
-    'num_queries': 28,
+    'num_queries': 24,
     'queries': list([
       dict({
         'origin': list([
@@ -721,124 +721,6 @@
       }),
       dict({
         'origin': list([
-          'JobApplicationQuerySet.first[<site-packages>/django/db/models/query.py]',
-          'get_user_last_accepted_siae_job_application[approvals/utils.py]',
-          'last_hire_was_made_by_siae[approvals/utils.py]',
-          'Approval.can_be_suspended_by_siae[approvals/models.py]',
-          'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "job_applications_jobapplication"."id",
-                 "job_applications_jobapplication"."job_seeker_id",
-                 "job_applications_jobapplication"."eligibility_diagnosis_id",
-                 "job_applications_jobapplication"."geiq_eligibility_diagnosis_id",
-                 "job_applications_jobapplication"."create_employee_record",
-                 "job_applications_jobapplication"."resume_link",
-                 "job_applications_jobapplication"."sender_id",
-                 "job_applications_jobapplication"."sender_kind",
-                 "job_applications_jobapplication"."sender_company_id",
-                 "job_applications_jobapplication"."sender_prescriber_organization_id",
-                 "job_applications_jobapplication"."to_company_id",
-                 "job_applications_jobapplication"."state",
-                 "job_applications_jobapplication"."archived_at",
-                 "job_applications_jobapplication"."archived_by_id",
-                 "job_applications_jobapplication"."hired_job_id",
-                 "job_applications_jobapplication"."message",
-                 "job_applications_jobapplication"."answer",
-                 "job_applications_jobapplication"."answer_to_prescriber",
-                 "job_applications_jobapplication"."refusal_reason",
-                 "job_applications_jobapplication"."refusal_reason_shared_with_job_seeker",
-                 "job_applications_jobapplication"."hiring_start_at",
-                 "job_applications_jobapplication"."hiring_end_at",
-                 "job_applications_jobapplication"."hiring_without_approval",
-                 "job_applications_jobapplication"."origin",
-                 "job_applications_jobapplication"."approval_id",
-                 "job_applications_jobapplication"."approval_delivery_mode",
-                 "job_applications_jobapplication"."approval_number_sent_by_email",
-                 "job_applications_jobapplication"."approval_number_sent_at",
-                 "job_applications_jobapplication"."approval_manually_delivered_by_id",
-                 "job_applications_jobapplication"."approval_manually_refused_by_id",
-                 "job_applications_jobapplication"."approval_manually_refused_at",
-                 "job_applications_jobapplication"."transferred_at",
-                 "job_applications_jobapplication"."transferred_by_id",
-                 "job_applications_jobapplication"."transferred_from_id",
-                 "job_applications_jobapplication"."created_at",
-                 "job_applications_jobapplication"."updated_at",
-                 "job_applications_jobapplication"."processed_at",
-                 "job_applications_jobapplication"."prehiring_guidance_days",
-                 "job_applications_jobapplication"."contract_type",
-                 "job_applications_jobapplication"."nb_hours_per_week",
-                 "job_applications_jobapplication"."contract_type_details",
-                 "job_applications_jobapplication"."qualification_type",
-                 "job_applications_jobapplication"."qualification_level",
-                 "job_applications_jobapplication"."planned_training_hours",
-                 "job_applications_jobapplication"."inverted_vae_contract",
-                 "job_applications_jobapplication"."diagoriente_invite_sent_at",
-                 CASE
-                     WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."hiring_start_at"
-                     WHEN "job_applications_jobapplication"."origin" = %s THEN "job_applications_jobapplication"."created_at"
-                     WHEN "job_applications_jobapplication"."state" = %s THEN COALESCE(
-                                                                                         (SELECT U0."timestamp"
-                                                                                          FROM "job_applications_jobapplicationtransitionlog" U0
-                                                                                          WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                                                                                                 AND U0."transition" = %s)
-                                                                                          ORDER BY U0."timestamp" DESC
-                                                                                          LIMIT 1), "job_applications_jobapplication"."created_at")
-                     ELSE
-                            (SELECT U0."timestamp"
-                             FROM "job_applications_jobapplicationtransitionlog" U0
-                             WHERE (U0."job_application_id" = ("job_applications_jobapplication"."id")
-                                    AND U0."transition" = %s)
-                             ORDER BY U0."timestamp" DESC
-                             LIMIT 1)
-                 END AS "accepted_at"
-          FROM "job_applications_jobapplication"
-          INNER JOIN "companies_company" ON ("job_applications_jobapplication"."to_company_id" = "companies_company"."id")
-          WHERE ("job_applications_jobapplication"."job_seeker_id" = %s
-                 AND "job_applications_jobapplication"."state" = %s
-                 AND "companies_company"."kind" IN (%s,
-                                                    %s,
-                                                    %s,
-                                                    %s,
-                                                    %s))
-          ORDER BY 47 DESC,
-                   "job_applications_jobapplication"."hiring_start_at" DESC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Approval.is_last_for_user[approvals/models.py]',
-          'Approval.can_be_prolonged[approvals/models.py]',
-          'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
-        ]),
-        'sql': '''
-          SELECT "approvals_approval"."id",
-                 "approvals_approval"."start_at",
-                 "approvals_approval"."end_at",
-                 "approvals_approval"."created_at",
-                 "approvals_approval"."number",
-                 "approvals_approval"."pe_notification_status",
-                 "approvals_approval"."pe_notification_time",
-                 "approvals_approval"."pe_notification_endpoint",
-                 "approvals_approval"."pe_notification_exit_code",
-                 "approvals_approval"."user_id",
-                 "approvals_approval"."created_by_id",
-                 "approvals_approval"."origin",
-                 "approvals_approval"."eligibility_diagnosis_id",
-                 "approvals_approval"."updated_at",
-                 "approvals_approval"."origin_siae_siret",
-                 "approvals_approval"."origin_siae_kind",
-                 "approvals_approval"."origin_sender_kind",
-                 "approvals_approval"."origin_prescriber_organization_kind"
-          FROM "approvals_approval"
-          WHERE "approvals_approval"."user_id" = %s
-          ORDER BY "approvals_approval"."start_at" DESC
-          LIMIT 1
-        ''',
-      }),
-      dict({
-        'origin': list([
           'JobApplication.get_eligibility_diagnosis[job_applications/models.py]',
           'EmployeeDetailView.get_context_data[www/employees_views/views.py]',
         ]),
@@ -1338,109 +1220,11 @@
       }),
       dict({
         'origin': list([
-          'Approval.suspensions_for_status_card[approvals/models.py]',
-          'WithNode[approvals/includes/status.html]',
-          'IfNode[approvals/includes/status.html]',
-          'IncludeNode[employees/detail.html]',
-          'IfNode[employees/detail.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[employees/detail.html]',
-        ]),
-        'sql': '''
-          SELECT "approvals_suspension"."id",
-                 "approvals_suspension"."approval_id",
-                 "approvals_suspension"."start_at",
-                 "approvals_suspension"."end_at",
-                 "approvals_suspension"."siae_id",
-                 "approvals_suspension"."reason",
-                 "approvals_suspension"."reason_explanation",
-                 "approvals_suspension"."created_at",
-                 "approvals_suspension"."created_by_id",
-                 "approvals_suspension"."updated_at",
-                 "approvals_suspension"."updated_by_id"
-          FROM "approvals_suspension"
-          WHERE "approvals_suspension"."approval_id" = %s
-          ORDER BY "approvals_suspension"."start_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'Approval.prolongations_for_status_card[approvals/models.py]',
-          'WithNode[approvals/includes/status.html]',
-          'IfNode[approvals/includes/status.html]',
-          'IncludeNode[employees/detail.html]',
-          'IfNode[employees/detail.html]',
-          'BlockNode[layout/base.html]',
-          'ExtendsNode[employees/detail.html]',
-        ]),
-        'sql': '''
-          SELECT "approvals_prolongation"."id",
-                 "approvals_prolongation"."approval_id",
-                 "approvals_prolongation"."start_at",
-                 "approvals_prolongation"."end_at",
-                 "approvals_prolongation"."reason",
-                 "approvals_prolongation"."reason_explanation",
-                 "approvals_prolongation"."declared_by_id",
-                 "approvals_prolongation"."declared_by_siae_id",
-                 "approvals_prolongation"."validated_by_id",
-                 "approvals_prolongation"."prescriber_organization_id",
-                 "approvals_prolongation"."created_at",
-                 "approvals_prolongation"."created_by_id",
-                 "approvals_prolongation"."updated_at",
-                 "approvals_prolongation"."updated_by_id",
-                 "approvals_prolongation"."report_file_id",
-                 "approvals_prolongation"."require_phone_interview",
-                 "approvals_prolongation"."contact_email",
-                 "approvals_prolongation"."contact_phone",
-                 "approvals_prolongation"."request_id",
-                 CASE
-                     WHEN ("approvals_prolongation"."end_at" >= %s
-                           AND "approvals_prolongation"."start_at" <= %s) THEN %s
-                     ELSE %s
-                 END AS "is_in_progress_lookup",
-                 "users_user"."id",
-                 "users_user"."password",
-                 "users_user"."last_login",
-                 "users_user"."is_superuser",
-                 "users_user"."username",
-                 "users_user"."first_name",
-                 "users_user"."last_name",
-                 "users_user"."is_staff",
-                 "users_user"."is_active",
-                 "users_user"."date_joined",
-                 "users_user"."address_line_1",
-                 "users_user"."address_line_2",
-                 "users_user"."post_code",
-                 "users_user"."city",
-                 "users_user"."department",
-                 "users_user"."coords",
-                 "users_user"."geocoding_score",
-                 "users_user"."geocoding_updated_at",
-                 "users_user"."ban_api_resolved_address",
-                 "users_user"."insee_city_id",
-                 "users_user"."title",
-                 "users_user"."email",
-                 "users_user"."phone",
-                 "users_user"."kind",
-                 "users_user"."identity_provider",
-                 "users_user"."has_completed_welcoming_tour",
-                 "users_user"."created_by_id",
-                 "users_user"."external_data_source_history",
-                 "users_user"."last_checked_at",
-                 "users_user"."public_id",
-                 "users_user"."address_filled_at",
-                 "users_user"."first_login"
-          FROM "approvals_prolongation"
-          LEFT OUTER JOIN "users_user" ON ("approvals_prolongation"."validated_by_id" = "users_user"."id")
-          WHERE "approvals_prolongation"."approval_id" = %s
-          ORDER BY "approvals_prolongation"."start_at" DESC
-        ''',
-      }),
-      dict({
-        'origin': list([
-          'IfNode[approvals/includes/status.html]',
-          'WithNode[approvals/includes/status.html]',
-          'IfNode[approvals/includes/status.html]',
+          'QuerySet.first[<site-packages>/django/db/models/query.py]',
+          'Approval.pending_prolongation_request[approvals/models.py]',
+          'WithNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
+          'IfNode[approvals/includes/box.html]',
           'IncludeNode[employees/detail.html]',
           'IfNode[employees/detail.html]',
           'BlockNode[layout/base.html]',
@@ -1601,8 +1385,9 @@
           LEFT OUTER JOIN "prescribers_prescriberorganization" ON ("approvals_prolongationrequest"."prescriber_organization_id" = "prescribers_prescriberorganization"."id")
           LEFT OUTER JOIN "users_user" T6 ON ("approvals_prolongationrequest"."processed_by_id" = T6."id")
           WHERE ("approvals_prolongationrequest"."approval_id" = %s
-                 AND NOT ("approvals_prolongationrequest"."status" = %s))
+                 AND "approvals_prolongationrequest"."status" = %s)
           ORDER BY "approvals_prolongationrequest"."created_at" DESC
+          LIMIT 1
         ''',
       }),
       dict({
@@ -1674,7 +1459,4 @@
                               </div>
                           </div>
   '''
-# ---
-# name: TestEmployeeDetailView.test_remove_approval_button[bouton de suppression d'un PASS IAE]
-  '<a aria-label="Mettre fin au PASS IAE de Doe JOHN" class="btn btn-block btn-outline-warning mt-3" href="https://tally.so/r/3je84Q?siaeID=999999&amp;nomSIAE=Aci+de+la+rochelle&amp;prenomemployeur=Milady&amp;nomemployeur=de+Winter&amp;emailemployeur=oph%40dewinter.com&amp;userID=123456&amp;numPASS=XXXXX+12+34568&amp;prenomsalarie=Doe&amp;nomsalarie=John" id="approval-deletion-link" rel="noopener" target="_blank">Clôturer</a>'
 # ---
