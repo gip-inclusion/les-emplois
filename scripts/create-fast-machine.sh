@@ -49,7 +49,7 @@ Vous pouvez maintenant:
  - 🔨 Jouer les scripts d’import, par exemple:
     cd ~/app_* && scripts/import-iae.sh
  - 🍺 Supprimer la machine:
-    clever delete --alias $APP_NAME --yes && git remote remove "$APP_NAME"
+    clever delete --alias $APP_NAME --yes
 EOF
 
 exit 0
