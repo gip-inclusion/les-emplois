@@ -8,13 +8,14 @@ from django.contrib.auth import login
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
 from django.utils import crypto
+from django.utils.html import format_html
 from django.utils.http import urlencode
 
 from itou.users.enums import UserKind
 from itou.utils import constants as global_constants
 from itou.utils.urls import get_absolute_url
 
-from ..models import InvalidKindException, MultipleUsersFoundException
+from ..models import EmailInUseException, InvalidKindException, MultipleUsersFoundException
 from . import constants
 from .models import FranceConnectState, FranceConnectUserData
 
@@ -22,9 +23,9 @@ from .models import FranceConnectState, FranceConnectUserData
 logger = logging.getLogger(__name__)
 
 
-def _redirect_to_job_seeker_login_on_error(error_msg, request=None):
+def _redirect_to_job_seeker_login_on_error(error_msg, request=None, extra_tags=""):
     if request:
-        messages.error(request, error_msg)
+        messages.error(request, error_msg, extra_tags)
     return HttpResponseRedirect(reverse("login:job_seeker"))
 
 
@@ -134,6 +135,28 @@ def france_connect_callback(request):
             UserKind.LABOR_INSPECTOR: reverse("login:labor_inspector"),
         }[e.user.kind]
         return HttpResponseRedirect(url)
+    except EmailInUseException as e:
+        redacted_name = e.user.get_redacted_full_name()
+        msg_who = (
+            format_html(
+                " au nom de <strong>{}</strong>",
+                redacted_name,
+            )
+            if redacted_name
+            else ""
+        )
+
+        return _redirect_to_job_seeker_login_on_error(
+            format_html(
+                "Vous avez essayé de vous connecter avec un compte France Connect, mais un compte"
+                "{} a déjà été créé avec cette adresse e-mail. Vous pouvez néanmoins"
+                " vous inscrire en utilisant une autre adresse e-mail et un mot de passe"
+                ' en cliquant sur <strong>"Inscription"</strong>.',
+                msg_who,
+            ),
+            request=request,
+            extra_tags="modal sso_email_conflict_registration_failure",
+        )
     except MultipleUsersFoundException as e:
         return _redirect_to_job_seeker_login_on_error(
             "Vous avez deux comptes sur la plateforme et nous détectons un conflit d'email : "

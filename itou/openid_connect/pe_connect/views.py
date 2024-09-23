@@ -153,7 +153,14 @@ def pe_connect_callback(request):
         )
     except EmailInUseException as e:
         redacted_name = e.user.get_redacted_full_name()
-        msg_who = f" au nom de <strong>{redacted_name}</strong>" if redacted_name else ""
+        msg_who = (
+            format_html(
+                " au nom de <strong>{}</strong>",
+                redacted_name,
+            )
+            if redacted_name
+            else ""
+        )
 
         return _redirect_to_job_seeker_login_on_error(
             format_html(
@@ -164,7 +171,7 @@ def pe_connect_callback(request):
                 msg_who,
             ),
             request=request,
-            extra_tags="modal france_travail_registration_failure",
+            extra_tags="modal sso_email_conflict_registration_failure",
         )
 
     nir = request.session.get(global_constants.ITOU_SESSION_NIR_KEY)

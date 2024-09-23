@@ -112,12 +112,15 @@ class OIDConnectUserData:
 
     def create_or_update_user(self, is_login=False):
         """
-        Create or update a user managed by another identity provider.
-         - If there is already a user with this username (user_info_dict["sub"])
-           and from the same identity provider, we update and return it.
-         - If there is already a user with the email, we return this user, provided
-           the email is not in use by another account of the same provider (some providers allow email overloading).
-         - Otherwise, we create a new user based on the data we received.
+        A user is being created or updated from information provided by an identity provider.
+        A user is globally unique with the combination of SSO provider + sub (e.g. InclusionConnect:username).
+
+        If we cannot find the user via provider + username:
+         - If the email isn't in use, we'll create a new account.
+         - We will replace a Django account with the same email with the SSO account information.
+         - We will raise an EmailInUseException if the email is being used by another account of the same SSO
+           (we do not support email overloading).
+         - We will return the user without modification if they exist on a different SSO.
         """
         user_data_dict = dataclasses.asdict(self)
         user_data_dict = {key: value for key, value in user_data_dict.items() if value}
@@ -131,14 +134,16 @@ class OIDConnectUserData:
             created = False
         except User.DoesNotExist:
             try:
+                # A different user has already claimed this email address (we require emails to be unique)
                 user = User.objects.get(email=self.email)
                 created = False
-                if user.identity_provider not in [IdentityProvider.DJANGO, self.identity_provider]:
+                if user.identity_provider == self.identity_provider:
+                    raise EmailInUseException(user)
+                # It is possible to "upgrade" a Django account to an SSO, but not to replace an SSO
+                if user.identity_provider != IdentityProvider.DJANGO:
                     self.check_valid_kind(user, user_data_dict, is_login)
                     # Don't update a user handled by another SSO provider.
                     return user, created
-                if user.identity_provider == self.identity_provider:
-                    raise EmailInUseException(user)
             except User.DoesNotExist:
                 # User.objects.create_user does the following:
                 # - set User.is_active to true,
