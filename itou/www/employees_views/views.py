@@ -1,16 +1,13 @@
 import contextlib
 import logging
-import urllib.parse
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import Exists, OuterRef, Prefetch
 from django.urls import reverse_lazy
-from django.utils import timezone
 from django.views.generic import DetailView
 
 from itou.approvals.models import (
-    SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE,
     Approval,
     ProlongationRequest,
 )
@@ -108,46 +105,12 @@ class EmployeeDetailView(LoginRequiredMixin, DetailView):
 
         context["can_view_personal_information"] = True  # SIAE members have access to personal info
         context["can_edit_personal_information"] = self.request.user.can_edit_personal_information(self.object)
-        context["approval_can_be_suspended_by_siae"] = approval and approval.can_be_suspended_by_siae(self.siae)
-        context["approval_can_be_prolonged"] = approval and approval.can_be_prolonged
         context["approval"] = approval
         context["job_application"] = job_application
         context["matomo_custom_title"] = "Profil salarié"
         context["eligibility_diagnosis"] = job_application and job_application.get_eligibility_diagnosis()
-        context["approval_deletion_form_url"] = None
         context["back_url"] = get_safe_url(self.request, "back_url", fallback_url=reverse_lazy("approvals:list"))
         context["link_immersion_facile"] = None
-
-        if approval and approval.is_in_progress:
-            # suspension_set has already been loaded via prefetch_related for the remainder computation
-            for suspension in sorted(approval.suspension_set.all(), key=lambda s: s.start_at):
-                if suspension.is_in_progress:
-                    suspension_duration = timezone.localdate() - suspension.start_at
-                    has_hirings_after_suspension = False
-                else:
-                    suspension_duration = suspension.duration
-                    has_hirings_after_suspension = (
-                        approval.jobapplication_set.accepted().filter(hiring_start_at__gte=suspension.end_at).exists()
-                    )
-
-                if (
-                    suspension_duration > SUSPENSION_DURATION_BEFORE_APPROVAL_DELETABLE
-                    and not has_hirings_after_suspension
-                ):
-                    context["approval_deletion_form_url"] = "https://tally.so/r/3je84Q?" + urllib.parse.urlencode(
-                        {
-                            "siaeID": self.siae.pk,
-                            "nomSIAE": self.siae.display_name,
-                            "prenomemployeur": self.request.user.first_name,
-                            "nomemployeur": self.request.user.last_name,
-                            "emailemployeur": self.request.user.email,
-                            "userID": self.request.user.pk,
-                            "numPASS": approval.number_with_spaces,
-                            "prenomsalarie": approval.user.first_name,
-                            "nomsalarie": approval.user.last_name,
-                        }
-                    )
-                    break
 
         if approval and approval.remainder.days < 90 and self.request.user.is_employer:
             context["link_immersion_facile"] = immersion_search_url(approval.user)

@@ -2678,7 +2678,7 @@ class TestDirectHireFullProcess:
         # Get application detail
         # ----------------------------------------------------------------------
         response = client.get(next_url)
-        assertTemplateUsed(response, "approvals/includes/status.html")
+        assertTemplateUsed(response, "approvals/includes/box.html")
         assert response.status_code == 200
 
     def test_hire_as_geiq(self, client):

@@ -36,45 +36,7 @@
                 </div>
                 <div class="col-12 col-lg-4 order-1 order-lg-2">
                     {% if approval %}
-                        <div class="c-box mb-4">
-                            {# Approval status. #}
-                            <div>{% include "approvals/includes/status.html" with common_approval=approval hiring_pending=False %}</div>
-                            {# Approval actions. #}
-                            {% if request.user.is_employer %}
-                                {% if approval_can_be_suspended_by_siae %}
-                                    <a href="{% url 'approvals:suspend' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                       class="btn btn-block btn-outline-primary mt-3"
-                                       aria-label="Suspendre le PASS IAE de {{ job_seeker.get_full_name }}">Suspendre</a>
-                                {% elif approval.can_be_suspended %}
-                                    <div class="btn btn-ico">
-                                        <span class="disabled">Suspendre</span>
-                                        <i class="ri-information-line ri-xl text-info" data-bs-toggle="tooltip" title="La suspension n’est pas possible car un autre employeur a embauché le candidat."></i>
-                                    </div>
-                                {% endif %}
-                                {% if approval_can_be_prolonged %}
-                                    <a href="{% url 'approvals:declare_prolongation' approval_id=approval.id %}?back_url={{ request.get_full_path|urlencode }}"
-                                       class="btn btn-block btn-outline-primary mt-3"
-                                       aria-label="Prolonger le PASS IAE de {{ job_seeker.get_full_name }}">Prolonger</a>
-                                {% endif %}
-                                {% if approval_deletion_form_url %}
-                                    <a href="{{ approval_deletion_form_url }}"
-                                       id="approval-deletion-link"
-                                       class="btn btn-block btn-outline-warning mt-3"
-                                       target="_blank"
-                                       rel="noopener"
-                                       aria-label="Mettre fin au PASS IAE de {{ job_seeker.get_full_name }}">Clôturer</a>
-                                {% endif %}
-                                <a class="btn btn-primary btn-block btn-ico mt-3"
-                                   {% matomo_event "telechargement-pdf" "agrement" "detail-agrement" %}
-                                   href="{% url 'approvals:display_printable_approval' approval_id=approval.id %}"
-                                   target="_blank"
-                                   rel="noopener"
-                                   aria-label="Afficher le PASS IAE de {{ job_seeker.get_full_name }}">
-                                    <i class="ri-eye-line ri-xl fw-medium" aria-hidden="true"></i>
-                                    <span>Afficher l'attestation</span>
-                                </a>
-                            {% endif %}
-                        </div>
+                        {% include "approvals/includes/box.html" with approval=approval link_from_current_url=request.get_full_path only %}
                     {% endif %}
                     {% if link_immersion_facile %}
                         {# Immersion Facilitée proposal on expiring passes #}

@@ -1,12 +1,9 @@
 import datetime
 
-import pytest
-from dateutil.relativedelta import relativedelta
 from django.template.defaultfilters import urlencode
 from django.test import override_settings
 from django.urls import reverse
 from django.utils import timezone
-from freezegun import freeze_time
 from pytest_django.asserts import assertContains, assertNotContains, assertRedirects
 
 from itou.job_applications.enums import JobApplicationState, SenderKind
@@ -15,18 +12,16 @@ from itou.utils.templatetags import format_filters
 from itou.utils.urls import add_url_params
 from tests.approvals.factories import (
     ApprovalFactory,
-    SuspensionFactory,
 )
-from tests.companies.factories import CompanyFactory, CompanyMembershipFactory
+from tests.companies.factories import CompanyFactory
 from tests.eligibility.factories import IAEEligibilityDiagnosisFactory
 from tests.job_applications.factories import JobApplicationFactory, JobApplicationSentByPrescriberOrganizationFactory
 from tests.prescribers.factories import PrescriberFactory, PrescriberOrganizationFactory
-from tests.users.factories import JobSeekerFactory
 from tests.utils.test import assert_previous_step, assertSnapshotQueries, parse_response_to_soup
 
 
 class TestEmployeeDetailView:
-    APPROVAL_NUMBER_LABEL = "Numéro de PASS IAE"
+    APPROVAL_NUMBER_LABEL = "Numéro de PASS IAE"
 
     def test_anonymous_user(self, client):
         approval = ApprovalFactory()
@@ -69,6 +64,7 @@ class TestEmployeeDetailView:
         with assertSnapshotQueries(snapshot(name="employee detail view")):
             response = client.get(url)
         assertContains(response, self.APPROVAL_NUMBER_LABEL)
+        assertContains(response, reverse("approvals:details", kwargs={"pk": approval.pk}))
         assertContains(response, "Informations du salarié")
         assertContains(response, "Éligibilité à l'IAE")
         assertContains(response, "Candidatures de ce salarié")
@@ -148,61 +144,6 @@ class TestEmployeeDetailView:
             assertContains(response, new_number)
             assertNotContains(response, expired_number)
 
-    def test_suspend_button(self, client):
-        approval = ApprovalFactory(with_jobapplication=True)
-        job_application = approval.jobapplication_set.get()
-        siae = job_application.to_company
-        employer = siae.members.first()
-        client.force_login(employer)
-
-        url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
-        assert approval.can_be_suspended_by_siae(siae)
-        response = client.get(url)
-        assertContains(response, reverse("approvals:suspend", kwargs={"approval_id": approval.id}))
-
-        SuspensionFactory(
-            approval=approval,
-            start_at=timezone.localdate() - relativedelta(days=1),
-            end_at=timezone.localdate() + relativedelta(days=1),
-        )
-        # Clear cached property
-        del approval.can_be_suspended
-        del approval.is_suspended
-        assert not approval.can_be_suspended_by_siae(siae)
-        response = client.get(url)
-        assertNotContains(response, reverse("approvals:suspend", kwargs={"approval_id": approval.id}))
-
-    def test_prolongation_button(self, client):
-        # any SIAE can prolong an approval (if it can be prolonged)
-        approval = ApprovalFactory(
-            with_jobapplication=True,
-            start_at=timezone.localdate() - relativedelta(months=12),
-            end_at=timezone.localdate() + relativedelta(months=2),
-        )
-        job_application = approval.jobapplication_set.get()
-        siae = job_application.to_company
-        employer = siae.members.first()
-        client.force_login(employer)
-
-        url = reverse("employees:detail", kwargs={"public_id": approval.user.public_id})
-        assert approval.can_be_prolonged
-        response = client.get(url)
-        assertContains(
-            response,
-            reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id}),
-        )
-
-        approval.end_at = timezone.localdate() - relativedelta(months=4)
-        approval.save()
-        # Clear cached property
-        del approval.can_be_prolonged
-        assert not approval.can_be_prolonged
-        response = client.get(url)
-        assertNotContains(
-            response,
-            reverse("approvals:declare_prolongation", kwargs={"approval_id": approval.id}),
-        )
-
     @override_settings(TALLY_URL="https://tally.so")
     def test_edit_user_info_button(self, client):
         approval = ApprovalFactory(with_jobapplication=True)
@@ -238,44 +179,6 @@ class TestEmployeeDetailView:
             ),
             html=True,
         )
-
-    @freeze_time("2023-04-26")
-    @pytest.mark.usefixtures("unittest_compatibility")
-    @override_settings(TALLY_URL="https://tally.so")
-    def test_remove_approval_button(self, client):
-        membership = CompanyMembershipFactory(
-            user__id=123456,
-            user__email="oph@dewinter.com",
-            user__first_name="Milady",
-            user__last_name="de Winter",
-            company__id=999999,
-            company__name="ACI de la Rochelle",
-        )
-        job_application = JobApplicationFactory(
-            hiring_start_at=datetime.date(2021, 3, 1),
-            to_company=membership.company,
-            job_seeker=JobSeekerFactory(last_name="John", first_name="Doe"),
-            with_approval=True,
-            # Don't set an ASP_ITOU_PREFIX (see approval.save for details)
-            approval__number="XXXXX1234568",
-        )
-
-        client.force_login(membership.user)
-
-        # suspension still active, more than 1 year old, starting after the accepted job application
-        suspension = SuspensionFactory(approval=job_application.approval, start_at=datetime.date(2022, 4, 8))
-        response = client.get(reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id}))
-
-        delete_button = parse_response_to_soup(response, selector="#approval-deletion-link")
-        assert str(delete_button) == self.snapshot(name="bouton de suppression d'un PASS IAE")
-
-        # suspension now is inactive
-        suspension.end_at = datetime.date(2023, 4, 10)  # more than 12 months but ended
-        suspension.save(update_fields=["end_at"])
-        response = client.get(reverse("employees:detail", kwargs={"public_id": job_application.job_seeker.public_id}))
-
-        delete_button = parse_response_to_soup(response, selector="#approval-deletion-link")
-        assert str(delete_button) == self.snapshot(name="bouton de suppression d'un PASS IAE")
 
     @override_settings(TALLY_URL="https://tally.so")
     def test_link_immersion_facile(self, client, snapshot):
