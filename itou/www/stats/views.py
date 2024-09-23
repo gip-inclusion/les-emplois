@@ -343,36 +343,12 @@ def stats_cd_iae(request):
 
 @login_required
 def stats_cd_hiring(request):
-    context = {
-        "pilotage_webinar_banners": [
-            {
-                "title": "Des questions sur la prise en main de ce nouveau tableau de bord ?",
-                "description": "Nous y répondons en direct lors d’un webinaire de questions / réponses, dédiés aux Conseils départementaux, organisés le mardi 17 septembre à 14h",  # noqa: E501
-                "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-webinaire-questions-and-reponses-pour-les-conseils-departementaux?s=f83e62e2-42a3-4cc1-9772-c963d2be2c00",  # noqa: E501
-                "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 9, 17),
-            }
-        ]
-    }
-    return render_stats_cd(request=request, page_title="Facilitation des embauches en IAE", extra_context=context)
+    return render_stats_cd(request=request, page_title="Facilitation des embauches en IAE")
 
 
 @login_required
 def stats_cd_brsa(request):
-    context = {
-        "pilotage_webinar_banners": [
-            {
-                "title": "Des questions sur la prise en main de ce nouveau tableau de bord ?",
-                "description": "Nous y répondons en direct lors d’un webinaire de questions / réponses, dédiés aux Conseils départementaux, organisés le mardi 17 septembre à 14h",  # noqa: E501
-                "url": "https://app.livestorm.co/itou/le-pilotage-de-linclusion-webinaire-questions-and-reponses-pour-les-conseils-departementaux?s=f83e62e2-42a3-4cc1-9772-c963d2be2c00",  # noqa: E501
-                "is_displayable": lambda: timezone.localdate() <= datetime.date(2024, 9, 17),
-            }
-        ]
-    }
-    return render_stats_cd(
-        request=request,
-        page_title="Suivi des prescriptions des accompagnateurs des publics bRSA",
-        extra_context=context,
-    )
+    return render_stats_cd(request=request, page_title="Suivi des prescriptions des accompagnateurs des publics bRSA")
 
 
 @login_required
