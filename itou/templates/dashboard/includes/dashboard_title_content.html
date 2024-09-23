@@ -3,11 +3,15 @@
 
 <div class="d-flex flex-column flex-md-row gap-3 mb-3 justify-content-md-between">
     <div>
-        <h1 class="mb-0">
-            {% if user.is_job_seeker and user.get_full_name %}Tableau de bord - {{ user.get_full_name }}{% endif %}
-            {% if request.current_organization %}{{ request.current_organization.display_name }}{% endif %}
-        </h1>
-        {% if request.current_organization %}
+        {% if not request.organizations %}
+            {% if user.get_full_name %}<h1 class="mb-0">{{ user.get_full_name }}</h1>{% endif %}
+            {% if user.is_prescriber %}
+                <p class="mb-0">Orienteur seul</p>
+            {% elif user.is_job_seeker %}
+                <p class="mb-0">Candidat</p>
+            {% endif %}
+        {% else %}
+            <h1 class="mb-0">{{ request.current_organization.display_name }}</h1>
             <p class="mb-0">
                 {% if user.is_prescriber %}
                     {% if request.current_organization.code_safir_pole_emploi %}
