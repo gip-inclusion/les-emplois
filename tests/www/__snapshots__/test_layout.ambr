@@ -101,10 +101,10 @@
   </ul>
   
               </nav>
-              <div class="dropdown">
+              <div class="dropdown d-sm-none d-xl-inline-block">
                   <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-account-circle-line"></i>
-                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                      <span class="ms-2">Mon espace</span>
                   </button>
                   <div class="dropdown-menu" id="dashboardUserDropdownMobile">
                       <ul class="list-unstyled">
@@ -199,10 +199,10 @@
   '''
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           <ul>
-                              <li class="dropdown">
+                              <li class="dropdown d-none d-sm-inline-block">
                                   <button aria-controls="dashboardUserDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" type="button">
                                       <i aria-hidden="true" class="ri-account-circle-line"></i>
-                                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                                      <span class="ms-2">Mon espace</span>
                                   </button>
                                   <div class="dropdown-menu dropdown-menu-end" id="dashboardUserDropdown">
                                       <ul class="list-unstyled">
@@ -373,10 +373,10 @@
   </ul>
   
               </nav>
-              <div class="dropdown">
+              <div class="dropdown d-sm-none d-xl-inline-block">
                   <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-account-circle-line"></i>
-                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                      <span class="ms-2">Mon espace</span>
                   </button>
                   <div class="dropdown-menu" id="dashboardUserDropdownMobile">
                       <ul class="list-unstyled">
@@ -476,10 +476,10 @@
   '''
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           <ul>
-                              <li class="dropdown">
+                              <li class="dropdown d-none d-sm-inline-block">
                                   <button aria-controls="dashboardUserDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" type="button">
                                       <i aria-hidden="true" class="ri-account-circle-line"></i>
-                                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                                      <span class="ms-2">Mon espace</span>
                                   </button>
                                   <div class="dropdown-menu dropdown-menu-end" id="dashboardUserDropdown">
                                       <ul class="list-unstyled">
@@ -602,10 +602,10 @@
   </ul>
   
               </nav>
-              <div class="dropdown">
+              <div class="dropdown d-sm-none d-xl-inline-block">
                   <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-account-circle-line"></i>
-                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                      <span class="ms-2">Mon espace</span>
                   </button>
                   <div class="dropdown-menu" id="dashboardUserDropdownMobile">
                       <ul class="list-unstyled">
@@ -703,10 +703,10 @@
   '''
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           <ul>
-                              <li class="dropdown">
+                              <li class="dropdown d-none d-sm-inline-block">
                                   <button aria-controls="dashboardUserDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" type="button">
                                       <i aria-hidden="true" class="ri-account-circle-line"></i>
-                                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                                      <span class="ms-2">Mon espace</span>
                                   </button>
                                   <div class="dropdown-menu dropdown-menu-end" id="dashboardUserDropdown">
                                       <ul class="list-unstyled">
@@ -841,10 +841,10 @@
   </ul>
   
               </nav>
-              <div class="dropdown">
+              <div class="dropdown d-sm-none d-xl-inline-block">
                   <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-account-circle-line"></i>
-                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                      <span class="ms-2">Mon espace</span>
                   </button>
                   <div class="dropdown-menu" id="dashboardUserDropdownMobile">
                       <ul class="list-unstyled">
@@ -937,10 +937,10 @@
   '''
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           <ul>
-                              <li class="dropdown">
+                              <li class="dropdown d-none d-sm-inline-block">
                                   <button aria-controls="dashboardUserDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" type="button">
                                       <i aria-hidden="true" class="ri-account-circle-line"></i>
-                                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                                      <span class="ms-2">Mon espace</span>
                                   </button>
                                   <div class="dropdown-menu dropdown-menu-end" id="dashboardUserDropdown">
                                       <ul class="list-unstyled">
@@ -1090,10 +1090,10 @@
   </ul>
   
               </nav>
-              <div class="dropdown">
+              <div class="dropdown d-sm-none d-xl-inline-block">
                   <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-account-circle-line"></i>
-                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                      <span class="ms-2">Mon espace</span>
                   </button>
                   <div class="dropdown-menu" id="dashboardUserDropdownMobile">
                       <ul class="list-unstyled">
@@ -1184,10 +1184,10 @@
   '''
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           <ul>
-                              <li class="dropdown">
+                              <li class="dropdown d-none d-sm-inline-block">
                                   <button aria-controls="dashboardUserDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" type="button">
                                       <i aria-hidden="true" class="ri-account-circle-line"></i>
-                                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                                      <span class="ms-2">Mon espace</span>
                                   </button>
                                   <div class="dropdown-menu dropdown-menu-end" id="dashboardUserDropdown">
                                       <ul class="list-unstyled">
@@ -1314,10 +1314,10 @@
   </ul>
   
               </nav>
-              <div class="dropdown">
+              <div class="dropdown d-sm-none d-xl-inline-block">
                   <button aria-controls="dashboardUserDropdownMobile" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico btn-block bg-white dropdown-toggle my-3" data-bs-toggle="dropdown" type="button">
                       <i aria-hidden="true" class="ri-account-circle-line"></i>
-                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                      <span class="ms-2">Mon espace</span>
                   </button>
                   <div class="dropdown-menu" id="dashboardUserDropdownMobile">
                       <ul class="list-unstyled">
@@ -1408,10 +1408,10 @@
   '''
   <nav aria-label="Navigation principale" id="nav-primary" role="navigation">
                           <ul>
-                              <li class="dropdown">
+                              <li class="dropdown d-none d-sm-inline-block">
                                   <button aria-controls="dashboardUserDropdown" aria-expanded="false" aria-haspopup="true" class="btn btn-outline-primary btn-ico bg-white dropdown-toggle" data-bs-toggle="dropdown" type="button">
                                       <i aria-hidden="true" class="ri-account-circle-line"></i>
-                                      <span class="d-none d-sm-inline-block ms-0 ms-sm-2">Mon espace</span>
+                                      <span class="ms-2">Mon espace</span>
                                   </button>
                                   <div class="dropdown-menu dropdown-menu-end" id="dashboardUserDropdown">
                                       <ul class="list-unstyled">
