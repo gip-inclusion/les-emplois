@@ -16,10 +16,10 @@
         {% endif %}
         {# Nothing is displayed to SIAE members when the job seeker is not eligible to the IAE #}
         {% if not auto_prescription_process or job_seeker.has_valid_common_approval or eligibility_diagnosis %}
-            <div class="alert alert-info mb-5">
+            <div class="alert alert-info mb-5" role="status">
                 <div class="row">
                     <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl"></i>
+                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
                     </div>
                     <div class="col">
                         {% if job_seeker.has_valid_common_approval %}
@@ -74,10 +74,10 @@
         {% endif %}
         {# Nothing is displayed to GEIQ members when the job seeker is not eligible #}
         {% if not auto_prescription_process or geiq_eligibility_diagnosis %}
-            <div class="alert alert-info mb-5">
+            <div class="alert alert-info mb-5" role="status">
                 <div class="row">
                     <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl"></i>
+                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
                     </div>
                     <div class="col">
                         {% if geiq_eligibility_diagnosis %}
@@ -214,10 +214,10 @@
                 </div>
             {% endif %}
             {% if resume_is_recommended %}
-                <div class="alert alert-warning">
+                <div class="alert alert-warning" role="alert">
                     <div class="row">
-                        <div class="col-auto pr-0">
-                            <i class="ri-information-line ri-xl text-warning"></i>
+                        <div class="col-auto pe-0">
+                            <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
                         </div>
                         <div class="col">
                             <p class="mb-2">

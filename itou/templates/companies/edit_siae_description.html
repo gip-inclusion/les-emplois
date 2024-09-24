@@ -37,10 +37,10 @@
                             {% bootstrap_form_errors form type="all" %}
 
                             {% bootstrap_field form.description %}
-                            <div class="alert alert-info">
+                            <div class="alert alert-info" role="status">
                                 <div class="row">
                                     <div class="col-auto pe-0">
-                                        <i class="ri-information-line ri-xl"></i>
+                                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
                                     </div>
                                     <div class="col">
                                         <p class="mb-2">
@@ -54,10 +54,10 @@
                             </div>
                             <hr>
                             {% bootstrap_field form.provided_support %}
-                            <div class="alert alert-info">
+                            <div class="alert alert-info" role="status">
                                 <div class="row">
                                     <div class="col-auto pe-0">
-                                        <i class="ri-information-line ri-xl"></i>
+                                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
                                     </div>
                                     <div class="col">
                                         <p class="mb-2">

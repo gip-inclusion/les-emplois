@@ -34,7 +34,9 @@
                         <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
                     </div>
                     <div class="col">
-                        <strong class="mb-0">Informations sur l'erreur de traitement :</strong>
+                        <p class="mb-2">
+                            <strong>Informations sur l'erreur de traitement :</strong>
+                        </p>
                         {% if employee_record.asp_processing_code == "3308" %}
                             <p class="mb-0">
                                 Il semblerait que la commune de naissance sélectionnée ne corresponde pas au département de naissance choisi.
@@ -96,7 +98,9 @@
                             <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
                         </div>
                         <div class="col">
-                            <strong class="mb-0">Informations manquantes</strong>
+                            <p class="mb-2">
+                                <strong>Informations manquantes</strong>
+                            </p>
                             <p class="mb-0">Pour créer cette fiche salarié, veuillez demander la régularisation du numéro de sécurité sociale.</p>
                         </div>
                     </div>
@@ -108,7 +112,9 @@
                             <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
                         </div>
                         <div class="col">
-                            <strong class="mb-0">Une action de votre part est nécessaire</strong>
+                            <p class="mb-2">
+                                <strong>Une action de votre part est nécessaire</strong>
+                            </p>
                             <p class="mb-0">
                                 La nouvelle date de fin du PASS IAE n’a pas pu être transmise automatiquement à l’Extranet IAE 2.0 de l’ASP.
                                 Une mise à jour manuelle est nécessaire même si ce salarié a déjà quitté la structure.

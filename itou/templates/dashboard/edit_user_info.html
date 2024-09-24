@@ -8,7 +8,7 @@
 {% block title_messages %}
     {{ block.super }}
     {% if extra_data %}
-        <div class="alert alert-info">
+        <div class="alert alert-info" role="status">
             <p class="mb-0">
                 Certains champs de ce formulaire sont pré-remplis avec des éléments en provenance de votre compte France Travail (récupérés lors de votre connexion du {{ extra_data.created_at|date:"d F Y" }}).
             </p>
@@ -29,15 +29,15 @@
                             <div id="missing-infos-warning" class="alert alert-warning" role="status">
                                 <div class="row">
                                     <div class="col-auto pe-0">
-                                        <i class="ri-information-line ri-xl text-warning"></i>
+                                        <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
                                     </div>
                                     <div class="col">
                                         <p class="mb-2">
                                             <strong>Informations manquantes</strong>
                                         </p>
                                         <p>Une ou plusieurs informations de votre profil sont nécessaires pour utiliser votre espace candidat.</p>
-                                        <p class="mb-0">Les champs suivants ne sont pas renseignés :</p>
-                                        <ul>
+                                        <p>Les champs suivants ne sont pas renseignés :</p>
+                                        <ul class="mb-0">
                                             {% for field in form %}
                                                 {% if field.field.required and not field.value or field.name == 'phone' and not field.value %}
                                                     <li>

@@ -12,16 +12,16 @@
                 <p class="text-tertiary font-weight-bold">{{ eligibility_diagnosis.author_organization.display_name }}</p>
             </div>
         {% endif %}
-        <div class="alert alert-info mb-5">
+        <div class="alert alert-info mb-5" role="status">
             <div class="row">
                 <div class="col-auto pe-0">
-                    <i class="ri-information-line ri-xl"></i>
+                    <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
                 </div>
                 <div class="col">
                     <p class="mb-2">
                         <strong>Date de fin de validité du diagnostic : {{ eligibility_diagnosis.expires_at|date:"d/m/Y" }}</strong>
                     </p>
-                    <p class="mb-2">
+                    <p>
                         Tant que l’éligibilité IAE est valide, vous n’avez rien à faire. Si vous souhaitez la mettre à jour, sa validité sera prolongée jusqu'au {{ new_expires_at_if_updated|date:"d/m/Y" }}.
                     </p>
                     <button class="btn btn-link text-start p-0" data-shroud-clear>Mettre à jour l’éligibilité</button>
@@ -43,7 +43,7 @@
                 <div class="alert alert-primary bg-white py-0" role="status">
                     <div class="row">
                         <div class="col-auto pe-0">
-                            <i class="ri-lightbulb-line ri-xl"></i>
+                            <i class="ri-lightbulb-line ri-xl" aria-hidden="true"></i>
                         </div>
                         <div class="col">
                             <p class="mb-2">

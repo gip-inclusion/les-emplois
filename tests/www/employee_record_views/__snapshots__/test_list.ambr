@@ -20,13 +20,13 @@
 # ---
 # name: ListEmployeeRecordsTest.test_employee_record_to_disable_with_nir_associated_to_other[alert]
   '''
-  <div class="alert alert-warning">
+  <div class="alert alert-warning" role="status">
               <div class="row">
                   <div class="col-auto pe-0">
-                      <i class="ri-error-warning-line ri-xl text-danger"></i>
+                      <i aria-hidden="true" class="ri-error-warning-line ri-xl text-danger"></i>
                   </div>
                   <div class="col">
-                      <p class="mb-0">
+                      <p class="mb-2">
                           <strong>Une action de votre part est nécessaire</strong>
                       </p>
                       <p class="mb-0">
@@ -46,13 +46,13 @@
 # ---
 # name: ListEmployeeRecordsTest.test_employee_records_with_a_prolongation_need_to_be_updated[alert]
   '''
-  <div class="alert alert-warning">
+  <div class="alert alert-warning" role="status">
               <div class="row">
                   <div class="col-auto pe-0">
-                      <i class="ri-error-warning-line ri-xl text-danger"></i>
+                      <i aria-hidden="true" class="ri-error-warning-line ri-xl text-danger"></i>
                   </div>
                   <div class="col">
-                      <p class="mb-0">
+                      <p class="mb-2">
                           <strong>Une action de votre part est nécessaire</strong>
                       </p>
                       <p class="mb-0">
@@ -72,13 +72,13 @@
 # ---
 # name: ListEmployeeRecordsTest.test_employee_records_with_a_suspension_need_to_be_updated[alert]
   '''
-  <div class="alert alert-warning">
+  <div class="alert alert-warning" role="status">
               <div class="row">
                   <div class="col-auto pe-0">
-                      <i class="ri-error-warning-line ri-xl text-danger"></i>
+                      <i aria-hidden="true" class="ri-error-warning-line ri-xl text-danger"></i>
                   </div>
                   <div class="col">
-                      <p class="mb-0">
+                      <p class="mb-2">
                           <strong>Une action de votre part est nécessaire</strong>
                       </p>
                       <p class="mb-0">
@@ -98,13 +98,13 @@
 # ---
 # name: ListEmployeeRecordsTest.test_employee_records_with_nir_associated_to_other[alert]
   '''
-  <div class="alert alert-warning">
+  <div class="alert alert-warning" role="status">
               <div class="row">
                   <div class="col-auto pe-0">
-                      <i class="ri-error-warning-line ri-xl text-danger"></i>
+                      <i aria-hidden="true" class="ri-error-warning-line ri-xl text-danger"></i>
                   </div>
                   <div class="col">
-                      <p class="mb-0">
+                      <p class="mb-2">
                           <strong>Une action de votre part est nécessaire</strong>
                       </p>
                       <p class="mb-0">

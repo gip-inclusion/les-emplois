@@ -12,7 +12,7 @@
 
 {% block title_messages %}
     {{ block.super }}
-    <div class="alert alert-info">
+    <div class="alert alert-info" role="status">
         <p class="m-0">
             <strong>Votre organisation est-elle déjà inscrite ?</strong> <a href="{% url 'signup:prescriber_pole_emploi_safir_code' %}">Je travaille pour France Travail</a>
         </p>

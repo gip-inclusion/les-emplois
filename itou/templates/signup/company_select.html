@@ -29,10 +29,16 @@
 
                     {% if siren_form.cleaned_data and not companies_without_members and not companies_with_members %}
                         <div class="alert alert-warning mt-3 mt-md-4" role="status">
-                            <p class="mb-0">
-                                <i class="ri-information-line ri-xl text-warning me-2"></i>
-                                <strong>Aucun résultat pour {{ siren_form.cleaned_data.siren }}</strong>.
-                            </p>
+                            <div class="row">
+                                <div class="col-auto pe-0">
+                                    <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
+                                </div>
+                                <div class="col">
+                                    <p class="mb-2">
+                                        <strong>Aucun résultat pour {{ siren_form.cleaned_data.siren }}</strong>
+                                    </p>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="mt-3 mt-md-4">

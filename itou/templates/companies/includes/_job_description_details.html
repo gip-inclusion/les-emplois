@@ -36,13 +36,13 @@
 {% endwith %}
 
 {% if job.is_resume_mandatory %}
-    <div class="alert alert-warning mb-3">
+    <div class="alert alert-warning mb-3" role="status">
         <div class="row">
             <div class="col-auto pe-0">
-                <i class="ri-file-list-3-line ri-xl text-warning"></i>
+                <i class="ri-file-list-3-line ri-xl text-warning" aria-hidden="true"></i>
             </div>
             <div class="col">
-                <p>
+                <p class="mb-0">
                     L'ajout du <strong>Curriculum Vitae (CV)</strong> est fortement recommandé pour que la candidature soit étudiée par le recruteur.
                 </p>
             </div>
@@ -51,16 +51,16 @@
 {% endif %}
 
 {% if siae.is_opcs and job.is_qpv_mandatory %}
-    <div class="alert alert-warning mb-3">
+    <div class="alert alert-warning mb-3" role="status">
         <div class="row">
             <div class="col-auto pe-0">
-                <i class="ri-information-line ri-xl text-warning"></i>
+                <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
             </div>
             <div class="col">
-                <p>
+                <p class="mb-2">
                     <strong>Attention</strong>
                 </p>
-                <p>
+                <p class="mb-0">
                     Cette offre d'emploi est réservée à des typologies de public particulières. Si le profil du candidat correspond au poste, le facilitateur pourra être amené à prendre contact avec vous en amont pour vérifier l'éligibilité du candidat à l’offre.
                 </p>
             </div>

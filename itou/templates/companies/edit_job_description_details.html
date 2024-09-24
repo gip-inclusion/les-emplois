@@ -36,40 +36,40 @@
                             {% bootstrap_form_errors form type="all" %}
                             {% csrf_token %}
                             {% bootstrap_field form.description %}
-                            <div class="alert alert-emploi">
+                            <div class="alert alert-info" role="status">
                                 <div class="row">
                                     <div class="col-auto pe-0">
-                                        <i class="ri-information-line ri-xl text-emplois"></i>
+                                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
                                     </div>
                                     <div class="col">
-                                        <p>
-                                            <b>Conseil</b>
+                                        <p class="mb-2">
+                                            <strong>Conseil</strong>
                                         </p>
-                                        <p>
-                                            Vous pouvez vous référer à la description sur la fiche métier présente dans le <a href="https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome={{ rome }}" aria-label="Référentiel des codes ROME" rel="noopener" target="_blank"><b>Répertoire Opérationnel des Métiers et des Emplois (ROME)</b></a>.
+                                        <p class="mb-0">
+                                            Vous pouvez vous référer à la description sur la fiche métier présente dans le <a href="https://candidat.pole-emploi.fr/marche-du-travail/fichemetierrome?codeRome={{ rome }}" aria-label="Référentiel des codes ROME" rel="noopener" target="_blank" class="has-external-link">Répertoire Opérationnel des Métiers et des Emplois (ROME)</a>.
                                         </p>
                                     </div>
                                 </div>
                             </div>
                             {% bootstrap_field form.profile_description %}
-                            <div class="alert alert-emploi">
+                            <div class="alert alert-info" role="status">
                                 <div class="row">
                                     <div class="col-auto pe-0">
-                                        <i class="ri-information-line ri-xl text-emplois"></i>
+                                        <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
                                     </div>
                                     <div class="col">
                                         {% if is_opcs %}
-                                            <p>
-                                                <b>Conseil</b>
+                                            <p class="mb-2">
+                                                <strong>Conseil</strong>
                                             </p>
-                                            <p>
+                                            <p class="mb-0">
                                                 Ajoutez la liste des publics éligibles à ce marché spécifique afin d’augmenter vos chances de recevoir des candidatures qualifiées.
                                             </p>
                                         {% else %}
-                                            <p>
-                                                <b>Exemple</b>
+                                            <p class="mb-2">
+                                                <strong>Exemple</strong>
                                             </p>
-                                            <p>« Poste ouvert aux candidats ne maîtrisant pas la langue française. »</p>
+                                            <p class="mb-0">« Poste ouvert aux candidats ne maîtrisant pas la langue française. »</p>
                                         {% endif %}
                                     </div>
                                 </div>
