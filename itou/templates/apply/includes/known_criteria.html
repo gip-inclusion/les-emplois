@@ -1,10 +1,10 @@
 <div class="alert alert-info mb-5" role="status">
     <div class="row">
         <div class="col-auto pe-0">
-            <i class="ri-information-line ri-xl"></i>
+            <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
         </div>
         <div class="col">
-            <p>
+            <p class="mb-2">
                 <strong>Critère(s) détecté(s)</strong> :
             </p>
             <ul>
@@ -28,13 +28,12 @@
                                 <strong>Résident en ZRR</strong> : la commune de "{{ city_name }}" est classée en ZRR.
                             {% endif %}
                         </li>
-
                     {% endwith %}
                 {% endif %}
             </ul>
-            <p>Vous pouvez cocher ce(s) critère(s) dans la liste ci-dessous.</p>
+            <p class="mb-0">Vous pouvez cocher ce(s) critère(s) dans la liste ci-dessous.</p>
             {% if request.user.is_employer %}
-                <p>
+                <p class="mb-0 mt-3">
                     <strong>Important :</strong> ce message d'information ne permet pas de certifier ces critères en cas de contrôle.
                     Vous devez conserver les justificatifs mentionnés ci-dessous.
                 </p>

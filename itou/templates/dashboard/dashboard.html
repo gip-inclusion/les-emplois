@@ -32,7 +32,7 @@
                         Veuillez contacter un de vos administrateurs (par exemple {{ admin.get_full_name }}) pour qu'il ou elle indique une autre adresse
                     {% endwith %}
                 {% endif %}
-                ou <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
+                ou <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" class="has-external-link" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
             </p>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
         </div>
@@ -52,6 +52,7 @@
                     <a href="{{ ITOU_HELP_CENTER_URL }}/requests/new"
                        target="_blank"
                        rel="noopener"
+                       class="has-external-link"
                        aria-label="contactez-nous pour modifier l’adresse postale de votre agence France Travail (ouverture dans un nouvel onglet)">
                         contactez nous
                     </a>.
@@ -63,7 +64,7 @@
                             Veuillez contacter un de vos administrateurs (par exemple {{ admin.get_full_name }}) pour qu'il ou elle indique une autre adresse
                         {% endwith %}
                     {% endif %}
-                    ou <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
+                    ou <a href="{{ ITOU_HELP_CENTER_URL }}" target="_blank" class="has-external-link" rel="noopener" aria-label="Contactez-nous en cas de problème (ouverture dans un nouvel onglet)">contactez-nous</a> en cas de problème.
                 {% endif %}
             </p>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
@@ -109,9 +110,9 @@
                     <a href="{% tally_form_url "wgDzz1" idprescriber=request.current_organization.pk iduser=user.pk source=ITOU_ENVIRONMENT %}"
                        rel="noopener"
                        target="_blank"
+                       class="has-external-link"
                        aria-label="Cliquez ici pour l'envoyer (ouverture dans un nouvel onglet)">
                         cliquez ici pour l'envoyer
-                        <i class="ri-external-link-line ri-lg"></i>
                     </a>
                 </p>
             {% endif %}

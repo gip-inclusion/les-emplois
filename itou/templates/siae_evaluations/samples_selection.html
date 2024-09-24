@@ -52,14 +52,16 @@
                                 (entre 2 et 20 dossiers maximum).
                             </p>
                             <div class="alert alert-info" role="status">
-                                <p class="font-weight-bold">Exemple</p>
-                                <p>
+                                <p class="mb-2">
+                                    <strong>Exemple</strong>
+                                </p>
+                                <p class="mb-0">
                                     Si une ETTI de votre territoire a fait 270 auto-prescriptions, vous devrez en contrôler seulement 20 au lieu de 54 (20% de 270)
                                 </p>
                             </div>
                             {% if evaluation_campaign.percent_set_at %}
                                 <div class="alert alert-success" role="status">
-                                    <p>
+                                    <p class="mb-0">
                                         Votre contrôle a posteriori sur la période du {{ evaluation_campaign.evaluated_period_start_at|date:"d F Y" }}
                                         au {{ evaluation_campaign.evaluated_period_end_at|date:"d F Y" }} concerne {{ evaluation_campaign.chosen_percent }}%
                                         des SIAE.

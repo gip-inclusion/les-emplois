@@ -32,17 +32,15 @@
                         <div class="alert alert-danger fade show" role="status">
                             <div class="row">
                                 <div class="col-auto pe-0">
-                                    <i class="ri-information-line ri-xl text-danger"></i>
+                                    <i class="ri-information-line ri-xl text-danger" aria-hidden="true"></i>
                                 </div>
                                 <div class="col">
-                                    <p class="mb-0">
-                                        Attention : la suppression définitive de cette suspension aura pour conséquence de :
-                                        <ul>
-                                            <li>
-                                                <strong>Réduire la durée restante de ce PASS IAE de {{ lost_days }} jour{{ lost_days|pluralizefr }}.</strong>
-                                            </li>
-                                        </ul>
-                                    </p>
+                                    <p class="mb-2">Attention : la suppression définitive de cette suspension aura pour conséquence de :</p>
+                                    <ul class="mb-0">
+                                        <li>
+                                            <strong>Réduire la durée restante de ce PASS IAE de {{ lost_days }} jour{{ lost_days|pluralizefr }}.</strong>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>

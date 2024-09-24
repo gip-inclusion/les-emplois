@@ -28,7 +28,7 @@
                             {% csrf_token %}
 
                             {% if form.non_field_errors %}
-                                <div class="alert alert-danger alert-dismissible alert-link" role="status">
+                                <div class="alert alert-danger alert-dismissible" role="status">
                                     <p class="mb-0">
                                         {% for error in form.non_field_errors %}
                                             {{ error | safe }}
@@ -44,13 +44,15 @@
                             {% endfor %}
 
                             <hr>
-                            <div class="alert alert-warning">
+                            <div class="alert alert-warning" role="status">
                                 <div class="row">
                                     <div class="col-auto pe-0">
-                                        <i class="ri-information-line ri-xl"></i>
+                                        <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
                                     </div>
                                     <div class="col">
-                                        En cliquant sur le bouton <b>« Enregistrer »</b>, vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
+                                        <p class="mb-0">
+                                            En cliquant sur le bouton <b>« Enregistrer »</b>, vous acceptez que vos informations et coordonnées ci-dessus soient rendues publiques.
+                                        </p>
                                     </div>
                                 </div>
                             </div>

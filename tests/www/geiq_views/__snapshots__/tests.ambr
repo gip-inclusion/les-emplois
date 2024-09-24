@@ -1053,7 +1053,7 @@
       <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
       <div class="row">
           <div class="col-auto pe-0">
-              <i class="ri-information-line ri-xl text-info"></i>
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
           </div>
           <div class="col">
               <p class="mb-2">
@@ -1202,7 +1202,7 @@
       <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
       <div class="row">
           <div class="col-auto pe-0">
-              <i class="ri-information-line ri-xl text-info"></i>
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
           </div>
           <div class="col">
               <p class="mb-2">
@@ -1391,7 +1391,7 @@
       <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
       <div class="row">
           <div class="col-auto pe-0">
-              <i class="ri-information-line ri-xl text-info"></i>
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
           </div>
           <div class="col">
               <p class="mb-2">
@@ -1538,7 +1538,7 @@
       <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
       <div class="row">
           <div class="col-auto pe-0">
-              <i class="ri-information-line ri-xl text-info"></i>
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
           </div>
           <div class="col">
               <p class="mb-2">
@@ -1727,7 +1727,7 @@
       <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
       <div class="row">
           <div class="col-auto pe-0">
-              <i class="ri-information-line ri-xl text-info"></i>
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
           </div>
           <div class="col">
               <p class="mb-2">
@@ -1876,7 +1876,7 @@
       <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
       <div class="row">
           <div class="col-auto pe-0">
-              <i class="ri-information-line ri-xl text-info"></i>
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
           </div>
           <div class="col">
               <p class="mb-2">
@@ -2065,7 +2065,7 @@
       <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
       <div class="row">
           <div class="col-auto pe-0">
-              <i class="ri-information-line ri-xl text-info"></i>
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
           </div>
           <div class="col">
               <p class="mb-2">
@@ -2214,7 +2214,7 @@
       <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
       <div class="row">
           <div class="col-auto pe-0">
-              <i class="ri-information-line ri-xl text-info"></i>
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
           </div>
           <div class="col">
               <p class="mb-2">
@@ -2403,7 +2403,7 @@
       <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
       <div class="row">
           <div class="col-auto pe-0">
-              <i class="ri-information-line ri-xl text-info"></i>
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
           </div>
           <div class="col">
               <p class="mb-2">
@@ -2550,7 +2550,7 @@
       <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
       <div class="row">
           <div class="col-auto pe-0">
-              <i class="ri-information-line ri-xl text-info"></i>
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
           </div>
           <div class="col">
               <p class="mb-2">
@@ -2733,7 +2733,7 @@
       <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
       <div class="row">
           <div class="col-auto pe-0">
-              <i class="ri-information-line ri-xl text-info"></i>
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
           </div>
           <div class="col">
               <p class="mb-2">
@@ -2876,7 +2876,7 @@
       <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
       <div class="row">
           <div class="col-auto pe-0">
-              <i class="ri-information-line ri-xl text-info"></i>
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
           </div>
           <div class="col">
               <p class="mb-2">
@@ -3044,7 +3044,7 @@
       <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
       <div class="row">
           <div class="col-auto pe-0">
-              <i class="ri-information-line ri-xl text-info"></i>
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
           </div>
           <div class="col">
               <p class="mb-2">
@@ -3236,7 +3236,7 @@
       <button aria-label="Fermer" class="btn-close" data-bs-dismiss="alert" type="button"></button>
       <div class="row">
           <div class="col-auto pe-0">
-              <i class="ri-information-line ri-xl text-info"></i>
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
           </div>
           <div class="col">
               <p class="mb-2">

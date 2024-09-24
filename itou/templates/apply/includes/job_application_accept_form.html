@@ -6,7 +6,7 @@
 <div class="c-form" id="acceptFormDiv">
     <form id="acceptForm" method="post" hx-post="{{ request.path }}" hx-swap="outerHTML show:#acceptForm:top" hx-select="#acceptForm" class="js-format-nir">
         {% if has_form_error %}
-            <div class="alert alert-danger">
+            <div class="alert alert-danger" role="alert">
                 <p class="mb-0">Merci de corriger les erreurs ci-dessous</p>
             </div>
         {% endif %}

@@ -8,17 +8,17 @@
     {{ block.super }}
     {% if not job_app_to_transfer|default:False %}
         {% if new_check_needed %}
-            <div class="alert alert-warning alert-dismissible fade show">
+            <div class="alert alert-warning alert-dismissible fade show" role="status">
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
                 <div class="row">
                     <div class="col-auto pe-0">
-                        <i class="ri-information-line ri-xl text-warning"></i>
+                        <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
                     </div>
                     <div class="col">
-                        <p>
+                        <p class="mb-2">
                             <strong>Veuillez vérifier les informations du candidat</strong>
                         </p>
-                        <p>
+                        <p class="mb-0">
                             La situation du candidat a peut-être changé depuis le {{ job_seeker.last_checked_at|date }}. Merci de vérifier la validité des informations présentes sur son profil.
                         </p>
                     </div>

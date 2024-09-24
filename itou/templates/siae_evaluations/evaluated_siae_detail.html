@@ -12,10 +12,10 @@
 {% block title_messages %}
     {{ block.super }}
     {% if campaign_closed_before_final_evaluation or accepted_by_default %}
-        <div class="alert alert-info">
+        <div class="alert alert-info" role="status">
             <div class="row">
                 <div class="col-auto pe-0">
-                    <i class="ri-information-line ri-xl text-info"></i>
+                    <i class="ri-information-line ri-xl text-info" aria-hidden="true"></i>
                 </div>
                 <div class="col">
                     <p class="mb-0">

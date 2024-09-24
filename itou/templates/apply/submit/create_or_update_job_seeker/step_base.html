@@ -54,14 +54,14 @@
                             {% block step_title %}{% endblock %}
                         </h2>
                         {% if readonly_form %}
-                            <div class="alert alert-warning alert-dismissible fade show mb-4">
+                            <div class="alert alert-warning alert-dismissible fade show mb-4" role="status">
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
                                 <div class="row">
                                     <div class="col-auto pe-0">
-                                        <i class="ri-information-line ri-xl text-warning"></i>
+                                        <i class="ri-information-line ri-xl text-warning" aria-hidden="true"></i>
                                     </div>
                                     <div class="col">
-                                        <p>
+                                        <p class="mb-2">
                                             <strong>Informations modifiables par le candidat uniquement</strong>
                                         </p>
                                         <p>Le candidat s’étant connecté à son compte utilisateur, vous ne pouvez modifier que sa situation administrative.</p>

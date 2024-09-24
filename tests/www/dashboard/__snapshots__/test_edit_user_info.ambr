@@ -4,15 +4,15 @@
   <div class="alert alert-warning" id="missing-infos-warning" role="status">
                                   <div class="row">
                                       <div class="col-auto pe-0">
-                                          <i class="ri-information-line ri-xl text-warning"></i>
+                                          <i aria-hidden="true" class="ri-information-line ri-xl text-warning"></i>
                                       </div>
                                       <div class="col">
                                           <p class="mb-2">
                                               <strong>Informations manquantes</strong>
                                           </p>
                                           <p>Une ou plusieurs informations de votre profil sont nécessaires pour utiliser votre espace candidat.</p>
-                                          <p class="mb-0">Les champs suivants ne sont pas renseignés :</p>
-                                          <ul>
+                                          <p>Les champs suivants ne sont pas renseignés :</p>
+                                          <ul class="mb-0">
                                               
                                                   
                                               
@@ -75,15 +75,15 @@
   <div class="alert alert-warning" id="missing-infos-warning" role="status">
                                   <div class="row">
                                       <div class="col-auto pe-0">
-                                          <i class="ri-information-line ri-xl text-warning"></i>
+                                          <i aria-hidden="true" class="ri-information-line ri-xl text-warning"></i>
                                       </div>
                                       <div class="col">
                                           <p class="mb-2">
                                               <strong>Informations manquantes</strong>
                                           </p>
                                           <p>Une ou plusieurs informations de votre profil sont nécessaires pour utiliser votre espace candidat.</p>
-                                          <p class="mb-0">Les champs suivants ne sont pas renseignés :</p>
-                                          <ul>
+                                          <p>Les champs suivants ne sont pas renseignés :</p>
+                                          <ul class="mb-0">
                                               
                                                   
                                               

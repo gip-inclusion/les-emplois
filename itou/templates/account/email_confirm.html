@@ -9,7 +9,7 @@
 
 {% block title_messages %}
     {{ block.super }}
-    <div class="alert alert-warning">
+    <div class="alert alert-warning" role="status">
         <p class="mb-0">Ce compte est inactif.</p>
     </div>
 {% endblock %}
@@ -43,8 +43,8 @@
 
                         {% url 'account_email' as email_url %}
 
-                        <div class="alert alert-danger">
-                            <p>Ce lien de confirmation d'adresse e-mail a expiré ou n'est pas valide.</p>
+                        <div class="alert alert-danger" role="status">
+                            <p class="mb-2">Ce lien de confirmation d'adresse e-mail a expiré ou n'est pas valide.</p>
                             <p class="mb-0">
                                 Veuillez lancer <a href="{{ email_url }}">une nouvelle demande de confirmation</a>.
                             </p>

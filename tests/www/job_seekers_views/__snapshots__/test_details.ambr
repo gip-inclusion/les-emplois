@@ -184,13 +184,13 @@
           <div class="alert alert-info" role="status">
       <div class="row">
           <div class="col-auto pe-0">
-              <i class="ri-information-line ri-xl text-info"></i>
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
           </div>
           <div class="col">
-              <p>
-                  <b>Aide à l'accompagement GEIQ</b>
+              <p class="mb-2">
+                  <strong>Aide à l'accompagement GEIQ</strong>
               </p>
-              <p>
+              <p class="mb-0">
                   
                       Les critères que vous avez sélectionnés vous donnent droit en cas d’embauche,
                   
@@ -1928,13 +1928,13 @@
           <div class="alert alert-info" role="status">
       <div class="row">
           <div class="col-auto pe-0">
-              <i class="ri-information-line ri-xl text-info"></i>
+              <i aria-hidden="true" class="ri-information-line ri-xl text-info"></i>
           </div>
           <div class="col">
-              <p>
-                  <b>Aide à l'accompagement GEIQ</b>
+              <p class="mb-2">
+                  <strong>Aide à l'accompagement GEIQ</strong>
               </p>
-              <p>
+              <p class="mb-0">
                   
                       Ce diagnostic émis par un prescripteur habilité vous donnera droit en cas d’embauche,
                   

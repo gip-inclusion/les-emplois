@@ -6,12 +6,12 @@
 
 {% block title_messages %}
     {{ block.super }}
-    <div class="alert alert-warning">
-        <p>
-            <b>Vous allez modifier des informations sensibles</b> concernant ce candidat ou cette candidate.
+    <div class="alert alert-warning" role="status">
+        <p class="mb-2">
+            <strong>Vous allez modifier des informations sensibles</strong> concernant ce candidat ou cette candidate.
         </p>
-        <p>
-            Tout changement entraînera une modification définitive dans notre base de données. <b>Les informations supprimées seront perdues.</b>
+        <p class="mb-0">
+            Tout changement entraînera une modification définitive dans notre base de données. <strong>Les informations supprimées seront perdues.</strong>
         </p>
     </div>
 {% endblock %}

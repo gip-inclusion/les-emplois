@@ -3,7 +3,7 @@
 {% load buttons_form %}
 
 {% block content_extend %}
-    <div class="alert alert-warning">
+    <div class="alert alert-warning" role="status">
         {% with prev_application.created_at|date:"d F Y à H:i" as prev_created_at %}
             {% if request.user == job_seeker %}
                 <p class="mb-0">
