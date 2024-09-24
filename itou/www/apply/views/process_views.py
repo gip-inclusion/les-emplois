@@ -403,6 +403,7 @@ class JobApplicationRefuseView(LoginRequiredMixin, NamedUrlSessionWizardView):
             "job_application": self.job_application,
             "can_view_personal_information": True,  # SIAE members have access to personal info
             "matomo_custom_title": "Candidature refusée",
+            "matomo_event_name": f"refuse-application-{self.steps.current}-submit",
             "primary_button_label": "Suivant" if context["wizard"]["steps"].next else "Confirmer le refus",
             "secondary_button_label": "Précédent" if context["wizard"]["steps"].prev else "Annuler",
         }
