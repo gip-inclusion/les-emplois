@@ -161,7 +161,9 @@ def list_employee_records(request, template_name="employee_record/list.html"):
 
     form = SelectEmployeeRecordStatusForm(data=request.GET)
     form.full_clean()  # We do not use is_valid to validate each field independently
-    status = Status(form.cleaned_data.get("status") or Status.NEW)
+    if not form.cleaned_data.get("status"):  # Redirect if status is missing or empty
+        return HttpResponseRedirect(reverse("employee_record_views:list") + f"?status={Status.NEW}")
+    status = Status(form.cleaned_data.get("status"))
     order_by = EmployeeRecordOrder(form.cleaned_data.get("order") or EmployeeRecordOrder.HIRING_START_AT_DESC)
 
     # Prepare .order_by() parameters for JobApplication() and EmployeeRecord()
