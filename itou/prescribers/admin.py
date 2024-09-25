@@ -225,7 +225,7 @@ class PrescriberOrganizationAdmin(ItouGISMixin, OrganizationAdmin):
             if request.user.is_superuser or obj.has_pending_authorization() or obj.has_refused_authorization():
                 # Organizations typed as "Other" cannot be marked valid
                 if obj.kind == PrescriberOrganizationKind.OTHER:
-                    msg = "Pour habiliter cette organisation, vous devez sélectionner un type différent de “Autre”"
+                    msg = "Pour habiliter cette organisation, vous devez sélectionner un type différent de “Autre”."
                     self.message_user(request, msg, messages.ERROR)
                     return HttpResponseRedirect(request.get_full_path())
                 obj.is_authorized = True

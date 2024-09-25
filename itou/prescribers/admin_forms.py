@@ -1,6 +1,6 @@
 from django import forms
 
-from itou.prescribers.enums import PrescriberOrganizationKind
+from itou.prescribers.enums import PrescriberAuthorizationStatus, PrescriberOrganizationKind
 from itou.prescribers.models import PrescriberOrganization
 
 
@@ -23,10 +23,9 @@ class PrescriberOrganizationAdminForm(forms.ModelForm):
         cleaned_data = super().clean()
         if (
             cleaned_data.get("kind") == PrescriberOrganizationKind.OTHER
-            and self.instance.is_authorized
-            # TODO(calummackervoy): included to permit cleaning existing rows. We can later remove this
-            and self.instance.kind != PrescriberOrganizationKind.OTHER
+            and self.instance.authorization_status == PrescriberAuthorizationStatus.VALIDATED
         ):
             raise forms.ValidationError(
-                "Cette organisation a été habilitée. Vous devez sélectionner un type différent de “Autre”"
+                "Cette organisation a été habilitée. Vous devez sélectionner un type différent de “Autre”."
             )
+        return cleaned_data
