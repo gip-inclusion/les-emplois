@@ -1,0 +1,7 @@
+{% load tally %}
+
+<a class="btn btn-primary btn-block w-100 w-md-auto has-external-link"
+   href="{% tally_form_url "wzxQlg" employeerecord=employee_record.pk|default:"" jobapplication=job_application.pk|default:"" %}"
+   target="_blank"
+   rel="noopener"
+   aria-label="Régulariser le n° de sécurité sociale {{ job_application.job_seeker.get_full_name }} (ouverture dans un nouvel onglet)">Régulariser le n° de sécurité sociale</a>
