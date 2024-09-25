@@ -648,7 +648,7 @@ class TestSiaeSelectCriteriaView:
     def test_post(self, client):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         criterion = (
-            evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
+            evaluated_job_application.job_application.eligibility_diagnosis.selected_administrative_criteria.first()
         )
 
         url = reverse(
@@ -673,7 +673,7 @@ class TestSiaeSelectCriteriaView:
     def test_post_with_submission_freezed_at(self, client):
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         criterion = (
-            evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
+            evaluated_job_application.job_application.eligibility_diagnosis.selected_administrative_criteria.first()
         )
         # Freeze submission
         evaluated_job_application.evaluated_siae.evaluation_campaign.freeze(timezone.now())
@@ -715,7 +715,7 @@ class TestSiaeSelectCriteriaView:
 
         # preselected criteria
         criterion = (
-            evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
+            evaluated_job_application.job_application.eligibility_diagnosis.selected_administrative_criteria.first()
         )
         EvaluatedAdministrativeCriteria.objects.create(
             evaluated_job_application=evaluated_job_application,
@@ -758,7 +758,7 @@ class TestSiaeUploadDocsView:
         siae = membership.company
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(siae, user)
         criterion = (
-            evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
+            evaluated_job_application.job_application.eligibility_diagnosis.selected_administrative_criteria.first()
         )
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
             evaluated_job_application=evaluated_job_application,
@@ -799,7 +799,7 @@ class TestSiaeUploadDocsView:
 
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         criterion = (
-            evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
+            evaluated_job_application.job_application.eligibility_diagnosis.selected_administrative_criteria.first()
         )
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
             evaluated_job_application=evaluated_job_application,
@@ -830,7 +830,7 @@ class TestSiaeUploadDocsView:
 
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         criterion = (
-            evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
+            evaluated_job_application.job_application.eligibility_diagnosis.selected_administrative_criteria.first()
         )
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
             evaluated_job_application=evaluated_job_application,
@@ -875,7 +875,7 @@ class TestSiaeUploadDocsView:
 
         evaluated_job_application = create_evaluated_siae_with_consistent_datas(self.siae, self.user)
         criterion = (
-            evaluated_job_application.job_application.eligibility_diagnosis.selectedadministrativecriteria_set.first()
+            evaluated_job_application.job_application.eligibility_diagnosis.selected_administrative_criteria.first()
         )
         proof = FileFactory()
         evaluated_administrative_criteria = EvaluatedAdministrativeCriteria.objects.create(
