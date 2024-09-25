@@ -269,7 +269,9 @@ class SelectedAdministrativeCriteria(AbstractSelectedAdministrativeCriteria):
     https://docs.djangoproject.com/en/dev/ref/models/relations/
     """
 
-    eligibility_diagnosis = models.ForeignKey(EligibilityDiagnosis, on_delete=models.CASCADE)
+    eligibility_diagnosis = models.ForeignKey(
+        EligibilityDiagnosis, on_delete=models.CASCADE, related_name="selected_administrative_criteria"
+    )
     administrative_criteria = models.ForeignKey(
         AdministrativeCriteria,
         on_delete=models.RESTRICT,

@@ -291,8 +291,7 @@ class GEIQAdministrativeCriteria(AbstractAdministrativeCriteria):
 
 class GEIQSelectedAdministrativeCriteria(AbstractSelectedAdministrativeCriteria):
     eligibility_diagnosis = models.ForeignKey(
-        GEIQEligibilityDiagnosis,
-        on_delete=models.CASCADE,
+        GEIQEligibilityDiagnosis, on_delete=models.CASCADE, related_name="selected_administrative_criteria"
     )
     administrative_criteria = models.ForeignKey(
         GEIQAdministrativeCriteria,

@@ -149,7 +149,9 @@ class Migration(migrations.Migration):
                 (
                     "eligibility_diagnosis",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="eligibility.eligibilitydiagnosis"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="selected_administrative_criteria",
+                        to="eligibility.eligibilitydiagnosis",
                     ),
                 ),
             ],
@@ -330,7 +332,9 @@ class Migration(migrations.Migration):
                 (
                     "eligibility_diagnosis",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="eligibility.geiqeligibilitydiagnosis"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="selected_administrative_criteria",
+                        to="eligibility.geiqeligibilitydiagnosis",
                     ),
                 ),
             ],
