@@ -206,7 +206,15 @@ class PrescriberOrganization(AddressMixin, OrganizationAbstract):
                     "Une organisation habilitée délégataire d'un Conseil Départemental "
                     "doit être conventionnée pour le suivi des BRSA."
                 ),
-            )
+            ),
+            models.CheckConstraint(
+                name="prevent_validated_authorization_if_other",
+                check=~models.Q(
+                    authorization_status=PrescriberAuthorizationStatus.VALIDATED,
+                    kind=PrescriberOrganizationKind.OTHER,
+                ),
+                violation_error_message=('Une organisation habilitée ne peut pas être de type "Autre".'),
+            ),
         ]
 
     def save(self, *args, **kwargs):

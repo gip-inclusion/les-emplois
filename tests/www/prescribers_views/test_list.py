@@ -27,13 +27,13 @@ def test_list_accredited_organizations(client):
     accredited_org = PrescriberOrganizationFactory(
         authorized=True,
         department=organization.department,
-        kind=PrescriberOrganizationKind.OTHER,
+        kind=PrescriberOrganizationKind.ODC,
         is_brsa=True,
     )
     accredited_org_from_other_department = PrescriberOrganizationFactory(
         authorized=True,
         department=random.choice(tuple(other_departments)),
-        kind=PrescriberOrganizationKind.OTHER,
+        kind=PrescriberOrganizationKind.ODC,
         is_brsa=True,
     )
     non_authorized_org = PrescriberOrganizationFactory(
@@ -44,7 +44,7 @@ def test_list_accredited_organizations(client):
     authorized_but_not_brsa_org = PrescriberOrganizationFactory(
         authorized=True,
         department=organization.department,
-        kind=PrescriberOrganizationKind.OTHER,
+        kind=PrescriberOrganizationKind.PE,
         is_brsa=False,
     )
 
