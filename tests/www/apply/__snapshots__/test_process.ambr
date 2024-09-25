@@ -3138,6 +3138,100 @@
   </ul>
   '''
 # ---
+# name: test_approval_status_includes[Approval prolongations list]
+  '''
+  <div class="ps-3 border-start approval-left-border" id="prolongations-list">
+                  
+                      <p class="mb-1">Prolongation en cours :</p>
+                      <ul class="list-unstyled">
+      
+          <li>
+              du 19/04/2023 au 29/04/2023
+              <small class="ms-3">Fin d'une formation</small>
+              
+          </li>
+      
+  </ul>
+  
+                  
+                  
+                      <p class="mb-1">
+                          Prolongations passées ou à venir :
+                      </p>
+                      <ul class="list-unstyled">
+      
+          <li>
+              du 09/05/2023 au 14/05/2023
+              <small class="ms-3">Fin d'une formation</small>
+              
+          </li>
+      
+          <li>
+              du 27/03/2023 au 06/04/2023
+              <small class="ms-3">Fin d'une formation</small>
+              
+          </li>
+      
+          <li>
+              du 25/02/2023 au 07/03/2023
+              <small class="ms-3">Fin d'une formation</small>
+              
+          </li>
+      
+  </ul>
+  
+                  
+                  
+                      <p class="mb-1">Demande de prolongation en cours :</p>
+                      <ul class="list-unstyled">
+                          
+                              <li>
+                                  du 26/04/2023 au 26/05/2023
+                                  <small class="ms-3">Fin d'une formation</small>
+                                  <small class="d-block mb-2">
+                                      
+                                          Demandée le 26/04/2023 par <i>Milady DE WINTER</i> à <i>First LAST</i> (Organization - 72)
+                                      
+                                  </small>
+                              </li>
+                          
+                      </ul>
+                  
+              </div>
+  '''
+# ---
+# name: test_approval_status_includes[Approval suspensions list]
+  '''
+  <div class="ps-3 border-start approval-left-border" id="suspensions-list">
+                  
+                      <p class="mb-1">Suspension en cours :</p>
+                      <ul class="list-unstyled">
+                          <li>
+                              <b>du 19/04/2023 au 29/04/2023</b>
+                              
+                                  <!-- djlint:off --><!-- djlint:on -->
+                                  
+                                      <br/>
+                                      <a class="btn btn-link ps-0" href="/approvals/suspension/1/action/edit/?back_url=/apply/[PK of JobApplication]/siae/details">Modifier la suspension</a>
+                                      <a class="btn btn-link" href="/approvals/suspension/1/action/?back_url=/apply/[PK of JobApplication]/siae/details">Supprimer la suspension</a>
+                                  
+                              
+                          </li>
+                      </ul>
+                  
+                  
+                      <p class="mb-1">Suspension passée :</p>
+                      <ul class="list-unstyled">
+                          
+                              <li>
+                                  <span>du 27/03/2023 au 06/04/2023</span>
+                              </li>
+                          
+                      </ul>
+                  
+              </div>
+  '''
+# ---
 # name: test_delete_prior_action[False]
   '''
   <ul class="list-step" hx-swap-oob="true" id="transition_logs_11111111-1111-1111-1111-111111111111">

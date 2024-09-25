@@ -44,11 +44,16 @@ from itou.users.enums import LackOfNIRReason, LackOfPoleEmploiId
 from itou.utils.mocks.address_format import mock_get_geocoding_data_by_ban_api_resolved
 from itou.utils.mocks.api_particulier import rsa_certified_mocker
 from itou.utils.models import InclusiveDateRange
-from itou.utils.templatetags.format_filters import format_nir, format_phone
+from itou.utils.templatetags.format_filters import format_approval_number, format_nir, format_phone
 from itou.utils.urls import add_url_params
 from itou.utils.widgets import DuetDatePickerWidget
 from itou.www.apply.forms import AcceptForm
-from tests.approvals.factories import PoleEmploiApprovalFactory, SuspensionFactory
+from tests.approvals.factories import (
+    PoleEmploiApprovalFactory,
+    ProlongationFactory,
+    ProlongationRequestFactory,
+    SuspensionFactory,
+)
 from tests.asp.factories import CommuneFactory, CountryFranceFactory
 from tests.cities.factories import create_test_cities
 from tests.companies.factories import CompanyFactory, CompanyMembershipFactory, JobDescriptionFactory
@@ -61,6 +66,7 @@ from tests.job_applications.factories import (
     PriorActionFactory,
 )
 from tests.jobs.factories import create_test_romes_and_appellations
+from tests.prescribers.factories import PrescriberOrganizationFactory
 from tests.siae_evaluations.factories import EvaluatedSiaeFactory
 from tests.users.factories import EmployerFactory, JobSeekerFactory, LaborInspectorFactory, PrescriberFactory
 from tests.utils.htmx.test import assertSoupEqual, update_page_with_htmx
@@ -3843,3 +3849,140 @@ def test_htmx_reload_contract_type_and_options(client):
     response = client.post(accept_url, data=data)
     reloaded_form_soup = parse_response_to_soup(response, selector="#acceptForm")
     assertSoupEqual(form_soup, reloaded_form_soup)
+
+
+@pytest.mark.ignore_unknown_variable_template_error("with_matomo_event")
+@freeze_time("2023-04-26")
+def test_approval_status_includes(client, snapshot):
+    """
+    templates/approvals/includes/status.html
+    This template is used in approval views but also in many other places.
+    Test its content only once.
+    """
+    # This gives access to the employer
+    accepted_app = JobApplicationFactory(
+        job_seeker__public_id="11111111-9999-2222-8888-555555555555",
+        state=JobApplicationState.ACCEPTED,
+    )
+    job_application = JobApplicationFactory(
+        job_seeker=accepted_app.job_seeker,
+        to_company=accepted_app.to_company,
+        state=JobApplicationState.PROCESSING,
+        with_approval=True,
+        approval__id=1,
+        sent_by_authorized_prescriber_organisation=True,
+    )
+    approval = job_application.approval
+
+    # Employer version
+    user = job_application.to_company.members.first()
+    client.force_login(user)
+
+    url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+    response = client.get(url)
+    assertContains(response, format_approval_number(approval))
+    assertContains(response, "26/04/2023")
+    assertContains(response, approval.get_remainder_display())
+
+    url = reverse("apply:details_for_company", kwargs={"job_application_id": job_application.pk})
+    response = client.get(url)
+    assertContains(
+        response,
+        "PASS IAE valide jusqu’au 24/04/2025, si le contrat démarre aujourd’hui.",
+    )
+
+    ## Display suspensions
+    # Valid
+    SuspensionFactory(
+        id=1,
+        approval=approval,
+        start_at=timezone.localdate() - relativedelta(days=7),
+        end_at=timezone.localdate() + relativedelta(days=3),
+    )
+    # Older
+    SuspensionFactory(
+        id=2,
+        approval=approval,
+        start_at=timezone.localdate() - relativedelta(days=30),
+        end_at=timezone.localdate() - relativedelta(days=20),
+    )
+
+    response = client.get(url)
+
+    suspensions_section = parse_response_to_soup(
+        response, selector="#suspensions-list", replace_in_attr=[job_application]
+    )
+    assert str(suspensions_section) == snapshot(name="Approval suspensions list")
+
+    approval.suspension_set.all().delete()
+
+    prescriber = PrescriberFactory(first_name="Milady", last_name="de Winter", email="milady@dewinter.com")
+
+    ## Display prolongations
+    default_kwargs = {
+        "declared_by": prescriber,
+        "validated_by": None,
+        "approval": approval,
+    }
+    # Valid
+    active_prolongation = ProlongationFactory(
+        id=1,
+        start_at=timezone.localdate() - relativedelta(days=7),
+        end_at=timezone.localdate() + relativedelta(days=3),
+        **default_kwargs,
+    )
+
+    ProlongationRequestFactory(
+        declared_by=prescriber,
+        validated_by=PrescriberFactory(
+            first_name="First",
+            last_name="Last",
+            email="first@last.com",
+        ),
+        approval=approval,
+        prescriber_organization=PrescriberOrganizationFactory(name="Organization", department="72"),
+    )
+
+    # Older
+    ProlongationFactory(
+        id=2,
+        start_at=timezone.localdate() - relativedelta(days=30),
+        end_at=timezone.localdate() - relativedelta(days=20),
+        **default_kwargs,
+    )
+    ProlongationFactory(
+        id=3,
+        start_at=timezone.localdate() - relativedelta(days=60),
+        end_at=timezone.localdate() - relativedelta(days=50),
+        **default_kwargs,
+    )
+
+    # In the future
+    ProlongationFactory(
+        id=4,
+        start_at=active_prolongation.end_at + relativedelta(days=10),
+        end_at=active_prolongation.end_at + relativedelta(days=15),
+        **default_kwargs,
+    )
+
+    response = client.get(url)
+
+    prolongations_section = parse_response_to_soup(response, selector="#prolongations-list")
+    assert str(prolongations_section) == snapshot(name="Approval prolongations list")
+
+    # Prescriber version
+    job_application.state = JobApplicationState.ACCEPTED
+    job_application.processed_at = timezone.now()
+    job_application.save()
+    user = job_application.sender
+    client.force_login(user)
+
+    url = reverse(
+        "apply:details_for_prescriber",
+        kwargs={"job_application_id": job_application.pk},
+    )
+    response = client.get(url)
+    assertContains(
+        response,
+        "Date de fin prévisionnelle : 29/05/2025",
+    )
