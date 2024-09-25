@@ -2,19 +2,19 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import Count, Exists, OuterRef
+from django.db.models import Count
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse, reverse_lazy
 from django.views.decorators.http import require_safe
 from formtools.wizard.views import NamedUrlSessionWizardView
 
-from itou.approvals.models import Approval, Prolongation, Suspension
+from itou.approvals.models import Approval
 from itou.employee_record.constants import get_availability_date_for_kind
 from itou.employee_record.enums import Status
 from itou.employee_record.models import EmployeeRecord
 from itou.job_applications.models import JobApplication
-from itou.users.enums import LackOfNIRReason, UserKind
+from itou.users.enums import UserKind
 from itou.utils.pagination import pager
 from itou.utils.perms.company import get_current_company_or_404
 from itou.utils.perms.employee_record import can_create_employee_record, siae_is_allowed
@@ -166,42 +166,14 @@ def list_employee_records(request, template_name="employee_record/list.html"):
     status = Status(form.cleaned_data.get("status"))
     order_by = EmployeeRecordOrder(form.cleaned_data.get("order") or EmployeeRecordOrder.HIRING_START_AT_DESC)
 
-    # Prepare .order_by() parameters for JobApplication() and EmployeeRecord()
-    job_application_order_by = {
-        EmployeeRecordOrder.NAME_ASC: ("job_seeker__last_name", "job_seeker__first_name"),
-        EmployeeRecordOrder.NAME_DESC: ("-job_seeker__last_name", "-job_seeker__first_name"),
-        EmployeeRecordOrder.HIRING_START_AT_ASC: ("hiring_start_at",),
-        EmployeeRecordOrder.HIRING_START_AT_DESC: ("-hiring_start_at",),
-    }[order_by]
-    employee_record_order_by = tuple(
-        f"-job_application__{order_by_item[1:]}" if order_by_item[0] == "-" else f"job_application__{order_by_item}"
-        for order_by_item in job_application_order_by
-    )
-
     # Construct badges
-
     employee_record_badges = {
         row["status"]: row["cnt"]
         for row in EmployeeRecord.objects.for_company(siae).values("status").annotate(cnt=Count("status"))
     }
-
-    eligible_job_applications = JobApplication.objects.eligible_as_employee_record(siae)
-    if status == Status.NEW:
-        # When showing NEW job applications, we need more infos
-        eligible_job_applications = eligible_job_applications.annotate(
-            has_suspension=Exists(Suspension.objects.filter(siae=siae, approval__jobapplication__pk=OuterRef("pk"))),
-            has_prolongation=Exists(
-                Prolongation.objects.filter(declared_by_siae=siae, approval__jobapplication__pk=OuterRef("pk"))
-            ),
-        ).order_by(*job_application_order_by)
-
     # Set count of each status for badge display
     status_badges = [
-        (
-            # Don't use count() since we also need the list when status is NEW
-            len(eligible_job_applications) if status == Status.NEW else eligible_job_applications.count(),
-            "bg-info",
-        ),
+        (employee_record_badges.get(Status.NEW, 0), "bg-info"),
         (employee_record_badges.get(Status.READY, 0), "bg-emploi-lightest text-info"),
         (employee_record_badges.get(Status.SENT, 0), "bg-emploi-lightest text-info"),
         (employee_record_badges.get(Status.REJECTED, 0), "bg-warning"),
@@ -209,61 +181,34 @@ def list_employee_records(request, template_name="employee_record/list.html"):
         (employee_record_badges.get(Status.DISABLED, 0), "bg-emploi-lightest text-info"),
     ]
 
-    # Employee records are created with a job application object.
-    # At this stage, job applications do not have an associated employee record.
-    # Objects in this list can be either:
-    # - employee records: iterate on their job application object
-    # - job applications: iterate as-is
-    employee_records_list = True
-    need_manual_regularization = False
-
-    if status == Status.NEW:
-        # Browse to get only the linked employee record in "new" state
-        data = eligible_job_applications
-        if job_seeker_id := filters_form.cleaned_data.get("job_seeker"):
-            # The queryset was already evaluated for badges, so it's faster to iterate because of the non-trivial query
-            data = [ja for ja in data if ja.job_seeker_id == job_seeker_id]
-
-        for item in data:
-            item.date_were_not_transmitted = item.has_suspension or item.has_prolongation
-            item.nir_tally_params = f"?jobapplication={item.pk}"
-            for e in item.employee_record.all():
-                item.date_were_not_transmitted = False
-                if e.status == Status.NEW:
-                    item.employee_record_new = e
-                    item.nir_tally_params = f"?employeerecord={e.pk}"
-                    break
-            # Flag for the global message alert
-            need_manual_regularization |= item.date_were_not_transmitted
-            need_manual_regularization |= (
-                item.job_seeker.jobseeker_profile.lack_of_nir_reason == LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
-            )
-
-        employee_records_list = False
-    else:
-        data = (
-            EmployeeRecord.objects.full_fetch()
-            .for_company(siae)
-            .filter(status=status)
-            .order_by(*employee_record_order_by)
-        )
-        if job_seeker_id := filters_form.cleaned_data.get("job_seeker"):
-            data = data.filter(job_application__job_seeker=job_seeker_id)
+    employee_record_order_by = {
+        EmployeeRecordOrder.NAME_ASC: (
+            "job_application__job_seeker__last_name",
+            "job_application__job_seeker__first_name",
+        ),
+        EmployeeRecordOrder.NAME_DESC: (
+            "-job_application__job_seeker__last_name",
+            "-job_application__job_seeker__first_name",
+        ),
+        EmployeeRecordOrder.HIRING_START_AT_ASC: ("job_application__hiring_start_at",),
+        EmployeeRecordOrder.HIRING_START_AT_DESC: ("-job_application__hiring_start_at",),
+    }[order_by]
+    data = (
+        EmployeeRecord.objects.full_fetch().for_company(siae).filter(status=status).order_by(*employee_record_order_by)
+    )
+    if job_seeker_id := filters_form.cleaned_data.get("job_seeker"):
+        data = data.filter(job_application__job_seeker=job_seeker_id)
 
     context = {
         "form": form,
         "filters_form": filters_form,
-        "employee_records_list": employee_records_list,
         "badges": status_badges,
         "navigation_pages": pager(data, request.GET.get("page"), items_per_page=10),
         "feature_availability_date": get_availability_date_for_kind(siae.kind),
-        "need_manual_regularization": need_manual_regularization,
         "ordered_by_label": order_by.label,
         "matomo_custom_title": "Fiches salarié ASP",
         "back_url": reverse("dashboard:index"),
-        "num_rejected_employee_records": EmployeeRecord.objects.for_company(siae)
-        .filter(status=Status.REJECTED)
-        .count(),
+        "num_rejected_employee_records": employee_record_badges.get(Status.REJECTED, 0),
     }
 
     return render(request, "employee_record/includes/list_results.html" if request.htmx else template_name, context)

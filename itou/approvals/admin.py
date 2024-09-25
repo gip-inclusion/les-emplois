@@ -90,9 +90,6 @@ class JobApplicationInline(ItouStackedInline):
                 .exists()
             )
 
-        if JobApplication.objects.eligible_as_employee_record(siae=obj.to_company).filter(pk=obj.pk).exists():
-            return "En attente de création" + (" (doublon)" if already_exists else "")
-
         if already_exists:  # Put this check after the eligibility to show that one is proposed but is also a duplicate
             return "Une fiche salarié existe déjà pour ce candidat"
 
