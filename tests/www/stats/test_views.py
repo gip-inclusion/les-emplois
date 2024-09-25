@@ -18,6 +18,7 @@ from itou.www.stats.views import get_params_aci_asp_ids_for_department
 from tests.companies.factories import CompanyFactory
 from tests.institutions.factories import InstitutionWithMembershipFactory
 from tests.prescribers.factories import PrescriberOrganizationWithMembershipFactory
+from tests.users.factories import PrescriberFactory
 
 
 class TestStatsView:
@@ -418,3 +419,10 @@ def test_stats_redirect_for_institution(client, institution_kind, dashboard_name
 
     response = client.get(reverse("stats:redirect", kwargs={"dashboard_name": dashboard_name}), follow=True)
     assert response.status_code == 200
+
+
+def test_stats_ph_state_main_for_prescriber_without_organization(client):
+    client.force_login(PrescriberFactory())
+
+    response = client.get(reverse("stats:stats_ph_state_main"))
+    assert response.status_code == 403
