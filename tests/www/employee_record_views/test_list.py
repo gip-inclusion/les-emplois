@@ -95,12 +95,12 @@ class TestListEmployeeRecords:
         assertContains(response, approval_number_formatted)
 
         # Or NEW
-        response = client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL, data={"status": Status.NEW})
         assertContains(response, approval_number_formatted)
 
         # More complete tests to come with fixtures files
         for status in [Status.SENT, Status.REJECTED, Status.PROCESSED]:
-            response = client.get(self.URL + f"?status={status.value}")
+            response = client.get(self.URL, data={"status": status.value})
             assertNotContains(response, approval_number_formatted)
 
     def test_job_seeker_filter(self, client):
@@ -113,11 +113,11 @@ class TestListEmployeeRecords:
         assertContains(response, approval_number_formatted)
         assertContains(response, other_approval_number_formatted)
 
-        response = client.get(self.URL + f"?job_seeker={self.job_seeker.pk}")
+        response = client.get(self.URL, data={"job_seeker": self.job_seeker.pk})
         assertContains(response, approval_number_formatted)
         assertNotContains(response, other_approval_number_formatted)
 
-        response = client.get(self.URL + "?job_seeker=0")
+        response = client.get(self.URL, data={"job_seeker": 0})
         assertContains(response, "Sélectionnez un choix valide. 0 n’en fait pas partie.")
         assertContains(response, approval_number_formatted)
         assertContains(response, other_approval_number_formatted)
@@ -140,7 +140,7 @@ class TestListEmployeeRecords:
             approval=self.job_application.approval, siae=self.job_application.to_company
         )
 
-        response = client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL, data={"status": Status.NEW})
 
         # Global message alert
         assert str(parse_response_to_soup(response, selector=".s-title-02 .alert")) == snapshot(name="alert")
@@ -163,7 +163,7 @@ class TestListEmployeeRecords:
             approval=self.job_application.approval, siae=self.job_application.to_company
         )
 
-        response = client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL, data={"status": Status.NEW})
 
         # Global message alert
         assertMessages(response, [])
@@ -187,7 +187,7 @@ class TestListEmployeeRecords:
             declared_by_siae=self.job_application.to_company,
         )
 
-        response = client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL, data={"status": Status.NEW})
 
         # Global message alert
         assert str(parse_response_to_soup(response, selector=".s-title-02 .alert")) == snapshot(name="alert")
@@ -210,7 +210,7 @@ class TestListEmployeeRecords:
             declared_by_siae=self.job_application.to_company,
         )
 
-        response = client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL, data={"status": Status.NEW})
 
         # Global message alert
         assertMessages(response, [])
@@ -230,7 +230,7 @@ class TestListEmployeeRecords:
         client.force_login(self.user)
         employee_record = employee_record_factories.EmployeeRecordFactory(job_application=self.job_application)
 
-        response = client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL, data={"status": Status.NEW})
 
         assert (
             str(
@@ -250,7 +250,7 @@ class TestListEmployeeRecords:
         self.job_seeker.jobseeker_profile.lack_of_nir_reason = LackOfNIRReason.NIR_ASSOCIATED_TO_OTHER
         self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
 
-        response = client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL, data={"status": Status.NEW})
 
         assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
         # Global message alert
@@ -272,7 +272,7 @@ class TestListEmployeeRecords:
         self.job_seeker.jobseeker_profile.save(update_fields=("nir", "lack_of_nir_reason"))
         new_er = employee_record_factories.EmployeeRecordFactory(job_application=self.job_application)
 
-        response = client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL, data={"status": Status.NEW})
 
         assertContains(response, format_filters.format_approval_number(self.job_application.approval.number))
         # Global message alert
@@ -294,7 +294,7 @@ class TestListEmployeeRecords:
         record.update_as_sent(faker.asp_batch_filename(), 1, None)
         record.update_as_rejected("0012", "JSON Invalide", None)
 
-        response = client.get(self.URL + "?status=REJECTED")
+        response = client.get(self.URL, data={"status": Status.REJECTED})
         assertContains(response, "Erreur 0012")
         assertContains(response, "JSON Invalide")
 
@@ -333,7 +333,7 @@ class TestListEmployeeRecords:
                 record.status = Status.SENT
                 record.update_as_rejected(err_code, err_message, "{}")
 
-                response = client.get(self.URL + "?status=REJECTED")
+                response = client.get(self.URL, data={"status": Status.REJECTED})
                 assertContains(response, f"Erreur {err_code}")
                 assertNotContains(response, err_message)
                 assertContains(response, custom_err_message)
@@ -487,14 +487,14 @@ class TestListEmployeeRecords:
 
     def test_display_result_count(self, client):
         client.force_login(self.user)
-        response = client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL, data={"status": Status.NEW})
         assertContains(response, "1 résultat")
 
         JobApplicationWithApprovalNotCancellableFactory(to_company=self.company)
-        response = client.get(self.URL + "?status=NEW")
+        response = client.get(self.URL, data={"status": Status.NEW})
         assertContains(response, "2 résultats")
 
-        response = client.get(self.URL + "?status=READY")
+        response = client.get(self.URL, data={"status": Status.READY})
         assertContains(response, "0 résultat")
 
     def test_htmx(self, client):
@@ -510,7 +510,7 @@ class TestListEmployeeRecords:
         response = client.get(self.URL, {"status": "READY"}, headers={"HX-Request": "true"})
         update_page_with_htmx(simulated_page, f"form[hx-get='{self.URL}']", response)
 
-        response = client.get(self.URL + "?status=READY")
+        response = client.get(self.URL, data={"status": Status.READY})
         fresh_page = parse_response_to_soup(response)
         assertSoupEqual(simulated_page, fresh_page)
 
@@ -544,7 +544,7 @@ class TestListEmployeeRecords:
         response = client.get(self.URL, {"status": "READY"}, headers={"HX-Request": "true"})
         update_page_with_htmx(simulated_page, f"form[hx-get='{self.URL}']", response)
 
-        response = client.get(self.URL + "?status=READY")
+        response = client.get(self.URL, data={"status": Status.READY})
         fresh_page = parse_response_to_soup(response)
         # Reloading the job seekers select2 with HTMX would change the
         # select input the form listens to via hx-trigger, causing the
