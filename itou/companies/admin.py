@@ -200,6 +200,8 @@ class CompanyAdmin(ItouGISMixin, OrganizationAdmin):
         ]
         if obj:
             readonly_fields.append("kind")
+            if obj.source == models.Company.SOURCE_ASP:
+                readonly_fields.extend(["siret", "convention", "auth_email"])
         return readonly_fields
 
     def save_model(self, request, obj, form, change):
