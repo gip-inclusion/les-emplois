@@ -1109,15 +1109,6 @@ class TestCustomApprovalAdminViews:
         msg = inline.employee_record_status(employee_record.job_application)
         assert msg == f'<a href="{url}"><b>Nouvelle (ID: {employee_record.pk})</b></a>'
 
-        # When the job application will lead to a duplicate employee record but is still proposed
-        job_application = JobApplicationFactory(
-            state=JobApplicationState.ACCEPTED,
-            to_company=employee_record.job_application.to_company,
-            approval=employee_record.job_application.approval,
-        )
-        msg = inline.employee_record_status(job_application)
-        assert msg == "En attente de création (doublon)"
-
         # When employee record creation is disabled for that job application
         job_application = JobApplicationFactory(create_employee_record=False)
         msg = inline.employee_record_status(job_application)
@@ -1136,7 +1127,7 @@ class TestCustomApprovalAdminViews:
                 if not job_application.to_company.can_use_employee_record:
                     assert msg == "La SIAE ne peut pas utiliser la gestion des fiches salarié"
                 else:
-                    assert msg == "En attente de création"
+                    assert msg == "-"
 
         # When an employee record already exists for the candidate
         employee_record = EmployeeRecordFactory(status=Status.READY)

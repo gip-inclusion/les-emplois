@@ -17,7 +17,7 @@ from itou.employee_record.enums import Status
 from itou.employee_record.exceptions import InvalidStatusError
 from itou.employee_record.models import EmployeeRecord, EmployeeRecordBatch, validate_asp_batch_filename
 from itou.job_applications.enums import JobApplicationState
-from itou.job_applications.models import JobApplication, JobApplicationWorkflow
+from itou.job_applications.models import JobApplicationWorkflow
 from itou.utils.mocks.address_format import mock_get_geocoding_data
 from tests.approvals.factories import ApprovalFactory
 from tests.companies.factories import CompanyFactory
@@ -423,10 +423,6 @@ class TestEmployeeRecordLifeCycle:
         assert self.employee_record.archived_json == "whatever"
 
     def test_state_disabled(self, faker):
-        assert self.employee_record.job_application not in JobApplication.objects.eligible_as_employee_record(
-            self.employee_record.job_application.to_company
-        )
-
         # Employee record in READY state can't be disabled
         with assertRaisesMessage(InvalidStatusError, EmployeeRecord.ERROR_EMPLOYEE_RECORD_INVALID_STATE):
             self.employee_record.update_as_disabled()
@@ -459,10 +455,6 @@ class TestEmployeeRecordLifeCycle:
 
     def test_state_disabled_with_reject(self, faker):
         self.employee_record.update_as_sent(faker.asp_batch_filename(), 1, None)
-
-        assert self.employee_record.job_application not in JobApplication.objects.eligible_as_employee_record(
-            self.employee_record.job_application.to_company
-        )
 
         self.employee_record.update_as_rejected("12", "JSON Invalide", None)
         self.employee_record.update_as_disabled()
